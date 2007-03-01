@@ -14,65 +14,95 @@
 #-----------------------------------------
 
 use File::stat;
+use File::Find ();
 use Image::Magick;
+use Getopt::Long;
+
 use lib "../lib";
 use WebGUI::Utility;
 
+my $thumbnailSize;
+my $onlyMissingThumbnails;
 
-if ($ARGV[0] ne ""){
-  $results = recurseFileSystem($ARGV[0]);
-} else {
-  print "Usage: perl $0 <uploadsPath> [<thumbnailSize (50)>]\n";
+my $path = shift @ARGV;
+
+my $ok = GetOptions(
+        'size=i'=>\$thumbnailSize,
+        'missing'=>\$onlyMissingThumbnails,
+);
+
+unless ($path ne "" and $ok){
+  print <<USAGE;
+Usage: perl $0 <uploadsPath> [--size=thumbnailSize] [--missing]
+
+uploadsPath is the complete path to your uploads directory
+--size allows you to override the default thumbnail size of 50
+--missing says to only create thumbnails for images that are missing thumbnails.
+USAGE
+
+exit 0;
 }
 
+$thumbnailSize ||= 50; ##set default
+
+File::Find::find(\&findThumbs, $path);
+
 #-----------------------------------------
-# getType(filename)
-#-----------------------------------------
-sub getType {
-        my ($extension);
-        $extension = $_[0];
-        $extension =~ s/.*\.(.*?)$/$1/;
-        return lc($extension);
+sub findThumbs {
+    ##Remember, by default we are chdir'ed to the directory with the files in it.
+    ##Skip directories
+    return if -d $_;
+    
+    ##Only Thumbnail files that we should.
+    return unless shouldThumbnail($_);
+
+    createThumbnail($_, $File::Find::dir);
+
+    return 1;  ##Just for cleanliness
 }
+
 
 #-----------------------------------------
 # createThumbnail(filename,path)
 #-----------------------------------------
 sub createThumbnail {
         my ($image, $x, $y, $r, $n, $type);
-	$type = getType($_[0]);
-        if (isIn($type, qw(jpg jpeg gif png tif tiff bmp)) && !($_[0] =~ m/thumb-/)) {
-		print "Nailing: $_[1]/$_[0]\n";
-                $image = Image::Magick->new;
-                $image->Read($_[1].'/'.$_[0]);
-                ($x, $y) = $image->Get('width','height');
-                $n = $ARGV[1] || 50;
-                $r = $x>$y ? $x / $n : $y / $n;
-                $image->Scale(width=>($x/$r),height=>($y/$r)) if ($r > 0);
-                if (isIn($type, qw(tif tiff bmp))) {
-                        $image->Write($_[1].'/thumb-'.$_[0].'.png');
-                } else {
-                        $image->Write($_[1].'/thumb-'.$_[0]);
-                }
+        my ($fileName, $fileDir) = @_;
+        print "Nailing: $fileDir/$fileName\n";
+        $image = Image::Magick->new;
+        $image->Read($fileName);
+        ($x, $y) = $image->Get('width','height');
+        $r = $x>$y ? $x / $thumbnailSize : $y / $thumbnailSize;
+        $image->Scale(width=>($x/$r),height=>($y/$r)) if ($r > 0);
+        if (isIn($type, qw(tif tiff bmp))) {
+                $image->Write('thumb-'.$fileName.'.png');
+        } else {
+                $image->Write($_[1].'/thumb-'.$fileName);
         }
 }
 
-#-----------------------------------------
-# recurseFileSystem(path)
-#-----------------------------------------
-sub recurseFileSystem {
-	my (@filelist, $file);
-  	if (opendir(DIR,$_[0])) {
-    		@filelist = readdir(DIR);
-    		foreach $file (@filelist) {
-      			unless ($file eq "." || $file eq "..") {
-        			recurseFileSystem($_[0]."/".$file);
-        			createThumbnail($file,$_[0]);
-      			}
-    		}
-    		closedir(DIR);
-  	}
+sub shouldThumbnail {
+    my ($fileName) = @_;
+    
+    my $fileType = getType($fileName);
+
+    ##I am a thumbnail, skip me
+    return 0 if $fileName =~ m/thumb-/;
+
+    ##I am not a graphics file, skip me
+    return 0 if !isIn($fileType, qw(jpg jpeg gif png tif tiff bmp));
+
+    ##My thumbnail already exists and I was told not to do it again
+    return 0 if ($onlyMissingThumbnails && -e 'thumb-'.$fileName);
+
+    return 1;
 }
 
-
-
+#-----------------------------------------
+# getType(filename)
+#-----------------------------------------
+sub getType {
+        my ($fileName) = @_;
+        my ($extension) = $fileName =~ m/(\w+)$/;
+        return lc($extension);
+}
