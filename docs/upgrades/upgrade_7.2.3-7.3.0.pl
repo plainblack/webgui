@@ -219,7 +219,7 @@ sub migrateCalendars {
 			includeOnlyClasses	=> ['WebGUI::Asset::Wobject::EventsCalendar'],
 			returnObjects		=> 1,
 		});
-	
+
 	for my $asset (@{$calendars})
 	{
 		next unless defined $asset;
@@ -232,9 +232,10 @@ sub migrateCalendars {
 
 
 		my $properties	= {%{$asset->get}};
-		$properties->{defaultDate}	= delete $properties->{defaultMonth};
 		#warn "Found calendar ".$properties->{title};
-		$properties->{className}	= "WebGUI::Asset::Wobject::Calendar";
+		$properties->{defaultDate}	    = delete $properties->{defaultMonth};
+		$properties->{className}	    = "WebGUI::Asset::Wobject::Calendar";
+        $properties->{groupIdEventEdit} = $properties->{groupIdEdit};
 
 		# Add the new asset
 		my $newAsset = $asset->getParent->addChild($properties);
