@@ -281,7 +281,7 @@ sub addFiles {
 				$newAsset->getStorageLocation->resize($filename, $maxImageSize);
 			}
 			elsif ($imgHeight > $maxImageSize) {
-				$newAsset->getStorageLocation->resize($filename, , $maxImageSize);
+				$newAsset->getStorageLocation->resize($filename, undef, $maxImageSize);
 			}
 		}
 		$newAsset->setSize($storage->getFileSize($filename));
