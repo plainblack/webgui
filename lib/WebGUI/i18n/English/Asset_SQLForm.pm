@@ -914,7 +914,7 @@ search results.</p>|,
 	},
 
 	'gef default view description' => {
-		message => q|<p>This property switches the default view between normal and advanced search.</p>|,
+		message => q|<p>This property switches the default view between normal and advanced search.  The two views have different templates.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -930,12 +930,12 @@ delete and restore but not purge records.</p>|,
 	},
 
 	'assetName' => {
-		message => q|SQL Form|,
+		message => q|SQLForm|,
 		lastUpdated => 0,
 	},
 
 	'edit sqlform' => {
-		message => q|SQL Form, Add/Edit|,
+		message => q|SQLForm, Add/Edit|,
 		lastUpdated => 0,
 	},
 
@@ -1180,7 +1180,7 @@ variables:</p>
 	},
 
 	'search template help title' => {
-		message => q|SQLForm, Search Record Template|,
+		message => q|SQLForm, Normal Search Record Template|,
 		lastUpdated => 0,
 	},
 
@@ -1599,6 +1599,16 @@ be useful, others may not.|,
 		lastUpdated => 1169508478
 	},
 
+
+	'advanced search template help title' => {
+		message => q|SQLForm, Advanced Search Record Template|,
+		lastUpdated => 0,
+	},
+
+	'advanced search template help body' => {
+		message => q|These template variables are available in the Advanced Search Record Template.|,
+		lastUpdated => 1172816905,
+	},
 
 };
 

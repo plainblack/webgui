@@ -540,6 +540,212 @@ our $HELP = {
 		],
 	},
 
+	'advanced search record template' => {
+		title => 'advanced search template help title',
+		body => 'advanced search template help body',
+		isa => [
+			{
+				namespace => "Asset_SQLForm",
+				tag => "sql form asset template variables"
+			},
+			{
+				namespace => "Asset_Template",
+				tag => "template variables"
+			},
+			{
+				namespace => "Asset",
+				tag => "asset template"
+			},
+		],
+		variables => [
+		          {
+		            'name' => 'headerLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'header.title'
+		                             },
+		                             {
+		                               'name' => 'header.sort.url'
+		                             },
+		                             {
+		                               'name' => 'header.sort.onThis'
+		                             },
+		                             {
+		                               'name' => 'header.sort.ascending'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'superSearch.url'
+		          },
+		          {
+		            'name' => 'superSearch.label'
+		          },
+		          {
+		            'name' => 'normalSearch.url'
+		          },
+		          {
+		            'name' => 'normalSearch.label'
+		          },
+		          {
+		            'name' => 'showFieldsDefined'
+		          },
+		          {
+		            'name' => 'searchResults.header'
+		          },
+		          {
+		            'name' => 'searchResults.footer'
+		          },
+		          {
+		            'name' => 'searchResults.actionButtons'
+		          },
+		          {
+		            'name' => 'searchForm'
+		          },
+		          {
+		            'name' => 'searchFormHeader'
+		          },
+		          {
+		            'name' => 'searchFormTrash.label'
+		          },
+		          {
+		            'name' => 'searchFormMode.label'
+		          },
+		          {
+		            'name' => 'searchFormMode.form'
+		          },
+		          {
+		            'name' => 'searchFormQuery.label'
+		          },
+		          {
+		            'name' => 'searchFormSearchIn.label'
+		          },
+		          {
+		            'name' => 'searchFormSearchIn.form'
+		          },
+		          {
+		            'name' => 'searchFormType.label'
+		          },
+		          {
+		            'name' => 'searchFormType.form'
+		          },
+		          {
+		            'name' => 'searchFormFooter'
+		          },
+		          {
+		            'name' => 'searchFormSubmit'
+		          },
+		          {
+		            'name' => 'searchFormJavascript'
+		          },
+		          {
+		            'name' => 'searchForm.field_loop',
+		            'variables' => [
+		                             {
+		                               'name' => 'field.label',
+		                             },
+		                             {
+		                               'name' => 'field.conditionalForm'
+		                             },
+		                             {
+		                               'name' => 'field.conditional'
+		                             },
+		                             {
+		                               'name' => 'field.searchForm1'
+		                             },
+		                             {
+		                               'name' => 'field.searchForm2'
+		                             },
+		                             {
+		                               'name' => 'field.formValue1'
+		                             },
+		                             {
+		                               'name' => 'field.formValue2'
+		                             },
+		                             {
+		                               'name' => 'field.__FIELDNAME__.id'
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'searchResults.header'
+		          },
+		          {
+		            'name' => 'searchResults.footer'
+		          },
+		          {
+		            'name' => 'searchResults.actionButtons'
+		          },
+		          {
+		            'name' => 'searchResults.recordLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'record.id',
+		                             },
+		                             {
+		                               'name' => 'record.controls',
+		                             },
+		                             {
+		                               'name' => 'record.deletionDate'
+		                             },
+		                             {
+		                               'name' => 'record.deletedBy'
+		                             },
+		                             {
+		                               'name' => 'record.updateDate'
+		                             },
+		                             {
+		                               'name' => 'record.updatedBy'
+		                             },
+		                             {
+		                               'name' => 'record.valueLoop',
+		                               'variables' => [
+		                                                {
+		                                                  'name' => 'record.value'
+		                                                },
+		                                                {
+		                                                  'name' => 'record.value.isFile'
+		                                                },
+		                                                {
+		                                                  'name' => 'record.value.isImage'
+		                                                },
+		                                                {
+		                                                  'name' => 'record.value.downloadUrl'
+		                                                }
+		                                              ]
+		                             }
+		                           ]
+		          },
+		          {
+		            'name' => 'showMetaData'
+		          },
+		          {
+		            'name' => 'managementLinks',
+		          },
+		          {
+		            'name' => 'errorOccurred',
+		          },
+		          {
+		            'name' => 'errorLoop',
+		            'variables' => [
+		                             {
+		                               'name' => 'error.message',
+		                             }
+		                           ],
+		          }
+		],
+		related => [
+			{
+				tag => 'sql form add/edit',
+				namespace => 'Asset_SQLForm',
+			},
+			{
+				tag => 'template language',
+				namespace => 'Asset_Template',
+			},
+		],
+	},
+
 	'edit record template' => {
 		title => 'edit template help title',
 		body => 'edit template help',
