@@ -19,7 +19,7 @@ use WebGUI::User;
 
 use Test::More;
 
-plan tests => 1; # increment this value for each test you create
+plan tests => 2; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -31,8 +31,38 @@ my ($userId) = $session->db->quickArray("select userId from userSession where se
 
 is($userId, $user->userId, 'changing session user changes sessionId inside userSession table');
 
+################################################################
+#
+# dbSlave
+#
+################################################################
+
+##Manually build one dbSlave in the config file to use
+
+my $slaveHash2 = {
+    dsn  => $session->config->get('dsn'),
+    user => $session->config->get('dbuser'),
+    pass => $session->config->get('dbpass'),
+};
+
+my $slaveHash1 = {
+    dsn  => $session->config->get('dsn').';host=192.168.104.202',
+    user => $session->config->get('dbuser'),
+    pass => $session->config->get('dbpass'),
+};
+
+diag $slaveHash1->{dsn};
+
+$session->config->set('dbslave2', $slaveHash2);
+$session->config->set('dbslave1', $slaveHash1);
+
+my $slave2 = $session->dbSlave;
+isa_ok($slave2, 'WebGUI::SQL');
+
 END {
 	foreach my $dude ($user) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
+    $session->config->delete('dbslave2');
+    $session->config->delete('dbslave1');
 }

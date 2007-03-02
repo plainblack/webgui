@@ -75,10 +75,10 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-        my $expireDate = (time()-(86400*$self->get("trashAfter")));
+        my $expireDate = (time()-$self->get("trashAfter"));
         my $sth = $self->session->db->read("select assetId,className from asset where state='clipboard' and stateChanged < ?", [$expireDate]);
         while (my ($id, $class) = $sth->array) {
-        	my $asset = WebGUI::Asset->new($id,$class);
+        	my $asset = WebGUI::Asset->new($self->session,$id,$class);
         	$asset->trash;
        	}
 	return $self->COMPLETE;
