@@ -374,6 +374,9 @@ our $HELP = {
 		            'name' => 'searchFormTrash.label'
 		          },
 		          {
+		            'name' => 'searchFormTrash.form'
+		          },
+		          {
 		            'name' => 'searchFormMode.label'
 		          },
 		          {
@@ -576,107 +579,6 @@ our $HELP = {
 		                           ]
 		          },
 		          {
-		            'name' => 'superSearch.url'
-		          },
-		          {
-		            'name' => 'superSearch.label'
-		          },
-		          {
-		            'name' => 'normalSearch.url'
-		          },
-		          {
-		            'name' => 'normalSearch.label'
-		          },
-		          {
-		            'name' => 'showFieldsDefined'
-		          },
-		          {
-		            'name' => 'searchResults.header'
-		          },
-		          {
-		            'name' => 'searchResults.footer'
-		          },
-		          {
-		            'name' => 'searchResults.actionButtons'
-		          },
-		          {
-		            'name' => 'searchForm'
-		          },
-		          {
-		            'name' => 'searchFormHeader'
-		          },
-		          {
-		            'name' => 'searchFormTrash.label'
-		          },
-		          {
-		            'name' => 'searchFormMode.label'
-		          },
-		          {
-		            'name' => 'searchFormMode.form'
-		          },
-		          {
-		            'name' => 'searchFormQuery.label'
-		          },
-		          {
-		            'name' => 'searchFormSearchIn.label'
-		          },
-		          {
-		            'name' => 'searchFormSearchIn.form'
-		          },
-		          {
-		            'name' => 'searchFormType.label'
-		          },
-		          {
-		            'name' => 'searchFormType.form'
-		          },
-		          {
-		            'name' => 'searchFormFooter'
-		          },
-		          {
-		            'name' => 'searchFormSubmit'
-		          },
-		          {
-		            'name' => 'searchFormJavascript'
-		          },
-		          {
-		            'name' => 'searchForm.field_loop',
-		            'variables' => [
-		                             {
-		                               'name' => 'field.label',
-		                             },
-		                             {
-		                               'name' => 'field.conditionalForm'
-		                             },
-		                             {
-		                               'name' => 'field.conditional'
-		                             },
-		                             {
-		                               'name' => 'field.searchForm1'
-		                             },
-		                             {
-		                               'name' => 'field.searchForm2'
-		                             },
-		                             {
-		                               'name' => 'field.formValue1'
-		                             },
-		                             {
-		                               'name' => 'field.formValue2'
-		                             },
-		                             {
-		                               'name' => 'field.__FIELDNAME__.id'
-		                             }
-		                           ]
-		          },
-		          {
-		            'name' => 'searchResults.header'
-		          },
-		          {
-		            'name' => 'searchResults.footer'
-		          },
-		          {
-		            'name' => 'searchResults.actionButtons'
-		          },
-		          {
 		            'name' => 'searchResults.recordLoop',
 		            'variables' => [
 		                             {
@@ -717,22 +619,91 @@ our $HELP = {
 		                           ]
 		          },
 		          {
+		            'name' => 'superSearch.url'
+		          },
+		          {
+		            'name' => 'superSearch.label'
+		          },
+		          {
+		            'name' => 'normalSearch.url'
+		          },
+		          {
+		            'name' => 'normalSearch.label'
+		          },
+		          {
+		            'name' => 'showFieldsDefined'
+		          },
+		          {
+		            'name' => 'searchResults.header'
+		          },
+		          {
+		            'name' => 'searchResults.footer'
+		          },
+		          {
+		            'name' => 'searchResults.actionButtons'
+		          },
+		          {
 		            'name' => 'showMetaData'
 		          },
 		          {
 		            'name' => 'managementLinks',
 		          },
 		          {
-		            'name' => 'errorOccurred',
+		            'name' => 'searchFormTrash.label'
 		          },
 		          {
-		            'name' => 'errorLoop',
+		            'name' => 'searchFormTrash.form'
+		          },
+		          {
+		            'name' => 'searchFormType.label'
+		          },
+		          {
+		            'name' => 'searchFormType.form'
+		          },
+		          {
+		            'name' => 'searchFormHeader'
+		          },
+		          {
+		            'name' => 'searchFormFooter'
+		          },
+		          {
+		            'name' => 'searchFormSubmit'
+		          },
+		          {
+		            'name' => 'searchFormJavascript'
+		          },
+		          {
+		            'name' => 'searchForm.field_loop',
 		            'variables' => [
 		                             {
-		                               'name' => 'error.message',
+		                               'name' => 'field.label',
+		                             },
+		                             {
+		                               'name' => 'field.conditionalForm'
+		                             },
+		                             {
+		                               'name' => 'field.conditional'
+		                             },
+		                             {
+		                               'name' => 'field.searchForm1'
+		                             },
+		                             {
+		                               'name' => 'field.searchForm2'
+		                             },
+		                             {
+		                               'name' => 'field.formValue1'
+		                             },
+		                             {
+		                               'name' => 'field.formValue2'
+		                             },
+		                             {
+		                               'name' => 'field.__FIELDNAME__.id'
 		                             }
-		                           ],
-		          }
+		                           ]
+		          },
+		          {
+		            'name' => 'searchForm'
+		          },
 		],
 		related => [
 			{
