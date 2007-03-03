@@ -468,7 +468,7 @@ sub www_manageProjects {
 	$errorMessage = qq|<span style="color:red;font-weight:bold">$_[0]</span>| if($_[0]);
 	
 	 my $output .= qq|
-       $errorMessage;
+       $errorMessage
 	   <div id="wrapper">
 	      <table id="mainDash">
 	         <tbody>
@@ -526,7 +526,7 @@ sub www_manageProjects {
 	   $output .= qq|<tr><td class="tableData" colspan="4">$noProjects</td></tr>|
 	}
 	
-	$output .= "</tbody></table>";
+	$output .= "</tbody></table></div>";
 	
 	my $css = q|
 	   <style type="text/css">
