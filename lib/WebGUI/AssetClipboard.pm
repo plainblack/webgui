@@ -105,12 +105,13 @@ If not specified, uses current user.
 
 sub getAssetsInClipboard {
 	my $self = shift;
+    my $session = $self->session;
 	my $limitToUser = shift;
-	my $userId = shift || $self->session->user->userId;
+	my $userId = shift || $session->user->userId;
 	my @assets;
 	my $limit;
 	if ($limitToUser) {
-		$limit = "and asset.stateChangedBy=".$self->session->db->quote($userId);
+		$limit = "and asset.stateChangedBy=".$session->db->quote($userId);
 	}
         my $sth = $self->session->db->read("
                 select 
@@ -123,15 +124,15 @@ sub getAssetsInClipboard {
                         assetData on asset.assetId=assetData.assetId 
                 where 
 			asset.state='clipboard'
-			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
+			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?))
 			$limit
 		group by
 			assetData.assetId
                 order by 
                         assetData.title desc
-                        ");
+                        ", [$session->scratch->get("versionTag")]);
         while (my ($id, $date, $class) = $sth->array) {
-                push(@assets, WebGUI::Asset->new($self->session,$id,$class,$date));
+                push(@assets, WebGUI::Asset->new($session,$id,$class,$date));
         }
         $sth->finish;
         return \@assets;

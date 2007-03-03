@@ -9,6 +9,7 @@
  - fix: the fileImport script did not resize vertical images. (Martin Kamerbeek / Oqapi)
  - fix: TrashClipboard.pm (thanks to Erik Svanberg for the patch)
  - fix: Manage events in time tracker goofed up (perlDreamer Consulting, LLC)
+ - fix: Clipboard to trash (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
