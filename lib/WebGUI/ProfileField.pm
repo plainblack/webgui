@@ -99,8 +99,8 @@ sub create {
 	my $fieldName = shift;
         my $properties = shift;
 	my $categoryId = shift || "1";
-	my ($fieldNameExists) = $session->db->quickArray("select count(*) from userProfileField where fieldName=".$session->db->quote($fieldName));
-	return undef if ($fieldNameExists);
+	my $fieldNameExists = $session->db->quickScalar("select count(*) from userProfileField where fieldName=?", [$fieldName]);
+	return undef if $fieldNameExists;
 	return undef if $class->isReservedFieldName($fieldName);
 
         my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
@@ -120,7 +120,7 @@ Deletes this field and all user data attached to it.
 
 sub delete {
 	my $self = shift;
-	$self->session->db->write("delete from userProfileData where fieldName=".$self->session->db->quote($self->getId));
+	$self->session->db->write("delete from userProfileData where fieldName=?", [$self->getId]);
 	$self->session->db->deleteRow("userProfileField","fieldName",$self->getId);
 }
 
