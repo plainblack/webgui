@@ -596,7 +596,7 @@ sub set {
 	$properties->{fieldName} = $self->getId;
 	$self->session->db->setRow("userProfileField","fieldName",$properties);
 	foreach my $key (keys %{$properties}) {
-		$self->{_property}{$key} = $properties->{$key};
+		$self->{_properties}{$key} = $properties->{$key};
 	}
 }
 
