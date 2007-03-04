@@ -18,7 +18,9 @@ use WebGUI::Utility;
 use WebGUI::Cache;
 
 use WebGUI::User;
-use Test::More tests => 100; # increment this value for each test you create
+use WebGUI::ProfileField;
+
+use Test::More tests => 102; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -254,8 +256,6 @@ $cm->ipFilter('192.168.0.0/24');
 
 is( $cm->ipFilter, "192.168.0.0/24", "ipFilter assignment to local net, 192.168.0.0/24");
 
-$session->errorHandler->warn("Begin IP lookup");
-
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['193.168.0.101', $session->getId]);
@@ -274,7 +274,6 @@ ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
 
 $user->addToGroups([3]);
 
-$session->errorHandler->warn('userId: '. $user->userId);
 ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
 ok($user->isInGroup(11), "New user is in group 11(Secondary Admins)");
 ok($user->isInGroup(12), "New user is in group 12(Turn On Admin)");
@@ -383,11 +382,22 @@ is($clone->username, 'dude', 'newByEmail returns valid user object');
 ################################################################
 
 my $buster = WebGUI::User->new($session, "new");
+is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received original user profile on user creation');
 
-TODO: {
-	local $TODO = "Tests to make later";
-	ok(0, 'Write a test to cover the conditional in sub new where the cache has a userId but no username');
-}
+my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
+my %originalFieldData = %{ $profileField->get() };
+my %copiedFieldData = %originalFieldData;
+$copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
+$profileField->set(\%copiedFieldData);
+
+is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
+
+$session->errorHandler->warn('Making buster copy');
+
+my $busterCopy = WebGUI::User->new($session, $buster->userId);
+is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy received updated user profile because there is no username set in his cached user object');
+
+$profileField->set(\%originalFieldData);
 
 ################################################################
 #
@@ -420,6 +430,9 @@ END {
 
     ##Note, do not delete the visitor account.  That would be really bad
     $session->config->delete('adminModeSubnets');
+
+    $profileField->set(\%originalFieldData);
+
 	$testCache->flush;
     $session->db->write(q!delete from userProfileData where userId='1' and fieldName='email'!);
 }
