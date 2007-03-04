@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 90; # increment this value for each test you create
+use Test::More tests => 93; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -78,6 +78,12 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- profileFi
 
 #Fetching a non-existant profile field returns undef
 is($user->profileField('notAProfileField'), undef, 'getting non-existant profile fields returns undef');
+
+################################################################
+#
+# authMethods
+#
+################################################################
 
 #Let's check the auth methods
 
@@ -336,7 +342,7 @@ is($clone->username, 'dude', 'newByEmail returns valid user object');
 
 ################################################################
 #
-# new, cached user profile data
+# new, cached user profile data and overrides
 #
 ################################################################
 
@@ -357,6 +363,37 @@ my $busterCopy = WebGUI::User->new($session, $buster->userId);
 is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy received updated user profile because there is no username set in his cached user object');
 
 $profileField->set(\%originalFieldData);
+
+$buster->username('mythBuster');
+
+my $aliasProfile = WebGUI::ProfileField->new($session, 'alias');
+my %originalAliasProfile = %{ $aliasProfile->get() };
+my %copiedAliasProfile = %originalAliasProfile;
+$copiedAliasProfile{'dataDefault'} = "'aliasAlias'"; ##Non word characters;
+$aliasProfile->set(\%copiedAliasProfile);
+
+my $buster3 = WebGUI::User->new($session, $buster->userId);
+is($buster3->profileField('alias'), 'aliasAlias', 'default alias set');
+
+$copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
+$aliasProfile->set(\%copiedAliasProfile);
+$buster->uncache();
+
+$buster3 = WebGUI::User->new($session, $buster->userId);
+is($buster3->profileField('alias'), 'mythBuster', 'alias set to username since the default alias has only non-word characters');
+
+$aliasProfile->set(\%originalAliasProfile);
+
+my %listProfile = %copiedAliasProfile;
+$listProfile{'fieldName'} = 'listProfile';
+$listProfile{'dataDefault'} = "['alpha', 'delta', 'tango']";
+my $listProfileField = WebGUI::ProfileField->create($session, 'listProfile', \%listProfile);
+
+$buster->uncache;
+$buster3 = WebGUI::User->new($session, $buster->userId);
+is($buster3->profileField('listProfile'), 'alpha', 'profile field with default data value that is a list gives the user the first value');
+
+$listProfileField->delete;
 
 ################################################################
 #
@@ -391,6 +428,8 @@ END {
     $session->config->delete('adminModeSubnets');
 
     $profileField->set(\%originalFieldData);
+    $aliasProfile->set(\%originalAliasProfile);
+    $listProfileField->delete;
 
 	$testCache->flush;
     $session->db->write(q!delete from userProfileData where userId='1' and fieldName='email'!);
