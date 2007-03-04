@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (121 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (137 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -105,6 +105,66 @@ foreach my $gid ('new', '') {
 }
 
 my $g = WebGUI::Group->new($session, "new");
+
+$g->description('I am really a montage');
+is($g->description(), 'I am really a montage', 'description set and get correctly');
+
+$g->expireNotifyMessage('Outta the tub');
+is($g->expireNotifyMessage(), 'Outta the tub', 'expire notify message set and get correctly');
+
+$g->expireNotifyOffset(-7);
+is($g->expireNotifyOffset(), -7, 'expireNotifyOffset set and get correctly');
+
+$g->expireOffset(3600);
+is($g->expireOffset(), 3600, 'expireOffset set and get correctly');
+
+$g->autoAdd(2);
+is($g->autoAdd(), 2, 'autoAdd set and get correctly');
+
+$g->autoDelete(1);
+is($g->autoDelete(), 1, 'autoDelete set and get correctly');
+
+$g->deleteOffset(-28);
+is($g->deleteOffset(), -28, 'deleteOffset set and get correctly');
+
+$g->expireNotify(7);
+is($g->expireNotify(), 7, 'expireNotify set and get correctly');
+
+$g->isEditable(0);
+is($g->isEditable(), 0, 'isEditable set and get correctly');
+
+$g->showInForms(0);
+is($g->showInForms(), 0, 'showInForms set and get correctly');
+
+$g->dbQuery('select userId from someOtherDatabase');
+is($g->dbQuery(), 'select userId from someOtherDatabase', 'dbQuery set and get correctly');
+
+################################################################
+#
+# LDAP specific group properties
+# These tests have to be done on an isolated group that will NEVER
+# have getGroups called on it
+#
+################################################################
+
+my $lGroup = WebGUI::Group->new($session, 'new');
+
+$lGroup->ldapGroup('LDAP group');
+is($lGroup->ldapGroup(), 'LDAP group', 'ldapGroup set and fetched correctly');
+
+$lGroup->ldapGroupProperty('LDAP group property');
+is($lGroup->ldapGroupProperty(), 'LDAP group property', 'ldapGroup set and fetched correctly');
+
+$lGroup->ldapLinkId('LDAP link id');
+is($lGroup->ldapLinkId(), 'LDAP link id', 'ldapLinkId set and fetched correctly');
+
+$lGroup->ldapRecursiveProperty('LDAP recursive property');
+is($lGroup->ldapRecursiveProperty(), 'LDAP recursive property', 'ldapRecursiveProperty set and fetched correctly');
+
+$lGroup->ldapRecursiveFilter('LDAP recursive filter');
+is($lGroup->ldapRecursiveFilter(), 'LDAP recursive filter', 'ldapRecursiveFilter set and fetched correctly');
+
+$lGroup->delete;
 
 my $gid = $g->getId;
 is (length($gid), 22, "GroupId is proper length");
