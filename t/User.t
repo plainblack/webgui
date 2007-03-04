@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 102; # increment this value for each test you create
+use Test::More tests => 90; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -64,11 +64,20 @@ is($user->status, "Selfdestructed", 'status("Selfdestructed")');
 $user->status('Deactivated');
 is($user->status, "Deactivated", 'status("Deactivated")');
 
+################################################################
+#
+# profileField
+#
+################################################################
+
 #Let's get/set a profile field
 $user->profileField("firstName", "Bill");
 $lastUpdate = time();
 is($user->profileField("firstName"), "Bill", 'profileField() get/set');
 cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- profileField');
+
+#Fetching a non-existant profile field returns undef
+is($user->profileField('notAProfileField'), undef, 'getting non-existant profile fields returns undef');
 
 #Let's check the auth methods
 
@@ -118,7 +127,8 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- referring
 my @groups = qw|6 4|;
 $user->addToGroups(\@groups);
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
+my $result;
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
 ok($result, 'addToGroups() -- added to first test group');
 
 ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
@@ -127,10 +137,10 @@ ok($result, 'addToGroups() -- added to second test group');
 #Let's delete this user from our test groups
 $user->deleteFromGroups(\@groups);
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [6, $user->userId]);
 is($result, '0', 'deleteFromGroups() -- removed from first test group');
 
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
+($result) = $session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [4, $user->userId]);
 is($result, '0', 'deleteFromGroups() -- removed from second test group');
 
 #Let's delete this user
@@ -166,63 +176,12 @@ is($user->userId, "ROYSUNIQUEUSERID000002", 'new() -- override user id');
 $user->authMethod("LDAP");
 is($user->authMethod, "LDAP", 'authMethod() -- set to LDAP');
 
-#get/set karma
-my $oldKarma = $user->karma;
-$user->karma('69', 'peter gibbons', 'test karma');
-is($user->karma, $oldKarma+69, 'karma() -- get/set add amount');
-
-my ($source, $description) = $session->db->quickArray("select source, description from karmaLog where userId=?",[$user->userId]);
-
-is($source, 'peter gibbons', 'karma() -- get/set source');
-is($description, 'test karma', 'karma() -- get/set description');
-
-$oldKarma = $user->karma;
-$user->karma('-69', 'peter gibbons', 'lumberg took test karma away');
-is($user->karma, $oldKarma-69, 'karma() -- get/set subtract amount');
-
-#Let's test referringAffiliate
-$lastUpdate = time();
-$user->referringAffiliate(10);
-is($user->referringAffiliate, '10', 'referringAffiliate() -- get/set');
-cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- referringAffiliate');
-
-#Let's try adding this user to some groups
-my @groups = qw|2 4|;
-$user->addToGroups(\@groups);
-
-my ($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
-ok($result, 'addToGroups() -- added to first test group');
-
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
-ok($result, 'addToGroups() -- added to second test group');
-
-#Let's delete this user from our test groups
-$user->deleteFromGroups(\@groups);
-
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('2')." and userId=".$session->db->quote($user->userId));
-is($result, '0', 'deleteFromGroups() -- removed from first test group');
-
-($result) = $session->db->quickArray("select count(*) from groupings where groupId=".$session->db->quote('4')." and userId=".$session->db->quote($user->userId));
-is($result, '0', 'deleteFromGroups() -- removed from second test group');
-
-#Let's delete this user
-my $userId = $user->userId;
-$user->delete;
-
-my ($count) = $session->db->quickArray("select count(*) from users where userId=".$session->db->quote($userId));
-is($count, '0', 'delete() -- users table');
-
-($count) = $session->db->quickArray("select count(*) from userProfileData where userId=".$session->db->quote($userId));
-is($count, '0', 'delete() -- userProfileData table');
-
-($count) = $session->db->quickArray("select count(*) from inbox where userId=".$session->db->quote($userId));
-is($count, '0', 'delete() -- inbox table'); 
-
-
 ok(WebGUI::User->validUserId($session, 1), 'Visitor has a valid userId');
 ok(WebGUI::User->validUserId($session, 3), 'Admin has a valid userId');
 ok(!WebGUI::User->validUserId($session, 'eeee'), 'random illegal Id #1');
 ok(!WebGUI::User->validUserId($session, 37), 'random illegal Id #2');
+
+$user->delete;
 
 #identifier() and uncache()
 SKIP: {

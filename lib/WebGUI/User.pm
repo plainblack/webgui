@@ -383,6 +383,7 @@ sub new {
 	my $cache = WebGUI::Cache->new($session,["user",$userId]);
 	my $userData = $cache->get;
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
+        $session->errorHandler->warn('Cache invalid');
 		my %user;
 		tie %user, 'Tie::CPHash';
 		%user = $session->db->quickHash("select * from users where userId=?",[$userId]);
@@ -462,7 +463,7 @@ sub profileField {
 	$self = shift;
         $fieldName = shift;
         $value = shift;
-	if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickArray("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
+	if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
 		$self->session->errorHandler->warn("No such profile field: $fieldName");
 		return undef;
 	}

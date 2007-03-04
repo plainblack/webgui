@@ -45,17 +45,18 @@ Package for interfacing with SQL databases. This package implements Perl DBI fun
  $db->commit;
  $db->rollback;
 
- @arr = $db->buildArray($sql);
+ @arr      = $db->buildArray($sql);
  $arrayRef = $db->buildArrayRef($sql);
- %hash = $db->buildHash($sql);
- $hashRef = $db->buildHashRef($sql);
- @arr = $db->quickArray($sql);
- $text = $db->quickCSV($sql);
- %hash = $db->quickHash($sql);
- $hashRef = $db->quickHashRef($sql);
- $text = $db->quickTab($sql);
+ %hash     = $db->buildHash($sql);
+ $hashRef  = $db->buildHashRef($sql);
+ @arr      = $db->quickArray($sql);
+ $scalar   = $db->quickScalar($sql);
+ $text     = $db->quickCSV($sql);
+ %hash     = $db->quickHash($sql);
+ $hashRef  = $db->quickHashRef($sql);
+ $text     = $db->quickTab($sql);
 
- $id = $db->getNextId("someId");
+ $id     = $db->getNextId("someId");
  $string = $db->quote($string);
  $string = $db->quoteAndJoin(\@array);
 
@@ -619,6 +620,35 @@ sub quickHashRef {
 		return {};
 	}
 }
+
+#-------------------------------------------------------------------
+
+=head2 quickScalar ( sql, params )
+
+Executes a query and returns the first column from a single row of data as a scalar.
+
+=head3 sql
+
+An SQL query.
+
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
+=cut
+
+sub quickScalar {
+	my $self = shift;
+	my $sql = shift;
+	my $params = shift;
+	my ($sth, @data);
+	$sth = $self->prepare($sql);
+	$sth->execute($params);
+	@data = $sth->array;
+	$sth->finish;
+	return $data[0];
+}
+
 
 #-------------------------------------------------------------------
 

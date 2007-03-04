@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 50; # increment this value for each test you create
+use Test::More tests => 52; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -81,6 +81,11 @@ $sth->finish;
 # quickArray
 my ($value) = $session->db->quickArray("select value from settings where name='authMethod'");
 ok($value, "quickArray()");
+
+# quickScalar
+my $quickScalar = $session->db->quickScalar("SELECT COUNT(*) from userProfileField where fieldName='email'");
+is(ref $quickScalar, '', 'quickScalar returns a scalar');
+is($quickScalar, 1, 'quickScalar returns the correct scalar');
 
 # write
 $session->db->write("delete from incrementer where incrementerId='theBigTest'"); # clean up previous failures
