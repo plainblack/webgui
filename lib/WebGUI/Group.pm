@@ -42,7 +42,7 @@ This package provides an object-oriented way of managing WebGUI groups and group
  $integer =	$g->deleteOffset(14);
  $text =       	$g->description("Those really smart dudes.");
  $integer =	$g->expireNotify(1);
- $integer = 	$g->expireNotifyMessage("You're outta here!");
+ $text =        $g->expireNotifyMessage("You're outta here!");
  $integer =	$g->expireNotifyOffset(-14);
  $integer =    	$g->expireOffset(360000);
  $integer =    	$g->getId;
@@ -421,7 +421,7 @@ sub expireNotifyOffset {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->get("expireNotifyOffset",$value);
+		$self->set("expireNotifyOffset",$value);
         }
         return $self->get("expireNotifyOffset");
 }
