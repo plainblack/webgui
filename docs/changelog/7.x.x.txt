@@ -10,6 +10,8 @@
  - fix: TrashClipboard.pm (thanks to Erik Svanberg for the patch)
  - fix: Manage events in time tracker goofed up (perlDreamer Consulting, LLC)
  - fix: Clipboard to trash (perlDreamer Consulting, LLC)
+ - fix: Fixed the left column template, which still used the RawHeadTags
+   macro. (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
