@@ -422,7 +422,7 @@ sub getLineage {
 	}
 	## finish up our where clause
 	$where .= ' and ('.join(" or ",@whereModifiers).')' if (scalar(@whereModifiers));
-	if (exists $rules->{whereClause}) {
+	if (exists $rules->{whereClause} && $rules->{whereClause}) {
 		$where .= ' and ('.$rules->{whereClause}.')';
 	}
 	# based upon all available criteria, let's get some assets

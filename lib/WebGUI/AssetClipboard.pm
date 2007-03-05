@@ -89,17 +89,23 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 getAssetsInClipboard ( [limitToUser,userId] )
+=head2 getAssetsInClipboard ( [limitToUser,userId,expireTime] )
 
-Returns an array reference of title, assetId, and classname to the assets in the clipboard.
+Returns an array reference of assets that are in the clipboard.  Only assets that are committed
+or that are under the current user's version tag are returned.
 
 =head3 limitToUser
 
-If True, only return assets last updated by userId.
+If True, only return assets last updated by userId, specified below.
 
 =head3 userId
 
 If not specified, uses current user.
+
+=head3 expireTime
+
+If defined, then uses expireTime to limit returned assets to only include those
+before expireTime.
 
 =cut
 
@@ -108,34 +114,27 @@ sub getAssetsInClipboard {
     my $session = $self->session;
 	my $limitToUser = shift;
 	my $userId = shift || $session->user->userId;
-	my @assets;
-	my $limit;
+    my $expireTime = shift;
+
+    my @limits = ();
 	if ($limitToUser) {
-		$limit = "and asset.stateChangedBy=".$session->db->quote($userId);
+		push @limits,  "asset.stateChangedBy=".$session->db->quote($userId);
 	}
-        my $sth = $self->session->db->read("
-                select 
-                        asset.assetId, 
-                        assetData.revisionDate,
-                        asset.className
-                from 
-                        asset                 
-		left join 
-                        assetData on asset.assetId=assetData.assetId 
-                where 
-			asset.state='clipboard'
-			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?))
-			$limit
-		group by
-			assetData.assetId
-                order by 
-                        assetData.title desc
-                        ", [$session->scratch->get("versionTag")]);
-        while (my ($id, $date, $class) = $sth->array) {
-                push(@assets, WebGUI::Asset->new($session,$id,$class,$date));
-        }
-        $sth->finish;
-        return \@assets;
+    if (defined $expireTime) {
+		push @limits,  "stateChanged < ".$expireTime;
+    }
+
+    my $limit = join ' and ', @limits;
+
+    my $root = WebGUI::Asset->getRoot($self->session);
+    return $root->getLineage(
+       ["descendents", ],
+       {
+           statesToInclude => ["clipboard"],
+           returnObjects   => 1,
+           whereClause     => $limit,
+       }
+    );
 }
 
 #-------------------------------------------------------------------

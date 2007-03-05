@@ -17,6 +17,8 @@ package WebGUI::Workflow::Activity::TrashClipboard;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
+use WebGUI::Asset;
+use WebGUI::AssetClipboard;
 
 =head1 NAME
 
@@ -74,13 +76,12 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-        my $expireDate = (time()-$self->get("trashAfter"));
-        my $sth = $self->session->db->read("select assetId,className from asset where state='clipboard' and stateChanged < ?", [$expireDate]);
-        while (my ($id, $class) = $sth->array) {
-        	my $asset = WebGUI::Asset->new($self->session,$id,$class);
+    my $self = shift;
+    my $expireDate = (time()-$self->get("trashAfter"));
+    my $root = WebGUI::Asset->getRoot($self->session);
+    foreach my $asset ( @{ $root->getAssetsInClipboard('', '', $expireDate) } ) {
         	$asset->trash;
-       	}
+    }
 	return $self->COMPLETE;
 }
 

@@ -15,7 +15,7 @@ package WebGUI::Asset::Wobject::WeatherData;
 =cut
 
 use strict;
-use Weather::Com::Simple;
+use Weather::Simple;
 use WebGUI::International;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Utility;
