@@ -20,9 +20,9 @@ our $I18N = {
 	},
 
 	'trash clipboard body' => {
-		message => q|<p>This workflow activity will move all assets from the Clipboard to the Trash after they have been in the Clipboard for the specified interval.</p>
+		message => q|<p>This workflow activity will move all assets from the Clipboard to the Trash after they have been in the Clipboard for the specified interval, if those Assets are committed.  Uncommitted Assets will stay in the Clipboard until after they are committed <i>and</i> they are older than the interval.</p>
 <p>WebGUI ships with a default Workflow that moves all assets from the Clipboard to the Trash if they have been in the Clipboard for 30 days.</p>|,
-		lastUpdated => 0,
+		lastUpdated => 1173117358,
 	},
 
 };

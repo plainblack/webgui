@@ -3072,6 +3072,11 @@ that Asset and all Assets below it.</p>
 
 <p>The clipboard contents may be managed individually. You may delete or paste an item by selecting the appropriate icon.  You may also empty the entire contents of the clipboard to the trash by choosing the Empty clipboard menu option.</p>
 
+<p>The clipboard will only show Assets that you placed there or that are under your current version tag.</p>
+
+<p>If you are an Admin, you may access the System Clipboard, which will display all Assets by any user which are committed
+or are under your current version tag.</p>
+
 <p><b>Title</b><br />The name of the item in the clipboard.  You may view the item by selecting the title.</p>
 
 <p><b>Type</b><br />The type of content.  For instance, a Page, Article, EventsCalendar, etc.</p>
@@ -3082,7 +3087,9 @@ that Asset and all Assets below it.</p>
 
 <p><b>Username</b><br />The username of the individual who placed the item in the clipboard.  This optional field is only visible in shared clipboard environments or when an administrator is managing the system clipboard.</p>|,
 
-		lastUpdated => 1146593054,
+|,
+
+		lastUpdated => 1173117114,
 	},
 
 	'419' => {
