@@ -239,7 +239,6 @@ sub view {
 			';
 	}
 	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
-	my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
 	my @parts = split("~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
 	my $output = "";
 	foreach my $part (@parts) {
