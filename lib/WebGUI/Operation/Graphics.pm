@@ -260,11 +260,10 @@ sub www_editFontSave {
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
 	
 	if ($session->form->process('fid') eq 'new') {
-		my $storage = WebGUI::Storage->create($session, 'new');
 
-		##This is a hack.  It should use the WebGUI::Form::File API to insulate
-		##us from future form name changes.
-		my $filename = $storage->addFileFromFormPost('fontFile_file');
+        my $fileStorageId = WebGUI::Form::File->new($self->session,{name => 'fontFile'})->getValueFromPost;
+        my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
+        my $filename = $storage->getFiles()->[0];
 
 		if ($filename) {
 			my $font = WebGUI::Image::Font->new($session, 'new');

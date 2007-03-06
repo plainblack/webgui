@@ -700,12 +700,17 @@ sub www_editListingSave {
 
 	##This is a hack.  File upload should go throught the WebGUI::Form::File API
 	##so that future changes don't affect us like this
-	my $screenshot = $storage->addFileFromFormPost("screenshot_file");
+    my $screenshotStorageId = WebGUI::Form::File->new($self->session,{name => 'screenshot'})->getValueFromPost;
+    my $uploadedScreenshot  = WebGUI::Storage->get($self->session, $screenshotStorageId);
+	my $screenshot          = $uploadedScreenshot->addFileFromFormPost("screenshot");
 
 	if (defined $screenshot) {
 		$data{filename} = $screenshot;
 		$storage->generateThumbnail($screenshot);
+        $storage->addFileFromFilesystem($uploadedScreenshot->getPath($screenshot));
 	}
+
+    $uploadedScreenshot->delete;
 
 	my $productName = $self->session->form->process("productName");
 
