@@ -3087,8 +3087,6 @@ or are under your current version tag.</p>
 
 <p><b>Username</b><br />The username of the individual who placed the item in the clipboard.  This optional field is only visible in shared clipboard environments or when an administrator is managing the system clipboard.</p>|,
 
-|,
-
 		lastUpdated => 1173117114,
 	},
 
