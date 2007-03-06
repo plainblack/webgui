@@ -45,16 +45,7 @@ my $slaveHash2 = {
     pass => $session->config->get('dbpass'),
 };
 
-my $slaveHash1 = {
-    dsn  => $session->config->get('dsn').';host=192.168.104.202',
-    user => $session->config->get('dbuser'),
-    pass => $session->config->get('dbpass'),
-};
-
-diag $slaveHash1->{dsn};
-
 $session->config->set('dbslave2', $slaveHash2);
-$session->config->set('dbslave1', $slaveHash1);
 
 my $slave2 = $session->dbSlave;
 isa_ok($slave2, 'WebGUI::SQL');
@@ -64,5 +55,4 @@ END {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
     $session->config->delete('dbslave2');
-    $session->config->delete('dbslave1');
 }
