@@ -152,6 +152,7 @@ our $HELP = {
 	},
 
 	'poll asset template variables' => {
+		private => 1,
 		title => 'poll asset template variables title',
 		body => 'poll asset template variables body',
 		isa => [

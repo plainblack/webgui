@@ -391,6 +391,7 @@ our $HELP = {
 	},
 
 	'stock asset template variables' => {
+		private => 1,
 		title => 'stock data asset template variables title',
 		body => 'stock data asset template variables body',
 		isa => [

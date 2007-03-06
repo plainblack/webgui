@@ -296,6 +296,7 @@ our $HELP = {
 	},
 
 	'navigation asset template variables' => {
+		private => 1,
 		title => 'navigation asset template variables title',
 		body => 'navigation asset template variables body',
 		isa => [

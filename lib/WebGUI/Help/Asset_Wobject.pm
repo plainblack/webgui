@@ -112,6 +112,7 @@ our $HELP = {
 	},
 
 	'wobject template variables' => {
+		private => 1,
 		title => 'wobject template variables title',
 		body => 'wobject template variables body',
 		isa => [

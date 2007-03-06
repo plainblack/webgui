@@ -262,6 +262,7 @@ our $HELP = {
 	},
 
 	'event asset template variables' => {
+		private => 1,
 		title => 'event asset template variables title',
 		body => 'event asset template variables body',
 		isa => [

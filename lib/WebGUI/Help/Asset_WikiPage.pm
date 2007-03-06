@@ -127,6 +127,7 @@ our $HELP = {
 	},
 
 	'wiki page asset template variables' => {
+		private => 1,
 		title => 'vars title',
 		body => 'vars body',
 		isa => [

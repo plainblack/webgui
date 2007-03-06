@@ -138,6 +138,7 @@ our $HELP = {
 	},
 
 	'syndicated content asset template variables' => {
+		private => 1,
 		title => 'syndicated content asset template variables title',
 		body => 'syndicated content asset template variables body',
 		isa => [

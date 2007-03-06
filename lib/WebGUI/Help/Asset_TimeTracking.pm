@@ -252,6 +252,7 @@ our $HELP = {
 	},
 
 	'time tracking asset template variables' => {
+		private => 1,
 		title => 'time tracking asset template variables title',
 		body => 'time tracking asset template variables body',
 		isa => [

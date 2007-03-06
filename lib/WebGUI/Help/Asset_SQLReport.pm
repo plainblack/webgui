@@ -202,6 +202,7 @@ our $HELP = {
 	},
 
 	'sql report asset template variables' => {
+		private => 1,
 		title => 'sql report asset template variables title',
 		body => 'sql report asset template variables body',
 		isa => [

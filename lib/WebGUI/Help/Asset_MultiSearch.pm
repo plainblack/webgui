@@ -76,6 +76,7 @@ our $HELP = {
 	},
 
 	'multi search asset template variables' => {
+		private => 1,
 		title => 'multi search asset template variables title',
 		body => 'multi search asset template variables body',
 		isa => [

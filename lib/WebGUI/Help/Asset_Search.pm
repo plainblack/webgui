@@ -104,6 +104,7 @@ our $HELP = {
 	},
 
 	'search asset template variables' => {
+		private => 1,
 		title => 'search asset template variables title',
 		body => 'search asset template variables body',
 		isa => [

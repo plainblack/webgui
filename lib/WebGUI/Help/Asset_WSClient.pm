@@ -136,6 +136,7 @@ our $HELP = {
 	},
 
 	'ws client asset template variables' => {
+		private => 1,
 		title => 'ws client asset template variables title',
 		body => 'ws client asset template variables body',
 		isa => [

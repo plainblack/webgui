@@ -266,6 +266,7 @@ our $HELP = {
 	},
 
 	'wiki master asset variables' => {
+		private => 1,
 		title => 'wiki master asset variables title',
 		body => 'wiki master asset variables body',
 		isa => [

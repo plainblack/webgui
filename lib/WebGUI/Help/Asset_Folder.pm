@@ -124,6 +124,7 @@ our $HELP = {
 	},
 
         'folder template asset variables' => {
+		private => 1,
 		title => 'asset template variables title',
 		body => 'asset template variables body',
 		isa => [

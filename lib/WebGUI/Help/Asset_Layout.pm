@@ -88,6 +88,7 @@ our $HELP = {
 	},
 
         'layout template asset variables' => {
+		private => 1,
 		title => 'layout asset template variables title',
 		body => 'layout asset template variables body',
 		isa => [

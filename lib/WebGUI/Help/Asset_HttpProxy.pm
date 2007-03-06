@@ -140,6 +140,7 @@ our $HELP = {
 	},
 
 	'http proxy asset template variables' => {
+		private => 1,
 		title => 'http proxy asset template variables title',
 		body => 'http proxy asset template variables body',
 		isa => [

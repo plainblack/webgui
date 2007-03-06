@@ -167,6 +167,7 @@ our $HELP = {
 	},
 
 	'thread asset template variables' => {
+		private => 1,
 		title => 'thread asset template title',
 		body => 'thread asset template body',
 		isa => [

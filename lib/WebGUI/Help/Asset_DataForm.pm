@@ -553,6 +553,7 @@ our $HELP = {
 	},
 
 	'data form asset template variables' => {
+		private => 1,
 		title => 'data form asset template variables title',
 		body => 'data form asset template variables body',
 		isa => [

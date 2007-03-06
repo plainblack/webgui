@@ -162,6 +162,7 @@ our $HELP = {
 	},
 
 	'message board asset template variables' => {
+		private => 1,
 		title => 'message board asset template variables title',
 		body => 'message board asset template variables body',
 		isa => [

@@ -400,6 +400,7 @@ our $HELP = {
 	},
 
 	'product asset template variables' => {
+		private => 1,
 		title => 'product asset template variables title',
 		body => 'product asset template variables body',
 		isa => [

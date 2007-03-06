@@ -80,6 +80,7 @@ our $HELP = {
 	},
 
         'file template asset variables' => {
+		private => 1,
 		title => 'file template asset var title',
 		body => 'file template asset var body',
 		isa => [

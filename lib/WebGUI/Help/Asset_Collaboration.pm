@@ -9,7 +9,7 @@ our $HELP = {
                                 title => 'visitor cache timeout',
                                 namespace => 'Asset_Collaboration',
                                 description => 'visitor cache timeout help',
-				uiLevel => 8,
+                                uiLevel => 8,
                         },
                         {
                                 title => 'display last reply',
@@ -216,6 +216,7 @@ our $HELP = {
 	},
 
 	'collaboration template labels' => {
+        private => 1,
 		title => 'collaboration template labels title',
 		body => 'collaboration template labels body',
 		variables => [

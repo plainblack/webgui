@@ -676,6 +676,7 @@ our $HELP = {
 	},
 
 	'survey asset template variables' => {
+		private => 1,
 		title => 'survey asset template variables body',
 		body => 'survey asset template variables title',
 		isa => [

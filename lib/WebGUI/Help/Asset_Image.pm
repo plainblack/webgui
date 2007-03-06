@@ -92,6 +92,7 @@ our $HELP = {
 	},
 
         'image template asset variables' => {
+		private => 1,
 		title => 'image template asset var title',
 		body => 'image template asset var body',
 		isa => [

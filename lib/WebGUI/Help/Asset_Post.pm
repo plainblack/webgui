@@ -266,6 +266,7 @@ our $HELP = {
 	},
 
 	'post asset variables' => {
+		private => 1,
 		title => 'post asset variables title',
 		body => 'post asset variables body',
 		isa => [

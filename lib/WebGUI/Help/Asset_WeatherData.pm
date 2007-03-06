@@ -85,6 +85,7 @@ our $HELP = {
 	},
 
 	'weatherdata asset template variables' => {
+		private => 1,
 		title => 'weatherdata asset template variables title',
 		body => 'weatherdata asset template variables body',
 		isa => [

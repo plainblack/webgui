@@ -215,6 +215,7 @@ our $HELP = {
 	},
 
 	'in out board asset template variables' => {
+		private => 1,
 		title => 'in out board asset template variables title',
 		body => 'in out board asset template variables body',
 		isa => [

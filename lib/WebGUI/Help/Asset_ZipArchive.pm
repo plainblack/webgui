@@ -85,6 +85,7 @@ our $HELP = {
 	},
 
     'zip archive asset variables' => {
+		private => 1,
 		title => 'zip archive asset variables title',
 		body => 'zip archive asset variables body',
 		isa => [

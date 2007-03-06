@@ -554,6 +554,7 @@ our $HELP = {
 	},
 
 	'project manager asset template variables' => {
+		private => 1,
 		title => 'project manager asset template variables title',
 		body => 'project manager asset template variables body',
 		isa => [

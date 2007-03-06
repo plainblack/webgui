@@ -807,6 +807,7 @@ our $HELP = {
 	},
 
 	'sql form asset template variables' => {
+		private => 1,
 		title => 'sql form asset template variables title',
 		body => 'sql form asset template variables body',
 		isa => [
