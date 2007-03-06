@@ -387,6 +387,7 @@ sub www_viewHelpIndex {
 		my $namespace = $fileSet->[1];
 		my $help = _load($session,$namespace);
 		foreach my $key (keys %{$help}) {
+            next if $help->{$key}{private};
 			push @helpIndex, [$namespace, $key,
 					$i18n->get($help->{$key}{title},$namespace)];
 			$i++;
@@ -505,6 +506,7 @@ sub www_viewHelpChapter {
 	my $output = '';
 	my $i18n = WebGUI::International->new($session);
         foreach my $id (@entries) {
+                next if $help->{$id}{private};
                 $output .= '<p><a href="'._link($session,$id,$namespace).'">'.$i18n->get($help->{$id}{title},$namespace).'</a></p>';
 	}
 	my $ac = WebGUI::AdminConsole->new($session,"help");

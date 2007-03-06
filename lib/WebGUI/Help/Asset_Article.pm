@@ -158,6 +158,7 @@ our $HELP = {
 	},
 
 	'article asset template variables' => {
+		private => 1,
 		title => 'article asset template variables title',
 		body => 'article asset template variables body',
 		isa => [
