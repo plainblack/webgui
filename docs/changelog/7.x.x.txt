@@ -16,6 +16,7 @@
    macro. (perlDreamer Consulting, LLC)
  - Fixed a bad module name in the updated WeatherData asset (perlDreamer Consulting, LLC)
  - File and Image handling via Storage.pm (perlDreamer Consulting, LLC)
+ - Calendar: event details misdirection (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.

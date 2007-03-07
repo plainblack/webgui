@@ -1633,7 +1633,7 @@ sub www_search {
                     if ($data->{startTime});
             
                 push(@results, {
-                    url         => $data->{url},
+                    url         => $self->session->url->gateway($data->{url}),
                     title       => $data->{title},
                     synopsis    => $data->{synopsis},
                     startDate   => $dt->strftime('%B %e, %Y'),
