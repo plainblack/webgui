@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (137 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (138 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -321,6 +321,12 @@ $user->delete;
 
 ##Build a group of users and add them to various groups to test fetching users
 
+################################################################
+#
+# addUser
+#
+################################################################
+
 my @crowd = map { WebGUI::User->new($session, "new") } 0..7;
 my @mob;
 foreach my $idx (0..2) {
@@ -347,6 +353,15 @@ cmp_bag($gB->getAllUsers(), [@bUsers, @aUsers, @cUsers, @zUsers, 3], 'users in g
 cmp_bag($gA->getAllUsers(), [@aUsers, @zUsers, 3], 'users in group A, recursively');
 cmp_bag($gC->getAllUsers(), [@cUsers, 3], 'users in group C, recursively');
 cmp_bag($gZ->getAllUsers(), [@zUsers, 3], 'users in group Z, recursively');
+
+##User and Group specific addUser tests
+
+my $visitorUser = WebGUI::User->new($session, 1);
+
+my $everyoneGroup = WebGUI::Group->new($session, 7);
+my $everyUsers = $everyoneGroup->getUsers();
+$everyoneGroup->addUsers([$visitorUser->userId]);
+cmp_bag($everyUsers, $everyoneGroup->getUsers(), 'addUsers will not add a user to a group they already belong to');
 
 ##Database based user membership in groups
 

@@ -163,7 +163,6 @@ sub addUsers {
 	$self->clearCaches();
 	my $expireOffset = shift || $self->get("expireOffset");
 	foreach my $uid (@{$users}) {
-		next if ($uid eq '1' and !isIn($self->getId, 1, 7));
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupings where groupId=? and userId=?", [$self->getId, $uid]);
 		unless ($isIn) {
 			$self->session->db->write("insert into groupings (groupId,userId,expireDate) values (?,?,?)", [$self->getId, $uid, ($self->session->datetime->time()+$expireOffset)]);
