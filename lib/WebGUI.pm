@@ -126,13 +126,21 @@ sub contentHandler {
 				}
 			}
 		} else {
-			$out = page($session);
+			if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") {
+				$http->setStatus("304","Content Not Modified");
+				$http->sendHeader;
+				$session->close;
+    				return Apache2::Const::OK();
+			} else {
+				$out = page($session);
+			}
 		}
 		my $filename = $http->getStreamedFile();
 		if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
 			my $ct = guess_media_type($filename);
             		my $oldContentType = $r->content_type($ct);
             		if ($r->sendfile($filename) ) {
+				$session->close;
     				return Apache2::Const::OK();
 			} else {
                 		$r->content_type($oldContentType);

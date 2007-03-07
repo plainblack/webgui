@@ -1,6 +1,9 @@
 7.3.12
  - Performance enhancement added to Page Layouts to make them do template
    processing twice as fast.
+ - Made Weather Data asset more fault tollerant.
+ - Made CS related upgrades more fault tollerant.
+ - Enhanced HTTP caching directives.
  - fix: Fixing bad link on the Event page to the search engine. Added a new
    Event template variable called urlSearch to handle it.  (perlDreamer Consulting, LLC)
  - fix: Set default groupIdEditEvent to groupIdEdit during upgrade (perlDreamer Consulting, LLC)

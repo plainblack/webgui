@@ -792,7 +792,12 @@ select sum(Post.rating) from Post
 EOSQL
 	my ($sum) = $self->session->db->quickArray($ratingSumSQL, [$self->getId]);
 	$self->update({threadRating=>$sum});
-	$self->getParent->recalculateRating;
+	my $parent = $self->getParent;
+	if (defined $parent) {
+		$parent->recalculateRating;
+	} else {
+		$self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
+	}
 }
 
 

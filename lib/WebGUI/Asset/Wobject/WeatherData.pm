@@ -190,23 +190,26 @@ to be displayed within the page style
 sub view {
 	my $self = shift;
 	my %var;
-	foreach my $location (split("\n", $self->get("locations"))) {
-		my $weather = Weather::Com::Simple->new({
-			'partner_id' 	=> $self->get("partnerId"), 
-                        'license'    	=> $self->get("licenseKey"),
-			'place'		=> $location,
-			'cache'		=> '/tmp',
-			});	
-		foreach my $foundLocation (@{$weather->get_weather}) {
-			push(@{$var{'ourLocations.loop'}}, {
-       				query => $location,
-                        	cityState => $foundLocation->{place} || $location,
-                        	sky => $foundLocation->{conditions} || 'N/A',
-                        	tempF => $foundLocation->{temperature_fahrenheit} || 'N/A',
-				tempC => $foundLocation->{temperature_celsius} || 'N/A',
-                        	iconUrl => $self->session->url->extras("wobject/WeatherData/".$self->_chooseWeatherConditionsIcon($foundLocation->{conditions}).'.jpg'),
-                        	iconAlt => $foundLocation->{conditions},
-				});
+	if ($self->get("partnerId") ne "" && $self->get("licenseKey") ne "") {
+		foreach my $location (split("\n", $self->get("locations"))) {
+			my $weather = Weather::Com::Simple->new({
+				'partner_id' 	=> $self->get("partnerId"), 
+       	                 	'license'    	=> $self->get("licenseKey"),
+				'place'		=> $location,
+				'cache'		=> '/tmp',
+				});	
+			next unless defined $weather;
+			foreach my $foundLocation (@{$weather->get_weather}) {
+				push(@{$var{'ourLocations.loop'}}, {
+       					query 		=> $location,
+	       	                 	cityState 	=> $foundLocation->{place} || $location,
+       		                 	sky 		=> $foundLocation->{conditions} || 'N/A',
+       		                 	tempF 		=> $foundLocation->{temperature_fahrenheit} || 'N/A',
+					tempC 		=> $foundLocation->{temperature_celsius} || 'N/A',
+	       	                 	iconUrl 	=> $self->session->url->extras("wobject/WeatherData/".$self->_chooseWeatherConditionsIcon($foundLocation->{conditions}).'.jpg'),
+	       	                 	iconAlt 	=> $foundLocation->{conditions},
+					});
+			}
 		}
 	}
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});

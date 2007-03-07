@@ -191,6 +191,8 @@ if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventP
 <meta http-equiv="Expires" content="0" />
 ';
 	$self->session->http->setCacheControl("none");
+} else {
+	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
