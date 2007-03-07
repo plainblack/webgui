@@ -97,99 +97,88 @@ sub _exportAsHtml {
 
 	my $i18n = WebGUI::International->new($self->session, 'Asset');
 
+	# Get a list of the asset IDs we need, reverse sorted by URL
 	my $tempSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
 	$tempSession->user({userId=>$userId});
-
 	my $newSelf = WebGUI::Asset->new($tempSession, $self->getId, $self->get("className"), $self->get("revisionDate"));
-	# Get a list of the asset IDs we need, reverse sorted by URL
-    my $assetIds 
-        = $newSelf->getLineage(["self","descendants"],{ 
-                endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth"),
+    	my $assetIds = $newSelf->getLineage(["self","descendants"],{ 
+        	endingLineageLength => $newSelf->getLineageLength+$self->session->form->process("depth"),
                 orderByClause       => 'assetData.url DESC',
-            });
-
-    $tempSession->var->end;
-    $tempSession->close;
+            	});
+    	$tempSession->var->end;
+    	$tempSession->close;
     
-    # We're going to walk up the URL branch, making the deepest paths first
+    	# We're going to walk up the URL branch, making the deepest paths first
 	foreach my $assetId (@{$assetIds}) {
-        my $assetSession 
-            = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
-        $assetSession->user({userId=>$userId});
+        	my $assetSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+        	$assetSession->user({userId=>$userId});
 		my $asset = WebGUI::Asset->newByDynamicClass($assetSession, $assetId);
-
 		my $url = $asset->get("url");
-		$self->session->output->print(sprintf($i18n->get('exporting page'), $url)) unless $quiet;
 
+		# notify we can't output because user selected can't view the page
 		unless ($asset->canView($userId)) {
-			$self->session->output->print(sprintf($i18n->get('bad user privileges')."\n")) unless $quiet;
+			$self->session->output->print(sprintf($i18n->get('bad user privileges')."\n") . $asset->getUrl) unless $quiet;
 			next;
 		}
 
+		# find out where we're exporting
 		my $pathData = $self->_translateUrlToPath($url, $index);
 		if (my $error = $pathData->{'error'}) {
 			return (0, $error);
 		}
-
-		my $path        = $pathData->{'path'};
+		my $path        = $exportPath . '/'. $pathData->{'path'};
 		my $filename    = $pathData->{'filename'};
 
-		my $fullPath = (length($path)? "$path/" : "").$filename;
+		# this is needed for symlinking
 		if ($asset->getId eq $defaultAssetId) {
-			$defaultAssetPath = $fullPath;
+			$defaultAssetPath = (length($pathData->{'path'}) ? $pathData->{'path'}."/" : "") . $pathData->{'filename'};
 		}
 
-        # Make sure that the filename is not a directory in this path
-        if (-d $exportPath . "/" . $fullPath) {
-            # A previous asset created this directory
-            # so make this asset the index of this directory
-            if (!-e "$exportPath/$fullPath/$index") {
-                $path       .= "/$filename";
-                $filename   = $index;
-                $fullPath   .= "/$index";
-            }
-            else {
-                return (0, sprintf($i18n->get('file exists when making directory index'), $fullPath, $@));
-            }
-        }
+		# see if path already exists, if not, create it
+        	unless (-d $path) {
+        		eval { mkpath($path) };
+        		if($@) {
+            			return (0, sprintf($i18n->get('could not create path'), $path, $@));
+        		}
+		}
 
-		$self->session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$fullPath, $asset->getId]);
+		# output which page we're exporting
+		my $pathWithFilename = $path.'/'.$filename;
+		unless ($quiet) {
+			$self->session->output->print(sprintf($i18n->get('exporting page'), $pathWithFilename));
+		}
 
-        $path = $exportPath . (length($path)? "/$path" : "");
-        eval { mkpath($path) };
-        if($@) {
-            return (0, sprintf($i18n->get('could not create path'), $path, $@));
-        }
-        $path .= "/".$filename;
-
-        my $file = eval { FileHandle->new(">".$path) or die "$!" };
-        if ($@) {
-            return (0, sprintf($i18n->get('could not open path'), $path, $@));
-        } else {
-            $assetSession->output->setHandle($file);
-            $assetSession->asset($asset);
-            my $content = $asset->exportHtml_view;
-            unless ($content eq "chunked") {
-                $assetSession->output->print($content);
-            }
-        $file->close;
-        }
-
+		# write the file
+        	#open my $fileHandle, ">", $pathWithFilename;
+		my $fileHandle = FileHandle->new(">".$pathWithFilename);
+        	if (defined $fileHandle) {
+            		$assetSession->output->setHandle($fileHandle);
+            		$assetSession->asset($asset);
+            		my $content = $asset->exportHtml_view;
+			# chunked content will have already been printed, so no need to print again
+            		unless ($content eq "chunked") {
+                		$assetSession->output->print($content);
+            		}
+        		$fileHandle->close;
+        	} 
+		else {
+            		return (0, sprintf($i18n->get('could not open path'), $pathWithFilename, $!));
+        	}
 		$assetSession->var->end;
 		$assetSession->close;
+		$self->session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$pathWithFilename, $asset->getId]);
 		$self->session->output->print($i18n->get('done')) unless $quiet;
 	}
     
-    
-    if ($extrasUploadsAction eq 'symlink') {
+    	# symlink?
+    	if ($extrasUploadsAction eq 'symlink') {
 		my ($extrasPath, $uploadsPath) = ($self->session->config->get('extrasPath'), $self->session->config->get('uploadsPath'));
 		my ($extrasUrl, $uploadsUrl) = ($self->session->config->get('extrasURL'), $self->session->config->get('uploadsURL'));
 		s#^/*## for ($extrasUrl, $uploadsUrl);
 		my ($extrasDst, $uploadsDst) = ($exportPath.'/'.$extrasUrl, $exportPath.'/'.$uploadsUrl);
 
 		$self->session->output->print($i18n->get('extrasUploads symlinking')."\n") unless $quiet;
-		foreach my $rec ([$extrasPath, $extrasDst],
-				 [$uploadsPath, $uploadsDst]) {
+		foreach my $rec ([$extrasPath, $extrasDst], [$uploadsPath, $uploadsDst]) {
 			my ($path, $dst) = @$rec;
 			if (-l $dst) {
 				next if (readlink $dst eq $path);
@@ -201,21 +190,20 @@ sub _exportAsHtml {
 			rmdir $dst or return (0, sprintf($i18n->get('could not rmdir'), $dst, $!));
 			symlink $path, $dst or return (0, sprintf($i18n->get('could not symlink'), $path, $dst, $!));
 		}
-	} elsif ($extrasUploadsAction eq 'none') {
+	} 
+	elsif ($extrasUploadsAction eq 'none') {
 		# Nothing.  This is the default.
 	}
 
 	if ($rootUrlAction eq 'symlinkDefault') {
 		if (defined $defaultAssetPath) {
-			{
-				my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
-				$self->session->output->print($i18n->get('rootUrl symlinking default')."\n") unless $quiet;
-				if (-l $dst) {
-					last if (readlink $dst eq $src);
-					unlink $dst or return (0, sprintf($i18n->get('could not unlink'), $dst, $!));
-				}
-				symlink $src, $dst or return (0, sprintf($i18n->get('could not symlink'), $src, $dst, $!));
+			my ($src, $dst) = ($defaultAssetPath, $exportPath.'/'.$index);
+			$self->session->output->print($i18n->get('rootUrl symlinking default')."\n") unless $quiet;
+			if (-l $dst) {
+				last if (readlink $dst eq $src);
+				unlink $dst or return (0, sprintf($i18n->get('could not unlink'), $dst, $!));
 			}
+			symlink $src, $dst or return (0, sprintf($i18n->get('could not symlink'), $src, $dst, $!));
 		} else {
 			$self->session->output->print($i18n->get('rootUrl default not present')."\n") unless $quiet;
 		}
@@ -262,7 +250,7 @@ sub _translateUrlToPath {
         my ($path,$name) = $url =~ m{(?:(.*)  /)?  ([^/]+)  $}x;   # NOTE: Might be more efficient to use index() and substr()
 
         # If it ends in a known file type handled by apache, use that 
-        if ($name =~ m{[.](?:html|htm|txt)$}) {
+        if ($name =~ m{[.](?:html|htm|txt|pdf|jpg|css|gif|png|doc|xls|xml|rss)$}) {
             $dataRef->{'path'       } = $path;
             $dataRef->{'filename'   } = $name;
         }
@@ -384,7 +372,7 @@ sub www_exportStatus {
 		$iframeUrl = $self->session->url->append($iframeUrl, $formVar.'='.$self->session->form->process($formVar));
 	}
 
-	my $output = '<iframe src="'.$iframeUrl.'" title="'.$i18n->get('Page Export Status').'" width="410" height="200"></iframe>';
+	my $output = '<iframe src="'.$iframeUrl.'" title="'.$i18n->get('Page Export Status').'" width="700" height="500"></iframe>';
         $self->getAdminConsole->render($output,$i18n->get('Page Export Status'),"Asset");
 }
 
@@ -412,12 +400,12 @@ sub www_exportGenerate {
 				 $self->session->form->process('rootUrlAction'));
 	if (!$success) {	
 		$self->session->output->print($description,1);
-		return;
+		return "chunked";
 	}
 
 	$self->session->output->print($description,1);
 	$self->session->output->print('<a target="_parent" href="'.$self->getUrl.'">'.$i18n->get(493,'WebGUI').'</a>');
-	return;
+	return "chunked";
 }
 
 1;

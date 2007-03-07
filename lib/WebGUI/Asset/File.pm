@@ -388,8 +388,6 @@ sub www_edit {
 # exporter.  We have a separate method for this now.
 sub exportHtml_view {
 	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-
 	my $path = $self->getStorageLocation->getPath($self->get('filename'));
 	my $fh = eval { FileHandle->new($path) };
 	defined($fh) or return "";

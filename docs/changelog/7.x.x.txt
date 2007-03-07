@@ -4,6 +4,7 @@
  - Made Weather Data asset more fault tollerant.
  - Made CS related upgrades more fault tollerant.
  - Made slave handling more fault tollerant, and slightly higher performing.
+ - fix: EXPORT- Exporting Files (PDFs, docs, and some pages)
  - Enhanced HTTP caching directives.
  - fix: Fixing bad link on the Event page to the search engine. Added a new
    Event template variable called urlSearch to handle it.  (perlDreamer Consulting, LLC)
