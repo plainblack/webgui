@@ -663,6 +663,27 @@ sub getEventsIn {
     return @{$events};
 }
 
+####################################################################
+
+=head2 getEventVars ( event )
+
+Returns a list of all event template variables to be embedded in
+week, month and or day views.
+
+=cut
+
+sub getEventVars {
+    my $self    = shift;
+    my $event   = shift;
+    
+    my %eventVar    = %{$event->get};
+    %eventVar       = (map { "event".ucfirst($_) => delete $eventVar{$_} } keys %eventVar);
+    my %eventDates  = $event->getTemplateVars;
+    %eventDates     = (map { "event".ucfirst($_) => delete $eventDates{$_} } keys %eventDates);
+
+    return %eventVar, %eventDates;
+}
+
 
 
 
@@ -1120,22 +1141,14 @@ sub viewMonth {
         my $dt_event_end    = $event->getDateTimeEnd;
         
         # Prepare the template variables
-        my %eventVar    = %{$event->get};
-        %eventVar       = (map { "event".ucfirst($_) => delete $eventVar{$_} } keys %eventVar);
-        my %eventDates  = $event->getTemplateVars;
-        %eventDates     = (map { "event".ucfirst($_) => delete $eventDates{$_} } keys %eventDates);
-        
+        my %eventTemplateVariables = $self->getEventVars($event);
+
         # Make the event show on each day it spans
         for my $mday ($dt_event_start->day_of_month_0..$dt_event_end->day_of_month_0) {
             my $week        = int(($adjust + $mday) / 7);
             my $position    = ($adjust + $mday) % 7;
             
-            my $eventRef = {
-                ## Event data
-                (%eventVar),
-                (%eventDates)
-                };
-            push @{$var->{weeks}->[$week]->{days}->[$position]->{events}}, $eventRef;
+            push @{$var->{weeks}->[$week]->{days}->[$position]->{events}}, \%eventTemplateVariables;
         }
     }
     
@@ -1260,21 +1273,19 @@ sub viewWeek {
     
     # The events
     for my $event (@events) {
-        # ??? TODO ??? Show event in each day it spans a la month view?
         # Get the week this event is in, and add it to that week in
         # the template variables
-        my $dt_event = $event->getDateTimeStart;
-        $dt_event->set_locale($i18n->get("locale"));
-        
-        my $day         = $dt_event->day_of_week - $dt->day_of_week;
-        
-        my $eventVar    = $event->get;
-        my %eventDates  = $event->getTemplateVars;
-        push @{$var->{days}->[$day]->{events}}, {
-            ## Event information
-            (map { "event".ucfirst($_) => $eventVar->{$_} } keys %$eventVar),
-            (map { "event".ucfirst($_) => $eventDates{$_} } keys %eventDates),
-            };
+
+        my $dt_event_start = $event->getDateTimeStart;
+        my $dt_event_end   = $event->getDateTimeEnd;
+        $dt_event_start->set_locale($i18n->get("locale"));
+        $dt_event_end->set_locale($i18n->get("locale"));
+
+        my %eventTemplateVariables = $self->getEventVars($event);
+
+        foreach my $weekDay ($dt_event_start->day_of_week..$dt_event_end->day_of_week) {
+            push @{$var->{days}->[$weekDay]->{events}}, \%eventTemplateVariables;
+        }
     }
     
     # Make the navigation bars
