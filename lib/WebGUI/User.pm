@@ -383,7 +383,6 @@ sub new {
 	my $cache = WebGUI::Cache->new($session,["user",$userId]);
 	my $userData = $cache->get;
 	unless ($userData->{_userId} && $userData->{_user}{username}) {
-        $session->errorHandler->warn('Cache invalid');
 		my %user;
 		tie %user, 'Tie::CPHash';
 		%user = $session->db->quickHash("select * from users where userId=?",[$userId]);

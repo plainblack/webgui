@@ -182,6 +182,7 @@ Returns a random slave database handler, if one is defined, otherwise it returns
 
 sub dbSlave {
 	my $self = shift;
+    return $self->db if $self->var->isAdminOn;
 	unless (exists $self->{_slave}) {
 		my @slaves = ();
 		foreach (1..3) {
@@ -190,14 +191,17 @@ sub dbSlave {
 				push (@slaves, $slave);
 			}
 		}
-		my $slave = $slaves[rand @slaves];
-		$self->{_slave} = WebGUI::SQL->connect($self, $slave->{dsn},$slave->{user},$slave->{pass});
-	}
-        if ($self->var("adminOn") || !exists $self->{_slave}) {
-		return $self->db;
-        } else {
-                return $self->{_slave};
+        if (scalar @slaves > 0) {
+            my $slave = $slaves[rand @slaves];
+            $self->{_slave} = WebGUI::SQL->connect($self, $slave->{dsn},$slave->{user},$slave->{pass});
         }
+	}
+    if (!exists $self->{_slave}) {
+        return $self->db;
+    }
+    else {
+        return $self->{_slave};
+    }
 }
 
 
