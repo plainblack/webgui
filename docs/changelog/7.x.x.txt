@@ -30,6 +30,7 @@
  - Fixed a bad module name in the updated WeatherData asset (perlDreamer Consulting, LLC)
  - File and Image handling via Storage.pm (perlDreamer Consulting, LLC)
  - Calendar: event details misdirection (perlDreamer Consulting, LLC)
+ - Calendar: feed uilevel (perlDreamer Consulting, LLC)
  - Calendar asset bug, hourly workflow error (Thanks to Chad Kotil (Global
    Research NOC) for debug help with this)
 
