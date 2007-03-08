@@ -10,6 +10,8 @@
  - fix: Linking Pages
  - Enhanced HTTP caching directives.
  - Fixed a problem with JSON formatting in spectre config transaction.
+ - Changed Manage Revisions screen to order revisions by descending revision
+   date.
  - fix: Fixing bad link on the Event page to the search engine. Added a new
    Event template variable called urlSearch to handle it.  (perlDreamer Consulting, LLC)
  - fix: Set default groupIdEditEvent to groupIdEdit during upgrade (perlDreamer Consulting, LLC)

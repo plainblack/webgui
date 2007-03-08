@@ -456,7 +456,7 @@ sub www_manageRevisions {
 	$i18n->get('revision date'), $i18n->get('revised by'), $i18n->get('tag name');
         my $sth = $self->session->db->read("select assetData.revisionDate, users.username, assetVersionTag.name,assetData.tagId from assetData
 		left join assetVersionTag on assetData.tagId=assetVersionTag.tagId left join users on assetData.revisedBy=users.userId
-		where assetData.assetId=".$self->session->db->quote($self->getId));
+		where assetData.assetId=? order by revisionDate desc", [$self->getId]);
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'
 			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
