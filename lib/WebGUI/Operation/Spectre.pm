@@ -78,7 +78,7 @@ sub www_spectreGetSiteData {
 		}
 		$siteData{cron} = \@schedules;
 	}
-	return JSON::objToJson(\%siteData);
+	return JSON::objToJson(\%siteData,{autoconv=>0, skipinvalid=>1});
 }
 
 #-------------------------------------------------------------------
