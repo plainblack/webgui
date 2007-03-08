@@ -405,7 +405,7 @@ sub getEditForm {
     my $form    = $self->SUPER::getEditForm;
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
     
-    my $tab     = $form->addTab("feeds",$i18n->get("feeds"));
+    my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
     $tab->raw("<tr><td>");
     
     
@@ -881,7 +881,21 @@ sub processPropertiesFromFormPost {
 }
 
 
+####################################################################
 
+=head2 purge ( )
+
+Handle Asset specific purge tasks.
+
+Delete iCal feeds for this Calendar.
+
+=cut
+
+sub purge {
+    my $self = shift;
+    $self->session->db->write('delete from Calendar_feeds where assetId=?',[$self->get('assetId')]);
+    $self->SUPER::purge;
+}
 
 ####################################################################
 

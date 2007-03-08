@@ -21,16 +21,24 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+deleteUnusedIcalFeeds($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub deleteUnusedIcalFeeds {
+	my $session = shift;
+	print "\tDeleting iCal feeds for Calendar that have already been deleted.\n" unless ($quiet);
+    my $calendarAssetIds = $session->db->buildArrayRef('select distinct(assetId) from Calendar');
+    return unless scalar @{ $calendarAssetIds };
+    my $query = sprintf(
+            "DELETE FROM Calendar_feeds WHERE assetId NOT IN (%s)",
+            $session->db->quoteAndJoin($calendarAssetIds)
+        );
+    print $query;
+    $session->db->write($query);
+}
 
 
 
