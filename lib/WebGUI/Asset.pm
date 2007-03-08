@@ -385,12 +385,17 @@ Any text string. Most likely will have been the Asset's name or title.
 sub fixUrl {
 	my $self = shift;
 	my $url = shift;
+
+	# build a URL from the parent
 	unless ($url) {
 		$url = $self->getParent->get("url");
 		$url =~ s/(.*)\..*/$1/;
 		$url .= '/'.$self->getValue("menuTitle");
 	}
 	$url = $self->session->url->urlize($url);
+
+	# fix urls used by uploads and extras
+	# and those beginning with http
 	my @badUrls = ($self->session->config->get("extrasURL"), $self->session->config->get("uploadsURL"));
 	foreach my $badUrl (@badUrls) {
 		if ($badUrl =~ /^http/) {
@@ -402,15 +407,26 @@ sub fixUrl {
 			$url = "_".$url;
 		}
 	}
+
+	# urls can't be longer than 250 characters
 	if (length($url) > 250) {
 		$url = substr($url,220);
 	}
+
+	# remove multiple extensions from the url if there are some
+	while ($url =~ m{^(.*)\.\w+(/.*)$}) {
+ 		$url =~ s{^(.*)\.\w+(/.*)$}{$1$2}ig;
+	}
+
+	# add automatic extension if we're supposed to
 	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
 		&& !($url =~ /\./) #don't add an extension of the url already contains a dot
 		&& $self->get("url") eq $self->getId # only add it if we're creating a new url
 		) {
 		$url .= ".".$self->session->setting->get("urlExtension");
 	}
+
+	# check to see if the url already exists or not, and increment it if it does
         if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
                 my @parts = split(/\./,$url);
                 if ($parts[0] =~ /(.*)(\d+$)/) {

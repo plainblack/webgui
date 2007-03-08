@@ -12,6 +12,8 @@
  - Fixed a problem with JSON formatting in spectre config transaction.
  - Changed Manage Revisions screen to order revisions by descending revision
    date.
+ - URLs that would have been created like page.html/article.html are now
+   created like page/article.html to make them look more realistic.
  - fix: Fixing bad link on the Event page to the search engine. Added a new
    Event template variable called urlSearch to handle it.  (perlDreamer Consulting, LLC)
  - fix: Set default groupIdEditEvent to groupIdEdit during upgrade (perlDreamer Consulting, LLC)
