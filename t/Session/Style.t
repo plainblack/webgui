@@ -252,7 +252,11 @@ my $expectedMetas = [
            {
              'http-equiv' => 'Content-Style-Type',
              'content' => 'text/css'
-           }
+           },
+           {
+             'http-equiv' => 'Cache-Control',
+             'content' => 'must-revalidate'
+           },
 ];
 cmp_bag(\@metas, $expectedMetas, 'process:default meta tags');
 is($session->http->{_http}{cacheControl}, undef, 'process: HTTP cacheControl undefined');
@@ -262,7 +266,23 @@ $styled = $style->process('body.content');
 $head = $styled;
 $head =~ s/(^HEAD=.+$)/$1/s;
 @metas = fetchMultipleMetas($head);
-push @{ $expectedMetas }, (
+$expectedMetas = [
+           {
+             'content' => 'WebGUI '.$WebGUI::VERSION,
+             'name' => 'generator'
+           },
+           {
+             'http-equiv' => 'Content-Type',
+             'content' => 'text/html; charset=UTF-8'
+           },
+           {
+             'http-equiv' => 'Content-Script-Type',
+             'content' => 'text/javascript'
+           },
+           {
+             'http-equiv' => 'Content-Style-Type',
+             'content' => 'text/css'
+           },
            {
              'http-equiv' => 'Pragma',
              'content' => 'no-cache',
@@ -275,7 +295,7 @@ push @{ $expectedMetas }, (
              'http-equiv' => 'Expires',
              'content' => '0',
            },
-);
+];
 cmp_bag(\@metas, $expectedMetas, 'process:default meta tags with no caching head tags, group 2 user');
 
 $session->user({userId=>1});
@@ -329,6 +349,10 @@ $expectedMetas = [
            {
              'http-equiv' => 'Content-Style-Type',
              'content' => 'text/css'
+           },
+           {
+             'http-equiv' => 'Cache-Control',
+             'content' => 'must-revalidate'
            },
 ];
 cmp_bag(\@metas, $expectedMetas, 'process, headBlock:no duped headBlock from style template');
