@@ -1228,7 +1228,8 @@ sub processPropertiesFromFormPost {
 	my ($tableName, @tables, @usedTables);
 	my $self = shift;
 
-	my $dbLink = WebGUI::DatabaseLink->new($self->session, $self->session->form->process("databaseLinkId"));
+	my $dbLinkId = $self->session->form->process("databaseLinkId");
+	my $dbLink = WebGUI::DatabaseLink->new($self->session, $dbLinkId);
 
 	# $dbLink->db will raise a fatal error if there is a connection error.
 #	return ["Can't connect to database through the selected database link"] unless ($dbLink->db);
@@ -1243,7 +1244,7 @@ sub processPropertiesFromFormPost {
 		#if table exists and not in SQLForm format, put in SQLFormFormat.
 		@tables = $dbLink->db->buildArray("show tables");
 		
-		@usedTables = $self->session->db->buildArray("select tableName, state  from SQLForm, asset where asset.assetID=SQLForm.assetId and state='published'");
+		@usedTables = $self->session->db->buildArray("select tableName from SQLForm, asset where asset.assetID=SQLForm.assetId and state='pub        lished' and databaseLinkId = ".$self->session->db->quote($dbLinkId));
 
 		if (isIn(lc($tableName), map {lc} @usedTables)) {
 			return ["The table is already used in an SQLForm."];
