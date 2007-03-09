@@ -101,7 +101,7 @@ $session->setting->set(preventProxyCache => 1);
 is( 1, $session->setting->get('preventProxyCache'), 'gateway: disable proxy caching');
 
 $url2 = $session->url->gateway('home');
-like( $url2, qr{/home\?noCache=\d+,\d+$}, 'gateway: check proxy prevention setting');
+like( $url2, qr{/home\?noCache=\d+:\d+$}, 'gateway: check proxy prevention setting');
 
 $url2 = $session->url->gateway('home','',1);
 is( $url2, '/home', 'gateway: skipPreventProxyCache');
@@ -239,7 +239,7 @@ $session->setting->set('preventProxyCache', 1);
 my $cacheableUrl = $session->url->page('','',1);
 is($cacheableUrl, $requestedUrl, 'page: skipPreventProxyCache does not change url');
 
-like($session->url->page('','',0), qr(^$requestedUrl\?noCache=\d{0,4},\d+$), 'page: noCache added');
+like($session->url->page('','',0), qr(^$requestedUrl\?noCache=\d{0,4}:\d+$), 'page: noCache added');
 
 ##Restore original setting
 $session->setting->set('preventProxyCache', $preventProxyCache);
