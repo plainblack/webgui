@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 use WebGUI;
 
-use Test::More tests => 57; # increment this value for each test you create
+use Test::More tests => 58; # increment this value for each test you create
 use Test::Deep;
  
 my $session = WebGUI::Test->session;
@@ -310,6 +310,20 @@ $session->setting->set('preventProxyCache', $origPreventProxyCache);
 
 ##No accessor
 is($session->http->{_http}{cacheControl}, 'none', 'process: HTTP cacheControl set to none to prevent proxying');
+
+####################################################
+#
+# process 
+# Style Template meta data
+#
+####################################################
+
+
+TODO: {
+	local $TODO = "needed process tests";
+	ok(0, 'check that meta data in the style template is placed in the style when session->setting->get(metaDataEnabled) is set');
+}
+
 
 ####################################################
 #
