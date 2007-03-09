@@ -137,14 +137,12 @@ sub db {
 		$self->{_dbh} = $self->session->db;
 		return $self->{_dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
-		eval{
-		 	$self->{_dbh} = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier);
-		};
-		if ($@) {
-			$self->session->errorHandler->warn("DatabaseLink [".$self->getId."] ".$@);
-		} else {
-			return $self->{_dbh};
+		my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier);
+		unless (defined $dbh) {
+			$self->session->errorHandler->arn("Cannot connect to DatabaseLink [".$self->getId."]");
 		}
+		$self->{_dbh} = $dbh;
+		return $self->{_dbh};
 	} else {
 		$self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	}

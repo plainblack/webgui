@@ -208,15 +208,17 @@ sub fatal {
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
 	$self->session->http->sendHeader if ($self->session->request);
 
-	if ($self->session->dbNotAvailable) {
+	if (! defined $self->session->db(1)) {
 		# We can't even _determine_ whether we can show the debug text.  Punt.
 		$self->session->output->print("<h1>Fatal Internal Error</h1>");
-	} elsif ($self->canShowDebug()) {
+	} 
+	elsif ($self->canShowDebug()) {
 		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
 		$self->session->output->print("<p>".$message."</p>\n",1);
 		$self->session->output->print($self->getStackTrace(), 1);
 		$self->session->output->print($self->showDebug(),1);
-	} else {
+	} 
+	else {
 		# NOTE: You can't internationalize this because with some types of errors that would cause an infinite loop.
 		$self->session->output->print("<h1>Problem With Request</h1>
 		We have encountered a problem with your request. Please use your back button and try again.

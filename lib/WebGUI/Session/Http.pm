@@ -247,7 +247,7 @@ Generates and sends HTTP headers for a response.
 sub sendHeader {
 	my $self = shift;
 	return undef if ($self->{_http}{noHeader});
-	return $self->_sendMinimalHeader if $self->session->dbNotAvailable;
+	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
 	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
 	return undef unless $request;

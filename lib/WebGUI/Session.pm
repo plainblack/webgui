@@ -117,7 +117,7 @@ Cleans up a WebGUI session information from memory and disconnects from any reso
 
 sub close {
 	my $self = shift;
-	$self->db->disconnect unless $self->dbNotAvailable;
+	$self->db->disconnect if (exists $self->{_db});
 
 	# Kill circular references.  The literal list is so that the order
 	# can be explicitly shuffled as necessary.
@@ -158,16 +158,32 @@ sub datetime {
 
 #-------------------------------------------------------------------
 
-=head2 db ( ) 
+=head2 db ( [ skipFatal ] ) 
 
 Returns a WebGUI::SQL object, which is connected to the WebGUI database.
+
+=head3 skipFatal
+
+If set to true, we won't throw a fatal error, just return undef.
 
 =cut
 
 sub db {
 	my $self = shift;
+	my $skipFatal = shift;
 	unless (exists $self->{_db}) {
-		$self->{_db} = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
+		my $db = WebGUI::SQL->connect($self,$self->config->get("dsn"), $self->config->get("dbuser"), $self->config->get("dbpass"));
+		if (defined $db) {
+			$self->{_db} = $db;
+		}
+		else {
+			if ($skipFatal) {
+				return undef
+			}
+			else { 	
+				$self->errorHandler->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
+			}
+		}
 	}
 	return $self->{_db};
 }
@@ -616,30 +632,6 @@ sub var {
 		$self->{_var} = WebGUI::Session::Var->new($self);
 	}
 	return $self->{_var};
-}
-
-#-------------------------------------------------------------------
-
-=head2 setDbNotAvailable ( )
-
-Sets a flag for this session indicating that database accesses are known to be probably broken and should not be performed.
-
-=cut
-
-sub setDbNotAvailable {
-	my $self = shift;
-	$self->{_dbNotAvailable} = 1;
-}
-
-=head2 dbNotAvailable ( )
-
-Returns true iff there is an error condition such that no database accesses should be attempted for this session whatsoever.
-
-=cut
-
-sub dbNotAvailable {
-	my $self = shift;
-	return $self->{_dbNotAvailable};
 }
 
 1;
