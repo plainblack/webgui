@@ -630,8 +630,11 @@ sub getEventsIn {
                 ( 
                     Event.startTime IS NULL 
                     && Event.endTime IS NULL 
-                    && Event.startDate >= '$startDate' 
-                    && Event.startDate < '$endDate'
+                    && !
+                        (
+                            Event.startDate >= '$endDate' 
+                         || Event.endDate   <  '$startDate'
+                        )
                 ) 
                 || ( 
                     CONCAT(Event.startDate,' ',Event.startTime) >= '$startTz' 
