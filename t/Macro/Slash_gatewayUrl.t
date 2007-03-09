@@ -51,10 +51,10 @@ is($output, $session->url->gateway('/foo/bar'), 'passing URL through to macro');
 $session->setting->set('preventProxyCache', 1);
 
 $output = WebGUI::Macro::Slash_gatewayUrl::process($session);
-like($output, qr{/\?noCache=\d+,\d+$}, 'checking the cache settings in the URL');
+like($output, qr{/\?noCache=\d+:\d+$}, 'checking the cache settings in the URL');
 
 $output = WebGUI::Macro::Slash_gatewayUrl::process($session, '/foo/bar');
-like($output, qr{/foo/bar\?noCache=\d+,\d+$}, 'checking the cache settings in the URL are at the end of the URL');
+like($output, qr{/foo/bar\?noCache=\d+:\d+$}, 'checking the cache settings in the URL are at the end of the URL');
 
 $session->setting->set('preventProxyCache', 0);
 

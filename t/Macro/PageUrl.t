@@ -52,10 +52,10 @@ is($output, $session->url->gateway.$homeAsset->get('url').'/sub/page', 'fetching
 $session->setting->set('preventProxyCache', 1);
 
 $output = WebGUI::Macro::PageUrl::process($session);
-like($output, qr{\?noCache=\d+,\d+$}, 'checking the cache settings in the page URL');
+like($output, qr{\?noCache=\d+:\d+$}, 'checking the cache settings in the page URL');
 
 $output = WebGUI::Macro::PageUrl::process($session, '/sub/page');
-like($output, qr{/sub/page\?noCache=\d+,\d+$}, 'checking the cache settings in the URL are at the end of the page URL');
+like($output, qr{/sub/page\?noCache=\d+:\d+$}, 'checking the cache settings in the URL are at the end of the page URL');
 
 }
 
