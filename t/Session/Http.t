@@ -18,11 +18,12 @@ use WebGUI::Session;
 use HTML::TokeParser;
 use DateTime;
 use DateTime::Format::Strptime;
+use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 71;
+my $num_tests = 60;
 
 plan tests => $num_tests;
  
@@ -201,22 +202,7 @@ is($http->sendHeader, undef, 'sendHeader returns undef when setNoHeader is true'
 $http->setNoHeader(0);
 is($http->sendHeader, undef, 'sendHeader returns undef when no request object is available');
 
-##Add blank request object
-$request = WebGUI::PseudoRequest->new;
-$session->{_request} = $request;
-
-$session->setDbNotAvailable();
-$http->sendHeader;
-
 ##returns minimal header based on setup from previous test
-
-is($request->status, 302, 'sendHeader with dbNotAvailable: status transferred to request object');
-is($request->status_line, '302 '.$http->getStatusDescription, 'sendHeader with dbNotAvailable: status_line set in request object');
-is($request->content_type, 'text/html; charset=UTF-8', 'sendHeader with dbNotAvailable: content_type set');
-is_deeply($request->headers_out->fetch, {'Cache-Control' => 'private'}, 'sendHeader with dbNotAvailable: cache header set');
-is($request->no_cache, '1', 'sendHeader with dbNotAvailable: no_cache set true');
-
-$session->{_dbNotAvailable} = 0;
 
 ##Clear request object to run a new set of requests
 $request = WebGUI::PseudoRequest->new();
@@ -240,7 +226,11 @@ is($request->status, 200, 'sendHeader: status set');
 is($request->status_line, '200 Just spiffy', 'sendHeader: status_line set');
 is($request->content_type, 'text/html; charset=UTF-8', 'sendHeader: default mimetype');
 is($request->no_cache, undef, 'sendHeader: no_cache undefined');
-is_deeply($request->headers_out->fetch, {'Last-Modified' => $session->datetime->epochToHttp(1200)}, 'sendHeader: normal headers');
+my $expected_headers = {
+    'Last-Modified' => $session->datetime->epochToHttp(1200),
+    'Cache-Control' => 'must-revalidate',
+};
+cmp_deeply($request->headers_out->fetch, $expected_headers, 'sendHeader: normal headers');
 
 $http->setNoHeader(0);
 $http->setFilename('image.png');
@@ -250,6 +240,7 @@ is_deeply(
 	{
 		'Last-Modified' => $session->datetime->epochToHttp(1200),
 		'Content-Disposition' => q!attachment; filename="image.png"!,
+        'Cache-Control' => 'must-revalidate',
 	},
 	'sendHeader: normal headers'
 );
@@ -265,7 +256,6 @@ $http->sendHeader();
 ##Replace this with DateTime math to subtract the two dates, if we can
 my $delta = deltaHttpTimes($session->datetime->epochToHttp(), $request->headers_out->fetch->{'Last-Modified'});
 cmp_ok($delta->seconds, '<=', 1, 'sendHeader, user=root: Last-Modified uses current time if not visitor');
-is($request->no_cache, 1, 'sendHeader, user=root: no_cache set to 1 since CacheControl is blank');
 
 ##Clear request object to run a new set of requests
 $request = WebGUI::PseudoRequest->new();
@@ -274,9 +264,7 @@ $http->setNoHeader(0);
 $http->setCacheControl(500);
 $http->sendHeader();
 
-is($request->headers_out->fetch->{'Cache-Control'}, 'private', 'sendHeaders, cacheControl=500, user=root: header Cache-Control="private"');
-$delta = deltaHttpTimes($session->datetime->epochToHttp(500 + time), $request->headers_out->fetch->{'Expires'});
-cmp_ok($delta->seconds, '<=', 1, 'sendHeaders, cacheControl=500, user=root: header Expires=now+500seconds');
+is($request->headers_out->fetch->{'Cache-Control'}, 'must-revalidate', 'sendHeaders, cacheControl=500, user=root: header Cache-Control="private"');
 is($request->no_cache, undef, 'sendHeader, cacheControl=500, user=root: no_cache set to undef');
 
 ##Clear request object to run a new set of requests
@@ -288,9 +276,7 @@ $session->user({userId=>1});
 $http->sendHeader();
 
 ##Boolean test here
-ok(! exists $request->headers_out->fetch->{'Cache-Control'}, 'sendHeaders, cacheControl=500, user=visitor: header Cache-Control does not exist');
-$delta = deltaHttpTimes($session->datetime->epochToHttp(500 + time), $request->headers_out->fetch->{'Expires'});
-cmp_ok($delta->seconds, '<=', 1, 'sendHeaders, cacheControl=500, user=visitor: header Expires=now+500seconds');
+is( $request->headers_out->fetch->{'Cache-Control'}, 'must-revalidate', 'sendHeaders, cacheControl=500, user=visitor: header Cache-Control set to must-revalidate');
 is($request->no_cache, undef, 'sendHeader, cacheControl=500, user=visitor: no_cache set to undef');
 
 ##Clear request object to run a new set of requests
@@ -301,10 +287,7 @@ $http->setNoHeader(0);
 $http->setCacheControl(500);
 $http->sendHeader();
 
-##Boolean test here
-ok(! exists $request->headers_out->fetch->{'Cache-Control'}, 'sendHeaders, cacheControl=500, user=visitor, HTTP 1.0: header Cache-Control does not exist');
-$delta = deltaHttpTimes($session->datetime->epochToHttp(500 + time), $request->headers_out->fetch->{'Expires'});
-cmp_ok($delta->seconds, '<=', 1, 'sendHeaders, cacheControl=500, user=visitor, HTTP 1.0: header Expires=now+500seconds');
+is($request->headers_out->fetch->{'Cache-Control'}, 'must-revalidate', 'sendHeaders, cacheControl=500, user=visitor, HTTP 1.0: header Cache-Control does not exist');
 is($request->no_cache, undef, 'sendHeaders, cacheControl=500, user=visitor, HTTP 1.0:no_cache undefined');
 
 ##Clear request object to run a new set of requests
@@ -318,7 +301,7 @@ $http->sendHeader();
 
 ##Boolean test here
 ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=200, user=root, HTTP 5.5: header Expires does not exist');
-is($request->headers_out->fetch->{'Cache-Control'}, "max-age=200, private", 'sendHeaders, cacheControl=200, user=root, HTTP 5.5: header Expires does not exist');
+is($request->headers_out->fetch->{'Cache-Control'}, "must-revalidate", 'sendHeaders, cacheControl=200, user=root, HTTP 5.5: header Expires does not exist');
 is($request->no_cache, undef, 'sendHeaders, cacheControl=200, user=visitor, HTTP 1.0: no_cache undefined');
 
 ##Clear request object to run a new set of requests
@@ -332,7 +315,7 @@ $http->sendHeader();
 
 ##Boolean test here
 ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
-is($request->headers_out->fetch->{'Cache-Control'}, "max-age=250", 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
+is($request->headers_out->fetch->{'Cache-Control'}, "must-revalidate", 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
 is($request->no_cache, undef, 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: no_cache undefined');
 
 ##Clear request object to run a new set of requests
@@ -346,7 +329,7 @@ $http->sendHeader();
 
 ##Boolean test here
 ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
-is($request->headers_out->fetch->{'Cache-Control'}, "max-age=250", 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
+is($request->headers_out->fetch->{'Cache-Control'}, "must-revalidate", 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: header Expires does not exist');
 is($request->no_cache, undef, 'sendHeaders, cacheControl=250, user=visitor, HTTP 5.5: no_cache undefined');
 
 ##Clear request object to run a new set of requests
@@ -359,8 +342,7 @@ $http->sendHeader();
 
 ##Boolean test here
 ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Expires does not exist');
-is($request->headers_out->fetch->{'Cache-Control'}, "private", 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Cache-Control=private');
-is($request->no_cache, 1, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: no_cache=1');
+is($request->headers_out->fetch->{'Cache-Control'}, "must-revalidate", 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Cache-Control=private');
 
 ##Clear request object to run a new set of requests
 $request = WebGUI::PseudoRequest->new();
@@ -373,8 +355,7 @@ $http->sendHeader();
 
 ##Boolean test here
 ok(! exists $request->headers_out->fetch->{'Expires'}, 'sendHeaders, cacheControl=none, user=visitor, HTTP 5.5: header Expires does not exist');
-is($request->headers_out->fetch->{'Cache-Control'}, "private", 'sendHeaders, cacheControl=80, preventProxyCache=1, user=visitor, HTTP 5.5: header Cache-Control=private');
-is($request->no_cache, 1, 'sendHeaders, cacheControl=none, preventProxyCache=1, user=visitor, HTTP 5.5: no_cache=1');
+is($request->headers_out->fetch->{'Cache-Control'}, "must-revalidate", 'sendHeaders, cacheControl=80, preventProxyCache=1, user=visitor, HTTP 5.5: header Cache-Control=private');
 
 ####################################################
 #
