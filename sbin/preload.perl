@@ -65,22 +65,6 @@ use Apache2::ServerUtil ();
 use APR::Request::Apache2 ();
 use Apache2::Cookie ();
 
-
-#----------------------------------------
-# Precache i18n
-#----------------------------------------
-opendir(DIR,$webguiRoot."/lib/WebGUI/i18n/English");
-my @files = readdir(DIR);
-closedir(DIR);
-foreach my $file (@files) {
-	if ($file =~ /^(\w+)\.pm$/) {
-		my $namespace = $1;
-		my $cmd = "\$WebGUI::i18n::English::".$namespace."::I18N";
-		my $data = eval($cmd);
-		$WebGUI::International::i18nCache{English}{$namespace} = $data;
-	}
-}
-
 #----------------------------------------
 # Preload all site configs.
 #----------------------------------------
