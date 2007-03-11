@@ -89,7 +89,7 @@ largely from http://www.weather.gov/data/current_obs/weather.php
 my %weatherConditionsIconHash =
     (
      (map{$_ => 'unknown'} ('', 'N/A', 'NULL')),
-     (map{$_ => 'bkn'} ('Mostly Cloudy','Mostly Cloudy with Haze','Mostly Cloudy and Breezy')),
+     (map{$_ => 'bkn'} ('Cloudy','Mostly Cloudy','Mostly Cloudy with Haze','Mostly Cloudy and Breezy')),
      (map{$_ => 'skc'} ('Fair','Clear','Fair with Haze','Clear with Haze','Fair and Breezy','Clear and Breezy')),
      (map{$_ => 'few'} ('A Few Clouds','A Few Clouds with Haze','A Few Clouds and Breezy')),
      (map{$_ => 'sct'} ('Partly Cloudy','Party Cloudy with Haze','Partly Cloudy and Breezy')),
