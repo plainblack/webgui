@@ -155,7 +155,7 @@ sub checkSchedule {
 		&& $self->checkSegment($now->hour, $job->{hourOfDay}, [0..23])
 		&& $self->checkSegment($now->day, $job->{dayOfMonth}, [1..31])
 		&& $self->checkSegment($now->month, $job->{monthOfYear}, [1..12])
-		&& $self->checkSegment($now->dow, $job->{dayOfWeek}, [0..6]) ) {
+		&& $self->checkSegment($now->dow-1, $job->{dayOfWeek}, [0..6]) ) {
 		$self->debug("It's time to run ".$jobId.". Creating workflow instance.");
 		$kernel->yield("runJob",$jobId);
 	}
