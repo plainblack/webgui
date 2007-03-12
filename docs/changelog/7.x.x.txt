@@ -38,6 +38,7 @@
    Veradox)
  - Fully remove i18n precaching to free up memory (thanks to Matthew Wilson,
    Veradox)
+ - Wiki page revisions were not in order (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.

@@ -217,7 +217,7 @@ sub getRevisions {
 		$statusClause = " and status=".$self->session->db->quote($status);
 	}
 	my @revisions = ();
-	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause);
+	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=".$self->session->db->quote($self->getId).$statusClause. " order by revisionDate desc");
 	while (my ($version) = $rs->array) {
 		push(@revisions, WebGUI::Asset->new($self->session, $self->getId, $self->get("className"), $version));
 	}
