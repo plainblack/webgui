@@ -13,6 +13,7 @@
  - Changed Manage Revisions screen to order revisions by descending revision
    date.
  - fix: 7.4 Editing SQL Form seems to break site ...?
+ - rfe: Export & files
  - URLs that would have been created like page.html/article.html are now
    created like page/article.html to make them look more realistic.
  - fix: Fixing bad link on the Event page to the search engine. Added a new

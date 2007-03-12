@@ -144,6 +144,7 @@ sub _exportAsHtml {
 
 		# output which page we're exporting
 		my $pathWithFilename = $path.'/'.$filename;
+		$pathWithFilename =~ s{//}{/}g;
 		unless ($quiet) {
 			$self->session->output->print(sprintf($i18n->get('exporting page'), $pathWithFilename));
 		}
