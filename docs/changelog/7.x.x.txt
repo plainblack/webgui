@@ -36,6 +36,8 @@
    Research NOC) for debug help with this)
  - Add missing weather condition to WeatherData.pm (thanks to Matthew Wilson,
    Veradox)
+ - Fully remove i18n precaching to free up memory (thanks to Matthew Wilson,
+   Veradox)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
