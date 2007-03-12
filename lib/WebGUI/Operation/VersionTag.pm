@@ -364,9 +364,11 @@ sub www_manageVersions {
 		next unless ($session->user->isInGroup($tag->get("groupToUse")));
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
-			<td>'
-				.$session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt)
-				.$session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
+			<td>';
+        if ($session->user->isInGroup(3)) {
+				$output .= $session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
+        }
+        $output .= $session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
 			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
 			<td>'.$session->datetime->epochToHuman($tag->get("creationDate")).'</td>
