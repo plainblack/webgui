@@ -42,6 +42,8 @@
  - Wiki page revisions were not in order (perlDreamer Consulting, LLC)
  - Spectre misses Sundays (thanks to Todor Kouyoumdjiev, ECoCoMS Ltd.)
  - fix: RollbackVersion (Thanks to Erik Svanberg for the patch)
+ - rfe: Paginate "manageCommittedVersions" (perlDreamer Consulting, LLC)
+ - rfe: manageCommittedVersions in reverse chronological order (perlDreamer Consulting, LLC)
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.

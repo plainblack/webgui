@@ -20,6 +20,7 @@ use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
+use WebGUI::Paginator;
 
 =head1 NAME
 
@@ -269,30 +270,33 @@ A reference to the current session.
 =cut
 
 sub www_manageCommittedVersions {
-        my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-        my $ac = WebGUI::AdminConsole->new($session,"versions");
-        my $i18n = WebGUI::International->new($session,"VersionTag");
-	my $rollback = $i18n->get('rollback');
-	my $rollbackPrompt = $i18n->get('rollback version tag confirm');
-        $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
-        my $output = '<table width="100%" class="content">
+    my $session = shift;
+    return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    my $ac = WebGUI::AdminConsole->new($session,"versions");
+    my $i18n = WebGUI::International->new($session,"VersionTag");
+    my $rollback = $i18n->get('rollback');
+    my $rollbackPrompt = $i18n->get('rollback version tag confirm');
+    $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+    $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+    $ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
+    my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("committed on").'</th><th>'.$i18n->get("committed by").'</th><th></th></tr> ';
-        my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1");
-        while (my ($id,$name,$date,$by) = $sth->array) {
-                my $u = WebGUI::User->new($session,$by);
-                $output .= '<tr>
-			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
-			<td>'.$session->datetime->epochToHuman($date).'</td>
-			<td>'.$u->username.'</td>
-			<td><a href="'.$session->url->page("proceed=manageCommittedVersions;op=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
-        }
-        $sth->finish;
-        $output .= '</table>';
-	$ac->setHelp('manage committed versions', 'VersionTag');
-        return $ac->render($output,$i18n->get("committed versions"));
+    my $paginator = WebGUI::Paginator->new($session, $session->url->page("op=manageCommittedVersions"));
+    $paginator->setDataByQuery('select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=1 ORDER BY commitDate DESC');
+    my @versionTagFields = qw/tagId name commitDate committedBy /;
+    foreach my $versionData (@{ $paginator->getPageData }) {
+        my ($id,$name,$date,$by) = @{ $versionData }{@versionTagFields};
+        my $u = WebGUI::User->new($session,$by);
+        $output .= '<tr>
+            <td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$id).'">'.$name.'</a></td>
+            <td>'.$session->datetime->epochToHuman($date).'</td>
+            <td>'.$u->username.'</td>
+            <td><a href="'.$session->url->page("proceed=manageCommittedVersions;op=rollbackVersionTag;tagId=".$id).'" onclick="return confirm(\''.$rollbackPrompt.'\');">'.$rollback.'</a></td></tr>';
+    }
+    $output .= '</table>';
+	$output .= $paginator->getBarTraditional();
+    $ac->setHelp('manage committed versions', 'VersionTag');
+    return $ac->render($output,$i18n->get("committed versions"));
 }
 
 #-------------------------------------------------------------------
