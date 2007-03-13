@@ -371,12 +371,12 @@ sub duplicate {
     my $newCalendar = $self->SUPER::duplicate(@_);
     
     # Duplicate the events in this calendar
-    my @events = $self->getLineage(["descendents"], {
+    my $events = $self->getLineage(["descendents"], {
             returnObjects       => 1,
             includeOnlyClasses  => ['WebGUI::Asset::Event'],
         });
     
-    for my $event (@events) {
+    for my $event (@{ $events }) {
         my %eventProperties = %{ $event->get() };
         $newCalendar->addChild(\%eventProperties);
     }

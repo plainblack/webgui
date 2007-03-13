@@ -44,6 +44,7 @@
  - fix: RollbackVersion (Thanks to Erik Svanberg for the patch)
  - rfe: Paginate "manageCommittedVersions" (perlDreamer Consulting, LLC)
  - rfe: manageCommittedVersions in reverse chronological order (perlDreamer Consulting, LLC)
+ - fix: Deploy package with calendar
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
