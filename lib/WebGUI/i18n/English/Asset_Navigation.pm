@@ -586,8 +586,8 @@ be useful, others may not.|,
 	},
 
 	'assetsToInclude' => {
-		message => q|An newline separated string containg the kids of assets to include in the Navigation, by relationship.  Ancestors, the asset itself, siblings, descendents and/or pedigree.|,
-		lastUpdated => 1164841201
+		message => q|An newline separated string containg the kids of assets to include in the Navigation, by relationship.  Ancestors, the asset itself, siblings, descendants and/or pedigree.|,
+		lastUpdated => 1173814820
 	},
 
 	'startType' => {

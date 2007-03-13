@@ -38,7 +38,7 @@ sub fixEventGroups {
     my $session     = shift;
     print "\tFixing Event groups for Events created since 7.3.0.....";
 
-	my $events = WebGUI::Asset->getRoot($session)->getLineage(['descendents'], {
+	my $events = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {
         statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
         statusToInclude     => ['pending','approved','deleted','archived'],
         includeOnlyClasses  => ['WebGUI::Asset::Event'],

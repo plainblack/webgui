@@ -212,7 +212,7 @@ sub migrateCalendars {
 	
 	# For every EventsCalendar
 	#EventsCalendar.defaultMonth = Calendar.defaultDate
-	my $calendars	= WebGUI::Asset->getRoot($session)->getLineage(['descendents'],
+	my $calendars	= WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
 		{
             statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
             statusToInclude     => ['pending','approved','deleted','archived'],

@@ -128,7 +128,7 @@ sub getAssetsInClipboard {
 
     my $root = WebGUI::Asset->getRoot($self->session);
     return $root->getLineage(
-       ["descendents", ],
+       ["descendants", ],
        {
            statesToInclude => ["clipboard"],
            returnObjects   => 1,

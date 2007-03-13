@@ -52,7 +52,7 @@ sub addThreadRatingColumn {
     $session->db->write("alter table Thread add column threadRating integer default 0");
     my $root = WebGUI::Asset->getRoot($session);
     my $threads = $root->getLineage(
-    	['descendents'],
+    	['descendants'],
         {
             returnObjects      => 1,
             includeOnlyClasses => ['WebGUI::Asset::Post::Thread'],
