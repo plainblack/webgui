@@ -1,3 +1,5 @@
+7.3.13
+
 7.3.12
  - Performance enhancement added to Page Layouts to make them do template
    processing twice as fast.
