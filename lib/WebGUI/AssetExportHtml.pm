@@ -251,7 +251,7 @@ sub _translateUrlToPath {
         my ($path,$name) = $url =~ m{(?:(.*)  /)?  ([^/]+)  $}x;   # NOTE: Might be more efficient to use index() and substr()
 
         # If it ends in a known file type handled by apache, use that 
-        if ($name =~ m{[.](?:html|htm|txt|pdf|jpg|css|gif|png|doc|xls|xml|rss)$}) {
+        if ($name =~ m{[.](?:html|htm|txt|pdf|jpg|css|gif|png|doc|xls|xml|rss|bmp|mp3|js|fla|flv|swf)$}) {
             $dataRef->{'path'       } = $path;
             $dataRef->{'filename'   } = $name;
         }

@@ -48,6 +48,7 @@
  - fix: Deploy package with calendar
  - fix: Mis-spelled argument to getLineage in Calendar, Clipboard and upgrade
    scripts (Thanks to Matthew Wilson, Veradox)
+ - Added additional file types to export - bmp,fla,flv,mp3,js,swf
 
 7.3.11
  - Added an option for enabling coverage tests to testCodebase.pl.
