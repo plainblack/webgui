@@ -77,7 +77,7 @@ Returns the cache control setting from this object.
 
 sub getCacheControl {
 	my $self = shift;
-	return $self->{_http}{cacheControl};
+	return $self->{_http}{cacheControl} || 1;
 }
 
 #-------------------------------------------------------------------
@@ -266,24 +266,21 @@ sub sendHeader {
 		$request->content_type($self->getMimeType || "text/html; charset=UTF-8");
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
-		$request->headers_out->set('Cache-Control' => "must-revalidate");
 		$request->headers_out->set('Last-Modified' => $date);
-#		if ($cacheControl eq "none" || $self->session->setting->get("preventProxyCache") || ($cacheControl eq "" && $userId ne "1")) {
-#			$request->headers_out->set("Cache-Control" => "private");
-#			$request->no_cache(1);
-#		} elsif ($cacheControl ne "" && $request->protocol =~ /(\d\.\d)/ && $1 >= 1.1){
-#			my $extras = "";
-#			$extras .= ", private" unless ($userId eq "1");
-#    			$request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl.$extras);
-#  		} elsif ($cacheControl ne "") {
-#			if ($userId eq "1") {
-#				$request->headers_out->set("Cache-Control" => "must-revalidate");
-#			} else {
-#				$request->headers_out->set("Cache-Control" => "private");
-#			}
-#			my $date = $datetime->epochToHttp(time() + $cacheControl);
-#    			$request->headers_out->set('Expires' => $date);
-#  		}
+		# under these circumstances, don't allow caching
+		if ($userId ne "1" ||  $cacheControl eq "none" || $self->session->setting->get("preventProxyCache")) {
+			$request->headers_out->set("Cache-Control" => "private, max-age=1");
+			$request->no_cache(1);
+		} 
+		# in all other cases, set cache, but tell it to ask us every time so we don't mess with recently logged in users
+		else {
+  			$request->headers_out->set('Cache-Control' => "must-revalidate, max-age=" . $cacheControl);
+			# do an extra incantation if the HTTP protocol is really old
+			if ($request->protocol =~ /(\d\.\d)/ && $1 < 1.1) {
+				my $date = $datetime->epochToHttp(time() + $cacheControl);
+  				$request->headers_out->set('Expires' => $date);
+			}
+  		}
 		if ($self->getFilename) {
                         $request->headers_out->set('Content-Disposition' => qq{attachment; filename="}.$self->getFilename().'"');
 		}
