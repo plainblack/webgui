@@ -146,6 +146,19 @@
 #	"pass" : "password"
 #	},
 
+# You can configure a backup master database as a failover in case
+# your primary database goes down. WebGUI will use this database until
+# the original becomes available. However, this does nothing to change
+# the settings of your database. If it was set up as a slave until the
+# master went down, then some script will have to be written to convert
+# it from a slave to a master.
+
+# "failoverdb" : {
+#        "dsn" : "DBI:mysql:www_example_com;host=failover.example.com;port=3306",
+#        "user" : "webgui",
+#        "password" : "password"
+#        },
+
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.
 
