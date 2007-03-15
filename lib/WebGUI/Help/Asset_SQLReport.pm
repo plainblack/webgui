@@ -75,6 +75,10 @@ our $HELP = {
 		],
 		isa => [
 			{
+				tag => 'pagination template variables',
+				namespace => 'WebGUI'
+			},
+			{
 				namespace => "Asset_SQLReport",
 				tag => "sql report asset template variables"
 			},
@@ -187,17 +191,9 @@ our $HELP = {
 		        ],
 		related => [
 			{
-				tag => 'pagination template variables',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'sql report add/edit',
 				namespace => 'Asset_SQLReport'
 			},
-			{
-				tag => 'wobject template',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 
