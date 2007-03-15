@@ -610,7 +610,8 @@ sub _processQuery {
                                 }
                         }
 			my $paginateAfter = ($page == 1) ? $self->get("paginateAfter") : 99999999;
-                        my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter);
+			my $paginatePage = ($nr > 1) ? 1 : $self->session->form->param('pn');
+                        my $p = WebGUI::Paginator->new($self->session,$url,$paginateAfter, undef, $paginatePage);
                         my $error = $p->setDataByQuery($query,$dbh,1,$placeholderParams);
                         if ($error ne "") {
                                 $self->session->errorHandler->warn("There was a problem with the query: ".$error);
@@ -621,7 +622,7 @@ sub _processQuery {
                                 my @columns;
                                 my @rows;
                                 my $rownum = 1;
-                                foreach my $data (@{$p->getPageData}) {
+                                foreach my $data (@{$p->getPageData($paginatePage)}) {
 					$self->{_query}{$nr}{rowData} = $data;
                                         my %row;
                                         my $colnum = 1;
