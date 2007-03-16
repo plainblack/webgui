@@ -24,20 +24,20 @@ use WebGUI::Utility;
 my $thumbnailSize;
 my $onlyMissingThumbnails;
 my $help;
-
-my $path = shift @ARGV;
+my $path;
 
 my $ok = GetOptions(
         'size=i'=>\$thumbnailSize,
         'missing'=>\$onlyMissingThumbnails,
         'help'=>\$help,
+	'path=s'=>\$path
 );
 
 if ($help || ($path && $ok) ) {
   print <<USAGE;
-Usage: perl $0 <uploadsPath> [--size=thumbnailSize] [--missing]
+Usage: perl $0 --path=/path/to/files [--size=thumbnailSize] [--missing]
 
-uploadsPath is the complete path to your uploads directory
+--path is the complete path to your uploads directory
 
 --size=thumbSize allows you to override the default thumbnail size of 50.
 

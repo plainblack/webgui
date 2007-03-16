@@ -3,6 +3,7 @@
  - fix: SQLReport SubQuery Pagination (William McKee / Knowmad Technologies)
  - fix: SQL Report: Paginate After (Still) (William McKee / Knowmad
    Technologies)
+ - fix: Bug in thumbnailer.pl
 
 
 7.3.12
