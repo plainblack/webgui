@@ -37,7 +37,25 @@ sub body {
 	my $self = shift;
 	my $value = shift;
 	return keys %{ $self->{body} } unless defined $value;
-	return $self->{body}->{$value};
+	if ($self->{body}->{$value}) {
+        if (wantarray && ref $self->{body}->{$value} eq "ARRAY") {
+            return @{$self->{body}->{$value}};
+        }
+        elsif (ref $self->{body}->{$value} eq "ARRAY") {
+            return $self->{body}->{$value}->[0];
+        }
+        else {
+            return $self->{body}->{$value};
+        }
+    }
+    else {
+        if (wantarray) {
+            return ();
+        }
+        else {
+            return undef;
+        }
+    }
 }
 
 sub setup_body {
@@ -73,7 +91,25 @@ sub param {
 	my $self = shift;
 	my $value = shift;
 	return keys %{ $self->{param} } unless defined $value;
-	return $self->{param}->{$value};
+	if ($self->{param}->{$value}) {
+        if (wantarray && ref $self->{param}->{$value} eq "ARRAY") {
+            return @{$self->{param}->{$value}};
+        }
+        elsif (ref $self->{param}->{$value} eq "ARRAY") {
+            return $self->{param}->{$value}->[0];
+        }
+        else {
+            return $self->{param}->{$value};
+        }
+    }
+    else {
+        if (wantarray) {
+            return ();
+        }
+        else {
+            return undef;
+        }
+    }
 }
 
 sub setup_param {

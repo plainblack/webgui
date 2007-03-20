@@ -1019,7 +1019,6 @@ sub viewDay {
     ### Get all the events in this time period
     # Get the range of the epoch of this day
     my $dt        = WebGUI::DateTime->new($session, $params->{start});
-    $dt->set_locale($i18n->get("locale"));
     $dt->truncate( to => "day");
     
     my @events    = $self->getEventsIn($dt->toMysql,$dt->clone->add(days => 1)->toMysql);
@@ -1113,7 +1112,6 @@ sub viewMonth {
     #### Get all the events in this time period
     # Get the range of the epoch of this month
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
-    $dt->set_locale($i18n->get("locale"));
     $dt->truncate( to => "month");
     
     my @events      
@@ -1292,7 +1290,6 @@ sub viewWeek {
     for my $event (@events) {
         # Get the week this event is in, and add it to that week in
         # the template variables
-
         my $dt_event_start = $event->getDateTimeStart;
         my $dt_event_end   = $event->getDateTimeEnd;
         $dt_event_start->set_locale($i18n->get("locale"));
@@ -1311,6 +1308,7 @@ sub viewWeek {
     $var->{"pagePrevUrl"}        
         = $self->getUrl("type=week;start=" . $dt->clone->subtract(weeks=>1)->toMysql);
     
+    $var->{"startMonth"         } = $dt->month;
     $var->{"startMonthName"     } = $dt->month_name;
     $var->{"startMonthAbbr"     } = $dt->month_abbr;
     $var->{"startDayOfMonth"    } = $dt->day_of_month;
@@ -1318,6 +1316,7 @@ sub viewWeek {
     $var->{"startDayAbbr"       } = $dt->day_abbr;
     $var->{"startYear"          } = $dt->year;
     
+    $var->{"endMonth"           } = $dtEnd->month;
     $var->{"endMonthName"       } = $dtEnd->month_name;
     $var->{"endMonthAbbr"       } = $dtEnd->month_abbr;
     $var->{"endDayOfMonth"      } = $dtEnd->day_of_month;

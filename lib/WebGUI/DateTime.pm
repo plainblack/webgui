@@ -611,16 +611,23 @@ DateTime
 sub _splitMysql
 {
 	my $string	= shift;
-	my ($y,$m,$d,$h,$n,$s) 	= split /\D+/,$string;
-	my %hash	= (
-			year		=> $y,
-			month		=> $m,
-			day		=> $d,
-			hour		=> $h,
-			minute		=> $n,
-			second		=> $s,
-			);
-	
+	my %hash;
+
+    @hash{ qw( year month day hour minute second ) } 	
+        = $string =~ m{
+          (\d+)   # Year
+          \D*
+          (\d+)   # Month
+          \D*
+          (\d+)   # Day
+          \D*
+          (\d+)   # Hours
+          \D*
+          (\d+)   # Minutes
+          \D*
+          (\d+)   # Seconds
+        }x;
+
 	return %hash;
 }
 

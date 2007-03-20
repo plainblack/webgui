@@ -222,6 +222,9 @@ our $HELP   = {
 		            'description' => 'pagePrevUrl weekVar'
 		          },
                   {
+                    'name'  => 'startMonth',
+                  },
+                  {
                     'name' => 'startMonthName'
                   },
                   {
@@ -238,6 +241,9 @@ our $HELP   = {
                   },
                   {
                     'name' => 'startYear'
+                  },
+                  {
+                    'name'  => 'endMonth',
                   },
                   {
                     'name' => 'endMonthName'

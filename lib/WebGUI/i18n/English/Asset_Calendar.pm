@@ -276,6 +276,18 @@ our $I18N = {
 			context		=> q{Description of what the Calendar Update Feeds workflow activity does},
 	},	
 	
+	'workflow generateRecurringEvents' => {
+			message		=> q{Generate Recurring Events},
+			lastUpdated	=> 0,
+			context		=> q{The name of the CalendarGenerateRecurringEvents workflow activity},
+	},
+
+	'workflow generateRecurringEvents description' => {
+			message 	=> q{This activity generates recurring events for calendars. }
+                        . q{This activity also maintains recurring events in the future.},
+			lastUpdated	=> 0,
+			context		=> q{Description of what the CalendarGenerateRecurringEvents workflow activity does},
+	},	
 
 #################### HELP PAGES ####################
     
@@ -510,6 +522,11 @@ our $I18N = {
 		lastUpdated 	=> 1171171998,
 	},
 
+    'startMonth'    => {
+        message     => q{The number (1-12) of the month this week starts.},
+        lastUpdated => 1171043883,
+    },
+
 	'startMonthName' => {
 		message 	=> q|The name of the month this week starts.|,
 		lastUpdated 	=> 1171043883,
@@ -539,6 +556,11 @@ our $I18N = {
 		message 	=> q|The year this week starts in.|,
 		lastUpdated 	=> 1171043883,
 	},
+
+    'endMonth'  => {
+        message     => q{The number (1-12) of the month this week ends.},
+        lastUpdated => 117104883,
+    },
 
 	'endMonthName' => {
 		message 	=> q|The name of the month this week ends.|,
