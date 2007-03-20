@@ -5,6 +5,7 @@
    Technologies)
  - fix: Bug in thumbnailer.pl
  - fix: Events userDefined fields now work.
+ - fix: Bug in thumbnailer.pl revisited ("guiuser")
 
 
 7.3.12

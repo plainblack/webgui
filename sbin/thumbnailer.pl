@@ -33,7 +33,7 @@ my $ok = GetOptions(
 	'path=s'=>\$path
 );
 
-if ($help || ($path && $ok) ) {
+if ($help || !($path && $ok) ) {
   print <<USAGE;
 Usage: perl $0 --path=/path/to/files [--size=thumbnailSize] [--missing]
 
