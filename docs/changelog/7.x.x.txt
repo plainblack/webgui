@@ -4,6 +4,7 @@
  - fix: SQL Report: Paginate After (Still) (William McKee / Knowmad
    Technologies)
  - fix: Bug in thumbnailer.pl
+ - fix: Events userDefined fields now work.
 
 
 7.3.12
