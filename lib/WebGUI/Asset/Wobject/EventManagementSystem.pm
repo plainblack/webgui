@@ -2695,15 +2695,15 @@ sub www_saveRegistrantInfo {
 	$userId = $theirUserId unless $thisIsI;
 	if ($userId && $userId ne '1') {
 		my $u = WebGUI::User->new($self->session,$userId);
-		$u->profileField('firstName',$firstName);
-		$u->profileField('lastName',$lastName);
-		$u->profileField('homeAddress',$address);
-		$u->profileField('homeCity',$city);
-		$u->profileField('homeState',$state);
-		$u->profileField('homeZip',$zipCode);
-		$u->profileField('homeCountry',$country);
-		$u->profileField('homePhone',$phoneNumber);
-		$u->profileField('email',$email);
+		$u->profileField('firstName',$firstName) if ($firstName ne "");
+		$u->profileField('lastName',$lastName) if ($lastName ne "");
+		$u->profileField('homeAddress',$address) if ($address ne "");
+		$u->profileField('homeCity',$city) if ($city ne "");
+		$u->profileField('homeState',$state) if ($state ne "");
+		$u->profileField('homeZip',$zipCode) if ($zipCode ne "");
+		$u->profileField('homeCountry',$country) if ($country ne "");
+		$u->profileField('homePhone',$phoneNumber) if ($phoneNumber ne "");
+		$u->profileField('email',$email) if ($email ne "");
 	}
 
 	$self->session->scratch->set('currentBadgeId',$badgeId);
@@ -3582,15 +3582,15 @@ sub www_editRegistrantSave {
 			$u = WebGUI::User->new($self->session,$userId);
 		}
 		if (ref($u) eq 'WebGUI::User') {
-			$u->profileField('firstName',$firstName);
-			$u->profileField('lastName',$lastName);
-			$u->profileField('homeAddress',$address);
-			$u->profileField('homeCity',$city);
-			$u->profileField('homeState',$state);
-			$u->profileField('homeZip',$zipCode);
-			$u->profileField('homeCountry',$country);
-			$u->profileField('homePhone',$phoneNumber);
-			$u->profileField('email',$email);
+			$u->profileField('firstName',$firstName) if ($firstName ne "");
+                	$u->profileField('lastName',$lastName) if ($lastName ne "");
+                	$u->profileField('homeAddress',$address) if ($address ne "");
+                	$u->profileField('homeCity',$city) if ($city ne "");
+                	$u->profileField('homeState',$state) if ($state ne "");
+                	$u->profileField('homeZip',$zipCode) if ($zipCode ne "");
+                	$u->profileField('homeCountry',$country) if ($country ne "");
+                	$u->profileField('homePhone',$phoneNumber) if ($phoneNumber ne "");
+                	$u->profileField('email',$email) if ($email ne "");
 		}
 	}
 	return $self->www_manageRegistrants();

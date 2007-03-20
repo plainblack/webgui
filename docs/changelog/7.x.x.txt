@@ -4,6 +4,7 @@
  - fix: SQL Report: Paginate After (Still) (William McKee / Knowmad
    Technologies)
  - fix: Bug in thumbnailer.pl
+ - fix: EMS: Adding badges for others
  - fix: Events userDefined fields now work.
  - fix: Bug in thumbnailer.pl revisited ("guiuser")
 
