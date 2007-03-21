@@ -7,6 +7,8 @@
  - fix: EMS: Adding badges for others
  - fix: Events userDefined fields now work.
  - fix: Bug in thumbnailer.pl revisited ("guiuser")
+ - fix: in Default USS "open in new windows" not working (perlDreamer
+   Consulting, LLC)
 
 
 7.3.12
