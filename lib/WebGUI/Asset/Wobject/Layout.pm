@@ -170,7 +170,6 @@ sub prepareView {
 			foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
-						$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 						$child->prepareView;
 						if ($i > $numPositions || $i==1) {
 							push(@placeHolder1, $child);
