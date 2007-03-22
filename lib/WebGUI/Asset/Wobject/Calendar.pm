@@ -630,8 +630,8 @@ sub getEventsIn {
                 ( 
                     Event.startTime IS NULL 
                     && Event.endTime IS NULL 
-                    && !
-                        (
+                    && 
+                        !(
                             Event.startDate >= '$endDate' 
                          || Event.endDate   <  '$startDate'
                         )
@@ -1113,9 +1113,12 @@ sub viewMonth {
     # Get the range of the epoch of this month
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
     $dt->truncate( to => "month");
+    my $start = $dt->toMysql;
+    my $dtEnd = $dt->clone->add(months => 1)->add(seconds => -1);
+    my $end   = $dtEnd->toMysql;
     
     my @events      
-        = $self->getEventsIn($dt->toMysql,$dt->clone->add(months => 1)->toMysql);
+        = $self->getEventsIn($start,$end);
     
     
     #### Create the template parameters
@@ -1157,6 +1160,15 @@ sub viewMonth {
         
         # Prepare the template variables
         my %eventTemplateVariables = $self->getEventVars($event);
+
+        #Handle events that start before this month or end after this month.
+        if ($dt_event_start < $dt) {
+            $dt_event_start = $dt;
+        }
+
+        if ($dt_event_end > $dtEnd) {
+            $dt_event_end = $dtEnd;
+        }
 
         # Make the event show on each day it spans
         for my $mday ($dt_event_start->day_of_month_0..$dt_event_end->day_of_month_0) {
@@ -1255,7 +1267,7 @@ sub viewWeek {
     $dt->subtract(days => $dt->day_of_week % 7 - $first_dow);
     
     my $start   = $dt->toMysql;
-    my $dtEnd   = $dt->clone->add(days => 7);
+    my $dtEnd   = $dt->clone->add(days => 7)->add(seconds => -1);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
     
     my @events  = $self->getEventsIn($start,$end);
@@ -1287,11 +1299,22 @@ sub viewWeek {
     }
     
     # The events
+
     for my $event (@events) {
         # Get the week this event is in, and add it to that week in
         # the template variables
         my $dt_event_start = $event->getDateTimeStart;
         my $dt_event_end   = $event->getDateTimeEnd;
+
+        #Handle events that start before this week or end after this week.
+        if ($dt_event_start < $dt) {
+            $dt_event_start = $dt;
+        }
+
+        if ($dt_event_end > $dtEnd) {
+            $dt_event_end = $dtEnd;
+        }
+
         $dt_event_start->set_locale($i18n->get("locale"));
         $dt_event_end->set_locale($i18n->get("locale"));
 
