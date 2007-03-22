@@ -1,5 +1,7 @@
 7.3.14
  - fix: Duplicate Metadata (perlDreamer Consulting, LLC)
+ - add: User Defined Fields in Posts Edit Form can now be used as hidden form
+        elements
 
 
 7.3.13

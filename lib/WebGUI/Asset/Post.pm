@@ -1151,27 +1151,41 @@ sub www_edit {
 		value => $self->session->form->process('visitorName') || $self->getValue("visitorName")
 		});
 	for my $x (1..5) {
-		my $userDefined = $self->session->form->process("userDefined".$x) || $self->getValue("userDefined".$x);
-		$var{'userDefined'.$x.'.form'} = WebGUI::Form::text($self->session, {
-			name=>"userDefined".$x,
-			value=>$userDefined
+		my $userDefinedValue 
+            = $self->session->form->process("userDefined".$x) 
+            || $self->getValue("userDefined".$x)
+            ;
+		
+        $var{'userDefined'.$x.'.form'} 
+            = WebGUI::Form::text($self->session, {
+			    name    => "userDefined".$x,
+			    value   => $userDefinedValue,
 			});
-		$var{'userDefined'.$x.'.form.yesNo'} = WebGUI::Form::yesNo($self->session, {
-			name=>"userDefined".$x,
-			value=>$userDefined
+		$var{'userDefined'.$x.'.form.yesNo'} 
+            = WebGUI::Form::yesNo($self->session, {
+			    name    => "userDefined".$x,
+			    value   => $userDefinedValue,
 			});
-		$var{'userDefined'.$x.'.form.textarea'} = WebGUI::Form::textarea($self->session, {
-			name=>"userDefined".$x,
-			value=>$userDefined
+		$var{'userDefined'.$x.'.form.textarea'} 
+            = WebGUI::Form::textarea($self->session, {
+			    name    => "userDefined".$x,
+			    value   => $userDefinedValue,
 			});
-		$var{'userDefined'.$x.'.form.htmlarea'} = WebGUI::Form::HTMLArea($self->session, {
-			name=>"userDefined".$x,
-			value=>$userDefined
+		$var{'userDefined'.$x.'.form.htmlarea'} 
+            = WebGUI::Form::HTMLArea($self->session, {
+			    name    => "userDefined".$x,
+			    value   => $userDefinedValue,
 			});
-		$var{'userDefined'.$x.'.form.float'} = WebGUI::Form::Float($self->session, {
-			name=>"userDefined".$x,
-			value=>$userDefined
+		$var{'userDefined'.$x.'.form.float'} 
+            = WebGUI::Form::Float($self->session, {
+			    name    => "userDefined".$x,
+			    value   => $userDefinedValue,
 			});
+        $var{'userDefined'.$x.'.form.hidden'}
+            = WebGUI::Form::hidden($self->session, {
+                name    => "userDefined".$x,
+                value   => $userDefinedValue,
+            });
 	}
 	
 	$title = WebGUI::HTML::filter($title,"all");
