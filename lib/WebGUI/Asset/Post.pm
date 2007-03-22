@@ -1155,7 +1155,7 @@ sub www_edit {
             = $self->session->form->process("userDefined".$x) 
             || $self->getValue("userDefined".$x)
             ;
-		
+		$var{'userDefined'.$x}  = $userDefinedValue;
         $var{'userDefined'.$x.'.form'} 
             = WebGUI::Form::text($self->session, {
 			    name    => "userDefined".$x,
@@ -1181,11 +1181,6 @@ sub www_edit {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
-        $var{'userDefined'.$x.'.form.hidden'}
-            = WebGUI::Form::hidden($self->session, {
-                name    => "userDefined".$x,
-                value   => $userDefinedValue,
-            });
 	}
 	
 	$title = WebGUI::HTML::filter($title,"all");
