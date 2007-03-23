@@ -84,7 +84,7 @@ sub delete {
 	my $self = shift;
 	my $skipNotify = shift;
 	$self->session->db->deleteRow("WorkflowSchedule","taskId",$self->getId);
-	if ($skipNotify) {	
+	if (! $skipNotify) {	
 		WebGUI::Workflow::Spectre->new($self->session)->notify("cron/deleteJob", $self->session->config->getFilename."-".$self->getId);
 	}
 	undef $self;
