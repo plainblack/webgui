@@ -9,6 +9,8 @@
  - fix: Collaboration System not deleting getCSMail workflows (perlDreamer Consulting, LLC)
  - fix: Calendar event edit should inherit (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/calendar-event-edit-should-inherit
+ - fix: Calendar: recurrance generates uncommitted version tag (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/calendar-recurrance-generates-uncommitted-version-tag
 
 
 7.3.13

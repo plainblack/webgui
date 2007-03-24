@@ -15,7 +15,7 @@ $VERSION = "0.0.0";
 use strict;
 
 use Tie::IxHash;
-use Carp qw(cluck confess);
+use Carp qw(croak);
 use Storable qw(nfreeze thaw);
 
 use WebGUI::International;
@@ -1540,7 +1540,9 @@ sub setRecurrence {
     
     ## Set to the database
     ## Return the new recurId
-    return $self->session->db->setRow("Event_recur","recurId",$data);
+    my $recurId = $self->session->db->setRow("Event_recur","recurId",$data);
+    $self->update({recurId => $recurId}); 
+    return $recurId;
 }
 
 
