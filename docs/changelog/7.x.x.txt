@@ -11,7 +11,8 @@
     http://www.plainblack.com/bugs/tracker/calendar-event-edit-should-inherit
  - fix: Calendar: recurrance generates uncommitted version tag (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/calendar-recurrance-generates-uncommitted-version-tag
-
+ - fix: Wrong location after login (thanks to Michelle Lamar)
+    http://www.plainblack.com/bugs/tracker/wrong-location-after-login#1gVCQqlv41L9gQ3kv4Eg-g
 
 7.3.13
  - fix: Stale pages after user login
