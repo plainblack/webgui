@@ -154,16 +154,14 @@ sub canAdd {
 
 =head2 canEdit
 
-Returns true if a user can edit this asset.
+Returns true if a user can edit this asset.  This uses the canEditEvent
+from the parent Calendar.
 
 =cut
 
 sub canEdit {
     my $self    = shift;
-    my $session    = $self->session;
-    
-    return $session->user->isInGroup($self->getParent->get("groupIdEventEdit"))
-        or $self->SUPER::canEdit;
+    return $self->getParent->canAddEvent;
 }
 
 

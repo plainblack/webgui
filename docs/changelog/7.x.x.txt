@@ -7,6 +7,8 @@
  - add: User Defined Fields in Posts Edit Form can now be used as hidden form
         elements
  - fix: Collaboration System not deleting getCSMail workflows (perlDreamer Consulting, LLC)
+ - fix: Calendar event edit should inherit (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/calendar-event-edit-should-inherit
 
 
 7.3.13
