@@ -400,9 +400,9 @@ sub displayLogin {
 	my $method = $_[0] || "login";
 	my $vars = $_[1];
 	# Automatically set redirectAfterLogin unless we've linked here directly
-	# or it's already been set.
+	# or it's already been set to perform another operation
 	unless ($self->session->form->process("op") eq "auth"
-		|| $self->session->scratch->get("redirectAfterLogin") ) {
+		|| ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) ) {
 	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
 	}
     my $i18n = WebGUI::International->new($self->session);
