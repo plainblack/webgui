@@ -2,17 +2,19 @@
  - fix: Duplicate Metadata (perlDreamer Consulting, LLC)
  - fix: calender (thanks to TjECC for suggesting a very elegant way to fix
    this)
-    http://www.plainblack.com/bugs/tracker/calender#TKMNSvU-0qlmsv3aNk5W7g
-    Display of events which span weeks, months and/or days
+        http://www.plainblack.com/bugs/tracker/calender#TKMNSvU-0qlmsv3aNk5W7g
  - add: User Defined Fields in Posts Edit Form can now be used as hidden form
         elements
  - fix: Collaboration System not deleting getCSMail workflows (perlDreamer Consulting, LLC)
  - fix: Calendar event edit should inherit (perlDreamer Consulting, LLC)
-    http://www.plainblack.com/bugs/tracker/calendar-event-edit-should-inherit
+        http://www.plainblack.com/bugs/tracker/calendar-event-edit-should-inherit
  - fix: Calendar: recurrance generates uncommitted version tag (perlDreamer Consulting, LLC)
-    http://www.plainblack.com/bugs/tracker/calendar-recurrance-generates-uncommitted-version-tag
+        http://www.plainblack.com/bugs/tracker/calendar-recurrance-generates-uncommitted-version-tag
  - fix: Wrong location after login (thanks to Michelle Lamar)
-    http://www.plainblack.com/bugs/tracker/wrong-location-after-login#1gVCQqlv41L9gQ3kv4Eg-g
+        http://www.plainblack.com/bugs/tracker/wrong-location-after-login#1gVCQqlv41L9gQ3kv4Eg-g
+ - fix: Clear Login History period is calculated 24 times longer if it is set
+   in months (thanks to Todor  Kouyoumdjiev ECoCoMS Ltd.)
+        http://www.plainblack.com/bugs/tracker/clear-login-history-period-is-calculated-24-times-longer-if-it-is-set-in-months#VomZpVCroSN6WoQ-UYo7Xw
 
 7.3.13
  - fix: Stale pages after user login
