@@ -400,7 +400,7 @@ sub disconnect {
 
 #-------------------------------------------------------------------
 
-=head2 errorCode {
+=head2 errorCode ( )
 
 Returns an error code for the current handler.
 
@@ -414,7 +414,7 @@ sub errorCode {
 
 #-------------------------------------------------------------------
 
-=head2 errorMessage {
+=head2 errorMessage ( )
 
 Returns a text error message for the current handler.
 
@@ -477,7 +477,7 @@ sub getRow {
 
 #-------------------------------------------------------------------
 
-=head2 prepare ( sql ) {
+=head2 prepare ( sql ) 
 
 This is a wrapper for WebGUI::SQL::ResultSet->prepare()
 
