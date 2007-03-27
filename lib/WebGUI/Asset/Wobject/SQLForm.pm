@@ -656,12 +656,13 @@ sub _databaseLinkHasPrivileges {
 	@grants = $dbLink->db->buildArray('show grants for current_user');
 
 	foreach (@grants) {
-		if (m/GRANT ([\w\s\d,]*?) ON .$databaseName.*$/) {
+        ##Checks for grants on all databases '*' or grants on a specific database
+		if (m/GRANT ([\w\s\d,]*?) ON (?:\*|.$databaseName.)\./) {
 			push(@privileges, (split(/, /,$1)));
 		}
 	}
 
-	# Check ik all required privs are present.
+	# Check if all required privs are present.
 	return 1 if (isIn('ALL PRIVILEGES', @privileges));
 	
 	foreach (@$wantedPrivileges) {
