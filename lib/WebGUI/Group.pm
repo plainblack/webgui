@@ -319,7 +319,7 @@ sub deleteUsers {
 
 =head2 deleteOffset ( [ value ] )
 
-Returns the number of days after the expiration to delete the grouping.
+Returns the number of seconds after the expiration to delete the grouping.
 
 =head3 value
 
@@ -408,7 +408,7 @@ sub expireNotifyMessage {
 
 =head2 expireNotifyOffset ( [ value ] )
 
-Returns the number of days after the expiration to notify the user.
+Returns the number of seconds after the expiration to notify the user.
 
 =head3 value
 
