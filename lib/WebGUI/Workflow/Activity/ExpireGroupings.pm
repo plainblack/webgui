@@ -75,7 +75,7 @@ sub execute {
 	my $i18n = WebGUI::International->new($self->session, "WebGUI");
         my $a = $self->session->db->read("select groupId,expireNotifyOffset,expireNotifyMessage from groups where expireNotify=1");
         while (my $group = $a->hashRef) {
-        	my $start = $now + (86400 * ($group->{expireNotifyOffset}-1));
+        	my $start = $now + ($group->{expireNotifyOffset}-1);
                 my $end = $start + 86400;
                 my $b = $self->session->db->read("select userId from groupings where groupId=? and expireDate>=? and expireDate<=?", [$group->{groupId}, $start, $end]);
                 while (my ($userId) = $b->array) { 
@@ -92,7 +92,7 @@ sub execute {
         		# there is no need to wait deleteOffset days for expired external group cache data
                   	$self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()]);
                 } else {
-                        $self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()-(86400*$data->{deleteOffset})]);
+                        $self->session->db->write("delete from groupings where groupId=? and expireDate < ?", [$data->{groupId}, time()-$data->{deleteOffset}]);
                 }
         }
 	return $self->COMPLETE;
