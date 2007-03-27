@@ -365,6 +365,11 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
+	'urlIcal' => {
+		message 	=> q|A URL to the iCal feed for the calendar, starting at this month.|,
+		lastUpdated 	=> 1175028512,
+	},
+
 	'paramStart' => {
 		message 	=> q|The starting date of the calendar.|,
 		lastUpdated 	=> 1171043883,

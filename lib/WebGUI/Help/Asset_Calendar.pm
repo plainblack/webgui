@@ -133,6 +133,9 @@ our $HELP   = {
 		            'name' => 'urlPrint'
 		          },
 		          {
+		            'name' => 'urlIcal'
+		          },
+		          {
 		            'name' => 'paramStart'
 		          },
 		          {
