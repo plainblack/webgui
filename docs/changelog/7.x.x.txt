@@ -1,5 +1,8 @@
 7.3.14
  - fix: Duplicate Metadata (perlDreamer Consulting, LLC)
+ - fix: fixed double conversion into seconds (seconds were being stored, and
+   then multiplied by 86400) in group expirations
+ - fix: Caching (last-modified bug) (misja / E-Wise)
  - fix: calender (thanks to TjECC for suggesting a very elegant way to fix
    this)
         http://www.plainblack.com/bugs/tracker/calender#TKMNSvU-0qlmsv3aNk5W7g
