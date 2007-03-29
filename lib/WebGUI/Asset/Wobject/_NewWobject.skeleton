@@ -154,7 +154,8 @@ to be displayed within the page style.
 
 sub view {
 	my $self = shift;
-	
+	my $session = $self->session;	
+
 	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
 	
