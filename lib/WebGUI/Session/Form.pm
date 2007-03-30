@@ -143,14 +143,14 @@ sub param {
 		}
 	} else {
 		if ($self->session->request) {
-			my @params = ();
+			my %params = ();
 			foreach ($self->session->request->param) {
-				push(@params, $_);
+				$params{$_} = 1;
 			}
 			foreach ($self->session->request->body) {
-				push(@params, $_);
+				$params{$_} = 1; 
 			}
-			return @params;
+			return keys %params;
 		} else {
 			return undef;
 		}

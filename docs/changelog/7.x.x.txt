@@ -20,6 +20,8 @@
         http://www.plainblack.com/bugs/tracker/clear-login-history-period-is-calculated-24-times-longer-if-it-is-set-in-months#VomZpVCroSN6WoQ-UYo7Xw
  - fix: SQLForm - cannot add new asset (revisited) (thanks to Joek Hondius)
         http://www.plainblack.com/bugs/tracker/sqlform---cannot-add-new-asset-revisited#barqLwFe3LPODb4Mksc6ZA
+ - fix: Fixed a bug where $session->form->param() would return params twice. 
+ 	(Martin Kamerbeek / Oqapi)
 
 7.3.13
  - fix: Stale pages after user login
