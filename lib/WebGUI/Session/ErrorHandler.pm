@@ -32,7 +32,7 @@ This package provides simple but effective error handling, debugging,  and loggi
 
  use WebGUI::Session::ErrorHandler;
 
- my $errorHandler = WebGUI::ErrorHandler->new($session);
+ my $errorHandler = WebGUI::Session::ErrorHandler->new($session);
 
  $errorHandler->audit($message);
  $errorHandler->debug($message);
