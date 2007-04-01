@@ -323,7 +323,7 @@ sub epochToHuman {
 		"c" => "B",
 		"C" => "b",
 		"d" => "d",
-		"D" => "e",
+		"D" => "_varday_",
 		"h" => "I",
 		"H" => "l",
 		"j" => "H",
@@ -346,10 +346,15 @@ sub epochToHuman {
 		my $replacement = $conversion{$key};
 		$output =~ s/\~$key/\%$replacement/g;
 	}
-  #--- %M
+	
 	$output = $dt->strftime($output);
+	
+  #--- %M
 	$temp = int($dt->month);
 	$output =~ s/\%_varmonth_/$temp/g;
+  #-- %D
+	$temp = int($dt->day);
+	$output =~ s/\%_varday_/$temp/g;
   #--- return
 	return $output;
 }
