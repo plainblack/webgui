@@ -22,6 +22,8 @@
         http://www.plainblack.com/bugs/tracker/sqlform---cannot-add-new-asset-revisited#barqLwFe3LPODb4Mksc6ZA
  - fix: Fixed a bug where $session->form->param() would return params twice. 
  	(Martin Kamerbeek / Oqapi)
+ - fix: Can't set workflow to singleton (perlDreamer Consulting, LLC)
+        http://www.plainblack.com/bugs/tracker/cant-set-workflow-to-singleton
 
 7.3.13
  - fix: Stale pages after user login

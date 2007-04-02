@@ -246,10 +246,11 @@ sub www_editWorkflowSave {
         return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
 	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->set({
-		enabled=>$session->form->get("enabled","yesNo"),
-		isSerial=>$session->form->get("isSerial","yesNo"),
-		title=>$session->form->get("title"),
-		description=>$session->form->get("description","textarea"),
+		enabled     => $session->form->get("enabled",     "yesNo"),
+		isSingleton => $session->form->get("isSingleton", "yesNo"),
+		isSerial    => $session->form->get("isSerial",    "yesNo"),
+		title       => $session->form->get("title"),
+		description => $session->form->get("description", "textarea"),
 		});
 	return www_editWorkflow($session, $workflow);
 }
