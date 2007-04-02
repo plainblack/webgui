@@ -782,7 +782,7 @@ sub view {
 
 sub viewList {
 	my $self = shift;
-	return $self->session->privilege::insufficient() unless ($self->session->user->isInGroup($self->get("groupToViewEntries")));
+	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup($self->get("groupToViewEntries")));
 	return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
 }
 
