@@ -1,4 +1,7 @@
 7.3.14
+ - fix: http://www.plainblack.com/bugs/tracker/dataform-security-bug (thanks to misja)
+ - fix: changed Email.pm's filter to allow '+' in email address
+ - fix: DateTime::epochToHuman %D formatting error- getting day data directly form DateTime, not from $dt->strftime
  - fix: Duplicate Metadata (perlDreamer Consulting, LLC)
  - fix: fixed double conversion into seconds (seconds were being stored, and
    then multiplied by 86400) in group expirations
