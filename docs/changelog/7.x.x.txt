@@ -1,4 +1,5 @@
 7.3.14
+ - fix: modifiex templates for month, week, and day, added iCal variable links
  - fix: added ability for Workflow/Activity/GetCsMail.pm to handle unregistered posters
  - fix: http://www.plainblack.com/bugs/tracker/dataform-security-bug (thanks to misja)
  - fix: changed Email.pm's filter to allow '+' in email address
