@@ -181,18 +181,19 @@ sub execute {
 		$from = $1 || $from;
 		$from =~ /(\S+\@\S+)/;	
 		my $user = WebGUI::User->newByEmail($self->session, $from);
-		if ($cs->get("requireSubscriptionForEmailPosting")) { #don't reject if subscription isn't required
-			unless (defined $user ) {			# if subscription is required, chuck the message if there's no user
-				my $send = WebGUI::Mail::Send->create($self->session, {
-					to=>$message->{from},
-					inReplyTo=>$message->{messageId},
-					subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
-					from=>$cs->get("mailAddress")
-					});
-				$send->addText($i18n->get("rejected because no user account"));
-				$send->send;
-				next;
-			}
+		if (!$cs->get("requireSubscriptionForEmailPosting") && !(defined $user)) { #this one is for unregistered posters
+			$user = WebGUI::User->new($self->session, undef);
+		}
+		unless (defined $user ) {			
+			my $send = WebGUI::Mail::Send->create($self->session, {
+				to=>$message->{from},
+				inReplyTo=>$message->{messageId},
+				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+				from=>$cs->get("mailAddress")
+				});
+			$send->addText($i18n->get("rejected because no user account"));
+			$send->send;
+			next;
 		}
 		my $post = undef;
 		if ($message->{inReplyTo}) {
@@ -200,12 +201,8 @@ sub execute {
 			my $id = $1;	
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}
-		if (!$cs->get("requireSubscriptionForEmailPosting") && !(defined $user)) { #this one is for unregistered posters
-			$user = WebGUI::User->new($self->session, undef);
-			$self->addPost($cs, $message, $user, $cs->get("mailPrefix"));
-			
 
-		} elsif (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
+		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
 			$self->addPost($post, $message, $user, $cs->get("mailPrefix"));
 			if ($cs->get("autoSubscribeToThread") && !($user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
 				$user->addToGroups([$post->getThread->get("subscriptionGroupId")]);
