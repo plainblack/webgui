@@ -246,19 +246,21 @@ sub processPropertiesFromFormPost {
 	$self->SUPER::processPropertiesFromFormPost;
 	delete $self->{_storageLocation};
 
-    my $fileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValueFromPost;
-    my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
-	$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
-	my $filename = $storage->getFiles()->[0];
-	if (defined $filename && $filename ne $self->get("filename")) {
-		my %data;
-		$data{filename} = $filename;
-		$data{storageId} = $storage->getId;
-		$data{title} = $filename unless ($self->session->form->process("title"));
-		$data{menuTitle} = $filename unless ($self->session->form->process("menuTitle"));
-		$data{url} = $self->getParent->get('url').'/'.$filename unless ($self->session->form->process("url"));
-		$self->update(\%data);
-		$self->setSize($storage->getFileSize($filename));
+    	my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'file'})->getValueFromPost;
+    	my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
+	if (defined $storage) {
+		$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
+		my $filename = $storage->getFiles()->[0];
+		if (defined $filename && $filename ne $self->get("filename")) {
+			my %data;
+			$data{filename} = $filename;
+			$data{storageId} = $storage->getId;
+			$data{title} = $filename unless ($self->session->form->process("title"));
+			$data{menuTitle} = $filename unless ($self->session->form->process("menuTitle"));
+			$data{url} = $self->getParent->get('url').'/'.$filename unless ($self->session->form->process("url"));
+			$self->update(\%data);
+			$self->setSize($storage->getFileSize($filename));
+		}
 	}
 }
 

@@ -139,7 +139,7 @@ sub db {
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
 		my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier);
 		unless (defined $dbh) {
-			$self->session->errorHandler->arn("Cannot connect to DatabaseLink [".$self->getId."]");
+			$self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
 		}
 		$self->{_dbh} = $dbh;
 		return $self->{_dbh};
