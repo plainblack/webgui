@@ -582,7 +582,7 @@ sub getDatabaseUsers {
         ### Check db database
         if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
 		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
-		my $dbh = $dbLink->db;
+		my $dbh = $dbLink->db if (defined $dbLink);
 		if (defined $dbh) {
 			my $query = $self->get("dbQuery");
 			WebGUI::Macro::process($self->session,\$query);

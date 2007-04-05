@@ -1,5 +1,6 @@
 7.3.15
  - fix: modified Form/Textarea.pm to use -min versions of YUI javascript libraries in order to speed up page load times
+ - fix: fixed an error in the groups/db system where removing a dblink connected to a group would produce a fatal error
 
 
 7.3.14
