@@ -1101,7 +1101,7 @@ Returns the value of anything it can find with an index of key, or else it retur
 
 =head3 key
 
-A form variable, an asset property name, or a propertyDefinition.
+An asset property name, or a propertyDefinition.
 
 =cut
 
