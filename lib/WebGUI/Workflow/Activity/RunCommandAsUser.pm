@@ -80,7 +80,7 @@ sub execute {
 	my $user = shift;
 	my $cmd = $self->get("command");
 	$self->session->user({user=>$user});
-	WebGUI::Macro::process(\$cmd);
+	WebGUI::Macro::process($self->session, \$cmd);
 	if (system($cmd)) {
 		$self->session->errorHandler->error("Workflow: RunCommandAsUser failed because: $!");
 		return $self->ERROR;
