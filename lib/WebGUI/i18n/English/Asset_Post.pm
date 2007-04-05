@@ -33,8 +33,8 @@ editing an existing Post.|,
 	},
 
 	'reply.synopsis' => {
-		message => q|The synopsis of the Post that is being replied to.|,
-		lastUpdated => 1149829706,
+		message => q|The synopsis of the Post that is being replied to.  If no synopsis has been set, then it will try to grab text from the description, up to the &#94;-; marker.  If no marker is found, then it takes everything up to the first newline in the description|,
+		lastUpdated => 1175746663,
 	},
 
 	'reply.content' => {
@@ -89,8 +89,8 @@ a reply in the thread.|,
 	},
 
 	'preview.synopsis' => {
-		message => q|The synopsis when previewing a post.|,
-		lastUpdated => 1149829706,
+		message => q|The synopsis when previewing a post.  If no synopsis has been set, then it will try to grab text from the description, up to the &#94;-; marker.  If no marker is found, then it takes everything up to the first newline in the description|,
+		lastUpdated => 1175746627,
 	},
 
 	'preview.content' => {
@@ -433,8 +433,8 @@ editing an existing Post, and a thread containing the Post exists.|,
 	},
 
 	'synopsis' => {
-		message => q|The synopsis of the Post.|,
-		lastUpdated => 1150167057,
+		message => q|The synopsis of the Post.  If no synopsis has been set, then it will try to grab text from the description, up to the &#94;-; marker.  If no marker is found, then it takes everything up to the first newline in the description|,
+		lastUpdated => 1175746674,
 	},
 
 	'extraHeadTags' => {
