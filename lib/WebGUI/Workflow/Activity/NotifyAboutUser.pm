@@ -27,7 +27,8 @@ Package WebGUI::Workflow::Activity::NotifyAboutUser
 
 =head1 DESCRIPTION
 
-Takes a user object and sends out a message. Can use macros in message.
+Takes a user object and sends out a message. Can use macros in message, to and subject
+fields.
 
 =head1 SYNOPSIS
 
