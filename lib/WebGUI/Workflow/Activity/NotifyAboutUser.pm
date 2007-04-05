@@ -93,11 +93,11 @@ sub execute {
 	my $user = shift;
 	$self->session->user({user=>$user});
 	my $message = $self->get("message");
-	WebGUI::Macro::process(\$message);
+	WebGUI::Macro::process($self->session, \$message);
 	my $to = $self->get("to");
-	WebGUI::Macro::process(\$to);
+	WebGUI::Macro::process($self->session, \$to);
 	my $subject = $self->get("subject");
-	WebGUI::Macro::process(\$subject);
+	WebGUI::Macro::process($self->session, \$subject);
 	my $mail = WebGUI::Mail::Send->create($self->session, {
 		to=>$to,
 		subject=>$subject
