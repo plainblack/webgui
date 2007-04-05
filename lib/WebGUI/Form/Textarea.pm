@@ -114,11 +114,11 @@ sub toHtml {
 	if ($self->get("resizeable")) {
 		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
 		my ($style, $url) = $self->session->quick(qw(style url));
-		$style->setScript($url->extras("yui/build/yahoo/yahoo.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/event/event.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/dom/dom.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/dragdrop/dragdrop.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/logger/logger.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/yahoo/yahoo-min.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/dom/dom-min.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui/build/logger/logger-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui-ext/yui-ext-core.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui-ext/resizable-lib.js"), {type=>"text/javascript"});
 		$style->setLink($url->extras("yui-ext/resources/css/resizable.css"), {type=>"text/css", rel=>"stylesheet"});
