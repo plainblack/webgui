@@ -1,9 +1,8 @@
 7.3.15
- -  
+ - fix: modified Form/Textarea.pm to use -min versions of YUI javascript libraries in order to speed up page load times
 
 
 7.3.14
- - fix: modified Form/Textarea.pm to use -min versions of YUI javascript libraries in order to speed up page load times
  - fix: a typo in DatabaseLink.pm
  - fix: a typo in CleanTempSpace.pm
  - fix: an unhandled exception in Asset/File.pm
