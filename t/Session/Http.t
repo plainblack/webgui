@@ -23,7 +23,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 41;
+my $num_tests = 52;
 
 plan tests => $num_tests;
  
@@ -219,6 +219,12 @@ $http->sendHeader;
 is($request->status, 301, 'sendHeader as redirect: status set to 301');
 is_deeply($request->headers_out->fetch, {'Location' => '/here/there'}, 'sendHeader as redirect: location set');
 
+####################################################
+#
+# sendHeader, Status, LastModified, default mime-type, cache headers.
+#
+####################################################
+
 ##Clear request object to run a new set of requests
 $request = WebGUI::PseudoRequest->new();
 $session->{_request} = $request;
@@ -238,9 +244,18 @@ my $expected_headers = {
 };
 cmp_deeply($request->headers_out->fetch, $expected_headers, 'sendHeader: normal headers');
 
+####################################################
+#
+# sendHeader, mime-type, filename/attachment, recent HTTP protocol
+#
+####################################################
+
 $http->setNoHeader(0);
 $http->setFilename('image.png');
+$http->setMimeType('image/png');
+$request->protocol('HTTP 1.1');
 $http->sendHeader();
+is($request->content_type, 'image/png', 'sendHeader: mimetype');
 is_deeply(
 	$request->headers_out->fetch,
 	{
@@ -251,13 +266,132 @@ is_deeply(
 	'sendHeader: normal headers'
 );
 
+####################################################
+#
+# sendHeader, old HTTP protocol
+#
+####################################################
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+
+$http->setNoHeader(0);
+$http->setFilename('');
+$request->protocol('HTTP 1.0');
+$http->sendHeader();
+my $headers_out = $request->headers_out->fetch;
+my $expire_header = delete $headers_out->{Expires};
+my $delta = deltaHttpTimes($session->datetime->epochToHttp(), $expire_header);
+cmp_ok($delta->seconds, '<=', 1, 'sendHeader, old HTTP protocol: adds extra cache header field');
+is_deeply(
+	$request->headers_out->fetch,
+	{
+		'Last-Modified' => $session->datetime->epochToHttp(1200),
+        'Cache-Control' => 'must-revalidate, max-age=1',
+	},
+	'sendHeader: normal headers'
+);
+
+####################################################
+#
+# sendHeader, old HTTP protocol, cacheControl set to 500
+#
+####################################################
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+
+$http->setNoHeader(0);
+$http->setFilename('');
+$request->protocol('HTTP 1.0');
+$http->setCacheControl(500);
+$http->sendHeader();
+my $headers_out = $request->headers_out->fetch;
+my $expire_header = delete $headers_out->{Expires};
+my $delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
+cmp_ok($delta->seconds, '<=', 2, 'sendHeader, old HTTP protocol, cacheControl=500: adds extra cache header field');
+is_deeply(
+	$request->headers_out->fetch,
+	{
+		'Last-Modified' => $session->datetime->epochToHttp(1200),
+        'Cache-Control' => 'must-revalidate, max-age=500',
+	},
+	'sendHeader: normal headers'
+);
+
+
+
+####################################################
+#
+# sendHeader, preventProxyCache changes cache headers
+#
+####################################################
+
+##Clear request object to run a new set of requests
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+$http->setFilename('');
+$http->setNoHeader(0);
+
+$session->setting->set('preventProxyCache', 1);
+
+$http->sendHeader();
+is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
+is_deeply(
+	$request->headers_out->fetch,
+	{
+        'Cache-Control' => 'private, max-age=1',
+	},
+	'sendHeader: Cache-Control setting when preventProxyCache set'
+);
+
+$session->setting->set('preventProxyCache', 0);
+
+####################################################
+#
+# sendHeader, cacheControl=none changes cache headers
+#
+####################################################
+
+##Clear request object to run a new set of requests
+$request = WebGUI::PseudoRequest->new();
+$session->{_request} = $request;
+$http->setFilename('');
+$http->setNoHeader(0);
+$http->setCacheControl('none');
+
+$http->sendHeader();
+is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
+is_deeply(
+	$request->headers_out->fetch,
+	{
+        'Cache-Control' => 'private, max-age=1',
+	},
+	'sendHeader: Cache-Control setting when preventProxyCache set'
+);
+
+####################################################
+#
+# sendHeader, non-visitor user changes cache headers
+#
+####################################################
+
 ##Clear request object to run a new set of requests
 $request = WebGUI::PseudoRequest->new();
 $session->{_request} = $request;
 $http->setFilename('');
 $http->setNoHeader(0);
 $session->user({userId => 3});
+
 $http->sendHeader();
+is($request->no_cache, 1, 'sendHeader: no_cache set when preventProxyCache set');
+is_deeply(
+	$request->headers_out->fetch,
+	{
+        'Cache-Control' => 'private, max-age=1',
+	},
+	'sendHeader: Cache-Control setting when preventProxyCache set'
+);
+
+$session->user({userId => 1});
 
 ####################################################
 #
