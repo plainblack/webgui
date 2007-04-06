@@ -18,7 +18,7 @@ use WebGUI::Session;
 use Test::More;
 use Test::MockObject::Extends;
 
-my $numTests = 38;
+my $numTests = 37;
 
 plan tests => $numTests;
 
@@ -29,17 +29,6 @@ my %newEnv = ( REMOTE_ADDR => '192.168.0.6' );
 $session->env->{_env} = \%newEnv;
 
 my ($eh) = $session->quick('errorHandler');
-my $logger = $session->errorHandler->getLogger;
-$logger = Test::MockObject::Extends->new( $logger );
-
-is( $logger, $session->errorHandler->getLogger, 'Main logger mocked');
-
-my ($warns, $debug, $info, $error);
-
-$logger->mock( 'warn',  sub { $warns = $_[1]} );
-$logger->mock( 'debug', sub { $debug = $_[1]} );
-$logger->mock( 'info',  sub { $info  = $_[1]} );
-$logger->mock( 'error', sub { $error = $_[1]} );
 
 ####################################################
 #
@@ -49,17 +38,17 @@ $logger->mock( 'error', sub { $error = $_[1]} );
 
 my $accumulated_warn = "";
 $eh->warn("This is a warning");
-is($warns, "This is a warning", "warn: Log4perl called");
+is($WebGUI::Test::logger_warns, "This is a warning", "warn: Log4perl called");
 $accumulated_warn .= "This is a warning\n";
 is($session->errorHandler->{_debug_warn}, $accumulated_warn, "warn: message internally appended");
 $eh->warn("Second warning");
-is($warns, "Second warning", "warn: Log4perl called again");
+is($WebGUI::Test::logger_warns, "Second warning", "warn: Log4perl called again");
 $accumulated_warn .= "Second warning\n";
 is($session->errorHandler->{_debug_warn}, $accumulated_warn, "warn: second message appended");
 $eh->security('Shields up, red alert');
 my $security = sprintf '%s (%d) connecting from %s attempted to %s',
 	$session->user->username, $session->user->userId, $session->env->getIp, 'Shields up, red alert';
-is($warns, $security, 'security: calls warn with username, userId and IP address');
+is($WebGUI::Test::logger_warns, $security, 'security: calls warn with username, userId and IP address');
 
 ####################################################
 #
@@ -69,16 +58,16 @@ is($warns, $security, 'security: calls warn with username, userId and IP address
 
 my $accumulated_info = '';
 $eh->info("This is informative");
-is($info, "This is informative", "info: Log4perl called");
+is($WebGUI::Test::logger_info, "This is informative", "info: Log4perl called");
 $accumulated_info .= "This is informative\n";
 is($session->errorHandler->{_debug_info}, $accumulated_info, "info: message internally appended");
 $eh->info("More info");
-is($info, "More info", "info: Log4perl called again");
+is($WebGUI::Test::logger_info, "More info", "info: Log4perl called again");
 $accumulated_info .= "More info\n";
 is($session->errorHandler->{_debug_info}, $accumulated_info, "info: second message appended");
 $eh->audit('Check this out');
 my $audit = sprintf '%s (%d) %s', $session->user->username, $session->user->userId, 'Check this out';
-is($info, $audit, 'audit: calls info with username and userId');
+is($WebGUI::Test::logger_info, $audit, 'audit: calls info with username and userId');
 
 ####################################################
 #
@@ -88,29 +77,29 @@ is($info, $audit, 'audit: calls info with username and userId');
 
 $eh->{'_debug_debug'} = ''; ##Manually clean debug
 $eh->debug("This is a bug");
-is($debug, "This is a bug", "debug: Log4perl called");
+is($WebGUI::Test::logger_debug, "This is a bug", "debug: Log4perl called");
 is($eh->{'_debug_debug'}, "This is a bug\n", "debug: message internally appended");
 $eh->debug("More bugs");
-is($debug, "More bugs", "debug: Log4perl called again");
+is($WebGUI::Test::logger_debug, "More bugs", "debug: Log4perl called again");
 is($eh->{'_debug_debug'}, "This is a bug\nMore bugs\n", "debug: second message appended");
 
 $eh->{'_debug_debug'} = ''; ##Manually clean debug
 my $queryCount = $eh->{_queryCount};
 $eh->query('select this');
 ++$queryCount;
-is($debug, "query  $queryCount:  select this", "query: Log4perl called debug via query");
+is($WebGUI::Test::logger_debug, "query  $queryCount:  select this", "query: Log4perl called debug via query");
 
 $eh->query('select that', 'literal');
 ++$queryCount;
-is($debug, "query  $queryCount:  select that", "query: Log4perl called debug via query, literal placeholder");
+is($WebGUI::Test::logger_debug, "query  $queryCount:  select that", "query: Log4perl called debug via query, literal placeholder");
 
 $eh->query('select more', []);
 ++$queryCount;
-is($debug, "query  $queryCount:  select more", "query: Log4perl called debug via query, empty placeholder");
+is($WebGUI::Test::logger_debug, "query  $queryCount:  select more", "query: Log4perl called debug via query, empty placeholder");
 
 $eh->query('select many', [1, 2]);
 ++$queryCount;
-is($debug, "query  $queryCount:  select many\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['1', '2']", "query: Log4perl called debug via query, empty placeholder");
+is($WebGUI::Test::logger_debug, "query  $queryCount:  select many\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['1', '2']", "query: Log4perl called debug via query, empty placeholder");
 
 ####################################################
 #
@@ -120,11 +109,11 @@ is($debug, "query  $queryCount:  select many\n&nbsp;&nbsp;with placeholders:&nbs
 
 $eh->{'_debug_debug'} = ''; ##Manually clean debug
 $eh->error("ERROR");
-is($error, "ERROR", "error: Log4perl called error");
-like($debug, qr/^Stack trace for ERROR ERROR/, "error: Log4perl called debug");
+is($WebGUI::Test::logger_error, "ERROR", "error: Log4perl called error");
+like($WebGUI::Test::logger_debug, qr/^Stack trace for ERROR ERROR/, "error: Log4perl called debug");
 is($eh->{'_debug_error'}, "ERROR\n", "error: message internally appended");
 $eh->error("More errors");
-is($error, "More errors", "error: Log4perl called error again");
+is($WebGUI::Test::logger_error, "More errors", "error: Log4perl called error again");
 is($eh->{'_debug_error'}, "ERROR\nMore errors\n", "error: new message internally appended");
 
 ####################################################

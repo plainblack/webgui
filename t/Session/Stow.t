@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 32; # increment this value for each test you create
+use Test::More tests => 33; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
  
@@ -41,8 +41,18 @@ is($stow->get("Test1"), undef, "delete()");
 $stow->deleteAll;
 is($stow->get("Test2"), undef, "deleteAll()");
 
+####################################################
+#
+# get, set with disableCache
+#
+####################################################
+
 $session->config->set('disableCache', 1);
 is($stow->get('Test2'), undef, 'get: when config->disableCache is set get returns undef');
+
+$stow->set('unavailableVariable', 'too bad');
+is($WebGUI::Test::logger_debug, 'Stow->set() is being called but cache has been disabled', 'debug emitted by set when disableCache is true');
+
 $session->config->set('disableCache', 0);
 
 is($session->stow->set('', 'null string'), undef, 'set returns undef when name is empty string');

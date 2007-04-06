@@ -8,6 +8,12 @@ our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL
 use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
+use Test::MockObject::Extends;
+
+our $logger_warns;
+our $logger_debug;
+our $logger_info;
+our $logger_error;
 
 BEGIN {
 
@@ -81,6 +87,14 @@ BEGIN {
     }
 
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
+
+    my $logger = $SESSION->errorHandler->getLogger;
+    $logger = Test::MockObject::Extends->new( $logger );
+
+    $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
+    $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
+    $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
+    $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
 }
 
 END {
