@@ -4,6 +4,8 @@
  - fix: Event Management System -- No longer uses session scratch to save
         purchase information, which breaks things when a user logs out before 
         they complete their transaction.
+ - fix: Trouble with Search Users (perlDreamer Consulting, LLC)
+        http://www.plainblack.com/bugs/tracker/trouble-with-search-users
 
 
 7.3.14

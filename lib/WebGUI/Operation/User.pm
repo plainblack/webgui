@@ -182,9 +182,9 @@ sub getUserSearchForm {
 	my $op = shift;
 	my $params = shift;
 	my $noStatus = shift;
-	$session->scratch->set("userSearchKeyword",$session->form->process("keyword")) if $session->form->process("keyword");
-	$session->scratch->set("userSearchStatus",$session->form->process("status")) if $session->form->process("status");
-	$session->scratch->set("userSearchModifier",$session->form->process("modifier")) if $session->form->process("modifier");
+	$session->scratch->set("userSearchKeyword",$session->form->process("keyword")) if defined($session->form->process("keyword"));
+	$session->scratch->set("userSearchStatus",$session->form->process("status")) if defined($session->form->process("status"));
+	$session->scratch->set("userSearchModifier",$session->form->process("modifier")) if defined($session->form->process("modifier"));
 	my $i18n = WebGUI::International->new($session);
 	my $output = '<div align="center">'
 		.WebGUI::Form::formHeader($session,)
@@ -536,7 +536,7 @@ sub www_formUsers {
 	$session->http->setCacheControl("none");
 	return $session->privilege->insufficient() unless $session->user->isInGroup(12);
 	$session->style->useEmptyStyle("1");
-my $output = getUserSearchForm($session,"formUsers",{formId=>$session->form->process("formId")},1);
+    my $output = getUserSearchForm($session,"formUsers",{formId=>$session->form->process("formId")},1);
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return $output unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	$output .= '<ul>';
