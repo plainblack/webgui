@@ -972,7 +972,7 @@ sub removeFromScratchCart {
 #	if ($event eq $self->session->scratch->get('currentMainEvent')) {
 #		return $self->resetScratchCart();
 #	}
-	my $currentPurchase = $self->session->scratch->get('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
+	my $currentPurchase = $self->session->scratch->get('currentPurchase');
 	if ($currentPurchase ne "") {
 		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 		my ($items, $nothing) = $shoppingCart->getItems;
@@ -1328,7 +1328,7 @@ sub validateEditEventForm {
   if ($self->session->form->get("pid") eq "meetmymaker") {
      push (@{$errors}, {
      	type	  => "special",
-     	message   => "+4F]Y(&UA9&4@;64",
+     	message   => '/26T@<V]R<GDL($1A=F4N',
      	}
       );
   }
@@ -1408,24 +1408,65 @@ sub addCartVars {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $var = shift;
 	$var->{'cart.purchaseLoop'} = [];
-	my $i;
-	for ( $i=0; $i < 25;$i++) {
-		my $purchase = {};
-		$purchase->{purchaseId} = $self->session->scratch->get("purchaseId".$i);
-		next unless $purchase->{purchaseId};
-		$purchase->{badgeId} = $self->session->scratch->get("badgeId".$i);
+	my $purchases   = $self->session->db->buildArrayRefOfHashRefs(
+        "SELECT purchaseId, badgeId FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
+        [$self->session->getId]
+    );
+	for my $purchase (@{ $purchases }) {
 		# so we don't show the badge we're currently editing
-		next if ($i eq $self->session->scratch->get("currentPurchaseCounter"));
-		my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.passId, q.passType from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and r.badgeId=? and r.returned=0 and r.purchaseId=? and q.productId=r.productId",[$purchase->{badgeId},$purchase->{purchaseId}]);
+		next if ($purchase->{purchaseId} eq $self->session->scratch->get("currentPurchase"));
+		my $theseRegs 
+            = $self->session->db->buildArrayRefOfHashRefs(
+                "select r.*, p.price, q.passId, q.passType 
+                    from EventManagementSystem_registrations as r, 
+                        EventManagementSystem_products as q, 
+                        products as p 
+                    where p.productId=r.productId 
+                        and r.badgeId=? 
+                        and r.returned=0 
+                        and r.purchaseId=? 
+                        and q.productId=r.productId",
+                [$purchase->{badgeId},$purchase->{purchaseId}]
+            );
 		my @currentEvents;
-		$purchase->{registrantInfoLoop} = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_badges where badgeId=?",[$purchase->{badgeId}]);
+		$purchase->{registrantInfoLoop} 
+            = $self->session->db->buildArrayRefOfHashRefs(
+                "select * from EventManagementSystem_badges where badgeId=?",
+                [$purchase->{badgeId}]
+            );
 		foreach (@$theseRegs) {
-			my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$_->{productId}]);
+			my ($isChild) 
+                = $self->session->db->quickArray(
+                    "select prerequisiteId from EventManagementSystem_products where productId = ?",
+                    [$_->{productId}]
+                );
 			$purchase->{'purchase.mainEventTitle'} = $self->getEventName($_->{productId}) unless $isChild;
-			($purchase->{alreadyPurchasedBadge}) = $self->session->db->quickArray("select p.transactionId from EventManagementSystem_purchases as p, transaction as t where p.purchaseId = ? and t.transactionId=p.transactionId and t.status='Completed'",[$_->{productId}]) unless $isChild;
-			push(@currentEvents,$_->{productId});
+			($purchase->{alreadyPurchasedBadge}) 
+                = $self->session->db->quickArray(
+                    "select p.transactionId 
+                    from EventManagementSystem_purchases as p, 
+                        transaction as t 
+                    where p.purchaseId = ? 
+                        and t.transactionId=p.transactionId 
+                        and t.status='Completed'",
+                    [$_->{productId}]
+                ) unless $isChild;
+			push @currentEvents,$_->{productId};
 		}
-		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$purchase->{badgeId}]);
+		my @pastEvents 
+            = $self->session->db->buildArray(
+                "select r.productId 
+                    from EventManagementSystem_registrations as r, 
+                        EventManagementSystem_purchases as p, 
+                        transaction as t 
+                    where r.returned=0 
+                        and r.badgeId=? 
+                        and t.transactionId=p.transactionId 
+                        and t.status='Completed' 
+                        and p.purchaseId=r.purchaseId 
+                    group by productId",
+                [$purchase->{badgeId}]
+            );
 		push(@currentEvents,@pastEvents);
 		$purchase->{newPrice} = 0;
 		foreach (@$theseRegs) {
@@ -1449,10 +1490,10 @@ sub addCartVars {
 				$purchase->{newPrice} += $_->{price};
 			}
 		}
-		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i, $self->get('url'));
-		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseCounter=".$i,$self->get('url'),$i18n->get('confirm delete purchase'));
-		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseCounter=".$i);
-		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseCounter=".$i);
+		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseId=".$purchase->{purchaseId}, $self->get('url'));
+		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseId=".$purchase->{purchaseId},$self->get('url'),$i18n->get('confirm delete purchase'));
+		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseId=".$purchase->{purchaseId});
+		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseId=".$purchase->{purchaseId});
 		push(@{$var->{'cart.purchaseLoop'}},$purchase);
 	}
 	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
@@ -1469,10 +1510,10 @@ sub www_emptyCart {
 	my $self = shift;	
 	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
 	$shoppingCart->empty;
-	foreach (0..25) {
-		$self->session->scratch->delete('purchaseId'.$_);
-		$self->session->scratch->delete('badgeId'.$_);
-	}
+    $self->session->db->write(
+        "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
+        [$self->session->getId]
+    );
 	return $self->www_resetScratchCart();
 }
 
@@ -2238,41 +2279,49 @@ sub www_addEventsToBadge {
 	    }
 		$self->session->scratch->set('EMS_add_purchase_badgeId',$bid);
 		my @pastEvents = $self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]);
-		my $purchaseCounter = $self->session->form->process('purchaseCounter');
 		$self->session->scratch->set('EMS_add_purchase_events',join("\n",@pastEvents));
-		if ($purchaseCounter ne "") {
+		my $purchaseId = $self->session->form->process('purchaseId');
+		if ($purchaseId ne "") {
 			# if we're loading a badge that's in the cart, put its stuff in the scratch cart along with the already-purchased events for this badgeId.
-			$self->session->scratch->set("currentPurchaseCounter",$purchaseCounter);
-			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and q.productId=r.productId and r.returned=0 and r.badgeId=?",[$self->session->scratch->get("badgeId".$purchaseCounter)]);
+			$self->session->scratch->set("currentPurchase",$purchaseId);
+            my ($badgeId) 
+                = $self->session->db->quickArray(
+                    "SELECT badgeId FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=? AND purchaseId=?",
+                    [$self->session->getId,$purchaseId]
+                );
+			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select r.*, p.price, q.prerequisiteId from EventManagementSystem_registrations as r, EventManagementSystem_products as q, products as p where p.productId=r.productId and q.productId=r.productId and r.returned=0 and r.badgeId=?",[$badgeId]);
 			foreach (@$theseRegs) {
 				push(@pastEvents,$_->{productId}) unless isIn($_->{productId},@pastEvents);
 				$eventId = $_->{productId} unless $_->{prerequisiteId};
 			}
-			$self->removePurchaseFromCart($self->session->scratch->get("purchaseId".$purchaseCounter));
+			$self->removePurchaseFromCart($purchaseId);
+            # Remove from the sessionPurchaseRef, it will be added again when
+            # the user is finished and clicks "Add to cart" again
+            $self->session->db->write(
+                "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=? AND purchaseId=? AND badgeId=?",
+                [$self->session->getId, $purchaseId, $badgeId]
+            );
 		} else {
 			# gotta use the existing purchaseId, b/c we're loading a completed purchase.
 			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? and purchaseId != '' and returned=0 and purchaseId is not null limit 1",[$bid,$eventId]);
-			my $counter = 0;
-			while (1) {
-				unless ($self->session->scratch->get("purchaseId".$counter)) {
-					$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-					$self->session->scratch->set("badgeId".$counter, $bid);
-					$self->session->scratch->set("currentPurchaseCounter",$counter);
-					last;
-				}
-				$counter++;	
-			}	
+            $self->session->scratch->set("currentPurchase",$purchaseId);
+            $self->session->db->write(
+                "INSERT INTO EventManagementSystem_sessionPurchaseRef (sessionId, purchaseId, badgeId) VALUES (?,?,?)",
+                [$self->session->getId, $purchaseId, $bid]
+            );
 		}
 		$self->session->scratch->set('EMS_scratch_cart',join("\n",@pastEvents));
 		$self->session->scratch->set('currentMainEvent',$eventId);
 		$self->session->scratch->set('currentBadgeId',$bid);
 		return $self->www_search();
 	} else {
-		my $purchaseCounter = $self->session->form->process('purchaseCounter');
-		if ($purchaseCounter ne "") {
-			my $purchaseIdToDelete = $self->session->scratch->get('purchaseId'.$purchaseCounter);
-			$self->removePurchaseFromCart($purchaseIdToDelete);
-			$self->session->scratch->delete('purchaseId'.$purchaseCounter);
+		my $purchaseId = $self->session->form->process('purchaseId');
+		if ($purchaseId ne "") {
+			$self->removePurchaseFromCart($purchaseId);
+            $self->session->db->write(
+                "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE purchaseId=?",
+                [$purchaseId]
+            );
 		}
 	}
 	return $self->www_resetScratchCart();
@@ -2595,23 +2644,17 @@ sub saveRegistration {
 		$shoppingCart->add($eventId, 'Event');
 		$addedAny = 1;
 	}
-		#Our item plug-in needs to be able to associate these records with the result of the payment attempt
-		my $counter = 0;
-		while (1) {
-			unless ($self->session->scratch->get("purchaseId".$counter)) {
-				$self->session->scratch->set("purchaseId".$counter, $purchaseId);
-				$self->session->scratch->set("badgeId".$counter, $badgeId);
-				$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
-				last;
-			}
-			$counter++;	
-		}
-		$self->emptyScratchCart;
-		$self->session->scratch->delete('EMS_add_purchase_badgeId');
-		$self->session->scratch->delete('EMS_add_purchase_events');
-		$self->session->scratch->delete('currentBadgeId');
-		$self->session->scratch->delete('currentMainEvent');
-		$self->session->scratch->delete('currentPurchaseCounter');
+    #Our item plug-in needs to be able to associate these records with the result of the payment attempt
+    $self->session->db->write(
+        "INSERT INTO EventManagementSystem_sessionPurchaseRef (sessionId, purchaseId, badgeId) VALUES (?,?,?)",
+        [$self->session->getId, $purchaseId, $badgeId]
+    );
+    $self->emptyScratchCart;
+    $self->session->scratch->delete('EMS_add_purchase_badgeId');
+    $self->session->scratch->delete('EMS_add_purchase_events');
+    $self->session->scratch->delete('currentBadgeId');
+    $self->session->scratch->delete('currentMainEvent');
+    $self->session->scratch->delete('currentPurchase');
 
 #	if ($self->session->form->get('checkoutNow')) {
 #	   srand;
@@ -2629,8 +2672,11 @@ sub www_resetScratchCart {
 	$self->session->scratch->delete('EMS_add_purchase_events');
 	$self->session->scratch->delete('currentMainEvent');
 	$self->session->scratch->delete('currentBadgeId');
-	$self->session->scratch->delete('purchaseId'.$self->session->scratch->get('currentPurchaseCounter'));
-	$self->session->scratch->delete('currentPurchaseCounter');
+	$self->session->db->write(
+        "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE purchaseId=?",
+        [$self->session->scratch->get('currentPurchase')]
+    );
+	$self->session->scratch->delete('currentPurchase');
 	return $self->www_view;
 }
 

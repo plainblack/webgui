@@ -7,6 +7,27 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.15
+--------------------------------------------------------------------
+
+ * The Event Management System now uses an extra table to store
+   information about events in the user's cart. This fixes a bug
+   where a user that logs out after adding events to their cart but
+   before they complete their transaction will be charged for their
+   events but not registered for them.
+
+   Existing sessions affected by this bug are not fixed, so there may still 
+   be errors. This SQL query will get the session IDs of the
+   sessions affected by this bug:
+
+    select distinct(sessionId) 
+        from shoppingCart 
+        where itemId IN (SELECT productId from EventManagementSystem_products) 
+            AND sessionId IN (SELECT distinct(sessionId) FROM userSessionScratch WHERE name LIKE "purchaseId%");
+   
+   You may want to expire these sessions from the Admin Console > 
+   Active Sessions screen.
+
 7.3.12
 --------------------------------------------------------------------
 

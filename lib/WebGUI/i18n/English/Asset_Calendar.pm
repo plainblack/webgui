@@ -111,12 +111,12 @@ our $I18N = {
 	
 	##### Group to add/edit events #####
 	'groupIdEventEdit label' => {
-		message		=> q{Who can add/edit Events?},
+		message		=> q{Who can add Events?},
 		lastUpdated	=> 0,
 		context		=> q{The label for the Group to Edit Events field.},
 	},
 	'groupIdEventEdit description' => {
-		message		=> q{Members of this group can add and edit Events in this calendar.},
+		message		=> q{Members of this group can add Events to this calendar.},
 		lastUpdated	=> 0,
 		context		=> q{Hover Help for the Group to Edit Events field.},
 	},

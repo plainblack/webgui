@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addEmsSessionPurchaseTable($session);
 
 finish($session); # this line required
 
@@ -32,6 +33,21 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+#----------------------------------------------------------------------------
+
+sub addEmsSessionPurchaseTable {
+    my $session     = shift;
+    print "\tAdding EMS Session-to-purchase reference table..."; 
+    $session->db->write(
+        "CREATE TABLE IF NOT EXISTS EventManagementSystem_sessionPurchaseRef (
+            sessionId VARCHAR(22) BINARY,
+            purchaseId VARCHAR(22) BINARY,
+            badgeId VARCHAR(22) BINARY,
+            PRIMARY KEY (sessionId, purchaseId, badgeId)
+        )"
+    );
+    print "OK!\n";
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

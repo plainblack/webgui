@@ -43,20 +43,25 @@ sub handler {
 	my $self = shift;
 	my $transactionId = shift;
 	#mark all purchaseIds as paid
-	my $counter;
 	
-	for ($counter = 0 ; $counter < 50 ; $counter++ ) {
-		my $purchaseId;
-		if ($purchaseId = $self->session->scratch->get("purchaseId".$counter)) {
-			$self->session->db->setRow('EventManagementSystem_purchases', 'purchaseId', {'purchaseId'=>$purchaseId, 'transactionId'=>$transactionId}, $purchaseId);
-			my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_registrations where purchaseId=?",[$purchaseId]);
-			foreach (@$theseRegs) {
-				# clean up the duplicate registrations, if any.
-				$self->session->db->write("delete from EventManagementSystem_registrations where badgeId=? and productId=? and registrationId != ?",[$_->{badgeId},$_->{productId},$_->{registrationId}]);
-			}
-			$self->session->scratch->delete("purchaseId".$counter);
-		}
+    my $purchases 
+        = $self->session->db->buildArrayRefOfHashRefs(
+            "SELECT purchaseId FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
+            [$self->session->getId]
+        );
+	for my $purchase (@$purchases) {
+		my $purchaseId = $purchase->{purchaseId};
+        $self->session->db->setRow('EventManagementSystem_purchases', 'purchaseId', {'purchaseId'=>$purchaseId, 'transactionId'=>$transactionId}, $purchaseId);
+        my $theseRegs = $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_registrations where purchaseId=?",[$purchaseId]);
+        foreach (@$theseRegs) {
+            # clean up the duplicate registrations, if any.
+            $self->session->db->write("delete from EventManagementSystem_registrations where badgeId=? and productId=? and registrationId != ?",[$_->{badgeId},$_->{productId},$_->{registrationId}]);
+        }
 	}
+    $self->session->db->write(
+        "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
+        [$self->session->getId]
+    );
 }
 
 #-------------------------------------------------------------------
