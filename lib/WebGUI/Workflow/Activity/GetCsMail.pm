@@ -79,8 +79,9 @@ sub addPost {
 		if (($part->{type} =~ /^text\/plain/ || $part->{type} =~ /^text\/html/) && $part->{filename} eq "") {
 			my $text = $part->{content};
 			if ($part->{type} eq "text/plain") {
+				$text = WebGUI::HTML::filter($text, "all");
 				$text = WebGUI::HTML::format($text, "text");
-			}
+			} 
 			$content .= $text;
 		} else {
 			push(@attachments, $part);
