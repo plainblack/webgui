@@ -263,7 +263,7 @@ sub sendHeader {
 		$request->headers_out->set(Location => $self->getRedirectLocation);
 		$request->status(301);
 	} else {
-		$request->content_type($self->getMimeType || "text/html; charset=UTF-8");
+		$request->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
 		my $date = ($userId eq "1") ? $datetime->epochToHttp($self->getLastModified) : $datetime->epochToHttp;
 		# under these circumstances, don't allow caching
