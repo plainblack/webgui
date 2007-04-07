@@ -28,8 +28,8 @@ my $session = WebGUI::Test->session;
  
 # put your tests here
 
-my $module = use_ok('HTML::Template::Expr', 'Loaded HTML::Template::Expr');
-my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr', 'Loaded WebGUI::Asset::Template::HTMLTemplateExpr plugin');
+my $module = use_ok('HTML::Template::Expr');
+my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
 
 my ($versionTag, $template);
 my $originalParsers = $session->config->get('templateParsers');
