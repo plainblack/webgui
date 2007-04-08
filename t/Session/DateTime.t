@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 30; # increment this value for each test you create
+use Test::More tests => 40; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -34,12 +34,18 @@ is($session->datetime->epochToHuman($wgbday,"%n"), "00", "epochToHuman() - 2 dig
 is($session->datetime->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
 is($session->datetime->epochToHttp($wgbday),"Thu, 16 Aug 2001 13:00:00 GMT","epochToHttp()");
 is($session->datetime->epochToMail($wgbday),"Thu, 16 Aug 2001 08:00:00 -0500","epochToMail()");
-is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet()");
+is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet(), with time");
+is($session->datetime->epochToSet($wgbday),   "2001-08-16",          "epochToSet(), without time");
+is($session->datetime->getDayOfWeek($wgbday), 4, "getDayOfWeek()");
 is($session->datetime->getDayName(7), "Sunday", "getDayName()");
+is($session->datetime->getDayName(8), undef,    "getDayName(), too high returns undef");
+is($session->datetime->getDayName(0), undef,    "getDayName(), too low returns undef");
 is($session->datetime->getDaysInMonth($wgbday), 31, "getDaysInMonth()");
 is($session->datetime->getDaysInInterval($wgbday,$wgbday+3*60*60*24), 3, "getDaysInInterval()");
 is($session->datetime->getFirstDayInMonthPosition($wgbday), 3, "getFirstDayInMonthPosition()");
 is($session->datetime->getMonthName(1), "January", "getMonthName()");
+is($session->datetime->getMonthName(0), undef,     "getMonthName returns undef if too low");
+is($session->datetime->getMonthName(25), undef,    "getMonthName returns undef if too high");
 is($session->datetime->getSecondsFromEpoch($wgbday), 60*60*8, "getSecondsFromEpoch()");
 SKIP: {
 	skip("getTimeZones() - not sure how to test",1);
@@ -79,4 +85,28 @@ is($session->datetime->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
                 "%Y" => "%y"
                 );
 
+####################################################
+#
+# getTimeZone
+#
+####################################################
 
+my $visitorTimeZone = $session->datetime->getTimeZone();
+is ($visitorTimeZone, 'America/Chicago', 'getTimeZone: default time zone for visitor is America/Chicago');
+is ($session->datetime->getTimeZone(), 'America/Chicago', 'getTimeZone: fetching cached version from user object');
+
+my $buster = WebGUI::User->new($session, "new");
+$buster->profileField('timeZone', 'Amerigo/Vespucci');
+$session->user({user => $buster});
+is ($session->datetime->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the approved list get reset to the default');
+
+my $dude = WebGUI::User->new($session, "new");
+$dude->profileField('timeZone', 'Australia/Perth');
+$session->user({user => $dude});
+is ($session->datetime->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
+
+END {
+    foreach my $account ($buster, $dude) {
+        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
+    }
+}
