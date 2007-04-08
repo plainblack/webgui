@@ -620,11 +620,9 @@ sub getTimeZone {
 	my $zone = $self->session->user->profileField('timeZone');
 	$zone =~ s/ /\_/g;
 	if ($zone) {
-		foreach (@zones) {
-			if ($_ eq $zone) {
+        if (isIn($zone, @zones)) {
 				$self->session->user->{_timeZone} = $zone;
 				return $zone;
-			}
 		}
 	}
 	$self->session->user->{_timeZone} = 'America/Chicago';
