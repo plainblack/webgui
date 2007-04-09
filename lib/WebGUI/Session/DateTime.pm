@@ -723,7 +723,7 @@ A date formatted according to RFC2822/822.
 
 sub mailToEpoch {
 	my $self = shift;
-	my $date = shift || time();
+	my $date = shift;
 	my $parser = DateTime::Format::Mail->new->loose;
 	my $dt = eval {$parser->parse_datetime($date)};
 	if ($@) {

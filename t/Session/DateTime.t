@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 40; # increment this value for each test you create
+use Test::More tests => 43; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -104,6 +104,18 @@ my $dude = WebGUI::User->new($session, "new");
 $dude->profileField('timeZone', 'Australia/Perth');
 $session->user({user => $dude});
 is ($session->datetime->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
+
+####################################################
+#
+# mailToEpoch
+#
+####################################################
+
+my $wgBdayMail = 'Thu, 16 Aug 2001 08:00:00 -0500';
+is ($session->datetime->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
+
+is ($session->datetime->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
+like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
 
 END {
     foreach my $account ($buster, $dude) {
