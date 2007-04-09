@@ -447,7 +447,7 @@ sub toUserTimeZoneTime {
 
 Handle copying all WebGUI::DateTime specific data. This is an object method.
 
-This method overrides the set in DateTime to keep WebGUI::DateTime specific
+This method overrides the truncate in DateTime to keep WebGUI::DateTime specific
 information being passed between object instances. Some DateTime operations
 create a new object.
 
