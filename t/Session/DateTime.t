@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 43; # increment this value for each test you create
+use Test::More tests => 49; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -47,10 +47,6 @@ is($session->datetime->getMonthName(1), "January", "getMonthName()");
 is($session->datetime->getMonthName(0), undef,     "getMonthName returns undef if too low");
 is($session->datetime->getMonthName(25), undef,    "getMonthName returns undef if too high");
 is($session->datetime->getSecondsFromEpoch($wgbday), 60*60*8, "getSecondsFromEpoch()");
-SKIP: {
-	skip("getTimeZones() - not sure how to test",1);
-	ok($session->datetime->getTimeZones(),"getTimeZones()");
-    }
 is($session->datetime->humanToEpoch("2001-08-16 08:00:00"), $wgbday, "humanToEpoch()");
 is($session->datetime->intervalToSeconds(2,"weeks"),60*60*24*14, "intervalToSeconds()");
 is(join("-",$session->datetime->localtime($wgbday)),'2001-8-16-8-0-0-228-4-1', "localtime()");
@@ -105,6 +101,13 @@ $dude->profileField('timeZone', 'Australia/Perth');
 $session->user({user => $dude});
 is ($session->datetime->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
 
+my $bud = WebGUI::User->new($session, "new");
+$bud->profileField('timeZone', '');
+$session->user({user => $bud});
+is ($session->datetime->getTimeZone(), 'America/Chicago', q|getTimeZone: if user's time zone doesn't exist, then return America/Chicago|);
+
+$session->user({userId => 1});  ##back to Visitor
+
 ####################################################
 #
 # mailToEpoch
@@ -116,6 +119,34 @@ is ($session->datetime->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
 
 is ($session->datetime->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
 like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
+
+####################################################
+#
+# getMonthDiff
+#
+####################################################
+
+my $wgDayAfter = $wgbday + (3600*24);
+is ($session->datetime->getMonthDiff($wgbday, $wgDayAfter), 0, 'getMonthDiff = 0 (1 day apart)');
+my $wgWeekAfter = $wgbday + (3600*24*7);
+is ($session->datetime->getMonthDiff($wgbday, $wgWeekAfter), 0, 'getMonthDiff = 0 (1 week apart)');
+my $wgMonthAfter = $wgbday + (3600*24*32);
+is ($session->datetime->getMonthDiff($wgbday, $wgMonthAfter), 1, 'getMonthDiff = 1 (1 month apart)');
+$wgMonthAfter = $wgbday + (3600*24*70);
+is ($session->datetime->getMonthDiff($wgbday, $wgMonthAfter), 2, 'getMonthDiff = 2 (2 month apart)');
+my $wgYearAfter = $wgbday + (3600*24*(365+32));
+is ($session->datetime->getMonthDiff($wgbday, $wgYearAfter), 13, 'getMonthDiff = 13 (1+ years apart)');
+
+####################################################
+#
+# getTimeZones
+#
+####################################################
+
+use DateTime::TimeZone;
+my $dt_tzs = DateTime::TimeZone::all_names;
+my $wg_tzs = $session->datetime->getTimeZones();
+is (scalar @{ $dt_tzs }, scalar keys %{ $wg_tzs }, 'getTimeZones: correct number of time zones');
 
 END {
     foreach my $account ($buster, $dude) {
