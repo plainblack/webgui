@@ -11,49 +11,52 @@
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
+use File::Copy;
+use File::Spec;
 
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 69; # increment this value for each test you create
+use Test::More tests => 74; # increment this value for each test you create
+
+installBadLocale();
  
 my $session = WebGUI::Test->session;
+
+my $dt = $session->datetime;
 
 my $wgbday = 997966800;
 my $bdayCopy = $wgbday;
 my ($start, $end) = $session->datetime->dayStartEnd($wgbday);
 ok($end-$start >= 60*60*23, "dayStartEnd()"); 
-is($session->datetime->epochToHuman($wgbday,"%y"), "2001", "epochToHuman() - year"); 
-is($session->datetime->epochToHuman($wgbday,"%c"), "August", "epochToHuman() - month name"); 
-is($session->datetime->epochToHuman($wgbday,"%m"), "08", "epochToHuman() - month number, 2 digit"); 
-is($session->datetime->epochToHuman($wgbday,"%M"), "8", "epochToHuman() - month number, variable digit"); 
-is($session->datetime->epochToHuman($wgbday,"%n"), "00", "epochToHuman() - 2 digit minute"); 
-is($session->datetime->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
-is($session->datetime->epochToHttp($wgbday),"Thu, 16 Aug 2001 13:00:00 GMT","epochToHttp()");
-is($session->datetime->epochToMail($wgbday),"Thu, 16 Aug 2001 08:00:00 -0500","epochToMail()");
-is($session->datetime->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet(), with time");
-is($session->datetime->epochToSet($wgbday),   "2001-08-16",          "epochToSet(), without time");
-is($session->datetime->getDayOfWeek($wgbday), 4, "getDayOfWeek()");
-is($session->datetime->getDayName(7), "Sunday", "getDayName()");
-is($session->datetime->getDayName(8), undef,    "getDayName(), too high returns undef");
-is($session->datetime->getDayName(0), undef,    "getDayName(), too low returns undef");
-is($session->datetime->getDaysInMonth($wgbday), 31, "getDaysInMonth()");
-is($session->datetime->getDaysInInterval($wgbday,$wgbday+3*60*60*24), 3, "getDaysInInterval()");
-is($session->datetime->getFirstDayInMonthPosition($wgbday), 3, "getFirstDayInMonthPosition()");
-is($session->datetime->getMonthName(1), "January", "getMonthName()");
-is($session->datetime->getMonthName(0), undef,     "getMonthName returns undef if too low");
-is($session->datetime->getMonthName(25), undef,    "getMonthName returns undef if too high");
-is($session->datetime->getSecondsFromEpoch($wgbday), 60*60*8, "getSecondsFromEpoch()");
-is($session->datetime->humanToEpoch("2001-08-16 08:00:00"), $wgbday, "humanToEpoch()");
-is(join("-",$session->datetime->localtime($wgbday)),'2001-8-16-8-0-0-228-4-1', "localtime()");
-is($session->datetime->monthCount($wgbday,$wgbday+60*60*24*365), 12, "monthCount()");
-my ($start, $end) = $session->datetime->monthStartEnd($wgbday);
+is($dt->epochToHuman($wgbday,"%y"), "2001", "epochToHuman() - year"); 
+is($dt->epochToHuman($wgbday,"%c"), "August", "epochToHuman() - month name"); 
+is($dt->epochToHuman($wgbday,"%m"), "08", "epochToHuman() - month number, 2 digit"); 
+is($dt->epochToHuman($wgbday,"%M"), "8", "epochToHuman() - month number, variable digit"); 
+is($dt->epochToHuman($wgbday,"%n"), "00", "epochToHuman() - 2 digit minute"); 
+is($dt->epochToHuman($wgbday,"%%%c%d%h"), "%August1608", "epochToHuman()"); 
+is($dt->epochToHttp($wgbday),"Thu, 16 Aug 2001 13:00:00 GMT","epochToHttp()");
+is($dt->epochToMail($wgbday),"Thu, 16 Aug 2001 08:00:00 -0500","epochToMail()");
+is($dt->epochToSet($wgbday,1), "2001-08-16 08:00:00", "epochToSet(), with time");
+is($dt->epochToSet($wgbday),   "2001-08-16",          "epochToSet(), without time");
+is($dt->getDayOfWeek($wgbday), 4, "getDayOfWeek()");
+is($dt->getDayName(7), "Sunday", "getDayName()");
+is($dt->getDayName(8), undef,    "getDayName(), too high returns undef");
+is($dt->getDayName(0), undef,    "getDayName(), too low returns undef");
+is($dt->getDaysInMonth($wgbday), 31, "getDaysInMonth()");
+is($dt->getDaysInInterval($wgbday,$wgbday+3*60*60*24), 3, "getDaysInInterval()");
+is($dt->getFirstDayInMonthPosition($wgbday), 3, "getFirstDayInMonthPosition()");
+is($dt->getMonthName(1), "January", "getMonthName()");
+is($dt->getMonthName(0), undef,     "getMonthName returns undef if too low");
+is($dt->getMonthName(25), undef,    "getMonthName returns undef if too high");
+is($dt->getSecondsFromEpoch($wgbday), 60*60*8, "getSecondsFromEpoch()");
+is(join("-",$dt->localtime($wgbday)),'2001-8-16-8-0-0-228-4-1', "localtime()");
+is($dt->monthCount($wgbday,$wgbday+60*60*24*365), 12, "monthCount()");
+my ($start, $end) = $dt->monthStartEnd($wgbday);
 ok($end-$start >= 60*60*24*28, "monthStartEnd()"); 
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2)),"2 years", "secondsToInterval()");
-is($session->datetime->secondsToTime(60*60*8),"08:00:00", "secondsToTime()");
-is($session->datetime->setToEpoch("2001-08-16 08:00:00"), $wgbday, "setToEpoch()");
-ok($session->datetime->time() > $wgbday,"time()");
-is($session->datetime->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
+is($dt->secondsToTime(60*60*8),"08:00:00", "secondsToTime()");
+ok($dt->time() > $wgbday,"time()");
+is($dt->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
 
         my %conversion = (
                 "%c" => "%B",
@@ -83,24 +86,24 @@ is($session->datetime->timeToSeconds("08:00:00"), 60*60*8, "timeToSeconds()");
 #
 ####################################################
 
-my $visitorTimeZone = $session->datetime->getTimeZone();
+my $visitorTimeZone = $dt->getTimeZone();
 is ($visitorTimeZone, 'America/Chicago', 'getTimeZone: default time zone for visitor is America/Chicago');
-is ($session->datetime->getTimeZone(), 'America/Chicago', 'getTimeZone: fetching cached version from user object');
+is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: fetching cached version from user object');
 
 my $buster = WebGUI::User->new($session, "new");
 $buster->profileField('timeZone', 'Amerigo/Vespucci');
 $session->user({user => $buster});
-is ($session->datetime->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the approved list get reset to the default');
+is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the approved list get reset to the default');
 
 my $dude = WebGUI::User->new($session, "new");
 $dude->profileField('timeZone', 'Australia/Perth');
 $session->user({user => $dude});
-is ($session->datetime->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
+is ($dt->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
 
 my $bud = WebGUI::User->new($session, "new");
 $bud->profileField('timeZone', '');
 $session->user({user => $bud});
-is ($session->datetime->getTimeZone(), 'America/Chicago', q|getTimeZone: if user's time zone doesn't exist, then return America/Chicago|);
+is ($dt->getTimeZone(), 'America/Chicago', q|getTimeZone: if user's time zone doesn't exist, then return America/Chicago|);
 
 $session->user({userId => 1});  ##back to Visitor
 
@@ -111,9 +114,9 @@ $session->user({userId => 1});  ##back to Visitor
 ####################################################
 
 my $wgBdayMail = 'Thu, 16 Aug 2001 08:00:00 -0500';
-is ($session->datetime->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
+is ($dt->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
 
-is ($session->datetime->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
+is ($dt->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
 like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
 
 ####################################################
@@ -123,15 +126,15 @@ like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTi
 ####################################################
 
 my $wgDayAfter = $wgbday + (3600*24);
-is ($session->datetime->getMonthDiff($wgbday, $wgDayAfter), 0, 'getMonthDiff = 0 (1 day apart)');
+is ($dt->getMonthDiff($wgbday, $wgDayAfter), 0, 'getMonthDiff = 0 (1 day apart)');
 my $wgWeekAfter = $wgbday + (3600*24*7);
-is ($session->datetime->getMonthDiff($wgbday, $wgWeekAfter), 0, 'getMonthDiff = 0 (1 week apart)');
+is ($dt->getMonthDiff($wgbday, $wgWeekAfter), 0, 'getMonthDiff = 0 (1 week apart)');
 my $wgMonthAfter = $wgbday + (3600*24*32);
-is ($session->datetime->getMonthDiff($wgbday, $wgMonthAfter), 1, 'getMonthDiff = 1 (1 month apart)');
+is ($dt->getMonthDiff($wgbday, $wgMonthAfter), 1, 'getMonthDiff = 1 (1 month apart)');
 $wgMonthAfter = $wgbday + (3600*24*70);
-is ($session->datetime->getMonthDiff($wgbday, $wgMonthAfter), 2, 'getMonthDiff = 2 (2 month apart)');
+is ($dt->getMonthDiff($wgbday, $wgMonthAfter), 2, 'getMonthDiff = 2 (2 month apart)');
 my $wgYearAfter = $wgbday + (3600*24*(365+32));
-is ($session->datetime->getMonthDiff($wgbday, $wgYearAfter), 13, 'getMonthDiff = 13 (1+ years apart)');
+is ($dt->getMonthDiff($wgbday, $wgYearAfter), 13, 'getMonthDiff = 13 (1+ years apart)');
 
 ####################################################
 #
@@ -141,7 +144,7 @@ is ($session->datetime->getMonthDiff($wgbday, $wgYearAfter), 13, 'getMonthDiff =
 
 use DateTime::TimeZone;
 my $dt_tzs = DateTime::TimeZone::all_names;
-my $wg_tzs = $session->datetime->getTimeZones();
+my $wg_tzs = $dt->getTimeZones();
 is (scalar @{ $dt_tzs }, scalar keys %{ $wg_tzs }, 'getTimeZones: correct number of time zones');
 
 my $timeZoneFormatFlag = 1;
@@ -162,8 +165,8 @@ ok($timeZoneFormatFlag, 'getTimeZones: All time zones formatted correctly for re
 #
 ####################################################
 
-ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
-is($session->datetime->addToDate($wgbday), $wgbday, 'addToDate defaults to adding 0');
+ok($dt->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
+is($dt->addToDate($wgbday), $wgbday, 'addToDate defaults to adding 0');
 
 ####################################################
 #
@@ -171,8 +174,8 @@ is($session->datetime->addToDate($wgbday), $wgbday, 'addToDate defaults to addin
 #
 ####################################################
 
-ok($session->datetime->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
-is($session->datetime->addToTime($wgbday), $wgbday, 'addToTime defaults to adding 0');
+ok($dt->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
+is($dt->addToTime($wgbday), $wgbday, 'addToTime defaults to adding 0');
 
 ####################################################
 #
@@ -180,8 +183,8 @@ is($session->datetime->addToTime($wgbday), $wgbday, 'addToTime defaults to addin
 #
 ####################################################
 
-ok($session->datetime->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
-is($session->datetime->addToDateTime($wgbday), $wgbday, 'addToDateTime defaults to adding 0');
+ok($dt->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
+is($dt->addToDateTime($wgbday), $wgbday, 'addToDateTime defaults to adding 0');
 
 ####################################################
 #
@@ -189,15 +192,15 @@ is($session->datetime->addToDateTime($wgbday), $wgbday, 'addToDateTime defaults 
 #
 ####################################################
 
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2)), "2 years", "secondsToInterval(), years");
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2.4)), "2 years", "secondsToInterval(), years, rounded down");
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2.9)), "3 years", "secondsToInterval(), years, rounded up");
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*363)), "12 months",  "secondsToInterval(), months");
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*7*3)), "3 weeks",    "secondsToInterval(), weeks");
-is(join(" ",$session->datetime->secondsToInterval(60*60*24*5)),   "5 days",     "secondsToInterval(), days");
-is(join(" ",$session->datetime->secondsToInterval(60*60*18)),     "18 hours",   "secondsToInterval(), hours");
-is(join(" ",$session->datetime->secondsToInterval(60*27)),        "27 minutes", "secondsToInterval(), minutes");
-is(join(" ",$session->datetime->secondsToInterval(59)),           "59 seconds", "secondsToInterval(), seconds");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2)),   "2 years", "secondsToInterval(), years");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 years", "secondsToInterval(), years, rounded down");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 years", "secondsToInterval(), years, rounded up");
+is(join(" ",$dt->secondsToInterval(60*60*24*363)), "12 months",  "secondsToInterval(), months");
+is(join(" ",$dt->secondsToInterval(60*60*24*7*3)), "3 weeks",    "secondsToInterval(), weeks");
+is(join(" ",$dt->secondsToInterval(60*60*24*5)),   "5 days",     "secondsToInterval(), days");
+is(join(" ",$dt->secondsToInterval(60*60*18)),     "18 hours",   "secondsToInterval(), hours");
+is(join(" ",$dt->secondsToInterval(60*27)),        "27 minutes", "secondsToInterval(), minutes");
+is(join(" ",$dt->secondsToInterval(59)),           "59 seconds", "secondsToInterval(), seconds");
 
 ####################################################
 #
@@ -205,16 +208,61 @@ is(join(" ",$session->datetime->secondsToInterval(59)),           "59 seconds", 
 #
 ####################################################
 
-is($session->datetime->intervalToSeconds(40),            40,          "intervalToSeconds() seconds as default");
-is($session->datetime->intervalToSeconds(59, 'seconds'), 59,          "intervalToSeconds() seconds");
-is($session->datetime->intervalToSeconds(3,  'minutes'), 60*3,        "intervalToSeconds() minutes");
-is($session->datetime->intervalToSeconds(2,  'hours'),   60*60*2,     "intervalToSeconds() hours");
-is($session->datetime->intervalToSeconds(1,  'days'),    60*60*24,    "intervalToSeconds() days");
-is($session->datetime->intervalToSeconds(2,  'weeks'),   60*60*24*14, "intervalToSeconds() weeks");
-is($session->datetime->intervalToSeconds(5,  'months'),  60*60*24*30*5, "intervalToSeconds() months");
-is($session->datetime->intervalToSeconds(7,  'years'),   60*60*24*365*7, "intervalToSeconds() years");
+is($dt->intervalToSeconds(40),            40,          "intervalToSeconds() seconds as default");
+is($dt->intervalToSeconds(59, 'seconds'), 59,          "intervalToSeconds() seconds");
+is($dt->intervalToSeconds(3,  'minutes'), 60*3,        "intervalToSeconds() minutes");
+is($dt->intervalToSeconds(2,  'hours'),   60*60*2,     "intervalToSeconds() hours");
+is($dt->intervalToSeconds(1,  'days'),    60*60*24,    "intervalToSeconds() days");
+is($dt->intervalToSeconds(2,  'weeks'),   60*60*24*14, "intervalToSeconds() weeks");
+is($dt->intervalToSeconds(5,  'months'),  60*60*24*30*5, "intervalToSeconds() months");
+is($dt->intervalToSeconds(7,  'years'),   60*60*24*365*7, "intervalToSeconds() years");
+
+####################################################
+#
+# humanToEpoch
+#
+####################################################
+
+is($dt->humanToEpoch("2001-08-16 08:00:00"), $wgbday, "humanToEpoch()");
+is($dt->humanToEpoch("2001-08-16 24:00:00"), $wgbday-8*3600, "humanToEpoch() sets hour 24 to 0");
+
+####################################################
+#
+# setToEpoch
+#
+####################################################
+
+is($dt->setToEpoch(), undef, "setToEpoch() returns undef with no set time");
+is($dt->setToEpoch("2001-08-16"),          $wgbday-3600*8, "setToEpoch() date only");
+is($dt->setToEpoch("2001-08-16 08:00:00"), $wgbday,        "setToEpoch() date and time");
+isnt($dt->setToEpoch("2001:08:16 08-00000"), $wgbday,      "setToEpoch() with bad format does not return wgbday");
+cmp_ok(
+    abs($dt->setToEpoch("2001:08:16 08-00000")-time),
+    '<=',
+    1,
+    "setToEpoch() with bad format returns current time"
+);
+
+####################################################
+#
+# epochToHuman
+#
+####################################################
+
+$dude->profileField('language', 'BadLocale');
+$session->user({user => $dude});
+is($dt->epochToHuman($wgbday), '8/16/2001  9:00 pm', 'epochToHuman: constructs a default locale if the language does not provide one.');
+$session->user({userId => 1});
+
+sub installBadLocale {
+	copy(
+		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'BadLocale.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/)
+	);
+}
 
 END {
+	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/);
     foreach my $account ($buster, $dude) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
