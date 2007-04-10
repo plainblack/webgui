@@ -15,15 +15,12 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 49; # increment this value for each test you create
+use Test::More tests => 69; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
 my $wgbday = 997966800;
 my $bdayCopy = $wgbday;
-ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
-ok($session->datetime->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
-ok($session->datetime->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
 my ($start, $end) = $session->datetime->dayStartEnd($wgbday);
 ok($end-$start >= 60*60*23, "dayStartEnd()"); 
 is($session->datetime->epochToHuman($wgbday,"%y"), "2001", "epochToHuman() - year"); 
@@ -48,7 +45,6 @@ is($session->datetime->getMonthName(0), undef,     "getMonthName returns undef i
 is($session->datetime->getMonthName(25), undef,    "getMonthName returns undef if too high");
 is($session->datetime->getSecondsFromEpoch($wgbday), 60*60*8, "getSecondsFromEpoch()");
 is($session->datetime->humanToEpoch("2001-08-16 08:00:00"), $wgbday, "humanToEpoch()");
-is($session->datetime->intervalToSeconds(2,"weeks"),60*60*24*14, "intervalToSeconds()");
 is(join("-",$session->datetime->localtime($wgbday)),'2001-8-16-8-0-0-228-4-1', "localtime()");
 is($session->datetime->monthCount($wgbday,$wgbday+60*60*24*365), 12, "monthCount()");
 my ($start, $end) = $session->datetime->monthStartEnd($wgbday);
@@ -147,6 +143,76 @@ use DateTime::TimeZone;
 my $dt_tzs = DateTime::TimeZone::all_names;
 my $wg_tzs = $session->datetime->getTimeZones();
 is (scalar @{ $dt_tzs }, scalar keys %{ $wg_tzs }, 'getTimeZones: correct number of time zones');
+
+my $timeZoneFormatFlag = 1;
+foreach my $timeZone (keys %{ $wg_tzs } ) {
+    my $tzLabel = $wg_tzs->{$timeZone};
+    my $tz;
+    ($tz = $timeZone) =~ tr/_/ /;
+    if ($tz ne $tzLabel) {
+        $timeZoneFormatFlag = 0;
+    }
+}
+
+ok($timeZoneFormatFlag, 'getTimeZones: All time zones formatted correctly for reference and display');
+
+####################################################
+#
+# addToDate
+#
+####################################################
+
+ok($session->datetime->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
+is($session->datetime->addToDate($wgbday), $wgbday, 'addToDate defaults to adding 0');
+
+####################################################
+#
+# addToTime
+#
+####################################################
+
+ok($session->datetime->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
+is($session->datetime->addToTime($wgbday), $wgbday, 'addToTime defaults to adding 0');
+
+####################################################
+#
+# addToDateTime
+#
+####################################################
+
+ok($session->datetime->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
+is($session->datetime->addToDateTime($wgbday), $wgbday, 'addToDateTime defaults to adding 0');
+
+####################################################
+#
+# secondsToInverval
+#
+####################################################
+
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2)), "2 years", "secondsToInterval(), years");
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2.4)), "2 years", "secondsToInterval(), years, rounded down");
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*365*2.9)), "3 years", "secondsToInterval(), years, rounded up");
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*363)), "12 months",  "secondsToInterval(), months");
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*7*3)), "3 weeks",    "secondsToInterval(), weeks");
+is(join(" ",$session->datetime->secondsToInterval(60*60*24*5)),   "5 days",     "secondsToInterval(), days");
+is(join(" ",$session->datetime->secondsToInterval(60*60*18)),     "18 hours",   "secondsToInterval(), hours");
+is(join(" ",$session->datetime->secondsToInterval(60*27)),        "27 minutes", "secondsToInterval(), minutes");
+is(join(" ",$session->datetime->secondsToInterval(59)),           "59 seconds", "secondsToInterval(), seconds");
+
+####################################################
+#
+# intervalToSeconds
+#
+####################################################
+
+is($session->datetime->intervalToSeconds(40),            40,          "intervalToSeconds() seconds as default");
+is($session->datetime->intervalToSeconds(59, 'seconds'), 59,          "intervalToSeconds() seconds");
+is($session->datetime->intervalToSeconds(3,  'minutes'), 60*3,        "intervalToSeconds() minutes");
+is($session->datetime->intervalToSeconds(2,  'hours'),   60*60*2,     "intervalToSeconds() hours");
+is($session->datetime->intervalToSeconds(1,  'days'),    60*60*24,    "intervalToSeconds() days");
+is($session->datetime->intervalToSeconds(2,  'weeks'),   60*60*24*14, "intervalToSeconds() weeks");
+is($session->datetime->intervalToSeconds(5,  'months'),  60*60*24*30*5, "intervalToSeconds() months");
+is($session->datetime->intervalToSeconds(7,  'years'),   60*60*24*365*7, "intervalToSeconds() years");
 
 END {
     foreach my $account ($buster, $dude) {

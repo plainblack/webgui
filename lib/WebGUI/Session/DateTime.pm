@@ -674,18 +674,24 @@ sub intervalToSeconds {
 	my $units = shift;
 	if ($units eq "years") {
 		return ($interval*31536000);
-	} elsif ($units eq "months") {
+	}
+    elsif ($units eq "months") {
 		return ($interval*2592000);
-        } elsif ($units eq "weeks") {
-                return ($interval*604800);
-        } elsif ($units eq "days") {
-                return ($interval*86400);
-        } elsif ($units eq "hours") {
-                return ($interval*3600);
-        } elsif ($units eq "minutes") {
-                return ($interval*60);
-        } else {
-                return $interval;
+    }
+    elsif ($units eq "weeks") {
+        return ($interval*604800);
+    }
+    elsif ($units eq "days") {
+        return ($interval*86400);
+    }
+    elsif ($units eq "hours") {
+        return ($interval*3600);
+    }
+    elsif ($units eq "minutes") {
+        return ($interval*60);
+    }
+    else {
+        return $interval;
 	} 
 }
 
@@ -824,24 +830,30 @@ sub secondsToInterval {
 	if ($seconds >= 31536000) {
 		$interval = round($seconds/31536000);
 		$units = "years";
-	} elsif ($seconds >= 2592000) {
-                $interval = round($seconds/2592000);
-                $units = "months";
-	} elsif ($seconds >= 604800) {
-                $interval = round($seconds/604800);
-                $units = "weeks";
-	} elsif ($seconds >= 86400) {
-                $interval = round($seconds/86400);
-                $units = "days";
-        } elsif ($seconds >= 3600) {
-                $interval = round($seconds/3600);
-                $units = "hours";
-        } elsif ($seconds >= 60) {
-                $interval = round($seconds/60);
-                $units = "minutes";
-        } else {
-                $interval = $seconds;
-                $units = "seconds";
+	}
+    elsif ($seconds >= 2592000) {
+        $interval = round($seconds/2592000);
+        $units = "months";
+	}
+    elsif ($seconds >= 604800) {
+        $interval = round($seconds/604800);
+        $units = "weeks";
+	}
+    elsif ($seconds >= 86400) {
+        $interval = round($seconds/86400);
+        $units = "days";
+    }
+    elsif ($seconds >= 3600) {
+        $interval = round($seconds/3600);
+        $units = "hours";
+    }
+    elsif ($seconds >= 60) {
+        $interval = round($seconds/60);
+        $units = "minutes";
+    }
+    else {
+        $interval = $seconds;
+        $units = "seconds";
 	}
 	return ($interval, $units);
 }
