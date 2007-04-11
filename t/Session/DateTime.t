@@ -17,7 +17,7 @@ use File::Spec;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 74; # increment this value for each test you create
+use Test::More tests => 77; # increment this value for each test you create
 
 installBadLocale();
  
@@ -167,6 +167,12 @@ ok($timeZoneFormatFlag, 'getTimeZones: All time zones formatted correctly for re
 
 ok($dt->addToDate($wgbday,1,2,3) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24, "addToDate()"); 
 is($dt->addToDate($wgbday), $wgbday, 'addToDate defaults to adding 0');
+cmp_ok(
+    abs($dt->addToDate()-time),
+    '<=',
+    1,
+    "addToDate() with no arguments returns the current time"
+);
 
 ####################################################
 #
@@ -176,6 +182,13 @@ is($dt->addToDate($wgbday), $wgbday, 'addToDate defaults to adding 0');
 
 ok($dt->addToTime($wgbday,1,2,3) >= $wgbday+1*60*60+2*60+3, "addToTime()"); 
 is($dt->addToTime($wgbday), $wgbday, 'addToTime defaults to adding 0');
+cmp_ok(
+    abs($dt->addToTime()-time),
+    '<=',
+    1,
+    "addToTime() with no arguments returns the current time"
+);
+
 
 ####################################################
 #
@@ -185,6 +198,12 @@ is($dt->addToTime($wgbday), $wgbday, 'addToTime defaults to adding 0');
 
 ok($dt->addToDateTime($wgbday,1,2,3,4,5,6) >= $wgbday+1*60*60*24*365+2*60*60*24*28+3*60*60*24+4*60*60+5*60+6, "addToDateTime()"); 
 is($dt->addToDateTime($wgbday), $wgbday, 'addToDateTime defaults to adding 0');
+cmp_ok(
+    abs($dt->addToDateTime()-time),
+    '<=',
+    1,
+    "addToDateTime() with no arguments returns the current time"
+);
 
 ####################################################
 #
