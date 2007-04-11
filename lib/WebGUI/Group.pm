@@ -582,25 +582,29 @@ sub getDatabaseUsers {
         ### Check db database
         if ($self->get("dbQuery") && defined $self->get("databaseLinkId")) {
 		my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->get("databaseLinkId"));
-		my $dbh = $dbLink->db if (defined $dbLink);
-		if (defined $dbh) {
-			my $query = $self->get("dbQuery");
-			WebGUI::Macro::process($self->session,\$query);
-			my $sth = $dbh->unconditionalRead($query);
-			if (defined $sth) {
-				unless ($sth->errorCode < 1) {
-					$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
-				} else {
-					while(my ($userId)=$sth->array) {
-						push @dbUsers, $userId;
+		if (defined $dbLink) {
+			my $dbh = $dbLink->db ;
+			if (defined $dbh) {
+				my $query = $self->get("dbQuery");
+				WebGUI::Macro::process($self->session,\$query);
+				my $sth = $dbh->unconditionalRead($query);
+				if (defined $sth) {
+					unless ($sth->errorCode < 1) {
+						$self->session->errorHandler->warn("There was a problem with the database query for group ID $gid.");
+					} else {
+						while(my ($userId)=$sth->array) {
+							push @dbUsers, $userId;
+						}
 					}
+					$sth->finish;
+				} else {
+					$self->session->errorHandler->error("Couldn't process unconditional read for database group with group id $gid.");
 				}
-				$sth->finish;
-			} else {
-				$self->session->errorHandler->error("Couldn't process unconditional read for database group with group id $gid.");
-			}
-			$dbLink->disconnect;
-                }
+				$dbLink->disconnect;
+       	 	        }
+		} else {
+			$self->session->errorHandler->warn("The database link ".$self->get("databaseLinkId")." no longer exists even though group ".$gid." references it.");
+		}
         }
 	return \@dbUsers;
 }
