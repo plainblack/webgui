@@ -6,6 +6,7 @@
         they complete their transaction.
  - fix: Trouble with Search Users (perlDreamer Consulting, LLC)
         http://www.plainblack.com/bugs/tracker/trouble-with-search-users
+ - fix: Fixed an unhandled exception in Workflow/Activity/PurgeOldAssetRevisions.pm
 
 
 7.3.14

@@ -79,9 +79,13 @@ sub execute {
         my $sth = $self->session->db->read("select assetData.assetId,asset.className,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.revisionDate<? order by assetData.revisionDate asc", [time() - $self->get("purgeAfter")]);
         while (my ($id, $class, $version) = $sth->array) {
         	my $asset = WebGUI::Asset->new($self->session, $id,$class,$version);
-                if ($asset->getRevisionCount("approved") > 1) {
-                	$asset->purgeRevision;
-                }
+		if (defined $asset) {
+                	if ($asset->getRevisionCount("approved") > 1) {
+                		$asset->purgeRevision;
+                	}
+		} else {
+			$self->session->errorHandler->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
+		}
         }
 	$sth->finish;
 	return $self->COMPLETE;
