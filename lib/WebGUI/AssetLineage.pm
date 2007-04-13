@@ -211,7 +211,7 @@ sub getFirstChild {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{firstChild}{$self->getId};
 		unless ($lineage) {
-			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			($lineage) = $self->session->db->quickArray("select min(asset.lineage) from asset,assetData where asset.parentId=? and asset.assetId=assetData.assetId and asset.state='published'",[$self->getId]);
 			unless ($self->session->config->get("disableCache")) {
 				$assetLineage->{firstChild}{$self->getId} = $lineage;
 				$self->session->stow->set("assetLineage", $assetLineage);
@@ -237,7 +237,7 @@ sub getLastChild {
 		my $assetLineage = $self->session->stow->get("assetLineage");
 		my $lineage = $assetLineage->{lastChild}{$self->getId};
 		unless ($lineage) {
-			($lineage) = $self->session->db->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=".$self->session->db->quote($self->getId)." and asset.assetId=assetData.assetId and asset.state='published'");
+			($lineage) = $self->session->db->quickArray("select max(asset.lineage) from asset,assetData where asset.parentId=? and asset.assetId=assetData.assetId and asset.state='published'",[$self->getId]);
 			$assetLineage->{lastChild}{$self->getId} = $lineage;
 			$self->session->stow->set("assetLineage", $assetLineage);
 		}
