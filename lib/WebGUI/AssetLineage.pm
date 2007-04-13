@@ -674,8 +674,8 @@ sub setParent {
     $self->updateHistory("moved to parent ".$newParent->getId);
     $self->{_properties}{lineage} = $lineage;
     $self->purgeCache;
+    $self->{_parent} = $newParent;
     return 1;
-	return 0;
 }
 
 #-------------------------------------------------------------------
