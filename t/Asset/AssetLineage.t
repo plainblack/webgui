@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 
 use WebGUI::Asset;
-use Test::More tests => 9; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -37,7 +37,13 @@ my $folder = $root->addChild({
     title => 'folder',
     menuTitle => 'folderMenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
-    isPackage => 1,
+});
+
+my $folder2 = $root->addChild({
+    url   => 'testFolder2',
+    title => 'folder2',
+    menuTitle => 'folder2MenuTitle',
+    className => 'WebGUI::Asset::Wobject::Folder',
 });
 
 my @snippets = ();
@@ -51,6 +57,15 @@ foreach my $snipNum (0..6) {
             menuTitle   => $snipNum,
         });
 }
+
+my $snippet2 = $folder2->addChild( {
+            className   => "WebGUI::Asset::Snippet",
+            groupIdView => 7,
+            groupIdEdit => 3,
+            title       => "Snippet2 0",
+            menuTitle   => 0,
+});
+
 $versionTag->commit;
 
 my @snipIds = map { $_->getId } @snippets;
@@ -91,6 +106,33 @@ is(scalar @snippets, $folder->getChildCount, 'getChildCount');
 ok($folder->hasChildren,      'test folder has children');
 ok($root->hasChildren,        'root node has children');
 ok(!$snippets[0]->hasChildren, 'test snippet has no children');
+
+####################################################
+#
+# cascadeLineage
+#
+####################################################
+
+#diag $snippets[0]->get('lineage');
+#diag $snippet2->get('lineage');
+##Uncomment me to crash the test
+#$snippet2->cascadeLineage($snippets[0]->get('lineage'));
+#diag $snippets[0]->get('lineage');
+#diag $snippet2->get('lineage');
+
+####################################################
+#
+# setParent
+#
+####################################################
+
+ok(!$snippet2->setParent(),          'setParent: new parent must be passed in');
+ok(!$snippet2->setParent($snippet2), 'setParent: cannot be your own parent');
+ok(!$snippet2->setParent($folder2),  'setParent: will not move self to current parent');
+ok(!$snippet2->setParent($folder),   'setParent: user must be in group 4 to do this');
+$session->user({userId => 3});
+ok($snippet2->setParent($folder),    'setParent: Admin can run setParent');
+is($folder->getChildCount, 8,        'setParent: folder now has 8 children');
 
 END {
 	$versionTag->rollback;

@@ -113,18 +113,17 @@ If not present, asset's existing lineage is used.
 =cut
 
 sub cascadeLineage {
-        my $self = shift;
-        my $newLineage = shift;
-        my $oldLineage = shift || $self->get("lineage");
-	my $now =$self->session->datetime->time();
-        my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
+    my $self = shift;
+    my $newLineage = shift;
+    my $oldLineage = shift || $self->get("lineage");
+    my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
 	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ".$self->session->db->quote($oldLineage.'%'));
 	my $cache = WebGUI::Cache->new($self->session);
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
 		$prepared->execute([$fixedLineage,$assetId]);
-                # we do the purge directly cuz it's a lot faster than instantiating all these assets
-                $cache->deleteChunk(["asset",$assetId]);
+        # we do the purge directly cuz it's a lot faster than instantiating all these assets
+        $cache->deleteChunk(["asset",$assetId]);
 	}
 	$descendants->finish;
 }
@@ -663,20 +662,19 @@ sub setParent {
 	return 0 unless (defined $newParent); # can't move it if a parent object doesn't exist
 	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
-	if (defined $newParent) {
-		my $oldLineage = $self->get("lineage");
-		return 0 unless $newParent->canEdit;
-		my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
-		return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
-		$self->session->db->beginTransaction;
-		$self->session->db->write("update asset set parentId=".$self->session->db->quote($newParent->getId)." where assetId=".$self->session->db->quote($self->getId));
-		$self->cascadeLineage($lineage);
-		$self->session->db->commit;
-		$self->updateHistory("moved to parent ".$newParent->getId);
-		$self->{_properties}{lineage} = $lineage;
-		$self->purgeCache;
-		return 1;
-	}
+    my $oldLineage = $self->get("lineage");
+    return 0 unless $newParent->canEdit;
+    my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
+    return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
+    $self->session->db->beginTransaction;
+    $self->session->db->write("update asset set parentId=? where assetId=?",
+        [$newParent->getId, $self->getId]);
+    $self->cascadeLineage($lineage);
+    $self->session->db->commit;
+    $self->updateHistory("moved to parent ".$newParent->getId);
+    $self->{_properties}{lineage} = $lineage;
+    $self->purgeCache;
+    return 1;
 	return 0;
 }
 
