@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 
 use WebGUI::Asset;
-use Test::More tests => 17; # increment this value for each test you create
+use Test::More tests => 22; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -96,6 +96,29 @@ is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild');
 ####################################################
 
 is(scalar @snippets, $folder->getChildCount, 'getChildCount');
+
+####################################################
+#
+# getParent
+#
+####################################################
+
+is($snippets[0]->getParent->getId, $folder->getId, 'getParent');
+is($root->getParent->getId,        $root->getId,   "getParent: root's parent is itself");
+
+####################################################
+#
+# getParentLineage
+#
+####################################################
+
+is($snippets[0]->getParentLineage, $folder->get('lineage'), 'getParentLineage: self');
+is($root->getParentLineage,        '000001',                'getParentLineage: root');
+is(
+    $root->getParentLineage('000001000002'),
+    '000001',
+    'getParentLineage: arbitrary lineage'
+);
 
 ####################################################
 #

@@ -540,7 +540,9 @@ Optional lineage of another Asset.
 sub getParentLineage {
 	my $self = shift;
 	my $lineage = shift || $self->get("lineage");
-	my ($parentLineage) = $lineage =~ m/^(.).{6}$/;
+    my $lineageLength = length($lineage) - 6;
+    return $lineage unless $lineageLength;
+	my $parentLineage = substr($lineage, 0, $lineageLength);
 	return $parentLineage;
 }
 
