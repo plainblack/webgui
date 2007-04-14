@@ -14,9 +14,10 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 43; # increment this value for each test you create
+use Test::More tests => 45; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -35,8 +36,9 @@ my $root = WebGUI::Asset->getRoot($session);
 my $folder = $root->addChild({
     url   => 'testFolder',
     title => 'folder',
-    menuTitle => 'folderMenuTitle',
-    className => 'WebGUI::Asset::Wobject::Folder',
+    menuTitle   => 'folderMenuTitle',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
 });
 
 my $folder2 = $root->addChild({
@@ -45,6 +47,9 @@ my $folder2 = $root->addChild({
     menuTitle => 'folder2MenuTitle',
     className => 'WebGUI::Asset::Wobject::Folder',
 });
+
+my $editor = WebGUI::User->new($session, 'new');
+$editor->addToGroups([4]);
 
 my @snippets = ();
 foreach my $snipNum (0..6) {
@@ -150,12 +155,14 @@ ok(!$snippets[0]->hasChildren, 'test snippet has no children');
 ####################################################
 
 ok(!$snippet2->setParent($folder),   'setParent: user must be in group 4 to do this');
-$session->user({userId => 3});
+$session->user({userId => $editor->userId});
 ok(!$snippet2->setParent(),          'setParent: new parent must be passed in');
 ok(!$snippet2->setParent($snippet2), 'setParent: cannot be your own parent');
 ok(!$snippet2->setParent($folder2),  'setParent: will not move self to current parent');
 ok(!$folder2->setParent($snippet2),  'setParent: will not move self to my child');
+ok(!$snippet2->setParent($folder),   'setParent: user cannot edit parent');
 
+$session->user({userId => 3});
 ok($snippet2->setParent($folder),    'setParent: successfully set');
 
 is($snippet2->getParent->getId, $folder->getId, 'setParent successfully set parent');
@@ -262,8 +269,16 @@ cmp_bag(
     'promote: 4 was swapped with 3'
 );
 
-
+####################################################
+#
+# setRank
+#
+####################################################
+ok($snippet2->setRank($snippet2->getRank), 'setRank: returns true if the rank is set to itself');
 
 END {
-	$versionTag->rollback;
+    $versionTag->rollback;
+    foreach my $account ($editor) {
+        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
+    }
 }
