@@ -139,12 +139,13 @@ Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwi
 sub demote {
 	my $self = shift;
 	my ($sisterLineage) = $self->session->db->quickArray("select min(lineage) from asset 
-		where parentId=".$self->session->db->quote($self->get("parentId"))." 
-		and state='published' and lineage>".$self->session->db->quote($self->get("lineage")));
+		where parentId=? and state='published' and lineage>?",[$self->get('parentId'), $self->get('lineage')]);
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;
+		return 1;
 	}
+	return 0;
 }
 
 
@@ -634,8 +635,7 @@ Keeps the same rank of lineage, swaps with sister above. Returns 1 if there is a
 sub promote {
 	my $self = shift;
 	my ($sisterLineage) = $self->session->db->quickArray("select max(lineage) from asset 
-		where parentId=".$self->session->db->quote($self->get("parentId"))." 
-		and state='published' and lineage<".$self->session->db->quote($self->get("lineage")));
+		where parentId=? and state='published' and lineage<?",[$self->get("parentId"), $self->get("lineage")]);
 	if (defined $sisterLineage) {
 		$self->swapRank($sisterLineage);
 		$self->{_properties}{lineage} = $sisterLineage;

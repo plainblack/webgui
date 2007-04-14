@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 
 use WebGUI::Asset;
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 43; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -201,6 +201,68 @@ cmp_bag(
     $lineageIds,
     'swapRank: swapped first and second snippets'
 );
+
+is(
+    $snippets[3]->swapRank($snippets[0]->get('lineage'), $snippets[0]->get('lineage'), ), 
+    1, 
+    'swapRank: remote, two different snippets to restore original order'
+);
+
+@snipIds[0,1] = @snipIds[1,0];
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'swapRank: swapped first and second snippets'
+);
+
+####################################################
+#
+# demote
+#
+####################################################
+
+ok(!$snippets[6]->demote(), 'demote: last snippet in the set will not swap');
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'demote: no change'
+);
+
+ok($snippets[5]->demote(), 'demote: demote 5 to 6');
+@snipIds[5,6] = @snipIds[6,5];
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'demote: 5 was swapped with 6'
+);
+
+####################################################
+#
+# promote
+#
+####################################################
+
+ok(!$snippets[0]->promote(), 'promote: first snippet in the set will not swap');
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'promote: no change'
+);
+
+ok($snippets[4]->promote(), 'promote: promote 4 to 3');
+@snipIds[4,3] = @snipIds[3,4];
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'promote: 4 was swapped with 3'
+);
+
+
 
 END {
 	$versionTag->rollback;
