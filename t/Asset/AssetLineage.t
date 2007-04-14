@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 
 use WebGUI::Asset;
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 33; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -160,6 +160,47 @@ ok($snippet2->setParent($folder),    'setParent: successfully set');
 
 is($snippet2->getParent->getId, $folder->getId, 'setParent successfully set parent');
 is($folder->getChildCount,      8,              'setParent: folder now has 8 children');
+
+##Return snippet2 to folder2
+ok($snippet2->setParent($folder2),   'setParent: return snippet to original folder');
+is($folder2->getChildCount,     1,   'setParent: folder2 now haw 1 child');
+is($folder->getChildCount,      7,   'setParent: folder again has 7 children');
+
+####################################################
+#
+# getRank
+#
+####################################################
+
+is($root->getRank,           '1',      "getRank: root's rank");
+is($snippets[0]->getRank,    '1',      "getRank: snippet[0]");
+is($snippets[1]->getRank,    '2',      "getRank: snippet[1]");
+is($root->getRank('100001'), '100001', "getRank: arbitrary lineage");
+
+####################################################
+#
+# getNextChildRank
+#
+####################################################
+
+is($folder->getNextChildRank,  '000008',  "getNextChildRank: folder with 8 snippets");
+is($folder2->getNextChildRank, '000002',  "getNextChildRank: empty folder");
+
+####################################################
+#
+# swapRank
+#
+####################################################
+
+is($snippets[0]->swapRank($snippets[1]->get('lineage')),  1, 'swapRank: self and adjacent');
+
+@snipIds[0,1] = @snipIds[1,0];
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $lineageIds,
+    'swapRank: swapped first and second snippets'
+);
 
 END {
 	$versionTag->rollback;

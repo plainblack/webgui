@@ -497,7 +497,7 @@ Returns a 6 digit number with leading zeros of the next rank a child will get.
 
 sub getNextChildRank {
 	my $self = shift;	
-	my ($lineage) = $self->session->db->quickArray("select max(lineage) from asset where parentId=".$self->session->db->quote($self->getId));
+	my ($lineage) = $self->session->db->quickArray("select max(lineage) from asset where parentId=?",[$self->getId]);
 	my $rank;
 	if (defined $lineage) {
 		$rank = $self->getRank($lineage);
@@ -674,7 +674,8 @@ sub setParent {
     $self->cascadeLineage($lineage);
     $self->session->db->commit;
     $self->updateHistory("moved to parent ".$newParent->getId);
-    $self->{_properties}{lineage} = $lineage;
+    $self->{_properties}{lineage}  = $lineage;
+    $self->{_properties}{parentId} = $newParent->getId;
     $self->purgeCache;
     $self->{_parent} = $newParent;
     return 1;
