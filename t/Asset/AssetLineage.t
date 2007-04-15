@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 45; # increment this value for each test you create
+use Test::More tests => 49; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -60,6 +60,7 @@ foreach my $snipNum (0..6) {
             groupIdEdit => 3,
             title       => "Snippet $snipNum",
             menuTitle   => $snipNum,
+            url         => 'snippet'.$snipNum,
         });
 }
 
@@ -100,7 +101,8 @@ is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild');
 #
 ####################################################
 
-is(scalar @snippets, $folder->getChildCount, 'getChildCount');
+is(scalar @snippets, $folder->getChildCount,  'getChildCount on folder with several children');
+is(1,                $folder2->getChildCount, 'getChildCount on folder with 1 child');
 
 ####################################################
 #
@@ -209,12 +211,15 @@ cmp_bag(
     'swapRank: swapped first and second snippets'
 );
 
+@snippets[0..1] = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..1;
+
 is(
-    $snippets[3]->swapRank($snippets[0]->get('lineage'), $snippets[0]->get('lineage'), ), 
+    $snippets[1]->swapRank($snippets[0]->get('lineage'), $snippets[1]->get('lineage'), ), 
     1, 
     'swapRank: remote, two different snippets to restore original order'
 );
 
+@snippets[0..1] = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..1;
 @snipIds[0,1] = @snipIds[1,0];
 $lineageIds = $folder->getLineage(['descendants']);
 cmp_bag(
@@ -222,6 +227,18 @@ cmp_bag(
     $lineageIds,
     'swapRank: swapped first and second snippets'
 );
+
+
+ok($folder->swapRank($folder2->get('lineage')), 'swap folder and folder2');
+
+is(scalar @snippets, $folder->getChildCount,  'changing lineage does not change relationship in folder');
+is(1               , $folder2->getChildCount, 'changing lineage does not change relationship in folder2');
+
+##Reinstance the asset object due to db manipulation
+$folder  = WebGUI::Asset->newByUrl($session, $folder->get('url'));
+$folder2 = WebGUI::Asset->newByUrl($session, $folder2->get('url'));
+@snippets = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..6;
+$snippet2 = WebGUI::Asset->newByUrl($session, $snippet2->get('url'));
 
 ####################################################
 #
@@ -251,6 +268,7 @@ cmp_bag(
 # promote
 #
 ####################################################
+
 
 ok(!$snippets[0]->promote(), 'promote: first snippet in the set will not swap');
 $lineageIds = $folder->getLineage(['descendants']);

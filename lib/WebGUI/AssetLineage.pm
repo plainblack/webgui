@@ -100,7 +100,8 @@ sub addChild {
 
 =head2 cascadeLineage ( newLineage [,oldLineage] )
 
-Updates lineage when asset is moved. Prepends newLineage to the lineage "stack."
+Updates lineage when asset is moved. Prepends newLineage to the lineage
+"stack."  The change only occurs in the db, no in the objects.
 
 =head3 newLineage
 
@@ -117,7 +118,7 @@ sub cascadeLineage {
     my $newLineage = shift;
     my $oldLineage = shift || $self->get("lineage");
     my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
-	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ".$self->session->db->quote($oldLineage.'%'));
+	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ?",[$oldLineage.'%']);
 	my $cache = WebGUI::Cache->new($self->session);
 	while (my ($assetId, $lineage) = $descendants->array) {
 		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
@@ -133,6 +134,8 @@ sub cascadeLineage {
 =head2 demote ( )
 
 Swaps lineage with sister below. Returns 1 if there is a sister to swap. Otherwise returns 0.
+
+This will update the lineage of $self, but not the sister.
 
 =cut
 
@@ -630,6 +633,8 @@ sub newByLineage {
 
 Keeps the same rank of lineage, swaps with sister above. Returns 1 if there is a sister to swap. Otherwise returns 0.
 
+This will update the lineage of $self, but not the sister.
+
 =cut
 
 sub promote {
@@ -729,7 +734,8 @@ Returns 1. Swaps current rank with second rank.
 
 =head3 first
 
-If specified, swaps second rank with first rank.
+If specified, swaps second rank with first rank.  The change only occurs in the db,
+no in the objects.
 
 =cut
 
