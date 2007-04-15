@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 49; # increment this value for each test you create
+use Test::More tests => 59; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -33,7 +33,15 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"AssetLineage Test"});
 
 my $root = WebGUI::Asset->getRoot($session);
-my $folder = $root->addChild({
+my $topFolder = $root->addChild({
+    url   => 'TopFolder',
+    title => 'TopFolder',
+    menuTitle   => 'topFolderMenuTitle',
+    groupIdEdit => 3,
+    className   => 'WebGUI::Asset::Wobject::Folder',
+});
+
+my $folder = $topFolder->addChild({
     url   => 'testFolder',
     title => 'folder',
     menuTitle   => 'folderMenuTitle',
@@ -41,7 +49,7 @@ my $folder = $root->addChild({
     className   => 'WebGUI::Asset::Wobject::Folder',
 });
 
-my $folder2 = $root->addChild({
+my $folder2 = $topFolder->addChild({
     url   => 'testFolder2',
     title => 'folder2',
     menuTitle => 'folder2MenuTitle',
@@ -106,6 +114,16 @@ is(1,                $folder2->getChildCount, 'getChildCount on folder with 1 ch
 
 ####################################################
 #
+# getDescendantCount
+#
+####################################################
+
+is(10, $topFolder->getDescendantCount,             'getDescendantCount on top folder');
+is(scalar @snippets, $folder->getDescendantCount,  'getDescendantCount on folder with several children');
+is(1,                $folder2->getDescendantCount, 'getDescendantCount on folder with 1 child');
+
+####################################################
+#
 # getParent
 #
 ####################################################
@@ -161,10 +179,10 @@ $session->user({userId => $editor->userId});
 ok(!$snippet2->setParent(),          'setParent: new parent must be passed in');
 ok(!$snippet2->setParent($snippet2), 'setParent: cannot be your own parent');
 ok(!$snippet2->setParent($folder2),  'setParent: will not move self to current parent');
-ok(!$folder2->setParent($snippet2),  'setParent: will not move self to my child');
 ok(!$snippet2->setParent($folder),   'setParent: user cannot edit parent');
 
 $session->user({userId => 3});
+ok(!$folder2->setParent($snippet2),  'setParent: will not move self to my child');
 ok($snippet2->setParent($folder),    'setParent: successfully set');
 
 is($snippet2->getParent->getId, $folder->getId, 'setParent successfully set parent');
@@ -293,6 +311,26 @@ cmp_bag(
 #
 ####################################################
 ok($snippet2->setRank($snippet2->getRank), 'setRank: returns true if the rank is set to itself');
+##Note, setRank ALWAYS returns 1, whether the setRank worked or not
+ok($snippet2->setRank('000002'), 'setRank: try to change rank on snippet2 to 2');
+is($folder2->getNextChildRank, '000002', 'setRank: will not change rank on an Asset with no siblings');
+
+$snippets[6]->setRank('100000');
+is($snippets[6]->getRank(), '7', 'setRank: will not set an arbitrary rank');
+
+$snippets[6]->setRank('000005');
+is($snippets[6]->getRank(), '5', 'setRank was able to set an arbitrary rank(lower) on an Asset with siblings');
+
+@snipIds = map { $_->getId } @snippets[0..3,6,4..5];
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(\@snipIds, $lineageIds, 'setRank reordered the other siblings appropiately');
+
+$snippets[6]->setRank('000007');
+is($snippets[6]->getRank(), '7', 'setRank: move the Asset back (higher rank)');
+
+@snipIds = map { $_->getId } @snippets;
+$lineageIds = $folder->getLineage(['descendants']);
+cmp_bag(\@snipIds, $lineageIds, 'setRank: put them back in order');
 
 END {
     $versionTag->rollback;

@@ -613,15 +613,15 @@ Lineage string.
 sub newByLineage {
 	my $class = shift;
 	my $session = shift;
-        my $lineage = shift;
+    my $lineage = shift;
 	my $assetLineage = $session->stow->get("assetLineage");
 	my $id = $assetLineage->{$lineage}{id};
 	$class = $assetLineage->{$lineage}{class};
-        unless ($id && $class) {
-		($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$session->db->quote($lineage));
-		$assetLineage->{$lineage}{id} = $id;
-		$assetLineage->{$lineage}{class} = $class;
-		$session->stow->set("assetLineage",$assetLineage);
+    unless ($id && $class) {
+        ($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$session->db->quote($lineage));
+        $assetLineage->{$lineage}{id} = $id;
+        $assetLineage->{$lineage}{class} = $class;
+        $session->stow->set("assetLineage",$assetLineage);
 	}
 	return WebGUI::Asset->new($session, $id, $class);
 }
@@ -704,11 +704,11 @@ sub setRank {
 	my $currentRank = $self->getRank;
 	return 1 if ($newRank == $currentRank); # do nothing if we're moving to ourself
 	my $parentLineage = $self->getParentLineage;
-	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1});
+
+    my $reverse = ($newRank < $currentRank) ? 1 : 0;
+	my $siblings = $self->getLineage(["siblings"],{returnObjects=>1, invertTree=>$reverse});
+
 	my $temp = substr($self->session->id->generate(),0,6);
-	if ($newRank < $currentRank) { # have to do the ordering in reverse when the new rank is above the old rank
-		@{$siblings} = reverse @{$siblings};
-	}
 	my $previous = $self->get("lineage");
 	$self->session->db->beginTransaction;
 	$self->cascadeLineage($temp);
