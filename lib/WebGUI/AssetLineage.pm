@@ -618,7 +618,7 @@ sub newByLineage {
 	my $id = $assetLineage->{$lineage}{id};
 	$class = $assetLineage->{$lineage}{class};
     unless ($id && $class) {
-        ($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=".$session->db->quote($lineage));
+        ($id,$class) = $session->db->quickArray("select assetId, className from asset where lineage=?",[$lineage]);
         $assetLineage->{$lineage}{id} = $id;
         $assetLineage->{$lineage}{class} = $class;
         $session->stow->set("assetLineage",$assetLineage);

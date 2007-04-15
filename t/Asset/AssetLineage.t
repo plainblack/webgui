@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 59; # increment this value for each test you create
+use Test::More tests => 67; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -94,6 +94,7 @@ cmp_bag(\@snipIds, $lineageIds, 'default order returned by getLineage is lineage
 ####################################################
 
 is($snippets[0]->getId, $folder->getFirstChild->getId, 'getFirstChild');
+is($snippets[0]->getId, $folder->getFirstChild->getId, 'getFirstChild: cached lookup');
 
 ####################################################
 #
@@ -102,6 +103,7 @@ is($snippets[0]->getId, $folder->getFirstChild->getId, 'getFirstChild');
 ####################################################
 
 is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild');
+is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild: cached lookup');
 
 ####################################################
 #
@@ -144,16 +146,6 @@ is(
     '000001',
     'getParentLineage: arbitrary lineage'
 );
-
-####################################################
-#
-# hasChildren
-#
-####################################################
-
-ok($folder->hasChildren,      'test folder has children');
-ok($root->hasChildren,        'root node has children');
-ok(!$snippets[0]->hasChildren, 'test snippet has no children');
 
 ####################################################
 #
@@ -331,6 +323,51 @@ is($snippets[6]->getRank(), '7', 'setRank: move the Asset back (higher rank)');
 @snipIds = map { $_->getId } @snippets;
 $lineageIds = $folder->getLineage(['descendants']);
 cmp_bag(\@snipIds, $lineageIds, 'setRank: put them back in order');
+
+####################################################
+#
+# hasChildren
+#
+####################################################
+
+##Functional tests
+ok($root->hasChildren,        'root node has children');
+ok(!$snippets[0]->hasChildren, 'test snippet has no children');
+
+##Coverage tests will require reaching inside the object
+##to reset the caching
+delete $folder->{_hasChildren};
+ok($folder->hasChildren,      'test folder has children, manually built');
+
+delete $folder->{_hasChildren};
+$folder->getLastChild();
+ok($folder->hasChildren, 'hasChildren: cached from getLastChild');
+
+delete $folder->{_hasChildren};
+$folder->getFirstChild();
+ok($folder->hasChildren, 'hasChildren: cached from getFirstChild');
+
+####################################################
+#
+# newByLineage
+#
+####################################################
+##Clear the stowed assetLineage hash
+$session->stow->delete('assetLineage');
+my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
+is ($snippet4->getId, $snippets[4]->getId, 'newByLineage returns correct Asset');
+
+$snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
+is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: cached lookup');
+
+my $cachedLineage = $session->stow->get('assetLineage');
+delete $cachedLineage->{$snippet4->get('lineage')}->{id};
+my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
+is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing id cache forces lookup');
+
+delete $cachedLineage->{$snippet4->get('lineage')}->{class};
+my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
+is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache forces lookup');
 
 END {
     $versionTag->rollback;
