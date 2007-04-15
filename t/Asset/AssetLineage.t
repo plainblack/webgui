@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 72; # increment this value for each test you create
+use Test::More tests => 74; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -413,6 +413,11 @@ cmp_bag(
     'getLineage: descendants of topFolder',
 );
 
+TODO: {
+    local $TODO = "Tests to make later";
+    ok(0, 'addChild');
+    ok(0, 'getLineage tests');
+}
 
 
 END {
