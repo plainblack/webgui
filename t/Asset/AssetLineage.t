@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 67; # increment this value for each test you create
+use Test::More tests => 72; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -352,6 +352,7 @@ ok($folder->hasChildren, 'hasChildren: cached from getFirstChild');
 # newByLineage
 #
 ####################################################
+
 ##Clear the stowed assetLineage hash
 $session->stow->delete('assetLineage');
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
@@ -368,6 +369,51 @@ is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing id cache force
 delete $cachedLineage->{$snippet4->get('lineage')}->{class};
 my $snippet4 = WebGUI::Asset->newByLineage($session, $snippets[4]->get('lineage'));
 is ($snippet4->getId, $snippets[4]->getId, 'newByLineage: failing class cache forces lookup');
+
+####################################################
+#
+# getLineage
+#
+####################################################
+
+@snipIds = map { $_->getId } @snippets;
+my $ids = $folder->getLineage(['descendants']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineage: get descendants of folder'
+);
+
+$ids = $folder->getLineage(['self','descendants']);
+unshift @snipIds, $folder->getId;
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineage: get descendants of folder and self'
+);
+
+$ids = $folder->getLineage(['self','children']);
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineage: descendants == children if there are no grandchildren'
+);
+
+$ids = $topFolder->getLineage(['self','children']);
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    'getLineage: children (no descendants) of topFolder',
+);
+
+$ids = $topFolder->getLineage(['self','descendants']);
+cmp_bag(
+    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    'getLineage: descendants of topFolder',
+);
+
+
 
 END {
     $versionTag->rollback;
