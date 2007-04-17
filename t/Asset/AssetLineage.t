@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 74; # increment this value for each test you create
+use Test::More tests => 76; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -75,7 +75,7 @@ foreach my $snipNum (0..6) {
 my $snippet2 = $folder2->addChild( {
             className   => "WebGUI::Asset::Snippet",
             groupIdView => 7,
-            groupIdEdit => 3,
+            ownerUserId => $editor->userId, #For coverage on addChild properties
             title       => "Snippet2 0",
             menuTitle   => 0,
 });
@@ -413,6 +413,32 @@ cmp_bag(
     'getLineage: descendants of topFolder',
 );
 
+####################################################
+#
+# addChild
+#
+####################################################
+
+my $vTag2 = WebGUI::VersionTag->getWorking($session);
+$vTag2->set({name=>"deep addChild test"});
+
+my @deepAsset = ($root);
+
+for (1..42) {
+    $deepAsset[$_] = $deepAsset[$_-1]->addChild( {
+            className   => "WebGUI::Asset::Snippet",
+            groupIdView => 7,
+            ownerUserId => 3, #For coverage on addChild properties
+            title       => "Deep Snippet $_",
+            menuTitle   => "Deep Snip $_",
+    });
+}
+
+$vTag2->commit;
+
+is($deepAsset[41]->getParent->getId, $deepAsset[40]->getId, 'addChild will not create an asset with a lineage deeper than 42 levels');
+like($WebGUI::Test::logger_warns, qr/Adding it as a sibling instead/, 'addChild logged a warning about deep assets');
+
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'addChild');
@@ -421,7 +447,9 @@ TODO: {
 
 
 END {
-    $versionTag->rollback;
+    foreach my $tag ($versionTag, $vTag2) {
+        $tag->rollback;
+    }
     foreach my $account ($editor) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
