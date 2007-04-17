@@ -191,7 +191,12 @@ sub getAssets {
 	}
 	my $sth = $self->session->db->read("select asset.assetId,asset.className,assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId=? ".$pending." order by ".$sort." ".$direction, [$self->getId]);
 	while (my ($id,$class,$version) = $sth->array) {
-		push(@assets, WebGUI::Asset->new($self->session,$id,$class,$version));
+		my $asset = WebGUI::Asset->new($self->session,$id,$class,$version);
+                unless (defined $asset) {
+                        $self->session->errorHandler->error("Asset $id $class $version could not be instanciated by version tag ".$self->getId.". Perhaps it is corrupt.");
+                        next;
+                }
+                push(@assets, $asset);
 	}
 	return \@assets;
 }

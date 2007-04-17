@@ -7,6 +7,7 @@
  - fix: Trouble with Search Users (perlDreamer Consulting, LLC)
         http://www.plainblack.com/bugs/tracker/trouble-with-search-users
  - fix: Fixed an unhandled exception in Workflow/Activity/PurgeOldAssetRevisions.pm
+ - Added better error handling for asset instanciation in version tags.
 
 
 7.3.14
