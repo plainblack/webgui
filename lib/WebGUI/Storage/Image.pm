@@ -133,7 +133,11 @@ sub generateThumbnail {
         my $n = $thumbnailSize;
         if ($x > $n || $y > $n) {
                 my $r = $x>$y ? $x / $n : $y / $n;
-                $image->Scale(width=>($x/$r),height=>($y/$r));
+                $x /= $r;
+                $y /= $r;
+                if($x < 1) { $x = 1 } # Dimentions < 1 cause Scale to fail
+                if($y < 1) { $y = 1 }
+                $image->Scale(width=>$x,height=>$y);
 		$image->Sharpen('0.0x1.0');
         }
         $error = $image->Write($self->getPath.'/'.'thumb-'.$filename);
