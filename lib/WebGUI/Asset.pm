@@ -1510,7 +1510,10 @@ sub new {
 			$where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
 		}
 		$properties = $session->db->quickHashRef($sql.$where);
-		return undef unless (exists $properties->{assetId});
+		unless (exists $properties->{assetId}) {
+			$session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
+			return undef;
+		}
 		$cache->set($properties,60*60*24);
 	}
 	if (defined $properties) {

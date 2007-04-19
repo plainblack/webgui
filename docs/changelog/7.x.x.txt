@@ -8,6 +8,7 @@
         http://www.plainblack.com/bugs/tracker/trouble-with-search-users
  - fix: Fixed an unhandled exception in Workflow/Activity/PurgeOldAssetRevisions.pm
  - Added better error handling for asset instanciation in version tags.
+ - Added better error handling in asset instanciation.
  - fix: Image::Magick->Scale does nothing if given dimensions < 1, so make sure
         they are large enough when generating thumbnails in Storage/Image.pm
 
