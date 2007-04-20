@@ -48,26 +48,29 @@ The Apache2::RequestRec object passed in by Apache's mod_perl.
 =cut
 
 sub handler {
-	my $r = shift;
-	my $configFile = shift || $r->dir_config('WebguiConfig');
-	my $s = Apache2::ServerUtil->server;
-	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'), $configFile);
-	$r->push_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls"));
-	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {
+	## Note: To Apache, the return values of OK, DECLINED, and DONE are all 'success' values.  Anything else is an error.  OK and DECLINED are pretty much the same thing as far as Apache is concerned.  Why use one or the other?  To make the code somewhat self-documenting.  In this case, DECLINED means 'We aren't going to do anything more with this'
+	## OK means 'we handled it'
+
+	my $r = shift;	#start with apache request object
+	my $configFile = shift || $r->dir_config('WebguiConfig'); #either we got a config file, or we'll build it from the request object's settings
+	my $s = Apache2::ServerUtil->server;	#instantiate the server api
+	my $config = WebGUI::Config->new($s->dir_config('WebguiRoot'), $configFile); #instantiate the config object
+	$r->push_handlers(PerlFixupHandler => \&fixupHandler) if (defined $config->get("passthruUrls")); #set up the fixup handler if we have passthruUrls
+	foreach my $url ($config->get("extrasURL"), @{$config->get("passthruUrls")}) {	#get list of unhandled urls, return DECLINED if our url is on that list
 		return Apache2::Const::DECLINED if ($r->uri =~ m/^$url/);
 	}
-	my $uploads = $config->get("uploadsURL");
-	$uploads .= "/" unless ($uploads =~ m{/$});
-	if ($r->uri =~ m!^$uploads/dictionaries!) {
+	my $uploads = $config->get("uploadsURL");	#get uploads directory
+	$uploads .= "/" unless ($uploads =~ m{/$});	#ad the trailing slash if it's not already present
+	if ($r->uri =~ m!^$uploads/dictionaries!) {	# if the requested url is a personal dictionary, return not found
 		# Do not allow web-access to personal dictionaries.
 		$r->push_handlers(PerlAccessHandler => sub { return 401 } );
-	} elsif($r->uri =~ m/^$uploads/) {
+	} elsif($r->uri =~ m/^$uploads/) {									#if the request has uploads in it, return the appropriate handler
 		$r->push_handlers(PerlAccessHandler => sub { return uploadsHandler($r, $configFile); } );
-	} else {
+	} else {												#else go to content handler, and set the status to Ok
 		$r->push_handlers(PerlResponseHandler => sub { return contentHandler($r, $configFile); } );
 		$r->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
 	}
-	return Apache2::Const::DECLINED;
+	return Apache2::Const::DECLINED; #decline further processing (keep in mind that OK and DECLINED are both success.  The difference is mostly for internal documentation.  As far as apache in concerned, the two are identical.
 }
 
 
@@ -89,7 +92,7 @@ sub contentHandler {
 	### inherit Apache request.
 	my $r = shift;
 	my $configFile = shift || $r->dir_config('WebguiConfig');
-	### nstantiate the API for this httpd instance.
+	### instantiate the API for this httpd instance.
 	my $s = Apache2::ServerUtil->server;
 	### Open new or existing user session based on user-agent's cookie.
 	my $request = Apache2::Request->new($r);
@@ -101,13 +104,13 @@ sub contentHandler {
 	} elsif ($setting->get("specialState") eq "upgrading") {
 		upgrading($session);
 	} else {
-		my $out = processOperations($session);
+		my $out = processOperations($session); #anything that has op=<whatever> will have it's thing done here
 		if ($out ne "") {
 			# do nothing because we have operation output to display
-			$out = undef if ($out eq "chunked");
-		} elsif ($setting->get("specialState") eq "init") {
+			$out = undef if ($out eq "chunked");	#'chunked' is WebGUI's way of saying 'I took care of it'  The output was sent to the browser in pieces as quickly as it could be produced. 
+		} elsif ($setting->get("specialState") eq "init") { #if specialState is flagged and it's 'init' do initial setup
 			$out = setup($session);
-		} elsif ($errorHandler->canShowPerformanceIndicators) {
+		} elsif ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
 			my $t = [Time::HiRes::gettimeofday()];
 			$out = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
@@ -126,12 +129,12 @@ sub contentHandler {
 				}
 			}
 		} else {
-			if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") {
+			if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") { #display from cache if page hasn't been modified.
 				$http->setStatus("304","Content Not Modified");
 				$http->sendHeader;
 				$session->close;
     				return Apache2::Const::OK();
-			} else {
+			} else {					#return the page.
 				$out = page($session);
 			}
 		}
@@ -146,7 +149,7 @@ sub contentHandler {
                 		$r->content_type($oldContentType);
 			}
 		}
-		$http->sendHeader();
+		$http->sendHeader();	#http object will only send the header once per request, so if the above sent a header as part of it's operation, this will do nothing.
 		unless ($http->isRedirect()) {
 			$output->print($out);
 			if ($errorHandler->canShowDebug()) {
