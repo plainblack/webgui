@@ -12,7 +12,8 @@
  - Added better error handling in asset instanciation.
  - fix: Image::Magick->Scale does nothing if given dimensions < 1, so make sure
         they are large enough when generating thumbnails in Storage/Image.pm
-
+ - fix: WebGUI::Image->new doesn't obey width and height settings (Martin Kamerbeek /Oqapi)
+ 	http://www.plainblack.com/bugs/tracker/webguiimage-new-doesnt-obey-width-and-height-settings
 
 7.3.14
  - fix: a typo in DatabaseLink.pm

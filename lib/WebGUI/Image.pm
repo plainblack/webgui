@@ -173,7 +173,10 @@ sub new {
 	my $width = shift || 300;
 	my $height = shift || 300;
 
-	my $img = Image::Magick->new;
+	my $img = Image::Magick->new(
+		size => $width.'x'.$height,
+	);
+
 	$img->Read(filename => 'xc:white');
 	
 	bless {_image => $img, _session => $session, _properties => {
