@@ -14,6 +14,8 @@
         they are large enough when generating thumbnails in Storage/Image.pm
  - fix: WebGUI::Image->new doesn't obey width and height settings (Martin Kamerbeek /Oqapi)
  	http://www.plainblack.com/bugs/tracker/webguiimage-new-doesnt-obey-width-and-height-settings
+ - fix: Calendar week view didn't display events correctly if they happened on
+        Sunday or if first day of week was set to Monday.
 
 7.3.14
  - fix: a typo in DatabaseLink.pm

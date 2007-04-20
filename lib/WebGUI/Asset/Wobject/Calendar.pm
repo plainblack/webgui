@@ -1321,12 +1321,12 @@ sub viewWeek {
             $dt_event_end = $dtEnd;
         }
 
-        $dt_event_start->set_locale($i18n->get("locale"));
-        $dt_event_end->set_locale($i18n->get("locale"));
+        my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
+        my $end_dow = ($dt_event_end->day_of_week - $first_dow) % 7;
 
         my %eventTemplateVariables = $self->getEventVars($event);
 
-        foreach my $weekDay ($dt_event_start->day_of_week..$dt_event_end->day_of_week) {
+        foreach my $weekDay ($start_dow .. $end_dow) {
             push @{$var->{days}->[$weekDay]->{events}}, \%eventTemplateVariables;
         }
     }
