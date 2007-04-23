@@ -97,6 +97,27 @@ sub copy {
 
 #-------------------------------------------------------------------
 
+=head2 deleteFile ( filename )
+
+Deletes the thumbnail for a file and the file from its storage location
+
+=head3 filename
+
+The name of the file to delete.
+
+=cut
+
+sub deleteFile {
+    my $self = shift;
+    my $filename = shift;
+    $self->SUPER::deleteFile('thumb-'.$filename);
+    $self->SUPER::deleteFile($filename);
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 generateThumbnail ( filename, [ thumbnailSize ] ) 
 
 Generates a thumbnail for this image.
