@@ -7,6 +7,7 @@
         they complete their transaction.
  - fix: Trouble with Search Users (perlDreamer Consulting, LLC)
         http://www.plainblack.com/bugs/tracker/trouble-with-search-users
+ - fix: Fixed a typo in SQLForm.pm (Radix)
  - fix: Fixed an unhandled exception in Workflow/Activity/PurgeOldAssetRevisions.pm
  - Added better error handling for asset instanciation in version tags.
  - Added better error handling in asset instanciation.

@@ -1245,7 +1245,7 @@ sub processPropertiesFromFormPost {
 		#if table exists and not in SQLForm format, put in SQLFormFormat.
 		@tables = $dbLink->db->buildArray("show tables");
 		
-		@usedTables = $self->session->db->buildArray("select tableName from SQLForm, asset where asset.assetID=SQLForm.assetId and state='pub        lished' and databaseLinkId = ".$self->session->db->quote($dbLinkId));
+		@usedTables = $self->session->db->buildArray("select tableName from SQLForm, asset where asset.assetID=SQLForm.assetId and state='published' and databaseLinkId = ".$self->session->db->quote($dbLinkId));
 
 		if (isIn(lc($tableName), map {lc} @usedTables)) {
 			return ["The table is already used in an SQLForm."];
