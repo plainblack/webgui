@@ -165,7 +165,16 @@ sub canEdit {
 }
 
 
-
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    # Make sure menuTitle has some text, and that it is <= 15 characters.
+    if (exists $properties->{menuTitle}) {
+        $properties->{menuTitle} ||= $properties->{title} || $self->getTitle;
+        $properties->{menuTitle} = substr($properties->{menuTitle}, 0, 15);
+    }
+    return $self->SUPER::update($properties);
+}
 
 
 

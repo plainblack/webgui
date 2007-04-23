@@ -18,6 +18,8 @@
  	http://www.plainblack.com/bugs/tracker/webguiimage-new-doesnt-obey-width-and-height-settings
  - fix: Calendar week view didn't display events correctly if they happened on
         Sunday or if first day of week was set to Monday.
+ - fix: Events limit menuTitle to 15 characters yet if not specified, used
+        Title without limiting its length.
 
 7.3.14
  - fix: a typo in DatabaseLink.pm
