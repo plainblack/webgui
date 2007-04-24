@@ -245,7 +245,7 @@ sub www_richEditImageTree {
                         font-size: 15px;
                 }
                 </style>|);
-	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getMedia($session);
 	my @crumb;
 	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
 	my $media;
