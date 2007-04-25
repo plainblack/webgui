@@ -1,3 +1,7 @@
+7.3.16
+
+
+
 7.3.15
  - Added more documentation to WebGUI.pm
  - fix: modified Form/Textarea.pm to use -min versions of YUI javascript libraries in order to speed up page load times
