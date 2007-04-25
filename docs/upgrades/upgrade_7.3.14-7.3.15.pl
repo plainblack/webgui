@@ -14,7 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 
 
-my $toVersion = "0.0.0"; # make this match what version you're going to
+my $toVersion = "7.3.15"; # make this match what version you're going to
 my $quiet; # this line required
 
 
