@@ -17,7 +17,9 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
 
+use File::Spec;
 use Test::More;
+use Test::Deep;
 
 my $extensionTests = [
 	{
@@ -47,13 +49,21 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 28 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 37 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 my $uploadDir = $session->config->get('uploadsPath');
-
 ok ($uploadDir, "uploadDir defined in config");
+
+my $uploadUrl = $session->config->get('uploadsURL');
+ok ($uploadUrl, "uploadDir defined in config");
+
+####################################################
+#
+# get
+#
+####################################################
 
 ok ((-e $uploadDir and -d $uploadDir), "uploadDir exists and is a directory");
 
@@ -69,9 +79,21 @@ is( $storage1->getErrorCount, 0, "No errors during path creation");
 
 is( $storage1->getLastError, undef, "No errors during path creation");
 
-my $storageDir1 = join '/', $uploadDir, 'fo', 'ob', 'foobar';
+####################################################
+#
+# getPath, getUrl
+#
+####################################################
 
-is ($storageDir1, $storage1->getPath, 'path calculated correctly');
+my $storageDir1 = join '/', $uploadDir, 'fo', 'ob', 'foobar';
+is ($storageDir1, $storage1->getPath, 'getPath: path calculated correctly for directory');
+my $storageFile1 = join '/', $storageDir1, 'baz';
+is ($storageFile1, $storage1->getPath('baz'), 'getPath: path calculated correctly for file');
+
+my $storageUrl1 = join '/', $uploadUrl, 'fo', 'ob', 'foobar';
+is ($storageUrl1, $storage1->getUrl, 'getUrl: url calculated correctly for directory');
+my $storageUrl2 = join '/', $storageUrl1, 'bar';
+is ($storageUrl2, $storage1->getUrl('bar'), 'getUrl: url calculated correctly for file');
 
 ok( (-e $storageDir1 and -d $storageDir1), "Storage location created and is a directory");
 
@@ -172,11 +194,31 @@ $storage1->renameFile("testfile-hash.file", "testfile-hash-renamed.file");
 ok (-e $storage1->getPath("testfile-hash-renamed.file"),'renameFile created file with new name');
 ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file is gone");
 
-TODO: {
-	local $TODO = "Tests to make later";
-	#ok(0, 'Add a file to the storage location via addFileFromHashref');
-	#ok(0, 'Test renaming of files inside of a storage location');
-}
+####################################################
+#
+# addFileFromFilesystem
+#
+####################################################
+
+$storage1->addFileFromFilesystem(
+    File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'WebGUI.pm'),
+);
+
+ok(
+    grep(/WebGUI\.pm/, @{ $storage1->getFiles }),
+    'addFileFromFilesystem: file added from test collateral area'
+);
+
+####################################################
+#
+# deleteFile
+#
+####################################################
+
+is(scalar @{ $storage1->getFiles}, 3, 'storage1 has 2 files');
+is($storage1->deleteFile("testfile-hash-renamed.file"), 1, 'deleteFile: deleted 1 file');
+is($storage1->deleteFile("WebGUI.pm"), 1, 'deleteFile: deleted another file');
+cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file');
 
 END {
 	foreach my $stor ($storage1, $storage2, $storage3) {
