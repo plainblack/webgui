@@ -238,11 +238,12 @@ sub getSiteURL {
 	unless ($self->{_siteUrl}) {
 		my $site = "";
 		my $sitenames = $self->session->config->get("sitename");
-        	if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($self->session->env->get("HTTP_HOST"),@{$sitenames})) {
-                	$site = $self->session->env->get("HTTP_HOST");
-        	} else {
-                	$site = $sitenames->[0];
-        	}
+                my ($http_host,$currentPort) = split(':', $self->session->env->get("HTTP_HOST"));
+                if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
+                        $site = $http_host;
+                } else {
+                        $site = $sitenames->[0];
+                }
         	my $proto = "http://";
         	if ($self->session->env->get("HTTPS") eq "on") {
                	 	$proto = "https://";
