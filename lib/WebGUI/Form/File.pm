@@ -26,7 +26,7 @@ Package WebGUI::Form::File
 
 =head1 DESCRIPTION
 
-Creates a text input box form field.
+Creates a javascript driven file upload control for files.
 
 =head1 SEE ALSO
 

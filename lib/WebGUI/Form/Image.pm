@@ -27,11 +27,11 @@ Package WebGUI::Form::Image
 
 =head1 DESCRIPTION
 
-Creates a text input box form field.
+Creates a javascript driven file upload control for files or images.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::File, and thereform WebGUI::Form::Image.
+This is a subclass of WebGUI::Form::File.
 
 =head1 METHODS 
 
