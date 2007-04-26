@@ -41,7 +41,7 @@ sub archive {
 #-------------------------------------------------------------------
 sub canReply {
 	my $self = shift;
-	return !$self->isLocked && $self->getParent->get("allowReplies") && $self->getParent->canPost;
+	return !$self->isThreadLocked && $self->getParent->get("allowReplies") && $self->getParent->canPost;
 }
 
 #-------------------------------------------------------------------
@@ -401,13 +401,13 @@ sub getUnsubscribeUrl {
 
 #-------------------------------------------------------------------
 
-=head2 isLocked ( )
+=head2 isThreadLocked ( )
 
 Returns a boolean indicating whether this thread is locked from new posts and other edits.
 
 =cut
 
-sub isLocked {
+sub isThreadLocked {
         my ($self) = @_;
         return $self->get("isLocked");
 }
@@ -844,7 +844,7 @@ sub view {
         $var->{'stick.url'} = $self->getStickUrl;
         $var->{'unstick.url'} = $self->getUnstickUrl;
 
-        $var->{'isLocked'} = $self->isLocked;
+        $var->{'isLocked'} = $self->isThreadLocked;
         $var->{'lock.url'} = $self->getLockUrl;
         $var->{'unlock.url'} = $self->getUnlockUrl;
 

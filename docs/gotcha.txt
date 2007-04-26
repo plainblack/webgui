@@ -7,6 +7,19 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.3.16
+--------------------------------------------------------------------
+
+ * There was an inadvertent override of the Asset method isLocked inside
+   of WebGUI::Asset::Post::Thread.pm.  Normally, isLocked will return true
+   if the Asset is being edited by another user.  However, the isLocked inside
+   of Thread.pm returned true if the Thread was locked to prevent more
+   replies from being added to the it.
+
+   In 7.3.16, the thread lock method inside Thread.pm was renamed
+   isThreadLocked.  No template variables, field names or database
+   columsn were changed.
+
 7.3.15
 --------------------------------------------------------------------
 
