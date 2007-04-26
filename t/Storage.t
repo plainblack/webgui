@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 37 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 44 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -73,7 +73,7 @@ is( $storage1, undef, "get requires id to be passed");
 
 $storage1 = WebGUI::Storage->get($session, 'foobar');
 
-is( ref $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
+isa_ok( $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
 
 is( $storage1->getErrorCount, 0, "No errors during path creation");
 
@@ -147,7 +147,7 @@ undef $storage3;
 
 $storage1 = WebGUI::Storage->create($session);
 
-is( ref $storage1, "WebGUI::Storage", "create returns a WebGUI Storage object");
+isa_ok( $storage1, "WebGUI::Storage");
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
@@ -187,8 +187,30 @@ foreach my $extTest (@{ $extensionTests }) {
 	is( $storage1->getFileExtension($extTest->{filename}), $extTest->{extension}, $extTest->{comment} );
 }
 
-$storage1->addFileFromHashref("testfile-hash.file",{'blah'=>"blah",'foo'=>"foo"});
+####################################################
+#
+# addFileFromHashref
+#
+####################################################
+
+my $storageHash = {'blah'=>"blah",'foo'=>"foo"};
+$storage1->addFileFromHashref("testfile-hash.file", $storageHash);
 ok (-e $storage1->getPath("testfile-hash.file"), 'addFileFromHashRef creates file');
+
+####################################################
+#
+# getFileContentsAsHashref
+#
+####################################################
+
+my $thawedHash = $storage1->getFileContentsAsHashref('testfile-hash.file');
+cmp_deeply($storageHash, $thawedHash, 'getFileContentsAsHashref: thawed hash correctly');
+
+####################################################
+#
+# renameFile
+#
+####################################################
 
 $storage1->renameFile("testfile-hash.file", "testfile-hash-renamed.file");
 ok (-e $storage1->getPath("testfile-hash-renamed.file"),'renameFile created file with new name');
@@ -211,6 +233,24 @@ ok(
 
 ####################################################
 #
+# copy
+#
+####################################################
+
+my $copiedStorage = $storage1->copy();
+cmp_bag($copiedStorage->getFiles(), $storage1->getFiles(), 'copy: both storage objects have the same files');
+
+my $secondCopy = WebGUI::Storage->create($session);
+$storage1->copy($secondCopy);
+cmp_bag($secondCopy->getFiles(), $storage1->getFiles(), 'copy: passing explicit variable');
+
+my $s3copy = WebGUI::Storage->create($session);
+my @filesToCopy = qw/WebGUI.pm testfile-hash-renamed.file/;
+$storage1->copy($s3copy, [@filesToCopy]);
+cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable and files to copy');
+
+####################################################
+#
 # deleteFile
 #
 ####################################################
@@ -220,8 +260,20 @@ is($storage1->deleteFile("testfile-hash-renamed.file"), 1, 'deleteFile: deleted 
 is($storage1->deleteFile("WebGUI.pm"), 1, 'deleteFile: deleted another file');
 cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file');
 
+####################################################
+#
+# createTemp
+#
+####################################################
+
+my $tempStor = WebGUI::Storage->createTemp($session);
+
+isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
+is ($tempStor->{_part1}, 'temp', 'createTemp puts stuff in the temp directory');
+ok (-e $tempStor->getPath(), 'createTemp: directory was created');
+
 END {
-	foreach my $stor ($storage1, $storage2, $storage3) {
+	foreach my $stor ($storage1, $storage2, $storage3, $copiedStorage, $secondCopy, $s3copy, $tempStor) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
 }
