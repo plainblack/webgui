@@ -18,7 +18,7 @@ save you many hours of grief.
 
    In 7.3.16, the thread lock method inside Thread.pm was renamed
    isThreadLocked.  No template variables, field names or database
-   columsn were changed.
+   columns were changed.
 
 7.3.15
 --------------------------------------------------------------------

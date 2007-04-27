@@ -208,9 +208,17 @@ sub processPropertiesFromFormPost {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
 	my $storage = $self->getStorageLocation;
-	$self->generateThumbnail($self->session->setting->get("maxImageSize"));
-	$storage->deleteFile($self->get("filename"));
-	$storage->renameFile('thumb-'.$self->get("filename"),$self->get("filename"));
+    my $max_size = $self->session->setting->get("maxImageSize");
+    my $file = $self->get("filename");
+    my ($w, $h) = $storage->getSizeInPixels($file);
+    if($w > $max_size || $h > $max_size) {
+        if($w > $h) {
+            $storage->resize($file, $max_size);
+        }
+        else {
+            $storage->resize($file, 0, $max_size);
+        }
+    }
 	$self->generateThumbnail($self->session->form->process("thumbnailSize"));
 }
 
