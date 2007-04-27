@@ -102,6 +102,32 @@ sub insufficient {
 	return $self->session->style->userStyle($output);
 }
 
+#-------------------------------------------------------------------
+
+=head2 locked ( )
+
+Returns a message stating that Asset is locked.  This is a variation of insufficient with
+a different error message.
+
+=cut
+
+sub locked {
+	my $self = shift;
+    my $noStyle = shift;
+	my $i18n = WebGUI::International->new($self->session);
+	$self->session->http->setStatus("401", "Insufficient Privileges");
+	my $output = '<h1>'.$i18n->get(37).'</h1>';
+    if ($noStyle) {
+        $self->session->style->useEmptyStyle(1);
+        $output .= $i18n->get('asset locked');
+    }
+    else {
+        $output .= $i18n->get('asset locked');
+    }
+	return $self->session->style->userStyle($output);
+}
+
+
 
 #-------------------------------------------------------------------
 

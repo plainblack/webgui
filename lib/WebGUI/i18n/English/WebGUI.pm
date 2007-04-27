@@ -3298,6 +3298,11 @@ or are under your current version tag.</p>
 		lastUpdated => 1031514049
 	},
 
+	'asset locked' => {
+		message => q|This Asset is locked for editing under a version tag different from the one that you are using.|,
+		lastUpdated => 1177706405
+	},
+
 	'bare insufficient' => {
 		message => q|You do not have sufficient privileges to perform this operation. Please log in with an account that has sufficient privileges before attempting this operation.|,
 		lastUpdated => 1169790230

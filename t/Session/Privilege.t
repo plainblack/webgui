@@ -33,6 +33,12 @@ my @simpleTests = (
 		titleCode => 37,
 	},
 	{
+		method => 'locked',
+		status => 401,
+		description => 'Insufficient Privileges',
+		titleCode => 37,
+	},
+	{
 		method => 'notMember',
 		status => 400,
 		description => 'Not A Member',
