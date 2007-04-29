@@ -296,11 +296,12 @@ order by department, lastName, firstName";
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("in out board add/edit","Asset_InOutBoard");
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    $self->getAdminConsole->setHelp("in out board add/edit","Asset_InOutBoard");
 	my $i18n = WebGUI::International->new($self->session, "Asset_InOutBoard");
-        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("18"));
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("18"));
 }
 
 #-------------------------------------------------------------------

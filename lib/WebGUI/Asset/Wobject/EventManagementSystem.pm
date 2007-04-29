@@ -1606,6 +1606,7 @@ Edit wobject method.
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my ($tag) = ($self->get("className") =~ /::(\w+)$/);
 	my $tag2 = $tag;
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps

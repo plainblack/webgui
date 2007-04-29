@@ -555,10 +555,11 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session,"Asset_RichEdit");
-        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("rich edit edit config"));
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get("rich edit edit config"));
 }
 
 

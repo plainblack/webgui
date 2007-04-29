@@ -174,11 +174,12 @@ sub view {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("snippet add/edit","Asset_Snippet");
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Snippet');
-        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('snippet add/edit title'));
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    $self->getAdminConsole->setHelp("snippet add/edit","Asset_Snippet");
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Snippet');
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('snippet add/edit title'));
 }
 
 #-------------------------------------------------------------------

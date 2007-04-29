@@ -2065,6 +2065,7 @@ Renders an AdminConsole EditForm, unless canEdit returns False.
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	return $self->getAdminConsole->render($self->getEditForm->print);
 }
 
@@ -2080,6 +2081,7 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
 	my $self = shift;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	if ($self->session->config("maximumAssets")) {
 		my ($count) = $self->session->db->quickArray("select count(*) from asset");

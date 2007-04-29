@@ -372,6 +372,7 @@ sub view {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session);
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(

@@ -351,12 +351,13 @@ sub processRaw {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
-	$self->getAdminConsole->setHelp("template add/edit","Asset_Template");
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
-        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+    $self->getAdminConsole->setHelp("template add/edit","Asset_Template");
+    $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
 }
 
 #-------------------------------------------------------------------
@@ -378,7 +379,8 @@ sub www_manage {
 #-------------------------------------------------------------------
 sub www_styleWizard {
 	my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Template");
 	my $form = $self->session->form;
 	my $output = "";

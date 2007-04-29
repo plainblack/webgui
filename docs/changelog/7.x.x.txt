@@ -2,7 +2,8 @@
  - fix: The POD of Form::Image is faulty (perlDreamer Consulting, LLC)
  - fix: Method name clash between WebGUI::Asset::Post::Thread and WebGUI::AssetVersioning (perlDreamer Consulting, LLC)
  - fix: Images in various places were broken in 7.3.15
-
+ - fix: Able to edit locked template (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
 
 
 7.3.15

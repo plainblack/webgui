@@ -1249,6 +1249,7 @@ We're extending www_editSave() here to deal with editing a post that has been de
 sub www_editSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	if ($self->session->config("maximumAssets")) {
 		my ($count) = $self->session->db->quickArray("select count(*) from asset");
 		my $i18n = WebGUI::International->new($self->session, "Asset");

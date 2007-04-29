@@ -1426,6 +1426,7 @@ sub www_edit {
     my $i18n    = WebGUI::International->new($session, 'Asset_Calendar');
     
     return $session->privilege->insufficient() unless $self->canEdit;
+    return $session->privilege->locked() unless $self->canEditIfLocked;
     
     $self->getAdminConsole->setHelp("Calendar add/edit", "Calendar");
     

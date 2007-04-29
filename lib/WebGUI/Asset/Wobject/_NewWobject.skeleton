@@ -181,6 +181,7 @@ adminConsole views.
 #sub www_edit {
 #   my $self = shift;
 #   return WebGUI::Privilege::insufficient() unless $self->canEdit;
+#   return WebGUI::Privilege::locked() unless $self->canEditIfLocked;
 #   $self->getAdminConsole->setHelp("new wobject add/edit", "NewWobject");
 #   return $self->getAdminConsole->render($self->getEditForm->print,
 #                  WebGUI::International::get("edit_title","NewWobject"));

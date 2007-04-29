@@ -82,11 +82,12 @@ sub definition {
 
 #-------------------------------------------------------------------
 sub www_edit {
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
-        $self->getAdminConsole->setHelp("redirect add/edit", "Asset_Redirect");
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    $self->getAdminConsole->setHelp("redirect add/edit", "Asset_Redirect");
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Redirect');
-        return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('redirect add/edit title'));
+    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('redirect add/edit title'));
 }
 
 #-------------------------------------------------------------------

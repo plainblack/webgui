@@ -333,6 +333,7 @@ sub www_delete {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless $self->canEdit;
+	return $self->session->privilege->locked unless $self->canEditIfLocked;
 	return $self->getWiki->processStyle($self->getEditForm);
 }
 

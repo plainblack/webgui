@@ -680,6 +680,7 @@ sub view {
 sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));

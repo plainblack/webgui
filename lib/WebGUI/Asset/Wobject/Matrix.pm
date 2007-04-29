@@ -508,12 +508,12 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 sub www_edit {  
-        my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
 	$self->getAdminConsole->setHelp('matrix add/edit', 'Asset_Matrix');
-        return $self->getAdminConsole->render($self->getEditForm->print,
-					$i18n->get("edit matrix"));
+    return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit matrix"));
 }
 
 #-------------------------------------------------------------------
