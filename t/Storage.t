@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 44 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 52 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -272,8 +272,37 @@ isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object
 is ($tempStor->{_part1}, 'temp', 'createTemp puts stuff in the temp directory');
 ok (-e $tempStor->getPath(), 'createTemp: directory was created');
 
+####################################################
+#
+# tar
+#
+####################################################
+
+my $tarStorage = $copiedStorage->tar('tar.tar');
+isa_ok( $tarStorage, "WebGUI::Storage", "tar: returns a WebGUI::Storage object");
+is ($tarStorage->{_part1}, 'temp', 'tar: puts stuff in the temp directory');
+cmp_bag($tarStorage->getFiles(), [ 'tar.tar' ], 'tar: storage contains only the tar file');
+isnt($tarStorage->getPath, $copiedStorage->getPath, 'tar did not reuse the same path as the source storage object');
+
+####################################################
+#
+# untar
+#
+####################################################
+
+my $untarStorage = $tarStorage->untar('tar.tar');
+isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
+is ($untarStorage->{_part1}, 'temp', 'untar: puts stuff in the temp directory');
+##Note, getFiles will NOT recurse, so do not use a deep directory structure here
+cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
+isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same path as the tar storage object');
+
 END {
-	foreach my $stor ($storage1, $storage2, $storage3, $copiedStorage, $secondCopy, $s3copy, $tempStor) {
+	foreach my $stor (
+        $storage1,   $storage2, $storage3, $copiedStorage,
+        $secondCopy, $s3copy,   $tempStor, $tarStorage,
+        $untarStorage,
+    ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
 }

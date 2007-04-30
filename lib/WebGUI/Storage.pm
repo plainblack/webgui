@@ -518,9 +518,8 @@ sub getFileContentsAsScalar {
 	my $filename = shift;
 	my $content;
 	open (my $FILE,"<",$self->getPath($filename));
-	while (<$FILE>) {
-		$content .= $_;
-	}
+    local undef $/;
+    $content = <$FILE>;
 	close($FILE);
 	return $content;
 }
@@ -820,13 +819,13 @@ Pass in a storage location object to extract the contents to, instead of having 
 =cut
 
 sub untar {
-        my $self = shift;
-	my $filename = shift;
-	my $temp = shift || WebGUI::Storage->createTemp($self->session);
-        chdir $temp->getPath;
-	Archive::Tar->extract_archive($self->getPath($filename),1);
-	$self->_addError(Archive::Tar->error) if (Archive::Tar->error);
-	return $temp;
+    my $self = shift;
+    my $filename = shift;
+    my $temp = shift || WebGUI::Storage->createTemp($self->session);
+    chdir $temp->getPath;
+    Archive::Tar->extract_archive($self->getPath($filename),1);
+    $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+    return $temp;
 }
 
 
