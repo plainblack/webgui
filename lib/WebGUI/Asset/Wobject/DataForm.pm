@@ -1110,19 +1110,19 @@ sub www_exportTab {
         $entries->finish;
 
         ##Output field headers
-        my @row;
+        my @validFields;
         foreach my $fieldId (keys %fields) {
                 next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
-                push(@row, $fields{$fieldId});
+                push(@validFields, $fields{$fieldId});
         }
-        my $tab = join("\t",@row)."\n";
+        unshift @validFields, qw/entryId ipAddress username userId submissionDate/;
+        my $tab = join("\t",@validFields)."\n";
 
         ##Output actual row data
         foreach my $record (@data) {
-                @row = ();
-                foreach my $fieldId (keys %fields) {
-                        next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
-                        my $value = $record->{$fields{$fieldId}};
+                my @row = ();
+                foreach my $fieldName (@validFields) {
+                        my $value = $record->{$fieldName};
                         $value =~ s/\t/\\t/g;
                         $value =~ s/\r//g;
                         $value =~ s/\n/;/g;

@@ -7,6 +7,8 @@
     http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
  - fix: demo site: wiki: links broken (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
+ - fix: DataForm does not export entry information (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/dataform-does-not-export-entry-information
 
 7.3.15
  - Added more documentation to WebGUI.pm
