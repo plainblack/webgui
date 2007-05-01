@@ -1,4 +1,5 @@
 7.3.16
+ - fix: Thread template: next.url and previous.url tmpl_vars are always defined (Yung Han Khoe, United Knowledge)
  - fix: The POD of Form::Image is faulty (perlDreamer Consulting, LLC)
  - fix: Method name clash between WebGUI::Asset::Post::Thread and WebGUI::AssetVersioning (perlDreamer Consulting, LLC)
  - fix: Images in various places were broken in 7.3.15
