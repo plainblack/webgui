@@ -1108,12 +1108,16 @@ sub www_exportTab {
                 $i++;
         }
         $entries->finish;
+
+        ##Output field headers
         my @row;
         foreach my $fieldId (keys %fields) {
                 next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
                 push(@row, $fields{$fieldId});
         }
         my $tab = join("\t",@row)."\n";
+
+        ##Output actual row data
         foreach my $record (@data) {
                 @row = ();
                 foreach my $fieldId (keys %fields) {

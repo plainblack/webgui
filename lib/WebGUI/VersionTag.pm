@@ -127,7 +127,45 @@ sub commit {
 
 =head2 get ( name ) 
 
-Returns the value for a given property.
+Returns the value for a given property.  An incomplete list of properties is below:
+
+=head3 name
+
+The name of the tag.
+
+=head4 createdBy
+
+The ID of the user who originally created the tag.
+
+=head4 committedBy
+
+The ID of the user who committed the tag.
+
+=head4 lockedBy
+
+If the version tag is locked, the ID of the user who has it locked.
+
+=head4 isLocked
+
+An integer that indicates whether the version tag is locked.  A 1 indicates that the tag
+is locked.  Note that this is different from edit locking an Asset.  Locked Version Tags may
+not be edited.
+
+=head3 groupToUse
+
+The ID of the group that's allowed to use this tag. Defaults to the turn admin on group.
+
+=head4 commitDate
+
+The epoch date the tag was committed.
+
+=head3 creationDate
+
+The epoch date the tag was created.
+
+=head3 comments
+
+Some text about this version tag, what it's for, why it was committed, why it was denied, why it was approved, etc.
 
 =cut
 
