@@ -5,7 +5,8 @@
  - fix: Images in various places were broken in 7.3.15
  - fix: Able to edit locked template (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
-
+ - fix: demo site: wiki: links broken (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
 
 7.3.15
  - Added more documentation to WebGUI.pm
