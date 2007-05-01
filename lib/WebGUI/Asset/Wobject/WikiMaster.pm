@@ -92,7 +92,7 @@ sub autolinkHtml {
 	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
 	return $html unless %mapping;
 	foreach my $key (keys %mapping) {
-		$mapping{$key} = WebGUI::HTML::format('/'.$mapping{$key}, 'text');
+		$mapping{$key} = $self->session->url->gateway(WebGUI::HTML::format('/'.$mapping{$key}, 'text'));
 	}
 	my $matchString = join('|', map{quotemeta} keys %mapping);
 	my $regexp = qr/\b($matchString)\b/i;
