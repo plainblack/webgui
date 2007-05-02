@@ -1,6 +1,7 @@
 7.3.16
  - fix: Wiki titles not automatically linked
  - fix: Email to forum not working from Mac
+ - fix: Unable to set size in DynamicField (Diona Kidd / Knowmad)
  - fix: Calendar Events Disappearing
 	 http://www.plainblack.com/bugs/tracker/calendar-events-disappearing
  - fix: Modified SQLForm.pm to handle MySQL null dates.  Undefs them.  Undef dates default to time(), i.e. today's date

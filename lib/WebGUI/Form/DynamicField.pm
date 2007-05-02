@@ -102,11 +102,6 @@ sub new {
 	my $param = \%raw;
         my $fieldType = ucfirst($param->{fieldType});
 	delete $param->{fieldType};
-	my $size;
-	if (exists $param->{size}) {
-		$size = $param->{size};
-		delete $param->{size};
-	}
         # Return the appropriate field object.
 	if ($fieldType eq "") {
 		$session->errorHandler->warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
@@ -126,15 +121,12 @@ sub new {
                 return undef;
         }
 	my $formObj = $cmd->new($session, $param);
-	##Fix up methods for List type forms and restore the size to all Forms *except*
-	##List type forms.  Historically, dynamically created forms have always
-	##used the default size.
 	if ($formObj->isa('WebGUI::Form::List')) {
 		$formObj->correctValues($param->{value});
 		$formObj->correctOptions($param->{possibleValues});
 	}
-	elsif ($size) {
-		$formObj->set('size',$size);
+    if ($param->{size}) {
+		$formObj->set('size',$param->{size});
 	}
         return $formObj;
 }
