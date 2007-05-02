@@ -175,7 +175,6 @@ sub execute {
 		});
 	return $self->COMPLETE unless (defined $mail);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
-	my $msgnum = 1;
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
@@ -183,10 +182,7 @@ sub execute {
 		$from = $1 || $from;
 		$from =~ /(\S+\@\S+)/;	
 		my $user = WebGUI::User->newByEmail($self->session, $from);
-		if (!$cs->get("requireSubscriptionForEmailPosting") && !(defined $user)) { #this one is for unregistered posters
-			$user = WebGUI::User->new($self->session, undef);
-		}
-		unless (defined $user ) {			
+		unless (defined $user) {			
 			my $send = WebGUI::Mail::Send->create($self->session, {
 				to=>$message->{from},
 				inReplyTo=>$message->{messageId},
@@ -225,7 +221,6 @@ sub execute {
 			$send->send;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
-		$msgnum ++;
 		last if (time() > $start + 60);
 	}
 	$mail->disconnect;
