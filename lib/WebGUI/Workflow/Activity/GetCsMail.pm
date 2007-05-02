@@ -183,15 +183,16 @@ sub execute {
 		$from =~ /(\S+\@\S+)/;	
 		my $user = WebGUI::User->newByEmail($self->session, $from);
 		unless (defined $user) {			
-			my $send = WebGUI::Mail::Send->create($self->session, {
-				to=>$message->{from},
-				inReplyTo=>$message->{messageId},
-				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
-				from=>$cs->get("mailAddress")
-				});
-			$send->addText($i18n->get("rejected because no user account"));
-			$send->send;
-			next;
+			$user = WebGUI::User->new($self->session, undef);
+#			my $send = WebGUI::Mail::Send->create($self->session, {
+#				to=>$message->{from},
+#				inReplyTo=>$message->{messageId},
+#				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+#				from=>$cs->get("mailAddress")
+#				});
+#			$send->addText($i18n->get("rejected because no user account"));
+#			$send->send;
+#			next;
 		}
 		my $post = undef;
 		if ($message->{inReplyTo}) {
@@ -202,11 +203,13 @@ sub execute {
 
 		if (defined $post && $cs->get("allowReplies") && $user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
 			$self->addPost($post, $message, $user, $cs->get("mailPrefix"));
+			#subscribe poster to thread if set to autosubscribe, and they're not already
 			if ($cs->get("autoSubscribeToThread") && !($user->isInGroup($cs->get("subscriptionGroupId")) || $user->isInGroup($post->get("subscriptionGroupId")))) {
 				$user->addToGroups([$post->getThread->get("subscriptionGroupId")]);
 			}
 		} elsif ($user->isInGroup($cs->get("postGroupId")) && (!$cs->get("requireSubscriptionForEmailPosting") || $user->isInGroup($cs->get("subscriptionGroupId")))) {
 			my $thread = $self->addPost($cs, $message, $user, $cs->get("mailPrefix"));
+			#subscribe poster to thread if set to autosubscribe, and they're not already
 			if ($cs->get("autoSubscribeToThread") && !$user->isInGroup($cs->get("subscriptionGroupId"))) {
 				$user->addToGroups([$thread->get("subscriptionGroupId")]);
 			}
@@ -217,7 +220,8 @@ sub execute {
 				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
 				from=>$cs->get("mailAddress")
 				});
-			$send->addText($i18n->get("rejected because not allowed"));
+			my $cslevel = $cs->get("postGroupId");
+			$send->addText($i18n->get("rejected because not allowed").$cslevel);
 			$send->send;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
