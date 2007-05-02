@@ -77,13 +77,26 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-        my $size = $self->get("sizeLimit") + 10;
-        my $expiresModifier = 0;
-        my $cache = WebGUI::Cache::FileCache->new($self->session);
-        while ($size > $self->get("sizeLimit")) {
-                $size = $cache->getNamespaceSize($expiresModifier);
-                $expiresModifier += 60 * 30; # add 30 minutes each pass
-        }
+    my $size = $self->get("sizeLimit") + 10;
+    my $expiresModifier = 0;
+
+    # Purge expired content cache
+    my $cache = WebGUI::Cache::FileCache->new($self->session);
+    while ($size > $self->get("sizeLimit")) {
+        $size = $cache->getNamespaceSize($expiresModifier);
+        $expiresModifier += 60 * 30; # add 30 minutes each pass
+    }
+
+    $size = $self->get("sizeLimit") + 10;
+    $expiresModifier = 0;
+ 
+    # Purge expired rss cache
+    my $rssCache = WebGUI::Cache::FileCache->new($self->session, undef, 'RSS');
+    while ($size > $self->get("sizeLimit")) {
+        $size = $rssCache->getNamespaceSize($expiresModifier);
+        $expiresModifier += 60 * 30; # add 30 minutes each pass
+    }
+
 	return $self->COMPLETE;
 }
 
