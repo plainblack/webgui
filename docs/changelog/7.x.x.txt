@@ -45,6 +45,8 @@
  - fix: Calendar events do not show up on the last day of the month.
  - fix: Event Management System -- Safari can't get past enter attendee /
    select attendee information.
+ - fix: Search does not return exact match without quotes
+    http://www.plainblack.com/bugs/tracker/search-does-not-return-exact-match-without-quotes
 
 7.3.15
  - Added more documentation to WebGUI.pm
