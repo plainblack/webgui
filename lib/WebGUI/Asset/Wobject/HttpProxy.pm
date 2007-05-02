@@ -419,21 +419,21 @@ sub view {
 #-------------------------------------------------------------------
 
 sub www_view {
-        my $self = shift;
-        return $self->session->privilege->noAccess() unless $self->canView;
-	$self->prepareView;
-        my $output = $self->view;
-        if ($self->session->http->getMimeType ne "text/html") {
-                return $output;
-        } else {
-		$self->session->http->sendHeader;
-		my $style = $self->processStyle("~~~");
-		my ($head, $foot) = split("~~~",$style);
-		$self->session->output->print($head, 1);
-		$self->session->output->print($output);
-		$self->session->output->print($foot, 1);
-		return "chunked";
-        }
+    my $self = shift;
+    return $self->session->privilege->noAccess() unless $self->canView;
+    $self->prepareView;
+    my $output = $self->view;
+    if ($self->session->http->getMimeType ne "text/html") {
+        return $output;
+    } else {
+        $self->session->http->sendHeader;
+        my $style = $self->processStyle("~~~");
+        my ($head, $foot) = split("~~~",$style);
+        $self->session->output->print($head);
+        $self->session->output->print($output, 1); # Do not process macros
+        $self->session->output->print($foot);
+        return "chunked";
+    }
 }
 
 1;

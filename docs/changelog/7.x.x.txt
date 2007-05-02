@@ -29,6 +29,8 @@
     http://www.plainblack.com/bugs/tracker/too-many-directories-in-rss-cache
  - fix: Help link broken for navigation template (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/help-link-broken-for-navigation-template
+ - fix: HttpProxy no longer processes macros in proxied content
+    http://www.plainblack.com/bugs/tracker/weird-characters-in-webgui.log-caused-by-http-proxy
 
 7.3.15
  - Added more documentation to WebGUI.pm
