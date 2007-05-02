@@ -194,7 +194,8 @@ foreach my $filename (keys %{$configs}) {
 		$config{$filename}{mysqlDump} = $configs->{$filename}->get("mysqlDump");
 		$config{$filename}{backupPath} = $configs->{$filename}->get("backupPath");
 		my $session = WebGUI::Session->open($webguiRoot,$filename);
-		($config{$filename}{version}) = $session->db->quickArray("select webguiVersion from webguiVersion order by dateApplied desc, webguiVersion desc limit 1");
+		($config{$filename}{version}) = $session->db->quickArray("select webguiVersion from webguiVersion order by
+        dateApplied desc, length(webguiVersion) desc, webguiVersion desc limit 1");
 		unless ($history) {
 			print "\tPreparing site for upgrade.\n" unless ($quiet);
 			unless ($skipMaintenance) {
@@ -344,7 +345,7 @@ sub checkVersion {
 	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
 	my $goal = 6;
 	my $feature = 8;
-	my $fix = 5;
+	my $fix = 10;
         if ($1 > $goal) {
         	return 1;
         } elsif ($1 == $goal) {
