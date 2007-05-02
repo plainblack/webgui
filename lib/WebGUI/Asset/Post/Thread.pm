@@ -901,9 +901,9 @@ sub view {
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
  
 	my $next = $self->getNextThread;
-        $var->{"previous.url"} = $self->getUrl("func=previousThread") if (defined $next);
-        my $previous = $self->getPreviousThread;
-        $var->{"next.url"} = $self->getUrl("func=nextThread") if (defined $previous);
+	my $previous = $self->getPreviousThread;
+        $var->{"previous.url"} = $self->getUrl("func=previousThread") if (defined $previous);
+        $var->{"next.url"} = $self->getUrl("func=nextThread") if (defined $next);
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
