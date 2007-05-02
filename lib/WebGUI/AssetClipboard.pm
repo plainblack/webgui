@@ -160,9 +160,13 @@ sub paste {
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
-
+        
         # Update lineage in search index.
-        $pastedAsset->indexContent();
+        my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
+ 
+        foreach (@{$updateAssets}) {
+            $_->indexContent();
+        }
 
 		return 1;
 	}
