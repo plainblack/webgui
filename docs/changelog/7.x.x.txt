@@ -3,6 +3,7 @@
  - fix: Email to forum not working from Mac
  - fix: Unable to set size in DynamicField (Diona Kidd / Knowmad)
  - fix: race condition causes upgrade.pl to fail (Martin Kamerbeek / Oqapi)
+ - fix: Incomplete Form data on Asset Edit causes asset to be unaccessible
  - fix: Calendar Events Disappearing
 	 http://www.plainblack.com/bugs/tracker/calendar-events-disappearing
  - fix: Modified SQLForm.pm to handle MySQL null dates.  Undefs them.  Undef dates default to time(), i.e. today's date

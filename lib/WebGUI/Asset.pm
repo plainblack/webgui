@@ -276,6 +276,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('108 description'),
 					    uiLevel=>6,
                         fieldType=>'user',
+					    filter=>'fixId',
                         defaultValue=>'3'
                     },
                     groupIdView=>{
@@ -284,6 +285,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('872 description'),
 					    uiLevel=>6,
                         fieldType=>'group',
+					    filter=>'fixId',
                         defaultValue=>'7'
                     },
                     groupIdEdit=>{
@@ -293,6 +295,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('871 description'),
 					    uiLevel=>6,
                         fieldType=>'group',
+					    filter=>'fixId',
                         defaultValue=>'4'
                     },
                     synopsis=>{
@@ -372,6 +375,51 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 fixId ( id, fieldName )
+
+Returns the default Id for a field if we get an invalid Id, otherwise returns the id passed in. An valid id either looks like a GUID or is an integer.
+
+=head3 id
+
+The id to check.
+
+=head3 fieldName
+
+The name of the property we're checking. This is used to retrieve whatever the default is set to in the definition.
+
+=cut
+
+sub fixId {
+	my $self = shift;
+    my $id = shift;
+    my $field = shift;
+    if ($id =~ m/\Ad+\Z/xms || $id =~ m/\A[A-Za-z0-9\-\_]{22}\Z/xms) {
+        return $id;
+    }
+	return $self->getValue($field);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fixTitle ( string )
+
+Fixes a title by eliminating HTML from it.
+
+=head3 string
+
+Any text string. Most likely will have been the Asset's name or title.
+
+=cut
+
+sub fixTitle {
+	my $self = shift;
+	return WebGUI::HTML::filter(shift || $self->getValue("title") || 'Untitled', 'all');
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 fixUrl ( string )
 
 Returns a URL, removing invalid characters and making it unique.
@@ -438,24 +486,6 @@ sub fixUrl {
                 $url = $self->fixUrl($url);
         }
 	return $url;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 fixTitle ( string )
-
-Fixes a title by eliminating HTML from it.
-
-=head3 string
-
-Any text string. Most likely will have been the Asset's name or title.
-
-=cut
-
-sub fixTitle {
-	my $self = shift;
-	return WebGUI::HTML::filter(shift || $self->getValue("title") || 'Untitled', 'all');
 }
 
 
@@ -1870,7 +1900,7 @@ sub update {
 			my $value = $properties->{$property};
 			if (exists $definition->{properties}{$property}{filter}) {
 				my $filter = $definition->{properties}{$property}{filter};
-				$value = $self->$filter($value);
+				$value = $self->$filter($value, $property);
 			}
 			$self->{_properties}{$property} = $value;
 			push(@setPairs, $property."=".$self->session->db->quote($value));
