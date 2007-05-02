@@ -1,7 +1,11 @@
-7.3.16
+7.3.16 
  - fix: Wiki titles not automatically linked
+ - fix: Search indexer on Windows not indexing content, opening associated
+   application
+   http://www.plainblack.com/bugs/tracker/search-indexer-on-windows-not-indexing-content-opening-associated-application
  - fix: Email to forum not working from Mac
  - fix: Unable to set size in DynamicField (Diona Kidd / Knowmad)
+ - fix: Url's in rss feed don't use http_host (Yung / United Knowledge)
  - fix: race condition causes upgrade.pl to fail (Martin Kamerbeek / Oqapi)
  - fix: Incomplete Form data on Asset Edit causes asset to be unaccessible
  - fix: Calendar Events Disappearing
