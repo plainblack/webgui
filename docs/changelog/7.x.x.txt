@@ -35,6 +35,9 @@
     http://www.plainblack.com/bugs/tracker/help-link-broken-for-navigation-template
  - fix: HttpProxy no longer processes macros in proxied content
     http://www.plainblack.com/bugs/tracker/weird-characters-in-webgui.log-caused-by-http-proxy
+ - Added an error message to SQLForm if we can't find any permissions for the
+   database link.
+ - fix: Calendar events do not show up on the last day of the month.
 
 7.3.15
  - Added more documentation to WebGUI.pm

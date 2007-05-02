@@ -85,8 +85,7 @@ sub execute {
 	my $ua		= LWP::UserAgent->new(agent => "WebGUI");
 	my $dt		= WebGUI::DateTime->new($session, time)->toMysql;
 	
-	my $sth	    = $self->session->db->prepare("select * from Calendar_feeds");
-	$sth->execute();
+	my $sth	    = $self->session->db->read("select * from Calendar_feeds");
 	
 	#use Data::Dumper;
 
@@ -113,21 +112,21 @@ sub execute {
 		
 		# Get the feed
 		my $response	= $ua->get($feed->{url});
-		
+
 		if ($response->is_success)
-		{
-			my $data	= $response->content;
+	    {
+            my $data	= $response->content;
 			
 			# If doesn't start with BEGIN:VCALENDAR then error
 			unless ($data =~ /^BEGIN:VCALENDAR/i)
 			{
-				# Update the result and last updated fields
+                # Update the result and last updated fields
 				$self->session->db->write(
                     "update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",
 					["Not an iCalendar feed",$dt,$feed->{feedId}]);
 				next FEED;
 			}
-			
+
 			
 			my $active		= 0;	# Parser on/off
 			my %current_event	= ();
@@ -165,7 +164,6 @@ sub execute {
 					# Flush old entry
 					# KEY;ATTRIBUTE=VALUE;ATTRIBUTE=VALUE:KEYVALUE
 					my ($key_attrs,$value) = split /:/,$current_entry,2;
-					
 					my @attrs	= split /;/, $key_attrs;
 					my $key		= shift @attrs;
 					my %attrs;
@@ -377,11 +375,9 @@ sub execute {
 		{
 			# Update the result and last updated fields
 			$self->session->db->write("update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",
-				[$response->message,$dt,$feed->{feedId}]);
+				[($response->message || $response->content),$dt,$feed->{feedId}]);
 		}
 	}
-	
-	$sth->finish;
 	
 	return $self->COMPLETE;
 }

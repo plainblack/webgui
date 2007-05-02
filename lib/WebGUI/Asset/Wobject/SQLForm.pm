@@ -662,6 +662,14 @@ sub _databaseLinkHasPrivileges {
 		}
 	}
 
+    # Check if we found any privileges at all
+    if (!@privileges) {
+        $self->session->errorHandler->warn(
+            "SQLForm: Could not find SQL privileges or no privileges on database '$databaseName' for user '".$dbLink->get->{username}."' with database link ID '".$dbLink->getId."' using DSN '".$dbLink->get->{dsn}."'"
+        );
+        return 0;
+    }
+
 	# Check if all required privs are present.
 	return 1 if (isIn('ALL PRIVILEGES', @privileges));
 	

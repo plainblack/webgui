@@ -273,8 +273,11 @@ sub run {
 		return "disabled";
 	}
 	if ($workflow->get("isSerial")) {
-		my ($firstId) = $self->session->db->quickArray("select workflowId from WorkflowInstance order by runningSince");
-		if ($workflow->getId ne $firstId) { # must wait for currently running instance to complete
+		my ($firstId) = $self->session->db->quickArray(
+            "select instanceId from WorkflowInstance where workflowId=? order by runningSince",
+            [$workflow->getId]
+        );
+		if ($self->getId ne $firstId) { # must wait for currently running instance to complete
 			$self->set({lastStatus=>"waiting", notifySpectre=>0});
 			return "waiting";
 		}
