@@ -117,6 +117,7 @@ Retrieves the next available message from the server. Returns undef if there are
 	subject => 'This is my message subject',
 	inReplyTo => 'some-message-id',
 	messageId => 'some-message-id',
+    rawMessage => 'some mime encoded message',
 	date => 1144536119,
 	parts => [
 		{
@@ -195,6 +196,7 @@ sub getNextMessage {
 	my $inReplyTo = $head->get("In-Reply-To") || $head->get("References") || undef; 
 	chomp($inReplyTo);
 	my %data = (
+        rawMessage=> $rawMessage,
 		to => $to,
 		from => $from,
 		cc => $cc,

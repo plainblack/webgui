@@ -175,6 +175,11 @@ sub definition {
 				fieldType=>"hidden",
 				defaultValue=>undef
 				},
+            originalEmail => {
+                noFormPost=>1,
+                fieldType=>"hidden",
+                defaultValue=>undef
+                },
 			dateSubmitted => {
 				noFormPost=>1,
 				fieldType=>"hidden",
