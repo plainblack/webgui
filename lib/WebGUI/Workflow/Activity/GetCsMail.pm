@@ -175,25 +175,31 @@ sub execute {
 		});
 	return $self->COMPLETE unless (defined $mail);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+	my $postGroup = $cs->get("postGroupId"); #group that's allowed to post to the CS
+
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
 		$from =~ /<(\S+\@\S+)>/;
 		$from = $1 || $from;
 		$from =~ /(\S+\@\S+)/;	
-		my $user = WebGUI::User->newByEmail($self->session, $from);
-		unless (defined $user) {			
-			$user = WebGUI::User->new($self->session, undef);
-#			my $send = WebGUI::Mail::Send->create($self->session, {
-#				to=>$message->{from},
-#				inReplyTo=>$message->{messageId},
-#				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
-#				from=>$cs->get("mailAddress")
-#				});
-#			$send->addText($i18n->get("rejected because no user account"));
-#			$send->send;
-#			next;
+		my $user = WebGUI::User->newByEmail($self->session, $from); #instantiate the user by email
+		
+		unless (defined $user) { #if no user
+			unless ($postGroup eq 1 || $postGroup eq 7) { #reject mail if no registered email, unless post group is Visitors (1) or Everyone (7)
+				my $send = WebGUI::Mail::Send->create($self->session, {
+					to=>$message->{from},
+					inReplyTo=>$message->{messageId},
+					subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+					from=>$cs->get("mailAddress")
+					});
+				$send->addText($i18n->get("rejected because no user account"));
+				$send->send;
+				next;
+			}
+			$user = WebGUI::User->new($self->session, undef); # instantiate the user as a visitor
 		}
+
 		my $post = undef;
 		if ($message->{inReplyTo}) {
 			$message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/;
@@ -220,8 +226,7 @@ sub execute {
 				subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
 				from=>$cs->get("mailAddress")
 				});
-			my $cslevel = $cs->get("postGroupId");
-			$send->addText($i18n->get("rejected because not allowed").$cslevel);
+			$send->addText($i18n->get("rejected because not allowed"));
 			$send->send;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
