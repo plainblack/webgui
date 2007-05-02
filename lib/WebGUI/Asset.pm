@@ -1747,7 +1747,7 @@ sub processTemplate {
 =head2 publish ( arrayref )
 
 Sets an asset and it's descendants to a state of 'published' regardless of it's current state by default.
-Otherwise sets state to published only for assests matching one of the states passed in.
+Otherwise sets state to published only for assets matching one of the states passed in.
 
 =head3 arrayref
 

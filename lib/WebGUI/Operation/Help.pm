@@ -299,7 +299,7 @@ sub www_viewHelp {
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	$session->style->setLink($session->url->extras("/help.css"), {rel=>"stylesheet", type=>"text/css"});
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
-        my $i18n = WebGUI::International->new($session, $namespace);
+    my $i18n = WebGUI::International->new($session, $namespace);
 	my $help = _get($session,$session->form->process("hid"),$namespace);
 	my @related = @{ $help->{related} };
 	foreach my $row (@related) {
@@ -307,8 +307,8 @@ sub www_viewHelp {
 		next unless (defined $relatedHelp);
 		$ac->addSubmenuItem(_link($session,$row->{tag},$row->{namespace}),$i18n->get($relatedHelp->{title},$row->{namespace}));
 	}
-        my %vars;
-        $vars{uiLevelLabel} = $i18n->get('739', 'WebGUI');
+    my %vars;
+    $vars{uiLevelLabel} = $i18n->get('739', 'WebGUI');
 	if (ref $help->{body} eq 'CODE') {
 		$vars{body} = $help->{body}->($session);
 	}
@@ -318,23 +318,23 @@ sub www_viewHelp {
 	my $userUiLevel = $session->user->profileField("uiLevel");
 	my $uiOverride = $session->form->process("uiOverride");
         foreach my $row (@{ $help->{fields} }) {
-                push @{ $vars{fields} }, 
-			{ 'title'       => $i18n->get($row->{title},$row->{namespace}),
-                          'description' => $i18n->get($row->{description},$row->{namespace}),
-                          'uiLevel'     => $row->{uiLevel},
-			} if ($uiOverride || ($userUiLevel >= ($row->{uiLevel} || 1)));
+            push @{ $vars{fields} }, 
+                { 'title'       => $i18n->get($row->{title},$row->{namespace}),
+                  'description' => $i18n->get($row->{description},$row->{namespace}),
+                  'uiLevel'     => $row->{uiLevel},
+                } if ($uiOverride || ($userUiLevel >= ($row->{uiLevel} || 1)));
         }
 	$vars{variable_loop1} = _getTemplateVars($session, 1,  $help->{variables}, $i18n);
-        my $body = WebGUI::Asset::Template->new($session,"PBtmplHelp000000000001")->process(\%vars);
+    my $body = WebGUI::Asset::Template->new($session,"PBtmplHelp000000000001")->process(\%vars);
 	my $uiOverrideText = $uiOverride ? $i18n->get('show my fields','WebGUI') : $i18n->get('show all fields','WebGUI');
+
 	$ac->addSubmenuItem(_link($session, $session->form->process("hid"), $namespace).";uiOverride=".!$uiOverride, $uiOverrideText) if $userUiLevel < 9;
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95, 'WebGUI'));
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents', 'WebGUI'));
+    $ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95, 'WebGUI'));
+    $ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents', 'WebGUI'));
+
 	WebGUI::Macro::process($session,\$body);
-    	return $ac->render(
-		$body, 
-		$i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title})
-		);
+
+    return $ac->render($body, $i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title}));
 }
 
 #-------------------------------------------------------------------
@@ -354,16 +354,16 @@ sub _getTemplateVars {
 	foreach my $row (@{$variables}) {
 		my $indent = [];
 		my $label = "";
+        my $templateVar = {};
+        $templateVar->{title}       = $row->{name};
+        $templateVar->{description} = $i18n->get(($row->{description} || $row->{name}), $row->{namespace});
 		if (exists $row->{variables}) {
 			my $newLevel = $level + 1;
 			$indent = _getTemplateVars($session, $newLevel, $row->{variables}, $i18n);
 			$label = "variable_loop".$newLevel;
+            $templateVar->{$label} = $indent;
 		}	
-		push ( @{$template}, {
-			title => $row->{name}, 
-			description=> $i18n->get(($row->{description} || $row->{name}), $row->{namespace}),
-			$label => $indent
-			});
+		push ( @{ $template }, $templateVar );
 	}	
 	return $template;
 }

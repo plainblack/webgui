@@ -21,6 +21,8 @@
     http://www.plainblack.com/bugs/tracker/asset-tree-cut-and-paste-not-handled-by-search
  - fix: Fixed a bug where calendars would generate corrupt iCal feed urls
    (Martin Kamerbeek / Oqapi)
+ - fix: Help link broken for navigation template (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/help-link-broken-for-navigation-template
 
 7.3.15
  - Added more documentation to WebGUI.pm
