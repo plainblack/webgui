@@ -2336,7 +2336,11 @@ sub _getFieldValue {
 	$fieldValue = $self->session->form->process($field->{fieldName}) || $recordValues->{$field->{fieldName}} || $field->{processedDefaultValue};
 
 	if ($fieldValue && !$readOnly) {
-		$fieldValue = $self->session->datetime->setToEpoch($fieldValue) if (isIn($field->{formFieldType}, qw(date dateTime)));
+#		$fieldValue = $self->session->datetime->setToEpoch($fieldValue) if (isIn($field->{formFieldType}, qw(date dateTime)));
+		if (isIn($field->{formFieldType}, qw(date dateTime))) {
+			$fieldValue = '' if $fieldValue eq '0000-00-00'; #undef the value if the date is a mysql null (date will then default to time() )
+			$fieldValue = $self->session->datetime->setToEpoch($fieldValue) if $fieldValue; 
+		}
 		$fieldValue = $self->session->datetime->timeToSeconds($fieldValue) if ($field->{formFieldType} eq 'timeField');
 	}
 
