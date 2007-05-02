@@ -526,6 +526,7 @@ sub getRecordTemplateVars {
 				"tab.field.isDisplayed" => ($data{status} eq "visible" && !$hidden),
 				"tab.field.isRequired" => ($data{status} eq "required" && !$hidden),
 				"tab.field.subtext" => $subtext,
+				"tab.field.type" => $data{type},
 				"tab.field.controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
 			});
 		}
@@ -574,6 +575,7 @@ sub getRecordTemplateVars {
 			"isDisplayed" => ($data{status} eq "visible" && !$hidden),
 			"isRequired" => ($data{status} eq "required" && !$hidden),
 			"subtext" => $subtext,
+			"type" => $data{type},
 			"controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
 		);
 		push(@fields, { map {("field.".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
@@ -712,8 +714,6 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
-	WebGUI::Macro::process($self->session,\$message);
 	my ($to, $subject, $from, $bcc, $cc);
 	foreach my $row (@{$var->{field_loop}}) {
 		if ($row->{"field.name"} eq "to") {
@@ -726,8 +726,14 @@ sub sendEmail {
 			$bcc = $row->{"field.value"};
 		} elsif ($row->{"field.name"} eq "subject") {
 			$subject = $row->{"field.value"};
+		} elsif ($row->{"field.type"} eq "textArea") {
+			$row->{"field.value"} =~ s/\n/<br\/>/;
+		} elsif ($row->{"field.type"} eq "textarea") {
+			$row->{"field.value"} = WebGUI::HTML::format($row->{"field.value"},'mixed');
 		}
 	}
+	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
+	WebGUI::Macro::process($self->session,\$message);
 	my @attachments = $self->get('mailAttachments')?
 	    @{$self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}})}
 		: ();
