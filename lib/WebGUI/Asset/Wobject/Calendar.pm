@@ -928,7 +928,7 @@ sub view {
     my $params        = {};    
     $params->{type}   = $form->param("type");
     $params->{start}  = $form->param("start");
-    
+   
     ### TODO: Parse user input for sanity.
     # {start} must be of the form: YYYY-MM-DD%20HH:MM:SS
     # {type} must be "month", "week", or "day"
@@ -974,7 +974,7 @@ sub view {
     $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
     $var->{"urlIcal"}	    = $self->getUrl(
-                                    sprintf "func=ical;type=%s;start=%d",
+                                    sprintf "func=ical;type=%s;start=%s",
                                         $params->{type},
                                         $params->{start},
                               );
