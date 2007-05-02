@@ -92,10 +92,12 @@ sub autolinkHtml {
 	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
 	return $html unless %mapping;
 	foreach my $key (keys %mapping) {
-		$mapping{$key} = $self->session->url->gateway(WebGUI::HTML::format('/'.$mapping{$key}, 'text'));
+        $key =~ s{\(}{\\\(}gxms; # escape parens
+        $key =~ s{\)}{\\\)}gxms; # escape parens
+		$mapping{$key} = $self->session->url->gateway($mapping{$key});
 	}
 	my $matchString = join('|', map{quotemeta} keys %mapping);
-	my $regexp = qr/\b($matchString)\b/i;
+	my $regexp = qr/($matchString)/i;
 	my @acc = ();
 	my $in_a = 0;
 	my $p = HTML::Parser->new;
@@ -109,6 +111,7 @@ sub autolinkHtml {
 	$p->handler(text => sub {
 			    my $text = $_[0];
 			    unless ($in_a) {
+                    $text =~ s{\&\#39\;}{\'}xms; # html entities for ' created by rich editor
 				    while ($text =~ s#^(.*?)$regexp##i) {
 					    push @acc, sprintf '%s<a href="%s">%s</a>',
 						($1, $mapping{lc $2}, $2);

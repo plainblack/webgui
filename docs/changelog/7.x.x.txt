@@ -1,4 +1,5 @@
 7.3.16
+ - fix: Wiki titles not automatically linked
  - fix: Calendar Events Disappearing
 	 http://www.plainblack.com/bugs/tracker/calendar-events-disappearing
  - fix: Modified SQLForm.pm to handle MySQL null dates.  Undefs them.  Undef dates default to time(), i.e. today's date

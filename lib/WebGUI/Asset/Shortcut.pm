@@ -398,16 +398,18 @@ sub getOverrides {
 				}
 				$orig->{_propertyDefinitions} = \%properties;
 			}
+			$overrides{cacheNotExpired} = 1;
+			my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=? order by fieldName",[$self->getId]);
+			while (my ($fieldName, $newValue) = $sth->array) {
+				$overrides{overrides}{$fieldName}{fieldType} = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
+				$overrides{overrides}{$fieldName}{origValue} = $orig->get($fieldName);
+				$overrides{overrides}{$fieldName}{newValue} = $newValue;
+				$overrides{overrides}{$fieldName}{parsedValue} = $newValue;
+			}
+			$sth->finish;
+		} else {
+			$self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
 		}
-		$overrides{cacheNotExpired} = 1;
-		my $sth = $self->session->db->read("select fieldName, newValue from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." order by fieldName");
-		while (my ($fieldName, $newValue) = $sth->array) {
-			$overrides{overrides}{$fieldName}{fieldType} = $orig->{_propertyDefinitions}{$fieldName}{fieldType};
-			$overrides{overrides}{$fieldName}{origValue} = $self->getShortcutOriginal->get($fieldName);
-			$overrides{overrides}{$fieldName}{newValue} = $newValue;
-			$overrides{overrides}{$fieldName}{parsedValue} = $newValue;
-		}
-		$sth->finish;
 		if ($self->isDashlet) {
 			my $u = WebGUI::User->new($self->session, $self->discernUserId);
 			my @userPrefs = $self->getPrefFieldsToImport;
