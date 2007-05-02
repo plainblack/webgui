@@ -165,6 +165,19 @@ sub editSave {
 		if ($selfName eq  "WebGUI::Asset::File::Image") {
 			$data{templateId} = 'PBtmpl0000000000000088';
 			$data{parameters} = 'alt="'.$self->get("title").'"';
+
+            # Resize image if it is bigger than the max allowed image size.
+            my $maxSize = $self->session->setting->get("maxImageSize");
+            my ($width, $height) = $storage->getSizeInPixels($filename);
+            if($width > $maxSize || $height > $maxSize) {
+                if($width > $height) {
+                    $storage->resize($filename, $maxSize);
+                }
+                else {
+                    $storage->resize($filename, 0, $maxSize);
+                }
+            }
+
 		}
 		$data{url} = $self->getParent->get('url').'/'.$filename;
 		my $newAsset = $self->getParent->addChild(\%data);

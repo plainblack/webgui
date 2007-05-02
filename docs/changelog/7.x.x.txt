@@ -9,6 +9,8 @@
     http://www.plainblack.com/bugs/tracker/able-to-edit-locked-template 
  - fix: DataForm does not export entry information (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/dataform-does-not-export-entry-information
+ - fix: Image uploads only respect maximum size on update (Martin Kamerbeek / Oqapi)
+    http://www.plainblack.com/bugs/tracker/image-uploads-only-respect-maximum-size-on-update
 
 7.3.15
  - Added more documentation to WebGUI.pm
