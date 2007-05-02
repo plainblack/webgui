@@ -659,7 +659,13 @@ sub view {
 	if ($self->get("shortcutToAssetId") eq $self->get("parentId")) {
 		$content = $i18n->get("Displaying this shortcut would cause a feedback loop");
 	} else {
+        # Make sure the www_view method won't be skipped b/c the asset is cached.
+        $shortcut->purgeCache();
+
 		$content = $shortcut->view;
+
+        # Make sure the overrides are not cached by the original asset.
+        $shortcut->purgeCache();
 	}
 
 	my %var = (
@@ -878,6 +884,10 @@ sub www_view {
         return $check if defined $check;
         my $shortcut = $self->getShortcut;
         $self->prepareView;
+
+        # Make sure the www_view method won't be skipped b/c the asset is cached.
+        $shortcut->purgeCache();
+
         if ($shortcut->get("className") =~ m/Asset::Wobject/) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
@@ -889,7 +899,11 @@ sub www_view {
                 $self->session->output->print($foot, 1);
                 return "chunked";
         }
-        return $shortcut->www_view;
+        my $output = $shortcut->www_view;
+        
+        # Make sure the overrides are not cached by the original asset.
+        $shortcut->purgeCache();
+        return $output;
 }
 
 1;
