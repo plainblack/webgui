@@ -154,14 +154,20 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
-	# Don't allow a shortcut to create an endless loop
+
+    # Don't allow a shortcut to create an endless loop
 	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
+
+        # Update lineage in search index.
+        $pastedAsset->indexContent();
+
 		return 1;
 	}
-	return 0;
+        
+    return 0;
 }
 
 #-------------------------------------------------------------------

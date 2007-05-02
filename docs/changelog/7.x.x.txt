@@ -16,7 +16,9 @@
     http://www.plainblack.com/bugs/tracker/unable-to-upload-new-file-to-update-contents-of-file-asset
  - fix: Issue calling shortcut - incorrect template (Martin Kamerbeek / Oqapi)
     http://www.plainblack.com/bugs/tracker/issue-calling-shortcut---incorrect-template
- 
+ - fix: Asset tree cut and paste not handled by search (Martin Kamerbeek /
+   Oqapi)
+    http://www.plainblack.com/bugs/tracker/asset-tree-cut-and-paste-not-handled-by-search
 
 7.3.15
  - Added more documentation to WebGUI.pm
