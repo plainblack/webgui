@@ -161,8 +161,9 @@ sub getEditForm {
 
 	}
 	$tabform->getTab("properties")->file(
-		-label=>$i18n->get('new file'),
-		-hoverHelp=>$i18n->get('new file description'),
+        -name           => 'newFile',
+        -label          => $i18n->get('new file'),
+        -hoverHelp      => $i18n->get('new file description'),
 	);
 	return $tabform;
 }
@@ -245,13 +246,15 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	delete $self->{_storageLocation};
+    
+    my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile'})->getValueFromPost;
+    my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
 
-    	my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'file'})->getValueFromPost;
-    	my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
 	if (defined $storage) {
 		$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
 		my $filename = $storage->getFiles()->[0];
-		if (defined $filename && $filename ne $self->get("filename")) {
+
+		if (defined $filename) {
 			my %data;
 			$data{filename} = $filename;
 			$data{storageId} = $storage->getId;

@@ -11,6 +11,9 @@
     http://www.plainblack.com/bugs/tracker/dataform-does-not-export-entry-information
  - fix: Image uploads only respect maximum size on update (Martin Kamerbeek / Oqapi)
     http://www.plainblack.com/bugs/tracker/image-uploads-only-respect-maximum-size-on-update
+ - fix: Unable to upload new file to update contents of file asset (Martin
+   Kamerbeek /Oqapi)
+    http://www.plainblack.com/bugs/tracker/unable-to-upload-new-file-to-update-contents-of-file-asset
 
 7.3.15
  - Added more documentation to WebGUI.pm
