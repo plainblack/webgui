@@ -38,6 +38,8 @@
  - Added an error message to SQLForm if we can't find any permissions for the
    database link.
  - fix: Calendar events do not show up on the last day of the month.
+ - fix: Event Management System -- Safari can't get past enter attendee /
+   select attendee information.
 
 7.3.15
  - Added more documentation to WebGUI.pm
