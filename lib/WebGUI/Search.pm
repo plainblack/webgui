@@ -376,7 +376,6 @@ sub search {
 		push(@params, $keywords, $keywords);
 		$self->{_score} = "match (keywords) against (?) as score";
 		push(@clauses, "match (keywords) against (? in boolean mode)");
-        warn "Keywords: $keywords";
 	}
 	if ($rules->{lineage}) {
 		my @phrases = ();
