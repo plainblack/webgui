@@ -1,4 +1,7 @@
 7.3.16
+ - fix: Calendar Events Disappearing
+	 http://www.plainblack.com/bugs/tracker/calendar-events-disappearing
+ - fix: Modified SQLForm.pm to handle MySQL null dates.  Undefs them.  Undef dates default to time(), i.e. today's date
  - fix: Thread template: next.url and previous.url tmpl_vars are always defined (Yung Han Khoe, United Knowledge)
  - fix: The POD of Form::Image is faulty (perlDreamer Consulting, LLC)
  - fix: Method name clash between WebGUI::Asset::Post::Thread and WebGUI::AssetVersioning (perlDreamer Consulting, LLC)

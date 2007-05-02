@@ -1433,9 +1433,8 @@ sub processPropertiesFromFormPost {
                     returnObjects       => 1,
                     includeOnlyClasses  => ['WebGUI::Asset::Event'],
                     joinClass           => 'WebGUI::Asset::Event',
-                    whereClause         => qq{Event.recurId = "$old_id"},
+                    whereClause         => qq{Event.recurId = "$old_id" and Event.recurId <> NULL}, #without the <> NULL, it pulls in the recurId's
                 });
-            
             $_->purge for @$events;
         }
         else {
