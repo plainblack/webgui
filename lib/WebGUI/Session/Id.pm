@@ -18,7 +18,7 @@ package WebGUI::Session::Id;
 use strict;
 use Digest::MD5;
 use Time::HiRes qw( gettimeofday usleep );
-
+use MIME::Base64;
 
 
 =head1 NAME
@@ -103,6 +103,29 @@ sub session {
 	my $self = shift;
 	return $self->{_session};
 }
+
+
+#-------------------------------------------------------------------
+ 
+=head2 toHex ( guid )
+
+Returns the hex value of a guid
+
+=head3 guid
+
+guid to convert to hex value.
+
+=cut
+
+sub toHex {
+	my $self = shift;
+    my $id   = shift;
+    $id =~ tr{_-}{+/};
+    my $bin_id = decode_base64("$id==");
+    my $hex_id = sprintf('%*v02x', '', $bin_id);
+    return $hex_id
+}
+
 
 #-------------------------------------------------------------------
 

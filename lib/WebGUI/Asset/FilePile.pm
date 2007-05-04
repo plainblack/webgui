@@ -139,15 +139,17 @@ sub editSave {
 
 	##This is a hack.  File uploads should go through the WebGUI::Form::File API
     my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValueFromPost;
-	my $tempStorage       = WebGUI::Storage->get($self->session, $tempFileStorageId);
+	my $tempStorage       = WebGUI::Storage::Image->get($self->session, $tempFileStorageId);
 
 	foreach my $filename (@{$tempStorage->getFiles}) {
-		my $storage = WebGUI::Storage::Image->create($self->session);
-		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
+		#my $storage = WebGUI::Storage::Image->create($self->session);
+		#$storage->addFileFromFilesystem($tempStorage->getPath($filename));
+		
 		#$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));
 		my %data;
 		my $selfName = 'WebGUI::Asset::File';
-		$selfName = "WebGUI::Asset::File::Image" if ($storage->isImage($filename));
+		$selfName = "WebGUI::Asset::File::Image" if ($tempStorage->isImage($filename));
+		
 		foreach my $definition (@{$selfName->definition($self->session)}) {
 			foreach my $property (keys %{$definition->{properties}}) {
 				$data{$property} = $self->session->form->process(
@@ -157,9 +159,9 @@ sub editSave {
 					);
 			}
 		}
-		$storage->setPrivileges($data{"ownerUserId"},$data{"groupIdView"},$data{"groupIdEdit"});
+		
 		$data{className} = $selfName;
-		$data{storageId} = $storage->getId;
+		#$data{storageId} = $storage->getId;
 		$data{filename} = $data{title} = $data{menuTitle} = $filename;
 		$data{templateId} = 'PBtmpl0000000000000024';
 		if ($selfName eq  "WebGUI::Asset::File::Image") {
@@ -168,22 +170,34 @@ sub editSave {
 
             # Resize image if it is bigger than the max allowed image size.
             my $maxSize = $self->session->setting->get("maxImageSize");
-            my ($width, $height) = $storage->getSizeInPixels($filename);
+            my ($width, $height) = $tempStorage->getSizeInPixels($filename);
             if($width > $maxSize || $height > $maxSize) {
                 if($width > $height) {
-                    $storage->resize($filename, $maxSize);
+                    $tempStorage->resize($filename, $maxSize);
                 }
                 else {
-                    $storage->resize($filename, 0, $maxSize);
+                    $tempStorage->resize($filename, 0, $maxSize);
                 }
             }
 
 		}
 		$data{url} = $self->getParent->get('url').'/'.$filename;
+		
+		#Create the new asset
 		my $newAsset = $self->getParent->addChild(\%data);
-		delete $newAsset->{_storageLocation};
-		$newAsset->setSize($storage->getFileSize($filename));
+		
+		#Get the current storage location
+		my $storage = $newAsset->getStorageLocation();
+		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
+		$storage->setPrivileges($data{"ownerUserId"},$data{"groupIdView"},$data{"groupIdEdit"});
+		
+		$newAsset->setSize($tempStorage->getFileSize($filename));
 		$newAsset->generateThumbnail if ($selfName eq "WebGUI::Asset::File::Image");
+		$newAsset->update({ storageId=> $storage->getId });
+		
+		#Now remove the reference to the storeage location to prevent problems with different revisions.
+		delete $newAsset->{_storageLocation};
+		
 	}
 	$tempStorage->delete;
 	return $self->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");

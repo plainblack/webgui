@@ -110,7 +110,7 @@ NOTE: This is a private method and should never be called except internally to t
 sub _makePath {
 	my $self = shift;
 	my $node = $self->session->config->get("uploadsPath");
-	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->{_id}) {
+	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->getFileId) {
 		$node .= '/'.$folder;
 		unless (-e $node) { # check to see if it already exists
 			unless (mkdir($node)) { # check to see if there was an error during creation
@@ -287,6 +287,22 @@ sub addFileFromScalar {
 	return $filename;
 }
 
+#-------------------------------------------------------------------
+
+=head2 clear ( )
+
+Clears a storage locations of all files except the .wgaccess file
+
+=cut
+
+sub clear {
+	my $self = shift;
+	my $filelist = $self->getFiles(1);
+	foreach my $file (@{$filelist}) {	
+       $self->deleteFile($file);    
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -337,10 +353,23 @@ A reference to the current session;
 =cut
 
 sub create {
-	my $class = shift;
+	my $class   = shift;
 	my $session = shift;
-	my $id = $session->id->generate();
-	my $self = $class->get($session,$id);
+	my $id      = $session->id->generate();
+	
+    #Determine whether or not to use case insensitive files
+    my $config          = $session->config;
+    my $db              = $session->db;
+    my $caseInsensitive = $config->get("caseInsensitiveOS");
+    
+    #$session->errorHandler->warn($caseInsensitive.": $id\n".Carp::longmess()."\n");
+    #For case insensitive operating systems, convert guid to hex
+    if($caseInsensitive) {
+        my $hexId = $session->id->toHex($id);
+        $db->write("insert into storageTranslation (guidValue,hexValue) values (?,?)",[$id,$hexId]);
+    }
+    
+    my $self = $class->get($session,$id);
 	$self->_makePath;
 	return $self;
 }
@@ -359,11 +388,25 @@ A reference to the current session.
 =cut
 
 sub createTemp {
-	my $class = shift;
+	my $class   = shift;
 	my $session = shift;
-	my $id = $session->id->generate();
+	my $id      = $session->id->generate();
+	my $guid    = $id;
+
+    #Determine whether or not to use case insensitive files
+    my $config          = $session->config;
+    my $db              = $session->db;
+    my $caseInsensitive = $config->get("caseInsensitiveOS");
+                    
+    #For case insensitive operating systems, convert guid to hex
+    if($caseInsensitive) {
+        my $hexId = $session->id->toHex($id);
+        $db->write("insert into storageTranslation (guidValue,hexValue) values (?,?)",[$id,$hexId]);
+        $id = $hexId;
+    }
+    
 	$id =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $id, _part1 => 'temp', _part2 => $1};
+	my $self = {_session=>$session, _id => $guid, _part1 => 'temp', _part2 => $1};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
@@ -379,6 +422,8 @@ Deletes this storage location and its contents (if any) from the filesystem.
 
 sub delete {
 	my $self = shift;
+	my $db   = $self->session->db;
+	
 	my $path = $self->getPath;
 	if ($path) {
 		rmtree($path) if ($path);
@@ -395,6 +440,10 @@ sub delete {
 				$self->session->errorHandler->warn("Unable to open $uDir for directory reading");
 			}
 		}
+		#Delete the item from the storageTranslation table
+		if($self->session->config->get("caseInsensitiveOS")){
+		    $db->write("delete from storageTranslation where guidValue=?",[$self->getId]);
+	    }
 	}
 	return;
 }
@@ -435,12 +484,29 @@ The unique identifier for this file system storage location.
 =cut
 
 sub get {
-	my $class = shift;
+	my $class   = shift;
 	my $session = shift;
-	my $id = shift;
+	my $id      = shift;
 	return undef unless $id;
+	my $guid    = $id;
 	my $self;
-	$self = {_session=>$session, _id => $id, _errors => []};
+    
+    my $db      = $session->db;
+    
+	#Determine whether or not to use case insensitive files
+    my $config          = $session->config;
+    my $caseInsensitive = $config->get("caseInsensitiveOS");
+
+    #For case insensitive operating systems, convert guid to hex
+    if($caseInsensitive) {
+       #Determine if the item is in the database
+       my ($hexId) = $db->quickArray("select hexValue from storageTranslation where guidValue=?",[$id]);
+       
+       #Set the value of the guid to the hex value if found.
+       $id = $hexId if($hexId);
+    }
+                                
+    $self = {_session=>$session, _id => $guid, _errors => []};
 	bless $self, ref($class)||$class;
 	if (my ($part1, $part2) = $id =~ m/^(.{2})(.{2})/) {
 		$self->{_part1} = $part1;
@@ -616,8 +682,35 @@ sub getFiles {
 	return [];
 }
 
+#-------------------------------------------------------------------
 
+=head2 getFileId ( )
 
+Returns the file id for this storage location.
+
+=cut
+
+sub getFileId {
+	my $self    = shift;
+	my $session = $self->session;
+	my $config  = $session->config;
+	my $db      = $session->db;
+	
+	my $id      = $self->getId;
+	
+	my $caseInsensitive = $config->get("caseInsensitiveOS");
+
+    #For case insensitive operating systems, convert guid to hex
+    if($caseInsensitive) {
+       #Determine if the item is in the database
+       my ($hexId) = $db->quickArray("select hexValue from storageTranslation where guidValue=?",[$id]);
+       
+       #Set the value of the guid to the hex value if found.
+       return $hexId if($hexId);
+    }
+	
+	return $id;
+}
 
 #-------------------------------------------------------------------
 
@@ -662,14 +755,16 @@ If specified, we'll return a path to the file rather than the storage location.
 sub getPath {
 	my $self = shift;	
 	my $file = shift;
-	unless ($self->session->config->get("uploadsPath") && $self->{_part1} && $self->{_part2} && $self->getId) {
+	my $id   = $self->getFileId;
+	
+	unless ($self->session->config->get("uploadsPath") && $self->{_part1} && $self->{_part2} && $id) {
 		$self->_addError("storage object malformed");
 		return undef;
 	}
         my $path = $self->session->config->get("uploadsPath")
 		.'/'.$self->{_part1}
 		.'/'.$self->{_part2}
-		.'/'.$self->getId;
+		.'/'.$id;
         if (defined $file) {
                 $path .= '/'.$file;
         }
@@ -692,7 +787,7 @@ If specified, we'll return a URL to the file rather than the storage location.
 sub getUrl {
 	my $self = shift;
 	my $file = shift;
-	my $url = $self->session->config->get("uploadsURL").'/'.$self->{_part1}.'/'.$self->{_part2}.'/'.$self->getId;
+	my $url = $self->session->config->get("uploadsURL").'/'.$self->{_part1}.'/'.$self->{_part2}.'/'.$self->getFileId;
 	if (defined $file) {
 		$url .= '/'.$file;
 	}

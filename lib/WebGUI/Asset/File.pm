@@ -55,11 +55,15 @@ Override the default method in order to deal with attachments.
 
 sub addRevision {
 	my $self = shift;
-	my $newSelf = $self->SUPER::addRevision(@_);
-	if ($self->get("storageId")) {
+	my $properties = shift;
+	
+	if ($self->get("storageId") ne "") {
 		my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
-		$newSelf->update({storageId=>$newStorage->getId});
+		$properties->{storageId} = $newStorage->getId;
 	}
+	
+	my $newSelf = $self->SUPER::addRevision($properties);
+	
 	return $newSelf;
 }
 
@@ -243,12 +247,26 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
-	my $self = shift;
+	my $self    = shift;
+	my $session = $self->session;
 	$self->SUPER::processPropertiesFromFormPost;
+	
+	#Get the storage location out of memory.  If you call getStorageLocation you risk creating another one.
+	my $storageLocation = $self->{_storageLocation};
+	my $storageId       = undef;
+	$storageId          = $storageLocation->getId if(defined $storageLocation);
+	
+	#Now remove the storage location to prevent wierd caching stuff.
 	delete $self->{_storageLocation};
     
-    my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile'})->getValueFromPost;
-    my $storage = WebGUI::Storage->get($self->session, $fileStorageId);
+    #Clear the storage location if a file was uploaded.
+    if($session->form->get("newFile_file") ne "") {
+	   $storageLocation->clear();
+    }
+
+    #Pass in the storage Id to prevent another one from being created.
+    my $fileStorageId = WebGUI::Form::File->new($session, {name => 'newFile', value=>$storageId })->getValueFromPost;
+    my $storage       = WebGUI::Storage->get($session, $fileStorageId);
 
 	if (defined $storage) {
 		$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
@@ -258,9 +276,9 @@ sub processPropertiesFromFormPost {
 			my %data;
 			$data{filename} = $filename;
 			$data{storageId} = $storage->getId;
-			$data{title} = $filename unless ($self->session->form->process("title"));
-			$data{menuTitle} = $filename unless ($self->session->form->process("menuTitle"));
-			$data{url} = $self->getParent->get('url').'/'.$filename unless ($self->session->form->process("url"));
+			$data{title} = $filename unless ($session->form->process("title"));
+			$data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
+			$data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
 			$self->update(\%data);
 			$self->setSize($storage->getFileSize($filename));
 		}
@@ -306,11 +324,13 @@ sub purgeRevision {
 sub setSize {
 	my $self = shift;
 	my $fileSize = shift || 0;
-	my $storage = $self->getStorageLocation;
-	foreach my $file (@{$storage->getFiles}) {
-		$fileSize += $storage->getFileSize($file);
+	my $storage = $self->{_storageLocation};
+	if (defined $storage) {	
+	    foreach my $file (@{$storage->getFiles}) {
+		    $fileSize += $storage->getFileSize($file);
+	    }
 	}
-	$self->SUPER::setSize($fileSize);
+	return $self->SUPER::setSize($fileSize);
 }
 
 #-------------------------------------------------------------------
