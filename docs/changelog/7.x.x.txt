@@ -1,3 +1,8 @@
+7.3.17
+ - fix: First event in the calendar not working right (Martin Kamerbeek / Oqapi)
+    http://www.plainblack.com/bugs/tracker/first-event-in-the-calendar-not-working-right
+ 
+
 7.3.16 
  - fix: Wiki titles not automatically linked
  - fix: Search indexer on Windows not indexing content, opening associated

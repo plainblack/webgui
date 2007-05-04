@@ -574,6 +574,7 @@ sub getEvent {
     
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
         unless $event->get("parentId") eq $self->getId;
+
     
     return $event;
 }
@@ -724,20 +725,18 @@ Gets the first event in this calendar. Returns the Event object.
 =cut
 
 sub getFirstEvent {
-    my $self        = shift;
-    my $lineage     = $self->get("lineage");
-    
-    my ($assetId)   = $self->session->db->quickArray(<<ENDSQL);
-        SELECT asset.assetId 
-        FROM asset
-        JOIN Event ON asset.assetId = Event.assetId
-        WHERE lineage LIKE "$lineage\%"
-        AND className = "WebGUI::Asset::Event"
-        ORDER BY startDate ASC, startTime ASC, revisionDate DESC
-        LIMIT 1
-ENDSQL
-    
-    return $self->getEvent($assetId);
+    my $self = shift;
+
+    my $eventAsset = $self->getLineage(['children'], {
+        includeOnlyClasses  => ['WebGUI::Asset::Event'],
+        joinClass           => 'WebGUI::Asset::Event',
+        whereClause         => 'Event.startDate >= date( now() )',
+        orderByClause       => 'Event.startdate asc, Event.startTime asc, revisionDate desc',
+        limit               => 1,
+        returnObjects       => 1,
+    })->[0];
+
+    return $eventAsset;
 }
 
 
