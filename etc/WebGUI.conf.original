@@ -47,6 +47,11 @@
 # The relative or fully qualified URL to the extras folder
 # that comes with WebGUI.
 
+#"caseInsensitiveOS" : "1",
+
+# Enable this flag if you run or back up files on a case sensitive
+# file system.  This will ensure uniqueness in the uploads folder
+
 "extrasURL" : "/extras",
 
 # The filesystem path to get to the extras folder that ships
