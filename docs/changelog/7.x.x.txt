@@ -1,6 +1,8 @@
 7.3.17
  - fix: First event in the calendar not working right (Martin Kamerbeek / Oqapi)
     http://www.plainblack.com/bugs/tracker/first-event-in-the-calendar-not-working-right
+ - fix: Uploads folder case-sensitive
+ - fix: Creating and updating files in WebGUI creates multiple storage locations.
  
 
 7.3.16 

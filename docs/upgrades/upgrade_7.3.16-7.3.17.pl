@@ -42,7 +42,7 @@ sub addStorageTranslation {
     $session->db->write(
         "CREATE TABLE IF NOT EXISTS storageTranslation (
             guidValue VARCHAR(22) BINARY,
-            hexValue VARCHAR(22) BINARY,
+            hexValue VARCHAR(32) BINARY,
             PRIMARY KEY (guidValue)
         )"
     );
