@@ -53,7 +53,7 @@ my @testSets = (
 
 my $session = WebGUI::Test->session;
 
-plan tests => scalar(@testSets) + 3;
+plan tests => scalar(@testSets) + 4;
 
 # generate
 my $generateId = $session->id->generate();
@@ -75,3 +75,7 @@ foreach my $testSet (@testSets) {
 	is($session->id->valid($testSet->{guid}), $testSet->{valid}, $testSet->{comment});
 }
 
+# 
+# 
+
+is($session->id->toHex('wjabZsKOb7kBBSiO3bQwzA'), 'c2369b66c28e6fb90105288eddb430cc', 'toHex works');
