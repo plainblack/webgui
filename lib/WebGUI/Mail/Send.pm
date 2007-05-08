@@ -246,12 +246,17 @@ sub create {
 	}
 	my $from = $headers->{from} || $session->setting->get("companyEmail");
 	my $type = $headers->{contentType} || "multipart/mixed";
-	my $domain = $from;
-	$domain =~ s/.*\@(.*)/$1/;
-	my $id = $headers->{messageId} ||  "WebGUI-".$session->id->generate;
-	unless ($id =~ m/\@/) {
-		$id .= '@'.$domain;
-	}
+
+    # format of Message-Id should be '<unique-id@domain>'
+    my $id = $headers->{messageId} || "WebGUI-" . $session->id->generate;
+    if ($id !~ m/\@/) {
+        my $domain = $from;
+        $domain =~ s/.*\@//msx;
+        $id .= '@' . $domain;
+    }
+    if ($id !~ m/[<>]/msx) {
+        $id = "<$id>";
+    }
 	my $message = MIME::Entity->build(
 		Type=>$type,
 		From=>$from,

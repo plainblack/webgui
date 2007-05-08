@@ -4,6 +4,7 @@
  - fix: Uploads folder case-sensitive
  - fix: Creating and updating files in WebGUI creates multiple storage locations.
  - fix: Welcome messages shouldn't be added to inbox as pending.
+ - fix: Always use correct format for Message-Id headers in mail.
  
 
 7.3.16 
