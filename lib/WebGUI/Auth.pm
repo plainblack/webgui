@@ -256,6 +256,7 @@ sub createAccountSave {
 			message	=> $self->getSetting("welcomeMessage").$authInfo,
 			subject	=> $i18n->get(870),
 			userId	=> $self->userId,
+            status  => 'completed',
 		});
 	}
 	$self->session->user({user=>$u});

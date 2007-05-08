@@ -3,6 +3,7 @@
     http://www.plainblack.com/bugs/tracker/first-event-in-the-calendar-not-working-right
  - fix: Uploads folder case-sensitive
  - fix: Creating and updating files in WebGUI creates multiple storage locations.
+ - fix: Welcome messages shouldn't be added to inbox as pending.
  
 
 7.3.16 
