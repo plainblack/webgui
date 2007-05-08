@@ -393,7 +393,7 @@ sub fixId {
 	my $self = shift;
     my $id = shift;
     my $field = shift;
-    if ($id =~ m/\Ad+\Z/xms || $id =~ m/\A[A-Za-z0-9\-\_]{22}\Z/xms) {
+    if ($id =~ m/\A \d+ \z/xms || $id =~ m/\A [A-Za-z0-9\-\_]{22} \z/xms) {
         return $id;
     }
 	return $self->getValue($field);

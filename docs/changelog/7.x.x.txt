@@ -5,6 +5,7 @@
  - fix: Creating and updating files in WebGUI creates multiple storage locations.
  - fix: Welcome messages shouldn't be added to inbox as pending.
  - fix: Always use correct format for Message-Id headers in mail.
+ - fix: Don't reject built in groups when changing permissions.
  
 
 7.3.16 
