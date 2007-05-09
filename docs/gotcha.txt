@@ -20,6 +20,10 @@ save you many hours of grief.
    isThreadLocked.  No template variables, field names or database
    columns were changed.
 
+ * The create.sql script for 7.3.15 was released with 7.3.16. While
+   upgrading to 7.3.17 you'll notice it also processing the 7.3.15-
+   7.3.16 upgrade. This is to be expected.
+
 7.3.15
 --------------------------------------------------------------------
 
