@@ -115,7 +115,7 @@ sub addPost {
 		content=>$content,
 		ownerUserId=>$user->userId,
 		username=>$user->profileField("alias") || $user->username,
-        originalEmail=>$message->{rawMessage}
+        originalEmail=>join("",@{$message->{rawMessage}})
 		});
 	if (scalar(@attachments)) {
 		my $storage = $post->getStorageLocation;
