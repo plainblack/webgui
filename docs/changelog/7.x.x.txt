@@ -1,3 +1,7 @@
+7.3.18
+ - fix: "Rejected" messages in CS mail
+
+
 7.3.17
  - fix: First event in the calendar not working right (Martin Kamerbeek / Oqapi)
     http://www.plainblack.com/bugs/tracker/first-event-in-the-calendar-not-working-right

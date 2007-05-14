@@ -187,14 +187,22 @@ sub execute {
 		
 		unless (defined $user) { #if no user
 			unless ($postGroup eq 1 || $postGroup eq 7) { #reject mail if no registered email, unless post group is Visitors (1) or Everyone (7)
-				my $send = WebGUI::Mail::Send->create($self->session, {
-					to=>$message->{from},
-					inReplyTo=>$message->{messageId},
-					subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
-					from=>$cs->get("mailAddress")
-					});
-				$send->addText($i18n->get("rejected because no user account"));
-				$send->send;
+				if ($message->{from} eq "") {
+					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has no from address.");
+				}
+				elsif ($message->{from} eq $cs->get("mailAddress")) {
+					$self->session->errorHandler->error("For some reason the message ".$message->{subject}." (".$message->{messageId}.") has the same from address as the collaboration system's mail address.");
+				} 
+				else { 
+					my $send = WebGUI::Mail::Send->create($self->session, {
+						to=>$message->{from},
+						inReplyTo=>$message->{messageId},
+						subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+						from=>$cs->get("mailAddress")
+						});
+					$send->addText($i18n->get("rejected because no user account"));
+					$send->send;
+				}
 				next;
 			}
 			$user = WebGUI::User->new($self->session, undef); # instantiate the user as a visitor
