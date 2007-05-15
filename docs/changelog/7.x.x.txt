@@ -1,4 +1,6 @@
 7.3.18
+ - fix: diskUsage.pl (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/diskusage.pl#tlMpeq3vzsd37pRHcz_NYg
  - fix: thread next/prev url (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/thread-next/prev-url/
  - fix: getLineage joinClass expects string, not array ref (perlDreamer Consulting, LLC)
