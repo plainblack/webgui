@@ -900,10 +900,10 @@ sub view {
 	$p->appendTemplateVars($var);
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
  
-	my $next = $self->getNextThread;
-	my $previous = $self->getPreviousThread;
-        $var->{"previous.url"} = $self->getUrl("func=previousThread") if (defined $previous);
-        $var->{"next.url"} = $self->getUrl("func=nextThread") if (defined $next);
+    my $next     = $self->getNextThread;
+    my $previous = $self->getPreviousThread;
+    $var->{"previous.url"} = $previous->getUrl if (defined $previous);
+    $var->{"next.url"}     = $next->getUrl     if (defined $next);
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
@@ -951,6 +951,10 @@ sub www_lockThread {
 
 Displays the next logical thread after this one.
 
+NOTE:
+
+This method is deprecated.  It messes with macros via $session->asset.
+
 =cut
 
 sub www_nextThread {
@@ -968,6 +972,10 @@ sub www_nextThread {
 =head2 www_previousThread ( )
 
 Displays the previous logical thread before this one.
+
+NOTE:
+
+This method is deprecated.  It messes with macros via $session->asset.
 
 =cut
 
