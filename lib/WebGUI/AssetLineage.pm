@@ -305,7 +305,7 @@ A boolean indicating that we should include archived assets in the result set.
 
 =head4 joinClass
 
-An array reference containing asset classes to join in. There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
+A string containing as asset class to join in. There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
 
 =head4 whereClause
 
