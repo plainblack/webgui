@@ -40,9 +40,9 @@ sub process {
 	my $value = shift;
 	my $sql = "select count from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
-			and userId=".$session->db->$session->db->quote($session->user->userId)." 
-			and fieldName=".$session->db->$session->db->quote($key)." 
-			and value=".$session->db->$session->db->quote($value);
+			and userId=".$session->db->quote($session->user->userId)." 
+			and fieldName=".$session->db->quote($key)." 
+			and value=".$session->db->quote($value);
 	my ($count) = $session->db->buildArray($sql);
 	return $count;
 }

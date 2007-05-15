@@ -41,8 +41,8 @@ sub process {
 	$rank--;	# Rank is zero based
 	my $sql = "select value from passiveProfileAOI a, metaData_properties f 
 			where a.fieldId=f.fieldId 
-			and userId=".$session->db->$session->db->quote($session->user->userId)." 
-			and fieldName=".$session->db->$session->db->quote($key)." order by a.count desc";
+			and userId=".$session->db->quote($session->user->userId)." 
+			and fieldName=".$session->db->quote($key)." order by a.count desc";
 	my @values = $session->db->buildArray($sql);
 	return $values[$rank];
 }
