@@ -132,7 +132,7 @@ sub toHtml {
 	   $self->set("resizeable", 0);
 	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
     } else {
-	   WebGUI::ErrorHandler::warn($i18n->get('rich editor load error','Form_HTMLArea'));
+	   $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));
 	   return $self->SUPER::toHtml;
 	}
 

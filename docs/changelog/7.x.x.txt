@@ -7,6 +7,8 @@
     http://www.plainblack.com/bugs/tracker/getlineage-joinclass-expects-string-not-array-ref#wzbxkyWPuzsCRBr3x9QImA
  - fix: "Rejected" messages in CS mail
  - fix: AOIHits and AOIRank not working (Yung Han Khoe / United Knowledge)
+ - fix: HTMLArea form control crashing page if the specified Rich Editor could
+        not be loaded.
 
 
 7.3.17
