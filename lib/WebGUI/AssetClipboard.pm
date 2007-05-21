@@ -185,7 +185,7 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 sub www_copy {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $newAsset = $self->duplicate;
+	my $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
 	$newAsset->update({ title=>$self->getTitle.' (copy)'});
 	$newAsset->cut;
 	return $self->session->asset($self->getContainer)->www_view;
@@ -205,7 +205,7 @@ sub www_copyList {
 	foreach my $assetId ($self->session->form->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 		if ($asset->canEdit) {
-			my $newAsset = $asset->duplicate;
+			my $newAsset = $asset->duplicate({skipAutoCommitWorkflows => 1});
 			$newAsset->update({ title=>$newAsset->getTitle.' (copy)'});
 			$newAsset->cut;
 		}
