@@ -30,7 +30,8 @@ var firedobj = ie5?e.srcElement:e.target;
                 yoffset+=firedobj.offsetTop;}
             firedobj=firedobj.offsetParent;
    }
-		var el = document.documentElement;
+    var el = (document.documentElement && document.documentElement.scrollTop)
+        ? document.documentElement : document.body;
                posx = e.clientX - xoffset + (ie5? el.scrollLeft : window.pageXOffset);
                posy = e.clientY - yoffset + (ie5? el.scrollTop : window.pageYOffset);
 	menuobj.style.left=posx + "px";

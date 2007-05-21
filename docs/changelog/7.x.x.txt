@@ -11,6 +11,8 @@
  - fix: AOIHits and AOIRank not working (Yung Han Khoe / United Knowledge)
  - fix: HTMLArea form control crashing page if the specified Rich Editor could
         not be loaded.
+ - fix: Asset context menus sometimes appearing in wrong location in IE
+    http://www.plainblack.com/bugs/tracker/export-contextual-menu-not-always-working-in-ie.--works-great-in-firefox
 
 
 7.3.17
