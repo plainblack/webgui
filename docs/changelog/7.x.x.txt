@@ -1,4 +1,6 @@
 7.3.18
+ - fix: If no sysnopsis exists, the asset inherits the parents' (perlDreamer Consulting, LLC)
+    http://www.plainblack.com/bugs/tracker/if-no-sysnopsis-exists-the-asset-inherits-the-parents#VVesdkBSTm3neKRaKCJxKw
  - fix: diskUsage.pl (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/diskusage.pl#tlMpeq3vzsd37pRHcz_NYg
  - fix: thread next/prev url (perlDreamer Consulting, LLC)
