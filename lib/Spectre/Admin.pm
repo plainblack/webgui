@@ -146,7 +146,7 @@ sub loadSiteData {
         	my $request = new HTTP::Request (GET => $url);
         	my $response = $userAgent->request($request);
         	if ($response->is_error) {
-			$self->error( "Couldn't connect to WebGUI site $key");
+			$self->error( "Couldn't connect to WebGUI site $key at $url.  Response: " . $response->status_line );
         	} 
 		else {
 			my $siteData = {};

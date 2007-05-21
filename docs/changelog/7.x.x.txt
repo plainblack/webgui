@@ -13,6 +13,8 @@
         not be loaded.
  - fix: Asset context menus sometimes appearing in wrong location in IE
     http://www.plainblack.com/bugs/tracker/export-contextual-menu-not-always-working-in-ie.--works-great-in-firefox
+ - Added more detailed errors when spectre isn't able to connect to WebGUI.
+    http://www.plainblack.com/bugs/tracker/enhance-error-message-in-spectre-admin.pm
 
 
 7.3.17
