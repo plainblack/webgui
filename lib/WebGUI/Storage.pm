@@ -24,6 +24,7 @@ use Storable qw(nstore retrieve);
 use strict;
 use warnings;
 use WebGUI::Utility;
+use Carp;
 
 =head1 NAME
 
@@ -883,7 +884,7 @@ sub tar {
 	my $self = shift;
 	my $filename = shift;
 	my $temp = shift || WebGUI::Storage->createTemp($self->session);
-	chdir $self->getPath;
+    chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
 	my @files = ();
 	find(sub { push(@files, $File::Find::name)}, ".");
 	if ($Archive::Tar::VERSION eq '0.072') {
