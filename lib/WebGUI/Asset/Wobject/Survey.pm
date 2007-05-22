@@ -485,7 +485,7 @@ sub getResponseDrivenQuestionIds {
 			($questionId) = $self->session->db->quickArray("select gotoQuestion from Survey_question where 
 				Survey_questionId=".$self->session->db->quote($previousResponse->{Survey_questionId}));
 		}
-		unless ($questionId) { # terminate survey
+		if (!$questionId || $questionId eq '-1') { # terminate survey
 			$self->completeResponse($responseId);	
 			return ();
 		}
@@ -689,8 +689,8 @@ sub view {
 			if ($var->{'questions.soFar.count'} > 0) {
 				$var->{'questions.correct.percent'} = round(($var->{'questions.correct.count'}/$var->{'questions.soFar.count'})*100)
 			}
-			$var->{'response.isComplete'} = $self->responseIsComplete($var->{'response.Id'});
 			$var->{question_loop} = $self->getQuestionsLoop($var->{'response.Id'});
+            $var->{'response.isComplete'} = $self->responseIsComplete($var->{'response.Id'});
 		}
 	}
 	$var->{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})

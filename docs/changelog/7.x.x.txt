@@ -26,6 +26,7 @@
     http://www.plainblack.com/bugs/tracker/webgui-hangs-on-package-export
  - fix: spectre fails on Admin.pm because of env_proxy
     http://www.plainblack.com/bugs/tracker/spectre-fails-on-admin.pm-because-of-env_proxy
+ - fix: survey in response driven mode sometimes won't terminate correctly
 
 
 7.3.17
