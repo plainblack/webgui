@@ -139,7 +139,9 @@ sub loadSiteData {
 		next if $key =~ m/^demo/;
 		$self->debug("Fetching site data for $key");
 		 my $userAgent = new LWP::UserAgent;
-		$userAgent->env_proxy;
+        if (!$self->config->get('ignoreEnvProxy')) {
+            $userAgent->env_proxy;
+        }
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
 		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$self->{_config}->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreGetSiteData";
@@ -244,7 +246,9 @@ sub runTests {
 		next if $key =~ m/^demo/;
 		print "Testing $key\n";
 		 my $userAgent = new LWP::UserAgent;
-		$userAgent->env_proxy;
+        if (!$config->get('ignoreEnvProxy')) {
+            $userAgent->env_proxy;
+        }
         	$userAgent->agent("Spectre");
         	$userAgent->timeout(30);
 		my $url = "http://".$configs->{$key}->get("sitename")->[0].":".$config->get("webguiPort").$configs->{$key}->get("gateway")."?op=spectreTest";

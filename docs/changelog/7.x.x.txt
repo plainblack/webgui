@@ -24,6 +24,8 @@
     http://www.plainblack.com/bugs/tracker/new-second-inactive-version-tag-when-duplicating-thread
  - fix: Make WebGUI error out if there is a permissions problem while creating tar files
     http://www.plainblack.com/bugs/tracker/webgui-hangs-on-package-export
+ - fix: spectre fails on Admin.pm because of env_proxy
+    http://www.plainblack.com/bugs/tracker/spectre-fails-on-admin.pm-because-of-env_proxy
 
 
 7.3.17

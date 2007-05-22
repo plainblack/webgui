@@ -38,7 +38,15 @@
 # the WebGUI Runtime Environment, 81 might be a better choice to go
 # directly at the mod_perl server. 
 
-"webguiPort" : 80
+"webguiPort" : 80,
+
+# Should we ignore the proxy environment variables? If your server
+# uses a proxy to connect to the internet and you are running 
+# Spectre on the same server as WebGUI, you should set this to 1.
+# It should be safe to set this to 1 any time spectre and WebGUI
+# are running on the same server.
+
+"ignoreEnvProxy" : 0
 
 }
 
