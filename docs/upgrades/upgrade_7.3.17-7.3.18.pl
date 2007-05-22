@@ -20,17 +20,55 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixEmsBadges($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixEmsBadges {
+	my $session = shift;
+	print "\tAttaching EMS Badges to their EMS.\n" unless ($quiet);
+    my $db = $session->db;
+    # give tables an asset id that should have it
+    $db->write("alter table EventManagementSystem_badges add column assetId varchar(22) binary");
+    $db->write("alter table EventManagementSystem_prerequisites add column assetId varchar(22) binary");
+    $db->write("alter table EventManagementSystem_registrations add column assetId varchar(22) binary");
+    my $sth = $db->read("select badgeId,asset.assetId from EventManagementSystem_badges
+        left join EventManagementSystem_registrations using (badgeId) left join EventManagementSystem_products using
+        (productId) left join asset on (asset.assetId=EventManagementSystem_products.assetId);");
+    while (my ($badgeId, $assetId) = $sth->array) {
+        $db->write("update EventManagementSystem_badges set assetId=? where badgeId=?", [$assetId, $badgeId]);
+        $db->write("update EventManagementSystem_registrations set assetId=? where badgeId=?", [$assetId, $badgeId]);
+    }
+    my $sth = $db->read("select EventManagementSystem_prerequisites.prerequisiteId,
+        EventManagementSystem_products.assetId from EventManagementSystem_prerequisites left join
+        EventManagementSystem_prerequisiteEvents using (prerequisiteId) left join EventManagementSystem_products on
+        (EventManagementSystem_products.productId=EventManagementSystem_prerequisiteEvents.requiredProductId)");
+    while (my ($prereqId, $assetId) = $sth->array) {
+        $db->write("update EventManagementSystem_prerequisites set assetId=? where prerequisiteId=?", [$prereqId,
+            $assetId]); 
+    }
+
+    # delete badge data for which there is no asset
+    $db->write("delete from EventManagementSystem_badges where assetId is null");
+    $db->write("delete from EventManagementSystem_registrations where assetId is null");
+    # delete field data for which there is no asset
+    my $sth = $db->read("select EventManagementSystem_metaField.fieldId
+        from EventManagementSystem_metaField left join asset on
+        (EventManagementSystem_metaField.assetId=asset.assetId) where asset.assetId is null");
+    while (my ($fieldId) = $sth->array) {
+        $db->write("delete from EventManagementSystem_metaData where fieldId=?",[$fieldId]);
+        $db->write("delete from EventManagementSystem_metaField where fieldId=?",[$fieldId]);
+    }
+    # delete prereqs for which there is no asset
+    my $sth = $db->read("select EventManagementSystem_prerequisites.prerequisiteId from
+        EventManagementSystem_prerequisites left join asset using (assetId) where asset.assetId is null");
+    while (my ($id) = $sth->array) {
+        $db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=?",[$id]);
+        $db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$id]);
+    }
+}
 
 
 

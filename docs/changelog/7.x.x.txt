@@ -1,4 +1,7 @@
 7.3.18
+ - fix: Old registrants appear in new EMS asset
+    http://www.plainblack.com/bugs/tracker/old-registrants-appear-in-new-ems-asset
+ - fix: a bunch of EMS related bugs
  - fix: If no sysnopsis exists, the asset inherits the parents' (perlDreamer Consulting, LLC)
     http://www.plainblack.com/bugs/tracker/if-no-sysnopsis-exists-the-asset-inherits-the-parents#VVesdkBSTm3neKRaKCJxKw
  - fix: diskUsage.pl (perlDreamer Consulting, LLC)

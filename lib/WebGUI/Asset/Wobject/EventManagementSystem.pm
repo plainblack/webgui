@@ -530,28 +530,87 @@ sub definition {
 
 #------------------------------------------------------------------
 
-=head2 deleteOrphans ( )
+=head2 deleteBadge ( id )
 
-Utility method that checks for prerequisite groupings that no longer have any events assigned to them and deletes it
+Delete a badge.
 
 =cut
 
-sub deleteOrphans {
-	my $self = shift;
+sub deleteBadge {
+    my $self = shift;
+    my $id = shift;
+	$self->deleteCollateral('EventManagementSystem_badges', 'badgeId', $id); 
+}
 
-	# MSW Note - as this is on 4/27/2006, I don't think query will ever return any results.
+#------------------------------------------------------------------
 
-	#Check for orphaned prerequisite definitions
-	my @orphans = $self->session->db->quickArray("select p.prerequisiteId from EventManagementSystem_prerequisites as p 
-							left join EventManagementSystem_prerequisiteEvents as pe 
-							on p.prerequisiteId = pe.prerequisiteId 
-							where pe.prerequisiteId is null");
-	foreach my $orphan (@orphans) {
-		$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=".
-					   $self->session->db->quote($orphan));
+=head2 deleteEvent ( id )
+
+Delete an event.
+
+=cut
+
+sub deleteEvent {
+    my $self = shift;
+    my $id = shift;
+    my $db = $self->session->db;
+    $self->deletePrereq($id);
+	$self->deleteCollateral('EventManagementSystem_registrations', 'productId', $id);
+	$self->deleteCollateral('EventManagementSystem_products', 'productId', $id);
+	$self->deleteCollateral('products','productId',$id);
+	$self->reorderCollateral('EventManagementSystem_products', 'productId');
+}
+
+#------------------------------------------------------------------
+
+=head2 deleteMetaField ( id )
+
+Delete a meta field, and thusly metadata associated with that field.
+
+=cut
+
+sub deleteMetaField {
+    my $self = shift;
+    my $id = shift;
+	$self->deleteCollateral('EventManagementSystem_metaData', 'fieldId', $id); # deleteCollateral doesn't care about assetId.
+	$self->deleteCollateral('EventManagementSystem_metaField', 'fieldId', $id);
+	$self->reorderCollateral('EventManagementSystem_metaField', 'fieldId');
+}
 
 
-	} 
+#------------------------------------------------------------------
+
+=head2 deletePrereq ( id )
+
+Delete a prerequisite.
+
+=head3 id
+
+a valid event/product id
+
+=cut
+
+sub deletePrereq {
+    my $self = shift;
+    my $id = shift;
+	$self->deleteCollateral('EventManagementSystem_prerequisiteEvents', 'requiredProductId', $id);
+}
+
+#------------------------------------------------------------------
+
+=head2 deletePrereqSet ( id )
+
+Delete a prerequisite set.
+
+=cut
+
+sub deletePrereqSet {
+    my $self = shift;
+    my $id = shift;
+	$self->deleteCollateral('EventManagementSystem_prerequisiteEvents', 'prerequisiteId', $id);
+	$self->deleteCollateral('EventManagementSystem_prerequisites', 'prerequisiteId', $id);
+    $self->session->db->write("update EventManagementSystem_product set prerequisiteId=null where
+        prerequisiteId=?", [$id]);
 }
 
 #-------------------------------------------------------------------
@@ -962,6 +1021,35 @@ sub prerequisiteIsMet {
 		  }
 		  return 0;
 	}	
+}
+
+
+#------------------------------------------------------------------
+
+sub purge {
+    my $self = shift;
+    my $db = $self->session->db;
+    # delete meta fields
+    my $sth = $db->read("select fieldId from EventManagementSystem_metaField where assetId=?",[$self->getId]);
+    while (my ($id) = $sth->array) {
+        $self->deleteMetaField($id);
+    }
+    # delete events
+    my $sth = $db->read("select productId from EventManagementSystem_products where assetId=?",[$self->getId]);
+    while (my ($id) = $sth->array) {
+        $self->deleteEvent($id);
+    }
+    # delete prereqs
+    my $sth = $db->read("select prerequisiteId from EventManagementSystem_prerequisites where assetId=?",[$self->getId]);
+    while (my ($id) = $sth->array) {
+        $self->deletePrereqSet($id);
+    }
+    # delete badges
+    my $sth = $db->read("select fieldId from EventManagementSystem_badges where assetId=?",[$self->getId]);
+    while (my ($id) = $sth->array) {
+        $self->deleteBadge($id);
+    }
+    $self->SUPER::purge(@_);
 }
 
 
@@ -1556,42 +1644,23 @@ Method to delete an event, and to remove the deleted event from all prerequisite
 
 sub www_deleteEvent {
 	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	#Remove this event as a prerequisite to any other event
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where requiredProductId=?",
-				   [$eventId]);
-	$self->deleteOrphans;	
-
-	#Remove the event
-	$self->deleteCollateral('EventManagementSystem_products', 'productId', $eventId);
-	$self->deleteCollateral('products','productId',$eventId);
-	$self->reorderCollateral('EventManagementSystem_products', 'productId');
-
+    $self->deleteEvent($self->session->form->get("pid"));
 	return $self->www_search;			  
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_deletePrerequisite ( )
+=head2 www_deletePrereqSet ( )
 
 Method to delete a prerequisite assignment of one event to another
 
 =cut
 
-sub www_deletePrerequisite {
+sub www_deletePrereqSet {
 	my $self = shift;
-	my $eventId = $self->session->form->get("id");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->session->db->write("delete from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",
-				   [$eventId]);
-	$self->session->db->write("delete from EventManagementSystem_prerequisites where prerequisiteId=?",
-				   [$eventId]);
-
+    $self->deletePrereqSet($self->session->form->get("psid"));
 	return $self->www_editEvent;
 }
 
@@ -2531,12 +2600,8 @@ Method to move an event down one position in display order
 
 sub www_moveEventMetaDataFieldDown {
 	my $self = shift;
-	my $eventId = $self->session->form->get("fieldId");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->moveCollateralDown('EventManagementSystem_metaField', 'fieldId', $eventId);
-
+	$self->moveCollateralDown('EventManagementSystem_metaField', 'fieldId', $self->session->form->get("fieldId"));
 	return $self->www_manageEventMetadata;
 }
 
@@ -2550,12 +2615,8 @@ Method to move an event metdata field up one position in display order
 
 sub www_moveEventMetaDataFieldUp {
 	my $self = shift;
-	my $eventId = $self->session->form->get("fieldId");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->moveCollateralUp('EventManagementSystem_metaField', 'fieldId', $eventId);
-
+	$self->moveCollateralUp('EventManagementSystem_metaField', 'fieldId', $self->session->form->get("fieldId"));
 	return $self->www_manageEventMetadata;
 }
 
@@ -2570,14 +2631,8 @@ Method to move an event metdata field up one position in display order
 
 sub www_deleteEventMetaDataField {
 	my $self = shift;
-	my $eventId = $self->session->form->get("fieldId");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->deleteCollateral('EventManagementSystem_metaField', 'fieldId', $eventId);
-	$self->reorderCollateral('EventManagementSystem_metaField', 'fieldId');
-	$self->deleteCollateral('EventManagementSystem_metaData', 'fieldId', $eventId); # deleteCollateral doesn't care about assetId.
-
+    $self->deleteMetaField($self->session->form->get("fieldId"));
 	return $self->www_manageEventMetadata;
 }
 
@@ -2591,12 +2646,8 @@ Method to move an event down one position in display order
 
 sub www_moveEventDown {
 	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $eventId);
-
+	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $self->session->form->get("pid"));
 	return $self->www_search;
 }
 
@@ -2610,12 +2661,8 @@ Method to move an event up one position in display order
 
 sub www_moveEventUp {
 	my $self = shift;
-	my $eventId = $self->session->form->get("pid");
-
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $eventId);
-
+	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $self->session->form->get("pid"));
 	return $self->www_search;
 }
 
@@ -2637,11 +2684,12 @@ sub saveRegistration {
 		next if isIn($eventId,@addingToPurchase);
 		next if isIn($eventId,@badgeEvents);
 		my $registrationId = $self->setCollateral("EventManagementSystem_registrations", "registrationId",{
+            assetId         => $self->getId,
 			registrationId  => "new",
-			purchaseId	 => $purchaseId,
-			productId	 => $eventId,
-			badgeId => $badgeId
-		},0,0);
+			purchaseId	    => $purchaseId,
+			productId	    => $eventId,
+			badgeId         => $badgeId,
+		    },0,0);
 		$shoppingCart->add($eventId, 'Event');
 		$addedAny = 1;
 	}
@@ -2724,6 +2772,7 @@ sub www_saveRegistrantInfo {
 	
 	my $details = {
 		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
+        assetId => $self->getId,
 		firstName       => $firstName,
 		lastName	 => $lastName,
 		address         => $address,
@@ -3373,6 +3422,7 @@ sub www_editPrereqSetSave {
 	my $psid = $self->session->form->process('psid');
 	$psid = $self->setCollateral("EventManagementSystem_prerequisites", "prerequisiteId",{
 		prerequisiteId=>$psid,
+        assetId=>$self->getId,
 		name => $self->session->form->process("name"),
 		operator => $self->session->form->process("operator",'radioList')
 	},0,0);
@@ -3408,16 +3458,16 @@ sub www_manageRegistrants {
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $output;
-	my $sql = "select * from EventManagementSystem_badges order by lastName, firstName";
+	my $sql = "select * from EventManagementSystem_badges where assetId=? order by lastName, firstName";
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'),50);
-	$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql));
-	my $data = $p->getPageData;
+	#$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql),[$self->getId]);
+	$p->setDataByQuery($sql,undef,undef,[$self->getId]);
 	$p->setAlphabeticalKey('lastName');
-	foreach (@$data) {
+	foreach my $badge (@{$p->getPageData}) {
 		$output .= "<div>";
 	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->get('url'));
-		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$_->{badgeId}, $self->get('url')).
-			"&nbsp;&nbsp;".$_->{lastName}.",&nbsp;".$_->{firstName}."&nbsp;&nbsp;(&nbsp;".$_->{email}."&nbsp;)</div>";
+		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$badge->{badgeId}, $self->get('url')).
+			"&nbsp;&nbsp;".$badge->{lastName}.",&nbsp;".$badge->{firstName}."&nbsp;&nbsp;(&nbsp;".$badge->{email}."&nbsp;)</div>";
 	}
 	$output .= '<div>'.$p->getBarAdvanced.'</div>';
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->get('add registrant'));
@@ -3582,6 +3632,7 @@ sub www_editRegistrantSave {
 	my $addingNew = ($userId eq 'new') ? 1 : 0;
 	my $details = {
 		badgeId => $badgeId, # if this is "new", setCollateral will return the new one.
+        assetId => $self->getId,
 		firstName       => $firstName,
 		lastName	 => $lastName,
 		'address'         => $address,
