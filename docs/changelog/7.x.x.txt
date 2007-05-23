@@ -1,4 +1,6 @@
 7.4.0
+ - fix: old recurring events were not deleted when changing recurrence pattern
+ - fix: unable to remove recurrence on events
 
 
 

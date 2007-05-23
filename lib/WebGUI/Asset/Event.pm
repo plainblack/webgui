@@ -1419,23 +1419,30 @@ sub processPropertiesFromFormPost {
         if (nfreeze(\%recurrence_new) ne nfreeze(\%recurrence_old)) {
             # Delete all old events and create new ones
             my $old_id  = $self->get("recurId");
-    
-            # Set the new recurrence pattern
-            my $new_id  = $self->setRecurrence(\%recurrence_new);
-            return ["There is something wrong with your recurrence pattern."]
-                unless $new_id;
 
-            # Generate the new recurring events
-            $self->generateRecurringEvents();
+            # Set the new recurrence pattern
+            if (%recurrence_new) {
+                my $new_id  = $self->setRecurrence(\%recurrence_new);
+                return ["There is something wrong with your recurrence pattern."]
+                    unless $new_id;
+                
+                # Generate the new recurring events
+                $self->generateRecurringEvents();
+            }
+            else {
+                $self->update({recurId => undef});
+            }
 
             # Delete old events
-            my $events = $self->getLineage(["siblings"], {
+            if ($old_id) {
+                my $events = $self->getLineage(["siblings"], {
                     returnObjects       => 1,
                     includeOnlyClasses  => ['WebGUI::Asset::Event'],
                     joinClass           => 'WebGUI::Asset::Event',
-                    whereClause         => qq{Event.recurId = "$old_id" and Event.recurId <> NULL}, #without the <> NULL, it pulls in the recurId's
+                    whereClause         => qq{Event.recurId = "$old_id"},
                 });
-            $_->purge for @$events;
+                $_->purge for @$events;
+            }
         }
         else {
             # TODO: Give users a form property to decide what events to update
