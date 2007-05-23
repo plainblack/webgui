@@ -1,3 +1,7 @@
+7.4.0
+
+
+
 7.3.18
  - fix: Old registrants appear in new EMS asset
     http://www.plainblack.com/bugs/tracker/old-registrants-appear-in-new-ems-asset
