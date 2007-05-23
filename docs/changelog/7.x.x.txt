@@ -28,6 +28,7 @@
     http://www.plainblack.com/bugs/tracker/spectre-fails-on-admin.pm-because-of-env_proxy
  - fix: survey in response driven mode sometimes won't terminate correctly
  - fix: Importing a package that includes a CS generates multiple version tags
+ - Fixed parts of the test suite that were broken due to earlier changes.
 
 
 7.3.17

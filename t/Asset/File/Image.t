@@ -22,7 +22,7 @@ use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 8;
+plan tests => 7;
 
 my $session = WebGUI::Test->session;
 
@@ -55,7 +55,6 @@ my $properties = {
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
 
-is($asset->get('storageId'), '', 'Image Asset created with no initial storage location');
 ok($asset->getStorageLocation, 'Image Asset getStorageLocation initialized');
 ok($asset->get('storageId'), 'getStorageLocation updates Image asset object with storage location');
 is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Image Asset storageId and cached storageId agree');

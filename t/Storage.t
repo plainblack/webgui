@@ -124,7 +124,10 @@ ok (!(-e $storageDir2), "Storage2 cleaned up properly");
 
 undef $storage2;
 
-my @dirOptions = qw/bad bAd Bad BAd/;
+## NOTE: On case insensitive file systems more matches can occur on this test
+## and if all of these exist, then the next test will fail.
+
+my @dirOptions = qw/bad bAd Bad BAd Zod God Mod Tod Rod Bod Lod/;
 my $skipDirCheck = 0;
 
 my ($dir3, $dirOpt);
@@ -133,7 +136,6 @@ CHECKDIR: while ($dirOpt = pop @dirOptions) {
 	$dir3 = join '/', $uploadDir, substr $dirOpt,0,2;
 	last CHECKDIR if !-e $dir3;
 }
-
 my $storage3 = WebGUI::Storage->get($session, $dirOpt);
 
 is( $storage3->getErrorCount, 1, 'Error during creation of object due to short GUID');

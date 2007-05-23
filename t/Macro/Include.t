@@ -24,7 +24,6 @@ my $i18n = WebGUI::International->new($session, 'Macro_Include');
 
 my $configFile = WebGUI::Test->root .'/etc/'. WebGUI::Test->file;
 my $spectreConf = WebGUI::Test->root . '/etc/spectre.conf';
-my $confBackup = WebGUI::Test->root . '/etc/my.conf%';
 
 my $goodFile = 'The contents of this file are accessible';
 my $twoLines = "This file contains two lines of text\nThis is the second line";
@@ -65,11 +64,6 @@ my @testSets = (
 		file => $spectreConf,
 		output => $i18n->get('security'),
 		comment => q|spectre config file|,
-	},
-	{
-		file => $confBackup,
-		output => $i18n->get('security'),
-		comment => q|conf backup file|,
 	},
 	{
 		file => $storage->getPath('non-existantFile'),

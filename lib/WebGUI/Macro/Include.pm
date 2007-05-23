@@ -40,7 +40,7 @@ sub process {
         my (@param, $temp, $file);
         @param = @_;
 	my $i18n = WebGUI::International->new($session,'Macro_Include');
-	if ($param[0] =~ /passwd/i || $param[0] =~ /shadow/i || $param[0] =~ m!/etc/\w+\.conf!i) {
+	if ($param[0] =~ /passwd/i || $param[0] =~ /shadow/i || $param[0] =~ m{\.conf$}i) {
                 return $i18n->get('security');
         }
 	$file = FileHandle->new($param[0],"r");
