@@ -106,7 +106,7 @@ sub session {
 
 
 #-------------------------------------------------------------------
- 
+
 =head2 toHex ( guid )
 
 Returns the hex value of a guid
