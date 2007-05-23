@@ -147,11 +147,11 @@ sub importAssetData {
 		$asset = WebGUI::Asset->new($self->session, $id, $class);
 		if (defined $asset) { # create a new revision of an existing asset
 			$error->info("Creating a new revision of asset $id");	
-			$asset = $asset->addRevision($data->{properties}, $version);
+			$asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
 		}
         else { # add an entirely new asset
 			$error->info("Adding $id that didn't previously exist.");	
-			$asset = $self->addChild($data->{properties}, $id, $version);
+			$asset = $self->addChild($data->{properties}, $id, $version, {skipAutoCommitWorkflows => 1});
 		}
 	}
 	return $asset;
