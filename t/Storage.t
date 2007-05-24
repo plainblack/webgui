@@ -128,7 +128,6 @@ undef $storage2;
 ## and if all of these exist, then the next test will fail.
 
 my @dirOptions = qw/bad bAd Bad BAd Zod God Mod Tod Rod Bod Lod/;
-my $skipDirCheck = 0;
 
 my ($dir3, $dirOpt);
 
