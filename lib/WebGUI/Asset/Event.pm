@@ -1160,6 +1160,7 @@ sub getTemplateVars {
     my %var;
     
     # Some miscellaneous stuff
+    $var{'canEdit'} = $self->canEdit;
     $var{"isPublic"} = 1
         if $self->get("groupIdView") eq "7";
     $var{"groupToView"} = $self->get("groupIdView");    # Todo: Remove this? 

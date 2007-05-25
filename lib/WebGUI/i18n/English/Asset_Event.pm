@@ -452,6 +452,11 @@ be useful, others may not.|,
 		message 	=> q{Event},
 		lastUpdated 	=> 1131394072,
 	},
+
+	'canEdit' => {
+		message 	=> q{This variable is true if the current user can edit this event.},
+		lastUpdated 	=> 0,
+	},
 };
 
 1;

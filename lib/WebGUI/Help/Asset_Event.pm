@@ -89,6 +89,9 @@ our $HELP = {
 		],
 		variables => [
 		          {
+		            'name'     => 'canEdit',
+		          },
+		          {
 		            'name'     => 'isPublic',
 		          },
 		          {
