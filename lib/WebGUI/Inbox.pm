@@ -111,8 +111,8 @@ sub getMessagesForUser {
 		if ($user->userId eq $userId || $user->isInGroup($groupId)) {
 			push(@messages, $self->getMessage($messageId));
 			$counter++;
+			last if ($counter >= $limit);
 		}
-		last if ($counter >= $limit);
 	}
 	$rs->finish;
 	return \@messages;	
