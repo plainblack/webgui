@@ -15,6 +15,7 @@ package WebGUI::Paginator;
 =cut
 
 use strict;
+use POSIX qw(ceil);
 use WebGUI::International;
 use WebGUI::Utility;
 
@@ -298,9 +299,10 @@ Returns the number of pages in this paginator.
 =cut
 
 sub getNumberOfPages {
-	my $pageCount = int(($#{$_[0]->{_rowRef}}+1)/$_[0]->{_rpp});
-	$pageCount++ unless (($#{$_[0]->{_rowRef}}+1)%$_[0]->{_rpp} == 0);
-	return $pageCount;
+	my $self = shift;
+	my $rows = $self->getRowCount;
+	my $rowsPerPage = $self->{_rpp};
+	return ceil($rows/$rowsPerPage);
 }
 
 
@@ -336,16 +338,22 @@ Defaults to the page you're currently viewing. This is mostly here as an overrid
 =cut
 
 sub getPageData {
-	my ($i, @pageRows, $allRows, $pageCount, $pageNumber, $rowsPerPage, $pageStartRow, $pageEndRow);
-        $pageNumber = $_[1] || $_[0]->getPageNumber;
-        $pageCount = $_[0]->getNumberOfPages;
+	my $self = shift;
+        my $pageNumber = shift || $self->getPageNumber;
+        my $pageCount = $self->getNumberOfPages;
         return [] if ($pageNumber > $pageCount);
-        $rowsPerPage = $_[0]->{_rpp};
-        $pageStartRow = ($pageNumber*$rowsPerPage)-$rowsPerPage;
-        $pageEndRow = $pageNumber*$rowsPerPage;
-	$allRows = $_[0]->{_rowRef};
-        for ($i=$pageStartRow; $i<$pageEndRow; $i++) {
-		$pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$_[0]->{_rowRef}});
+
+        my $rowsPerPage = $self->{_rpp};
+        my $pageStartRow = ($pageNumber-1)*$rowsPerPage;
+        my $pageEndRow = ($pageNumber*$rowsPerPage) - 1;
+	if ($pageEndRow > $self->getRowCount) {
+		$pageEndRow = $self->getRowCount - 1;
+	}
+	my $allRows = $self->{_rowRef};
+
+	my @pageRows = ();
+        for (my $i=$pageStartRow; $i<=$pageEndRow; $i++) {
+		$pageRows[$i-$pageStartRow] = $allRows->[$i];
         }
 	return \@pageRows;
 }
