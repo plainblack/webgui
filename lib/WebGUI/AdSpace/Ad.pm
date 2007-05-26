@@ -115,7 +115,11 @@ The name of the property to retrieve the value for.
 sub get {
 	my $self = shift;
 	my $name = shift;
-	return $self->{_properties}{$name};
+    if (defined $name) {
+        return $self->{_properties}{$name}
+    }
+    my %copyOfProperties = %{ $self->{_properties} };
+    return \%copyOfProperties;
 }
 
 #-------------------------------------------------------------------
@@ -239,7 +243,7 @@ The number of times the user has paid for this ad to be displayed on the site.
 
 sub set {
 	my $self = shift;
-	my $properties = shift;
+	my $properties = shift || {};
 	$self->{_properties}{title} = $properties->{title} || $self->{_properties}{title} || "Untitled";
 	$self->{_properties}{clicksBought} = $properties->{clicksBought} || $self->{_properties}{clicksBought};
 	$self->{_properties}{impressionsBought} = $properties->{impressionsBought} || $self->{_properties}{impressionsBought};

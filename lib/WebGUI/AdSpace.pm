@@ -158,7 +158,11 @@ The name of the property to retrieve the value for.
 sub get {
 	my $self = shift;
 	my $name = shift;
-	return $self->{_properties}{$name};
+    if (defined $name) {
+        return $self->{_properties}{$name}
+    }
+    my %copyOfProperties = %{ $self->{_properties} };
+    return \%copyOfProperties;
 }
 
 #-------------------------------------------------------------------
