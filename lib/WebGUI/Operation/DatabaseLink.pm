@@ -62,10 +62,11 @@ sub _submenu {
                 $ac->setHelp($help);
         }
 	$ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid=new'), $i18n->get(982));
-	if (($session->form->process("op") eq "editDatabaseLink" && $session->form->process("dlid") ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
-                $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(983));
-                $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(984));
-		$ac->addSubmenuItem($session->url->page('op=deleteDatabaseLink;dlid='.$session->form->process("dlid")), $i18n->get(985));
+	my $dlid = $session->form->process("dlid");
+	if (($session->form->process("op") eq "editDatabaseLink" && $dlid ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
+                $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$dlid), $i18n->get(983));
+                $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$dlid), $i18n->get(984));
+		$ac->addConfirmedSubmenuItem($session->url->page("op=deleteDatabaseLinkConfirm;dlid=".$dlid), $i18n->get(985), $i18n->get(988));
 		$ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), $i18n->get(986));
 	}
         return $ac->render($workarea, $title);
@@ -256,7 +257,7 @@ sub www_listDatabaseLinks {
 #		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.$i18n->get(1076).'</td></tr>';
                 $output .= '<tr><td valign="top" class="tableData">';
 		if ($id ne '0') {
-			$output .= $session->icon->delete('op=deleteDatabaseLink;dlid='.$id)
+			$output .= $session->icon->delete('op=deleteDatabaseLinkConfirm;dlid='.$id,'',$i18n->get(988))
 				.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
 				.$session->icon->copy('op=copyDatabaseLink;dlid='.$id);
 		}

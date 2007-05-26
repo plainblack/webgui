@@ -3,6 +3,8 @@
  - fix: unable to remove recurrence on events
  - RFE: Search asset feedback. i.e. 'No results found'
     http://www.plainblack.com/rfe/request-for-enhancement/search-asset-feedback.-i.e.-no-results-found#kH5X_YA17ZxbRvi6gx5KRA
+ - RFE: JS confirmation Operation/DatabaseLink.pm
+    http://www.plainblack.com/rfe/request-for-enhancement/-1493348--js-confirmation-operation/databaselink/re--1493348--js-confirmation-operation/databaselink.pm#OUb5zN8bltGdPG_2LJZMGQ
 
 
 
