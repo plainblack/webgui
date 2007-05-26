@@ -1,6 +1,8 @@
 7.4.0
  - fix: old recurring events were not deleted when changing recurrence pattern
  - fix: unable to remove recurrence on events
+ - RFE: Search asset feedback. i.e. 'No results found'
+    http://www.plainblack.com/rfe/request-for-enhancement/search-asset-feedback.-i.e.-no-results-found#kH5X_YA17ZxbRvi6gx5KRA
 
 
 

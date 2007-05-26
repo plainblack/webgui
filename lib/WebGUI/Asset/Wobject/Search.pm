@@ -142,6 +142,7 @@ sub view {
 	$var{'form_footer'} = WebGUI::Form::formFooter($self->session);
 	$var{'form_submit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get("search")});
 	$var{'form_keywords'} = WebGUI::Form::text($self->session, {name=>"keywords", value=>$self->session->form->get("keywords")});
+	$var{'no_results'} = $i18n->get("no results");
 	if ($self->session->form->get("doit")) {
 		my $search = WebGUI::Search->new($self->session);
 		my %rules = (
@@ -160,6 +161,7 @@ sub view {
 				title=>$data->{title},
 				synopsis=>$data->{synopsis},
 				});
+             $var->{results_found} = 1;
 			}
 		} 
 		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));

@@ -93,7 +93,13 @@ our $HELP = {
 				    'name' => 'synopsis',
 				  },
 			    ],
-		          }
+		          },
+		          {
+		            'name' => 'results_found',
+		          },
+		          {
+		            'name' => 'no_results',
+		          },
 		],
 		related => [
 			{

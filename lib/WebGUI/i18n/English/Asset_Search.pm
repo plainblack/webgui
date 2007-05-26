@@ -132,6 +132,21 @@ be useful, others may not.|,
 		lastUpdated => 1169843465,
 	},
 
+	'results_found' => {
+		message => q|A conditional variable that will be true if any results were found.|,
+		lastUpdated => 1170549116,
+	},
+
+	'no results' => {
+		message => q|No results were found.|,
+		lastUpdated => 1170549113,
+	},
+
+	'no_results' => {
+		message => q|An internationalized label for telling the user that no results were found.|,
+		lastUpdated => 1170549119,
+	},
+
 };
 
 1;
