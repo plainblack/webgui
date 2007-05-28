@@ -9,6 +9,8 @@
     field.
  - add: Calendar events now allow attachments
  - add: Calendar events now allow setting view permissions
+ - add: WebGUI::Paginator now capable of more efficient SQL paginations using
+   LIMIT clauses.
 
 
 

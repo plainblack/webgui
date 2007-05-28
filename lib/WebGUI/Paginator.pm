@@ -15,7 +15,6 @@ package WebGUI::Paginator;
 =cut
 
 use strict;
-use POSIX qw(ceil);
 use WebGUI::International;
 use WebGUI::Utility;
 
@@ -56,6 +55,81 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 _setDataByQuery ( query [, dbh, unconditional, placeholders, dynamicPageNumberKey, dynamicPageNumberValue ] )
+
+Private method which retrieves a data set from a database and replaces whatever data set was passed in through the constructor.
+
+This method should only ever be called by the public setDataByQuery method and is only called in the case that dynamicPageNumberKey is set.
+
+The public setDataByQuery method is not capable of efficiently handling requests that dyncmically set the page number by value
+due to the fact that only one page of results is ever returned.   In this method, all the results are returned making this possible.
+
+=head3 query
+
+An SQL query that will retrieve a data set.
+
+=head3 dbh
+
+A WebGUI::SQL database handler. Defaults to the WebGUI site handler.
+
+=head3 unconditional
+
+A boolean indicating that the query should be read unconditionally. Defaults to "0". If set to "1" and the unconditional read results in an error, the error will be returned by this method.
+
+=head3 placeholders
+
+An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
+
+=head3 dynamicPageNumberKey
+
+One of the field names being returned from this query. If this is set, the paginator will dynamically assign a page number based upon this key matching the dynamicPageNumberValue. Note that this only applies if the default page number is 1.
+
+=head3 dynamicPageNumberValue
+
+A value to match the dynamicPageNumberKey.
+
+=cut
+
+sub _setDataByQuery {
+	my ($sth, $rowCount, @row);
+	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
+    $dbh ||= $self->session->dbSlave;
+	if ($unconditional) {
+		$sth = $dbh->unconditionalRead($sql,$placeholders);
+		return $sth->errorMessage if ($sth->errorCode > 0);
+	} else {
+		$sth = $dbh->read($sql,$placeholders);
+	}
+	my $defaultPageNumber = $self->getPageNumber;
+	$self->{_totalRows} = $sth->rows;
+	$self->{_columnNames} = [ $sth->getColumnNames ];  
+	my $pageCount = 1;
+	while (my $data = $sth->hashRef) {
+		$rowCount++;
+		if ($rowCount/$self->{_rpp} > $pageCount) {	
+			$pageCount++;
+		}
+		if (defined $dynamicPageNumberKey && $defaultPageNumber == 1) {
+			if ($data->{$dynamicPageNumberKey} eq $dynamicPageNumberValue) {
+				$self->{_pn} = $pageCount;
+				$dynamicPageNumberKey = undef;
+			}
+			push(@row,$data);
+		} else {
+			if ($pageCount == $self->getPageNumber) {
+				push(@row,$data);	
+			} else {
+				push(@row,{});
+			}
+		}
+	}
+	$sth->finish;
+	$self->{_rowRef} = \@row;
+    #Purposely do not set $self->{_setByQuery} = 1 so the data is processed appropriately
+	return "";
+}
 
 #-------------------------------------------------------------------
 
@@ -212,8 +286,9 @@ Returns an array containing the column names
 =cut
 
 sub getColumnNames {
-	if(ref $_[0]->{_columnNames} eq 'ARRAY') {
-		return @{$_[0]->{_columnNames}};
+    my $self = shift;
+	if(ref $self->{_columnNames} eq 'ARRAY') {
+		return @{$self->{_columnNames}};
 	}
 }
 
@@ -300,9 +375,10 @@ Returns the number of pages in this paginator.
 
 sub getNumberOfPages {
 	my $self = shift;
-	my $rows = $self->getRowCount;
-	my $rowsPerPage = $self->{_rpp};
-	return ceil($rows/$rowsPerPage);
+    my $rowCount = $self->{_totalRows};
+	my $pageCount = int($rowCount/$self->{_rpp});
+	$pageCount++ unless ($rowCount % $self->{_rpp} == 0);
+	return $pageCount;
 }
 
 
@@ -340,20 +416,24 @@ Defaults to the page you're currently viewing. This is mostly here as an overrid
 sub getPageData {
 	my $self = shift;
         my $pageNumber = shift || $self->getPageNumber;
+    my $allRows = $self->{_rowRef};
+    
         my $pageCount = $self->getNumberOfPages;
         return [] if ($pageNumber > $pageCount);
 
-        my $rowsPerPage = $self->{_rpp};
-        my $pageStartRow = ($pageNumber-1)*$rowsPerPage;
-        my $pageEndRow = ($pageNumber*$rowsPerPage) - 1;
-	if ($pageEndRow > $self->getRowCount) {
-		$pageEndRow = $self->getRowCount - 1;
+    if($self->{_setByQuery}) {
+        #Return the cached page
+        return $allRows if($pageNumber == $self->getPageNumber);
+        return [];
 	}
-	my $allRows = $self->{_rowRef};
 
+   #Handle setByArrayRef or the old setDataByQuery method
 	my @pageRows = ();
-        for (my $i=$pageStartRow; $i<=$pageEndRow; $i++) {
-		$pageRows[$i-$pageStartRow] = $allRows->[$i];
+    my $rowsPerPage = $self->{_rpp};
+    my $pageStartRow = ($pageNumber*$rowsPerPage)-$rowsPerPage;
+    my $pageEndRow = $pageNumber*$rowsPerPage;
+    for (my $i=$pageStartRow; $i<$pageEndRow; $i++) {
+	   $pageRows[$i-$pageStartRow] = $allRows->[$i] if ($i <= $#{$self->{_rowRef}});
         }
 	return \@pageRows;
 }
@@ -536,6 +616,7 @@ sub setDataByArrayRef {
 	my $rowRef = shift;
 	$self->{_rowRef} = $rowRef;
 	$self->{_totalRows} = $#{$rowRef} + 1;
+    $self->{_setByQuery} = 0;
 }
 
 
@@ -574,40 +655,49 @@ A value to match the dynamicPageNumberKey.
 =cut
 
 sub setDataByQuery {
-	my ($sth, $rowCount, @row);
-	my ($self, $sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
+	my ($sth, @row);
+    my $self = shift;
+	my ($sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
+    
+    #Set paginator info
+    my $pageNumber = $self->getPageNumber;
+    my $rowsPerPage = $self->{_rpp};
+    
+    #Handle dynamicPageNumber requests or custom limts the old way as it winds up being most efficient
+    if ((defined $dynamicPageNumberKey && $pageNumber == 1) || $sql =~ m/limit/i) {
+        return $self->_setDataByQuery(@_);
+    }
+    
 	$dbh ||= $self->session->dbSlave;
+
+    #Calculate where to start
+    my $start = ( ($pageNumber - 1) * $rowsPerPage );
+    
+    #Set the query limits
+    $sql .= " limit $start,$rowsPerPage";  
+    $sql =~ s/select/select SQL_CALC_FOUND_ROWS /;
+    
+    #$self->session->errorHandler->warn($sql);    
+    #Get only the data necessary from the database
+	my $sth;
 	if ($unconditional) {
 		$sth = $dbh->unconditionalRead($sql,$placeholders);
 		return $sth->errorMessage if ($sth->errorCode > 0);
 	} else {
 		$sth = $dbh->read($sql,$placeholders);
 	}
-	my $defaultPageNumber = $self->getPageNumber;
-	$self->{_totalRows} = $sth->rows;
+    
+    #Get total rows from last query
+	($self->{_totalRows}) = $dbh->quickArray("select found_rows()");
 	$self->{_columnNames} = [ $sth->getColumnNames ];
-	my $pageCount = 1;
+	
 	while (my $data = $sth->hashRef) {
-		$rowCount++;
-		if ($rowCount/$self->{_rpp} > $pageCount) {	
-			$pageCount++;
-		}
-		if (defined $dynamicPageNumberKey && $defaultPageNumber == 1) {
-			if ($data->{$dynamicPageNumberKey} eq $dynamicPageNumberValue) {
-				$self->{_pn} = $pageCount;
-				$dynamicPageNumberKey = undef;
-			}
-			push(@row,$data);
-		} else {
-			if ($pageCount == $self->getPageNumber) {
 				push(@row,$data);	
-			} else {
-				push(@row,{});
-			}
 		}
-	}
-	$sth->finish;
+    
 	$self->{_rowRef} = \@row;
+    $self->{_setByQuery} = 1;
+    $self->{_setByArrayRef} = 0;
 	return "";
 }
 
