@@ -11,6 +11,8 @@
  - add: Calendar events now allow setting view permissions
  - add: WebGUI::Paginator now capable of more efficient SQL paginations using
    LIMIT clauses.
+ - add: SyndicatedContent wobject now has more ways of representing the long
+   description from the RSS feed.
 
 
 

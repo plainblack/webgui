@@ -100,6 +100,42 @@ sub _getValidatedUrls {
 
 #-------------------------------------------------------------------
 
+=head2 appendChoppedTemplateDescriptionVars ( var ) 
+
+Appends shorter versions of the feeds description field to template vars returned.
+
+=cut
+
+sub appendChoppedDescriptionTemplateVars {
+	my $item = shift;
+
+        $item->{"descriptionFull"} = $item->{description};
+        $item->{"descriptionFirst100words"} = $item->{"descriptionFull"};
+        $item->{"descriptionFirst100words"} =~ s/(((\S+)\s+){100}).*/$1/s;
+        $item->{"descriptionFirst75words"} = $item->{"descriptionFirst100words"};
+        $item->{"descriptionFirst75words"} =~ s/(((\S+)\s+){75}).*/$1/s;
+        $item->{"descriptionFirst50words"} = $item->{"descriptionFirst75words"};
+        $item->{"descriptionFirst50words"} =~ s/(((\S+)\s+){50}).*/$1/s;
+        $item->{"descriptionFirst25words"} = $item->{"descriptionFirst50words"};
+        $item->{"descriptionFirst25words"} =~ s/(((\S+)\s+){25}).*/$1/s;
+        $item->{"descriptionFirst10words"} = $item->{"descriptionFirst25words"};
+        $item->{"descriptionFirst10words"} =~ s/(((\S+)\s+){10}).*/$1/s;
+        $item->{"descriptionFirst2paragraphs"} = $item->{"descriptionFull"};
+        $item->{"descriptionFirst2paragraphs"} =~ s/^((.*?\n){2}).*/$1/s;
+        $item->{"descriptionFirstParagraph"} = $item->{"descriptionFirst2paragraphs"};
+        $item->{"descriptionFirstParagraph"} =~ s/^(.*?\n).*/$1/s;
+        $item->{"descriptionFirst4sentences"} = $item->{"descriptionFull"};
+        $item->{"descriptionFirst4sentences"} =~ s/^((.*?\.){4}).*/$1/s;
+        $item->{"descriptionFirst3sentences"} = $item->{"descriptionFirst4sentences"};
+        $item->{"descriptionFirst3sentences"} =~ s/^((.*?\.){3}).*/$1/s;
+        $item->{"descriptionFirst2sentences"} = $item->{"descriptionFirst3sentences"};
+        $item->{"descriptionFirst2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
+        $item->{"descriptionFirstSentence"} = $item->{"descriptionFirst2sentences"};
+        $item->{"descriptionFirstSentence"} =~ s/^(.*?\.).*/$1/s;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -290,6 +326,7 @@ sub _normalize_items {
                 # IE doesn't recognize &apos;
                 $item->{title} =~ s/&apos;/\'/g;
                 $item->{description} =~ s/&apos;/\'/g;
+		appendChoppedDescriptionTemplateVars($item);
         }
 }
 
@@ -364,7 +401,6 @@ sub _get_rss_data {
                  $rss->{items} = [ $rss->{items} ] unless (ref $rss->{items} eq 'ARRAY');
 
                 _normalize_items($rss->{items});
-
 		#Assign dates "globally" rather than when seen in a viewed feed.
 		#This is important because we can "filter" now and want to ensure we keep order
 		#correctly as new items appear.
@@ -633,6 +669,7 @@ sub view {
 	    $var{'channel.link'} = $rss_feeds->[0]->{channel}->{link};
 	    $var{'channel.description'} = $rss_feeds->[0]->{channel}->{description};
 	}
+
 	$self->_createRSSURLs(\%var);
         $var{item_loop} = $item_loop;
 

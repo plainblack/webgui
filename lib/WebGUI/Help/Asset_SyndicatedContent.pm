@@ -115,11 +115,44 @@ our $HELP = {
 		                               'name' => 'title'
 		                             },
 		                             {
+		                               'name' => 'link'
+		                             },
+		                             {
 		                               'name' => 'description'
 		                             },
 		                             {
-		                               'name' => 'link'
-		                             }
+		                               'name' => 'descriptionFirst100words'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst75words'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst50words'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst25words'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst10words'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst2paragraphs'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirstParagraph'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst4sentences'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst3sentences'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirst2sentences'
+		                             },
+		                             {
+		                               'name' => 'descriptionFirstSentence'
+		                             },
 		                           ]
 		          }
 		],

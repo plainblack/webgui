@@ -276,6 +276,51 @@ be useful, others may not.|,
 		lastUpdated => 1164841201
 	},
 
+    'descriptionFirst100words' => {
+        message => q{The first 100 words of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst75words' => {
+        message => q{The first 75 words of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst50words' => {
+        message => q{The first 50 words of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst25words' => {
+        message => q{The first 25 words of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst10words' => {
+        message => q{The first 10 words of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst2paragraphs' => {
+        message => q{The first 2 paragraphs of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirstParagraph' => {
+        message => q{The first paragraph of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst4sentences' => {
+        message => q{The first 4 sentences of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst3sentences' => {
+        message => q{The first 3 sentences of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirst2sentences' => {
+        message => q{The first 2 sentences of the description.},
+        lastUpdated => 0,
+    },
+    'descriptionFirstSentence' => {
+        message => q{The first sentence of the description.},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
