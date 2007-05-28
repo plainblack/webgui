@@ -23,6 +23,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
+addAttachmentsToEvents($session);
 
 finish($session); # this line required
 
@@ -153,6 +154,17 @@ sub buildNewUserProfileTable {
 }
 
 
+
+#----------------------------------------------------------------------------
+
+sub addAttachmentsToEvents {
+    my $session     = shift;
+    print "\tAdding an storageId column to the Event table..." unless $quiet; 
+    $session->db->write(
+        "ALTER TABLE Event ADD COLUMN storageId VARCHAR(22) not null"
+    );
+    print "OK!\n" unless $quiet;
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

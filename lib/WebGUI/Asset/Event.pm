@@ -21,6 +21,7 @@ use Storable qw(nfreeze thaw);
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Form;
+use WebGUI::Storage::Image;
 
 use base 'WebGUI::Asset';
 
@@ -89,7 +90,7 @@ sub definition {
         },
         
         'relatedLinks' => {
-            fieldType       => "Textarea",
+            fieldType       => "HTMLarea",
             defaultValue    => undef,
         },
         'location' => {
@@ -99,6 +100,11 @@ sub definition {
         'feedId' => {
             fieldType       => "Text",
             defaultValue    => undef,
+        },
+        'storageId' => {
+            fieldType       => "Image",
+            defaultValue    => undef,
+            maxAttachments  => 1,
         },
         'feedUid' => {
             fieldType       => "Text",
@@ -165,16 +171,7 @@ sub canEdit {
 }
 
 
-sub update {
-    my $self = shift;
-    my $properties = shift;
-    # Make sure menuTitle has some text, and that it is <= 15 characters.
-    if (exists $properties->{menuTitle}) {
-        $properties->{menuTitle} ||= $properties->{title} || $self->getTitle;
-        $properties->{menuTitle} = substr($properties->{menuTitle}, 0, 15);
-    }
-    return $self->SUPER::update($properties);
-}
+
 
 
 
@@ -1143,6 +1140,20 @@ sub getRelatedLinks {
 
 
 
+#-------------------------------------------------------------------
+sub getStorageLocation {
+    my $self = shift;
+    unless (exists $self->{_storageLocation}) {
+        if ($self->get("storageId") eq "") {
+            $self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+            $self->update({storageId=>$self->{_storageLocation}->getId});
+        } else {
+            $self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+        }
+    }
+    return $self->{_storageLocation};
+}
+
 ####################################################################
 
 =head2 getTemplateVars
@@ -1163,7 +1174,7 @@ sub getTemplateVars {
     $var{'canEdit'} = $self->canEdit;
     $var{"isPublic"} = 1
         if $self->get("groupIdView") eq "7";
-    $var{"groupToView"} = $self->get("groupIdView");    # Todo: Remove this? 
+    $var{"groupToView"} = $self->get("groupIdView");
     
     # Start date/time
     my $dtStart    = $self->getDateTimeStart;
@@ -1241,10 +1252,60 @@ sub getTemplateVars {
     push @{$var{"relatedLinks"}}, { "linkUrl" => $_ }
         for ($self->getRelatedLinks);
     
+    # Attachments
+
+    my $gotImage;
+    my $gotAttachment;
+    @{$var{'attachment_loop'}} = ();
+    unless ($self->get("storageId") eq "") {
+        my $storage = $self->getStorageLocation;
+        foreach my $filename (@{$storage->getFiles}) {
+            if (!$gotImage && $storage->isImage($filename)) {
+                $var{"image.url"} = $storage->getUrl($filename);
+                $var{"image.thumbnail"} = $storage->getThumbnailUrl($filename);
+                $gotImage = 1;
+            }
+            if (!$gotAttachment && !$storage->isImage($filename)) {
+                $var{"attachment.url"} = $storage->getUrl($filename);
+                $var{"attachment.icon"} = $storage->getFileIconUrl($filename);
+                $var{"attachment.name"} = $filename;
+                $gotAttachment = 1;
+                }   
+            push(@{$var{"attachment_loop"}}, {
+                url=>$storage->getUrl($filename),
+                icon=>$storage->getFileIconUrl($filename),
+                filename=>$filename,
+                thumbnail=>$storage->getThumbnailUrl($filename),
+                isImage=>$storage->isImage($filename)
+                });
+        }
+    }
     
     return %var;
 }
 
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Indexing the content of attachments and user defined fields. See WebGUI::Asset::indexContent() for additonal details.
+
+=cut
+
+sub indexContent {
+    my $self = shift;
+    my $indexer = $self->SUPER::indexContent;
+    $indexer->addKeywords($self->get("userDefined1"));
+    $indexer->addKeywords($self->get("userDefined2"));
+    $indexer->addKeywords($self->get("userDefined3"));
+    $indexer->addKeywords($self->get("userDefined4"));
+    $indexer->addKeywords($self->get("userDefined5"));
+    $indexer->addKeywords($self->get("location"));
+    my $storage = $self->getStorageLocation;
+    foreach my $file (@{$storage->getFiles}) {
+               $indexer->addFile($storage->getPath($file));
+    }
+}
 
 
 
@@ -1356,12 +1417,6 @@ sub processPropertiesFromFormPost {
     # Events are always hidden from navigation
     $self->update({ isHidden => 1 });
     
-    # If there is no security information, grab it from the parent
-    if (!$self->get("groupIdView")) {
-        $self->update({
-            groupIdView     => $self->getParent->get("groupIdView"),
-        });
-    }
     if (!$self->get("groupIdEdit")) {
         my $groupIdEdit =  $self->getParent->get("groupIdEventEdit")
                         || $self->getParent->get("groupIdEdit")
@@ -1477,13 +1532,31 @@ sub processPropertiesFromFormPost {
     }
 
     # Finally, commit this event
+    delete $self->{_storageLocation};
     $self->requestAutoCommit;
 
     return;
 }
 
 
+sub purge {
+        my $self = shift;
+        my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
+        while (my ($storageId) = $sth->array) {
+        my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+                $storage->delete if defined $storage;
+        }
+        $sth->finish;
+        return $self->SUPER::purge;
+}
 
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+        my $self = shift;
+        $self->getStorageLocation->delete;
+        return $self->SUPER::purgeRevision;
+}
 
 ####################################################################
 
@@ -1622,6 +1695,13 @@ sub view  {
 
 
 
+#-------------------------------------------------------------------
+sub www_deleteFile {
+    my $self = shift;
+    $self->getStorageLocation->deleteFile($self->session->form->process("filename")) if $self->canEdit;
+    return $self->www_edit;
+}
+
 
 
 ####################################################################
@@ -1694,6 +1774,14 @@ sub www_edit {
             size        => 22,
         });
     
+    # Group to View
+    $var->{"formGroupIdView"} 
+        = WebGUI::Form::Group($session, {
+            name         => "groupIdView",
+            value        => $form->process("groupIdView") || $self->get("groupIdView"),
+            defaultValue => $self->getParent->get("groupIdView"),
+        });
+
     # location
     $var->{"formLocation"}
         = WebGUI::Form::text($session, {
@@ -1708,6 +1796,15 @@ sub www_edit {
             value   => $form->process("description") || $self->get("description"),
         });
     
+    # File attachments
+    $var->{"formAttachments"}
+        = WebGUI::Form::Image($session, {
+            name    => "storageId",
+            maxAttachments => 5,
+            value   => $form->process("storageId") || $self->get("storageId"),
+            deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
+        });
+
     ### Start date
     my $default_start;
     
@@ -1801,7 +1898,7 @@ sub www_edit {
     
     # related links
     $var->{"formRelatedLinks"} 
-        = WebGUI::Form::textarea($session, {
+        = WebGUI::Form::HTMLArea($session, {
             name    => "relatedLinks",
             value   => $form->process("relatedLinks") || $self->get("relatedLinks"),
         });
@@ -2140,3 +2237,4 @@ equal and then choose by assetId.
 =cut
 
 1;
+

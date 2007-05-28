@@ -575,7 +575,6 @@ sub getEvent {
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
         unless $event->get("parentId") eq $self->getId;
 
-    
     return $event;
 }
 
@@ -726,17 +725,19 @@ Gets the first event in this calendar. Returns the Event object.
 
 sub getFirstEvent {
     my $self = shift;
+    my $lineage     = $self->get("lineage");
 
-    my $eventAsset = $self->getLineage(['children'], {
-        includeOnlyClasses  => ['WebGUI::Asset::Event'],
-        joinClass           => 'WebGUI::Asset::Event',
-        whereClause         => 'Event.startDate >= date( now() )',
-        orderByClause       => 'Event.startdate asc, Event.startTime asc, revisionDate desc',
-        limit               => 1,
-        returnObjects       => 1,
-    })->[0];
+    my ($assetId)   = $self->session->db->quickArray(<<ENDSQL);
+        SELECT asset.assetId 
+        FROM asset
+        JOIN Event ON asset.assetId = Event.assetId
+        WHERE lineage LIKE "$lineage\%"
+        AND className = "WebGUI::Asset::Event"
+        ORDER BY startDate ASC, startTime ASC, revisionDate DESC
+        LIMIT 1
+ENDSQL
 
-    return $eventAsset;
+    return $self->getEvent($assetId);
 }
 
 
@@ -973,7 +974,7 @@ sub view {
     $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
     $var->{"urlIcal"}	    = $self->getUrl(
-                                    sprintf "func=ical;type=%s;start=%s",
+                                    sprintf "func=ical;type=%s;start=%d",
                                         $params->{type},
                                         $params->{start},
                               );
@@ -1032,7 +1033,8 @@ sub viewDay {
     # The events
     my $pos        = -1;
     my $last_hour  = -1;        # Keep track of hours for dividers
-    for my $event (@events) {
+    EVENT: for my $event (@events) {
+        next EVENT unless $event->canView();
         my $dt      = $event->getDateTimeStart;
         my $hour    = $dt->clone->truncate(to=>"hour")->hour;
         
@@ -1119,7 +1121,7 @@ sub viewMonth {
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
     $dt->truncate( to => "month");
     my $start = $dt->toMysql;
-    my $dtEnd = $dt->clone->add(months => 1);
+    my $dtEnd = $dt->clone->add(months => 1)->add(seconds => -1);
     my $end   = $dtEnd->toMysql;
     
     my @events      
@@ -1158,7 +1160,8 @@ sub viewMonth {
         until @{$var->{weeks}->[-1]->{days}} >= 7;
     
     ## The events
-    for my $event (@events) {
+    EVENT: for my $event (@events) {
+        next EVENT unless $event->canView();
         # Get the WebGUI::DateTime objects
         my $dt_event_start  = $event->getDateTimeStart;
         my $dt_event_end    = $event->getDateTimeEnd;
@@ -1305,7 +1308,8 @@ sub viewWeek {
     
     # The events
 
-    for my $event (@events) {
+    EVENT: for my $event (@events) {
+        next EVENT unless $event->canView();
         # Get the week this event is in, and add it to that week in
         # the template variables
         my $dt_event_start = $event->getDateTimeStart;
@@ -1425,7 +1429,6 @@ sub www_edit {
     my $i18n    = WebGUI::International->new($session, 'Asset_Calendar');
     
     return $session->privilege->insufficient() unless $self->canEdit;
-    return $session->privilege->locked() unless $self->canEditIfLocked;
     
     $self->getAdminConsole->setHelp("Calendar add/edit", "Calendar");
     
@@ -1544,7 +1547,8 @@ sub www_ical {
                 . qq{VERSION:2.0\r\n};
     
     # VEVENT:
-    for my $event (@events) {
+    EVENT: for my $event (@events) {
+        next EVENT unless $event->canView();
         $ical   .= qq{BEGIN:VEVENT\r\n};
         
         ### UID
@@ -1840,3 +1844,4 @@ toUserTimeZone methods of WebGUI::DateTime for to make less confusion.
 =cut
 
 1;
+

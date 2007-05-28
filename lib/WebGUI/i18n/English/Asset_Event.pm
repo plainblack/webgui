@@ -49,6 +49,16 @@ our $I18N = {
 		lastUpdated	=> 1171067211,
 	},
 
+    'formGroupToView'   => {
+        message     => q|HTML form for picking which group can view this Event.|,
+        lastUpdated => 1177383777,
+    },
+
+    'formAttachments'   => {
+        message     => q|HTML form for adding or removing files from this Event.|,
+        lastUpdated => 1177383776,
+    },
+
 	'formStartDate'	=> {
 		message		=> q|HTML form for entering or editing the Event's start date.|,
 		lastUpdated	=> 1171067211,
@@ -448,15 +458,71 @@ be useful, others may not.|,
 		lastUpdated => 1149829706,
 	},
 
+    'image.url' => {
+        message => q|The URL to the first image attached to the Post.|,
+        lastUpdated => 1177384150,
+    },
+
+    'image.thumbnail' => {
+        message => q|A thumbnail for the image attached to the Post.|,
+        lastUpdated => 1177384152,
+    },
+
+    'attachment.url' => {
+        message => q|The URL to download the first attachment attached to the Post.|,
+        lastUpdated => 1177384153,
+    },
+
+    'attachment.icon' => {
+        message => q|An icon showing the file type of this attachment.|,
+        lastUpdated => 1177384155,
+    },
+
+    'attachment.name' => {
+        message => q|The name of the first attachment found on the Post.|,
+        lastUpdated => 1177384156,
+    },
+
+    'attachment_loop' => {
+        message => q|A loop containing all file and image attachments to this Post.|,
+        lastUpdated => 1177384159,
+    },
+
+    'attachment_url' => {
+        message => q|The URL to download this attachment.|,
+        lastUpdated => 1177384161,
+    },
+
+    'icon' => {
+        message => q|The icon representing the file type of this attachment.|,
+        lastUpdated => 1177384169,
+    },
+
+    'filename' => {
+        message => q|The name of this attachment.|,
+        lastUpdated => 1177384171,
+    },
+
+    'thumbnail' => {
+        message => q|A thumbnail of this attachment, if applicable.|,
+        lastUpdated => 1177384174,
+    },
+
+    'isImage' => {
+        message => q|A conditional indicating whether this attachment is an image.|,
+        lastUpdated => 1177384177,
+    },
+
+    'canEdit' => {
+        message     => q{This variable is true if the current user can edit this event.},
+        lastUpdated     => 0,
+    },  
+
 	'assetName' => {
 		message 	=> q{Event},
 		lastUpdated 	=> 1131394072,
 	},
-
-	'canEdit' => {
-		message 	=> q{This variable is true if the current user can edit this event.},
-		lastUpdated 	=> 0,
-	},
 };
 
 1;
+

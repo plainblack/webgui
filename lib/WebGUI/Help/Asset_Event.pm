@@ -33,6 +33,12 @@ our $HELP = {
 		            'name'     => 'formDescription',
 		          },
 		          {
+                    'name'     => 'formGroupToView',
+                  },
+                  {
+                    'name'     => 'formAttachements',
+                  },
+                  {
 		            'name'     => 'formStartDate',
 		          },
 		          {
@@ -89,9 +95,9 @@ our $HELP = {
 		],
 		variables => [
 		          {
-		            'name'     => 'canEdit',
-		          },
-		          {
+                    'name'     => 'canEdit',
+                  },
+                  {
 		            'name'     => 'isPublic',
 		          },
 		          {
@@ -227,12 +233,40 @@ our $HELP = {
 		            'name'     => 'urlSearch',
 		          },
 		          {
-		            'name'     => 'relatedLinks',
-                    variables  => [
+                    'name' => 'image.url'
+                  },
                       {
-                        'name'     => 'linkUrl',
+                    'name' => 'image.thumbnail'
                       },
-                    ],
+                  {
+                    'name' => 'attachment.url'
+                  },
+                  {
+                    'name' => 'attachment.icon'
+                  },
+                  {
+                    'name' => 'attachment.name'
+                  },
+                  {
+                    'name' => 'attachment_loop',
+                    'variables' => [
+                                     {
+                                       'name'        => 'url'
+                                       'description' => 'attachment_url'
+                                     },
+                                     {
+                                       'name' => 'icon'
+                                     },
+                                     {
+                                       'name' => 'filename'
+                                     },
+                                     {
+                                       'name' => 'thumbnail'
+                                     },
+                                     {
+                                       'name' => 'isImage'
+                                     }
+                                   ]
 		          },
         ],
 		related => [
@@ -320,3 +354,4 @@ our $HELP = {
 };
 
 1;
+
