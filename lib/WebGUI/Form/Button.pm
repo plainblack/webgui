@@ -64,6 +64,9 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>$i18n->get(62)
 			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(255)",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

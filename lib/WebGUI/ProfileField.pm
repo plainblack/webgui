@@ -94,20 +94,45 @@ The unique id of the category to assign this field to. Defaults to "1" (misc).
 =cut
 
 sub create {
-        my $class = shift;
-	my $session = shift;
-	my $fieldName = shift;
-        my $properties = shift;
-	my $categoryId = shift || "1";
-	my $fieldNameExists = $session->db->quickScalar("select count(*) from userProfileField where fieldName=?", [$fieldName]);
-	return undef if $fieldNameExists;
-	return undef if $class->isReservedFieldName($fieldName);
+    my $class       = shift;
+    my $session     = shift;
+    my $fieldName   = shift;
+    my $properties  = shift;
+    my $categoryId  = shift || "1";
+    
+    my $db          = $session->db;
 
-        my $id = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
-        my $self = $class->new($session,$id);
-	$self->setCategory($categoryId);
-        $self->set($properties);
-        return $self;
+    ### Check data
+    # Check if the field already exists
+    my $fieldNameExists 
+        = $session->db->quickScalar(
+            "select count(*) from userProfileField where fieldName=?", 
+            [$fieldName]
+        );
+    return undef if $fieldNameExists;
+    return undef if $class->isReservedFieldName($fieldName);
+
+    ### Data okay, create the field
+    # Add the record
+    my $id 
+        = $session->db->setRow("userProfileField","fieldName",{fieldName=>"new"},$fieldName);
+    my $self = $class->new($session,$id);
+    
+    # Get the field's data type
+    my $formClass   = 'WebGUI::Form::' . ucfirst $properties->{fieldType};
+    eval "use $formClass;";
+    my $dbDataType = $formClass->new($session, $self->_formProperties($properties))->get("dbDataType");
+
+    # Add the column to the userProfileData table
+    $db->write(
+        "ALTER TABLE userProfileData ADD " . $db->dbh->quote_identifier($fieldName)
+        . $dbDataType
+    );
+    
+    $self->setCategory($categoryId);
+    $self->set($properties);
+    
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -119,19 +144,31 @@ Deletes this field and all user data attached to it.
 =cut
 
 sub delete {
-	my $self = shift;
-	$self->session->db->write("delete from userProfileData where fieldName=?", [$self->getId]);
-	$self->session->db->deleteRow("userProfileField","fieldName",$self->getId);
+    my $self    = shift;
+    my $db      = $self->session->db;
+    
+    # Remove the column from the userProfileData table
+    $db->write("ALTER TABLE userProfileData DROP " . $self->getId);
+
+    # Remove the record
+    $db->deleteRow("userProfileField","fieldName",$self->getId);
 }
 
+
 #-------------------------------------------------------------------
+# Get a hashref of properties to give to a WebGUI::Form::Control
 sub _formProperties {
-	my $self = shift;
-	my $properties = shift || {};
-	$properties->{label} = $self->getLabel unless $properties->{label};
-	$properties->{fieldType} = $self->get("fieldType");
-	$properties->{name} = $self->getId;
-	my $values = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
+	my $self        = shift;
+	my $properties  = shift || {};
+    
+    # Make a copy of the properties so we don't clobber them
+    my %properties     = %{$properties};
+
+	$properties{ label          } = $self->getLabel unless $properties->{label};
+	$properties{ fieldType      } = $self->get("fieldType");
+	$properties{ name           } = $self->getId;
+	my $values 
+        = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
 	unless (ref $values eq 'HASH') {
 		if ($self->get('possibleValues') =~ /\S/) {
 			$self->session->errorHandler->warn("Could not get a hash out of possible values for profile field ".$self->getId);
@@ -140,13 +177,13 @@ sub _formProperties {
 	}
 	my $orderedValues = {};
 	tie %{$orderedValues}, 'Tie::IxHash';
-	foreach my $ov (sort keys %{$values}) {
-		$orderedValues->{$ov} = $values->{$ov};
-	}
-	$properties->{options} = $orderedValues;
-	$properties->{forceImageOnly} = $self->get("forceImageOnly");
-    $properties->{dataDefault} = $self->get("dataDefault");
-	return $properties;
+    for my $ov (sort keys %{$values}) {
+        $orderedValues->{$ov} = $values->{$ov};
+    }
+    $properties{ options            } = $orderedValues;
+    $properties{ forceImageOnly     } = $self->get("forceImageOnly");
+    $properties{ dataDefault        } = $self->get("dataDefault");
+    return \%properties;
 }
 
 =head2 formField ( [ formProperties, withWrapper, userObject ] )
@@ -334,6 +371,19 @@ sub getFields {
 
 #-------------------------------------------------------------------
 
+=head2 getFormControlClass
+
+Returns the full class name of the form control for this profile field.
+
+=cut
+
+sub getFormControlClass {
+    my $self    = shift;
+    return "WebGUI::Form::" . ucfirst $self->get("fieldType");
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRequiredFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
@@ -484,15 +534,15 @@ The unique name of this field.
 =cut
 
 sub new {
-        my $class = shift;
-	my $session = shift;
-        my $id = shift;
-        return undef unless ($id);
-	return undef if $class->isReservedFieldName($id);
-        my $properties = $session->db->getRow("userProfileField","fieldName",$id);
-	# Reject properties that don't exist.
-	return undef unless scalar keys %$properties;
-        bless {_session=>$session, _properties=>$properties}, $class;
+    my $class = shift;
+    my $session = shift;
+    my $id = shift;
+    return undef unless ($id);
+    return undef if $class->isReservedFieldName($id);
+    my $properties = $session->db->getRow("userProfileField","fieldName",$id);
+    # Reject properties that don't exist.
+    return undef unless scalar keys %$properties;
+    bless {_session=>$session, _properties=>$properties}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -508,14 +558,40 @@ The new name this field should take.
 =cut
 
 sub rename {
-	my $self = shift;
-	my $newName = shift;
-	my ($fieldNameExists) = $self->session->db->quickArray("select count(*) from userProfileField where fieldName=".$self->session->db->quote($newName));
+	my $self        = shift;
+	my $newName     = shift;
+
+    my $session     = $self->session;
+    my $db          = $session->db;
+
+    ### Check data
+    # Make sure the field doesn't exist
+	my $fieldNameExists
+        = $self->session->db->quickScalar(
+            "SELECT COUNT(*) FROM userProfileField WHERE fieldName=?",
+            [$newName]
+        );
 	return 0 if ($fieldNameExists);
-	$self->session->db->write("update userProfileData set fieldName=".$self->session->db->quote($newName)." where fieldName=".$self->session->db->quote($self->getId));
-	$self->session->db->write("update userProfileField set fieldName=".$self->session->db->quote($newName)." where fieldName=".$self->session->db->quote($self->getId));
+   
+    # Rename the userProfileData column
+    my $fieldClass  = $self->getFormControlClass;
+    eval "use $fieldClass;";
+    my $dbDataType  = $fieldClass->new($session, $self->_formProperties)->get("dbDataType");
+
+    $self->session->db->write(
+        "ALTER TABLE userProfileData "
+        . "CHANGE " . $db->dbh->quote_identifier($self->getId) 
+        . $db->dbh->quote_identifier($newName) . " " . $dbDataType
+    );
+
+    # Update the record
+	$self->session->db->write(
+        "update userProfileField set fieldName=? where fieldName=?",
+        [$newName, $self->getId]
+    );
 	$self->{_properties}{fieldName} = $newName;
-	return 1;
+	
+    return 1;
 }
 
 
@@ -577,9 +653,14 @@ A scalar containing an array reference or scalar declaration of defaultly select
 =cut
 
 sub set {
-	my $self = shift;
-	my $properties = shift;
-	$properties->{visible} = 0 unless ($properties->{visible} == 1);
+	my $self        = shift;
+	my $properties  = shift;
+
+    my $session     = $self->session;
+	my $db          = $session->db;
+
+    # Set the defaults
+    $properties->{visible} = 0 unless ($properties->{visible} == 1);
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
 	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{required} = 0 unless ($properties->{required} == 1);
@@ -594,7 +675,26 @@ sub set {
                 }
         }
 	$properties->{fieldName} = $self->getId;
-	$self->session->db->setRow("userProfileField","fieldName",$properties);
+    
+    # If the fieldType has changed, modify the userProfileData column
+    if ($properties->{fieldType} ne $self->get("fieldType")) {
+        # Create a copy of the new properties so we don't mess them up
+        my $fieldClass  = "WebGUI::Form::".ucfirst($properties->{fieldType});
+        eval "use $fieldClass;";
+        my $dbDataType 
+            = $fieldClass->new($session, $self->_formProperties($properties))->get("dbDataType");
+        
+        my $sql 
+            = "ALTER TABLE userProfileData MODIFY COLUMN " 
+            . $db->dbh->quote_identifier($self->getId) . q{ }
+            . $dbDataType
+            ;
+        
+        $db->write($sql);
+    }
+
+    # Update the record
+	$db->setRow("userProfileField","fieldName",$properties);
 	foreach my $key (keys %{$properties}) {
 		$self->{_properties}{$key} = $properties->{$key};
 	}

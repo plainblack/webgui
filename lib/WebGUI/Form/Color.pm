@@ -53,6 +53,9 @@ sub definition {
 		formName=>{
 			defaultValue=>$i18n->get("color")
 			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(7)",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

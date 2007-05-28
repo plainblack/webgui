@@ -138,10 +138,9 @@ sub doUserSearch {
 	}
 	$keyword = $session->db->quote($keyword);
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
-                email.fieldData as email from users 
-                left join userProfileData email on users.userId=email.userId and email.fieldName='email'
-                left join userProfileData useralias on users.userId=useralias.userId and useralias.fieldName='alias'
-                where $selectedStatus  and (users.username like ".$keyword." or useralias.fieldData like ".$keyword." or email.fieldData like ".$keyword.") 
+                userProfileData.email from users 
+                left join userProfileData on users.userId=userProfileData.userId 
+                where $selectedStatus  and (users.username like ".$keyword." or alias like ".$keyword." or email like ".$keyword.") 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));

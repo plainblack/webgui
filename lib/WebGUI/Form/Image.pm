@@ -81,8 +81,11 @@ sub definition {
 		forceImageOnly=>{
 			defaultValue=>0
 			},
-		});
-        return $class->SUPER::definition($session, $definition);
+        dbDataType  => {
+            defaultValue    => "VARCHAR(22) BINARY",
+        },
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 

@@ -84,6 +84,9 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1,
 			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(255)",
+        }
 		});
         return $class->SUPER::definition($session, $definition);
 }

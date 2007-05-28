@@ -58,12 +58,13 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $session = shift;
-	my $userId = shift || $session->id->generate();
-	$session->db->write("insert into users (userId,dateCreated) values (?,?)",[$userId, time()]);
-	WebGUI::Group->new($session,2)->addUsers([$userId]);
-	WebGUI::Group->new($session,7)->addUsers([$userId]);
-        return $userId;
+    my $session = shift;
+    my $userId = shift || $session->id->generate();
+    $session->db->write("insert into users (userId,dateCreated) values (?,?)",[$userId, time()]);
+    $session->db->write("INSERT INTO userProfileData (userId) VALUES (?)",[$userId]);
+    WebGUI::Group->new($session,2)->addUsers([$userId]);
+    WebGUI::Group->new($session,7)->addUsers([$userId]);
+    return $userId;
 }
 
 #-------------------------------------------------------------------
@@ -375,41 +376,45 @@ A unique ID to use instead of the ID that WebGUI will generate for you. It must 
 =cut
 
 sub new {
-        my $class = shift;
-        my $session = shift;
-        my $userId = shift || 1;
-	my $overrideId = shift;
-        $userId = _create($session, $overrideId) if ($userId eq "new");
-	my $cache = WebGUI::Cache->new($session,["user",$userId]);
-	my $userData = $cache->get;
-	unless ($userData->{_userId} && $userData->{_user}{username}) {
-		my %user;
-		tie %user, 'Tie::CPHash';
-		%user = $session->db->quickHash("select * from users where userId=?",[$userId]);
-		my %profile = $session->db->buildHash("select userProfileField.fieldName, userProfileData.fieldData 
-			from userProfileField, userProfileData where userProfileField.fieldName=userProfileData.fieldName and 
-			userProfileData.userId=?",[$user{userId}]);
-		my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
-		foreach my $key (keys %default) {
-			my $value;
-			if ($profile{$key} eq "" && $default{$key}) {
-				$value = eval($default{$key});
-				if (ref $value eq "ARRAY") {
-					$profile{$key} = $$value[0];
-				} else {
-					$profile{$key} = $value;
-				}
-			}
-		}
-		$profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
-		$userData = {
-			_userId => $userId,
-			_user => \%user,
-			_profile => \%profile
-		};
-		$cache->set($userData, 60*60*24);
-	}
-	$userData->{_session} = $session;
+    my $class       = shift;
+    my $session     = shift;
+    my $userId      = shift || 1;
+    my $overrideId  = shift;
+    $userId         = _create($session, $overrideId) if ($userId eq "new");
+    my $cache       = WebGUI::Cache->new($session,["user",$userId]);
+    my $userData    = $cache->get;
+    unless ($userData->{_userId} && $userData->{_user}{username}) {
+        my %user;
+        tie %user, 'Tie::CPHash';
+        %user = $session->db->quickHash("select * from users where userId=?",[$userId]);
+        my %profile 
+            = $session->db->quickHash(
+                "select * from userProfileData where userId=?",
+                [$user{userId}]
+            );
+        delete $profile{userId};
+
+        my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
+        foreach my $key (keys %default) {
+            my $value;
+            if ($profile{$key} eq "" && $default{$key}) {
+                $value = eval($default{$key});
+                if (ref $value eq "ARRAY") {
+                    $profile{$key} = $$value[0];
+                } else {
+                    $profile{$key} = $value;
+                }
+            }
+        }
+        $profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
+        $userData = {
+            _userId => $userId,
+            _user => \%user,
+            _profile => \%profile
+        };
+        $cache->set($userData, 60*60*24);
+    }
+    $userData->{_session} = $session;
 	bless $userData, $class;
 }
 
@@ -433,7 +438,7 @@ sub newByEmail {
 	my $class = shift;
 	my $session = shift;
 	my $email = shift;
-	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where fieldName='email' and fieldData=?",[$email]);
+	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
 	my $user = $class->new($session, $id);
 	return undef if ($user->userId eq "1"); # visitor is never valid for this method
 	return undef unless $user->username;
@@ -458,22 +463,24 @@ The value to set the profile field name to.
 =cut
 
 sub profileField {
-        my ($self, $fieldName, $value);
-	$self = shift;
-        $fieldName = shift;
-        $value = shift;
-	if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
-		$self->session->errorHandler->warn("No such profile field: $fieldName");
-		return undef;
-	}
-	if (defined $value) {
-		$self->uncache;
-		$self->{_profile}{$fieldName} = $value;
-		$self->session->db->write("delete from userProfileData where userId=? and fieldName=?",[$self->{_userId}, $fieldName]);
-		$self->session->db->write("insert into userProfileData values (?,?,?)", [$self->{_userId}, $fieldName,$value]);
-		my $time = $self->session->datetime->time();
-		$self->{_user}{"lastUpdated"} = $time;
-        	$self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
+    my $self        = shift;
+    my $fieldName   = shift;
+    my $value       = shift;
+    my $db          = $self->session->db;
+    if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
+        $self->session->errorHandler->warn("No such profile field: $fieldName");
+        return undef;
+    }
+    if (defined $value) {
+        $self->uncache;
+        $self->{_profile}{$fieldName} = $value;
+        $db->write(
+            "UPDATE userProfileData SET ".$db->dbh->quote_identifier($fieldName)."=? WHERE userId=?",
+            [$value, $self->{_userId}]
+        );
+        my $time = $self->session->datetime->time;
+        $self->{_user}{"lastUpdated"} = $time;
+        $self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
 	}
 	return $self->{_profile}{$fieldName};
 }

@@ -5,6 +5,8 @@
     http://www.plainblack.com/rfe/request-for-enhancement/search-asset-feedback.-i.e.-no-results-found#kH5X_YA17ZxbRvi6gx5KRA
  - RFE: JS confirmation Operation/DatabaseLink.pm
     http://www.plainblack.com/rfe/request-for-enhancement/-1493348--js-confirmation-operation/databaselink/re--1493348--js-confirmation-operation/databaselink.pm#OUb5zN8bltGdPG_2LJZMGQ
+ - add: User profile data table is now a flat table, one column for each
+    field.
 
 
 

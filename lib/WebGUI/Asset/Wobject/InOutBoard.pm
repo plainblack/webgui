@@ -31,14 +31,10 @@ sub _fetchNames {
 	my $self = shift;
 	my @userIds = @_;
 	my %nameHash;
-	my $sql = "select users.username, 
-users.userId, 
-a.fieldData as firstName,
-b.fieldData as lastName
-from users
-left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-where users.userId=?";
+	my $sql = "SELECT users.username, users.userId, firstName, lastName
+FROM users
+LEFT JOIN userProfileData ON users.userId=userProfileData.userId
+WHERE users.userId=?";
 	my $sth = $self->session->db->prepare($sql);
 	foreach my $userId (@userIds) {
 		$sth->execute([ $userId ]);
@@ -51,7 +47,7 @@ where users.userId=?";
 #-------------------------------------------------------------------
 sub _fetchDepartments {
 	my $self = shift;
-	return $self->session->db->buildArray("select fieldData from userProfileData where fieldName='department' GROUP by fieldData");
+	return $self->session->db->buildArray("SELECT department FROM userProfileData GROUP BY department");
 }
 
 
@@ -244,19 +240,17 @@ sub view {
 	
 	my $sql = "select users.username, 
 users.userId, 
-a.fieldData as firstName, 
+firstName, 
 InOutBoard_status.message, 
-b.fieldData as lastName, 
+lastName, 
 InOutBoard_status.status, 
 InOutBoard_status.dateStamp, 
-c.fieldData as department, 
+department, 
 groupings.groupId
 from users 
 left join groupings on  groupings.userId=users.userId
 left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
-left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-left join userProfileData c on users.userId=c.userId and c.fieldName='department'
+left join userProfileData on users.userId=userProfileData.userId
 left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=".$self->session->db->quote($self->getId())."
 where users.userId<>'1' and InOutBoard.inOutGroup=".$self->session->db->quote($self->get("inOutGroup"))."
 group by userId
@@ -312,14 +306,12 @@ sub www_selectDelegates {
 		"select 
 			users.username, 
 			users.userId, 
-			a.fieldData as firstName,
-			b.fieldData as lastName
+			firstName,
+			lastName
 		from users
 		left join groupings on users.userId=groupings.userId
 		left join InOutBoard on groupings.groupId=InOutBoard.inOutGroup
-		left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-		left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-		left join userProfileData c on users.userId=c.userId and c.fieldName='department'
+		left join userProfileData on users.userId=userProfileData.userId
 		left join InOutBoard_status on users.userId=InOutBoard_status.userId and InOutBoard_status.assetId=?
 		where
 			users.userId<>'1'
@@ -465,19 +457,17 @@ sub www_viewReport {
 	  
 	  my $sql = "select users.username, 
 users.userId, 
-a.fieldData as firstName, 
+firstName, 
 InOutBoard_statusLog.message,
-b.fieldData as lastName, 
+lastName, 
 InOutBoard_statusLog.status, 
 InOutBoard_statusLog.dateStamp, 
 InOutBoard_statusLog.createdBy, 
-c.fieldData as department,
+department,
 groupings.groupId
 from users
 left join groupings on groupings.userId=users.userId
-left join userProfileData a on users.userId=a.userId and a.fieldName='firstName'
-left join userProfileData b on users.userId=b.userId and b.fieldName='lastName'
-left join userProfileData c on users.userId=c.userId and c.fieldName='department'
+left join userProfileData on users.userId=userProfileData.userId
 left join InOutBoard_statusLog on users.userId=InOutBoard_statusLog.userId and InOutBoard_statusLog.assetId=".$self->session->db->quote($self->getId())."
 where users.userId<>'1' and 
  groupings.groupId=".$self->session->db->quote($self->getValue("inOutGroup"))." and 

@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.4.0
+--------------------------------------------------------------------
+
+ * The userProfileData table has been completely re-done. Now, each
+   user profile field has its own column in the userProfileData table.
+
+   Any applications that you may have that makes raw SQL queries against
+   the userProfileData table will need to be updated to reflect these
+   changes.
+
+
 7.3.16
 --------------------------------------------------------------------
 

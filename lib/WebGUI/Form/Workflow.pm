@@ -85,7 +85,10 @@ sub definition {
 			},
 		none=>{
 			defaulValue=>0
-			}
+			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(22) BINARY",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

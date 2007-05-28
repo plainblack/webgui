@@ -159,6 +159,12 @@ A text string that will pop up when the user hovers over the label when toHtmlWi
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 dbDataType
+
+The SQL data type for this form element. Fields created using this form control
+will create a column with this data type. If undef, will not create a database 
+column. Defaults to "VARCHAR(255)".
+
 =cut
 
 sub definition {
@@ -216,8 +222,11 @@ sub definition {
 			},
 		profileEnabled=>{
 			defaultValue=>0
-			},
-		});
+            },
+        dbDataType => {
+            defaultValue => "VARCHAR(255)",
+        },
+    });
 	return $definition;
 }
 

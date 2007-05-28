@@ -93,6 +93,9 @@ sub definition {
 		hoverHelp=>{
 			defaultValue=>$i18n->get('1075 description')
 			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(22) BINARY",
+        },
 		});
 	return $class->SUPER::definition($session, $definition);
 }

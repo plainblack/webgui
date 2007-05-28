@@ -90,6 +90,9 @@ sub definition {
 		profileEnabled=>{
 			defaultValue=>1
 			},
+        dbDataType  => {
+            defaultValue    => "BIGINT",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

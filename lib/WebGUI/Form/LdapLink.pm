@@ -99,7 +99,10 @@ sub definition {
 			},
 		afterEdit=>{
 			defaultValue=>undef
-			}
+			},
+        dbDataType => {
+            defaultValue    => "TEXT",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

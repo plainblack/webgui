@@ -87,7 +87,10 @@ sub definition {
 			},
 		deleteFileUrl=>{
 			defaultValue=>undef
-			}
+			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(22) BINARY",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

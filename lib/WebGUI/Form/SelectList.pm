@@ -68,18 +68,21 @@ sub definition {
 	push(@{$definition}, {
 		formName=>{
 			defaultValue=>$i18n->get("484"),
-			},
+        },
 		multiple=>{
 			defaultValue=>1
-			},
+        },
 		size=>{
 			defaultValue=>5
-			},
+        },
 		profileEnabled=>{
 			defaultValue=>1
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+        },
+        dbDataType => {
+            defaultValue => "LONGTEXT",
+        },
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------

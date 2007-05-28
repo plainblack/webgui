@@ -270,13 +270,10 @@ sub _userSearchQuery {
 	my $query = <<"SQL";
 SELECT 'user' AS resourceKind, users.userId AS resourceId
   FROM users
-       LEFT JOIN userProfileData AS lastName ON users.userId = lastName.userId
-                                             AND lastName.fieldName = 'lastName'
-       LEFT JOIN userProfileData AS firstName ON users.userId = firstName.userId
-                                              AND firstName.fieldName = 'firstName'
- WHERE (LOWER(lastName.fieldData) LIKE ? OR LOWER(firstName.fieldData) LIKE ?
+       LEFT JOIN userProfileData ON users.userId = userProfileData.userId
+ WHERE (LOWER(lastName) LIKE ? OR LOWER(firstName) LIKE ?
         OR LOWER(users.username) LIKE ?) AND (users.userId NOT IN $excludePlaceholders)
- ORDER BY lastName.fieldData, firstName.fieldData
+ ORDER BY lastName, firstName
 SQL
 	my @placeholders  = (($searchPattern) x 3, @exclude);
 	return ($query, \@placeholders);

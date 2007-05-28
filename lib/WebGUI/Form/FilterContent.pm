@@ -79,6 +79,9 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>"most",
 			},
+        dbDataType  => {
+            defaultValue    => "VARCHAR(16)",
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }

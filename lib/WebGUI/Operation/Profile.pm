@@ -84,10 +84,14 @@ email address to check for duplication
 =cut
 
 sub isDuplicateEmail {
-	my $session = shift;
-	my $email = shift;
-	my ($otherEmail) = $session->db->quickArray("select count(*) from userProfileData where fieldName='email' and fieldData = ".$session->db->quote($email)." and userId <> ".$session->db->quote($session->user->userId));
-	return ($otherEmail > 0);
+    my $session     = shift;
+    my $email       = shift;
+    my ($otherEmail) 
+        = $session->db->quickArray(
+            'select count(*) from userProfileData where email = ? and userId <> ?',
+            [$email, $session->user->userId]
+        );
+    return ($otherEmail > 0);
 }
 
 #-------------------------------------------------------------------
