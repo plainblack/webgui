@@ -327,9 +327,13 @@ sub buildMenu {
 			my $fieldList = "";
 			foreach my $key (keys %{$list}) {
 				$fieldList .= "," if($fieldList ne "");
+                my $js_key = $key;
+                $js_key =~ s/\\/\\\\/g;
+                $js_key =~ s/"/\\"/g;
 				my $value = $list->{$key};
-				$value =~ s/"/\"/g;
-				$fieldList .= qq|"$key":"$value"|
+                $value =~ s/\\/\\\\/g;
+                $value =~ s/"/\\"/g;
+				$fieldList .= qq|"$js_key":"$value"|
 			}
 			$js .= qq| ,"list":{ $fieldList }|;
 		}

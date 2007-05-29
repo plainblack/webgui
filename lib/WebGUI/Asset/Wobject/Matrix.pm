@@ -690,28 +690,13 @@ sub www_editListingSave {
 		description => $self->session->form->process("description"),
 		versionNumber=>$self->session->form->process("versionNumber")
 		);
-	my $storage = undef;
-	if ($listing->{storageId} ne "") {
-		$storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
-	} else {
-		$storage = WebGUI::Storage::Image->create($self->session);
-		$data{storageId} = $storage->getId;
-	}
-
-	##This is a hack.  File upload should go throught the WebGUI::Form::File API
-	##so that future changes don't affect us like this
-    my $screenshotStorageId = WebGUI::Form::File->new($self->session,{name => 'screenshot'})->getValueFromPost;
-    my $uploadedScreenshot  = WebGUI::Storage->get($self->session, $screenshotStorageId);
-	my $screenshot          = $uploadedScreenshot->addFileFromFormPost("screenshot");
-
-	if (defined $screenshot) {
-		$data{filename} = $screenshot;
-		$storage->generateThumbnail($screenshot);
-        $storage->addFileFromFilesystem($uploadedScreenshot->getPath($screenshot));
-	}
-
-    $uploadedScreenshot->delete;
-
+    
+    my $storageId = WebGUI::Form::Image->new($self->session,{name => 'screenshot', value => $listing->{storageId}})->getValueFromPost;
+    if ($storageId) {
+        $data{storageId} = $storageId;
+        $data{filename} = WebGUI::Storage->get($self->session, $storageId)->getFiles->[0];
+    }
+    
 	my $productName = $self->session->form->process("productName");
 
 	my $isNew = 0;
