@@ -119,6 +119,7 @@ sub create {
     my $self = $class->new($session,$id);
     
     # Get the field's data type
+    $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = 'WebGUI::Form::' . ucfirst $properties->{fieldType};
     eval "use $formClass;";
     my $dbDataType = $formClass->new($session, $self->_formProperties($properties))->get("dbDataType");
