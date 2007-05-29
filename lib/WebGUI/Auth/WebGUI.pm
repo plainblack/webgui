@@ -651,7 +651,7 @@ sub recoverPasswordFinish {
 
 	my @fieldNames = keys %fieldValues;
 	my @fieldValues = values %fieldValues;
-	my $wheres = join(' ', map{"AND upd.$_ = ?"} (0..$#fieldNames));
+	my $wheres = join(' ', map{"AND upd.$fieldNames[$_] = ?"} (0..$#fieldNames));
 	$wheres .= ' AND u.username = ?' if defined $username;
 	my $sql = "SELECT u.userId FROM users AS u JOIN userProfileData AS upd ON u.userId=upd.userId WHERE u.authMethod = 'WebGUI' $wheres";
 	my @userIds = $self->session->db->buildArray($sql, [@fieldValues, (defined($username)? ($username) : ())]);
