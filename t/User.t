@@ -323,6 +323,7 @@ $session->config->delete('adminModeSubnets');
 #
 ################################################################
 
+my $originalVisitorEmail = $visitor->profileField('email');
 $visitor->profileField('email', 'visitor@localdomain');
 $dude->profileField('email', 'dude@aftery2k.com');
 
@@ -393,8 +394,6 @@ $buster->uncache;
 $buster3 = WebGUI::User->new($session, $buster->userId);
 is($buster3->profileField('listProfile'), 'alpha', 'profile field with default data value that is a list gives the user the first value');
 
-$listProfileField->delete;
-
 ################################################################
 #
 # getGroups
@@ -430,8 +429,8 @@ END {
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
+    $visitor->profileField('email', $originalVisitorEmail);
 
 	$testCache->flush;
-    $session->db->write(q!delete from userProfileData where userId='1' and fieldName='email'!);
 }
 
