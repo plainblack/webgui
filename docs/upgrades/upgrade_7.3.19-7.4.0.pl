@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addGroupingsIndexOnUserId($session);
 fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
 addAttachmentsToEvents($session);
@@ -34,6 +35,32 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#----------------------------------------------------------------------------
+
+sub addGroupingsIndexOnUserId {
+    my $session     = shift;
+    my $db          = $session->db;
+    print qq{\tAdding index on `userId` column in `groupings` table for performance... } unless $quiet;
+
+    # See if we even NEED to add this index, if we don't it just takes up
+    # disk/memory space.
+    my %createTable 
+        = $db->quickHash(
+            "SHOW CREATE TABLE `groupings`"
+        );
+
+    if ($createTable{'Create Table'} =~ /KEY\s+`[^`]+`\s+[(]`userId`[)]/) {
+        print   " Skipped!\n",
+                "\t\tAn index already exists on the `userId` column in the `groupings` table\n"
+                    unless $quiet;
+    }
+    else {
+        print   "\n\t\tThis may take a while... " unless $quiet;
+        $db->write("ALTER TABLE `groupings` ADD INDEX `userId` (`userId`)");
+        print   "DONE!\n" unless $quiet;
+    }
+}
 
 #----------------------------------------------------------------------------
 

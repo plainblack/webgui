@@ -13,6 +13,8 @@
    LIMIT clauses.
  - add: SyndicatedContent wobject now has more ways of representing the long
    description from the RSS feed.
+ - Added an index on the userId column of the groupings table to speed up
+   queries for groupIds by userId (instead of the usual userIds by groupId)
 
 
 
