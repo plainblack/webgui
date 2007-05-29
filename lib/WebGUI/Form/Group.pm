@@ -110,8 +110,8 @@ Returns a group pull-down field. A group pull down provides a select list that p
 
 sub toHtml {
 	my $self = shift;
-	my $where;
-	if ($self->get('excludeGroups')->[0] ne "") {
+	my $where = '';
+	if (($self->get('excludeGroups')->[0]||'') ne "") {
 		$where = "and groupId not in (".$self->session->db->quoteAndJoin($self->get("excludeGroups")).")";
 	}
 	$self->set('options', $self->session->db->buildHashRef("select groupId,groupName from groups where showInForms=1 $where order by groupName"));

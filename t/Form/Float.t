@@ -88,7 +88,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Float';
 my $formType = 'Float';
 
-my $numTests = 11 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 3;
 
 
 plan tests => $numTests;
@@ -142,4 +142,12 @@ is($input->{maxlength}, 20, 'set maxlength');
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+
+# just testing that getValueFromPost works with an argument
+
+my $float = WebGUI::Form::Float->new($session);
+is($float->getValueFromPost('112.233'), 112.233, 'Got a valid float');
+is($float->getValueFromPost('fred'), 0, 'Returned 0 instead of an invalid float');
+
+__END__
 

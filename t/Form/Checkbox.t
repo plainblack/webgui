@@ -45,7 +45,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Checkbox';
 my $formType = 'Checkbox';
 
-my $numTests = 7 + scalar @{ $testBlock } + 1;
+my $numTests = 7 + scalar @{ $testBlock } + 3;
 
 
 plan tests => $numTests;
@@ -105,3 +105,8 @@ is( $forms[0]->param('cbox3'), '    ', 'WRONG: whitespace value');
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
+#
+# test WebGUI::FormValidator::Checkbox(undef,@values)
+#
+is(WebGUI::Form::Checkbox->new($session)->getValueFromPost('test'), 'test', '$cbox->getValueFromPost(arg)');
+is($session->form->checkbox(undef,'test'),                          'test', 'WebGUI::FormValidator::checkbox');

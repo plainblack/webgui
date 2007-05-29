@@ -130,14 +130,19 @@ sub getOnChangeSlider {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
+
+=head2 value
+
+A value to process instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
+	my @args = @_;
 
 	my $properties = {
 		name	=> $self->get('name'),
@@ -146,7 +151,7 @@ sub getValueFromPost {
 		id	=> 'view-'.$self->get('id'),
 	};
 
-	return WebGUI::Form::Integer->new($self->session, $properties)->getValueFromPost;
+	return WebGUI::Form::Integer->new($self->session, $properties)->getValueFromPost(@args);
 }
 
 1;

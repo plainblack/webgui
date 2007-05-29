@@ -156,6 +156,105 @@ our $HELP = {
 		],
 	},
 
+	'import events' => {
+		source => 'sub www_importEvents',
+		title => 'import events help title',
+		body => 'import events help body',
+		fields => [
+                        {
+                                title => 'choose a file to import',
+                                description => 'import hoverhelp file',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'what about duplicates',
+                                description => 'import hoverhelp dups',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'ignore first line',
+                                description => 'import hoverhelp first line',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'import file contains field title',
+                                description => 'import file contains field description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'import field is duplicate key title',
+                                description => 'import field is duplicate key description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'status',
+                                description => 'approve event description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event title',
+                                description => 'add/edit event title description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event description',
+                                description => 'add/edit event description description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event image',
+                                description => 'add/edit event image description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'price',
+                                description => 'add/edit event price description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event template',
+                                description => 'add/edit event template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'weight',
+                                description => 'weight description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'sku',
+                                description => 'sku description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'sku template',
+                                description => 'sku template description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event start date',
+                                description => 'add/edit event start date description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event end date',
+                                description => 'add/edit event end date description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+                        {
+                                title => 'add/edit event maximum attendees',
+                                description => 'add/edit event maximum attendees description',
+                                namespace => 'Asset_EventManagementSystem',
+                        },
+		],
+		related => [
+			{
+				tag => 'event management system add/edit',
+				namespace => 'Asset_EventManagementSystem',
+			},
+		],
+	},
+
 	'edit event metadata field' => {
 		source => 'sub www_editEventMetaDataField',
 		title => 'add/edit event metadata field',

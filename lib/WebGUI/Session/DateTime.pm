@@ -664,7 +664,7 @@ An integer which represents the amount of time for the interval.
 
 =head3 units
 
-A string which represents the units of the interval. The string must be 'years', 'months', 'weeks', 'days', 'hours', 'minutes', or 'seconds'. 
+A string which represents the units of the interval. The string must be (case-insensitive) 'years', 'months', 'weeks', 'days', 'hours', 'minutes', or 'seconds'. 
 
 =cut
 
@@ -672,25 +672,25 @@ sub intervalToSeconds {
 	my $self = shift;
 	my $interval = shift;
 	my $units = shift;
-	if ($units eq "years") {
+	if (lc $units eq "years") {
 		return ($interval*31536000);
 	}
-    elsif ($units eq "months") {
+    elsif (lc $units eq "months") {
 		return ($interval*2592000);
     }
-    elsif ($units eq "weeks") {
+    elsif (lc $units eq "weeks") {
         return ($interval*604800);
     }
-    elsif ($units eq "days") {
+    elsif (lc $units eq "days") {
         return ($interval*86400);
     }
-    elsif ($units eq "hours") {
+    elsif (lc $units eq "hours") {
         return ($interval*3600);
     }
-    elsif ($units eq "minutes") {
+    elsif (lc $units eq "minutes") {
         return ($interval*60);
     }
-    else {
+    else { # seconds
         return $interval;
 	} 
 }

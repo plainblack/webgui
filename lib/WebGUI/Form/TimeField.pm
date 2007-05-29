@@ -99,7 +99,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 If the defaultValue is a MySQL time, the value returned by this form element 
 will be a MySQL time. Note: Will not be adjusted for the user's time zone.
@@ -107,10 +107,31 @@ will be a MySQL time. Note: Will not be adjusted for the user's time zone.
 Otherwise, the value returned by this form element will be a number of seconds,
 adjusted for the user's time zone..
 
+=head3 value
+
+An optional value to process, instead of POST input. This should be in the form of an integer of seconds, 'HH:MM', or 'HH:MM:SS'.
+
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
+
+	if (@_) {
+		my $value = shift;
+		if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$value     
+        || $value =~ m/^\d+$/) {
+			return $self->session->datetime->timeToSeconds($value)-($self->session->user->profileField("timeOffset")*3600);
+		}
+		elsif ($value =~ /^\d{2}\D\d{2}(\D\d{2})?$/) {
+			return $value
+		}
+		else {
+			return undef;
+		}
+	}
+
     # This should probably be rewritten as a cascading ternary
 	if (!$self->get("defaultValue") 
         || $self->get("defaultValue") =~ m/^\d+$/

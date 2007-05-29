@@ -85,14 +85,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ num_and_units ] )
 
 Returns either the interval that was posted (in seconds) or if nothing comes back it returns 0.
+
+=head3 num_and_units
+
+The number and units for this interval, to use instead of POST input, which is the default. ("3 days", for example.) Valid units are (case-insensitive): seconds, minutes, hours, days, weeks, months, years.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
+
+	if (@_) {
+		my @args = split /\s+/, shift;
+		return $self->session->datetime->intervalToSeconds(@args);
+	}
+
 	return $self->session->datetime->intervalToSeconds($self->session->form->param($self->get("name")."_interval"),$self->session->form->param($self->get("name")."_units")) || 0;
 }
 

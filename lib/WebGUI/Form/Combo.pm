@@ -78,22 +78,30 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns an array or a carriage return ("\n") separated scalar depending
 upon whether you're returning the values into an array or a scalar.  If
 any data is in the Text form, it is returned before a selected value from
 the list.
 
+=head3 value
+
+Optional values to process, instead of POST input.
+
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	if ($self->session->form->param($self->get("name")."_new")) {
+
+	if (@_) {
+		return $self->SUPER::getValueFromPost(@_);
+	}
+	elsif ($self->session->form->param($self->get("name")."_new")) {
 		my $formValue = $self->session->form->param($self->get("name")."_new");
 		$formValue =~ tr/\r\n//d;
 		return $formValue;
-        }
+	}
 	return $self->SUPER::getValueFromPost;
 }
 

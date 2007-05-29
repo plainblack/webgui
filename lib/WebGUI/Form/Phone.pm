@@ -70,19 +70,23 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns a string filtered to allow only digits, spaces, and these special characters: + - ( ) or it will return undef it the number doesn't validate to those.
+
+=head3 value
+
+An input value to use instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
-   	if ($value =~ /^[x\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
-                return $value;
-        }
-        return undef;
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+	if ($value =~ /^[x\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
+		return $value;
+	}
+	return undef;
 }
 
 #-------------------------------------------------------------------

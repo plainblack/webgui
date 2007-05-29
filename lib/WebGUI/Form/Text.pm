@@ -84,15 +84,26 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
+
+=head3 value
+
+An optional value to process, instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $self->session->form->param($self->get("name")) if ($self->session->request);
+	my $formValue;
+
+	if (@_) {
+		$formValue = shift;
+	}
+	elsif ($self->session->request) {
+		$formValue = $self->session->form->param($self->get("name"));
+	}
 	if (defined $formValue) {
 		$formValue =~ tr/\r\n//d;
 		return $formValue;

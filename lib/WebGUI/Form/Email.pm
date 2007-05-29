@@ -70,15 +70,19 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns a validated email address. If the result does not pass validation, it returns undef instead.
+
+=head3 value
+
+An optional value to process instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	if ($value =~ /^([0-9a-zA-Z]([-.+\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/i) {
 		return $value;
 	}

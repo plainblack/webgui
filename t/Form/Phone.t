@@ -87,7 +87,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Phone';
 my $formType = 'Phone';
 
-my $numTests = 11 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 10;
 
 
 plan tests => $numTests;
@@ -143,4 +143,18 @@ is($input->{maxlength}, 20, 'set maxlength');
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+
+# test that we can process non-POST values correctly
+my $cntl = WebGUI::Form::Phone->new($session,{ defaultValue => 4242 });
+is($cntl->getValueFromPost('123-123-1234'), '123-123-1234', 'getValueFromPost(valid)');
+is($cntl->getValueFromPost('123/123-1234'), undef, 'getValueFromPost(invalid)');
+is($cntl->getValueFromPost(0), 0, 'zero');
+is($cntl->getValueFromPost(''), undef, '""');
+is($session->form->phone(undef,'123-123-1234'), '123-123-1234', 'valid');
+is($session->form->phone(undef,'123/123-1234'), undef, 'invalid');
+is($session->form->phone(undef,0), 0, 'zero');
+is($session->form->phone(undef,undef), undef, 'undef returns undef');
+is($session->form->phone(undef,''), undef, '""');
+
+__END__
 

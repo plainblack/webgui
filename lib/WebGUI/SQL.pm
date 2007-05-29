@@ -19,6 +19,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::SQL::ResultSet;
 use WebGUI::Utility;
+use Text::CSV_XS;
 
 =head1 NAME
 
@@ -527,7 +528,7 @@ sub quickArray {
 
 =head2 quickCSV ( sql, params )
 
-Executes a query and returns a comma delimited text blob with column headers.
+Executes a query and returns a comma delimited text blob with column headers. Returns undef on failure.
 
 =head3 sql
 
@@ -543,16 +544,23 @@ sub quickCSV {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-        my ($sth, $output, @data);
-        $sth = $self->prepare($sql);
+	my ($sth, $output, @data);
+
+	my $csv = Text::CSV_XS->new({ eol => "\n" });
+
+	$sth = $self->prepare($sql);
 	$sth->execute($params);
-        $output = join(",",$sth->getColumnNames)."\n";
-        while (@data = $sth->array) {
-                makeArrayCommaSafe(\@data);
-                $output .= join(",",@data)."\n";
-        }
-        $sth->finish;
-        return $output;
+
+	return unless $csv->combine($sth->getColumnNames);
+	$output = $csv->string();
+
+	while (@data = $sth->array) {
+		return unless $csv->combine(@data);
+		$output .= $csv->string();
+	}
+
+	$sth->finish;
+	return $output;
 }
 
 

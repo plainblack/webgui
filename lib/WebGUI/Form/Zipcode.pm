@@ -77,20 +77,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, it returns undef instead.
+
+=head3 value
+
+An optional value to use instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	$value =~ tr/\r\n//d;
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
-                return $value;
-        }
-        return undef;
+		return $value;
+	}
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -102,7 +106,7 @@ Renders a zip code field.
 =cut
 
 sub toHtml {
-        my $self = shift;
+	my $self = shift;
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ- \')"');
 	return $self->SUPER::toHtml;

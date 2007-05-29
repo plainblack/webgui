@@ -133,10 +133,14 @@ sub displayValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, 
 it returns undef instead.
+
+=head3 value
+
+An optional value to process, instead of POST input. This should be in the 'YY(YY)?-MM-DD' form.
 
 =cut
 
@@ -147,11 +151,11 @@ sub getValueFromPost {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
+		return $self->session->datetime->setToEpoch(@_ ? shift : $self->session->form->param($self->get("name")));
 	} else {
 		# MySQL format
 		# YY(YY)?-MM-DD
-		my $value	= $self->session->form->param($self->get("name"));
+		my $value	= @_ ? shift : $self->session->form->param($self->get("name"));
 		
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 		

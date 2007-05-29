@@ -105,9 +105,13 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, it returns undef instead.
+
+=head3 value
+
+An optional value to process, instead of POST input. This should be in the 'YY(YY)?-MM-DD HH:MM:SS' form.
 
 =cut
 
@@ -119,11 +123,11 @@ sub getValueFromPost {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		return $self->session->datetime->setToEpoch($self->session->form->param($self->get("name")));
+		return $self->session->datetime->setToEpoch(@_ ? shift : $self->session->form->param($self->get("name")));
 	} else {
 		# MySQL format
 		# YY(YY)?-MM-DD HH:MM:SS
-		my $value	= $self->session->form->param($self->get("name"));
+		my $value	= @_ ? shift : $self->session->form->param($self->get("name"));
 		$self->session->errorHandler->warn("Date value: $value");
 		
 		# Verify format

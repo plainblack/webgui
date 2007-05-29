@@ -70,9 +70,9 @@ Returns a class name which has been taint checked.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	$value =~ s/[^\w:]//g;
-        return $value;
+	return $value;
 }
 
 #-------------------------------------------------------------------
@@ -84,9 +84,9 @@ Renders a class name field.
 =cut
 
 sub toHtml {
-        my $self = shift;
+	my $self = shift;
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
-        $self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:_\')" ');
+	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:_\')" ');
 	return $self->SUPER::toHtml;
 }
 

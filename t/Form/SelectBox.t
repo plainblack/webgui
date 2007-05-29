@@ -48,7 +48,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::SelectBox';
 my $formType = 'SelectBox';
 
-my $numTests = 8 + scalar @{ $testBlock } + 1;
+my $numTests = 8 + scalar @{ $testBlock } + 12;
 
 
 plan tests => $numTests;
@@ -107,3 +107,20 @@ is($input->{size}, 5, 'set size');
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+
+# test that we can process non-POST values correctly
+my $cntl = WebGUI::Form::SelectBox->new($session,{ defaultValue => 4242 });
+is($cntl->getValueFromPost('text'), 'text', 'getValueFromPost(text)');
+is($cntl->getValueFromPost(42), 42, 'getValueFromPost(int)');
+is($cntl->getValueFromPost(0), 0, 'zero');
+is($cntl->getValueFromPost(''), '', '""');
+is($cntl->getValueFromPost(1,2,3), 1, 'list returns first item');
+is($session->form->selectBox(undef,'text'), 'text', 'text');
+is($session->form->selectBox(undef,42), 42, 'int');
+is($session->form->selectBox(undef,0), 0, 'zero');
+is($session->form->selectBox(undef,undef), '', 'undef returns ""');
+is($session->form->selectBox(undef,''), '', '""');
+is($session->form->selectBox(undef,1,2,3), 1, 'list returns first item');
+
+__END__
+

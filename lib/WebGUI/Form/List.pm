@@ -194,16 +194,20 @@ sub displayValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
+
+=head3 value
+
+Optional values to process, instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my @data = $self->session->form->param($self->get("name"));
-        return wantarray ? @data : join("\n",@data);
+	my @data = @_ ? @_ : $self->session->form->param($self->get("name"));
+	return wantarray ? @data : join("\n",@data);
 }
 
 #-------------------------------------------------------------------

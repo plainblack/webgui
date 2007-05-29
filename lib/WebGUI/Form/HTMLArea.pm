@@ -104,15 +104,19 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns the value of this form field after stipping unwanted tags like <body>.
+
+=head3 value
+
+An optional value to process, instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	return WebGUI::HTML::cleanSegment($self->SUPER::getValueFromPost());
+	return WebGUI::HTML::cleanSegment($self->SUPER::getValueFromPost(@_));
 }
 
 

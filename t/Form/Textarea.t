@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 12 + scalar @{ $testBlock } + 5;
 
 
 plan tests => $numTests;
@@ -99,3 +99,16 @@ like($input->{style}, qr/width: 500/, 'Custom width');
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
+
+# just testing that getValueFromPost works with an argument
+
+my $txt = WebGUI::Form::Textarea->new($session);
+is($txt->getValueFromPost("some test here"), "some test here", 'getValueFromPost(text)');
+is($txt->getValueFromPost("some \ntest \r\nhere"), "some \ntest \r\nhere", 'getValueFromPost(newlines)');
+
+is($session->form->textarea(undef,"some test here"), "some test here", 'session->form->textarea(undef,text)');
+is($session->form->textarea(undef,"some \ntest \r\nhere"), "some \ntest \r\nhere", 'session->form->textarea(undef,newlines)');
+
+
+__END__
+

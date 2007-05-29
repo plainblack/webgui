@@ -232,7 +232,7 @@ sub getValueFromPost {
 		id	=> 'view-'.$self->get('id'),
 	};
 	
-	return WebGUI::Form::hexadecimal->new($self->session, $properties)->getValueFromPost;
+	return WebGUI::Form::Hexadecimal->new($self->session, $properties)->getValueFromPost;
 }
 
 1;

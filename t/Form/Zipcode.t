@@ -62,7 +62,7 @@ my $testBlock = [
 
 my $formClass = 'WebGUI::Form::Zipcode';
 
-my $numTests = 12 + scalar @{ $testBlock } + 1;
+my $numTests = 12 + scalar @{ $testBlock } + 11;
 
 
 plan tests => $numTests;
@@ -117,3 +117,21 @@ is($input->{maxlength}, 13, 'Checking maxlength param, default');
 ##Test Form Output parsing
 
 WebGUI::Form_Checking::auto_check($session, 'Zipcode', $testBlock);
+
+# test that we can process non-POST values correctly
+my $cntl = WebGUI::Form::Zipcode->new($session,{ defaultValue => 4242 });
+is($cntl->getValueFromPost('ABCDE'), 'ABCDE', 'alpha');
+is($cntl->getValueFromPost('02468'), '02468', 'numeric');
+is($cntl->getValueFromPost('NO WHERE'), 'NO WHERE', 'alpha space');
+is($cntl->getValueFromPost('-'), '-', 'bare dash');
+is($cntl->getValueFromPost('abcde'), undef, 'lower case');
+
+is($session->form->zipcode(undef,'ABCDE'), 'ABCDE', 'alpha');
+is($session->form->zipcode(undef,'02468'), '02468', 'numeric');
+is($session->form->zipcode(undef,'NO WHERE'), 'NO WHERE', 'alpha space');
+is($session->form->zipcode(undef,'-'), '-', 'bare dash');
+is($session->form->zipcode(undef,'abcde'), undef, 'lower case');
+
+
+__END__
+

@@ -101,9 +101,9 @@ sub getValueFromPost {
 	my $self = shift;
 	my $value = $self->session->form->param($self->get("name"));
 	if ($value =~ /^[0-9a-f]+$/i) {
-                return $value;
-        }
-        return 0;
+		return $value;
+	}
+	return 0;
 }
 
 #-------------------------------------------------------------------

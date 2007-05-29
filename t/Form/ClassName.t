@@ -69,7 +69,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::ClassName';
 my $formType = 'ClassName';
 
-my $numTests = 11 + scalar @{ $testBlock } + 1;
+my $numTests = 11 + scalar @{ $testBlock } + 3;
 
 
 plan tests => $numTests;
@@ -127,3 +127,8 @@ is($input->{maxlength}, 20, 'set maxlength');
 #diag $formType;
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
+#
+# test WebGUI::FormValidator::ClassName(undef,@values)
+#
+is(WebGUI::Form::ClassName->new($session)->getValueFromPost('t*est'), 'test', '$cname->getValueFromPost(arg)');
+is($session->form->className(undef,'t*est'),                          'test', 'WebGUI::FormValidator::className');

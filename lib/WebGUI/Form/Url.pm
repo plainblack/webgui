@@ -85,7 +85,7 @@ Parses the posted value and tries to make corrections if necessary.
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	$value =~ tr/\r\n//d;
      	if ($value =~ /mailto:/) {
                 return $value;

@@ -46,8 +46,8 @@ Deconstructor.
 =cut
 
 sub DESTROY {
-        my $self = shift;
-        undef $self;
+	my $self = shift;
+	undef $self;
 }
 
 
@@ -80,9 +80,9 @@ Returns the user's real IP address. Normally this is REMOTE_ADDR, but if they go
 
 sub getIp {
 	my $self = shift;
-        if ($self->get("HTTP_X_FORWARDED_FOR") =~ m/(\d+\.\d+\.\d+\.\d+)/) {
-                return $1;
-        } 
+	if ($self->get("HTTP_X_FORWARDED_FOR") =~ m/(\d+\.\d+\.\d+\.\d+)/) {
+		return $1;
+	} 
 	return $self->get("REMOTE_ADDR");
 }
 

@@ -96,15 +96,19 @@ sub generateIdParameter {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return undef.
+
+=head3 value
+
+An optional value to process, instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $self->session->form->param($self->get("name"));
+	my $formValue = @_ ? shift : $self->session->form->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
 	} else {
@@ -122,10 +126,10 @@ Renders and input tag of type checkbox.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
-	my $checkedText = ' checked="checked"' if ($self->get("checked"));
-	my $idText = ' id="'.$self->get('id').'" ' if ($self->get('id'));
-	return '<input type="checkbox" name="'.$self->get("name").'" value="'.$value.'"'.$idText.$checkedText.' '.$self->get("extras").' />';
+	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value")))) || '';
+	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
+	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';
+	return '<input type="checkbox" name="'.($self->get("name")||'').'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';
 }
 
 

@@ -94,19 +94,23 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Returns the integer from the form post, or returns 0 if the post result is invalid.
+
+=head3 value
+
+An optional value to process, instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	if ($value =~ /^-?\d+$/) {
-                return $value;
-        }
-        return 0;
+		return $value;
+	}
+	return 0;
 }
 
 #-------------------------------------------------------------------

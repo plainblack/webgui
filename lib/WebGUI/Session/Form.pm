@@ -16,6 +16,7 @@ package WebGUI::Session::Form;
 
 use strict qw(vars subs);
 use WebGUI::HTML;
+use base 'WebGUI::FormValidator';
 
 =head1 NAME
 
@@ -23,7 +24,7 @@ Package WebGUI::Session::Form
 
 =head1 DESCRIPTION
 
-This is a convenience package to the individual form controls. It allows you to get the form post results back without having to load each form control seperately, instantiate an object, and call methods.
+This is a subclass of WebGUI::FormValidator. It processes POST input.
 
 =head1 SYNOPSIS
 
@@ -41,79 +42,49 @@ This is a convenience package to the individual form controls. It allows you to 
 
 =head1 METHODS
 
-These functions are available from this package:
-
 =cut
 
 
 #-------------------------------------------------------------------
 
-=head2 AUTOLOAD ( )
+=head2 AUTOLOAD ( params )
 
-Dynamically creates functions on the fly for all the different form control types.
+This just passes control to WebGUI::FormValidator::AUTOLOAD.
+
+=head3 params
+
+Either an href of parameters or the fieldName in question.
 
 =cut
 
 sub AUTOLOAD {
-        our $AUTOLOAD;
 	my $self = shift;
-        my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
-	my $params = shift;
-	$params = {name=>$params} if ref ($params) ne "HASH";
-        my $cmd = "use WebGUI::Form::".$name;
-        eval ($cmd);
-        if ($@) {
-                $self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-                return undef;
-        }
-        my $class = "WebGUI::Form::".$name;
-        return $class->new($self->session, $params)->getValueFromPost;
+	my @args = @_;
+	our $AUTOLOAD;
+	my $method = "SUPER::".(split /::/, $AUTOLOAD)[-1];
+	return $self->$method(@args);
 }
 
 #-------------------------------------------------------------------
 
-=head2 DESTROY ( )
+=head2 paramsHashRef (  )
 
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 get ( )
-
-An alias for process()
+Gets a hash ref of all the params passed in to this class, and their values. This should not be confused with the param() method.
 
 =cut
 
-sub get {
+sub paramsHashRef {
 	my $self = shift;
-	return $self->process(@_);
-}
-
-#-------------------------------------------------------------------
-
-=head2 new ( session )
-
-Constructor.
-
-=head3 session
-
-A reference to the current session.
-
-=cut
-
-sub new {
-	my $class = shift;
-	my $session = shift;
-	bless {_session=>$session}, $class;
+	unless ($self->{_paramsHashRef}) {
+		my %hash;
+		tie %hash, "Tie::IxHash";
+		foreach ($self->param) {
+			my @arr = $self->process($_);
+			$hash{$_} = (scalar(@arr) > 1)?\@arr:$arr[0];
+		}
+		$self->{_paramsHashRef} = \%hash;
+	}
+	return $self->{_paramsHashRef};
 }
 
 
@@ -159,29 +130,6 @@ sub param {
 
 #-------------------------------------------------------------------
 
-=head2 paramsHashRef (  )
-
-Gets a hash ref of all the params passed in to this class, and their values. This should not be confused with the param() method.
-
-=cut
-
-sub paramsHashRef {
-	my $self = shift;
-	unless ($self->{_paramsHashRef}) {
-		my %hash;
-		tie %hash, "Tie::IxHash";
-		foreach ($self->param) {
-			my @arr = $self->process($_);
-			$hash{$_} = (scalar(@arr) > 1)?\@arr:$arr[0];
-		}
-		$self->{_paramsHashRef} = \%hash;
-	}
-	return $self->{_paramsHashRef};
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 process ( name, type [ , default, params ] )
 
 Returns whatever would be the expected result of the method type that was specified. This method also checks to make sure that the field is not returning a string filled with nothing but whitespace.
@@ -206,39 +154,16 @@ A full set of form params just as you'd pass into any of the form controls when 
 
 sub process {
 	my ($self, $name, $type, $default, $params) = @_;
+
 	$type = ucfirst($type);
 	return $self->param($name) if ($type eq "");
-	$params->{name} = $name;	
-	if (wantarray) {	
-		my @values = $self->$type($params);
-		if (scalar(@values) < 1 && ref $default eq "ARRAY") {
-			return @{$default};
-		} else {
-			return @values;
-		}
-	} else {
-		my $value = $self->$type($params);
-		unless (defined $value) {
-			return $default;
-		}
-		if ($value =~ /^[\s]+$/) {
-			return undef;
-		}
-		return $value;
-	}
-}
 
-#-------------------------------------------------------------------
-
-=head2 session ( )
-
-Returns a reference to the current session.
-
-=cut
-
-sub session {
-	my $self = shift;
-	return $self->{_session};
+	return $self->SUPER::process({
+		name	=>	$name,
+		type	=>	$type,
+		default	=>	$default,
+		params	=>	$params,
+	});
 }
 
 1;

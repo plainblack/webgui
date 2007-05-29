@@ -93,15 +93,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Note, this is exactly the same method as used by Control since SelectBoxes only support a single value.
+
+=head3 value
+
+Optional values to process (read "return"), instead of POST input.
 
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue = $self->session->form->param($self->get("name"));
+
+	my $formValue = @_ ? shift : $self->session->form->param($self->get("name"));
 	if (defined $formValue) {
 		return $formValue;
 	} else {
@@ -119,7 +124,7 @@ Renders a select list form control.
 
 sub toHtml {
 	my $self = shift;
-	my $output = '<select name="'.$self->get("name").'" size="'.$self->get("size").'" id="'.$self->get('id').'" '.$self->get("extras").'>';
+	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').'>';
 	my %options;
 	tie %options, 'Tie::IxHash';
 	%options = $self->orderedHash;

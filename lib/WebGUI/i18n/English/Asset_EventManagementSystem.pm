@@ -193,15 +193,15 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1138312761,
 	},
 
-        'add/edit useSalesTax' => {
-                message => q|Use Sales Tax?|,
-                lastUpdated => 1160109884,
-        },
+	'add/edit useSalesTax' => {
+		message => q|Use Sales Tax?|,
+		lastUpdated => 1160109884,
+	},
 
-        'add/edit useSalesTax description' => {
-                message => q|Should this event have sales tax applied to it?|,
-                lastUpdated => 1160109886,
-        },
+	'add/edit useSalesTax description' => {
+		message => q|Should this event have sales tax applied to it?|,
+		lastUpdated => 1160109886,
+	},
 
 	'add/edit event maximum attendees' => {
 		message => q|Maximum Attendees|,
@@ -383,6 +383,168 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1147146318,
 	},
 
+	'check required fields' => {
+		message => q|You did not include these required fields: |,
+		lastUpdated => 0,
+		context => q|Require that the user include all required fields in their import|,
+	},
+
+	'import blank line' => {
+		message => q|Record %d was blank (skipped).|,
+		lastUpdated => 0,
+		context => q|Report which lines were blank.|,
+	},
+
+	'import other line' => {
+		message => q|Record %d was %s.|,
+		lastUpdated => 0,
+		context => q|Report which lines were skipped or overwritten.|,
+	},
+
+	'import record parse error' => {
+		message => q|There was an error processing record %d: '%s'|,
+		lastUpdated => 0,
+		context => q|Couldn't parse a line of the import file|,
+	},
+
+	'no import took place' => {
+		message => q|No records were imported. There were errors in the input:|,
+		lastUpdated => 0,
+		context => q|Let the user know that we didn't partially import their bad data|,
+	},
+
+	'export error' => {
+		message => q|There was an error in the export procedure.|,
+		lastUpdated => 0,
+		context => q|generic export error|,
+	},
+
+	'import form header' => {
+		message => q|Using this form you can import data directly into this EMS. Be sure that your fields are specified in the order shown below.|,
+		lastUpdated => 0,
+		context => q|header to the import form...|,
+	},
+
+	'import need dup key' => {
+		message => q|You must check at least one duplicate key checkbox.|,
+		lastUpdated => 0,
+		context => q|When importing, we need at least one field to tell record apart|,
+	},
+
+	'import invalid status' => {
+		message => q|Record %d has an invalid Status value (%s). Valid values are: Approved, Cancelled, Denied, Pending.|,
+		lastUpdated => 0,
+		context => q|There are only a few valid valued for the event status (approved) field|,
+	},
+
+	'import invalid prereq' => {
+		message => q|Record %d has an invalid Prerequisite Set Name value (%s). You need to create the relevant Prerequisite Sets prior to import.|,
+		lastUpdated => 0,
+		context => q|The prereq import field is a EMS_prereqs.name; we need it to store the id in EMS_products.prerequisiteId|,
+	},
+
+	'import invalid template' => {
+		message => q|Record %d has an invalid Event Template Name value (%s). You need to create the relevant Event Template prior to import.|,
+		lastUpdated => 0,
+		context => q|The templateId import field is an assetData.title; we need it to store the assetId in EMS_products.templateId|,
+	},
+
+	'import missing required' => {
+		message => q|Record %d did not have %s, a required field, filled.|,
+		lastUpdated => 0,
+		context => q|Import records need to have required fields filled|,
+	},
+
+	'field count mismatch' => {
+		message => q|Record %d has %d fields, not %d as indicated by the checkboxes you clicked.|,
+		lastUpdated => 0,
+		context => q|Import records need to have the right number of fields|,
+	},
+
+	'import ok' => {
+		message => q|All %d records were successfully processed. %d created, %d blank lines, %d duplicates %s.|,
+		lastUpdated => 0,
+		context => q|Let the user know that the importing of events was successful|,
+	},
+
+	'skipped' => {
+		message => q|skipped|,
+		lastUpdated => 0,
+		context => q|What did we do with duplicates (skipped/overwritten)?|,
+	},
+
+	'overwritten' => {
+		message => q|overwritten|,
+		lastUpdated => 0,
+		context => q|What did we do with duplicates (skipped/overwritten)?|,
+	},
+
+	'import events help title' => {
+		message => q|Import Events|,
+		lastUpdated => 0,
+		context => q|Help for importing events from CSV files.|,
+	},
+
+	'import events help body' => {
+		message => q|This is the body of the import events help page.|,
+		lastUpdated => 0,
+		context => q|Help for importing events from CSV files.|,
+	},
+
+	'meta hover help' => {
+		message => q|This is a custom field. Please ask your administrator for guidance.|,
+		lastUpdated => 0,
+		context => q|What's this meta field for?|,
+	},
+
+	'import hoverhelp file' => {
+		message => q|Upload a comma-seperated values (CSV) file for importing events. (Spreadsheet applications can output this format.) The fields must be comma-delimited, with double-quotes (") around field values which contain commas. Embedded double quotes are escaped with another double-quote (""). Your file will be checked for field count and required fields before any import takes place. If errors are found, then you are notified of the errors and no import takes place. This checking does not include checking whether or not LDAP, database links, or templates are valid. The format of special fields is as it is for exporting, so if you have a question as to how to format a given field for importing, look at how that information is exported and format your data accordingly. List fields with multiple values should be joined in the same CSV field by a semi-colon (;).|,
+		lastUpdated => 0,
+		context => q|What's the file field for?|,
+	},
+
+	'import hoverhelp dups' => {
+		message => q|The system will use whatever fields you specify under 'Field Is Duplicate Key' as the fields to use to identify duplicate event records. When a duplicate is found, this pulldown will determine what we do with the duplicate event record - either skip the incoming record or overwrite the old record with the new one. Note that all fields in overwritten records are overwritten, regardless of whether they're present in the incoming record or not.|,
+		lastUpdated => 0,
+		context => q|What's the duplicates field for?|,
+	},
+
+	'import hoverhelp first line' => {
+		message => q|If the first line of your import file contains field names instead of an event record, check yes. Otherwise, check no.|,
+		lastUpdated => 0,
+		context => q|What's the first line field for?|,
+	},
+
+	'import file contains field title' => {
+		message => q|File Contains Field|,
+		lastUpdated => 0,
+		context => q|What's "file contains field" mean?|,
+	},
+
+	'import file contains field description' => {
+		message => q|Check the checkboxes next to the fields which are included in your imput file. Please note that the fields must be in the order shown, and all required fields must be checked and filled in order for the import to proceed.|,
+		lastUpdated => 0,
+		context => q|What's "file contains field" mean?|,
+	},
+
+	'import field is duplicate key title' => {
+		message => q|Field Is Duplicate Key|,
+		lastUpdated => 0,
+		context => q|What's "field is dup key" mean?|,
+	},
+
+	'import field is duplicate key description' => {
+		message => q|In order to handle duplicate event records intelligently, the system needs to be able to identify a record as a duplicate. By checking these checkboxes, you're letting the system know what fields it needs to consider when trying to find an already-existing record for the event record being imported. For example, if you check Event Title and Event Start Date as the only fields which are duplicate keys, then if the incoming Event Title and Event Start Date match those of an existing event record, then the incoming record will be considered a duplicate of the already existing record. In that case, the system will either skip the incoming record, or overwrite the existing record.|,
+		lastUpdated => 0,
+		context => q|What's "field is dup key" mean?|,
+	},
+
+	'null field error recnum' => {
+		message => q|The %s field cannot be blank (record %d).|,
+		lastUpdated => 1179563424,
+		context => q|When a required field is empty/blank, then this message is used in sprintf to tell the user which field it is and that it cannot be blank - it also shows the relevant import file record number|,
+	},
+
 	'null field error' => {
 		message => q|The %s field cannot be blank.|,
 		lastUpdated => 1138908251,
@@ -486,6 +648,11 @@ in the system.</p>
 
 	'title' => {
 		message => q|The title of this event.|,
+		lastUpdated => 1149828404,
+	},
+
+	'short title' => {
+		message => q|Title|,
 		lastUpdated => 1149828404,
 	},
 
@@ -981,7 +1148,7 @@ for this event.</p>
 	'you' => {
 		message => q|you|,
 		lastUpdated => 1145396293,
-		context => q|Third person pronoun|,
+		context => q|Second person pronoun|,
 	},
 
 	'create a badge for myself' => {
@@ -1064,7 +1231,7 @@ for this event.</p>
 	'filter' => {
 		message => q|Filter|,
 		lastUpdated => 1145402683,
-		context => q|Button in search form to limit displayed events based on user criteria|,
+		context => q|Button in search form to limit displayed eveed events based on user criteria|,
 	},
 
 	'managePrereqsMessage' => {
@@ -1206,22 +1373,42 @@ for this event.</p>
 		context => q|The label for the sku template field in the edit event screen.|
 	},
 
-        'sku template description' => {
-                message => q|This field defines how the SKU for each
+	'sku template description' => {
+		message => q|This field defines how the SKU for each
 product variant will be composed. The syntax is the same as that of
 normal templates.|,
-                lastUpdated => 1146170930,
-        },
+		lastUpdated => 1146170930,
+	},
 
-        'error' => {
-                message => q|Error:|,
-                lastUpdated => 1146170930,
-        },
+	'error no colon' => {
+		message => q|Error|,
+		lastUpdated => 0,
+	},
 
-        'manage prerequisite sets' => {
-                message => q|Manage Prerequisite Sets|,
-                lastUpdated => 1147050475,
-        },
+	'error' => {
+		message => q|Error:|,
+		lastUpdated => 1146170930,
+	},
+
+	'manage prerequisite sets' => {
+		message => q|Manage Prerequisite Sets|,
+		lastUpdated => 1147050475,
+	},
+
+	'export events' => {
+		message => q|Export Events|,
+		lastUpdated => 1179341015,
+	},
+
+	'import events' => {
+		message => q|Import Events|,
+		lastUpdated => 1179341015,
+	},
+
+	'enter import file' => {
+		message => q|Please enter a file to import|,
+		lastUpdated => 1179341015,
+	},
 
         'edit prerequisite set' => {
                 message => q|Edit Prerequisite Set|,
@@ -1530,6 +1717,42 @@ added to the user's cart and would be discounted if the Attend All Sessions even
 		lastUpdated => 0,
 	},
 
+	'choose a file to import' => {
+		message => q|Choose a file to import|,
+		lastUpdated => 0,		
+	},
+
+	'what about duplicates' => {
+		message => q|What about duplicates?|,
+		lastUpdated => 0,
+		context => q|Import EMS data form|,
+	},
+
+	'ignore first line' => {
+		message => q|Ignore first line?|,
+		lastUpdated => 0,
+		context => q|Import EMS data form|,
+	},
+
+	'yes' => {
+		message => q|yes|,
+		lastUpdated => 0,
+	},
+
+	'no' => {
+		message => q|no|,
+		lastUpdated => 0,
+	},
+
+	'skip' => {
+		message => q|Skip|,
+		lastUpdated => 0,
+	},
+
+	'overwrite' => {
+		message => q|Overwrite|,
+		lastUpdated => 0,
+	},
 };
 
 1;

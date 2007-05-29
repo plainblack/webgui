@@ -81,7 +81,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 yesNo ( )
 
 Returns either a 1 or 0 representing yes, no. 
 
@@ -93,6 +93,32 @@ sub yesNo {
                 return 1;
         }
 	return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueFromPost ( [ value ] )
+
+If value is present, we will process it, otherwise the superclass will handle the request.
+
+=head3 value
+
+An optional value to process, instead of POST input. This should be in the form 1, 0, 'Y' or 'N'. 1 or 0 is returned.
+
+=cut
+
+sub getValueFromPost {
+	my $self = shift;
+	my $formValue;
+
+	if (@_) {
+		my $value = shift;
+		return '' unless length $value; # empty import value?
+		return ($value =~ /^y/i || $value eq '1') ? 1 : 0;
+	}
+	else {
+		return $self->SUPER::getValueFromPost;
+	}
 }
 
 #-------------------------------------------------------------------

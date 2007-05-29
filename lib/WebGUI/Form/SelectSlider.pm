@@ -16,6 +16,7 @@ package WebGUI::Form::SelectSlider;
 
 use strict;
 use base 'WebGUI::Form::Slider';
+use WebGUI::Form::SelectList;
 use WebGUI::International;
 
 =head1 NAME
@@ -177,16 +178,21 @@ sub getSliderValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValueFromPost ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes
 back as undef, this method will return the defaultValue instead. Strip
 newlines/carriage returns from the value.
 
+=head2 value
+
+A value to process instead of POST input.
+
 =cut
 
 sub getValueFromPost {
 	my $self = shift;
+	my @args = @_;
 
 	my $properties =  {
 		-name	=> $self->get('name'),
@@ -196,7 +202,7 @@ sub getValueFromPost {
 		-size	=> 1,
 	};
 
-	return WebGUI::Form::selectList->new($self->session, $properties)->getValueFromPost;
+	return WebGUI::Form::SelectList->new($self->session, $properties)->getValueFromPost(@args);
 }
 
 
