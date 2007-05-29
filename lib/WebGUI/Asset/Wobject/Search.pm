@@ -161,7 +161,7 @@ sub view {
 				title=>$data->{title},
 				synopsis=>$data->{synopsis},
 				});
-             $var->{results_found} = 1;
+             $var{results_found} = 1;
 			}
 		} 
 		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));
