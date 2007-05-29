@@ -655,7 +655,6 @@ A value to match the dynamicPageNumberKey.
 =cut
 
 sub setDataByQuery {
-	my ($sth, @row);
     my $self = shift;
 	my ($sql, $dbh, $unconditional, $placeholders, $dynamicPageNumberKey, $dynamicPageNumberValue) = @_;
     
@@ -691,9 +690,10 @@ sub setDataByQuery {
 	($self->{_totalRows}) = $dbh->quickArray("select found_rows()");
 	$self->{_columnNames} = [ $sth->getColumnNames ];
 	
+    my @row;
 	while (my $data = $sth->hashRef) {
-				push(@row,$data);	
-		}
+        push(@row,$data);	
+    }
     
 	$self->{_rowRef} = \@row;
     $self->{_setByQuery} = 1;
