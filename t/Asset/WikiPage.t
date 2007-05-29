@@ -44,15 +44,17 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 # See if the duplicate method works
 my $wikiPageCopy = $wikipage->duplicate();
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
+my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
 
 TODO: {
-        local $TODO = "Tests to make later";
-	ok(0, 'Lots and lots to do');
+    local $TODO = "Tests to make later";
+    ok(0, 'Lots and lots to do');
 }
 
 END {
 	# Clean up after thy self
-	$versionTag->rollback($versionTag->getId);
-	$secondVersionTag->rollback($secondVersionTag->getId);
+	$versionTag->rollback();
+	$secondVersionTag->rollback();
+	$thirdVersionTag->rollback();
 }
 

@@ -52,6 +52,6 @@ TODO: {
 
 END {
 	# Clean up after thy self
-	$versionTag->rollback($versionTag->getId);
+	$versionTag->rollback();
 }
 
