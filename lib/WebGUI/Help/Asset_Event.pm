@@ -36,7 +36,7 @@ our $HELP = {
                     'name'     => 'formGroupToView',
                   },
                   {
-                    'name'     => 'formAttachements',
+                    'name'     => 'formAttachments',
                   },
                   {
 		            'name'     => 'formStartDate',
@@ -251,8 +251,8 @@ our $HELP = {
                     'name' => 'attachment_loop',
                     'variables' => [
                                      {
-                                       'name'        => 'url'
-                                       'description' => 'attachment_url'
+                                       'name'        => 'url',
+                                       'description' => 'attachment_url',
                                      },
                                      {
                                        'name' => 'icon'
