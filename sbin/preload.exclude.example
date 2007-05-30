@@ -1,4 +1,3 @@
-WebGUI::Cache::Memcached
 WebGUI::Cache::Database
 WebGUI::Auth::LDAP
 WebGUI::Asset::Wobject::WSClient

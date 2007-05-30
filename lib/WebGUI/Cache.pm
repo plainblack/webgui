@@ -118,10 +118,7 @@ sub new {
 	my $cache;
 	my $class = shift;
 	my $session = shift;
-	if ($session->config->get("cacheType") eq "WebGUI::Cache::Memcached" && $session->config->get("memcached_servers")) {
-		require WebGUI::Cache::Memcached;
-		return WebGUI::Cache::Memcached->new($session,@_);
-	} elsif ($session->config->get("cacheType") eq "WebGUI::Cache::Database") {
+	if ($session->config->get("cacheType") eq "WebGUI::Cache::Database") {
 		require WebGUI::Cache::Database;
 		return WebGUI::Cache::Database->new($session,@_);
 	} else {

@@ -19,6 +19,8 @@
    queries for groupIds by userId (instead of the usual userIds by groupId)
  - fix: bad javascript string escaping in EMS
  - fix: Unable to upload images or edit listings for Matrix
+ - Added import/export mechanism for EMS events.
+ - Removed the long depricated Memcached cache module.
 
 
 7.3.19

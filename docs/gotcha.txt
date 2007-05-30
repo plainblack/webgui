@@ -22,6 +22,10 @@ save you many hours of grief.
    the userProfileData table will need to be updated to reflect these
    changes.
 
+ * WebGUI now requires the following additional perl modules to operate:
+    Config::JSON
+    Text::CSV_XS
+
 
 7.3.16
 --------------------------------------------------------------------
