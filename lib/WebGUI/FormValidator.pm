@@ -19,7 +19,7 @@ use WebGUI::HTML;
 
 =head1 NAME
 
-Package WebGUI::Session::Form
+Package WebGUI::FormValidator
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ This is a convenience package to the individual form controls. It allows you to 
 
 =head1 SYNOPSIS
 
- use WebGUI::Session::Form;
+ use WebGUI::FormValidator;
 
  my $fp = WebGUI::FormValidator->new($session);
 
