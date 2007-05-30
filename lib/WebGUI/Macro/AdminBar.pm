@@ -99,6 +99,13 @@ sub process {
 	my @tags = ();
 	if ($working) {
 		$workingId = $working->getId;
+        my $commitUrl = "";
+        if ($session->setting->get("skipCommitComments")) {
+            $session->url->page("op=commitVersionTagConfirm;tagId=".$workingId);
+        }
+        else {
+            $session->url->page("op=commitVersionTag;tagId=".$workingId);
+        }
 		push(@tags, {
 			url=>$session->url->page("op=commitVersionTag;tagId=".$workingId),
 			title=>$i18n->get("commit my changes"),

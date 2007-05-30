@@ -1,6 +1,28 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'skip commit comments' => {
+		message => q|Skip commit comments?|,
+		lastUpdated => 0,
+	},
+
+	'skip commit comments help' => {
+		message => q|Do you wish to be prompted to add comments to your content commits?|,
+		lastUpdated => 0,
+	},
+
+	'auto request commit' => {
+		message => q|Automatically request commit?|,
+		lastUpdated => 0,
+	},
+
+	'auto request commit help' => {
+		message => q|Would you like the system to automatically request commits for you so that you don't have to
+        remember to hit "Commit My Changes"? Note that when using this in conjunction with "Skip commit comments?"
+        and a realtime commit workflow it effectively hides the whole versioning and workflow process from users.|,
+		lastUpdated => 0,
+	},
+
 	'select' => {
 		message => q|Select|,
 		lastUpdated => 0,

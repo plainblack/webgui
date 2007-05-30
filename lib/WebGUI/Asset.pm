@@ -2144,9 +2144,21 @@ sub www_editSave {
 	}
 
 	$object->updateHistory("edited");
+
 	if ($self->session->form->process("saveAndCommit") ne "") {
-		$self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        if ($self->session->setting->get("skipCommitComments")) {
+		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        } else {
+		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        }
 		return "1";
+	}
+	if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        }
 	}
 	if ($self->session->form->process("proceed") eq "manageAssets") {
 		$self->session->asset($object->getParent);
@@ -2166,6 +2178,7 @@ sub www_editSave {
 	return $self->session->asset->www_view;
 }
 
+                
 
 #-------------------------------------------------------------------
 

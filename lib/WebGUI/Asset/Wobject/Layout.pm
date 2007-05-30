@@ -268,6 +268,9 @@ sub www_setContentPositions {
 	$self->addRevision({
 		contentPositions=>$self->session->form->process("map")
 		});
+	if ($self->session->setting->get("autoRequestCommit")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+    }
 	return "Map set: ".$self->session->form->process("map");
 }
 

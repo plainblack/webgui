@@ -1,4 +1,6 @@
 7.4.0
+ - Added a realtime workflow option for content publishing.
+ - Added switches to auto request commit operations and skip adding comments.
  - fix: old recurring events were not deleted when changing recurrence pattern
  - fix: unable to remove recurrence on events
  - RFE: Search asset feedback. i.e. 'No results found'
@@ -18,6 +20,9 @@
  - fix: bad javascript string escaping in EMS
  - fix: Unable to upload images or edit listings for Matrix
 
+
+7.3.19
+ - Fixed a formatting problem in the workflow editor screen.
 
 
 7.3.18

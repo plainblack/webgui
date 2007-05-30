@@ -227,6 +227,8 @@ sub getActivities {
 	return \@activities;
 }
 
+#-------------------------------------------------------------------
+
 =head2 getInstances ( )
 
 Returns an array reference of the instance objects currently existing for this workflow.
@@ -242,6 +244,8 @@ sub getInstances {
 	}
 	return \@instances;
 }
+
+#-------------------------------------------------------------------
 
 =head2 getCrons ( )
 
@@ -274,7 +278,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( session, [ type ] )
+=head2 getList ( session, [ type, includeRealtime ] )
 
 Returns a hash reference of workflowId/title pairs of all enabled workflows.  This is a class method.
 
@@ -286,18 +290,27 @@ A reference to the current session.
 
 If specified this will limit the list to a certain type of workflow based upon the object type that the workflow is set up to handle.
 
+=head3 includeRealtime
+
+If set to 1 the list returned will include workflows with a mode of "realtime", otherwise it won't.
+
 =cut
 
 sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $type = shift;
+    my $includeRealtime = shift;
 	my $sql = "select workflowId, title from Workflow where enabled=1";
+    my @params;
 	if ($type) {
 		$sql .= " and type=?";
-		$type = [$type];
+		push(@params, $type);
 	}
-	return $session->db->buildHashRef($sql, $type);
+    unless ($includeRealtime) {
+        $sql .= " and mode<>'realtime'";
+    }
+	return $session->db->buildHashRef($sql, \@params);
 }
 
 
@@ -321,6 +334,62 @@ sub getNextActivity {
 	my ($id) = $self->session->db->quickArray("select activityId from WorkflowActivity where workflowId=? 
 		and sequenceNumber>=? order by sequenceNumber", [$self->getId, $sequenceNumber]);
 	return $self->getActivity($id);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isParallel ( ) 
+
+Returns 1 if the mode is set to "parallel".
+
+=cut
+
+sub isParallel {
+    my $self = shift;
+    return ($self->get("mode") eq "parallel") ? 1 : 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isRealtime ( ) 
+
+Returns 1 if the mode is set to "realtime".
+
+=cut
+
+sub isRealtime {
+    my $self = shift;
+    return ($self->get("mode") eq "realtime") ? 1 : 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isSerial ( ) 
+
+Returns 1 if the mode is set to "serial".
+
+=cut
+
+sub isSerial {
+    my $self = shift;
+    return ($self->get("mode") eq "serial") ? 1 : 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isSingleton ( ) 
+
+Returns 1 if the mode is set to "singleton".
+
+=cut
+
+sub isSingleton {
+    my $self = shift;
+    return ($self->get("mode") eq "singleton") ? 1 : 0;
 }
 
 
@@ -431,34 +500,30 @@ A boolean indicating whether this workflow may be executed right now.
 
 A string indicating the type of object this workflow will be operating on. Valid values are "None", or any object type, like "WebGUI::VersionTag".
 
-=head4 isSingleton
+=head4 mode
 
-A boolean indicating whether this workflow should be run as a singleton. If it's a singleton, then only one instance of the workflow will be allowed to be created at a given time. So if you try to create a new instance of it, and one instance is already created, the create() method will return undef instead of a reference to the object.
-
-=head4 isSerial
-
-A boolean indicating whether this workflow should be run in serial mode. If it's run in serial, then only one instance of this workflow will be run at a given time, and all other instances of it will queue up.
+A string containing one of "singleton", "parallel", "serial", or "realtime". Parallel is the default and should be
+used in most situations. Singltons will allow only one instance of the workflow to be created at one time. New
+instances will be destroyed immediately if a one instance of a singleton already exists. Serial workflows will run
+instances sequentially in FIFO. Realtime workflows will run immediately without being handed off to Spectre for
+governance.
 
 =cut
 
 sub set {
 	my $self = shift;
 	my $properties = shift;
-	if ($properties->{enabled} == 1) {
-		$self->{_data}{enabled} = 1;
-	} elsif ($properties->{enabled} == 0) {
-		$self->{_data}{enabled} = 0;
-	}
+
+    # depricated. replaced by mode.
 	if ($properties->{isSerial} == 1) {
-		$self->{_data}{isSerial} = 1;
-	} elsif ($properties->{isSerial} == 0) {
-		$self->{_data}{isSerial} = 0;
+		$properties->{mode} = "serial";
 	}
 	if ($properties->{isSingleton} == 1) {
-		$self->{_data}{isSingleton} = 1;
-	} elsif ($properties->{isSingleton} == 0) {
-		$self->{_data}{isSingleton} = 0;
+		$properties->{mode} = "singleton";
 	}
+
+    $self->{_data}{mode} = $properties->{mode} || "parallel";
+	$self->{_data}{enabled} = ($properties->{enabled} == 1) ? 1 : 0;
 	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};
 	$self->{_data}{type} = $properties->{type} || $self->{_data}{type} || "None";

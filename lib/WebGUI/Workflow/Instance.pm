@@ -42,7 +42,8 @@ These methods are available from this class:
 
 =head2 create ( session, properties ) 
 
-Creates a new workflow instance and returns a reference to the object. Will return undef if the workflow specified is serial and an instance of it already exists.
+Creates a new workflow instance and returns a reference to the object. Will return undef if the workflow specified
+is singleton and an instance of it already exists.
 
 =head3 session
 
@@ -58,10 +59,17 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	my ($isSingleton) = $session->db->quickArray("select isSingleton from Workflow where workflowId=?",[$properties->{workflowId}]);
-	my $params = (exists $properties->{parameters}) ? JSON::objToJson({parameters => $properties->{parameters}}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}) : undef;
+
+    # do singleton check
+	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
+    mode='singleton'",[$properties->{workflowId}]);
+	my $params = (exists $properties->{parameters}) 
+        ? JSON::objToJson({parameters => $properties->{parameters}}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}) 
+        : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
 	return undef if ($isSingleton && $count);
+
+    # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
 	my $self = $class->new($session, $instanceId);
 	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
@@ -119,8 +127,9 @@ Deconstructor.
 =cut
 
 sub DESTROY {
-        my $self = shift;
-        undef $self;
+    my $self = shift;
+    delete $self->{_workflow};
+    undef $self;
 }
 
 
@@ -153,12 +162,12 @@ Returns an array reference of all the instance objects defined in this system. A
 sub getAllInstances {
 	my $class = shift;
 	my $session = shift;
-        my @instances = ();
-        my $rs = $session->db->read("SELECT instanceId FROM WorkflowInstance");
-        while (my ($instanceId) = $rs->array) {
-                push(@instances, WebGUI::Workflow::Instance->new($session, $instanceId));
-        }
-        return \@instances;	
+    my @instances = ();
+    my $rs = $session->db->read("SELECT instanceId FROM WorkflowInstance");
+    while (my ($instanceId) = $rs->array) {
+        push(@instances, WebGUI::Workflow::Instance->new($session, $instanceId));
+    }
+    return \@instances;	
 }
 
 
@@ -218,7 +227,10 @@ Returns a reference to the workflow object this instance is associated with.
 
 sub getWorkflow {
 	my $self = shift;
-	return WebGUI::Workflow->new($self->session, $self->get("workflowId"));
+    unless (exists $self->{_workflow}) {
+        $self->{_workflow} = WebGUI::Workflow->new($self->session, $self->get("workflowId"));
+    }
+    return $self->{_workflow};
 }
 
 #-------------------------------------------------------------------
@@ -272,7 +284,7 @@ sub run {
 		$self->set({lastStatus=>"disabled", notifySpectre=>0});
 		return "disabled";
 	}
-	if ($workflow->get("isSerial")) {
+	if ($workflow->isSerial) {
 		my ($firstId) = $self->session->db->quickArray(
             "select instanceId from WorkflowInstance where workflowId=? order by runningSince",
             [$workflow->getId]
@@ -333,6 +345,23 @@ sub run {
 	return $status;
 }
 
+#-------------------------------------------------------------------
+
+=head2 runAll ( )
+
+Runs all activities in this workflow instance, and returns the last status code, which should be "done" unless
+something bad happens.
+
+=cut
+
+sub runAll {
+    my $self = shift;
+    my $status = "complete";
+    while ($status eq "complete") {
+        $status = $self->run;
+    }
+    return $status;
+}
 
 #-------------------------------------------------------------------
 
@@ -401,7 +430,7 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	if ($properties->{notifySpectre}) {
+	if (!$self->getWorkflow->isRealtime && $properties->{notifySpectre}) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId) unless ($properties->{newlyCreated});
 		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});

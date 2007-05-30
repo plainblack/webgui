@@ -7,6 +7,12 @@ our $I18N = {
 		lastUpdated => 0 
 	},
 
+	'bad commit' => {
+		message => q|Something bad happened while trying to commit your content. Please contact your system
+        administrator.|,
+		lastUpdated => 0 
+	},
+
 	'back to home' => {
 		message => q|Back to home.|,
 		lastUpdated => 0 

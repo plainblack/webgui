@@ -116,7 +116,8 @@ sub www_editVersionTag {
 	if ($session->user->isInGroup("pbgroup000000000000016")) {
 		$f->workflow(
 			value=>$workflowId,
-			type=>"WebGUI::VersionTag"
+			type=>"WebGUI::VersionTag",
+            includeRealtime=>1,
 			);
 		$f->group(
 			value=>[$groupId],
@@ -240,13 +241,17 @@ sub www_commitVersionTagConfirm {
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
-			$tag->set({comments=>$session->form->process("comments", "textarea")});
-			$tag->requestCommit;
 			my $i18n = WebGUI::International->new($session, "VersionTag");
-        		my $ac = WebGUI::AdminConsole->new($session,"versions");
+			$tag->set({comments=>$session->form->process("comments", "textarea")});
+            eval { $tag->requestCommit; };
+            my $error = "";
+            if ($@) {
+                 $error .= $i18n->get("bad commit")." ".$@; 
+            }
+        	my $ac = WebGUI::AdminConsole->new($session,"versions");
 			my $default = WebGUI::Asset->getDefault($session);
 			return $ac->render(
-				'<p>'.$i18n->get("commit accepted").'</p>'
+				$error.'<p>'.$i18n->get("commit accepted").'</p>'
 				.'<ul>
 				<li><a href="'.$default->getUrl.'">'.$i18n->get("back to home").'</a></li>
 				<li><a href="'.$default->getUrl("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>

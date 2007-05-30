@@ -7,8 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
 7.4.0
 --------------------------------------------------------------------
+
+ * You must upgrade to the latest 7.3.x release before upgrading to
+    7.4.0 or you will encounter fatal errors during the upgrade
+    process.
 
  * The userProfileData table has been completely re-done. Now, each
    user profile field has its own column in the userProfileData table.

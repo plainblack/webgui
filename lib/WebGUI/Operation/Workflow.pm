@@ -199,22 +199,21 @@ sub www_editWorkflow {
 		label=>$i18n->get("is enabled"),
 		hoverHelp=>$i18n->get("is enabled help")
 		);
-	$f->yesNo(
-		name=>"isSingleton",
-		value=>$workflow->get("isSingleton"),
-		defaultValue=>0,
-		label=>$i18n->get("is singleton"),
-		hoverHelp=>$i18n->get("is singleton help")
-		);
-	$f->yesNo(
-		name=>"isSerial",
-		value=>$workflow->get("isSerial"),
-		defaultValue=>0,
-		label=>$i18n->get("is serial"),
-		hoverHelp=>$i18n->get("is serial help")
+	$f->selectBox(
+		name=>"mode",
+        options=>{
+            singleton=>$i18n->get("singleton"),
+            parallel=>$i18n->get("parallel"),
+            serial=>$i18n->get("serial"),
+            realtime=>$i18n->get("realtime"),
+        },
+		value=>$workflow->get("mode") || "parallel",
+		defaultValue=>"parallel",
+		label=>$i18n->get("mode"),
+		hoverHelp=>$i18n->get("mode help")
 		);
 	$f->submit;
-	my $steps = '<div style="clear:both"></div><table class="content">';
+	my $steps = '<table class="content">';
 	my $rs = $session->db->read("select activityId, title from WorkflowActivity where workflowId=? order by sequenceNumber",[$workflow->getId]);
 	while (my ($id, $title) = $rs->array) {
 		$steps .= '<tr><td>'
@@ -224,7 +223,7 @@ sub www_editWorkflow {
 			.$session->icon->moveUp("op=promoteWorkflowActivity;workflowId=".$workflow->getId.";activityId=".$id)
 			.'</td><td>'.$title.'</td></tr>';	
 	}
-	$steps .= '</table>';
+	$steps .= '</table><div style="clear: both;"></div>';
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
@@ -247,8 +246,7 @@ sub www_editWorkflowSave {
 	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->set({
 		enabled     => $session->form->get("enabled",     "yesNo"),
-		isSingleton => $session->form->get("isSingleton", "yesNo"),
-		isSerial    => $session->form->get("isSerial",    "yesNo"),
+		mode        => $session->form->get("mode"),
 		title       => $session->form->get("title"),
 		description => $session->form->get("description", "textarea"),
 		});

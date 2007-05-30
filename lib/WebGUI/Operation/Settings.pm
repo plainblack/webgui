@@ -77,7 +77,24 @@ sub definition {
 		defaultValue=>$session->setting->get("defaultVersionTagWorkflow"),
 		type=>"WebGUI::VersionTag",
 		label=>$i18n->get("default version tag workflow"),
-		hoverHelp=>$i18n->get('default version tag workflow help')
+		hoverHelp=>$i18n->get('default version tag workflow help'),
+        includeRealtime=>1,
+		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"yesNo",
+        name=>"autoRequestCommit",
+        label=>$i18n->get("auto request commit"),
+        hoverHelp=>$i18n->get("auto request commit help"),
+        defaultValue=>$session->setting->get("autoRequestCommit")
+		});
+	push(@fields, {
+		tab=>"content",
+		fieldType=>"yesNo",
+        name=>"skipCommitComments",
+        label=>$i18n->get("skip commit comments"),
+        hoverHelp=>$i18n->get("skip commit comments"),
+        defaultValue=>$session->setting->get("skipCommitComments")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -164,10 +181,10 @@ sub definition {
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"yesNo",
-                name=>"metaDataEnabled",
-                label=>$i18n->get("Enable Metadata"),
-                hoverHelp=>$i18n->get("Enable Metadata description"),
-                defaultValue=>$session->setting->get("metaDataEnabled")
+        name=>"metaDataEnabled",
+        label=>$i18n->get("Enable Metadata"),
+        hoverHelp=>$i18n->get("Enable Metadata description"),
+        defaultValue=>$session->setting->get("metaDataEnabled")
 		});
 	# user interface settings
 	push(@fields, {

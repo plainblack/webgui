@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Workflow;
 
 my $toVersion = "7.4.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -20,7 +20,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addRealtimeWorkflow($session);
 addGroupingsIndexOnUserId($session);
 fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
@@ -29,12 +29,32 @@ addAttachmentsToEvents($session);
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub addRealtimeWorkflow {
+	my $session = shift;
+	print "\tAdding realtime workflow option.\n" unless ($quiet);
+    my $db = $session->db;
+    $db->write("alter table Workflow add column mode varchar(20) not null default 'parallel'");
+    my $sth = $db->read("select workflowId, isSerial from Workflow where isSerial=1 or isSingleton=1");
+    while (my ($id, $serial) = $sth->array) {
+        my $mode = "singleton";
+        $mode = "serial" if ($serial);
+        $db->write("update Workflow set mode=? where workflowId=?",[$mode, $id]);
+    }
+    $db->write("alter table Workflow drop column isSingleton");
+    $db->write("alter table Workflow drop column isSerial");
+    my $workflow = WebGUI::Workflow->create($session, {
+        enabled     => 1,
+        title       => "Commit Content Immediately",
+        description => "Will commit the content as soon as save is pressed rather than waiting for Spectre to pick it up and run it in the background.",
+        mode        => "realtime",
+        type        => "WebGUI::VersionTag",
+        },"realtimeworkflow-00001");
+    my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::CommitVersionTag", "pb-commitimmediately01");
+    $activity->set("title", "Commit Version Tag"); 
+    $session->setting->add("autoRequestCommit",0);
+    $session->setting->add("skipCommitComments",0);
+}
 
 #----------------------------------------------------------------------------
 
