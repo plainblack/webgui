@@ -282,7 +282,7 @@ sub installBadLocale {
 
 END {
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/);
-    foreach my $account ($buster, $dude) {
+    foreach my $account ($buster, $dude, $bud) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
 }
