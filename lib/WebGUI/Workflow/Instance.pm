@@ -18,6 +18,7 @@ package WebGUI::Workflow::Instance;
 use strict;
 use JSON;
 use WebGUI::Workflow::Spectre;
+use WebGUI::Workflow;
 
 
 =head1 NAME
