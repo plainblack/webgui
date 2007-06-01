@@ -48,12 +48,12 @@ The fieldId to be deleted.
 =cut
 
 sub deleteMetaDataField {
-	my $self = shift;
-	my $fieldId = shift;
-	$self->session->db->beginTransaction;
-        $self->session->db->write("delete from metaData_properties where fieldId = ".$self->session->db->quote($fieldId));
-        $self->session->db->write("delete from metaData_values where fieldId = ".$self->session->db->quote($fieldId));
-	$self->session->db->commit;
+    my $self = shift;
+    my $fieldId = shift;
+    $self->session->db->beginTransaction;
+    $self->session->db->write("delete from metaData_properties where fieldId = ?",[$fieldId]);
+    $self->session->db->write("delete from metaData_values where fieldId = ?",[$fieldId]);
+    $self->session->db->commit;
 }
 
 
@@ -224,36 +224,46 @@ sub www_editMetaDataFieldSave {
 	my $i18n = WebGUI::International->new($self->session,"Asset");
 	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
+    my $fid       = $self->session->form->process("fid");
+    my $fieldName = $self->session->form->process("fieldName");
 	my $sql = "select count(*) from metaData_properties where fieldName = ".
-                                $self->session->db->quote($self->session->form->process("fieldName"));
-	if ($self->session->form->process("fid") ne "new") {
-		$sql .= " and fieldId <> ".$self->session->db->quote($self->session->form->process("fid"));
+                                $self->session->db->quote($fieldName);
+	if ($fid ne "new") {
+		$sql .= " and fieldId <> ".$self->session->db->quote($fid);
 	}
 	my ($isDuplicate) = $self->session->db->buildArray($sql);
 	if($isDuplicate) {
 		my $error = $i18n->get("duplicateField");
-		$error =~ s/\%field\%/$self->session->form->process("fieldName")/;
+		$error =~ s/\%field\%/$fieldName/;
 		return $ac->render($error,$i18n->get('Edit Metadata'));
 	}
-	if($self->session->form->process("fieldName") eq "") {
+	if($fieldName eq "") {
 		return $ac->render($i18n->get("errorEmptyField"),$i18n->get('Edit Metadata'));
 	}
-	if($self->session->form->process("fid") eq 'new') {
-		my $fid = $self->session->id->generate();
-		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (".
-					$self->session->db->quote($fid).",".
-					$self->session->db->quote($self->session->form->process("fieldName")).",".
-					$self->session->db->quote($self->session->form->process("defaultValue")).",".
-					$self->session->db->quote($self->session->form->process("description")).",".
-					$self->session->db->quote($self->session->form->process("fieldType")).",".
-					$self->session->db->quote($self->session->form->process("possibleValues")).")");
-	} else {
-                $self->session->db->write("update metaData_properties set fieldName = ".$self->session->db->quote($self->session->form->process("fieldName")).", ".
-					"defaultValue = ".$self->session->db->quote($self->session->form->process("defaultValue")).", ".
-					"description = ".$self->session->db->quote($self->session->form->process("description")).", ".
-					"fieldType = ".$self->session->db->quote($self->session->form->process("fieldType")).", ".
-					"possibleValues = ".$self->session->db->quote($self->session->form->process("possibleValues")).
-					" where fieldId = ".$self->session->db->quote($self->session->form->process("fid")));
+	if($fid eq 'new') {
+		$fid = $self->session->id->generate();
+		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (?,?,?,?,?,?)",
+            [
+                $fid,
+                $fieldName,
+                $self->session->form->process("defaultValue") || '',
+                $self->session->form->process("description") || '',
+                $self->session->form->process("fieldType"),
+                $self->session->form->process("possibleValues") || '',
+            ]
+        );
+	}
+    else {
+        $self->session->db->write("update metaData_properties set fieldName = ?, defaultValue = ?, description = ?, fieldType = ?, possibleValues = ? where fieldId = ?",
+            [
+                $fieldName,
+                $self->session->form->process("defaultValue") || '',
+                $self->session->form->process("description") || '',
+                $self->session->form->process("fieldType"),
+                $self->session->form->process("possibleValues") || '',
+                $fid,
+            ]
+        );
 	}
 
 	return $self->www_manageMetaData; 
