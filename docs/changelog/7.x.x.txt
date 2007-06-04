@@ -21,6 +21,7 @@
  - fix: Unable to upload images or edit listings for Matrix
  - Added import/export mechanism for EMS events.
  - Removed the long depricated Memcached cache module.
+ - fix: Show edit links on EMS search view without being in Admin group
 
 
 7.3.19

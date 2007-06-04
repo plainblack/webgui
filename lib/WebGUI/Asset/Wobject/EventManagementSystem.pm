@@ -4058,12 +4058,7 @@ sub www_search {
 	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
 	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
 	$var{'addEvent.label'} = $i18n->get('add event');
-	if ($self->session->user->isInGroup($self->get("groupToManageEvents"))) {
-		$var{'canManageEvents'} = 1;
-	}
-	else {
-		$var{'canManageEvents'} = 0;
-	}
+    $var{'canManageEvents'} = $self->canAddEvents();
 	my $message;
 	$subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
 	my $advSearchFlag = $self->session->form->get("advSearch");
