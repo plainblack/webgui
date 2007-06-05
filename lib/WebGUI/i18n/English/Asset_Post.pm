@@ -595,10 +595,40 @@ user subscribed to.|,
                 context => q|label for Asset Manager, getName|,
                 lastUpdated => 1128829703,
         },
-                                                                                                                              
+
 	'new file description' => {
 		message => q|Enter the path to a file, or use the "Browse" button to find a file on your local hard drive that you would like to be uploaded.|,
 		lastUpdated => 1119068745
+	},
+
+	'meta_loop' => {
+		message => q|A loop containing metadata lables and fields for this Post.  If metadata is not enabled for the site, or if metadata is not enabled for this CS, or if there's no metadata defined for the site, the loop will be empty.|,
+		lastUpdated => 1180928713
+	},
+
+	'field' => {
+		message => q|The form for this metadata field.|,
+		lastUpdated => 1180928713
+	},
+
+	'name' => {
+		message => q|The label for this metadata field.  Metadata labels are not internationalized.|,
+		lastUpdated => 1180928713
+	},
+
+	'value' => {
+		message => q|The value of this metadata field for this post.|,
+		lastUpdated => 1180928713
+	},
+
+	'meta_X_form' => {
+		message => q|The form for a particular metadata field, picked by name.  X is the name of the metadata field, where any spaces in the name have been changed into underscores.|,
+		lastUpdated => 1180929142
+	},
+
+	'meta_X_value' => {
+		message => q|The value for a particular metadata field, picked by name.  X is the name of the metadata field, where any spaces in the name have been changed into underscores.|,
+		lastUpdated => 1180931029
 	},
 
 };

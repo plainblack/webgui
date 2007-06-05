@@ -1510,6 +1510,16 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1165449336,
 	},
 
+	'enable metadata' => {
+		message => q|Enable MetaData in Posts?|,
+		lastUpdated => 1180759718,
+	},
+
+	'enable metadata description' => {
+		message => q|<p>Select "Yes" to enable Posts to have MetaData and to be passively profiled.  This will impact the performance of the Collaboration System.  MetaData must also be enabled sitewide in the site settings.</p>|,
+		lastUpdated => 1180759724,
+	},
+
 	'collaboration rss template title' => {
 		message => q|Collaboration RSS Template|,
 		lastUpdated => 1114467745,

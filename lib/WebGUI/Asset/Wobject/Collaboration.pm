@@ -109,6 +109,7 @@ sub appendPostListTemplateVars {
                 	"avatar.url"=>$post->getAvatarUrl,
 			%lastReply
 		);
+        $post->getTemplateMetadataVars(\%postVars);
 		if ($row->{className} eq 'WebGUI::Asset::Post::Thread') {
 			$postVars{'rating'} = $post->get('threadRating');
 		}
@@ -619,6 +620,13 @@ sub definition {
 			tab=>'properties',
 			label=>$i18n->get('enable avatars'),
 			hoverHelp=>$i18n->get('enable avatars description'),
+			},
+		enablePostMetaData =>{
+			fieldType=>"yesNo",
+			defaultValue=>0,
+			tab=>'meta',
+			label=>$i18n->get('enable metadata'),
+			hoverHelp=>$i18n->get('enable metadata description'),
 			},
 		postGroupId =>{
 			fieldType=>"group",

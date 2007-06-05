@@ -130,6 +130,20 @@ our $HELP = {
 		            'name' => 'karmaIsEnabled'
 		          },
 		          {
+		            'name' => 'meta_loop',
+		            'variables' => [
+                      {
+                        'name' => 'name'
+                      },
+                      {
+                        'name' => 'field'
+                      },
+                    ]
+		          },
+		          {
+		            'name' => 'meta_X_form'
+		          },
+		          {
 		            'name' => 'form.preview'
 		          },
 		          {
@@ -249,6 +263,20 @@ our $HELP = {
 		                               'name' => 'isImage'
 		                             }
 		                           ]
+		          },
+		          {
+		            'name' => 'meta_loop',
+		            'variables' => [
+                      {
+                        'name' => 'name'
+                      },
+                      {
+                        'name' => 'value'
+                      },
+                    ]
+		          },
+		          {
+		            'name' => 'meta_X_value'
 		          },
 		],
 		fields => [

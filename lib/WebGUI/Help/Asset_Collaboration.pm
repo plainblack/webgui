@@ -157,6 +157,11 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'enable metadata',
+                                description => 'enable metadata description',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'get mail',
                                 description => 'get mail help',
                                 namespace => 'Asset_Collaboration',

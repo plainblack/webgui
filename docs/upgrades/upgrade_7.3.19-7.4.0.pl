@@ -25,6 +25,7 @@ addGroupingsIndexOnUserId($session);
 fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
 addAttachmentsToEvents($session);
+addMetaDataPostsToCS($session);
 
 finish($session); # this line required
 
@@ -101,6 +102,18 @@ sub fixProfileDataWithoutFields {
         );
     }
 
+    print "OK!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+
+sub addMetaDataPostsToCS {
+    my $session     = shift;
+    my $db          = $session->db;
+    
+    print "\tAdding feature to CS to enable meta data in posts... " unless $quiet;
+    $db->write("alter table Collaboration add column enablePostMetaData int(11) not null default 0");
     print "OK!\n" unless $quiet;
 }
 

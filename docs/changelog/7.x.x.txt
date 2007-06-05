@@ -9,6 +9,7 @@
     http://www.plainblack.com/rfe/request-for-enhancement/-1493348--js-confirmation-operation/databaselink/re--1493348--js-confirmation-operation/databaselink.pm#OUb5zN8bltGdPG_2LJZMGQ
  - add: User profile data table is now a flat table, one column for each
     field.
+ - add: Posts can now have Metadata (United Knowledge)
  - add: Calendar events now allow attachments
  - add: Calendar events now allow setting view permissions
  - add: WebGUI::Paginator now capable of more efficient SQL paginations using

@@ -19,6 +19,7 @@ use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
+use WebGUI::Form::DynamicField;
 use WebGUI::International;
 use WebGUI::Inbox;
 use WebGUI::Mail::Send;
@@ -479,6 +480,28 @@ sub getSynopsisAndContent {
 }
 
 #-------------------------------------------------------------------
+sub getTemplateMetadataVars {
+	my $self = shift;
+    my $var  = shift;
+    if ($self->session->setting->get("metaDataEnabled")
+     && $self->getThread->getParent->get('enablePostMetaData')) {
+        my $meta = $self->getMetaDataFields();
+        my @meta_loop = ();
+        foreach my $field (keys %{ $meta }) {
+            push @meta_loop, {
+                value => $meta->{$field}{value},
+                name  => $meta->{$field}{fieldName},
+            };
+            my $fieldName = $meta->{$field}{fieldName};
+            $fieldName =~ tr/ /_/;
+            $fieldName = lc $fieldName;
+            $var->{'meta_'.$fieldName.'_value'} = $meta->{$field}{value};  ##By name interface
+        }
+        $var->{meta_loop} = \@meta_loop;
+    }
+}
+
+#-------------------------------------------------------------------
 sub getTemplateVars {
 	my $self = shift;
 	my %var = %{$self->get};
@@ -527,6 +550,7 @@ sub getTemplateVars {
 				});
 		}
 	}
+    $self->getTemplateMetadataVars(\%var);
 	return \%var;
 }
 
@@ -1062,7 +1086,7 @@ sub www_edit {
 	if ($self->session->form->process("func") eq "add") { # new post
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
 			.WebGUI::Form::hidden($self->session, {
-                		name=>"func",
+                name=>"func",
 				value=>"add"
 				})
 			.WebGUI::Form::hidden($self->session, {
@@ -1073,7 +1097,7 @@ sub www_edit {
 				name=>"class",
 				value=>$self->session->form->process("class","className")
 				});
-        	$var{'isNewPost'} = 1;
+        $var{'isNewPost'} = 1;
 		$content = $self->session->form->process("content");
 		$title = $self->session->form->process("title");
 		$synopsis = $self->session->form->process("synopsis");
@@ -1096,46 +1120,48 @@ sub www_edit {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe")
 				});
-		} elsif ($self->session->form->process("class","className") eq "WebGUI::Asset::Post::Thread") { # new thread
+		}
+        elsif ($self->session->form->process("class","className") eq "WebGUI::Asset::Post::Thread") { # new thread
 			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{isThread} = 1;
 			$var{isNewThread} = 1;
-                	if ($self->getThread->getParent->canEdit) {
-                        	$var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {
-                                	name=>'stick',
-                                	value=>$self->session->form->process("stick")
-                                	});
-                        	$var{'lock.form'} = WebGUI::Form::yesNo($self->session, {
-                       	         	name=>'lock',
-                                	value=>$self->session->form->process('lock')
-                                	});
+            if ($self->getThread->getParent->canEdit) {
+                $var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {
+                        name=>'stick',
+                        value=>$self->session->form->process("stick")
+                        });
+                $var{'lock.form'} = WebGUI::Form::yesNo($self->session, {
+                        name=>'lock',
+                        value=>$self->session->form->process('lock')
+                        });
 			}
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe") || 1
 				});
 		}
-                $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
-	} else { # edit
+        $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
+	}
+    else { # edit
 		return $self->session->privilege->insufficient() unless ($self->canEdit);
 		$var{isThread} = !$self->isReply;
         	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 			.WebGUI::Form::hidden($self->session, {
-                		name=>"func",
-				value=>"edit"
-				})
+                name=>"func",
+                value=>"edit"
+            })
 			.WebGUI::Form::hidden($self->session, {
 				name=>"revision",
 				value=>$self->session->form->param("revision")
-				})
+            })
 			.WebGUI::Form::hidden($self->session, {
 				name=>"ownerUserId",
 				value=>$self->getValue("ownerUserId")
-				})
+            })
 			.WebGUI::Form::hidden($self->session, {
 				name=>"username",
 				value=>$self->getValue("username")
-				});
+            });
 		$var{isEdit} = 1;
 		$content = $self->session->form->process('content') || $self->getValue("content");
 		$title = $self->session->form->process('title') || $self->getValue("title");
@@ -1193,11 +1219,11 @@ sub www_edit {
 			    value   => $userDefinedValue,
 			});
 	}
-	
+
 	$title = WebGUI::HTML::filter($title,"all");
 	$content = WebGUI::HTML::filter($content,"macros");
 	$synopsis = WebGUI::HTML::filter($synopsis,"all");
-	
+
 	$var{'title.form'} = WebGUI::Form::text($self->session, {
 		name=>"title",
 		value=>$title
@@ -1234,10 +1260,43 @@ sub www_edit {
 		maxAttachments=>$numberOfAttachments,
 		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
 		}) if ($numberOfAttachments);
-        $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
-                name=>'contentType',
-                value=>$self->getValue("contentType") || "mixed"
-                });
+    $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
+        name=>'contentType',
+        value=>$self->getValue("contentType") || "mixed",
+    });
+    if ($self->session->setting->get("metaDataEnabled")
+     && $self->getThread->getParent->get('enablePostMetaData')) {
+        my $meta = $self->getMetaDataFields();
+        my $formGen = $self->session->form;
+        my @meta_loop = ();
+        foreach my $field (keys %{ $meta }) {
+            my $fieldType = $meta->{$field}{fieldType} || "Text";
+            my $options;
+            # Add a "Select..." option on top of a select list to prevent from
+            # saving the value on top of the list when no choice is made.
+            if($fieldType eq "selectList") {
+                $options = {"", $i18n->get("Select", "Asset")};
+            }
+            my $form = WebGUI::Form::DynamicField->new($self->session,
+                                                name=>"metadata_".$meta->{$field}{fieldId},
+                                                uiLevel=>5,
+                                                value=>$meta->{$field}{value},
+                                                extras=>qq/title="$meta->{$field}{description}"/,
+                                                possibleValues=>$meta->{$field}{possibleValues},
+                                                options=>$options,
+                                                fieldType=>$fieldType,
+            )->toHtml;
+            push @meta_loop, {
+                field => $form,
+                name  => $meta->{$field}{fieldName},
+            };
+            my $fieldName = $meta->{$field}{fieldName};
+            $fieldName =~ tr/ /_/;
+            $fieldName = lc $fieldName;
+            $var{'meta_'.$fieldName.'_form'} = $form;  ##By name interface
+        }
+        $var{meta_loop} = \@meta_loop;
+    }
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
