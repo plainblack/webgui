@@ -37,6 +37,64 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addMetaDataField ( )
+
+Adds a field to the metadata system.
+
+=head3 fieldId
+
+The fieldId to be added.
+
+=head3 fieldName
+
+The name of the field
+
+=head3 defaultValue
+
+The default value of the metadata field, if none is chosen by the user.
+
+=head3 description
+
+A description for the field, in case you forget later why you ever bothered
+wasting space in the db for this field.
+
+=head3 fieldType
+
+The form field type for metaData, select list, text, integer.
+
+=head3 possibleValues
+
+For fields that provide options, the list of options.  This is a string with
+newline separated values.
+
+=cut
+
+sub addMetaDataField {
+    my $self = shift;
+
+    my $fieldId          = shift || 'new';
+    my $fieldName        = shift || $self->session->id->generate();
+    my $defaultValue     = shift;
+    my $description      = shift || '';
+    my $fieldType        = shift;
+    my $possibleValues   = shift;
+
+	if($fieldId eq 'new') {
+		$fieldId = $self->session->id->generate();
+		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (?,?,?,?,?,?)",
+            [ $fieldId, $fieldName, $defaultValue, $description, $fieldType, $possibleValues, ]
+        );
+	}
+    else {
+        $self->session->db->write("update metaData_properties set fieldName = ?, defaultValue = ?, description = ?, fieldType = ?, possibleValues = ? where fieldId = ?",
+            [ $fieldName, $defaultValue, $description, $fieldType, $possibleValues, $fieldId, ]
+        );
+	}
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 deleteMetaDataField ( )
 
 Deletes a field from the metadata system.
@@ -61,7 +119,8 @@ sub deleteMetaDataField {
 
 =head2 getMetaDataFields ( [fieldId] )
 
-Returns a hash reference containing all metadata field properties.  You can limit the output to a certain field by specifying a fieldId.
+Returns a hash reference containing all metadata field properties for this Asset.
+You can limit the output to a certain field by specifying a fieldId.
 
 =head3 fieldId
 
@@ -86,16 +145,17 @@ sub getMetaDataFields {
 	$sql .= " order by f.fieldName";
 	if ($fieldId) {
 		return $self->session->db->quickHashRef($sql);	
-	} else {
-		tie my %hash, 'Tie::IxHash';
-		my $sth = $self->session->db->read($sql);
-	        while( my $h = $sth->hashRef) {
+	}
+    else {
+        tie my %hash, 'Tie::IxHash';
+        my $sth = $self->session->db->read($sql);
+        while( my $h = $sth->hashRef) {
 			foreach(keys %$h) {
 				$hash{$h->{fieldId}}{$_} = $h->{$_};
 			}
 		}
-       	 	$sth->finish;
-        	return \%hash;
+        $sth->finish;
+        return \%hash;
 	}
 }
 
@@ -122,14 +182,15 @@ sub updateMetaData {
 	my $value = shift;
 	my $db = $self->session->db;
 	my ($exists) = $db->quickArray("select count(*) from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
-        if (!$exists && $value ne "") {
-        	$db->write("insert into metaData_values (fieldId, assetId) values (?,?)",[$fieldId, $self->getId]);
-        }
-        if ($value  eq "") { # Keep it clean
-                $db->write("delete from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
-        } else {
-                $db->write("update metaData_values set value = ? where assetId = ? and fieldId=?", [$value, $self->getId, $fieldId]);
-        }
+    if (!$exists && $value ne "") {
+        $db->write("insert into metaData_values (fieldId, assetId) values (?,?)",[$fieldId, $self->getId]);
+    }
+    if ($value  eq "") { # Keep it clean
+        $db->write("delete from metaData_values where assetId = ? and fieldId = ?",[$self->getId, $fieldId]);
+    }
+    else {
+        $db->write("update metaData_values set value = ? where assetId = ? and fieldId=?", [$value, $self->getId, $fieldId]);
+    }
 }
 
 
@@ -240,31 +301,14 @@ sub www_editMetaDataFieldSave {
 	if($fieldName eq "") {
 		return $ac->render($i18n->get("errorEmptyField"),$i18n->get('Edit Metadata'));
 	}
-	if($fid eq 'new') {
-		$fid = $self->session->id->generate();
-		$self->session->db->write("insert into metaData_properties (fieldId, fieldName, defaultValue, description, fieldType, possibleValues) values (?,?,?,?,?,?)",
-            [
-                $fid,
-                $fieldName,
-                $self->session->form->process("defaultValue") || '',
-                $self->session->form->process("description") || '',
-                $self->session->form->process("fieldType"),
-                $self->session->form->process("possibleValues") || '',
-            ]
-        );
-	}
-    else {
-        $self->session->db->write("update metaData_properties set fieldName = ?, defaultValue = ?, description = ?, fieldType = ?, possibleValues = ? where fieldId = ?",
-            [
-                $fieldName,
-                $self->session->form->process("defaultValue") || '',
-                $self->session->form->process("description") || '',
-                $self->session->form->process("fieldType"),
-                $self->session->form->process("possibleValues") || '',
-                $fid,
-            ]
-        );
-	}
+    $self->addMetaDataField(
+        $fid,
+        $fieldName,
+        $self->session->form->process("defaultValue"),
+        $self->session->form->process("description") || '',
+        $self->session->form->process("fieldType"),
+        $self->session->form->process("possibleValues"),
+    );
 
 	return $self->www_manageMetaData; 
 }
