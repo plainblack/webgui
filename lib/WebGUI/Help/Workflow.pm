@@ -74,13 +74,8 @@ our $HELP = {
                                 namespace => 'Workflow',
 			},
                         {
-                                title => 'is singleton',
-                                description => 'is singleton help',
-                                namespace => 'Workflow',
-			},
-                        {
-                                title => 'is serial',
-                                description => 'is serial help',
+                                title => 'mode',
+                                description => 'mode help',
                                 namespace => 'Workflow',
 			},
 		],
