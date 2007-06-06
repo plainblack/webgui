@@ -153,8 +153,7 @@ sub prepareView {
 	# I'm sure there's a more efficient way to do this. We'll figure it out someday.
 	my @positions = split(/\./,$self->get("contentPositions"));
 	my @hidden = split("\n",$self->get("assetsToHide"));
-	my @placeHolder1 = ();
-	my @placeHolderN = ();
+	my %placeHolder;
 	my $i = 1;
 	my $template = WebGUI::Asset->new($self->session,$self->get("templateId"),"WebGUI::Asset::Template");
 	my $templateContent = $template->get("template");
@@ -166,26 +165,30 @@ sub prepareView {
 	my @found;
 	foreach my $position (@positions) {
 		my @assets = split(",",$position);
-		foreach my $asset (@assets) {
-			foreach my $child (@{$children}) {
+		ASSET: foreach my $asset (@assets) {
+			my $childCount = 0;
+			CHILD: foreach my $child (@{$children}) {
 				if ($asset eq $child->getId) {
 					unless (isIn($asset,@hidden) || !($child->canView)) {
 						$child->prepareView;
 						if ($i > $numPositions || $i==1) {
-							push(@placeHolder1, $child);
+							$placeHolder{$child->getId} = $child;
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
-								content=>"~~~"
+								content=>"~~~".$child->getId."~~~~~"
 							});
 						} else {
-							push(@placeHolderN, $child);
+							$placeHolder{$child->getId} = $child;
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
-								content=>"~~~"
+								content=>"~~~".$child->getId."~~~~~"
 							});
 						}
 					}
-					push(@found, $child->getId);
+					splice(@{$children},$childCount,1);
+                                        next ASSET;
+                                }else{
+                                        $childCount++;
 				}
 			}
 		}
@@ -193,19 +196,19 @@ sub prepareView {
 	}
 	# deal with unplaced children
 	foreach my $child (@{$children}) {
-		unless (isIn($child->getId, @found)||isIn($child->getId,@hidden)) {
+		unless (isIn($child->getId,@hidden)) {	
 			if ($child->canView) {
 				$self->session->style->setRawHeadTags($child->getExtraHeadTags);
 				$child->prepareView;
-				push(@placeHolder1, $child);
+				$placeHolder{$child->getId} = $child;
 				push(@{$vars{"position1_loop"}},{
 					id=>$child->getId,
-					content=>"~~~"
+					content=>"~~~".$child->getId."~~~~~"
 					});
 			}
 		}
 	}
-	@{$self->{_viewPlaceholders}} = (@placeHolder1, @placeHolderN);
+	$self->{_viewPlaceholder} = \%placeHolder;
 	$vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
 	$self->{_viewVars} = \%vars;
 	if ($vars{showAdmin}) {
@@ -238,15 +241,17 @@ sub view {
 			';
 	}
 	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
-	my @parts = split("~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
+	my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
+	my @parts = split("~~~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
 	my $output = "";
 	foreach my $part (@parts) {
+		my ($outputPart, $assetId) = split("~~~",$part,2);
 		if ($self->{_viewPrintOverride}) {
-			$self->session->output->print($part);
+			$self->session->output->print($outputPart);
 		} else {
-			$output .= $part;
+			$output .= $outputPart;
 		}
-		my $asset = shift @{$self->{_viewPlaceholders}};
+		my $asset = $self->{_viewPlaceholder}{$assetId};
 		if (defined $asset) {
 			my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
 			my $assetOutput = $asset->view;
