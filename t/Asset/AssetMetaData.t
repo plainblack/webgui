@@ -71,7 +71,7 @@ $folder->addMetaDataField('new', 'color', '', 'Favorite Color', 'radioList', "Bl
 
 @snipKeys = keys %{ $snippet->getMetaDataFields };
 @foldKeys = keys %{ $folder->getMetaDataFields };
-is(scalar @foldKeys, 2, 'Two meta data field available');
+is(scalar @foldKeys, 2, 'Two meta data fields available');
 cmp_deeply( \@snipKeys, \@foldKeys, 'Snippet and Folder have access to the same meta data fields');
 
 END {

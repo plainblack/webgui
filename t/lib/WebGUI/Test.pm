@@ -10,6 +10,13 @@ use IO::Handle qw[];
 use File::Spec qw[];
 use Test::MockObject::Extends;
 
+##Hack to get ALL test output onto STDOUT.
+use Test::Builder;
+sub import {
+    no warnings;
+    *Test::Builder::failure_output = sub { return \*STDOUT };
+}
+
 our $logger_warns;
 our $logger_debug;
 our $logger_info;
