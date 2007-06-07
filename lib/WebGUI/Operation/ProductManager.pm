@@ -164,7 +164,6 @@ sub www_editProduct {
 		name => 'productId', 
 		value => $productId
 	});
-
 	$f->getTab("properties")->text(
 		-name		=> 'title',
 		-label		=> $i18n->get('title'),
@@ -861,6 +860,7 @@ sub www_manageProduct {
 	$output .= "<h1>".$product->get('title')."</h1>";
 	$output .= "<h2>".$i18n->get('properties').$session->icon->edit('op=editProduct;productId='.$productId)."</h2>";
 	$output .= "<table>";
+	$output .= "<tr><td>".$i18n->get('productId')."</td><td>".$productId."</td></tr>";
 	$output .= "<tr><td>".$i18n->get('price')."</td><td>".$product->get('price')."</td></tr>";
 	my $useSalesTax = $product->get('useSalesTax')
 			? $i18n->get(138, 'WebGUI')

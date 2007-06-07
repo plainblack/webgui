@@ -27,6 +27,10 @@
    Consulting, LLC)
  - fix: Order of content position loops in Page Layout (Yung Han Khoe, United Knowledge)
     http://www.plainblack.com/bugs/tracker/7.4-order-of-content-position-loops-in-page-layout
+ - RFE: Product (operation based) (perlDreamer Consulting, LLC.)
+    Display the productId in the product manager to make it easier to use
+    with the product macro.
+    http://www.plainblack.com/rfe/request-for-enhancement/product-operation-based#v43RzN_dmRPokd9SCRKWUw
 
 
 7.3.19

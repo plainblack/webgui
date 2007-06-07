@@ -642,6 +642,12 @@ the form.<br />|,
 		context => "A time period for group expires offset",
 	},
 
+	'productId'	=> {
+		message => "Product ID",
+		lastUpdated => 0,
+		context => "Unique identifier for a Product",
+	},
+
 };
 
 1;
