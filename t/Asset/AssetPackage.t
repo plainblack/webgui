@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
-plan tests => 6;
+plan tests => 7;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -80,6 +80,12 @@ isa_ok($deployedFolderChildren->[0] , 'WebGUI::Asset::Snippet', 'deployed child 
 
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 $newVersionTag->commit;
+
+TODO: {
+    local $TODO = "Tests to make later";
+    ok(0, 'Check package deployment with 2-level package and look for new style templates propagating down the tree');
+}
+
 
 ##This allows us to place an arbitrary assetId inside the form processor.
 ##This is required for deploying a package.

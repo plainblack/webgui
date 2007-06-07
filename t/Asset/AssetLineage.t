@@ -442,7 +442,7 @@ like($WebGUI::Test::logger_warns, qr/Adding it as a sibling instead/, 'addChild 
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'addChild');
-    ok(0, 'getLineage tests');
+    ok(0, 'getLineage coverage tests');
 }
 
 
