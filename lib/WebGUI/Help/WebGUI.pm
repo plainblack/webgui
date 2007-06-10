@@ -404,6 +404,16 @@ our $HELP = {
                                 namespace => 'WebGUI',
                         },
                         {
+                                title => 'Enable user invitations',
+                                description => 'Enable user invitations description',
+                                namespace => 'WebGUI',
+                        },
+                        {
+                                title => 'user invitations email exists',
+                                description => 'user invitations email exists description',
+                                namespace => 'WebGUI',
+                        },
+                        {
                                 title => '164',
                                 description => '164 description',
                                 namespace => 'WebGUI',

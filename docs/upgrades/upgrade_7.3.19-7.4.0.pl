@@ -26,6 +26,7 @@ fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
 addAttachmentsToEvents($session);
 addMetaDataPostsToCS($session);
+addUserInvitations($session);
 
 finish($session); # this line required
 
@@ -114,6 +115,35 @@ sub addMetaDataPostsToCS {
     
     print "\tAdding feature to CS to enable meta data in posts... " unless $quiet;
     $db->write("alter table Collaboration add column enablePostMetaData int(11) not null default 0");
+    print "OK!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+
+sub addUserInvitations {
+    my $session     = shift;
+    my $db          = $session->db;
+    
+    print "\tAdding the ability for users's to invite others to the site... " unless $quiet;
+    ##Add settings
+    $session->setting->add('userInvitationsEnabled', 0);
+    $session->setting->add('userInvitationsEmailExists', 'This email address exists in our system.  This means that your friend is already a member of the site.  The invitation will not be sent.');
+
+    ##Create table for tracking invitations
+    $session->db->write(<<EOSQL);
+
+CREATE TABLE userInvitations (
+    inviteId    VARCHAR(22) BINARY NOT NULL,
+    userId      VARCHAR(22) BINARY NOT NULL,
+    dateSent    DATE,
+    email       VARCHAR(255) NOT NULL,
+    newUserId   VARCHAR(22) BINARY,
+    dateCreated DATE,
+    PRIMARY KEY (inviteId)
+
+)
+EOSQL
     print "OK!\n" unless $quiet;
 }
 

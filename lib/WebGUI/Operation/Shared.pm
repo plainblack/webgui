@@ -68,6 +68,11 @@ is in group Admin (3).  Returns the user to the List Database Links screen.
 		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.$i18n->get('redeem code', 'Subscription').'</a>'});
 	}
 		
+    if ($session->setting->get('userInvitationsEnabled')) {
+        push @array, {
+            'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=inviteUser'), $i18n->get('invite a friend')),
+        };
+    }
 	my %logout;
 	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.$i18n->get(64).'</a>'; 
 	push(@array,\%logout);

@@ -39,7 +39,7 @@ Operation for creating, deleting, editing and many other user related functions.
 
 #-------------------------------------------------------------------
 
-=head2 _submenu ( session, workarea [, title, help] )
+=head2 _submenu ( session, properties )
 
 Internal utility routine for setting up the Admin Console for User functions.
 

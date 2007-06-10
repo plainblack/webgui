@@ -184,6 +184,36 @@ sub gateway {
 
 #-------------------------------------------------------------------
 
+=head2 getBackToSiteURL ( )
+
+Tries to return a URL to take the user back to the last page they were at before
+using an operation or other function.
+
+=cut
+
+sub getBackToSiteURL {
+    my $self = shift;
+    my $url;
+	if (defined $self->session->asset) {
+		my $importNode = WebGUI::Asset->getImportNode($self->session);
+		my $importNodeLineage = $importNode->get("lineage");
+		my $media = WebGUI::Asset->getMedia($self->session);
+		my $mediaLineage = $media->get("lineage");
+		my $assetLineage = $self->session->asset->get("lineage");
+		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001" || $assetLineage =~ /^$mediaLineage/  || ($self->session->asset->get("state") ne "published" && $self->session->asset->get("state") ne "archived")) {
+			$url = WebGUI::Asset->getDefault($self->session)->getUrl;
+		} else {
+			$url = $self->session->asset->getContainer->getUrl;
+		}
+	} else {
+		$url = $self->session->url->page();
+	}
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getRefererUrl ( )
 
 Returns the URL of the page this request was refered from (no gateway, no query params, just the page url). Returns undef if there was no referer.

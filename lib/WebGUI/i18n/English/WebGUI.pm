@@ -3676,10 +3676,9 @@ and tracked by WebGUI.|,
                 lastUpdated => 1163457062,
         },
 
-        'Enable passive profiling description' => {
-                message => q|Used in conjunction with Metadata, this keeps a record of every wobject viewed by
-a user.|,
-                lastUpdated => 1167189802,
+        'Enable user invitations description' => {
+                message => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
+                lastUpdated => 1181017746,
         },
 
         '164 description' => {
@@ -3786,6 +3785,17 @@ Select which of the configured LDAP connections to use to authenticate users.
 	'Enable passive profiling' => {
 		message => q|Enable passive profiling?|,
 		lastUpdated => 1089039511
+	},
+
+    'Enable passive profiling description' => {
+        message => q|Used in conjunction with Metadata, this keeps a record of every wobject viewed by
+a user.|,
+        lastUpdated => 1167189802,
+    },
+
+	'Enable user invitations' => {
+		message => q|Enable user invitations?|,
+		lastUpdated => 1181017730
 	},
 
 	'Illegal Warning' => {
@@ -4076,6 +4086,21 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		message => q|Select State|,
 		lastUpdated => 1161388472,
 	},
+
+	'invite a friend' => {
+		message => q|Invite a friend|,
+		lastUpdated => 1181019679,
+	},
+
+	'user invitations email exists' => {
+		message => q|Email exists message|,
+		lastUpdated => 1181277915
+	},
+
+    'user invitations email exists description' => {
+        message => q|This is the message displayed to users who try to invite someone whose email address already exists in the system.|,
+        lastUpdated => 1181277914,
+    },
 
 };
 

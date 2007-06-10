@@ -509,20 +509,8 @@ sub render {
         if (scalar(@tags)) {
 		$var{versionTags} = \@tags;
         }
-	if (defined $self->session->asset) {
-		my $importNode = WebGUI::Asset->getImportNode($self->session);
-		my $importNodeLineage = $importNode->get("lineage");
-		my $media = WebGUI::Asset->getMedia($self->session);
-		my $mediaLineage = $media->get("lineage");
-		my $assetLineage = $self->session->asset->get("lineage");
-		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001" || $assetLineage =~ /^$mediaLineage/  || ($self->session->asset->get("state") ne "published" && $self->session->asset->get("state") ne "archived")) {
-			$var{"backtosite.url"} = WebGUI::Asset->getDefault($self->session)->getUrl;
-		} else {
-			$var{"backtosite.url"} = $self->session->asset->getContainer->getUrl;
-		}
-	} else {
-		$var{"backtosite.url"} = $self->session->url->page();
-	}
+
+    $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
 	$var{"application_loop"} = $self->getAdminFunction;
 	return $self->session->style->process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
 }

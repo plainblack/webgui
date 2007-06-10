@@ -211,6 +211,7 @@ sub formField {
 	my $withWrapper = shift;
 	my $u = shift;
 	my $skipDefault = shift;
+	my $assignedValue = shift;
 	my $default;
 	if ($skipDefault) {
 	} 
@@ -231,6 +232,9 @@ sub formField {
 		$default = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
 	}
 	$properties->{value} = $default;
+    if (defined $assignedValue) {
+        $properties->{value} = $assignedValue;
+    }
 	if ($withWrapper == 1) {
 		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayFormWithWrapper;
 	} elsif ($withWrapper == 2) {

@@ -368,6 +368,22 @@ sub definition {
                 defaultValue=>$session->setting->get("passiveProfilingEnabled"),
                 extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
 		});
+    push(@fields, {
+        tab=>"user",
+        fieldType=>"yesNo",
+        name=>"userInvitationsEnabled",
+        label=>$i18n->get("Enable user invitations"),
+        hoverHelp=>$i18n->get("Enable user invitations description"),
+        defaultValue=>$session->setting->get("userInvitationsEnabled"),
+    });
+    push(@fields, {
+        tab=>"user",
+        fieldType=>"textarea",
+        name=>"userInvitationsEmailExists",
+        label=>$i18n->get("user invitations email exists"),
+        hoverHelp=>$i18n->get("user invitations email exists description"),
+        defaultValue=>$session->setting->get("userInvitationsEmailExists"),
+    });
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {

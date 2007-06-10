@@ -135,11 +135,13 @@ sub createAccount {
    my $confirm = shift || $self->session->form->process("confirm");
    my $vars = shift || {}; 
    
-   if ($self->session->user->userId ne "1") {
-      return $self->displayAccount;
-   } elsif (!$self->session->setting->get("anonymousRegistration")) {
- 	  return $self->displayLogin;
-   } 
+   $self->session->errorHandler->warn('WebGUI::Auth::createAccount called');
+    if ($self->session->user->userId ne "1") {
+        return $self->displayAccount;
+    }
+    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
+        return $self->displayLogin;
+    } 
 	my $i18n = WebGUI::International->new($self->session);
    $vars->{'create.message'} = $message if ($message);
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
@@ -170,7 +172,7 @@ sub createAccountSave {
   return $self->displayAccount if ($self->session->user->userId ne "1");
 
    #Make sure anonymous registration is enabled 
-   unless ($self->session->setting->get("anonymousRegistration")) {    
+   unless ($self->session->setting->get("anonymousRegistration") || $self->session->setting->get("userInvitationsEnabled")) {    
      $self->session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
      return $self->displayLogin;
    }

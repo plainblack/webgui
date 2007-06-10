@@ -178,9 +178,23 @@ sub createAccount {
 	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
 	
 	#User Defined Options
+    my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
+    $self->session->errorHandler->warn('invite = '.$userInvitation);
 	$vars->{'create.form.profile'} = [];
 	foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
-		my ($id, $formField, $label) = ($field->getId, $field->formField, $field->getLabel);
+		my $id           = $field->getId;
+		my $label        = $field->getLabel;
+        my $emailAddress = {};
+        if ($field->get('fieldName') eq "email" && $userInvitation ) {
+           $self->session->errorHandler->warn('Email address field');
+           my $code = $self->session->form->get('code')
+                   || $self->session->form->get('uniqueUserInvitationCode');
+           $self->session->errorHandler->warn('Code:'.$code);
+           ($emailAddress) = $self->session->db->quickArray('select email from userInvitations where inviteId=?',[$code]);
+           $self->session->errorHandler->warn('Email address :'.$emailAddress);
+           $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+        }
+        my $formField = $field->formField(undef, undef, undef, undef, $emailAddress); ##Manually set the field
 		my $required = $field->isRequired;
 
 		# Old-style field loop.
@@ -279,7 +293,20 @@ sub createAccountSave {
 	} else {
 		$self->session->http->setStatus(201,"Account Registration Successful");
 	}
-	
+
+    ##Finalize the record in the user invitation table.
+    my $inviteId = $self->session->form->get('uniqueUserInvitationCode');
+    if ($inviteId) {
+        $self->session->db->setRow(
+            'userInvitations',
+            'inviteId',
+            {
+                inviteId    => $inviteId,
+                newUserId   => $u->userId,
+                dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
+            },
+        );
+    }
 	
 	return undef;
 }

@@ -223,7 +223,8 @@ sub createAccount {
     my $vars;
     if ($self->session->user->userId ne "1") {
        return $self->displayAccount;
-    } elsif (!$self->session->setting->get("anonymousRegistration")) {
+    }
+    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
  	   return $self->displayLogin;
     } 
 	

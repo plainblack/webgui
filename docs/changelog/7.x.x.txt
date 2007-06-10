@@ -10,6 +10,7 @@
  - add: User profile data table is now a flat table, one column for each
     field.
  - add: Posts can now have Metadata (United Knowledge)
+ - add: Users can now invite others to create an account (United Knowledge)
  - add: Calendar events now allow attachments
  - add: Calendar events now allow setting view permissions
  - add: WebGUI::Paginator now capable of more efficient SQL paginations using

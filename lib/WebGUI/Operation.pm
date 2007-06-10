@@ -164,6 +164,10 @@ sub getOperations {
 		'viewInbox' => 'WebGUI::Operation::Inbox',
 		'viewInboxMessage' => 'WebGUI::Operation::Inbox',
 
+		'inviteUser'       => 'WebGUI::Operation::Invite',
+		'inviteUserSave'   => 'WebGUI::Operation::Invite',
+		'acceptInvite'     => 'WebGUI::Operation::Invite',
+
 		'copyLDAPLink' => 'WebGUI::Operation::LDAPLink',
 		'deleteLDAPLink' => 'WebGUI::Operation::LDAPLink',
 		'editLDAPLink' => 'WebGUI::Operation::LDAPLink',
