@@ -41,7 +41,8 @@ sub appendRecentChanges {
 	my $var = shift;
 	my $limit = shift || $self->get("recentChangesCount") || 50;
 	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
-		lineage like ? and lineage<>? and status='approved' order by revisionDate desc limit ?", [$self->get("lineage").'%', $self->get("lineage"), $self->get("recentChangesCount")]);
+		lineage like ? and lineage<>? and status='approved' order by revisionDate desc limit ?",
+        [$self->get("lineage").'%', $self->get("lineage"), $limit]);
 	while (my ($id, $version) = $rs->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));

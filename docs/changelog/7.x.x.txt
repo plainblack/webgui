@@ -36,6 +36,13 @@
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.
+ - fix: bad javascript string escaping in EMS
+ - fix: Unable to upload images or edit listings for Matrix
+ - fix: recent changes limit in wiki master front page
+ - fix: old recurring events were not deleted when changing recurrence pattern
+ - fix: unable to remove recurrence on events
+ - fix: Show edit links on EMS search view without being in Admin group
+ - fix: Fixed a typo in the Article with attachments template (perlDreamer Consulting, LLC)
 
 
 7.3.18
