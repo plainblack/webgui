@@ -32,6 +32,8 @@
     Display the productId in the product manager to make it easier to use
     with the product macro.
     http://www.plainblack.com/rfe/request-for-enhancement/product-operation-based#v43RzN_dmRPokd9SCRKWUw
+ - Added a simple Single Sign On mechanism.
+ - Added the SessionId macro.
 
 
 7.3.19

@@ -226,6 +226,8 @@ sub getOperations {
 		'spectreGetSiteData' => 'WebGUI::Operation::Spectre',
 		'spectreTest' => 'WebGUI::Operation::Spectre',
 
+        'ssoViaSessionId' => 'WebGUI::Operation::SSO',
+
 		'viewStatistics' => 'WebGUI::Operation::Statistics',
 
 		'makePrintable' => 'WebGUI::Operation::Style',
