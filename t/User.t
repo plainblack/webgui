@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 93; # increment this value for each test you create
+use Test::More tests => 95; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -205,7 +205,9 @@ is( $cm->name, "Content Managers", "content manager name check");
 is( $cm->getId, 4, "content manager groupId check");
 
 my $admin = WebGUI::User->new($session, 3);
+is($admin->profileField('uiLevel'), 9, 'Admin default uiLevel = 9');
 my $visitor = WebGUI::User->new($session, 1);
+is($visitor->profileField('uiLevel'), 5, 'Visitor gets the default uiLevel of 5');
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['192.168.0.101', $session->getId]);
 
