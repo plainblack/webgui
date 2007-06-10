@@ -1,0 +1,36 @@
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2006 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
+
+use FindBin;
+use strict;
+use lib "$FindBin::Bin/../lib";
+
+use WebGUI::Test;
+use WebGUI::Session;
+use HTML::TokeParser;
+use Data::Dumper;
+
+use Test::More; # increment this value for each test you create
+
+my $session = WebGUI::Test->session;
+
+my $numTests =  1;
+$numTests    += 1; #For the use_ok
+plan tests   => 2;
+
+my $macro = 'WebGUI::Macro::SessionId';
+my $loaded = use_ok($macro);
+
+SKIP: {
+
+skip "Unable to load $macro", $numTests-1 unless $loaded;
+	my $output = WebGUI::Macro::SessionId::process( $session );
+    is($session->getId, $output, 'Session macro works');
+}
