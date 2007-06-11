@@ -34,6 +34,7 @@
     http://www.plainblack.com/rfe/request-for-enhancement/product-operation-based#v43RzN_dmRPokd9SCRKWUw
  - Added a simple Single Sign On mechanism.
  - Added the SessionId macro.
+ - fix: Package deploy: hidden assets become visible (Yung Han Khoe, United Knowledge)
 
 
 7.3.19
