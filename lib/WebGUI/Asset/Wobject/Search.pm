@@ -160,6 +160,7 @@ sub view {
 				url=>$data->{url},
 				title=>$data->{title},
 				synopsis=>$data->{synopsis},
+				assetId=>$data->{assetId},
 				});
              $var{results_found} = 1;
 			}
