@@ -131,6 +131,10 @@ be useful, others may not.|,
 		message => q|The synopsis of the Asset found in the search.|,
 		lastUpdated => 1169843465,
 	},
+	'assetId' => { 
+                message => q|The assetId of the Asset found in the search.|,
+                lastUpdated => 1169843465,
+        },
 
 	'results_found' => {
 		message => q|A conditional variable that will be true if any results were found.|,

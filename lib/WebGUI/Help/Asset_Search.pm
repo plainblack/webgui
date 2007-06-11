@@ -92,6 +92,9 @@ our $HELP = {
 				  {
 				    'name' => 'synopsis',
 				  },
+				  {
+                                    'name' => 'assetId',
+                                  },
 			    ],
 		          },
 		          {
