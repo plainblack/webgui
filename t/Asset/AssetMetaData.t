@@ -67,6 +67,7 @@ cmp_deeply( \@snipKeys, \@foldKeys, 'Snippet and Folder have access to the same 
 
 my $seMetaData = $snippet->getMetaDataFields()->{$snipKeys[0]};
 
+##Add a second field, this time to the folder.
 $folder->addMetaDataField('new', 'color', '', 'Favorite Color', 'radioList', "Blue\nRed\nWhite\nYellow\nGreen");
 
 @snipKeys = keys %{ $snippet->getMetaDataFields };
