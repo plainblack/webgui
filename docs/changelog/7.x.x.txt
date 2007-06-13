@@ -35,8 +35,6 @@
  - Added a simple Single Sign On mechanism.
  - Added the SessionId macro.
  - fix: Package deploy: hidden assets become visible (Yung Han Khoe, United Knowledge)
- - fix: Uploaded File Sizes Wrong (perlDreamer Consulting, LLC)
-    http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
 
 
 7.3.19
@@ -48,6 +46,8 @@
  - fix: unable to remove recurrence on events
  - fix: Show edit links on EMS search view without being in Admin group
  - fix: Fixed a typo in the Article with attachments template (perlDreamer Consulting, LLC)
+ - fix: Uploaded File Sizes Wrong (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
 
 
 7.3.18
