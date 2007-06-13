@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 9;
+plan tests => 10;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -129,6 +129,12 @@ cmp_deeply(
     },
     'Fetching just one metadata field, by fieldId, works'
 );
+
+$folder->deleteMetaDataField($byName->{'color'});
+$foMetaData = $folder->getMetaDataFields;
+$byName = buildNameIndex($foMetaData);
+cmp_bag( [keys %{ $byName}], ['sport', 'searchEngine'], 'color meta data field removed');
+
 
 sub buildNameIndex {
     my ($fidStruct) = @_;
