@@ -223,18 +223,6 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
-sub setSize {
-	my $self  = shift;
-	my $input = shift;
-	my $size  = 0;
-    my $storage = $self->{_storageLocation};
-    if (defined $storage) {
-	   $size = ($input > $storage->getFileSize($self->get("filename"))) ? $input : $storage->getFileSize($self->get("filename"));
-	}
-	return $self->SUPER::setSize($size);
-}
-
-#-------------------------------------------------------------------
 
 sub setStorageLocation {
 	my $self = shift;

@@ -1855,8 +1855,10 @@ sub setSize {
 	foreach my $key (keys %{$self->get}) {
 		$sizetest .= $self->get($key);
 	}
-	$self->session->db->write("update assetData set assetSize=".(length($sizetest)+$extra)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
+    my $size = length($sizetest) + $extra;
+	$self->session->db->write("update assetData set assetSize=".$size." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->session->db->quote($self->get("revisionDate")));
 	$self->purgeCache;
+    $self->{_properties}{assetSize} = $size;
 }
 	
 
@@ -1907,9 +1909,9 @@ sub update {
 		}
 		if (scalar(@setPairs) > 0) {
 			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
-			$self->setSize;
 		}
 	}
+    $self->setSize();
 	$self->purgeCache;
 }
 

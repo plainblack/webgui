@@ -279,8 +279,8 @@ sub processPropertiesFromFormPost {
 			$data{title} = $filename unless ($session->form->process("title"));
 			$data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
 			$data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
+            $self->{_storageLocation} = $storage;
 			$self->update(\%data);
-			$self->setSize($storage->getFileSize($filename));
 		}
 	}
 }
@@ -324,7 +324,7 @@ sub purgeRevision {
 sub setSize {
 	my $self = shift;
 	my $fileSize = shift || 0;
-	my $storage = $self->{_storageLocation};
+	my $storage = $self->getStorageLocation;
 	if (defined $storage) {	
 	    foreach my $file (@{$storage->getFiles}) {
 		    $fileSize += $storage->getFileSize($file);
@@ -361,7 +361,6 @@ sub update {
 		edit => $self->get("groupIdEdit"),
 		storageId => $self->get('storageId'),
 	);
-	$self->SUPER::update(@_);
 	##update may have entered a new storageId.  Reset the cached one just in case.
 	if ($self->get("storageId") ne $before{storageId}) {
 		$self->setStorageLocation;
@@ -369,6 +368,7 @@ sub update {
 	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
 		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
 	}
+	$self->SUPER::update(@_);
 }
 
 #-------------------------------------------------------------------

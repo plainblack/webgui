@@ -35,6 +35,8 @@
  - Added a simple Single Sign On mechanism.
  - Added the SessionId macro.
  - fix: Package deploy: hidden assets become visible (Yung Han Khoe, United Knowledge)
+ - fix: Uploaded File Sizes Wrong (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
 
 
 7.3.19
