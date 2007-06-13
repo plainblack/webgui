@@ -71,24 +71,14 @@ our $I18N = {
 
 	'mode help' => {
 		message => q|The mode of a workflow determines the precidence of when and how a workflow is run.
-        <p>Parallel workflows may run as many instances of the workflow as there are in existence. This is what you 
-        want for most workflows. This mode is asynchronous.</p>
-        <p>Singleton means only one instance of this workflow will be allowed to be created at one time. Generally 
-        speaking this would be a bad idea for approval workflows, but is probably a good idea for workflows that 
-        download emails from a remote server, to avoid getting duplicates. This mode is asynchronous.</p>
-        <p>Serial means that you can create as many instances of a workflow that you like, but they will run 
-        sequentially one after the other. Two instances of the same workflow will not run a the same time. This 
-        is generally bad for approval processes, but it's good for maintenance functions or other things that need 
-        to operate on the same data. Processing sequentially will ensure that the workflows don't overwrite each 
-        other's data. This mode is asynchronous.</p>
-        <p>Realtime workflows run immediately and in parallel, meaning there can be more than one workflow of this
-        type in existence at one time and it will run at the same time as others. Realtime workflows are good for 
-        publishing operations that don't have an approval needed and other functions that you want to ensure happen 
-        immediately. This mode is synchronous. <b>NOTE:</b> Do not include any activities which may return a
-        waiting status, such as those that require human approval or an external event to occur. Doing so will
-        cause this workflow to run indefinitely and could lead to a crashed system. In addition, not all triggers
-        support realtime workflows. If they do not, then workflows with a mode of realtime won't show up in their
-        workflow select list.|,
+        <p><b>Parallel</b> workflows asynchronously run as many instances of the workflow as there are in existence.</p>
+        <p><b>Singleton</b> workflows asynchronously run exactly one instance of a given type at any one time, and if a
+        new workflow of that type is created while the original is running, it will be discarded.</p>
+        <p><b>Serial</b> workflows asynchronously run one workflow instance of a given type at a time, in the order it was
+        created.</p>
+        <p><b>Realtime</b> workflows synchronously (immediately) run all activities associated with it, because of this
+        not all triggers support realtime workflows, and you can't use any asynchronous workflow activities (like
+        version tag approval) in realtime workflows.</p>|,
 		context => q|the hover help for the mode field|,
 		lastUpdated => 0,
 	},
