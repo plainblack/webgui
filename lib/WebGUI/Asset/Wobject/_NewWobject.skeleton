@@ -32,7 +32,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'NewWobject');
+	my $i18n = WebGUI::International->new($session, 'Asset_NewWobject');
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -101,7 +101,7 @@ sub getEditForm {
 
 	$tabform->getTab("display")->template(
 		-value=>$self->getValue("templateId"),
-		-label=>WebGUI::International::get("template_label","NewWobject"),
+		-label=>WebGUI::International::get("template_label","Asset_NewWobject"),
 		-namespace=>"NewWobject"
 	);
 	
@@ -177,11 +177,11 @@ adminConsole views.
 
 #sub www_edit {
 #   my $self = shift;
-#   return WebGUI::Privilege::insufficient() unless $self->canEdit;
-#   return WebGUI::Privilege::locked() unless $self->canEditIfLocked;
-#   $self->getAdminConsole->setHelp("new wobject add/edit", "NewWobject");
-#   return $self->getAdminConsole->render($self->getEditForm->print,
-#                  WebGUI::International::get("edit_title","NewWobject"));
+#   return $self->session->privilege->insufficient() unless $self->canEdit;
+#   return $self->session->privilege->locked() unless $self->canEditIfLocked;
+#   my $i18n = WebGUI::International->new($self->session, "Asset_NewWobject");
+#   $self->getAdminConsole->setHelp("new wobject add/edit", "Asset_NewWobject");
+#   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
 #}
 
 
