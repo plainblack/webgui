@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 6;
+plan tests => 9;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -67,6 +67,20 @@ cmp_deeply( \@snipKeys, \@foldKeys, 'Snippet and Folder have access to the same 
 
 my $seMetaData = $snippet->getMetaDataFields()->{$snipKeys[0]};
 
+cmp_deeply(
+    $seMetaData,
+    {
+        fieldName      => 'searchEngine',
+        fieldType      => 'text',
+        description    => 'Search Engine preference',
+        fieldId        => $snipKeys[0],
+        defaultValue   => ignore(),
+        possibleValues => ignore(),
+        value          => ignore(),
+    },
+    'Meta data field, searchEngine, set correctly'
+);
+
 ##Add a second field, this time to the folder.
 $folder->addMetaDataField('new', 'color', '', 'Favorite Color', 'radioList', "Blue\nRed\nWhite\nYellow\nGreen");
 
@@ -74,6 +88,56 @@ $folder->addMetaDataField('new', 'color', '', 'Favorite Color', 'radioList', "Bl
 @foldKeys = keys %{ $folder->getMetaDataFields };
 is(scalar @foldKeys, 2, 'Two meta data fields available');
 cmp_deeply( \@snipKeys, \@foldKeys, 'Snippet and Folder have access to the same meta data fields');
+
+my $foMetaData;
+my $byName;
+$foMetaData = $folder->getMetaDataFields;
+$byName = buildNameIndex($foMetaData);
+
+cmp_deeply(
+    $foMetaData->{ $byName->{'color'} },
+    {
+        fieldName      => 'color',
+        fieldType      => 'radioList',
+        description    => 'Favorite Color',
+        fieldId        => $byName->{'color'},
+        defaultValue   => ignore(),
+        possibleValues => "Blue\nRed\nWhite\nYellow\nGreen",
+        value          => ignore(),
+    },
+    'Meta data field, color, set correctly'
+);
+
+##Add a third field
+$folder->addMetaDataField('new', 'sport', '', 'Favorite Sport', 'radioList', "Running\nBiking\nHacking\nWriting Tests");
+
+$foMetaData = $folder->getMetaDataFields;
+$byName = buildNameIndex($foMetaData);
+
+my $sportField = $folder->getMetaDataFields($byName->{'sport'});
+
+cmp_deeply(
+    $sportField,
+    {
+        fieldName      => 'sport',
+        fieldType      => 'radioList',
+        description    => 'Favorite Sport',
+        fieldId        => $byName->{'sport'},
+        defaultValue   => ignore(),
+        possibleValues => "Running\nBiking\nHacking\nWriting Tests",
+        value          => ignore(),
+    },
+    'Fetching just one metadata field, by fieldId, works'
+);
+
+sub buildNameIndex {
+    my ($fidStruct) = @_;
+    my $nameStruct;
+    foreach my $field ( values %{ $fidStruct } ) {
+        $nameStruct->{ $field->{fieldName} } = $field->{fieldId};
+    }
+    return $nameStruct;
+}
 
 END {
     foreach my $metaDataFieldId (keys %{ $snippet->getMetaDataFields }) {
