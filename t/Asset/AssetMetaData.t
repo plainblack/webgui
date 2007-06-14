@@ -31,6 +31,12 @@ my $root = WebGUI::Asset->getRoot($session);
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset Package test"});
 
+####################################################
+#
+# Setup Assets for testing
+#
+####################################################
+
 my $folder = $root->addChild({
     url   => 'testFolder',
     title => 'folder',
@@ -51,6 +57,12 @@ $versionTag->commit;
 
 ##Note that there is no MetaData field master class.  New fields can be added
 ##from _ANY_ asset, and be available to all assets.
+
+####################################################
+#
+# getMetaDataFields
+#
+####################################################
 
 cmp_deeply({}, $snippet->getMetaDataFields, 'snippet has no metadata fields');
 cmp_deeply({}, $folder->getMetaDataFields,  'folder has no metadata fields');
@@ -129,6 +141,12 @@ cmp_deeply(
     },
     'Fetching just one metadata field, by fieldId, works'
 );
+
+####################################################
+#
+# deleteMetaDataField
+#
+####################################################
 
 $folder->deleteMetaDataField($byName->{'color'});
 $foMetaData = $folder->getMetaDataFields;
