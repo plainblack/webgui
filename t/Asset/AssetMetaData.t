@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 10;
+plan tests => 12;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -135,6 +135,41 @@ $foMetaData = $folder->getMetaDataFields;
 $byName = buildNameIndex($foMetaData);
 cmp_bag( [keys %{ $byName}], ['sport', 'searchEngine'], 'color meta data field removed');
 
+####################################################
+#
+# updateMetaData
+#
+####################################################
+
+$folder->updateMetaData( $byName->{'sport'}, 'underwaterHockey');
+
+cmp_deeply(
+    $folder->getMetaDataFields( $byName->{'sport'} ),
+    {
+        fieldName      => 'sport',
+        fieldType      => 'radioList',
+        description    => 'Favorite Sport',
+        fieldId        => $byName->{'sport'},
+        defaultValue   => ignore(),
+        possibleValues => "Running\nBiking\nHacking\nWriting Tests",
+        value          => 'underwaterHockey',
+    },
+    'Folder has a value field for sports'
+);
+
+cmp_deeply(
+    $snippet->getMetaDataFields( $byName->{'sport'} ),
+    {
+        fieldName      => 'sport',
+        fieldType      => 'radioList',
+        description    => 'Favorite Sport',
+        fieldId        => $byName->{'sport'},
+        defaultValue   => ignore(),
+        possibleValues => "Running\nBiking\nHacking\nWriting Tests",
+        value          => ignore(),
+    },
+    'Snippet does not have a value, yet'
+);
 
 sub buildNameIndex {
     my ($fidStruct) = @_;
