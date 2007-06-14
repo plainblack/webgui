@@ -26,6 +26,10 @@ save you many hours of grief.
     Config::JSON
     Text::CSV_XS
 
+ * Any customizations made to the Inbox or Inbox/Message tempalates 
+   will be lost. Please back up your custom templates before running
+   the upgrade
+
 
 7.3.16
 --------------------------------------------------------------------
