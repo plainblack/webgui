@@ -35,7 +35,7 @@
  - Added a simple Single Sign On mechanism.
  - Added the SessionId macro.
  - fix: Package deploy: hidden assets become visible (Yung Han Khoe, United Knowledge)
-
+ - RFE: Added Private Messaging to WebGUI (United Knowledge)
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.
