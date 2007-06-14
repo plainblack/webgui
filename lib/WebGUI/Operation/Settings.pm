@@ -222,6 +222,33 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$session->setting->get("AdminConsoleTemplate")
 		});
+    push(@fields, {
+		tab=>"ui",
+		fieldType=>"template",
+		name=>"viewInboxTemplateId",
+		label=>$i18n->get('view inbox template'),
+		hoverHelp=>$i18n->get('view inbox template description'),
+		namespace=>"Inbox",
+		defaultValue=>$session->setting->get("viewInboxTemplateId"),
+		});
+    push(@fields, {
+		tab=>"ui",
+		fieldType=>"template",
+		name=>"viewInboxMessageTemplateId",
+		label=>$i18n->get('view inbox message template'),
+		hoverHelp=>$i18n->get('view inbox message template description'),
+		namespace=>"Inbox/Message",
+		defaultValue=>$session->setting->get("viewInboxMessageTemplateId"),
+		});    
+    push(@fields, {
+		tab=>"ui",
+		fieldType=>"template",
+		name=>"sendPrivateMessageTemplateId",
+		label=>$i18n->get('send private message template'),
+		hoverHelp=>$i18n->get('send private message template description'),
+		namespace=>"Inbox/SendPrivateMessage",
+		defaultValue=>$session->setting->get("sendPrivateMessageTemplateId"),
+		});    
 	# messaging settings
 	push(@fields, {
 		tab=>"messaging",

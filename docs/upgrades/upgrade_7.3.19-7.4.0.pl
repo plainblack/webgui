@@ -27,6 +27,7 @@ buildNewUserProfileTable($session);
 addAttachmentsToEvents($session);
 addMetaDataPostsToCS($session);
 addUserInvitations($session);
+addPrivateMessaging($session);
 
 finish($session); # this line required
 
@@ -253,6 +254,31 @@ sub addAttachmentsToEvents {
     $session->db->write(
         "ALTER TABLE Event ADD COLUMN storageId VARCHAR(22) not null"
     );
+    print "OK!\n" unless $quiet;
+}
+
+#-------------------------------------------------
+sub addPrivateMessaging {
+	my $session = shift;
+	print "\tAdding private messaging...." unless ($quiet); 
+    $session->setting->add("viewInboxTemplateId","PBtmpl0000000000000206");
+    $session->setting->add("viewInboxMessageTemplateId","PBtmpl0000000000000205");
+    $session->setting->add("sendPrivateMessageTemplateId","PBtmplPrivateMessage01");
+    $session->db->write("alter table inbox add sentBy varchar(22) not null default 3");
+    
+    my %data = (
+		label=>q|WebGUI::International::get("allow private messages label","WebGUI")|,
+		editable=>1,
+		visible=>1,
+		required=>0,
+		showAtRegistration=>0,
+		requiredForPasswordRecovery=>0,
+		fieldType=>"yesNo",
+		protected=>1,
+		);
+	WebGUI::ProfileField->create($session,"allowPrivateMessages", \%data, 4);
+    #Allow private messages for everyone initially
+    $session->db->write("update userProfileData set allowPrivateMessages=1");
     print "OK!\n" unless $quiet;
 }
 

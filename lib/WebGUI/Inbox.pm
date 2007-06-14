@@ -101,17 +101,22 @@ An integer indicating the number of messages to fetch. Defaults to 50.
 =cut
 
 sub getMessagesForUser {
-	my $self = shift;
-	my $user = shift;
-	my $limit = shift || 50;
+	my $self     = shift;
+	my $user     = shift;
+	my $limit    = shift || 50;
+    my $page     = shift || 1;
 	my @messages = ();
-	my $counter = 0;
-	my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending' desc, dateStamp desc");
+	my $counter  = 0;
+	
+    my $start = (($page-1) * $limit) + 1;
+    my $end   = $page * $limit;
+    my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending' desc, dateStamp desc");
 	while (my ($messageId, $userId, $groupId) = $rs->array) {
-		if ($user->userId eq $userId || $user->isInGroup($groupId)) {
-			push(@messages, $self->getMessage($messageId));
+		if ($user->userId eq $userId || ($groupId && $user->isInGroup($groupId))) {
 			$counter++;
-			last if ($counter >= $limit);
+            next if ($counter < $start);
+            push(@messages, $self->getMessage($messageId));
+			last if ($counter >= $end);
 		}
 	}
 	$rs->finish;

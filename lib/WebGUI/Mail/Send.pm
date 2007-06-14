@@ -244,8 +244,9 @@ sub create {
 			}	
 		}
 	}
-	my $from = $headers->{from} || $session->setting->get("companyEmail");
-	my $type = $headers->{contentType} || "multipart/mixed";
+	my $from    = $headers->{from} || $session->setting->get("companyEmail");
+	my $type    = $headers->{contentType} || "multipart/mixed";
+    my $replyTo = $headers->{replyTo} ||  $session->setting->get("mailReturnPath");
 
     # format of Message-Id should be '<unique-id@domain>'
     my $id = $headers->{messageId} || "WebGUI-" . $session->id->generate;
@@ -263,7 +264,7 @@ sub create {
 		To=>$headers->{to},
 		Cc=>$headers->{cc},
 		Bcc=>$headers->{bcc},
-		"Reply-To"=>$headers->{replyTo},
+		"Reply-To"=>$replyTo,
 		"In-Reply-To"=>$headers->{inReplyTo},
 		Subject=>$headers->{subject},
 		"Message-Id"=>$id,
@@ -313,6 +314,7 @@ Puts this message in the mail queue so it can be sent out later by the workflow 
 
 sub queue {
 	my $self = shift;
+    $self->session->errorHandler->warn($self->{_message}->stringify);
 	return $self->session->db->setRow("mailQueue", "messageId", { messageId=>"new", message=>$self->{_message}->stringify, toGroup=>$self->{_toGroup} });
 }
 

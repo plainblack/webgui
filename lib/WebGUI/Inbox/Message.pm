@@ -80,12 +80,13 @@ sub create {
 	my $properties = shift;
 	my $self = {};
 	$self->{_properties}{messageId} = "new";
-	$self->{_properties}{status} = $properties->{status} || "pending";
-	$self->{_properties}{subject} = $properties->{subject} || WebGUI::International->new($session)->get(523);
-	$self->{_properties}{message} = $properties->{message};
+	$self->{_properties}{status}    = $properties->{status} || "pending";
+	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
+	$self->{_properties}{message}   = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
-	$self->{_properties}{userId} = $properties->{userId};
-	$self->{_properties}{groupId} = $properties->{groupId};
+	$self->{_properties}{userId}    = $properties->{userId};
+	$self->{_properties}{groupId}   = $properties->{groupId};
+    $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
 	if ($self->{_properties}{status} eq "completed") {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
@@ -235,6 +236,40 @@ sub setCompleted {
 	$self->{_properties}{completedBy} = $userId;
 	$self->{_properties}{completedOn} = time();
 	$self->session->db->setRow("inbox","messageId",$self->{_properties});
+}
+
+#-------------------------------------------------------------------
+
+=head2 setStatus ( status,[ userId ] ) 
+
+Marks a message completed.
+
+=head4 status
+
+Status to mark the message
+
+=head4 userId
+
+The id of the user that completed this task. Defaults to the current user.
+
+=cut
+
+sub setStatus {
+	my $self = shift;
+    my $status = shift;
+	my $userId = shift || $self->session->user->userId;
+	unless ($status) {
+        $self->session->errorHandler->warn("No status passed in for message.  Exit without update");
+        return;
+    }
+    
+    if($status eq "completed") {
+        $self->setCompleted($userId);
+        return;
+    }
+    $self->{_properties}{status} = $status;
+	$self->session->db->setRow("inbox","messageId",$self->{_properties});
+    return;
 }
 
 1;

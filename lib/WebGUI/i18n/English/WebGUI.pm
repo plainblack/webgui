@@ -4101,7 +4101,147 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
         message => q|This is the message displayed to users who try to invite someone whose email address already exists in the system.|,
         lastUpdated => 1181277914,
     },
-
+    
+    'send private message' => {
+		message => q|Send Private Message|,
+		lastUpdated => 1181019679,
+	},
+    
+    'private message title' => {
+		message => q|Send Private Message|,
+		lastUpdated => 1181019679,
+	},
+    
+    'private message no self error' => {
+		message => q|You may not send private messages to yourself.|,
+		lastUpdated => 1181019679,
+	},
+    
+    'private message no user' => {
+    	message => q|You have not selected a user to send a private message to|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message to label' => {
+    	message => q|To|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message from label' => {
+    	message => q|From|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message subject label' => {
+    	message => q|Subject|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message message label' => {
+    	message => q|Message|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message submit label' => {
+    	message => q|Submit|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message error' => {
+    	message => q|Message Error|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message blocked error' => {
+        message => q|This user does not wish to receive private messages.|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message sent' => {
+        message => q|Your private message has been sent.|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message status unread' => {
+        message => q|Unread|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message status replied' => {
+        message => q|Replied|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message status read' => {
+        message => q|Read|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message prev label' => {
+        message => q|Previous|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message next label' => {
+        message => q|Next|,
+		lastUpdated => 1181019679,
+    },
+    
+    'allow private messages label' => {
+        message => q|Allow Private Messages|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message from label' => {
+        message => q|From|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message date label' => {
+        message => q|Date|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message reply title' => {
+        message => q|Reply to Message|,
+		lastUpdated => 1181019679,
+    },
+    
+    'private message unread display message' => {
+        message => q|%s unread messages|,
+		lastUpdated => 1181019679,
+    },
+    
+    'view inbox template' => {
+		message => q|Inbox Template|,
+		lastUpdated => 1181019679,
+	},
+    
+    'view inbox template description' => {
+		message => q|Choose a template for displaying the inbox|,
+		lastUpdated => 1181019679,
+	},
+    
+    'view inbox message template' => {
+		message => q|Inbox Message Template|,
+		lastUpdated => 1181019679,
+	},
+    
+    'view inbox message template description' => {
+		message => q|Choose a template for displaying messages in the inbox|,
+		lastUpdated => 1181019679,
+	},
+    
+    'send private message template' => {
+		message => q|Send Private Message Template|,
+		lastUpdated => 1181019679,
+	},
+    
+    'send private message template description' => {
+		message => q|Choose a template for sending private messages|,
+		lastUpdated => 1181019679,
+	},
+    
 };
 
 1;

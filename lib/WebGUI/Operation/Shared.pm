@@ -35,6 +35,8 @@ is in group Admin (3).  Returns the user to the List Database Links screen.
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
 	my @array;
+	my $op = $session->form->process("op");
+	
 	if ($session->user->isInGroup(12)) {
 		my %hash;
 		if ($session->var->get("adminOn")) {
@@ -44,29 +46,35 @@ is in group Admin (3).  Returns the user to the List Database Links screen.
 		}
 	    push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "displayAccount"){
+	unless ($op eq "displayAccount"){
 		my %hash;
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=init').'">'.$i18n->get(342).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "editProfile"){
+	unless ($op eq "editProfile"){
 		my %hash;
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=editProfile').'">'.$i18n->get(341).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "viewProfile"){
+	unless ($op eq "viewProfile"){
 		my %hash;
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->userId).'">'.$i18n->get(343).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "viewInbox"){
+	unless ($op eq "viewInbox"){
 		my %hash;
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewInbox').'">'.$i18n->get(354).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($session->form->process("op") eq "redeemSubscriptionCode") {
+	unless ($op eq "redeemSubscriptionCode") {
 		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.$i18n->get('redeem code', 'Subscription').'</a>'});
 	}
+	
+    my $uid = $session->form->get("uid");
+	if($op eq "viewProfile" && $uid ne $session->user->userId) {
+        push(@array, {'options.display' => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$uid).'">'.$i18n->get('send private message').'</a>'});
+    }
+	
 		
     if ($session->setting->get('userInvitationsEnabled')) {
         push @array, {
