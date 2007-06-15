@@ -1,5 +1,5 @@
 #PBtmpl00000userInvite1
-#url: userInviteTemplate
+#url:userinvitetemplate
 #title:User Invite Template
 #menuTitle:Default User Invite Template
 #namespace:userInvite
@@ -10,6 +10,13 @@
 
 <table width="100%" cellspacing="1" cellpadding="2" border="0">
 <tbody>
+<tmpl_if inviteFormError>
+<tr>
+   <td class="tableData" colspan="2">
+      <tmpl_var inviteFormError>
+   </td>
+</tr>
+</tmpl_if>
 <tr>
    <td class="tableData">
       <tmpl_var emailAddressLabel>
