@@ -1,0 +1,131 @@
+#PBtmplPrivateMessage01
+#title:Default Send Private Message Template
+#menuTitle:Default Send Private Message Template
+#url:default-send-private-message-template
+#namespace:Inbox/SendPrivateMessage
+#create
+
+
+<div class="PM_wrapper">
+	<tmpl_var form_header>
+		<table cellpadding="2" cellspacing="2">
+		<tr>
+			<td colspan="2" class="PM_title"><tmpl_var title></td>
+		</tr>		
+        <tmpl_if error_msg>
+        <tr>
+			<td colspan="2" class="PM_text">
+                <tmpl_var error_msg>
+            </td>
+        </tr>
+        <tmpl_else>
+		<tr>
+			<td class="PM_label"><tmpl_var message_to_label>:</td>
+			<td><tmpl_var message_to></td>
+		</tr>
+		<tr>
+			<td class="PM_label"><tmpl_var message_from_label>:</td>
+			<td><tmpl_var message_from></td>
+		</tr>
+		<tr>
+			<td class="PM_label"><tmpl_var subject_label>:</td>
+			<td><tmpl_var subject></td>
+		</tr>
+		<tr>
+			<td class="PM_label"><tmpl_var message_label>:</td>
+			<td><tmpl_var message_text></td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align:right">
+            <!-- <tmpl_var submit_button> -->
+            <input type="submit" value="<tmpl_var submit_label>" class="PM_button" />
+            </td>
+		</tr>
+        </tmpl_if>
+		</table>
+	<tmpl_var form_footer>
+</div>
+
+
+<ul class="accountOptions">
+	<tmpl_loop accountOptions>
+       <li><tmpl_var options.display></li>
+    </tmpl_loop>
+</ul>
+
+
+~~~
+
+<style type="text/css">
+.PM_wrapper {
+	font-family:arial;
+	font-size:11px;
+	width:450px;
+}
+
+.PM_wrapper table {
+	background-color:#f9f9f9;
+	border:solid #BBBBBB 1px;
+}
+
+.PM_title {
+	font-size:15px;
+	font-weight:bold;
+	border-bottom:solid silver 2px;
+	background-color:#555555;
+	color:white;
+}
+.PM_label {
+	text-align:right;
+	font-weight:bold;
+	font-size:12px;
+	vertical-align:top;
+}
+.PM_text {
+	width:350px;
+	font-size:11px;
+	border: solid silver 1px;
+}
+.PM_button {
+	background-color:silver;
+	border:solid #555 1px;
+	color:#333;
+	font-weight:bold;
+}		
+.PM_detail {
+	background-color:#e9e9e9;
+}
+.PM_wrapper th {
+	background-color: #555;
+	text-align:left;
+	border-bottom:solid silver 2px;
+}
+.PM_wrapper a {
+	color:#003F9D;
+}
+.PM_wrapper th a {
+	color:#fff;
+	font-size:12px;
+}
+.PM_wrapper tr.alt td {
+	background-color:#E9E9E9;
+	border-bottom:solid #E1E1E1 1px;
+}
+
+.PM_wrapper .unread {
+	color:green;
+	font-weight:bold;
+}
+.PM_wrapper .replied {
+	color:blue;
+	font-weight:bold;
+}
+.PM_wrapper .pending {
+	color:orange;
+	font-weight:bold;
+}		
+.PM_wrapper .completed {
+	color:black;
+	font-weight:bold;
+}
+</style>
