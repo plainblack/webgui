@@ -314,7 +314,6 @@ Puts this message in the mail queue so it can be sent out later by the workflow 
 
 sub queue {
 	my $self = shift;
-    $self->session->errorHandler->warn($self->{_message}->stringify);
 	return $self->session->db->setRow("mailQueue", "messageId", { messageId=>"new", message=>$self->{_message}->stringify, toGroup=>$self->{_toGroup} });
 }
 
