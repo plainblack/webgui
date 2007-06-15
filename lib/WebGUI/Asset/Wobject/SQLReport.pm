@@ -33,7 +33,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session,"Asset_SQLReport");
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		uiLevel => 9,
+		uiLevel => 5,
 		icon=>'sqlReport.gif',
 		tableName=>'SQLReport',
 		className=>'WebGUI::Asset::Wobject::SQLReport',
