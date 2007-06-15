@@ -253,20 +253,39 @@ sub www_viewInbox {
 	my $session = shift;
 	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
 	
-    my $i18n = WebGUI::International->new($session);
-	my $vars = {};
-	my @msg  = ();
-    my $pn   = $session->form->get("pn") || 1;
-    my $rpp  = 10;
+    my $i18n     = WebGUI::International->new($session);
+	my $vars     = {};
+	my @msg      = ();
+    my $rpp      = 50;
+    
+    #Deal with page number
+    my $pn       = $session->form->get("pn") || 1;
+    my $pn_url   = "";
+    $pn_url      = ";pn=$pn";
    	
+    #Deal with sort order
+    my $sortBy   = $session->form->get("sortBy");
+    my $sort_url = "";
+    $sort_url    = ";sortBy=$sortBy" if($sortBy);
+     
+    #Cache the base url
+    my $inboxUrl =  $session->url->page('op=viewInbox');
+     
     $vars->{ title           } = $i18n->get(159);
    	$vars->{'subject_label'  } = $i18n->get(351);
-   	$vars->{'status_label'   } = $i18n->get(553);
+    $vars->{'subject_url'    } = $inboxUrl.$pn_url.";sortBy=subject";
+   	
+    $vars->{'status_label'   } = $i18n->get(553);
+    $vars->{'status_url'     } = $inboxUrl.$pn_url.";sortBy=status";
+    
     $vars->{'from_label'     } = $i18n->get("private message from label");
-   	$vars->{'dateStamp_label'} = $i18n->get(352);
+   	$vars->{'from_url'       } = $inboxUrl.$pn_url.";sortBy=sentBy";
+    
+    $vars->{'dateStamp_label'} = $i18n->get(352);
+    $vars->{'dateStamp_url'  } = $inboxUrl.$pn_url.";sortBy=dateStamp";
     
     my $adminUser = WebGUI::User->new($session,3)->username;
-  	my $messages  = WebGUI::Inbox->new($session)->getMessagesForUser($session->user,$rpp,$pn); 
+  	my $messages  = WebGUI::Inbox->new($session)->getMessagesForUser($session->user,$rpp,$pn,$sortBy); 
    	foreach my $message (@$messages) {   
         my $hash = {};
         $hash->{ message_url  } = $session->url->page('op=viewInboxMessage;messageId='.$message->getId);
@@ -296,10 +315,10 @@ sub www_viewInbox {
     
     #Pagination has to exist on every page regardless if there are more messages or not.
     if($pn > 1 ) {
-       $vars->{'prev_url'    } = $session->url->page('op=viewInbox;pn='.($pn-1));
+       $vars->{'prev_url'    } = $inboxUrl.';pn='.($pn-1).$sort_url;
        $vars->{'prev_label'  } = $i18n->get("private message prev label");
     }
-    $vars->{'next_url'       } = $session->url->page('op=viewInbox;pn='.($pn+1));
+    $vars->{'next_url'       } = $inboxUrl.';pn='.($pn+1).$sort_url;
     $vars->{'next_label'     } = $i18n->get("private message next label");
     
    	$vars->{'messages'      } = \@msg;

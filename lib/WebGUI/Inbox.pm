@@ -105,12 +105,18 @@ sub getMessagesForUser {
 	my $user     = shift;
 	my $limit    = shift || 50;
     my $page     = shift || 1;
+    my $sortBy   = shift;
+    
 	my @messages = ();
 	my $counter  = 0;
 	
+    unless($sortBy eq "subject" || $sortBy eq "sentBy" || $sortBy eq "dateStamp") {
+        $sortBy = "status='pending' desc, dateStamp desc";
+    }
+    
     my $start = (($page-1) * $limit) + 1;
     my $end   = $page * $limit;
-    my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by status='pending' desc, dateStamp desc");
+    my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by $sortBy");
 	while (my ($messageId, $userId, $groupId) = $rs->array) {
 		if ($user->userId eq $userId || ($groupId && $user->isInGroup($groupId))) {
 			$counter++;
