@@ -1694,10 +1694,11 @@ anything.
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	my %data;
+    my $form = $self->session->form;
 	foreach my $definition (@{$self->definition($self->session)}) {
 		foreach my $property (keys %{$definition->{properties}}) {
 			if ($definition->{properties}{$property}{noFormPost}) {
-				if ($self->session->form->process("assetId") eq "new" && $self->get($property) eq "") {
+				if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
 					$data{$property} = $definition->{properties}{$property}{defaultValue};
 				}
 				next;
@@ -1705,7 +1706,7 @@ sub processPropertiesFromFormPost {
 			my %params = %{$definition->{properties}{$property}};
 			$params{name} = $property;
 			$params{value} = $self->get($property);
-			$data{$property} = $self->session->form->process(
+			$data{$property} = $form->process(
 				$property,
 				$definition->{properties}{$property}{fieldType},
 				$definition->{properties}{$property}{defaultValue},
@@ -1713,11 +1714,13 @@ sub processPropertiesFromFormPost {
 				);
 		}
 	}
-	foreach my $form ($self->session->form->param) {
-		if ($form =~ /^metadata_(.*)$/) {
-			$self->updateMetaData($1,$self->session->form->process($form));
-		}
-	}
+    if ($self->session->setting->get("metaDataEnabled")) {
+        my $meta = $self->getMetaDataFields;
+	    foreach my $field (keys %{$meta}) {
+            my $value = $form->process("metadata_".$field, $meta->{$field}{fieldType}, $meta->{$field}{defaultValue});
+		   	$self->updateMetaData($field, $value);
+	    }
+    }
 	$self->session->db->beginTransaction;
 	$self->update(\%data);
 	$self->session->db->commit;

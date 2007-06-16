@@ -1,0 +1,18 @@
+#newsletter000000000001
+#url: newsletterdefaulttemplate
+#title: Summary Newsletter (default)
+#menuTitle: Summary Newsletter
+#namespace:newsletter
+#create
+
+<p><tmpl_var header></p>
+
+<tmpl_loop thread_loop>
+<p>
+    <a href="<tmpl_var url>"><tmpl_var title></a><br />
+    <p><tmpl_var synopsis></p>
+</p>
+</tmpl_loop>
+
+<p><tmpl_var footer></p>
+

@@ -25,6 +25,54 @@ use base 'WebGUI::Asset::RSSCapable';
 use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
+sub _computePostCount {
+	my $self = shift;
+	return scalar @{$self->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::Post']})};
+}
+
+#-------------------------------------------------------------------
+sub _computeThreadCount {
+	my $self = shift;
+	return scalar @{$self->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']})};
+}
+
+#-------------------------------------------------------------------
+# format the date according to rfc 822 (for RSS export)
+my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+sub _get_rfc822_date {
+	my $self = shift;
+        my ($time) = @_;
+        my ($year, $mon, $mday, $hour, $min, $sec) = $self->session->datetime->localtime($time);
+        my $month = $_months[$mon - 1];
+        return sprintf("%02d %s %04d %02d:%02d:%02d GMT", 
+                       $mday, $month, $year, $hour, $min, $sec);
+}
+  
+#-------------------------------------------------------------------
+sub _visitorCacheKey {
+	my $self = shift;
+	my $pn = $self->session->form->process('pn');
+	return "view_".$self->getId."?pn=".$pn;
+}
+
+#-------------------------------------------------------------------
+sub _visitorCacheOk {
+	my $self = shift;
+	return ($self->session->user->userId eq '1'
+		&& !$self->session->form->process('sortBy'));
+}
+
+#-------------------------------------------------------------------
+# encode a string to include in xml (for RSS export)
+sub _xml_encode {
+	my $text = shift;
+        $text =~ s/&/&amp;/g;
+        $text =~ s/</&lt;/g;
+        $text =~ s/\]\]>/\]\]&gt;/g;
+        return $text;
+}
+
+#-------------------------------------------------------------------
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
@@ -554,7 +602,7 @@ sub definition {
 			fieldType=>"template",
 			namespace=>"Collaboration/Notification",
 			defaultValue=>'PBtmpl0000000000000027',
-			tab=>'display',
+			tab=>'mail',
 			label=>$i18n->get('notification template'),
 			hoverHelp=>$i18n->get('notification template description'),
 			},
@@ -665,6 +713,27 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+sub getEditTabs {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
+
+	return (['mail', $i18n->get('mail'), 9]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getNewThreadUrl(  )
+
+Formats the url to start a new thread.
+
+=cut
+
+sub getNewThreadUrl {
+	my $self = shift;
+	$self->getUrl("func=add;class=WebGUI::Asset::Post::Thread");
+}
+
+#-------------------------------------------------------------------
 sub getRssItems {
 	my $self = shift;
 
@@ -727,27 +796,6 @@ SQL
 }
 
 #-------------------------------------------------------------------
-sub getEditTabs {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-
-	return (['mail', $i18n->get('mail'), 9]);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getNewThreadUrl(  )
-
-Formats the url to start a new thread.
-
-=cut
-
-sub getNewThreadUrl {
-	my $self = shift;
-	$self->getUrl("func=add;class=WebGUI::Asset::Post::Thread");
-}
-
-#-------------------------------------------------------------------
 
 =head2 getSearchUrl (  )
 
@@ -806,14 +854,78 @@ sub getUnsubscribeUrl {
 
 
 #-------------------------------------------------------------------
-sub _computeThreadCount {
+sub getViewTemplateVars {
 	my $self = shift;
-	return scalar @{$self->getLineage(['children'], {includeOnlyClasses => ['WebGUI::Asset::Post::Thread']})};
-}
-
-sub _computePostCount {
-	my $self = shift;
-	return scalar @{$self->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::Post']})};
+	my $scratchSortBy = $self->getId."_sortBy";
+	my $scratchSortOrder = $self->getId."_sortDir";
+	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
+	my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
+	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
+		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
+                if ($sortOrder eq "asc") {
+                        $sortOrder = "desc";
+                } else {
+                        $sortOrder = "asc";
+                }
+                $self->session->scratch->set($scratchSortOrder, $sortOrder);
+	}
+	$sortBy ||= "dateUpdated";
+	$sortOrder ||= "desc";
+	my %var;
+	$var{'user.canPost'} = $self->canPost;
+        $var{"add.url"} = $self->getNewThreadUrl;
+        $var{"rss.url"} = $self->getRssUrl;
+        $var{'user.isModerator'} = $self->canModerate;
+        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
+	$var{'user.isSubscribed'} = $self->isSubscribed;
+	$var{'sortby.title.url'} = $self->getSortByUrl("title");
+	$var{'sortby.username.url'} = $self->getSortByUrl("username");
+	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
+	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
+	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
+	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
+	$var{'sortby.views.url'} = $self->getSortByUrl("views");
+	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
+	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
+	$var{"search.url"} = $self->getSearchUrl;
+	$var{"subscribe.url"} = $self->getSubscribeUrl;
+	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
+	$var{"collaborationAssetId"} = $self->getId;
+	my $sql = "
+		select 
+			asset.assetId,
+			asset.className,
+			assetData.revisionDate as revisionDate 
+		from Thread 
+			left join asset on Thread.assetId=asset.assetId 
+			left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
+			left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
+		where 
+			asset.parentId=".$self->session->db->quote($self->getId)." 
+			and asset.state='published' 
+			and asset.className='WebGUI::Asset::Post::Thread' 
+			and assetData.revisionDate=(
+				select
+					max(revisionDate) 
+				from 
+					assetData 
+				where 
+					assetData.assetId=asset.assetId 
+					and (status='approved' or status='archived')
+			) 
+			and status='approved'
+		group by 
+			assetData.assetId 
+		order by 
+			Thread.isSticky desc, 
+		".$sortBy." 
+			".$sortOrder;
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
+	$p->setDataByQuery($sql);
+	$self->appendPostListTemplateVars(\%var, $p);
+	$self->appendTemplateLabels(\%var);
+    return \%var;
 }
 
 #-------------------------------------------------------------------
@@ -1053,18 +1165,6 @@ sub unsubscribe {
 
 
 #-------------------------------------------------------------------
-sub _visitorCacheOk {
-	my $self = shift;
-	return ($self->session->user->userId eq '1'
-		&& !$self->session->form->process('sortBy'));
-}
-
-sub _visitorCacheKey {
-	my $self = shift;
-	my $pn = $self->session->form->process('pn');
-	return "view_".$self->getId."?pn=".$pn;
-}
-
 sub view {
 	my $self = shift;
 	if ($self->_visitorCacheOk) {
@@ -1072,87 +1172,16 @@ sub view {
 		$self->session->errorHandler->debug("HIT") if $out;
 		return $out if $out;
 	}
-	my $scratchSortBy = $self->getId."_sortBy";
-	my $scratchSortOrder = $self->getId."_sortDir";
-	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
-	my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
-	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
-		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
-	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
-                if ($sortOrder eq "asc") {
-                        $sortOrder = "desc";
-                } else {
-                        $sortOrder = "asc";
-                }
-                $self->session->scratch->set($scratchSortOrder, $sortOrder);
-	}
-	$sortBy ||= "dateUpdated";
-	$sortOrder ||= "desc";
-	my %var;
-	$var{'user.canPost'} = $self->canPost;
-        $var{"add.url"} = $self->getNewThreadUrl;
-        $var{"rss.url"} = $self->getRssUrl;
-        $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
-	$var{'user.isSubscribed'} = $self->isSubscribed;
-	$var{'sortby.title.url'} = $self->getSortByUrl("title");
-	$var{'sortby.username.url'} = $self->getSortByUrl("username");
-	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
-	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
-	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
-	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
-	$var{'sortby.views.url'} = $self->getSortByUrl("views");
-	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
-	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
-	$var{"search.url"} = $self->getSearchUrl;
-	$var{"subscribe.url"} = $self->getSubscribeUrl;
-	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	$var{"collaborationAssetId"} = $self->getId;
-	my $sql = "
-		select 
-			asset.assetId,
-			asset.className,
-			assetData.revisionDate as revisionDate 
-		from Thread 
-			left join asset on Thread.assetId=asset.assetId 
-			left join Post on Post.assetId=Thread.assetId and Thread.revisionDate = Post.revisionDate 
-			left join assetData on assetData.assetId=Thread.assetId and Thread.revisionDate = assetData.revisionDate 
-		where 
-			asset.parentId=".$self->session->db->quote($self->getId)." 
-			and asset.state='published' 
-			and asset.className='WebGUI::Asset::Post::Thread' 
-			and assetData.revisionDate=(
-				select
-					max(revisionDate) 
-				from 
-					assetData 
-				where 
-					assetData.assetId=asset.assetId 
-					and (status='approved' or status='archived')
-			) 
-			and status='approved'
-		group by 
-			assetData.assetId 
-		order by 
-			Thread.isSticky desc, 
-		".$sortBy." 
-			".$sortOrder;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
-	$p->setDataByQuery($sql);
-	$self->appendPostListTemplateVars(\%var, $p);
-	$self->appendTemplateLabels(\%var);
 
 	# If the asset is not called through the normal prepareView/view cycle, first call prepareView.
 	# This happens for instance in the viewDetail method in the Matrix. In that case the Collaboration
 	# is called through the api.
 	$self->prepareView unless ($self->{_viewTemplate});
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+    my $out = $self->processTemplate($self->getViewTemplateVars,undef,$self->{_viewTemplate});
 	if ($self->_visitorCacheOk) {
-		WebGUI::Cache->new($self->session,$self->_visitorCacheKey)
-			->set($out,$self->get("visitorCacheTimeout"));
-		$self->session->errorHandler->debug("MISS");
+		WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->set($out,$self->get("visitorCacheTimeout"));
 	}
-       	return $out;
+    return $out;
 }
 
 #-------------------------------------------------------------------
@@ -1219,28 +1248,6 @@ sub www_unsubscribe {
 	my $self = shift;
 	$self->unsubscribe if $self->canSubscribe;
 	return $self->www_view;
-}
-
-#-------------------------------------------------------------------
-# format the date according to rfc 822 (for RSS export)
-my @_months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-sub _get_rfc822_date {
-	my $self = shift;
-        my ($time) = @_;
-        my ($year, $mon, $mday, $hour, $min, $sec) = $self->session->datetime->localtime($time);
-        my $month = $_months[$mon - 1];
-        return sprintf("%02d %s %04d %02d:%02d:%02d GMT", 
-                       $mday, $month, $year, $hour, $min, $sec);
-}
-  
-#-------------------------------------------------------------------
-# encode a string to include in xml (for RSS export)
-sub _xml_encode {
-	my $text = shift;
-        $text =~ s/&/&amp;/g;
-        $text =~ s/</&lt;/g;
-        $text =~ s/\]\]>/\]\]&gt;/g;
-        return $text;
 }
 
 #-------------------------------------------------------------------

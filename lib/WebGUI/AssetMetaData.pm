@@ -60,7 +60,7 @@ wasting space in the db for this field.
 
 =head3 fieldType
 
-The form field type for metaData, select list, text, integer.
+The form field type for metaData: selectBox, text, integer, or checkList, yesNo, radioList.
 
 =head3 possibleValues
 
@@ -251,19 +251,26 @@ sub www_editMetaDataField {
 		-name=>"description",
 		-label=>$i18n->get(85),
 		-hoverHelp=>$i18n->get('Metadata Description description'),
-		-value=>$fieldInfo->{description});
+		-value=>$fieldInfo->{description}
+        );
 	$f->fieldType(
 		-name=>"fieldType",
 		-label=>$i18n->get(486),
 		-hoverHelp=>$i18n->get('Data Type description'),
 		-value=>$fieldInfo->{fieldType} || "text",
-		-types=> [ qw /text integer yesNo selectList radioList/ ]
+		-types=> [ qw /text integer yesNo selectBox radioList checkList/ ]
 	);
 	$f->textarea(
 		-name=>"possibleValues",
 		-label=>$i18n->get(487),
 		-hoverHelp=>$i18n->get('Possible Values description'),
 		-value=>$fieldInfo->{possibleValues}
+	);
+	$f->textarea(
+		-name=>"defaultValue",
+		-label=>$i18n->get('default value'),
+		-hoverHelp=>$i18n->get('default value description'),
+		-value=>$fieldInfo->{defaultValue}
 	);
 	$f->submit();
 	$ac->setHelp("metadata edit property","Asset");

@@ -723,6 +723,15 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
                    lastUpdated => 1031514049,
                    message => q|Possible Values|
                  },
+        'default value' => {
+                   lastUpdated => 0,
+                   message => q|Default Value(s)|
+                 },
+        'default value description' => {
+                   lastUpdated => 0,
+                   message => q|The default value for this field. If there are multiple default values, as in the
+                   case of the check box list, then enter one per line.|
+                 },
         'Depth' => {
                      lastUpdated => 1089039511,
                      context => q|Field label for the Export Page operation|,

@@ -28,9 +28,40 @@ addAttachmentsToEvents($session);
 addMetaDataPostsToCS($session);
 addUserInvitations($session);
 addPrivateMessaging($session);
+addNewsletter($session);
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addNewsletter {
+	my $session = shift;
+	print "\tAdding a newsletter management system.\n" unless ($quiet);
+    $session->config->addToArray("assets","WebGUI::Asset::Wobject::Collaboration::Newsletter");
+    my $db = $session->db;
+    $db->write("create table Newsletter (
+        assetId varchar(22) binary not null,
+        revisionDate bigint not null,
+        newsletterTemplateId varchar(22) binary not null default 'newsletter000000000001',
+        mySubscriptionsTemplateId varchar(22) binary not null default 'newslettersubscrip0001',
+        newsletterHeader mediumtext,
+        newsletterFooter mediumtext,
+        newsletterCategories text,
+        primary key (assetId, revisionDate)
+        )");
+    $db->write("create table Newsletter_subscriptions (
+        assetId varchar(22) binary not null, 
+        userId varchar(22) binary not null, 
+        subscriptions text,
+        lastTimeSent bigint not null default 0,
+        primary key (assetId, userId)
+        )");
+    $db->write("alter table Newsletter_subscriptions add index lastTimeSent_assetId_userId
+        (lastTimeSent,assetId,userId)");
+    my $workflow = WebGUI::Workflow->new($session, "pbworkflow000000000002");
+    my $activity = $workflow->addActivity("WebGUI::Workflow::Activity::SendNewsletters","newslettersendactivity");
+    $activity->set("title","Send Newsletters For Newsletter Assets");
+}
 
 #-------------------------------------------------
 sub addRealtimeWorkflow {
