@@ -411,6 +411,15 @@ sub definition {
         hoverHelp=>$i18n->get("user invitations email exists description"),
         defaultValue=>$session->setting->get("userInvitationsEmailExists"),
     });
+    push(@fields, {
+		tab=>"user",
+		fieldType=>"template",
+		name=>"userInvitationsEmailTemplateId",
+		label=>$i18n->get('user email template'),
+		hoverHelp=>$i18n->get('user email template description'),
+		namespace=>"userInvite/Email",
+		defaultValue=>$session->setting->get("userInvitationsEmailTemplateId"),
+		});    
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {

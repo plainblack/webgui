@@ -124,10 +124,16 @@ sub www_inviteUserSave {
     ##No sneaky attack paths...
     $message = WebGUI::HTML::filter($message);
 
-    ##Append the invitation url.
+    ##Create the invitation url.
     my $inviteId = $session->id->generate();
     my $inviteUrl = $session->url->append($session->url->getSiteURL, 'op=acceptInvite;code='.$inviteId);
-    $message .= "\n$inviteUrl\n";
+
+    my $var;
+    $var->{registrationUrl}   = $inviteUrl;
+    $var->{invitationMessage} = $message;
+
+    my $emailTemplate  = WebGUI::Asset::Template->new($session, $session->setting->get('userInvitationsEmailTemplateId'));
+    my $templatedEmail = $emailTemplate->process($var);
 
     ##Create the invitation record.
     $session->db->setRow(
@@ -141,7 +147,7 @@ sub www_inviteUserSave {
         $inviteId,
     );
 
-    $invitation->addText($message);
+    $invitation->addText($templatedEmail);
     $invitation->send;
 
     my $output = sprintf qq!<p>%s</p><a href="%s">%s</a>!,

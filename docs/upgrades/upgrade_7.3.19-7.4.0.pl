@@ -161,6 +161,7 @@ sub addUserInvitations {
     ##Add settings
     $session->setting->add('userInvitationsEnabled', 0);
     $session->setting->add('userInvitationsEmailExists', 'This email address exists in our system.  This means that your friend is already a member of the site.  The invitation will not be sent.');
+    $session->setting->add('userInvitationsEmailTemplateId', 'PBtmpl0userInviteEmail');
 
     ##Create table for tracking invitations
     $session->db->write(<<EOSQL);

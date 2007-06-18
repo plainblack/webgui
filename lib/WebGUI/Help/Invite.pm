@@ -49,6 +49,23 @@ our $HELP = {
 		]
 	},
 
+	'invite email template' => {
+		title => 'invite email template title',
+		body => 'invite email template body',
+		variables => [
+			{
+				name     => 'inviteFormError',
+			}, 
+			{
+				name     => 'formHeader',
+			}, 
+		],
+		fields => [
+		],
+		related => [
+		]
+	},
+
 };
 
 1;  ##All perl modules must return true

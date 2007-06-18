@@ -4101,7 +4101,17 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
         message => q|This is the message displayed to users who try to invite someone whose email address already exists in the system.|,
         lastUpdated => 1181277914,
     },
-    
+
+	'user email template' => {
+		message => q|User Invitation Email Template|,
+		lastUpdated => 1181969396
+	},
+
+    'user email template description' => {
+        message => q|The template used to build the email invitation to the user.|,
+        lastUpdated => 1181969398,
+    },
+
     'send private message' => {
 		message => q|Send Private Message|,
 		lastUpdated => 1181019679,

@@ -123,6 +123,26 @@ our $I18N = {
 		lastUpdated => 1181493546,
 	},
 
+	'invite email template title' => {
+		message => q|User Invitation Email Template|,
+		lastUpdated => 1181970017,
+	},
+
+	'invite email template body' => {
+		message => q|This template is used to customize and display the invitation that is sent via email.|,
+		lastUpdated => 1181970016,
+	},
+
+	'registrationUrl' => {
+		message => q|The URL that the recipient will use to accept the invitation.|,
+		lastUpdated => 1181970016,
+	},
+
+	'invitationMessage' => {
+		message => q|The message entered by the user, filtered for HTML to prevent XSS attacks.|,
+		lastUpdated => 1181970094,
+	},
+
 };
 
 1;
