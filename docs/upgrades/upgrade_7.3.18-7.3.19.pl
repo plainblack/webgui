@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::Asset;
 
 
 my $toVersion = "7.3.19"; # make this match what version you're going to
@@ -21,16 +22,21 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixAssetSizes($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixAssetSizes {
+	my $session = shift;
+	print "\tFix the sizes of ALL Image and Size assets.  This will take a while.\n" unless ($quiet);
+    my $root = WebGUI::Asset->getRoot($session);
+    foreach my $fileAsset ( @{ $root->getLineage(["self","descendants"],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::File','WebGUI::Asset::Image']}) } ) {
+        $fileAsset->setSize();
+    }
+	# and here's our code
+}
 
 
 
