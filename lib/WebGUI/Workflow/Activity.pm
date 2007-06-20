@@ -94,7 +94,7 @@ sub create {
 	my $workflowId = shift;
 	my $id = shift;
 	my $classname = shift;
-	my ($sequenceNumber) = $session->db->quickArray("select count(*) from WorkflowActivity where workflowId=?", [$workflowId]);
+	my ($sequenceNumber) = $session->db->quickArray("select max(sequenceNumber) from WorkflowActivity where workflowId=?", [$workflowId]);
 	$sequenceNumber++;
 	my $activityId = $session->db->setRow("WorkflowActivity","activityId", {
 		sequenceNumber=>$sequenceNumber,
