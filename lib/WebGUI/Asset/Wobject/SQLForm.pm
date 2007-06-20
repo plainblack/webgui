@@ -2435,7 +2435,7 @@ sub _getFormElement {
 		$fieldParameters->{options}->{''}		= '-leave empty-' if (!$field->{isRequired});
 		$fieldParameters->{name} 			= $field->{fieldName};
 		$fieldParameters->{value}			= $fieldValue unless ($fieldType eq 'file');
-		$fieldParameters->{multiple}			= $field->{multipleAllowed} == 1;
+		$fieldParameters->{multiple}			= $field->{canHaveMultipleValues} == 1;
 		$fieldParameters->{$field->{widthParam}}	= $field->{formFieldWidth} if ($field->{formFieldWidth});
 		$fieldParameters->{$field->{heightParam}}	= $field->{formFieldHeight} if ($field->{formFieldHeight});
 		$fieldParameters->{maxlength}			= $maxLength;
@@ -3460,6 +3460,12 @@ sub www_search {
 	# Get field properties;
 	tie %searchableFields, "Tie::IxHash";
 my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLForm_fieldOrder where assetId=".$self->session->db->quote($self->getId)." order by rank");
+
+    # if this is a form submission, delete everything from scratch
+    if ($self->session->form->get('searchMode') || $self->session->form->get('searchType')) {
+        $self->_clearScratch(\@fields);
+    }
+
 	foreach (@fields) {
 		$fieldProperties{$_} = $self->_getFieldProperties($_);
 		unless ($fieldProperties{$_}->{disabled}) {
@@ -3902,6 +3908,13 @@ Hashref containing the properties of the fields that are in the search.
 
 =cut
 
+my %sortWeights = (
+	title		=>	7,
+	name		=>	7,
+	description	=>	3,
+	synopsis	=>	3,
+);
+
 sub _constructSearchQuery {
 	my (@tables, @joinConstraints, $tableCounter, @constraints, $currentField, $conditional, @joinSequence);
 	my $self = shift;
@@ -3909,6 +3922,14 @@ sub _constructSearchQuery {
 	my $showFields = shift;
 	my $fieldProperties = shift;
 	my $passedQuery = shift;
+
+	# order the results by a calculated field
+	# each clause is something like this: IF(test,$weight,0) where weight is higher for fields with
+	# certain names, like 7 'title' or 'name', 3 for 'description', and 1 for everything else
+	# the tests are the same as those in the where clause
+	# the final result is: " SELECT  ..., (test + test + ...) AS sqlforms_orderby_field 
+	#  ... ORDER BY sqlforms_orderby_field "
+	my @sortClauses = ();
 
 	# This variable should be set to value of the minimum word length for fulltext searches
 	# as it is set in your MySQL database. Normally this is 3.
@@ -3936,7 +3957,7 @@ my			$fieldName = $currentFieldProperties->{fieldName};
 my			$fieldType = $currentFieldProperties->{type};
 my			$fullFieldName = "t1.$fieldName";
 my 			$constraint;
-my			$query = $passedQuery || $self->session->form->process("searchQuery") || $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'query');
+my			$query = $passedQuery || $self->session->form->process("searchQuery") || $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1') || $self->session->scratch->get('SQLForm_'.$self->getId.'query');
 my $queryLike;
 			if ($conditional == 100 || $conditional == 101) {
 				$query =~ s/\\/\\\\/g;
@@ -3961,14 +3982,16 @@ my			$formValue2 = $self->session->form->process($currentField.'-2') || $self->s
 				} else {
 					$formValue2 = Storable::thaw($formValue2);
 				}
-			}	
+			}
 
 			if ($conditional == 200 && $formValue2) {
-				#$constraint = "(".join(' or ', map {"$fullFieldName = ".$self->session->db->quote($_)} $self->session->request->param($currentField.'-2')).")";
-				$constraint = "(".join(' or ', map {"$fullFieldName = ".$self->session->db->quote($_)} @$formValue2).")";
-			} elsif ($conditional == 201 && $formValue2) {
-				#$constraint = "(".join(' and ', map {"$fullFieldName = ".$self->session->db->quote($_)} $self->session->request->param($currentField.'-2')).")";
-				$constraint = "(".join(' or ', map {"$fullFieldName = ".$self->session->db->quote($_)} @$formValue2).")";
+                if (@$formValue2) {
+    				$constraint = "(".join(' or ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
+	            }
+	   		} elsif ($conditional == 201 && $formValue2) { # match all
+                if (@$formValue2) {
+    				$constraint = "(".join(' and ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
+	            }
 			# Match the joined columns only if type is a list and has joins.
 			# Else the regular like and regex will handle this.
 			} elsif ($fieldType eq 'list' && $currentFieldProperties->{numberOfJoins}) {
@@ -3983,7 +4006,8 @@ my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
 							$prepend.$currentFieldProperties->{"joinOnB$joinCounter"};
 					} else {
 						$joinStatement .= " on ".
-							$fullFieldName." = ".$prepend.$currentFieldProperties->{selectField1};
+							$fullFieldName." RegExp CONCAT('(^|\\n)',".$prepend.$currentFieldProperties->{selectField1}.",'(\\n|\$)')";
+#							$fullFieldName." = ".$prepend.$currentFieldProperties->{selectField1};
 						$joinStatement .= " or ".$fullFieldName." = ''" if (!$currentFieldProperties->{isRequired});
 							
 					}
@@ -3991,21 +4015,36 @@ my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
 					push(@joinSequence, $joinStatement);
 				}
 				if ($conditional == 100) {	
-					$constraint .= $prepend.$currentFieldProperties->{selectField2}." like ".$queryLike;
+                    if ($queryLike ne q['%%']) {
+    					$constraint .= $prepend.$currentFieldProperties->{selectField2}." like ".$queryLike;
+	                }
+                    elsif (defined $formValue1 && $formValue1 ne '') {
+                        $constraint = "$fullFieldName like ".$self->session->db->quote('%'.$formValue1.'%');
+                    }
 				} else {
-					$constraint .= $prepend.$currentFieldProperties->{selectField2}." regexp($query)";
+				    if ($query ne "''") {
+    					$constraint .= $prepend.$currentFieldProperties->{selectField2}." regexp($query)";
+	                }
+                    elsif (defined $formValue1 && $formValue1 ne '') {
+                        $constraint = "$fullFieldName like ".$self->session->db->quote($formValue1);
+                    }
 				}
 			# 10 = between
 			} elsif ($conditional == 10) {
-				$constraint = 
-					"($fullFieldName > ".$self->session->db->quote($formValue1)." and ".
-					" $fullFieldName <".$self->session->db->quote($formValue2).")";
+   				$constraint = 
+				    "($fullFieldName > ".$self->session->db->quote($formValue1)." and ".
+			    	" $fullFieldName <".$self->session->db->quote($formValue2).")";
 			# 100 = like
 			} elsif ($conditional == 100) {
 				if ($currentFieldProperties->{useFulltext} && length($query) >= $minimumFulltextLength) {
 					$constraint = "match($fullFieldName) against($query in boolean mode)";
 				} else {
-					$constraint = "$fullFieldName like $queryLike";
+				    if ($queryLike ne q['%%']) {
+					    $constraint = "$fullFieldName like $queryLike";
+                    }
+                    elsif (defined $formValue1 && $formValue1 ne '') {
+                        $constraint = "$fullFieldName like ".$self->session->db->quote('%'.$formValue1.'%');
+                    }
 				}
 			# 101 = regexp
 			} elsif ($conditional == 101) {
@@ -4014,6 +4053,10 @@ my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
 				$constraint = "$fullFieldName ".$types->{$fieldType}->{$conditional}." ".$self->session->db->quote($formValue1);
 			}
 
+            next unless $constraint;
+
+			my $sortWeight = exists $sortWeights{lc $fieldName} ? $sortWeights{lc $fieldName} : 1;
+			push @sortClauses, "IF($constraint,$sortWeight,0)";
 			push(@constraints, $constraint) if $constraint;
 		}
 	}
@@ -4037,7 +4080,10 @@ my	$searchType = ($self->session->form->process("searchType") || $self->session-
 	return undef if (!@constraints);
 
 	# Construct the search query
-my	$sql = " select distinct ".join(', ', @selectColumns);
+	my $sortField = @sortClauses ? ('('.join('+', @sortClauses).') AS sqlform_orderby') : '1 AS sqlform_orderby';
+	$sortField = ' 1 AS sqlform_orderby ' if $searchType eq 'and';
+
+my	$sql = " select distinct ".join(', ', @selectColumns, $sortField);
 	$sql .= " from ".$self->get('tableName').' as t1 ';
 	$sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
 	$sql .= " where ";
@@ -4047,6 +4093,8 @@ my	$sql = " select distinct ".join(', ', @selectColumns);
 	$sql .= " and " if (@joinConstraints);
 	$sql .= " t1.__archived=0 ";
 	$sql .= " and t1.__deleted=".$self->session->db->quote($searchInTrash) if ($searchInTrash < 2);
+
+    $sql .= " GROUP BY $selectColumns[0] ";
 
 my	$sortColumn = $self->session->form->process("sortColumn");
 	$sortColumn = $self->session->scratch->get('SQLForm_'.$self->getId.'sortColumn') unless ($sortColumn);
@@ -4059,6 +4107,9 @@ my	$sortAscending = $self->session->form->process("sortAscending");
 	if (isIn($sortColumn, @$showFields)) {
 		$sql .= " order by ".$fieldProperties->{$sortColumn}->{fieldName};
 		$sql .= " desc " unless ($sortAscending);
+	}
+	else {
+        $sql .= " ORDER BY sqlform_orderby DESC ";
 	}
 
 	return $sql;
@@ -4170,6 +4221,40 @@ my			$value;
 
 #-------------------------------------------------------------------
 
+=head2 _clearScratch
+
+Clear all of the previous search criteria and settings in preparation for a newly submitted search.
+
+=cut
+
+sub _clearScratch {
+    my($self, $fields_aref) = @_;
+
+    my $scratch = $self->session->scratch();
+
+    my $id = $self->getId();
+
+    my @static_tags = qw(
+        query
+        searchIn
+        searchInTrash
+        searchType
+        sortAscending
+        sortColumn
+    );
+
+    my @tags = (@static_tags, map "---$_", @$fields_aref);
+
+    # for each field, and also delete some other things
+    for my $tag (@tags) {
+        $scratch->delete("SQLForm_${id}$tag");
+    }
+
+    return; # nothing explicitly
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_superSearch
 
 Returns the super search.
@@ -4192,6 +4277,12 @@ sub www_superSearch {
 	$self->session->scratch->delete('SQLForm_'.$self->getId.'searchMode');
 	
 my	@fields = $self->session->db->buildArray("select distinct fieldId from SQLForm_fieldOrder where assetId=".$self->session->db->quote($self->getId)." order by rank");
+
+    # if this is a form submission, delete everything from scratch
+    if ($self->session->form->get('searchMode') || $self->session->form->get('searchType')) {
+        $self->_clearScratch(\@fields);
+    }
+
 my 	@showFields;
 	foreach (@fields) {
 		$fieldProperties{$_} = $self->_getFieldProperties($_);
@@ -4256,6 +4347,7 @@ my		$sth = $dbLink->db->unconditionalRead($sql);
 	$var->{managementLinks} = $self->_getManagementLinks;	
 
 	# Only process style if search is called directly;
+	delete $var->{'searchForm.field_loop'};
 	return $self->processTemplate($var, $self->getValue('searchTemplateId')) unless ($self->session->form->process("func") eq 'superSearch');
 	return $self->processStyle($self->processTemplate($var, $self->getValue('searchTemplateId')));
 }
