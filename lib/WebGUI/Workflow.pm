@@ -133,7 +133,10 @@ sub deleteActivity {
 	my $self = shift;
 	my $activityId = shift;
 	my $activity = $self->getActivity($activityId);
-	$activity->delete if ($activity);
+	if ($activity) {
+        $activity->delete;
+        $self->reorderActivities;
+    }
 }
 
 #-------------------------------------------------------------------

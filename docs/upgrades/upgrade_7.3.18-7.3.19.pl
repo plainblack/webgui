@@ -13,6 +13,7 @@ use strict;
 use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Asset;
+use WebGUI::Workflow;
 
 
 my $toVersion = "7.3.19"; # make this match what version you're going to
@@ -23,6 +24,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 fixAssetSizes($session);
+resequenceWorkflowActivities($session);
 
 finish($session); # this line required
 
@@ -35,8 +37,24 @@ sub fixAssetSizes {
     foreach my $fileAsset ( @{ $root->getLineage(["self","descendants"],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::File','WebGUI::Asset::Image']}) } ) {
         $fileAsset->setSize();
     }
-	# and here's our code
 }
+
+#-------------------------------------------------
+sub resequenceWorkflowActivities {
+	my $session = shift;
+	print "\tFix sequencing problems in Workflow Activities.  This will take a while.\n" unless ($quiet);
+    my $workflows = WebGUI::Workflow->getList($session);
+    use Data::Dumper;
+    $session->errorHandler->warn(Dumper $workflows);
+    my ($workflowId, $title);
+    while ( ($workflowId, $title) = each %{ $workflows } ) {
+        $session->errorHandler->warn($workflowId . ':' . $title);
+        my $workflow = WebGUI::Workflow->new($session, $workflowId);
+        next unless defined $workflow;
+        $workflow->reorderActivities;
+    }
+}
+
 
 
 

@@ -52,6 +52,8 @@
  - fix: Fixed a typo in the Article with attachments template (perlDreamer Consulting, LLC)
  - fix: Uploaded File Sizes Wrong (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
+ - fix: Activity Sequence Numbers Incorrect when Editing Workflows (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/activity-sequence-numbers-incorrect-when-editing-workflows#YRH7TYSWFkEUSPVDNN6zKQ
 
 
 7.3.18
