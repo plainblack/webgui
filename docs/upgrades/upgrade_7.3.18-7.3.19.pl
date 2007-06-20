@@ -44,12 +44,9 @@ sub resequenceWorkflowActivities {
 	my $session = shift;
 	print "\tFix sequencing problems in Workflow Activities.  This will take a while.\n" unless ($quiet);
     my $workflows = WebGUI::Workflow->getList($session, undef, 1);  ##Hack to get around non-existant mode column
-    $session->errorHandler->warn("after getList");
     my ($workflowId, $title);
     while ( ($workflowId, $title) = each %{ $workflows } ) {
-        $session->errorHandler->warn($workflowId . ':' . $title);
         my $workflow = WebGUI::Workflow->new($session, $workflowId);
-        $session->errorHandler->warn("after getList");
         next unless defined $workflow;
         $workflow->reorderActivities;
     }
