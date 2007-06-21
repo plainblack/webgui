@@ -3446,7 +3446,7 @@ Generates the normal search form.
 =cut
 
 sub www_search {
-	my (%searchableFields, @showFields, $query, $searchInTrash, @searchIn, $f, $output, %fieldProperties,
+    my (%searchableFields, @showFields, $query, $searchInTrash, @searchIn, $f, $output, %fieldProperties,
 		$useRegex, $sortColumn, $sortAscending, $recordControls, $queryLike,
 		%row, $sth, @headerLoop, $var, @recordLoop, %searchInTrashOptions, $i18n);
 	my $self = shift;
@@ -3793,15 +3793,22 @@ my	$searchInTrash = $self->session->form->process("searchInTrash");
 			$self->session->scratch->delete('SQLForm_'.$self->getId.'---'.$_.'c');
 		}
 		
-my		$formValue1 = $self->session->form->process($_.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'v1');
-my		$formValue2 = $self->session->form->process($_.'-2') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'v2');
-my		$conditional = $self->session->form->process('_'.$_.'_conditional') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'c');
+                my $formValue1 = $self->session->form->process($_.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'v1');
+                my $formValue2 = $self->session->form->process($_.'-2') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'v2');
+                my $formConditional = $self->session->form->process('_'.$_.'_conditional');
+                my $scratchConditional = $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$_.'c');
+                my $fieldType = $fieldProperties->{$_}->{type};
+                my $conditional = defined $formConditional           ? $formConditional
+                                : defined $scratchConditional        ? $scratchConditional
+                                : exists $types->{$fieldType}{'200'} ? 200 # mach any
+                                :                                      100 # like
+                                ;
 
 		$self->session->scratch->set('SQLForm_'.$self->getId.'---'.$_.'v1', $formValue1);
 		$self->session->scratch->set('SQLForm_'.$self->getId.'---'.$_.'v2', $formValue2);
 		$self->session->scratch->set('SQLForm_'.$self->getId.'---'.$_.'c', $conditional);
 
-		if ($fieldProperties->{$_}->{type} eq 'list') {
+		if ($fieldType eq 'list') {
 			if ($self->session->form->process($_.'-2')) {
 				$formValue2 = [ $self->session->request->param($_.'-2') ];
 				$self->session->scratch->set('SQLForm_'.$self->getId.'---'.$_.'v2', Storable::freeze($formValue2));
@@ -3976,6 +3983,9 @@ my $queryLike;
 my			$formValue1 = $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1');
 my			$formValue2 = $self->session->form->process($currentField.'-2') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v2');
 
+            # don't search this field unless there's something to search for
+#            next if ($query eq qq[''] and $formValue1 eq "" and (ref $formValue2 ne 'ARRAY' || @$formValue2 == 0));
+
 			if ($fieldType eq 'list') {
 				if ($self->session->form->process($currentField.'-2')) {
 					$formValue2 = [ $self->session->request->param($currentField.'-2') ];
@@ -4112,6 +4122,7 @@ my	$sortAscending = $self->session->form->process("sortAscending");
         $sql .= " ORDER BY sqlform_orderby DESC ";
 	}
 
+$self->session->errorHandler->warn($sql);
 	return $sql;
 }
 
