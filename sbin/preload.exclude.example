@@ -1,3 +1,7 @@
+# Create preload.exclude in your WebGUI/sbin directory and add modules to it
+# that you don't want to be loaded by modperl. This will decrease the overall
+# size of your modperl instances, which will increase performance, and reduce
+# memory use.
 WebGUI::Cache::Database
 WebGUI::Auth::LDAP
 WebGUI::Asset::Wobject::WSClient

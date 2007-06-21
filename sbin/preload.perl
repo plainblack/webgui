@@ -1,15 +1,26 @@
 my $webguiRoot;
+my $customLibs;
 
 BEGIN {
         $webguiRoot = "/data/WebGUI";
         unshift (@INC, $webguiRoot."/lib");
+        @{$customLibs} = ();
+        open(FILE,"<".$webguiRoot."/sbin/preload.custom");
+        while (my $line = <FILE>) {
+            next if $line =~ m/^#/;
+	        chomp $line;
+	        push(@{$customLibs}, $line);
+        }
+        close(FILE);
+        foreach my $lib (@customLibs) {
+            unshift (@INC, $lib);
+        }
 }
 
 $|=1;
 
 use strict;
 print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
-
 
 #----------------------------------------
 # Logger
@@ -39,12 +50,17 @@ my @modules = ();
 # these modules should always be skipped
 my @excludes = qw(WebGUI::i18n::English::Automated_Information WebGUI::PerformanceProfiler);
 open(FILE,"<".$webguiRoot."/sbin/preload.exclude");
-while (<FILE>) {
-	chomp;
-	push(@excludes,$_);
+while (my $line = <FILE>) {
+    next if $line =~ m/^#/;
+	chomp $line;
+	push(@excludes, $line);
 }
 close(FILE);
-File::Find::find(\&getWebGUIModules, $webguiRoot."/lib/WebGUI");
+my @folders = ($webguiRoot."/lib/WebGUI");
+foreach my $lib (@{$customLibs}) {
+    push(@folders, $lib."/WebGUI");
+}
+File::Find::find(\&getWebGUIModules, @folders);
 foreach my $package (@modules) {
 	next if (WebGUI::Utility::isIn($package,@excludes));
 	my $use = "use ".$package." ()";
@@ -79,7 +95,7 @@ sub getWebGUIModules {
         my $filename = $File::Find::dir."/".$_;
         return unless $filename =~ m/\.pm$/;
         my $package = $filename;
-        $package =~ s/^$webguiRoot\/lib\/(.*)\.pm$/$1/;
+        $package =~ s/.*\/lib\/(.*)\.pm$/$1/;
         $package =~ s/\//::/g;
         push(@modules,$package);
 }

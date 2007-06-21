@@ -1,4 +1,7 @@
 7.4.0
+ - rfe: snippets should have titles too!
+ - Added a mechanism for using external folders for custom code. See
+   sbin/preload.custom.example for details.
  - Added a realtime workflow option for content publishing.
  - Added switches to auto request commit operations and skip adding comments.
  - fix: old recurring events were not deleted when changing recurrence pattern

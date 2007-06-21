@@ -164,7 +164,7 @@ sub view {
 	WebGUI::Macro::process($self->session,\$output);
 	$output = $self->getToolbar.$output if ($self->session->var->get("adminOn") && !$calledAsWebMethod);
 	if ($self->getValue("processAsTemplate")) {
-		$output = WebGUI::Asset::Template->processRaw($self->session, $output);
+		$output = WebGUI::Asset::Template->processRaw($self->session, $output, $self->get);
 	}
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
