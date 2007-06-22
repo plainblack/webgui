@@ -57,6 +57,8 @@
     http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
  - fix: Activity Sequence Numbers Incorrect when Editing Workflows (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/activity-sequence-numbers-incorrect-when-editing-workflows#YRH7TYSWFkEUSPVDNN6zKQ
+ - fix: Spectre Should Check That It Has a Valid Workflow (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/spectre-should-check-that-it-has-a-valid-workflow#lHx4BxEUxcacX7rS5VLxeg
 
 
 7.3.18

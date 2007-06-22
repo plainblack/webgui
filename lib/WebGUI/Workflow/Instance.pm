@@ -166,7 +166,13 @@ sub getAllInstances {
     my @instances = ();
     my $rs = $session->db->read("SELECT instanceId FROM WorkflowInstance");
     while (my ($instanceId) = $rs->array) {
-        push(@instances, WebGUI::Workflow::Instance->new($session, $instanceId));
+        my $instance = WebGUI::Workflow::Instance->new($session, $instanceId);
+        if (defined $instance) {
+            push(@instances, $instance);
+        }
+        else {
+            $session->errorHandler->warn('Tried to instance instanceId '.$instanceId.' but it returned undef');
+        }
     }
     return \@instances;	
 }
