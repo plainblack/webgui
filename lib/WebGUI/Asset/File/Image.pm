@@ -207,7 +207,10 @@ sub processPropertiesFromFormPost {
 	unless ($parameters =~ /alt\=/) {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
-	my $storage = $self->getStorageLocation;
+    ##We just inherited a storage object of the wrong type.  Reinstance the same
+    ##storage object with the correct type
+    my $storage = WebGUI::Storage::Image->get($self->session, $self->getStorageLocation->getId);
+	$self->setStorageLocation($storage);
     my $max_size = $self->session->setting->get("maxImageSize");
     my $file = $self->get("filename");
     my ($w, $h) = $storage->getSizeInPixels($file);
@@ -225,11 +228,16 @@ sub processPropertiesFromFormPost {
 #-------------------------------------------------------------------
 
 sub setStorageLocation {
-	my $self = shift;
-	if ($self->get("storageId") eq "") {
+	my $self    = shift;
+    my $storage = shift;
+	if (defined $storage) {
+        $self->{_storageLocation} = $storage;
+	}
+	elsif ($self->get("storageId") eq "") {
 		$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
 		$self->update({storageId=>$self->{_storageLocation}->getId});
-	} else {
+	}
+    else {
 		$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
 	}
 }

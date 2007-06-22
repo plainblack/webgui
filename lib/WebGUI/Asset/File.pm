@@ -279,7 +279,7 @@ sub processPropertiesFromFormPost {
 			$data{title} = $filename unless ($session->form->process("title"));
 			$data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
 			$data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
-            $self->{_storageLocation} = $storage;
+            $self->setStorageLocation($storage);
 			$self->update(\%data);
 		}
 	}
@@ -336,11 +336,16 @@ sub setSize {
 #-------------------------------------------------------------------
 
 sub setStorageLocation {
-	my $self = shift;
-	if ($self->get("storageId") eq "") {
+	my $self    = shift;
+    my $storage = shift;
+	if (defined $storage) {
+        $self->{_storageLocation} = $storage;
+	}
+	elsif ($self->get("storageId") eq "") {
 		$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 		$self->update({storageId=>$self->{_storageLocation}->getId});
-	} else {
+	}
+    else {
 		$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
 	}
 }
