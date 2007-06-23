@@ -3923,207 +3923,208 @@ my %sortWeights = (
 );
 
 sub _constructSearchQuery {
-	my (@tables, @joinConstraints, $tableCounter, @constraints, $currentField, $conditional, @joinSequence);
-	my $self = shift;
-	my $searchInFields = shift;
-	my $showFields = shift;
-	my $fieldProperties = shift;
-	my $passedQuery = shift;
+    my (@tables, @joinConstraints, $tableCounter, @constraints, $currentField, $conditional, @joinSequence);
+    my $self = shift;
+    my $searchInFields = shift;
+    my $showFields = shift;
+    my $fieldProperties = shift;
+    my $passedQuery = shift;
 
-	# order the results by a calculated field
-	# each clause is something like this: IF(test,$weight,0) where weight is higher for fields with
-	# certain names, like 7 'title' or 'name', 3 for 'description', and 1 for everything else
-	# the tests are the same as those in the where clause
-	# the final result is: " SELECT  ..., (test + test + ...) AS sqlforms_orderby_field 
-	#  ... ORDER BY sqlforms_orderby_field "
-	my @sortClauses = ();
+    # order the results by a calculated field
+    # each clause is something like this: IF(test,$weight,0) where weight is higher for fields with
+    # certain names, like 7 'title' or 'name', 3 for 'description', and 1 for everything else
+    # the tests are the same as those in the where clause
+    # the final result is: " SELECT  ..., (test + test + ...) AS sqlforms_orderby_field 
+    #  ... ORDER BY sqlforms_orderby_field "
+    my @sortClauses = ();
 
-	# This variable should be set to value of the minimum word length for fulltext searches
-	# as it is set in your MySQL database. Normally this is 3.
-	my $minimumFulltextLength = 3;
+    # This variable should be set to value of the minimum word length for fulltext searches
+    # as it is set in your MySQL database. Normally this is 3.
+    my $minimumFulltextLength = 3;
 	
-	# Include the table the form writes to.
-	$tableCounter = 2;
+    # Include the table the form writes to.
+    $tableCounter = 2;
 
-	# Process search fields.
-	foreach $currentField (@$searchInFields) {
-		# Set conditional given for this field or to like or regexp mode if in normal search
-my 		$searchMode = $self->session->form->process("searchMode") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchMode');
-		if ($searchMode) {
-			$conditional = 100 if ($searchMode eq 'normal');
-			$conditional = 101 if ($searchMode eq 'regexp');
-		} else {
-			$conditional = $self->session->form->process('_'.$currentField.'_conditional') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'c');
-		}
+    # Process search fields.
+    foreach $currentField (@$searchInFields) {
+	# Set conditional given for this field or to like or regexp mode if in normal search
+	my $searchMode = $self->session->form->process("searchMode") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchMode');
+	if ($searchMode) {
+	    $conditional = 100 if ($searchMode eq 'normal');
+	    $conditional = 101 if ($searchMode eq 'regexp');
+	} else {
+	    $conditional = $self->session->form->process('_'.$currentField.'_conditional') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'c');
+	}
 
-		$tableCounter++;
+	$tableCounter++;
 		
-		if ($conditional ne '') {
-my			$currentFieldProperties = $fieldProperties->{$currentField};
-my			$fieldName = $currentFieldProperties->{fieldName};
-my			$fieldType = $currentFieldProperties->{type};
-my			$fullFieldName = "t1.$fieldName";
-my 			$constraint;
-my			$query = $passedQuery || $self->session->form->process("searchQuery") || $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1') || $self->session->scratch->get('SQLForm_'.$self->getId.'query');
-my $queryLike;
-			if ($conditional == 100 || $conditional == 101) {
-				$query =~ s/\\/\\\\/g;
-				$query =~ s/'/\\'/g;
+	if ($conditional ne '') {
+	    my $currentFieldProperties = $fieldProperties->{$currentField};
+	    my $fieldName = $currentFieldProperties->{fieldName};
+	    my $fieldType = $currentFieldProperties->{type};
+	    my $fullFieldName = "t1.$fieldName";
+	    my $constraint;
+	    my $query = $passedQuery || $self->session->form->process("searchQuery") || $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1') || $self->session->scratch->get('SQLForm_'.$self->getId.'query');
+	    my $queryLike;
+	    if ($conditional == 100 || $conditional == 101) {
+		$query =~ s/\\/\\\\/g;
+		$query =~ s/'/\\'/g;
 
-				# Search on 'like'
-				if ($conditional == 100) {
-					$queryLike = $query;
-					$queryLike =~ s/%/\\%/g;
-					$queryLike =~ s/\*/%/g;
-					$queryLike = "'%".$queryLike."%'";
-				}
-				$query = "'$query'";
-			}
+		# Search on 'like'
+		if ($conditional == 100) {
+		    $queryLike = $query;
+		    $queryLike =~ s/%/\\%/g;
+		    $queryLike =~ s/\*/%/g;
+		    $queryLike = "'%".$queryLike."%'";
+		}
+		$query = "'$query'";
+	    }
 
-my			$formValue1 = $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1');
-my			$formValue2 = $self->session->form->process($currentField.'-2') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v2');
+	    my $formValue1 = $self->session->form->process($currentField.'-1') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v1');
+	    my $formValue2 = $self->session->form->process($currentField.'-2') || $self->session->scratch->get('SQLForm_'.$self->getId.'---'.$currentField.'v2');
 
             # don't search this field unless there's something to search for
 #            next if ($query eq qq[''] and $formValue1 eq "" and (ref $formValue2 ne 'ARRAY' || @$formValue2 == 0));
 
-			if ($fieldType eq 'list') {
-				if ($self->session->form->process($currentField.'-2')) {
-					$formValue2 = [ $self->session->request->param($currentField.'-2') ];
-				} else {
-					$formValue2 = Storable::thaw($formValue2);
-				}
-			}
+	    if ($fieldType eq 'list') {
+		if ($self->session->form->process($currentField.'-2')) {
+		    $formValue2 = [ $self->session->request->param($currentField.'-2') ];
+		} else {
+		    $formValue2 = Storable::thaw($formValue2);
+		}
+	    }
 
-			if ($conditional == 200 && $formValue2) {
+	    if ($conditional == 200 && ref $formValue2 eq 'ARRAY') {
                 if (@$formValue2) {
-    				$constraint = "(".join(' or ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
-	            }
-	   		} elsif ($conditional == 201 && $formValue2) { # match all
+		    $constraint = "(".join(' or ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
+		}
+	    } elsif ($conditional == 201 && $formValue2) { # match all
                 if (@$formValue2) {
-    				$constraint = "(".join(' and ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
-	            }
-			# Match the joined columns only if type is a list and has joins.
-			# Else the regular like and regex will handle this.
-			} elsif ($fieldType eq 'list' && $currentFieldProperties->{numberOfJoins}) {
-my				$prepend = "t$tableCounter";
-				for my $joinCounter (1 .. $currentFieldProperties->{numberOfJoins}) {
-my					$joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
-						$currentFieldProperties->{"table$joinCounter"}." as ".$prepend."table$joinCounter";
-						
-					if ($joinCounter > 1) {
-						$joinStatement .= " on ".
-							$prepend.$currentFieldProperties->{"joinOnA$joinCounter"}.'='.
-							$prepend.$currentFieldProperties->{"joinOnB$joinCounter"};
-					} else {
-						$joinStatement .= " on ".
-							$fullFieldName." RegExp CONCAT('(^|\\n)',".$prepend.$currentFieldProperties->{selectField1}.",'(\\n|\$)')";
+		    $constraint = "(".join(' and ', map {"$fullFieldName RegExp CONCAT('(^|\\n)',$_,'(\\n|\$)')"} map $self->session->db->quote($_), @$formValue2).")";
+		}
+		# Match the joined columns only if type is a list and has joins.
+		# Else the regular like and regex will handle this.
+	    } elsif ($fieldType eq 'list' && $currentFieldProperties->{numberOfJoins}) {
+		my $prepend = "t$tableCounter";
+		for my $joinCounter (1 .. $currentFieldProperties->{numberOfJoins}) {
+		    my $joinStatement = $currentFieldProperties->{"database$joinCounter"}.'.'.
+			$currentFieldProperties->{"table$joinCounter"}." as ".$prepend."table$joinCounter";
+
+		    if ($joinCounter > 1) {
+			$joinStatement .= " on ".
+			    $prepend.$currentFieldProperties->{"joinOnA$joinCounter"}.'='.
+			    $prepend.$currentFieldProperties->{"joinOnB$joinCounter"};
+		    } else {
+			$joinStatement .= " on ".
+			    $fullFieldName." RegExp CONCAT('(^|\\n)',".$prepend.$currentFieldProperties->{selectField1}.",'(\\n|\$)')";
 #							$fullFieldName." = ".$prepend.$currentFieldProperties->{selectField1};
-						$joinStatement .= " or ".$fullFieldName." = ''" if (!$currentFieldProperties->{isRequired});
-							
-					}
-					push(@joinConstraints, $prepend."table$joinCounter.__archived='0'");
-					push(@joinSequence, $joinStatement);
-				}
-				if ($conditional == 100) {	
+			$joinStatement .= " or ".$fullFieldName." = ''" if (!$currentFieldProperties->{isRequired});
+		    }
+		    push(@joinConstraints, $prepend."table$joinCounter.__archived='0'");
+		    push(@joinSequence, $joinStatement);
+		}
+		if ($conditional == 100) {	
                     if ($queryLike ne q['%%']) {
-    					$constraint .= $prepend.$currentFieldProperties->{selectField2}." like ".$queryLike;
-	                }
+			$constraint .= $prepend.$currentFieldProperties->{selectField2}." like ".$queryLike;
+		    }
                     elsif (defined $formValue1 && $formValue1 ne '') {
                         $constraint = "$fullFieldName like ".$self->session->db->quote('%'.$formValue1.'%');
                     }
-				} else {
-				    if ($query ne "''") {
-    					$constraint .= $prepend.$currentFieldProperties->{selectField2}." regexp($query)";
-	                }
+		} else {
+		    if ($query and $query ne "''") {
+			$constraint .= $prepend.$currentFieldProperties->{selectField2}." regexp($query)";
+		    }
                     elsif (defined $formValue1 && $formValue1 ne '') {
                         $constraint = "$fullFieldName like ".$self->session->db->quote($formValue1);
                     }
-				}
-			# 10 = between
-			} elsif ($conditional == 10) {
-   				$constraint = 
-				    "($fullFieldName > ".$self->session->db->quote($formValue1)." and ".
-			    	" $fullFieldName <".$self->session->db->quote($formValue2).")";
-			# 100 = like
-			} elsif ($conditional == 100) {
-				if ($currentFieldProperties->{useFulltext} && length($query) >= $minimumFulltextLength) {
-					$constraint = "match($fullFieldName) against($query in boolean mode)";
-				} else {
-				    if ($queryLike ne q['%%']) {
-					    $constraint = "$fullFieldName like $queryLike";
+		}
+		# 10 = between
+	    } elsif ($conditional == 10) {
+		$constraint = 
+		    "($fullFieldName > ".$self->session->db->quote($formValue1)." and ".
+		    " $fullFieldName <".$self->session->db->quote($formValue2).")";
+		# 100 = like
+	    } elsif ($conditional == 100) {
+		if ($currentFieldProperties->{useFulltext} && length($query) >= $minimumFulltextLength) {
+		    $constraint = "match($fullFieldName) against($query in boolean mode)";
+		} else {
+		    if ($queryLike ne q['%%']) {
+			$constraint = "$fullFieldName like $queryLike";
                     }
                     elsif (defined $formValue1 && $formValue1 ne '') {
                         $constraint = "$fullFieldName like ".$self->session->db->quote('%'.$formValue1.'%');
                     }
-				}
-			# 101 = regexp
-			} elsif ($conditional == 101) {
-				$constraint = "$fullFieldName regexp($query)";
-			} else {
-				$constraint = "$fullFieldName ".$types->{$fieldType}->{$conditional}." ".$self->session->db->quote($formValue1);
-			}
-
-            next unless $constraint;
-
-			my $sortWeight = exists $sortWeights{lc $fieldName} ? $sortWeights{lc $fieldName} : 1;
-			push @sortClauses, "IF($constraint,$sortWeight,0)";
-			push(@constraints, $constraint) if $constraint;
 		}
-	}
+		# 101 = regexp
+	    } elsif ($conditional == 101) {
+		if ($query) {
+		    $constraint = "$fullFieldName regexp($query)";
+		}
+	    } else {
+		$constraint = "$fullFieldName ".$types->{$fieldType}->{$conditional}." ".$self->session->db->quote($formValue1);
+	    }
 
-my 	@selectColumns = qw(t1.__recordId t1.__deletionDate t1.__deletedBy t1.__initDate t1.__userId t1.__deleted t1.__archived t1.__revision);
-	foreach (@$showFields) {
-my		$fieldName = $fieldProperties->{$_}->{fieldName};
+	    next unless $constraint;
+
+	    my $sortWeight = exists $sortWeights{lc $fieldName} ? $sortWeights{lc $fieldName} : 1;
+	    push @sortClauses, "IF($constraint,$sortWeight,0)";
+	    push(@constraints, $constraint) if $constraint;
+	}
+    }
+
+    my @selectColumns = qw(t1.__recordId t1.__deletionDate t1.__deletedBy t1.__initDate t1.__userId t1.__deleted t1.__archived t1.__revision);
+    foreach (@$showFields) {
+	my $fieldName = $fieldProperties->{$_}->{fieldName};
 	
-		push(@selectColumns, "t1.$fieldName");
+	push(@selectColumns, "t1.$fieldName");
 
-		# In case of files also select mimetype
-		if ($fieldProperties->{$_}->{formFieldType} eq 'file') {
-			push(@selectColumns, 't1.__'.$fieldName.'_mimeType');
-		}
+	# In case of files also select mimetype
+	if ($fieldProperties->{$_}->{formFieldType} eq 'file') {
+	    push(@selectColumns, 't1.__'.$fieldName.'_mimeType');
 	}
+    }
 
-my	$searchInTrash = $self->session->scratch->get('SQLForm_'.$self->getId.'searchInTrash') || $self->session->form->process("searchInTrash") || '0';
+    my $searchInTrash = $self->session->scratch->get('SQLForm_'.$self->getId.'searchInTrash') || $self->session->form->process("searchInTrash") || '0';
 
-my	$searchType = ($self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType')) eq 'and' ? 'and' : 'or';
+    my $searchType = ($self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType')) eq 'and' ? 'and' : 'or';
 
-	return undef if (!@constraints);
+    return undef if (!@constraints);
 
-	# Construct the search query
-	my $sortField = @sortClauses ? ('('.join('+', @sortClauses).') AS sqlform_orderby') : '1 AS sqlform_orderby';
-	$sortField = ' 1 AS sqlform_orderby ' if $searchType eq 'and';
+    # Construct the search query
+    my $sortField = @sortClauses ? ('('.join('+', @sortClauses).') AS sqlform_orderby') : '1 AS sqlform_orderby';
+    $sortField = ' 1 AS sqlform_orderby ' if $searchType eq 'and';
 
-my	$sql = " select distinct ".join(', ', @selectColumns, $sortField);
-	$sql .= " from ".$self->get('tableName').' as t1 ';
-	$sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
-	$sql .= " where ";
-	$sql .= "(".join(" $searchType \n", @constraints).")\n" if (@constraints);
-	$sql .= " and " if (@constraints);
-	$sql .= "(".join(" and \n", @joinConstraints).")\n" if (@joinConstraints);
-	$sql .= " and " if (@joinConstraints);
-	$sql .= " t1.__archived=0 ";
-	$sql .= " and t1.__deleted=".$self->session->db->quote($searchInTrash) if ($searchInTrash < 2);
+    my $sql = " select distinct ".join(', ', @selectColumns, $sortField);
+    $sql .= " from ".$self->get('tableName').' as t1 ';
+    $sql .= " left join ".join(" left join \n", @joinSequence)."\n" if (@joinSequence);
+    $sql .= " where ";
+    $sql .= "(".join(" $searchType \n", @constraints).")\n" if (@constraints);
+    $sql .= " and " if (@constraints);
+    $sql .= "(".join(" and \n", @joinConstraints).")\n" if (@joinConstraints);
+    $sql .= " and " if (@joinConstraints);
+    $sql .= " t1.__archived=0 ";
+    $sql .= " and t1.__deleted=".$self->session->db->quote($searchInTrash) if ($searchInTrash < 2);
 
     $sql .= " GROUP BY $selectColumns[0] ";
 
-my	$sortColumn = $self->session->form->process("sortColumn");
-	$sortColumn = $self->session->scratch->get('SQLForm_'.$self->getId.'sortColumn') unless ($sortColumn);
-	$self->session->scratch->set('SQLForm_'.$self->getId.'sortColumn', $sortColumn);
+    my $sortColumn = $self->session->form->process("sortColumn");
+    $sortColumn = $self->session->scratch->get('SQLForm_'.$self->getId.'sortColumn') unless ($sortColumn);
+    $self->session->scratch->set('SQLForm_'.$self->getId.'sortColumn', $sortColumn);
 	
-my	$sortAscending = $self->session->form->process("sortAscending");
-	$sortAscending = $self->session->scratch->get('SQLForm_'.$self->getId.'sortAscending') unless (defined $self->session->form->process("sortAscending"));
-	$self->session->scratch->set('SQLForm_'.$self->getId.'sortAscending', $sortAscending);
+    my $sortAscending = $self->session->form->process("sortAscending");
+    $sortAscending = $self->session->scratch->get('SQLForm_'.$self->getId.'sortAscending') unless (defined $self->session->form->process("sortAscending"));
+    $self->session->scratch->set('SQLForm_'.$self->getId.'sortAscending', $sortAscending);
 
-	if (isIn($sortColumn, @$showFields)) {
-		$sql .= " order by ".$fieldProperties->{$sortColumn}->{fieldName};
-		$sql .= " desc " unless ($sortAscending);
-	}
-	else {
+    if (isIn($sortColumn, @$showFields)) {
+	$sql .= " order by ".$fieldProperties->{$sortColumn}->{fieldName};
+	$sql .= " desc " unless ($sortAscending);
+    }
+    else {
         $sql .= " ORDER BY sqlform_orderby DESC ";
-	}
+    }
 
-$self->session->errorHandler->warn($sql);
-	return $sql;
+#$self->session->errorHandler->warn($sql);
+    return $sql;
 }
 
 #-------------------------------------------------------------------
