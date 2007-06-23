@@ -204,6 +204,23 @@ sub getIcon {
 
 #-------------------------------------------------------------------
 
+=head2 getStorageFromPost
+
+We have to wrap this operation because WebGUI::Asset::File::Image calls SUPER processPropertiesFormFormPost,
+which gives it the wrong type of Storage object.
+
+=cut
+
+sub getStorageFromPost {
+	my $self      = shift;
+    my $storageId = shift;
+    my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
+    return WebGUI::Storage->get($self->session, $fileStorageId);
+}
+
+
+#-------------------------------------------------------------------
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -265,8 +282,7 @@ sub processPropertiesFromFormPost {
     }
 
     #Pass in the storage Id to prevent another one from being created.
-    my $fileStorageId = WebGUI::Form::File->new($session, {name => 'newFile', value=>$storageId })->getValueFromPost;
-    my $storage       = WebGUI::Storage->get($session, $fileStorageId);
+    my $storage = $self->getStorageFromPost($storageId);
 
 	if (defined $storage) {
 		$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));

@@ -7,7 +7,6 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-
 7.4.0
 --------------------------------------------------------------------
 
@@ -29,6 +28,17 @@ save you many hours of grief.
  * Any customizations made to the Inbox or Inbox/Message tempalates 
    will be lost. Please back up your custom templates before running
    the upgrade
+
+
+7.3.19
+--------------------------------------------------------------------
+
+ * There was a bug fixed in this release relating to the Image asset.
+   The bug was that if you edited an Image, then the original image file
+   in the asset was replaced with its thumbnail.  There is no easy way to
+   automatically fix this the results of this bug.  To recover affected
+   Image Assets, then just upload a copy of the original image file.  You
+   do not need to Trash/Delete the Image Asset.
 
 
 7.3.16

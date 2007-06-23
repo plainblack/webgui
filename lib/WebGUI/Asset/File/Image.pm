@@ -149,6 +149,22 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
+=head2 getStorageFromPost
+
+Sub class this method from WebGUI::Asset::File so the storage object is the correct type.
+
+=cut
+
+sub getStorageFromPost {
+	my $self      = shift;
+    my $storageId = shift;
+    my $fileStorageId = WebGUI::Form::Image->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
+    return WebGUI::Storage::Image->get($self->session, $fileStorageId);
+}
+
+
+#-------------------------------------------------------------------
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -204,13 +220,10 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
 	my $parameters = $self->get("parameters");
+    my $storage = $self->getStorageLocation;
 	unless ($parameters =~ /alt\=/) {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
-    ##We just inherited a storage object of the wrong type.  Reinstance the same
-    ##storage object with the correct type
-    my $storage = WebGUI::Storage::Image->get($self->session, $self->getStorageLocation->getId);
-	$self->setStorageLocation($storage);
     my $max_size = $self->session->setting->get("maxImageSize");
     my $file = $self->get("filename");
     my ($w, $h) = $storage->getSizeInPixels($file);
