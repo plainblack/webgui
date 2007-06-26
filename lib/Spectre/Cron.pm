@@ -19,6 +19,7 @@ use DateTime;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
+use JSON 'objToJson';
 
 #-------------------------------------------------------------------
 
@@ -29,12 +30,12 @@ Initializes the scheduler.
 =cut
 
 sub _start {
-        my ($kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
-	$self->debug("Starting Spectre scheduler.");
-        my $serviceName = "cron";
-        $kernel->alias_set($serviceName);
-        $kernel->call( IKC => publish => $serviceName, $publicEvents );
-        $kernel->yield("checkSchedules");
+    my ($kernel, $self, $publicEvents) = @_[ KERNEL, OBJECT, ARG0 ];
+    $self->debug("Starting Spectre scheduler.");
+    my $serviceName = "cron";
+    $kernel->alias_set($serviceName);
+    $kernel->call( IKC => publish => $serviceName, $publicEvents );
+    $kernel->yield("checkSchedules");
 }
 
 #-------------------------------------------------------------------
@@ -46,9 +47,9 @@ Gracefully shuts down the scheduler.
 =cut
 
 sub _stop {
-	my ($kernel, $self) = @_[KERNEL, OBJECT];
-	$self->debug("Stopping the scheduler.");
-	undef $self;
+    my ($kernel, $self) = @_[KERNEL, OBJECT];
+    $self->debug("Stopping the scheduler.");
+    undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -318,7 +319,27 @@ sub getJob {
 
 #-------------------------------------------------------------------
 
-=head3 getLogger ( )
+=head2 getJsonStatus ( )
+
+Returns JSON of the jobs.
+
+=cut
+
+sub getJsonStatus {
+    my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
+    my ($sitename, $rsvp) = @$request;
+    my %data = ();
+    for my $key (keys %{ $self->{_jobs} }) {
+        next unless $self->{_jobs}->{$key}->{sitename} eq $sitename;
+        $data{$key} = $self->{_jobs}->{$key};
+    }
+    $kernel->call(IKC => post => $rsvp, objToJson(\%data));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getLogger ( )
 
 Returns a reference to the logger.
 
@@ -357,7 +378,7 @@ sub new {
 	my $debug = shift;
 	my $self = {_jobs=>{}, _debug=>$debug, _config=>$config, _logger=>$logger};
 	bless $self, $class;
-	my @publicEvents = qw(runJob runJobResponse addJob deleteJob);
+	my @publicEvents = qw(runJob runJobResponse addJob deleteJob getJsonStatus);
 	POE::Session->create(
 		object_states => [ $self => [qw(_start _stop runJob runJobResponse addJob deleteJob checkSchedules checkSchedule), @publicEvents] ],
 		args=>[\@publicEvents]

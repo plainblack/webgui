@@ -19,6 +19,8 @@ use WebGUI::Workflow;
 use WebGUI::Workflow::Activity;
 use WebGUI::Workflow::Instance;
 use WebGUI::Utility;
+use POE::Component::IKC::ClientLite;
+use JSON 'jsonToObj';
 
 =head1 NAME
 
@@ -231,6 +233,60 @@ sub www_editWorkflow {
 	return $ac->render($f->print.$addmenu.$steps, 'edit workflow');
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_editWorkflowPriority ( )
+
+Save the submitted new workflow priority.
+
+=cut
+
+sub www_editWorkflowPriority {
+    my $session = shift;
+
+    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+
+    my $i18n = WebGUI::International->new($session, 'Workflow');
+    my $ac = WebGUI::AdminConsole->new($session,"workflow");
+    $ac->addSubmenuItem($session->url->page("op=showRunningWorkflows"), $i18n->get('show running workflows'));
+    $ac->setHelp('manage workflows', 'Workflow');
+
+    # make sure the input is good
+    my $instanceId  = $session->form->get('instanceId')  || '';
+    my $newPriority = $session->form->get('newPriority') || '';
+    if (! $instanceId) {
+	my $output = $i18n->get('edit priority bad request');
+	return $ac->render($output, $i18n->get('show running workflows'));
+    }
+
+    # make the request
+    my $remote = create_ikc_client(
+		port=>$session->config->get("spectrePort"),
+		ip=>$session->config->get("spectreIp"),
+		name=>rand(100000),
+	        timeout=>10
+    );
+    if (! $remote) {
+	my $output = $i18n->get('edit priority no spectre error');
+	return $ac->render($output, $i18n->get('show running workflows'));
+    }
+
+    my $argHref = {
+	instanceId  => $instanceId,
+	newPriority => $newPriority,
+    };
+    my $resultJson = $remote->post_respond('workflow/editWorkflowPriority', $argHref);
+    if (! defined $resultJson) {
+	$remote->disconnect();
+	my $output = $i18n->get('edit priority no info error');
+	return $ac->render($output, $i18n->get('show running workflows'));
+    }
+
+    my $responseHref = jsonToObj($resultJson);
+
+    my $message = $i18n->get($responseHref->{message}) || $i18n->get('edit priority unknown error');
+    return $ac->render($message, $i18n->get('show running workflows'));
+}
 
 #-------------------------------------------------------------------
 
@@ -397,39 +453,132 @@ Display a list of the running workflow instances.
 =cut
 
 sub www_showRunningWorkflows {
-	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
-	my $i18n = WebGUI::International->new($session, "Workflow");
-	my $output = '<style>
-		.waiting { color: #808000; }
-		.complete { color: #008000; }
-		.error { color: #800000; }
-		.disabled { color: #808000; }
-		.done { color: #008000; }
-		.undefined { color: #800000; }
-		</style><table style="width: 100%;">'; 
-	my $isAdmin = $session->user->isInGroup("3");
-	my $rs = $session->db->read("select Workflow.title, WorkflowInstance.lastStatus, WorkflowInstance.runningSince, WorkflowInstance.lastUpdate, WorkflowInstance.instanceId from WorkflowInstance left join Workflow on WorkflowInstance.workflowId=Workflow.workflowId order by WorkflowInstance.runningSince desc");
-	while (my ($title, $status, $runningSince, $lastUpdate, $id) = $rs->array) {
-		my $class = $status || "complete";
-		$output .= '<tr class="'.$class.'">'
-			.'<td>'.$title.'</td>'
-			.'<td>'.$session->datetime->epochToHuman($runningSince).'</td>';
-		if ($status) {
-			$output .= '<td>'
-				.$status.' / '.$session->datetime->epochToHuman($lastUpdate)
-				.'</td>';
-		}
-		$output .= '<td><a href="'.$session->url->page("op=runWorkflow;instanceId=".$id).'">'.$i18n->get("run").'</a></td>' if ($isAdmin);
-		$output .= "</tr>\n";
-	}
-	$output .= '</table>';
-	my $ac = WebGUI::AdminConsole->new($session,"workflow");
-	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
-	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	$ac->setHelp('show running workflows', 'Workflow');
-	return $ac->render($output, 'show running workflows');
-}
+    my $session = shift;
 
+    return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+
+    my $i18n = WebGUI::International->new($session, "Workflow");
+    my $ac = WebGUI::AdminConsole->new($session,"workflow");
+    my $isAdmin = $session->user->isInGroup("3");
+
+    # javascript for creating/showing/hiding the edit priority form
+    my $cancel = $i18n->get('edit priority cancel');
+    my $updatePriority = $i18n->get('edit priority update priority');
+    my $output = <<"ENDCODE";
+    <style>
+    .waiting { color: #808000; }
+    .complete { color: #008000; }
+    .error { color: #800000; }
+    .disabled { color: #808000; }
+    .done { color: #008000; }
+    .undefined { color: #800000; }
+    </style>
+    <script type="text/javascript">
+        function showEditPriorityForm(iid) {
+            var alreadyOpenForm = document.getElementById('edit-priority-form');
+            if (alreadyOpenForm) {
+                var oldIid = alreadyOpenForm.instanceId.value;
+                hideEditPriorityForm(oldIid);
+            }
+            var ele = document.getElementById('priority-'+iid)
+            ele.style.display = 'none';
+            ele.parentNode.insertBefore(getEditPriorityFormNode(iid,ele.innerHTML),ele);
+        }
+        function getEditPriorityFormNode(iid,currentPriority) {
+            var f = document.createElement('form');
+            f.setAttribute('id','edit-priority-form');
+            f.setAttribute('method','POST');
+            f.setAttribute('action','?op=editWorkflowPriority');
+            f.innerHTML = '<input type="hidden" name="instanceId" value="'+iid+'"/>'+
+                '<input type="input" name="newPriority" size="3" value="'+currentPriority+'"/>'+
+                '<input type="submit" value="$updatePriority"/>'+
+                '<a href="javascript:void(0)" onclick="hideEditPriorityForm(\\''+iid+'\\')">$cancel</a>';
+            return f;
+        }
+        function hideEditPriorityForm(iid) {
+            var f = document.getElementById('edit-priority-form');
+            f.parentNode.removeChild(f);
+            document.getElementById('priority-'+iid).style.display = '';
+        }
+    </script>
+ENDCODE
+
+    my $remote = create_ikc_client(
+        port=>$session->config->get("spectrePort"),
+        ip=>$session->config->get("spectreIp"),
+        name=>rand(100000),
+        timeout=>10
+    );
+    if (! $remote) {
+        my $output = $i18n->get('spectre not running error');
+        return $ac->render($output, $i18n->get('show running workflows'));
+    }
+
+    my $sitename = $session->config()->get('sitename')->[0];
+    my $workflowResult = $remote->post_respond('workflow/getJsonStatus',$sitename);
+    if (! defined $workflowResult) {
+        $remote->disconnect();
+        my $output = $i18n->get('spectre no info error');
+        return $ac->render($output, $i18n->get('show running workflows'));
+    }
+
+    my $workflowsHref = jsonToObj($workflowResult);
+
+    my $workflowTitleFor = $session->db->buildHashRef(<<"");
+    SELECT wi.instanceId, w.title
+    FROM WorkflowInstance wi
+    JOIN Workflow w USING (workflowId)
+
+    my $lastActivityFor = $session->db->buildHashRef(<<"");
+    SELECT wi.instanceId, wa.title
+    FROM WorkflowInstance wi
+    JOIN WorkflowActivity wa ON wi.currentActivityId = wa.activityId
+
+    for my $workflowType (qw( Suspended Waiting Running )) {
+        my $workflowsAref = $workflowsHref->{$workflowType};
+        my $workflowCount = @$workflowsAref;
+
+        my $titleHeader = $i18n->get('title header');
+        my $priorityHeader = $i18n->get('priority header');
+        my $activityHeader = $i18n->get('activity header');
+        my $lastStateHeader = $i18n->get('last state header');
+        my $lastRunTimeHeader = $i18n->get('last run time header');
+        $output .= sprintf $i18n->get('workflow type count'), $workflowCount, $workflowType;
+        $output .= '<table style="width: 100%;">';
+        $output .= "<tr><th>$titleHeader</th><th>$priorityHeader</th><th>$activityHeader</th>";
+        $output .= "<th>$lastStateHeader</th><th>$lastRunTimeHeader</th></tr>";
+
+        for my $workflow (@$workflowsAref) {
+            my($priority, $id, $instance) = @$workflow;
+
+            my $originalPriority = ($instance->{priority} - 1) * 10;
+            my $instanceId       = $instance->{instanceId};
+            my $title            = $workflowTitleFor->{$instanceId} || '(no title)';
+            my $lastActivity     = $lastActivityFor->{$instanceId} || '(none)';
+            my $lastRunTime      = $instance->{lastRunTime} || '(never)';
+
+            $output .= '<tr>';
+            $output .= "<td>$title</td>";
+            $output .= qq[<td><a id="priority-$instanceId" href="javascript:void(0);" title="Edit Priority" onclick="showEditPriorityForm('$instanceId')">$priority</a>/$originalPriority</td>];
+            $output .= "<td>$lastActivity</td>";
+            $output .= "<td>$instance->{lastState}</td>";
+            $output .= "<td>$lastRunTime</td>";
+
+            if ($isAdmin) {
+                my $run = $i18n->get('run');
+                my $href = $session->url->page(qq[op=runWorkflow;instanceId=$instanceId]);
+                $output .= qq[<td><a href="$href">$run</a></td>];
+            }
+            $output .= "</tr>\n";
+        }
+        $output .= '</table>';
+    }
+ 
+    $ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
+    $ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
+    $ac->setHelp('show running workflows', 'Workflow');
+
+    return $ac->render($output, 'show running workflows');
+}
 
 1;

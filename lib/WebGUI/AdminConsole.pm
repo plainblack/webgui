@@ -182,6 +182,15 @@ sub getAdminFunction {
 	my $self = shift;
 	my $id = shift;
 	my $functions = {		# at some point in the future we'll need to make this pluggable/configurable
+		"spectre"=>{
+			title=>{
+				id=>"spectre",
+				namespace=>"Spectre"
+			},
+			icon=>"spectre.gif",
+			op=>"spectreStatus",
+			group=>"3"
+		},
 		"assets"=>{
 			title=>{
 				id=>"assets",

@@ -164,8 +164,9 @@ our $I18N = {
 
 	'show running workflows body' => {
 		message => q|
-<p>This screen can help you debug problems with workflows by showing which workflows are currently running.  The workflows are shown in a table with the name of the workflow, the date it started running.  If the workflow has a defined status, then that status will also be shown, along with the date the workflow's status was last updated.</p>
-<p>The screen will not automatically update.  To update the list of running workflows, reload the page.</p>
+<p>This screen can help you debug problems with workflows by showing which workflows are currently running.  The workflows are grouped by status, with their names, current and original priorities, current activities (if any), last state, and when the workflow was last run.</p>
+<p>You can edit the priority of workflows by clicking on the priority links and submitting the form that appears. You can also run a workflow by clicking the "Run" link in the right column of the table, if present.</p>
+  <p>The screen will not automatically update.  To update the list of running workflows, reload the page.</p>
 |,
 		lastUpdated => 1151719633,
 	},
@@ -193,6 +194,108 @@ and add activities to it.</p>
 <p>Activities that have already been added and configured are displayed by name in the order they will be executed by Spectre.  Icons next to the name of the activity allow it to be reordered, edited, deleted from this workflow.</p>
 |,
 		lastUpdated => 1151721687,
+	},
+
+	'edit priority success' => {
+		message => q|Workflow priority updated successfully.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority instance not found error' => {
+		message => q|I could not find that workflow. Perhaps it's finished running.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority cancel' => {
+		message => q|cancel|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority update priority' => {
+		message => q|Update Priority|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'spectre not running error' => {
+		message => q|Spectre <b>is not running</b>.<br/>Unable to get workflow information.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'spectre no info error' => {
+		message => q|Spectre <b>is running</b>, but I was not able to get workflow information.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'workflow type count' => {
+		message => q|<h2>%d %s Workflows</h2>|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'title header' => {
+		message => q|Title|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'priority header' => {
+		message => q|Current/Original Priority|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'activity header' => {
+		message => q|Current Activity|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'last state header' => {
+		message => q|Last State|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'last run time header' => {
+		message => q|Last Run Time|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority setting error' => {
+		message => q|There was an error setting the new priority.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority no spectre error' => {
+		message => q|Spectre <b>is not running</b>.<br/>Unable to get workflow information.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority bad request' => {
+		message => q|You have made a bad request.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority no info error' => {
+		message => q|Spectre <b>is running</b>, but I was not able to update the priority.|,
+		context => q||,
+		lastUpdated => 0,
+	},
+
+	'edit priority unknown error' => {
+		message => q|There was an unknown error updating the workflow priority. Please try again later.|,
+		context => q||,
+		lastUpdated => 0,
 	},
 
 	'topicName' => {

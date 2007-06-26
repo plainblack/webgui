@@ -82,6 +82,70 @@ sub www_spectreGetSiteData {
 }
 
 #-------------------------------------------------------------------
+  
+=head2 www_spectreStatus (  )
+
+Show information about Spectre's current workload.
+
+=cut
+
+sub www_spectreStatus {
+    my $session = shift;
+    
+    return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
+
+    # start to prepare the display
+    my $ac = WebGUI::AdminConsole->new($session, 'spectre');
+    my $i18n = WebGUI::International->new($session, 'Spectre');
+
+    $session->http->setCacheControl("none");
+    unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+	$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
+	return "subnet";
+    }
+
+    my $remote = create_ikc_client(
+		port=>$session->config->get("spectrePort"),
+		ip=>$session->config->get("spectreIp"),
+		name=>rand(100000),
+	        timeout=>10
+    );
+
+    if (!$remote) {
+	return $ac->render($i18n->get('not running'), $i18n->get('spectre'));
+    }
+
+    my $sitename = $session->config()->get('sitename')->[0];
+    my $workflowResult = $remote->post_respond('workflow/getJsonStatus',$sitename);
+    if (!$workflowResult) {
+        $remote->disconnect();
+	return $ac->render($i18n->get('workflow status error'), $i18n->get('spectre'));
+    }
+
+    my $cronResult = $remote->post_respond('cron/getJsonStatus',$sitename);
+    if (! defined $cronResult) {
+        $remote->disconnect();
+	return $ac->render($i18n->get('cron status error'), $i18n->get('spectre'));
+    }	
+
+    my %data = (
+        workflow    =>  jsonToObj($workflowResult),
+        cron        =>  jsonToObj($cronResult),
+    );
+
+    my $workflowCount = @{ $data{workflow}{Suspended} } + @{ $data{workflow}{Waiting} } + @{ $data{workflow}{Running} };
+    my $workflowUrl   = $session->url->page('op=showRunningWorkflows');
+    my $cronCount     = keys %{ $data{cron} };
+    my $cronUrl       = $session->url->page('op=manageCron');
+
+    my $output = $i18n->get('running').'<br/>';
+    $output .= sprintf $i18n->get('workflow header'), $workflowUrl, $workflowCount;
+    $output .= sprintf $i18n->get('cron header'), $cronUrl, $cronCount;
+
+    return $ac->render($output, $i18n->get('spectre'));
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_spectreTest (  )
 
