@@ -53,6 +53,7 @@
  - fix: unable to remove recurrence on events
  - fix: Show edit links on EMS search view without being in Admin group
  - fix: Fixed a typo in the Article with attachments template (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/article-template-variables-for-attachments
  - fix: Uploaded File Sizes Wrong (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/uploaded-file-sizes-wrong#8ao9yNQrxFyJNTUaU7ARPA
  - fix: Activity Sequence Numbers Incorrect when Editing Workflows (perlDreamer Consulting, LLC)
