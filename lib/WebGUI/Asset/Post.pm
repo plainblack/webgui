@@ -79,7 +79,6 @@ sub addRevision {
 		delete $newSelf->{_thread};
 	}
 	$newSelf->update({
-		isHidden => 1,
 		dateUpdated=>$now,
 		});
 
@@ -1037,19 +1036,21 @@ We overload the update method from WebGUI::Asset in order to handle file system 
 =cut
 
 sub update {
-        my $self = shift;
-        my %before = (
-               	owner => $self->get("ownerUserId"),
-                view => $self->get("groupIdView"),
-                edit => $self->get("groupIdEdit")
-                );
-        $self->SUPER::update(@_);
-        if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
-		my $storage = $self->getStorageLocation;
-		if (-d $storage->getPath) {
-               		$storage->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
-		}
+    my $self = shift;
+    my $properties = shift;
+    my %before = (
+        owner => $self->get("ownerUserId"),
+        view => $self->get("groupIdView"),
+        edit => $self->get("groupIdEdit")
+    );
+    $properties->{isHidden} = 1;
+    $self->SUPER::update($properties, @_);
+    if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
+    my $storage = $self->getStorageLocation;
+        if (-d $storage->getPath) {
+            $storage->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
         }
+    }
 }
 
 #-------------------------------------------------------------------

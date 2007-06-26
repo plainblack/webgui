@@ -61,7 +61,9 @@
     http://www.webgui.org/bugs/tracker/spectre-should-check-that-it-has-a-valid-workflow#lHx4BxEUxcacX7rS5VLxeg
  - fix: Problems with thumbnails (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/problems-with-thumbnails
-
+ - fix: CS branch error (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/cs-branch-error
+ - fix: Package deploy: hidden assets become visible (Yung Han Khoe, United Knowledge)
 
 7.3.18
  - fix: Old registrants appear in new EMS asset

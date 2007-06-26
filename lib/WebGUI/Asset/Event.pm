@@ -90,7 +90,7 @@ sub definition {
         },
         
         'relatedLinks' => {
-            fieldType       => "HTMLarea",
+            fieldType       => "HTMLArea",
             defaultValue    => undef,
         },
         'location' => {
@@ -169,10 +169,6 @@ sub canEdit {
     my $self    = shift;
     return $self->getParent->canAddEvent;
 }
-
-
-
-
 
 
 ####################################################################
@@ -1415,7 +1411,6 @@ sub processPropertiesFromFormPost {
     
     ### Form is verified
     # Events are always hidden from navigation
-    $self->update({ isHidden => 1 });
     
     if (!$self->get("groupIdEdit")) {
         my $groupIdEdit =  $self->getParent->get("groupIdEventEdit")
@@ -1655,8 +1650,20 @@ sub setRelatedLinks {
         });
 }
 
+####################################################################
 
+=head2 update
 
+Wrap update so that isHidden is always set to be a 1.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    $properties->{isHidden} = 1;
+    return $self->SUPER::update($properties);
+}
 
 
 ####################################################################

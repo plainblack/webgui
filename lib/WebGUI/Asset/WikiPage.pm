@@ -237,7 +237,6 @@ sub processPropertiesFromFormPost {
 
 	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
 			groupIdEdit => $self->getWiki->get('groupToAdminister'),
-			 isHidden => 1,
 			actionTakenBy => $self->session->user->userId,
 			actionTaken => $actionTaken,
 	});
@@ -295,6 +294,21 @@ sub scrubContent {
         }
 
         return $scrubbedContent;
+}
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+Wrap update to force isHidden to be on, all the time.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    $properties->{isHidden} = 1;
+    $self->SUPER::update($properties, @_);
 }
 
 #-------------------------------------------------------------------
