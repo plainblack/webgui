@@ -1,6 +1,5 @@
 package WebGUI::Asset::Wobject::InOutBoard;
 
-$VERSION = "0.5.3";
 
 use strict;
 use WebGUI::HTMLForm;
@@ -175,12 +174,12 @@ sub view {
 	
 	my $statusUserId = $self->session->scratch->get("userId") || $self->session->user->userId;
 	my $statusListString = $self->getValue("statusList");
-	chop($statusListString);
 	my @statusListArray = split("\n",$statusListString);
 	my $statusListHashRef;
 	
 	foreach my $status (@statusListArray) {
-		chop($status);
+		chomp($status);
+        next if $status eq "";
 		$statusListHashRef->{$status} = $status;
 	}
 
