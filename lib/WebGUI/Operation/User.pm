@@ -451,7 +451,7 @@ sub www_editUserSave {
        		# Loop through all profile fields, and update them with new values.
 		foreach my $field (@{WebGUI::ProfileField->getFields($session)}) {
 			next if $field->getId =~ /contentPositions/;
-			$u->profileField($field->getId,$field->formProcess);
+			$u->profileField($field->getId,$field->formProcess($u));
 		}
 		
 		# Update group assignements

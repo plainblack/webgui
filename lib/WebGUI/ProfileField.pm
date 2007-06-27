@@ -255,7 +255,9 @@ Returns the value retrieved from a form post.
 
 sub formProcess {
 	my $self = shift;
-	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $self->_formProperties);
+    my $u = shift || $self->session->user;
+    my $properties = $self->_formProperties({value => $u->profileField($self->getId)});
+	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
 	if (ref $result eq "ARRAY") {
 		my @results = @$result;
 		for (my $count=0;$count<scalar(@results);$count++) {

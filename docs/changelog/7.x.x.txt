@@ -44,6 +44,8 @@
  - Added User Invitations (Funded by United Knowledge)
  - fix: Calendar Event import ignores time zone
     http://www.webgui.org/bugs/tracker/calendar-feed-shows-wrong-time
+ - fix: Image profile fields edit issues
+    http://www.webgui.org/bugs/tracker/user-profile-images-disappear-after-updat
 
 
 7.3.19
