@@ -22,6 +22,7 @@ use base 'WebGUI::Workflow::Activity';
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 use WebGUI::DateTime;
+use DateTime::TimeZone;
 
 use LWP::UserAgent;
 
@@ -210,8 +211,11 @@ sub execute {
 					
 					my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
-                    my $tz = $events{$id}->{dtstart}->[0]->{tzid} || "UTC";
-					
+                    my $tz = $events{$id}->{dtstart}->[0]->{tzid};
+                    if (!$tz || !DateTime::TimeZone->is_valid_name($tz)) {
+                        $tz = "UTC";
+                    }
+                    
 					($properties->{startDate}, $properties->{startTime}) = 
 						split / /, WebGUI::DateTime->new(
 							year	=> $year,
@@ -245,7 +249,10 @@ sub execute {
 					
 					my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
-                    my $tz = $events{$id}->{dtend}->[0]->{tzid} || "UTC";
+                    my $tz = $events{$id}->{dtend}->[0]->{tzid};
+                    if (!$tz || !DateTime::TimeZone->is_valid_name($tz)) {
+                        $tz = "UTC";
+                    }
 					
 					($properties->{endDate}, $properties->{endTime}) = 
 						split / /, WebGUI::DateTime->new(
