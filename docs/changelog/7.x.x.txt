@@ -42,6 +42,8 @@
  - Added Newsletter Asset (Funded by United Knowledge)
  - Extended content profiling to CS Threads (Funded by United Knowledge)
  - Added User Invitations (Funded by United Knowledge)
+ - fix: Calendar Event import ignores time zone
+    http://www.webgui.org/bugs/tracker/calendar-feed-shows-wrong-time
 
 
 7.3.19

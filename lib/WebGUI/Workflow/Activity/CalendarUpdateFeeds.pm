@@ -210,6 +210,7 @@ sub execute {
 					
 					my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
+                    my $tz = $events{$id}->{dtstart}->[0]->{tzid} || "UTC";
 					
 					($properties->{startDate}, $properties->{startTime}) = 
 						split / /, WebGUI::DateTime->new(
@@ -219,7 +220,7 @@ sub execute {
 							hour	=> $hour,
 							minute	=> $minute,
 							second	=> $second,
-							time_zone	=> "UTC",
+							time_zone	=> $tz,
 							)->toMysql;
 				}
 				elsif ($dtstart =~ /(\d{4})(\d{2})(\d{2})/)
@@ -244,6 +245,7 @@ sub execute {
 					
 					my ($year, $month, $day) = $date =~ /(\d{4})(\d{2})(\d{2})/;
 					my ($hour, $minute, $second) = $time =~ /(\d{2})(\d{2})(\d{2})/;
+                    my $tz = $events{$id}->{dtend}->[0]->{tzid} || "UTC";
 					
 					($properties->{endDate}, $properties->{endTime}) = 
 						split / /, WebGUI::DateTime->new(
@@ -253,7 +255,7 @@ sub execute {
 							hour	=> $hour,
 							minute	=> $minute,
 							second	=> $second,
-							time_zone	=> "UTC",
+							time_zone	=> $tz,
 							)->toMysql;
 				}
 				elsif ($dtend =~ /(\d{4})(\d{2})(\d{2})/)
