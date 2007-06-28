@@ -46,7 +46,8 @@
     http://www.webgui.org/bugs/tracker/calendar-feed-shows-wrong-time
  - fix: Image profile fields edit issues
     http://www.webgui.org/bugs/tracker/user-profile-images-disappear-after-updat
-
+ - RFE: HttpProxy - regexp for URLs that will not be proxied.  Url pattern
+   filters can now be created in HttpProxy wobject properties.
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.
