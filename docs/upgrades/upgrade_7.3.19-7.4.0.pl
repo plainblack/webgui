@@ -29,9 +29,9 @@ addMetaDataPostsToCS($session);
 addUserInvitations($session);
 addPrivateMessaging($session);
 addNewsletter($session);
+addHttpProxyUrlPatternFilter($session);
 
 finish($session); # this line required
-
 
 #-------------------------------------------------
 sub addNewsletter {
@@ -313,6 +313,15 @@ sub addPrivateMessaging {
     $session->db->write("update userProfileData set allowPrivateMessages=1");
     print "OK!\n" unless $quiet;
 }
+
+#-------------------------------------------------
+sub addHttpProxyUrlPatternFilter {
+    my $session = shift;
+    print "\tAdding HttpProxy Url Pattern Filter..." unless ($quiet);
+    $session->db->write("alter table HttpProxy add urlPatternFilter mediumtext default NULL");
+    print "OK!\n" unless ($quiet);
+}
+
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

@@ -279,6 +279,20 @@ be useful, others may not.|,
 		context => q|Translator note: the "%s" tokens in the message should not be translated.|,
 		lastUpdated => 1168994613
 	},
+    
+    'url pattern filter label' => {
+        message     => q|Url Pattern Filter|,
+        lastUpdated => 1168994613,
+    },
+    
+    'url pattern filter hover help' => {
+        message     => q|Enter patterns one per line (Perl regular expressions are valid) that should be filtered when re-writing urls
+        <br /><br />
+        Ex: /bms/documents<br />
+            /bms/documents/document_\\d+\\.pdf
+        |,
+        lastUpdated => 1168994613,
+    }
 
 };
 

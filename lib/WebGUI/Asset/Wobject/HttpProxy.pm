@@ -118,7 +118,15 @@ sub definition {
 				label => $i18n->get(418, 'WebGUI'),
 				hoverHelp => $i18n->get('418 description', 'WebGUI'),
 				},
-
+            
+            urlPatternFilter=>{
+                fieldType => "textarea",
+                defaultValue => "",
+                tab          => "display",
+                label        => $i18n->get("url pattern filter label"),
+                hoverHelp    => $i18n->get("url pattern filter hover help"),
+                },
+            
 			followExternal => {
 				fieldType => "yesNo",
 				defaultValue => 1,
@@ -127,13 +135,13 @@ sub definition {
 				hoverHelp => $i18n->get('5 description'),
 				},
 
-                        rewriteUrls => {
+            rewriteUrls => {
 				fieldType => "yesNo",
-                                defaultValue => 1,
+                defaultValue => 1,
 				tab => 'properties',
 				label => $i18n->get(12),
 				hoverHelp => $i18n->get('12 description'),
-                                },
+                },
 
 			followRedirect => {
 				fieldType => "yesNo",
@@ -382,7 +390,7 @@ sub view {
 					$var{content} = $1 || $var{content};
 					$var{"content.trailing"} = $2;
 				}
-				my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl);
+				my $p = WebGUI::Asset::Wobject::HttpProxy::Parse->new($self->session, $proxiedUrl, $var{content}, $self->getId,$self->get("rewriteUrls"),$self->getUrl,$self->get("urlPatternFilter"));
 				$var{content} = $p->filter; # Rewrite content. (let forms/links return to us).
 				$p->DESTROY;
 		

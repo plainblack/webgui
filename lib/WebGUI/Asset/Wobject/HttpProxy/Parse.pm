@@ -68,7 +68,13 @@ sub new {
   	$self->{assetId} = shift;
 	$self->{rewriteUrls} = shift;
 	$self->{assetUrl} = shift;
-  	$self->{Filtered} ="";
+    
+    my $pfilter = shift;
+    $pfiler =~ s/\r//g;
+    my @patterns = split(/\n/,$pfilter); 
+    $self->{patternFilter} = \@patterns;
+   
+    $self->{Filtered} ="";
   	$self->{FormAction} = "";
   	$self->{FormActionIsDefined} = 0;
 	$self->{recurseCheck} = 0;
@@ -118,7 +124,8 @@ sub session {
 sub start {
   	my $self = shift;
   	my ($tag, $attr, $attrseq, $origtext) = @_;
-	# Check on the div class and div id attributes to see if we're proxying ourself.
+    
+    # Check on the div class and div id attributes to see if we're proxying ourself.
 	if($tag eq "div" && $attr->{'class'} eq 'wobjectHttpProxy' && $attr->{'id'} eq ('assetId'.$self->{assetId})) { 
 		$self->{recurseCheck} = 1;
 	}
@@ -156,9 +163,23 @@ sub start {
             					$self->{FormAction} = $val;  # set FormAction to include hidden field later
             					$val = $self->{assetUrl};    # Form Action returns to us
           				} else {
-						$val =~ s/\n//g;	# Bugfix 757068
-            					$val = $self->session->url->append($self->{assetUrl},'proxiedUrl='.$self->session->url->escape($val).';func=view'); # return to us
-          				}
+						    $val =~ s/\n//g;	# Bugfix 757068
+                            
+                            #Determine if pattern should not be rewritten
+                            $rewritePattern = 0;
+                            foreach my $pattern (@{$self->{patternFilter}}) {
+                                if($val =~ m/$pattern/i) {
+                                    $rewritePattern = 1;
+                                } 
+                            }
+                              
+                            if($rewritePattern) {
+                                $val = URI::URL::url($val)->abs($self->{Url},1); # make absolute
+                            }
+                            else {
+                                $val = $self->session->url->append($self->{assetUrl},'proxiedUrl='.$self->session->url->escape($val).';func=view'); # return to us
+                            }
+                        }
         			}
       			}
     		}
