@@ -555,7 +555,7 @@ sub www_editListing {
                 );
 	$f->text(
 		-name=>"productName",
-		-value=>$listing->{productName},
+		-value=>$listing->{productName} || 'Undefined',
 		-label=>$i18n->get('product name'),
 		-hoverHelp=>$i18n->get('product name description'),
 		-maxLength=>25
@@ -683,7 +683,7 @@ sub www_editListingSave {
 	my %data = (
 		listingId => $self->session->form->process("listingId"),
 		lastUpdated => $self->session->datetime->time(),
-		productName => $self->session->form->process("productName"),
+		productName => $self->session->form->process("productName") || 'Undefined',
 		productUrl => $self->session->form->process("productUrl"),
 		manufacturerName => $self->session->form->process("manufacturerName"),
 		manufacturerUrl => $self->session->form->process("manufacturerUrl"),
