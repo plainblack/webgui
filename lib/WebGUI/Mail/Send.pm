@@ -419,6 +419,7 @@ sub send {
 		$self->{_message}->head->replace("cc", undef);
 		foreach my $userId (@{$group->getAllUsers(1)}) {
 			my $user = WebGUI::User->new($self->session, $userId);
+            next unless $user->status eq 'Active';  ##Don't send this to invalid user accounts
 			if ($user->profileField("email")) {
 				$self->{_message}->head->replace("To",$user->profileField("email"));
 				$self->queue;

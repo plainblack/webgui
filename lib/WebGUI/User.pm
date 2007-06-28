@@ -533,6 +533,9 @@ Returns the status of the user.
 =head3 value
 
 If specified, the status is set to this value.  Possible values are 'Active', 'Selfdestructed' and 'Deactivated'.
+'Selfdestructed' means that the user deactivated their own account.  'Deactivated' means that either
+their status has been changed by an Admin, or that this is a new account that is pending email
+confirmation before activation.
 
 =cut
 

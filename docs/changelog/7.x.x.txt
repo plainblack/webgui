@@ -49,6 +49,10 @@
  - RFE: HttpProxy - regexp for URLs that will not be proxied.  Url pattern
    filters can now be created in HttpProxy wobject properties.
 
+7.3.20
+ - fix: Deactivated Users Subscriptions (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/deactivated-users-subscriptions
+
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.
  - fix: bad javascript string escaping in EMS
