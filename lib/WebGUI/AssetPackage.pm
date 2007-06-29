@@ -131,8 +131,10 @@ sub importAssetData {
 	my $id = $data->{properties}{assetId};
 	my $class = $data->{properties}{className};
 	my $version = $data->{properties}{revisionDate};
-	my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
-	if (defined $asset) { # update an existing revision
+    my $asset;
+	my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+	if ($assetExists) { # update an existing revision
+        $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
 		$error->info("Updating an existing revision of asset $id");	
 		$asset->update($data->{properties});
         ##Pending assets are assigned a new version tag

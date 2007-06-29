@@ -56,6 +56,8 @@
     http://www.webgui.org/bugs/tracker/matrix-filling-out-no-fields-leads-to-unapprovable-listing
  - fix: DiskUsage will return -1 if value too large (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/diskusage-will-return--1-if-value-too-large
+ - fix: Importing a package logs 'Consult your database tables for corruption' errors (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/importing-a-package-logs-consult-your-database-tables-for-corruption-errors
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.

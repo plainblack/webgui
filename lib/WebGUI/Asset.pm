@@ -83,6 +83,79 @@ sub addMissing {
 
 #-------------------------------------------------------------------
 
+=head2 assetDbProperties ( session, assetId, className, revisionDate )
+
+Class method to return all properties in all tables used by a particular Asset.
+Returns a hash ref with data from the table.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 assetId
+
+The assetId of the asset you're creating an object reference for. Must not be blank.
+
+=head3 className
+
+By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
+
+=head3 revisionDate
+
+An epoch date that represents a specific version of an asset.
+
+=cut
+
+sub assetDbProperties {
+	my $class = shift;
+	my $session = shift;
+    my ($assetId, $className, $revisionDate) = @_;
+    my $sql = "select * from asset";
+    my $where = " where asset.assetId=?";
+    my $placeHolders = [$assetId];
+    foreach my $definition (@{$class->definition($session)}) {
+        $sql .= ",".$definition->{tableName};
+        $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
+    }
+    return $session->db->quickHashRef($sql.$where, $placeHolders);
+}
+
+#-------------------------------------------------------------------
+
+=head2 assetExists ( session, assetId, className, revisionDate )
+
+Class method that checks to see if an asset exists in all the proper tables for
+the requested asset class.  Returns true or false.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 assetId
+
+The assetId of the asset you're creating an object reference for. Must not be blank.
+
+=head3 className
+
+By default we'll use whatever class it is called by like WebGUI::Asset::File->new(), so WebGUI::Asset::File would be used.
+
+=head3 revisionDate
+
+An epoch date that represents a specific version of an asset.
+
+=cut
+
+sub assetExists {
+	my $class = shift;
+	my $session = shift;
+    my ($assetId, $className, $revisionDate) = @_;
+    my $dbProperties = $class->assetDbProperties($session, $assetId, $className, $revisionDate);
+    return exists $dbProperties->{assetId};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 canAdd ( session, [userId, groupId] )
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
@@ -1533,13 +1606,7 @@ sub new {
 	if (exists $properties->{assetId}) {
 		# got properties from cache
 	} else {
-		my $sql = "select * from asset";
-		my $where = " where asset.assetId=".$session->db->quote($assetId);
-		foreach my $definition (@{$class->definition($session)}) {
-			$sql .= ",".$definition->{tableName};
-			$where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
-		}
-		$properties = $session->db->quickHashRef($sql.$where);
+		$properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
 		unless (exists $properties->{assetId}) {
 			$session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
 			return undef;
