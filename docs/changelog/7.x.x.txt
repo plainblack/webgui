@@ -54,6 +54,8 @@
     http://www.webgui.org/bugs/tracker/deactivated-users-subscriptions
  - fix: Matrix: filling out no fields leads to unapprovable listing (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/matrix-filling-out-no-fields-leads-to-unapprovable-listing
+ - fix: DiskUsage will return -1 if value too large (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/diskusage-will-return--1-if-value-too-large
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.

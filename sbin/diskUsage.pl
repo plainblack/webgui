@@ -132,7 +132,7 @@ sub du {
 
 	# Format to a whole number unless the total is less than 1.  If it's less than 1 attempt to display 2 digits of precision to avoid displaying a zero size.
 	unless ($totalSize < 1) {
-		$totalSize = sprintf("%d", $totalSize);	
+		$totalSize = sprintf("%.0f", $totalSize);	
 	}
 	else {
 		$totalSize = sprintf("%.2f", $totalSize);
