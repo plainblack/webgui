@@ -82,7 +82,7 @@ sub www_spectreGetSiteData {
 }
 
 #-------------------------------------------------------------------
-  
+
 =head2 www_spectreStatus (  )
 
 Show information about Spectre's current workload.

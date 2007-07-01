@@ -193,7 +193,7 @@ The id of the instance to update.
 =head4 newPriority
 
 The new priority value.
-  
+
 =cut
 
 sub editWorkflowPriority {
