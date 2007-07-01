@@ -65,10 +65,11 @@ $asset->update({
 	storageId => $storage->getId,
 	filename => 'square.png',
 });
-$versionTag->commit;
-
 
 $asset->generateThumbnail();
+
+$versionTag->commit;
+
 
 ##Call the Thumbnail Macro with that Asset's URL and see if it returns
 ##the correct URL.
@@ -77,19 +78,24 @@ my $output = WebGUI::Macro::Thumbnail::process($session, $asset->getUrl());
 my $macroUrl = $storage->getPath('thumb-square.png');
 is($output, $asset->getThumbnailUrl, 'Macro returns correct filename');
 
-my $thumbUrl = $asset->getThumbnailUrl;
+my $thumbUrl = $output;
 substr($thumbUrl, 0, length($session->config->get("uploadsURL"))) = '';
 my $thumbFile = $session->config->get('uploadsPath') . $thumbUrl;
-ok((-e $thumbFile), 'file actually exists');
+my $fileExists = ok((-e $thumbFile), "file actually exists $thumbFile");
 
-##Load the image into some parser and check a few pixels to see if they're blue-ish.
-##->Get('pixel[x,y]') hopefully returns color in hex triplets
-my $thumbImg = Image::Magick->new();
-$thumbImg->Read(filename => $thumbFile);
+SKIP: {
+    skip "File does not exist", 3 unless $fileExists;
 
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>25, y=>25, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #1');
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>75, y=>75, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #2');
-cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>50, y=>50, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #3');
+    ##Load the image into some parser and check a few pixels to see if they're blue-ish.
+    ##->Get('pixel[x,y]') hopefully returns color in hex triplets
+    my $thumbImg = Image::Magick->new();
+    $thumbImg->Read(filename => $thumbFile);
+
+    cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>25, y=>25, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #1');
+    cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>75, y=>75, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #2');
+    cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>50, y=>50, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #3');
+
+}
 
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
