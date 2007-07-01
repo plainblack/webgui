@@ -174,7 +174,7 @@ our $I18N = {
 		context => q|asset property|
 	},
 
-	'newsletteer header help' => {
+	'newsletter header help' => {
 		message => q|A message the will be placed at the top of the newsletter; like a greeting.|,
 		lastUpdated => 0,
 		context => q|help for asset property|
@@ -186,7 +186,7 @@ our $I18N = {
 		context => q|asset property|
 	},
 
-	'newsletteer footer help' => {
+	'newsletter footer help' => {
 		message => q|A message the will be placed at the bottom of the newsletter; like a salutation.|,
 		lastUpdated => 0,
 		context => q|help for asset property|

@@ -78,6 +78,7 @@ our $HELP = {  ##hashref of hashes
                         },
                     ],
             },
+		],
     },
 
     'newsletter template' => {
@@ -121,6 +122,7 @@ our $HELP = {  ##hashref of hashes
                         },
                     ],
             },
+        ],
     },
 
 };
