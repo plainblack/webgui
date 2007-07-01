@@ -113,7 +113,7 @@ sub assetDbProperties {
     my $sql = "select * from asset";
     my $where = " where asset.assetId=?";
     my $placeHolders = [$assetId];
-    foreach my $definition (@{$class->definition($session)}) {
+    foreach my $definition (@{$className->definition($session)}) {
         $sql .= ",".$definition->{tableName};
         $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
     }

@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 23; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Article;
 
 my $session = WebGUI::Test->session;
@@ -108,7 +108,10 @@ is ($duplicateFilename, undef, 'purge method deletes collateral');
 # Lets make sure the view method returns something.
 # This is not a very good test but I need to do it to test the purgeCache method anyways =)
 
+is ($article->{_viewTemplate}, undef, 'internal template cache unset until prepareView is called');
 $article->prepareView;
+isnt ($article->{_viewTemplate}, undef, 'internal template cache set by prepare view');
+isa_ok ($article->{_viewTemplate}, 'WebGUI::Asset::Template', 'internal template cache');
 my $output = $article->view;
 isnt ($output, "", 'view method returns something');
 
