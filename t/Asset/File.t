@@ -12,6 +12,11 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 
+use Test::MockObject;
+my $mocker = Test::MockObject->new();
+$mocker->fake_module('WebGUI::Form::File');
+$mocker->fake_new('WebGUI::Form::File');
+
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
@@ -21,7 +26,7 @@ use Image::Magick;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 7;
+plan tests => 9;
 
 my $session = WebGUI::Test->session;
 
@@ -66,9 +71,16 @@ is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage loc
 
 $versionTag->commit;
 
+my $fileStorage = WebGUI::Storage->create($session);
+$mocker->set_always('getValueFromPost', $fileStorage->getId);
+my $fileFormStorage = $asset->getStorageFromPost();
+isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
+isnt(ref $fileFormStorage, 'WebGUI::Storage::Image', 'getStorageFromPost does not return an image storage object');
+
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
 	##Storage is cleaned up by rolling back the version tag
+    $fileStorage->delete;
 }
