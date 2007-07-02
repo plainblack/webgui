@@ -770,7 +770,7 @@ sub validateEmail {
 	if (defined $userId) {
 		my $u = WebGUI::User->new($self->session,$userId);
 		$u->status("Active");
-		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'");
+		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'", [$userId]);
 	}
 	return $self->displayLogin;
 }
