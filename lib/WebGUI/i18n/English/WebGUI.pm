@@ -949,10 +949,10 @@ to add or remove users from their groups.
 <br />
 <br />We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
 <br />
-<br />&lt;tmpl_var session.page.title&gt; - &lt;tmpl_var session.setting.companyName&gt;
+<br />^PageTitle(); - ^c();
 <br />
 <br />That particular example will help you get good ranking on search engines.|,
-		lastUpdated => 1149182155,
+		lastUpdated => 1183420610,
 	},
 
 	'1074' => {

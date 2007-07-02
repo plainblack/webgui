@@ -61,6 +61,8 @@
  - fix: Importing a package logs 'Consult your database tables for corruption' errors (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/importing-a-package-logs-consult-your-database-tables-for-corruption-errors
  - fix: Email validate codes aren't removed after use
+ - fix: Session variables still used in Help docs (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/session-variables-still-used-in-help-docs
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.
