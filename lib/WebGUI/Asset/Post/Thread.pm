@@ -631,7 +631,7 @@ An asset object to make the parent of this asset.
 sub setParent {
         my $self = shift;
         my $newParent = shift;
-        return 0 unless ($newParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration");
+        return 0 unless ($newParent->isa("WebGUI::Asset::Wobject::Collaboration"));
         # specify the Asset package here directly because we don't want to use the ruls in WebGUI::Asset::Post, as they don't fit for Threads.
         return $self->WebGUI::Asset::setParent($newParent);
 }  

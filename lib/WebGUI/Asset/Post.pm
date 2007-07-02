@@ -71,7 +71,7 @@ sub addRevision {
 	my $threadId = $newSelf->get("threadId");
 	my $now = time();
 	if ($threadId eq "") { # new post
-		if ($newSelf->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
+		if ($newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
 			$newSelf->update({threadId=>$newSelf->getId, dateSubmitted=>$now});
 		} else {
 			$newSelf->update({threadId=>$newSelf->getParent->get("threadId"), dateSubmitted=>$now});
@@ -566,7 +566,7 @@ sub getThread {
 	unless (defined $self->{_thread}) {
 		my $threadId = $self->get("threadId");
                 if ($threadId eq "") { # new post
-                        if ($self->getParent->get("className") eq "WebGUI::Asset::Wobject::Collaboration") {
+                        if ($self->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
                                 $threadId=$self->getId;
                         } else {
                                 $threadId=$self->getParent->get("threadId");

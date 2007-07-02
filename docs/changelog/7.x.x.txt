@@ -48,6 +48,8 @@
     http://www.webgui.org/bugs/tracker/user-profile-images-disappear-after-updat
  - RFE: HttpProxy - regexp for URLs that will not be proxied.  Url pattern
    filters can now be created in HttpProxy wobject properties.
+ - Collaboration System wobjects can now be subclassed and still work with the
+   existing Thread and Post assets.
 
 7.3.20
  - fix: Deactivated Users Subscriptions (perlDreamer Consulting, LLC)
