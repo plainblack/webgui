@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 52 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 58 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -298,11 +298,34 @@ is ($untarStorage->{_part1}, 'temp', 'untar: puts stuff in the temp directory');
 cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
 isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same path as the tar storage object');
 
+####################################################
+#
+# clear
+#
+####################################################
+
+ok(scalar @{ $copiedStorage->getFiles } > 0, 'copiedStorage has some files');
+$copiedStorage->clear;
+cmp_ok(scalar @{ $copiedStorage->getFiles }, '==', 0, 'clear removed all files from copiedStorage');
+cmp_ok(scalar @{ $copiedStorage->getFiles(1) }, '==', 2, 'clear removed _all_ files from copiedStorage, except for . and ..');
+
+####################################################
+#
+# getFiles
+#
+####################################################
+
+my $fileStore = WebGUI::Storage->create($session);
+cmp_bag($fileStore->getFiles(1), ['.', '..'], 'Starting with an empty storage object, no files in here except for . and ..');
+$fileStore->addFileFromScalar('.dotfile', 'dot file');
+cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
+cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile'], 'getFiles(1) returns all files, including dot files');
+
 END {
 	foreach my $stor (
         $storage1,   $storage2, $storage3, $copiedStorage,
         $secondCopy, $s3copy,   $tempStor, $tarStorage,
-        $untarStorage,
+        $untarStorage, $fileStore,
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
