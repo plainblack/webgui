@@ -63,6 +63,8 @@
  - fix: Email validate codes aren't removed after use
  - fix: Session variables still used in Help docs (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/session-variables-still-used-in-help-docs
+ - fix: Editing a template sometimes fails (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/editing-a-template-sometimes-fails
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.

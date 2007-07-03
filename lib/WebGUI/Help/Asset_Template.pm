@@ -168,7 +168,7 @@ our $HELP = {
 			closedir(DIR);
 
 			##Build list of enabled macros, by namespace, by reversing session hash:
-			my @enabledPlugins = map { s/^WebGUI::Asset::Template:://; $_ } @{ $session->config->get("templateParsers") };
+			my @enabledPlugins = map { m/^WebGUI::Asset::Template::(\S+)//; $1 } @{ $session->config->get("templateParsers") };
 			my $defaultParser = $session->config->get('defaultTemplateParser');
 			$defaultParser =~ s/^WebGUI::Asset::Template:://;
 			my %enabledPlugins = map { $_ => 1 } @enabledPlugins;
