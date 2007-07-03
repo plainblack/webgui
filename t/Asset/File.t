@@ -57,6 +57,12 @@ my $properties = {
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
 
+############################################
+#
+# getStorageLocation
+#
+############################################
+
 ok($asset->getStorageLocation, 'File Asset getStorageLocation initialized');
 ok($asset->get('storageId'), 'getStorageLocation updates asset object with storage location');
 is($asset->get('storageId'), $asset->getStorageLocation->getId, 'Asset storageId and cached storageId agree');
@@ -70,6 +76,12 @@ is($storage->getId, $asset->get('storageId'), 'Asset updated with correct new st
 is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage location updated with correct new storageId');
 
 $versionTag->commit;
+
+############################################
+#
+# getStorageFromPost
+#
+############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
 $mocker->set_always('getValueFromPost', $fileStorage->getId);
