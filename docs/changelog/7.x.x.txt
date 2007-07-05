@@ -1,4 +1,8 @@
 7.4.0
+ - api: Form Controls and Workflow Activities may now include web based helper
+   subroutines directly in their files. See
+   WebGUI::Operation::FormHelpers::www_formHelper and 
+   WebGUI::Operation::Workflow::www_activityHelper for details.
  - rfe: snippets should have titles too!
  - Added a mechanism for using external folders for custom code. See
    sbin/preload.custom.example for details.

@@ -99,7 +99,7 @@ Renders an asset selector.
 sub toHtml {
 	my $self = shift;
         my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->get("value")) || WebGUI::Asset->getRoot($self->session);
-	my $url = $asset->getUrl("op=formAssetTree;formId=".$self->get('id'));
+	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name"),
@@ -118,6 +118,82 @@ sub toHtml {
                         extras=>'onclick="window.open(\''.$url.'\',\'assetPicker\',\'scrollbars=yes, toolbar=no, location=no, status=no, directories=no, width=400, height=400\');"'
                         )->toHtml;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_assetTree ( session )
+
+Returns a list of the all the current Asset's children as form.  The children can be filtered via the
+form variable C<classLimiter>.  A crumb trail is provided for navigation.
+
+=cut
+
+sub www_assetTree {
+	my $session = shift;
+	$session->http->setCacheControl("none");
+	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
+	my @crumb;
+	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
+	foreach my $ancestor (@{$ancestors}) {
+		my $url = $ancestor->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$session->form->process("formId"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
+		push(@crumb,'<a href="'.$url.'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
+	}
+	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style type="text/css">
+		.base {
+        		font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+			font-size: 12px;
+		}
+		a {
+        		color: #0f3ccc;
+        		text-decoration: none;
+		}
+		a:hover {
+			color: #000080;
+			text-decoration: underline;	
+		}
+		.selectLink {
+			color: #cc7700;
+		}
+		.crumb {
+			color: orange;
+		}
+		.crumbTrail {
+			padding: 3px;
+			background-color: #eeeeee;
+			-moz-border-radius: 10px;
+		}
+		.traverse {
+			font-size: 15px;
+		}
+		</style></head><body>
+		<div class="base">
+		<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
+	my $children = $base->getLineage(["children","self"],{returnObjects=>1});
+	my $i18n = WebGUI::International->new($session);
+	my $limit = $session->form->process("classLimiter","className");
+	foreach my $child (@{$children}) {
+		next unless $child->canView;
+		if ($limit eq "" || $child->get("className") =~ /^$limit/) {
+			$output .= '<a href="#" class="selectLink" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
+				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
+				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">['.$i18n->get("select").']</a> ';
+		} else {
+			$output .= '['.$i18n->get("select").'] ';
+		}
+		my $url = $child->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$session->form->process("formId"));
+		$url .= ";classLimiter=".$session->form->process("classLimiter","className") if ($session->form->process("classLimiter","className"));
+		$output .= '<a href="'.$url.'" class="traverse">'.$child->get("menuTitle").'</a>'."<br />\n";	
+	}
+	$output .= '</div></body></html>';
+	$session->style->useEmptyStyle("1");
+	return $output;
+}
+
 
 1;
 

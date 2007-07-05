@@ -34,6 +34,42 @@ Operation handler for managing workflows.
 
 #-------------------------------------------------------------------
 
+=head2 www_activityHelper ( session )
+
+Calls an activity helper. In the URL you must pass the activity class name, the subroutine to call and any other 
+parameters you wish the activity helper to use. Here's an example:
+
+/page?op=activityHelper;class=MyActivity;sub=doTheBigThing;param1=makeItGo
+
+=cut
+
+sub www_activityHelper {
+    my $session = shift;
+    my $form = $session->form;
+    my $class = "WebGUI::Workflow::Activity::".$form->get("class");
+    my $sub = $form->get("sub");
+    return "ERROR" unless (defined $sub && defined $class);
+    my $load = "use ".$class;
+    eval($load);
+    if ($@) {
+        $session->errorHandler->error("Couldn't load activity helper class $class because $@"); 
+        return "ERROR";
+    }
+    my $output = "";
+    my $command = $class.'::www_'.$sub;
+    no strict;
+    my $output = eval { &$command($session) };
+    use strict;
+    if ($@) {
+        $session->errorHandler->error("Couldn't execute activity helper subroutine $sub because $@"); 
+        return "ERROR";
+    }
+    return $output;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_addWorkflow ( )
 
 Allows the user to choose the type of workflow that's going to be created. 

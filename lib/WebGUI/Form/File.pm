@@ -65,6 +65,10 @@ Flag that tells the User Profile system that this is a valid form element in a U
 
 A url that will get a filename appended to it and then links to delete the files will be generated automatically.
 
+=head4 size
+
+Though not all browsers support it, this will attempt to set the size (or width) of the browse for file field.
+
 =cut
 
 sub definition {
@@ -88,6 +92,9 @@ sub definition {
 		deleteFileUrl=>{
 			defaultValue=>undef
 			},
+        size=>{
+            defaultValue=>40
+            },
         dbDataType  => {
             defaultValue    => "VARCHAR(22) BINARY",
         },
@@ -210,8 +217,8 @@ sub toHtml {
         	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
                 	}
         	}
-        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d"); uploader.addRow(); </script>!
-			, $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles;
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow(); </script>!
+			, $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size");
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
 	} else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";

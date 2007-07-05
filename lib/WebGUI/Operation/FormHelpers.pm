@@ -29,9 +29,48 @@ Operational support for various things relating to forms and rich editors.
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 www_formHelper ( session )
+
+Calls a form helper. In the URL you must pass the form class name, the subroutine to call and any other 
+parameters you wish the form helper to use. Here's an example:
+
+/page?op=formHelper;class=File;sub=assetTree;param1=XXX
+
+=cut
+
+sub www_formHelper {
+    my $session = shift;
+    my $form = $session->form;
+    my $class = "WebGUI::Form::".$form->get("class");
+    my $sub = $form->get("sub");
+    return "ERROR" unless (defined $sub && defined $class);
+    my $load = "use ".$class;
+    eval($load);
+    if ($@) {
+        $session->errorHandler->error("Couldn't load form helper class $class because $@"); 
+        return "ERROR";
+    }
+    my $output = "";
+    my $command = $class.'::www_'.$sub;
+    no strict;
+    my $output = eval { &$command($session) };
+    use strict;
+    if ($@) {
+        $session->errorHandler->error("Couldn't execute form helper subroutine $sub because $@"); 
+        return "ERROR";
+    }
+    return $output;
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 www_formAssetTree ( session )
+
+B<NOTE:> This function is depricated and will be removed in a future release.
 
 Returns a list of the all the current Asset's children as form.  The children can be filtered via the
 form variable C<classLimiter>.  A crumb trail is provided for navigation.
@@ -107,6 +146,8 @@ sub www_formAssetTree {
 #-------------------------------------------------------------------
 
 =head2 www_richEditPageTree ( session )
+
+B<NOTE:> This function is depricated and will be removed in a future release.
 
 Asset picker for the rich editor.
 
@@ -209,6 +250,8 @@ JS
 
 =head2 www_richEditImageTree ( session )
 
+B<NOTE:> This function is depricated and will be removed in a future release.
+
 Similar to www_formAssetTree, except it is limited to only display assets of class WebGUI::Asset::File::Image.
 Each link display a thumbnail of the image via www_richEditViewThumbnail.
 
@@ -290,6 +333,8 @@ sub www_richEditImageTree {
 
 =head2 www_richEditViewThumbnail ( session )
 
+B<NOTE:> This function is depricated and will be removed in a future release.
+
 Displays a thumbnail of an Image Asset in the Image manager for the Rich Editor.  The current
 URL in the session object is used to determine which Image is used.
 
@@ -331,6 +376,8 @@ sub www_richEditViewThumbnail {
 
 =head2 www_richEditAddFolder ( session )
 
+B<NOTE:> This function is depricated and will be removed in a future release.
+
 Returns a form to add a folder using the rich editor. The purpose of this feature is to provide a very simple way for end-users to create a folder from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
 
 =cut
@@ -362,6 +409,8 @@ sub www_richEditAddFolder {
 #-------------------------------------------------------------------
 
 =head2 www_richEditAddFolderSave ( session )
+
+B<NOTE:> This function is depricated and will be removed in a future release.
 
 Creates a directory under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
 
@@ -413,6 +462,8 @@ sub www_richEditAddFolderSave {
 
 =head2 www_richEditAddImage ( session )
 
+B<NOTE:> This function is depricated and will be removed in a future release.
+
 Returns a form to add an image using the rich editor. The purpose of this feature is to provide a very simple way for end-users to upload new images from within the rich editor, in stead of having to leave the rich editor and use the asset manager. A very minimal set of options is supplied, all other options should be derived from the current asset.
 
 =cut
@@ -445,6 +496,8 @@ sub www_richEditAddImage {
 #-------------------------------------------------------------------
 
 =head2 www_richEditAddImageSave ( session )
+
+B<NOTE:> This function is depricated and will be removed in a future release.
 
 Creates an Image asset under the current asset. The filename should be specified in the form. The Edit and View rights from the current asset are used if not specified in the form. All other properties are copied from the current asset.
 
@@ -485,106 +538,6 @@ sub www_richEditAddImageSave {
 	$session->http->setRedirect($url.'?op=richEditImageTree');
     $imageObj->delete;
 	return "";
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_setupSalesTaxForm ( $session )
-
-Create the AJAX form for displaying, adding and deleting sales tax information.
-
-=cut
-
-sub www_salesTaxTable {
-	my $session = shift;
-
-	my $returnTableOnly = 0;
-
-	if ($session->form->process('addDelete') eq 'add') {
-		my $state = $session->form->process('addStateId', 'selectBox');
-		my $taxRate = $session->form->process('taxRate', 'float');
-		my $commerceSalesTaxId = $session->id->generate();
-		if ( $state and $taxRate ) {
-			$session->db->write('insert into commerceSalesTax (commerceSalesTaxId,regionIdentifier,salesTax) VALUES (?,?,?)', [$commerceSalesTaxId, $state, $taxRate]);
-		}
-		$returnTableOnly = 1;
-	}
-	elsif ($session->form->process('addDelete') eq 'delete') {
-		my $commerceSalesTaxId = $session->form->process('entryId');
-		$session->db->write('delete from commerceSalesTax where commerceSalesTaxId=?',[$commerceSalesTaxId]);
-		$returnTableOnly = 1;
-	}
-
-	my $existingData = $session->db->buildArrayRefOfHashRefs('select * from commerceSalesTax order by regionIdentifier');
-
-	##To build the form, we need two pieces
-
-	##1: The table contains all information from the database
-	my @existingStates = map { $_->{regionIdentifier} } @{ $existingData };
-	my %existingStates = map { $_ => 1 } @existingStates;
-
-	##2: The list contains all states except for those in the table;
-	my $stateObj = Locale::US->new();
-	my @stateNames = $stateObj->all_state_names;
-	my @newStates = sort grep {! exists $existingStates{$_} } @stateNames;
-
-	my %orderedStates;
-	tie %orderedStates, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session);
-	%orderedStates = map { $_ => $_ } 'Select State', @newStates;
-	$orderedStates{'Select State'} = $i18n->get('Select State');
-
-	my $statesField = WebGUI::Form::selectBox($session,
-		-name    => 'stateChooser',
-		-options => \%orderedStates,
-		-default => 'Select State',
-	);
-
-	my $taxField = WebGUI::Form::float($session,
-		-name => 'taxRate',
-		-value => '',
-		-size => 6,
-	);
-	my $addButton = WebGUI::Form::button($session,
-		-name=>"addTaxInfo",
-		-value=>"Add Tax Information",
-		-extras=>q!align="right" onclick="addState()"!,
-	);
-
-	##build the table to display all existing sales tax
-
-	my $tableRows = '';
-	my $deleteIcon = $session->config->get('extrasURL').'/toolbar/bullet/delete.gif';
-	foreach my $sRow ( @{$existingData} ) {
-		$tableRows .= sprintf <<EOTR, $deleteIcon, $sRow->{commerceSalesTaxId}, $sRow->{regionIdentifier}, $sRow->{salesTax};
-<tr>
-<td class="cell"><img style="cursor:pointer;" src="%s" onclick="deleteState(event,'%s')"></td>
-<td class="cell"><span>%s</span></td>
-<td class="cell"><span>%6.4f%%</span></td>
-</tr>
-EOTR
-	}
-	my $stateForm = sprintf <<EOSF, $taxField, $statesField, $addButton;
-<table id="salesTaxEntryTable">
-<tbody>
-<tr>
-<td class="cell">%s&nbsp;%% tax for</td>
-<td class="cell">%s</td>
-<td class="cell">%s</td>
-</tr>
-</tbody>
-</table>
-EOSF
-
-my $stateTable = sprintf <<EOST, $tableRows;
-<table id="salesTaxDataTable" border="1" cellpadding="3">
-<tbody>
-%s
-</tbody>
-</table>
-EOST
-	$stateTable = '' unless $tableRows;
-	return $stateForm.$stateTable;
 }
 
 

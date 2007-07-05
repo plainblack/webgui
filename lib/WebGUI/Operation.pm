@@ -109,6 +109,7 @@ sub getOperations {
 		'editCommerceSettings' => 'WebGUI::Operation::Commerce',
 		'editCommerceSettingsSave' => 'WebGUI::Operation::Commerce',
 		'listTransactions' => 'WebGUI::Operation::Commerce',
+		'salesTaxTable' => 'WebGUI::Operation::Commerce',
 		'selectPaymentGateway' => 'WebGUI::Operation::Commerce',
 		'selectPaymentGatewaySave' => 'WebGUI::Operation::Commerce',
 		'selectShippingMethod' => 'WebGUI::Operation::Commerce',
@@ -130,6 +131,7 @@ sub getOperations {
 		'listDatabaseLinks' => 'WebGUI::Operation::DatabaseLink',
 
 		'formAssetTree' => 'WebGUI::Operation::FormHelpers',
+		'formHelper' => 'WebGUI::Operation::FormHelpers',
 		'richEditAddFolder' => 'WebGUI::Operation::FormHelpers',
 		'richEditAddFolderSave' => 'WebGUI::Operation::FormHelpers',
 		'richEditAddImage' => 'WebGUI::Operation::FormHelpers',
@@ -137,7 +139,6 @@ sub getOperations {
 		'richEditImageTree' => 'WebGUI::Operation::FormHelpers',
 		'richEditPageTree' => 'WebGUI::Operation::FormHelpers',
 		'richEditViewThumbnail' => 'WebGUI::Operation::FormHelpers',
-		'salesTaxTable' => 'WebGUI::Operation::FormHelpers',
 
 		'addGroupsToGroupSave' => 'WebGUI::Operation::Group',
 		'addUsersToGroupSave' => 'WebGUI::Operation::Group',

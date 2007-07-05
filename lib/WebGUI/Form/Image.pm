@@ -194,8 +194,8 @@ sub toHtml {
         	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
                 	}
         	}
-        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d"); uploader.addRow(); </script>!, 
-			$self->get("name")."_file", $i18n->get("removeLabel"), $maxNewFiles;
+        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow(); </script>!, 
+			$self->get("name")."_file", $i18n->get("removeLabel"), $maxNewFiles, $self->get("size");
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
 	} else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";
