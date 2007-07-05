@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 67 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 70 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -350,11 +350,10 @@ isnt($hexStorage->getId, $hexStorage->getFileId, 'getId != getFileId when caseIn
 is($session->id->toHex($hexStorage->getId), $hexStorage->getFileId, 'Hex value of GUID calculated correctly');
 my ($hexValue) = $session->db->quickArray('select hexValue,guidValue from storageTranslation where guidValue=?',[$hexStorage->getId]);
 is($hexStorage->getFileId, $hexValue, 'hexValue cached in the storageTranslation table');
-diag $hexStorage->getId;
-diag $hexStorage->{_id};
-diag $hexStorage->{_part1};
-diag $hexStorage->{_part2};
-diag $hexStorage->getFileId;
+my ($part1, $part2) = unpack "A2A2A*", $hexStorage->getFileId;  #fancy m/(..)(..)/;
+is ($hexStorage->{_part1}, $part1, 'Storage part1 uses hexId');
+is ($hexStorage->{_part2}, $part2, 'Storage part2 uses hexId, too');
+like ($hexStorage->getPath, qr/$hexValue/, 'Storage path uses hexId');
 
 $session->config->set('caseInsensitiveOS', 0);
 
