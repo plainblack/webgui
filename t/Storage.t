@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 58 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 67 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -59,9 +59,12 @@ ok ($uploadDir, "uploadDir defined in config");
 my $uploadUrl = $session->config->get('uploadsURL');
 ok ($uploadUrl, "uploadDir defined in config");
 
+my $originalCaseInsensitiveOS = $session->config->get('caseInsensitiveOS');
+$session->config->set('caseInsensitiveOS', 0);
+
 ####################################################
 #
-# get
+# get, getId
 #
 ####################################################
 
@@ -74,6 +77,7 @@ is( $storage1, undef, "get requires id to be passed");
 $storage1 = WebGUI::Storage->get($session, 'foobar');
 
 isa_ok( $storage1, "WebGUI::Storage", "storage will accept non GUID arguments");
+is ( $storage1->getId, 'foobar', 'getId returns the requested GUID');
 
 is( $storage1->getErrorCount, 0, "No errors during path creation");
 
@@ -146,9 +150,17 @@ SKIP: {
 
 undef $storage3;
 
+####################################################
+#
+# create
+#
+####################################################
+
 $storage1 = WebGUI::Storage->create($session);
 
 isa_ok( $storage1, "WebGUI::Storage");
+ok($session->id->valid($storage1->getId), 'create returns valid sessionIds');
+is($storage1->getId, $storage1->getFileId, 'getId and getFileId are the same when caseInsensitiveOS=0');
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
@@ -320,6 +332,31 @@ cmp_bag($fileStore->getFiles(1), ['.', '..'], 'Starting with an empty storage ob
 $fileStore->addFileFromScalar('.dotfile', 'dot file');
 cmp_bag($fileStore->getFiles(),  [                     ], 'getFiles() by default does not return dot files');
 cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile'], 'getFiles(1) returns all files, including dot files');
+$fileStore->addFileFromScalar('dot.file', 'dot.file');
+cmp_bag($fileStore->getFiles(),  ['dot.file'],            'getFiles() returns normal files');
+cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile', 'dot.file'], 'getFiles(1) returns all files, including dot files');
+
+####################################################
+#
+# Hexadecimal File Ids
+#
+####################################################
+
+$session->config->set('caseInsensitiveOS', 1);
+
+my $hexStorage = WebGUI::Storage->create($session);
+ok($session->id->valid($hexStorage->getId), 'create returns valid sessionIds in hex mode');
+isnt($hexStorage->getId, $hexStorage->getFileId, 'getId != getFileId when caseInsentiveOS=1');
+is($session->id->toHex($hexStorage->getId), $hexStorage->getFileId, 'Hex value of GUID calculated correctly');
+my ($hexValue) = $session->db->quickArray('select hexValue,guidValue from storageTranslation where guidValue=?',[$hexStorage->getId]);
+is($hexStorage->getFileId, $hexValue, 'hexValue cached in the storageTranslation table');
+diag $hexStorage->getId;
+diag $hexStorage->{_id};
+diag $hexStorage->{_part1};
+diag $hexStorage->{_part2};
+diag $hexStorage->getFileId;
+
+$session->config->set('caseInsensitiveOS', 0);
 
 END {
 	foreach my $stor (
@@ -329,4 +366,5 @@ END {
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
+    $session->config->set('caseInsensitiveOS', $originalCaseInsensitiveOS);
 }
