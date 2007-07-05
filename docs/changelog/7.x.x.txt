@@ -73,6 +73,8 @@
     http://www.webgui.org/bugs/tracker/editing-a-template-sometimes-fails
  - fix: CSS dragTrigger: multiple identical ID's on every page
     http://www.webgui.org/bugs/tracker/css-dragtrigger-multiple-identical-ids-on-every-page
+ - fix: Next/Previous links on thread not sorted same as collab
+    http://www.webgui.org/bugs/tracker/next/previous-not-sorted-same-as-collab
 
 7.3.19
  - Fixed a formatting problem in the workflow editor screen.

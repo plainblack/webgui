@@ -828,6 +828,36 @@ sub getSortByUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getSortBy
+
+Retrieves the field to sort by
+
+=cut
+
+sub getSortBy {
+    my $self = shift;
+    my $scratchSortBy = $self->getId."_sortBy";
+    my $sortBy = $self->session->scratch->get($scratchSortBy) || $self->getValue("sortBy");
+    return $sortBy;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSortOrder
+
+Retrieves the direction to sort in
+
+=cut
+
+sub getSortOrder {
+    my $self = shift;
+    my $scratchSortOrder = $self->getId."_sortDir";
+    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->getValue("sortOrder");
+    return $sortOrder;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getSubscribeUrl (  )
 
 Formats the url to subscribe to the forum.

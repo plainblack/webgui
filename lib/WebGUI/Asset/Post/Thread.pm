@@ -237,7 +237,9 @@ Returns a thread object for the next (newer) thread in the same forum.
 sub getNextThread {
 	my $self = shift;
         unless (defined $self->{_next}) {
-		my $sortBy = $self->getParent->getValue("sortBy");
+        my $parent = $self->getParent;
+        my $sortBy = $parent->getSortBy;
+        my $sortOrder = $parent->getSortOrder;
 		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
@@ -247,14 +249,14 @@ sub getNextThread {
 				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy.">".$self->session->db->quote($self->get($sortBy))." 
+					and ".$sortBy.($sortOrder eq 'asc' ? '>' : '<').$self->session->db->quote($self->get($sortBy))." 
 					and (
 						assetData.status in ('approved','archived')
 						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
 						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." asc 
+				order by ".$sortBy." ".$sortOrder." 
 				");
 		$self->{_next} = WebGUI::Asset->new($self->session, $id,$class,$version);
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
@@ -288,7 +290,9 @@ Returns a thread object for the previous (older) thread in the same forum.
 sub getPreviousThread {
 	my $self = shift;
         unless (defined $self->{_previous}) {
-		my $sortBy = $self->getParent->getValue("sortBy");
+        my $parent = $self->getParent;
+        my $sortBy = $parent->getSortBy;
+        my $sortOrder = lc($parent->getSortOrder) eq 'asc' ? 'desc' : 'asc';
 		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
 				select asset.assetId,asset.className,max(assetData.revisionDate)
 				from Thread
@@ -298,14 +302,14 @@ sub getPreviousThread {
 				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
 					and asset.state='published' 
 					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy."<".$self->session->db->quote($self->get($sortBy))." 
+					and ".$sortBy.($sortOrder eq 'asc' ? '>' : '<').$self->session->db->quote($self->get($sortBy))." 
 					and (
 						assetData.status in ('approved','archived')
 						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
 						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
 						)
 				group by assetData.assetId
-				order by ".$sortBy." desc, assetData.revisionDate desc ");
+				order by ".$sortBy." ".$sortOrder.", assetData.revisionDate desc ");
 		$self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
 	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
 	};
