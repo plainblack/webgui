@@ -58,11 +58,12 @@ function dragable_checkKeyEvent(e) {
 
 //goes up the parent tree until class is found. If not found, returns null
 function dragable_getObjectByClass(target,clazz) {
-    while (target.tagName!=topelement&&target.className!=clazz){
+    var classMatch = new RegExp("\\b" + clazz + "\\b");
+    while (target.tagName!=topelement && target.className.search(classMatch) == -1){
         target=dom? target.parentNode : target.parentElement
     }
 
-    if (target.className==clazz){
+    if (target.className.search(classMatch) != -1){
         return target;
     }else {
         return null;
@@ -202,7 +203,7 @@ function dragable_dragStart(e){
     e=dom? e : event;
     var fObj=dom? e.target : e.srcElement
 
-    if (fObj.className != "dragTrigger") {
+    if (fObj.className.search(/\bdragTrigger\b/) == -1) {
         return;
     }
 

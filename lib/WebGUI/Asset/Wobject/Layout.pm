@@ -232,7 +232,7 @@ sub view {
 	if ($self->{_viewVars}{showAdmin} && $self->canEditIfLocked) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
-		$self->{_viewVars}{"dragger.icon"} = '<div id="dragTrigger" class="dragTrigger">'.$self->session->icon->drag('class="dragTrigger"').'</div>';
+		$self->{_viewVars}{"dragger.icon"} = '<div class="dragTrigger dragTriggerWrap">'.$self->session->icon->drag('class="dragTrigger"').'</div>';
 		$self->{_viewVars}{"dragger.init"} = '
 			<iframe id="dragSubmitter" style="display: none;" src="'.$self->session->url->extras('spacer.gif').'"></iframe>
 			<script type="text/javascript">
