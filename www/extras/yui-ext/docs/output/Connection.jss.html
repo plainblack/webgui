@@ -1,0 +1,126 @@
+<html><head><title>Connection.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>Connection.js</h1><pre class="highlighted"><code><i>/**
+ * @class Ext.data.Connection
+ * The class encapsulates a connection to the page's originating domain, allowing requests to be made
+ * either to a configured URL, or to a URL specified at request time.
+ * &lt;p&gt;
+ * Requests made by <b>this</b> class are asynchronous, and will <b>return</b> immediately, and no data from
+ * the server will be available. To process the returned data, us a callback <b>in</b> the request options
+ * object.
+ * @constructor
+ * @param config {Object} a configuration object.
+ */</i>
+Ext.data.Connection = <b>function</b>(config){
+    Ext.apply(<b>this</b>, config);
+    <b>this</b>.addEvents({
+        &quot;beforerequest&quot; : true,
+        &quot;requestcomplete&quot; : true,
+        &quot;requestexception&quot; : true
+    });
+    Ext.data.Connection.superclass.constructor.call(<b>this</b>);
+};
+
+Ext.extend(Ext.data.Connection, Ext.util.Observable, {
+    <i>/**
+     * @cfg url {String} (Optional) The <b>default</b> URL to be used <b>for</b> requests to the server.
+     */</i>
+<i>// holder</i>
+<i>/***
+     * @cfg extraParams {Object} (Optional) An object containing properties which are used as
+     * extra parameters to each request made by <b>this</b> object.
+     */</i>
+<i>// holder</i>
+<i>/***
+     * @cfg method {String} (Optional) The <b>default</b> HTTP method to be used <b>for</b> requests.
+     */</i>
+<i>// holder</i>
+<i>/***
+     * @cfg timeout {Number} (Optional) The timeout <b>in</b> milliseconds to be used <b>for</b> requests. Defaults
+     * to 30000.
+     */</i>
+    timeout : 30000,
+    
+    <i>/**
+     * Sends an HTTP request to a remote server.
+     * @param {Object} options. An object which may contain the following properties:&lt;ul&gt;
+     * &lt;li&gt;url {String} (Optional) The URL to which to send the request. Defaults to configured URL&lt;/li&gt;
+     * &lt;li&gt;params {Object} (Optional) An object containing properties which are used as extra parameters to the request&lt;/li&gt;
+     * &lt;li&gt;method {String} (Optional) The HTTP method to use <b>for</b> the request. Defaults to the configured method, or
+     * <b>if</b> no method was configured, &quot;GET&quot; <b>if</b> no parameters are being sent, and &quot;POST&quot; <b>if</b> parameters are being sent.&lt;/li&gt;
+     * &lt;li&gt;callback {Function} (Optional) The <b>function</b> to be called upon receipt of the HTTP response.
+     * The callback is passed the following parameters:&lt;ul&gt;
+     * &lt;li&gt;options {Object} The parameter to the request call.&lt;/li&gt;
+     * &lt;li&gt;success {Boolean} True <b>if</b> the request succeeded.&lt;/li&gt;
+     * &lt;li&gt;resopnse {Object} The XMLHttpRequest object containing the response data.&lt;/li&gt;
+     * &lt;/ul&gt;&lt;/li&gt;
+     * &lt;li&gt;scope {Object} (Optional) The scope <b>in</b> which to execute the callback: The &quot;<b>this</b>&quot; object
+     * <b>for</b> the callback <b>function</b>. Defaults to the browser window.&lt;/li&gt;
+     * &lt;/ul&gt;
+     */</i>
+    request : <b>function</b>(options){
+        <b>if</b>(this.fireEvent(&quot;beforerequest&quot;, <b>this</b>, options) !== false){
+            <b>var</b> p = options.params;
+            <b>if</b>(typeof p == &quot;object&quot;){
+                p = Ext.urlEncode(Ext.apply(options.params, <b>this</b>.extraParams));
+            }
+            <b>var</b> cb = {
+                success: <b>this</b>.handleResponse,
+                failure: <b>this</b>.handleFailure,
+                scope: <b>this</b>,
+        		argument: {options: options},
+        		timeout : <b>this</b>.timeout
+            };
+            <b>var</b> method = options.method||<b>this</b>.method||(p ? &quot;POST&quot; : &quot;GET&quot;);
+            <b>var</b> url = options.url || <b>this</b>.url;
+            <b>if</b>(this.autoAbort !== false){
+                <b>this</b>.abort();
+            }
+            <b>if</b>(method == 'GET' &amp;&amp; p){
+                url += (url.indexOf('?') != -1 ? '&amp;' : '?') + p;
+                p = '';
+            }
+            <b>this</b>.transId = Ext.lib.Ajax.request(method, url, cb, p);
+        }<b>else</b>{
+            <b>if</b>(typeof options.callback == &quot;<b>function</b>&quot;){
+                options.callback.call(options.scope||window, options, null, null);
+            }
+        }
+    },
+
+    <i>/**
+     * Determine whether <b>this</b> object has a request outstanding.
+     * @<b>return</b> {Boolean} True <b>if</b> there is an outstanding request.
+     */</i>
+    isLoading : <b>function</b>(){
+        <b>return</b> this.transId ? true : false;  
+    },
+
+    <i>/**
+     * Aborts any outstanding request.
+     */</i>
+    abort : <b>function</b>(){
+        <b>if</b>(this.isLoading()){
+            Ext.lib.Ajax.abort(<b>this</b>.transId);
+        }
+    },
+
+    <i>// private</i>
+    handleResponse : <b>function</b>(response){
+        <b>this</b>.transId = false;
+        <b>var</b> options = response.argument.options;
+        <b>this</b>.fireEvent(&quot;requestcomplete&quot;, <b>this</b>, response, options);
+        <b>if</b>(typeof options.callback == &quot;<b>function</b>&quot;){
+            options.callback.call(options.scope||window, options, true, response);
+        }
+    },
+
+    <i>// private</i>
+    handleFailure : <b>function</b>(response, e){
+        <b>this</b>.transId = false;
+        <b>var</b> options = response.argument.options;
+        <b>this</b>.fireEvent(&quot;requestexception&quot;, <b>this</b>, response, options, e);
+        <b>if</b>(typeof options.callback == &quot;<b>function</b>&quot;){
+            options.callback.call(options.scope||window, options, false, response);
+        }
+    }
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

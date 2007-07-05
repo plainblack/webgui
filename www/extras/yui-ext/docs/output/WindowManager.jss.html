@@ -1,0 +1,137 @@
+<html><head><title>WindowManager.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>WindowManager.js</h1><pre class="highlighted"><code>Ext.WindowGroup = <b>function</b>(){
+    <b>var</b> list = {};
+    <b>var</b> accessList = [];
+    <b>var</b> front = null;
+
+    <i>// private</i>
+    <b>var</b> sortWindows = <b>function</b>(d1, d2){
+        <b>return</b> (!d1._lastAccess || d1._lastAccess &lt; d2._lastAccess) ? -1 : 1;
+    };
+
+    <i>// private</i>
+    <b>var</b> orderWindows = <b>function</b>(){
+        accessList.sort(sortWindows);
+        <b>var</b> seed = Ext.DialogManager.zseed;
+        <b>for</b>(var i = 0, len = accessList.length; i &lt; len; i++){
+            <b>var</b> win = accessList[i];
+            <b>if</b>(win &amp;&amp; !win.hidden){
+                win.setZIndex(seed + (i*10));
+            }
+        }
+        activateLast();
+    };
+
+    <b>var</b> setActiveWin = <b>function</b>(win){
+        <b>if</b>(win != front){
+            <b>if</b>(front){
+                front.setActive(false);
+            }
+            front = win;
+            <b>if</b>(win){
+                win.setActive(true);
+            }
+        }
+    };
+
+    <b>var</b> activateLast = <b>function</b>(){
+        <b>for</b>(var i = accessList.length-1; i &gt;=0; --i) {
+            <b>if</b>(!accessList[i].hidden){
+                setActiveWin(accessList[i]);
+                <b>return</b>;
+            }
+        }
+        <i>// none to activate</i>
+        setActiveWin(null);
+    };
+
+    <b>return</b> {
+        <i>/**
+         * The starting z-index <b>for</b> windows (defaults to 9000)
+         * @type Number The z-index value
+         */</i>
+        zseed : 9000,
+
+        <i>// private</i>
+        register : <b>function</b>(win){
+            list[win.id] = win;
+            accessList.push(win);
+            win.on('hide', activateLast);
+        },
+
+        <i>// private</i>
+        unregister : <b>function</b>(win){
+            <b>delete</b> list[win.id];
+            win.un('hide', activateLast);
+            accessList.remove(win);
+        },
+
+        <i>/**
+         * Gets a registered Window by id
+         * @param {String/Object} id The id of the Window or a Window
+         * @<b>return</b> {Ext.BasicDialog} <b>this</b>
+         */</i>
+        get : <b>function</b>(id){
+            <b>return</b> typeof id == &quot;object&quot; ? id : list[id];
+        },
+
+        <i>/**
+         * Brings the specified Window to the front
+         * @param {String/Object} win The id of the Window or a Window
+         * @<b>return</b> {Ext.BasicDialog} <b>this</b>
+         */</i>
+        bringToFront : <b>function</b>(win){
+            win = <b>this</b>.get(win);
+            <b>if</b>(win != front){
+                win._lastAccess = <b>new</b> Date().getTime();
+                orderWindows();
+            }
+            <b>return</b> win;
+        },
+
+        <i>/**
+         * Sends the specified Window to the back
+         * @param {String/Object} win The id of the Window or a Window
+         * @<b>return</b> {Ext.BasicDialog} <b>this</b>
+         */</i>
+        sendToBack : <b>function</b>(win){
+            win = <b>this</b>.get(win);
+            win._lastAccess = -(<b>new</b> Date().getTime());
+            orderWindows();
+            <b>return</b> win;
+        },
+
+        <i>/**
+         * Hides all Windows
+         */</i>
+        hideAll : <b>function</b>(){
+            <b>for</b>(var id <b>in</b> list){
+                <b>if</b>(list[id] &amp;&amp; <b>typeof</b> list[id] != &quot;<b>function</b>&quot; &amp;&amp; list[id].isVisible()){
+                    list[id].hide();
+                }
+            }
+        },
+
+
+
+        getBy : <b>function</b>(fn, scope){
+            <b>var</b> r = [];
+            <b>for</b>(var i = accessList.length-1; i &gt;=0; --i) {
+                <b>var</b> win = accessList[i];
+                <b>if</b>(fn.call(scope||win, win) !== false){
+                    r.push(win);
+                }
+            }
+            <b>return</b> r;
+        }
+    };
+};
+
+
+<i>/**
+ * @class Ext.WindowManager
+ * @extends Ext.WindowGroup
+ * The <b>default</b> global group of windows.
+ * @singleton
+ */</i>
+Ext.WindowMgr = <b>new</b> Ext.WindowGroup();</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

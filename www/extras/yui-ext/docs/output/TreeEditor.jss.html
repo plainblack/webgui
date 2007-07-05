@@ -1,0 +1,70 @@
+<html><head><title>TreeEditor.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>TreeEditor.js</h1><pre class="highlighted"><code>Ext.tree.TreeEditor = <b>function</b>(tree, config){
+    config = config || {};
+    <i>// config can either be a prebuilt field, or a field config</i>
+    <b>var</b> field = config.events ? config : <b>new</b> Ext.form.TextField(config);
+    Ext.tree.TreeEditor.superclass.constructor.call(<b>this</b>, field);
+
+    <b>this</b>.tree = tree;
+
+    tree.on('beforeclick', <b>this</b>.beforeNodeClick, <b>this</b>);
+    tree.el.on('mousedown', <b>this</b>.hide, <b>this</b>);
+    <b>this</b>.on('complete', <b>this</b>.updateNode, <b>this</b>);
+    <b>this</b>.on('beforestartedit', <b>this</b>.fitToTree, <b>this</b>);
+    <b>this</b>.on('startedit', <b>this</b>.bindScroll, <b>this</b>, {delay:10});
+    <b>this</b>.on('specialkey', <b>this</b>.onSpecialKey, <b>this</b>);
+};
+
+Ext.extend(Ext.tree.TreeEditor, Ext.Editor, {
+    alignment: &quot;l-l&quot;,
+    autoSize: false,
+    hideEl : false,
+    cls: &quot;x-small-editor x-tree-editor&quot;,
+    shim:false,
+    shadow:&quot;frame&quot;,
+    maxWidth: 250,
+
+    fitToTree : <b>function</b>(ed, el){
+        <b>var</b> td = <b>this</b>.tree.el.dom, nd = el.dom;
+        <b>if</b>(td.scrollLeft &gt;  nd.offsetLeft){ <i>// ensure the node left point is visible</i>
+            td.scrollLeft = nd.offsetLeft;
+        }
+        <b>var</b> w = Math.min(
+                <b>this</b>.maxWidth,
+                (td.clientWidth &gt; 20 ? td.clientWidth : td.offsetWidth) - Math.max(0, nd.offsetLeft-td.scrollLeft) - <i>/*cushion*/</i>5);
+        <b>this</b>.setSize(w, '');
+    },
+
+    triggerEdit : <b>function</b>(node){
+        <b>this</b>.completeEdit();
+        <b>this</b>.editNode = node;
+        <b>this</b>.startEdit(node.ui.textNode, node.text);
+    },
+
+    bindScroll : <b>function</b>(){
+        <b>this</b>.tree.el.on('scroll', <b>this</b>.cancelEdit, <b>this</b>);
+    },
+
+    beforeNodeClick : <b>function</b>(node){
+        <b>if</b>(this.tree.getSelectionModel().isSelected(node)){
+            <b>this</b>.triggerEdit(node);
+            <b>return</b> false;
+        }
+    },
+
+    updateNode : <b>function</b>(ed, value){
+        <b>this</b>.tree.el.un('scroll', <b>this</b>.cancelEdit, <b>this</b>);
+        <b>this</b>.editNode.setText(value);
+    },
+
+    onSpecialKey : <b>function</b>(field, e){
+        <b>var</b> k = e.getKey();
+        <b>if</b>(k == e.ESC){
+            <b>this</b>.cancelEdit();
+            e.stopEvent();
+        }<b>else</b> if(k == e.ENTER &amp;&amp; !e.hasModifier()){
+            <b>this</b>.completeEdit();
+            e.stopEvent();
+        }
+    }
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

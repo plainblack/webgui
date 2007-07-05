@@ -1,0 +1,41 @@
+<html><head><title>ContainerLayout.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>ContainerLayout.js</h1><pre class="highlighted"><code>Ext.layout.ContainerLayout = <b>function</b>(config){
+    Ext.apply(<b>this</b>, config);
+};
+
+Ext.layout.ContainerLayout.prototype = {
+    monitorResize:false,
+    activeItem : null,
+
+    layout : <b>function</b>(){
+        <b>this</b>.onLayout(<b>this</b>.container,
+                <b>this</b>.container.getLayoutTarget());
+    },
+
+    onLayout : <b>function</b>(ct, target){
+        <b>var</b> items = ct.items.items;
+        <b>for</b>(var i = 0, len = items.length; i &lt; len; i++) {
+            <b>var</b> c = items[i];
+            <b>if</b>(!c.rendered){
+                c.render(target, i);
+                <b>if</b>(this.renderHidden &amp;&amp; c != <b>this</b>.activeItem){
+                    c.hide();
+                }
+            }
+        }
+    },
+
+    onResize: <b>function</b>(){
+        <b>this</b>.layout();
+    },
+
+    setContainer : <b>function</b>(ct){
+        <b>if</b>(this.monitorResize){
+            <b>if</b>(ct &amp;&amp; <b>this</b>.container &amp;&amp; ct != <b>this</b>.container){
+                <b>this</b>.container.un('resize', <b>this</b>.onResize, <b>this</b>);
+            }
+            ct.on('resize', <b>this</b>.onResize, <b>this</b>);
+        }
+        <b>this</b>.container = ct;
+    }
+};</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

@@ -1,0 +1,127 @@
+<html><head><title>TreeLoader.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>TreeLoader.js</h1><pre class="highlighted"><code><i>/**
+ * @class Ext.tree.TreeLoader
+ */</i>
+Ext.tree.TreeLoader = <b>function</b>(config){
+    <b>this</b>.baseParams = {};
+    <b>this</b>.requestMethod = &quot;POST&quot;;
+    Ext.apply(<b>this</b>, config);
+    
+    <b>this</b>.addEvents({
+        &quot;beforeload&quot; : true,
+        &quot;load&quot; : true,
+        &quot;loadexception&quot; : true
+    });
+};
+
+Ext.extend(Ext.tree.TreeLoader, Ext.util.Observable, {
+    uiProviders : {},
+    clearOnLoad : true,
+    load : <b>function</b>(node, callback){
+        <b>if</b>(this.clearOnLoad){
+            <b>while</b>(node.firstChild){
+                node.removeChild(node.firstChild);
+            }
+        }
+        <b>if</b>(node.attributes.children){ <i>// preloaded json children</i>
+            <b>var</b> cs = node.attributes.children;
+            <b>for</b>(var i = 0, len = cs.length; i &lt; len; i++){
+                node.appendChild(<b>this</b>.createNode(cs[i]));
+            }
+            <b>if</b>(typeof callback == &quot;<b>function</b>&quot;){
+                callback();
+            }
+        }<b>else</b> if(<b>this</b>.dataUrl){
+            <b>this</b>.requestData(node, callback);
+        }
+    },
+    
+    getParams: <b>function</b>(node){
+        <b>var</b> buf = [], bp = <b>this</b>.baseParams;
+        <b>for</b>(var key <b>in</b> bp){
+            <b>if</b>(typeof bp[key] != &quot;<b>function</b>&quot;){
+                buf.push(encodeURIComponent(key), &quot;=&quot;, encodeURIComponent(bp[key]), &quot;&amp;&quot;);
+            }
+        }
+        buf.push(&quot;node=&quot;, encodeURIComponent(node.id));
+        <b>return</b> buf.join(&quot;&quot;);
+    },
+    
+    requestData : <b>function</b>(node, callback){
+        <b>if</b>(this.fireEvent(&quot;beforeload&quot;, <b>this</b>, node, callback) !== false){
+            <b>var</b> params = <b>this</b>.getParams(node);
+            <b>var</b> cb = {
+                success: <b>this</b>.handleResponse,
+                failure: <b>this</b>.handleFailure,
+                scope: <b>this</b>,
+        		argument: {callback: callback, node: node}
+            };
+            <b>this</b>.transId = Ext.lib.Ajax.request(<b>this</b>.requestMethod, <b>this</b>.dataUrl, cb, params);
+        }<b>else</b>{
+            <i>// <b>if</b> the load is cancelled, make sure we notify </i>
+            <i>// the node that we are done</i>
+            <b>if</b>(typeof callback == &quot;<b>function</b>&quot;){
+                callback();
+            }
+        }
+    },
+    
+    isLoading : <b>function</b>(){
+        <b>return</b> this.transId ? true : false;  
+    },
+    
+    abort : <b>function</b>(){
+        <b>if</b>(this.isLoading()){
+            Ext.lib.Ajax.abort(<b>this</b>.transId);
+        }
+    },
+
+    <i>/**
+    * Override <b>this</b> function <b>for</b> custom TreeNode node implementation
+    */</i>
+    createNode : <b>function</b>(attr){
+        <b>if</b>(this.applyLoader !== false){
+            attr.loader = <b>this</b>;
+        }
+        <b>if</b>(typeof attr.uiProvider == 'string'){
+           attr.uiProvider = <b>this</b>.uiProviders[attr.uiProvider] || eval(attr.uiProvider);
+        }
+        <b>return</b>(attr.leaf ?
+                        <b>new</b> Ext.tree.TreeNode(attr) : 
+                        <b>new</b> Ext.tree.AsyncTreeNode(attr));  
+    },
+    
+    processResponse : <b>function</b>(response, node, callback){
+        <b>var</b> json = response.responseText;
+        try {
+            <b>var</b> o = eval(&quot;(&quot;+json+&quot;)&quot;);
+	        <b>for</b>(var i = 0, len = o.length; i &lt; len; i++){
+                <b>var</b> n = <b>this</b>.createNode(o[i]);
+                <b>if</b>(n){
+                    node.appendChild(n); 
+                }
+	        }
+	        <b>if</b>(typeof callback == &quot;<b>function</b>&quot;){
+                callback(<b>this</b>, node);
+            }
+        }catch(e){
+            <b>this</b>.handleFailure(response);
+        }
+    },
+    
+    handleResponse : <b>function</b>(response){
+        <b>this</b>.transId = false;
+        <b>var</b> a = response.argument;
+        <b>this</b>.processResponse(response, a.node, a.callback);
+        <b>this</b>.fireEvent(&quot;load&quot;, <b>this</b>, a.node, response);
+    },
+    
+    handleFailure : <b>function</b>(response){
+        <b>this</b>.transId = false;
+        <b>var</b> a = response.argument;
+        <b>this</b>.fireEvent(&quot;loadexception&quot;, <b>this</b>, a.node, response);
+        <b>if</b>(typeof a.callback == &quot;<b>function</b>&quot;){
+            a.callback(<b>this</b>, a.node);
+        }
+    }
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

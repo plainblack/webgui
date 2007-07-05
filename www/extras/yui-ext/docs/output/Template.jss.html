@@ -1,0 +1,357 @@
+<html><head><title>Template.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>Template.js</h1><pre class="highlighted"><code><i>/**
+* @class Ext.Template
+* Represents an HTML fragment template. Templates can be precompiled <b>for</b> greater performance.
+* For a list of available format functions, see {@link Ext.util.Format}.
+&lt;pre&gt;&lt;code&gt;
+<b>var</b> t = <b>new</b> Ext.Template(
+	'&amp;lt;div name=&quot;{id}&quot;&amp;gt;',
+		'&amp;lt;span class=&quot;{cls}&quot;&amp;gt;{name:trim} {value:ellipsis(10)}&amp;lt;/span&amp;gt;',
+	'&amp;lt;/div&amp;gt;'
+);
+t.append('some-element', {id: 'myid', name: 'foo', value: 'bar'});
+&lt;/code&gt;&lt;/pre&gt;
+* For more information see &lt;a href=&quot;http:<i>//www.jackslocum.com/yui/2006/10/06/domhelper-create-elements-using-dom-html-fragments-or-templates/&quot;&gt;<b>this</b> blog post <b>with</b> examples&lt;/a&gt;. </i>
+* &lt;br&gt;
+* @constructor
+* @param {String/Array} html The HTML fragment or an array of fragments to join('') or multiple arguments to join('')
+*/</i>
+Ext.Template = <b>function</b>(html){
+    <b>if</b>(html instanceof Array){
+        html = html.join(&quot;&quot;);
+    }<b>else</b> if(arguments.length &gt; 1){
+        html = Array.prototype.join.call(arguments, &quot;&quot;);
+    }
+    <i>/**@private*/</i>
+    <b>this</b>.html = html;
+    
+};
+Ext.Template.prototype = {
+    <i>/**
+     * Returns an HTML fragment of <b>this</b> template <b>with</b> the specified values applied
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @<b>return</b> {String}
+     */</i>
+    applyTemplate : <b>function</b>(values){
+        <b>if</b>(this.compiled){
+            <b>return</b> this.compiled(values);
+        }
+        <b>var</b> useF = <b>this</b>.disableFormats !== true;
+        <b>var</b> fm = Ext.util.Format, tpl = <b>this</b>;
+        <b>var</b> fn = <b>function</b>(m, name, format, args){
+            <b>if</b>(format &amp;&amp; useF){
+                <b>if</b>(format.substr(0, 5) == &quot;<b>this</b>.&quot;){
+                    <b>return</b> tpl.call(format.substr(5), values[name]);
+                }<b>else</b>{
+                    <b>if</b>(args){
+                        <i>// quoted values are required <b>for</b> strings <b>in</b> compiled templates, </i>
+                        <i>// but <b>for</b> non compiled we need to strip them</i>
+                        <i>// quoted reversed <b>for</b> jsmin</i>
+                        <b>var</b> re = /^\s*['&quot;](.*)[&quot;']\s*$/;
+                        args = args.split(',');
+                        <b>for</b>(var i = 0, len = args.length; i &lt; len; i++){
+                            args[i] = args[i].replace(re, &quot;$1&quot;);
+                        }
+                        args = [values[name]].concat(args);
+                    }<b>else</b>{
+                        args = [values[name]];
+                    }
+                    <b>return</b> fm[format].apply(fm, args);
+                }
+            }<b>else</b>{
+                <b>return</b> values[name] !== undefined ? values[name] : &quot;&quot;;
+            }
+        };
+        <b>return</b> this.html.replace(<b>this</b>.re, fn);
+    },
+    
+    <i>/**
+     * Sets the html used as the template and optionally compiles it
+     * @param {String} html
+     * @param {Boolean} compile (optional)
+     * @<b>return</b> {Template} <b>this</b>
+     */</i>
+    set : <b>function</b>(html, compile){
+        <b>this</b>.html = html;
+        <b>this</b>.compiled = null;
+        <b>if</b>(compile){
+            <b>this</b>.compile();
+        }
+        <b>return</b> this;
+    },
+    
+    <i>/**
+     * True to disable format functions (<b>default</b> to false)
+     * @type Boolean
+     */</i>
+    disableFormats : false,
+    
+    <i>/**
+    * The regular expression used to match template variables 
+    * @type RegExp
+    * @property 
+    */</i>
+    re : /\{([\w-]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?\}/g,
+    
+    <i>/**
+     * Compiles the template into an internal <b>function</b>, eliminating the RegEx overhead
+     */</i>
+    compile : <b>function</b>(){
+        <b>var</b> fm = Ext.util.Format;
+        <b>var</b> useF = <b>this</b>.disableFormats !== true;
+        <b>var</b> sep = Ext.isGecko ? &quot;+&quot; : &quot;,&quot;;
+        <b>var</b> fn = <b>function</b>(m, name, format, args){
+            <b>if</b>(format &amp;&amp; useF){
+                args = args ? ',' + args : &quot;&quot;;
+                <b>if</b>(format.substr(0, 5) != &quot;<b>this</b>.&quot;){
+                    format = &quot;fm.&quot; + format + '(';
+                }<b>else</b>{
+                    format = '<b>this</b>.call(&quot;'+ format.substr(5) + '&quot;, ';
+                    args = &quot;&quot;;
+                }
+            }<b>else</b>{
+                args= '', format = &quot;(values['&quot; + name + &quot;'] == undefined ? '' : &quot;;
+            }
+            <b>return</b> &quot;'&quot;+ sep + format + &quot;values['&quot; + name + &quot;']&quot; + args + &quot;)&quot;+sep+&quot;'&quot;;
+        };
+        <b>var</b> body;
+        <i>// branched to use + <b>in</b> gecko and [].join() <b>in</b> others</i>
+        <b>if</b>(Ext.isGecko){
+            body = &quot;<b>this</b>.compiled = <b>function</b>(values){ <b>return</b> '&quot; +
+                   <b>this</b>.html.replace(/(\r\n|\n)/g, '\\n').replace(&quot;'&quot;, &quot;\\'&quot;).replace(<b>this</b>.re, fn) +
+                    &quot;';};&quot;;
+        }<b>else</b>{
+            body = [&quot;<b>this</b>.compiled = <b>function</b>(values){ <b>return</b> ['&quot;];
+            body.push(<b>this</b>.html.replace(/(\r\n|\n)/g, '\\n').replace(&quot;'&quot;, &quot;\\'&quot;).replace(<b>this</b>.re, fn));
+            body.push(&quot;'].join('');};&quot;);
+            body = body.join('');
+        }
+        eval(body);
+        <b>return</b> this;
+    },
+    
+    <i>// private <b>function</b> used to call members</i>
+    call : <b>function</b>(fnName, value){
+        <b>return</b> this[fnName](value);
+    },
+    
+    <i>/**
+     * Applies the supplied values to the template and inserts the <b>new</b> node(s) as the first child of el
+     * @param {String/HTMLElement/Element} el The context element
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @param {Boolean} returnElement (optional) true to <b>return</b> a Ext.Element
+     * @<b>return</b> {HTMLElement} The <b>new</b> node
+     */</i>
+    insertFirst: <b>function</b>(el, values, returnElement){
+        <b>return</b> this.doInsert('afterBegin', el, values, returnElement);
+    },
+
+    <i>/**
+     * Applies the supplied values to the template and inserts the <b>new</b> node(s) before el
+     * @param {String/HTMLElement/Element} el The context element
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @param {Boolean} returnElement (optional) true to <b>return</b> a Ext.Element
+     * @<b>return</b> {HTMLElement} The <b>new</b> node
+     */</i>
+    insertBefore: <b>function</b>(el, values, returnElement){
+        <b>return</b> this.doInsert('beforeBegin', el, values, returnElement);
+    },
+
+    <i>/**
+     * Applies the supplied values to the template and inserts the <b>new</b> node(s) after el
+     * @param {String/HTMLElement/Element} el The context element
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @param {Boolean} returnElement (optional) true to <b>return</b> a Ext.Element
+     * @<b>return</b> {HTMLElement} The <b>new</b> node
+     */</i>
+    insertAfter : <b>function</b>(el, values, returnElement){
+        <b>return</b> this.doInsert('afterEnd', el, values, returnElement);
+    },
+    
+    <i>/**
+     * Applies the supplied values to the template and append the <b>new</b> node(s) to el
+     * @param {String/HTMLElement/Element} el The context element
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @param {Boolean} returnElement (optional) true to <b>return</b> a Ext.Element
+     * @<b>return</b> {HTMLElement} The <b>new</b> node
+     */</i>
+    append : <b>function</b>(el, values, returnElement){
+        <b>return</b> this.doInsert('beforeEnd', el, values, returnElement);
+    },
+
+    doInsert : <b>function</b>(where, el, values, returnEl){
+        el = Ext.getDom(el);
+        <b>var</b> newNode = Ext.DomHelper.insertHtml(where, el, <b>this</b>.applyTemplate(values));
+        <b>return</b> returnEl ? Ext.get(newNode, true) : newNode;
+    },
+
+    <i>/**
+     * Applies the supplied values to the template and overwrites the content of el <b>with</b> the <b>new</b> node(s)
+     * @param {String/HTMLElement/Element} el The context element
+     * @param {Object} values The template values. Can be an array <b>if</b> your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})
+     * @param {Boolean} returnElement (optional) true to <b>return</b> a Ext.Element
+     * @<b>return</b> {HTMLElement} The <b>new</b> node
+     */</i>
+    overwrite : <b>function</b>(el, values, returnElement){
+        el = Ext.getDom(el);
+        el.innerHTML = <b>this</b>.applyTemplate(values);
+        <b>return</b> returnElement ? Ext.get(el.firstChild, true) : el.firstChild;
+    }
+};
+<i>/**
+ * Alias <b>for</b> applyTemplate
+ * @method
+ */</i>
+Ext.Template.prototype.apply = Ext.Template.prototype.applyTemplate;
+
+<i>// backwards compat</i>
+Ext.DomHelper.Template = Ext.Template;
+
+<i>/**
+ * Creates a template from the passed element's value (display:none textarea, preferred) or innerHTML
+ * @param {String/HTMLElement} el
+ * @static
+ */</i>
+Ext.Template.from = <b>function</b>(el){
+    el = Ext.getDom(el);
+    <b>return</b> new Ext.Template(el.value || el.innerHTML);  
+};
+
+<i>/**
+ * @class Ext.MasterTemplate
+ * @extends Ext.Template
+ * Provides a template that can have child templates. The syntax is:
+&lt;pre&gt;&lt;code&gt;
+<b>var</b> t = <b>new</b> Ext.MasterTemplate(
+	'&amp;lt;select name=&quot;{name}&quot;&amp;gt;',
+		'&amp;lt;tpl name=&quot;options&quot;&amp;gt;&amp;lt;option value=&quot;{value:trim}&quot;&amp;gt;{text:ellipsis(10)}&amp;lt;/option&amp;gt;&amp;lt;/tpl&amp;gt;',
+	'&amp;lt;/select&amp;gt;'
+);
+t.add('options', {value: 'foo', text: 'bar'});
+<i>// or you can add multiple child elements <b>in</b> one shot</i>
+t.addAll('options', [
+    {value: 'foo', text: 'bar'},
+    {value: 'foo2', text: 'bar2'},
+    {value: 'foo3', text: 'bar3'}
+]);
+<i>// then append, applying the master template values</i>
+t.append('my-form', {name: 'my-select'});
+&lt;/code&gt;&lt;/pre&gt;
+* A name attribute <b>for</b> the child template is not required <b>if</b> you have only one child 
+* template or you want to refer to them by index.
+ */</i>
+Ext.MasterTemplate = <b>function</b>(){
+    Ext.MasterTemplate.superclass.constructor.apply(<b>this</b>, arguments);
+    <b>this</b>.originalHtml = <b>this</b>.html;
+    <b>var</b> st = {};
+    <b>var</b> m, re = <b>this</b>.subTemplateRe;
+    re.lastIndex = 0;
+    <b>var</b> subIndex = 0;
+    <b>while</b>(m = re.exec(<b>this</b>.html)){
+        <b>var</b> name = m[1], content = m[2];
+        st[subIndex] = {
+            name: name,
+            index: subIndex,
+            buffer: [],
+            tpl : <b>new</b> Ext.Template(content)
+        };
+        <b>if</b>(name){
+            st[name] = st[subIndex];
+        }
+        st[subIndex].tpl.compile();
+        st[subIndex].tpl.call = <b>this</b>.call.createDelegate(<b>this</b>);
+        subIndex++;
+    }
+    <b>this</b>.subCount = subIndex;
+    <b>this</b>.subs = st;
+};
+Ext.extend(Ext.MasterTemplate, Ext.Template, {
+    <i>/**
+    * The regular expression used to match sub templates 
+    * @type RegExp
+    * @property 
+    */</i>
+    subTemplateRe : /&lt;tpl(?:\sname=&quot;([\w-]+)&quot;)?&gt;((?:.|\n)*?)&lt;\/tpl&gt;/gi,
+    
+    <i>/**
+     * Applies the passed values to a child template.
+     * @param {String/Number} name (optional) The name or index of the child template
+     * @param {Array/Object} values The values to be applied to the template
+     * @<b>return</b> {MasterTemplate} <b>this</b>
+     */</i>
+     add : <b>function</b>(name, values){
+        <b>if</b>(arguments.length == 1){
+            values = arguments[0];
+            name = 0;
+        }
+        <b>var</b> s = <b>this</b>.subs[name];
+        s.buffer[s.buffer.length] = s.tpl.apply(values);
+        <b>return</b> this;
+    },
+    
+    <i>/**
+     * Applies all the passed values to a child template.
+     * @param {String/Number} name (optional) The name or index of the child template
+     * @param {Array} values The values to be applied to the template, <b>this</b> should be an array of objects.
+     * @param {Boolean} reset (optional) True to reset the template first
+     * @<b>return</b> {MasterTemplate} <b>this</b>
+     */</i>
+    fill : <b>function</b>(name, values, reset){
+        <b>var</b> a = arguments;
+        <b>if</b>(a.length == 1 || (a.length == 2 &amp;&amp; <b>typeof</b> a[1] == &quot;boolean&quot;)){
+            values = a[0];
+            name = 0;
+            reset = a[1];
+        }
+        <b>if</b>(reset){
+            <b>this</b>.reset();
+        }
+        <b>for</b>(var i = 0, len = values.length; i &lt; len; i++){
+            <b>this</b>.add(name, values[i]);
+        }
+        <b>return</b> this;
+    },
+    
+    <i>/**
+     * Resets the template <b>for</b> reuse
+     * @<b>return</b> {MasterTemplate} <b>this</b>
+     */</i>
+     reset : <b>function</b>(){
+        <b>var</b> s = <b>this</b>.subs;
+        <b>for</b>(var i = 0; i &lt; <b>this</b>.subCount; i++){
+            s[i].buffer = [];
+        }
+        <b>return</b> this;
+    },
+    
+    applyTemplate : <b>function</b>(values){
+        <b>var</b> s = <b>this</b>.subs;
+        <b>var</b> replaceIndex = -1;
+        <b>this</b>.html = <b>this</b>.originalHtml.replace(<b>this</b>.subTemplateRe, <b>function</b>(m, name){
+            <b>return</b> s[++replaceIndex].buffer.join(&quot;&quot;);
+        });
+        <b>return</b> Ext.MasterTemplate.superclass.applyTemplate.call(<b>this</b>, values);
+    },
+    
+    apply : <b>function</b>(){
+        <b>return</b> this.applyTemplate.apply(<b>this</b>, arguments);
+    },
+    
+    compile : <b>function</b>(){<b>return</b> this;}
+});
+
+<i>/**
+ * Alias <b>for</b> fill().
+ * @method
+ */</i>
+Ext.MasterTemplate.prototype.addAll = Ext.MasterTemplate.prototype.fill;
+ <i>/**
+ * Creates a template from the passed element's value (display:none textarea, preferred) or innerHTML. e.g.
+ * <b>var</b> tpl = Ext.MasterTemplate.from('element-id');
+ * @param {String/HTMLElement} el
+ * @static
+ */</i>
+Ext.MasterTemplate.from = <b>function</b>(el){
+    el = Ext.getDom(el);
+    <b>return</b> new Ext.MasterTemplate(el.value || el.innerHTML);  
+};</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

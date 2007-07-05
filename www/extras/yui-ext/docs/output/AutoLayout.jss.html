@@ -1,0 +1,27 @@
+<html><head><title>AutoLayout.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>AutoLayout.js</h1><pre class="highlighted"><code>Ext.layout.FitLayout = Ext.extend(Ext.layout.ContainerLayout, {
+    monitorResize:true,    
+    onLayout : <b>function</b>(ct, target){
+        Ext.layout.FitLayout.superclass.onLayout.call(<b>this</b>, ct, target);
+        <b>var</b> item = <b>this</b>.activeItem || ct.items.itemAt(0);
+        <b>if</b>(item){
+            item.setSize(target.getSize(true));
+        }
+    }
+});
+
+Ext.layout.CardLayout = Ext.extend(Ext.layout.FitLayout, {
+    renderHidden : true,
+    setActiveItem : <b>function</b>(item){
+        item = <b>this</b>.container.getComponent(item);
+        <b>if</b>(this.activeItem != item){
+            <b>if</b>(this.activeItem){
+                <b>this</b>.activeItem.hide();
+            }
+            <b>this</b>.activeItem = item;
+            item.show();
+            <b>this</b>.layout();
+        }
+    }
+});
+</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

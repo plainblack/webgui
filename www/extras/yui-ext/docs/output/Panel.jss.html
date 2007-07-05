@@ -1,0 +1,547 @@
+<html><head><title>Panel.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>Panel.js</h1><pre class="highlighted"><code>Ext.Panel = <b>function</b>(config){
+    Ext.Panel.superclass.constructor.call(<b>this</b>, config);
+};
+
+Ext.extend(Ext.Panel, Ext.Container, {
+    baseCls : 'x-panel',
+    collapsedCls : 'x-panel-collapsed',
+    elements : 'header,body,footer',
+    maskDisabled: true,
+    collapsed : false,
+    animCollapse:Ext.enableFx,
+    toolTarget : 'header',
+    headerAsText:true,
+    buttonAlign:'right',
+    <i>/**
+     * @cfg {Number} minButtonWidth Minimum width of all buttons (defaults to 75)
+     */</i>
+    minButtonWidth:75,
+
+    initComponent : <b>function</b>(){
+        Ext.Panel.superclass.initComponent.call(<b>this</b>);
+        <b>this</b>.addEvents({
+            bodyresize : true,
+            titlechange: true,
+            collapse : true,
+            expand:true,
+            beforecollapse : true,
+            beforeexpand:true,
+
+            <i>// these 4 events are only fired <b>if</b> used within</i>
+            <i>// a container that supports them</i>
+            beforeclose: true,
+            close: true,
+            activate: true,
+            deactivate: true
+        });
+
+        <i>// shortcuts</i>
+        <b>if</b>(this.tbar){
+            <b>this</b>.elements += ',tbar';
+            <b>if</b>(typeof <b>this</b>.tbar == 'object'){
+                <b>this</b>.topToolbar = <b>this</b>.tbar;
+            }
+            <b>delete</b> this.tbar;
+        }
+        <b>if</b>(this.bbar){
+            <b>this</b>.elements += ',bbar';
+            <b>if</b>(typeof <b>this</b>.bbar == 'object'){
+                <b>this</b>.bottomToolbar = <b>this</b>.bbar;
+            }
+            <b>delete</b> this.bbar;
+        }
+
+        <b>if</b>(this.buttons){
+            <b>var</b> btns = <b>this</b>.buttons;
+            <b>delete</b> this.buttons;
+            <b>for</b>(var i = 0, len = btns.length; i &lt; len; i++) {
+                <b>this</b>.addButton(btns[i]);
+            }
+        }
+    },
+
+    <i>// private, notify box <b>this</b> class will handle heights</i>
+    deferHeight:true,
+
+    createElement : <b>function</b>(name, pnode){
+        <b>if</b>(name !== 'bwrap' &amp;&amp; <b>this</b>.elements.indexOf(name) == -1){
+            <b>return</b>;
+        }
+        <b>if</b>(this[name]){
+            pnode.appendChild(<b>this</b>[name].dom);
+        }<b>else</b>{
+            <b>if</b>(this[name+'Cfg']){
+                <b>this</b>[name] = Ext.fly(pnode).createChild(<b>this</b>[name+'Cfg']);
+            }<b>else</b>{
+                <b>var</b> el = document.createElement('div');
+                el.className = <b>this</b>[name+'Cls'];
+                <b>this</b>[name] = Ext.get(pnode.appendChild(el));
+            }
+        }
+    },
+
+    onRender : <b>function</b>(ct, position){
+        Ext.Panel.superclass.onRender.call(<b>this</b>, ct, position);
+
+        <b>this</b>.createClasses();
+
+        <b>if</b>(this.el){ <i>// existing markup</i>
+            <b>this</b>.header = <b>this</b>.el.down('.'+<b>this</b>.headerCls);
+            <b>this</b>.bwrap = <b>this</b>.el.down('.'+<b>this</b>.bwrapCls);
+            <b>var</b> cp = <b>this</b>.bwrap ? <b>this</b>.bwrap : <b>this</b>.el;
+            <b>this</b>.tbar = cp.down('.'+<b>this</b>.tbarCls);
+            <b>this</b>.body = cp.down('.'+<b>this</b>.bodyCls);
+            <b>this</b>.bbar = cp.down('.'+<b>this</b>.bbarCls);
+            <b>this</b>.footer = cp.down('.'+<b>this</b>.footerCls);
+        }<b>else</b>{
+            <b>this</b>.el = ct.createChild({
+                id: <b>this</b>.id,
+                cls: <b>this</b>.baseCls
+            }, position);
+        }
+        <b>var</b> el = <b>this</b>.el, d = el.dom;
+        <b>if</b>(this.cls){
+            <b>this</b>.el.addClass(<b>this</b>.cls);
+        }
+        <i>// This block allows <b>for</b> maximum flexibility and performance when using existing markup</i>
+
+        <i>// framing requires special markup</i>
+        <b>if</b>(this.frame){
+            el.insertHtml('afterBegin', String.format(Ext.Element.boxMarkup, <b>this</b>.baseCls));
+
+            <b>this</b>.createElement('header', d.firstChild.firstChild.firstChild);
+            <b>this</b>.createElement('bwrap', d);
+
+            <i>// append the mid and bottom frame to the bwrap</i>
+            <b>var</b> bw = <b>this</b>.bwrap.dom;
+            <b>var</b> ml = d.childNodes[1], bl = d.childNodes[2];
+            bw.appendChild(ml);
+            bw.appendChild(bl);
+
+            <b>var</b> mc = bw.firstChild.firstChild.firstChild;
+            <b>this</b>.createElement('tbar', mc);
+            <b>this</b>.createElement('body', mc);
+            <b>this</b>.createElement('bbar', mc);
+            <b>this</b>.createElement('footer', bw.lastChild.firstChild.firstChild);
+        }<b>else</b>{
+            <b>this</b>.createElement('header', d);
+            <b>this</b>.createElement('bwrap', d);
+
+            <i>// append the mid and bottom frame to the bwrap</i>
+            <b>var</b> bw = <b>this</b>.bwrap.dom;
+            <b>this</b>.createElement('tbar', bw);
+            <b>this</b>.createElement('body', bw);
+            <b>this</b>.createElement('bbar', bw);
+            <b>this</b>.createElement('footer', bw);
+
+            <b>if</b>(!<b>this</b>.header){
+                <b>this</b>.body.addClass(<b>this</b>.bodyCls + '-noheader');
+            }
+        }
+
+        <b>this</b>.bwrap.enableDisplayMode('block');
+
+        <b>if</b>(this.header){
+            <b>this</b>.header.unselectable();
+        }
+
+        <b>if</b>(this.iconCls){
+            <b>this</b>.header.addClass('x-panel-icon '+<b>this</b>.iconCls);
+        }
+
+        <b>if</b>(this.ownerCt){
+            <b>this</b>.el.addClass(<b>this</b>.baseCls + '-nested');
+        }
+
+        <i>// <b>for</b> tools, we need to wrap any existing header markup</i>
+        <b>if</b>(this.header &amp;&amp; <b>this</b>.headerAsText){
+            <b>this</b>.header.dom.innerHTML =
+                '&lt;span class=&quot;' + <b>this</b>.headerTextCls + '&quot;&gt;'+<b>this</b>.header.dom.innerHTML+'&lt;/span&gt;';
+        }
+        <b>if</b>(this.floating){
+            <b>this</b>.el = <b>new</b> Ext.Layer(
+                <b>typeof</b> this.floating == 'object' ? <b>this</b>.floating : {
+                    shadow:<b>this</b>.shadow||'sides', constrain:false, shim: <b>this</b>.shim === false ? false : undefined
+                }, <b>this</b>.el
+            );
+        }
+        <b>if</b>(this.collapsible){
+            <b>this</b>.tools = <b>this</b>.tools || [];
+            <b>this</b>.tools.unshift({
+                id: 'toggle',
+                on : {
+                    'click' : <b>this</b>.toggleCollapse,
+                    'scope': <b>this</b>
+                }
+            });
+        }
+        <b>if</b>(this.tools){
+            <b>var</b> ts = <b>this</b>.tools;
+            <b>this</b>.tools = {};
+            <b>this</b>.addTool.apply(<b>this</b>, ts);
+        }<b>else</b>{
+            <b>this</b>.tools = {};
+        }
+
+        <b>if</b>(this.buttons &amp;&amp; <b>this</b>.buttons.length &gt; 0){
+            <i>// tables are required to maintain order and <b>for</b> correct IE layout</i>
+            <b>var</b> tb = <b>this</b>.footer.createChild({cls:'x-panel-btns-ct', cn: {
+                cls:&quot;x-panel-btns x-panel-btns-&quot;+<b>this</b>.buttonAlign,
+                html:'&lt;table cellspacing=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;x-clear&quot;&gt;&lt;/div&gt;'
+            }}, null, true);
+            <b>var</b> tr = tb.getElementsByTagName('tr')[0];
+            <b>for</b>(var i = 0, len = <b>this</b>.buttons.length; i &lt; len; i++) {
+                <b>var</b> b = <b>this</b>.buttons[i];
+                <b>var</b> td = document.createElement('td');
+                td.className = 'x-panel-btn-td';
+                b.render(tr.appendChild(td));
+            }
+        }
+
+        <b>if</b>(this.tbar &amp;&amp; <b>this</b>.topToolbar){
+            <b>if</b>(this.topToolbar instanceof Array){
+                <b>this</b>.topToolbar = <b>new</b> Ext.Toolbar(<b>this</b>.topToolbar);
+            }
+            <b>this</b>.topToolbar.render(<b>this</b>.tbar);
+        }
+        <b>if</b>(this.bbar &amp;&amp; <b>this</b>.bottomToolbar){
+            <b>if</b>(this.bottomToolbar instanceof Array){
+                <b>this</b>.bottomToolbar = <b>new</b> Ext.Toolbar(<b>this</b>.bottomToolbar);
+            }
+            <b>this</b>.bottomToolbar.render(<b>this</b>.bbar);
+        }
+    },
+
+    <i>// must be called before rendering</i>
+    addButton : <b>function</b>(config, handler, scope){
+        <b>var</b> bc = {
+            handler: handler,
+            scope: scope,
+            minWidth: <b>this</b>.minButtonWidth,
+            hideParent:true
+        };
+        <b>if</b>(typeof config == &quot;string&quot;){
+            bc.text = config;
+        }<b>else</b>{
+            Ext.apply(bc, config);
+        }
+        <b>var</b> btn = <b>new</b> Ext.Button(null, bc);
+        <b>if</b>(!<b>this</b>.buttons){
+            <b>this</b>.buttons = [];
+        }
+        <b>this</b>.buttons.push(btn);
+        <b>return</b> btn;
+    },
+
+    addTool : <b>function</b>(){
+        <b>if</b>(!<b>this</b>.toolTemplate){
+            <i>// initialize the global tool template on first use</i>
+            <b>var</b> tt = <b>new</b> Ext.Template(
+                 '&lt;div class=&quot;x-tool x-tool-{id}&quot;&gt;&amp;#160&lt;/div&gt;'
+            );
+            tt.disableFormats = true;
+            tt.compile();
+            Ext.Panel.prototype.toolTemplate = tt;
+        }
+        <b>for</b>(var i = 0, a = arguments, len = a.length; i &lt; len; i++) {
+            <b>var</b> tc = a[i];
+            <b>var</b> t = <b>this</b>.toolTemplate.insertFirst(<b>this</b>[this.toolTarget], tc, true);
+            <b>this</b>.tools[tc.id] = t;
+            t.enableDisplayMode('block');
+            <b>if</b>(tc.on){
+                t.on(tc.on);
+            }
+            <b>if</b>(tc.hidden){
+                t.hide();
+            }
+            t.addClassOnOver('x-tool-'+tc.id+'-over');
+        }
+    },
+
+    afterRender : <b>function</b>(){
+        <b>if</b>(this.floating &amp;&amp; !<b>this</b>.hidden &amp;&amp; !<b>this</b>.initHidden){
+            <b>this</b>.el.show();
+        }
+        <b>if</b>(this.title){
+            <b>this</b>.setTitle(<b>this</b>.title);
+        }
+        <b>if</b>(this.autoScroll){
+            <b>this</b>.body.dom.style.overflow = 'auto';
+        }
+        <b>if</b>(this.html){
+            <b>this</b>.body.update(<b>this</b>.html);
+            <b>delete</b> this.html;
+        }
+        <b>if</b>(this.contentEl){
+            <b>this</b>.body.dom.appendChild(Ext.getDom(<b>this</b>.contentEl));
+        }
+        <b>if</b>(this.loadContent){
+            <b>this</b>.load.defer(10, <b>this</b>, [<b>this</b>.loadContent]);
+            <b>delete</b> this.loadContent;
+        }
+        <b>if</b>(this.collapsed){
+            <b>this</b>.collapsed = false;
+            <b>this</b>.collapse(false);
+        }
+        Ext.Panel.superclass.afterRender.call(<b>this</b>); <i>// <b>do</b> sizing calcs last</i>
+        <b>this</b>.initEvents();
+    },
+
+    initEvents : <b>function</b>(){
+
+    },
+
+    beforeEffect : <b>function</b>(){
+        <b>if</b>(this.floating){
+            <b>this</b>.el.beforeAction();
+        }
+        <b>if</b>(Ext.isGecko){
+            <b>this</b>.body.clip();
+        }
+    },
+
+    afterEffect : <b>function</b>(){
+        <b>this</b>.syncShadow();
+        <b>if</b>(Ext.isGecko){
+            <b>this</b>.body.unclip();
+        }
+    },
+
+    <i>// private - wraps up an animation param <b>with</b> internal callbacks</i>
+    createEffect : <b>function</b>(a, cb, scope){
+        <b>var</b> o = {
+            scope:scope,
+            block:true
+        };
+        <b>if</b>(a === true){
+            o.callback = cb;
+            <b>return</b> o;
+        }<b>else</b> if(!a.callback){
+            o.callback = cb;
+        }<b>else</b> { <i>// wrap it up</i>
+            o.callback = <b>function</b>(){
+                cb.call(scope);
+                Ext.callback(a.callback, a.scope);
+            };
+        }
+        <b>return</b> Ext.applyIf(o, a);
+    },
+
+    collapse : <b>function</b>(animate){
+        <b>if</b>(this.collapsed || <b>this</b>.el.hasFxBlock() || <b>this</b>.fireEvent('beforecollapse', <b>this</b>, animate) === false){
+            <b>return</b>;
+        }
+        <b>var</b> a = animate === true || (animate !== false &amp;&amp; <b>this</b>.animCollapse);
+        <b>this</b>.beforeEffect();
+        <b>if</b>(a){
+            <b>this</b>.bwrap.slideOut('t', <b>this</b>.createEffect(a, <b>this</b>.afterCollapse, <b>this</b>));
+        }<b>else</b>{
+            <b>this</b>.bwrap.hide();
+            <b>this</b>.afterCollapse();
+        }
+        <b>return</b> this;
+    },
+
+    afterCollapse : <b>function</b>(){
+        <b>this</b>.collapsed = true;
+        <b>this</b>.el.addClass(<b>this</b>.collapsedCls);
+        <b>this</b>.afterEffect();
+        <b>this</b>.fireEvent('collapse', <b>this</b>);
+    },
+
+    expand : <b>function</b>(animate){
+        <b>if</b>(!<b>this</b>.collapsed || <b>this</b>.el.hasFxBlock() || <b>this</b>.fireEvent('beforeexpand', <b>this</b>, animate) === false){
+            <b>return</b>;
+        }
+        <b>var</b> a = animate === true || (animate !== false &amp;&amp; <b>this</b>.animCollapse);
+        <b>this</b>.el.removeClass(<b>this</b>.collapsedCls);
+        <b>this</b>.beforeEffect();
+        <b>if</b>(a){
+            <b>this</b>.bwrap.slideIn('t', <b>this</b>.createEffect(a, <b>this</b>.afterExpand, <b>this</b>));
+        }<b>else</b>{
+            <b>this</b>.bwrap.show();
+            <b>this</b>.afterExpand();
+        }
+        <b>return</b> this;
+    },
+
+    afterExpand : <b>function</b>(){
+        <b>this</b>.collapsed = false;
+        <b>this</b>.afterEffect();
+        <b>this</b>.fireEvent('expand', <b>this</b>);
+    },
+
+    toggleCollapse : <b>function</b>(animate){
+        <b>this</b>[this.collapsed ? 'expand' : 'collapse'](animate);
+        <b>return</b> this;
+    },
+
+    onDisable : <b>function</b>(){
+        <b>if</b>(this.rendered &amp;&amp; <b>this</b>.maskDisabled){
+            <b>this</b>.el.mask();
+        }
+        Ext.Panel.superclass.onDisable.call(<b>this</b>);
+    },
+
+    onEnable : <b>function</b>(){
+        <b>if</b>(this.rendered &amp;&amp; <b>this</b>.maskDisabled){
+            <b>this</b>.el.unmask();
+        }
+        Ext.Panel.superclass.onEnable.call(<b>this</b>);
+    },
+
+    onResize : <b>function</b>(w, h){
+        <b>if</b>(w !== undefined || h !== undefined){
+            <b>if</b>(typeof w == 'number'){
+                <b>this</b>.body.setWidth(w - <b>this</b>.getFrameWidth());
+            }<b>else</b> if(w == 'auto'){
+                <b>this</b>.body.setWidth(w);
+            }
+
+            <b>if</b>(typeof h == 'number'){
+                <b>this</b>.body.setHeight(h - <b>this</b>.getFrameHeight());
+            }<b>else</b> if(h == 'auto'){
+                <b>this</b>.body.setHeight(h);
+            }
+            <b>this</b>.syncShadow();
+            <b>this</b>.fireEvent('bodyresize', <b>this</b>, w, h);
+        }
+    },
+
+    onPosition : <b>function</b>(){
+        <b>this</b>.syncShadow();
+    },
+
+    getFrameWidth : <b>function</b>(){
+        <b>var</b> w = <b>this</b>.el.getFrameWidth('lr');
+
+        <b>if</b>(this.frame){
+            <b>var</b> l = <b>this</b>.bwrap.dom.firstChild;
+            w += (Ext.fly(l).getFrameWidth('l') + Ext.fly(l.firstChild).getFrameWidth('r'));
+            <b>var</b> mc = <b>this</b>.bwrap.dom.firstChild.firstChild.firstChild;
+            w += Ext.fly(mc).getFrameWidth('lr');
+        }
+        <b>return</b> w;
+    },
+
+    getFrameHeight : <b>function</b>(){
+        <b>var</b> h  = <b>this</b>.el.getFrameWidth('tb');
+        h += (<b>this</b>.tbar ? <b>this</b>.tbar.getHeight() : 0) +
+             (<b>this</b>.bbar ? <b>this</b>.bbar.getHeight() : 0);
+
+        <b>if</b>(this.frame){
+            <b>var</b> hd = <b>this</b>.el.dom.firstChild;
+            <b>var</b> ft = <b>this</b>.bwrap.dom.lastChild;
+            h += (hd.offsetHeight + ft.offsetHeight);
+            <b>var</b> mc = <b>this</b>.bwrap.dom.firstChild.firstChild.firstChild;
+            h += Ext.fly(mc).getFrameWidth('tb');
+        }<b>else</b>{
+            h += (<b>this</b>.header ? <b>this</b>.header.getHeight() : 0) +
+                (<b>this</b>.footer ? <b>this</b>.footer.getHeight() : 0);
+        }
+        <b>return</b> h;
+    },
+
+    getInnerWidth : <b>function</b>(){
+        <b>return</b> this.getSize().width - <b>this</b>.getFrameWidth();
+    },
+
+    getInnerHeight : <b>function</b>(){
+        <b>return</b> this.getSize().height - <b>this</b>.getFrameHeight();
+    },
+
+    syncShadow : <b>function</b>(){
+        <b>if</b>(this.floating){
+            <b>this</b>.el.sync(true);
+        }
+    },
+
+    getLayoutTarget : <b>function</b>(){
+        <b>return</b> this.body;
+    },
+
+    setTitle : <b>function</b>(title){
+        <b>this</b>.title = title;
+        <b>if</b>(this.header &amp;&amp; <b>this</b>.headerAsText){
+            <b>this</b>.header.child('span').update(title);
+            <b>this</b>.fireEvent('titlechange', <b>this</b>, title);
+        }
+        <b>return</b> this;
+    },
+
+    <i>/**
+     * Get the {@link Ext.UpdateManager} <b>for</b> this panel. Enables you to perform Ajax updates.
+     * @<b>return</b> {Ext.UpdateManager} The UpdateManager
+     */</i>
+    getUpdateManager : <b>function</b>(){
+        <b>return</b> this.body.getUpdateManager();
+    },
+
+     <i>/**
+     * Loads <b>this</b> content panel immediately <b>with</b> content from XHR.
+     * @param {Object/String/Function} config A config object containing any of the following options:
+&lt;pre&gt;&lt;code&gt;
+panel.load({&lt;br/&gt;
+    url: &quot;your-url.php&quot;,&lt;br/&gt;
+    params: {param1: &quot;foo&quot;, param2: &quot;bar&quot;}, <i>// or a URL encoded string&lt;br/&gt;</i>
+    callback: yourFunction,&lt;br/&gt;
+    scope: yourObject, <i>//(optional scope)  &lt;br/&gt;</i>
+    discardUrl: false, &lt;br/&gt;
+    nocache: false,&lt;br/&gt;
+    text: &quot;Loading...&quot;,&lt;br/&gt;
+    timeout: 30,&lt;br/&gt;
+    scripts: false&lt;br/&gt;
+});
+&lt;/code&gt;&lt;/pre&gt;
+     * The only required property is url. The optional properties nocache, text and scripts
+     * are shorthand <b>for</b> disableCaching, indicatorText and loadScripts and are used to set their
+     * associated property on <b>this</b> panel UpdateManager instance.
+     * @<b>return</b> {Ext.Panel} <b>this</b>
+     */</i>
+    load : <b>function</b>(){
+        <b>var</b> um = <b>this</b>.body.getUpdateManager();
+        um.update.apply(um, arguments);
+        <b>return</b> this;
+    },
+
+    beforeDestroy : <b>function</b>(){
+        Ext.Element.uncache(
+            <b>this</b>.header,
+            <b>this</b>.tbar,
+            <b>this</b>.bbar,
+            <b>this</b>.footer,
+            <b>this</b>.body
+        );
+    },
+
+    createClasses : <b>function</b>(){
+        <b>this</b>.headerCls = <b>this</b>.baseCls + '-header';
+        <b>this</b>.headerTextCls = <b>this</b>.baseCls + '-header-text';
+        <b>this</b>.bwrapCls = <b>this</b>.baseCls + '-bwrap';
+        <b>this</b>.tbarCls = <b>this</b>.baseCls + '-tbar';
+        <b>this</b>.bodyCls = <b>this</b>.baseCls + '-body';
+        <b>this</b>.bbarCls = <b>this</b>.baseCls + '-bbar';
+        <b>this</b>.footerCls = <b>this</b>.baseCls + '-footer';
+    },
+
+    createGhost : <b>function</b>(cls, useShim, preventAppend){
+        <b>var</b> el = document.createElement('div');
+        el.className = 'x-panel-ghost ' + (cls ? cls : '');
+        <b>if</b>(this.header){
+            el.appendChild(<b>this</b>.el.dom.firstChild.cloneNode(true));
+        }
+        Ext.fly(el.appendChild(document.createElement('ul'))).setSize(<b>this</b>.bwrap.getSize());
+        <b>if</b>(!preventAppend){
+            <b>this</b>.container.dom.appendChild(el);
+        }
+        <b>if</b>(useShim !== false &amp;&amp; <b>this</b>.el.useShim !== false){
+            <b>var</b> layer = <b>new</b> Ext.Layer({shadow:false, useDisplay:true, constrain:false}, el);
+            layer.show();
+            <b>return</b> layer;
+        }<b>else</b>{
+            <b>return</b> new Ext.Element(el);
+        }
+    }
+});
+</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

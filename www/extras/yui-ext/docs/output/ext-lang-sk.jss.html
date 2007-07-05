@@ -1,0 +1,174 @@
+<html><head><title>ext-lang-sk.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>ext-lang-sk.js</h1><pre class="highlighted"><code><i>/**
+ * List compiled by mystix on the extjs.com forums.
+ * Thank you Mystix!
+ */</i>
+<i>// holder</i>
+<i>/**  Translation to Slovak by Michal Thomka
+  *  14 April 2007
+  */</i>
+
+Ext.UpdateManager.defaults.indicatorText = '&lt;div class=&quot;loading-indicator&quot;&gt;Nahr&aacute;vam...&lt;/div&gt;';
+
+<b>if</b>(Ext.View){
+   Ext.View.prototype.emptyText = &quot;&quot;;
+}
+
+<b>if</b>(Ext.grid.Grid){
+   Ext.grid.Grid.prototype.ddText = &quot;{0} ozna&egrave;en&yacute;ch riadkov&quot;;
+}
+
+<b>if</b>(Ext.TabPanelItem){
+   Ext.TabPanelItem.prototype.closeText = &quot;Zavrieù t&uacute;to z&aacute;loûku&quot;;
+}
+
+<b>if</b>(Ext.form.Field){
+   Ext.form.Field.prototype.invalidText = &quot;Hodnota v tomto poli je nespr&aacute;vna&quot;;
+}
+
+Date.monthNames = [
+   &quot;Janu&aacute;r&quot;,
+   &quot;Febru&aacute;r&quot;,
+   &quot;Marec&quot;,
+   &quot;Apr&iacute;l&quot;,
+   &quot;M&aacute;j&quot;,
+   &quot;J&uacute;n&quot;,
+   &quot;J&uacute;l&quot;,
+   &quot;August&quot;,
+   &quot;September&quot;,
+   &quot;Okt&oacute;ber&quot;,
+   &quot;November&quot;,
+   &quot;December&quot;
+];
+
+Date.dayNames = [
+   &quot;Nede&frac34;a&quot;,
+   &quot;Pondelok&quot;,
+   &quot;Utorok&quot;,
+   &quot;Streda&quot;,
+   &quot;ätvrtok&quot;,
+   &quot;Piatok&quot;,
+   &quot;Sobota&quot;
+];
+
+<b>if</b>(Ext.MessageBox){
+   Ext.MessageBox.buttonText = {
+      ok     : &quot;OK&quot;,
+      cancel : &quot;Zruöiù&quot;,
+      yes    : &quot;&Aacute;no&quot;,
+      no     : &quot;Nie&quot;
+   };
+}
+
+<b>if</b>(Ext.util.Format){
+   Ext.util.Format.date = <b>function</b>(v, format){
+      <b>if</b>(!v) <b>return</b> &quot;&quot;;
+      <b>if</b>(!(v instanceof Date)) v = <b>new</b> Date(Date.parse(v));
+      <b>return</b> v.dateFormat(format || &quot;m/d/R&quot;);
+   };
+}
+
+
+<b>if</b>(Ext.DatePicker){
+   Ext.apply(Ext.DatePicker.prototype, {
+      todayText         : &quot;Dnes&quot;,
+      minText           : &quot;Tento d&aacute;tum je menö&iacute; ako minim&aacute;lny moûn&yacute; d&aacute;tum&quot;,
+      maxText           : &quot;Tento d&aacute;tum je v&auml;&egrave;ö&iacute; ako maxim&aacute;lny moûn&yacute; d&aacute;tum&quot;,
+      disabledDaysText  : &quot;&quot;,
+      disabledDatesText : &quot;&quot;,
+      monthNames        : Date.monthNames,
+      dayNames          : Date.dayNames,
+      nextText          : '&Iuml;alö&iacute; Mesiac (Control+Doprava)',
+      prevText          : 'Predch. Mesiac (Control+Do&frac34;ava)',
+      monthYearText     : 'Vyberte Mesiac (Control+Hore/Dole pre posun rokov)',
+      todayTip          : &quot;{0} (Medzern&iacute;k)&quot;,
+      format            : &quot;m/d/r&quot;
+   });
+}
+
+
+<b>if</b>(Ext.PagingToolbar){
+   Ext.apply(Ext.PagingToolbar.prototype, {
+      beforePageText : &quot;Strana&quot;,
+      afterPageText  : &quot;z {0}&quot;,
+      firstText      : &quot;Prv&aacute; Strana&quot;,
+      prevText       : &quot;Predch. Strana&quot;,
+      nextText       : &quot;&Iuml;alöia Strana&quot;,
+      lastText       : &quot;Posledn&aacute; strana&quot;,
+      refreshText    : &quot;Obnoviù&quot;,
+      displayMsg     : &quot;Zobrazujem {0} - {1} z {2}&quot;,
+      emptyMsg       : 'éiadne d&aacute;ta'
+   });
+}
+
+
+<b>if</b>(Ext.form.TextField){
+   Ext.apply(Ext.form.TextField.prototype, {
+      minLengthText : &quot;Minim&aacute;lna d&aring;ûka pre toto pole je {0}&quot;,
+      maxLengthText : &quot;Maxim&aacute;lna d&aring;ûka pre toto pole je {0}&quot;,
+      blankText     : &quot;Toto pole je povinn&eacute;&quot;,
+      regexText     : &quot;&quot;,
+      emptyText     : null
+   });
+}
+
+<b>if</b>(Ext.form.NumberField){
+   Ext.apply(Ext.form.NumberField.prototype, {
+      minText : &quot;Minim&aacute;lna hodnota pre toto pole je {0}&quot;,
+      maxText : &quot;Maxim&aacute;lna hodnota pre toto pole je {0}&quot;,
+      nanText : &quot;{0} je nespr&aacute;vne &egrave;&iacute;slo&quot;
+   });
+}
+
+<b>if</b>(Ext.form.DateField){
+   Ext.apply(Ext.form.DateField.prototype, {
+      disabledDaysText  : &quot;Zablokovan&eacute;&quot;,
+      disabledDatesText : &quot;Zablokovan&eacute;&quot;,
+      minText           : &quot;D&aacute;tum v tomto poli mus&iacute; byù aû po {0}&quot;,
+      maxText           : &quot;D&aacute;tum v tomto poli mus&iacute; byù pred {0}&quot;,
+      invalidText       : &quot;{0} nie je spr&aacute;vny d&aacute;tum - mus&iacute; byù vo form&aacute;te {1}&quot;,
+      format            : &quot;m/d/r&quot;
+   });
+}
+
+<b>if</b>(Ext.form.ComboBox){
+   Ext.apply(Ext.form.ComboBox.prototype, {
+      loadingText       : &quot;Nahr&aacute;vam...&quot;,
+      valueNotFoundText : undefined
+   });
+}
+
+<b>if</b>(Ext.form.VTypes){
+   Ext.apply(Ext.form.VTypes, {
+      emailText    : 'Toto pole mus&iacute; byù e-mailov&aacute; adresa vo form&aacute;te &quot;user@domain.com&quot;',
+      urlText      : 'Toto pole mus&iacute; byù URL vo form&aacute;te &quot;http:/'+'/www.domain.com&quot;',
+      alphaText    : 'Toto po&frac34;e moûe obsahovaù iba p&iacute;smen&aacute; a znak _',
+      alphanumText : 'Toto po&frac34;e moûe obsahovaù iba p&iacute;smen&aacute;,&egrave;&iacute;sla a znak _'
+   });
+}
+
+<b>if</b>(Ext.grid.GridView){
+   Ext.apply(Ext.grid.GridView.prototype, {
+      sortAscText  : &quot;Zoradiù vzostupne&quot;,
+      sortDescText : &quot;Zoradiù zostupne&quot;,
+      lockText     : &quot;Zamkn&uacute;ù st&aring;pec&quot;,
+      unlockText   : &quot;Odomkn&uacute;ù st&frac34;pec&quot;,
+      columnsText  : &quot;St&aring;pce&quot;
+   });
+}
+
+<b>if</b>(Ext.grid.PropertyColumnModel){
+   Ext.apply(Ext.grid.PropertyColumnModel.prototype, {
+      nameText   : &quot;N&aacute;zov&quot;,
+      valueText  : &quot;Hodnota&quot;,
+      dateFormat : &quot;m/j/Y&quot;
+   });
+}
+
+<b>if</b>(Ext.SplitLayoutRegion){
+   Ext.apply(Ext.SplitLayoutRegion.prototype, {
+      splitTip            : &quot;Potiahnite pre zmenu rozmeru&quot;,
+      collapsibleSplitTip : &quot;Potiahnite pre zmenu rozmeru. Dvojklikom schov&aacute;te.&quot;
+   });
+}
+</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

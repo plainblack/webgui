@@ -1,0 +1,194 @@
+<html><head><title>TriggerField.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>TriggerField.js</h1><pre class="highlighted"><code><i>/**
+ * @class Ext.form.TriggerField
+ * @extends Ext.form.TextField
+ * Provides a convenient wrapper <b>for</b> TextFields that adds a clickable trigger button (looks like a combobox by <b>default</b>).
+ * The trigger has no <b>default</b> action, so you must assign a <b>function</b> to implement the trigger click handler by
+ * overriding {@link #onTriggerClick}. You can create a TriggerField directly, as it renders exactly like a combobox
+ * <b>for</b> which you can provide a custom implementation.  For example:
+ * &lt;pre&gt;&lt;code&gt;
+<b>var</b> trigger = <b>new</b> Ext.form.TriggerField();
+trigger.onTriggerClick = myTriggerFn;
+trigger.applyTo('my-field');
+&lt;/code&gt;&lt;/pre&gt;
+ *
+ * However, <b>in</b> general you will most likely want to use TriggerField as the base class <b>for</b> a reusable component.
+ * {@link Ext.form.DateField} and {@link Ext.form.ComboBox} are perfect examples of <b>this</b>.
+ * @cfg {String} triggerClass An additional CSS class used to style the trigger button.  The trigger will always get the
+ * class 'x-form-trigger' by <b>default</b> and triggerClass will be &lt;b&gt;appended&lt;/b&gt; <b>if</b> specified.
+ * @constructor
+ * Create a <b>new</b> TriggerField.
+ * @param {Object} config Configuration options (valid {@Ext.form.TextField} config options will also be applied
+ * to the base TextField)
+ */</i>
+Ext.form.TriggerField = <b>function</b>(config){
+    Ext.form.TriggerField.superclass.constructor.call(<b>this</b>, config);
+    <b>this</b>.mimicing = false;
+    <b>this</b>.on('disable', <b>this</b>.disableWrapper, <b>this</b>);
+    <b>this</b>.on('enable', <b>this</b>.enableWrapper, <b>this</b>);
+};
+
+Ext.extend(Ext.form.TriggerField, Ext.form.TextField,  {
+    <i>/**
+     * @cfg {String/Object} autoCreate A DomHelper element spec, or true <b>for</b> a <b>default</b> element spec (defaults to
+     * {tag: &quot;input&quot;, type: &quot;text&quot;, size: &quot;16&quot;, autocomplete: &quot;off&quot;})
+     */</i>
+
+    <i>// private</i>
+    defaultAutoCreate : {tag: &quot;input&quot;, type: &quot;text&quot;, size: &quot;16&quot;, autocomplete: &quot;off&quot;},
+    <i>/**
+     * @cfg {Boolean} hideTrigger True to hide the trigger element and display only the base text field (defaults to false)
+     */</i>
+    hideTrigger:false,
+
+    <i>/** @cfg {Boolean} grow @hide */</i>
+<i>// holder</i>
+<i>/*** @cfg {Number} growMin @hide */</i>
+<i>// holder</i>
+<i>/*** @cfg {Number} growMax @hide */</i>
+<i>// holder</i>
+<i>/***
+     * @hide 
+     * @method
+     */</i>
+    autoSize: Ext.emptyFn,
+
+    monitorTab : true,
+
+    <i>// private</i>
+    customSize : true,
+
+    <i>// private</i>
+    setSize : <b>function</b>(w, h){
+        <b>if</b>(!<b>this</b>.wrap){
+            <b>this</b>.width = w;
+            <b>this</b>.height = h;
+            <b>return</b>;
+        }
+        <b>if</b>(w){
+            <b>var</b> wrapWidth = w;
+            w = w - <b>this</b>.trigger.getWidth();
+            Ext.form.TriggerField.superclass.setSize.call(<b>this</b>, w, h);
+            <b>this</b>.wrap.setWidth(wrapWidth);
+            <b>if</b>(this.onResize){
+                <b>this</b>.onResize(wrapWidth, h);
+            }
+        }<b>else</b>{
+            Ext.form.TriggerField.superclass.setSize.call(<b>this</b>, w, h);
+            <b>this</b>.wrap.setWidth(<b>this</b>.el.getWidth()+<b>this</b>.trigger.getWidth());
+        }
+    },
+
+    <i>// private</i>
+    alignErrorIcon : <b>function</b>(){
+        <b>this</b>.errorIcon.alignTo(<b>this</b>.wrap, 'tl-tr', [2, 0]);
+    },
+
+    <i>// private</i>
+    onRender : <b>function</b>(ct, position){
+        Ext.form.TriggerField.superclass.onRender.call(<b>this</b>, ct, position);
+        <b>this</b>.wrap = <b>this</b>.el.wrap({cls: &quot;x-form-field-wrap&quot;});
+        <b>this</b>.trigger = <b>this</b>.wrap.createChild({
+            tag: &quot;img&quot;, src: Ext.BLANK_IMAGE_URL, cls: &quot;x-form-trigger &quot;+<b>this</b>.triggerClass});
+        <b>this</b>.trigger.on(&quot;click&quot;, <b>this</b>.onTriggerClick, <b>this</b>, {preventDefault:true});
+        <b>this</b>.trigger.addClassOnOver('x-form-trigger-over');
+        <b>this</b>.trigger.addClassOnClick('x-form-trigger-click');
+        <b>if</b>(this.hideTrigger){
+            <b>this</b>.trigger.setDisplayed(false);
+        }
+        <b>this</b>.setSize(<b>this</b>.width||'', <b>this</b>.height||'');
+    },
+
+    onDestroy : <b>function</b>(){
+        <b>if</b>(this.trigger){
+            <b>this</b>.trigger.removeAllListeners();
+            <b>this</b>.trigger.remove();
+        }
+        <b>if</b>(this.wrap){
+            <b>this</b>.wrap.remove();
+        }
+        Ext.form.TriggerField.superclass.onDestroy.call(<b>this</b>);
+    },
+
+    <i>// private</i>
+    onFocus : <b>function</b>(){
+        Ext.form.TriggerField.superclass.onFocus.call(<b>this</b>);
+        <b>if</b>(!<b>this</b>.mimicing){
+            <b>this</b>.mimicing = true;
+            Ext.get(Ext.isIE ? document.body : document).on(&quot;mousedown&quot;, <b>this</b>.mimicBlur, <b>this</b>);
+            <b>if</b>(this.monitorTab){
+                <b>this</b>.el.on(&quot;keydown&quot;, <b>this</b>.checkTab, <b>this</b>);
+            }
+        }
+    },
+
+    <i>// private</i>
+    checkTab : <b>function</b>(e){
+        <b>if</b>(e.getKey() == e.TAB){
+            <b>this</b>.triggerBlur();
+        }
+    },
+
+    <i>// private</i>
+    onBlur : <b>function</b>(){
+        <i>// <b>do</b> nothing</i>
+    },
+
+    <i>// private</i>
+    mimicBlur : <b>function</b>(e, t){
+        <b>if</b>(!<b>this</b>.wrap.contains(t) &amp;&amp; <b>this</b>.validateBlur()){
+            <b>this</b>.triggerBlur();
+        }
+    },
+
+    <i>// private</i>
+    triggerBlur : <b>function</b>(){
+        <b>this</b>.mimicing = false;
+        Ext.get(Ext.isIE ? document.body : document).un(&quot;mousedown&quot;, <b>this</b>.mimicBlur);
+        <b>if</b>(this.monitorTab){
+            <b>this</b>.el.un(&quot;keydown&quot;, <b>this</b>.checkTab, <b>this</b>);
+        }
+        Ext.form.TriggerField.superclass.onBlur.call(<b>this</b>);
+    },
+
+    <i>// private</i>
+    <i>// This should be overriden by any subclass that needs to check whether or not the field can be blurred.</i>
+    validateBlur : <b>function</b>(e, t){
+        <b>return</b> true;
+    },
+
+    <i>// private</i>
+    disableWrapper : <b>function</b>(){
+        <b>if</b>(this.wrap){
+            <b>this</b>.wrap.addClass('x-item-disabled');
+        }
+    },
+
+    <i>// private</i>
+    enableWrapper : <b>function</b>(){
+        <b>if</b>(this.wrap){
+            <b>this</b>.wrap.removeClass('x-item-disabled');
+        }
+    },
+
+    <i>// private</i>
+    onShow : <b>function</b>(){
+        <b>if</b>(this.wrap){
+            <b>this</b>.wrap.dom.style.display = '';
+            <b>this</b>.wrap.dom.style.visibility = 'visible';
+        }
+    },
+
+    <i>// private</i>
+    onHide : <b>function</b>(){
+        <b>this</b>.wrap.dom.style.display = 'none';
+    },
+
+    <i>/**
+     * The <b>function</b> that should handle the trigger's click event.  This method does nothing by <b>default</b> until overridden
+     * by a handler implementation.
+     * @method
+     * @param {EventObject} e
+     */</i>
+    onTriggerClick : Ext.emptyFn
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

@@ -1,0 +1,160 @@
+<html><head><title>Container.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>Container.js</h1><pre class="highlighted"><code>Ext.Container = <b>function</b>(config){
+    Ext.Container.superclass.constructor.call(<b>this</b>, config);
+    <b>if</b>(this.renderTo){
+        <b>this</b>.render(<b>this</b>.renderTo);
+        <b>delete</b> this.renderTo;
+    }
+};
+
+Ext.extend(Ext.Container, Ext.BoxComponent, {
+    autoDestroy: true,
+
+    initComponent : <b>function</b>(){
+        Ext.Container.superclass.initComponent.call(<b>this</b>);
+
+        <b>this</b>.addEvents({
+            'beforeadd':true,
+            'beforeremove':true,
+            'add':true,
+            'remove':true
+        });
+
+        <b>var</b> items = <b>this</b>.items;
+        <b>if</b>(items){
+            <b>delete</b> this.items;
+            <b>if</b>(items instanceof Array){
+                <b>this</b>.add.apply(<b>this</b>, items);
+            }<b>else</b>{
+                <b>this</b>.add(items);
+            }
+        }
+    },
+
+    initItems : <b>function</b>(){
+        <b>if</b>(!<b>this</b>.items){
+            <b>this</b>.items = <b>new</b> Ext.util.MixedCollection(false, <b>this</b>.getComponentId);
+            <b>this</b>.getLayout(); <i>// initialize the layout</i>
+        }
+    },
+
+    setLayout : <b>function</b>(layout){
+        <b>if</b>(this.layout &amp;&amp; <b>this</b>.layout != layout){
+            <b>this</b>.layout.setContainer(null);
+        }
+        <b>this</b>.layout = layout;
+        layout.setContainer(<b>this</b>);
+    },
+
+    render : <b>function</b>(){
+        Ext.Container.superclass.render.apply(<b>this</b>, arguments);
+        <b>if</b>(this.layout){
+            <b>this</b>.setLayout(<b>this</b>.layout);
+        }
+        <b>this</b>.doLayout();
+    },
+
+    getLayoutTarget : <b>function</b>(){
+        <b>return</b> this.el;  
+    },
+
+    getComponentId : <b>function</b>(comp){
+        <b>return</b> comp.id;
+    },
+
+    add : <b>function</b>(comp){
+        <b>if</b>(!<b>this</b>.items){
+            <b>this</b>.initItems();
+        }
+        <b>var</b> a = arguments, len = a.length;
+        <b>if</b>(len &gt; 1){
+            <b>for</b>(var i = 0; i &lt; len; i++) {
+                <b>this</b>.add(a[i]);
+            }
+        }<b>else</b>{
+            <b>var</b> c = <b>this</b>.lookupComponent(comp);
+            <b>var</b> pos = <b>this</b>.items.length;
+            <b>if</b>(this.fireEvent('beforeadd', <b>this</b>, c, pos) !== false){
+                <b>this</b>.items.add(c);
+                c.ownerCt = <b>this</b>;
+                <b>this</b>.fireEvent('add', <b>this</b>, c, pos);
+            }
+        }
+        <b>return</b> this;
+    },
+
+    insert : <b>function</b>(index, comp){
+        <b>if</b>(!<b>this</b>.items){
+            <b>this</b>.initItems();
+        }
+        <b>var</b> a = arguments, len = a.length;
+        <b>if</b>(len &gt; 1){
+            <b>for</b>(var i = len; i &gt;= 0; --i) {
+                <b>this</b>.insert(index, a[i]);
+            }
+        }<b>else</b>{
+
+            <b>var</b> c = <b>this</b>.lookupComponent(comp);
+            <b>if</b>(this.fireEvent('beforeadd', <b>this</b>, c, index) !== false){
+                <b>this</b>.items.insert(index, c);
+                <b>this</b>.fireEvent('add', <b>this</b>, c, index);
+            }
+        }
+        <b>return</b> this;
+    },
+
+    remove : <b>function</b>(comp){
+        <b>var</b> c = <b>this</b>.getComponent(comp);
+        <b>if</b>(this.fireEvent('beforeremove', <b>this</b>, c) !== false){
+            <b>this</b>.items.remove(c);
+            <b>if</b>(this.autoDestroy){
+                c.destroy();
+            }
+            <b>this</b>.fireEvent('remove', <b>this</b>, c);
+        }
+    },
+
+    getComponent : <b>function</b>(comp){
+        <b>if</b>(typeof comp == 'object'){
+            <b>return</b> comp;
+        }
+        <b>return</b> this.items.get(comp);
+    },
+
+    <i>// private</i>
+    lookupComponent : <b>function</b>(comp){
+        <b>if</b>(typeof comp == 'string'){
+            <b>return</b> Ext.ComponentMgr.get(comp);
+        }<b>else</b> if(!comp.events){
+            <b>return</b> this.createComponent(comp);
+        }
+        <b>return</b> comp;
+    },
+
+    createComponent : <b>function</b>(config){
+        <b>return</b> new Ext.Panel(config);
+    },
+
+    doLayout : <b>function</b>(){
+        <b>if</b>(this.layout){
+            <b>this</b>.layout.layout();
+        }
+        <b>if</b>(this.items){
+            <b>var</b> cs = <b>this</b>.items.items;
+            <b>for</b>(var i = 0, len = cs.length; i &lt; len; i++) {
+                <b>var</b> c  = cs[i];
+                <b>if</b>(c.doLayout){
+                    c.doLayout();
+                }
+            }
+        }
+    },
+
+    getLayout : <b>function</b>(){
+        <b>if</b>(!<b>this</b>.layout){
+            <b>var</b> layout = <b>new</b> Ext.layout.AutoLayout();
+            <b>this</b>.setLayout(layout);
+        }
+        <b>return</b> this.layout;
+    }
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>

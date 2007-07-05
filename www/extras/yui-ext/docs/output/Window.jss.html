@@ -1,0 +1,509 @@
+<html><head><title>Window.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>Window.js</h1><pre class="highlighted"><code>
+Ext.Window = <b>function</b>(config){
+    Ext.Window.superclass.constructor.call(<b>this</b>, config);
+};
+
+Ext.extend(Ext.Window, Ext.Panel, {
+    baseCls : 'x-window',
+    frame:true,
+    floating:true,
+    collapsible:true,
+    resizable:true,
+    draggable:true,
+    closable : true,
+    constrain:true,
+
+    minimizable : true,
+    maximizable : true,
+
+    minHeight: 80,
+    minWidth: 200,
+
+    initHidden : true,
+    monitorResize : true,
+
+    <i>//tools:[{id:'minimize'},{id:'maximize'},{id:'restore', hidden:true},{id:'close'}],</i>
+
+    initComponent : <b>function</b>(){
+        Ext.Window.superclass.initComponent.call(<b>this</b>);
+        <b>this</b>.addEvents({
+            resize: true,
+            maximize : true,
+            minimize: true,
+            restore : true
+        });
+    },
+
+    onRender : <b>function</b>(ct, position){
+        Ext.Window.superclass.onRender.call(<b>this</b>, ct, position);
+
+        <i>// <b>this</b> element allows the Window to be focused <b>for</b> keyboard events</i>
+        <b>this</b>.focusEl = <b>this</b>.el.createChild({
+                    tag: &quot;a&quot;, href:&quot;#&quot;, cls:&quot;x-dlg-focus&quot;,
+                    tabIndex:&quot;-1&quot;, html: &quot;&amp;#160;&quot;});
+        <b>this</b>.focusEl.swallowEvent('click', true);
+
+        <b>this</b>.proxy = <b>this</b>.el.createProxy(&quot;x-window-proxy&quot;);
+        <b>this</b>.proxy.enableDisplayMode('block');
+
+        <b>if</b>(this.modal){
+            <b>this</b>.mask = <b>this</b>.container.createChild({cls:&quot;ext-el-mask&quot;});
+            <b>this</b>.mask.enableDisplayMode(&quot;block&quot;);
+        }
+    },
+
+    initEvents : <b>function</b>(){
+        <b>if</b>(this.animateTarget){
+            <b>this</b>.setAnimateTarget(<b>this</b>.animateTarget);
+        }
+
+        <b>if</b>(this.resizable){
+            <b>this</b>.resizer = <b>new</b> Ext.Resizable(<b>this</b>.el, {
+                minWidth: <b>this</b>.minWidth,
+                minHeight:<b>this</b>.minHeight,
+                handles: <b>this</b>.resizeHandles || &quot;all&quot;,
+                pinned: true,
+                resizeElement : <b>this</b>.resizerAction
+            });
+            <b>this</b>.resizer.window = <b>this</b>;
+            <b>this</b>.resizer.on(&quot;beforeresize&quot;, <b>this</b>.beforeResize, <b>this</b>);
+        }
+
+        <b>if</b>(this.draggable){
+            <b>this</b>.header.addClass(&quot;x-window-draggable&quot;);
+            <b>this</b>.dd = <b>new</b> Ext.Window.DD(<b>this</b>);
+        }
+        <b>this</b>.initTools();
+
+        <b>this</b>.el.on(&quot;mousedown&quot;, <b>this</b>.toFront, <b>this</b>);
+        <b>this</b>.manager = <b>this</b>.manager || Ext.WindowMgr;
+        <b>this</b>.manager.register(<b>this</b>);
+        <b>this</b>.hidden = true;
+        <b>if</b>(this.maximized){
+            <b>this</b>.maximized = false;
+            <b>this</b>.maximize();
+        }
+    },
+
+    initTools : <b>function</b>(){
+        <b>if</b>(this.minimizable){
+            <b>this</b>.addTool({
+                id: 'minimize',
+                on: {
+                    'click' : <b>this</b>.onMinimize.createDelegate(<b>this</b>, [])
+                }
+            });
+        }
+        <b>if</b>(this.maximizable){
+            <b>this</b>.addTool({
+                id: 'maximize',
+                on: {
+                    'click' : <b>this</b>.maximize.createDelegate(<b>this</b>, [])
+                }
+            });
+            <b>this</b>.addTool({
+                id: 'restore',
+                on: {
+                    'click' : <b>this</b>.restore.createDelegate(<b>this</b>, [])
+                },
+                hidden:true
+            });
+            <b>this</b>.header.on('dblclick', <b>this</b>.toggleMaximize, <b>this</b>);
+        }
+        <b>if</b>(this.closable){
+            <b>this</b>.addTool({
+                id: 'close',
+                on: {
+                    'click' : <b>this</b>.onClose.createDelegate(<b>this</b>, [])
+                }
+            });
+        }
+    },
+
+    resizerAction : <b>function</b>(){
+        <b>var</b> box = <b>this</b>.proxy.getBox();
+        <b>this</b>.proxy.hide();
+        <b>this</b>.window.handleResize(box);
+        <b>return</b> box;
+    },
+
+    beforeResize : <b>function</b>(){
+        <b>this</b>.resizer.minHeight = Math.max(<b>this</b>.minHeight, <b>this</b>.getFrameHeight() + 40); <i>// 40 is a magic minimum content size?</i>
+        <b>this</b>.resizer.minWidth = Math.max(<b>this</b>.minWidth, <b>this</b>.getFrameWidth() + 40);
+    },
+
+    <i>// private</i>
+    handleResize : <b>function</b>(box){
+        <b>this</b>.updateBox(box);
+        <b>this</b>.focus();
+        <b>this</b>.fireEvent(&quot;resize&quot;, <b>this</b>, box.width, box.height);
+    },
+
+    <i>/**
+     * Focuses the Window.  If a defaultButton is set, it will receive focus, otherwise the
+     * Window itself will receive focus.
+     */</i>
+    focus : <b>function</b>(){
+        <b>this</b>.focusEl.focus.defer(10, <b>this</b>.focusEl);
+    },
+
+    setAnimateTarget : <b>function</b>(el){
+        el = Ext.get(el);
+        <b>this</b>.animateTarget = el;
+    },
+
+    beforeShow : <b>function</b>(){
+        <b>delete</b> this.el.lastXY;
+        <b>delete</b> this.el.lastLT;
+        <b>if</b>(this.x === undefined){
+            <b>var</b> xy = <b>this</b>.el.getAlignToXY(<b>this</b>.container, 'c-c');
+            <b>var</b> pos = <b>this</b>.el.translatePoints(xy[0], xy[1]);
+            <b>this</b>.x = pos.left;
+            <b>this</b>.y = pos.top;
+        }
+        <b>this</b>.el.setLeftTop(<b>this</b>.x, <b>this</b>.y);
+        <b>this</b>.expand(false);
+
+        <b>if</b>(this.modal){
+            Ext.get(document.body).addClass(&quot;x-body-masked&quot;);
+            <b>this</b>.mask.setSize(Ext.lib.Dom.getViewWidth(true), Ext.lib.Dom.getViewHeight(true));
+            <b>this</b>.mask.show();
+        }
+    },
+
+    show : <b>function</b>(animateTarget, cb, scope){
+        <b>if</b>(this.hidden === false){
+            <b>this</b>.toFront();
+            <b>return</b>;
+        }
+        <b>if</b>(this.fireEvent(&quot;beforeshow&quot;, <b>this</b>) === false){
+            <b>return</b>;
+        }
+        <b>if</b>(cb){
+            <b>this</b>.on('show', cb, scope, {single:true});
+        }
+        <b>this</b>.hidden = false;
+        <b>if</b>(animateTarget !== undefined){
+            <b>this</b>.setAnimateTarget(animateTarget);
+        }
+        <b>this</b>.beforeShow();
+        <b>if</b>(this.animateTarget){
+            <b>this</b>.animShow();
+        }<b>else</b>{
+            <b>this</b>.afterShow();
+        }
+    },
+
+    afterShow : <b>function</b>(){
+        <b>this</b>.proxy.hide();
+        <b>this</b>.el.setStyle('display', 'block');
+        <b>this</b>.el.show();
+
+        <b>if</b>(this.monitorResize &amp;&amp; <b>this</b>.constrain){
+            Ext.EventManager.onWindowResize(<b>this</b>.onWindowResize, <b>this</b>);
+            <b>this</b>.doConstrain();
+        }
+        <b>if</b>(this.layout){
+            <b>this</b>.doLayout();
+        }
+        <b>this</b>.toFront();
+        <b>this</b>.fireEvent(&quot;show&quot;, <b>this</b>);
+    },
+
+    <i>// private</i>
+    animShow : <b>function</b>(){
+        <b>this</b>.proxy.show();
+        <b>this</b>.proxy.setBox(<b>this</b>.animateTarget.getBox());
+        <b>var</b> b = <b>this</b>.getBox(false);
+        b.callback = <b>this</b>.afterShow;
+        b.scope = <b>this</b>;
+        b.duration = .25;
+        b.easing = 'easeNone';
+        b.block = true;
+        <b>this</b>.el.setStyle('display', 'none');
+        <b>this</b>.proxy.shift(b);
+    },
+
+
+    hide : <b>function</b>(animateTarget, cb, scope){
+        <b>if</b>(this.hidden || <b>this</b>.fireEvent(&quot;beforehide&quot;, <b>this</b>) === false){
+            <b>return</b>;
+        }
+        <b>if</b>(cb){
+            <b>this</b>.on('hide', cb, scope, {single:true});
+        }
+        <b>this</b>.hidden = true;
+        <b>if</b>(animateTarget !== undefined){
+            <b>this</b>.setAnimateTarget(animateTarget);
+        }
+        <b>if</b>(this.animateTarget){
+            <b>this</b>.animHide();
+        }<b>else</b>{
+            <b>this</b>.el.hide();
+            <b>this</b>.afterHide();
+        }
+    },
+
+    afterHide : <b>function</b>(){
+        <b>this</b>.proxy.hide();
+        <b>if</b>(this.monitorResize &amp;&amp; <b>this</b>.constrain){
+            Ext.EventManager.removeResizeListener(<b>this</b>.onWindowResize, <b>this</b>);
+        }
+        <b>if</b>(this.modal){
+            <b>this</b>.mask.hide();
+            Ext.get(document.body).removeClass(&quot;x-body-masked&quot;);
+        }
+        <b>this</b>.fireEvent(&quot;hide&quot;, <b>this</b>);
+    },
+
+    animHide : <b>function</b>(){
+        <b>this</b>.proxy.show();
+        <b>var</b> tb = <b>this</b>.getBox(false);
+        <b>this</b>.proxy.setBox(tb);
+        <b>this</b>.el.hide();
+        <b>var</b> b = <b>this</b>.animateTarget.getBox();
+        b.callback = <b>this</b>.afterHide;
+        b.scope = <b>this</b>;
+        b.duration = .25;
+        b.easing = 'easeNone';
+        b.block = true;
+        <b>this</b>.proxy.shift(b);
+    },
+
+    onWindowResize : <b>function</b>(){
+        <b>if</b>(this.maximized){
+            <b>this</b>.fitContainer();
+        }
+        <b>this</b>.doConstrain();
+    },
+
+    doConstrain : <b>function</b>(){
+        <b>if</b>(this.constrain){
+            <b>var</b> xy = <b>this</b>.el.getConstrainToXY(<b>this</b>.container, true,
+                    {   right:<b>this</b>.el.shadowOffset,
+                        left:<b>this</b>.el.shadowOffset,
+                        bottom:<b>this</b>.el.shadowOffset});
+            <b>if</b>(xy){
+                <b>this</b>.setPosition(xy[0], xy[1]);
+            }
+        }
+    },
+
+    ghost : <b>function</b>(cls){
+        <b>var</b> ghost = <b>this</b>.createGhost(cls);
+        <b>var</b> box = <b>this</b>.getBox(true);
+        ghost.setLeftTop(box.x, box.y);
+        ghost.setWidth(box.width);
+        <b>this</b>.el.hide();
+        <b>this</b>.activeGhost = ghost;
+        <b>return</b> ghost;
+    },
+
+    unghost : <b>function</b>(show, matchPosition){
+        <b>if</b>(show !== false){
+            <b>this</b>.el.show();
+            <b>this</b>.focus();
+        }
+        <b>if</b>(matchPosition !== false){
+            <b>this</b>.setPosition(<b>this</b>.activeGhost.getLeft(true), <b>this</b>.activeGhost.getTop(true));
+        }
+        <b>this</b>.activeGhost.hide();
+        <b>this</b>.activeGhost.remove();
+        <b>delete</b> this.activeGhost;
+    },
+
+    onMinimize : <b>function</b>(){
+        <b>this</b>.fireEvent('minimize', <b>this</b>);
+    },
+
+    onClose : <b>function</b>(){
+        <b>if</b>(this.fireEvent(&quot;beforeclose&quot;, <b>this</b>) === false){
+            <b>return</b>;
+        }
+        <b>this</b>.hide(null, <b>function</b>(){
+            <b>this</b>.fireEvent('close', <b>this</b>);
+            <b>this</b>.destroy();
+        }, <b>this</b>);
+    },
+
+    maximize : <b>function</b>(){
+        <b>if</b>(!<b>this</b>.maximized){
+            <b>this</b>.expand(false);
+            <b>this</b>.restoreSize = <b>this</b>.getSize();
+            <b>this</b>.restorePos = <b>this</b>.getPosition(true);
+            <b>this</b>.tools.maximize.hide();
+            <b>this</b>.tools.restore.show();
+            <b>this</b>.maximized = true;
+            <b>this</b>.el.disableShadow();
+
+            <b>if</b>(this.dd){
+                <b>this</b>.dd.lock();
+            }
+            <b>if</b>(this.collapsible){
+                <b>this</b>.tools.toggle.hide();
+            }
+            <b>this</b>.el.addClass('x-window-maximized');
+            <b>this</b>.container.addClass('x-window-maximized-ct');
+
+            <b>this</b>.setPosition(0, 0);
+            <b>this</b>.fitContainer();
+            <b>this</b>.fireEvent('maximize', <b>this</b>);
+        }
+    },
+
+    restore : <b>function</b>(){
+        <b>if</b>(this.maximized){
+            <b>this</b>.el.removeClass('x-window-maximized');
+            <b>this</b>.tools.restore.hide();
+            <b>this</b>.tools.maximize.show();
+            <b>this</b>.setPosition(<b>this</b>.restorePos[0], <b>this</b>.restorePos[1]);
+            <b>this</b>.setSize(<b>this</b>.restoreSize.width, <b>this</b>.restoreSize.height);
+            <b>delete</b> this.restorePos;
+            <b>delete</b> this.restoreSize;
+            <b>this</b>.maximized = false;
+            <b>this</b>.el.enableShadow(true);
+
+            <b>if</b>(this.dd){
+                <b>this</b>.dd.unlock();
+            }
+            <b>if</b>(this.collapsible){
+                <b>this</b>.tools.toggle.show();
+            }
+            <b>this</b>.container.removeClass('x-window-maximized-ct');
+
+            <b>this</b>.doConstrain();
+            <b>this</b>.fireEvent('restore', <b>this</b>);
+        }
+    },
+
+    toggleMaximize : <b>function</b>(){
+        <b>this</b>[this.maximized ? 'restore' : 'maximize']();
+    },
+
+    fitContainer : <b>function</b>(){
+        <b>var</b> vs = <b>this</b>.container.getViewSize();
+        <b>this</b>.setSize(vs.width, vs.height);
+    },
+
+    <i>// private</i>
+    <i>// z-index is managed by the WindowManager and may be overwritten at any time</i>
+    setZIndex : <b>function</b>(index){
+        <b>if</b>(this.modal){
+            <b>this</b>.mask.setStyle(&quot;z-index&quot;, index);
+        }
+        <b>this</b>.el.setZIndex(++index);
+        index += 5;
+
+        <b>if</b>(this.resizer){
+            <b>this</b>.resizer.proxy.setStyle(&quot;z-index&quot;, ++index);
+        }
+
+        <b>this</b>.lastZIndex = index;
+    },
+
+    <i>/**
+     * Aligns the window to the specified element
+     * @param {String/HTMLElement/Ext.Element} element The element to align to.
+     * @param {String} position The position to align to (see {@link Ext.Element#alignTo} <b>for</b> more details).
+     * @param {Array} offsets (optional) Offset the positioning by [x, y]
+     * @<b>return</b> {Ext.Window} <b>this</b>
+     */</i>
+    alignTo : <b>function</b>(element, position, offsets){
+        <b>var</b> xy = <b>this</b>.el.getAlignToXY(element, position, offsets);
+        <b>this</b>.setPagePosition(xy[0], xy[1]);
+        <b>return</b> this;
+    },
+
+    <i>/**
+     * Anchors <b>this</b> window to another element and realigns it when the window is resized or scrolled.
+     * @param {String/HTMLElement/Ext.Element} element The element to align to.
+     * @param {String} position The position to align to (see {@link Ext.Element#alignTo} <b>for</b> more details)
+     * @param {Array} offsets (optional) Offset the positioning by [x, y]
+     * @param {Boolean/Number} monitorScroll (optional) true to monitor body scroll and reposition. If <b>this</b> parameter
+     * is a number, it is used as the buffer delay (defaults to 50ms).
+     * @<b>return</b> {Ext.Window} <b>this</b>
+     */</i>
+    anchorTo : <b>function</b>(el, alignment, offsets, monitorScroll){
+        <b>var</b> action = <b>function</b>(){
+            <b>this</b>.alignTo(el, alignment, offsets);
+        };
+        Ext.EventManager.onWindowResize(action, <b>this</b>);
+        <b>var</b> tm = <b>typeof</b> monitorScroll;
+        <b>if</b>(tm != 'undefined'){
+            Ext.EventManager.on(window, 'scroll', action, <b>this</b>,
+                {buffer: tm == 'number' ? monitorScroll : 50});
+        }
+        action.call(<b>this</b>);
+        <b>return</b> this;
+    },
+
+    <i>/**
+     * Brings <b>this</b> Window to the front of any other visible Windows
+     * @<b>return</b> {Ext.Window} <b>this</b>
+     */</i>
+    toFront : <b>function</b>(){
+        <b>this</b>.manager.bringToFront(<b>this</b>);
+        <b>this</b>.focus();
+        <b>return</b> this;
+    },
+
+    setActive : <b>function</b>(active){
+        <b>if</b>(active){
+            <b>if</b>(!<b>this</b>.maximized){
+                <b>this</b>.el.enableShadow(true);
+            }
+            <b>this</b>.fireEvent('activate', <b>this</b>);
+        }<b>else</b>{
+            <b>this</b>.el.disableShadow();
+            <b>this</b>.fireEvent('deactivate', <b>this</b>);
+        }
+    },
+
+    <i>/**
+     * Sends <b>this</b> Window to the back (under) of any other visible Windows
+     * @<b>return</b> {Ext.Window} <b>this</b>
+     */</i>
+    toBack : <b>function</b>(){
+        <b>this</b>.manager.sendToBack(<b>this</b>);
+        <b>return</b> this;
+    },
+
+    <i>/**
+     * Centers <b>this</b> Window <b>in</b> the viewport
+     * @<b>return</b> {Ext.Window} <b>this</b>
+     */</i>
+    center : <b>function</b>(){
+        <b>var</b> xy = <b>this</b>.el.getAlignToXY(<b>this</b>.container, 'c-c');
+        <b>this</b>.setPagePosition(xy[0], xy[1]);
+        <b>return</b> this;
+    }
+});
+
+Ext.Window.DD = <b>function</b>(win){
+    <b>this</b>.win = win;
+    Ext.Window.DD.superclass.constructor.call(<b>this</b>, win.el.id, 'WindowDD-'+win.id);
+    <b>this</b>.setHandleElId(win.header.id);
+    <b>this</b>.scroll = false;
+};
+
+Ext.extend(Ext.Window.DD, Ext.dd.DD, {
+    moveOnly:true,
+    startDrag : <b>function</b>(){
+        <b>var</b> w = <b>this</b>.win;
+        <b>this</b>.proxy = w.ghost();
+        <b>if</b>(w.constrain !== false){
+            <b>var</b> so = w.el.shadowOffset;
+            <b>this</b>.constrainTo(w.container, {right: so, left: so, bottom: so});
+        }
+    },
+    b4Drag : Ext.emptyFn,
+
+    onDrag : <b>function</b>(e){
+        <b>this</b>.alignElWithMouse(<b>this</b>.proxy, e.getPageX(), e.getPageY());
+    },
+
+    endDrag : <b>function</b>(e){
+        <b>this</b>.win.unghost();
+    }
+});</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>
