@@ -457,14 +457,15 @@ Deletes a file from it's storage location.
 
 =head3 filename
 
-The name of the file to delete.
+The name of the file to delete.  Returns a 1 if the file was successfully deleted, or 0 if
+it doesn't.
 
 =cut
 
 sub deleteFile {
-	my $self = shift;
-	my $filename = shift;
-        unlink($self->getPath($filename));
+    my $self = shift;
+    my $filename = shift;
+    unlink($self->getPath($filename));
 }
 
 

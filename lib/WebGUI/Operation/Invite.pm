@@ -102,7 +102,6 @@ sub www_inviteUserSave {
 
     #User existance check.
     my $existingUser = WebGUI::User->newByEmail($session, $hisEmailAddress);
-    use Data::Dumper;
     if (defined $existingUser) {
         my $output = sprintf qq!<h1>%s</h1>\n<p>%s</p><a href="%s">%s</a>!,
             $i18n->get('already a member'),
