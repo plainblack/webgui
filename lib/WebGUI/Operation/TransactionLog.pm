@@ -5,6 +5,7 @@ use WebGUI::Commerce::Transaction;
 use WebGUI::Asset::Template;
 use WebGUI::Operation;
 use WebGUI::Form;
+use WebGUI::Paginator;
 
 =head1 NAME
 
@@ -32,12 +33,14 @@ This error message will be added to the template variables.
 
 sub www_viewPurchaseHistory {
 	my $session = shift;
-	my (@history, @historyLoop, %var, %properties);
-
+	my (@historyLoop, %var, %properties);
 	$var{errorMessage} = shift;
-	
-	@history = @{WebGUI::Commerce::Transaction->new($session)->transactionsByUser($session->user->userId)};
-	for my $transaction (@history) {
+    my $p = WebGUI::Paginator->new($session, $session->url->page("op=viewPurchaseHistory"));
+    	
+	my @history = reverse @{WebGUI::Commerce::Transaction->new($session)->transactionsByUser($session->user->userId)};
+    $p->setDataByArrayRef(\@history);
+    $p->appendTemplateVars(\%var);
+	for my $transaction (@{$p->getPageData}) {
 		%properties = %{$transaction->get};
 		$properties{initDate} = $session->datetime->epochToHuman($properties{initDate});
 		$properties{completionDate} = $session->datetime->epochToHuman($properties{completionDate}) 

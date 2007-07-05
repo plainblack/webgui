@@ -2,7 +2,7 @@
 //input.  Each file upload input is named "file"  the control must be rendered in a form.  The
 //Workspace id is the id of the div in the html page to render the control in.
 
-function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit) {
+function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit, size) {
 
 	this.images = imageArray;
 	this.fileLimit = fileLimit;
@@ -21,7 +21,9 @@ function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit) {
 	str +='<table style="display: none;">'
 	
 	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td style="display:none;"><img src="' + imageArray["unknown"] + '" style="visibility: hidden;"></td>';
-	str +='<td colspan="2"><input type="file" name="'+fieldName+'" size="40" onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
+	str +='<td colspan="2"><input type="file" name="'+fieldName+'" ';
+        str += ' size="'+ size + '" ';
+    str +=' onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
 	
 	str += '</table>';
 	

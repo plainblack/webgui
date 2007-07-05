@@ -3262,7 +3262,7 @@ sub www_addEventsToBadge {
 			my ($purchaseId) = $self->session->db->quickArray("select purchaseId from EventManagementSystem_registrations where badgeId=? and productId=? and purchaseId != '' and returned=0 and purchaseId is not null limit 1",[$bid,$eventId]);
             $self->session->scratch->set("currentPurchase",$purchaseId);
             $self->session->db->write(
-                "INSERT INTO EventManagementSystem_sessionPurchaseRef (sessionId, purchaseId, badgeId) VALUES (?,?,?)",
+                "REPLACE INTO EventManagementSystem_sessionPurchaseRef (sessionId, purchaseId, badgeId) VALUES (?,?,?)",
                 [$self->session->getId, $purchaseId, $bid]
             );
 		}
@@ -3803,7 +3803,7 @@ sub www_search {
 	my $showAllFlag;
 	my $addToBadgeMessage;
 	if ($eventAdded) {
-		$showAllFlag = 1;
+		#$showAllFlag = 1;
 		$addToBadgeMessage = sprintf $i18n->get('add to badge message'), $eventAdded;
 	}
 	if ($var{badgeSelected}) {
@@ -3839,9 +3839,17 @@ sub www_search {
 	if (scalar(@keys)) {
 		#$searchPhrases = " and ( ";
 		my $count = 0;
-		foreach (@keys) {
+		foreach my $word (@keys) {
+             if ($count) {
+                   if ($word =~ m/^\d+$/) {   # searching for a bunch of skus, so let's do an or instead
+                        $searchPhrases .= ' or ';
+                   }
+                   else {
+                        $searchPhrases .= ' and ';
+                   }
+              } 
 			$searchPhrases .= ' and ' if $count;
-			my $val = $self->session->db->quote('%'.$_.'%');
+			my $val = $self->session->db->quote('%'.$word.'%');
 			$searchPhrases .= "(p.title like $val or p.description like $val or p.sku like $val)";
 			$count++;
 		}
@@ -4042,7 +4050,8 @@ sub www_search {
 	  	$eventFields{'purchase.label'} = $i18n->get('add to cart');
 	  }
 		my $masterEventId = $cfilter_t0 || $self->session->form->get("cfilter_t0");
-	  $eventFields{'purchase.url'} = $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId.";pn=".$self->session->form->get("pn"));
+	  $eventFields{'purchase.url'} =
+$self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$masterEventId.";pn=".$self->session->form->get("pn").";searchKeywords=".$self->session->form->get("searchKeywords"));
 	  %eventFields = ('event' => $self->processTemplate(\%eventFields, $event->{'templateId'}), %eventFields) if ($self->{_calledFromView} && $self->session->form->process('func') eq 'view');
 	  push (@events, \%eventFields);
 	} 

@@ -3,6 +3,8 @@
    subroutines directly in their files. See
    WebGUI::Operation::FormHelpers::www_formHelper and 
    WebGUI::Operation::Workflow::www_activityHelper for details.
+ - Added pagination to purchase history in commerce.
+ - improved performance of EMS
  - rfe: snippets should have titles too!
  - Added a mechanism for using external folders for custom code. See
    sbin/preload.custom.example for details.
