@@ -6,6 +6,9 @@
  - Added pagination to purchase history in commerce.
  - improved performance of EMS
  - upgraded YUI to 2.2.2 and YUI-ext to 1.0.1a
+ - Improved error handling in Spectre when WebGUI hands it bad data.
+ - Fixed a problem where Spectre dropped cron jobs that were erroring
+   consistently.
  - rfe: snippets should have titles too!
  - Added a mechanism for using external folders for custom code. See
    sbin/preload.custom.example for details.

@@ -79,10 +79,14 @@ The priority (1,2, or 3) that this instance should be run at.
 
 sub addInstance {
 	my ($self, $instance) = @_[OBJECT, ARG0];
-	my $priority = ($instance->{priority} -1) * 10;
-	$instance->{lastState} = "never run";
-	$self->debug("Adding workflow instance ".$instance->{instanceId}." from ".$instance->{sitename}." to queue at priority ".$priority.".");
-	$self->getWaitingQueue->enqueue($priority, $instance);
+    if ($instance->{priority} < 1 || $instance->{instanceId} eq "" || $instance->{sitename} eq "") {
+        $self->error("Can't add workflow instance with missing data: ". $instance->{sitename}." - ".$instance->{instanceId});
+    } else {
+	    my $priority = ($instance->{priority} -1) * 10;
+	    $instance->{lastState} = "never run";
+	    $self->debug("Adding workflow instance ".$instance->{instanceId}." from ".$instance->{sitename}." to queue at priority ".$priority.".");
+	    $self->getWaitingQueue->enqueue($priority, $instance);
+    }
 }
 
 #-------------------------------------------------------------------

@@ -127,9 +127,14 @@ An integer (1,2,3) that determines what priority the workflow should be executed
 sub addJob {
 	my ($self, $params) = @_[OBJECT, ARG0];
 	my $id = $params->{config}."-".$params->{taskId};
-	$self->debug("Adding schedule ".$params->{taskId}." to the queue.");
-	$params->{schedule} = join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek});
-	$self->{_jobs}{$id} = $params;
+    if ($params->{config} eq "" || $params->{taskId}) {
+        $self->error("Can't add a schedule with missing data: $id");
+    }   
+    else {
+	    $self->debug("Adding schedule ".$params->{taskId}." to the queue.");
+	    $params->{schedule} = join(" ", $params->{minuteOfHour}, $params->{hourOfDay}, $params->{dayOfMonth}, $params->{monthOfYear}, $params->{dayOfWeek});
+	    $self->{_jobs}{$id} = $params;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -274,7 +279,6 @@ The unique ID for this job.
 sub deleteJob {
 	my ($self, $id) = @_[OBJECT, ARG0];
 	$self->debug("Deleting schedule ".$id." from queue.");
-	delete $self->{_errorCount}{$id};
 	delete $self->{_jobs}{$id};
 }
 
@@ -406,9 +410,6 @@ sub runJob {
 	if ($job->{sitename} eq "" || $job->{config} eq "" || $job->{taskId} eq "") {
 		$self->error("A job has corrupt information and is not able to be run. Skipping execution.");
 		$kernel->yield("deleteJob",$id);
-	} elsif ($self->{_errorCount}{$id} >= 5) {
-		$self->error("Job ".$id." has failed ".$self->{_errorCount}{$id}." times in a row and will no longer attempt to execute.");
-		$kernel->yield("deleteJob",$id);
 	} else {
 		my $url = "http://".$job->{sitename}.':'.$self->config->get("webguiPort").$job->{gateway};
 		my $request = POST $url, [op=>"runCronJob", taskId=>$job->{taskId}];
@@ -450,29 +451,24 @@ sub runJobResponse {
 			}
 			my $state = $response->content; 
 			if ($state eq "done") {
-				delete $self->{_errorCount}{$id};
 				$self->debug("Job $id is now complete.");
 				if ($job->{runOnce}) {
 					$kernel->yield("deleteJob",$id);
 				}
 			} elsif ($state eq "error") {
-				$self->{_errorCount}{$id}++;
 				$self->debug("Got an error response for job $id, will try again in ".$self->config->get("suspensionDelay")." seconds.");
 				$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
 			} else {
-				$self->{_errorCount}{$id}++;
 				$self->error("Something bad happened on the return of job $id, will try again in ".$self->config->get("suspensionDelay")." seconds. ".$response->error_as_HTML);
 				$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
 			}
 		} else {
-			$self->{_errorCount}{$id}++;
 			$self->error("Job $id is not in our queue.");
 		}
 	} elsif ($response->is_redirect) {
 		$self->error("Response for $id was redirected. This should never happen if configured properly!!!");
 	} elsif ($response->is_error) {	
 		$self->error("Response for job $id had a communications error. ".$response->error_as_HTML);
-		$self->{_errorCount}{$id}++;
 		$kernel->delay_set("runJob",$self->config->get("suspensionDelay"),$id);
 	}
 }
