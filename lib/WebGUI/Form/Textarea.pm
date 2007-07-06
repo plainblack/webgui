@@ -112,30 +112,29 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
+	my $style = $self->get("style");
 	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>';
-	if ($self->get("resizeable")) {
 		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
+	if ($self->get("resizeable")) {
 		my ($style, $url) = $self->session->quick(qw(style url));
 		$style->setScript($url->extras("yui/build/yahoo/yahoo-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/dom/dom-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/logger/logger-min.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui-ext/yui-ext-core.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui-ext/resizable-lib.js"), {type=>"text/javascript"});
-		$style->setLink($url->extras("yui-ext/resources/css/resizable.css"), {type=>"text/css", rel=>"stylesheet"});
+		$style->setLink($url->extras("yui-ext/resources/css/ext-all.css"), {type=>"text/css", rel=>"stylesheet"});
+		$style->setScript($url->extras("yui-ext/adapter/yui/ext-yui-adapter.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("yui-ext/ext-all.js"), {type=>"text/javascript"});
 		$out .= qq|
 		<script type="text/javascript">
 			YAHOO.util.Event.addListener(window, 'load', function () {
-				var draggable_textarea = document.getElementById('|.$self->get('id').qq|_wrapper');
-				draggable_textarea.resize = new YAHOO.ext.Resizable(draggable_textarea, {resizeChild: true, minWidth:300, minHeight:150, disableTrackOver:true, multiDirectional: false});
+                    var resizableTextarea = new Ext.Resizable('|.$self->get('id').qq|_wrapper', {minWidth:300, minHeight:150, wrap:false, resizeChild:true, disableTrackOver:true, multiDirectional:false, pinned:true, width:|.$width.qq|, height:|.$height.qq|, dynamic:false });
 				});
 		</script>
 		|;
 	}
 	return $out;
 }
+
 
 
 1;

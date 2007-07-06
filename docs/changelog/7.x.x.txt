@@ -5,6 +5,7 @@
    WebGUI::Operation::Workflow::www_activityHelper for details.
  - Added pagination to purchase history in commerce.
  - improved performance of EMS
+ - upgraded YUI to 2.2.2 and YUI-ext to 1.0.1a
  - rfe: snippets should have titles too!
  - Added a mechanism for using external folders for custom code. See
    sbin/preload.custom.example for details.
