@@ -56,6 +56,7 @@
    filters can now be created in HttpProxy wobject properties.
  - Collaboration System wobjects can now be subclassed and still work with the
    existing Thread and Post assets.
+ - fix: Added some additional i18n that was missing.
 
 7.3.20
  - fix: Deactivated Users Subscriptions (perlDreamer Consulting, LLC)

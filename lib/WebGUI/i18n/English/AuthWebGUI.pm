@@ -543,6 +543,36 @@ our $I18N = {
 		lastUpdated => 1165402566,
 	},
 	
+    'error password requiredDigits' => {
+        message         => q{Password must contain at least %s numeric characters.},
+        lastUpdated     => 0,
+    },
+
+    'error password nonWordCharacters' => {
+        message         => q{Password must contain at least %s non-word characters (such as '!', '@', or '$').},
+        lastUpdated     => 0,
+    },
+
+    'error password requiredMixedCase' => {
+        message         => q{Password must contain at least %s upper case characters and at least 
+                             one lowercase character (mixed case)."},
+        lastUpdated     => 0,
+    },
+
+    'setting webguiRequiredDigits' => {
+        message         => q{Number of digits required in password},
+        lastUpdated     => 0,
+    },
+
+    'setting webguiNonWordCharacters' => {
+        message         => q{Number of non-word characters required in password},
+        lastUpdated     => 0,
+    },
+
+    'setting webguiRequiredMixedCase' => {
+        message         => q{Number of upper-case characters required in password},
+        lastUpdated     => 0,
+    },
 };
 
 1;

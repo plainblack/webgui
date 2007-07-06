@@ -183,7 +183,7 @@ sub createAccount {
 	foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
 		my $id           = $field->getId;
 		my $label        = $field->getLabel;
-        my $emailAddress = {};
+        my $emailAddress = '';
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
            my $code = $self->session->form->get('code')
                    || $self->session->form->get('uniqueUserInvitationCode');
@@ -195,7 +195,7 @@ sub createAccount {
 
 		# Old-style field loop.
 		push @{$vars->{'create.form.profile'}},
-		    +{ 'profile.formElement' => $formField,
+		    { 'profile.formElement' => $formField,
 		       'profile.formElement.label' => $label,
 		       'profile.required' => $required };
 
