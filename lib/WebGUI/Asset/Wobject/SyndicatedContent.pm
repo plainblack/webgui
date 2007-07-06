@@ -334,7 +334,7 @@ sub _normalize_items {
 sub _get_rss_data {
 	my $session = shift;
         my $url = shift;
-	my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
+        my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
         my $rss_serial = $cache->get;
         my $rss = {};
         if ($rss_serial) {
@@ -422,22 +422,28 @@ sub _get_rss_data {
 # whole database to keep the thing from growing too large
 
 sub _assign_rss_dates {
-	my $session = shift;
-        my ($items) = @_;
+    my $session = shift;
+    my ($items) = @_;
 
-        for my $item (@{$items}) {
-                my $key = 'dates:' . ($item->{guid} || $item->{title} || 
-                                      $item->{description} || $item->{link});
-                my $cache = WebGUI::Cache->new($session,$key, 'RSS');
-                if (my $date = $cache->get()) {
-                        $item->{date} = $date;
-                } else {
-                        $item->{date} =$session->datetime->time();
-                        $cache->set($item->{date}, '1 year');
-                }
+    for my $item (@{$items}) {
+        my $key = 'dates:' . ($item->{guid} || $item->{title} || 
+                              $item->{description} || $item->{link});
+        my $cache = WebGUI::Cache->new($session,$key, 'RSS');
+        if (my $date = $cache->get()) {
+            $item->{date} = $date;
         }
-	@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
-  }
+        else {
+            if (my $pubDate = $session->datetime->mailToEpoch($item->{pubDate})) {
+                $item->{date} = $pubDate;
+            }
+            else {
+                $item->{date} = $session->datetime->time() - (60 * 60 * 24 * 365); # handicap the undated
+            }
+            $cache->set($item->{date}, '1 year');
+        }
+    }
+    @{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
+}
 
 #-------------------------------------------------------------------
 # $items is the hashref to put items into.
@@ -489,6 +495,7 @@ sub _create_interleaved_items {
 	    }
 	}
     }
+    @$items = sort { $b->{date} <=> $a->{date} } @$items;
 }
 
 #-------------------------------------------------------------------
@@ -559,14 +566,12 @@ sub _get_items {
 		@rss_feeds = @{$cached->[1]};
 	} else {
                 $items = [];
-
                 for my $url (@{$urls}) {
 		    my $rss_info=_get_rss_data($self->session,$url);
 		    push(@rss_feeds, $rss_info) if(defined $rss_info);
                 }
 
 		# deal with the fact that we may never get valid data
-
 		if (scalar(@rss_feeds) < 1) {
 			return ({}, []);
 		}
