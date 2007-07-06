@@ -31,7 +31,10 @@ This package provides an object-oriented way of managing WebGUI users as well as
 =head1 SYNOPSIS
 
  use WebGUI::User;
- $u = WebGUI::User->new($session,3); or  $u = WebGUI::User->new($session,"new"); or $u = WebGUI::User->newByEmail($session, $email);
+ $u = WebGUI::User->new($session,3);
+ $u = WebGUI::User->new($session,"new");
+ $u = WebGUI::User->newByEmail($session, $email);
+ $u = WebGUI::User->newByUsername($session, $username);
 
  $authMethod =		$u->authMethod("WebGUI");
  $dateCreated = 	$u->dateCreated;
@@ -423,6 +426,7 @@ sub new {
 =head2 newByEmail ( session, email )
 
 Instanciates a user by email address. Returns undef if the email address could not be found.
+Visitor may not be looked up with this method.
 
 =head3 session
 
@@ -439,6 +443,35 @@ sub newByEmail {
 	my $session = shift;
 	my $email = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
+	my $user = $class->new($session, $id);
+	return undef if ($user->userId eq "1"); # visitor is never valid for this method
+	return undef unless $user->username;
+	return $user;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 newByUsername ( session, username )
+
+Instanciates a user by username. Returns undef if the username could not be found.
+Visitor may not be looked up with this method.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 username
+
+The username to search for.
+
+=cut
+
+sub newByUsername {
+	my $class = shift;
+	my $session = shift;
+	my $username = shift;
+	my ($id) = $session->dbSlave->quickArray("select userId from users where username=?",[$username]);
 	my $user = $class->new($session, $id);
 	return undef if ($user->userId eq "1"); # visitor is never valid for this method
 	return undef unless $user->username;

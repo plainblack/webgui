@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 95; # increment this value for each test you create
+use Test::More tests => 101; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -335,13 +335,40 @@ is($clone, undef, 'newByEmail returns undef if you look up the Visitor');
 $clone = WebGUI::User->newByEmail($session, 'noone@localdomain');
 is($clone, undef, 'newByEmail returns undef if email address cannot be found');
 
+$dude->username('');
+
 $clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
 is($clone, undef, 'newByEmail returns undef if the user does not have a username');
 
 $dude->username('dude');
 
 $clone = WebGUI::User->newByEmail($session, 'dude@aftery2k.com');
-is($clone->username, 'dude', 'newByEmail returns valid user object');
+isa_ok($clone, 'WebGUI::User', 'newByEmail returns a valid user object');
+is($clone->username, 'dude', '... and it has the right username');
+
+################################################################
+#
+# newByUsername
+#
+################################################################
+
+my $useru = WebGUI::User->newByUsername($session, 'Visitor');
+is($useru, undef, 'newByUsername returns undef if you look up the Visitor');
+
+$useru = WebGUI::User->newByUsername($session, 'NotHomeRightNow');
+is($useru, undef, 'newByUsername returns undef if username cannot be found');
+
+$dude->username('');
+
+$useru = WebGUI::User->newByUsername($session, 'dude@aftery2k.com');
+is($useru, undef, 'newByUsername returns undef if the user does not have a username');
+
+$dude->username('dude');
+
+$useru = WebGUI::User->newByUsername($session, 'dude');
+isa_ok($useru, 'WebGUI::User', 'newByUsername returns a valid user object');
+is($useru->userId, $dude->userId, '... and it is the right user object');
+
 
 ################################################################
 #

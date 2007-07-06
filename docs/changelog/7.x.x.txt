@@ -55,6 +55,8 @@
     http://www.webgui.org/bugs/tracker/user-profile-images-disappear-after-updat
  - RFE: HttpProxy - regexp for URLs that will not be proxied.  Url pattern
    filters can now be created in HttpProxy wobject properties.
+ - RFE: WebGUI::User has no way to get a user when you only know their username (Wes Morgan, U.S. PIRG)
+   http://www.webgui.org/bugs/tracker/webguiuser-has-no-way-to-get-a-user-when-you-only-know-their-username
  - Collaboration System wobjects can now be subclassed and still work with the
    existing Thread and Post assets.
  - fix: Added some additional i18n that was missing.
