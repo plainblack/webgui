@@ -89,7 +89,7 @@ our $I18N = {
 
 		assetName => {
 			lastUpdated => 0,
-			message => q|Time Tracking System|
+			message => q|Time Tracker (beta)|
 		},
 
 		'No  name was entered for new task' => {

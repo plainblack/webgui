@@ -10,7 +10,7 @@ our $I18N = {
 		lastUpdated => 1133619940
 	},
 	'assetName' => {
-		message => q|Dashboard|,
+		message => q|Dashboard (beta)|,
 		lastUpdated => 1133619940
 	},
 	'dashboard adminsGroupId description' => {

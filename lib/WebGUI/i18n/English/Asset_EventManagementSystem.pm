@@ -1096,7 +1096,7 @@ for this event.</p>
 	#If the help file documents an Macro, it must include an macroName key
 	#For all other types, use topicName
 	'assetName' => {
-		message => q|Event Management System|,
+		message => q|Event Manager (beta)|,
 		lastUpdated => 1131394072,
 	},
 

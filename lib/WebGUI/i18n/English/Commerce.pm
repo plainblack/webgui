@@ -18,7 +18,7 @@ our $I18N = {
 	},
 
 	'commerce settings' => {
-		message => q|Commerce|,
+		message => q|Commerce (beta)|,
 		lastUpdated => 1101772584,
 		context => q|The displayed title of the Commerce Settings in the Admin Console|
 	},

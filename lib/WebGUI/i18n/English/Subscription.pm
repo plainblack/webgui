@@ -198,7 +198,7 @@ paid for. The following is the list of properties attached to each Description.<
 	},
 
 	'manage subscriptions' => {
-		message => q|Subscriptions|,
+		message => q|Subscriptions (beta)|,
 		lastUpdated => 1101228391,
 		context => q|A submenu option in the Subscriptions Admin Console menu.|
 	},

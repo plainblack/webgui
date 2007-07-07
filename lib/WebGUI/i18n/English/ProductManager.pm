@@ -7,7 +7,7 @@ our $I18N = {
 		context => q|displayed when deleting a product|
 	},
 	'manage products' => {
-		message => q|Products|,
+		message => q|Products (beta)|,
 		lastUpdated => 0,
 		context => q|The admin console label of the product manager.|
 	},

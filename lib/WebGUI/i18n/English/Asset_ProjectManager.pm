@@ -72,7 +72,7 @@ our $I18N = {
 		},
 
 	'assetName' => {
-		message => q|Project Management System|,
+		message => q|Project Manager (beta)|,
 		lastUpdated => 0
 		},
 
