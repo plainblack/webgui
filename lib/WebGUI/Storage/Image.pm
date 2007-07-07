@@ -179,7 +179,7 @@ Returns an array reference of the files in this storage location.
 
 sub getFiles {
 	my $self = shift;
-	my $files = $self->SUPER::getFiles;
+	my $files = $self->SUPER::getFiles(@_);
 	my @newFiles;
 	foreach my $file (@{$files}) {
 		next if $file =~ /^thumb-/;
