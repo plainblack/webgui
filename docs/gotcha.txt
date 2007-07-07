@@ -21,9 +21,13 @@ save you many hours of grief.
    the userProfileData table will need to be updated to reflect these
    changes.
 
- * WebGUI now requires the following additional perl modules to operate:
+ * WebGUI now requires the following additional perl modules to operate,
+   and you should install them prior to upgrading:
+
     Config::JSON
     Text::CSV_XS
+    Class::InsideOut
+    HTML::TagCloud
 
  * Any customizations made to the Inbox or Inbox/Message tempalates 
    will be lost. Please back up your custom templates before running

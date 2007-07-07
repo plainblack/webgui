@@ -29,6 +29,8 @@ use WebGUI::Cache;
 use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
+use WebGUI::Keyword;
+use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -570,7 +572,8 @@ Returns a reference to a list of properties (or specified property) of an Asset.
 
 =head3 propertyName
 
-Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle", "synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId",  and "assetSize".
+Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle",
+"synopsis", "url", "groupIdEdit", "groupIdView", "ownerUserId",  "keywords", and "assetSize".
 
 =cut
 
@@ -578,6 +581,9 @@ sub get {
 	my $self = shift;
 	my $propertyName = shift;
 	if (defined $propertyName) {
+        if ($propertyName eq "keywords") {
+            return WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
+        }
 		return $self->{_properties}{$propertyName};
 	}
 	my %copyOfHashRef = %{$self->{_properties}};
@@ -1906,6 +1912,7 @@ sub session {
 	return $self->{_session};
 }
 
+
 #-------------------------------------------------------------------
 
 =head2 setSize ( [extra] )
@@ -1965,6 +1972,10 @@ Hash reference of properties and values to set.
 sub update {
 	my $self = shift;
 	my $properties = shift;
+    if (exists $properties->{keywords}) {
+        WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
+            {keywords=>$properties->{keywords}, asset=>$self});
+    }
 	foreach my $definition (@{$self->definition($self->session)}) {
 		my @setPairs;
 		foreach my $property (keys %{$definition->{properties}}) {

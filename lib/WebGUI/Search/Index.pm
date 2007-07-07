@@ -125,7 +125,10 @@ sub create {
 	my $url = $asset->get("url");
 	$url =~ s/\/|\-|\_/ /g;
 	my $description = WebGUI::HTML::filter($asset->get('description'), "all");
-	my $keywords = WebGUI::HTML::filter(join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url, $description), "all");
+    my $keywords = join(" ",$asset->get("title"), $asset->get("menuTitle"), $asset->get("synopsis"), $url,
+        $description);
+    $keywords .= WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$asset});
+	$keywords = WebGUI::HTML::filter($keywords, "all");
 	my $synopsis = $asset->get("synopsis") || substr($description,0,255) || substr($keywords,0,255);
 
 #-------------------- added by zxp for chinese word segment

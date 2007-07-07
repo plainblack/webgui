@@ -155,6 +155,10 @@ sub getEditForm {
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
 		formAttachment => '',
+        formKeywords => WebGUI::Form::text($session, {
+            name    => "keywords",
+            value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
+            });
 		allowsAttachments => $wiki->get("maxAttachments"),
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),

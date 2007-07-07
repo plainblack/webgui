@@ -121,12 +121,13 @@ sub purge {
 		(defined $kid) ? $kid->purge :
 			$self->session->errorHandler->warn("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
 	}
+    WebGUI::Keyword->new($self->session)->deleteKeywordsForAsset($self->getId);
+    WebGUI::Search::Index->new($self)->delete;
 	$self->session->db->beginTransaction;
+	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));
 	foreach my $definition (@{$self->definition($self->session)}) {
 		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));
 	}
-	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));
-	$self->session->db->write("delete from assetIndex where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->write("delete from asset where assetId=".$self->session->db->quote($self->getId));
 	$self->session->db->commit;
 	$self->purgeCache;

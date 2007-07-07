@@ -4,6 +4,7 @@
    WebGUI::Operation::FormHelpers::www_formHelper and 
    WebGUI::Operation::Workflow::www_activityHelper for details.
  - Added pagination to purchase history in commerce.
+ - Added keyword tagging api.
  - improved performance of EMS
  - upgraded YUI to 2.2.2 and YUI-ext to 1.0.1a
  - Improved error handling in Spectre when WebGUI hands it bad data.

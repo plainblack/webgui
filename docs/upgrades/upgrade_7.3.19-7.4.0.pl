@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addRealtimeWorkflow($session);
+addKeywordTagging($session);
 addGroupingsIndexOnUserId($session);
 fixProfileDataWithoutFields($session);
 buildNewUserProfileTable($session);
@@ -32,6 +33,19 @@ addNewsletter($session);
 addHttpProxyUrlPatternFilter($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addKeywordTagging {
+	my $session = shift;
+	print "\tAdding a keyword tagging system.\n" unless ($quiet);
+    $session->db->write("create table assetKeyword (
+        keyword varchar(64) not null,
+        assetId varchar(22) binary not null,
+        primary key (keyword, assetId),
+        index keyword (keyword),
+        index assetId (assetId)
+        )"); 
+}
 
 #-------------------------------------------------
 sub addNewsletter {
