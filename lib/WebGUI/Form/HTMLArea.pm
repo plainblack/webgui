@@ -138,7 +138,7 @@ sub toHtml {
 	if (defined $richEdit) {
        $self->session->style->setScript($self->session->url->extras('textFix.js'),{ type=>'text/javascript' });
 	   $self->set("extras", $self->get('extras') . ' onblur="fixChars(this.form.'.$self->get("name").')" mce_editable="true" ');
-	   $self->set("resizeable", 0);
+	   $self->set("resizable", 0);
 	   return $self->SUPER::toHtml.$richEdit->getRichEditor($self->get('id'));
     } else {
 	   $self->session->errorHandler->warn($i18n->get('rich editor load error','Form_HTMLArea'));

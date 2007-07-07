@@ -6,6 +6,8 @@
  - Added pagination to purchase history in commerce.
  - Added keyword tagging api.
  - Added keyword tagging to Wiki.
+ - Upgraded TinyMCE to 2.1.1.1.
+ - Safari 3 and above now fully supported in admin interface.
  - improved performance of EMS
  - upgraded YUI to 2.2.2 and YUI-ext to 1.0.1a
  - Improved error handling in Spectre when WebGUI hands it bad data.

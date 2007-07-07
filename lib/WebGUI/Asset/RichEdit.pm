@@ -431,7 +431,7 @@ sub getToolbar {
 #-------------------------------------------------------------------
 sub getRichEditor {
 	my $self = shift;
-	return '' if ($self->getValue('disableRichEditor') || $self->session->env->get("HTTP_USER_AGENT") =~ /Safari/);
+	return '' if ($self->getValue('disableRichEditor'));
 	my $nameId = shift;
 	#my @toolbarRows = grep{@$_} map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
 	my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);

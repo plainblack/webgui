@@ -62,7 +62,7 @@ Style attributes besides width and height which should be specified using the ab
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
-=head4 resizeable 
+=head4 resizable 
 
 A boolean indicating whether the text area can be reized by users. Defaults to 1.
 
@@ -86,7 +86,7 @@ sub definition {
 		style=>{
 			defaultValue => undef,
 			},
-		resizeable => {
+		resizable => {
 			defaultValue => 1,
 			},
 		profileEnabled=>{
@@ -112,10 +112,10 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my $style = $self->get("style");
+	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
 	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>';
+	if ($self->get("resizable")) {
 		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
-	if ($self->get("resizeable")) {
 		my ($style, $url) = $self->session->quick(qw(style url));
 		$style->setScript($url->extras("yui/build/yahoo/yahoo-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
