@@ -158,7 +158,7 @@ sub getEditForm {
         formKeywords => WebGUI::Form::text($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
-            });
+            }),
 		allowsAttachments => $wiki->get("maxAttachments"),
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
@@ -319,7 +319,20 @@ sub update {
 sub view {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiPage");
+    my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({
+        asset=>$self,
+        asArrayRef=>1,
+        });
+    my $wiki = $self->getWiki;
+    my @keywordsLoop = ();
+    foreach my $word (@{$keywords}) {
+        push(@keywordsLoop, {
+            keyword=>$word,
+            url=>$wiki->getUrl("func=byKeyword;keyword=".$word),
+            });
+    }
 	my $var = {
+        keywordsLoop => \@keywordsLoop,
 		viewLabel => $i18n->get("viewLabel"),
 		editLabel => $i18n->get("editLabel"),
 		historyLabel => $i18n->get("historyLabel"),

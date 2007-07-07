@@ -325,6 +325,10 @@ if ($notRun) {
 UPGRADES COMPLETE
 Please restart your web server and test your sites.
 
+WARNING: If you saw any errors in the output during the upgrade, restore 
+your install and databases from backup immediately. Do not continue using 
+your site EVEN IF IT SEEMS TO WORK.
+
 NOTE: If you have not already done so, please consult
 docs/gotcha.txt for possible upgrade complications.
 

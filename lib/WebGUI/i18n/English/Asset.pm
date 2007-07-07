@@ -7,6 +7,12 @@ our $I18N = {
 		context => q|A button added to all asset properties pages when save and commit mode is enabled.|
 	},
 
+	'keywords' => {
+		message => q|Keywords|,
+		lastUpdated => 0,
+		context => q|A label for the property that relates assets to keywords.|
+	},
+
 	'add the missing page' => {
 		message => q|Add the missing page.|,
 		lastUpdated => 0,

@@ -17,6 +17,7 @@ package WebGUI::Keyword;
 use strict;
 use Class::InsideOut qw(public register id);
 use HTML::TagCloud;
+use WebGUI::Paginator;
 
 =head1 NAME
 
@@ -104,7 +105,7 @@ The www func that will be called on the displayAsset to display the list of asse
 
 =head3 cloudLevels
 
-How many levels of keyword sizes should there be displayed in the cloud. Defaults to 10.
+How many levels of keyword sizes should there be displayed in the cloud. Defaults to 24. Range between 2 and 24.
 
 =head3 startAsset
 
@@ -124,7 +125,7 @@ sub generateCloud {
     my $sth = $self->session->db->read("select count(*) as keywordTotal, keyword from assetKeyword 
         left join asset using (assetId) where lineage like ? group by keyword order by keywordTotal limit 50", 
         [ $options->{startAsset}->get("lineage").'%' ]);
-    my $cloud = HTML::TagCloud->new(levels=>$options->{cloudLevels} || 10);
+    my $cloud = HTML::TagCloud->new(levels=>$options->{cloudLevels} || 24);
     while (my ($count, $keyword) = $sth->array) {
         $cloud->add($keyword, $display->getUrl("func=".$options->{displayFunc}.";keyword=".$keyword), $count);
     }
@@ -148,8 +149,7 @@ A boolean, that if set to 1 will return the keywords as an array reference rathe
 =cut
 
 sub getKeywordsForAsset {
-    my $self = shift;
-    my $options = shift;
+    my ($self, $options) = @_;
     my @keywords = $self->session->db->buildArray("select keyword from assetKeyword where assetId=?",
         [$options->{asset}->getId]);
     if ($options->{asArrayRef}) {
@@ -163,7 +163,43 @@ sub getKeywordsForAsset {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session )
+=head2 getMatchingAssets ( { startAsset => $asset, keyword => $keyword } )
+
+Returns an array reference of asset ids matching the start point + keyword.
+
+=head3 startAsset
+
+An asset object where you'd like to start searching for matching keywords.
+
+=head3 keyword
+
+The keyword to match.
+
+=head3 usePaginator
+
+Instead of returning an array reference of assetId's, return a paginator object. 
+
+=cut
+
+sub getMatchingAssets {
+    my ($self, $options) = @_;
+    my $query = "select assetKeyword.assetId from assetKeyword left join asset using (assetId) 
+        where lineage like ? and keyword=? order by creationDate desc";
+    my $params = [$options->{startAsset}->get("lineage").'%', $options->{keyword}];
+    if ($options->{usePaginator}) {
+        my $p = WebGUI::Paginator->new($self->session);
+        $p->setDataByQuery($query, undef, undef, $params);
+        return $p;
+    }
+    else {
+        return $self->session->db->buildArrayRef($query, $params);
+    }
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( $session )
 
 Constructor.
 

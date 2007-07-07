@@ -132,6 +132,10 @@ our $I18N = {
 		lastUpdated => 1160157064,
 	},
 
+ 'byKeywordTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to display a
+listing of pages that are related to a specific keyword?| },
+ 'byKeywordTemplateId label' => { lastUpdated => 1160157064, message => q|By Keyword Template| },
+
  'pageTemplateId hoverHelp' => { lastUpdated => 1160157064, message => q|Which template to use to display pages?| },
  'pageTemplateId label' => { lastUpdated => 1160157064, message => q|Page Template| },
 

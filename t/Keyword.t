@@ -48,5 +48,6 @@ unlike($keyword->getKeywordsForAsset({asset=>$home }), qr/owns/, "getLatestVersi
 
 $keyword->deleteKeywordsForAsset($home);
 is(scalar(@{$keyword->getKeywordsForAsset({ asset=>$home, asArrayRef=>1})}), 0, "getKeywordsForAsset()");
-
+undef $keyword;
+undef $home;
 

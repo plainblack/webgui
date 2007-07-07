@@ -233,6 +233,13 @@ sub definition {
 					  hoverHelp => $i18n->get('recentChangesTemplateId hoverHelp'),
 					  label => $i18n->get('recentChangesTemplateId label') },
 
+	     byKeywordTemplateId => { fieldType => 'template',
+					  namespace => 'WikiMaster_byKeyword',
+					  defaultValue => 'WikiKeyword00000000001',
+					  tab => 'display',
+					  hoverHelp => $i18n->get('byKeywordTemplateId hoverHelp'),
+					  label => $i18n->get('byKeywordTemplateId label') },
+
 	     searchTemplateId => { fieldType => 'template',
 				   namespace => 'WikiMaster_search',
 				   defaultValue => 'WikiSearchTmpl00000001',
@@ -361,12 +368,45 @@ sub view {
 		recentChangesLabel=>$i18n->get("recentChangesLabel"),
 		restoreLabel => $i18n->get("restoreLabel"),
 		canAdminister => $self->canAdminister,
+        keywordCloud => WebGUI::Keyword->new($self->session)->generateCloud({
+            startAsset=>$self,
+            displayFunc=>"byKeyword",
+            }),
 		};
 	my $template = $self->{_frontPageTemplate};
 	$self->appendSearchBoxVars($var);
 	$self->appendRecentChanges($var, $self->get('recentChangesCountFront'));
 	$self->appendMostPopular($var, $self->get('mostPopularCountFront'));
 	return $self->processTemplate($var, undef, $template);
+}
+
+
+#-------------------------------------------------------------------
+sub www_byKeyword {
+    my $self = shift;
+    my $keyword = $self->session->form->process("keyword");
+    my @pages = ();
+    my $p = WebGUI::Keyword->new($self->session)->getMatchingAssets({
+        startAsset      => $self,
+        keyword         => $keyword,   
+        usePaginator    => 1,
+        });
+    $p->setBaseUrl($self->getUrl("func=byKeyword"));
+    foreach my $assetData (@{$p->getPageData}) {
+$self->session->errorHandler->warn($assetData->{assetId});
+        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetData->{assetId});
+        next unless defined $asset;
+        push(@pages, {
+            title   => $asset->getTitle,
+            url     => $asset->getUrl,
+            });
+    }
+    my $var = {
+        keyword => $keyword,
+        pagesLoop => \@pages,
+        };
+    $p->appendTemplateVars($var);
+	return $self->processStyle($self->processTemplate($var, $self->get('byKeywordTemplateId')));
 }
 
 

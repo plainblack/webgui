@@ -45,6 +45,8 @@ sub addKeywordTagging {
         index keyword (keyword),
         index assetId (assetId)
         )"); 
+    $session->db->write("alter table WikiMaster add column byKeywordTemplateId varchar(22) binary 
+        not null default 'WikiKeyword00000000001'");
 }
 
 #-------------------------------------------------
