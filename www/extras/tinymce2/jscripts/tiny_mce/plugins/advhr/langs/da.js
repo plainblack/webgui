@@ -1,4 +1,4 @@
-// DK lang variables contributed by Jan Moelgaard, John Dalsgaard and Bo Frederiksen.
+// DK lang variables - Transl.:Jan Moelgaard, Bo Frederiksen, John Dalsgaard - Corr.:
 
 tinyMCE.addToLang('',{
 insert_advhr_desc : 'Inds&aelig;t / rediger horisontal linie',

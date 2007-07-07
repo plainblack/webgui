@@ -1,4 +1,4 @@
-// RU lang variables KOI8-R
+// RU lang variables
 
 tinyMCE.addToLang('',{
 fullscreen_title : 'Полноэкранный режим',

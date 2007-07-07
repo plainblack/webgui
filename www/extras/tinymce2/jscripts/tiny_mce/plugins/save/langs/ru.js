@@ -1,5 +1,5 @@
-// RU lang variables cp1251
+// RU lang variables
 
 tinyMCE.addToLang('',{
-save_desc : 'Сохранить'
+save_desc : 'РЎРѕС…СЂР°РЅРёС‚СЊ'
 });

@@ -1,5 +1,5 @@
-// DK lang variables contributed by Jan Moelgaard
+// DK lang variables - Transl.:Jan Moelgaard - Corr.: Ronny Buelund
 
 tinyMCE.addToLang('',{
-preview_desc : 'Se siden'
+preview_desc : 'Forh&aring;ndsvisning'
 });

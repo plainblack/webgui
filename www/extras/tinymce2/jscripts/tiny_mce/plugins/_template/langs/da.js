@@ -1,4 +1,4 @@
-// DK lang variables contributed by Jan Moelgaard
+// DK lang variables - Transl.:Jan Moelgaard - Corr.:
 
 /* Remember to namespace the language parameters lang_<your plugin>_<some name> */
 

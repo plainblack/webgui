@@ -1,8 +1,8 @@
-// DK lang variables contributed by Jan Moelgaard, John Dalsgaard and Bo Frederiksen.
+// DK lang variables - Transl.:Jan Moelgaard, Bo Frederiksen, John Dalsgaard - Corr.:
 
 tinyMCE.addToLang('',{
-insertdate_def_fmt : '%d-%m-%Y',
-inserttime_def_fmt : '%H:%M:%S',
+insertdate_def_fmt : '%d-%m-%&Aring;',
+inserttime_def_fmt : '%T:%M:%S',
 insertdate_desc : 'Inds&aelig;t dato',
 inserttime_desc : 'Inds&aelig;t tid',
 inserttime_months_long : new Array("Januar", "Februar", "Marts", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"),

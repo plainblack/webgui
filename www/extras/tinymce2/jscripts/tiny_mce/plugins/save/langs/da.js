@@ -1,4 +1,4 @@
-// DK lang variables contributed by Jan Moelgaard
+// DK lang variables - Transl.:Jan Moelgaard - Corr.:
 
 tinyMCE.addToLang('',{
 save_desc : 'Gem'

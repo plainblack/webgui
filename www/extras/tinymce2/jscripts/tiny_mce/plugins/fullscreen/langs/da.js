@@ -1,6 +1,5 @@
-// DK lang variables contributed by Jan Moelgaard, John Dalsgaard and Bo Frederiksen.
+// // DK lang variables - Transl.:Jan Moelgaard, Bo Frederiksen - Corr.:
 
 tinyMCE.addToLang('',{
-fullscreen_title : 'Fuldsk&aelig;rmstilstand',
-fullscreen_desc : 'T&aelig;nd / sluk for fuldsk&aelig;rm'
+fullscreen_desc : 'Skift fuldsk&aelig;rms mode'
 });

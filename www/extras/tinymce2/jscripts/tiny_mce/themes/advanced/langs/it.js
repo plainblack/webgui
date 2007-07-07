@@ -1,4 +1,10 @@
-// IT lang variables
+/**
+ * IT lang variables
+ * 
+ * Author : Luciano Vernaschi <luciano@virgilio.it>
+ * Last Updated : Mar. 1st, 2007
+ * TinyMCE Version : 2.1.0
+ */
 
 tinyMCE.addToLang('',{
 theme_style_select : '-- Stili --',
@@ -78,5 +84,15 @@ help : 'Aiuto',
 not_set : '-- Non impostato --',
 close : 'Chiudi',
 toolbar_focus : 'Passa ai bottoni - Alt+Q, Passa all\'editor - Alt-Z, Passa al percorso - Alt-X',
+invalid_data : 'Errore: introdotti valori non validi (sono indicati in rosso).',
+more_colors : 'Pi&ugrave; colori',
+color_picker_tab : 'Selettore',
+color_picker : 'Selettore di colori',
+web_colors_tab : 'Web safe',
+web_colors : 'Colori web safe',
+named_colors_tab : 'Per nome',
+named_colors : 'Colori per nome',
+color : 'Colore:',
+color_name : 'Nome:',
 theme_advanced_anchor_delta_width : 25
 });
