@@ -64,7 +64,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 9 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 14 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -108,6 +108,21 @@ cmp_bag($imageStore->getFiles(1), $expectedFiles, '... even when the allFiles sw
 
 foreach my $extTest ( @{ $extensionTests } ) {
 	is( $imageStore->isImage($extTest->{filename}), $extTest->{isImage}, $extTest->{comment} );
+}
+
+####################################################
+#
+# getSizeInPixels
+#
+####################################################
+
+TODO: {
+	local $TODO = "Methods that need to be tested";
+	ok(0, 'copy also copies thumbnails');
+	ok(0, 'deleteFile also deletes thumbnails');
+	ok(0, 'getThumbnailUrl');
+	ok(0, 'generateThumbnail');
+	ok(0, 'resize');
 }
 
 END {
