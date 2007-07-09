@@ -39,6 +39,13 @@ sub archive {
 }
 
 #-------------------------------------------------------------------
+sub canAdd {
+    my $class   = shift;
+    my $session = shift;
+    return $session->user->isInGroup($session->asset->get('canStartThreadGroupId'));
+}
+
+#-------------------------------------------------------------------
 sub canReply {
 	my $self = shift;
 	return !$self->isThreadLocked && $self->getParent->get("allowReplies") && $self->getParent->canPost;
