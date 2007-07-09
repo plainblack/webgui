@@ -4,6 +4,7 @@
    WebGUI::Operation::FormHelpers::www_formHelper and 
    WebGUI::Operation::Workflow::www_activityHelper for details.
  - Added pagination to purchase history in commerce.
+ - Replaced color picker form control with a more robust version.
  - Added keyword tagging api.
  - Added keyword tagging to Wiki.
  - Upgraded TinyMCE to 2.1.1.1.

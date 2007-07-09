@@ -121,9 +121,9 @@ sub toHtml {
 		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/dom/dom-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"), {type=>"text/javascript"});
-		$style->setLink($url->extras("yui-ext/resources/css/ext-all.css"), {type=>"text/css", rel=>"stylesheet"});
-		$style->setScript($url->extras("yui-ext/adapter/yui/ext-yui-adapter.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui-ext/ext-all.js"), {type=>"text/javascript"});
+		$style->setLink($url->extras("extjs/resources/css/ext-all.css"), {type=>"text/css", rel=>"stylesheet"});
+		$style->setScript($url->extras("extjs/adapter/yui/ext-yui-adapter.js"), {type=>"text/javascript"});
+		$style->setScript($url->extras("extjs/ext-all.js"), {type=>"text/javascript"});
 		$out .= qq|
 		<script type="text/javascript">
 			YAHOO.util.Event.addListener(window, 'load', function () {

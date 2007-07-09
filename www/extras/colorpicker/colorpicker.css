@@ -1,0 +1,10 @@
+    #ddPicker { position: absolute; background-color: #eeeeee; top: 200px; left: 20px; width: 360px; height: 240px; z-index: 1000; }
+    #ddPicker input { font-size: .85em }
+    #pickerHandle { background-color: #bbbbbb; height: 10px; cursor: move; }
+    #hueThumb { cursor:default; width:18px; height:18px; z-index: 9; position:absolute; }
+    #hueBg {-moz-outline: none; outline:0px none; position:absolute; left:216px; height:198px; width:18px; background:url(/extras/colorpicker/hue.png) no-repeat; top:18px; }
+    #pickerDiv {-moz-outline: none; outline:0px none; position:absolute; left:10px; height:187px; width:188px; background-color:#FF0000; top:20px; }
+    #pickerbg { position:absolute; z-index: 1; top:0px; left:0px; } 
+    #selector { cursor:default; width:11px; height:11px; z-index: 9; position:absolute; top:0px; left:0px; }
+    #valdiv { text-align:right; position:absolute; top: 86px; left:246px; } 
+    #swatch { position:absolute; left:260px; top:30px; height:60px; width:60px; border:2px solid #aaaaaa; }

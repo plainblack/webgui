@@ -89,8 +89,25 @@ Renders a color picker control.
 
 sub toHtml {
 	my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('colorPicker.js'),{ type=>'text/javascript' });
-        return '<script type="text/javascript">initColorPicker("'.$self->get("name").'","'.($self->get("value")).'");</script>';
+    my $url = $self->session->url;
+    my $style = $self->session->style;
+	$style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/yui/build/dragdrop/dragdrop-min.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/yui/build/animation/animation-min.js'),{ type=>'text/javascript' });
+	$style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
+	$style->setScript($url->extras('/colorpicker/color.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/colorpicker/key.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/yui/build/slider/slider-min.js'),{ type=>'text/javascript' });
+	$style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
+    my $id = $self->get("id");
+    my $value = $self->get("value");
+    return q| <a href="javascript:webguiColorPicker.display('|. $id. q|');" id="|. $id.q|_swatch"
+    style="width: 20px; height: 20px; background-color: |.$value.q|; border: 1px solid black; float: left;"></a>
+   <input onchange="document.getElementById('|.$id.q|_swatch').style.backgroundColor=this.value;" 
+   maxlength="7" name="|.$self->get("name").q|" type="text" size="8" value="|.$value.q|" id="|.$id.q|" />|;
+
 }
 
 1;
