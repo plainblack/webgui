@@ -47,7 +47,12 @@ sub addCanStartThreadToCS {
     # set defaults for existing records
     $session->db->write('UPDATE Collaboration SET canStartThreadGroupId = postGroupId');
     $session->db->write('UPDATE Collaboration SET threadApprovalWorkflow = approvalWorkflow');
-    
+
+    # add it to the config file
+    my $workflowActivities = $session->config->get('workflowActivities');
+    push @{ $workflowActivities->{None} }, 'WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags';
+    $session->config->set('workflowActivities',$workflowActivities);
+
     return;
 }
 
