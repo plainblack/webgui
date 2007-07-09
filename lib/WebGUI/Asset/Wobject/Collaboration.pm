@@ -290,6 +290,21 @@ sub canSubscribe {
 }
 
 #-------------------------------------------------------------------
+sub canStartThread {
+	my $self = shift;
+	return (
+		(
+			$self->get("status") eq "approved" || 
+			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
+		) && (
+			$self->session->user->isInGroup($self->get("canStartThreadGroupId")) 
+			|| $self->SUPER::canEdit
+		)
+	);
+}
+
+
+#-------------------------------------------------------------------
 sub canView {
 	my $self = shift;
 	return $self->SUPER::canView || $self->canPost;
@@ -392,6 +407,14 @@ sub definition {
 			tab=>'security',
 			label=>$i18n->get('approval workflow'),
 			hoverHelp=>$i18n->get('approval workflow description'),
+			},
+		threadApprovalWorkflow =>{
+			fieldType=>"workflow",
+			defaultValue=>"pbworkflow000000000003",
+			type=>'WebGUI::VersionTag',
+			tab=>'security',
+			label=>$i18n->get('thread approval workflow'),
+			hoverHelp=>$i18n->get('thread approval workflow description'),
 			},
 		thumbnailSize => {
 			fieldType => "integer",
@@ -683,6 +706,13 @@ sub definition {
 			label=>$i18n->get('who posts'),
 			hoverHelp=>$i18n->get('who posts description'),
 			},
+		canStartThreadGroupId =>{
+			fieldType=>"group",
+			defaultValue=>'2',
+			tab=>'security',
+			label=>$i18n->get('who threads'),
+			hoverHelp=>$i18n->get('who threads description'),
+			},
 		defaultKarmaScale => {
 			fieldType=>"integer",
 			defaultValue=>1,
@@ -904,6 +934,7 @@ sub getViewTemplateVars {
 	$sortOrder ||= "desc";
 	my %var;
 	$var{'user.canPost'} = $self->canPost;
+	$var{'user.canStartThread'} = $self->canStartThread;
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
@@ -1039,7 +1070,7 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId"));
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
 	$self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
 	$template->prepare;
 	$self->{_viewTemplate} = $template;

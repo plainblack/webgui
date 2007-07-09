@@ -62,8 +62,18 @@ our $HELP = {
                                 namespace => 'Asset_Collaboration',
                         },
                         {
+                                title => 'who threads',
+                                description => 'who threads description',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
                                 title => 'approval workflow',
                                 description => 'approval workflow description',
+                                namespace => 'Asset_Collaboration',
+                        },
+                        {
+                                title => 'thread approval workflow',
+                                description => 'thread approval workflow description',
                                 namespace => 'Asset_Collaboration',
                         },
                         {

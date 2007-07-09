@@ -645,6 +645,11 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
+	'who threads' => {
+		message => q|Who can post a thread?|,
+		lastUpdated => 1109698614,
+	},
+
 	'threads/page' => {
 		message => q|Threads Per Page|,
 		lastUpdated => 1109698614,
@@ -1106,8 +1111,23 @@ properties listed below:</p>
                 lastUpdated => 0,
         },
 
+        'thread approval workflow description' => {
+                message => q|Choose a workflow to be executed on each thread as it gets submitted.|,
+                lastUpdated => 0,
+        },
+
+        'thread approval workflow' => {
+                message => q|Thread Approval Workflow|,
+                lastUpdated => 0,
+        },
+
         'who posts description' => {
                 message => q|The group allowed to submit posts to this Asset.|,
+                lastUpdated => 1119070429,
+        },
+
+        'who threads description' => {
+                message => q|The group allowed to start a thread in this Asset.|,
                 lastUpdated => 1119070429,
         },
 

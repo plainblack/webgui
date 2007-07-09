@@ -412,7 +412,7 @@
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
 			"WebGUI::Workflow::Activity::SendQueuedMailMessages","WebGUI::Workflow::Activity::CleanDatabaseCache",
-			"WebGUI::Workflow::Activity::CalendarUpdateFeeds"],
+			"WebGUI::Workflow::Activity::CalendarUpdateFeeds","WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags"],
 		"WebGUI::User" : ["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag" : ["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob",

@@ -31,8 +31,25 @@ addUserInvitations($session);
 addPrivateMessaging($session);
 addNewsletter($session);
 addHttpProxyUrlPatternFilter($session);
+addCanStartThreadToCS($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+
+sub addCanStartThreadToCS {
+    my $session = shift;
+
+    # add the columns required
+    $session->db->write("ALTER TABLE Collaboration add column canStartThreadGroupId varchar(22) NOT NULL default 2 AFTER postGroupId");
+    $session->db->write("ALTER TABLE Collaboration add column threadApprovalWorkflow varchar(22) NOT NULL default 'pbworkflow000000000003' AFTER approvalWorkflow");
+
+    # set defaults for existing records
+    $session->db->write('UPDATE Collaboration SET canStartThreadGroupId = postGroupId');
+    $session->db->write('UPDATE Collaboration SET threadApprovalWorkflow = approvalWorkflow');
+    
+    return;
+}
 
 #-------------------------------------------------
 sub addKeywordTagging {
