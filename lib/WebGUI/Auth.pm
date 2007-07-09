@@ -367,6 +367,22 @@ sub deleteParams {
 
 #-------------------------------------------------------------------
 
+=head2 deleteSingleParam ( )
+
+Removes a single authentication parameter from the database.
+
+=cut
+
+sub deleteSingleParam {
+       my $self = shift;
+       my ($userId, $authMethod, $fieldName) = @_;
+
+       $self->session->db->write('delete from authentication where userId = ? and authMethod = ? and fieldName = ?', [$userId, $authMethod, $fieldName]);
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 displayAccount ( method [,vars] )
 
 Superclass method that performs general functionality for viewing editable fields related to a user's account.

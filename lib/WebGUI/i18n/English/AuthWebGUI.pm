@@ -573,6 +573,113 @@ our $I18N = {
         message         => q{Number of upper-case characters required in password},
         lastUpdated     => 0,
     },
+
+	'password recovery email label' => {
+		message => q|Email Address|,
+		lastUpdated => 1177127324,
+	},
+
+	'password recovery email hoverHelp' => {
+		message => q|Enter your login name|,
+		lastUpdated => 1177127324,
+	},
+	
+	'password recovery login label' => {
+		message => q|Login Name|,
+		lastUpdated => 1177127324,
+	},
+
+	'password recovery login hoverHelp' => {
+		message => q|Enter your email address here|,
+		lastUpdated => 1177127324,
+	},
+
+	'new password label' => {
+		message => q|New Password|,
+		lastUpdated => 1177127324,
+	},
+
+	'new password help' => {
+		message => q|Enter your new password here|,
+		lastUpdated => 1177127324,
+	},
+
+	'new password verify' => {
+		message => q|Verify New Password|,
+		lastUpdated => 1177127324,
+	},
+
+	'new password verify help' => {
+		message => q|Enter your password again to verify|,
+		lastUpdated => 177127324,
+	},
+
+	'recover password not found' => {
+		message => q|We have no record of a user matching the information you have given|,
+		lastUpdated => 177127324,
+	},
+
+	'recover password email text1' => {
+		message => q|We have received your request the password for |,
+		lastUpdated => 177127324,
+	},
+	
+	'recover password email text2' => {
+		message => q|Pleae use the link below to visit the site and change your password|,
+		lastUpdated => 177127324,
+	},
+
+	'recover password email text3' => {
+		message => q|If you did not request your password to be recovered, please contact the system administrator by replying to this message|,
+		lastUpdated => 177127324,
+	},
+
+	'recover password banner' => {
+		message => q|Password Recovery|,
+		lastUpdated => 177127324,
+	},
+
+	'email recover password finish message1' => {
+		message => q|An email has been sent to |,
+		lastUpdated => 177127324,
+	},
+
+	'email recover password finish message2' => {
+		message => q| with instructions for resetting your password.|,
+		lastUpdated => 177127324,
+	},
+
+	'email recover password start message' => {
+		message => q|Enter either your email address or your login below to initiate the passwrod recovery process.|,
+		lastUpdated => 177127324,
+	},
+
+	'email password recovery end message' => {
+		message => q|Enter a new password for your account below.|,
+		lastUpdated => 177127324,
+	},
+
+    'setting passwordRecoveryType profile' => {
+        message     => "Profile field",
+        lastUpdated => 0,
+    },
+
+    'setting passwordRecoveryType email' => {
+        message     => "E-mail address",
+        lastUpdated => 0,
+    },
+
+    'setting passwordRecoveryType none' => {
+        message     => "No",
+        lastUpdated => 0,
+    },
+
+    'error passwordRecoveryType no profile fields required' => {
+        message     => q{Cannot enable WebGUI authentication password recovery 
+                        by profile field: There are no user profile fields required for password recovery.},
+        lastUpdated => 0,
+    },
+
 };
 
 1;

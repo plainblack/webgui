@@ -68,6 +68,9 @@
  - Collaboration System wobjects can now be subclassed and still work with the
    existing Thread and Post assets.
  - fix: Added some additional i18n that was missing.
+ - add: Settings can now return error messages to the user
+ - add: Password recovery can now be based on profile fields or simply by the
+   user's e-mail address.
 
 7.3.20
  - fix: Deactivated Users Subscriptions (perlDreamer Consulting, LLC)

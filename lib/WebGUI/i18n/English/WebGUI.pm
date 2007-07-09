@@ -4251,6 +4251,16 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
 		message => q|Choose a template for sending private messages|,
 		lastUpdated => 1181019679,
 	},
+
+    'editSettings error occurred' => {
+        message     => q{The following errors occurred while trying to save settings.},
+        lastUpdated => 0,
+    },
+
+    'editSettings done' => {
+        message     => "Settings saved!",
+        lastUpdated => 0,
+    },
     
 };
 

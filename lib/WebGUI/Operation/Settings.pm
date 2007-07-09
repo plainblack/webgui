@@ -440,46 +440,83 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 www_editSettings ( $session )
+=head2 www_editSettings ( $session, $argsHash )
 
 Display a form for sitewide settings, if the user is in group Admin (3).
+
+argsHash is a hash reference of additional arguments to this sub. Available
+keys:
+
+ errors     - An array reference of errors with processing the site settings
+                NOTE: Must be i18n BEFORE given to this sub
+ message    - A benign message to the user
+                NOTE: Must be i18n BEFORE given to this sub
 
 =cut
 
 sub www_editSettings {
-	my $session = shift;
+	my $session     = shift;
+    my $argsHash    = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new($session, "WebGUI");
-	my %tabs;
-	tie %tabs, 'Tie::IxHash';
- 	%tabs = (
-       		company=>{ label=>$i18n->get("company") },
-        	content=>{ label=>$i18n->get("content") },
-        	ui=>{ label=>$i18n->get("ui") },
-        	messaging=>{ label=>$i18n->get("messaging") },
-        	misc=>{ label=>$i18n->get("misc") },
-        	user=>{ label=>$i18n->get("user") },
-        	auth=>{ label=>$i18n->get("authentication") },
-        );
+	my $i18n        = WebGUI::International->new($session, "WebGUI");
+    my $output      = '';
+
+    # Show any errors or message
+    if ($argsHash->{message}) {
+        $output .= '<p>' . $argsHash->{message} . '</p>';
+    }
+    my @errors  = @{ $argsHash->{errors} };
+    if (@errors) {
+        $output .= '<p>' . $i18n->get("editSettings error occurred") . '</p>'
+                . '<ul>'
+                ;
+        for my $error (@errors) {
+            $output     .= "<li>$error</li>";
+        }
+        $output .= '</ul>';
+    }
+
+    # Available tabs
+    # TODO: Build this from the definition instead.
+	tie my %tabs, 'Tie::IxHash', (
+        company     => { label => $i18n->get("company") },
+        content     => { label => $i18n->get("content") },
+        ui          => { label => $i18n->get("ui") },
+        messaging   => { label => $i18n->get("messaging") },
+        misc        => { label => $i18n->get("misc") },
+        user        => { label => $i18n->get("user") },
+        auth        => { label => $i18n->get("authentication") },
+    );
+
+    # Start the form
  	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->hidden({
-		name=>"op",
-		value=>"saveSettings"});
+		name        => "op",
+		value       => "saveSettings"
+    });
+
 	my $definitions = definition($session, $i18n);
 	foreach my $definition (@{$definitions}) {
 		$tabform->getTab($definition->{tab})->dynamicField(%{$definition});
 	}
+
+    # Get fieldsets for avaiable auth methods
 	foreach (@{$session->config->get("authMethods")}) {
 		$tabform->getTab("auth")->fieldSetStart($_);
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
 		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
 		$tabform->getTab("auth")->fieldSetEnd;
 	}
+
 	$tabform->submit();
+    $output .= $tabform->print;
+
 	my $ac = WebGUI::AdminConsole->new($session,"settings");
 	$ac->setHelp("settings");
-	return $ac->render($tabform->print);
+	return $ac->render($output);
 }
+
+#----------------------------------------------------------------------------
 
 =head2 www_saveSettings ( $session )
 
@@ -488,22 +525,29 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_saveSettings {
-	my $session = shift;
+	my $session     = shift;
 	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $i18n = WebGUI::International->new($session, "WebGUI");
+	my $i18n        = WebGUI::International->new($session, "WebGUI");
+	my $setting     = $session->setting;
+	my $form        = $session->form;
+    my @errors;     # Errors trying to save the form
+
 	my $definitions = definition($session, $i18n);
-	my $setting = $session->setting;
-	my $form = $session->form;
 	foreach my $definition (@{$definitions}) {
 		$setting->set($definition->{name}, $form->process($definition->{name}, $definition->{fieldType}, undef, $definition));
 	}
+
 	foreach (@{$session->config->get("authMethods")}) {
-		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
-		$authInstance->editUserSettingsFormSave;
+		my $authInstance    = WebGUI::Operation::Auth::getInstance($session,$_,1);
+
+		my $authErrors          = $authInstance->editUserSettingsFormSave;
+        if ($authErrors) {
+            push @errors, @{ $authErrors };
+        }
 	}
-	return www_editSettings($session);
+
+	return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });
 }
 
 1;
