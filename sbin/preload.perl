@@ -2,19 +2,23 @@ my $webguiRoot;
 my $customLibs;
 
 BEGIN {
-        $webguiRoot = "/data/WebGUI";
-        unshift (@INC, $webguiRoot."/lib");
-        @{$customLibs} = ();
-        open(FILE,"<".$webguiRoot."/sbin/preload.custom");
-        while (my $line = <FILE>) {
-            next if $line =~ m/^#/;
-	        chomp $line;
-	        push(@{$customLibs}, $line);
+    $webguiRoot = "/data/WebGUI";
+    unshift (@INC, $webguiRoot."/lib");
+    @{$customLibs} = ();
+    open(FILE,"<".$webguiRoot."/sbin/preload.custom");
+    while (my $line = <FILE>) {
+        chomp $line;
+        next unless $line;
+        if (!-d $line) {
+            print "WARNING: Not adding lib directory '$line' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
+            next;
         }
-        close(FILE);
-        foreach my $lib (@customLibs) {
-            unshift (@INC, $lib);
-        }
+        push(@{$customLibs}, $line);
+    }
+    close(FILE);
+    foreach my $lib (@{$customLibs}) {
+        unshift @INC, $lib;
+    }
 }
 
 $|=1;
