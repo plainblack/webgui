@@ -1839,7 +1839,7 @@ sub processTemplate {
 			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
 		}
 		$var->{'controls'} = $self->getToolbar;
-		my %vars = (
+                my %vars = (
 			%{$self->{_properties}},
 			%{$var}
 			);

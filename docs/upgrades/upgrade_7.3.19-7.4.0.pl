@@ -40,6 +40,8 @@ finish($session); # this line required
 sub addCanStartThreadToCS {
     my $session = shift;
 
+    print "\tAdding canStartThreadGroupId setting to Collaboration Systems.\n" unless ($quiet);
+
     # add the columns required
     $session->db->write("ALTER TABLE Collaboration add column canStartThreadGroupId varchar(22) NOT NULL default 2 AFTER postGroupId");
     $session->db->write("ALTER TABLE Collaboration add column threadApprovalWorkflow varchar(22) NOT NULL default 'pbworkflow000000000003' AFTER approvalWorkflow");
@@ -58,8 +60,8 @@ sub addCanStartThreadToCS {
 
 #-------------------------------------------------
 sub addKeywordTagging {
-	my $session = shift;
-	print "\tAdding a keyword tagging system.\n" unless ($quiet);
+    my $session = shift;
+    print "\tAdding a keyword tagging system.\n" unless ($quiet);
     $session->db->write("create table assetKeyword (
         keyword varchar(64) not null,
         assetId varchar(22) binary not null,

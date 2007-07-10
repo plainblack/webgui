@@ -25,6 +25,7 @@ var pageHeight=0;
 var pageWidth=0;
 var scrollJump=50;
 var blankCount=1;
+var draggableListOrigClassNames = []; // make sure that we're preserving the locked-asset class, if present
 
 //checks the key Events for copy and paste operations
 //ctrlC ctrlV shiftP shiftY
@@ -142,7 +143,8 @@ function dragable_init(url) {
             for (i = 0; i< children.length;i++) {
                 draggableObjectList[draggableObjectList.length] = children[i];
                 dragableList[dragableList.length]=document.getElementById(children[i].id + "_div");
-            }
+                draggableListOrigClassNames[draggableListOrigClassNames.length] = dragableList[dragableList.length - 1].className;
+            }       
         }
         obj = document.getElementById("position" + contentCount);
         contentCount++;
@@ -338,7 +340,8 @@ function dragable_dragStop(e) {
             for(i=0;i<dragableList.length;i++) {
                 dragableList[i].style.top=0+"px";
                 dragableList[i].style.left=0+"px";
-                dragableList[i].className="dragable";    
+                dragableList[i].className = draggableListOrigClassNames[i];    
+//                dragableList[i].className="dragable";    
             }
         
             //this is a ie hack for a render bug
