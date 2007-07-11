@@ -680,7 +680,8 @@ sub view {
 		$var->{'user.isFirstResponse'} = ($var->{'response.Count'} == 0 && !(exists $var->{'response.id'}));
 		$var->{'user.canRespondAgain'} = ($var->{'response.Count'} < $self->get("maxResponsesPerUser"));
 		if (($var->{'user.isFirstResponse'}) || ($self->session->form->process("startNew") && $var->{'user.canRespondAgain'})) {
-			$var->{'response.Id'} = $self->generateResponseId;
+			$var->{'response.Id'} = "new"; #Added 7-11-07 by fdillon
+            #$var->{'response.Id'} = $self->generateResponseId; #Removed 7-11-07 by fdillon
 		}
 		if ($var->{'response.Id'}) {
 			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
@@ -698,6 +699,10 @@ sub view {
 			name=>'func',
 			value=>'respond'
 			});
+    $var->{'form.header'} .= WebGUI::Form::hidden($self->session, { #Added 7-11-07 by fdillon
+        name=>"startNew", 
+        value=>$self->session->form->process("startNew") 
+    });
 	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var->{'form.submit'} = WebGUI::Form::submit($self->session,{
 			value=>$i18n->get(50)
@@ -1211,7 +1216,16 @@ sub www_moveSectionUp {
 sub www_respond {
 	my $self = shift;
 	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
-	my $varname = $self->getResponseIdString;
+    #If user has not responded before, create the responseId binding the survey to this session: fdillon 7-11-07
+    my $responseCount   = $self->getResponseCount;
+    my $responseId      = $self->getResponseId();
+    my $isFirstResponse = ($rc == 0 && !(defined $rid));
+	my $canRespondAgain = ($rc < $self->get("maxResponsesPerUser"));
+	if ($isFirstResponse || ($self->session->form->process("startNew") && $canRespondAgain)) {
+	    $self->generateResponseId;
+	}
+	
+    my $varname = $self->getResponseIdString;
 	return "" unless ($self->session->scratch->get($varname));
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
 	my $terminate = 0;
@@ -1231,7 +1245,8 @@ sub www_respond {
 				".$self->session->db->quote($self->session->form->process("comment_".$id)).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
 		}
 	}
-	my $responseCount = $self->getQuestionResponseCount($self->session->scratch->get($varname)); 
+	
+    $responseCount = $self->getQuestionResponseCount($self->session->scratch->get($varname)); 
 	if ($terminate || $responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
 		$self->session->db->setRow("Survey_response","Survey_responseId",{
 			isComplete=>1,
