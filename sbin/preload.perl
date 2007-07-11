@@ -9,6 +9,7 @@ BEGIN {
     while (my $line = <FILE>) {
         chomp $line;
         next unless $line;
+        next if $line =~ /^#/;
         if (!-d $line) {
             print "WARNING: Not adding lib directory '$line' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
             next;
