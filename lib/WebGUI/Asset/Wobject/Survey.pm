@@ -1219,8 +1219,8 @@ sub www_respond {
     #If user has not responded before, create the responseId binding the survey to this session: fdillon 7-11-07
     my $responseCount   = $self->getResponseCount;
     my $responseId      = $self->getResponseId();
-    my $isFirstResponse = ($rc == 0 && !(defined $rid));
-	my $canRespondAgain = ($rc < $self->get("maxResponsesPerUser"));
+    my $isFirstResponse = ($responseCount == 0 && !(defined $responseId));
+	my $canRespondAgain = ($responseCount < $self->get("maxResponsesPerUser"));
 	if ($isFirstResponse || ($self->session->form->process("startNew") && $canRespondAgain)) {
 	    $self->generateResponseId;
 	}
