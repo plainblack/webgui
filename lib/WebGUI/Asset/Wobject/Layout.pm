@@ -175,12 +175,14 @@ sub prepareView {
 							$placeHolder{$child->getId} = $child;
 							push(@{$vars{"position1_loop"}},{
 								id=>$child->getId,
+								isUncommitted=> $child->get('status') eq 'pending',
 								content=>"~~~".$child->getId."~~~~~"
 							});
 						} else {
 							$placeHolder{$child->getId} = $child;
 							push(@{$vars{"position".$i."_loop"}},{
 								id=>$child->getId,
+								isUncommitted=>$child->get('status') eq 'pending',
 								content=>"~~~".$child->getId."~~~~~"
 							});
 						}
@@ -229,6 +231,8 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
+        $self->session->errorHandler->warn('count: '. @{ $self->{_viewVars}{position1_loop} });
+        $self->session->errorHandler->warn('first: '. Dumper($self->{_viewVars}{position1_loop}->[0]) );
 	if ($self->{_viewVars}{showAdmin} && $self->canEditIfLocked) {
 		# under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
 		# for end users to work with our templates
@@ -243,6 +247,8 @@ sub view {
 	my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
 	my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
 	my @parts = split("~~~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
+        use Data::Dumper;
+#        $self->session->errorHandler->warn('parts: '.Dumper(\@parts));
 	my $output = "";
 	foreach my $part (@parts) {
 		my ($outputPart, $assetId) = split("~~~",$part,2);
