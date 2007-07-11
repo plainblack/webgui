@@ -32,8 +32,8 @@ my @testSets = (
 	},
 	{
 		input => 'colorPicker.js',
-		output => 'text/plain',
-		comment => q|plain text|,
+		output => 'application/octet-stream',
+		comment => q|javascript|,
 	},
 	{
 		input => 'favIcon.ico',
