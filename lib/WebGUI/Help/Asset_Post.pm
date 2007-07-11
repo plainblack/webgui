@@ -388,6 +388,7 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'notification template' => {
 		title => 'notification template title',
 		body => 'notification template body',
@@ -413,9 +414,15 @@ our $HELP = {
 		            'description' => 'relativeUrl'
 		          },
 		          {
-		            'name' => 'notification.subscription.message',
+		            'name' => 'notify.subscription.message',
 		            'description' => '875'
-		          }
+		          },
+		          {
+		            'name' => 'unsubscribeUrl',
+		          },
+		          {
+		            'name' => 'unsubscribeLinkText',
+		          },
 		],
 		related => [
 			{

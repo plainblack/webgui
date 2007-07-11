@@ -567,11 +567,11 @@ templates in the Collaboration System.</p>
 		lastUpdated => 1149829885,
 	},
 
-	'notification.subscription.message' => {
-		message => q|Internationalized message that a new message has been posted to a thread that the
+    'notify.subscription.message' => {
+        message => q|Internationalized message that a new message has been posted to a thread that the
 user subscribed to.|,
-		lastUpdated => 1149829885,
-	},
+        lastUpdated => 1184174234,
+    },
 
 	'notification template body' => {
 		message => q|<p>In addition to the common Post Template variables, the Notification Template has these variables:
@@ -629,6 +629,16 @@ user subscribed to.|,
 	'meta_X_value' => {
 		message => q|The value for a particular metadata field, picked by name.  X is the name of the metadata field, where any spaces in the name have been changed into underscores.|,
 		lastUpdated => 1180931029
+	},
+
+	'unsubscribeUrl' => {
+		message => q|The URL for the user to unsubscribe.|,
+		lastUpdated => 1184174298
+	},
+
+	'unsubscribeLinkText' => {
+		message => q|The internationalized word "Unsubscribe", to be used a text for the link to unsubscribe.|,
+		lastUpdated => 1184174365
 	},
 
 };
