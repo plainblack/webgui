@@ -45,22 +45,24 @@ Duplicates this asset and the entire subtree below it.  Returns the root of the 
 =cut
 
 sub duplicateBranch {
-	my $self = shift;
-	my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1});
-	my $contentPositions = $self->get("contentPositions");
-	my $assetsToHide = $self->get("assetsToHide");
+    my $self = shift;
+    my $childrenOnly = shift || 0;
 
-	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
-		my $newChild = $child->duplicateBranch;
-		$newChild->setParent($newAsset);
-		my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
-                $contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g if ($contentPositions);
-                $assetsToHide =~ s/\Q${oldChildId}\E/${newChildId}/g if ($assetsToHide);
-	}
+    my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1});
+    my $contentPositions = $self->get("contentPositions");
+    my $assetsToHide = $self->get("assetsToHide");
 
-	$newAsset->update({contentPositions=>$contentPositions}) if $contentPositions;
-	$newAsset->update({assetsToHide=>$assetsToHide}) if $assetsToHide;
-	return $newAsset;
+    foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
+        my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1}) : $child->duplicateBranch;
+        $newChild->setParent($newAsset);
+        my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
+        $contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g if ($contentPositions);
+        $assetsToHide =~ s/\Q${oldChildId}\E/${newChildId}/g if ($assetsToHide);
+    }
+
+    $newAsset->update({contentPositions=>$contentPositions}) if $contentPositions;
+    $newAsset->update({assetsToHide=>$assetsToHide}) if $assetsToHide;
+    return $newAsset;
 }
 
 

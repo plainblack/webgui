@@ -1102,7 +1102,24 @@ sub getToolbar {
 		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url")) if ($userUiLevel >= $uiLevels->{"revisions"});
 	}
         $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))  if ($userUiLevel >= $uiLevels->{"cut"});
-        $toolbar .= $self->session->icon->copy('func=copy',$self->get("url")) if ($userUiLevel >= $uiLevels->{"copy"});
+
+        # if this asset has children, create a more full-featured menu for copying
+        if ($self->getChildCount) {
+            my $copy = '<script type="text/javascript">
+                //<![CDATA[
+                var contextMenu = new contextMenu_createWithImage("'.$self->session->icon->getBaseURL().'copy.gif","'.$self->getId.'_2","'.$i18n->get('copy').'",true);';
+            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("this asset only").'");';
+            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy;with=children").'","'.$i18n->get("with children").'");';
+            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy;with=descendants").'","'.$i18n->get("with descendants").'");';
+            $copy .= 'contextMenu.print();
+                //]]>
+                </script>';
+            $toolbar .= $copy;
+        }
+        else {
+            $toolbar .= $self->session->icon->copy('func=copy',$self->get("url")) if ($userUiLevel >= $uiLevels->{"copy"});
+        }
+        
         $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) if ($userUiLevel >= $uiLevels->{"shortcut"} && !($self->get("className") =~ /Shortcut/));
 	$self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
 	$self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});

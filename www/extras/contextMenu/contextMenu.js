@@ -47,10 +47,11 @@ function contextMenu_hide(){
 	return false;
 }
 
-function contextMenu_createWithImage(imagePath, id, name){
+function contextMenu_createWithImage(imagePath, id, name, addContext){
 	contextMenu_items.push(id);
 	this.id = id;
 	this.name = name;
+	this.addContext = addContext;
 	this.type = "image";
 	this.imagePath=imagePath;
 	this.linkLabels = new Array();
@@ -80,7 +81,14 @@ function contextMenu_draw(){
 	}
 	output += '</div>';
 	if (this.type == "image") {
-		output += '<img src="' + this.imagePath + '" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" alt="' + this.name + '" title="' + this.name + '" align="absmiddle" />';
+                if (this.addContext)
+                        output += '<p style="display: inline; vertical-align: middle;"><a href="javascript:void(0)">';
+                output += '<img src="' + this.imagePath + '" id="contextMenu_' + this.id + '_2" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" alt="' + this.name + '" title="' + this.name + '" align="absmiddle" ';
+                if (this.addContext)
+                        output += 'style="border: 0px none; vertical-align: middle;"';
+                output += ' />';
+                if (this.addContext)
+                        output += '</a></p>';
 	} else {
 		output += '<a href="#" id="contextMenu_' + this.id + '" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)">' + this.name + '</a>';
 	}

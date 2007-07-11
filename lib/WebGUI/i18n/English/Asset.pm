@@ -241,6 +241,24 @@ our $I18N = {
 		context => q|Used in asset context menus.|
 	},
 	
+	'this asset only' => {
+		message => q|This&nbsp;Asset&nbsp;Only|,
+		lastUpdated => 0,
+		context => q|Used in the small pop-up copy menu.|
+	},
+	
+	'with children' => {
+		message => q|With&nbsp;Children|,
+		lastUpdated => 0,
+		context => q|Used in the small pop-up copy menu.|
+	},
+	
+	'with descendants' => {
+		message => q|With&nbsp;Descendants|,
+		lastUpdated => 0,
+		context => q|Used in the small pop-up copy menu.|
+	},
+	
 	'create shortcut' => {
 		message => q|Create Shortcut|,
 		lastUpdated => 0,

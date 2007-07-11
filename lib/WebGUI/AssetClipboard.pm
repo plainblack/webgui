@@ -185,10 +185,23 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 sub www_copy {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
-	$newAsset->update({ title=>$self->getTitle.' (copy)'});
-	$newAsset->cut;
-	return $self->session->asset($self->getContainer)->www_view;
+
+        # with: 'children' || 'descendants' || ''
+        my $with = $self->session->form->get('with') || '';
+
+        if ($with) {
+            my $childrenOnly = $with eq 'children';
+            my $newAsset = $self->duplicateBranch($childrenOnly);
+            $newAsset->update({ title=>$self->getTitle.' (copy)'});
+            $newAsset->cut;
+            return $self->session->asset($self->getContainer)->www_view;
+        }
+        else {
+            my $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
+            $newAsset->update({ title=>$self->getTitle.' (copy)'});
+            $newAsset->cut;
+            return $self->session->asset($self->getContainer)->www_view;
+        }
 }
 
 #-------------------------------------------------------------------
