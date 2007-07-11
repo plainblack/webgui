@@ -670,13 +670,13 @@ sub new {
 }
 
 #-------------------------------------------------------------------
- 
+
 =head2 recoverPassword ( )
- 
+
 Initiates the password recovery process.  Checks for recovery type, and then runs the appropriate method.
- 
+
 =cut
- 
+
 sub recoverPassword {
     my $self = shift;
 
@@ -781,13 +781,13 @@ sub profileRecoverPassword {
 }
   
 #-------------------------------------------------------------------
- 
+
 =head2 recoverPasswordFinish ( ) 
- 
+
 Handles data for recovery of password.  Gets password recovery type, and then runs the appropriate method.
- 
+
 =cut
- 
+
 sub recoverPasswordFinish {
     my $self = shift;
 
