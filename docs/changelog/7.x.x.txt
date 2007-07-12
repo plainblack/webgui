@@ -73,6 +73,8 @@
    user's e-mail address.
 
 7.3.20
+ - Added beta label to the beta components in the system, so people can more
+   easily tell which parts of the system are a work in progress.
  - fix: Deactivated Users Subscriptions (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/deactivated-users-subscriptions
  - fix: Matrix: filling out no fields leads to unapprovable listing (perlDreamer Consulting, LLC)
@@ -81,7 +83,6 @@
     http://www.webgui.org/bugs/tracker/diskusage-will-return--1-if-value-too-large
  - fix: Importing a package logs 'Consult your database tables for corruption' errors (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/importing-a-package-logs-consult-your-database-tables-for-corruption-errors
- - fix: Email validate codes aren't removed after use
  - fix: Session variables still used in Help docs (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/session-variables-still-used-in-help-docs
  - fix: Editing a template sometimes fails (perlDreamer Consulting, LLC)
