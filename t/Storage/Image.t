@@ -15,6 +15,7 @@ our $todo;
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Image;
 use WebGUI::Storage::Image;
 
 use File::Spec;
@@ -112,6 +113,16 @@ foreach my $extTest ( @{ $extensionTests } ) {
 
 ####################################################
 #
+# generateThumbnail
+#
+####################################################
+my $thumbStore = WebGUI::Storage::Image->create($session);
+my $square = WebGUI::Image->new($session, 500, 500);
+$square->setBackgroundColor('#FF0000');
+$square->saveToStorageLocation($thumbStore, 'square.png');
+
+####################################################
+#
 # getSizeInPixels
 #
 ####################################################
@@ -127,7 +138,7 @@ TODO: {
 
 END {
 	foreach my $stor (
-        $imageStore,
+        $imageStore, $thumbStore,
     ) {
 		ref $stor eq "WebGUI::Storage::Image" and $stor->delete;
 	}
