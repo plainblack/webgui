@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 14 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 18 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -120,6 +120,10 @@ my $thumbStore = WebGUI::Storage::Image->create($session);
 my $square = WebGUI::Image->new($session, 500, 500);
 $square->setBackgroundColor('#FF0000');
 $square->saveToStorageLocation($thumbStore, 'square.png');
+is($thumbStore->generateThumbnail(), 0, 'generateThumbnail returns 0 if no filename is supplied');
+is($WebGUI::Test::logger_error, q/Can't generate a thumbnail when you haven't specified a file./, 'generateThumbnail logs an error message for not sending a filename');
+is($thumbStore->generateThumbnail('file.txt'), 0, 'generateThumbnail returns 0 if you try to thumbnail a non-image file');
+is($WebGUI::Test::logger_warns, q/Can't check the size of something that's not an image./, 'generateThumbnail logs a warning message for thumbnailing a non-image file.');
 
 ####################################################
 #
