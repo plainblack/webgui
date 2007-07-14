@@ -100,6 +100,33 @@ sub delete {
 
 #-------------------------------------------------------------------
 
+=head3 databaseName ( )
+
+Based on the DSN, figures out what the database name is.
+
+=cut
+
+sub databaseName {
+	my $self = shift;
+    return $self->{_databaseName} if $self->{_databaseName};
+	my @dsnEntries = split(/[:;]/, $self->get->{DSN});
+
+    my $databaseName;
+	if ($dsnEntries[2] !~ /=/) {
+		$databaseName = $dsnEntries[2];
+	} else {
+		foreach (@dsnEntries) {
+			if ($_ =~ m/^(database|db|dbname)=(.+)$/) {
+				$databaseName = $2;
+				last;
+			}
+		}
+	}
+    return $databaseName;
+}
+
+#-------------------------------------------------------------------
+
 =head2 disconnect ( )
 
 Disconnect cleanly from the current databaseLink. You should always use this method rather than the disconnect method of the actual WebGUI::SQL database handle otherwise you may accidentally close the database handle to the WebGUI database prematurely.
