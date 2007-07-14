@@ -107,21 +107,22 @@ Based on the DSN, figures out what the database name is.
 =cut
 
 sub databaseName {
-	my $self = shift;
+    my $self = shift;
     return $self->{_databaseName} if $self->{_databaseName};
-	my @dsnEntries = split(/[:;]/, $self->get->{DSN});
+    my @dsnEntries = split(/[:;]/, $self->get->{DSN});
 
     my $databaseName;
-	if ($dsnEntries[2] !~ /=/) {
-		$databaseName = $dsnEntries[2];
-	} else {
-		foreach (@dsnEntries) {
-			if ($_ =~ m/^(database|db|dbname)=(.+)$/) {
-				$databaseName = $2;
-				last;
-			}
-		}
-	}
+    if ($dsnEntries[2] !~ /=/) {
+        $databaseName = $dsnEntries[2];
+    }
+    else {
+        foreach (@dsnEntries) {
+            if ($_ =~ m/^(?:database|db|dbname)=(.+)$/) {
+                $databaseName = $1;
+                last;
+            }
+        }
+    }
     return $databaseName;
 }
 
