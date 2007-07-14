@@ -17,7 +17,9 @@ package WebGUI::DatabaseLink;
 
 use strict;
 use Tie::CPHash;
+use WebGUI::SQL;
 use WebGUI::International;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -43,6 +45,75 @@ This package contains utility methods for WebGUI's database link system.
 These subroutines are available from this package:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 checkPrivileges ( $requestedPrivileges, [$overrideGrants] )
+
+Checks that the database has the requested set of privileges and returns true if it
+does.
+
+=head3 requestedPrivileges
+
+An array reference containing the list of privileges to check for this database.
+
+=head3 overrideGrants
+
+An array reference that allows for testing of arbitrary grants.  This argument is
+solely for testing, as it bypasses querying the database for grants.
+
+=cut
+
+sub checkPrivileges {
+	my $self = shift; 
+    my $requestedPrivileges = shift;
+    my $overrideGrants = shift;
+
+    ##Get the grants for the database, respecting the override if it has
+    ##been passed.
+    my @grants;
+    if (defined $overrideGrants) {
+        @grants = @{ $overrideGrants };
+    }
+    else {
+        @grants = $self->db->buildArray('show grants for current_user');
+    }
+
+    ##Parse through the grants, building both the list of grants and the
+    ##database which they belong to.
+    my @privileges;
+	foreach (@grants) {
+        ##Checks for grants on all databases '*' or grants on a specific database
+		if (m/GRANT ([\w\s\d,]*?) ON ([^.]+)/) {
+            my ($privileges, $database) = ($1, $2);
+            $database =~ tr/`//d;
+            $database =~ s/[%*]/.*/g;
+            if ($self->databaseName() =~ /$database/) {
+                push(@privileges, (split(/, /,$privileges)));
+            }
+		}
+	}
+
+    # Check if we found any privileges at all
+    if (! scalar @privileges) {
+        $self->session->errorHandler->warn(
+            sprintf( "DatabaseLink: Could not find SQL privileges or no privileges on database '%s' for user '%s' with database link ID '%s' using DSN '%s'",
+                $self->databaseName, $self->get->{username},
+                $self->getId, $self->get->{DSN},
+            )
+        );
+        return 0;
+    }
+
+	# Check if all required privs are present.
+	return 1 if (isIn('ALL PRIVILEGES', @privileges));
+	
+	foreach (@{ $requestedPrivileges }) {
+		return 0 unless (isIn(uc($_), @privileges));
+	}
+
+    return 1;
+}
 
 #-------------------------------------------------------------------
 
