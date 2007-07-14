@@ -4261,6 +4261,11 @@ Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the
         message     => "Settings saved!",
         lastUpdated => 0,
     },
+     
+    'deactivateAccount success' => {
+        message     => q{%s has been deactivated},
+        lastUpdated => 0,
+    },
     
 };
 

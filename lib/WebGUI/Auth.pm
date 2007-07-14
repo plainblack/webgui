@@ -337,26 +337,43 @@ sub deactivateAccount {
 
 #-------------------------------------------------------------------
 
-=head2 deactivateAccountConfirm ( method )
+=head2 deactivateAccountConfirm ( )
 
 Superclass method that performs general functionality for deactivating accounts.
 
 =cut
 
 sub deactivateAccountConfirm {
-	my $self = shift;
-	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
-	my $u = $self->user;
-	$u->status("Selfdestructed");
-	$self->session->var->end();
-	$self->session->user({userId=>'1'});
+    my $self = shift;
+    
+    # Cannot deactivate "Visitor" or "Admin" users this way
+    return $self->session->privilege->vitalComponent 
+        if $self->userId eq '1' || $self->userId eq '3';
+
+    my $i18n    = WebGUI::International->new($self->session);
+
+    # Change user's status
+    my $user    = $self->user;
+    $user->status("Selfdestructed");
+    
+    # TODO: Fix displayLogin in all subclasses to have the same prototype. THIS WILL BREAK API!
+    # Show the login form 
+    #$self->logout;
+    #return $self->displayLogin(undef, {
+        #'login.message' => sprintf( $i18n->get("deactivateAccount success"), $user->username )
+    #});
+
+    $self->logout;
+    return undef;
 }
 
 #-------------------------------------------------------------------
 
 =head2 deleteParams (  )
 
-Removes the user's authentication parameters from the database for all authentication methods. This is primarily useful when deleting the user's account.
+Removes the user's authentication parameters from the database for all 
+authentication methods. This is primarily useful when deleting the user's 
+account.
 
 =cut
 
@@ -436,35 +453,35 @@ Array ref of template vars from subclass
 =cut
 
 sub displayLogin {
-    	my $self = shift;
-	my $method = $_[0] || "login";
-	my $vars = $_[1];
-	# Automatically set redirectAfterLogin unless we've linked here directly
-	# or it's already been set to perform another operation
-	unless ($self->session->form->process("op") eq "auth"
-		|| ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) ) {
-	   	$self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
-	}
+    my $self = shift;
+    my $method = $_[0] || "login";
+    my $vars = $_[1];
+    # Automatically set redirectAfterLogin unless we've linked here directly
+    # or it's already been set to perform another operation
+    unless ($self->session->form->process("op") eq "auth" 
+        || ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) ) {
+        $self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
+    }
     my $i18n = WebGUI::International->new($self->session);
-	$vars->{title} = $i18n->get(66);
-	my $action;
-        if ($self->session->setting->get("encryptLogin")) {
-                $action = $self->session->url->page(undef,1);
-                $action =~ s/http:/https:/;
-        }
-	$vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
-    	$vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-	$vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-	$vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
-    	$vars->{'login.form.username.label'} = $i18n->get(50);
-    	$vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
-    	$vars->{'login.form.password.label'} = $i18n->get(51);
-	$vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
-	$vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
-	$vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
-	$vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
-	$vars->{'createAccount.label'} = $i18n->get(67);
-	return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
+    $vars->{title} = $i18n->get(66);
+    my $action;
+    if ($self->session->setting->get("encryptLogin")) {
+        $action = $self->session->url->page(undef,1);
+        $action =~ s/http:/https:/;
+    }
+    $vars->{'login.form.header'} = WebGUI::Form::formHeader($self->session,{action=>$action});
+    $vars->{'login.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
+    $vars->{'login.form.hidden'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
+    $vars->{'login.form.username'} = WebGUI::Form::text($self->session,{"name"=>"username"});
+    $vars->{'login.form.username.label'} = $i18n->get(50);
+    $vars->{'login.form.password'} = WebGUI::Form::password($self->session,{"name"=>"identifier"});
+    $vars->{'login.form.password.label'} = $i18n->get(51);
+    $vars->{'login.form.submit'} = WebGUI::Form::submit($self->session,{"value"=>$i18n->get(52)});
+    $vars->{'login.form.footer'} = WebGUI::Form::formFooter($self->session,);
+    $vars->{'anonymousRegistration.isAllowed'} = ($self->session->setting->get("anonymousRegistration"));
+    $vars->{'createAccount.url'} = $self->session->url->page('op=auth;method=createAccount');
+    $vars->{'createAccount.label'} = $i18n->get(67);
+    return WebGUI::Asset::Template->new($self->session,$self->getLoginTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------

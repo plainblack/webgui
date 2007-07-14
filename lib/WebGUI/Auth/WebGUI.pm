@@ -263,9 +263,21 @@ sub deactivateAccount {
 
 #-------------------------------------------------------------------
 sub deactivateAccountConfirm {
-   my $self = shift;
-   return $self->displayLogin unless ($self->session->setting->get("selfDeactivation"));
-   return $self->SUPER::deactivateAccountConfirm;
+    my $self = shift;
+    return $self->displayLogin unless ($self->session->setting->get("selfDeactivation"));
+
+    # Keep the username for a nice message
+    my $username    = $self->user->username;
+
+    # Deactivate the account
+    my $response    = $self->SUPER::deactivateAccountConfirm;
+
+    # If there was a response, it's probably an error 
+    return $response if $response;
+
+    # Otherwise show the login form with a friendly message
+    my $i18n    = WebGUI::International->new($self->session);
+    return $self->displayLogin(sprintf( $i18n->get("deactivateAccount success"), $username ));
 }
 
 #-------------------------------------------------------------------
@@ -297,7 +309,7 @@ sub displayAccount {
 
 =head2 displayLogin ( )
 
-   The initial login screen an unauthenticated user sees
+The initial login screen an unauthenticated user sees
 
 =cut
 

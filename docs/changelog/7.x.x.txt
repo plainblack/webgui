@@ -72,6 +72,9 @@
  - add: Password recovery can now be based on profile fields or simply by the
    user's e-mail address.
 
+7.3.21
+ - fix: Self-deactivation doesn't show login screen after success
+
 7.3.20
  - Added beta label to the beta components in the system, so people can more
    easily tell which parts of the system are a work in progress.
