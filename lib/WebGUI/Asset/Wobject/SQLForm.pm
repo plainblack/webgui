@@ -610,7 +610,8 @@ sub _createFieldType {
 
 =head2 _databaseLinkHasPrivileges ( wantedPrivileges, databaseLink )
 
-Returns true if the database link has at least the given privileges.
+Returns true if the database link has at least the given privileges.  This method is
+deprecated.  Please use the checkPrivileges method in WebGUI::DatabaseLink instead.
 
 =head3 wantedPrivileges
 
@@ -676,6 +677,8 @@ sub _databaseLinkHasPrivileges {
 	foreach (@$wantedPrivileges) {
 		return 0 unless (isIn(uc($_), @privileges));
 	}
+
+	return 1;
 }
 
 #-------------------------------------------------------------------
@@ -1243,7 +1246,7 @@ sub processPropertiesFromFormPost {
 	# $dbLink->db will raise a fatal error if there is a connection error.
 #	return ["Can't connect to database through the selected database link"] unless ($dbLink->db);
 
-	unless ($self->_databaseLinkHasPrivileges([qw(ALTER CREATE DELETE INDEX INSERT SELECT UPDATE)], $dbLink)) {
+	unless ($dbLink->checkPrivileges([qw(ALTER CREATE DELETE INDEX INSERT SELECT UPDATE)])) {
 		return ["Databaselink does not have enough privileges (Needs ALTER, CREATE, DELETE, INDEX, INSERT, SELECT, UPDATE)"];
 	}
 
