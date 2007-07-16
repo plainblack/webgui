@@ -1,0 +1,82 @@
+.fieldLabel {
+    width: 180px;
+    float: left;
+}
+#initBox {
+            font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 98%; 
+            height: 98%; top: 10; left: 10; position: absolute;
+}
+#themeContainer {
+    height: 40px; 
+               z-index: 10;
+}
+.themeSwatch {
+       z-index: 10; display: block; float: left;
+          height: 20px; width: 20px;
+                border: 5px solid black;
+}
+.endFloat, .clearFloat {
+                clear: both;
+}
+#editToggleContainer {
+    padding: 1px;
+}
+#utilityLinksContainer {
+    float: right;
+    padding: 1px;
+}
+#pageHeaderContainer {
+}
+#pageHeaderLogoContainer {
+    float: left;
+    padding: 5px;
+}
+#logo {
+    border: 0px;
+    max-width: 300px;
+}
+#companyNameContainer {
+    float: right;
+    padding: 5px;
+    font-size: 16pt;
+}
+#pageBodyContainer {
+    
+}
+#mainNavigationContainer {
+    padding: 5px;
+    float: left;
+    width: 100px;
+    font-size: 10pt;
+}
+#mainBodyContentContainer {
+    padding: 5px;
+    margin-left: 120px;
+    font-family: serif, times new roman;
+    font-size: 12pt;
+}
+#pageFooterContainer {
+    text-align: center;
+}
+#copyrightContainer {
+    font-size: 8pt;
+}
+#colorOptions {
+    width: 35%; float: left;
+}
+#body {
+    float: right;  width: 65%;
+}
+a {
+}
+#pageWidthContainer {
+    margin-left: 15%;
+    margin-right: 15%;
+    font-family: sans-serif, helvetica, arial;
+    border: 3px solid black;
+}
+#pageUtilityContainer {
+    font-size: 10pt;
+}
+
+
