@@ -98,12 +98,13 @@ WebguiColorPicker = function() {
             hue.setValue(pickerSize -  Math.round((hsv["h"] * pickerSize)/360));
             //picker.setRegionValue(hsv["s"] * pickerSize, pickerSize - Math.round(hsv["v"]*100/pickerSize) );
             picker.setRegionValue(hsv["s"] * pickerSize, pickerSize - Math.round(hsv["v"]*128/pickerSize) +1);
-            Dom.get("hexval").value = color;
-        },
+            Dom.get("hexval").value = color; 
+        }
     }
 }();
 
 YAHOO.util.Event.on(window, "load", WebguiColorPicker.init);
+
 
 function correctPNG() // correctly handle PNG transparency in Win IE 5.5 or higher.
    {
@@ -133,3 +134,4 @@ function correctPNG() // correctly handle PNG transparency in Win IE 5.5 or high
 if (navigator.appName == 'Microsoft Internet Explorer') {
     YAHOO.util.Event.addListener(window, "load", correctPNG);
 }
+
