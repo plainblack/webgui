@@ -103,8 +103,8 @@ sub toHtml {
 	$style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
     my $id = $self->get("id");
     my $value = $self->get("value");
-    return q| <a href="javascript:webguiColorPicker.display('|. $id. q|');" id="|. $id.q|_swatch"
-    style="width: 20px; height: 20px; background-color: |.$value.q|; border: 1px solid black; float: left;"></a>
+    return q| <a href="javascript:WebguiColorPicker.display('|. $id. q|');" id="|. $id.q|_swatch"
+    class="colorPickerFormSwatch" style="background-color: |.$value.q|;"></a>
    <input onchange="document.getElementById('|.$id.q|_swatch').style.backgroundColor=this.value;" 
    maxlength="7" name="|.$self->get("name").q|" type="text" size="8" value="|.$value.q|" id="|.$id.q|" />|;
 
