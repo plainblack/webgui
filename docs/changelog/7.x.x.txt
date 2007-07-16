@@ -74,6 +74,8 @@
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success
+ - fix regression: Calendar events on the last day of the month do not appear on the month view
+    http://www.webgui.org/bugs/tracker/fixed-calendar-events-on-the-last-day-of-the-month-do-not-appear-on-the-month-view
 
 7.3.20
  - Added beta label to the beta components in the system, so people can more

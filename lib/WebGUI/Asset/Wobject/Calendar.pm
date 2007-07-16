@@ -1121,8 +1121,9 @@ sub viewMonth {
     my $dt          = WebGUI::DateTime->new($self->session, $params->{start});
     $dt->truncate( to => "month");
     my $start = $dt->toMysql;
-    my $dtEnd = $dt->clone->add(months => 1)->add(seconds => -1);
+    my $dtEnd = $dt->clone->add(months => 1);
     my $end   = $dtEnd->toMysql;
+    $dtEnd->add(seconds => -1);
     
     my @events      
         = $self->getEventsIn($start,$end);
