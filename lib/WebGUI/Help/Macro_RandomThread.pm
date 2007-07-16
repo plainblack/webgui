@@ -12,10 +12,6 @@ our $HELP = {
 				namespace => 'Macros'
 			},
 			{
-				tag => 'macros list',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'random asset proxy',
 				namespace => 'Macro_RandomAssetProxy'
 			},
