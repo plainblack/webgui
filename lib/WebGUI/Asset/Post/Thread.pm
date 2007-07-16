@@ -911,8 +911,10 @@ sub view {
 	$p->appendTemplateVars($var);
         $var->{'add.url'} = $self->getParent->getNewThreadUrl;
  
-    $var->{"previous.url"} = $self->getUrl("func=previousThread");
-    $var->{"next.url"}     = $self->getUrl("func=nextThread");
+        my $prev = $self->getPreviousThread;
+        $var->{"previous.url"} = $prev->getUrl if $prev;
+        my $next = $self->getNextThread;
+        $var->{"next.url"}     = $next->getUrl if $next;
 
 	$var->{"search.url"} = $self->getParent->getSearchUrl;
         $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
