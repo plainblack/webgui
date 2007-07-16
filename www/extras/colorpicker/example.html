@@ -23,14 +23,11 @@ return props[propName];
 <script type="text/javascript" src="/extras/colorpicker/colorpicker.js"></script>
 </head>
 <body> 
-
 <form>
-    <a href="javascript:WebguiColorPicker.display('color_formId');" id="color_formId_swatch"
-    style="width: 20px; height: 20px; background-color: #008000; border: 1px solid black; float: left;"></a>
+    <a href="#" id="color_formId_swatch" style="width: 20px; height: 20px; background-color: #008000; border: 1px solid black; float: left;" onclick="WebguiColorPicker.display('color_formId');"></a>
    <input onchange="document.getElementById('color_formId_swatch').style.backgroundColor=this.value;" 
    maxlength="7" name="color" type="text" size="8" value="#008000" id="color_formId" />
 </form>
-
 
 </body>
 </html>

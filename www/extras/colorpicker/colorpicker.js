@@ -58,30 +58,20 @@ WebguiColorPicker = function() {
 
     return {
         init: function () {
-            var ddPicker = document.createElement('div');
-            ddPicker.id = "ddPicker";
-            ddPicker.style.display = "none";
-            document.body.appendChild(ddPicker);
-        },
-
-        setColor: function () {
-            var color = "#"+document.getElementById("hexval").value;
-            currentColorField.value = color;
-            currentColorField.onchange();
-            ddPicker = Dom.get("ddPicker");
-            ddPicker.innerHTML = "";
-            ddPicker.style.display = "none";
-        
+            var thepicker = document.createElement('div');
+            thepicker.id = "ddPicker";
+            thepicker.style.display = "none";
+            document.body.appendChild(thepicker);
         },
 
         display: function (field) {
-            currentColorField = document.getElementById(field); 
+            currentColorField = Dom.get(field); 
             var extras = getWebguiProperty("extrasURL");
-            ddPicker = Dom.get("ddPicker");
-            ddPicker.style.top = YAHOO.util.Dom.getY(currentColorField) + "px";
-            ddPicker.style.left = YAHOO.util.Dom.getX(currentColorField) + "px";
-            ddPicker.style.display = "block";
-            ddPicker.innerHTML = ' <div id="pickerHandle">&nbsp;</div> <div id="pickerDiv" tabindex="-1" hidefocus="true"> <img id="pickerbg" src="' + extras + 'colorpicker/pickerbg.png" alt="" /> <div id="selector"><img src="' + extras + 'colorpicker/select.gif" /></div> </div> <div id="hueBg" tabindex="-1" hidefocus="true"> <div id="hueThumb"><img src="' + extras + 'colorpicker/hline.png" /></div> </div> <div id="valdiv"> <form name="rgbform"> <br /> R <input autocomplete="off" name="rval" id="rval" type="text" value="0" size="3" maxlength="3" /> H <input autocomplete="off" name="hval" id="hval" type="text" value="0" size="3" maxlength="3" /> <br />G <input autocomplete="off" name="gval" id="gval" type="text" value="0" size="3" maxlength="3" /> S <input autocomplete="off" name="gsal" id="sval" type="text" value="0" size="3" maxlength="3" /> <br /> B <input autocomplete="off" name="bval" id="bval" type="text" value="0" size="3" maxlength="3" /> V <input autocomplete="off" name="vval" id="vval" type="text" value="0" size="3" maxlength="3" /> <br /> <br /> # <input autocomplete="off" name="hexval" id="hexval" type="text" value="0" size="6" maxlength="6" /> <br /> <input type="button" value="Set" onclick="WebguiColorPicker.setColor()" /> </form> </div> <div id="swatch">&nbsp;</div> ';
+            thepicker = Dom.get("ddPicker");
+            thepicker.style.top = YAHOO.util.Dom.getY(currentColorField) + "px";
+            thepicker.style.left = YAHOO.util.Dom.getX(currentColorField) + "px";
+            thepicker.style.display = "block";
+            thepicker.innerHTML = ' <div id="pickerHandle">&nbsp;</div> <div id="pickerDiv" tabindex="-1" hidefocus="true"> <img id="pickerbg" src="' + extras + 'colorpicker/pickerbg.png" alt="" /> <div id="selector"><img src="' + extras + 'colorpicker/select.gif" /></div> </div> <div id="hueBg" tabindex="-1" hidefocus="true"> <div id="hueThumb"><img src="' + extras + 'colorpicker/hline.png" /></div> </div> <div id="valdiv"> <form name="rgbform"> <br /> R <input autocomplete="off" name="rval" id="rval" type="text" value="0" size="3" maxlength="3" /> H <input autocomplete="off" name="hval" id="hval" type="text" value="0" size="3" maxlength="3" /> <br />G <input autocomplete="off" name="gval" id="gval" type="text" value="0" size="3" maxlength="3" /> S <input autocomplete="off" name="gsal" id="sval" type="text" value="0" size="3" maxlength="3" /> <br /> B <input autocomplete="off" name="bval" id="bval" type="text" value="0" size="3" maxlength="3" /> V <input autocomplete="off" name="vval" id="vval" type="text" value="0" size="3" maxlength="3" /> <br /> <br /> # <input autocomplete="off" name="hexval" id="hexval" type="text" value="0" size="6" maxlength="6" /> <br /> <input type="button" value="Set" onclick="WebguiColorPicker.setColor()" /> </form> </div> <div id="swatch">&nbsp;</div> ';
             hue = Slider.getVertSlider("hueBg", "hueThumb", 0, pickerSize);
             hue.subscribe("change", hueUpdate);
 
@@ -96,9 +86,17 @@ WebguiColorPicker = function() {
             color = color.substring(1,7);
             var hsv = Color.hex2hsv(color);
             hue.setValue(pickerSize -  Math.round((hsv["h"] * pickerSize)/360));
-            //picker.setRegionValue(hsv["s"] * pickerSize, pickerSize - Math.round(hsv["v"]*100/pickerSize) );
             picker.setRegionValue(hsv["s"] * pickerSize, pickerSize - Math.round(hsv["v"]*128/pickerSize) +1);
             Dom.get("hexval").value = color; 
+        },
+
+        setColor: function () {
+            var color = "#"+document.getElementById("hexval").value;
+            currentColorField.value = color;
+            currentColorField.onchange();
+            thepicker = Dom.get("ddPicker");
+            thepicker.innerHTML = "";
+            thepicker.style.display = "none";
         }
     }
 }();
