@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 18 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 24 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -123,7 +123,16 @@ $square->saveToStorageLocation($thumbStore, 'square.png');
 is($thumbStore->generateThumbnail(), 0, 'generateThumbnail returns 0 if no filename is supplied');
 is($WebGUI::Test::logger_error, q/Can't generate a thumbnail when you haven't specified a file./, 'generateThumbnail logs an error message for not sending a filename');
 is($thumbStore->generateThumbnail('file.txt'), 0, 'generateThumbnail returns 0 if you try to thumbnail a non-image file');
-is($WebGUI::Test::logger_warns, q/Can't check the size of something that's not an image./, 'generateThumbnail logs a warning message for thumbnailing a non-image file.');
+is($WebGUI::Test::logger_warns, q/Can't generate a thumbnail for something that's not an image./, 'generateThumbnail logs a warning message for thumbnailing a non-image file.');
+chmod 0, $thumbStore->getPath('square.png');
+ok(! -r $thumbStore->getPath('square.png'), 'Made square.png not readable');
+is($thumbStore->generateThumbnail('square.png'), 0, 'generateThumbnail returns 0 if there are errors reading the file');
+like($WebGUI::Test::logger_error, qr/^Couldn't read image for thumbnail creation: (.+)$/, 'generateThumbnail when it cannot read the file for thumbnailing');
+chmod 0644, $thumbStore->getPath('square.png');
+ok(-r $thumbStore->getPath('square.png'), 'Made square.png readable again');
+ok($thumbStore->generateThumbnail('square.png', 50), 'generateThumbnail returns true when there are no problems');
+ok(-e $thumbStore->getPath('thumb-square.png'), 'thumbnail exists in right place with correct name');
+
 
 ####################################################
 #
