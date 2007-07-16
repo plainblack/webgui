@@ -24,6 +24,31 @@ WebguiColorPicker = function() {
         return (pickerSize - picker.getYValue()) / pickerSize;
     }
 
+    // correctly handle PNG transparency in Win IE 5.5 or higher.
+    var correctPNG = function() {
+        if (YAHOO.util.Event.isIE) {
+            for(var i=0; i<document.images.length; i++) {
+                var img = document.images[i]
+                var imgName = img.src.toUpperCase()
+                if (imgName.substring(imgName.length-3, imgName.length) == "PNG") {
+                    var imgID = (img.id) ? "id='" + img.id + "' " : ""
+                    var imgClass = (img.className) ? "class='" + img.className + "' " : ""
+                    var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' "
+                    var imgStyle = "display:inline-block;" + img.style.cssText 
+                    if (img.align == "left") imgStyle = "float:left;" + imgStyle
+                    if (img.align == "right") imgStyle = "float:right;" + imgStyle
+                    if (img.parentElement.href) imgStyle = "cursor:hand;" + imgStyle       
+                    var strNewHTML = "<span " + imgID + imgClass + imgTitle
+                        + " style=\"" + "width:" + img.width + "px; height:" + img.height + "px;" + imgStyle + ";"
+                        + "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader"
+                        + "(src=\'" + img.src + "\', sizingMethod='scale');\"></span>" 
+                    img.outerHTML = strNewHTML
+                    i = i-1
+                }
+            }
+        }
+    }
+
     var swatchUpdate = function() {
         var h=getH(), s=getS(), v=getV();
 
@@ -72,6 +97,7 @@ WebguiColorPicker = function() {
             thepicker.style.left = YAHOO.util.Dom.getX(currentColorField) + "px";
             thepicker.style.display = "block";
             thepicker.innerHTML = ' <div id="pickerHandle">&nbsp;</div> <div id="pickerDiv" tabindex="-1" hidefocus="true"> <img id="pickerbg" src="' + extras + 'colorpicker/pickerbg.png" alt="" /> <div id="selector"><img src="' + extras + 'colorpicker/select.gif" /></div> </div> <div id="hueBg" tabindex="-1" hidefocus="true"> <div id="hueThumb"><img src="' + extras + 'colorpicker/hline.png" /></div> </div> <div id="valdiv"> <form name="rgbform"> <br /> R <input autocomplete="off" name="rval" id="rval" type="text" value="0" size="3" maxlength="3" /> H <input autocomplete="off" name="hval" id="hval" type="text" value="0" size="3" maxlength="3" /> <br />G <input autocomplete="off" name="gval" id="gval" type="text" value="0" size="3" maxlength="3" /> S <input autocomplete="off" name="gsal" id="sval" type="text" value="0" size="3" maxlength="3" /> <br /> B <input autocomplete="off" name="bval" id="bval" type="text" value="0" size="3" maxlength="3" /> V <input autocomplete="off" name="vval" id="vval" type="text" value="0" size="3" maxlength="3" /> <br /> <br /> # <input autocomplete="off" name="hexval" id="hexval" type="text" value="0" size="6" maxlength="6" /> <br /> <input type="button" value="Set" onclick="WebguiColorPicker.setColor()" /> </form> </div> <div id="swatch">&nbsp;</div> ';
+            correctPNG();
             hue = Slider.getVertSlider("hueBg", "hueThumb", 0, pickerSize);
             hue.subscribe("change", hueUpdate);
 
@@ -104,32 +130,4 @@ WebguiColorPicker = function() {
 YAHOO.util.Event.on(window, "load", WebguiColorPicker.init);
 
 
-function correctPNG() // correctly handle PNG transparency in Win IE 5.5 or higher.
-   {
-   for(var i=0; i<document.images.length; i++)
-      {
-      var img = document.images[i]
-      var imgName = img.src.toUpperCase()
-      if (imgName.substring(imgName.length-3, imgName.length) == "PNG")
-         {
-         var imgID = (img.id) ? "id='" + img.id + "' " : ""
-         var imgClass = (img.className) ? "class='" + img.className + "' " : ""
-         var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' "
-         var imgStyle = "display:inline-block;" + img.style.cssText 
-         if (img.align == "left") imgStyle = "float:left;" + imgStyle
-         if (img.align == "right") imgStyle = "float:right;" + imgStyle
-         if (img.parentElement.href) imgStyle = "cursor:hand;" + imgStyle       
-         var strNewHTML = "<span " + imgID + imgClass + imgTitle
-         + " style=\"" + "width:" + img.width + "px; height:" + img.height + "px;" + imgStyle + ";"
-         + "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader"
-         + "(src=\'" + img.src + "\', sizingMethod='scale');\"></span>" 
-         img.outerHTML = strNewHTML
-         i = i-1
-         }
-      }
-   }
-
-if (navigator.appName == 'Microsoft Internet Explorer') {
-    YAHOO.util.Event.addListener(window, "load", correctPNG);
-}
 
