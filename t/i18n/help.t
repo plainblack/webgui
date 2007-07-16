@@ -91,7 +91,7 @@ sub getHelpLabels {
 					tag=>'body',
 					namespace=>$topic, ##default
 					label=>$helpTable{$topic}{$entry}{'body'},
-				};
+				} if $helpTable{$topic}{$entry}{'body'};
 			}
 
 			##Add all labels in the fields array

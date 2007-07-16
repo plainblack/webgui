@@ -313,7 +313,7 @@ sub www_viewHelp {
 		$vars{body} = $help->{body}->($session);
 	}
 	else {
-		$vars{body} = $i18n->get($help->{body});
+		$vars{body} = $i18n->get($help->{body}) if $help->{body};  ##Body entry is optional
 	}
 	my $userUiLevel = $session->user->profileField("uiLevel");
 	my $uiOverride = $session->form->process("uiOverride");

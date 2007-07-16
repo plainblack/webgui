@@ -4,7 +4,7 @@ our $HELP = {
 
         'account' => {
 		title => 'account title',
-		body => 'account body',
+		body => '',
 		fields => [
 		],
 		variables => [
