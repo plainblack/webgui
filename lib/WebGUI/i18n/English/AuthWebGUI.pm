@@ -580,7 +580,7 @@ our $I18N = {
 	},
 
 	'password recovery email hoverHelp' => {
-		message => q|Enter your login name|,
+		message => q|Enter your email address here|,
 		lastUpdated => 1177127324,
 	},
 	
@@ -590,7 +590,7 @@ our $I18N = {
 	},
 
 	'password recovery login hoverHelp' => {
-		message => q|Enter your email address here|,
+		message => q|Enter your username here|,
 		lastUpdated => 1177127324,
 	},
 

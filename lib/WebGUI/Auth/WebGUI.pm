@@ -732,13 +732,13 @@ sub emailRecoverPassword {
     $f->text(
         name        => "username",
         label       => $i18n->get('password recovery login label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery login help', 'AuthWebGUI'),
+        hoverHelp   => $i18n->get('password recovery login hoverHelp', 'AuthWebGUI'),
     );
 
     $f->email(
-        name        =>"email",
+        name        => "email",
         label       => $i18n->get('password recovery email label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery email help', 'AuthWebGUI'),
+        hoverHelp   => $i18n->get('password recovery email hoverHelp', 'AuthWebGUI'),
     );
     
     $f->submit();
