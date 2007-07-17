@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'create cron job body' => {
-		message => q|<p>This workflow activity is used to run other Workflows on specified times and days or regular intervals.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

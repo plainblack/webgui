@@ -31,11 +31,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'add user to group body' => {
-		message => q|<p>This workflow activity adds a user to a specified group.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

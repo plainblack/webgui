@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'calendar update feeds body' => {
-		message => q|<p>This workflow activity fetches all iCal feeds for Calendars.</p>|,
-		lastUpdated => 1165865159,
-	},
-
 };
 
 1;

@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'export version tag to html body' => {
-		message => q|<p>This workflow activity will export every Asset contained in this version tag to HTML.  If a custom workflow is created for handling version tags, it will automate the exporting of content to your static site.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

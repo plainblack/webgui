@@ -7,11 +7,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'archive old threads body' => {
-		message => q|<p>This workflow activity will go through all Collaboration Systems (CS) in your site and, based on the settings of that CS, archive old posts.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

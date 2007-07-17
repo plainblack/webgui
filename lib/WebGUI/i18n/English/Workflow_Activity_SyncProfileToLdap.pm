@@ -7,11 +7,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'sync profile to ldap body' => {
-		message => q|<p>This workflow activity will synchronize the profile of one user configured for LDAP authentication.  Note that this only comes from LDAP and goes to WebGUI and not the other direction.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

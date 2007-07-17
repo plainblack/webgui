@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'trash version tag body' => {
-		message => q|<p>This workflow activity will move all assets in the version tag into the trash.  After the move, the version tag is locked.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

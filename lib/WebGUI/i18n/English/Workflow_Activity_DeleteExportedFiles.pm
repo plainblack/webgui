@@ -7,11 +7,6 @@ our $I18N = {
 		lastUpdated => 1162839802,
 	},
 
-	'delete exported files body' => {
-		message => q|<p>Deletes an asset's exported files.</p>|,
-		lastUpdated => 1162839804,
-	},
-
 };
 
 1;

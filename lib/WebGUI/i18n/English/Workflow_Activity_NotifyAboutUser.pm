@@ -43,11 +43,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'notify about user body' => {
-		message => q|<p>This workflow activity will send out an email with information about a user.  This can be used as a notification that some action needs to be taken, or to notify an Admin or Secondary Admin about a user.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

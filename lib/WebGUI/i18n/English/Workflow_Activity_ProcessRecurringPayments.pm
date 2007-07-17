@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'process recurring payments body' => {
-		message => q|<p>This workflow activity will process all recurring transactions (payments) in the Commerce system that are complete at the time the Activity is executed.  When the Activity is through with all those payments, an email with the details of all transactions is sent to the user configured in the Settings to receive them.</p>|,
-		lastUpdated => 1167186902,
-	},
-
 };
 
 1;

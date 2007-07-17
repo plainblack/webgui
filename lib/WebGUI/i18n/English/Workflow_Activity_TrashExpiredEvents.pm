@@ -8,12 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'trash expired events body' => {
-		message => q|<p>This workflow activity will move all Event assets to the Trash after a user defined interval has passed from their end date.</p>
-<p>The default interval is 30 days.</p>|,
-		lastUpdated => 0,
-	},
-
 	'trash after' => {
 		message => q|Trash After|,
 		lastUpdated => 1165731581,

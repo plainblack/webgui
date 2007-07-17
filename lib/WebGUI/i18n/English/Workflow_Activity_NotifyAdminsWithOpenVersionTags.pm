@@ -25,17 +25,6 @@ our $I18N = { ##hashref of hashes
 		context => q||,
 	},
 
-	'notify admins with open version tags body' => { 
-		message => q|<p>This workflow activity sends out a notification to all users who have an uncommitted tag.  It only does this if the version tag is empty.  The amount of time a version tag is empty is configurable, with a default of 3 days.</p>|,
-		lastUpdated => 1184020073,
-		context => q||,
-	},
-
-	#If the help file documents an Asset, it must include an assetName key
-	#If the help file documents an Macro, it must include an macroName key
-	#If the help file documents a Workflow Activity, it must include an activityName key
-	#If the help file documents a Template Parser, it must include an templateParserName key
-	#For all other types, use topicName
 	'activityName' => {
 		message => q|Notify Admins of Old Version Tags|,
 		lastUpdated => 1131394072,

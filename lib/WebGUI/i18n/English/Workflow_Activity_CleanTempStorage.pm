@@ -19,11 +19,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'clean temp storage body' => {
-		message => q|<p>This workflow activity goes through the temporary area of the uploads directory for this site and deletes any files that are older than the user configured timeout.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

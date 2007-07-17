@@ -7,11 +7,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'get syndicated content body' => {
-		message => q|<p>This workflow activity will pre-fetch syndicated content URLs to that the Syndicated Content Assets can serve pages more quickly.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;

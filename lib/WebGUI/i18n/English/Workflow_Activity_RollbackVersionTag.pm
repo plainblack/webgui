@@ -8,11 +8,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'rollback version tag body' => {
-		message => q|<p>This workflow activity will purge all versions of assets contained in a version tag.</p>|,
-		lastUpdated => 0,
-	},
-
 };
 
 1;
