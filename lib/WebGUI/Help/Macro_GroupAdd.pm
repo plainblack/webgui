@@ -2,9 +2,9 @@ package WebGUI::Help::Macro_GroupAdd;
 
 our $HELP = {
 
-        'group add' => {
+    'group add' => {
 		title => 'group add title',
-		body => 'group add body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'group.url'

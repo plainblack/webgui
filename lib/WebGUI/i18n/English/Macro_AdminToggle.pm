@@ -9,7 +9,7 @@ our $I18N = {
 
     'admin toggle title' => {
         message => q|Admin Toggle Macro Template Variables|,
-        lastUpdated => 1112466408,
+        lastUpdated => 1184691381,
     },
 
 	'toggle.url' => {

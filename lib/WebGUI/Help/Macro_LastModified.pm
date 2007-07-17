@@ -8,10 +8,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'date',
-				namespace => 'Macro_D_date'
-			},
 		]
 	},
 

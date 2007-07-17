@@ -4,7 +4,7 @@ our $HELP = {
 
         'editable toggle' => {
 		title => 'editable toggle title',
-		body => 'editable toggle body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'toggle.url'

@@ -4,7 +4,7 @@ our $I18N = {
 
 	'admin bar title' => {
 		message => q|Admin Bar Macro Template Variables|,
-		lastUpdated => 1112374923,
+		lastUpdated => 1184691377,
 	},
 
 	'adminbar_loop' => {

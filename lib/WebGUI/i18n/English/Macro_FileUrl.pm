@@ -7,21 +7,6 @@ our $I18N = {
         lastUpdated => 1128838332,
     },
 
-    'file url title' => {
-        message => q|File Url Macro|,
-        lastUpdated => 1112315917,
-    },
-
-    'file url body' => {
-        message => q|
-<p><b>&#94;FileUrl</b>();<br />
-<b>&#94;FileUrl</b>(<i>Asset URL</i>);<br />
-This macro is used to return a filesystem URL to an Asset which stores a single file (File, Image, ZipArchive, etc.) identified by its Asset URL.  The Macro will <i>not</i> work on Assets which store multiple files, such as the Post or Article Assets.</p>
-<p>This Macro may be nested inside other Macros.</p>
-        |,
-        lastUpdated => 1168622358,
-    },
-
     'invalid url' => {
         message => q|Invalid Asset URL|,
         lastUpdated => 1134855446,

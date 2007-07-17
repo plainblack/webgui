@@ -4,7 +4,7 @@ our $I18N = {
 
 	'account title' => {
 		message => q|Account Macro Template Variables|,
-		lastUpdated => 1112466408,
+		lastUpdated => 1184691356,
 	},
 
 	'account.url' => {

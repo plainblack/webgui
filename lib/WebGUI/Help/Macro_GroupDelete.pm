@@ -4,7 +4,7 @@ our $HELP = {
 
         'group delete' => {
 		title => 'group delete title',
-		body => 'group delete body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'group.url'
