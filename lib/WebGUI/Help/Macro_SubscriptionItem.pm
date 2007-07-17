@@ -4,7 +4,7 @@ our $HELP = {
 
         'subscription item' => {
 		title => 'subscription item title',
-		body => 'subscription item body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'url'

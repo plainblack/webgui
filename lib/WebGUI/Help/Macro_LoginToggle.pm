@@ -10,7 +10,7 @@ our $HELP = {
 			},
 		],
 		title => 'login toggle title',
-		body => 'login toggle body',
+		body => '',
 		variables => [
               {
                 'name' => 'toggle.url'

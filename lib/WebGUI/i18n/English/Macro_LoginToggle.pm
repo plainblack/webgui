@@ -22,6 +22,16 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'toggle.url' => {
+        message => q|The URL to login or logout.|,
+		lastUpdated => 1184712592,
+	},
+
+    'toggle.text' => {
+        message => q|The Internationalized label for logging in or logging out (depending on the state of the macro), or the text that you supply to the macro.|,
+		lastUpdated => 1184712592,
+	},
+
 };
 
 1;

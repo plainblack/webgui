@@ -4,7 +4,7 @@ our $HELP = {
 
         'printable' => {
 		title => 'printable title',
-		body => 'printable body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'printable.url'

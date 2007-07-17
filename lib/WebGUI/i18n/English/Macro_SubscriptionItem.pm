@@ -8,8 +8,8 @@ our $I18N = {
 	},
 
 	'subscription item title' => {
-		message => q|Subscription Item Macro|,
-		lastUpdated => 1112547248,
+		message => q|Subscription Item Macro Template Variables|,
+		lastUpdated => 1184712144,
 	},
 
 	'url' => {
@@ -32,21 +32,6 @@ our $I18N = {
 		lastUpdated => 1149217400,
 	},
 
-	'subscription item body' => {
-		message => q|
-
-<p><b>&#94;SubscriptionItem(<i>subscriptionId</i>,[<i>templateId</i>]);</b><br />
-This macro is used to display information about subscription items from your site.
-It accepts two arguments, the Id of the subscription item and an optional
-template to use instead of the default template, specified by a template Id
-from the Macro/SubscriptionItem namespace.</p>
-
-<p>This Macro may not be nested inside other Macros.</p>
-
-<p>These variables are available in the template:</p>
-|,
-		lastUpdated => 1168623113,
-	},
 };
 
 1;
