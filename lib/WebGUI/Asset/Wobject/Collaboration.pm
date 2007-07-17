@@ -901,22 +901,17 @@ sub getSubscribeUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getUnsubscribeUrl ( )
+=head2 getThreadsPaginator
 
-Formats the url to unsubscribe from the forum.
+Returns a WebGUI::Paginator object containing all the threads in this
+Collaboration System
 
 =cut
 
-sub getUnsubscribeUrl {
-	my $self = shift;
-	return $self->getUrl("func=unsubscribe");
-}
-
-
-#-------------------------------------------------------------------
-sub getViewTemplateVars {
-	my $self = shift;
-	my $scratchSortBy = $self->getId."_sortBy";
+sub getThreadsPaginator {
+    my $self        = shift;
+	
+    my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
 	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
 	my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
@@ -932,27 +927,7 @@ sub getViewTemplateVars {
 	}
 	$sortBy ||= "dateUpdated";
 	$sortOrder ||= "desc";
-	my %var;
-	$var{'user.canPost'} = $self->canPost;
-	$var{'user.canStartThread'} = $self->canStartThread;
-        $var{"add.url"} = $self->getNewThreadUrl;
-        $var{"rss.url"} = $self->getRssUrl;
-        $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
-	$var{'user.isSubscribed'} = $self->isSubscribed;
-	$var{'sortby.title.url'} = $self->getSortByUrl("title");
-	$var{'sortby.username.url'} = $self->getSortByUrl("username");
-	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
-	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
-	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
-	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
-	$var{'sortby.views.url'} = $self->getSortByUrl("views");
-	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
-	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
-	$var{"search.url"} = $self->getSearchUrl;
-	$var{"subscribe.url"} = $self->getSubscribeUrl;
-	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
-	$var{"collaborationAssetId"} = $self->getId;
+
 	my $sql = "
 		select 
 			asset.assetId,
@@ -984,8 +959,54 @@ sub getViewTemplateVars {
 			".$sortOrder;
 	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->get("threadsPerPage"));
 	$p->setDataByQuery($sql);
+
+    return $p;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUnsubscribeUrl ( )
+
+Formats the url to unsubscribe from the forum.
+
+=cut
+
+sub getUnsubscribeUrl {
+	my $self = shift;
+	return $self->getUrl("func=unsubscribe");
+}
+
+
+#-------------------------------------------------------------------
+sub getViewTemplateVars {
+	my $self = shift;
+	my %var;
+	$var{'user.canPost'} = $self->canPost;
+	$var{'user.canStartThread'} = $self->canStartThread;
+        $var{"add.url"} = $self->getNewThreadUrl;
+        $var{"rss.url"} = $self->getRssUrl;
+        $var{'user.isModerator'} = $self->canModerate;
+        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
+	$var{'user.isSubscribed'} = $self->isSubscribed;
+	$var{'sortby.title.url'} = $self->getSortByUrl("title");
+	$var{'sortby.username.url'} = $self->getSortByUrl("username");
+	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
+	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
+	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
+	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
+	$var{'sortby.views.url'} = $self->getSortByUrl("views");
+	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
+	$var{'sortby.rating.url'} = $self->getSortByUrl("rating");
+	$var{"search.url"} = $self->getSearchUrl;
+	$var{"subscribe.url"} = $self->getSubscribeUrl;
+	$var{"unsubscribe.url"} = $self->getUnsubscribeUrl;
+	$var{"collaborationAssetId"} = $self->getId;
+
+    # Get the threads in this CS
+    my $p = $self->getThreadsPaginator;
 	$self->appendPostListTemplateVars(\%var, $p);
 	$self->appendTemplateLabels(\%var);
+
     return \%var;
 }
 
