@@ -8,10 +8,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'random asset proxy',
 				namespace => 'Macro_RandomAssetProxy'
 			},

@@ -3,19 +3,6 @@ package WebGUI::Help::Macros;
 
 our $HELP = {
 
-    'macros using' => {
-		title => 'macros using title',
-		body => 'macros using body',
-		fields => [
-		],
-		related => [
-            {
-                tag => "macros list",
-                namespace => "Macros",
-            },
-        ],
-    },
-
     'macros list' => {
 		title => 'macros list title',
 		body => sub {

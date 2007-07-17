@@ -16,10 +16,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
 		]
 	},
 

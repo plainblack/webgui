@@ -66,10 +66,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'manage product',
 				namespace => 'ProductManager'
 			},

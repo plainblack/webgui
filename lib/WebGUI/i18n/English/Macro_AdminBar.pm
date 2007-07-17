@@ -3,7 +3,7 @@ package WebGUI::i18n::English::Macro_AdminBar;
 our $I18N = {
 
 	'admin bar title' => {
-		message => q|Admin Bar Macro|,
+		message => q|Admin Bar Macro Template Variables|,
 		lastUpdated => 1112374923,
 	},
 
@@ -40,21 +40,6 @@ our $I18N = {
 	'icon' => {
 		message => q|The URL of an icon to associate with this item.|,
 		lastUpdated => 1149178356,
-	},
-
-
-	'admin bar body' => {
-		message => q|
-
-<p><b>&#94;AdminBar;</b><br />
-<b>&#94;AdminBar(<i>custom template ID</i>);</b><br />
-Places the administrative tool bar on the page. Omitting this macro will prevent you from adding content, pasting
-content from the clipboard, accessing the help system and other administrative functions.</p>
-<p>This Macro may not be nested inside other Macros.</p>
-<p>
-The macro may take one optional argument, an alternate template in the Macro/AdminBar namespace for generating the AdminBar.  The following variables are available in the template:</p>
-|,
-		lastUpdated => 1168558295,
 	},
 
 	'376' => {

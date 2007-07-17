@@ -4,7 +4,7 @@ our $HELP = {
 
         'admin toggle' => {
 		title => 'admin toggle title',
-		body => 'admin toggle body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'toggle.url'
@@ -16,10 +16,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
 			{
 				tag => 'template language',
 				namespace => 'Asset_Template'

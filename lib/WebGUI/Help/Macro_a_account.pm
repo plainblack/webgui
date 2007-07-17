@@ -17,10 +17,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros',
-			},
-			{
 				tag => 'template language',
 				namespace => 'Asset_Template',
 			},

@@ -9,10 +9,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'macros using',
-				namespace => 'Macros'
-			},
-			{
 				tag => 'date',
 				namespace => 'Macro_D_date'
 			},

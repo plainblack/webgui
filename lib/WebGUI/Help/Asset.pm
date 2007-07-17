@@ -436,14 +436,6 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'aoi hits',
-				namespace => 'Macro_AOIHits'
-			},
-			{
-				tag => 'aoi rank',
-				namespace => 'Macro_AOIRank'
-			},
-			{
 				tag => 'wobject add/edit',
 				namespace => 'Asset_Wobject',
 			},
@@ -451,9 +443,9 @@ our $HELP = {
 	},
 
 	'metadata edit property' => {
-                title => 'metadata edit property',
-                body => 'metadata edit property body',
-		fields => [
+        title => 'metadata edit property',
+        body => 'metadata edit property body',
+        fields => [
                         {
                                 title => 'Field name',
                                 description => 'Field Name description',
@@ -474,26 +466,18 @@ our $HELP = {
                                 description => 'Possible Values description',
                                 namespace => 'Asset',
                         },
-		],
-                related => [
-			{
-				tag => 'metadata manage',
-				namespace => 'Asset'
-                        },
-			{
-				tag => 'aoi hits',
-				namespace => 'Macro_AOIHits'
-			},
-			{
-				tag => 'aoi rank',
-				namespace => 'Macro_AOIRank'
-			},
-                        {
-                                tag => 'wobject add/edit',
-                                namespace => 'Asset_Wobject',
-                        },
-                ],
-        },
+        ],
+        related => [
+            {
+                tag => 'metadata manage',
+                namespace => 'Asset'
+            },
+            {
+                tag => 'wobject add/edit',
+                namespace => 'Asset_Wobject',
+            },
+        ],
+    },
 
 	'manage versions' => {
 		title => 'committed versions',

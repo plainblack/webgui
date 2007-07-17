@@ -83,10 +83,6 @@ our $HELP = {
                                 tag => 'edit ad space',
                                 namespace => 'AdSpace',
                         },
-                        {
-                                tag => 'ad space',
-                                namespace => 'Macro_AdSpace',
-                        },
                 ],
 	},
 
