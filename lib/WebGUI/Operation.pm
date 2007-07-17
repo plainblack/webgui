@@ -109,6 +109,7 @@ sub getOperations {
 		'editCommerceSettings' => 'WebGUI::Operation::Commerce',
 		'editCommerceSettingsSave' => 'WebGUI::Operation::Commerce',
 		'listTransactions' => 'WebGUI::Operation::Commerce',
+		'listPendingTransactions' => 'WebGUI::Operation::Commerce',
 		'salesTaxTable' => 'WebGUI::Operation::Commerce',
 		'selectPaymentGateway' => 'WebGUI::Operation::Commerce',
 		'selectPaymentGatewaySave' => 'WebGUI::Operation::Commerce',
