@@ -4,7 +4,7 @@ our $HELP = {
 
         'home link' => {
 		title => 'home link title',
-		body => 'home link body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'homeLink.url'

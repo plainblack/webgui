@@ -119,19 +119,6 @@ of the Product to their shopping cart.|,
 	},
 
 
-	'product body' => {
-		message => q|
-
-<p><b>&#94;Product(<i>SKU or productId</i>, [<i>templateId</i>]);</b><br />
-This macro looks up a Product in the Product Manager by SKU or productId and
-allows information about it to be displayed.  If the SKU or productId cannot
-be found, the message ^International("cannot find product","Macro_Product"); will
-be displayed.</p>
-<p>The macro takes one optional argument, an alternate template in the Macro/Product namespace for formatting information about the Product.  The following variables are available in the template:</p>
-|,
-		lastUpdated => 1149217613,
-	},
-
 };
 
 1;

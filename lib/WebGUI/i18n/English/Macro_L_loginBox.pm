@@ -8,8 +8,8 @@ our $I18N = {
 	},
 
 	'login box title' => {
-		message => q|Login Box Macro|,
-		lastUpdated => 1112466408,
+		message => q|Login Box Macro Template Variables|,
+		lastUpdated => 1184709750,
 	},
 
 	'user.isVisitor' => {
@@ -80,24 +80,6 @@ our $I18N = {
 	'form.footer' => {
 		message => q|Form footer.|,
 		lastUpdated => 1148963673,
-	},
-
-	'login box body' => {
-		message => q|
-<p><b>&#94;L; or &#94;L(); - Login Box</b><br />
-A small login form. This macro takes up to three parameters.  The first is used to set the width of text boxes for entering the username and password: &#94;L(20);.   This width is scaled by 2/3 if the user's browser isn't IE due to differences in the way that different browsers draw the text boxes. The second sets the message displayed after the user is logged in: &#94;L(20,"Hi &#94;a(&#94;@;);. Click %here% if you have to scoot!");.  Text between percent signs (%) is replaced by a link to the logout operation.  The third parameter is the ID of a template in the Macro/L_loginBox namespace to replace the default template.  The variables below are
-available for use in the template.</p>
-
-<p>
-<b>NOTES:</b><br />
-<ul>
-<li>The .loginBox style sheet class is tied to this macro.</li>
-<li>This Macro may not be nested inside other Macros.</li>
-</ul>
-</p>
-
-|,
-		lastUpdated => 1168622639,
 	},
 
 	'48' => {

@@ -4,7 +4,7 @@ our $HELP = {
 
         'login box' => {
 		title => 'login box title',
-		body => 'login box body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Template",

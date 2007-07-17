@@ -4,7 +4,7 @@ our $HELP = {
 
         'product' => {
 		title => 'product title',
-		body => 'product body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'variants.message'

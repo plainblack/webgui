@@ -8,8 +8,8 @@ our $I18N = {
 	},
 
 	'home link title' => {
-		message => q|Home Link Macro|,
-		lastUpdated => 1112466408,
+		message => q|Home Link Macro Template Variables|,
+		lastUpdated => 1184709588,
 	},
 
 	'homeLink.url' => {
@@ -20,18 +20,6 @@ our $I18N = {
 	'homeLink.text' => {
 		message => q|The translated label for the link to the home page or the text that you supply to the macro.|,
 		lastUpdated => 1149217666,
-	},
-
-	'home link body' => {
-		message => q|
-<p><b>&#94;H; or &#94;H(); - Home Link</b><br />A link to the home page of this site. In addition you can change the link text by creating a macro like this <b>&#94;H("Go Home");</b>.</p>
-<p><b>NOTES:</b> You can also use the special case &#94;H(linkonly); to return only the URL to the home page and nothing more. Also, the .homeLink style sheet class is tied to this macro. And you can specify a second parameter that with the name of a template in the Macro/H_homeLink namespace that will override the default template.</p>
-
-<p>This Macro may only be nested inside other Macros if the "linkonly" option is used.</p>
-
-<p>The following variables are available for use in the template:</p>
-|,
-		lastUpdated => 1149217683,
 	},
 
 	'47' => {
