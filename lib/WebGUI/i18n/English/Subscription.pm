@@ -102,12 +102,6 @@ our $I18N = {
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
 
-#	'help edit subscription title' => {
-#		message => q|Subscription, Add/Edit|,
-#		lastUpdated => 1101228391,
-#		context => q|The Add/Edit subscription help page title.|
-#	},
-
         'subscription name description' => {
                 message => q|<p>Name of the subscription.</p>|,
                 lastUpdated => 1120861450,

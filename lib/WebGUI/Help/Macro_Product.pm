@@ -65,10 +65,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'manage product',
-				namespace => 'ProductManager'
-			},
 		]
 	},
 

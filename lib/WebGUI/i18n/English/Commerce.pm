@@ -84,13 +84,6 @@ our $I18N = {
 	},
 
 
-	'help manage commerce title' => {
-		message => q|Commerce, Manage|,
-		lastUpdated => 0,
-		context => q|The title of the manage commerce help page.|
-	},
-
-
         'confirm checkout template description' => {
                 message => q|<p>This template is shown when a user is asked to confirm his purchase. The form data for the payment gateway is also shown here.</p>|,
                 lastUpdated => 1138922899,
@@ -144,13 +137,6 @@ our $I18N = {
 |,
                 lastUpdated => 1147797861,
         },
-
-
-	'help manage commerce body' => {
-		message => q|<p>The commerce system of WebGUI is highly configurable. You can set the following properties:</p>|,
-		lastUpdated => 1138922965,
-		context => q|The content of the manage commerce help page.|
-	},
 
 
 	'manage commerce settings' => {
@@ -320,39 +306,20 @@ our $I18N = {
 		context => q|Label for the link that allows you to complete a pending transaction.|
 	},
 
-	'help manage pending transactions title' => {
-		message => q|List pending transactions|,
-		lastUpdated => 0,
-		context => q|The title of the help page of the list pending transactions screen.|
-	},
-
 	'list pending transactions' => {
 		message => q|List pending transactions|,
 		lastUpdated => 0,
 	},
 
-	'help manage pending transactions body' => {
-		message => q|<p>All transactions that are marked as 'Pending' are listed here. Transactions are marked pending if some extra review is required. For instance when a transaction is suspected of fraud. Pending transactions can also be transactions that have yet to be confirmed by something as or similar to PayPal's APN. If you have checked that the transaction is legit you can click on the 'Complete transaction' link.</p>|,
-		lastUpdated => 1165518203,
-		context => q|The body of the help page of the list pending transactions screen.|
-	},
-
 	'help cancel checkout template title' => {
-		message => q|Cancel checkout template|,
-		lastUpdated => 0,
+		message => q|Cancel checkout template variables|,
+		lastUpdated => 1184790373,
 		context => q|The title of the help page of the cancel checkout template.|
 	},
 
 	'message' => {
 		message => q|The internationalized cancellation message.|,
 		lastUpdated => 1149221050,
-	},
-
-	'help cancel checkout template body' => {
-		message => q|<p>The following template variable is available in this template:</p>
-|,
-		lastUpdated => 1149221067,
-		context => q|The body of the help page of the cancel checkout template.|
 	},
 
 	'title' => {
@@ -426,18 +393,8 @@ our $I18N = {
 	},
 
 
-	'help checkout confirm template body' => {
-		message => q|<p>This template separates normal and recurring items. A normal item is an item that is paid only once. Recurring items are paid once a period, like a subscription.</p>
-
-<p>The following template variables are available in this template:</p>
-|,
-		lastUpdated => 1165449926,
-		context => q|The body of the help page of the confirm checkout template.|
-	},
-
-
 	'help checkout confirm template title' => {
-		message => q|Confirm checkout template|,
+		message => q|Confirm checkout template variables|,
 		lastUpdated => 0,
 		context => q|The title of the help page of the confirm checkout template.|
 	},
@@ -473,16 +430,8 @@ our $I18N = {
 	},
 
 
-	'help checkout error template body' => {
-		message => q|<p>The following template variables are available in this template:</p>
-
-|,
-		lastUpdated => 0,
-		context => q|The body of the help page of the checkout error template.|
-	},
-
 	'help checkout error template title' => {
-		message => q|Checkout error template|,
+		message => q|Checkout error template variables|,
 		lastUpdated => 1101791348,
 		context => q|The title of the help page of the checkout error template.|
 	},
@@ -518,7 +467,7 @@ our $I18N = {
 	},
 
 	'help select payment template title' => {
-		message => q|Select payment gateway template|,
+		message => q|Select payment gateway template variables|,
 		lastUpdated => 0,
 		context => q|The title of the 'select payment gateway' help page.|
 	},
@@ -571,13 +520,6 @@ our $I18N = {
 	'formElement' => {
 		message => q|A radio button tied to this plugin.|,
 		lastUpdated => 1149221607,
-	},
-
-	'help select payment template body' => {
-		message => q|<p>In this template the following template variables are available:</p>
-|,
-		lastUpdated => 1149221754,
-		context => q|The body of the help page of the select payment gateway template.|
 	},
 
 	'shipping tab' => {

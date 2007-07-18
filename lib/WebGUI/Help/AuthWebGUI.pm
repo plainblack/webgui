@@ -3,7 +3,7 @@ package WebGUI::Help::AuthWebGUI;
 our $HELP = {
 	'webgui authentication display account template' => {
 		title => 'display account template title',
-		body => 'display account template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Auth",
@@ -44,9 +44,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'webgui authentication login template' => {
 		title => 'login template title',
-		body => 'login template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Auth",
@@ -72,9 +73,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'webgui authentication anonymous registration template' => {
 		title => 'anon reg template title',
-		body => 'anon reg template body',
+		body => '',
 		fields => [
 		],
 		isa => [
@@ -121,9 +123,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'webgui authentication password recovery template' => {
 		title => 'recovery template title',
-		body => 'recovery template body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'title',
@@ -200,9 +203,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'webgui authentication password expiration template' => {
 		title => 'expired template title',
-		body => 'expired template body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'expired.form.header'
@@ -246,9 +250,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'webgui deactivate account template' => {
 		title => 'deactivate account template title',
-		body => 'deactivate account template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Auth",
@@ -259,6 +264,7 @@ our $HELP = {
 		fields => [ ],
 		related => [ ],
 	},
+
 };
 
 1;

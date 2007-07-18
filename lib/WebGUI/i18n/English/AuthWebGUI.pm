@@ -161,13 +161,6 @@ our $I18N = {
 		lastUpdated => 1149220294,
 	},
 
-	'login template body' => {
-		message => q|<p>The following template variables are available for WebGUI Authentication Login templates. 
-</p>
-|,
-		lastUpdated => 1149220323
-	},
-
 	'18' => {
 		message => q|Allow Users to Change Passwords?|,
 		lastUpdated => 1076357595
@@ -231,13 +224,6 @@ our $I18N = {
 	'expired.form.passwordConfirm.label' => {
 		message => q|Default text for password confirm form field|,
 		lastUpdated => 1149220347,
-	},
-
-	'expired template body' => {
-		message => q|
-	<p>The following template variables are available for WebGUI Authentication Password Expiration templates.</p>
-|,
-		lastUpdated => 1149220376
 	},
 
 	'16' => {
@@ -350,13 +336,6 @@ our $I18N = {
 		lastUpdated => 1165440841,
 	},
 
-	'recovery template body' => {
-		message => q|<p>The following template variables are available for WebGUI Authentication Password Recovery templates.</p>
-|,
-
-		lastUpdated => 1149220524
-	},
-
 	'20' => {
 		message => q|Allow User to Change Password?|,
 		lastUpdated => 1076358606
@@ -432,13 +411,6 @@ our $I18N = {
 		lastUpdated => 1149220575,
 	},
 
-
-	'display account template body' => {
-		message => q|<p>The following template variables are available for WebGUI Authentication Display Account templates. </p>
-|,
-		lastUpdated => 1149220652
-	},
-
 	'create.form.hidden' => {
 		message => q|Hidden form fields required for form submittal.|,
 		lastUpdated => 1149220721,
@@ -479,13 +451,6 @@ our $I18N = {
 		lastUpdated => 1149220721,
 	},
 
-
-	'anon reg template body' => {
-		message => q|<p>The following template variables are available for WebGUI Authentication Anonymous Registration templates. </p>
-|,
-		lastUpdated => 1149220828
-	},
-
 	'19' => {
 		message => q|Allow Users to Change Username?|,
 		lastUpdated => 1076358029
@@ -509,13 +474,6 @@ our $I18N = {
 	'deactivate account template title' => {
 		message => q|WebGUI Authentication Deactivate Account Template|,
 		lastUpdated => 1164394401
-	},
-
-	'deactivate account template body' => {
-		message => q|<p>The following template variables are available for the WebGUI Authentication Deactivate account templates. 
-</p>
-|,
-		lastUpdated => 1164394398
 	},
 
 	'topicName' => {

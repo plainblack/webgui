@@ -220,49 +220,6 @@ our $I18N = {
 		context => q|Label of the edit variant screen.|
 	},
 
-	'help list products title' => {
-		message => q|List products|,
-		lastUpdated => 0,
-		context => q|The title of the list products help page|
-	},
-	'help list products body' => {
-		message => q|<span style="font-weight: bold;">Overview</span><br />
-<br />
-In addition to subscriptions, WebGUI features products. Products allow you to
-sell your products with considerable ease. Just define a base product
-and add parameters to it if you need to. WebGUI generates all possible
-product configurations for you and automatically sets the price, weight and sku values.<br />
-<br />
-For example you want to sell T-shirts in the sizes S, M, L and XL and
-the colors blue and grey. Also an XL costs $ 1.50 extra. <br />
-<br />
-To do this just add a product called T-shirt and add parameters color
-and size to it. Add to the color parameter the options 'blue' and
-'grey', and add 'S', 'M', 'L' and 'XL' to the size parameter. Set the
-price modifier of the 'XL' option to 1.50.<br />
-<br />
-Now you have created eight variants of your T-shirt product and only in
-about a minute. <br />
-<br />
-If you are out of blue large T-shirts, just disable this variant. You
-are in full control.<br />
-<br />
-<span style="font-weight: bold;">Usage</span><br />
-<br />
-You can add new products with the 'Add a new product' link in the
-righthand menu. To manage an existing product click on the edit button
-left of it. Use the delete button to remove it.<br />
-<br />|,
-		lastUpdated => 0,
-		context => q|The body of the list products help page|
-	},
-
-	'help manage product title' => {
-		message => q|Manage Product|,
-		lastUpdated => 0,
-		context => q|The title of the manage product help page|
-	},
-
         'title description' => {
                 message => q|The name of the product.|,
                 lastUpdated => 1120449422,
@@ -310,125 +267,11 @@ normal templates.|,
                 lastUpdated => 1120449422,
         },
 
-	'help manage product body' => {
-		message => q|The manage product menu allows you to inspect and edit the properties
-of your product.
-
-<p>Overview<br />
-Products consist of base Properties along with Parameters with various
-Options. The properties are the base of your product. They define the
-the default price, weight, sku and sku composition of the product and
-all its variants.
-</p>
-
-<p><b>Properties</b><br />
-The properties section shows the base values for your product. Every
-product configuration you sell is based on these values. Modifiers set
-in options are relative to these values. You can edit properties by
-clicking the edit button above them.
-</p>
-
-<p><b>Parameters</b></p>
-<p>Parameters are the different forms in which your product comes,
-like 'Color' and 'Size' for a T-shift.  You can add a parameter to define
-these forms by clicking on the 'Add parameter' link. Editing or deleting
-a parameter can be accomplished by clicking on the edit or delete button
-on the left of the parameter respectively.
-</p>
-
-<p>If you add a parameter, you will be taken to the SKU Template edit
-screen when you click on 'Save'. This allows you to add this parameter
-to the SKU Template of the product.
-</p>
-
-<p>If you edit a parameter to change its name, the SKU Template should be
-updated automatically and you will be taken back to the Manage product
-screen after clicking 'Save'.
-</p>
-
-<p><b>Options</b></p>
-<p>An option is a value a parameter can
-take, such as 'Blue' or 'Grey', and 'Large' or 'Small'. Options also allow you to
-set modifiers for price, weight and sku. These modifiers add to the the
-base price, weight and sku defined in the properties of your product. A
-price modifier of 5.00 for 'Rainbow' increases the price with
-$5.00 for rainbow-colored shirts.
-</p>
-
-<p>To add an Option to an existing Parameter, click on the 'Add option'
-link directly below it.
-</p>
-
-<p>Editing an option can be done by clicking the 'edit' button left of it.
-The delete button left of an option allows you to delete that option.
-</p>
-
-<p><b>List variants</b><br />
-This menu option can be found in the righthand side menu, and allows
-you to view all product variants that are possible with the given
-options. Also, this is the place to change the automatically generated
-price, weight and sku values and set availability of a product variant.
-</p>
-|,
-		lastUpdated => 1165518436,
-		context => q|The body of the manage product help page|
-	},
-	
-	'help edit product title' => {
-		message => q|Edit product|,
-		lastUpdated => 0,
-		context => q|The title of the edit product help page|
-	},
-
-	'help edit product body' => {
-		message => q|<p>The properties section shows the base values for your product. Every
-product configuration you sell is based on these values. Modifiers set
-in options are relative to these values. The properties of a product
-are:</p>
-|,
-		lastUpdated => 1120449342,
-		context => q|The body of the edit product help page|
-	},
-	'help edit parameter title' => {
-		message => q|Edit parameter|,
-		lastUpdated => 0,
-		context => q|The title of the edit parameter help page|
-	},
-	'help edit parameter body' => {
-		message => q|<p>Parameters define the variables of your product, like 'Color' or
-'Size'. A parameter only has a name. This name will also be used
-for the name of the template variable pointing to this parameter in the
-SKU Template.</p>
-<p>If you add a new parameter, you will be taken to the SKU Template edit
-screen when you click on 'Save'. This allows you to add this parameter
-to the SKU Template of the product.</p>
-
-<p>If you edit an existing parameter the SKU Template should be
-updated automatically and you will be taken back to the Manage product
-screen after clicking 'Save'.</p>
-|,
-		lastUpdated => 1146606343,
-		context => q|The body of the edit parameter help page|
-	},
-
         'edit parameter name description' => {
                 message => q|<p>The name of this parameter.</p>|,
                 lastUpdated => 1122609059,
         },
 
-	'help edit option title' => {
-		message => q|Edit option|,
-		lastUpdated => 0,
-		context => q|The title of the edit option help page|
-	},
-	'help edit option body' => {
-		message => q|<p>Options are the values a parameter can take, like 'Blue', 'Red' or
-'Grey'.</p>
-<p>Options consist of several modifiers.</p>
-|,
-		lastUpdated => 1146606353,
-		context => q|The body of the edit option help page|
-	},
         'edit option value description' => {
                 message => q|<p>The value of this option (ie. 'Blue').</p>|,
                 lastUpdated => 1122609417,
@@ -450,68 +293,6 @@ default weight for product variants consisting of this option.</p>|,
                 message => q|<p>When this option is called in the SKU template as a template variable, the value that will be displayed.</p>|,
                 lastUpdated => 1165513384,
         },
-	'help list variants title' => {
-		message => q|List product variants|,
-		lastUpdated => 0,
-		context => q|The title of the list variants help page|
-	},
-	'help list variants body' => {
-		message => q|<span style="font-weight: bold;">Overview</span><br />
-<br />
-Product variants are what customers can actually buy. This screen
-shows all possible configurations of parameters and options and
-therefore define the product variants you can actually sell.<br />
-<span style="font-weight: bold;"></span><br />
-<span style="font-weight: bold;">The variant list<br />
-</span><br />
-The list shows all product variants. The columns on the left indicate
-the configuration of the product variant, those on the right show its
-price, weight, SKU and availability. Values marked with a asterisk
-('*') are overridden via the edit mode of the variant (see below).<br />
-<br />
-<span style="font-weight: bold;">Usage</span><br />
-<br />
-Aside from inspecting the variants you can do two things in this
-screen. <br />
-<br />
-First you can set the availability of certain variants. This is done by
-using the checkboxes in the column available. If a box is checked it
-means that the product it's next to is available for purchase. Of
-course it's not available if the box is unchecked. If you make any
-changes to the checkboxes you'll need to click the 'Save' button that's
-at the bottom and the top of the screen.<br />
-<br />
-Also you can edit variants to override their automatically generated
-values for price, weight and SKU. To do this simply click on the edit
-button next to the variant you want to edit.<br />|,
-		lastUpdated => 1165518232,
-		context => q|The body of the list variants help page|
-	},
-
-	'help edit variant title' => {
-		message => q|Edit product variant|,
-		lastUpdated => 0,
-		context => q|The title of the edit variant help page|
-	},
-	'help edit variant body' => {
-		message => q|<p>Product variants have their price, weight and SKU automatically
-generated by WebGUI. Mostly this is exactly what you want, but
-sometimes you'll want to override one or more of these properties. For
-example if you want to discount some variants. </p>
-
-<p>This is the place to set those overrides. Form fields that are empty
-have their value automatically calculated by WebGUI where those that
-contain data will set the corresponding property to that value.</p>
-
-<p>If you have overridden a field but want to return it to the generated
-value simply empty it and WebGUI will regenerate the value for it.
-Please note that a field containing only spaces is not empty.</p>
-
-<p>The overrides you can set for a product variant are:</p>
-|,
-		lastUpdated => 1146607083,
-		context => q|The body of the edit variant help page|
-	},
 
         'price override description' => {
                 message => q|The price for this variant.|,
