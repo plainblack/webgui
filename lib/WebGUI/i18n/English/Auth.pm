@@ -7,12 +7,6 @@ our $I18N = {
 		lastUpdated => 1078856626
 	},
 
-	'anon reg template body' => {
-		message => q|<p>The following template variables are available in all Anonymous Registration templates.</p>
-|,
-		lastUpdated => 1164335958
-	},
-
 	'create.form.header' => {
 		message => q|The required form elements that go at the top of the anonymous registration page.|,
 		lastUpdated => 1149220721,
@@ -83,12 +77,6 @@ our $I18N = {
 		lastUpdated => 1078852836
 	},
 
-	'display account template body' => {
-		message => q|<p>The following template variables are available for Authentication Display Account templates. </p>
-|,
-		lastUpdated => 1149220652
-	},
-
 	'account.form.header' => {
 		message => q|The required form elements that go at the top of the display account page.|,
 		lastUpdated => 1149220575,
@@ -122,13 +110,6 @@ our $I18N = {
 	'login template title' => {
 		message => q|Authentication Login Template|,
 		lastUpdated => 1164394401
-	},
-
-	'login template body' => {
-		message => q|<p>The following template variables are available for all Authentication Login templates. 
-</p>
-|,
-		lastUpdated => 1164394398
 	},
 
 	'login.form.header' => {
@@ -189,13 +170,6 @@ our $I18N = {
 	'deactivate account template title' => {
 		message => q|Authentication Deactivate Account Template|,
 		lastUpdated => 1164394401
-	},
-
-	'deactivate account template body' => {
-		message => q|<p>The following template variables are available for all Authentication Deactivate account templates. 
-</p>
-|,
-		lastUpdated => 1164394398
 	},
 
 	'yes.label' => {

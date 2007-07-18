@@ -1,9 +1,10 @@
 package WebGUI::Help::Auth;
 
 our $HELP = {
+
 	'display account template' => {
 		title => 'display account template title',
-		body => 'display account template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Template",
@@ -35,9 +36,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'login template' => {
 		title => 'login template title',
-		body => 'login template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Template",
@@ -81,9 +83,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'anonymous registration template' => {
 		title => 'anon reg template title',
-		body => 'anon reg template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Template",
@@ -138,9 +141,10 @@ our $HELP = {
 		related => [
 		]
 	},
+
 	'deactivate account template' => {
 		title => 'deactivate account template title',
-		body => 'deactivate account template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Template",
@@ -172,6 +176,7 @@ our $HELP = {
 		related => [
 		]
 	},
+
 };
 
 1;

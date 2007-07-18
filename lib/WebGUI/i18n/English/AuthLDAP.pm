@@ -79,8 +79,8 @@ our $I18N = {
 	},
 
 	'display account template title' => {
-		message => q|LDAP Authentication Display Account Template|,
-		lastUpdated => 1078852969
+		message => q|LDAP Authentication Display Account Template Variables|,
+		lastUpdated => 1184793098
 	},
 
 	'11' => {
@@ -99,8 +99,8 @@ our $I18N = {
 	},
 
 	'anon reg template title' => {
-		message => q|LDAP Authentication Anonymous Registration Template|,
-		lastUpdated => 1078855925
+		message => q|LDAP Authentication Anonymous Registration Template Variables|,
+		lastUpdated => 1184793095
 	},
 
 	'1' => {
@@ -111,13 +111,6 @@ our $I18N = {
 	'login.message' => {
 		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
 		lastUpdated => 1149219946,
-	},
-
-	'auth login template body' => {
-		message => q|<p>The following template variables are available for LDAP Authentication Login templates.
-</p>
-|,
-		lastUpdated => 1149220017
 	},
 
 	'13' => {
@@ -190,12 +183,6 @@ our $I18N = {
 		lastUpdated => 1149219846,
 	},
 
-	'display account template body' => {
-		message => q|<p>The following template variables are available for the LDAP Authentication Display Account templates.</p>
-|,
-		lastUpdated => 1149219877
-	},
-
 	'10' => {
 		message => q|Password (confirm)|,
 		lastUpdated => 1071845113
@@ -251,20 +238,14 @@ our $I18N = {
 		lastUpdated => 1149219898,
 	},
 
-	'anon reg template body' => {
-		message => q|<p>The following template variables are available for LDAP Authentication Anonymous Registration templates.</p>
-|,
-		lastUpdated => 1149219931
-	},
-
 	'5' => {
 		message => q|LDAP URL (default)|,
 		lastUpdated => 1031514049
 	},
 
 	'auth login template title' => {
-		message => q|LDAP Authentication Login Template|,
-		lastUpdated => 1078854953
+		message => q|LDAP Authentication Login Template Variables|,
+		lastUpdated => 1184793100
 	},
 
 	'LDAPLink_0' => {
@@ -528,10 +509,10 @@ our $I18N = {
 		lastUpdated => 1116151382
 	},
 
-	'LDAPLink_990' => {
-		message => q|Edit LDAP Connection|,
-		lastUpdated => 1056151382
-	},
+#	'LDAPLink_990' => {
+#		message => q|Edit LDAP Connection|,
+#		lastUpdated => 1056151382
+#	},
 
 	'LDAPLink_991' => {
 		message => q|LDAP Connection ID|,
@@ -632,11 +613,6 @@ Usually the RDN looks something like:</p>
                 lastUpdated => 1165512102,
         },
 
-        'ldap connection add/edit body' => {
-                message => q| |,
-		lastUpdated => 1120164639,
-	},
-
 	'868' => {
 		message => q|Send welcome message?|,
 		lastUpdated => 1120164338
@@ -709,15 +685,8 @@ Usually the RDN looks something like:</p>
 	},
 
 	'deactivate account template title' => {
-		message => q|LDAP Authentication Deactivate Account Template|,
-		lastUpdated => 1164406538
-	},
-
-	'deactivate account template body' => {
-		message => q|<p>The following template variables are available for the LDAP Authentication Deactivate account templates. 
-</p>
-|,
-		lastUpdated => 1164406540
+		message => q|LDAP Authentication Deactivate Account Template Variables|,
+		lastUpdated => 1184793102
 	},
 
 	'topicName' => {
