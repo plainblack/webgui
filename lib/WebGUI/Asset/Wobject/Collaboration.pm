@@ -374,7 +374,12 @@ sub definition {
 			 );
 
 	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
-
+    
+    #my $subManageButton = "&nbsp;"; 
+    #if($self->get("subscriptionGroupId")) {
+    #    $subManageButton = $session->icon->manage("op=editGroup;gid=".$self->get("subscriptionGroupId"));
+    #}
+        
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -518,11 +523,6 @@ sub definition {
 			tab=>'properties',
 			label=>$i18n->get('archive after'),
 			hoverHelp=>$i18n->get('archive after description'),
-			},
-		subscriptionGroupId =>{
-			noFormPost=>1,
-			fieldType=>"hidden",
-			defaultValue=>undef
 			},
 		lastPostDate =>{
 			noFormPost=>1,
@@ -720,7 +720,15 @@ sub definition {
 			visible=>$useKarma,
 			label=>$i18n->get("default karma scale"),
 			hoverHelp=>$i18n->get('default karma scale help'),
-			}
+			},
+       
+        subscriptionGroupId =>{
+			fieldType=>"subscriptionGroup",
+            tab=>'security',
+			label=>$i18n->get("subscription group label"),
+            hoverHelp=>$i18n->get("subscription group hoverHelp"),
+            defaultValue=>undef,
+			},
         );
 
         push(@{$definition}, {

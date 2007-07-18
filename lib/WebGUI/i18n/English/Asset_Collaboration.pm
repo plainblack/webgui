@@ -1651,6 +1651,15 @@ the Collaboration Asset, the user will be notified.|,
 		message => q|The assetId of this Collaboration System.  Unlike the variable assetId, this one will not be overridden by the assetIds inside of Threads or Posts.|,
 		lastUpdated => 1170543345,
 	},
+    
+    'subscription group label' => {
+        message => q|Subscription Group|,
+        lastUpdated => 1170543345,
+    },
+    
+    'subscription group hoverHelp' => {
+        message => q|Manage the users in the subscription group for this Collaboration System|,
+    },
 
 
 };
