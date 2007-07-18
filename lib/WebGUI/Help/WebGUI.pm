@@ -484,10 +484,6 @@ our $HELP = {
 				namespace => 'WebGUI'
 			},
 			{
-				tag => 'user profile edit',
-				namespace => 'WebGUIProfile'
-			},
-			{
 				tag => 'user add/edit',
 				namespace => 'WebGUI'
 			},

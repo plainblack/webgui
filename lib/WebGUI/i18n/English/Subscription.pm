@@ -102,11 +102,11 @@ our $I18N = {
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
 
-	'help edit subscription title' => {
-		message => q|Subscription, Add/Edit|,
-		lastUpdated => 1101228391,
-		context => q|The Add/Edit subscription help page title.|
-	},
+#	'help edit subscription title' => {
+#		message => q|Subscription, Add/Edit|,
+#		lastUpdated => 1101228391,
+#		context => q|The Add/Edit subscription help page title.|
+#	},
 
         'subscription name description' => {
                 message => q|<p>Name of the subscription.</p>|,
@@ -152,14 +152,6 @@ our $I18N = {
                 message => q|<p>The amount of karma which is added to the user after he/she subscribes.</p>|,
                 lastUpdated => 1120861450,
         },
-
-	'help edit subscription body' => {
-		message => q|<p>A subscription will allow the user a piece of content which he/she has
-paid for. The following is the list of properties attached to each Description.</p>
-|,
-		lastUpdated => 1167190398,
-		context => q|The Add/Edit subscription help page text.|
-	},
 
 	'codes expire' => {
 		message => q|Codes expire after|,
@@ -305,36 +297,6 @@ paid for. The following is the list of properties attached to each Description.<
 		context => q|Menu name for createSubscriptionCodeBatch.|
 	},
 
-	'help manage subscriptions title' => {
-		message => q|Subscriptions, Manage|,
-		lastUpdated => 0,
-		context => q|The title of the Manage Subscriptions help page.|
-	},
-
-	'help manage subscriptions body' => {
-		message => q|Subscriptions allow you to sell your users group access on a subscription basis. To sell content to your users, set the content to be viewable by a certain group, then set that group to be used by the subscription.|,
-		lastUpdated => 1167190537,
-		context => q|The content of the Manage Subscriptions help page.|
-	},
-
-	'help manage subscription codes title' => {
-		message => q|Subscription, Manage Subscription Codes|,
-		lastUpdated => 0,
-		context => q|The title of the Manage Subscriptions codes help page.|
-	},
-
-	'help manage subscription codes body' => {
-		message => q|A subscription code is a string of characters that is tied to a set of subscriptions. A user can redeem such a code, and thus make himself subscribed for one term to all subscriptions the code is tied to, using the 'Redeem a subscription code' link in his account menu. Note that when redeeming a subscription code no money is charged.|,
-		lastUpdated => 1101754831,
-		context => q|The content of the Manage Subscriptions codes help page.|
-	},
-
-	'help create batch title' => {
-		message => q|Subscription, Create Batches of Subscription Codes|,
-		lastUpdated => 0,
-		context => q|The title of the Create Subscription code batch help page.|
-	},
-
         'noc description' => {
                 message => q|<p>Number of codes to create</p>|,
                 lastUpdated => 1120858265,
@@ -360,24 +322,6 @@ characters long.</p>|,
                 message => q|Description of the batch.|,
                 lastUpdated => 1120858265,
         },
-
-	
-	'help create batch body' => {
-		message => q|<p>Generate a batch of subscription codes.</p>|,
-		lastUpdated => 1146593246,
-		context => q|The content of the Create Subscription code batch help page.|
-	},
-
-	'help manage batch title' => {
-		message => q|Subscription, Manage Subscription Code Batches|,
-		lastUpdated => 0,
-		context => q|The title of the Manage Subscription code batch help page.|
-	},
-
-	'help manage batch body' => {
-		message => q|Subscription code batches are containers for subscription codes. Subscription codes are always generated in batches, even if there's only one code in a batch. All codes in the same batch share the same properties, except for the status flag.|,
-		lastUpdated => q|The body of the Manage Subscription code batch help page.|
-	},
 
 	'no subscriptions' => {
 		message => q|There are no subscriptions yet. You can add subscriptions by using the 'Add Subscription' option in the menu on the right of the screen.|,
@@ -420,11 +364,13 @@ The form in which the user can enter his subscription code.<br />|,
 		lastUpdated => 1146593261,
 		context => q|The body of the help page of the code redemption template.|
 	},
+
 	'help redeem code template title' => {
 		message => q|Redeem subscription code template|,
 		lastUpdated => 1101754848,
 		context => q|The title of the help page of the code redemption template.|
 	},
+
 	'code length' => {
 		message => q|Subscription code length|,
 		lastUpdated => 1102660410,

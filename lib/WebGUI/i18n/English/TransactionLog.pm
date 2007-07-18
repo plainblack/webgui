@@ -113,23 +113,18 @@ our $I18N = {
 		lastUpdated => 1149222142,
 	},
 
-
-	'help purchase history template body' => {
-		message => q|<p>The following template variables are available in this template:</p>
-|,
-		lastUpdated => 1149222379,
-		context => q|The body of the help page of the purchase history template.|
-	},
 	'help purchase history template title' => {
-		message => q|View purchase history template|,
-		lastUpdated => 0,
+		message => q|View purchase history template variables|,
+		lastUpdated => 1184781026,
 		context => q|The title of the help page of the purchase history template.|
 	},
+
 	'init date' => {
 		message => q|Init date|,
 		lastUpdated => 0,
 		context => q|Init date label.|
 	},
+
 	'completion date' => {
 		message => q|Completion date|,
 		lastUpdated => 0,

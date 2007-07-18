@@ -25,18 +25,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'add/edit workflow activity' => {
-		message => q|Add/Edit Workflow Activity|,
-		context => q|Title for the add and edit workflow activity screen|,
-		lastUpdated => 0,
-	},
-
-	'add/edit workflow activity body' => {
-		message => q|<p>Most Workflow Activities have these basic fields and properties:</p>|,
-		context => q|Body for the add and edit workflow activity screen|,
-		lastUpdated => 1165365265,
-	},
-
 	'list of installed activities' => {
 		message => q|List of Installed Workflow Activities|,
 		lastUpdated => 0,
