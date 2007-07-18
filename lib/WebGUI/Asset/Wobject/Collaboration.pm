@@ -375,11 +375,6 @@ sub definition {
 
 	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
     
-    #my $subManageButton = "&nbsp;"; 
-    #if($self->get("subscriptionGroupId")) {
-    #    $subManageButton = $session->icon->manage("op=editGroup;gid=".$self->get("subscriptionGroupId"));
-    #}
-        
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -727,6 +722,7 @@ sub definition {
             tab=>'security',
 			label=>$i18n->get("subscription group label"),
             hoverHelp=>$i18n->get("subscription group hoverHelp"),
+            noFormPost=>1,
             defaultValue=>undef,
 			},
         );
