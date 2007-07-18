@@ -209,12 +209,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'commit version tag' => {
-		message => q|Commit Version Tag|,
-		context => q|The name of the workflow activity.|,
-		lastUpdated => 0,
-	},
-
 	'group to use help' => {
 		message => q|Which group is allowed to use this tag?|,
 		lastUpdated => 0,
@@ -327,11 +321,6 @@ our $I18N = {
 		context => q|The prompt for purging a revision from the manage revisios screen.|
 	},
 
-	'manage version tags' => {
-		message => q|Manage Version Tags|,
-		lastUpdated => 1148359381,
-	},
-
 	'workflow' => {
 		message => q|Workflow|,
 		lastUpdated => 1148445024,
@@ -342,35 +331,10 @@ our $I18N = {
 		lastUpdated => 1148445024,
 	},
 
-	'manage version tags body' => {
-		message => q|<p>This screen lists all uncommitted version tags in WebGUI, their status and an interface to manage them.  If you are currently working under a tag, the name of the tag is prominently displayed for reference.</p>
-<p>The icons next to each tag allow each tag to be edited, or deleted.  The name of the tag is a link to manage work done in the tag.  The date the tag was created and the username of the user who created are shown as well.  A link is provided so that the tag can be committed</p>
-<p>Links are also provided to set any other version tag as your new current working version tag.  From that point forward, all work will be done under the new tag.</p>|,
-		lastUpdated => 1165518479,
-	},
-
-	'manage pending versions body' => {
-		message => q|<p>This screen presents a list of pending version tags by name.  Version tags are pending after they have been committed and before they have been approved and/or processed, or if they are in the process of becoming unlocked to be re-edited.  Each name is a link to display the list of revisions in this tag.</p>|,
+	'commit version tag' => {
+		message => q|Commit Version Tag|,
+		context => q|The name of the workflow activity.|,
 		lastUpdated => 0,
-	},
-
-	'manage committed versions body' => {
-		message => q|<p>This screen lists all committed version tags in WebGUI, information about the tags and an interface to manage them.</p>
-<p>The name of the tag is a link to display what work was performed in the tag.  The date the tag was committed and the username of the user who committed the tag are shown as well.  A link is provided so that the tag can be rolled back.</p>
-|,
-		lastUpdated => 1148359381,
-	},
-
-	'commit version tag body' => {
-		message => q|<p>Committing the version tag will make its content the current version of content that is used and displayed on your website.</p>
-|,
-		lastUpdated => 1148444236,
-	},
-
-	'edit version tag body' => {
-		message => q|<p>In this screen you will create a new version tag for use on the site, or edit an existing version tag.  Members of the Manage Version Tag group will have the additionaly ability to define how the version tag is handled via a workflow and which group is allowed to make edits under the tag.</p>
-|,
-		lastUpdated => 1148444236,
 	},
 
 	'topicName' => {

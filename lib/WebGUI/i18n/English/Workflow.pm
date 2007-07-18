@@ -154,48 +154,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'manage workflow help body' => {
-		message => q|
-<p>This is the master screen for managing workflows.  All configured workflows are shown in a table by the title of the workflow, along with icons to edit or delete the workflow and the workflow's status, enabled or disabled. Links are provided to add new workflows and to show which, if any, workflows are presently running.</p>
-<p>The Manage Workflow screen is accessed from the Admin Console.</p>
-|,
-		lastUpdated => 1151719637,
-	},
-
-	'show running workflows body' => {
-		message => q|
-<p>This screen can help you debug problems with workflows by showing which workflows are currently running.  The workflows are grouped by status, with their names, current and original priorities, current activities (if any), last state, and when the workflow was last run.</p>
-<p>You can edit the priority of workflows by clicking on the priority links and submitting the form that appears. You can also run a workflow by clicking the "Run" link in the right column of the table, if present.</p>
-  <p>The screen will not automatically update.  To update the list of running workflows, reload the page.</p>
-|,
-		lastUpdated => 1151719633,
-	},
-
-	'add a new workflow body' => {
-		message => q|
-<p>Adding a workflow is a two-step process:</p>
-<div>
-<ol>
-<li>Select the type of workflow to add in this screen.</li>
-<li>Edit the workflow and add activities to it in the screen that follows.</li>
-</ol>
-</div>
-<p>Workflow types, and the kinds of activities that can be added to each, are configured in your WebGUI.conf file.</p>
-|,
-		lastUpdated => 1151719633,
-	},
-
-	'edit workflow body' => {
-		message => q|
-<p>Now that you have selected which type of workflow you want to add, you will edit the workflow
-and add activities to it.</p>
-<p>Below the fields in two columns are the set of activities that are available to be added, and activities, if any, that have already been added to the worflow.</p>
-<p>To add a new activity to the workflow, click on its name.  This will take you to the screen to configure that activity for this workflow.</p>
-<p>Activities that have already been added and configured are displayed by name in the order they will be executed by Spectre.  Icons next to the name of the activity allow it to be reordered, edited, deleted from this workflow.</p>
-|,
-		lastUpdated => 1151721687,
-	},
-
 	'edit priority success' => {
 		message => q|Workflow priority updated successfully.|,
 		context => q||,
