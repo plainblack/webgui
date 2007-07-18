@@ -71,6 +71,7 @@
  - add: Settings can now return error messages to the user
  - add: Password recovery can now be based on profile fields or simply by the
    user's e-mail address.
+ - add: Button in Collaboration Systems for managing CS subscription group.
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success
