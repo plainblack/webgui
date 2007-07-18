@@ -9,10 +9,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'style sheets using',
-				namespace => 'WebGUI'
-			},
-			{
 				tag => 'wobject add/edit',
 				namespace => 'Asset_Wobject'
 			},

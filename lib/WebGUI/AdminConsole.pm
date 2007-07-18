@@ -168,7 +168,7 @@ sub getAdminConsoleParams {
 
 #-------------------------------------------------------------------
 
-=head2 getAdminFunction ( [id] )
+=head2 getAdminFunction ( [id, testing] )
 
 Returns _formatFunction list of available AdminFunctions.
 
@@ -176,11 +176,17 @@ Returns _formatFunction list of available AdminFunctions.
 
 If present, returns a _formatFunction hash based upon the given parameter.
 
+=head3 testing
+
+If true, then getAdminFunction will return the internal hash for i18n, icon and
+other tests.
+
 =cut
 
 sub getAdminFunction {
 	my $self = shift;
 	my $id = shift;
+	my $testing = shift;
 	my $functions = {		# at some point in the future we'll need to make this pluggable/configurable
 		"spectre"=>{
 			title=>{
@@ -417,6 +423,7 @@ sub getAdminFunction {
 			group=>"3",
 		},
 	};
+    return $functions if $testing;
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});
 	} else {

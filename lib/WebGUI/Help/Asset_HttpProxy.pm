@@ -85,10 +85,6 @@ our $HELP = {
 				tag => 'http proxy template',
 				namespace => 'Asset_HttpProxy',
 			},
-			{
-				tag => 'content filtering',
-				namespace => 'WebGUI',
-			},
 		],
 	},
 

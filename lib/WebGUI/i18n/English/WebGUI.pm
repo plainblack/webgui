@@ -670,17 +670,6 @@ Database Links enable a WebGUI administrator to add commonly used databases for 
 		lastUpdated => 1031514049
 	},
 
-	'grouping edit title' => {
-		message => q|Grouping, Edit|,
-		lastUpdated => 1122079302
-	},
-
-	'grouping edit body' => {
-		message => q|You can set how long a user is in a group, or assign them to be a group
-		admin.|,
-		lastUpdated => 1122079302
-	},
-
         '50 description' => {
                 message => q|The name of the user.|,
                 lastUpdated => 1122088999,
@@ -955,14 +944,6 @@ to add or remove users from their groups.
 		lastUpdated => 1183420610,
 	},
 
-	'1074' => {
-		message => q|<p>Style templates are a special kind of template in WebGUI. They allow you to keep your content separated from the look and feel of your site. The following are the template variables available in style templates:
-</p>
-
-|,
-		lastUpdated => 1149182205,
-	},
-
 	'860' => {
 		message => q|Make email address public?|,
 		lastUpdated => 1043879942
@@ -1067,16 +1048,6 @@ removed from the system after a set period of time.  That period of time is set 
 	'170' => {
 		message => q|search|,
 		lastUpdated => 1031514049
-	},
-
-	'660' => {
-		message => q|Groups, Manage|,
-		lastUpdated => 1031514049
-	},
-
-	'groups default title' => {
-		message => q|Groups, Default|,
-		lastUpdated => 1100223171
 	},
 
 	'428' => {
@@ -1243,53 +1214,6 @@ The following fields make up a Database Link.
 		lastUpdated => 1031514049
 	},
 
-	'610' => {
-		message => q|<p>See <b>Manage Users</b> for additional details.</p>
-
-<p><b>Username</b><br />
-Username is a unique identifier for a user. Sometimes called a handle, it is also how the user will be known on the site. (<i>Note:</i> Administrators have unlimited power in the WebGUI system. This also means they are capable of breaking the system. If you rename or create a user, be careful not to use a username already in existence.)
-</p>
-
-<p><b>Authentication Method</b><br />
-See <i>Edit Settings</i> for details.
-</p>
-
-<p><b>Password</b> *W<br />
-A password is used to ensure that the user is who s/he says s/he is.
-</p>
-
-<p><b>Password Timeout</b> *W<br />
-Length of time before this user's password expires, forcing it to be changed
-</p>
-
-<p><b>Allow User to Change Username?</b> *W<br />
-Should this user be allowed to change his username?
-</p>
-
-<p><b>Allow User to Change Password?</b> *W<br />
-Should this user be allowed to change his password?
-</p>
-
-<p><b>LDAP Connection</b> *L<br />
-Select one of the available LDAP connections to authenticate this user.
-</p>
-
-<p><b>LDAP URL</b> *L<br />
-See <i>Edit Settings</i> for details.
-</p>
-
-<p><b>Connect DN</b> *L<br />
-The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP database. It should be specified as <b>cn=John Doe</b>. This is, in effect, the username that will be used to authenticate this user against your LDAP server.
-</p>
-
-<p>*W available in WebGUI authentication<br />
-*L available in LDAP authentication.
-</p>
-
-|,
-		lastUpdated => 1146526452,
-	},
-
 	'514' => {
 		message => q|Views|,
 		lastUpdated => 1031514049
@@ -1298,69 +1222,6 @@ The Connect DN is the <b>cn</b> (or common name) of a given user in your LDAP da
 	'725' => {
 		message => q|Your username cannot be blank.|,
 		lastUpdated => 1031879612
-	},
-
-	'groups default body' => {
-		message => q|<p>There are several groups built into WebGUI:</p>
-
-<p><b>Admins</b><br />
-Admins are users who have unlimited privileges within WebGUI. A user should only be added to the admin group if they oversee the system. Usually only one to three people will be added to this group.  Once a person has been added to this group, their UI level is automatically updated to 9.
-</p>
-
-<p><b>Turn Admin On</b><br />
-Users in this group are allowed to enter Admin mode.  By default, the Content Managers,
-Template Managers, Package Managers and Secondary Admins groups are members of the
-Turn Admin On group and also may enter Admin mode.
-</p>
-
-<p><b>Content Managers</b><br />
-Content managers are users who have privileges to add, edit, and delete content from various areas on the site. The content managers group should not be used to control individual content areas within the site, but to determine whether a user can edit content at all. You should set up additional groups to separate content areas on the site.
-</p>
-
-<p><b>Everyone</b><br />
-Everyone is a magic group in that no one is ever physically inserted into it, but yet all members of the site are part of it. If you want to open up your site to both visitors and registered users, use this group to do it.
-</p>
-
-<p><b>Export Managers</b><br />
-Members of this group are allowed to export pages to disk.
-</p>
-
-<p><b>Package Managers</b><br />
-Users that have privileges to add, edit, and delete packages of wobjects and pages to deploy.
-</p>
-
-<p><b>Registered Users</b><br />
-When users are added to the system they are put into the registered users group. A user should only be removed from this group if their account is deleted or if you wish to punish a troublemaker.
-</p>
-
-<p><b>Secondary Admins</b><br /> Users in the Secondary Admins group may
-add new users, but cannot edit users.
-</p>
-
-<p><b>Style Managers</b><br />
-Users that have privileges to edit styles for this site. These privileges do not allow the user to assign styles to a page, just define them to be used.
-</p>
-
-<p><b>Visitors</b><br />
-Visitors are users who are not logged in using an account on the system. Also, if you wish to punish a registered user you could remove him/her from the Registered Users group and insert him/her into the Visitors group.
-</p>
-
-<p><b>Template Managers</b><br />
-Template Managers are an old deprecated group that used to be in charge of editing and creating
-templates.  Templates are now owned by the Turn On Admin group by default.
-</p>
-|,
-		lastUpdated => 1164348333
-	},
-
-	'615' => {
-		message => q|<p>Groups are used to subdivide privileges and responsibilities within the WebGUI system. For instance, you may be building a site for a classroom situation. In that case you might set up a different group for each class that you teach. You would then apply those groups to the pages that are designed for each class.
-</p>
-<p>
-The Groups page displays all groups that you are allowed to edit.  The form on the page allows you to display a subset of those groups.  The search engine uses SQL wildcards like '%' instead of the familiar ones used by internet search engines.
-</p>
-|,
-		lastUpdated => 1146592059
 	},
 
 	'50' => {
@@ -1396,11 +1257,6 @@ The Groups page displays all groups that you are allowed to edit.  The form on t
 
 	'449' => {
 		message => q|Miscellaneous Information|,
-		lastUpdated => 1031514049
-	},
-
-	'658' => {
-		message => q|Users, Manage|,
 		lastUpdated => 1031514049
 	},
 
@@ -1525,16 +1381,6 @@ sent in HTML format. No attachments can be included.|,
                 lastUpdated => 1122093200,
         },
 
-	'group email title' => {
-		message => q|Group, Email|,
-		lastUpdated => 1122092662
-	},
-
-	'group email body' => {
-		message => q|<p>This provides an easy way to contact all of the members of a group at once.</p> |,
-		lastUpdated => 1037579611
-	},
-
 	'332' => {
 		message => q|Work Zip Code|,
 		lastUpdated => 1031514049
@@ -1574,19 +1420,6 @@ sent in HTML format. No attachments can be included.|,
 	'565' => {
 		message => q|Who can moderate?|,
 		lastUpdated => 1031514049
-	},
-
-	'620' => {
-		message => q|<p>As this function suggests, you will be deleting a group.  Users in that group are removed from the group,but are not deleted from the site.</p>
-		
-<p>Any Asset that uses that group will lose the privileges associated with that group.  For example, if a page was set to
-be viewable by the group you are deleting, then only Admins and the page owner will be able to see that page.  Do not delete
-groups lightly!</p>
-
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no then the delete will not take place.
-</p>
-|,
-		lastUpdated => 1171410836
 	},
 
 	'1004' => {
@@ -1677,11 +1510,6 @@ groups lightly!</p>
 
 	'347' => {
 		message => q|View Profile For|,
-		lastUpdated => 1031514049
-	},
-
-	'665' => {
-		message => q|Group, Delete|,
 		lastUpdated => 1031514049
 	},
 
@@ -1884,26 +1712,6 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
         },
 
 
-	'622' => {
-		message => q|
-<p>Here you will define a new group or edit an existing group.
-Group membership is very flexible, determined from any or all of the following:</p>
-<div>
-<ul>
-<li>Add users directly to a group.</li>
-<li>Via membership in an LDAP group.</li>
-<li>From a database query.</li>
-<li>By IP address.</li>
-</ul>
-</div>
-<p>Groups can also be setup to that
-users can add or remove themselves from the group, although it is
-strongly recommended that you not allow users to add themselves to
-default WebGUI groups such as Admin or Content Manager.</p>
-<p>Custom profile fields cannot be added to Groups. If you would like to add custom profile fields, these can be added to Users globally under the User Profiling tab in the Admin Console.|,
-		lastUpdated => 1171413841,
-	},
-
 	'361' => {
 		message => q|Three Over One|,
 		lastUpdated => 1031514049
@@ -2043,11 +1851,6 @@ default WebGUI groups such as Admin or Content Manager.</p>
 	'555' => {
 		message => q|Edit this user's karma.|,
 		lastUpdated => 1031514049
-	},
-
-	'681' => {
-		message => q|Packages, Using|,
-		lastUpdated => 1038889481
 	},
 
 	'1017' => {
@@ -2253,17 +2056,6 @@ div.tabs {
 		lastUpdated => 1068703399
 	},
 
-	'612' => {
-		message => q|<p>There is no need to ever actually delete a user. If you are concerned with locking out a user, then simply change their password. If you truly wish to delete a user, then please keep in mind that there are consequences. If you delete a user any content that they added to the site via wobjects (like message boards and user contributions) will remain on the site. However, if another user tries to visit the deleted user's profile they will get an error message. Also if the user ever is welcomed back to the site, there is no way to give him/her access to his/her old content items except by re-adding the user to the users table manually.
-</p>
-
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-</p>
-
-|,
-		lastUpdated => 1101775447,
-	},
-
 	'827' => {
 		message => q|Wobject Template|,
 		lastUpdated => 1052046436
@@ -2455,11 +2247,6 @@ div.tabs {
 		lastUpdated => 1031514049
 	},
 
-	'668' => {
-		message => q|Style Sheets, Using|,
-		lastUpdated => 1046067403
-	},
-
 	'52' => {
 		message => q|login|,
 		lastUpdated => 1031514049
@@ -2468,11 +2255,6 @@ div.tabs {
 	'750' => {
 		message => q|Delete this user.|,
 		lastUpdated => 1036864742
-	},
-
-	'657' => {
-		message => q|User, Delete|,
-		lastUpdated => 1031514049
 	},
 
 	'229' => {
@@ -2534,62 +2316,6 @@ div.tabs {
 		message => q|There is already a user of this system with the email address you've entered.  
         Please re-complete the form and press "Save" if you still wish to create this user|,
 		lastUpdated => 1067951807
-	},
-
-	'623' => {
-		message => q|<p><a href="http://www.w3.org/Style/CSS/">Cascading Style Sheets (CSS)</a> are a great way to manage the look and feel of any web site. They are used extensively in WebGUI.
-</p>
-
-<p>If you are unfamiliar with how to use CSS, <a href="http://www.plainblack.com/">Plain Black</a> provides training classes on XHTML and CSS. Alternatively, Bradsoft makes an excellent CSS editor called <a href="http://www.bradsoft.com/topstyle/index.asp">Top Style</a>.
-</p>
-
-<p>The following is a list of classes used to control the default look of WebGUI. These of course can be overridden or replaced in the various templates that generate them.
-</p>
-
-<p><b>A</b><br />
-The links throughout the style.
-</p>
-
-<p><b>BODY</b><br />
-The default setup of all pages within a style.
-</p>
-
-<p><b>H1</b><br />
-The headers on every page.
-</p>
-
-<p><b>.content</b><br />
-The main content area on all pages of the style.
-</p>
-
-<p><b>.formDescription </b><br />
-The tags on all forms next to the form elements. 
-</p>
-
-<p><b>.formSubtext </b><br />
-The tags below some form elements.
-</p>
-
-<p><b>.highlight </b><br />
-Denotes a highlighted item, such as which message you are viewing within a list.
-</p>
-
-<p><b>.pagination </b><br />
-The Previous and Next links on pages with pagination.
-</p>
-
-<p><b>.tableData </b><br />
-The data rows on things like message boards and user contributions.
-</p>
-
-<p><b>.tableHeader </b><br />
-The headings of columns on things like message boards and user contributions.
-</p>
-
-<p><b>NOTE:</b> Some wobjects and macros have their own unique styles sheet classes, which are documented in their individual help files.
-</p>
-|,
-		lastUpdated => 1146592967
 	},
 
 	'328' => {
@@ -2715,11 +2441,6 @@ The headings of columns on things like message boards and user contributions.
 	'1007' => {
 		message => q|Content Type|,
 		lastUpdated => 1060432032
-	},
-
-	'667' => {
-		message => q|Group, Add/Edit|,
-		lastUpdated => 1031514049
 	},
 
 	'998' => {
@@ -2912,24 +2633,6 @@ The headings of columns on things like message boards and user contributions.
                 lastUpdated => 1121052295,
         },
 
-	'replacements edit body' => {
-		message => q|
-<p>Many Assets allow you to control HTML and javascript that is entered by users, but that is
-limited to the scope of the Asset and don't control content entered users.  WebGUI has a
-sitewide system called Content Filtering that provides that ability.</p>
-
-<p>It works much like the Search and Replace function of word processors.  First, enter
-a string to be searched for.  Then enter in the string that you want to replace it.</p>
-
-<p>Most of the time, this Content Filter will be used to remove offensive words such as slang,
-curses or racial slurs.  However, it can also be used as a preprocessor for inline macros.  See
-the default replacements that ship with WebGUI for examples.</p>
-
-<p>Only Admins may configure the Content Filter.</p>
-|,
-		lastUpdated => 1121052324
-	},
-
 	'735' => {
 		message => q|6 Professional|,
 		lastUpdated => 1033836686
@@ -2938,27 +2641,6 @@ the default replacements that ship with WebGUI for examples.</p>
 	'404' => {
 		message => q|First Page|,
 		lastUpdated => 1031514049
-	},
-
-	'613' => {
-		message => q|<p>Users are the accounts in the system that are given rights to do certain things. There are two default users built into the system: Admin and Visitor.
-</p>
-
-<p><i>Admin</i><br />
-Admin is exactly what you'd expect. It is a user with unlimited rights in the WebGUI environment. If it can be done, this user has the rights to do it.
-</p>
-
-<p><i>Visitor</i><br />
-Visitor is exactly the opposite of Admin. Visitor has no rights what-so-ever. By default any user who is not logged in is seen as the user Visitor.
-</p>
-
-<p><b>Add a new user.</b><br />
-Click on this to go to the add user screen.
-</p>
-
-<p><b>Search</b><br />
-You can search users based on username and email address. You can do partial searches too if you like.</p>|,
-		lastUpdated => 1146592990,
 	},
 
 	'1043' => {
@@ -2989,39 +2671,6 @@ You can search users based on username and email address. You can do partial sea
 	'1071' => {
 		message => q|Env HTTP Host|,
 		lastUpdated => 1066641511
-	},
-
-	'636' => {
-		message => q|
-<p>Packages are groups of Assets that are predefined to be redeployed
-together. It works exactly the same as the clipboard, except that you
-do not need to cut or copy the Assets before redeploying, or pasting,
-the Assets in other areas of the site.</p>
-
-<p>Packages are often defined to lessen the burden of repetitive tasks. A
-package manager may see the need to create a package several of pages with
-a message board, an FAQ, and a Poll because that task is performed often.</p>
-
-<p>In order to define or delete packages you must be in the Package
-Managers group or in the Admins group.</p>
-
-<p>To create a package follow these simple steps, just go the Metadata tab of
-any Asset's Add/Edit form and select "Make package?".  The Package will consist of
-that Asset and all Assets below it.</p>
-
-<p>To deploy a Package:</p>
-<div>
-<ol>
-<li>Point your browser at a page on the site where you want to deploy the Package.</li>
-<li>Enable Admin mode.</li>
-<li>Select the Package tab from the Admin Bar.</li>
-<li>Click on the name of the Package to deploy.</li>
-</ol>
-</div>
-
-<p>All Asset URLs in the Package will be made unique after being deployed.</p>
-|,
-		lastUpdated => 1127363010
 	},
 
 	'561' => {
@@ -3198,23 +2847,6 @@ or are under your current version tag.</p>
 		lastUpdated => 1031514049
 	},
 
-	'manage users in group title' => {
-		message => q|Users In Group|,
-		lastUpdated => 1122094682
-	},
-
-	'manage users in group body' => {
-		message => q|Use this form to add or remove users in bulk from a group.|,
-		lastUpdated => 1132359408
-	},
-
-	'manage groups in group body' => {
-		message => q|<p>In this form, you will add or remove groups to this group.  Doing this with several groups can create a hierarchy of groups (think about a tree structure) with parent groups and children groups.  The privileges of parent groups flow down to children groups.</p>
-<p>WebGUI will prevent you from creating circular structures that could cause it to go into an infinite loop while recursing down through groups.</p>
-|,
-		lastUpdated => 1151622488
-	},
-
 	'1009' => {
 		message => q|HTML|,
 		lastUpdated => 1060433286
@@ -3248,11 +2880,6 @@ or are under your current version tag.</p>
 	'848' => {
 		message => q|There is a syntax error in this template. Please correct.|,
 		lastUpdated => 1039892202
-	},
-
-	'655' => {
-		message => q|User, Add/Edit|,
-		lastUpdated => 1076700945
 	},
 
 	'59' => {
@@ -3538,8 +3165,8 @@ or are under your current version tag.</p>
 	'settings' => {
 		message => q|Settings|,
 		lastUpdated =>1092930637,
-                context => q|Title of the settings manager for the admin console.|
-        },
+        context => q|Title of the settings manager for the admin console.|
+    },
 
         '125 description' => {
                 message => q|The name of your company. It will appear on all emails and anywhere you use the Company Name style macro.|,
@@ -3691,96 +3318,6 @@ and tracked by WebGUI.|,
                 lastUpdated => 1146799413,
         },
 
-	
-	'settings help' => {
-		message => q|Settings allow you to customize WebGUI's default values to satisfy your particular needs.  They are sorted below by tab:
-<p/>
-|,
-		lastUpdated => 1120239400,
-	},
-
-	'leftovers from settings stored for later' => {
-		message => q|
-
-<h2>WebGUI Authentication Options</h2>
-
-<p><b>Minimum Password Length</b><br />
-Set the minimum length that passwords can be.  If set to 0, there is no minimum length.
-</p>
-
-<p><b>Password Timeout</b><br />
-Set how long before a user's password expires and has to change it.
-</p>
-
-<p><b>Expire passwords on user creation?</b><br />
-Should a user's password be expired when he is created by an administrator forcing a change?
-</p>
-
-<p><b>Send welcome message?</b><br />
-Do you wish WebGUI to automatically send users a welcome message when they register for your site? 
-</p>
-
-<p><b>NOTE:</b> In addition to the message you specify below, the user's account information will be included in the message.
-</p>
-
-<p><b>Welcome Message</b> <br />
-Type the message that you'd like to be sent to users upon registration.
-</p>
-
-<p><b>Allow Users to Change Username?</b><br />
-Should users be allowed to change their Usernames?
-</p>
-
-<p><b>Allow Users to Change Passwords?</b><br />
-Should users be allowed to change their Passwords?
-</p>
-
-<p><b>Allow Password Recovery?</b><br />
-Can users recover their passwords?
-</p>
-
-<p><b>Recover Password Message</b><br />
-Type a message that will be sent to your users if they try to recover their WebGUI password.
-</p>
-
-<p><b>Validate email addresses</b><br />
-Before a user's account is activated, require that they click on a link sent to their email
-account.
-</p>
-
-<p><b>Use captcha image</b><br />
-Require the user to enter in the data from a captcha image before activating an account.
-</p>
-
-<p><b>Account Template</b><br />
-Template to be used to display a user's account.
-</p>
-
-<p><b>Create Account Template</b><br />
-Template to be used to show the form for creating an account.
-</p>
-
-<p><b>Expired Password Template</b><br />
-Template used to inform user that their password has expired.
-</p>
-
-<b>Login Template</b><br />
-Template used to display login information to the user as an operation as opposed to inside of a page via a macro.
-<p>
-
-<p><b>Password Recovery Template</b><br />
-Template used to display a form to the user to recover their password, if the feature is enabled.
-</p>
-
-<h2>LDAP Authentication Options</h2>
-
-<p><b>LDAP Connection</b><br />
-Select which of the configured LDAP connections to use to authenticate users.
-</p>
-
-|,
-		lastUpdated => 1146593115
-	},
 
 	'Enable passive profiling' => {
 		message => q|Enable passive profiling?|,
@@ -3818,30 +3355,6 @@ a user.|,
 		message => q|Profile|,
 		lastUpdated => 1098327046,
 		context => q|Tab label for the user's profile in the user manager.|
-	},
-
-	'content filter body' => {
-		message => q|<p>WebGUI has many features to accept content from outside sources, such as users posting to message boards or pulling data from external websites via the HttpProxy or SyndicatedContent Assets.  However, this can expose a risk to your site, for example, through cross-site scripting attacks.</p>
-<p>To help solve this problem
-many Assets have a <b>^International("418","WebGUI");</b> property that performs various levels
-of filtering on content.  Each one is pretty self-explanatory:</p>
-<div>
-<dl>
-<dt>^International("420","WebGUI");</dt>
-<dd>No filtering will be done.  All original content will be displayed.</dd>
-<dt>^International("891","WebGUI");</dt>
-<dd>Negates WebGUI Macros.  Instead of displaying Macro output, the Macro itself
-will be shown;</dd>
-<dt>^International("526","WebGUI");</dt>
-<dd>Negates WebGUI Macros. Removes the contents of &lt;script&gt; tags and deletes
-JavaScript fields from HTML tags.</dd>
-<dt>^International("421","WebGUI");</dt>
-<dd>Removes everything except for bold, italics, breaks, etc.</dd>
-<dt>^International("419","WebGUI");</dt>
-<dd>Strips everything that it can, returning just plain old, safe text.</dd>
-</dl></div>
-|,
-		lastUpdated => 1165517754,
 	},
 
 	'glossary title' => {

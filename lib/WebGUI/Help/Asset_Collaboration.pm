@@ -223,10 +223,6 @@ our $HELP = {
                         },
 		],
 		related => [
-			{
-				tag => 'content filtering',
-				namespace => 'WebGUI'
-			},
 		]
 	},
 
