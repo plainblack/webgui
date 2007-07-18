@@ -61,10 +61,6 @@ our $HELP = {
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
 			},
-			{
-				tag => 'database links manage',
-				namespace => 'WebGUI',
-			},
 		]
 	},
 

@@ -255,11 +255,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'968' => {
-		message => q|Clipboard, Empty|,
-		lastUpdated => 1052850265
-	},
-
 	'540' => {
 		message => q|Karma Per Login|,
 		lastUpdated => 1031514049
@@ -395,11 +390,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'653' => {
-		message => q|Page, Delete|,
-		lastUpdated => 1031514049
-	},
-
 	'950' => {
 		message => q|Empty clipboard.|,
 		lastUpdated => 1052850265
@@ -430,19 +420,10 @@ our $I18N = {
 		lastUpdated => 1044126611
 	},
 
-	'1000' => {
-		message => q|<p>
-Database Links enable a WebGUI administrator to add commonly used databases for use in SQL Reports.  This frees the SQL Report author from having to know or enter a DSN, user, or password.</p>
-<p>Be aware that any database links you create here will be available to all content authors.  While they will not be able to see the database connection info, they will be able to execute any select, show, or describe commands on the database.
-</p>|,
-		lastUpdated => 1146526290
-	},
-
 	'43' => {
 		message => q|Are you certain that you wish to delete this content?|,
 		lastUpdated => 1031514049
 	},
-
 
 	'485' => {
 		message => q|Boolean (Checkbox)|,
@@ -512,11 +493,6 @@ Database Links enable a WebGUI administrator to add commonly used databases for 
 	'351' => {
 		message => q|Message|,
 		lastUpdated => 1031514049
-	},
-
-	'999' => {
-		message => q|Database Link, Delete|,
-		lastUpdated => 1056151382
 	},
 
 	'61' => {
@@ -618,11 +594,6 @@ Database Links enable a WebGUI administrator to add commonly used databases for 
                 lastUpdated => 1120768600,
         },
 
-	'edit user karma body' => {
-		message => q|<p>Most karma adjustments are done automatically based on what the user does on your website.  However, karma can also be adjusted by Admins</p>|,
-		lastUpdated => 1146455436
-	},
-
 	'12' => {
 		message => q|Turn admin off.|,
 		lastUpdated => 1031514049
@@ -651,13 +622,6 @@ Database Links enable a WebGUI administrator to add commonly used databases for 
 	'405' => {
 		message => q|Last Page|,
 		lastUpdated => 1031514049
-	},
-
-	'1002' => {
-		message => q|<p> When you delete a database link, all SQL Reports using that link will stop working.  A list of all affected reports is shown on the confirmation screen.</p>
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.</p>
-|,
-		lastUpdated => 1127413182
 	},
 
 	'1084' => {
@@ -1010,21 +974,6 @@ to add or remove users from their groups.
 		lastUpdated => 1031514049
 	},
 
-	'961' => {
-		message => q|<p>The trash is a special system location where deleted content is temporarily stored. Items in the trash may be cut to the clipboard or restored to their previous location.</p>
-<p><b>Title</b><br />The name of the item in the trash.  You may view the item by selecting the title.</p>
-<p><b>Type</b><br />The type of content.  For instance, a Page, Article, EventsCalendar, etc.</p>
-<p><b>Last Updated</b><br />The date and time the item was added to the trash.</p>
-<p><b>Size</b><br />The size of the Asset.</p>
-<p>Note that when Assets are in the trash that their URLs are still active in the WebGUI
-system.  If another page with an identical URL is created, the URL of the newly created page
-will be modified to make it unique.</p>
-<p>It is no longer possible to manually delete items from the trash, due to versioning.  Items in the trash will be automatically
-removed from the system after a set period of time.  That period of time is set in the config file, TrashExpiredContent_offset</p>
-<p>To truly delete an Asset from the system, rollback all releases of it under "Content Versioning"</p>|,
-		lastUpdated => 1127337912,
-	},
-
 	'483' => {
 		message => q|Yes or No|,
 		lastUpdated => 1031514049
@@ -1151,14 +1100,6 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
                 lastUpdated => 1122070396,
         },
 
-	'1001' => {
-		message => q|<p>
-The following fields make up a Database Link.
-</p>
-|,
-		lastUpdated => 1122070424
-	},
-
 	'556' => {
 		message => q|Amount|,
 		lastUpdated => 1031514049
@@ -1234,12 +1175,6 @@ The following fields make up a Database Link.
 		lastUpdated => 1031514049
 	},
 
-	'969' => {
-		message => q|If you choose to empty your clipboard, any items contained in it will be moved to the trash.
-|,
-		lastUpdated => 1052850265
-	},
-
 	'1076' => {
 		message => q|WebGUI Database|,
 		lastUpdated => 1070899134
@@ -1308,11 +1243,6 @@ The following fields make up a Database Link.
 	'699' => {
 		message => q|First Day Of Week|,
 		lastUpdated => 1031514049
-	},
-
-	'960' => {
-		message => q|Trash, Manage|,
-		lastUpdated => 1052850265
 	},
 
 	'818' => {
@@ -1587,11 +1517,6 @@ sent in HTML format. No attachments can be included.|,
 	'811' => {
 		message => q|From|,
 		lastUpdated => 1037580145
-	},
-
-	'957' => {
-		message => q|Clipboard, Manage|,
-		lastUpdated => 1052850265
 	},
 
         '84 description' => {
@@ -1872,19 +1797,6 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		message => q|Edited at|,
 		lastUpdated => 1047842180
 	},
-
-	'698' => {
-		message => q|<p>Karma is a method of tracking the activity of your users, and potentially rewarding or punishing them for their level of activity. Once karma has been enabled, you'll notice that the menus of many things in WebGUI change to reflect karma.
-</p>
-
-<p>You can track whether users are logging in, and how much they contribute to your site. And you can allow them access to additional features by the level of their karma.
-</p>
-
-<p>You can find out more about karma in <a href="http://www.plainblack.com/ruling_webgui">Ruling WebGUI</a>.</p>|,
-
-		lastUpdated => 1031514049
-	},
-
 
 	'538' => {
 		message => q|Karma Threshold|,
@@ -2191,12 +2103,6 @@ div.tabs {
 		lastUpdated => 1149182026,
 	},
 
-	'1086' => {
-		message => q|<p>Many wobjects have pagination features. Though some wobjects define their own pagination variables, most use a common set of pagination variables:</p>
-|,
-		lastUpdated => 1149182066,
-	},
-
 	'701' => {
 		message => q|Week(s)|,
 		lastUpdated => 1031514049
@@ -2348,11 +2254,6 @@ div.tabs {
 		lastUpdated => 1031514049
 	},
 
-	'997' => {
-		message => q|Database Links, Manage|,
-		lastUpdated => 1056151382
-	},
-
 	'36' => {
 		message => q|You must be an administrator to perform this function. Please contact one of your administrators. |,
 		lastUpdated => 1058092984
@@ -2376,16 +2277,6 @@ div.tabs {
 	'317' => {
 		message => q|<a href="http://www.icq.com">ICQ</a> UIN|,
 		lastUpdated => 1031514049
-	},
-
-	'608' => {
-		message => q|<p>Deleting a page can create a big mess if you are uncertain about what you are doing. When you delete a page you are also deleting the content it contains, all sub-pages connected to this page, and all the content they contain. Be certain that you have already moved all the content you wish to keep before you delete a page.
-</p>
-
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-</p>
-|,
-		lastUpdated => 1146804549
 	},
 
 	'169' => {
@@ -2443,11 +2334,6 @@ div.tabs {
 		lastUpdated => 1060432032
 	},
 
-	'998' => {
-		message => q|Database Link, Add/Edit|,
-		lastUpdated => 1056151382
-	},
-
 	'95' => {
 		message => q|Help Index|,
 		lastUpdated => 1031514049
@@ -2480,11 +2366,6 @@ div.tabs {
 
 	'504' => {
 		message => q|Template|,
-		lastUpdated => 1031514049
-	},
-
-	'697' => {
-		message => q|Karma, Using|,
 		lastUpdated => 1031514049
 	},
 
@@ -3357,78 +3238,6 @@ a user.|,
 		context => q|Tab label for the user's profile in the user manager.|
 	},
 
-	'glossary title' => {
-		message => q|WebGUI Glossary|,
-		lastUpdated => 1031514049
-	},
-
-	'glossary body' => {
-		message => q|
-
-<p><b>Assets</b><br />
-Everything inside of WebGUI is an Asset: files, images, forums, threads in forums, posts in threads, templates, Wobjects (like Articles, DataForms, EventsCalendars) and more.  Assets come in three types, Utility, Container and Assets (for lack of a better name).  Regular old Assets are those assets that are dealt with on a daily bases, such as Articles, File Piles, Data Forms and Collaboration Systems.
-</p>
-
-<p><b>Container Assets</b><br />
-Container Assets are those Assets which contain other Assets, like Folders, Pages and Dashboards.  Collaboration System and Event Calendar Assets are not considered Container Assets even though they do contain other Assets (Posts and Events, respectively).
-</p>
-
-<p><b>captcha</b><br />
-An image displaying a message along with lines or shades that make it hard for a computer
-to do character recognition.  Used in WebGUI to prevent accounts from being created by programs or spiders.
-</p>
-
-<p><b>locked</b><br />
-If Posts and Threads are "locked", no new posts can be added and no existing posts can be edited.
-</p>
-
-<p><b>Macros</b><br />
-Macros are used to create dynamic content within content that would otherwise be unchanging.  For
-example, showing today's date, or the name of the user on a page can be done with Macros.
-</p>
-
-<p><b>Passwords</b><br />
-The validity of a password in WebGUI depends on what kind of authentication system
-is used.  If the default, WebGUI authentication, is used, passwords may be made of
-any characters so it meets the minimum length set by the Administrator.
-</p>
-
-<p><b>sticky</b><br />
-If Posts and Threads are set to being "sticky", they will appear at the top of the Forum listing.
-</p>
-
-<p><b>UI level</b><br />
-For WebGUI Content Managers and Admins, the Asset and Wobject edit
-screens can be configured to make them easier to use, based on each
-user's UI level.  The UI level can be altered by Admins in the user's profile.
-Users added to the Admin group have their UI level automatically set to 9
-to give them full access to the site controls.
-</p>
-
-<p><b>Usernames</b><br />
-WebGUI usernames cannot start or begin with any kind of space (spaces, tabs, etc.) and can only be made of letters, numbers, or dashes, underscores, periods, commas or @ signs.
-</p>
-
-<p><b>Utility Assets</b><br />
-Utility Assets are those Assets which are not normally used in content management, but have various
-uses inside of WebGUI.  Utility Assets include RichEditors (which are used for entering content),
-Templates (used for styling content) and File and Image Assets.
-</p>
-
-<p><b>Version Tag</b><br />
-Every version in WebGUI is assigned a tag.  In the default version control setup, the tag is the date and time
-the tag was requested.
-</p>
-
-<p><b>Wobjects</b><br />
-If you think of Assets as "things" inside of WebGUI, then Wobject are
-"things" that "do stuff".  Articles are used to display content, DataForms
-are for collecting data from users (and optionally emailing a copy), and
-Message Boards hold forums for users.  There are many different Wobjects in WebGUI.
-</p>
-|,
-		lastUpdated => 1160064628,
-	},
 	'manage cache'  => {
                 message => q|Cache|,
                 lastUpdated => 1031514049
@@ -3542,27 +3351,6 @@ Message Boards hold forums for users.  There are many different Wobjects in WebG
 	'pages' => {
 		message => q|Pages|,
 		lastUpdated => 1141963573,
-	},
-
-	'webgui tips title' => {
-		message => q|WebGUI Tips|,
-		lastUpdated => 1145658318,
-	},
-
-	'webgui tips body' => {
-		message => q|<p>These are just random useful bits of information about WebGUI that we've collected.</p>
-
-<p><b>Dumping a whole WebGUI site statically.</b><br />
-<em>Len Kranendonk</em>
-Get a copy of wget and use this: <code>wget -p -r --html-extension -k http://the.webgui.site</code><br />
--p will fetch all page requisites (images, css, etc)<br />
--r is for recursively downloading all pages<br />
---html-extension  will add .html to all pages. This is needed to avoid duplicate page /directory names ( /home and /home/contact).<br />
--k will convert all URLs to local URLs
-</p>
-
-|,
-		lastUpdated => 1145658316,
 	},
 
 	'hex slider' => {
