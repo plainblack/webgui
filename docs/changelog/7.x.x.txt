@@ -81,6 +81,7 @@
     http://www.webgui.org/bugs/tracker/sqlform-says-databaselink-does-not-have-enough-privileges
  - fix: List pending Transactions (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/list-pending-transactions
+ - fix: syndicated content fails if feeds have items with single and multiple category entries
 
 7.3.20
  - Added beta label to the beta components in the system, so people can more

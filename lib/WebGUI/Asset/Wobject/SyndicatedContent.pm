@@ -326,6 +326,8 @@ sub _normalize_items {
                 # IE doesn't recognize &apos;
                 $item->{title} =~ s/&apos;/\'/g;
                 $item->{description} =~ s/&apos;/\'/g;
+                $item->{category} = [$item->{category}]
+                    if ref $item->{category} ne 'ARRAY';  
 		appendChoppedDescriptionTemplateVars($item);
         }
 }
