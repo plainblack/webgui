@@ -419,7 +419,12 @@ sub view {
 	if($var{header} ne "text/html") {
 		return $var{content};
 	} else {
-		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	    my $content = $var{content};
+	    $var{content} = '~~~';
+	    my $output = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	    WebGUI::Macro::process($self->session, \$output);
+	    my ($head, $foot) = split('~~~', $output);
+	    return $head . $content . $foot;
 	}
 }
 

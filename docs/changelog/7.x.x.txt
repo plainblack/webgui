@@ -73,6 +73,8 @@
    user's e-mail address.
  - add: Button in Collaboration Systems for managing CS subscription group.
  - fix: relative links sent out in emails don't work properly
+ - fix: macros not processed in HttpProxy template
+    http://www.webgui.org/bugs/tracker/macro-not-working-i-httpproxy
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success
