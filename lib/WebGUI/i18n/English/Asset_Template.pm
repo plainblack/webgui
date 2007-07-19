@@ -49,52 +49,6 @@ our $I18N = {
 		lastUpdated => 1107391368,
 	},
 
-	'684' => {
-		message => q|Template, Add/Edit|,
-		lastUpdated => 1038890615
-	},
-
-	'639' => {
-		message => q|<p>Templates allow you to customize the look and feel of your content on your site.  WebGUI comes with many existing templates that you can use as is or copy and modify to suit your individual needs.  Note that in many cases that you can change the look of default WebGUI templates through CSS.  The advantage to this is that the default templates are automatically updated when you upgrade WebGUI, where custom templates will have to be manually updated.</p>
-<p>There are two ways to edit templates, via the Display tab of the Asset Edit screen or via the Asset Manager.  In either case, you will need to be an Admin or a Template Admin.
-</p>
-
-<p><b>Display tab of the Asset Edit screen</b></p>
-<div>
-<ul>
-<li>Turn on Admin mode.</li>
-<li>Click on the Edit icon for an Asset.</li>
-<li>Select the "Display" tab for the Asset.</li>
-<li>Next to the template that the Asset uses will be two icons.
-	<dl>
-	<dt>Edit</dt>
-	<dd>This will allow you to edit the currently selected template.</dd>
-	<dt>Manage</dt>
-	<dd>This will take you to the Folder in the Asset Manager that contains this template.</dd>
-	</dl>
-</li></ul>
-</div>
-
-<p><b>Asset Manager</b></p>
-<div>
-<ul>
-<li>Turn on Admin mode.</li>
-<li>Click on the "Assets" icon in the Admin bar.</li>
-<li>In the crumb trail style navigation, click on "Root".</li>
-<li>Then click on Asset titled, "Import Node".</li>
-<li>Most default WebGUI templates are stored by type in folders inside the Template Folder.</li>
-</ul>
-</div>
-
-<p><b>Template Name</b><br />
-Give this template a descriptive name so that you'll know what it is when you're applying a template to content.
-</p>
-<p>
-<b>NOTE:</b> You should never edit the default templates that come with WebGUI as they are subject to change with each new release. Instead, copy the template you wish to edit, and edit the copy.</p>
-|,
-		lastUpdated => 1146800528
-	},
-
         'namespace description' => {
                 message => q|What type of template is this?|,
                 lastUpdated => 1146455494,
@@ -119,127 +73,6 @@ Give this template a descriptive name so that you'll know what it is when you're
                 message => q|If your configuration file lists multiple template engines, then select which type of template this is so that WebGUI can send it to the correct one.|,
                 lastUpdated => 1146455514,
         },
-
-	'825' => {
-		message => q|Template, Language|,
-		lastUpdated => 1038865669
-	},
-
-	'826' => {
-		message => q|<p>WebGUI has a powerful templating language built to give you maximum control over the layout of your content.</p>
-<p><b>NOTES:</b><br />
-Both the template language and template variables are case-insensitive.
-</p>
-
-<p>
-<b>Variables</b><br />
-Variables are the most basic of the template commands. They are used to position pieces of content.
-In the examples below, please note that the words <i>foo</i> and <i>bar</i> are used as placeholders for the actual variable names that you'll use. They are not part of the template language.</p>
-
-<p>
-<i>Syntax:</i> &lt;tmpl_var foo&gt; or &lt;tmpl_var name="foo"&gt;
-</p>
-
-<p>
-<i>Example:</i> &lt;tmpl_var name&gt;
-</p>
-
-<p>
-<b>Escaping text</b><br />
-Sometimes you would like to escape text to make it safe to use inside of XML and HTML tags or Javascript code.  There
-is a built-in way to do this for variables, using the ESCAPE option inside of &lt;tmpl_var&gt;.
-</p>
-
-<p>
-<i>Javascript safe:</i> &lt;tmpl_var foo ESCAPE="JS"&gt;
-</p>
-
-<p>
-<i>XML and HTML safe:</i> &lt;tmpl_var foo ESCAPE="HTML"&gt;
-</p>
-
-<p>
-<b>Conditions</b><br />
-To programmers conditions are nothing new, but to designers they can often be confusing at first. Conditions are really just true or false questions, and if you think of them that way, you'll have no trouble at all.
-</p>
-
-<p>
-<i>Syntax:</i> &lt;tmpl_if foo&gt; &lt;tmpl_else&gt; &lt;/tmpl_if&gt;<br />
-<i>Syntax:</i> &lt;tmpl_unless foo&gt; &lt;tmpl_else&gt; &lt;/tmpl_unless&gt;
-</p>
-
-<p>
-<i>Example:</i> &lt;tmpl_if isTrue&gt; It was true!&lt;tmpl_else&gt; It was false! &lt;/tmpl_if&gt;
-</p>
-
-<p>Truth or falsehood is determined by the following rules:</p>
-<div>
-<ul>
-<li><p>Variables not used in this template are false.</p></li>
-<li><p>Variables which are undefined are false.</p></li>
-<li><p>Variables which are empty are false.</p></li>
-<li><p>Variables which are equal to zero are false.</p></li>
-<li><p>All other variables are true.</p></li>
-</ul></div>
-
-<p><b>Loops</b><br />
-Loops iterate over a list of data output for each pass in the loop. Loops are slightly more complicated to use than plain variables, but are considerably more powerful.
-</p>
-
-<p>
-<i>Syntax:</i> &lt;tmpl_loop foo&gt; &lt;/tmpl_loop&gt;
-</p>
-
-<p>
-<i>Example:</i> <br />
-&lt;tmpl_loop users&gt; <br />
-  &nbsp; Name: &lt;tmpl_var first_name&gt;&lt;br/&gt;<br />
-&lt;/tmpl_loop&gt;
-</p>
-
-<p>
-<b>Loop Conditions</b><br />
-Loops come with special condition variables of their own. They are __FIRST__, __ODD__, __INNER__, and __LAST__.
-There is also a loop counter variable, __COUNTER__, which keeps track of how many times the
-loop has been executed.
-</p>
-
-<p><i>Examples:</i></p>
-
-<pre>
-   &lt;TMPL_LOOP FOO&gt;
-      &lt;TMPL_IF __FIRST__&gt;
-        This only outputs on the first pass.
-      &lt;/TMPL_IF&gt;
-
-      &lt;TMPL_IF __ODD__&gt;
-        This outputs every other pass, on the odd passes.
-      &lt;/TMPL_IF&gt;
-
-      &lt;TMPL_UNLESS __ODD__&gt;
-        This outputs every other pass, on the even passes.
-      &lt;/TMPL_UNLESS&gt;
-
-      &lt;TMPL_IF __INNER__&gt;
-        This outputs on passes that are neither first nor last.
-      &lt;/TMPL_IF&gt;
-
-      &lt;TMPL_IF __LAST__&gt;
-        This only outputs on the last pass.
-      &lt;TMPL_IF&gt;
-
-      Loop number: &lt;TMPL_VAR __COUNTER__&gt;
-        This keeps track of how many times you have gone through the loop.
-      &lt;TMPL_IF&gt;
-   &lt;/TMPL_LOOP&gt;
-</pre>
-
-<p><i>NOTE: This only documents WebGUI's default template language, HTML::Template.  If the Template Type
-has been set to some other language you will need to consult the documentation for it.</i></p>.
-<p><i>Some examples have been borrowed from the HTML::Template documentation.</i></p>.
-|,
-		lastUpdated =>1157490959,
-	},
 
 	'template variable title' => {
 		message => q|Template Variables|,
@@ -452,23 +285,6 @@ has been set to some other language you will need to consult that template's doc
 	'choose a layout' => {
 		message => q|<p>Choose a layout for this style:</p>|,
 		lastUpdated => 1146455484,
-	},
-
-	'style wizard help' => {
-		message => q|<p>The Style Wizard can help you create simple CSS based page style templates for your website
-with your choice of two layouts and navigation styles, and configurable colors.  To access the Style
-Wizard edit a template in the "style" namespace.  A link to open the Style Wizard will
-be on the right side of the page.</p>
-<p>Creating a style template is a three step process:</p>
-<div>
-<ol>
-<li>Select one of the layouts.</li>
-<li>Enter your site name, upload a logo and configure the colors.</li>
-<li>Make customizations to the generated template.</li>
-</ol>
-</div>
-|,
-		lastUpdated => 1146456174,
 	},
 
 	'plugin name' => {

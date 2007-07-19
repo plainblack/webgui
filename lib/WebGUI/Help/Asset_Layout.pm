@@ -80,10 +80,6 @@ our $HELP = {
 				tag => 'layout add/edit',
 				namespace => 'Asset_Layout'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 
@@ -114,10 +110,6 @@ our $HELP = {
 			{
 				tag => 'layout add/edit',
 				namespace => 'Asset_Layout'
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
 			},
 		]
 	},

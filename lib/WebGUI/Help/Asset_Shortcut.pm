@@ -39,10 +39,6 @@ our $HELP = {
 				tag => 'wobjects using',
 				namespace => 'Asset_Wobject'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 

@@ -116,10 +116,6 @@ our $HELP = {
 				tag => 'folder add/edit',
 				namespace => 'Asset_Folder',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		]
 	},
 
@@ -149,10 +145,6 @@ our $HELP = {
 			{
 				tag => 'folder add/edit',
 				namespace => 'Asset_Folder',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		]
 	},

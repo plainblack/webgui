@@ -536,10 +536,6 @@ our $HELP = {
 				tag => 'sql form add/edit',
 				namespace => 'Asset_SQLForm',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		],
 	},
 
@@ -710,10 +706,6 @@ our $HELP = {
 				tag => 'sql form add/edit',
 				namespace => 'Asset_SQLForm',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		],
 	},
 
@@ -798,10 +790,6 @@ our $HELP = {
 			{
 				tag => 'sql form add/edit',
 				namespace => 'Asset_SQLForm',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		],
 	},

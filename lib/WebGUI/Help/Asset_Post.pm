@@ -10,7 +10,7 @@ our $HELP = {
 				namespace => 'Asset_Collaboration'
 			},
 			{
-				tag => 'template language',
+				tag => 'template variables',
 				namespace => 'Asset_Template'
 			},
 			{
@@ -283,10 +283,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
-			{
 				tag => 'collaboration template labels',
 				namespace => 'Asset_Collaboration'
 			},
@@ -398,7 +394,7 @@ our $HELP = {
 				tag => "post template variables"
 			},
 			{
-				tag => 'template language',
+				tag => 'template variables',
 				namespace => 'Asset_Template'
 			},
 		],

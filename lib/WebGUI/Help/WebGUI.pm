@@ -16,10 +16,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 

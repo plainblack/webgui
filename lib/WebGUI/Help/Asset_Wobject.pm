@@ -96,10 +96,6 @@ our $HELP = {
 				tag => 'pagination template variables',
 				namespace => 'WebGUI'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 
@@ -130,10 +126,6 @@ our $HELP = {
 			},
 		],
 		related => [
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			},
 		]
 	},
 

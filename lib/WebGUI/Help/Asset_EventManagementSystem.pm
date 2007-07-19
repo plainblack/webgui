@@ -483,10 +483,6 @@ our $HELP = {
 				tag => 'pagination template variables',
 				namespace => 'WebGUI',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		],
 	},
 
@@ -574,10 +570,6 @@ our $HELP = {
 				tag => 'event management system template',
 				namespace => 'Asset_EventManagementSystem',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		],
 	},
 
@@ -608,10 +600,6 @@ our $HELP = {
 				tag => 'event management system add/edit',
 				namespace => 'Asset_EventManagementSystem',
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
-			},
 		],
 	},
 
@@ -641,10 +629,6 @@ our $HELP = {
 			{
 				tag => 'event management system add/edit',
 				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		],
 	},
@@ -742,10 +726,6 @@ our $HELP = {
 			{
 				tag => 'event management system add/edit',
 				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		],
 	},
@@ -920,10 +900,6 @@ our $HELP = {
 			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI',
-			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template',
 			},
 		],
 	},

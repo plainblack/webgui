@@ -72,10 +72,6 @@ our $HELP = {
 				tag => 'navigation template',
 				namespace => 'Asset_Navigation'
 			},
-			{
-				tag => 'template add/edit',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 
@@ -288,10 +284,6 @@ our $HELP = {
 				tag => 'navigation add/edit',
 				namespace => 'Asset_Navigation'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 
@@ -347,10 +339,6 @@ our $HELP = {
 				tag => 'navigation add/edit',
 				namespace => 'Asset_Navigation'
 			},
-			{
-				tag => 'template language',
-				namespace => 'Asset_Template'
-			}
 		]
 	},
 

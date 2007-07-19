@@ -6,7 +6,7 @@ our $HELP = {
 		body => 'thread template body',
 		isa => [
 			{
-				tag => 'template language',
+				tag => 'template variables',
 				namespace => 'Asset_Template'
 			},
 			{
