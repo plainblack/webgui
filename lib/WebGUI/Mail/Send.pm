@@ -133,6 +133,38 @@ A string of HTML.
 sub addHtml {
 	my $self = shift;
 	my $text = shift;
+	if ($text !~ /<(?:html|body)/) {
+	    my $site = $self->session->url->getSiteURL;
+	    $text = <<END_HTML;
+<html>
+<head>
+<base href="$site">
+</head>
+<body>
+$text
+</body>
+</html>
+END_HTML
+	}
+	$self->addHtmlRaw($text);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 addHtmlRaw ( html ) 
+
+Appends an HTML block to the message without wrapping in a document.
+
+=head3 html
+
+A string of HTML.
+
+=cut
+
+sub addHtmlRaw {
+	my $self = shift;
+	my $text = shift;
 	$self->{_message}->attach(
 		Charset=>"UTF-8",
 		Data=>$text,

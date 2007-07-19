@@ -72,6 +72,7 @@
  - add: Password recovery can now be based on profile fields or simply by the
    user's e-mail address.
  - add: Button in Collaboration Systems for managing CS subscription group.
+ - fix: relative links sent out in emails don't work properly
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success
