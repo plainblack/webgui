@@ -75,6 +75,8 @@
  - fix: relative links sent out in emails don't work properly
  - fix: macros not processed in HttpProxy template
     http://www.webgui.org/bugs/tracker/macro-not-working-i-httpproxy
+ - fix: navigation shows toolbar for users who can't edit it
+    http://www.webgui.org/bugs/tracker/navigation-shows-edit-button-to-users-without-permission
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success

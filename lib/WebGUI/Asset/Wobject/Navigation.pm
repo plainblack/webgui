@@ -297,6 +297,8 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
+	return
+	    unless $self->canEdit;
 	if ($self->getToolbarState) {
 		my $returnUrl;
 		if ($self->session->asset) {
