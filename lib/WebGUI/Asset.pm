@@ -40,7 +40,7 @@ Package WebGUI::Asset
 
 =head1 DESCRIPTION
 
-Package to manipulate items in WebGUI's asset system. Replaces Collateral.
+Package to manipulate items in WebGUI's asset system. 
 
 =head1 SYNOPSIS
 
@@ -310,7 +310,7 @@ sub definition {
 					    uiLevel=>1,
                         fieldType=>'text',
 					    filter=>'fixTitle',
-                        defaultValue=>undef
+                        defaultValue=>'Untitled',
                     },
                     url=>{
 					    tab=>"properties",
@@ -489,7 +489,11 @@ Any text string. Most likely will have been the Asset's name or title.
 
 sub fixTitle {
 	my $self = shift;
-	return WebGUI::HTML::filter(shift || $self->getValue("title") || 'Untitled', 'all');
+    my $string = shift;
+    if (lc($string) eq "untitled" || $string eq "") {
+        $string = $self->getValue("title") || 'Untitled';
+    }
+	return WebGUI::HTML::filter($string, 'all');
 }
 
 
@@ -1992,27 +1996,55 @@ Hash reference of properties and values to set.
 sub update {
 	my $self = shift;
 	my $properties = shift;
+
+    # if keywords were specified, then let's set them the right way
     if (exists $properties->{keywords}) {
         WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
             {keywords=>$properties->{keywords}, asset=>$self});
     }
-	foreach my $definition (@{$self->definition($self->session)}) {
+
+    # check the definition of all properties against what was given to us
+	foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my @setPairs;
+
+        # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
-			next unless (exists $properties->{$property});
+
+            # skip a property unless it was specified to be set by the properties field or has a default value
+			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+            # use the update value
 			my $value = $properties->{$property};
+            # use the current value because the update value was undef
+            unless (defined $value) {
+                $value = $self->get($property);
+            }
+
+            # apply filter logic on a property to validate or fix it's value
 			if (exists $definition->{properties}{$property}{filter}) {
 				my $filter = $definition->{properties}{$property}{filter};
 				$value = $self->$filter($value, $property);
 			}
+
+            # use the default value because default and update were both undef
+            unless (defined $value) {
+                $value = $definition->{properties}{$property}{defaultValue};
+            }
+
+            # set the property
 			$self->{_properties}{$property} = $value;
 			push(@setPairs, $property."=".$self->session->db->quote($value));
 		}
+
+        # if there's anything to update, then do so
 		if (scalar(@setPairs) > 0) {
 			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
 		}
 	}
+
+    # we've changed something so we need to update our size
     $self->setSize();
+
+    # we've changed something so cache is no longer valid
 	$self->purgeCache;
 }
 

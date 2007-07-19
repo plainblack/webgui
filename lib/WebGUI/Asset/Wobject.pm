@@ -84,7 +84,7 @@ sub definition {
 	},
 	styleTemplateId=>{
 		fieldType=>'template',
-		defaultValue=>undef,
+		defaultValue=>'PBtmpl0000000000000060',
 		tab=>"display",
 		label=>$i18n->get(1073),
 		hoverHelp=>$i18n->get('1073 description'),
@@ -93,7 +93,7 @@ sub definition {
 	},
 	printableStyleTemplateId=>{
 		fieldType=>'template',
-		defaultValue=>undef,
+		defaultValue=>'PBtmpl0000000000000060',
 		tab=>"display",
 		label=>$i18n->get(1079),
 		hoverHelp=>$i18n->get('1079 description'),

@@ -68,11 +68,6 @@ sub addChild {
 	my $id = shift || $self->session->id->generate();
 	my $now = shift || $self->session->datetime->time();
 	my $options = shift;
-	# add a few things just in case the creator forgets
-	$properties->{ownerUserId} ||= '3';
-	$properties->{groupIdEdit} ||= '12';
-	$properties->{groupIdView} ||= '7';
-	$properties->{styleTemplateId} ||= 'PBtmpl0000000000000060';
 
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
 	if (length($self->get("lineage")) >= 252) {
