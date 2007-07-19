@@ -34,10 +34,6 @@ our $HELP = {
 			},
 		],
 		related => [
-			{
-				tag => 'shortcut add/edit',
-				namespace => 'Asset_Shortcut'
-			}
 		]
 	}
 };

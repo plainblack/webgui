@@ -53,31 +53,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'6' => {
-		message => q|<p>With the Shortcut you can mirror an asset in another location. This is useful if you want to reuse the same content in multiple sections of your site.</p>
-
-<p><b>NOTES:</b><br />
-The shortcut is not available through the Add Content menu, but instead through the shortcut icon on each Asset's toolbar.
-</p>
-
-<p><b>Overrides</b><br />
-You can also create overrides and user preferences.  The 6.8 upgrade automatically converted your previous override settings to overrides.  These are shown on the Overrides tab.  You can also view them by clicking "Manage overrides" on the right menu bar while editing a Shortcut.  The list of fields is the list of the shortcutted asset's properties.  If one is overridden, its values are displayed to the right, and you may edit or delete the override by clicking on the icons.  if there is no override, you can click Edit to edit that property.</p>
-
-<p><b>User Preference Fields</b><br />
-You may also create User Preference fields, which autogenerate form fields for your users to customize settings on Dashlets on a Dashboard.  These are displayed when the dashboard user clicks the (default) green Edit hoverbutton on the titlebar of a Dashlet.  You can choose from the form field types: text, textlist (multiline text box), selectList (choose one from a drop-down list), and checkList (choose one or more from a list of checkboxes).  You can set the possibleValues while editing a User Preference field.  You can also directly create an override by creating a User Preference field whose unique fieldName corresponds to a field on the shortcutted asset.</p>
-
-<p><b>Chaining</b><br />
-In an override's New Value field, you can put a substitution call for the value of a User Preference Field.  This is helpful for the Dashboard container, primarily.  Let's say you create a user preference selectList field named myFavColor, with possible values blue, green, red, and yellow.  Then you want to override the shorcutted asset's Title with: "My Favorite Color is XXXX."  You create an override for "title", and in the New Value box, place the following text:</p>
-
-<pre>My Favorite Color is ##userPref:myFavColor##.</pre>
-
-<p>Make sure to create a default Value under the myFavColor user preference field.</p>
-<p>Now, go back to manage Overrides, and it should show the original value, new value, and the parsed/replaced value.  You can use this for all kinds of choices: templateIds, formats, or any other kind of preference.</p>
-<p><b>Fields</b></p>
-|,
-		lastUpdated => 1146799562,
-	},
-
         'shortcut template title description' => {
                 message => q|Select a template from the list to display the Shortcut.|,
                 lastUpdated => 1119905806,
@@ -196,14 +171,9 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1053183804
 	},
 
-	'5' => {
-		message => q|Shortcut, Add/Edit|,
-		lastUpdated => 1031514049
-	},
-
 	'shortcut template title' => {
-		message => q|Shortcut Template|,
-		lastUpdated => 1109525763,
+		message => q|Shortcut Template Variables|,
+		lastUpdated => 1184821580,
 	},
 
 	'shortcut.content' => {
@@ -229,13 +199,6 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 	'shortcut.properties' => {
 		message => q|Any properties assigned to this shortcut will be available in the template by their name.|,
 		lastUpdated => 1148953116,
-	},
-
-
-	'shortcut template body' => {
-		message => q|<p>These variables are available in Shortcut Templates:</p>
-                |,
-		lastUpdated => 1148953146,
 	},
 
 	'The unique name of a user preference parameter you are inventing' => {
@@ -381,11 +344,6 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 
 	'field add/edit title' => {
 		message => q|Add/Edit User Preference|,
-		lastUpdated => 1133619940,
-	},
-
-	'field add/edit body' => {
-		message => q|<p>User Preferences are the key to personalization of a Shortcut, and the key to creating a personalized dashboard.  You can create a user preference field of one of four types: text, textArea, checkList, and selectList.  If yours is a list type, you can put the possible choices in the Possible Choices box, and each one will be its own entry in a list of that type (select: choose one, or check: choose none or any or all).  </p><p>You can use a user preference field to generate a list of templates from which the user can pick, a choice of some kind of other preference, such as US or metric units format, or any other kind of user preference.  User Preference fields are asset-(shortcut-)specific, whereas user profile fields are site-wide.  The user preference fields will be exposed to your override fields in the format ##userPref:myUserPrefField##, and will be exposed everywhere else as normal template variables (&lt;tmpl_var myUserPrefField&gt;).</p>|,
 		lastUpdated => 1133619940,
 	},
 

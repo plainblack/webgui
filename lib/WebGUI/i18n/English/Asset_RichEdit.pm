@@ -348,21 +348,9 @@ our $I18N = {
         	lastUpdated => 1115150778,
 	},
 
-	'rich edit add/edit title' => {
-		message => q|Rich Editor, Add/Edit|,
-        	lastUpdated => 1115154822,
-	},
-
 	'rich edit edit config' => {
 		message => q|Edit Rich Editor Configuration|,
         	lastUpdated => 1131398652,
-	},
-
-	'rich edit add/edit body' => {
-		message => q|<p>This Asset allows you to customize the Rich Editor used by WebGUI for WYSIWIG HTML editing and
-		to have multiple configurations available for Collaboration Assets.</p>
-	        |,
-        	lastUpdated => 1119584956,
 	},
 
 	'disable rich edit' => {
