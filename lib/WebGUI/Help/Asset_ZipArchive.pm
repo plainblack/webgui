@@ -2,41 +2,6 @@ package WebGUI::Help::Asset_ZipArchive;
 
 our $HELP = {
 
-        'zip archive add/edit' => {
-		title => 'zip archive add/edit title',
-		body => 'zip archive add/edit body',
-		isa => [
-			{
-				namespace => "Asset_File",
-				tag => "file add/edit"
-			},
-		],
-		fields => [
-			{
-				title => 'new file',
-				description => 'new file description',
-				namespace => 'Asset_File',
-			},
-			{
-				title => 'current file',
-				description => 'current file description',
-				namespace => 'Asset_File',
-			},
-			{
-				title => 'show page',
-				description => 'show page description',
-				namespace => 'Asset_ZipArchive',
-			},
-			
-		],
-		related => [
-			{
-				tag => 'zip archive template',
-				namespace => 'Asset_ZipArchive',
-			},
-		]
-	},
-
     'zip archive template' => {
 		title => 'zip archive template title',
 		body => 'zip archive template body',

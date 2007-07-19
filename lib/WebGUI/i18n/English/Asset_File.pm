@@ -16,24 +16,9 @@ our $I18N = {
         	lastUpdated => 1106683494,
 	},
 
-	'file add/edit body' => {
-                message => q|<p>File Assets are files on your site that are available for users to download. If you would like to have multiple files available, try using a FilePile Asset.</p>
-
-<p>Since Files are Assets, they have all the properties of Assets.  Below are the properties that are specific to Image Assets:</p>
-
-|,
-		context => 'Describing file add/edit form specific fields',
-		lastUpdated => 1165517702,
-	},
-
 	'file template title' => {
-		message => q|File Template|,
-        	lastUpdated => 1130456105,
-	},
-
-	'file template description' => {
-		message => q|File templates allow you to display information about the file, such as its filename, size or an icon representing the file type.  In addition to the variables below, the File Asset template also has all the default Asset template variables. |,
-        	lastUpdated => 1140196488,
+		message => q|File Template Variables|,
+        lastUpdated => 1184820764,
 	},
 
 	'fileSize' => {
@@ -76,13 +61,6 @@ our $I18N = {
 		lastUpdated => 1148952092,
 	},
 
-	'file template body' => {
-                message => q|<p>The following variables are available in File Templates:</p>
-		|,
-		context => 'Describing the file template variables',
-		lastUpdated => 1148952146,
-	},
-
 	'current file' => {
 		message => q|Current file|,
 		context => q|label for File asset form|,
@@ -114,12 +92,6 @@ our $I18N = {
 	'file template asset var title' => {
 		message => q|File Template, Asset Variables|,
         	lastUpdated => 1130456105,
-	},
-
-	'file template asset var body' => {
-                message => q|<p>The following variables are available in File Templates.  They may or may not be useful.</p>
-		|,
-		lastUpdated => 1166824158,
 	},
 
 	'cacheTimeout' => {

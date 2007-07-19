@@ -2,20 +2,6 @@ package WebGUI::i18n::English::Asset_Image;
 
 our $I18N = {
 
-	'image add/edit title' => {
-		message => q|Image, Add/Edit|,
-        	lastUpdated => 1106762707,
-	},
-
-	'image add/edit body' => {
-                message => q|<p>Image Assets are used to store images that you want displayed on your site.</p>
-
-<p>Since Images are a subset of File Assets, they have the properties that all Assets do as well
-as File Assets.  Below are the properties that are specific to Image Assets:</p>|,
-		context => 'Describing image add/edit form specific fields',
-		lastUpdated => 1119409764,
-	},
-
         'assetName' => {
                 message => q|Image|,
                 context => q|label for Asset Manager, getName|,
@@ -131,13 +117,13 @@ shown here.|,
 	},
 
 	'image template title' => {
-		message => q|Image Template|,
-        	lastUpdated => 1130440964,
+		message => q|Image Template Variables|,
+        lastUpdated => 1184820779,
 	},
 
 	'image template description' => {
 		message => q|Image templates allow you to display information about the image, such as its thumbnail, filename or the image itself.|,
-        	lastUpdated => 1130440964,
+        lastUpdated => 1130440964,
 	},
 
 	'fileIcon' => {
@@ -190,22 +176,9 @@ shown here.|,
 		lastUpdated => 1148952544,
 	},
 
-	'image template body' => {
-                message => q|<p>The following variables are available in Image Templates:</p>
-		|,
-		context => 'Describing the image template variables',
-		lastUpdated => 1148952657,
-	},
-
 	'image template asset var title' => {
 		message => q|Image Template, Asset Variables|,
         	lastUpdated => 1166827631,
-	},
-
-	'image template asset var body' => {
-                message => q|<p>The following variables are available in Image Templates.  They represent internal Asset properties and may or may not be particularly useful in your templates.</p>
-		|,
-		lastUpdated => 1166827628,
 	},
 
 };
