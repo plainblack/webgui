@@ -7,16 +7,6 @@ our $I18N =
  'rssTemplateId label' => { message => 'RSS Template', lastUpdate => 1162487361 },
  'rssTemplateId hoverHelp' => { message => q|The template to use for the RSS feed of this asset.|, lastUpdate => 1162487361 },
 
-	'rss capable title' => {
-		message => q|RSS Capable|,
-		lastUpdated => 1162956598
-	},
-
-	'rss capable body' => {
-		message => q|<p>This Asset is used to enable other Assets to make their own RSS feeds using the RSSFromParent Asset.  As a content manager or admin, you will probably never directly use this Asset.</p>|,
-		lastUpdated => 1162956563
-	},
-
  'assetName' => { message => 'RSS Capable', lastUpdate => 1162487361 },
 };
 

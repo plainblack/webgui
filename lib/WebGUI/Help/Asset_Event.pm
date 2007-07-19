@@ -3,7 +3,7 @@ package WebGUI::Help::Asset_Event;
 our $HELP = {
 	'event add/edit' => {
 		title => 'add/edit title',
-		body => 'add/edit body',
+		body => '',
 		isa => [
             {
                 namespace => "Asset_Event",

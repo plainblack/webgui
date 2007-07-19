@@ -3,7 +3,7 @@ package WebGUI::Help::Asset_WikiPage;
 our $HELP = {
 	'wiki page add/edit' => {
 		title => 'add/edit title',
-		body => 'add/edit body',
+		body => '',
 		isa => [
 		],
 		variables => [

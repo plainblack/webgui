@@ -89,6 +89,11 @@ our $I18N = {
 		lastUpdated => 1165517718
 	},
 
+	'file template description' => {
+		message => q|File templates allow you to display information about the file, such as its filename, size or an icon representing the file type.  In addition to the variables below, the File Asset template also has all the default Asset template variables. |,
+        	lastUpdated => 1140196488,
+	},
+
 	'file template asset var title' => {
 		message => q|File Template, Asset Variables|,
         	lastUpdated => 1130456105,

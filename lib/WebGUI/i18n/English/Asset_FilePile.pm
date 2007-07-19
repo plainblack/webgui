@@ -1,21 +1,6 @@
 package WebGUI::i18n::English::Asset_FilePile;
 
 our $I18N = {
-	'file pile add/edit title' => {
-		message => q|File Pile, Add/Edit|,
-        	lastUpdated => 1111735119,
-	},
-
-	'file pile add/edit body' => {
-                message => q|<p>File Pile Assets allow you to upload lots of files to your site all at once.  This is the only function that the File Pile has.  If you want to display the files that have been uploaded, you'll need to use another Asset or Wobject.</p>
-
-<p>Unlike most Assets, the File Pile does not share the base set of Asset properties.  All File Piles
-have the following properties:</p>
-
-|,
-		context => 'Describing file pile add/edit form specific fields',
-		lastUpdated => 1146630312,
-	},
 
         '886 description' => {
                 message => q|<p>Whether or not this asset will be hidden from the navigation menu and site maps.</p>|,

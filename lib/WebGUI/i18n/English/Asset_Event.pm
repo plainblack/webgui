@@ -9,14 +9,9 @@ our $I18N = {
 	},
 
 	'add/edit title'	=> {
-		message		=> q{Event, Add/Edit},
+		message		=> q{Event, Add/Edit Screen Template Variables},
 		lastUpdated	=> 0,
 		context		=> q{Title for the Event Add/Edit Help screen},
-	},
-
-	'add/edit body'	=> {
-		message		=> q|The Add/Edit screen for the Event is templatable.  The template variables that are available are listed below.|,
-		lastUpdated	=> 1171067184,
 	},
 
 	'formHeader'	=> {

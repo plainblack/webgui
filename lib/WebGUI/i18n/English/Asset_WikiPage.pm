@@ -95,11 +95,6 @@ our $I18N =
                 lastUpdated => 1165790228,
         },
 
-        'add/edit body' => {
-                message => q|The add/edit screen for this Asset is templated.  Fields seen by the user will not have hoverHelp.  Variables available for use in the template are listed below:|,
-                lastUpdated => 1165790228,
-        },
-
         'view title' => {
                 message => q|Wiki Page, View Template|,
                 lastUpdated => 1165790228,
