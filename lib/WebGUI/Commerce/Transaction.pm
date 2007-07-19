@@ -468,13 +468,14 @@ sub new {
 
 =head2 pendingTransactions ( )
 
-Returns a reference to an array which contains transaction objects of all pending transactions.
+Returns a reference to an array which contains transaction objects of all pending transactions.  This
+is a class method.
 
 =cut
 
 sub pendingTransactions {
 	my (@transactionIds, @transactions);
-	my ($session) = @_;
+	my ($class, $session) = @_;
 	@transactionIds = $session->db->buildArray("select transactionId from transaction where status = 'Pending'");
 
 	foreach (@transactionIds) {
