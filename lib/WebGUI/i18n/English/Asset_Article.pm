@@ -36,15 +36,6 @@ our $I18N = {
 		lastUpdated => 1164841027
 		},
 
-	'71' => {
-		message => q|<p>Articles are the Swiss Army knife of WebGUI. Most pieces of static content can be added via the Article.  Articles are Wobjects, so they inherit the properties of both Wobjects and Assets.</p>
-
-<p>NOTE: You can create a multi-paged article by placing the separator marker (&#94;-;) at various places through-out your article.  This works unless you are using a Make Page Printable style.</p>
-
-|,
-		lastUpdated => 1146514077,
-	},
-
 	'7' => {
 		message => q|Link Title|,
 		lastUpdated => 1031514049
@@ -90,11 +81,6 @@ be useful, others may not.|,
 	'28' => {
 		message => q|View Responses|,
 		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|Article, Add/Edit|,
-		lastUpdated => 1066583066
 	},
 
 	'12' => {

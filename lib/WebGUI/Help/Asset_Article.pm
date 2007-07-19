@@ -1,51 +1,6 @@
 package WebGUI::Help::Asset_Article;
 
 our $HELP = {
-	'article add/edit' => {
-		title => '61',
-		body => '71',
-		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
-		],
-		fields => [
-                        {
-                                title => 'cache timeout',
-                                namespace => 'Asset_Article',
-                                description => 'cache timeout help',
-				uiLevel => 8,
-                        },
-                        {
-                                title => '72',
-                                description => 'article template description',
-                                namespace => 'Asset_Article',
-                        },
-                        {
-                                title => '7',
-                                description => 'link title description',
-                                namespace => 'Asset_Article',
-				uiLevel => 3,
-                        },
-                        {
-                                title => '8',
-                                description => 'link url description',
-                                namespace => 'Asset_Article',
-				uiLevel => 3,
-                        },
-		],
-		related => [
-			{
-				tag => 'article template',
-				namespace => 'Asset_Article'
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
-			},
-		],
-	},
 
 	'article template' => {
 		title => '72',
@@ -150,10 +105,6 @@ our $HELP = {
 		          },
 		        ],
 		related => [
-			{
-				tag => 'article add/edit',
-				namespace => 'Asset_Article'
-			},
 		]
 	},
 
@@ -187,10 +138,6 @@ our $HELP = {
 		          },
 		        ],
 		related => [
-			{
-				tag => 'article add/edit',
-				namespace => 'Asset_Article'
-			},
 		]
 	},
 

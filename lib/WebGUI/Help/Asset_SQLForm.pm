@@ -842,10 +842,6 @@ our $HELP = {
 		          },
 		        ],
 		related => [
-			{
-				tag => 'article add/edit',
-				namespace => 'Asset_Article'
-			},
 		]
 	},
 
