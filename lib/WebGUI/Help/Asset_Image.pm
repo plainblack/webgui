@@ -4,7 +4,7 @@ our $HELP = {
 
         'image template' => {
 		title => 'image template title',
-		body => 'image template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Image",
@@ -47,7 +47,7 @@ our $HELP = {
         'image template asset variables' => {
 		private => 1,
 		title => 'image template asset var title',
-		body => 'image template asset var body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_File",
