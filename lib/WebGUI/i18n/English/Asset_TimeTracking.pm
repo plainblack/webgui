@@ -52,18 +52,8 @@ our $I18N = {
 			lastUpdated => 1151296556,
 		},
 
-		'user view template body' => {
-			message => q|<p>These variables are available in the User View Template of the Time Tracking Asset.</p>|,
-			lastUpdated => 1151296556,
-		},
-
 		'time row template title' => {
 			message => q|Time Tracking Time Row Template|,
-			lastUpdated => 1151296556,
-		},
-
-		'time row template body' => {
-			message => q|<p>These variables are available in the Time Row Template of the Time Tracking Asset.</p>|,
 			lastUpdated => 1151296556,
 		},
 
@@ -307,16 +297,6 @@ our $I18N = {
 			message => q|Project Resource|
 		},
 
-		'timetracking add/edit title' => {
-			lastUpdated => 0,
-			message => q|Add/Edit Time Tracking|,
-		},
-
-		'timetracking add/edit body' => {
-			lastUpdated => 1165365096,
-			message => q|The Time Tracking Asset lets you define a set of tasks and then track how well they are accomplished against an original estimate for the task.|,
-		},
-
 		'report.nextWeek.url' => {
 			lastUpdated => 0,
 			message => q|URL display information for the next week|,
@@ -448,28 +428,9 @@ our $I18N = {
 			message => q|This is similar to form.hours, except that it always contains the number of hours entered by the user for work done on this task on a day.  If no hours have been entered, it will be 0.|,
 		},
 
-		'manage projects body' => {
-			lastUpdated => 0,
-			message => q|<p>The Manage Projects screen allows you to add new projects to this Time Tracking Asset so that users can track time on tasks performed on them.  Projects that have already been added to the Asset are displayed in a table, with their associated tasks and resources Each project also has a links for editing and/or deleting the project.</p>|,
-		},
-
-		'edit projects body' => {
-			lastUpdated => 0,
-			message => q|<p>In this screen, you'll either edit an existing project, or configure a new one.  Each project has a project name, a list of users who can work on the project (resources) and a list of tasks.</p>
-<p>Users are any valid WebGUI user (not Visitor or Admin).  Use the select list to add or remove users to your list of resources.</p>
-<p>Tasks are individual to each project, and consist of only a name.  To add a new task to the project, enter a task name and hit the submit button.  To delete a task, use the delete button next to the task you delete in the list of tasks.</p>|,
-		},
-
 	'time tracking asset template variables title' => {
 		message => q|Time Tracking System Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'time tracking asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
 	'userViewTemplateId' => {

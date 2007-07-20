@@ -1,39 +1,9 @@
 package WebGUI::Help::Asset_WeatherData;
 
 our $HELP = {
-	'weather data add/edit' => {
-		title => 'weather data add/edit title',
-		body => 'weather data add/edit body',
-		isa => [
-		],
-		fields => [
-			{
-				title => 'partnerId',
-				description => 'partnerId help',
-				namespace => 'Asset_WeatherData',
-			},
-			{
-				title => 'licenseKey',
-				description => 'licenseKey help',
-				namespace => 'Asset_WeatherData',
-			},
-			{
-				title => 'Default Locations',
-				description => 'Your list of default weather locations',
-				namespace => 'Asset_WeatherData',
-			},
-		],
-		related => [
-			{
-				tag => 'weatherdata template',
-				namespace => 'Asset_WeatherData'
-			},
-		],
-	},
-
 	'weatherdata template' => {
 		title => 'WeatherData template title',
-		body => 'WeatherData template description',
+		body => '',
 		isa => [
 			{
 				tag => "weatherdata asset template variables",
@@ -66,10 +36,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'weather data add/edit',
-				namespace => 'Asset_WeatherData'
-			},
-			{
 				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
 			}
@@ -79,7 +45,7 @@ our $HELP = {
 	'weatherdata asset template variables' => {
 		private => 1,
 		title => 'weatherdata asset template variables title',
-		body => 'weatherdata asset template variables body',
+		body => '',
 		isa => [
 			{
 				tag => "wobject template variables",

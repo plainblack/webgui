@@ -404,21 +404,6 @@ our $I18N = {
 		lastUpdated => 0
 		},
 
-	 'pm add/edit title' => {
-		message => q|Add/Edit Project Manager|,
-		lastUpdated => 0
-		},
-
-	 'pm add/edit body' => {
-		message => q|<p>The Project Manager provides an interface for you to create a project, add tasks to it and monitor its status as it progresses.</p>|,
-		lastUpdated => 0
-		},
-
-	 'project edit body' => {
-		message => q|<p>In the Edit Project screen, you will define a new project or edit an existing project by giving general information about the project, including a name, a description, the group of users who are allowed to manage the project and the target budget.</p>|,
-		lastUpdated => 0
-		},
-
 	'edit task template vars title' => {
 		message => q|Edit Task Template Variables|,
 		lastUpdated => 0
@@ -483,12 +468,6 @@ from working.|,
 	'edit form.footer' => {
 		message => q|Code to end the form.|,
 		lastUpdated => 1149825164,
-	},
-
-	'edit task template vars body' => {
-		message => q|<p>The Edit Task template has these template variables</p>
-|,
-		lastUpdated => 1149825739
 	},
 
 	'view project template vars title' => {
@@ -688,12 +667,6 @@ Otherwise, just the duration will be displayed as text.|,
 		lastUpdated => 1149824991,
 	},
 
-	 'view project template vars body' => {
-		message => q|<p>The View Project template has these template variables</p>
-|,
-		lastUpdated => 1149825022
-	},
-
 	'gantt chart template vars title' => {
 		message => q|Gantt Chart Template Variables|,
 		lastUpdated => 0
@@ -757,11 +730,6 @@ Otherwise, just the duration will be displayed as text.|,
 	'day.number' => {
 		message => q|The ordinal number for this day of the week, an integer between 1 and 7|,
 		lastUpdated => 1149825039,
-	},
-
-	'gantt chart template vars body' => {
-		message => q|<p>These variables are available in the Gantt Chart Template:</p>|,
-		lastUpdated => 1149825108
 	},
 
 	'resource add opTitle' => {
@@ -879,21 +847,9 @@ Otherwise, just the duration will be displayed as text.|,
 		lastUpdated => 1164841146
 	},
 
-	'project manager asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
-	},
-
 	'project dashboard template title' => {
-		message => q|Project Manager, Default View (Dashboard) Template|,
-		lastUpdated => 1168925012
-	},
-
-	'project dashboard template body' => {
-		message => q|<p>The Default View (Dashboard) template has these template variables:</p>|,
-		lastUpdated => 1168925012
+		message => q|Project Manager, Default View (Dashboard) Template Variables|,
+		lastUpdated => 1184967340
 	},
 
 	'project.create' => {

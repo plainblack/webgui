@@ -1,64 +1,9 @@
 package WebGUI::Help::Asset_SQLReport;
 
 our $HELP = {
-	'sql report add/edit' => {
-		title => '61',
-		body => '71',
-		isa => [
-		],
-		fields => [
-                        { #templateId
-                                title => '72',
-                                description => '72 description',
-                                namespace => 'Asset_SQLReport',
-                        },
-                        { #debug mode
-                                title => '16',
-                                description => '16 description',
-                                namespace => 'Asset_SQLReport',
-                        },
-                        {
-                                title => 'cache timeout',
-                                description => 'cache timeout description',
-                                namespace => 'Asset_SQLReport',
-                        },
-                        {
-                                title => 'Placeholder Parameters',
-                                description => 'Placeholder Parameters description',
-                                namespace => 'Asset_SQLReport',
-                        },
-                        { #preprocess macros
-                                title => '15',
-                                description => '15 description',
-                                namespace => 'Asset_SQLReport',
-                        },
-			{
-				title => 'Prequery statements',
-				description => 'Prequery statements description',
-				namespace => 'Asset_SQLReport',
-			},
-                        { #db query
-                                title => '4',
-                                description => '4 description',
-                                namespace => 'Asset_SQLReport',
-                        },
-                        { #pagination
-                                title => '14',
-                                description => '14 description',
-                                namespace => 'Asset_SQLReport',
-                        },
-		],
-		related => [
-			{
-				tag => 'sql report template',
-				namespace => 'Asset_SQLReport'
-			},
-		]
-	},
-
 	'sql report template' => {
 		title => '72',
-		body => '73',
+		body => '',
 		fields => [
 		],
 		isa => [
@@ -178,17 +123,13 @@ our $HELP = {
 		          }
 		        ],
 		related => [
-			{
-				tag => 'sql report add/edit',
-				namespace => 'Asset_SQLReport'
-			},
 		]
 	},
 
 	'sql report asset template variables' => {
 		private => 1,
 		title => 'sql report asset template variables title',
-		body => 'sql report asset template variables body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Wobject",

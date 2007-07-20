@@ -74,32 +74,9 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1149567859,
 	},
 
-	'search template body' => {
-		message => q|<p>The following template variables are available for Search Asset templates.  All of these variables are required.</p>
-|,
-		lastUpdated => 1149567912,
-	},
-
-	'add/edit title' => {
-		message => q|Add/Edit Search|,
-		lastUpdated => 1142052517,
-	},
-
-	'add/edit body' => {
-		message => q|<p>The Search Asset is used to search WebGUI content.  In addition to the properties below, Search Assets also have the properties of Wobjects and Assets.</p>|,
-		lastUpdated => 1142052519,
-	},
-
 	'search asset template variables title' => {
 		message => q|Search Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'search asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
 	'templateId' => {

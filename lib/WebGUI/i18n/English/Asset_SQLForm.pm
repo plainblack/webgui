@@ -934,44 +934,8 @@ delete and restore but not purge records.</p>|,
 		lastUpdated => 0,
 	},
 
-	'edit sqlform' => {
-		message => q|SQLForm, Add/Edit|,
-		lastUpdated => 0,
-	},
-
-	'sqlform description' => {
-		message => q|<p>The SQLForm asset allows you to dynamically
-create data input and storage functionality in your site. All data is put in a
-table of your choice in a database of your choice. An arbitrary form element can
-be tied to each field and input forms can be built in different ways to ensure
-optimal adaptability to your needs.</p>
-
-<p>The SQLForm features creation of new tables, import of existing tables and
-re-importing previously imported tables. Fields can be linked to other fields in
-other tables in several ways, making it possible to dynamically resolve id's to
-values using joins, add constraints to inputted data or connect different
-SQLForms together.</p>
-
-<p>User input can also be checked against regular expressions and manual
-constraints that are definable by you. In addition it's possible to add an
-autoincrement flag and macros to fields, among other functionality.</p>
-
-<p>All inputted data is versioned and a two level (delete/purge) trash is built
-in. Three privilege layers are available to split access to different
-actions.</p>|,
-		lastUpdated => 1167187479,
-	},
-
 	'edit field title' => {
 		message => q|SQLForm, Add/Edit Field|,
-		lastUpdated => 0,
-	},
-
-	'edit field description' => {
-		message => q|<p>Fields are the basis of SQLForms. Each form
-consists of one or more fields. Please note that in order to define fields, at
-least one field type has to be defined. For information considering field types
-please see the <b>Manage field types</b> help section.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -980,28 +944,8 @@ please see the <b>Manage field types</b> help section.</p>|,
 		lastUpdated => 0,
 	},
 
-	'edit field type description' => {
-		message => q|<p>Field types are combinations of a database column
-type and a form element for data input. These field types are used to define the
-basis of the fields in your SQLForm. Field types can only be deleted if they are
-not in use by any SQLForm in the system. Please note that this also includes
-SQLForm assets that are in the trash and are not yet purged.</p>|,
-		lastUpdated => 0,
-	},
-
 	'edit regex title' => {
 		message => q|SQLForm, Add/Edit Regex|,
-		lastUpdated => 0,
-	},
-
-	'edit regex description' => {
-		message => q|<p>Regular expressions are strings that represent a
-pattern of text. Regexes used in the SQLForm are of the perl-variant. The syntax
-of perl-style regular expressions can be found <a
-href="http://perldoc.perl.org/perlretut.html">here</a>. To ensure data integrity, 
-regular expressions can only be deleted if they're not in use by any SQLForm in
-the system. Please note this also includes SQLForm that are in the trash and not
-have been purged yet.</p>|,
 		lastUpdated => 0,
 	},
 
@@ -1152,31 +1096,6 @@ is new.|,
 		message => q|Delete, edit and copy buttons for this record. Only available if the user is 
 allowed to edit the record.|,
 		lastUpdated => 1167189136,
-	},
-
-	'edit template help' => {
-		message => q|<p>The SQLForm provides you with three
-methods to construct record input and edit forms, offering three
-levels of flexibility. Please note that more flexibility has the
-downside of increased complexity.</p>
-<p>The three methods you can use are:
-<b>completeForm</b>, <b>formloop</b> or manual placement of form
-elements using <b>field.__FIELDNAME__.formElement</b> and
-<b>field.__FIELDNAME__.label</b></p>
-<p><b>completeForm</b> handles placing everything that you need in a table,
-automatically, using a default layout.</p>
-<p><b>formloop</b> handles placing everything that you need in a table,
-automatically.  This allows you some flexibility in your form layout.</p>
-<p>Finally there is the option of placing
-each separate field by hand. This allows you to define the order and
-place of each form element. Please note, however, that using this
-method will not automatically follow changes you make to the SQLForm.
-If you add, delete or rename a field you must update the template by
-hand. Using this method also implies the use of <b>formHeader</b> and
-<b>formFooter.</b> You should use the following two template
-variables:</p>
-|,
-		lastUpdated => 1167188606,
 	},
 
 	'search template help title' => {
@@ -1465,21 +1384,6 @@ as well as links to add record and search record.|,
 		lastUpdated => 1149822982,
 	},
 
-	'search template help' => {
-		message => q|<p>The search template of the SQLForm asset
-provides you with a way to customize the looks of the search
-functionality that the SQLForm offers.</p>
-
-<p>There are two separate search methods, normal and advanced search, but
-both use the same template. In both cases a complete <b>searchForm</b> is available. 
-The individual form Elements are also available, but note that different form Elements are used for normal and advanced search.
-</p>
-
-<p>The template provides variables for the search results that are the same for normal and advanced search:</p>
-|,
-		lastUpdated => 1167189433,
-	},
-
 	'dft cannot delete' => {
 		message => q|This field type cannot by deleted beacause it still is in use by|,
 		lastUpdated => 0,
@@ -1538,13 +1442,6 @@ the table.</p>|,
 	'sql form asset template variables title' => {
 		message => q|SQLForm Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'sql form asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
 	'formId' => {
@@ -1606,11 +1503,6 @@ be useful, others may not.|,
 	'advanced search template help title' => {
 		message => q|SQLForm, Advanced Search Record Template|,
 		lastUpdated => 0,
-	},
-
-	'advanced search template help body' => {
-		message => q|These template variables are available in the Advanced Search Record Template.|,
-		lastUpdated => 1172816905,
 	},
 
 };

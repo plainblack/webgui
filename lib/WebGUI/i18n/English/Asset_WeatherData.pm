@@ -46,21 +46,10 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
-	'weather data add/edit title' => {
-		message => q|WeatherData Add/Edit|,
-		lastUpdated => 1133619940,
-	},
-
-	'weather data add/edit body' => {
-		message => q|The WeatherData wobject is useful for displaying current weather conditions about a city/state or zipcode, or a series of locations.|,
-		lastUpdated => 1133619940,
-	},
-
 	'assetName' => {
 		message => q|WeatherData|,
 		lastUpdated => 1133619940,
 	},
-
 
 	'WeatherData template title' => {
 		message => q|WeatherData Template|,
@@ -97,13 +86,6 @@ our $I18N = {
 		lastUpdated => 1149565151,
 	},
 
-
-	'WeatherData template description' => {
-		message => q|<p>These template variables are available in the WeatherData template:</p>
-|,
-		lastUpdated => 1149565185,
-	},
-
 	'templateId' => {
 		message => q|The ID of the template that will be used to display this Asset.|,
 		lastUpdated => 1167972308,
@@ -117,13 +99,6 @@ our $I18N = {
 	'weatherdata asset template variables title' => {
 		message => q|WeatherData Asset Template Variables|,
 		lastUpdated => 1167972337
-	},
-
-	'weatherdata asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
 };

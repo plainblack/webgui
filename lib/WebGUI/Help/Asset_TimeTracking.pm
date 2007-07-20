@@ -1,78 +1,9 @@
 package WebGUI::Help::Asset_TimeTracking;
 
 our $HELP = {
-	'time tracking add/edit' => {
-		title => 'timetracking add/edit title',
-		body => 'timetracking add/edit body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'userViewTemplate label',
-                                description => 'userViewTemplate hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'managerViewTemplate label',
-                                description => 'managerViewTemplate hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'timeRowTemplateId label',
-                                description => 'timeRowTemplateId hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'groupToManage label',
-                                description => 'groupToManage hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'Project Management Integration',
-                                description => 'Choose yes to pull projects and task information from the various project management assets on your site',
-                                namespace => 'Asset_TimeTracking',
-                        },
-		],
-		related => [
-		],
-	},
-
-	'manage projects' => {
-		title => 'manage projects screen label',
-		body => 'manage projects body',
-		fields => [
-		],
-		related => [
-		],
-	},
-
-	'edit project' => {
-		title => 'edit project screen label',
-		body => 'edit projects body',
-		fields => [
-                        {
-                                title => 'edit project id label',
-                                description => 'edit project id hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'edit project resource label',
-                                description => 'edit project resource hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-                        {
-                                title => 'edit project tasks label',
-                                description => 'edit project tasks hoverhelp',
-                                namespace => 'Asset_TimeTracking',
-                        },
-		],
-		related => [
-		],
-	},
-
 	'user view template variables' => {
 		title => 'user view template title',
-		body => 'user view template body',
+		body => '',
 		isa => [
 			{
 				namespace => 'Asset_Wobject',
@@ -140,7 +71,7 @@ our $HELP = {
 
 	'time row template variables' => {
 		title => 'time row template title',
-		body => 'time row template body',
+		body => '',
 		isa => [
 			{
 				namespace => 'Asset_Wobject',
@@ -250,7 +181,7 @@ our $HELP = {
 	'time tracking asset template variables' => {
 		private => 1,
 		title => 'time tracking asset template variables title',
-		body => 'time tracking asset template variables body',
+		body => '',
 		isa => [
 			{
 				namespace => 'Asset_Wobject',

@@ -16,17 +16,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'71' => {
-		message => q|<p>SQL Reports are perhaps the most powerful wobject in the WebGUI arsenal. They allow a user to query data from any database that they have access to. This is great for getting sales figures from your accounting database or even summarizing all the message boards on your web site.</p>
-<p><b>Nested query support</b><br />
-The SQL Report wobject supports up to 5 nested queries (1 base query and 4 subqueries). Each subsequent query is executed for each row in the previous query results. For example, if you have two queries (query1 and query2), then query2 will be executed once for each row returned in query1. You can use placeholder parameters to compose subqueries with data from prior queries. 
-</p>
-<p>
-SQL Reports are Wobjects and Assets, so they share the properties of both.  SQL Reports also have these unique properties:
-</p>|,
-		lastUpdated => 1167187342,
-	},
-
         '72 description' => {
                 message => q|<p>Select a template to display the results of your SQL Report.
 </p>|,
@@ -79,11 +68,6 @@ while the second question mark will contain the form variable "field1".</p>
 </p>|,
                 lastUpdated => 1119841649,
         },
-
-	'61' => {
-		message => q|SQL Report, Add/Edit|,
-		lastUpdated => 1082365503
-	},
 
 	'17' => {
 		message => q|<b>Debug:</b> Query:|,
@@ -274,16 +258,6 @@ will always be false for query5.|,
 		lastUpdated => 1149633030,
 	},
 
-	'73' => {
-		message => q|<p>The following variables are made available in SQL Reports:
-</p>
-
-<p>Variables for any subqueries will have exactly the same format as the first
-query, but will be prefixed with queryN where N goes from 2 to 5.</p>
-|,
-		lastUpdated => 1149633053,
-	},
-
 	'16' => {
 		message => q|Debug?|,
 		lastUpdated => 1031514049
@@ -373,13 +347,6 @@ query, but will be prefixed with queryN where N goes from 2 to 5.</p>
 	'sql report asset template variables title' => {
 		message => q|SQL Report Asset Template Variables|,
 		lastUpdated => 1168887204
-	},
-
-	'sql report asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1168887206
 	},
 
 	'templateId' => {

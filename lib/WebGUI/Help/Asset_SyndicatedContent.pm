@@ -1,55 +1,9 @@
 package WebGUI::Help::Asset_SyndicatedContent;
 
 our $HELP = {
-	'syndicated content add/edit' => {
-		title => '61',
-		body => '71',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'cache timeout',
-                                namespace => 'Asset_SyndicatedContent',
-                                description => 'cache timeout help',
-				uiLevel => 8,
-                        },
-                        {
-                                title => '72',
-                                description => '72 description',
-                                namespace => 'Asset_SyndicatedContent',
-                        },
-                        {
-                                title => 'displayModeLabel',
-                                description => 'displayModeLabel description',
-                                namespace => 'Asset_SyndicatedContent',
-                        },
-                        {
-                                title => 'hasTermsLabel',
-                                description => 'hasTermsLabel description',
-                                namespace => 'Asset_SyndicatedContent',
-                        },
-                        {
-                                title => '1',
-                                description => '1 description',
-                                namespace => 'Asset_SyndicatedContent',
-                        },
-                        {
-                                title => '3',
-                                description => '3 description',
-                                namespace => 'Asset_SyndicatedContent',
-                        },
-		],
-		related => [
-			{
-				tag => 'syndicated content template',
-				namespace => 'Asset_SyndicatedContent'
-			},
-		],
-	},
-
 	'syndicated content template' => {
 		title => '72',
-		body => '73',
+		body => '',
 		isa => [
 			{
 				namespace => 'Asset_SyndicatedContent',
@@ -150,10 +104,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'syndicated content add/edit',
-				namespace => 'Asset_SyndicatedContent'
-			},
-			{
 				tag => 'wobject template',
 				namespace => 'Asset_Wobject'
 			}
@@ -165,7 +115,7 @@ our $HELP = {
 	'syndicated content asset template variables' => {
 		private => 1,
 		title => 'syndicated content asset template variables title',
-		body => 'syndicated content asset template variables body',
+		body => '',
 		isa => [
 			{
 				namespace => 'Asset_Wobject',

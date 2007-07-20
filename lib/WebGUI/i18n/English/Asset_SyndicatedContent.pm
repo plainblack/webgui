@@ -45,23 +45,6 @@ our $I18N = {
 		message => q|Edit Syndicated Content|
 	},
 
-	'61' => {
-		lastUpdated => 1047855741,
-		message => q|Syndicated Content, Add/Edit|
-	},
-
-	'71' => {
-		lastUpdated => 1167193158,
-		message => q|<p>Syndicated content is content that is pulled from another site using the RDF/RSS specification. This technology is often used to pull headlines from various news sites like <a href="http://www.cnn.com/">CNN</a> and  <a href="http://slashdot.org/">Slashdot</a>. It can, of course, be used for other things like sports scores, stock market info, etc.
-</p>
-<p>The Syndicated Content system also has the ability to "republish" its items as RSS 0.9, 0.91, 1.0 and 2.0 flavor feeds. This means you can aggregate a bunch of feeds together, filter on relevant keywords and then republish this aggregated feed, and the Syndicated Content wobject will take care of all the messy stuff for you. See the "Syndicated Content Template" help for additional information. 
-</p>
-<p>The Syndicated Content client is a Wobject and an Asset, so it has the properties of both.  It also has
-these unique properties:
-</p>
-|
-                   },
-
 	'channel.title' => {
 		message => q|The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you're creating an aggregate feed.|,
 		lastUpdated => 1149567508,
@@ -141,15 +124,6 @@ these unique properties:
                      lastUpdated => 1047855526,
                      message => q|Syndicated Content Template|
                    },
-
-           '73' => {
-                     lastUpdated => 1149567527,
-                     message => q|<p>The following are the template variables available to the Syndicated Content template:</p>
-
-<p>Additionally, RSS feeds are transformed into HTML via XSLT stylesheets for "friendly" in-browser viewing. These XSLT stylesheets are stored in the WebGUI collateral system as snippets.
-</p>
-|,
-	},
 
 	'displayModeLabel' => {
 		lastUpdated => 1047855526,
@@ -267,13 +241,6 @@ these unique properties:
 	'syndicated content asset template variables title' => {
 		message => q|Syndicated Content Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'syndicated content asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
     'descriptionFirst100words' => {

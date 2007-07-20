@@ -1,39 +1,9 @@
 package WebGUI::Help::Asset_Search;
 
 our $HELP = {
-	'search add/edit' => {
-		title => 'add/edit title',
-		body => 'add/edit body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'search template',
-                                description => 'search template description',
-                                namespace => 'Asset_Search',
-                        },
-                        {
-                                title => 'search root',
-                                description => 'search root description',
-                                namespace => 'Asset_Search',
-                        },
-                        {
-                                title => 'class limiter',
-                                description => 'class limiter description',
-                                namespace => 'Asset_Search',
-                        },
-		],
-		related => [
-			{
-				tag => 'search template',
-				namespace => 'Asset_Search'
-			},
-		]
-	},
-
 	'search template' => {
 		title => 'search template',
-		body => 'search template body',
+		body => '',
 		isa => [
 			{
 				tag => 'pagination template variables',
@@ -107,7 +77,7 @@ our $HELP = {
 	'search asset template variables' => {
 		private => 1,
 		title => 'search asset template variables title',
-		body => 'search asset template variables body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Wobject",

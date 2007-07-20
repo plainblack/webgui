@@ -359,12 +359,6 @@ our $I18N = {
 		lastUpdated => 1162270283,
 	},
 
-	'89' => {
-		message => q|<p>The following template variables are available for the Survey:</p>
-|,
-		lastUpdated => 1149654687
-	},
-
 	'10' => {
 		message => q|Quiz|,
 		lastUpdated => 1033949566
@@ -468,12 +462,6 @@ our $I18N = {
 	'survey.label' => {
 		message => q|The default label for survey.url.|,
 		lastUpdated => 1149654717,
-	},
-
-	'91' => {
-		message => q|<p>The following template variables are available in all survey templates.</p>
-|,
-		lastUpdated => 1149654745
 	},
 
 	'78' => {
@@ -736,11 +724,6 @@ our $I18N = {
 		lastUpdated => 1075639549
 	},
 
-	'3' => {
-		message => q|Survey, Add/Edit|,
-		lastUpdated => 1038890559
-	},
-
 	'36' => {
 		message => q|Somewhat Disagree|,
 		lastUpdated => 1037498872
@@ -769,13 +752,6 @@ our $I18N = {
 	'38' => {
 		message => q|Strongly Disagree|,
 		lastUpdated => 1037498903
-	},
-
-	'4' => {
-		message => q|<p>Surveys allow you to gather information from your users. In the case of WebGUI surveys, you can also use them to test your user's knowledge.</p>
-<p>Surveys are Wobjects and Assets, so they have the properties of both.  Surveys have these unique properties:</p>
-|,
-		lastUpdated => 1167193063
 	},
 
         'view template description' => {
@@ -927,12 +903,6 @@ the survey was added.|,
 		lastUpdated => 1149654771,
 	},
 
-	'1088' => {
-		message => q|<p>The following template variables are available in the survey's gradebook report: </p>
-|,
-		lastUpdated => 1149654794
-	},
-
 	'1089' => {
 		message => q|Survey Response Template|,
 		lastUpdated => 1078515839
@@ -1058,12 +1028,6 @@ the survey was added.|,
 		lastUpdated => 1149654822,
 	},
 
-	'1090' => {
-		message => q|<p>The following are the variables available to display the individual response.</p>
-|,
-		lastUpdated => 1149654936
-	},
-
 	'1091' => {
 		message => q|Statistical Overview Report Template|,
 		lastUpdated => 1078517114
@@ -1134,12 +1098,6 @@ the survey was added.|,
 		lastUpdated => 1149654954,
 	},
 
-	'1092' => {
-		message => q|<p>The following are the variables available in this template:</p>
-|,
-		lastUpdated => 1149655216
-	},
-
 	'overview template' => {
 		message => q|Overview template|,
 		lastUpdated => 0,
@@ -1172,11 +1130,6 @@ the survey was added.|,
 	'45' => {
 		message => q|No, I made a mistake.|,
 		lastUpdated => 1110006259,
-	},
-
-        'question add/edit body' => {
-		message => q|WebGUI's Survey Wobject supplies you with many kinds of questions, such as multiple choice, boolean (a or b, such as Yes/No, True/False, etc.), and various kinds of essay answers.  The order of the questions can also be changed after they are entered.|,
-		lastUpdated => 1132357445,
 	},
 
         '14 description' => {
@@ -1217,11 +1170,6 @@ is set to "response".|,
 		lastUpdated => 1035864828
 	},
 
-	'answer add/edit body' => {
-                message => q|Depending on the type of question, you may be able to supply more than one answer for each question.|,
-                lastUpdated => 1132356704,
-	},
-
         '19 description' => {
                 message => q|The answer to this question.|,
                 lastUpdated => 1119993924,
@@ -1243,13 +1191,6 @@ is correct or not.|,
 	'survey asset template variables title' => {
 		message => q|Survey Asset Template Variables|,
 		lastUpdated => 1168644075
-	},
-
-	'survey asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1168644077
 	},
 
         'templateId' => {

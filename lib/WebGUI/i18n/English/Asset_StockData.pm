@@ -98,15 +98,6 @@ our $I18N = {
 	},
 
 	#Help Messages
-	'help_add_edit_stocklist_title' => {
-		message => q|Stock List, Add/Edit|,
-		lastUpdated => 1066583066
-	},
-
-	'help_add_edit_stocklist_body' => {
-		message => q|<p>Stock Lists allow users to track stocks on your site.  Data is retrieved from various sources on the internet and displayed in tabular format.  This application allows any registered user to configure stock lists as well as to set a default stock list for visitors or for users who have not configured one themselves</p>|,
-		lastUpdated => 1167190305,
-	},
 
 	'template_label_description' => {
 		message => q|Select a template from the list to layout your Stock List.  Each Stock List may only use templates with namespace "StockList".|,
@@ -133,24 +124,14 @@ our $I18N = {
 		lastUpdated => 1167190356
 	},
 
-	'help_add_edit_stock_title' => {
-		message => q|Stock List, Add/Edit Stocks|,
-		lastUpdated => 1119066250
-	},
-
-	'help_add_edit_stock_description' => {
-		message => q|<p>The stock edit page allows you to customize your stock lists.  Add to, remove from, and order your personalized list of stocks to display on the site</p>|,
-		lastUpdated => 1119066250
-	},
-
 	'symbol_label_description' => {
 		message => q|Enter a valid stock symbol.  If your symbol cannot be found, contact your administrator.  It is likely that your site restricts stocks to a certain market (US market, European market, etc)|,
 		lastUpdated => 1119066250
 	},
 
 	'help_stock_list_template' => {
-		message => q|Stock List Template|,
-		lastUpdated => 1119066250
+		message => q|Stock List Template Variables|,
+		lastUpdated => 1184968097,
 	},
 
 	'extrasFolder' => {
@@ -378,33 +359,14 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
-	'help_stock_list_template_description' => {
-		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-		|,
-		lastUpdated => 1149565354
-	},
-
 	'help_stock_list_display_template' => {
-		message => q|Stock List Display Template|,
-		lastUpdated => 1119066250
-	},
-
-	'help_stock_list_display_template_description' => {
-		message => q|<p>The following describes the list of available template variables for building StockList templates</p>
-		|,
-		lastUpdated => 1149567007
+		message => q|Stock List Display Template Variables|,
+		lastUpdated => 1184968130,
 	},
 
 	'stock data asset template variables title' => {
 		message => q|Stock Data Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'stock data asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1168646697
 	},
 
 	'templateId' => {
