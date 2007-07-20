@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 25; # increment this value for each test you create
+use Test::More tests => 27; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -102,13 +102,24 @@ is($importNode->getParent->getId, $rootAsset->getId, 'Import Nodes parent is Roo
 #
 ################################################################
 
-##We need as asset with a URL for this one.
+##We need an asset with a URL for this one.
 
 my $importUrl = $importNode->get('url');
 my $importId  = $importNode->getId;
 
-ok( WebGUI::Asset->urlExists($session, $importUrl),      'url for import node exists');
-ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz'), 'made up url does not exist');
-ok( !WebGUI::Asset->urlExists($session, $importUrl, {assetId => $importId}), 'url for import node only exists at specific id');
-ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz', {assetId => $importId}), 'imaginary url does not exist at specific id');
-ok( WebGUI::Asset->urlExists($session, $importUrl, {assetId => 'notAnWebGUIId'}), 'imaginary url does not exist at wrong id');
+ok(  WebGUI::Asset->urlExists($session, $importUrl),      'url for import node exists');
+ok(  WebGUI::Asset->urlExists($session, uc($importUrl)),  'url for import node exists, case insensitive');
+ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz'),  'made up url does not exist');
+
+ok( !WebGUI::Asset->urlExists($session, $importUrl,     {assetId => $importId}),       'url for import node only exists at specific id');
+ok( !WebGUI::Asset->urlExists($session, '/foo/bar/baz', {assetId => $importId}),       'imaginary url does not exist at specific id');
+ok(  WebGUI::Asset->urlExists($session, $importUrl,     {assetId => 'notAnWebGUIId'}), 'imaginary url does not exist at wrong id');
+
+################################################################
+#
+# addEditLabel
+#
+################################################################
+
+my $i18n = WebGUI::International->new($session, 'Asset_Wobject');
+is($importNode->addEditLabel, $i18n->get('edit').' '.$importNode->getName, 'addEditLabel, default mode is edit mode');

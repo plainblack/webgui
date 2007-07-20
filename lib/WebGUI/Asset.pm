@@ -59,6 +59,22 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 addEditLabel ( )
+
+Generate an internationalized label for the add/edit screens that says
+whether you're adding or editing an Asset, for clarity.
+
+=cut
+
+sub addEditLabel {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
+	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
+    return $addEdit.' '.$self->getName;
+}
+
+#-------------------------------------------------------------------
+
 =head2 addMissing ( url )
 
 Displays a message to the admin that they have requested a non-existent page and give them an option to create it.
@@ -2065,7 +2081,7 @@ The asset url you'd like to check for.
 
 head3 options
 
-A hash reference of optional parameters.
+A hash reference of optional parameters that can be passed to refine the search.
 
 head4 assetId
 
