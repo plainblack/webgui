@@ -178,8 +178,6 @@ sub www_edit {
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     $self->getAdminConsole->setHelp("snippet add/edit","Asset_Snippet");
-    my $i18n = WebGUI::International->new($self->session, 'Asset_Snippet');
-    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('snippet add/edit title'));
 	my $i18n = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
 	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
