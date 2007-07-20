@@ -296,7 +296,7 @@ Returns a thread object for the previous (older) thread in the same forum.
 
 sub getPreviousThread {
 	my $self = shift;
-        unless (defined $self->{_previous}) {
+    unless (defined $self->{_previous}) {
         my $parent = $self->getParent;
         my $sortBy = $parent->getSortBy;
         my $sortOrder = lc($parent->getSortOrder) eq 'asc' ? 'desc' : 'asc';
@@ -317,9 +317,11 @@ sub getPreviousThread {
 						)
 				group by assetData.assetId
 				order by ".$sortBy." ".$sortOrder.", assetData.revisionDate desc ");
-		$self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
-	#	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
-	};
+		if($id) {
+            $self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
+	    }
+    #	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
+	}
 	return $self->{_previous};
 }
 
@@ -814,64 +816,66 @@ EOSQL
 
 #-------------------------------------------------------------------
 sub view {
-	my $self = shift;
+    my $self = shift;
 	my $currentPost = shift || $self;
-        $self->markRead;
-        $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
+    $self->markRead;
+    $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
 	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
-		return $out if $out;
-	}
-        $self->session->scratch->set("discussionLayout",$self->session->form->process("layout"))
-		if ($self->session->form->process("layout"));
-        my $layout = $self->session->scratch->get("discussionLayout") 
-		|| $self->session->user->profileField("discussionLayout");
-        my $var = $self->getTemplateVars;
+        my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
+        return $out if $out;
+    }
+    $self->session->scratch->set("discussionLayout",$self->session->form->process("layout")) if ($self->session->form->process("layout"));
+    my $layout = $self->session->scratch->get("discussionLayout") || $self->session->user->profileField("discussionLayout");
+    my $var = $self->getTemplateVars;
 	$self->getParent->appendTemplateLabels($var);
-	$var->{karmaIsEnabled} = $self->session->setting->get("useKarma");
-        $var->{'user.isVisitor'} = ($self->session->user->userId eq '1');
-        $var->{'user.isModerator'} = $self->getParent->canModerate;
-        $var->{'user.canPost'} = $self->getParent->canPost;
-        $var->{'user.canReply'} = $self->canReply;
-        $var->{'repliesAllowed'} = $self->getParent->get("allowReplies");
+	
+    $var->{'karmaIsEnabled'     }  = $self->session->setting->get("useKarma");
+    $var->{'user.isVisitor'     }  = ($self->session->user->userId eq '1');
+    $var->{'user.isModerator'   }  = $self->getParent->canModerate;
+    $var->{'user.canPost'       }  = $self->getParent->canPost;
+    $var->{'user.canReply'      }  = $self->canReply;
+    $var->{'repliesAllowed'     }  = $self->getParent->get("allowReplies");
 
-        $var->{'layout.nested.url'} = $self->getLayoutUrl("nested");
-        $var->{'layout.flat.url'} = $self->getLayoutUrl("flat");
-        $var->{'layout.isFlat'} = ($layout eq "flat");
-        $var->{'layout.isNested'} = ($layout eq "nested" || !$var->{'layout.isFlat'});
+    $var->{'layout.nested.url'  }  = $self->getLayoutUrl("nested");
+    $var->{'layout.flat.url'    }  = $self->getLayoutUrl("flat");
+    $var->{'layout.isFlat'      }  = ($layout eq "flat");
+    $var->{'layout.isNested'    }  = ($layout eq "nested" || !$var->{'layout.isFlat'});
 
-        $var->{'user.isSubscribed'} = $self->isSubscribed;
-        $var->{'subscribe.url'} = $self->getSubscribeUrl;
-        $var->{'unsubscribe.url'} = $self->getUnsubscribeUrl;
+    $var->{'user.isSubscribed'  }  = $self->isSubscribed;
+    $var->{'subscribe.url'      }  = $self->getSubscribeUrl;
+    $var->{'unsubscribe.url'    }  = $self->getUnsubscribeUrl;
 
-	$var->{'thumbsUp.icon.url'} = $self->session->url->extras('thumbup.gif');
-	$var->{'thumbsDown.icon.url'} = $self->session->url->extras('thumbdown.gif');
+	$var->{'thumbsUp.icon.url'  }  = $self->session->url->extras('thumbup.gif');
+	$var->{'thumbsDown.icon.url'}  = $self->session->url->extras('thumbdown.gif');
 
-        $var->{'isArchived'} = $self->get("status") eq "archived";
-        $var->{'archive.url'} = $self->getArchiveUrl;
-        $var->{'unarchive.url'} = $self->getUnarchiveUrl;
+    $var->{'isArchived'         }  = $self->get("status") eq "archived";
+    $var->{'archive.url'        }  = $self->getArchiveUrl;
+    $var->{'unarchive.url'      }  = $self->getUnarchiveUrl;
+    
+    $var->{'isSticky'           }  = $self->isSticky;
+    $var->{'stick.url'          }  = $self->getStickUrl;
+    $var->{'unstick.url'        }  = $self->getUnstickUrl;
+    
+    $var->{'isLocked'           }  = $self->isThreadLocked;
+    $var->{'lock.url'           }  = $self->getLockUrl;
+    $var->{'unlock.url'         }  = $self->getUnlockUrl;
 
-        $var->{'isSticky'} = $self->isSticky;
-        $var->{'stick.url'} = $self->getStickUrl;
-        $var->{'unstick.url'} = $self->getUnstickUrl;
+	$var->{'transfer.karma.form'}  = WebGUI::Form::formHeader($self->session, {
+        action=>$self->getUrl
+    });
+    
+    $var->{'transfer.karma.form'} .= WebGUI::Form::hidden($self->session, {
+	    name=>"func",
+	    value=>"transferKarma"
+    });
+    $var->{'transfer.karma.form'} .= WebGUI::Form::integer($self->session, {
+        name=>"karma",
+        value=>10
+	});
+    $var->{'transfer.karma.form'} .= WebGUI::Form::submit($self->session);
+    $var->{'transfer.karma.form'} .= WebGUI::Form::formFooter($self->session);
 
-        $var->{'isLocked'} = $self->isThreadLocked;
-        $var->{'lock.url'} = $self->getLockUrl;
-        $var->{'unlock.url'} = $self->getUnlockUrl;
-
-	$var->{'transfer.karma.form'} = WebGUI::Form::formHeader($self->session, {action=>$self->getUrl})
-		.WebGUI::Form::hidden($self->session, {
-			name=>"func",
-			value=>"transferKarma"
-			})
-		.WebGUI::Form::integer($self->session, {
-			name=>"karma",
-			value=>10
-			})
-		.WebGUI::Form::submit($self->session)
-		.WebGUI::Form::formFooter($self->session);
-
-        my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
+    my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
 		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
@@ -886,45 +890,47 @@ sub view {
 			))
 		group by assetData.assetId
 		order by ";
-	if ($layout eq "flat") {
+	
+    if ($layout eq "flat") {
 		$sql .= "Post.dateSubmitted";
 	} else {
 		$sql .= "asset.lineage";
 	}
-	my $currentPageUrl = $self->session->url->getRequestedUrl;
+	
+    my $currentPageUrl = $self->session->url->getRequestedUrl;
 	$p->setDataByQuery($sql, undef, undef, undef, "url", $currentPageUrl);
 	foreach my $dataSet (@{$p->getPageData()}) {
 		next unless ($dataSet->{className} eq "WebGUI::Asset::Post" || $dataSet->{className} eq "WebGUI::Asset::Post::Thread"); #handle non posts!
 		my $reply = WebGUI::Asset::Post->new($self->session, $dataSet->{assetId}, $dataSet->{className}, $dataSet->{revisionDate});
-		$reply->{_thread} = $self; # caching thread for better performance
-		my %replyVars = %{$reply->getTemplateVars};
-		$replyVars{isCurrent} = ($reply->getId eq $currentPost->getId);
-		$replyVars{isThreadRoot} = $self->getId eq $reply->getId;
-		$replyVars{depth} = $reply->getLineageLength - $self->getLineageLength;
-		$replyVars{depthX10} = $replyVars{depth}*10;
-        	my @depth_loop;
-        	for (my $i=0; $i<$replyVars{depth}; $i++) {
-                	push(@{$replyVars{indent_loop}},{depth=>$i});
-        	}
+		$reply->{'_thread'      }  = $self; # caching thread for better performance
+		my %replyVars             = %{$reply->getTemplateVars};
+		$replyVars{isCurrent    } = ($reply->getId eq $currentPost->getId);
+		$replyVars{isThreadRoot } = $self->getId eq $reply->getId;
+		$replyVars{depth        } = $reply->getLineageLength - $self->getLineageLength;
+		$replyVars{depthX10     }     = $replyVars{depth}*10;
+        my @depth_loop;
+        for (my $i=0; $i<$replyVars{depth}; $i++) {
+            push(@{$replyVars{indent_loop}},{depth=>$i});
+        }
 		push (@{$var->{post_loop}}, \%replyVars);
 	}		
 	$p->appendTemplateVars($var);
-        $var->{'add.url'} = $self->getParent->getNewThreadUrl;
- 
-        my $prev = $self->getPreviousThread;
-        $var->{"previous.url"} = $prev->getUrl if $prev;
-        my $next = $self->getNextThread;
-        $var->{"next.url"}     = $next->getUrl if $next;
+    $var->{'add.url'} = $self->getParent->getNewThreadUrl;
+    my $prev                            = $self->getPreviousThread;
+    $var->{"previous.url"             } = $prev->getUrl if $prev;
+    my $next                            = $self->getNextThread;
+    $var->{"next.url"                 } = $next->getUrl if $next;
 
-	$var->{"search.url"} = $self->getParent->getSearchUrl;
-        $var->{"collaboration.url"} = $self->getThread->getParent->getUrl;
-        $var->{'collaboration.title'} = $self->getParent->get("title");
-        $var->{'collaboration.description'} = $self->getParent->get("description");
-       	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
+	$var->{"search.url"               } = $self->getParent->getSearchUrl;
+    $var->{"collaboration.url"        } = $self->getThread->getParent->getUrl;
+    $var->{'collaboration.title'      } = $self->getParent->get("title");
+    $var->{'collaboration.description'} = $self->getParent->get("description");
+    my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
+	
+    if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getThread->getParent->get("visitorCacheTimeout"));
 	}
-       	return $out;
+    return $out;
 }
 
 
