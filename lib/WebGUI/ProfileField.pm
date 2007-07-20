@@ -207,34 +207,29 @@ A WebGUI::User object reference to use instead of the currently logged in user.
 
 sub formField {
 	my $self = shift;
-	my $properties = $self->_formProperties(shift);
+    my $properties = $self->_formProperties(shift);
 	my $withWrapper = shift;
-	my $u = shift;
+	my $u = shift || $self->session->user;
 	my $skipDefault = shift;
 	my $assignedValue = shift;
-	my $default;
 	if ($skipDefault) {
-	} 
-	# display form version in case there is an error on submit, so they don't have to retype
-    	elsif (defined $self->session->form->process($properties->{name})) {
-		$default = $self->session->form->process($properties->{name});
-	} 
-	# get it from the user profile if we already have a user object
-	elsif (defined $u && defined $u->profileField($properties->{name})) {
-		$default = $u->profileField($properties->{name});
-	} 
-	# get it from the user profile if we don't have the user object
-	elsif (!defined $u && defined $self->session->user->profileField($properties->{name})) {
-		$default = $self->session->user->profileField($properties->{name});
-	} 
-	# get it from the defaults if necessary
- 	else {
-		$default = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
+	    $properties->{value} = undef;
 	}
-	$properties->{value} = $default;
-    if (defined $assignedValue) {
-        $properties->{value} = $assignedValue;
-    }
+	elsif (defined $assignedValue) {
+	    $properties->{value} = $assignedValue;
+	}
+	else {
+	    # start with specified (or current) user's data.  previous data needed by some form types as well (file).
+        $properties->{value} = $u->profileField($self->getId);
+        # use submitted data if it exists
+        if (defined $self->session->form->process($properties->{name})) {
+            $properties->{value} = $self->session->form->process($self->getId,$self->get("fieldType"), undef, $properties);
+	    }
+	    # fall back on default
+	    if(!defined $properties->{value}) {
+	        $properties->{value} = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
+	    }
+	}
 	if ($withWrapper == 1) {
 		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayFormWithWrapper;
 	} elsif ($withWrapper == 2) {
