@@ -62,6 +62,12 @@
 				</tr>
 			</tmpl_if>
 		</tmpl_if>
+        <tmpl_if useCaptcha>
+            <tr>
+                <td><tmpl_var captcha_label></td>
+                <td><tmpl_var captcha_form></td>
+            </tr>
+        </tmpl_if>
 	</tmpl_if>
 	<tr>
 		<td></td>

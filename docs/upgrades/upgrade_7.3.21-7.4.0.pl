@@ -32,9 +32,21 @@ addPrivateMessaging($session);
 addNewsletter($session);
 addHttpProxyUrlPatternFilter($session);
 addCanStartThreadToCS($session);
+addPostCaptchaToCS($session);
 
 finish($session); # this line required
 
+#-------------------------------------------------
+
+sub addPostCaptchaToCS {
+    my $session = shift;
+    print "\tAdding useCaptcha setting to Collaboration Systems..." unless ($quiet);
+    
+    $session->db->write("ALTER TABLE Collaboration add column useCaptcha integer NOT NULL default 0");   
+    
+    print "OK\n";
+    return;
+}
 #-------------------------------------------------
 
 sub addCanStartThreadToCS {
