@@ -2,37 +2,6 @@ package WebGUI::Help::Asset_Folder;
 
 our $HELP = {
 
-        'folder add/edit' => {
-		title => 'folder add/edit title',
-		body => 'folder add/edit body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'visitor cache timeout',
-                                namespace => 'Asset_Folder',
-                                description => 'visitor cache timeout help',
-				uiLevel => 8,
-                        },
-                        {
-                                title => 'folder template title',
-                                description => 'folder template description',
-				namespace => 'Asset_Folder',
-                        },
-                        {
-                                title => 'sort alphabetically',
-                                description => 'sort alphabetically help',
-				namespace => 'Asset_Folder',
-                        },
-		],
-		related => [
-			{
-				tag => 'folder template',
-				namespace => 'Asset_Folder',
-			},
-		]
-	},
-
         'folder template' => {
 		title => 'folder template title',
 		body => 'folder template body',
@@ -108,10 +77,6 @@ our $HELP = {
 			}
 		],
 		related => [
-			{
-				tag => 'folder add/edit',
-				namespace => 'Asset_Folder',
-			},
 		]
 	},
 
@@ -138,10 +103,6 @@ our $HELP = {
 			},
 		],
 		related => [
-			{
-				tag => 'folder add/edit',
-				namespace => 'Asset_Folder',
-			},
 		]
 	},
 

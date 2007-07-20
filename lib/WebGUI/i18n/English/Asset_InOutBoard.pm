@@ -11,11 +11,6 @@ our $I18N = {
 		lastUpdated =>1091624565
 	},
 
-	'18' => {
-		message => q|In/Out Board, Add/Edit|,
-		lastUpdated =>1091624565
-	},
-
 	'select delegate' => {
 		message => q|In/Out Board, Select Delegates|,
 		lastUpdated =>1122010599
@@ -117,22 +112,6 @@ our $I18N = {
                 message => q|Which groups are allowed to use this In/Out Board to change their status?|,
                 lastUpdated => 1138988640,
         },
-
-	'19' => {
-		message => q|<p>
-An In/Out board is used to keep track of whether people are currently
-in/out of the office. It shows the current In/Out status of all WebGUI
-users and also logs the reason the person has left, the time they
-left and the time they return.  The log is viewable in two forms.  The first
-is a summary of the current status for all users in the groups configured for
-this In/Out board instance.  The second is a complete report of the history of
-all status changes for those users.  This report can be setup to have restricted
-viewing privileges and is templatable.</p>
-<p>Users of the In/Out Board can select other users, called delegates, to update
-their status for them.</p>
-|,
-		lastUpdated =>1139255107
-	},
 
 	'20' => {
 		message => q|In/Out Board, Template|,

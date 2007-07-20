@@ -7,25 +7,6 @@ our $I18N = {
 		context=>q|The name of the layout asset.|
 	},
 
-	'layout add/edit title' => {
-		message => q|Page Layout, Add/Edit|,
-        	lastUpdated => 1106683494,
-	},
-
-	'layout add/edit body' => {
-                message => q|
-<p>Page Layout Assets are used to display multiple Assets on the same time, much like
-Page Layouts in version 5 of WebGUI.  The Page Layout Asset consists of a template with
-multiple content areas, and Assets that are children of the Page Layout can be assigned
-to be displayed in those areas.
-</p>
-
-<p>Page Layout Assets are Wobjects and Assets, and share the same properties of both.  Page Layout
-Assets also have these unique properties:</p>|,
-		context => 'Describing Page Layout Add/Edit form specific fields',
-		lastUpdated => 1119410129,
-	},
-
         'template description' => {
                 message => q|Choose a template from the list to display the contents of the Page Layout Asset and
 its children.|,

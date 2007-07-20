@@ -2,34 +2,6 @@ package WebGUI::Help::Asset_Layout;
 
 our $HELP = {
 
-        'layout add/edit' => {
-		title => 'layout add/edit title',
-		body => 'layout add/edit body',
-		fields => [
-                        {
-                                title => 'layout template title',
-                                description => 'template description',
-                                namespace => 'Asset_Layout',
-                        },
-                        {
-                                title => 'assets to hide',
-                                description => 'assets to hide description',
-                                namespace => 'Asset_Layout',
-				uiLevel => 9,
-                        },
-		],
-		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
-				tag => 'layout template',
-				namespace => 'Asset_Layout'
-			},
-		]
-	},
-
         'layout template' => {
 		title => 'layout template title',
 		body => 'layout template body',
@@ -72,10 +44,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'layout add/edit',
-				namespace => 'Asset_Layout'
-			},
 		]
 	},
 
@@ -103,10 +71,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'layout add/edit',
-				namespace => 'Asset_Layout'
-			},
 		]
 	},
 

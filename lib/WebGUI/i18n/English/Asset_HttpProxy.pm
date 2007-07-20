@@ -28,16 +28,7 @@ our $I18N = {
 		lastUpdated => 1047837230
 	},
 
-	'11' => {
-		message => q|<p>The HTTP Proxy wobject is a very powerful tool. It enables you to embed external sites and applications into your site. For example, if you have a web mail system that you wish your staff could access through the intranet, then you could use the HTTP Proxy to accomplish that.
-</p>
-
-<p><i>Note: The <b>Search for</b> and <b>Stop at</b> strings are included in the content in the default template. You can change this by creating your own template.</i></p>
-|,
-		lastUpdated => 1146775758,
-	},
-
-	'http proxy template title' => {
+    'http proxy template title' => {
 		message => q|HTTP Proxy Template|,
 		lastUpdated => 1109714266,
 	},
@@ -167,11 +158,6 @@ our $I18N = {
 	'13' => {
 		message => q|Search for|,
 		lastUpdated => 1060433963
-	},
-
-	'10' => {
-		message => q|HTTP Proxy, Add/Edit|,
-		lastUpdated => 1047858432
 	},
 
 	'5' => {
