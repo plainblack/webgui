@@ -19,19 +19,6 @@ our $I18N = { ##hashref of hashes
 		context => q|Describes this template field selector|
 	},     
         
-	'add/edit help title' => { 
-		message => q|Add/Edit Event Management System|,
-		lastUpdated => 1131394070,
-		context => q|Title for Add/Edit Event Managment System Help|
-	},
-
-	'add/edit help body' => { 
-		message => q|<p>WebGUI allows registration and payments to be made directly from the site with the Event Management System (EMS).  You can assign two groups who are allowed to do event management, one to add events to the manager and another to approve them.  You will also be able to set up several templates for the display of the list of events and the event checkout form.</p>
-		<p>Each event for sale is a Product from the Commerce System.</p>|,
-		lastUpdated => 1131394070,
-		context => q|Body for Add/Edit Event Managment System Help|
-	},
-
 	'display template' => { 
 		message => q|Display Template|,
 		lastUpdated => 1131394070,
@@ -366,23 +353,6 @@ our $I18N = { ##hashref of hashes
 		context => q|In Manage Event Metadata screen|,
 	},
 
-	'add/edit event metadata field body' => {
-		message => q|<p>This screen allows you to add a new metadata field to an event or to reconfigure existing metadata fields.</p>|,
-		lastUpdated => 1138908251,
-	},
-
-	'edit prerequisite set body' => {
-		message => q|<p>This screen allows you to define prerequisites for an event or edit an event's current prerequisites.</p>
-<p>With respect to prerequisites, there are basically two classes of Events.  There are those that have prerequisites (Select Events) and those that do not (Master Events).  Only Master Events can serve as prerequisites.  Adding a prerequisite to a Master Event will make it become a Select Event, and it may no longer be used as a Master Event.</p>|,
-		lastUpdated => 1147146318,
-	},
-
-	'edit discount pass body' => {
-		message => q|<p>This screen allows you to create new discount passes that can be purchased, or to edit existing passes.</p>
-|,
-		lastUpdated => 1147146318,
-	},
-
 	'check required fields' => {
 		message => q|You did not include these required fields: |,
 		lastUpdated => 0,
@@ -479,18 +449,6 @@ our $I18N = { ##hashref of hashes
 		context => q|What did we do with duplicates (skipped/overwritten)?|,
 	},
 
-	'import events help title' => {
-		message => q|Import Events|,
-		lastUpdated => 0,
-		context => q|Help for importing events from CSV files.|,
-	},
-
-	'import events help body' => {
-		message => q|This is the body of the import events help page.|,
-		lastUpdated => 0,
-		context => q|Help for importing events from CSV files.|,
-	},
-
 	'meta hover help' => {
 		message => q|This is a custom field. Please ask your administrator for guidance.|,
 		lastUpdated => 0,
@@ -573,7 +531,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'template help title' => {
-		message => q|Event Management System Template|,
+		message => q|Event Management System Template Variables|,
 		lastUpdated => 1140465899,
 	},
 
@@ -630,15 +588,6 @@ our $I18N = { ##hashref of hashes
 	'managePurchases.label' => {
 		message => q|An internationalized label to display to the user the link for managing purchases.|,
 		lastUpdated => 1165511507,
-	},
-
-	'template help body' => {
-		message => q|
-<p>This template is used to style the main page of the Event Management System where
-products are displayed to the user as well as provide a link for managing events
-in the system.</p>
-|,
-		lastUpdated => 1165517304,
 	},
 
 	'event template help title' => {
@@ -762,14 +711,6 @@ If the event is full, this variable will be blank.|,
 		lastUpdated => 1149828404,
 	},
 
-	'event template help body' => {
-		message => q|
-<p>This template is used to display the contents of a single Event to the
-user.</p>
-|,
-		lastUpdated => 1149828859,
-	},
-
 	'manage purchases template help title' => {
 		message => q|EMS Manage Purchases Template|,
 		lastUpdated => 1140465899,
@@ -793,14 +734,6 @@ user.</p>
 	'managePurchasesTitle' => {
 		message => q|An internationalized label to title this screen.|,
 		lastUpdated => 1149828546,
-	},
-
-	'manage purchases template help body' => {
-		message => q|
-<p>This template is used to style the screen of the Event Management System where
-the user can manage their purchases.</p>
-|,
-		lastUpdated => 1149828862,
 	},
 
 	'view purchase template help title' => {
@@ -914,17 +847,6 @@ fall into this group.|,
 	'appUrl' => {
 		message => q|A URL back to the main screen of the Asset.|,
 		lastUpdated => 1149828601,
-	},
-
-	'view purchase template help body' => {
-		message => q|
-<p>This template is used to style the screen of the Event Management System where
-the users and admins can view or edit a purchase.</p>
-
-<p>In addition to the template variables below, this template also has access to the
-EMS Asset variables.</p>
-|,
-		lastUpdated => 1149828843,
 	},
 
 	'search template help title' => {
@@ -1058,43 +980,11 @@ by setting the "hide" form variable.|,
 		lastUpdated => 1149828900,
 	},
 
-	'search template help body' => {
-		message => q|
-<p>This template is used to style the screen of the Event Management System where
-the users and admins can view or edit a purchase.</p>
-|,
-		lastUpdated => 1149829240,
-	},
-
 	'event template help title' => {
 		message => q|Event Management System Event Template|,
 		lastUpdated => 1140465899,
 	},
 
-	'add/edit event help title' => { 
-		message => q|Add/Edit Event|,
-		lastUpdated => 1140469726,
-		context => q|Title for Add/Edit Event Help|
-	},
-
-	'add/edit event help body' => { 
-		message => q|
-<p>In this form you will create an Event for sale on the site.
-Each Event is very similar to a cross between a Product in the Product
-Manager and an Event in the Events Calendar.  You will give the Event
-a title, description, price, a template for displaying the event to the user and when
-the event starts and ends.  There are also several Event Management System specific fields for
-defining the maximum number of attendees, and if there are other events which are prerequisites
-for this event.</p>
-
-|,
-		lastUpdated => 1140470450,
-		context => q|Body for Add/Edit Event Help|
-	},
-
-	#If the help file documents an Asset, it must include an assetName key
-	#If the help file documents an Macro, it must include an macroName key
-	#For all other types, use topicName
 	'assetName' => {
 		message => q|Event Manager (beta)|,
 		lastUpdated => 1131394072,
@@ -1500,11 +1390,6 @@ normal templates.|,
                 lastUpdated => 1147050958,
         },
 
-        'edit registrant body' => {
-                message => q|<p></p>|,
-                lastUpdated => 1147050958,
-        },
-
         'see available subevents' => {
                 message => q|Would you like to see available subevents?|,
                 lastUpdated => 1147050958,
@@ -1679,11 +1564,6 @@ added to the user's cart and would be discounted if the Attend All Sessions even
                 lastUpdated => 1147108858,
         },
 
-        'manage discount pass body' => {
-                message => q|<p>The Manage Discount Passes screen allows you to manage Discount Passes on any Event Management System asset on your site.  Any user who is allowed to add events to the EMS also has access this screen.  Using the list of displayed passes, you may delete or edit any pass.  Use the link to the right to create a new discount pass.</p>|,
-                lastUpdated => 1147108858,
-        },
-
         'confirm delete purchase' => {
                 message => q|Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.|,
                 lastUpdated => 1147108858,
@@ -1691,12 +1571,6 @@ added to the user's cart and would be discounted if the Attend All Sessions even
 	
 	'checkout template help title' => {
 		message => q|EMS Checkout Template|,
-		lastUpdated => 0,
-	},
-
-	'checkout template help body' => {
-		message => q|<p>The checkout template controls the display elements rendered during the Event Management Systems checkout process.  Note that this should not be confused with the Commerce portion of the checkout process when the user begins to enter payment details.  This template handles gathering registration information from users for the events, conflict resolution when a user has created an event schedule that overlaps, and prerequisite resolution when a user has events assigned to a badge that require subsequent events not selected by the user.
-			    |,
 		lastUpdated => 0,
 	},
 

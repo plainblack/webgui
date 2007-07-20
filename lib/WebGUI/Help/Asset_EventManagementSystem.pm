@@ -3,429 +3,10 @@ package WebGUI::Help::Asset_EventManagementSystem; ## Be sure to change the pack
 ##Stub document for creating help documents.
 
 our $HELP = {
-	'event management system add/edit' => {
-		source => 'sub definition',
-		title => 'add/edit help title',
-		body => 'add/edit help body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'display template',
-                                description => 'display template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'checkout template',
-                                description => 'checkout template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'manage purchases template',
-                                description => 'manage purchases template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'view purchase template',
-                                description => 'view purchase template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'search template',
-                                description => 'search template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'paginate after',
-                                description => 'paginate after description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'group to add events',
-                                description => 'group to add events description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'group to approve events',
-                                description => 'group to approve events description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'global prerequisite',
-                                description => 'global prerequisite description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'global metadata',
-                                description => 'global metadata description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-		],
-	},
-
-	'add/edit event' => {
-		source => 'sub www_editEvent',
-		title => 'add/edit event help title',
-		body => 'add/edit event help body',
-		fields => [
-                        {
-                                title => 'approve event',
-                                description => 'approve event description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event title',
-                                description => 'add/edit event title description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event description',
-                                description => 'add/edit event description description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event image',
-                                description => 'add/edit event image description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'price',
-                                description => 'add/edit event price description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event template',
-                                description => 'add/edit event template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'weight',
-                                description => 'weight description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'sku',
-                                description => 'sku description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'sku template',
-                                description => 'sku template',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event start date',
-                                description => 'add/edit event start date description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event end date',
-                                description => 'add/edit event end date description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event maximum attendees',
-                                description => 'add/edit event maximum attendees description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'assigned prerequisite set',
-                                description => 'assigned prerequisite set description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'import events' => {
-		source => 'sub www_importEvents',
-		title => 'import events help title',
-		body => 'import events help body',
-		fields => [
-                        {
-                                title => 'choose a file to import',
-                                description => 'import hoverhelp file',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'what about duplicates',
-                                description => 'import hoverhelp dups',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'ignore first line',
-                                description => 'import hoverhelp first line',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'import file contains field title',
-                                description => 'import file contains field description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'import field is duplicate key title',
-                                description => 'import field is duplicate key description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'status',
-                                description => 'approve event description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event title',
-                                description => 'add/edit event title description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event description',
-                                description => 'add/edit event description description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event image',
-                                description => 'add/edit event image description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'price',
-                                description => 'add/edit event price description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event template',
-                                description => 'add/edit event template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'weight',
-                                description => 'weight description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'sku',
-                                description => 'sku description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'sku template',
-                                description => 'sku template description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event start date',
-                                description => 'add/edit event start date description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event end date',
-                                description => 'add/edit event end date description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'add/edit event maximum attendees',
-                                description => 'add/edit event maximum attendees description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'edit event metadata field' => {
-		source => 'sub www_editEventMetaDataField',
-		title => 'add/edit event metadata field',
-		body => 'add/edit event metadata field body',
-		fields => [
-                        {
-                                title => '475',
-                                description => '475 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '472',
-                                description => '472 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '473a',
-                                description => '473a description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '474',
-                                description => '474 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '486',
-                                description => '486 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '487',
-                                description => '487 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => '488',
-                                description => '488 description',
-                                namespace => 'WebGUIProfile',
-                        },
-                        {
-                                title => 'auto search',
-                                description => 'auto search description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'add/edit event',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'edit event prerequisite set' => {
-		source => 'sub www_editPrereqSet',
-		title => 'edit prerequisite set',
-		body => 'edit prerequisite set body',
-		fields => [
-                        {
-                                title => 'prereq set name field label',
-                                description => 'prereq set name field description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'operator type',
-                                description => 'operator type description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'events required by this prerequisite set',
-                                description => 'events required by description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'add/edit event',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'edit discount pass' => {
-		source => 'sub www_editDiscountPass',
-		title => 'edit discount pass',
-		body => 'edit discount pass body',
-		fields => [
-                        {
-                                title => 'discount pass id',
-                                description => 'discount pass id description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'pass name',
-                                description => 'pass name description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'discount pass type',
-                                description => 'discount pass type description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'discount amount',
-                                description => 'discount amount description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'add/edit event',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'manage discount passes' => {
-		source => 'sub www_manageDiscountPass',
-		title => 'manage discount passes',
-		body => 'manage discount pass body',
-		fields => [
-		],
-		related => [
-			{
-				tag => 'edit discount pass',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
-	'edit registrant' => {
-		source => 'sub www_editRegistrant',
-		title => 'edit registrant',
-		body => 'edit registrant body',
-		fields => [
-                        {
-                                title => 'associated user',
-                                description => 'associated user description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-                        {
-                                title => 'created by',
-                                description => 'created by description',
-                                namespace => 'Asset_EventManagementSystem',
-                        },
-		],
-		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
-				tag => 'add/edit event',
-				namespace => 'Asset_EventManagementSystem',
-			},
-		],
-	},
-
 	'event management system template' => {
 		source => 'sub view',
 		title => 'template help title',
-		body => 'template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'checkout.url'
@@ -468,10 +49,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI',
 			},
@@ -481,7 +58,7 @@ our $HELP = {
 	'event management system event template' => {
 		source => 'sub www_editEvent',
 		title => 'event template help title',
-		body => 'event template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'title'
@@ -555,10 +132,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
-			{
 				tag => 'event management system template',
 				namespace => 'Asset_EventManagementSystem',
 			},
@@ -568,7 +141,7 @@ our $HELP = {
 	'ems manage purchases template' => {
 		source => 'sub www_managePurchases',
 		title => 'manage purchases template help title',
-		body => 'manage purchases template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'purchasesLoop',
@@ -588,17 +161,13 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
 		],
 	},
 
 	'ems checkout template' => {
 		source => 'sub getRegistrationInfo',
 		title => 'checkout template help title',
-		body => 'checkout template help body',
+		body => '',
 		variables => [
 			  {
 				'name' => 'isError',
@@ -618,17 +187,13 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
 		],
 	},
 
 	'ems view purchase template' => {
 		source => 'sub www_viewPurchases',
 		title => 'view purchase template help title',
-		body => 'view purchase template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'purchasesLoop',
@@ -715,10 +280,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
 		],
 	},
 
@@ -726,7 +287,7 @@ our $HELP = {
 	'ems search template' => {
 		source => 'sub www_search',
 		title => 'search template help title',
-		body => 'search template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'calendarJS'
@@ -885,10 +446,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'event management system add/edit',
-				namespace => 'Asset_EventManagementSystem',
-			},
 			{
 				tag => 'pagination template variables',
 				namespace => 'WebGUI',
