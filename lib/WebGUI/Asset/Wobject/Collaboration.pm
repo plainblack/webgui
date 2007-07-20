@@ -241,6 +241,7 @@ sub appendTemplateLabels {
         $var->{"user.label"} = $i18n->get("user");
 	$var->{"views.label"} = $i18n->get("views");
         $var->{'visitorName.label'} = $i18n->get("visitor");
+    $var->{"captcha_label"} = $i18n->get("captcha label");
 }
 
 #-------------------------------------------------------------------
@@ -716,7 +717,13 @@ sub definition {
 			label=>$i18n->get("default karma scale"),
 			hoverHelp=>$i18n->get('default karma scale help'),
 			},
-       
+        useCaptcha => {
+            fieldType=>"yesNo",
+            defaultValue=>'0',
+            tab=>'security',
+            label=>$i18n->get('use captcha label'),
+            hoverHelp=>$i18n->get('use captcha hover help'),
+        },
         subscriptionGroupId =>{
 			fieldType=>"subscriptionGroup",
             tab=>'security',
@@ -1268,6 +1275,35 @@ sub view {
 		WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->set($out,$self->get("visitorCacheTimeout"));
 	}
     return $out;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
+
+=cut
+
+sub www_editSave {
+	my $self    = shift;
+    my $session = $self->session;
+    
+    my $className = $session->form->param("class");
+    
+    #my $assetId = $self->session->form->param("assetId");
+    if($className eq "WebGUI::Asset::Post::Thread") {
+        my $assetId = $session->form->param("assetId");
+      
+        if($assetId eq "new" && $self->getValue("useCaptcha")) {
+            my $captcha = $self->session->form->process("captcha","Captcha");
+            unless ($captcha) {
+                return $self->www_add;
+            }
+        }
+    }
+    
+    return $self->SUPER::www_editSave();
 }
 
 #-------------------------------------------------------------------
