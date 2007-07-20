@@ -24,10 +24,6 @@ our $HELP = {
 				tag => 'multisearch template',
 				namespace => 'Asset_MultiSearch',
 			},
-			{
-				tag => 'dashboard add/edit',
-				namespace => 'Asset_Dashboard',
-			},
 		],
 	},
 

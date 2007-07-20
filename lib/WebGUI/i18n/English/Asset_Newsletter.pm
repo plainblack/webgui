@@ -92,20 +92,6 @@ our $I18N = {
 		context => q|template variable|
 	},
 
-	'newsletter add/edit' => {
-		message => q|Newsletter, Add/Edit|,
-		lastUpdated => 0, 
-		context => q|help title|
-	},
-
-	'newsletter add/edit desc' => {
-		message => q|The Newsletter asset is used to create news stories and then send subscribed users an email
-        based upon their chosen interests. This asset requires content profiling to be enabled in order to
-        function.|,
-		lastUpdated => 0, 
-		context => q|help description|
-	},
-
 	'mySubscriptionsUrl' => {
 		message => q|The URL for a user to click on to manage their subscriptions.|,
 		lastUpdated => 0, 

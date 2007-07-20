@@ -721,9 +721,9 @@ our $I18N = {
 	},
 
 	'collaboration template labels title' => {
-		message => q|Collaboration Template Labels|,
-                lastUpdated => 1111520746,
-        },
+		message => q|Collaboration Template Variable Labels|,
+        lastUpdated => 1184905426,
+    },
 
 	'add.label' => {
 		message => q|The word "Add".|,
@@ -1040,33 +1040,6 @@ our $I18N = {
 		lastUpdated => 1150169038,
 	},
 
-	'collaboration template labels body' => {
-		message => q|<p>These labels are available in the templates of several Assets and Wobjects, but all of them may not be useful.   Please consult the template documentation for the Asset or Wobject to see which are used.
-</p>
-|,
-		lastUpdated => 1150169127
-	},
-	
-	'collaboration add/edit title' => {
-		message => q|Collaboration, Add/Edit|,
-		lastUpdated => 1113673895,
-	},
-
-	'collaboration add/edit body' => {
-		message => q|<p>This Asset is used to hold a collection of Posts submitted by users and content managers.  Based on how it is configured and which templates it uses, it can be used to build message boards, photo galleries, weblogs, FAQ lists and many more tools for your website.</p>
-<p>When a Post is deleted from a Collaboration Asset, it goes into the trash and all replies or children
-of that post are removed from the Collaboration Asset, and the reply counter is decremented.  The Post
-you deleted may be restored from the Trash.  This will also restore all the replies to that Post.
-However, it is not possible to restore the children of the Post directly, without restoring the
-Post that was originally deleted.
-</p>
-
-<p>Collaboration Assets have the properties of Assets and Wobjects, as well as the
-properties listed below:</p>
-                |,
-		lastUpdated => 1113974026,
-	},
-
         'display last reply description' => {
                 message => q|If set to Yes, template variables will be added to allow the display of the last reply in this Thread.|,
                 lastUpdated => 1165449294,
@@ -1379,15 +1352,8 @@ user has an avatar.|,
 		lastUpdated => 1149655722,
 	},
 
-	'collaboration post list template variables body' => {
-		message => q|<p>These variables are available in several of the templates
-used by Collaboration Assets:</p>
-                |,
-		lastUpdated => 1149655819,
-	},
-
 	'collaboration template title' => {
-		message => q|Collaboration Template|,
+		message => q|Collaboration Template Variables|,
 		lastUpdated => 1114466567,
 	},
 
@@ -1482,15 +1448,9 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149655833,
 	},
 
-	'collaboration template body' => {
-		message => q|<p>These variables are available in the Collaboration Template:</p>
-                |,
-		lastUpdated => 1149655899,
-	},
-
 	'collaboration search template title' => {
-		message => q|Collaboration Search Template|,
-		lastUpdated => 1114467745,
+		message => q|Collaboration Search Template Variables|,
+		lastUpdated => 1184905531,
 	},
 
 	'form.header' => {
@@ -1511,13 +1471,6 @@ the Collaboration Asset, the user will be notified.|,
 	'back.url' => {
 		message => q|A URL for returning to the main view for this Collaboration Asset.|,
 		lastUpdated => 1149655909,
-	},
-
-	'collaboration search template body' => {
-		message => q|<p>These variables are available in the Collaboration Search Template:</p>
-
-                |,
-		lastUpdated => 1145039922,
 	},
 
 	'enable avatars' => {
@@ -1541,8 +1494,8 @@ the Collaboration Asset, the user will be notified.|,
 	},
 
 	'collaboration rss template title' => {
-		message => q|Collaboration RSS Template|,
-		lastUpdated => 1114467745,
+		message => q|Collaboration RSS Template Variables|,
+		lastUpdated => 1184905545,
 	},
 
 	'feed title' => {
@@ -1639,12 +1592,6 @@ the Collaboration Asset, the user will be notified.|,
 	'attachment.length' => {
 		message => q|The length in this attachment, in bytes.|,
 		lastUpdated => 1149656056,
-	},
-
-	'collaboration rss template body' => {
-		message => q|<p>The Collaboration RSS template is available to allow configuration of the XML produced as an RSS feed for a collaboration.  To produce a valid rss feed, this template must adhere to the <a href="http://blogs.law.harvard.edu/tech/rss">RSS 2.0 Specification.</a>  These variables are available in the Collaboration RSS Template:</p>
-                |,
-		lastUpdated => 1149656374,
 	},
 
 	'collaborationAssetId' => {

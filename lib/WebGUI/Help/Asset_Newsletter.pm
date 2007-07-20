@@ -3,52 +3,9 @@ package WebGUI::Help::Asset_Newsletter; ## Be sure to change the package name to
 ##Stub document for creating help documents.
 
 our $HELP = {  ##hashref of hashes
-	'newsletter add/edit' => {	
-		title => 'newsletter add/edit',  
-		body => 'newsletter add/edit desc',
-		isa => [
-			{
-			tag => 'collaboration add/edit',
-			namespace => 'Asset_Collaboration',
-			},
-		],
-		fields => [	
-                        {
-                                title => 'newsletter header',
-                                description => 'newsletter header help',
-                                namespace => 'Asset_Newsletter',  
-                        },
-                        {
-                                title => 'newsletter footer',
-                                description => 'newsletter footer help',
-                                namespace => 'Asset_Newsletter',  
-                        },
-                        {
-                                title => 'newsletter template',
-                                description => 'newsletter template help',
-                                namespace => 'Asset_Newsletter',  
-                        },
-                        {
-                                title => 'my subscriptions template',
-                                description => 'my subscriptions template help',
-                                namespace => 'Asset_Newsletter',  
-                        },
-                        {
-                                title => 'newsletter categories',
-                                description => 'newsletter categories help',
-                                namespace => 'Asset_Newsletter',  
-                        },
-		],
-		variables => [
-			{
-				name => "mySubscriptionsUrl",
-			},
-		],
-	},
-
     'my subscriptions template' => {
         title => 'my subscriptions template',
-        body => 'my subscriptions template help',
+        body => '',
         variables => [
             {
                 name => "formHeader",
@@ -83,7 +40,7 @@ our $HELP = {  ##hashref of hashes
 
     'newsletter template' => {
         title => 'newsletter template',
-        body => 'newsletter template help',
+        body => '',
         variables => [
             {
                 name => "title",

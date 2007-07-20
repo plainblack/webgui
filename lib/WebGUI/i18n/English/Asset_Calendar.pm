@@ -290,19 +290,6 @@ our $I18N = {
 	},	
 
 #################### HELP PAGES ####################
-    
-    'help add/edit title' => {
-		message 	=> q|Calendar, Add/Edit|,
-		lastUpdated 	=> 1165878391,
-	},
-
-	'help add/edit body' => {
-		message 	=> q|This Asset has no documentation.|,
-		lastUpdated 	=> 1165878391,
-	},
-
-
-#################### HELP PAGES ####################
 	'searchButtonLabel' => {
 		message 	=> q|Search|,
 		lastUpdated 	=> 1170803504,

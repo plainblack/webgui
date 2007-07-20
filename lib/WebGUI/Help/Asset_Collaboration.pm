@@ -1,235 +1,11 @@
 package WebGUI::Help::Asset_Collaboration;
 
 our $HELP = {
-	'collaboration add/edit' => {
-		title => 'collaboration add/edit title',
-		body => 'collaboration add/edit body',
-		fields => [
-                        {
-                                title => 'visitor cache timeout',
-                                namespace => 'Asset_Collaboration',
-                                description => 'visitor cache timeout help',
-                                uiLevel => 8,
-                        },
-                        {
-                                title => 'display last reply',
-                                description => 'display last reply description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'thumbnail size',
-                                description => 'thumbnail size help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'max image size',
-                                description => 'max image size help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'system template',
-                                description => 'system template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'thread template',
-                                description => 'thread template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'post template',
-                                description => 'post template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'search template',
-                                description => 'search template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'notification template',
-                                description => 'notification template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'rss template',
-                                description => 'rss template description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'who posts',
-                                description => 'who posts description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'who threads',
-                                description => 'who threads description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'approval workflow',
-                                description => 'approval workflow description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'thread approval workflow',
-                                description => 'thread approval workflow description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'threads/page',
-                                description => 'threads/page description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'posts/page',
-                                description => 'posts/page description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'default karma scale',
-                                description => 'default karma scale help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'karma/post',
-                                description => 'karma/post description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'karma spent to rate',
-                                description => 'karma spent to rate description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'karma rating multiplier',
-                                description => 'karma rating multiplier description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'filter code',
-                                description => 'filter code description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'sort by',
-                                description => 'sort by description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'sort order',
-                                description => 'sort order description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'archive after',
-                                description => 'archive after description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'attachments/post',
-                                description => 'attachments/post description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'edit timeout',
-                                description => 'edit timeout description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'allow replies',
-                                description => 'allow replies description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'edit stamp',
-                                description => 'edit stamp description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'rich editor',
-                                description => 'rich editor description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'content filter',
-                                description => 'content filter description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'use preview',
-                                description => 'use preview description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'enable avatars',
-                                description => 'enable avatars description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'enable metadata',
-                                description => 'enable metadata description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'get mail',
-                                description => 'get mail help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'display last reply',
-                                description => 'display last reply description',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'mail server',
-                                description => 'mail server help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'mail account',
-                                description => 'mail account help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'mail password',
-                                description => 'mail password help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'mail address',
-                                description => 'mail address help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'get mail interval',
-                                description => 'get mail interval help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'mail prefix',
-                                description => 'mail prefix help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'auto subscribe to thread',
-                                description => 'auto subscribe to thread help',
-                                namespace => 'Asset_Collaboration',
-                        },
-                        {
-                                title => 'require subscription for email posting',
-                                description => 'require subscription for email posting help',
-                                namespace => 'Asset_Collaboration',
-                        },
-		],
-		related => [
-		]
-	},
-
+    
 	'collaboration template labels' => {
         private => 1,
 		title => 'collaboration template labels title',
-		body => 'collaboration template labels body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'add.label'
@@ -432,7 +208,7 @@ our $HELP = {
 
 	'collaboration post list template variables' => { ##from appendPostListTemplateVars
 		title => 'collaboration post list template variables title',
-		body => 'collaboration post list template variables body',
+		body => '',
 		fields => [
 		],
 		variables => [
@@ -551,7 +327,7 @@ our $HELP = {
 
 	'collaboration template' => {
 		title => 'collaboration template title',
-		body => 'collaboration template body',
+		body => '',
 		fields => [
 		],
 		variables => [
@@ -627,7 +403,7 @@ our $HELP = {
 
 	'collaboration search template' => {
 		title => 'collaboration search template title',
-		body => 'collaboration search template body',
+		body => '',
 		fields => [
 		],
 		variables => [
@@ -678,7 +454,7 @@ our $HELP = {
 
 	'collaboration rss template' => {
 		title => 'collaboration rss template title',
-		body => 'collaboration rss template body',
+		body => '',
 		fields => [
 		],
 		variables => [

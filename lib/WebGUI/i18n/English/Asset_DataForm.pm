@@ -51,23 +51,6 @@ our $I18N = {
 		message => q|Are you sure you want to DELETE this entry permanently?|,
 		lastUpdated => 1031514049
 	},
-	'71' => {
-		message => q|
-<p>This Asset creates a simple multipurpose data-entry and display
-form.  You can add additional fields to the DataForm, create multiple
-tabs, use the DataForm as a web form to email gateway, or easily
-create tables on your website with it.</p>
-
-<p>The Data Form Wobject is special in that some of the controls for it
-are only available from the template.  Be sure to read the documentation
-for the Data Form Template and to include the variables that enable those
-functions.</p>
-
-<p> Dataforms are Wobjects, so they inherit the properties of both Wobjects and Assets.  They also have these unique properties:</p>
-|,
-		lastUpdated => 1119071111,
-	},
-
         '16 description' => {
                 message => q|This message will be displayed to the user after they submit their data.|,
                 lastUpdated => 1119071283,
@@ -184,11 +167,6 @@ or return to the page where it was created.|,
 	'go to form' => {
 		message => q|Go to form|,
 		lastUpdated => 1113423537
-	},
-
-	'72' => {
-		message => q|<p>You may add as many additional fields to your Data Form as you like.</p>|,
-		lastUpdated => 1119156650,
 	},
 
         '104 description' => {
@@ -628,18 +606,6 @@ below to see which template variables may be used inside this loop.|,
 		lastUpdated => 1149392054,
 	},
 
-	'83' => {
-		message => q|<p>The following template variables are available for Data Form templates for
-		creating forms, displaying data and sending emails.</p>
-	|,
-		lastUpdated => 1157575884,
-	},
-
-	'61' => {
-		message => q|Data Form, Add/Edit|,
-		lastUpdated => 1053885941
-	},
-
 	'20' => {
 		message => q|Edit Field|,
 		lastUpdated => 1031514049
@@ -668,13 +634,6 @@ below to see which template variables may be used inside this loop.|,
 	'editField vertical subtext' => {
 		message => q|This property only affects radio- and checklists.|,
 		lastUpdated => 1127958381
-	},
-
-	'89' => {
-		message => q|<p>The following variables are available to the Data Form List template:
-</p>
-|,
-		lastUpdated => 1149392138,
 	},
 
 	'field.id' => {
@@ -890,11 +849,6 @@ below to see which template variables may be used inside this loop.|,
 	'19' => {
 		message => q|Are you certain that you want to delete this field?|,
 		lastUpdated => 1031514049
-	},
-
-	'62' => {
-		message => q|Data Form Fields, Add/Edit|,
-		lastUpdated => 1052047004
 	},
 
 	'5' => {

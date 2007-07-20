@@ -5,84 +5,6 @@ use warnings;
 
 our $HELP   = {
 
-	'calendar add/edit' => {
-		title => 'help add/edit title',
-		body => 'help add/edit body',
-		isa => [
-		],
-		fields => [
-		    {
-			title       => "defaultView label",
-			description => "defaultView description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "defaultDate label",
-			description => "defaultDate description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "groupIdEventEdit label",
-			description => "groupIdEventEdit description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdMonth label",
-			description => "templateIdMonth description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdWeek label",
-			description => "templateIdWeek description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdDay label",
-			description => "templateIdDay description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdEvent label",
-			description => "templateIdEvent description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdEventEdit label",
-			description => "templateIdEventEdit description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdSearch label",
-			description => "templateIdSearch description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdPrintMonth label",
-			description => "templateIdPrintMonth description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdPrintWeek label",
-			description => "templateIdPrintWeek description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdPrintDay label",
-			description => "templateIdPrintDay description",
-			namespace   => "Asset_Calendar",
-		    },
-		    {
-			title       => "templateIdPrintEvent label",
-			description => "templateIdPrintEvent description",
-			namespace   => "Asset_Calendar",
-		    },
-		],
-		variables => [
-		],
-		related => [
-		],
-	},
-
 #### View Calendar Page
 
 	'view calendar template' => {
@@ -142,10 +64,6 @@ our $HELP   = {
 		          },
 		],
 		related => [
-			{
-				tag => 'calendar add/edit',
-				namespace => 'Asset_Calendar'
-			},
 		]
 	},
 
@@ -264,10 +182,6 @@ our $HELP   = {
                   },
 		],
 		related => [
-			{
-				tag => 'calendar add/edit',
-				namespace => 'Asset_Calendar'
-			},
 		]
 	},
 
@@ -352,10 +266,6 @@ our $HELP   = {
 		          },
 		],
 		related => [
-			{
-				tag => 'calendar add/edit',
-				namespace => 'Asset_Calendar'
-			},
 		]
 	},
 
