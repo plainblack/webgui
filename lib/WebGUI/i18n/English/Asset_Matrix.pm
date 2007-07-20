@@ -114,15 +114,9 @@ our $I18N = {
 		lastUpdated => 1149783768,
 	},
 
-        'comparison template help body' => {
-                lastUpdated => 0,
-                message => q| <p>The following template variables are available in the comparison template.</p>
-|
-        },
-
         'comparison template help title' => {
-                lastUpdated => 0,
-                message => q|Matrix Comparison Template|
+                message => q|Matrix Comparison Template Variables|,
+                lastUpdated => 1184949083,
         },
 
 	'discussion' => {
@@ -285,15 +279,9 @@ our $I18N = {
 		lastUpdated => 1149784175,
 	},
 
-        'detail template help body' => {
-                lastUpdated => 1149795166,
-                message => q|<p>The following variables are available in the listing detail template.</p>
-|
-        },
-
         'detail template help title' => {
                 lastUpdated => 0,
-                message => q|Matrix Listing Detail Template|
+                message => q|Matrix Listing Detail Template Variables|
         },
 
 	'search.url' => {
@@ -506,19 +494,14 @@ our $I18N = {
 		lastUpdated => 1149795214,
 	},
 
-        'matrix template help body' => {
-                lastUpdated => 1149795645,
-                message => q|<p>The following variables are available in the main Matrix template.</p>|
-        },
-
         'matrix template help title' => {
-                lastUpdated => 0,
-                message => q|Matrix Main Template|
+                message => q|Matrix Main Template Variables|,
+                lastUpdated => 1184949132,
         },
 
         'ratings detail template help title' => {
                 lastUpdated => 0,
-                message => q|Matrix Ratings Detail Template|
+                message => q|Matrix Ratings Detail Template Variables|
         },
 
 	'rating_loop' => {
@@ -556,12 +539,6 @@ our $I18N = {
 		lastUpdated => 1149996259,
 	},
 
-        'ratings detail template help body' => {
-                lastUpdated => 1149997187,
-                message => q|<p>The following variables are available in the ratings detail template.</p>
-|
-        },
-
 	'form.header' => {
 		message => q|The required header component of the search form.|,
 		lastUpdated => 1149996685,
@@ -597,26 +574,9 @@ our $I18N = {
 		lastUpdated => 1149996685,
 	},
 
-        'search template help body' => {
-                lastUpdated => 1149997201,
-                message => q|<p>The following variables are available in the matrix search template.</p>
-|
-        },
-
         'search template help title' => {
-                lastUpdated => 0,
-                message => q|Matrix Search Template|
-        },
-
-        'add/edit help title' => {
-                lastUpdated => 0,
-                message => q|Matrix, Add/Edit|
-        },
-
-        'add/edit help body' => {
-                lastUpdated => 1135271513,
-                message => q|<p>The Matrix allows you to set up a really powerful comparison system for any manner of item or service.</p>
-|
+                message => q|Matrix Search Template Variables|,
+                lastUpdated => 1184949060,
         },
 
 	'categories description' => {
@@ -940,16 +900,6 @@ our $I18N = {
                 message => q|Limited|
         },
 
-        'listing add/edit help title' => {
-                lastUpdated => 1136488382,
-                message => q|Matrix Listing, Add/Edit|
-        },
-
-        'listing add/edit help body' => {
-                lastUpdated => 1135279558,
-                message => q|In this form, you may add a listing in the Matrix for a new product or edit the listing for an existing product.|
-        },
-
         'product name description' => {
                 lastUpdated => 1135279558,
                 message => q|Enter the name of the product.  If there are entries for the product with different revisions, it would be best to make sure the names are the same.|
@@ -995,16 +945,6 @@ our $I18N = {
         'matrix specific fields' => {
                 lastUpdated => 1135279558,
                 message => q|Matrix Specific Fields|
-        },
-
-        'field add/edit help title' => {
-                lastUpdated => 1136488382,
-                message => q|Matrix Field, Add/Edit|
-        },
-
-        'field add/edit help body' => {
-                lastUpdated => 1135279558,
-                message => q|In this form, you may add a field to the Matrix.  This will define a new feature or performance criterion that will be used to rate all products in the Matrix.  This is very similar to adding fields to a DataForm Asset.|
         },
 
         'field name description' => {
