@@ -158,82 +158,85 @@ sub commit {
 sub definition {
 	my $class = shift;
 	my $session = shift;
-        my $definition = shift;
+    my $definition = shift;
 	my $i18n = WebGUI::International->new($session,"Asset_Post");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'post.gif',
-                tableName=>'Post',
-                className=>'WebGUI::Asset::Post',
-                properties=>{
-			storageId => {
-				fieldType=>"image",
-				defaultValue=>undef
-				},
-			threadId => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-            originalEmail => {
-                noFormPost=>1,
-                fieldType=>"hidden",
-                defaultValue=>undef
-                },
-			dateSubmitted => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>$session->datetime->time()
-				},
-			dateUpdated => {
-				fieldType=>"hidden",
-				defaultValue=>$session->datetime->time()
-				},
-			username => {
-				fieldType=>"hidden",
-				defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->username
-				},
-			rating => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			views => {
-				noFormPost=>1,
-				fieldType=>"hidden",
-				defaultValue=>undef
-				},
-			contentType => {
-				fieldType=>"contentType",
-				defaultValue=>"mixed"
-				},
-			userDefined1 => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				},
-			userDefined2 => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				},
-			userDefined3 => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				},
-			userDefined4 => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				},
-			userDefined5 => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				},
-			content => {
-				fieldType=>"HTMLArea",
-				defaultValue=>undef
-				}
-			},
-		});
-        return $class->SUPER::definition($session,$definition);
+    
+    my $properties = {
+        storageId => {
+            fieldType=>"image",
+            defaultValue=>undef
+        },
+        threadId => {
+            noFormPost=>1,
+            fieldType=>"hidden",
+            defaultValue=>undef
+        },
+        originalEmail => {
+            noFormPost=>1,
+            fieldType=>"hidden",
+            defaultValue=>undef
+        },
+        dateSubmitted => {
+            noFormPost=>1,
+            fieldType=>"hidden",
+            defaultValue=>$session->datetime->time()
+        },
+        dateUpdated => {
+            fieldType=>"hidden",
+            defaultValue=>$session->datetime->time()
+        },
+        username => {
+            fieldType=>"hidden",
+            defaultValue=>$session->form->process("visitorUsername") || $session->user->profileField("alias") || $session->user->username
+        },
+        rating => {
+            noFormPost=>1,
+            fieldType=>"hidden",
+            defaultValue=>undef
+        },
+        views => { 
+            noFormPost=>1,
+            fieldType=>"hidden",
+            defaultValue=>undef
+        },
+        contentType => {
+            fieldType=>"contentType",
+            defaultValue=>"mixed"
+        },
+        userDefined1 => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+        userDefined2 => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+        userDefined3 => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+        userDefined4 => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+        userDefined5 => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+        content => {
+            fieldType=>"HTMLArea",
+            defaultValue=>undef
+        },
+    };
+    
+    push(@{$definition}, {
+        assetName=>$i18n->get('assetName'),
+        icon=>'post.gif',
+        tableName=>'Post',
+        className=>'WebGUI::Asset::Post',
+        properties=>$properties,
+    });
+    return $class->SUPER::definition($session,$definition);
 }
 
 
@@ -1081,195 +1084,241 @@ sub www_deleteFile {
 
 #-------------------------------------------------------------------
 sub www_edit {
-	my $self = shift;
+	my $self      = shift;
+    my $session   = $self->session;
+    my $form      = $session->form;
+    my $privilege = $session->privilege;
+    my $user      = $session->user;
+    my $func      = $form->process("func");
+    
 	my (%var, $content, $title, $synopsis);
-	
-	my $i18n = WebGUI::International->new($self->session);
-	if ($self->session->form->process("func") eq "add") { # new post
-        	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getParent->getUrl})
-			.WebGUI::Form::hidden($self->session, {
-                name=>"func",
-				value=>"add"
-				})
-			.WebGUI::Form::hidden($self->session, {
-				name=>"assetId",
-				value=>"new"
-				})
-			.WebGUI::Form::hidden($self->session, {
-				name=>"class",
-				value=>$self->session->form->process("class","className")
-				});
-        $var{'isNewPost'} = 1;
-		$content = $self->session->form->process("content");
-		$title = $self->session->form->process("title");
-		$synopsis = $self->session->form->process("synopsis");
-		if ($self->session->form->process("class","className") eq "WebGUI::Asset::Post") { # new reply
-			$self->{_thread} = $self->getParent->getThread;
-			return $self->session->privilege->insufficient() unless ($self->getThread->canReply);
-			$var{isReply} = 1;
-			$var{'reply.title'} = $self->getParent->get("title");
-			$var{'reply.synopsis'} = $self->getParent->get("synopsis");
-			$var{'reply.content'} = $self->getParent->formatContent;
+	my $i18n = WebGUI::International->new($session);
+	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
+        #Add Form Header for all new posts
+        my $className = $form->process("class","className");
+        #Post to the parent if this is a new request
+        my $action    = $self->getParent->getUrl;
+        #Post to self if there was an error Posting to a Thread (not a Collaboration)
+        $action       = $self->getUrl if($func eq "editSave" && $className ne "WebGUI::Asset::Post::Thread");
+        
+        $var{'form.header'} = WebGUI::Form::formHeader($session,{
+            action=>$action
+        });
+        $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"func",
+            value=>"add"
+		});
+        $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"assetId",
+            value=>"new"
+		});
+		$var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"class",
+            value=>$form->process("class","className")
+        });
+        
+        if($self->getThread->getParent->getValue("useCaptcha")) {
+            $var{'useCaptcha'   } = "true";
+            
+            use WebGUI::Form::Captcha;
+            my $captcha = WebGUI::Form::Captcha->new($self->session,{
+                "name"=>"captcha"
+            });
+            $var{'captcha_form' } 
+                = $captcha->toHtml. '<span class="formSubtext">'.$captcha->get('subtext').'</span>';
+   		}
+        
+        $var{'isNewPost'  } = 1;
+		
+        $content            = $form->process("content");
+		$title              = $form->process("title");
+		$synopsis           = $form->process("synopsis");
+        
+        if ($className eq "WebGUI::Asset::Post") { # new reply
+            #If editSave comes back on a reply to a new thread, you wind up with a post who's parent is a collaboration system.
+            my $parent = $self->getParent;
+            if(ref $self->getParent eq "WebGUI::Asset::Wobject::Collaboration") {
+                $self->{_thread} = $self->getThread;
+                $parent = $self;
+            } else {
+			    $self->{_thread} = $self->getParent->getThread;
+            }
+            
+            return $privilege->insufficient() unless ($self->getThread->canReply);
+			
+            $var{'isReply'       } = 1;
+			$var{'reply.title'   } = $title || $parent->get("title");
+			$var{'reply.synopsis'} = $synopsis || $parent->get("synopsis");
+			$var{'reply.content' } = $content || $parent->formatContent;
 			for my $i (1..5) {	
-				$var{'reply.userDefined'.$i} = WebGUI::HTML::filter($self->getParent->get('userDefined'.$i),"macros");
+				$var{'reply.userDefined'.$i} = WebGUI::HTML::filter($parent->get('userDefined'.$i),"macros");
 			}
-			unless ($self->session->form->process("content") || $self->session->form->process("title")) {
-                		$content = "[quote]".$self->getParent->get("content")."[/quote]" if ($self->session->form->process("withQuote"));
-                		$title = $self->getParent->get("title");
-                		$title = "Re: ".$title unless ($title =~ /^Re:/i);
+			unless ($content || $title) {
+                $content = "[quote]".$parent->get("content")."[/quote]" if ($form->process("withQuote"));
+                $title = $parent->get("title");
+                $title = "Re: ".$title unless ($title =~ /^Re:/i);
 			}
-			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
+			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
 				value=>$self->session->form->process("subscribe")
-				});
+            });
 		}
-        elsif ($self->session->form->process("class","className") eq "WebGUI::Asset::Post::Thread") { # new thread
-			return $self->session->privilege->insufficient() unless ($self->getThread->getParent->canPost);
-			$var{isThread} = 1;
-			$var{isNewThread} = 1;
+        elsif ($className eq "WebGUI::Asset::Post::Thread") { # new thread
+			return $privilege->insufficient() unless ($self->getThread->getParent->canPost);
+			$var{'isThread'    } = 1;
+			$var{'isNewThread' } = 1;
             if ($self->getThread->getParent->canEdit) {
-                $var{'sticky.form'} = WebGUI::Form::yesNo($self->session, {
-                        name=>'stick',
-                        value=>$self->session->form->process("stick")
-                        });
-                $var{'lock.form'} = WebGUI::Form::yesNo($self->session, {
-                        name=>'lock',
-                        value=>$self->session->form->process('lock')
-                        });
+                $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
+                    name=>'stick',
+                    value=>$form->process("stick")
+                });
+                $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
+                    name=>'lock',
+                    value=>$form->process('lock')
+                });
 			}
-			$var{'subscribe.form'} = WebGUI::Form::yesNo($self->session, {
+			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
-				value=>$self->session->form->process("subscribe") || 1
-				});
+				value=>$form->process("subscribe") || 1
+            });
 		}
-        $content .= "\n\n".$self->session->user->profileField("signature") if ($self->session->user->profileField("signature") && !$self->session->form->process("content"));
+        $content .= "\n\n".$user->profileField("signature") if ($user->profileField("signature") && !$form->process("content"));
 	}
     else { # edit
-		return $self->session->privilege->insufficient() unless ($self->canEdit);
-		$var{isThread} = !$self->isReply;
-        	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			.WebGUI::Form::hidden($self->session, {
-                name=>"func",
-                value=>"edit"
-            })
-			.WebGUI::Form::hidden($self->session, {
-				name=>"revision",
-				value=>$self->session->form->param("revision")
-            })
-			.WebGUI::Form::hidden($self->session, {
-				name=>"ownerUserId",
-				value=>$self->getValue("ownerUserId")
-            })
-			.WebGUI::Form::hidden($self->session, {
-				name=>"username",
-				value=>$self->getValue("username")
-            });
+		return $privilege->insufficient() unless ($self->canEdit);
+		$var{'isThread'   } = !$self->isReply;
+        $var{'form.header'} = WebGUI::Form::formHeader($session,{
+            action=>$self->getUrl
+        });
+        $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"func",
+            value=>"edit"
+        });
+        $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"revision",
+            value=>$form->param("revision")
+        });
+	    $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"ownerUserId",
+            value=>$self->getValue("ownerUserId")
+        });
+        $var{'form.header'} .= WebGUI::Form::hidden($session, {
+            name=>"username",
+            value=>$self->getValue("username")
+        });
 		$var{isEdit} = 1;
-		$content = $self->session->form->process('content') || $self->getValue("content");
-		$title = $self->session->form->process('title') || $self->getValue("title");
-		$synopsis = $self->session->form->process('synopsis') || $self->getValue("synopsis");
+		$content     = $form->process('content') || $self->getValue("content");
+		$title       = $form->process('title') || $self->getValue("title");
+		$synopsis    = $form->process('synopsis') || $self->getValue("synopsis");
 	}
-	$var{'archive.form'} = WebGUI::Form::yesNo($self->session, {
-		name=>"archive"
-		});
-	$var{'form.header'} .= WebGUI::Form::hidden($self->session, {name=>"proceed", value=>"showConfirmation"});
-	if ($self->session->form->process("title") || $self->session->form->process("content") || $self->session->form->process("synopsis")) {
-		$var{'preview.title'} = WebGUI::HTML::filter($self->session->form->process("title"),"all");
-		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContent($self->session->form->process("synopsis","textarea"), $self->session->form->process("content","HTMLArea"));
-		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$self->session->form->process("contentType"));
+    
+    $var{'archive.form'} = WebGUI::Form::yesNo($session, {
+        name=>"archive"
+    });
+	$var{'form.header'} .= WebGUI::Form::hidden($session, {
+        name=>"proceed", 
+        value=>"showConfirmation"
+    });
+	
+    if ($form->process("title") || $form->process("content") || $form->process("synopsis")) {
+		$var{'preview.title'} = WebGUI::HTML::filter($form->process("title"),"all");
+		($var{'preview.synopsis'}, $var{'preview.content'}) = $self->getSynopsisAndContent($form->process("synopsis","textarea"), $form->process("content","HTMLArea"));
+		$var{'preview.content'} = $self->formatContent($var{'preview.content'},$form->process("contentType"));
 		for my $i (1..5) {	
-			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($self->session->form->process('userDefined'.$i),"macros");
+			$var{'preview.userDefined'.$i} = WebGUI::HTML::filter($form->process('userDefined'.$i),"macros");
 		}
 	}
-	$var{'form.footer'} = WebGUI::Form::formFooter($self->session,);
-	$var{usePreview} = $self->getThread->getParent->get("usePreview");
+	$var{'form.footer'     } = WebGUI::Form::formFooter($session);
+	$var{'usePreview'      } = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
-	$var{'user.isVisitor'} = ($self->session->user->userId eq '1');
-	$var{'visitorName.form'} = WebGUI::Form::text($self->session, {
+	$var{'user.isVisitor'  } = ($user->userId eq '1');
+	$var{'visitorName.form'} = WebGUI::Form::text($session, {
 		name => "visitorName",
-		value => $self->session->form->process('visitorName') || $self->getValue("visitorName")
-		});
+		value => $form->process('visitorName') || $self->getValue("visitorName")
+    });
+    
 	for my $x (1..5) {
 		my $userDefinedValue 
-            = $self->session->form->process("userDefined".$x) 
+            = $form->process("userDefined".$x) 
             || $self->getValue("userDefined".$x)
             ;
 		$var{'userDefined'.$x}  = $userDefinedValue;
         $var{'userDefined'.$x.'.form'} 
-            = WebGUI::Form::text($self->session, {
+            = WebGUI::Form::text($session, {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
 		$var{'userDefined'.$x.'.form.yesNo'} 
-            = WebGUI::Form::yesNo($self->session, {
+            = WebGUI::Form::yesNo($session, {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
 		$var{'userDefined'.$x.'.form.textarea'} 
-            = WebGUI::Form::textarea($self->session, {
+            = WebGUI::Form::textarea($session, {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
 		$var{'userDefined'.$x.'.form.htmlarea'} 
-            = WebGUI::Form::HTMLArea($self->session, {
+            = WebGUI::Form::HTMLArea($session, {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
 		$var{'userDefined'.$x.'.form.float'} 
-            = WebGUI::Form::Float($self->session, {
+            = WebGUI::Form::Float($session, {
 			    name    => "userDefined".$x,
 			    value   => $userDefinedValue,
 			});
 	}
 
-	$title = WebGUI::HTML::filter($title,"all");
-	$content = WebGUI::HTML::filter($content,"macros");
+	$title    = WebGUI::HTML::filter($title,"all");
+	$content  = WebGUI::HTML::filter($content,"macros");
 	$synopsis = WebGUI::HTML::filter($synopsis,"all");
 
-	$var{'title.form'} = WebGUI::Form::text($self->session, {
-		name=>"title",
-		value=>$title
-		});
-	$var{'title.form.textarea'} = WebGUI::Form::textarea($self->session, {
-		name=>"title",
-		value=>$title
-		});
-	$var{'synopsis.form'} = WebGUI::Form::textarea($self->session, {
-		name=>"synopsis",
-		value=>$synopsis,
-		});
-	$var{'content.form'} = WebGUI::Form::HTMLArea($self->session, {
-		name=>"content",
-		value=>$content,
-		richEditId=>$self->getThread->getParent->get("richEditor")
-		});
-	$var{'form.submit'} = WebGUI::Form::submit($self->session, {
-		extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
-		});
-	$var{'karmaScale.form'} = WebGUI::Form::integer($self->session, {
-		name=>"karmaScale",
-		defaultValue=>$self->getThread->getParent->get("defaultKarmaScale"),
-		value=>$self->getValue("karmaScale"),
-		});
-	$var{karmaIsEnabled} = $self->session->setting->get("useKarma");
-	$var{'form.preview'} = WebGUI::Form::submit($self->session, {
-		value=>$i18n->get("preview","Asset_Collaboration")
-		});
+	$var{'title.form'         } = WebGUI::Form::text($session, {
+        name=>"title",
+        value=>$title
+    });
+	$var{'title.form.textarea'} = WebGUI::Form::textarea($session, {
+        name=>"title",
+        value=>$title
+    });
+	$var{'synopsis.form'} = WebGUI::Form::textarea($session, {
+        name=>"synopsis",
+        value=>$synopsis,
+    });
+	$var{'content.form'} = WebGUI::Form::HTMLArea($session, {
+        name=>"content",
+        value=>$content,
+        richEditId=>$self->getThread->getParent->get("richEditor")
+    });
+	$var{'form.submit'} = WebGUI::Form::submit($session, {
+        extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave'; this.form.submit();return false;\""
+	});
+	$var{'karmaScale.form'} = WebGUI::Form::integer($session, {
+        name=>"karmaScale",
+        defaultValue=>$self->getThread->getParent->get("defaultKarmaScale"),
+        value=>$self->getValue("karmaScale"),
+    });
+	$var{karmaIsEnabled} = $session->setting->get("useKarma");
+	$var{'form.preview'} = WebGUI::Form::submit($session, {
+        value=>$i18n->get("preview","Asset_Collaboration")
+    });
 	my $numberOfAttachments = $self->getThread->getParent->getValue("attachmentsPerPost");
-	$var{'attachment.form'} = WebGUI::Form::image($self->session, {
-		name=>"storageId",
-		value=>$self->get("storageId"),
-		maxAttachments=>$numberOfAttachments,
-		deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
-		}) if ($numberOfAttachments);
-    $var{'contentType.form'} = WebGUI::Form::contentType($self->session, {
+	$var{'attachment.form'} = WebGUI::Form::image($session, {
+        name=>"storageId",
+        value=>$self->get("storageId"),
+        maxAttachments=>$numberOfAttachments,
+        deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
+    }) if ($numberOfAttachments);
+    
+    $var{'contentType.form'} = WebGUI::Form::contentType($session, {
         name=>'contentType',
         value=>$self->getValue("contentType") || "mixed",
     });
-    if ($self->session->setting->get("metaDataEnabled")
+    if ($session->setting->get("metaDataEnabled")
      && $self->getThread->getParent->get('enablePostMetaData')) {
         my $meta = $self->getMetaDataFields();
-        my $formGen = $self->session->form;
+        my $formGen = $form;
         my @meta_loop = ();
         foreach my $field (keys %{ $meta }) {
             my $fieldType = $meta->{$field}{fieldType} || "Text";
@@ -1279,14 +1328,14 @@ sub www_edit {
             if($fieldType eq "selectList") {
                 $options = {"", $i18n->get("Select", "Asset")};
             }
-            my $form = WebGUI::Form::DynamicField->new($self->session,
-                                                name=>"metadata_".$meta->{$field}{fieldId},
-                                                uiLevel=>5,
-                                                value=>$meta->{$field}{value},
-                                                extras=>qq/title="$meta->{$field}{description}"/,
-                                                possibleValues=>$meta->{$field}{possibleValues},
-                                                options=>$options,
-                                                fieldType=>$fieldType,
+            my $form = WebGUI::Form::DynamicField->new($session,
+                name=>"metadata_".$meta->{$field}{fieldId},
+                uiLevel=>5,
+                value=>$meta->{$field}{value},
+                extras=>qq/title="$meta->{$field}{description}"/,
+                possibleValues=>$meta->{$field}{possibleValues},
+                options=>$options,
+                fieldType=>$fieldType,
             )->toHtml;
             push @meta_loop, {
                 field => $form,
@@ -1316,6 +1365,14 @@ sub www_editSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $assetId = $self->session->form->param("assetId");
+    
+    if($assetId eq "new" && $self->getThread->getParent->getValue("useCaptcha")) {
+        my $captcha = $self->session->form->process("captcha","Captcha");
+        unless ($captcha) {
+            return $self->www_edit;
+        }
+    }
 	if ($self->session->config("maximumAssets")) {
 		my ($count) = $self->session->db->quickArray("select count(*) from asset");
 		my $i18n = WebGUI::International->new($self->session, "Asset");
