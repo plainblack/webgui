@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'edit sqlform',
 		body => 'sqlform description',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
                         {

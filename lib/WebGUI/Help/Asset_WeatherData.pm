@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'weather data add/edit title',
 		body => 'weather data add/edit body',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
 			{
@@ -31,10 +27,6 @@ our $HELP = {
 			{
 				tag => 'weatherdata template',
 				namespace => 'Asset_WeatherData'
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
 			},
 		],
 	},

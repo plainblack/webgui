@@ -4,7 +4,7 @@ our $HELP = {
 
 	'template variables' => {
 		title => 'template variable title',
-		body => 'template variable body',
+		body => '',
 		fields => [
 		],
 		variables => [

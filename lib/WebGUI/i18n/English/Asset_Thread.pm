@@ -230,13 +230,6 @@ also contains a set of its own Post Template variables.|,
 		lastUpdated => 1149633755,
 	},
 
-	'thread template body' => {
-		message => q|<p>The variables below are available in the Thread template.  In addition, all variables from the Post Template can be used.  Labels for URLs for actions like <b>unlock.url</b>, <b>stick.url</b>, etc. are provided by the Collaboration Labels.  The Pagination Template variables are also available to display multiple pages of posts and threads.
-</p>
-|,
-		lastUpdated => 1149633782,
-	},
-
         'assetName' => {
                 message => q|Thread|,
                 context => q|label for Asset Manager, getName|,
@@ -282,12 +275,6 @@ also contains a set of its own Post Template variables.|,
 		message => q|Thread Asset Template Variables|,
                 lastUpdated => 1166848379,
         },
-
-	'thread asset template body' => {
-		message => q|<p>The variables below are available in the Thread template. Most of them are internal variable that are not overly useful.</p>
-|,
-		lastUpdated => 1166848381,
-	},
 
 };
 

@@ -431,10 +431,6 @@ our $HELP = {
 				tag => 'metadata edit property',
 				namespace => 'Asset'
 			},
-			{
-				tag => 'wobject add/edit',
-				namespace => 'Asset_Wobject',
-			},
 		],
 	},
 
@@ -467,10 +463,6 @@ our $HELP = {
             {
                 tag => 'metadata manage',
                 namespace => 'Asset'
-            },
-            {
-                tag => 'wobject add/edit',
-                namespace => 'Asset_Wobject',
             },
         ],
     },

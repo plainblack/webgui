@@ -5,10 +5,6 @@ our $HELP = {
 		title => '3',
 		body => '4',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit'
-			},
 		],
 		fields => [
                         {
@@ -81,10 +77,6 @@ our $HELP = {
 			{
 				tag => 'asset fields',
 				namespace => 'Asset'
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
 			},
 			{
 				tag => 'question add/edit',

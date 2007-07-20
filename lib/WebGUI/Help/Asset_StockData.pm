@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'help_add_edit_stocklist_title',
 		body => 'help_add_edit_stocklist_body',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit',
-			},
 		],
 		fields => [
 			{
@@ -49,10 +45,6 @@ our $HELP = {
 			{
 				tag => 'stock list display template',
 				namespace => 'Asset_StockData',
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject',
 			},
 		],
 	},

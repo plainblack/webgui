@@ -5,10 +5,6 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit',
-			},
 		],
 		fields => [
                         {
@@ -27,10 +23,6 @@ our $HELP = {
 			{
 				tag => 'message board template',
 				namespace => 'Asset_MessageBoard',
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject',
 			},
 		],
 	},

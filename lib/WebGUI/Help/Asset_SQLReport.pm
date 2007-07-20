@@ -5,10 +5,6 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
                         { #templateId
@@ -56,10 +52,6 @@ our $HELP = {
 			{
 				tag => 'sql report template',
 				namespace => 'Asset_SQLReport'
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
 			},
 		]
 	},

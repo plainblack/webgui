@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'dashboard add/edit title',
 		body => 'dashboard add/edit body',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
                         {

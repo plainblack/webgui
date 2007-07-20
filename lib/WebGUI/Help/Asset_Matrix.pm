@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'add/edit help title',
 		body => 'add/edit help body',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
                         {

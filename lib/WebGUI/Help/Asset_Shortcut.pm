@@ -35,10 +35,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
-			},
 		]
 	},
 

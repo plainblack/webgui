@@ -37,35 +37,13 @@ our $I18N = {
 		lastUpdated => 1148750705,
 	},
 
-	'828' => {
-		message => q|<p>Most wobjects have templates that allow you to change the layout of the wobject's user interface. Those wobjects that do have templates all have a common set of template variables that you can use for layout, as well as their own custom variables. The following is a list of the common template variables shared among all wobjects.</p>
-|,
-		lastUpdated => 1148750840,
-                   },
           '1079' => {
                       lastUpdated => 1073152790,
                       message => q|Printable Style|
                     },
           '827' => {
+                     message => q|Wobject Template Variables|,
                      lastUpdated => 1052046436,
-                     message => q|Wobject Template|
-                   },
-
-          '632' => {
-                     lastUpdated => 1119410914,
-                     message => q|<p>You can add wobjects by selecting from the <i>^International("1","WebGUI");</i> pulldown menu. You can edit them by clicking on the "Edit" button that appears directly above an instance of a particular wobject while in Admin mode.</p>
-<p>Wobjects are Assets, so they have all of the properties that Assets do.  Additionally, most Wobjects share some basic properties. Those properties are:</p>|
-                   },
-
-          '626' => {
-                     lastUpdated => 1146852133,
-                     message => q|<p>Wobjects are the true power of WebGUI. Wobjects are tiny pluggable applications built to run under WebGUI. Articles, message boards and polls are examples of wobjects.
-Wobjects can be standalone pages all by themselves, or can be individual parts of pages.
-</p>
-
-<p>To add a wobject to a page, first go to that page, then select <b>Add Content...</b> from the upper left corner of your screen. Each wobject has it's own help so be sure to read the help if you're not sure how to use it.
-</p>
-|
                    },
 
         '174 description' => {
@@ -94,10 +72,6 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                     lastUpdated => 1031514049,
                     message => q|Please Confirm|
                   },
-          '677' => {
-                     lastUpdated => 1047858650,
-                     message => q|Wobject, Add/Edit|
-                   },
           '174' => {
                      lastUpdated => 1031514049,
                      message => q|Display the title?|
@@ -114,29 +88,9 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
                     lastUpdated => 1031514049,
                     message => q|Description|
                   },
-          '664' => {
-                     lastUpdated => 1031514049,
-                     message => q|Wobject, Delete|
-                   },
-          '619' => {
-                     lastUpdated => 1146852148,
-                     message => q|<p>This function permanently deletes the selected wobject from a page. If you are unsure whether you wish to delete this content you may be better served to cut the content to the clipboard until you are certain you wish to delete it.
-</p>
-
-<p>As with any delete operation, you are prompted to be sure you wish to proceed with the delete. If you answer yes, the delete will proceed and there is no recovery possible. If you answer no you'll be returned to the prior screen.
-</p>
-
-|
-                   },
-
 	'45' => {
 		lastUpdated => 1031514049,
 		message => q|No, I made a mistake.|
-	},
-
-	'671' => {
-		lastUpdated => 1047858549,
-		message => q|Wobjects, Using|
 	},
 
 	'assetName' => {
@@ -159,14 +113,6 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
 		message => q|Wobject Template Asset Variables|,
 		lastUpdated => 1167374430,
 	},
-
-	'wobject template variables body' => {
-		message => q|<p>These template variables are common to almost every Wobject and include all the template variables common to Assets.  Many of them are internal asset properties that govern behavior and may not be very useful for templates.  One example of this would be the ID of templates used to display the Asset.  Depending on whether or not the user filled out the fields, they may or may not be blank.</p>
-|,
-		lastUpdated => 1167374417,
-	},
-
-
 
 };
 

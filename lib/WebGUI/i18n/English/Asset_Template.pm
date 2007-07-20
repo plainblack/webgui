@@ -135,27 +135,6 @@ Any scratch variables will be available in the template with this syntax:<br/>
 		lastUpdated => 1165343240,
 	},
 
-	'template variable body' => {
-		message => q|
-<p>Each template has access two kinds of variables.  The first kind is specific to the kind,
-or namespace, of the template.  Article templates have different variables from Poll templates.
-Even inside of an Asset there can be several kinds of template, each with its own set of
-template variables.  The Collaboration System alone uses 5 templates to style user notification,
-editing posts, displaying threads and other tasks.</p>
-<p>The second kind of variables are available in every template, regardless of its type
-or what namespace it lives in.  These common variables are listed below.</p>
-<p><i>NOTES:</i><br />
-<ul>
-<li>The syntax for these variables is shown in WebGUI's default template language, HTML::Template.  If the Template Type
-has been set to some other language you will need to consult that template's documentation for the appropriate syntax for its variables.</li>
-<li>The session variables are deprecated.</li>
-</ul>
-</p>.
-
-		|,
-		lastUpdated => 1169243386,
-	},
-
 	'site name' => {
 		message => q|Site Name|,
 		lastUpdated => 1146244474,

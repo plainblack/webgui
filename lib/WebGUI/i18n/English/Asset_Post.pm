@@ -208,13 +208,6 @@ Defaults to mixed.|,
 		lastUpdated => 1149829706,
 	},
 
-	'add/edit post template body' => {
-		message => q|<p>In addition to the common Post Template variables, the Add/Edit Post Template has these variables:
-</p>
-|,
-		lastUpdated => 1149829733,
-	},
-
 	'post template variables title' => {
 		message => q|Post Template Variables|,
                 lastUpdated => 1111253044,
@@ -507,24 +500,10 @@ editing an existing Post, and a thread containing the Post exists.|,
 		lastUpdated => 1150167057,
 	},
 
-	'post template variables body' => {
-		message => q|<p>The following variables are available in all Post templates and
-templates in the Collaboration System.</p>
-|,
-		lastUpdated => 1164424949,
-	},
-
 	'post asset variables title' => {
 		message => q|Post Asset Template Variables|,
                 lastUpdated => 1164425086,
         },
-
-	'post asset variables body' => {
-		message => q|<p>The following variables are used in many Post and Collaboration System templates.  They
-		pull their data directly from the Post Asset's properties.</p>
-|,
-		lastUpdated => 1164425047,
-	},
 
 	'post received' => {
 		message => q|Your post has been received and is being processed so it can be added to the site. Please be patient.|,

@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'timetracking add/edit title',
 		body => 'timetracking add/edit body',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit'
-			},
 		],
 		fields => [
                         {

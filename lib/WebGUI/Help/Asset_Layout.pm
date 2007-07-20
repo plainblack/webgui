@@ -24,10 +24,6 @@ our $HELP = {
 				namespace => 'Asset'
 			},
 			{
-				tag => 'wobject add/edit',
-				namespace => 'Asset_Wobject'
-			},
-			{
 				tag => 'layout template',
 				namespace => 'Asset_Layout'
 			},

@@ -3,7 +3,7 @@ package WebGUI::Help::Asset_Post;
 our $HELP = {
 	'post add/edit template' => { ##Asset/Post/www_edit
 		title => 'add/edit post template title',
-		body => 'add/edit post template body',
+		body => '',
 		isa => [
 			{
 				tag => 'collaboration template labels',
@@ -163,7 +163,7 @@ our $HELP = {
 
 	'post template variables' => { ##Asset/Post/getTemplateVars
 		title => 'post template variables title',
-		body => 'post template variables body',
+		body => '',
 		isa => [
 			{
 				tag => 'post asset variables',
@@ -292,7 +292,7 @@ our $HELP = {
 	'post asset variables' => {
 		private => 1,
 		title => 'post asset variables title',
-		body => 'post asset variables body',
+		body => '',
 		isa => [
 			{
 				tag => 'asset template asset variables',

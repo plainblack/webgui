@@ -5,10 +5,6 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit',
-			},
 		],
 		fields => [
                         {
@@ -62,10 +58,6 @@ our $HELP = {
 				tag => 'poll template',
 				namespace => 'Asset_Poll',
 			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject',
-			}
 		]
 	},
 

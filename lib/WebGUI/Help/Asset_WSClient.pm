@@ -5,10 +5,6 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit"
-			},
 		],
 		fields => [
                         {
@@ -87,10 +83,6 @@ our $HELP = {
 				tag => 'ws client template',
 				namespace => 'Asset_WSClient'
 			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
-			}
 		]
 	},
 

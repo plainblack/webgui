@@ -6,10 +6,6 @@ our $HELP = {
 		title => 'folder add/edit title',
 		body => 'folder add/edit body',
 		isa => [
-			{
-				namespace => "Asset_Wobject",
-				tag => "wobject add/edit",
-			},
 		],
 		fields => [
                         {

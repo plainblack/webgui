@@ -5,10 +5,6 @@ our $HELP = {
 		title => '18',
 		body => '19',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit',
-			},
 		],
 		fields => [
                         {
@@ -50,10 +46,6 @@ our $HELP = {
 			{
 				tag => 'in out board report template',
 				namespace => 'Asset_InOutBoard',
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject',
 			},
 		],
 	},

@@ -5,10 +5,6 @@ our $HELP = {
 		title => 'multisearch add/edit title',
 		body => 'multisearch add/edit body',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit',
-			},
 		],
 		fields => [
                         {

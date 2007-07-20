@@ -3,7 +3,7 @@ package WebGUI::Help::Asset_Thread;
 our $HELP = {
 	'thread template variables' => {
 		title => 'thread template title',
-		body => 'thread template body',
+		body => '',
 		isa => [
 			{
 				tag => 'template variables',
@@ -169,7 +169,7 @@ our $HELP = {
 	'thread asset template variables' => {
 		private => 1,
 		title => 'thread asset template title',
-		body => 'thread asset template body',
+		body => '',
 		isa => [
 			{
 				tag => 'post asset variables',

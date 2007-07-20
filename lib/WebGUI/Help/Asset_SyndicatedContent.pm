@@ -5,10 +5,6 @@ our $HELP = {
 		title => '61',
 		body => '71',
 		isa => [
-			{
-				namespace => 'Asset_Wobject',
-				tag => 'wobject add/edit'
-			},
 		],
 		fields => [
                         {
@@ -47,10 +43,6 @@ our $HELP = {
 			{
 				tag => 'syndicated content template',
 				namespace => 'Asset_SyndicatedContent'
-			},
-			{
-				tag => 'wobjects using',
-				namespace => 'Asset_Wobject'
 			},
 		],
 	},
