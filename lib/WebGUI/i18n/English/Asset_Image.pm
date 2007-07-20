@@ -76,22 +76,6 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
-	'resize image title' => {
-		message => q|Image, Resize|,
-		context => q|Title for help entry|,
-		lastUpdated => 1130532366,
-	},
-
-	'resize image body' => {
-		message => q|<p>This allows you to grow, shrink or stretch images inside of WebGUI. Simply enter
-		the new width and height in the form, press Submit and the image will be changed on the server.</p>
-		<p>There is no undo or versioning for this task.  You may wish to download a copy of the image
-		in case you make a mistake.</p>
-		<p>If you know the new width or height, and do not want to calculate the other dimension, just enter 0
-		in that field and WebGUI will calculate it for you.</p>|,
-		lastUpdated => 1130531896,
-	},
-
 	'new width' => {
 		message => q|New Width|,
 		context => q|label to resize the image|,

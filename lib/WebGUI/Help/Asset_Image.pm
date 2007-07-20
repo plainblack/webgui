@@ -65,30 +65,6 @@ our $HELP = {
 		]
 	},
 
-        'image resize' => {
-		title => 'resize image title',
-		body => 'resize image body',
-		fields => [
-                        {
-                                title => 'image size',
-                                description => 'image size description',
-                                namespace => 'Asset_Image',
-                        },
-                        {
-                                title => 'new width',
-                                description => 'new width description',
-                                namespace => 'Asset_Image',
-                        },
-                        {
-                                title => 'new height',
-                                description => 'new height description',
-                                namespace => 'Asset_Image',
-                        },
-		],
-		related => [
-		]
-	},
-
 };
 
 1;
