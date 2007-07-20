@@ -315,10 +315,6 @@ our $HELP = {
 		],
 		related => [
 			{
-				tag => 'asset fields',
-				namespace => 'Asset'
-			},
-			{
 				tag => 'post template variables',
 				namespace => 'Asset_Post'
 			},

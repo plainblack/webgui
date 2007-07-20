@@ -21,19 +21,6 @@ our $I18N = {
 		lastUpdated => 1033575504
 	},
 
-	'71' => {
-		message => q|<p>A Web Services Client allows a user to query data from any SOAP server to which they have access.  This wobject is in development status and should not be made accessible to untrusted site administrators.</p>
-
-<p>A few tricks...</p>
-<div>
-<ul>
-<li>If you want to process a SOAP call (for example, one that sets or updates a value on the remote SOAP server) but then redirect to a completely different page, add a form input parameter <code>redirectURL</code>.  The value of redirectURL can be any valid URI understood by a web browser.</li>
-<li>To trigger a SOAP wobject that has "Execute by default?" turned off, pass a form input param of targetWobjects=<i>call</i> where call is the SOAP method.</li>
-<li>To completely ignore a SOAP wobject, including any possible cached returns, pass a form input param of disableWobjects=<i>call</i> where call is the SOAP method.</li></ul></div>
-|,
-		lastUpdated => 1146800732,
-	},
-
         '72 description' => {
                 message => q|Select a template to display the output of the Web Service Client Asset.|,
                 lastUpdated => 1119981444,
@@ -176,11 +163,6 @@ property allows you to override the default MIME type for this page.|,
 		lastUpdated => 1033575504
 	},
 
-	'61' => {
-		message => q|Web Services Client, Add/Edit|,
-		lastUpdated => 1033575504
-	},
-
 	'9' => {
 		message => q|Debug?|,
 		lastUpdated => 1033575504
@@ -232,12 +214,6 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 	'numResults' => {
 		message => q|Number of rows found by the client, if an array was returned.|,
 		lastUpdated => 1149568071,
-	},
-
-	'73' => {
-		message => q|<p>This is the list of template variables available for Web Services Client templates.</p>
-|,
-		lastUpdated => 1149568096
 	},
 
 	'24' => {
@@ -338,13 +314,6 @@ names set for them by the SOAP server (i.e. perhaps "localTime" for a time query
 	'ws client asset template variables title' => {
 		message => q|Web Services Client Asset Template Variables|,
 		lastUpdated => 1164841146
-	},
-
-	'ws client asset template variables body' => {
-		message => q|Every asset provides a set of variables to most of its
-templates based on the internal asset properties.  Some of these variables may
-be useful, others may not.|,
-		lastUpdated => 1164841201
 	},
 
 };

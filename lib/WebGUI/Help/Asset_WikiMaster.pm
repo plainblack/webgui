@@ -1,110 +1,9 @@
 package WebGUI::Help::Asset_WikiMaster;
 
 our $HELP = {
-	'wiki master add/edit' => {
-		title => 'add/edit title',
-		body => 'add/edit body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'groupToEditPages label',
-                                description => 'groupToEditPages hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'groupToAdminister label',
-                                description => 'groupToAdminister hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'richEditor label',
-                                description => 'richEditor hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'frontPageTemplateId label',
-                                description => 'frontPageTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'pageTemplateId label',
-                                description => 'pageTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'pageHistoryTemplateId label',
-                                description => 'pageHistoryTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'mostPopularTemplateId label',
-                                description => 'mostPopularTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'recentChangesTemplateId label',
-                                description => 'recentChangesTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'searchTemplateId label',
-                                description => 'searchTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'pageEditTemplateId label',
-                                description => 'pageEditTemplateId hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'recentChangesCount label',
-                                description => 'recentChangesCount hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'recentChangesCountFront label',
-                                description => 'recentChangesCountFront hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'mostPopularCountFront label',
-                                description => 'mostPopularCountFront hoverHelp',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'approval workflow',
-                                description => 'approval workflow description',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'thumbnail size',
-                                description => 'thumbnail size help',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'max image size',
-                                description => 'max image size help',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'content filter',
-                                description => 'content filter description',
-                                namespace => 'Asset_WikiMaster',
-                        },
-                        {
-                                title => 'filter code',
-                                description => 'filter code description',
-                                namespace => 'Asset_WikiMaster',
-                        },
-		],
-		related => [
-		],
-	},
-
 	'wiki master search box variables' => {
 		title => 'search box variables title',
-		body => 'search box variables body',
+		body => '',
 		isa => [
 		],
 		variables => [
@@ -129,7 +28,7 @@ our $HELP = {
 
 	'wiki master recent changes variables' => {
 		title => 'recent changes variables title',
-		body => 'recent changes variables body',
+		body => '',
 		isa => [
 		],
 		variables => [
@@ -182,7 +81,7 @@ our $HELP = {
 
 	'wiki master most popular variables' => {
 		title => 'most popular variables title',
-		body => 'most popular variables body',
+		body => '',
 		isa => [
 		],
 		variables => [
@@ -208,7 +107,7 @@ our $HELP = {
 
 	'front page template' => {
 		title => 'front page template title',
-		body => 'front page template body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_WikiMaster",
@@ -260,7 +159,7 @@ our $HELP = {
 	'wiki master asset variables' => {
 		private => 1,
 		title => 'wiki master asset variables title',
-		body => 'wiki master asset variables body',
+		body => '',
 		isa => [
 			{
 				namespace => "Asset_Wobject",

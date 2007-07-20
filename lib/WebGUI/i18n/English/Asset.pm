@@ -66,11 +66,6 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'change url body' => {
-		message => q|<p>Suppose that you want to put a new Asset in the place of an old Asset, but to use the old Asset's URL for the new Asset.  Normally, to do this you would have to change the URL in the latest revision of the Asset and then purge each and every revision of the old Asset (since the old revisions of the old Asset have the same URL).  Change URL allows you to do this easily.  Enter in the new URL for the old Asset, and it will perform all the work for you.</p>|,
-		lastUpdated => 0,
-	},
-
 	'ago' => {
 		message => q|ago|,
 		lastUpdated => 0,
@@ -305,13 +300,6 @@ our $I18N = {
 		context => q|Used in asset context menus.|
 	},
 
-	'edit branch body' => {
-		message => q|<p>Edit Branch allows you to make changes to entire trees of Assets.  You can change who can view Assets, who can edit Assets or you can change the templates or other display features such as SSL or whether to hide the Asset from navigations.  The form will not give you editing privileges for Assets that you don't have.</p>
-<p>Each field has a Yes/No button to confirm that you want to change it recursively.  Simply edit the fields that you want to change and select Yes from its change confirmation, and then hit save when you're all done.</p>|,
-		lastUpdated => 0,
-		context => q|Used in edit branch help.|
-	},
-
 	'edit' => {
 		message => q|Edit|,
 		lastUpdated => 0,
@@ -362,12 +350,6 @@ our $I18N = {
 		message => q|Asset ID|,
 		lastUpdated => 1099344172,
 	},
-
-        'asset fields body' => {
-                message => q|<p>These are the base properties that all Assets share:</p>|,
-                context => q|Describing the form to add or edit an Asset.|,
-                lastUpdated => 1127426220,
-        },
 
         'asset id description' => {
                 message => q|<p>This is the unique identifier WebGUI uses to keep track of this Asset instance. Normal users should never need to be concerned with the Asset ID, but some advanced users may need to know it for things like SQL Reports. The Asset ID is not editable.</p>|,
@@ -452,30 +434,10 @@ throughout the site.  Check yes if you want this Asset to be available as a pack
                 lastUpdated => 1127413710,
         },
 
-        'prototype using body' => {
-                message => q|<p>Chances are if you like assets to be configured a certain way, then you'll find Prototypes useful. By setting an Asset as a Prototype you can create new items in your New Content menu configured exactly as you like. For instance, if you use the Collaboration System as a photo gallery, then create a photo gallery and mark it as a Prototype. From then on you can just "Add content > New Content > Photo Gallery".</p>
-<p>The title of the Asset is used as the name of the Content Prototype in the New Content menu. If you set the title of your prototype to be the same as the name of an Asset (Article, DataForm, etc.) then it will replace the WebGUI default Asset in the menu. When a content Prototype is added to an existing page layout, note that it will pick up the permissions and style information from the page where it is added. This will override the prototype settings, and may cause some changes in appearance.</p>
-|,
-                lastUpdated => 1170178159,
-        },
-
-	'asset fields title' => {
-	    message => q|Asset, Common Fields|,
-	    lastUpdated => 1113357557,
-	},
-
 	'controls' => {
 		message => q|These are the icons and URLs that allow editing, cutting, copying, deleting and reordering the Asset.|,
 		lastUpdated => 1148840768,
 	},
-
-        'asset template body' => {
-                message => q|
-<p>This variable is inserted into every template:</p>
-
-        |,
-        lastUpdated => 1113357523,
-  },
 
 	'asset template title' => {
 	    message => q|Asset Template Variables|,
@@ -584,65 +546,6 @@ as mouseover text in the asset properties tab.</p>|,
                 message => q|<p>This field is used only for the Radio List and Select List data types. Enter
 the values you wish to appear, one per line.</p>|,
                 lastUpdated => 1129329870,
-        },
-
-
-	'metadata edit property body' => {
-		message => q|
-<p>You may add as many Metadata properties to a Wobject as you like.</p>
-|,
-		lastUpdated => 1129330051
-	},
-
-        'metadata manage body' => {
-                message => q|
-<p>The content profiling system in WebGUI (also known as the metadata system) allows you to identify content. Metadata is
-information about the content, and is defined in terms of property-value pairs.</p>
-<p>Examples of metadata:</p>
-<ul>
-  <li>contenttype: sport</li>
-  <li>adult content: no</li>
-  <li>source: newspaper</li>
-</ul>
-<p>In the example <b>source: newspaper</b>, this metadata has a <i>property</i> named
-<i>source</i> with a <i>value</i> of <i>newspaper</i>.</p>
-<p>Metadata properties are defined globally, while Metadata values are set for
-each asset under the tab &quot;Meta&quot; in the asset properties.</p>
-<p>Before you can use metadata in WebGUI, you have to enable metadata in the WebGUI Settings (Content tab)</p>
-<p>Usage of metadata:</p>
-<ul>
-  <li><p><b>Passive Profiling</b><br />
-    When passive profiling is switched on, every wobject viewed by a user will
-    be logged.  The WebGUI scheduler summarizes the profiling information on a regular
-    basis.
-    This is basically content
-    ranking based upon the user's Areas of Interest (AOI).<br />
-    By default the summarizer runs once a day. However you can change that by
-    setting: <b>passiveProfileInterval = &lt;number of seconds&gt;</b> in the
-    WebGUI config file.</p>
-  </li>
-  <li><p><b>Areas of Interest Ranking</b><br />
-    Metadata in combination with passive profiling produces AOI (<b>Areas of
-    Interest</b>) information. You can retrieve the value of a metadata property
-    with the &#94;AOIRank(); and &#94;AOIHits(); macros.</p>
-  </li>
-  <li><p><b>Show content based upon criteria</b><br />
-    The Wobject Proxy allows you to select content based upon criteria like:</p>
-    <div class="helpIndent">
-    contenttype = sport AND source != newspaper
-    </div>
-    <p>You can use the AOI macro's described above in the criteria, so you can
-    present content based upon the user's Areas of Interest. Example:<br />
-    type = &#94;AOIRank(contenttype);</p></li>
-   <li><p><b>Display</b><br />
-    Metadata fields are exposed to the asset templates as their property name. So you can actually display the metadata
-    to the rendered page using a template variable like &lt;tmpl_var <i>propertyname</i>&gt;</p></li>
-   <li><p><b>Meta tags</b><br />
-    Since the meta data is exposed as template variables, you can use them in the Head Block of Style templates
-    to create meta tags from meta data, including the tags from the Dublin Core standard.</p></li>
-</ul>|,
-                context => q|Metadata help|,
-                lastUpdated => 1165450008
         },
 
 	'metadata edit property' => {
@@ -825,11 +728,6 @@ each asset under the tab &quot;Meta&quot; in the asset properties.</p>
 		 message => q|Asset, List of Available|
 	       },
 
-	'asset list body' => {
-		 lastUpdated => 1112291919,
-		 message => q|<p>These Assets are available for use at your site:</p>|
-	       },
-
 	'directory index' => {
 		 lastUpdated => 1118896675,
 		 message => q|Directory Index|,
@@ -866,15 +764,6 @@ config file.</p>|,
                 message => q|Page, Export|,
                 lastUpdated => 1089039511,
                 context => q|Help title for Page Export operation|
-        },
-	'Page Export body' => {
-                message => q|
-<p>The Export Page function allows you to export WebGUI pages to static
-HTML files on disk.  The &quot;exportPath&quot; variable in the WebGUI
-config file must be enabled for this function to be available.</p>
-				|,
-                lastUpdated => 1121361734,
-                context => q|Help body for Page Export operation|
         },
 
 	'exporting page' => {
@@ -917,23 +806,6 @@ Couldn't open %-s because %-s <br />
 		message => q|Committed Versions|,
 		lastUpdated => 0,
 		context => q|Admin console label for manage versions.|
-	},
-
-	'manage versions body' => {
-		message => q|<p>This screen displays a list of all committed versions for the current Asset, showing the date it was committed or opened, who owns the tag for that version, and the name of the version tag.  Icons will allow you purge a revision and remove it from the system or to view that particular version of the  Asset.  The version tag name in the list is a link that will take you to the Manage Revisions in Tag screen.|,
-		lastUpdated => 1165449841,
-	},
-
-	'asset toolbar title' => {
-		message => q|Asset Toolbar|,
-		lastUpdated => 0,
-	},
-
-	'asset toolbar body' => {
-		message => q|<p>When you are viewing an asset in Admin mode, and if you have editing privileges for that asset
-and you have Admin mode turned on, the asset will display a toolbar with icons that allow you
-to edit or modify that asset.</p>|,
-		lastUpdated => 1165448599,
 	},
 
 	'Class Icon' => {
@@ -1078,12 +950,6 @@ to edit or modify that asset.</p>|,
 	    message => q|Asset Template Asset Variables|,
 	    lastUpdated => 1100463645,
 	},
-
-        'asset template asset var body' => {
-                message => q|<p>These template variables are common to almost every asset.  Many of them are internal asset properties that govern behavior and may not be very useful for templates.  One example of this would be the ID of templates used to display the Asset.  Depending on whether or not the user filled out the fields, they may or may not be blank.</p>
-        |,
-        lastUpdated => 1166825198,
-  },
 
 	'title' => {
 		message => q|The title of the Asset|,

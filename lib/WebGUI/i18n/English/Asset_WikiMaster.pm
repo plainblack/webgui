@@ -232,23 +232,8 @@ listing of pages that are related to a specific keyword?| },
  'actionN created' =>
  { lastUpdated => 1160505291, message => q|Created| },
 
-        'add/edit title' => {
-                message => q|Wiki, Add/Edit|,
-                lastUpdated => 1165732630,
-        },
-
-        'add/edit body' => {
-                message => q|<p>The Wiki is very similar to the Collaboration System.  It manages Wiki Pages that are added to it.  These fields are available for configuring and customizing the Wiki.</p>|,
-                lastUpdated => 1165732631,
-        },
-
         'search box variables title' => {
                 message => q|Wiki Master, Search Box Variables|,
-                lastUpdated => 1165790228,
-        },
-
-        'search box variables body' => {
-                message => q|<p>These variables are available in many Wiki templates for creating a search box.</p>|,
                 lastUpdated => 1165790228,
         },
 
@@ -273,13 +258,8 @@ listing of pages that are related to a specific keyword?| },
         },
 
         'recent changes variables title' => {
-                message => q|Wiki Master, Recent Changes Variables|,
-                lastUpdated => 1165790228,
-        },
-
-        'recent changes variables body' => {
-                message => q|<p>These variables are available in many Wiki templates for displaying links to recently changed wiki pages.</p>|,
-                lastUpdated => 1165790228,
+                message => q|Wiki Master, Recent Changes Template Variables|,
+                lastUpdated => 1184969334,
         },
 
         'recentChanges' => {
@@ -329,12 +309,7 @@ listing of pages that are related to a specific keyword?| },
         },
 
         'most popular variables title' => {
-                message => q|Wiki Master, Most Popular Variables|,
-                lastUpdated => 1165790228,
-        },
-
-        'most popular variables body' => {
-                message => q|<p>These variables are available in many Wiki templates for displaying links to the wiki pages that are most popular.</p>|,
+                message => q|Wiki Master, Most Popular Template Variables|,
                 lastUpdated => 1165790228,
         },
 
@@ -354,13 +329,8 @@ listing of pages that are related to a specific keyword?| },
         },
 
         'front page template title' => {
-                message => q|Wiki, Front Page Template|,
-                lastUpdated => 1165790228,
-        },
-
-        'front page template body' => {
-                message => q|<p>This template is main Wiki template, and is what most users will see when they view a Wiki asset.</p>|,
-                lastUpdated => 1165812138,
+                message => q|Wiki, Front Page Template Variables|,
+                lastUpdated => 1184969362,
         },
 
         'description' => {
@@ -400,11 +370,6 @@ listing of pages that are related to a specific keyword?| },
 
         'wiki master asset variables title' => {
                 message => q|Wiki Asset Variables.|,
-                lastUpdated => 1165812138,
-        },
-
-        'wiki master asset variables body' => {
-                message => q|<p>These variables are available in many of the Wiki templates, but many of them may not be overly useful.</p>|,
                 lastUpdated => 1165812138,
         },
 
