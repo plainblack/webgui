@@ -128,11 +128,6 @@ our $I18N = {
 		lastUpdated => 1078208044
 	},
 
-	'1098' => {
-		message => q|Navigation, Add/Edit|,
-		lastUpdated => 1078208044
-	},
-
         '1096 description' => {
                 message => q|Choose a template to use for displaying your navigation|,
                 lastUpdated => 1121969610,
@@ -195,21 +190,6 @@ the Navigation Template to determine who can see them in the menu.</p>
                 message => q|Should the menus the macro creates include pages which the currently logged-in user does not have the privilege to view?|,
                 lastUpdated => 1121969610,
         },
-
-
-	'1093' => {
-		message => q|<p>Navigation Assets will help you build sets of links so that users can get around in your
-site.  You can customize a Navigation form to choose the which pages are shown in
-your site navigation and how to display them.  Some of the default Navigation templates that come with WebGUI are
-vertical, horizontal and crumbtrail.  These templates can often be styled via CSS to match your site's design, instead
-of rewriting the templates.</p>
-<p>The Navigation Asset can also be used to generate XML output by creating a
-template and setting the MIME Type appropriately.  This could be useful for building
-a Google sitemap of your site or RSS feeds.</p>
-|,
-
-		lastUpdated => 1140139614,
-	},
 
 	'1096' => {
 		message => q|Navigation Template|,

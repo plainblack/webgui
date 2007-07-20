@@ -27,16 +27,6 @@ our $I18N = {
 		lastUpdated => 1133619940,
 	},
 
-	'multisearch add/edit title' => {
-		message => q|Add/Edit MultiSearch Wobject|,
-		lastUpdated => 1133619940,
-	},
-
-	'multisearch add/edit body' => {
-		message => q|The MultiSearch wobject is a simple wobject that enables the user to search various search engines.  The results appear in a new window.|,
-		lastUpdated => 1140587496,
-	},
-
 	'multisearch template title' => {
 		message => q|MultiSearch Template Variables|,
 		lastUpdated => 1133619940,

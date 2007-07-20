@@ -72,12 +72,6 @@ our $I18N = {
 		lastUpdated => 1149655462,
 	},
 
-	'74' => {
-		message => q|<p>The following variables are available to the poll template:</p>
-|,
-		lastUpdated => 1149655485,
-	},
-
 	'6' => {
 		message => q|Question|,
 		lastUpdated => 1031514049
@@ -86,12 +80,6 @@ our $I18N = {
 	'11' => {
 		message => q|Vote!|,
 		lastUpdated => 1031514049
-	},
-
-	'71' => {
-		message => q|Polls can be used to get the impressions of your users on various topics.  Polls are Wobjects and Assets so they have the basic properties of both of those.  Polls also have these unique properties:
-|,
-		lastUpdated => 1119412535,
 	},
 
         '3 description' => {
@@ -140,11 +128,6 @@ width is 150 pixels.|,
 	'3' => {
 		message => q|Active|,
 		lastUpdated => 1031514049
-	},
-
-	'61' => {
-		message => q|Poll, Add/Edit|,
-		lastUpdated => 1050183732
 	},
 
 	'7' => {

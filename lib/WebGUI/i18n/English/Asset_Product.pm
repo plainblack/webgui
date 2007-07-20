@@ -241,12 +241,6 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'63' => {
-		message => q|<p>The following is the list of template variables available in product templates.</p>
-|,
-		lastUpdated => 1149655422,
-	},
-
 	'21' => {
 		message => q|Add another related product?|,
 		lastUpdated => 1031514049
@@ -292,11 +286,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'44' => {
-		message => q|Product Accessory, Add/Edit|,
-		lastUpdated => 1031514049
-	},
-
 	'55' => {
 		message => q|Add a benefit.|,
 		lastUpdated => 1031514049
@@ -317,11 +306,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'40' => {
-		message => q|Product Feature, Add/Edit|,
-		lastUpdated => 1031514049
-	},
-
 	'57' => {
 		message => q|Are you certain you wish to delete this template and set all the products using it to the default template?|,
 		lastUpdated => 1031514049
@@ -339,11 +323,6 @@ our $I18N = {
 
 	'59' => {
 		message => q|Name|,
-		lastUpdated => 1031514049
-	},
-
-	'49' => {
-		message => q|Product Benefit, Add/Edit|,
 		lastUpdated => 1031514049
 	},
 
@@ -382,18 +361,8 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'42' => {
-		message => q|Product Specification, Add/Edit|,
-		lastUpdated => 1031514049
-	},
-
 	'22' => {
 		message => q|Edit Feature|,
-		lastUpdated => 1031514049
-	},
-
-	'46' => {
-		message => q|Product (Related), Add/Edit|,
 		lastUpdated => 1031514049
 	},
 
@@ -426,11 +395,6 @@ our $I18N = {
                 message => q|If you'd like to add another benefit right away, select "Yes".|,
                 lastUpdated => 1120337226,
         },
-
-	'50' => {
-		message => q|Benefits are typically the result of the features of your product. They are why your product is so good. If you add benefits, you may also wish to consider adding some features.|,
-		lastUpdated => 1120337252
-	},
 
         '62 description' => {
                 message => q|Select a layout for this product.|,
@@ -477,11 +441,6 @@ our $I18N = {
                 lastUpdated => 1120332527,
         },
 
-	'39' => {
-		message => q|WebGUI has a product management system built in to enable you to publish your products and services to your site quickly and easily.|,
-		lastUpdated => 1120332572
-	},
-
 	'36' => {
 		message => q|Add an accessory.|,
 		lastUpdated => 1031514049
@@ -512,11 +471,6 @@ our $I18N = {
                 lastUpdated => 1120335791,
         },
 
-	'41' => {
-		message => q|Features are selling points for a product(ie. reasons to buy your product). Features often result in benefits, so you may want to also add some benefits to this product.|,
-		lastUpdated => 1167186992
-	},
-
 	'58' => {
 		message => q|Edit Product Template|,
 		lastUpdated => 1031514049
@@ -532,19 +486,9 @@ our $I18N = {
                 lastUpdated => 1120337083,
         },
 
-	'47' => {
-		message => q|Related products are products that are comparable or complementary to other products.|,
-		lastUpdated => 1041876679
-	},
-
 	'15' => {
 		message => q|Warranty|,
 		lastUpdated => 1031514049
-	},
-
-	'38' => {
-		message => q|Product, Add/Edit|,
-		lastUpdated => 1038889846
 	},
 
 	'52' => {
@@ -587,11 +531,6 @@ our $I18N = {
                 lastUpdated => 1120336412,
         },
 
-	'45' => {
-		message => q|Accessories are products that enhance other products.|,
-		lastUpdated => 1031514049
-	},
-
 	'37' => {
 		message => q|Add a related product.|,
 		lastUpdated => 1031514049
@@ -616,11 +555,6 @@ our $I18N = {
                 message => q|If you'd like to add another specification, select "Yes".|,
                 lastUpdated => 1120336120,
         },
-
-	'43' => {
-		message => q|Specifications are the technical details of your product.|,
-		lastUpdated => 1120336146
-	},
 
 	'19' => {
 		message => q|Add Related Product|,

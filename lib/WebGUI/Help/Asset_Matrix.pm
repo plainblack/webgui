@@ -387,7 +387,7 @@ our $HELP = {
 
 	'listing detail template' => {
 		title => 'detail template help title',
-		body => 'detail template help body',
+		body => '',
 		variables => [
 		          {
 		            'name' => 'discussion'

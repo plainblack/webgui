@@ -1,32 +1,6 @@
 package WebGUI::Help::Asset_MultiSearch;
 
 our $HELP = {
-	'multi search add/edit' => {
-		title => 'multisearch add/edit title',
-		body => 'multisearch add/edit body',
-		isa => [
-		],
-		fields => [
-                        {
-                                title => 'cache timeout',
-                                namespace => 'Asset_MultiSearch',
-                                description => 'cache timeout help',
-				uiLevel => 8,
-                        },
-                        {
-                                title => 'MultiSearch Template',
-                                description => 'MultiSearch Template description',
-                                namespace => 'Asset_MultiSearch',
-                        },
-		],
-		related => [
-			{
-				tag => 'multisearch template',
-				namespace => 'Asset_MultiSearch',
-			},
-		],
-	},
-
 	'multisearch template' => {
 		title => 'multisearch template title',
 		body => 'multisearch template body',
@@ -60,10 +34,6 @@ our $HELP = {
 		fields => [
 		],
 		related => [
-			{
-				tag => 'multi search add/edit',
-				namespace => 'Asset_MultiSearch',
-			},
 		],
 	},
 

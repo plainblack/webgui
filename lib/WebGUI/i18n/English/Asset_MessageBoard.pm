@@ -192,18 +192,6 @@ our $I18N = {
 		lastUpdated => 1066038194
 	},
 
-	'71' => {
-		message => q|<p>Message boards can contain one or more Forums and/or Discussion Boards.  They are a great way to add community to any site or intranet. Many companies use message boards internally to collaborate on projects.
-</p>
-|,
-		lastUpdated => 1168991147
-	},
-
-	'61' => {
-		message => q|Message Board, Add/Edit|,
-		lastUpdated => 1066584548
-	},
-
 	'assetName' => {
 		message => q|Message Board|,
 		lastUpdated => 1128831826
