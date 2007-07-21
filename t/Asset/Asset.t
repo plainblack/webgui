@@ -17,7 +17,8 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 27; # increment this value for each test you create
+use Test::More tests => 28; # increment this value for each test you create
+use Test::MockObject;
 
 my $session = WebGUI::Test->session;
 
@@ -123,3 +124,12 @@ ok(  WebGUI::Asset->urlExists($session, $importUrl,     {assetId => 'notAnWebGUI
 
 my $i18n = WebGUI::International->new($session, 'Asset_Wobject');
 is($importNode->addEditLabel, $i18n->get('edit').' '.$importNode->getName, 'addEditLabel, default mode is edit mode');
+
+my $origRequest = $session->{_request};
+my $newRequest = Test::MockObject->new();
+my $func;
+$newRequest->set_bound('body', \$func);
+$session->{_request} = $newRequest;
+$func = 'add';
+is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
+$session->{_request} = $origRequest;
