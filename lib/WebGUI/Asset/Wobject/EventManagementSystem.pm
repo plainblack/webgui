@@ -1746,12 +1746,11 @@ sub www_edit {
 	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
 	my $i18n  = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata', 'Asset_EventManagementSystem'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events', 'Asset_EventManagementSystem'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=importEvents'), $i18n2->get('import events'));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=exportEvents'), $i18n2->get('export events'));
-	return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
+	return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 
 #-------------------------------------------------------------------
