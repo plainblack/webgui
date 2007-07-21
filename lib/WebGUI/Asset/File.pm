@@ -425,8 +425,7 @@ sub www_edit {
 		-namespace=>"FileAsset"
 	);
 	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add','Asset_Wobject') : $i18n->get('edit','Asset_Wobject');
-	return $self->getAdminConsole->render($tabform->print,$addEdit.' '.$self->getName);
+	return $self->getAdminConsole->render($tabform->print,$self->addEditLabel);
 }
 
 #-------------------------------------------------------------------
