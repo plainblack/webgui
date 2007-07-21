@@ -3315,6 +3315,11 @@ a user.|,
 		lastUpdated => 1165511447,
 	},
 
+	'allow access from macros' => {
+                message => q|Allow access from Macro's|,
+                lastUpdated => 0,
+        },
+
 	'preview' => {
 		message => q|Preview|,
 		context => q|alternate image text displayed when a thumbnail cannot be found for an image.  The image is being previewed.|,

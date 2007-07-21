@@ -33,9 +33,21 @@ addNewsletter($session);
 addHttpProxyUrlPatternFilter($session);
 addCanStartThreadToCS($session);
 addPostCaptchaToCS($session);
+addMacroAccessToDatabaseLinks($session);
 
 finish($session); # this line required
 
+#-------------------------------------------------
+
+sub addMacroAccessToDatabaseLinks {
+    my $session = shift;
+    print "\tAdding allowMacroAccess setting to Database Links..." unless ($quiet);
+    
+    $session->db->write("ALTER TABLE databaseLink add column allowMacroAccess integer NOT NULL default 0");
+    
+    print "OK\n";
+    return;
+}
 #-------------------------------------------------
 
 sub addPostCaptchaToCS {

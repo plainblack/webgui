@@ -202,7 +202,13 @@ sub www_editDatabaseLink {
 		-hoverHelp => $i18n->get('allowed keywords description'),
 		-value => $db{allowedKeywords},
 	);
-        $f->submit;
+        $f->yesNo(
+		-name => "allowMacroAccess",
+		-label => $i18n->get('allow access from macros'),
+                -defaultValue=>0,
+		-value => $db{allowMacroAccess},
+	);
+	$f->submit;
 	$output .= $f->print;
         return _submenu($session,$output,"990","database link add/edit");
 }
@@ -230,6 +236,7 @@ sub www_editDatabaseLinkSave {
 		identifier=>$session->form->process("dbidentifier"),
 		DSN=>$session->form->process("DSN"),
 		allowedKeywords=>$allowedKeywords,
+		allowMacroAccess=>$session->form->process("allowMacroAccess"),
 		};
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
