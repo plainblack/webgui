@@ -212,12 +212,6 @@ sub _getHelpName {
 	elsif ($file =~ /^Macro_/) {
 		$helpName = 'macroName';
 	}
-	elsif ($file =~ /^Workflow_Activity_/) {
-		$helpName = 'activityName';
-	}
-	elsif ($file =~ /^Template_/) {
-		$helpName = 'templateParserName';
-	}
 	else {
 		$helpName = 'topicName';
 	}
@@ -437,14 +431,6 @@ sub www_viewHelpTOC {
 		},
         	macro => {
 			label => $i18n->get('topicName', 'Macros'),
-			uiLevel => 1,
-		},
-        	workf => {
-			label => $i18n->get('topicName', 'Workflow'),
-			uiLevel => 1,
-		},
-        	templ => {
-			label => $i18n->get('template parsers', 'Asset_Template'),
 			uiLevel => 1,
 		},
 	);

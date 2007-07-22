@@ -70,7 +70,6 @@ sub _submenu {
 	my $workarea = $properties->{workarea};
 	my $title;
 	$title = $i18n->get($properties->{title}) if ($properties->{title});
-	$ac->setHelp($properties->{help}) if ($properties->{help});
 
 	if ($session->user->isInGroup(11)) {
 		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), $i18n->get(169));
@@ -390,11 +389,12 @@ sub www_editUser {
 		-size=>15,
 		-value=>\@groupsToDelete
 		);
-	my $submenu = _submenu($session,{ workarea => $error.$tabform->print,
-					  title    => 168,
-					  help     => 'user add/edit',
-					  userId   => $uid,
-					});
+	my $submenu = _submenu(
+                        $session,
+                        { workarea => $error.$tabform->print,
+                          title    => 168,
+                          userId   => $uid, }
+                  );
 	return $submenu;;
 }
 
@@ -501,10 +501,11 @@ sub www_editUserKarma {
 	);
         $f->submit;
         $output .= $f->print;
-	my $submenu = _submenu($session,{ workarea => $output,
-					  title    => 558,
-					  help	   => 'edit user karma',
-					});  
+	my $submenu = _submenu(
+                    $session,
+                    { workarea => $output,
+					  title    => 558, }
+                  );  
         return $submenu;
 }
 
@@ -605,9 +606,10 @@ sub www_listUsers {
         $output .= '</table>';
         $p->setAlphabeticalKey('username');
         $output .= $p->getBarTraditional;
-	my $submenu = _submenu($session, { workarea => $output,
-					   help => "users manage"
-					 });
+	my $submenu = _submenu(
+                    $session,
+                    { workarea => $output, }
+                  );
 	return $submenu;
 }
 
