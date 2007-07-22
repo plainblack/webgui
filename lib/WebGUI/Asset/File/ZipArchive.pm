@@ -245,7 +245,7 @@ sub www_edit {
     $self->getAdminConsole->setHelp("zip archive add/edit", "Asset_ZipArchive");
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Wobject');
 	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
-    return $self->getAdminConsole->render($self->getEditForm->print,$addEdit.' '.$self->getName);
+    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 
 #-------------------------------------------------------------------
