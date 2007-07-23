@@ -328,7 +328,7 @@ sub www_viewHelp {
 
 	WebGUI::Macro::process($session,\$body);
 
-    return $ac->render($body, $i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title}));
+    return $ac->render(wikiHelpLink($session).$body, $i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title}));
 }
 
 #-------------------------------------------------------------------
@@ -400,9 +400,9 @@ sub www_viewHelpIndex {
                 }	
 	}
 	$output .= '</td></tr></table>';
-	my $ac = WebGUI::AdminConsole->new($session,"help");
-    	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
-	return $ac->render($output, join ': ',$i18n->get(93), $i18n->get('help index'));
+    my $ac = WebGUI::AdminConsole->new($session,"help");
+    $ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
+    return $ac->render(wikiHelpLink($session).$output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 
 #-------------------------------------------------------------------
@@ -472,7 +472,7 @@ sub www_viewHelpTOC {
 	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
 	$tabForm->{_submit} = $tabForm->{_cancel} = '';
-	return $ac->render($tabForm->print, join(': ',$i18n->get(93), $i18n->get('help toc')));
+	return $ac->render(wikiHelpLink($session).$tabForm->print, join(': ',$i18n->get(93), $i18n->get('help toc')));
 }
 #-------------------------------------------------------------------
 
@@ -498,7 +498,24 @@ sub www_viewHelpChapter {
 	my $ac = WebGUI::AdminConsole->new($session,"help");
     	$ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95));
     	$ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
-	return $ac->render($output, join ': ',$i18n->get(93), _getHelpName($session,$namespace));
+	return $ac->render(wikiHelpLink($session).$output, join ': ',$i18n->get(93), _getHelpName($session,$namespace));
+}
+
+#-------------------------------------------------------------------
+
+=head2 wikiHelpLink ( $session )
+
+Utility method that returns link to the WebGUI Community Wiki with i18n'ed text.
+
+=cut
+
+sub wikiHelpLink {
+	my $session = shift;
+	my $i18n = WebGUI::International->new($session);
+    return sprintf q!<p>%s <a href="%s">%s</a></p>!, 
+        $i18n->get('wiki help label leadin'),
+        'http://www.webgui.org/community-wiki',
+        $i18n->get('wiki help target'),
 }
 
 1;

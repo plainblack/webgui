@@ -2960,73 +2960,73 @@ or are under your current version tag.</p>
 		lastUpdated =>1092930637,
                 context => q|Title of the database manager for the admin console.|
         },
-	
+
 	'packages' => {
 		message => q|Packages|,
 		lastUpdated =>1092930637,
                 context => q|Title of the package manager for the admin console.|
         },
-	
+
 	'help' => {
 		message => q|Help|,
 		lastUpdated =>1092930637,
                 context => q|Title of the help index for the admin console.|
         },
-	
+
 	'content filters' => {
 		message => q|Content Filters|,
 		lastUpdated =>1092930637,
                 context => q|Title of the content filters manager for the admin console.|
         },
-	
+
 	'user profiling' => {
 		message => q|User Profiling|,
 		lastUpdated =>1092930637,
                 context => q|Title of the user profile settings manager for the admin console.|
         },
-	
+
 	'page statistics' => {
 		message => q|Page Statistics|,
 		lastUpdated =>1092930637,
                 context => q|Title of the page statistics viewer for the admin console.|
         },
-	
+
 	'user' => {
 		message => q|User|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'content' => {
 		message => q|Content|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'ui' => {
 		message => q|UI|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'messaging' => {
 		message => q|Messaging|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'authentication' => {
 		message => q|Authentication|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'company' => {
 		message => q|Company|,
 		lastUpdated =>1092930637,
                 context => q|Title of a tab in the global settings.|
         },
-	
+
 	'misc' => {
 		message => q|Miscellaneous|,
 		lastUpdated =>1092930637,
@@ -3042,7 +3042,7 @@ or are under your current version tag.</p>
 		message => q|Admin Console Template|,
 		lastUpdated =>1118453709,
         },
-	
+
 	'settings' => {
 		message => q|Settings|,
 		lastUpdated =>1092930637,
@@ -3304,7 +3304,7 @@ a user.|,
 		message => q|unknown user|,
 		lastUpdated => 1135205716,
 	},
-	
+
 	'allowed keywords' => {
 		message => q|Allowed keywords|,
 		lastUpdated => 0,
@@ -3422,137 +3422,137 @@ a user.|,
 		message => q|Send Private Message|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'private message title' => {
 		message => q|Send Private Message|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'private message no self error' => {
 		message => q|You may not send private messages to yourself.|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'private message no user' => {
     	message => q|You have not selected a user to send a private message to|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message to label' => {
     	message => q|To|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message from label' => {
     	message => q|From|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message subject label' => {
     	message => q|Subject|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message message label' => {
     	message => q|Message|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message submit label' => {
     	message => q|Submit|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message error' => {
     	message => q|Message Error|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message blocked error' => {
         message => q|This user does not wish to receive private messages.|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message sent' => {
         message => q|Your private message has been sent.|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message status unread' => {
         message => q|Unread|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message status replied' => {
         message => q|Replied|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message status read' => {
         message => q|Read|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message prev label' => {
         message => q|Previous|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message next label' => {
         message => q|Next|,
 		lastUpdated => 1181019679,
     },
-    
+
     'allow private messages label' => {
         message => q|Allow Private Messages|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message from label' => {
         message => q|From|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message date label' => {
         message => q|Date|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message reply title' => {
         message => q|Reply to Message|,
 		lastUpdated => 1181019679,
     },
-    
+
     'private message unread display message' => {
         message => q|%s unread messages|,
 		lastUpdated => 1181019679,
     },
-    
+
     'view inbox template' => {
 		message => q|Inbox Template|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'view inbox template description' => {
 		message => q|Choose a template for displaying the inbox|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'view inbox message template' => {
 		message => q|Inbox Message Template|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'view inbox message template description' => {
 		message => q|Choose a template for displaying messages in the inbox|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'send private message template' => {
 		message => q|Send Private Message Template|,
 		lastUpdated => 1181019679,
 	},
-    
+
     'send private message template description' => {
 		message => q|Choose a template for sending private messages|,
 		lastUpdated => 1181019679,
@@ -3567,12 +3567,22 @@ a user.|,
         message     => "Settings saved!",
         lastUpdated => 0,
     },
-     
+
     'deactivateAccount success' => {
         message     => q{%s has been deactivated},
         lastUpdated => 0,
     },
-    
+
+    'wiki help label leadin' => {
+        message     => q{For more help, visit the},
+        lastUpdated => 1185162265,
+    },
+
+    'wiki help target' => {
+        message     => q{WebGUI Community Wiki},
+        lastUpdated => 1185162267,
+    },
+
 };
 
 1;
