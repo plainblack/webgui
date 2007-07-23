@@ -173,19 +173,19 @@ ok(-e $imageCopy->getPath('thumb-square.png'), 'copy also copied the thumbnail')
 #
 ####################################################
 
-$imageCopy->deleteFile('square.png');
+is($imageCopy->deleteFile('square.png'), 1, 'deleteFile only reports 1 file deleted');
 
 cmp_bag(
-    $imageCopy->getFiles(), #Must call SUPER because getFiles ignores thumb files.
+    $imageCopy->getFiles(),
     [qw()],
     'delete deleted the file',
 );
 ok(!-e $imageCopy->getPath('thumb-square.png'), 'deleteFile also deleted the thumbnail');
 
+is($imageCopy->deleteFile('../../'), undef, 'deleteFile in Storage::Image also returns undef if you try to delete a file outside of this storage object');
+
 TODO: {
 	local $TODO = "Methods that need to be tested";
-	ok(0, 'copy also copies thumbnails');
-	ok(0, 'deleteFile also deletes thumbnails');
 	ok(0, 'getThumbnailUrl');
 	ok(0, 'resize');
 }
