@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 70 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 74 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -82,6 +82,14 @@ is ( $storage1->getId, 'foobar', 'getId returns the requested GUID');
 is( $storage1->getErrorCount, 0, "No errors during path creation");
 
 is( $storage1->getLastError, undef, "No errors during path creation");
+
+####################################################
+#
+# getPathFrag
+#
+####################################################
+
+is( $storage1->getPathFrag, 'fo/ob/foobar');
 
 ####################################################
 #
@@ -273,6 +281,14 @@ is($storage1->deleteFile("testfile-hash-renamed.file"), 1, 'deleteFile: deleted 
 is($storage1->deleteFile("WebGUI.pm"), 1, 'deleteFile: deleted another file');
 cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file');
 
+##Test for out of object file deletion
+my $hackedStore = WebGUI::Storage->create($session);
+$hackedStore->addFileFromScalar('fileToHack', 'Can this file be deleted from another object?');
+ok(-e $hackedStore->getPath('fileToHack'), 'set up a file for deleteFile to try and delete illegally');
+my $hackedPath = '../../../'.$hackedStore->getPathFrag().'/fileToHack';
+is($storage1->deleteFile($hackedPath), undef, 'deleteFile into another storage returns undef');
+ok(-e $hackedStore->getPath('fileToHack'), 'deleteFile did not delete the file in another storage object');
+
 ####################################################
 #
 # createTemp
@@ -362,6 +378,7 @@ END {
         $storage1,   $storage2, $storage3, $copiedStorage,
         $secondCopy, $s3copy,   $tempStor, $tarStorage,
         $untarStorage, $fileStore,
+        $hackedStore,
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}

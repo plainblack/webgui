@@ -465,6 +465,7 @@ it doesn't.
 sub deleteFile {
     my $self = shift;
     my $filename = shift;
+    return undef if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
     unlink($self->getPath($filename));
 }
 
@@ -771,6 +772,20 @@ sub getPath {
                 $path .= '/'.$file;
         }
         return $path;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getPathFrag (  )
+
+Returns the internal, upload dir specific part of the path.
+
+=cut
+
+sub getPathFrag {
+    my $self = shift;	
+    return join '/', $self->{_part1}, $self->{_part2}, $self->getFileId;
 }
 
 
