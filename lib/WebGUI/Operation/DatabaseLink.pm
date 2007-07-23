@@ -25,7 +25,7 @@ Package WebGUI::Operation::DatabaseLink
 Handles creating, managing and deleting Database Links via operations.  Many
 of the subroutines here are wrappers around corresponding routines in WebGUI::Database.
 
-=head2 _submenu ( $session, $workarea, $title, $help )
+=head2 _submenu ( $session, $workarea, $title, )
 
 Utility routine for creating the AdminConsole for DatabaseLink functions.
 
@@ -42,11 +42,6 @@ The content to display to the user.
 The title of the Admin Console.  This should be an entry in the i18n
 table in the WebGUI namespace.
 
-=head3 $help
-
-An entry in the Help system in the WebGUI namespace.  This will be shown
-as a link to the user.
-
 =cut
 
 #-------------------------------------------------------------------
@@ -56,11 +51,7 @@ sub _submenu {
         my $title = shift;
 	my $i18n = WebGUI::International->new($session);
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"databases");
-        if ($help) {
-                $ac->setHelp($help);
-        }
 	$ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid=new'), $i18n->get(982));
 	my $dlid = $session->form->process("dlid");
 	if (($session->form->process("op") eq "editDatabaseLink" && $dlid ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
@@ -108,7 +99,7 @@ sub www_deleteDatabaseLink {
 		.'">'.$i18n->get(44).'</a>';
         $output .= '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$session->url->page('op=listDatabaseLinks').
 		'">'.$i18n->get(45).'</a></div>';
-        return _submenu($session,$output,"987","database link delete");
+        return _submenu($session,$output,"987");
 }
 
 =head2 www_deleteDatabaseLinkConfirm ( $session )
@@ -210,7 +201,7 @@ sub www_editDatabaseLink {
 	);
 	$f->submit;
 	$output .= $f->print;
-        return _submenu($session,$output,"990","database link add/edit");
+        return _submenu($session,$output,"990");
 }
 
 =head2 www_editDatabaseLinkSave ( $session )
@@ -272,7 +263,7 @@ sub www_listDatabaseLinks {
                 $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }
         $output .= '</table>';
-        return _submenu($session,$output,"database links manage");
+        return _submenu($session,$output);
 }
 
 

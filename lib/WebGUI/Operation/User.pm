@@ -57,8 +57,6 @@ userId: userId of user to be modified by submenu controls such as edit and delet
 
 title: internationalization key from users for text to display as the admin consoles title
 
-help: interanationalization key from users help to link current screen help icon to
-
 =cut
 
 sub _submenu {
