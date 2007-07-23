@@ -88,7 +88,7 @@ Optionally pass a storage object to copy the files to.
 
 sub copy {
 	my $self = shift;
-	my $newStorage = shift;
+	my $newStorage = shift || WebGUI::Storage::Image->create($self->session);
 	# Storage::Image->getFiles excludes thumbnails from the filelist and we want to copy the thumbnails
 	my $filelist = $self->SUPER::getFiles(1);
 	

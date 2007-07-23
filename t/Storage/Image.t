@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 24 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 36 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -80,7 +80,7 @@ $session->config->set('caseInsensitiveOS', 0);
 
 ####################################################
 #
-# getFiles
+# getFile
 #
 ####################################################
 
@@ -140,18 +140,59 @@ ok(-e $thumbStore->getPath('thumb-square.png'), 'thumbnail exists in right place
 #
 ####################################################
 
+cmp_bag([$thumbStore->getSizeInPixels('square.png')],       [500,500], 'getSizeInPixels on original file');
+cmp_bag([$thumbStore->getSizeInPixels('thumb-square.png')], [50,50],   'getSizeInPixels on thumb');
+
+is($thumbStore->getSizeInPixels(), 0, 'getSizeInPixels returns only a zero if no file is sent');
+is($WebGUI::Test::logger_error, q/Can't check the size when you haven't specified a file./, 'getSizeInPixels logs an error message for not sending a filename');
+
+is($thumbStore->getSizeInPixels('noImage.txt'), 0, 'getSizeInPixels returns only a zero if sent a non-image file');
+is($WebGUI::Test::logger_error, q/Can't check the size of something that's not an image./, 'getSizeInPixels logs an error message for sending a non-image filename');
+
+is($thumbStore->getSizeInPixels('noImage.gif'), 0, 'getSizeInPixels returns only a zero if sent a file that does not exist');
+like($WebGUI::Test::logger_error, qr/^Couldn't read image to check the size of it./, 'getSizeInPixels logs an error message for reading a file that does not exist');
+
+####################################################
+#
+# copy
+#
+####################################################
+
+my $imageCopy = $thumbStore->copy();
+isa_ok($imageCopy, 'WebGUI::Storage::Image', 'copy returns an object');
+cmp_bag(
+    $imageCopy->getFiles(),
+    ['square.png'],
+    'copy copied the original file',
+);
+ok(-e $imageCopy->getPath('thumb-square.png'), 'copy also copied the thumbnail');
+
+####################################################
+#
+# deleteFiles
+#
+####################################################
+
+$imageCopy->deleteFile('square.png');
+
+cmp_bag(
+    $imageCopy->getFiles(), #Must call SUPER because getFiles ignores thumb files.
+    [qw()],
+    'delete deleted the file',
+);
+ok(!-e $imageCopy->getPath('thumb-square.png'), 'deleteFile also deleted the thumbnail');
+
 TODO: {
 	local $TODO = "Methods that need to be tested";
 	ok(0, 'copy also copies thumbnails');
 	ok(0, 'deleteFile also deletes thumbnails');
 	ok(0, 'getThumbnailUrl');
-	ok(0, 'generateThumbnail');
 	ok(0, 'resize');
 }
 
 END {
 	foreach my $stor (
-        $imageStore, $thumbStore,
+        $imageStore, $thumbStore, $imageCopy,
     ) {
 		ref $stor eq "WebGUI::Storage::Image" and $stor->delete;
 	}
