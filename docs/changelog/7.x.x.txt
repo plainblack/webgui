@@ -80,6 +80,8 @@
  - add: Database Links now have a 'Allow access from macro's' setting
  - All help except for hoverHelp and template variables has been removed from
    WebGUI and put into the WebGUI Community Wiki, http://www.webgui.org/community-wiki.
+ - The Table of Contents view was removed from the Help system.  The only view
+   is now the Help Index.
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success

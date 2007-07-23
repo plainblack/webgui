@@ -159,9 +159,7 @@ sub getOperations {
 		'manageUsersInGroup' => 'WebGUI::Operation::Group',
 
 		'viewHelp' => 'WebGUI::Operation::Help',
-		'viewHelpChapter' => 'WebGUI::Operation::Help',
 		'viewHelpIndex' => 'WebGUI::Operation::Help',
-		'viewHelpTOC' => 'WebGUI::Operation::Help',
 
 		'viewInbox' => 'WebGUI::Operation::Inbox',
 		'viewInboxMessage' => 'WebGUI::Operation::Inbox',
