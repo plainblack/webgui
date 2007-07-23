@@ -764,14 +764,13 @@ sub getPath {
 		$self->_addError("storage object malformed");
 		return undef;
 	}
-        my $path = $self->session->config->get("uploadsPath")
-		.'/'.$self->{_part1}
-		.'/'.$self->{_part2}
-		.'/'.$id;
-        if (defined $file) {
-                $path .= '/'.$file;
-        }
-        return $path;
+    my $path = $self->session->config->get("uploadsPath")
+             . '/'
+             . $self->getPathFrag();
+    if (defined $file) {
+            $path .= '/'.$file;
+    }
+    return $path;
 }
 
 
@@ -804,7 +803,9 @@ If specified, we'll return a URL to the file rather than the storage location.
 sub getUrl {
 	my $self = shift;
 	my $file = shift;
-	my $url = $self->session->config->get("uploadsURL").'/'.$self->{_part1}.'/'.$self->{_part2}.'/'.$self->getFileId;
+	my $url = $self->session->config->get("uploadsURL")
+            . '/'
+            . $self->getPathFrag;
 	if (defined $file) {
 		$url .= '/'.$file;
 	}
