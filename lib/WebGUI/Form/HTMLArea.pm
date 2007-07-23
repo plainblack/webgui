@@ -132,7 +132,6 @@ Renders an HTML area field.
 
 sub toHtml {
 	my $self = shift;
-	#return $self->SUPER::toHtml.WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"))->getRichEditor($self->get('id'));
 	my $i18n = WebGUI::International->new($self->session);
 	my $richEdit = WebGUI::Asset::RichEdit->new($self->session,$self->get("richEditId"));
 	if (defined $richEdit) {

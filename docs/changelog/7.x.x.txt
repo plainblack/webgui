@@ -3,6 +3,9 @@
    subroutines directly in their files. See
    WebGUI::Operation::FormHelpers::www_formHelper and 
    WebGUI::Operation::Workflow::www_activityHelper for details.
+ - api: Asset properties that have default values are now enforced by the API
+   as they always have been by the user interface.
+ - Added Site Starter to WebGUI Initial Configuration.
  - Added pagination to purchase history in commerce.
  - Replaced color picker form control with a more robust version.
  - Added keyword tagging api.

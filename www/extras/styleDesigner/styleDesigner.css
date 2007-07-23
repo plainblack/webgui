@@ -2,10 +2,6 @@
     width: 180px;
     float: left;
 }
-#initBox {
-            font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 98%; 
-            height: 98%; top: 10; left: 10; position: absolute;
-}
 #themeContainer {
     height: 40px; 
                z-index: 10;

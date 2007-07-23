@@ -17,6 +17,21 @@ WebguiStyleDesigner = function () {
         "footerTextColor"           : "#000000"
          },
         {
+        "pageBackgroundColor"       : "#A10101",
+        "linkColor"                 : "#FFCACA",
+        "visitedLinkColor"          : "#FFCACA",
+        "utilityBackgroundColor"    : "#4A0000",
+        "utilityTextColor"          : "#ffffff",
+        "headerBackgroundColor"     : "#ffffff",
+        "headerTextColor"           : "#000000",
+        "navigationBackgroundColor" : "#FFF6F6",
+        "navigationTextColor"       : "#FF0101",
+        "contentBackgroundColor"    : "#888888",
+        "contentTextColor"          : "#ffffff",
+        "footerBackgroundColor"     : "#ffffff",
+        "footerTextColor"           : "#000000"
+         },
+        {
         "pageBackgroundColor"       : "#000000",
         "linkColor"                 : "#cccccc",
         "visitedLinkColor"          : "#dddddd",
@@ -31,6 +46,21 @@ WebguiStyleDesigner = function () {
         "footerBackgroundColor"     : "#ffffff",
         "footerTextColor"           : "#000000"
          },
+        {
+        "pageBackgroundColor"       : "#FFCC3D",
+        "linkColor"                 : "#0000B3",
+        "visitedLinkColor"          : "#0000B3",
+        "utilityBackgroundColor"    : "#FFB300",
+        "utilityTextColor"          : "#ffffff",
+        "headerBackgroundColor"     : "#ffffff",
+        "headerTextColor"           : "#000000",
+        "navigationBackgroundColor" : "#D57F1C",
+        "navigationTextColor"       : "#FFFFFF",
+        "contentBackgroundColor"    : "#FFD683",
+        "contentTextColor"          : "#000000",
+        "footerBackgroundColor"     : "#ffffff",
+        "footerTextColor"           : "#000000"
+         }
         ];
 
     var drawThemeSwatch = function ( themeNumber ) {
@@ -39,8 +69,8 @@ WebguiStyleDesigner = function () {
         
     var colorPickerFieldNames = {
         "pageBackgroundColor"       : "Page Background",
-        "linkColor"                 : "Link Color",
-        "visitedLinkColor"          : "Visited Link Color",
+        "linkColor"                 : "Links",
+        "visitedLinkColor"          : "Visited Links",
         "utilityBackgroundColor"    : "Utility Background",
         "utilityTextColor"          : "Utility Text",
         "headerBackgroundColor"     : "Header Background",
@@ -48,7 +78,7 @@ WebguiStyleDesigner = function () {
         "contentBackgroundColor"    : "Content Background",
         "contentTextColor"          : "Content Text",
         "navigationBackgroundColor" : "Navigation Background",
-        "navigationTextColor"       : "Navigation Text",
+        "navigationTextColor"       : "Navigation Links",
         "footerBackgroundColor"     : "Footer Background",
         "footerTextColor"           : "Footer Text Color"
         };
@@ -115,7 +145,14 @@ WebguiStyleDesigner = function () {
                         case "contentBackgroundColor": Dom.get("pageBodyContainer").style.backgroundColor = this.value; break;
                         case "contentTextColor": Dom.get("pageBodyContainer").style.color = this.value; break;
                         case "navigationBackgroundColor": Dom.get("mainNavigationContainer").style.backgroundColor = this.value; break;
-                        case "navigationTextColor": Dom.get("mainNavigationContainer").style.color = this.value; break;
+                        case "navigationTextColor": 
+                            var tags = Dom.get("mainNavigationContainer").getElementsByTagName("a");
+                            for (var i = 0; i < tags.length; i++) { 
+                                tags[i].style.color = this.value;
+                                tags[i].style.linkColor = this.value;
+                                tags[i].style.vlinkColor = this.value;
+                            }
+                            break;
                         case "footerBackgroundColor": Dom.get("pageFooterContainer").style.backgroundColor = this.value; break;
                         case "footerTextColor": Dom.get("pageFooterContainer").style.color = this.value; break;
                     }
@@ -124,7 +161,7 @@ WebguiStyleDesigner = function () {
             for (var i in themeColors) {
                 theme = Dom.get("theme_" + i);
                 themeColorSet = themeColors[i];
-                theme.style.backgroundColor = themeColorSet["contentBackgroundColor"];
+                theme.style.backgroundColor = themeColorSet["pageBackgroundColor"];
                 theme.style.borderColor = themeColorSet["linkColor"];
                 theme.onclick = function () {
                     var id = this.id.replace(/theme_(\d+)/,"$1");

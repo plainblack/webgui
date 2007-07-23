@@ -619,7 +619,7 @@ sub toHtmlWithWrapper {
 	if ($self->passUiLevelCheck) {
 		my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-		return '<tr'.$rowClass.'>
+		return '<tr'.$rowClass.' id="'.$self->get("id").'_row">
 				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
 				<td valign="top"'.$fieldClass.'>'.$rawField.$subtext."</td>
 			</tr>\n";

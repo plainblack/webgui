@@ -68,7 +68,8 @@ sub definition {
                 properties=>{
 			templateId =>{
 				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000054'
+                namespace => "Layout",
+				defaultValue=>'PBtmpl0000000000000054',
 				},
 			contentPositions => {
 				noFormPost=>1,

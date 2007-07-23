@@ -1,29 +1,33 @@
 package WebGUI;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com			info@plainblack.com
-#-------------------------------------------------------------------
+our $VERSION = "7.4.0";
+our $STATUS = "beta";
+
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2007 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
 
 use strict qw(vars subs);
-use Tie::CPHash;
 use Time::HiRes;
 use WebGUI::Affiliate;
 use WebGUI::Asset;
-use WebGUI::Cache;
 use WebGUI::Config;
-use WebGUI::HTMLForm;
-use WebGUI::International;
 use WebGUI::Operation;
 use WebGUI::Session;
-use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::PassiveProfiling;
+use WebGUI::Setup;
 use Apache2::Upload;
 use Apache2::Request;
 use Apache2::RequestRec ();
@@ -32,8 +36,23 @@ use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
 use Apache2::ServerUtil ();
 use LWP::MediaTypes qw(guess_media_type);
 
-our $VERSION = "7.4.0";
-our $STATUS = "beta";
+=head1 NAME
+
+Package WebGUI
+
+=head1 DESCRIPTION
+
+An Apache mod_perl handler for WebGUI.
+
+=head1 SYNOPSIS
+
+ use WebGUI;
+
+=head1 SUBROUTINES
+
+These subroutines are available from this package:
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -109,7 +128,7 @@ sub contentHandler {
 			# do nothing because we have operation output to display
 			$out = undef if ($out eq "chunked");	#'chunked' is WebGUI's way of saying 'I took care of it'  The output was sent to the browser in pieces as quickly as it could be produced. 
 		} elsif ($setting->get("specialState") eq "init") { #if specialState is flagged and it's 'init' do initial setup
-			$out = setup($session);
+			$out = WebGUI::Setup::setup($session);
 		} elsif ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
 			my $t = [Time::HiRes::gettimeofday()];
 			$out = page($session);
@@ -268,112 +287,6 @@ sub processOperations {
 	}
 	return $output;
 }
-
-
-#-------------------------------------------------------------------
-
-=head2 setup ( session )
-
-Handles a specialState: "setup"
-
-=head3 session
-
-The current WebGUI::Session object.
-
-=cut
-
-sub setup {
-	my $session = shift;
-	my $i18n = WebGUI::International->new($session, "WebGUI");
-	my $output = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>WebGUI Initial Configuration</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<style type="text/css">
-		a { color: black; }
-		a:visited { color: black;}
-		</style>
-	</head>
-	<body><div style="font-family: georgia, helvetica, arial, sans-serif; color: white; z-index: 10; width: 550px; height: 400px; top: 20%; left: 20%; position: absolute;"><h1>WebGUI Initial Configuration</h1><fieldset>';
-	if ($session->form->process("step") eq "2") {
-		$output .= '<legend align="left">Company Information</legend>';
-		my $u = WebGUI::User->new($session,"3");
-		$u->username($session->form->process("username","text","Admin"));
-		$u->profileField("email",$session->form->email("email"));
-		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
-		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
-		$f->hidden(
-			-name=>"step",
-			-value=>"3"
-			);
-		$f->text(
-			-name=>"companyName",
-			-value=>$session->setting->get("companyName"),
-			-label=>$i18n->get(125),
-			-hoverHelp=>$i18n->get('125 description'),
-			);
-		$f->email(
-			-name=>"companyEmail",
-			-value=>$session->setting->get("companyEmail"),
-			-label=>$i18n->get(126),
-			-hoverHelp=>$i18n->get('126 description'),
-			);
-		$f->url(
-			-name=>"companyURL",
-			-value=>$session->setting->get("companyURL"),
-			-label=>$i18n->get(127),
-			-hoverHelp=>$i18n->get('127 description'),
-			);
-		$f->submit;
-		$output .= $f->print;
-	} elsif ($session->form->process("step") eq "3") {
-		$session->setting->remove('specialState');
-		$session->setting->set('companyName',$session->form->text("companyName"));
-		$session->setting->set('companyURL',$session->form->url("companyURL"));
-		$session->setting->set('companyEmail',$session->form->email("companyEmail"));
-		$session->http->setRedirect($session->url->gateway());
-		return undef;
-	} else {
-		$output .= '<legend align="left">Admin Account</legend>';
-		my $u = WebGUI::User->new($session,'3');
-		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
-		$f->hidden(
-			-name=>"step",
-			-value=>"2"
-			);
-		$f->text(
-			-name=>"username",
-			-value=>$u->username,
-			-label=>$i18n->get(50),
-			-hoverHelp=>$i18n->get('50 setup description'),
-			);
-		$f->text(
-			-name=>"identifier",
-			-value=>"123qwe",
-			-label=>$i18n->get(51),
-			-hoverHelp=>$i18n->get('51 description'),
-			-subtext=>'<div style=\"font-size: 10px;\">('.$i18n->get("password clear text").')</div>'
-			);
-		$f->email(
-			-name=>"email",
-			-value=>$u->profileField("email"),
-			-label=>$i18n->get(56),
-			-hoverHelp=>$i18n->get('56 description'),
-			);
-		$f->submit;
-		$output .= $f->print; 
-	}
-	$output .= '</fieldset></div>
-		<img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5;" />
-	</body>
-</html>';
-	$session->http->setCacheControl("none");
-	$session->http->setMimeType("text/html");
-	return $output;
-}
-
 
 #-------------------------------------------------------------------
 

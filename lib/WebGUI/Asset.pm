@@ -343,7 +343,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('886 description'),
 					    uiLevel=>6,
 					    fieldType=>'yesNo',
-					    defaultValue=>0
+					    defaultValue=>0,
 					},
 				    newWindow=>{
 					    tab=>"display",
@@ -2025,7 +2025,7 @@ sub update {
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
-
+            
             # skip a property unless it was specified to be set by the properties field or has a default value
 			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
             # use the update value
@@ -2042,7 +2042,7 @@ sub update {
 			}
 
             # use the default value because default and update were both undef
-            unless (defined $value) {
+            if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
                 $value = $definition->{properties}{$property}{defaultValue};
             }
 

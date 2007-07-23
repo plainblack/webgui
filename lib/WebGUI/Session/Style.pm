@@ -87,6 +87,7 @@ sub generateAdditionalHeadTags {
 }
 
 
+
 #-------------------------------------------------------------------
 
 =head2 makePrintable ( boolean ) 
