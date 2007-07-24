@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 36 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 40 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -184,9 +184,22 @@ ok(!-e $imageCopy->getPath('thumb-square.png'), 'deleteFile also deleted the thu
 
 is($imageCopy->deleteFile('../../'), undef, 'deleteFile in Storage::Image also returns undef if you try to delete a file outside of this storage object');
 
+####################################################
+#
+# getThumbnailUrl
+#
+####################################################
+
+is($thumbStore->getThumbnailUrl(), '', 'getThumbnailUrl returns undef if no file is sent');
+is($WebGUI::Test::logger_error, q/Can't make a thumbnail url without a filename./, 'getThumbnailUrl logs an error message for not sending a filename');
+
+is($thumbStore->getThumbnailUrl('round.png'), '', 'getThumbnailUrl returns undef if the requested file is not in the storage location');
+is($WebGUI::Test::logger_error, q/Can't make a thumbnail for a file that is not in my storage location./, 'getThumbnailUrl logs an error message for not sending a filename');
+
+is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square.png'), 'getThumbnailUrl returns the correct url');
+
 TODO: {
 	local $TODO = "Methods that need to be tested";
-	ok(0, 'getThumbnailUrl');
 	ok(0, 'resize');
 }
 

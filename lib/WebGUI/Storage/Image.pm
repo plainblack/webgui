@@ -235,6 +235,14 @@ The file to retrieve the thumbnail for.
 sub getThumbnailUrl {
 	my $self = shift;
 	my $filename = shift;
+	if (! defined $filename) {
+		$self->session->errorHandler->error("Can't make a thumbnail url without a filename.");
+		return '';
+	}
+    if (! isIn($filename, @{ $self->getFiles() })) {
+        $self->session->errorHandler->error("Can't make a thumbnail for a file that is not in my storage location.");
+        return '';
+    }
 	return $self->getUrl("thumb-".$filename);
 }
 
