@@ -2442,7 +2442,9 @@ sub _getFormElement {
 		$fieldParameters->{$field->{widthParam}}	= $field->{formFieldWidth} if ($field->{formFieldWidth});
 		$fieldParameters->{$field->{heightParam}}	= $field->{formFieldHeight} if ($field->{formFieldHeight});
 		$fieldParameters->{maxlength}			= $maxLength;
-		$fieldParameters->{extras}			= 'onkeyup="if (this.value.length > '.$maxLength.') {this.value = this.value.substring(0,'.$maxLength.');}"';
+		if ($fieldType eq 'textarea') {
+    		$fieldParameters->{extras}			= 'onkeyup="if (this.value.length > '.$maxLength.') {this.value = this.value.substring(0,'.$maxLength.');}"';
+		}
 		$fieldParameters->{id}				= 'sqlform'.$field->{fieldId};
 
 		# Show file if a file is uploaded
