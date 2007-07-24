@@ -22,13 +22,13 @@ my $session = WebGUI::Test->session;
 
 my @testSets = (
 	{
-		input => ['macroName', 'Macro_International'],
-		output => q!International!,
+		input => ['none', 'Asset'],
+		output => q!None!,
 		comment => q|explicit namespace|,
 	},
 	{
-		input => ['international title', 'Macro_International'],
-		output => q!International Macro!,
+		input => ['change url', 'Asset'],
+		output => q!Change URL!,
 		comment => q|space in label|,
 	},
 	{
