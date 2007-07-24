@@ -15,7 +15,6 @@ package WebGUI::VersionTag;
 =cut
 
 use strict;
-use Carp qw(carp);
 use WebGUI::Asset;
 use WebGUI::Workflow::Instance;
 
@@ -384,8 +383,8 @@ sub new {
 
 =head2 requestCommit ( )
 
-Locks the version tag and then kicks off the approval/commit workflow for it. A carp is thrown if workflow is
-realtime and fails.
+Locks the version tag and then kicks off the approval/commit workflow for it.  Returns an error message if it
+fails.
 
 =cut
 
@@ -411,7 +410,7 @@ sub requestCommit {
             my $errorMessage = "Realtime workflow instance ".$instance->getId." returned status ".$status." where
                 'done' was expected";
             $self->session->errorHandler->warn($errorMessage);
-            carp $errorMessage;
+            return $errorMessage;
         }
     }
 }

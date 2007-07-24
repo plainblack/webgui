@@ -243,10 +243,10 @@ sub www_commitVersionTagConfirm {
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
 			my $i18n = WebGUI::International->new($session, "VersionTag");
 			$tag->set({comments=>$session->form->process("comments", "textarea")});
-            eval { $tag->requestCommit; };
+            my $message = $tag->requestCommit;
             my $error = "";
-            if ($@) {
-                 $error .= $i18n->get("bad commit")." ".$@; 
+            if ($message) {
+                 $error .= $i18n->get("bad commit")." ".$message;
             }
         	my $ac = WebGUI::AdminConsole->new($session,"versions");
 			my $default = WebGUI::Asset->getDefault($session);
