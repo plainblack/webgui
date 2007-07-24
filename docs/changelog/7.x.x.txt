@@ -87,6 +87,7 @@
    is now the Help Index.
  - Allow editing previous revisions of assets in the current version tag
  - Add user to transactions list and pending transactions.
+ - fix: autolinking in wiki pages with manual links didn't work properly
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success

@@ -105,18 +105,15 @@ sub autolinkHtml {
 	$p->case_sensitive(1);
 	$p->marked_sections(1);
 	$p->unbroken_text(1);
-	$p->handler(start => sub { push @acc, $_[2]; if ($_[0] eq 'a' and exists $_[1]{href}) { $in_a++ } },
+	$p->handler(start => sub { push @acc, $_[2]; if ($_[0] eq 'a') { $in_a++ } },
 		    'tagname, attr, text');
-	$p->handler(end => sub { push @acc, $_[2]; if ($_[0] eq 'a' and exists $_[1]{href}) { $in_a-- } },
+	$p->handler(end => sub { push @acc, $_[2]; if ($_[0] eq 'a') { $in_a-- } },
 		    'tagname, attr, text');
 	$p->handler(text => sub {
 			    my $text = $_[0];
 			    unless ($in_a) {
                     $text =~ s{\&\#39\;}{\'}xms; # html entities for ' created by rich editor
-				    while ($text =~ s#^(.*?)$regexp##i) {
-					    push @acc, sprintf '%s<a href="%s">%s</a>',
-						($1, $mapping{lc $2}, $2);
-				    }
+                    $text =~ s{$regexp}{'<a href="' . $mapping{lc $1} . '">' . $1 . '</a>'}xmseg;
 			    }
 			    push @acc, $text;
 		    }, 'text');
