@@ -142,7 +142,9 @@ Returns 1 if it's not locked. Returns 1 if is locked, and the user is using the 
 sub canEditIfLocked {
 	my $self = shift;
 	return 1 unless ($self->isLocked);
-	return ($self->session->scratch->get("versionTag") eq $self->get("tagId"));
+	my $ver_tag = $self->session->scratch->get("versionTag");
+	my ($count) = $self->session->db->quickArray("select count(*) from assetData where assetId=? and tagId=?",[$self->getId, $ver_tag]);
+	return $count > 0;
 }
 
 

@@ -85,6 +85,7 @@
    WebGUI and put into the WebGUI Community Wiki, http://www.webgui.org/community-wiki.
  - The Table of Contents view was removed from the Help system.  The only view
    is now the Help Index.
+ - Allow editing previous revisions of assets in the current version tag
 
 7.3.21
  - fix: Self-deactivation doesn't show login screen after success
