@@ -330,9 +330,10 @@ sub new {
 				identifier=>$session->config->get("dbpass"),
 				title=>"WebGUI Database",
 				allowedKeywords=>"select\ndescribe\ndesc\nshow\ncall",
+                allowMacroAccess=>0,
 				);
 		} else {
-			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=".$session->db->quote($databaseLinkId));
+			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=?",[$databaseLinkId]);
 		}
 	}
 	
@@ -406,6 +407,15 @@ The password to connect to the database with.
 =head4 title
 
 A text label to identify this database to humans in the UI.
+
+=head4 allowedKeywords
+
+A whitespace delimited of keywords that a query may start with.  Checked in
+queryIsAllowed.
+
+=head4 allowMacroAccess
+
+A boolean that indicates whether macros are allowed to access this DatabaseLink.
 
 =cut
 

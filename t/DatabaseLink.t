@@ -17,7 +17,8 @@ use WebGUI::Session;
 
 use WebGUI::DatabaseLink;
 
-use Test::More; # increment this value for each test you create
+use Test::More;
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
@@ -123,18 +124,106 @@ my $grants = [
 ];
 
 
-plan tests => 2 + scalar @{ $DSNs } + scalar @{ $grants };
+plan tests => 14 + scalar @{ $DSNs } + scalar @{ $grants };
 
-my $dbLink = WebGUI::DatabaseLink->new($session, 0);
-is($dbLink->get->{DSN}, $session->config->get('dsn'), 'DSN set correctly for default database link');
+####################################################
+#
+# create
+#
+####################################################
+
+my $startingDbLinks = scalar keys %{WebGUI::DatabaseLink->getList($session)}; 
+
+my $dbLink = WebGUI::DatabaseLink->create($session);
+isa_ok($dbLink, 'WebGUI::DatabaseLink', 'create made an object');
+ok($session->id->valid($dbLink->getId), 'create makes an object with a valid GUID');
+cmp_deeply(
+    $dbLink->get(),
+    {
+        databaseLinkId => re(".{22}"),
+        DSN        => undef,
+        username   => undef,
+        identifier => undef,
+        title      => undef,
+        allowedKeywords => undef,
+        allowMacroAccess => 0,
+    },
+    'create: passing no params autovivifies the databaseLinkId, but that is all',
+);
+
+is(scalar keys %{WebGUI::DatabaseLink->getList($session)}, $startingDbLinks+1, 'new DatabaseLink created');
+$dbLink->delete();
+is(scalar keys %{WebGUI::DatabaseLink->getList($session)}, $startingDbLinks, 'new DatabaseLink deleted');
+
+my $dbLinkParams = {
+                       DSN        => 'DBI:mysql:myDb:myHost',
+                       username   => 'dbUser',
+                       identifier => 'dbPass',
+                       title      => 'Access to my Awesome DB',
+                       allowedKeywords => 'SELECT UPDATE',
+                       databaseLinkId  => 'fooBarBaz',
+                       allowMacroAccess => 0,
+                   };
+
+$dbLink = WebGUI::DatabaseLink->create($session, $dbLinkParams);
+$dbLinkParams->{databaseLinkId} = ignore();
+
+cmp_deeply(
+    $dbLink->get(),
+    $dbLinkParams,
+    'create: params sent to create are embedded in the object correctly',
+);
+isnt($dbLink->getId, 'fooBarBaz', 'requested databaseLinkId was not used as the linkId');
+ok($session->id->valid($dbLink->getId), 'create made a valid GUID instead of that thing I asked for');
+
+####################################################
+#
+# queryIsValid
+#
+####################################################
+
+####################################################
+#
+# new
+#
+####################################################
+
+my $wgDbLink = WebGUI::DatabaseLink->new($session, 0);
+is($wgDbLink->get->{DSN}, $session->config->get('dsn'), 'DSN set correctly for default database link');
 my ($databaseName) = $session->db->quickArray('SELECT DATABASE()');
-is ($dbLink->databaseName, $databaseName, 'databaseName parsed default DSN from config file');
+is ($wgDbLink->databaseName, $databaseName, 'databaseName parsed default DSN from config file');
+is ($wgDbLink->getId, 0, 'databaseLinkId set correctly');
+
+is(WebGUI::DatabaseLink->new($session), undef, 'new returns undef unless you specify a databaseLinkId');
+is(WebGUI::DatabaseLink->new($session,'foobar'), undef, 'new returns undef with a non-existant databaseLinkId');
+
+####################################################
+#
+# delete
+#
+####################################################
+
+
+
+####################################################
+#
+# databaseName
+#
+####################################################
+
+my $dbs = WebGUI::DatabaseLink->getList($session);
 
 foreach my $dsn (@{ $DSNs }) {
     my $dbl = WebGUI::DatabaseLink->create($session, { DSN => $dsn->{dsn} });
 	is( $dbl->databaseName(), $dsn->{dbName}, $dsn->{comment} );
     $dbl->delete;
 }
+
+####################################################
+#
+# checkPrivileges
+#
+####################################################
 
 foreach my $grant (@{ $grants }) {
     my $dbl = WebGUI::DatabaseLink->create($session, { DSN => $grant->{dsn} });
@@ -146,8 +235,12 @@ foreach my $grant (@{ $grants }) {
     $dbl->delete;
 }
 
+my $dbsAfter = WebGUI::DatabaseLink->getList($session);
+
+cmp_deeply($dbs, $dbsAfter, 'delete cleaned up all temporarily created DatabaseLinks');
+
 END {
-	foreach my $link ($dbLink, ) {
+	foreach my $link ($dbLink, $wgDbLink) {
 		$link->delete if (defined $link and ref $link eq 'WebGUI::DatabaseLink');
 	}
 }
