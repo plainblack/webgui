@@ -864,12 +864,16 @@ sub www_listPendingTransactions {
 
 	$output = $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
-	$output .= '<tr><th>'.$i18n->get('transactionId').'</th><th>'.$i18n->get('gateway').'</th>'.
+	$output .= '<tr><th>'.$i18n->get('transactionId').'</th><th>' . $i18n->get('username') . '</th><th>'.$i18n->get('gateway').'</th>'.
 		'<th>'.$i18n->get('gatewayId').'</th><th>'.$i18n->get('init date').'</th></tr>';
 	foreach (@{$transactions}) {
 		$properties = $_->get;
 		$output .= '<tr>';
 		$output .= '<td>'.$properties->{transactionId}.'</td>';
+
+		my $userId = $properties->{userId};
+		my $username = WebGUI::User->new($session, $userId)->username;
+		$output .= '<td><a href="' . $session->url->page('op=editUser;uid=' . $userId) . '">' . $username . '</a></td>';
 		$output .= '<td>'.$properties->{gatewayId}.'</td>';
 		$output .= '<td>'.$properties->{gateway}.'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($properties->{initDate}).'</td>';
@@ -960,6 +964,7 @@ sub www_listTransactions {
 
 	$output .= '<table border="1">';
 	$output .= '<tr><th></th>'.
+	    '<th>'. $i18n->get('username'). '</th>'.
 		'<th>'. $i18n->get('init date'). '</th>'.
 		'<th>'. $i18n->get('completion date'). '</th>'.
 		'<th>'. $i18n->get('amount'). '</th>'.
@@ -969,6 +974,9 @@ sub www_listTransactions {
 	foreach $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
 		$output .= '<td>'.$session->icon->delete('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
+		my $userId = $transaction->get('userId');
+		my $username = WebGUI::User->new($session, $userId)->username;
+		$output .= '<td><a href="' . $session->url->page('op=editUser;uid=' . $userId) . '">' . $username . '</a></td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('initDate')).'</td>';
 		$output .= '<td>'.$session->datetime->epochToHuman($transaction->get('completionDate')).'</td>';
 		$output .= '<td>'.sprintf('%.2f',$transaction->get('amount')).'</td>';
@@ -981,7 +989,7 @@ sub www_listTransactions {
 		foreach (@items) {
 			$output .= '<tr>';
 			$output .= '<td></td>';
-			$output .= '<td colspan="3">'.
+			$output .= '<td colspan="4">'.
 				$session->icon->delete('op=deleteTransactionItem;tid='.$transaction->get('transactionId').';iid='.$_->{itemId}.';itype='.$_->{itemType}).
 				$_->{itemName}.'</td>';
 			$output .= '<td>'.$_->{quantity}.'</td>';

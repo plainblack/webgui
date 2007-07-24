@@ -83,6 +83,10 @@ our $I18N = {
 		lastUpdated => 1149222142,
 	},
 
+    'username' => {
+        message => q|User|,
+        lastUpdated => 1185302874,
+    },
 	'itemLoop' => {
 		message => q|This loop contains all items the transaction consists of. These variables are available:|,
 		lastUpdated => 1149222142,

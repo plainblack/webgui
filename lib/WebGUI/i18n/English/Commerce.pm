@@ -152,14 +152,16 @@ our $I18N = {
 		context => q|The menu title for 'Show pending transactions' in the AdminConsole side menu.|
 	},
 
+	'username' => {
+		message => q|User|,
+		lastUpdated => 0,
+	},
 
 	'transactionId' => {
 		message => q|TransactionId|,
 		lastUpdated => 0,
 		context => q|TransactionId, just leave it as it is.|
 	},
-
-
 
 	'gatewayId' => {
 		message => q|Gateway ID|,
