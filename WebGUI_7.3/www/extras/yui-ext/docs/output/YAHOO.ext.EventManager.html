@@ -1,0 +1,225 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.EventManager</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.EventManager.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.EventManager</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext</td></tr>
+            <tr><td class="label">Class:</td><td>EventManager</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="EventManager.js.html">EventManager.js</a></td></tr>
+        </table>
+        <div class="description">
+            Registers event handlers that want to receive a normalized EventObject instead of the standard browser event and provides 
+several useful events directly.
+See <a href="YAHOO.ext.EventObject.html">YAHOO.ext.EventObject</a> for more details on normalized event objects.<br><br><i>This class is a singleton and cannot be created directly.</i>        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addListener">addListener</a>(<code>Object element</code>, <code>String eventName</code>, <code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>) : Function</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends an event handler</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#on">on</a>(<code>Object element</code>, <code>String eventName</code>, <code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>) : Function</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends an event handler (shorthand for addListener)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDocumentReady">onDocumentReady</a>(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>) : void</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires when the document is ready (before onload and before images are loaded)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onWindowResize">onWindowResize</a>(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>) : void</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires when the window is resized and provides resize event buffering (50 milliseconds), passes new viewport width and...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeListener">removeListener</a>(<code>Object element</code>, <code>String eventName</code>, <code>Function wrappedFn</code>) : Boolean</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes an event handler</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeResizeListener">removeResizeListener</a>(<code>Function fn</code>, <code>Object scope</code>) : void</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the passed window resize listener.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#wrap">wrap</a>(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>) : Function</td>
+        <td class="msource" rowspan="2">EventManager</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Places a simple wrapper around an event handler to override the browser event 
+object with a YAHOO.ext.EventObject</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addListener"></a>
+                <div class="mdetail">
+                <h3>addListener</i></h3>
+                <code>public function addListener(<code>Object element</code>, <code>String eventName</code>, <code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : Object<div class="sub-desc">The html element to assign the event to</div></li><li><code>eventName</code> : String<div class="sub-desc">The type of event to append</div></li><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">An object that becomes the scope of the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Function</code><div class="sub-desc">The wrapper function created (to be used to remove the listener if necessary)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="on"></a>
+                <div class="mdetail alt">
+                <h3>on</i></h3>
+                <code>public function on(<code>Object element</code>, <code>String eventName</code>, <code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler (shorthand for addListener)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : Object<div class="sub-desc">The html element to assign the event to</div></li><li><code>eventName</code> : String<div class="sub-desc">The type of event to append</div></li><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">An arbitrary object that will be passed as a parameter to the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Function</code><div class="sub-desc">The wrapper function created (to be used to remove the listener if necessary)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="onDocumentReady"></a>
+                <div class="mdetail">
+                <h3>onDocumentReady</i></h3>
+                <code>public function onDocumentReady(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Fires when the document is ready (before onload and before images are loaded)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">An object that becomes the scope of the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="onWindowResize"></a>
+                <div class="mdetail alt">
+                <h3>onWindowResize</i></h3>
+                <code>public function onWindowResize(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Fires when the window is resized and provides resize event buffering (50 milliseconds), passes new viewport width and height to handlers.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">An object that becomes the scope of the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="removeListener"></a>
+                <div class="mdetail">
+                <h3>removeListener</i></h3>
+                <code>public function removeListener(<code>Object element</code>, <code>String eventName</code>, <code>Function wrappedFn</code>)</code>
+                <div class="mdetail-desc">
+                    Removes an event handler                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : Object<div class="sub-desc">The html element to remove the event from</div></li><li><code>eventName</code> : String<div class="sub-desc">The type of event to append</div></li><li><code>wrappedFn</code> : Function<div class="sub-desc">The wrapper method returned when adding the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True if a listener was actually removed</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="removeResizeListener"></a>
+                <div class="mdetail alt">
+                <h3>removeResizeListener</i></h3>
+                <code>public function removeResizeListener(<code>Function fn</code>, <code>Object scope</code>)</code>
+                <div class="mdetail-desc">
+                    Removes the passed window resize listener.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">The scope of handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                            <a name="wrap"></a>
+                <div class="mdetail">
+                <h3>wrap</i></h3>
+                <code>public function wrap(<code>Function fn</code>, <code>Object scope</code>, <code>boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Places a simple wrapper around an event handler to override the browser event 
+object with a YAHOO.ext.EventObject                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">An object that becomes the scope of the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Function</code><div class="sub-desc">The wrapped function</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by EventManager.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

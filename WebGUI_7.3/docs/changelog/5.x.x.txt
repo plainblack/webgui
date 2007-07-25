@@ -1,0 +1,700 @@
+5.5.8
+ - bugfix [ 991366 ] 5.5.7 typo in Macro/Synopsis.pm
+ - bugfix [ 992018 ] Synopsis(); macro generates error
+
+5.5.7
+ - bugfix [ 935552 ] USS bug (w/ and w/o img mixed posts). 
+ - bugfix [ 926610 ] WebGUI::Wobject::Article
+ - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
+ - Fixed a possible counting problem when looking for an infinite loop in
+   groups of groups.
+ - Fixed a bug in the LDAP module that required the RDN to be a URL.
+ - bugfix [962196] addHTTP problem.
+ - bugfix [962224] WebGUI::Operation::Statistics
+ - bugfix [966470] WebGUI::User. Session not properly killed when deleting user.
+ - bugfix [966466] WebGUI::Session. System crash when user language missing.
+ - bugfix [ 981059 ] WebGUI vs perl 5.8.4
+ - bugfix [ 975609 ] The form field for phone and email do not support maxlength
+   (Thanks to Junying Du).
+ - bugfix [ 938266 ] Fix: 5.5.4 Synopsis ignores hideFromNav (Thanks to 
+   Nicklous Roberts.)
+ - bugfix [ 961056 ] pages erroneously owned by visitor
+ - bugfix [ 913847 ] Minutes on times can not be updated.
+ - bugfix [ 939070 ] 5.5.4: Macros do not work in DataForm fields
+
+
+
+5.5.6
+ - bugfix [ 895067 ] Forum ID Missing In USS
+ - bugfix [ 909688 ] USS forum post edit function not work
+ - bugfix [ 910514 ] Article Discussion - Not reporting correctly
+ - Bugfix [ 917535 ] 5.5.5 HTMLEdit - Insert Image Not Functional
+ - bugfix [ 912404 ] Visitors can turn admin on
+ - bugfix [ 917913, 915019, 913999, 912765, 912206 ] OwnerId was not set correctly
+   when saving page.
+ - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
+   www_viewForum to handle postings that start a new thread.
+ - Bugfix [ 909579 ] possible package problem 5.5.4
+ - Bugfix [ 918136 ] upgrade to 5.5.5 sql inserts wrong version number
+ - Bugfix [ 917338 ] Typo in 5.5.5 Email Data Form
+ - Bugfix [ 932243 ] Security bug: Env Host can be spoofed
+ - Bugfix [ 913525 ] Beg. / End Dates of WObjects
+ - Bugfix [ 927530 ] bugfix FormProcessor email checking change
+
+
+
+5.5.5
+ - Fixed a bug in AdminBar's clipboard code where a standard hash was
+   used instead of a CPHash for database access.  (Thanks to Steve Simms.)
+ - When copying a Wobject to a clipboard, the previous location was
+   not stored correctly.  (Thanks to Steve Smms.)
+ - Fixed a problem in the forum that showed up under Postgres.
+ - Bugfix [ 822805 ] Emptying trash can cause fatal error
+   (Thanks to Steve Simms.)
+ - Bugfix [ 870681 ] Wobject start/end dates change when editing wobject
+ - Bugfix [ 877999 ] runHourly.pl crashes server when no db
+ - Fixed a timing bug in the run hourly script
+ - Bugfix [ 903064 ] article won't display after edit
+ - Bugfix [ 903063 ] weird url cause page to break
+ - Bugfix [ 889761 ] Editing Page/Wobject Settings Crashes Netscape 4
+ - Bugfix [ 878601 ] ui level and page owner bug
+ - Bugfix [ 881586 ] Forum overview
+ - bugfix [ 881599 ] edit Posts
+ - Bugfix [ 883909 ] font family for contentType code in forum
+ - bugfix [ 884372 ] $session{header}{redirect} bug under mod_perl
+ - Bugfix [ 884375 ] Fix for multiple forum posts caused by browser Refresh
+ - Bugfix [ 886432 ] endless loop in group of groups
+ - bugfix [ 887447 ] editing messages
+ - Bugfix [ 893203 ] IO::Zlib not getting installed
+ - Bugfix [ 893556 ] TabForm bug: uiLevels not working
+ - Bugfix [ 894855 ] users cannot delete from message board
+ - Added the Polish translation. (Thanks to Indigo-Profit-Hosting.)
+ - Added an expires flag to HTTP header when prevent proxy cache is turned on.
+
+
+
+5.5.4
+ - Bugfix [ 849210 ] Login Redirect should filter out the "logout" operation
+ - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
+ - ^t; now starts in current root rather then in site root.
+ - Bugfix [ 867047 ] cannot delete Redirect URL. Thanks to Klaus Hertle.
+ - Bugfix [ 864535 ] Secondary admin adds user to group
+ - Bugfix [ 864537 ] Secondary admin adds user to group #2
+ - Bugfix [ 859199 ] Login problem
+ - Bugfix [ 852930 ] Pieces of Collateral Statistic always zero. Thanks to ajaman.
+ - Bugfix [ 854124 ] Can't reply to discussion message for USS submission.
+ - Fixed a bug in form processor that caused legal email addy's with funny
+   characters to fail the check.
+ - Bugfix [ 855228 ] word wrap not working when posting as text
+ - Bugfix [ 855632 ] SyndicatedContent crashs when rss contains only one item
+   (Thanks to Len Kranendonk)
+ - Bugfix [ 855682 ] USS rss feed shows unapproved items
+ - Bugfix [ 855684 ] USS: no approvement check
+ - Bugfix [ 826864 ] Endless recursion
+ - Bugfix [ 855968 ] search shows deleted messages
+ - Fixed a bug that wouldn't allow urls like ldap://some.server and
+   https://some.server to work in a url field
+ - Bugfix [ 852024 ] Can't copy a USS wobject (Thanks to Len Kranendonk)
+ - Bugfix [ 849438 ] Adding Wobject Fails for Content Managers
+ - Updated the Italian translation. (Thanks to Paolo Pigati.)
+ - Updated the Italian translation. (Thanks to ProcoliX.)
+ - Bugfix [ 870209 ] Calendar times thrown off by user's offset.
+
+
+5.5.3
+ - Lowercase file extension in importCollateral.pl while determinating file
+   type.
+ - Fixed a typo in the Forum Threads that caused an error upon deleting a
+   post.
+ - Bugfix [ 847198 ] no final newline when data form errors display
+ - Bugfix [ 699010 ] Need Approval option to Discussions like in USS
+ - Bugfix [ 847808 ] Signature not displayed in forum
+ - Fixed a bug where users would only be directed to the page they were on
+   after login, and not to a deeper location with URL parameters.
+
+
+5.5.2
+ - Fixed a whole slew of bugs in the forums introduced in the last version.
+ - Fixed a bug in the reply.url variable in the USS submission where template didn't get updated to reflect the new forum system.
+ - Fixed a bug in the forum search system where it would search all messages
+   regardless of forum.
+ - Fixed bugs where counters weren't being decremented when a post was
+   deleted.
+ - Fixed bug [ 843591 ] Fatal error while creating a new Message Board if
+   there are no Forums yet.
+ - Fixed bug [ 844196 ] Time formats
+ - Fixed a bug in the forum where new replies defaulted to always subscribing
+   the user to the thread.
+ - Fixed bug [ 844961 ] DataForm: no deleting
+ - Bugfix [ 822324 ]: From field not working in DataForm when mailing to group
+ - Fixed typos in importCollateral.pl
+ - Fixed bug [ 845046 ] Forum notification - no int. message at all
+
+
+5.5.1
+ - Fixed bug #829806 preventing users from updating thier passwords from the updateAccount form.
+ - Added Apache 2 instructions to install.txt. (Thanks to Andy Grundman.)
+ - Fixed bug [ 831628 ] Subscription notifications sent in wrong language.
+ - Fixed bug [ 828071 ] USS doubles the number of replies
+ - Fixed bug [ 831784 ] Pagination in Messeboard with multiple boards
+ - Fixed bug [ 836133 ] forum title and description are not template variables
+ - Fixed bug [ 840939 ] check on uniqueness of email address while
+   creating/modifying account.
+ - Fixed bug [ 811175 ] check on uniqueness of session Id while generating one
+ - Fixed bug [ 789461 ] added an option to terminate a answer-driven Survey
+ - Fixed bug [ 815856 ] added a patch for htmlArea which solves a problem with relative links
+ - Fixed bug [ 824171 ] page statistics are now tracked only if contenttype is "text/html"
+ - Fixed bug [ 828031 ] proper dsn parsing in upgrade.pl
+ - Fixed bug [ 810035 ] HTTP proxy and forms bug 
+ - Fixed bug [ 828057 ] DataForm fixed SQL insert syntax error
+ - Fixed bug [ 828967 ] addHTTP.js didn't work (Thanks to Leendert Bottelberghs).
+ - Fixed bug [ 826251 ] Return a understandable error if webgui.log isn't writable
+ - Fixed bug [ 837143 ] Pagination broken on Survey report
+ - Fixed bug [ 831331 ] translation errors
+ - Fixed bug [ 834792 ] Karma Decay triggers SQL error
+ - Fixed bug [ 832284 ] Pagination broken in Messageboard with Search
+ - Fixed bug [ 838091 ] Read-Only Forum User Cannot Subscribe
+ - Fixed bug [ 839524 ] Editing forum settings defaults all template names
+ - Fixed bug [ 841194 ] denied post security problem
+ - Added a check for malicious mail headers
+ - Fixed bug [ 820144 ] Theme problems under Win32
+ - Fixed bug [ 834633 ] View Threaded subscriptions fails
+ - Fixed bug [ 808704 ] Privilege API missing in Ruling WebGUI 5.4
+ - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Updated the German translation. (Thanks to Andreas Graf.)
+ - Fixed a security problem where users could access a forum they didn't have
+   privileges to view if they created a specific URL.
+ - Fixed a security problem where users could edit a forum post they didn't
+   create if they generated a proper URL.
+
+
+5.5.0
+ - Rewrote the discussion system and added many new features in the process.
+ - Made the username field in the database unique.
+ - Added sorting options to USS.
+ - Added external database group privileges. (Thanks to Andy Grundman.)
+ - Added a switch to the miscellaneous settings that allows the admin to set
+   how URLs are generated to fix a problem with sites behind load balancers.
+ - Added support for encryptLogin user setting. (Thanks to Hal Roberts.)
+ - Added anonymous response option to Survey. (Thanks to Andy Grundman.)
+ - Added the alphabetic? option to the SiteMap wobject. (Thanks to Hal Roberts.)
+ - Changed the page hideFromNavigation option to hide the given page from site maps as well as from navigation menus. (Thanks to Hal Roberts.)
+ - Revamped SyndicatedContent to support aggregate feeds. (Thanks to Hal Roberts.)
+ - Ordered the username list in the manageUsersInGroup operation (Thanks to
+   Andreas Graf.)
+ - Added support for record deletion in DataForm (Thanks to Hal Roberts.)
+ - Templatized the HttpProxy wobject. (Thanks to Len Kranendonk.)
+ - Added a "Search for" and "Stop at" option to HttpProxy. (Thanks to Len Kranendonk.)
+ - Added additional DSN formats for upgrades of remote databases.
+ - Enhanced HTMLArea editor to include table editing. (Thanks to Irving Carrion.)
+ - If the Cache Timeout on a given page is set to 10 seconds or less, that
+   page will not be cached.
+ - Added master events calendar switch.
+ - Updated the Dutch translation. (Thanks to ProcoliX.)
+ - Updated the Spanish translation. (Thanks to Paco Avila.) 
+ - Updated the German translation. (Thanks to Andreas Graf.)
+ - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Added the missing group scratch filter documentation to the help.
+ - Fixed a bug in the 5.4.3-5.4.4 upgrade script that some users experienced
+   with null values in their DataForm.
+ - Fixed a relative hyperlink bug in htmlArea (Thanks to Andreas Graf.)
+ - Fixed a bug where reinvoking www_createAccountSave could produce duplicate
+   usernames in the database. (Thanks to Martin Kamerbeek.)
+ - Fixed a bug in SQL macro where it required a leading space in queries.
+ - Fixed a case-sensitivity bug in email verfication. (Thanks to Steve Simms.)
+ - Fixed a bug where the user was returned to the wrong page after deleting an
+   item from the clipboard. (Thanks to Steve Simms.)
+ - Fixed a bug in WebGUI account creation where welcome emails were sent
+   regardless of the sendWelcomeMessage setting. (Thanks to Steve Simms.)
+ - Fixed a bug where templates would not render properly in the mini view on
+   the page if they contained macros.
+ - Fixed a display bug in the Data Form. (Thanks to Christian Kocourek.)
+ - Fixed a bug in the date method of the forms package where the noDate option
+   did the opposite of what was expected. (Thanks to Ed Van Duinen.)
+ - Fixed a bug that could hang the macro parser while processing incorrect
+   macro syntax. (Thanks to Len Kranendonk.)
+
+
+5.4.4
+ - Updated Finnish translation. (Thanks to Markus Hynna.)
+ - Added Croatian translation. (Thanks to Gordon.)
+ - Updated Portuguese translation. (Thanks to Marcelo Ennes.)
+ - Updated Dutch translation. (Thanks to Leo Noordergraaf, ProcoliX, BNC Distribution, and Hugo Van der Kooij.)
+ - Updated German translation. (Thanks to Andreas Graf.)
+ - Fixed a bug in the PreviousDropMenu macro.
+ - Added an association for PPS attachments.
+ - Readded wobject date range check that was accidentally removed.
+ - Fixed a bug that caused incompatibility in the HTML Area image manager with
+   Postgres. (Thanks to Jeremy Malcolm.)
+ - Fixed a leading whitespace bug with the SQL macro. 
+ - Usernames can now be 100 characters long.
+ - Page ordering wasn't always maintained when deploying packages, this is now
+   fixed. (Thanks to Y.H.Khoe.)
+ - Errors could have occured if you specified an image name in a collateral
+   macro that did not exist.
+ - Email address didn't validate when it contained a dash (-). (Thanks to
+   Fekke.)
+ - Fixed a bug in the node mechanism where no error would be logged if
+   decompression failed.
+ - Fixed a bug that allowed users to import the same theme multiple times.
+ - Fixed a bug in the page template draw method where javascript caused
+   problems. (Thanks to Leendert Bottelberghs.)
+ - Messages in the message log now have carriage returns converted to HTML
+   breaks when necessary.
+ - Fixed a bug in SMB authentication where the user was let in if there was no
+   SMB Username specified for a user.
+ - Fixed a preceeding space problem in the M macro.
+ - Added a manage templates link to the page properties.
+ - The calendar wizard was too narrow and wrapping on some browsers.
+ - The size attribute was missing from the email method in the Form package.
+   (Thanks to Andreas Graf.)
+ - Data Form: Was displaying mail fields in admin mode even when mailing was
+   disabled.
+ - Data Form: Dates were reset to epoch if a required field caused the form to
+   error.
+ - Data Form: If a site had two data forms with the same field names the list
+   template would be broken.
+ - Data Form: No longer keys on field name, which was dangerous, but instead
+   keys on fieldId.
+ - Data Form: Date and Date Time fields were displaying epoch to the end user
+   rather than human readable dates.
+ - Data Form: A bug in the default acknowlegement caused hidden fields to be
+   displayed.
+ - Data Form: CC and BCC would not be sent if the TO was specified as a
+   username or group name instead of an email address.
+ - Survey: Couldn't go beyond page 1 in gradebook report.
+ - HTTP Proxy: Improper headers were set on errors.
+
+
+5.4.3
+ - Fixed a bug where CM's could have deleted the entire collateral manager
+   contents if they deleted an item, then hit their back button and deleted it
+again.
+ - Fixed a bug in the collateralImport.pl script.
+ - Fixed a bug where exports of themes would only work if an image was
+   included in the theme.
+ - Fixed a bug in the RandomSnippet and RandomImage macros where they would
+   crash the page if an invalid collateral folder were specified.
+ - Fixed a bug when wobject privileges were turned on and a user had the
+   privileges to edit a page, they could not add wobjects to the page.
+ - Fixed a bug where all of the articles on a page would get the same template
+   for one page view after a properties save.
+ - Fixed a bug where the email address would not appear when editing a user
+   profile after an admin created a new account. (Thanks to Arne Dokken.)
+ - Fixed a bug in editing secondary admins. (Thanks to Leendert Bottelberghs.)
+ - Fixed an ordering bug on the list of users in the Manage Users In Group
+   page.
+ - Fixed an LDAP auth bug where users could not authenticate if RDN = DN.
+   (Thanks to Chris Jackson.)
+ - Fixed a bug in the DataForm where multiple items in a check list were not
+   being emailed.
+ - Fixed a bug in the Syndicated Content wobject where feeds with only one
+   item would cause a problem. (Thanks to Len Kranendonk.)
+ - Made session page setup use the same mechanism to mangle urls as the rest
+   of WebGUI uses.
+ - Fixed a bug in DataForm where the name of the last form element added would
+   appear as the default value of another form field if it were called "name".
+ - Fixed a potential security problem in the collateral manager where content
+   managers could delete collateral they didn't own.
+
+
+
+5.4.2
+ - Fixed tab forms for better support with older browsers, less resource usage, and a cookie bug that would log users out after editing their stie for a while.
+ - Updated German translation. (Thanks to Andreas Graf.)
+ - Fixed a minor security problem where some error messages would list the admins on the system. This would theoretically make it easier for people to guess their passwords since they knew the usernames.
+ - Fixed a bug where the "Validate This Page" option was broken.
+ - Fixed a bug that would cause a fatal error if a user's session was killed while they were trying to access a page that required special privileges.
+ - Fixed a bug that allowed data form field names to contain "-" and "/".
+ - Fixed several bugs related to editing while per-wobject privileges is enabled.
+
+
+
+5.4.1
+ - Disabled write actions in the SQL macro for better security.
+ - Fixed a security flaw that could allow registered users to get admin privileges in WebGUI. (Thanks to Len Kranendonk.)
+ - Removed the programmer macros from the default config file as a security measure. They can still be readded when needed.
+ - Updated the Norwegian translation. (Thanks to Nils-Magne Kvammen.)
+ - Fixed a bug caused by running WebGUI on a non-standard port.
+ - Fixed an ordering bug in page statistics report.
+ - Fixed a vulnerability where unauthorized users could edit a Data Form entry.
+ - Updated the Italian translation. (Thanks to Paolo Pigati.)
+ - Fixed a package deployment sequencing problem.
+ - Updated the German translation (Thanks to Andreas Graf.)
+ - Fixed a bug in Form.pm where interval fields that were set to "0" displayed as "1". (Thanks to Andy Grundman.)
+ - Fixed a bug in the databaseLink selectList in SQLReport where it would not properly default to the null entry. (Thanks to Andy Grundman.)
+ - Fixed a recursive page privs problem. 
+ - Fixed a problem moving pages up and down under mod_perl2. (Thanks to Arne Dokken.)
+ - Changed the HTTP Proxy to handle malformed URLs better. (Thanks to Len Kranendonk.)
+ - Fixed an Article template problem that caused attachments not to show up.
+ - Added a CSS class to the last element in the Crumbtrail Macro. (Thanks to Jonas Diemer.)
+ - Changed a few things to get closer to XHTML 1.0 compliance. (Thanks to Balint Sandor.)
+
+
+
+5.4.0
+ - Added RSS syndication to the USS. (Thanks to Hal Roberts.)
+ - Added per wobject Privileges.
+ - Added per page caching.
+ - Added database connection properties manager. (Thanks to Andy Grundman.)
+ - Added "Rewrite URLs?" option to HTTP Proxy. (Thanks to Len Kranendonk.)
+ - HTTP Proxy now proxies all content types. So images, etc, go through WebGUI. (Thanks to Len Kranendonk.)
+ - Added caching of content. (Thanks to Len Kranendonk.)
+ - Updated the German translation. (Thanks to Andreas Graf.)
+ - Fixed a bug that could cause SQL Report to crash. (Thanks to Andy Grundman.)
+ - Fixed that caused two sub-menus to appear when you copied a style. (Thanks to Andy Grundman.)
+ - Fixed an encoding problem with the Japanese translation.
+ - Fixed a bug where users could create files in the File Manager that they could not edit.
+ - Added some extra attributes to the user manager for easier management. (Thanks to Richard Calieus.)
+
+
+5.3.3
+ - Fixed a spelling error in the userImport script.
+ - Fixed a bug where all discussions would crash if the message board was disabled in the config file.
+ - Fixed a bug where data form required fields were not actually being checked as required.
+ - Macros are now pre-processed on default data in the Data Form.
+ - Rich edit is now always a popup option when editing snippets to avoid problems with CSS, and Javascript snippets.
+ - Fixed an IP Filter problem in the groups privileges.
+ - Fixed a privilege caching problem. (Thanks to Len Kranendonk.)
+ - Fixed a db connection pooling problem. (Thanks to Andy Grundman.)
+ - Fixed an LDAP Profile Sync problem. (Thanks to Andy Grundman.)
+ - Fixed an unclosed file handle problem. (Thanks to Andy Grundman.)
+ - Fixed an erroneous prompt before deleting a collateral folder (Thanks to Andy Grundman.)
+ - Fixed a problem where pages would never remain hidden. (Thanks to Andy Grundman.)
+ - Fixed a problem where items deleted from collateral manager were not always deleted from the filesystem. (Thanks to Andy Grundman.)
+ - Added the Japanese translation. (Thanks to Nusphere.)
+ - Updated the Italian translation. (Thanks to Paolo Pigati.)
+ - Updated the German Translation (Thanks to Andreas Graf.)
+
+
+
+
+5.3.2
+ - Fixed a bug where the "export theme" option wasn't showing up.
+ - Fixed a bug in the group expiration notification system where it wasn't sending the notifications.
+ - Fixed a bug where the registration page didn't work if a custom profile field was of type select and was required.
+ - Changed the theme file extention to "theme.tar.gz" because just plain "theme" was conflicting with Windows theme manager.
+ - Fixed a bug where welcome emails were not being sent to users.
+ - Fixed a bug during the upgrade process where certain types of data forms would fail to migrate.
+ - Fixed a bug during the upgrade process where wobject proxies that were pointing to invalid wobjects would fail to migrate.
+ - Updated Italian toolbar images. (Thanks to Pablo Pigati.)
+ - Updated German translation. (Thanks to Andreas Graf.)
+ - Fixed a bug where you could not "cut" any of the pages that ship with WebGUI.
+ - Fixed a bug where you could not paste pages directly from the clipboard drop down, only through the manage clipboard interface.
+ - Fixed a bug in the Extra Column wobject where the start/end dates were not being set properly.
+ - Fixed a syntax error in the scaled image macro.
+ - In the new persistence layer using getTree() with a defined depth was not working.
+ - Fixed a bug in the gotchas that read 'Compress:Zlib' when it should have read 'Compress::Zlib'.
+ - Fixed a bug in the spell checker in HTML Area where the spell checker stayed in memory even after the editor was closed.
+
+5.3.1
+ - 5.3.0 was released with the 5.2.4 create script due to a bug in our build process. This has been corrected. Upgraders will not have a problem, but those creating a new site from the 5.3.0 create script will need up use 5.3.1 instead.
+ - Fixed some POD formatting errors.
+ - Fixed a syntax error in the Data Form acknowledgement.
+
+
+
+5.3.0
+ - Converted the Mail Form wobject into the Data Form wobject.
+
+ - Added more range options to Events Calendar.
+ - Added a theme manager.
+ - Enhanced Wobject Proxy wobject by creating a new shortcut interface and allowing overrides of title, description, and template.
+ - Added secondary security.
+ - Moved HTTP Proxy cookie jar to WebGUI's tempspace.
+ - Added dateTime and time field formats and all accompanying methods.
+ - Added a relative distinquished name setting to LDAP authentication.
+ - Added content type meta tag to page generation to help with text encoding on non-english languages.
+ - Added time setting to wobjects and pages start and end dates.
+ - Events calendar entries can now be sorted by selecting a time.
+ - Added an option to use the real IP address as the client IP when running through a proxy. (Thanks to Ed Van Duinen.)
+ - Added massive improvements to HTML Area rich editor: link target selection, smileys, find / replace, undo / redo, MS-Word cleanup, special characters, integration with the collateral manager for images, and spell check (requires MS Word). (Thanks to Len Kranendonk and the HTML Area open source community.)
+ - Added more field types to the user profile system.
+ - The upgrade system automatically deals with dislocated databases now.
+ - Added user separated clipboards and trash. (Thanks to Ed Van Duinen.)
+ - Added advanced trash and clipboard management functions (Thanks to Ed Van Duinen.)
+ - Added trash and clipboard expiration (auto delete) functions. (Thanks to Ed Van Duinen.)
+ - Added a new persistence layer capable of easily dealing with complex data structures like trees and persisting them to a relational database table. (Thanks to Ben Simpson.)
+ - Added the ability to set set scratch variables from the web interface.
+ - Added template to wobject API.
+ - Can now move pages left and right in heirarchy in the page tree manager. (Thanks to Ben Simpson.)
+ - Deleting a collateral folder will now recursively delete the contents of the collateral folder rather than moving the contents to the parent folder. (Thanks to Ben Simpson.)
+ - Added a link to download a new version of WebGUI to the statistics page, when one exists.
+ - Added a mechanism to allow administrators to set up groups that users can auto-(un)subscribe to/from. Useful for newsletter management and other opt-in programs.
+ - Remved the hardcoded paragraph tag (p) that went between articles.
+ - Added methods to the DateTime package for dealing with time in forms.
+ - Added a div class called "wobject" around all wobjects. (Thanks to Hal Roberts.)
+ - Enhanced debug for easier development.
+ - Added the RootTab, RandomSnippet, RandomImage, CanEditText, If, Spacer, EditableToggle, SpecificDropMenu, TopDropMenu, GroupAdd, GroupDelete, LastModified, PreviousDropMenu, and SI (scaled image) macros. 
+ - Added the ability to move pages up and down in the page tree (thanks to Ben Simpson).
+ - Added a translation managers group so that administrators can sub-divide the internationalization task without giving away admin privileges.
+ - Added macros to get random data back from the collateral manager.
+ - Changed the GroupText macro to have an "else" display.
+ - Added a parameter to the ThumbnailLinker macro to open the image in a new window.
+ - Added an option to open menu links in a new window.
+ - Templatized the Poll wobject.
+ - Added a search parameter of email address to the user manager.
+ - Page redirect URLs no longer redirect when admin mode is turned on in order to make the page properties easier to edit.
+ - Added a date stamp to outgoing mail to maintain compliance with the RFC2822 specification.
+ - Added configurable favicon and site icon support.
+ - Added new administrative settings to the profile manager for more extensible user profiling.
+ - Changed link list so users couldn't see edit icons unless they had the privileges to edit the link.
+ - Removed the long since depricated "become" method from the icons package.
+ - Updated icons to use the "title" attribute for tooltips.
+ - Added a more comprehensive search and filtering system in the translations manager.
+ - Added a pagination feature to the Article wobject to allow for multi-paged articles.
+ - Enhanced the Attachments and Nodes sub-systems.
+ - Added a "context" attribute to the translations manager to help make translations easier.
+ - Added scratch filter to groups.
+ - Added a temp directory subsystem.
+ - Fixed a bug that caused the syndicated content wobject to fail, and also removed the HTML::Parser 3.27 requirement.
+ - Fixed a pagination bug in the groups manager.
+ - Fixed a bug in the File Manager wobject that didn't delete the collateral data from the database when the wobject was purged from the system.
+ - Fixed a minor security problem where a user could log in with an invalid password if an administrator did not specify a connect DN for them, but did set their account to authenticate via LDAP.
+ - Fixed a potential problem where adding a slash at the end of a url would cause the user to only see the not found page.
+ - Fixed a bug where visitors could not turn the search on/off in USS.
+ - Fixed a problem where users were unable to "recover" their password if the administrator didn't set them a default password.
+ - The "next event" link in the events calendar would choose events that did not belong to the current calendar, this has been fixed.
+
+
+
+
+
+5.2.6
+ - Fixed a major security problem where users could edit settings they had no privileges to edit.
+ - Fixed a compatibility problem with Mac OS X and Windows.
+
+
+
+5.2.5.
+ - Added the Finnish translation (thanks to Markus Hynna).
+ - Updated the Swedish translation (thanks to Michael Westlund).
+ - Fixed a bug where users could not delete their own submissions.
+ - Fixed a bug where dates in user profile were shown as epoch.
+ - Added the "m3u" extension type to the attachment system.
+ - Fixed a bug where the SQL macro would cause a fatal error if an invalid query was used.
+ - Changed the Syndicated Content wobject to accept both the new and old specifications of RSS/RDF.
+ - Removed the hard coded "cn=" in the LDAP auth method.
+ - Fixed a bug where the "Hide From Navigation" setting would default back to no even when it was set to yes.
+ - Fixed a syntax error that caused a problem on Red Hat 9 installs.
+ - Fixed a bug where the karma threshold did not display properly in the "edit group" form.
+ - Fixed a parsing bug in Syndicated Content wobject. Requires the upgrade of HTML::Parser to version 3.27+.
+ - Fixed a bug where users in the content managers group were not showing up as possible page owners.
+
+
+
+5.2.4
+ - Updated the Italian translation (thanks to Emiliano Grilli).
+ - Eliminated a possible denial of service situation with the HTTP Proxy (thanks to Len Kranendonk).
+ - Fixed some typos in the upgrade utility (thanks to Ben Simpson).
+ - Fixed a problem where the karma properties on discussions did not show up properly.
+ - Fixed a problem where FAQ templates could not be switched (thanks to Len Kranendonk).
+ - Fixed a problem in the backwards compatibility code for the pre-5.2 Wobject API (thanks to Frank Dillon).
+ - Updated Syndicated Content to use new improved RSS feed reader (thanks to Andy Grundman and Len Kranendonk).
+ - Fixed a bug where date fields were not being properly validated in the user profile system.
+ - Fixed a bug where a page URL could start with a / (slash), causing problems when using mod_rewrite.
+
+
+
+
+
+5.2.3
+ - Updated the German translation (thanks to Andreas Graf)
+ - Fixed a macro processing bug for HTML entities.
+ - Fixed a bug in the user alias where alias could be left blank.
+ - Fixed a bug where referencing non-existant collateral would cause a fatal error.
+ - Fixed a problem in the MailForm validation for MailForm instances that existed prior to validation.
+ - Fixed a bug in HTTP Proxy that caused a fatal error due to a bad cookie jar name.
+ - Fixed a bug where WebGUI would crash if the site config had only one authentication method specified.
+ - Fixed a bug in item pop-up template.
+ - Fixed a bug where editing collateral data wouldn't update the wobject's last edited property.
+ - Fixed a bug where admin could create a username that a user couldn't validate.
+
+
+
+
+5.2.2
+ - Fixed some bugs with the radioList method in the form package.
+ - Fixed a bug in the form package that would not allow integers to be negative.
+ - Fixed a bug where alias was not saved properly.
+ - Fixed a bug where you could not reorder wobjects.
+ - Updated the German, Norsk, and Russian translations.
+ - Fixed a bug in the collateral manager where deleting an attached file would delete the entire collateral entry.
+
+
+
+
+
+5.2.1
+ - Added Italian icons.
+ - Updated the Swedish, German, and Danish translations.
+ - Javascript and iframe URLs are now rewritten in the HTTP proxy.
+ - Fixed a problem in the user importer where the default identifier was always used even if a new one was specified in the import script.
+ - Fixed a bug where page editing would crash if the Everyone, Visitors, or Registered Users groups were added to the Content Managers group.
+ - Fixed a bug in the help system where macros were being processed, when they should have been displayed.
+ - Fixed a typo that cause LDAP Auth to fail.
+ - Fixed a bug in the translations manager where macros were being processed rather than being displayed.
+ - Fixed a bug where automatic validation of wobject properties was not working properly, and causing fields like "Display title?" to save as their default value rather than their set value.
+
+
+
+
+
+5.2.0
+ - Added the HTTP Proxy wobject (very special thanks to Len Kranendonk).
+ - Rewrote all of the command line utilities for greater flexibility, ease of use, and for better design.
+ - Exposed a Collateral API and converted existing systems to use it.
+ - Added a template variable to Site Map to make multi-column site maps.
+ - Templatized the Syndicated Content wobject.
+ - Exposed a Cache API.
+ - Moved page caching settings from the config file to the UI and split the setting between visitors and everyone else.
+ - Added verbosity to runHourly.pl for diagnostic purposes.
+ - WebGUI now allows forward slashes so that users content managers can simulate directory hierarchy.
+ - The system now displays the file icon for an image when thumbnails are not available due to image magick not being installed.
+ - File size abbreviations have been changed to be more accurate.
+ - Added radio/checkbox support to Mail Form.
+ - Added input validation to Mail Form.
+ - Increased ip group support to allow for more IP information.
+ - Added a new TabForm subsystem and API.
+ - Migrated some of the more complex UI components to Tab Forms.
+ - Switched to a new config file parser.
+ - Macros, Authentication Modules, and Wobjects are now configured from the config file rather than the filesystem for greater control and speed.
+ - Added support for nested (embedded) macros (thanks to Len Kranendonk).
+ - Added filtering options to each discussion and the USS.
+ - Modified the wobject API for better extensibility and to make programming wobjects a little easier. (Wobject API is still reverse compatible.)
+ - Macros are now processed only once per page rather than once for each wobject, plus templates, and styles. This has increased macro processing speed dramatically.
+ - Added Norsk translation (thanks to Nils-Magne Kvammen).
+ - Updated the Danish translation.
+ - Updated the Italian translation (thanks to Emiliano Grilli and Paolo Pigati).
+ - Added a floating point data type to the forms system.
+ - Changed the default maximum attachment size to 10mb for new installs.
+ - Fixed a bug where runHourly left it's session open each time it ran, thusly cluttering the user sessions.
+ - Fixed a postgres problem with moveCollateralDown and moveCollateralUp in the wobject superclass.
+ - Fixed a bug where Packages were defaultly hidden from the navigation.
+ - Fixed a render bug for Netscape 6 in the forms package.
+ - Fixed a bug that allowed a user to post a document seemingly anonymously using a blank alias.
+
+ - Fixed a superficial bug in the upgrade system.
+ - Fixed a bug where the make page printable functionality didn't work if the user was a visitor and page caching was enabled.
+ - Fixed a bug in the discussion system where some messages were not internationalized.
+
+
+
+5.1.2
+ - Updated the German translation.
+ - Fixed a bug where survey questions and answers could not be edited when using Postgres.
+ - Made a cosmetic change to the Midas editor.
+
+
+
+
+5.1.1
+ - Fixed a bug in the round utility function that was causing a problem in the poll graph.
+ - WebGUI's mail system no longer automatically processes macros on the mail body due to possible security problems.
+ - Fixed a couple of translations problems.
+ - Fixed a bug where search engine results did not maintain proper number of results per page.
+
+
+
+
+
+
+
+
+5.1.0
+ - Added width field to Mail Form.
+ - Fixed a bug where you couldn't copy a style when running with Postgres.
+ - WebGUI now adds a warning to the log when a file upload is too big, and gracefully recovers from the problem.
+
+ - Added a rich editor for Mozilla 1.3b and above.
+ - Rewrote the user import system for greater flexibiltiy and robustness.
+ - Fixed a bug where it was possible for an admin to disable him/herself.
+ - Fixed a bug where yes/no items in the user profile always defaulted to their defaults rather than the user preference.
+ - Added support for user alias in the USS.
+ - Added a "hide from navigation" option to pages.
+ - Removed a bunch of depricated messages from the various tranlsations.
+ - Updated the Russian translation.
+ - Added user preferences for rich editor.
+ - Fixed a bug in the error handler where it would lose session data in offline sessions.
+ - Updated the error handler to provide better debugging information in the log.
+ - Fixed a b bug in SiteMap where menuTitle would not display.
+ - Fixed a bug where deleting the second alternate version of a file in the file manager would result in deleteing the first alternate version.
+ - Added discussion thread subscription support.
+ - Removed privilege overrides in favor of groups of groups.
+
+ - Changed the page privileges system to be more intuitive and more powerful (thanks to Ed Van Duinen for all his input).
+ - Added a welcome message setting for new registrations.
+ - Added notification and deletion options to grouping expirations.
+ - Updated German translation.
+ - Added IP-based groups.
+ - Added signature and alias to user profile.
+ - Added preferences to toggle the display of email address and profile.
+
+ - Exposed an API for the groups system.
+ - Exposed an API for the groups of groups of users system.
+ - Optimized preloader for recent changes.
+ - Macros are now processed on all messages that pass through WebGUI's email system.
+
+
+
+
+
+5.0.3
+ - Fixed a bug where interval settings (like sessionTimeout) would not save.
+ -  In the USS you can now change the status of a submission even if the submission has already been approved. In this way you'll be able to "complete" the approval process even if it has already been completed.
+ - In the USS if you have the privileges to approve/deny a submission, the submission will automatically be approved. Also, if the message is automatically approved then no notification will be generated for approval.
+ - Updated the Dutch translation.
+ - Fixed a Postgres bug with editing user profiles.
+ - Some code efficiency improvements.
+ - Fixed a bug where calling for a radio button would produce a checkbox.
+ - Fixed some timing problems with some of the scheduler plugins.
+ - Fixed a bug that moved expired content to the trash unexpectedly.
+ - Added Spanish toolbar icon set.
+ - Changed translation export to include toolbar.
+ - Updated the German translation.
+ - Fixed a bug in the USS submission template.
+ - Updated the macro help to include the Snippet macro.
+ - Added the Snippet macro to the macro toolbar in the Rich Editor.
+
+
+
+
+
+5.0.2
+ - Fixed a bug in the calendar where only months with 31 days would be displayed if the current day is the 31st of a 31 day month.
+ - Fixed a bug where the calendar wobject would not display the last month in the calendar.
+ - Fixed a potential bug in mail server connectivity.
+ - Fixed a couple of typos.
+ - Upgraded HTML Area rich editor to version 2.0.3.
+ - Updated copyrights for 2003.
+ - Removed some old unncessary code.
+ - Added Microsoft Project file type support.
+ - Fixed a problem where the group for a page would always be "Admins" if a UI Level was set to less than 9.
+ - Updated the German translation.
+ - Updated the Russian translation.
+ - Internationalized the "Send" button on the Mail Form wobject (it was previously hardcoded in English).
+ - Made some database changes for future Sybase compatibility.
+
+
+
+
+
+
+
+5.0.1
+ - Fixed a bug where an upgrade from 4.6.9 to 4.7.0 would fail if a site had used ids greater than 1000.
+ - Updated the German translation.
+ - Fixed a sorting bug in the File Manager.
+ - Fixed a search bug in the ^?; macro.
+ - Improved the efficiency of the isIn method in the Utility package (thanks to John Krahn)
+ - Fixed some bugs in the hash sorters (thanks to John Krahn)
+ - Fixed a syntax error in the user importer.
+
+
+
+5.0.0
+ - Fixed another IE Cookie login bug.
+ - Updated Dutch translation thanks to (Koen).
+ - Fixed a bug in the translation manager search subsystem.
+ - Updated the German translation.
+

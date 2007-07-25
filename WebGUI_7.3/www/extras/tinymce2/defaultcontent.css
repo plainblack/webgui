@@ -1,0 +1,5 @@
+/* If the site managers don't specify a style sheet to use with the rich editor, we do just to make it readable. */
+
+body {
+ font-size: 15px;
+}

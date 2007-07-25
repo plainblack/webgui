@@ -1,0 +1,213 @@
+#StockDataTMPL000000002
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title></title>
+<style type="text/css">
+.qmmt_tab
+{
+	background-color: #eeeeee;
+	border-top-color: #cccccc;
+	border-right: 1px solid #cccccc;
+}
+.qmmt_tabactive
+{
+	border-right: 1px solid #cccccc;
+}
+body {
+	color:#000;
+	background-color:#f1f1f1;
+}
+a:link, a:visited {
+	color:#0000cc;
+}
+a:hover {
+	color:#FF0000;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="<tmpl_var extrasFolder>/tools.css" />
+</head>
+<body>
+<div><a name="id<tmpl_var assetId>"></a></div>
+<script type="text/javascript">
+//<![CDATA[
+   var symbol = "<tmpl_var stocks.symbol>";
+   function isIE() {
+      var ua = navigator.userAgent.toLowerCase();
+	  var isIE = ( (ua.indexOf("msie") != -1) && (ua.indexOf("opera") == -1) && (ua.indexOf("webtv") == -1) );
+	  return (isIE);
+   }
+
+   function enableTab(obj, scale){
+      for (i=0; i < 7; i++)    {
+	     document.getElementById('qm_ch_tab' + i + '_9350').className = (i == obj) ? 'qmmt_tabactive' : 'qmmt_tab';
+		 document.getElementById('qm_ch_tab' + i + '_9350').style.cursor = (i == obj) ? 'default' : (isIE()) ? 'hand': 'pointer';
+		 document.getElementById('qm_ch_tab' + i + '_9350').style.borderTop = (i == obj) ? '0px' : '1px solid';
+	  }
+	  document.getElementById('chartimg').src = "http://ichart.finance.yahoo.com/z?s=" + symbol + "&amp;t=" + scale + "&amp;q=l&amp;l=off&amp;z=s&amp;p=s";
+   }
+//]]>
+</script>
+
+<table cellpadding="0" cellspacing="0" border="0" class="qmmt_main" width="650">
+  <tr>
+     <td style="text-align: center;">
+	    <div class="qmmt_header_bar" style="padding-bottom: 1px; border-bottom-width: 1px; ">
+		   <table cellpadding="0" cellspacing="0" border="0" width="100%">
+		      <tr>
+			     <td><span class="qmmt_header_text" style="padding-left:5px;"><tmpl_var stocks.name> (<tmpl_var stocks.symbol>)</span></td>
+				 <td align="right" style="padding-right:3px;">
+				    <span class="qmmt_header_text" style="text-align: right; font-weight:normal;">
+					<div style="white-space:nowrap;" id="qm_textChange_5920">1:23 PM EDT</div>
+					<script type="text/javascript">
+//<![CDATA[
+					   function qm_UpdateText_5920(phase){
+					      switch (phase)    {
+						     case 1:
+							    document.getElementById('qm_textChange_5920').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;">Delayed</span>';
+                                setTimeout("qm_UpdateText_5920(2)", 5000);
+								break;
+						     case 2:
+							    document.getElementById('qm_textChange_5920').innerHTML = '<span class="qmmt_header_text" style="font-weight:normal;">1:23 PM EDT</span>';
+                                setTimeout("qm_UpdateText_5920(3)", 5000);
+								break;
+							 case 3:
+							    document.getElementById('qm_textChange_5920').innerHTML = '<a href="http://finance.yahoo.com/" style="text-decoration:none;"><span class="qmmt_header_text" style="font-weight:normal;">Yahoo Finance</span></a>';
+                                 setTimeout("qm_UpdateText_5920(1)", 5000);
+								 break;
+						  }
+					   }
+					   qm_UpdateText_5920(2);
+//]]>
+				    </script>
+					</span>
+				 </td>
+			  </tr>
+		   </table>
+		</div>
+     </td>
+  </tr>
+  <tr>
+     <td style="text-align: center;">
+	    <table cellpadding="2" cellspacing="0" border="0" width="100%">
+		   <tr>
+		      <td style="text-align: center;width:40%">
+			     <img id="chartimg" style="width:350px;height:205px;vertical-align:center;" src="http://ichart.finance.yahoo.com/z?s=<tmpl_var stocks.symbol>&amp;t=1d&amp;q=l&amp;l=off&amp;z=s&amp;p=s" alt="chart" />
+                     <table cellpadding="0" cellspacing="0" border="0" width="100%">
+					    <tr>
+						   <td id="qm_ch_tab0_9350" class="qmmt_tabactive" onclick="enableTab('0', '1d')" style="cursor: default; border-left: 0px; border-bottom: 0px; border-top: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">Today</td>
+                           <td id="qm_ch_tab1_9350" class="qmmt_tab" onclick="enableTab('1', '5d')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">5d</td>
+                           <td id="qm_ch_tab2_9350" class="qmmt_tab" onclick="enableTab('2', '1m')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">1m</td>
+                           <td id="qm_ch_tab3_9350" class="qmmt_tab" onclick="enableTab('3', '3m')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">3m</td>
+                           <td id="qm_ch_tab4_9350" class="qmmt_tab" onclick="enableTab('4', '1y')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">1y</td>
+                           <td id="qm_ch_tab5_9350" class="qmmt_tab" onclick="enableTab('5', '5y')" style="cursor: default; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">5y</td>
+						   <td id="qm_ch_tab6_9350" class="qmmt_tab" onclick="enableTab('6', 'my')" style="cursor: default; border-right: 0px; border-bottom: 0px; padding-top:1px; padding-bottom:1px; font-weight: normal;width: 14%;">20y</td>
+                        </tr>
+					 </table>
+			      </td>
+				  <td align="center" style="width:30%">
+				     <table cellpadding="2" cellspacing="0" border="0" width="95%">
+					    <tr class="qmmt_main">
+						   <td class="qmmt_text">Last Price</td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.last></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Market Cap </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.cap></td>
+						</tr>
+						<tr class="qmmt_main"><td class="qmmt_text"> Change </td>
+						   <td class="qmmt_text<tmpl_if stocks.net.isUp>_up<tmpl_else><tmpl_if stocks.net.isDown>_down</tmpl_if></tmpl_if>" style="text-align: right; font-weight: bold;">
+						      <img style="vertical-align:center;" src='<tmpl_var extrasFolder>/<tmpl_var stocks.net.icon>' alt="" /> <tmpl_var stocks.net>
+						   </td>
+                        </tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Open </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.open></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Day High </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.high></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text">Bid</td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.bid></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> 52 Wk High </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.year_high></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> E.P.S. </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.eps></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Ex-Div Date </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.ex_div></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Yield </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.yield></td>
+						</tr>
+				     </table>
+				  </td>
+				  <td align="center" style="width:30%;">
+				     <table cellpadding="2" cellspacing="0" border="0" width="95%">
+					    <tr class="qmmt_main">
+						   <td class="qmmt_text"> Last Trade </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var lastUpdate.us></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Volume </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.volume.millions> m</td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text">% Change </td>
+						   <td class="qmmt_text<tmpl_if stocks.net.isUp>_up<tmpl_else><tmpl_if stocks.net.isDown>_down</tmpl_if></tmpl_if>"  style="text-align: right; font-weight: bold;"><tmpl_var stocks.p_change>%</td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Prev Close </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.close></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Day Low </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.low></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Ask </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.ask></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> 52 Wk Low </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.year_low></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> P/E Ratio </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.pe></td>
+						</tr>
+						<tr class="qmmt_main">
+						   <td class="qmmt_text"> Dividend </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.div></td>
+						</tr>
+						<tr class="qmmt_cycle">
+						   <td class="qmmt_text"> Exchange </td>
+						   <td class="qmmt_text" style="text-align: right; font-weight: bold;"><tmpl_var stocks.exchange></td>
+						</tr>
+				     </table>
+				  </td>
+			   </tr>
+			</table>
+	     </td>
+	  </tr>
+   </table>
+
+<div style="text-align:center;">
+<table cellpadding="0" cellspacing="0" border="0" width="650">
+<tr>
+   <td>
+      <div class="qmmt_text" style="text-align:right;"><br /><a href="javascript:window.close()" style="color:#0000cc">CLOSE</a></div>
+   </td>
+</tr>
+</table>
+</div>
+</body>
+</html>

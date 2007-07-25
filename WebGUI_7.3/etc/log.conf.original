@@ -1,0 +1,12 @@
+# WebGUI uses the log4perl logging system. This default configuration file
+# will work out of the box and will log only warnings and errors to
+# /var/log/webgui.log. This is only the beginning of what this logging
+# system is capable of. To unleash the full power read the config file manual
+# http://log4perl.sourceforge.net/releases/Log-Log4perl/docs/html/Log/Log4perl/Config.html
+
+log4perl.logger = WARN, mainlog 
+log4perl.appender.mainlog = Log::Log4perl::Appender::File
+log4perl.appender.mainlog.filename = /var/log/webgui.log 
+log4perl.appender.mainlog.layout = PatternLayout
+log4perl.appender.mainlog.layout.ConversionPattern = %d - %p - %c - %M[%L] - %m%n
+

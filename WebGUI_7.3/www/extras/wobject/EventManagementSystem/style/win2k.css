@@ -1,0 +1,41 @@
+/*
+* !!!!!!!!!!!!!!!!!!!!!!!!!!
+* deprecated, not used anymore! check win2k_ie.css
+* !!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
+
+.bsBtnDefault {
+  display:inline; 
+  /*float:left;*/
+  width:24; 
+  height:22; 
+  background-color:menu; 
+  padding-left:4px;
+  padding-top:3px;
+}
+.bsBtnMouseOver {
+  display:inline; 
+  /*float:left;*/
+  width:24; 
+  height:22; 
+  background-color:menu; 
+  padding-left:3px;
+  padding-top:2px;
+  border-left:1px solid white;
+  border-top:1px solid white;
+  border-right:1px solid #808080;
+  border-bottom:1px solid #808080;
+}
+.bsBtnMouseDown {
+  display:inline; 
+  /*float:left;*/
+  width:24; 
+  height:22; 
+  background-color:menu; 
+  padding-left:4px;
+  padding-top:3px;
+  border-left:1px solid #808080;
+  border-top:1px solid #808080;
+  border-right:1px solid white;
+  border-bottom:1px solid white;
+}

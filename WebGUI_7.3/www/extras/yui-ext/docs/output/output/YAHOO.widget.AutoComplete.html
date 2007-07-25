@@ -1,0 +1,1616 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.AutoComplete</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.AutoComplete.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.AutoComplete</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>AutoComplete</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="autocomplete.js.html">autocomplete.js</a></td></tr>
+        </table>
+        <div class="description">
+            The AutoComplete class provides the customizable functionality of a plug-and-play DHTML
+auto completion widget.  Some key features:
+<ul>
+<li>Navigate with up/down arrow keys and/or mouse to pick a selection</li>
+<li>The drop down container can "roll down" or "fly out" via configurable
+animation</li>
+<li>UI look-and-feel customizable through CSS, including container
+attributes, borders, position, fonts, etc</li>
+</ul>        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ERROR_DATANULL">ERROR_DATANULL</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Error message for null data responses.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ERROR_DATAPARSE">ERROR_DATAPARSE</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Error message for data responses with parsing errors.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#ERROR_DATAXHR">ERROR_DATAXHR</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Error message for XHR failure.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TYPE_FLAT">TYPE_FLAT</a> : Number</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Flat-file data type.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TYPE_JSON">TYPE_JSON</a> : Number</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; JSON data type.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TYPE_XML">TYPE_XML</a> : Number</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; XML data type.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#allowBrowserAutocomplete">allowBrowserAutocomplete</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not to allow browsers to cache user-typed input in the input
+field. Disabling this feature will prevent th...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#alwaysShowContainer">alwaysShowContainer</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the results container should always be displayed.
+Enabling this feature displays the container when th...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animHoriz">animHoriz</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not to animate the expansion/collapse of the results container in the
+horizontal direction.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animSpeed">animSpeed</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Speed of container expand/collapse animation, in seconds..</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animVert">animVert</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not to animate the expansion/collapse of the results container in the
+vertical direction.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#autoHighlight">autoHighlight</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the first item in results container should be automatically highlighted
+on expand.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#connMgr">connMgr</a> : Object
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Alias to YUI Connection Manager. Allows implementers to specify their own
+subclasses of the YUI Connection Manager ut...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#connTimeout">connTimeout</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Number of milliseconds the XHR connection will wait for a server response. A
+a value of zero indicates the XHR connec...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#data">data</a> : Array</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">In-memory Javascript array of strings.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataFunction">dataFunction</a> : HTMLFunction</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">In-memory Javascript function that returns query results.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataSource">dataSource</a> : Object</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The DataSource object that encapsulates the data used for auto completion.
+This object should be an inherited object ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#delimChar">delimChar</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Query delimiter. A single character separator for multiple delimited
+selections. Multiple delimiter characteres may b...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#forceSelection">forceSelection</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not to force the user's selection to match one of the query
+results. Enabling this feature essentially tra...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#highlighClassName">highlighClassName</a> : String
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Class name of a highlighted item within results container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#maxCacheEntries">maxCacheEntries</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Max size of the local cache.  Set to 0 to turn off caching.  Caching is
+useful to reduce the number of server connect...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#maxResultsDisplayed">maxResultsDisplayed</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Maximum number of results to display in results container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minQueryLength">minQueryLength</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Number of characters that must be entered before querying for results. A negative value
+effectively turns off the wid...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#prehighlightClassName">prehighlightClassName</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Class name of a pre-highlighted item within results container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queryDelay">queryDelay</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Number of seconds to delay before submitting a query request.  If a query
+request is received before a previous one h...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queryMatchCase">queryMatchCase</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Enables query case-sensitivity matching. If caching is on and
+queryMatchCase is true, queries will only return result...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queryMatchContains">queryMatchContains</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Use this to equate cache matching with the type of matching done by your live
+data source. If caching is on and query...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queryMatchSubset">queryMatchSubset</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Enables query subset matching. If caching is on and queryMatchSubset is
+true, substrings of queries will return match...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#responseStripAfter">responseStripAfter</a> : String
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">String after which to strip results. If the results from the XHR are sent
+back as HTML, the gzip HTML comment appears...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#responseType">responseType</a> : String
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">XHR response data type. Other types that may be defined are YAHOO.widget.DS_XHR.TYPE_XML
+and YAHOO.widget.DS_XHR.TYPE...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#scriptQueryAppend">scriptQueryAppend</a> : String
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">String of key/value pairs to append to requests made to scriptURI. Define
+this string when you want to send additiona...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#scriptQueryParam">scriptQueryParam</a> : String
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Query string parameter name sent to scriptURI. For instance, queries will be
+sent to &#60;scriptURI&#62;?&#60;scriptQ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#scriptURI">scriptURI</a> : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Absolute or relative URI to script that returns query results. For instance,
+queries will be sent to &#60;scriptURI&#...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#typeAhead">typeAhead</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the input field should be automatically updated
+with the first query result as the user types, auto-se...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#useIFrame">useIFrame</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Whether or not to use an iFrame to layer over Windows form elements in
+IE. Set to true only when the results containe...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#useShadow">useShadow</a> : Boolean
+@default</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Whether or not the results container should have a shadow.</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#AutoComplete">AutoComplete</a>(<code>elInput {HTMLElement}</code>, <code>elInput {String}</code>, <code>elContainer {HTMLElement}</code>, <code>elContainer {String}</code>, <code>oDataSource {Object}</code>, <span class="optional" title="Optional">[<code>oConfigs {Object}</code>]</span>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doBeforeExpandContainer">doBeforeExpandContainer</a>() : Boolean</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Overridable method called before container expands allows implementers to access data
+and DOM elements.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doQuery">doQuery</a>(<code>oCallbackFn {HTMLFunction}</code>, <code>sQuery {String}</code>, <code>oParent {Object}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Queries the live data source defined by data for results. Results are passed
+back to a callback function.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#flushCache">flushCache</a>() : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Flushes cache.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#formatResult">formatResult</a>(<code>oResultItem {Object}</code>, <code>sQuery {String}</code>) : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Overridable method that converts a result item object into HTML markup
+for display. Return data values are accessible...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getListItemData">getListItemData</a>() : Object</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Public accessor to the data held in an &lt;li&gt; element of the
+results container.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getListItems">getListItems</a>() : HTMLElement[]</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public accessor to the internal array of DOM &lt;li&gt; elements that
+display query results within the results contai...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getResults">getResults</a>(<code>oCallbackFn {HTMLFunction}</code>, <code>sQuery {String}</code>, <code>oParent {Object}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Retrieves query results, first checking the local cache, then making the
+query request to the live data source as def...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isContainerOpen">isContainerOpen</a>() : Boolean</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns true if container is in an expanded state, false otherwise.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parseResponse">parseResponse</a>(<code>sQuery {String}</code>, <code>oResponse {Object}</code>, <code>oParent {Object}</code>) : s</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Parses raw response data into an array of result objects. The result data key
+is always stashed in the [0] element of...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sendQuery">sendQuery</a>(<code>sQuery {String}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Makes query request to the DataSource.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setBody">setBody</a>(<code>sHeader {String}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets HTML markup for the results container body. This markup will be
+inserted within a &lt;div&gt; tag with a class o...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setFooter">setFooter</a>(<code>sFooter {String}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets HTML markup for the results container footer. This markup will be
+inserted within a &lt;div&gt; tag with a class...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setHeader">setHeader</a>(<code>sHeader {String}</code>) : void</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets HTML markup for the results container header. This markup will be
+inserted within a &lt;div&gt; tag with a class...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Public accessor to the unique name of the DataSource instance.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cacheFlushEvent">cacheFlushEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the local cache is flushed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cacheQueryEvent">cacheQueryEvent</a> : (<code>oSelf {Object}</code>, <code>oParent {Object}</code>, <code>sQuery {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when a query is made to the local cache.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#containerCollapseEvent">containerCollapseEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the results container is collapsed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#containerExpandEvent">containerExpandEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the results container is expanded.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataErrorEvent">dataErrorEvent</a> : (<code>oSelf {Object}</code>, <code>oParent {Object}</code>, <code>sQuery {String}</code>, <code>sMsg {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when an error is encountered with the live data source.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataRequestEvent">dataRequestEvent</a> : (<code>oSelf {Object}</code>, <code>sQuery {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the AutoComplete instance makes a query to the DataSource.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dataReturnEvent">dataReturnEvent</a> : (<code>oSelf {Object}</code>, <code>sQuery {String}</code>, <code>aResults {Array}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the AutoComplete instance receives query results from the data
+source.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getCachedResultsEvent">getCachedResultsEvent</a> : (<code>oSelf {Object}</code>, <code>oParent {Object}</code>, <code>sQuery {String}</code>, <code>aResults {Object[]}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when data is retrieved from the local cache.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getResultsEvent">getResultsEvent</a> : (<code>oSelf {Object}</code>, <code>oParent {Object}</code>, <code>sQuery {String}</code>, <code>aResults {Object[]}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when data is retrieved from the live data source.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemArrowFromEvent">itemArrowFromEvent</a> : (<code>oSelf {Object}</code>, <code>elItem {HTMLElement}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when result item has been arrowed away from.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemArrowToEvent">itemArrowToEvent</a> : (<code>oSelf {Object}</code>, <code>elItem {HTMLElement}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when result item has been arrowed to.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemMouseOutEvent">itemMouseOutEvent</a> : (<code>oSelf {Object}</code>, <code>elItem {HTMLElement}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when result item has been moused out.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemMouseOverEvent">itemMouseOverEvent</a> : (<code>oSelf {Object}</code>, <code>elItem {HTMLElement}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when result item has been moused over.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#itemSelectEvent">itemSelectEvent</a> : (<code>oSelf {Object}</code>, <code>elItem {HTMLElement}</code>, <code>oData {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when an item is selected via mouse click, ENTER key, or TAB key.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queryEvent">queryEvent</a> : (<code>oSelf {Object}</code>, <code>oParent {Object}</code>, <code>sQuery {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a query is made to the live data source.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#selectionEnforceEvent">selectionEnforceEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired if forceSelection is enabled and the user's input has been cleared
+because it did not match one of the returned...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#textboxBlurEvent">textboxBlurEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the input field loses focus.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#textboxFocusEvent">textboxFocusEvent</a> : (<code>oSelf {Object}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the input field receives focus.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#textboxKeyEvent">textboxKeyEvent</a> : (<code>oSelf {Object}</code>, <code>nKeycode {Number}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the input field receives key input.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#typeAheadEvent">typeAheadEvent</a> : (<code>oSelf {Object}</code>, <code>sQuery {String}</code>, <code>sPrefill {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the input field has been prefilled by the type-ahead
+feature.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unmatchedItemSelectEvent">unmatchedItemSelectEvent</a> : (<code>oSelf {Object}</code>, <code>sQuery {String}</code>)</td>
+        <td class="msource" rowspan="2">AutoComplete</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a user selection does not match any of the displayed result items.
+Note that this event may not behave as ...</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="ERROR_DATANULL"></a>
+                <div class="mdetail">
+                <h3>ERROR_DATANULL</i></h3>
+                <code>public String ERROR_DATANULL</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Error message for null data responses.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="ERROR_DATAPARSE"></a>
+                <div class="mdetail alt">
+                <h3>ERROR_DATAPARSE</i></h3>
+                <code>public String ERROR_DATAPARSE</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Error message for data responses with parsing errors.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="ERROR_DATAXHR"></a>
+                <div class="mdetail">
+                <h3>ERROR_DATAXHR</i></h3>
+                <code>public String ERROR_DATAXHR</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Error message for XHR failure.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="TYPE_FLAT"></a>
+                <div class="mdetail alt">
+                <h3>TYPE_FLAT</i></h3>
+                <code>public Number TYPE_FLAT</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Flat-file data type.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="TYPE_JSON"></a>
+                <div class="mdetail">
+                <h3>TYPE_JSON</i></h3>
+                <code>public Number TYPE_JSON</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; JSON data type.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="TYPE_XML"></a>
+                <div class="mdetail alt">
+                <h3>TYPE_XML</i></h3>
+                <code>public Number TYPE_XML</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; XML data type.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="allowBrowserAutocomplete"></a>
+                <div class="mdetail">
+                <h3>allowBrowserAutocomplete</i></h3>
+                <code>public Boolean
+@default allowBrowserAutocomplete</code>
+                <div class="mdetail-desc">
+                    Whether or not to allow browsers to cache user-typed input in the input
+field. Disabling this feature will prevent the widget from setting the
+autocomplete="off" on the input field. When autocomplete="off"
+and users click the back button after form submission, user-typed input can
+be prefilled by the browser from its cache. This caching of user input may
+not be desired for sensitive data, such as credit card numbers, in which
+case, implementers should consider setting allowBrowserAutocomplete to false.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="alwaysShowContainer"></a>
+                <div class="mdetail alt">
+                <h3>alwaysShowContainer</i></h3>
+                <code>public Boolean
+@default alwaysShowContainer</code>
+                <div class="mdetail-desc">
+                    Whether or not the results container should always be displayed.
+Enabling this feature displays the container when the widget is instantiated
+and prevents the toggling of the container to a collapsed state.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="animHoriz"></a>
+                <div class="mdetail">
+                <h3>animHoriz</i></h3>
+                <code>public Boolean
+@default animHoriz</code>
+                <div class="mdetail-desc">
+                    Whether or not to animate the expansion/collapse of the results container in the
+horizontal direction.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="animSpeed"></a>
+                <div class="mdetail alt">
+                <h3>animSpeed</i></h3>
+                <code>public Number
+@default animSpeed</code>
+                <div class="mdetail-desc">
+                    Speed of container expand/collapse animation, in seconds..                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="animVert"></a>
+                <div class="mdetail">
+                <h3>animVert</i></h3>
+                <code>public Boolean
+@default animVert</code>
+                <div class="mdetail-desc">
+                    Whether or not to animate the expansion/collapse of the results container in the
+vertical direction.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="autoHighlight"></a>
+                <div class="mdetail alt">
+                <h3>autoHighlight</i></h3>
+                <code>public Boolean
+@default autoHighlight</code>
+                <div class="mdetail-desc">
+                    Whether or not the first item in results container should be automatically highlighted
+on expand.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="connMgr"></a>
+                <div class="mdetail">
+                <h3>connMgr</i></h3>
+                <code>public Object
+@default connMgr</code>
+                <div class="mdetail-desc">
+                    Alias to YUI Connection Manager. Allows implementers to specify their own
+subclasses of the YUI Connection Manager utility.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="connTimeout"></a>
+                <div class="mdetail alt">
+                <h3>connTimeout</i></h3>
+                <code>public Number
+@default connTimeout</code>
+                <div class="mdetail-desc">
+                    Number of milliseconds the XHR connection will wait for a server response. A
+a value of zero indicates the XHR connection will wait forever. Any value
+greater than zero will use the Connection utility's Auto-Abort feature.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="data"></a>
+                <div class="mdetail">
+                <h3>data</i></h3>
+                <code>public Array data</code>
+                <div class="mdetail-desc">
+                    In-memory Javascript array of strings.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="dataFunction"></a>
+                <div class="mdetail alt">
+                <h3>dataFunction</i></h3>
+                <code>public HTMLFunction dataFunction</code>
+                <div class="mdetail-desc">
+                    In-memory Javascript function that returns query results.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="dataSource"></a>
+                <div class="mdetail">
+                <h3>dataSource</i></h3>
+                <code>public Object dataSource</code>
+                <div class="mdetail-desc">
+                    The DataSource object that encapsulates the data used for auto completion.
+This object should be an inherited object from YAHOO.widget.DataSource.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="delimChar"></a>
+                <div class="mdetail alt">
+                <h3>delimChar</i></h3>
+                <code>public String delimChar</code>
+                <div class="mdetail-desc">
+                    Query delimiter. A single character separator for multiple delimited
+selections. Multiple delimiter characteres may be defined as an array of
+strings. A null value or empty string indicates that query results cannot
+be delimited. This feature is not recommended if you need forceSelection to
+be true.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="forceSelection"></a>
+                <div class="mdetail">
+                <h3>forceSelection</i></h3>
+                <code>public Boolean
+@default forceSelection</code>
+                <div class="mdetail-desc">
+                    Whether or not to force the user's selection to match one of the query
+results. Enabling this feature essentially transforms the input field into a
+&lt;select&gt; field. This feature is not recommended with delimiter character(s)
+defined.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="highlighClassName"></a>
+                <div class="mdetail alt">
+                <h3>highlighClassName</i></h3>
+                <code>public String
+@default highlighClassName</code>
+                <div class="mdetail-desc">
+                    Class name of a highlighted item within results container.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="maxCacheEntries"></a>
+                <div class="mdetail">
+                <h3>maxCacheEntries</i></h3>
+                <code>public Number
+@default maxCacheEntries</code>
+                <div class="mdetail-desc">
+                    Max size of the local cache.  Set to 0 to turn off caching.  Caching is
+useful to reduce the number of server connections.  Recommended only for data
+sources that return comprehensive results for queries or when stale data is
+not an issue.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="maxResultsDisplayed"></a>
+                <div class="mdetail alt">
+                <h3>maxResultsDisplayed</i></h3>
+                <code>public Number
+@default maxResultsDisplayed</code>
+                <div class="mdetail-desc">
+                    Maximum number of results to display in results container.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="minQueryLength"></a>
+                <div class="mdetail">
+                <h3>minQueryLength</i></h3>
+                <code>public Number
+@default minQueryLength</code>
+                <div class="mdetail-desc">
+                    Number of characters that must be entered before querying for results. A negative value
+effectively turns off the widget. A value of 0 allows queries of null or empty string
+values.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="prehighlightClassName"></a>
+                <div class="mdetail alt">
+                <h3>prehighlightClassName</i></h3>
+                <code>public String prehighlightClassName</code>
+                <div class="mdetail-desc">
+                    Class name of a pre-highlighted item within results container.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="queryDelay"></a>
+                <div class="mdetail">
+                <h3>queryDelay</i></h3>
+                <code>public Number
+@default queryDelay</code>
+                <div class="mdetail-desc">
+                    Number of seconds to delay before submitting a query request.  If a query
+request is received before a previous one has completed its delay, the
+previous request is cancelled and the new request is set to the delay.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="queryMatchCase"></a>
+                <div class="mdetail alt">
+                <h3>queryMatchCase</i></h3>
+                <code>public Boolean
+@default queryMatchCase</code>
+                <div class="mdetail-desc">
+                    Enables query case-sensitivity matching. If caching is on and
+queryMatchCase is true, queries will only return results for case-sensitive
+matches.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="queryMatchContains"></a>
+                <div class="mdetail">
+                <h3>queryMatchContains</i></h3>
+                <code>public Boolean
+@default queryMatchContains</code>
+                <div class="mdetail-desc">
+                    Use this to equate cache matching with the type of matching done by your live
+data source. If caching is on and queryMatchContains is true, the cache
+returns results that "contain" the query string. By default,
+queryMatchContains is set to false, meaning the cache only returns results
+that "start with" the query string.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="queryMatchSubset"></a>
+                <div class="mdetail alt">
+                <h3>queryMatchSubset</i></h3>
+                <code>public Boolean
+@default queryMatchSubset</code>
+                <div class="mdetail-desc">
+                    Enables query subset matching. If caching is on and queryMatchSubset is
+true, substrings of queries will return matching cached results. For
+instance, if the first query is for "abc" susequent queries that start with
+"abc", like "abcd", will be queried against the cache, and not the live data
+source. Recommended only for DataSources that return comprehensive results
+for queries with very few characters.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="responseStripAfter"></a>
+                <div class="mdetail">
+                <h3>responseStripAfter</i></h3>
+                <code>public String
+@default responseStripAfter</code>
+                <div class="mdetail-desc">
+                    String after which to strip results. If the results from the XHR are sent
+back as HTML, the gzip HTML comment appears at the end of the data and should
+be ignored.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="responseType"></a>
+                <div class="mdetail alt">
+                <h3>responseType</i></h3>
+                <code>public String
+@default responseType</code>
+                <div class="mdetail-desc">
+                    XHR response data type. Other types that may be defined are YAHOO.widget.DS_XHR.TYPE_XML
+and YAHOO.widget.DS_XHR.TYPE_FLAT.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="scriptQueryAppend"></a>
+                <div class="mdetail">
+                <h3>scriptQueryAppend</i></h3>
+                <code>public String
+@default scriptQueryAppend</code>
+                <div class="mdetail-desc">
+                    String of key/value pairs to append to requests made to scriptURI. Define
+this string when you want to send additional query parameters to your script.
+When defined, queries will be sent to
+&#60;scriptURI&#62;?&#60;scriptQueryParam&#62;=userinput&#38;&#60;scriptQueryAppend&#62;                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="scriptQueryParam"></a>
+                <div class="mdetail alt">
+                <h3>scriptQueryParam</i></h3>
+                <code>public String
+@default scriptQueryParam</code>
+                <div class="mdetail-desc">
+                    Query string parameter name sent to scriptURI. For instance, queries will be
+sent to &#60;scriptURI&#62;?&#60;scriptQueryParam&#62;=userinput                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="scriptURI"></a>
+                <div class="mdetail">
+                <h3>scriptURI</i></h3>
+                <code>public String scriptURI</code>
+                <div class="mdetail-desc">
+                    Absolute or relative URI to script that returns query results. For instance,
+queries will be sent to &#60;scriptURI&#62;?&#60;scriptQueryParam&#62;=userinput                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="typeAhead"></a>
+                <div class="mdetail alt">
+                <h3>typeAhead</i></h3>
+                <code>public Boolean
+@default typeAhead</code>
+                <div class="mdetail-desc">
+                    Whether or not the input field should be automatically updated
+with the first query result as the user types, auto-selecting the substring
+that the user has not typed.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="useIFrame"></a>
+                <div class="mdetail">
+                <h3>useIFrame</i></h3>
+                <code>public Boolean
+@default useIFrame</code>
+                <div class="mdetail-desc">
+                    Whether or not to use an iFrame to layer over Windows form elements in
+IE. Set to true only when the results container will be on top of a
+&lt;select&gt; field in IE and thus exposed to the IE z-index bug (i.e.,
+5.5 < IE < 7).                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                            <a name="useShadow"></a>
+                <div class="mdetail alt">
+                <h3>useShadow</i></h3>
+                <code>public Boolean
+@default useShadow</code>
+                <div class="mdetail-desc">
+                    Whether or not the results container should have a shadow.                </div>
+                <div class="mdetail-def">This property is defined by AutoComplete.</div>
+                </div>
+                        </div>
+                
+                    <a name="AutoComplete"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>AutoComplete</i></h3>
+                <code>public function AutoComplete(<code>elInput {HTMLElement}</code>, <code>elInput {String}</code>, <code>elContainer {HTMLElement}</code>, <code>elContainer {String}</code>, <code>oDataSource {Object}</code>, <span class="optional" title="Optional">[<code>oConfigs {Object}</code>]</span>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLElement}</code> : elInput<div class="sub-desc">DOM element reference of an input field</div></li><li><code>{String}</code> : elInput<div class="sub-desc">String ID of an input field</div></li><li><code>{HTMLElement}</code> : elContainer<div class="sub-desc">DOM element reference of an existing DIV</div></li><li><code>{String}</code> : elContainer<div class="sub-desc">String ID of an existing DIV</div></li><li><code>{Object}</code> : oDataSource<div class="sub-desc">Instance of YAHOO.widget.DataSource for query/results</div></li><li><code>{Object}</code> : oConfigs<div class="sub-desc">(optional) Object literal of configuration params</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="doBeforeExpandContainer"></a>
+                <div class="mdetail">
+                <h3>doBeforeExpandContainer</i></h3>
+                <code>public function doBeforeExpandContainer()</code>
+                <div class="mdetail-desc">
+                    Overridable method called before container expands allows implementers to access data
+and DOM elements.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Return true to continue expanding container, false to cancel the expand.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="doQuery"></a>
+                <div class="mdetail alt">
+                <h3>doQuery</i></h3>
+                <code>public function doQuery(<code>oCallbackFn {HTMLFunction}</code>, <code>sQuery {String}</code>, <code>oParent {Object}</code>)</code>
+                <div class="mdetail-desc">
+                    Queries the live data source defined by data for results. Results are passed
+back to a callback function.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLFunction}</code> : oCallbackFn<div class="sub-desc">Callback function defined by oParent object to which to return results.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">Query string.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The object instance that has requested data.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="flushCache"></a>
+                <div class="mdetail">
+                <h3>flushCache</i></h3>
+                <code>public function flushCache()</code>
+                <div class="mdetail-desc">
+                    Flushes cache.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="formatResult"></a>
+                <div class="mdetail alt">
+                <h3>formatResult</i></h3>
+                <code>public function formatResult(<code>oResultItem {Object}</code>, <code>sQuery {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Overridable method that converts a result item object into HTML markup
+for display. Return data values are accessible via the oResultItem object,
+and the key return value will always be oResultItem[0]. Markup will be
+displayed within &lt;li&gt; element tags in the container.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{Object}</code> : oResultItem<div class="sub-desc">Result item representing one query result. Data is held in an array.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The current query string.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">HTML markup of formatted result data.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="getListItemData"></a>
+                <div class="mdetail">
+                <h3>getListItemData</i></h3>
+                <code>public function getListItemData()</code>
+                <div class="mdetail-desc">
+                    Public accessor to the data held in an &lt;li&gt; element of the
+results container.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object</code><div class="sub-desc">| Array} Object or array of result data or null</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="getListItems"></a>
+                <div class="mdetail alt">
+                <h3>getListItems</i></h3>
+                <code>public function getListItems()</code>
+                <div class="mdetail-desc">
+                    Public accessor to the internal array of DOM &lt;li&gt; elements that
+display query results within the results container.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement[]</code><div class="sub-desc">Array of &lt;li&gt; elements within the results container.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="getResults"></a>
+                <div class="mdetail">
+                <h3>getResults</i></h3>
+                <code>public function getResults(<code>oCallbackFn {HTMLFunction}</code>, <code>sQuery {String}</code>, <code>oParent {Object}</code>)</code>
+                <div class="mdetail-desc">
+                    Retrieves query results, first checking the local cache, then making the
+query request to the live data source as defined by the function doQuery.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{HTMLFunction}</code> : oCallbackFn<div class="sub-desc">Callback function defined by oParent object to which to return results.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">Query string.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The object instance that has requested data.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="isContainerOpen"></a>
+                <div class="mdetail alt">
+                <h3>isContainerOpen</i></h3>
+                <code>public function isContainerOpen()</code>
+                <div class="mdetail-desc">
+                    Returns true if container is in an expanded state, false otherwise.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Returns true if container is in an expanded state, false otherwise.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="parseResponse"></a>
+                <div class="mdetail">
+                <h3>parseResponse</i></h3>
+                <code>public function parseResponse(<code>sQuery {String}</code>, <code>oResponse {Object}</code>, <code>oParent {Object}</code>)</code>
+                <div class="mdetail-desc">
+                    Parses raw response data into an array of result objects. The result data key
+is always stashed in the [0] element of each result object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sQuery<div class="sub-desc">Query string.</div></li><li><code>{Object}</code> : oResponse<div class="sub-desc">The raw response data to parse.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The object instance that has requested data.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>s</code><div class="sub-desc">{Object[]} Array of result objects.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="sendQuery"></a>
+                <div class="mdetail alt">
+                <h3>sendQuery</i></h3>
+                <code>public function sendQuery(<code>sQuery {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Makes query request to the DataSource.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sQuery<div class="sub-desc">Query string.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="setBody"></a>
+                <div class="mdetail">
+                <h3>setBody</i></h3>
+                <code>public function setBody(<code>sHeader {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Sets HTML markup for the results container body. This markup will be
+inserted within a &lt;div&gt; tag with a class of "ac_bd".                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sHeader<div class="sub-desc">HTML markup for results container body.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="setFooter"></a>
+                <div class="mdetail alt">
+                <h3>setFooter</i></h3>
+                <code>public function setFooter(<code>sFooter {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Sets HTML markup for the results container footer. This markup will be
+inserted within a &lt;div&gt; tag with a class of "ac_ft".                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sFooter<div class="sub-desc">HTML markup for results container footer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="setHeader"></a>
+                <div class="mdetail">
+                <h3>setHeader</i></h3>
+                <code>public function setHeader(<code>sHeader {String}</code>)</code>
+                <div class="mdetail-desc">
+                    Sets HTML markup for the results container header. This markup will be
+inserted within a &lt;div&gt; tag with a class of "ac_hd".                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>{String}</code> : sHeader<div class="sub-desc">HTML markup for results container header.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Public accessor to the unique name of the DataSource instance.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">Unique name of the DataSource instance</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by AutoComplete.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="cacheFlushEvent"></a>
+                <div class="mdetail">
+                <h3>cacheFlushEvent</i></h3>
+                <code>public event cacheFlushEvent</code>
+                <div class="mdetail-desc">
+                Fired when the local cache is flushed.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="cacheQueryEvent"></a>
+                <div class="mdetail alt">
+                <h3>cacheQueryEvent</i></h3>
+                <code>public event cacheQueryEvent</code>
+                <div class="mdetail-desc">
+                Fired when a query is made to the local cache.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The requesting object.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="containerCollapseEvent"></a>
+                <div class="mdetail">
+                <h3>containerCollapseEvent</i></h3>
+                <code>public event containerCollapseEvent</code>
+                <div class="mdetail-desc">
+                Fired when the results container is collapsed.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="containerExpandEvent"></a>
+                <div class="mdetail alt">
+                <h3>containerExpandEvent</i></h3>
+                <code>public event containerExpandEvent</code>
+                <div class="mdetail-desc">
+                Fired when the results container is expanded.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="dataErrorEvent"></a>
+                <div class="mdetail">
+                <h3>dataErrorEvent</i></h3>
+                <code>public event dataErrorEvent</code>
+                <div class="mdetail-desc">
+                Fired when an error is encountered with the live data source.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The requesting object.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li><li><code>{String}</code> : sMsg<div class="sub-desc">Error message string</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="dataRequestEvent"></a>
+                <div class="mdetail alt">
+                <h3>dataRequestEvent</i></h3>
+                <code>public event dataRequestEvent</code>
+                <div class="mdetail-desc">
+                Fired when the AutoComplete instance makes a query to the DataSource.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="dataReturnEvent"></a>
+                <div class="mdetail">
+                <h3>dataReturnEvent</i></h3>
+                <code>public event dataReturnEvent</code>
+                <div class="mdetail-desc">
+                Fired when the AutoComplete instance receives query results from the data
+source.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li><li><code>{Array}</code> : aResults<div class="sub-desc">Results array.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="getCachedResultsEvent"></a>
+                <div class="mdetail alt">
+                <h3>getCachedResultsEvent</i></h3>
+                <code>public event getCachedResultsEvent</code>
+                <div class="mdetail-desc">
+                Fired when data is retrieved from the local cache.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The requesting object.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li><li><code>{Object[]}</code> : aResults<div class="sub-desc">Array of result objects.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="getResultsEvent"></a>
+                <div class="mdetail">
+                <h3>getResultsEvent</i></h3>
+                <code>public event getResultsEvent</code>
+                <div class="mdetail-desc">
+                Fired when data is retrieved from the live data source.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The requesting object.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li><li><code>{Object[]}</code> : aResults<div class="sub-desc">Array of result objects.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="itemArrowFromEvent"></a>
+                <div class="mdetail alt">
+                <h3>itemArrowFromEvent</i></h3>
+                <code>public event itemArrowFromEvent</code>
+                <div class="mdetail-desc">
+                Fired when result item has been arrowed away from.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{HTMLElement}</code> : elItem<div class="sub-desc">The &lt;li&gt; element item arrowed from.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="itemArrowToEvent"></a>
+                <div class="mdetail">
+                <h3>itemArrowToEvent</i></h3>
+                <code>public event itemArrowToEvent</code>
+                <div class="mdetail-desc">
+                Fired when result item has been arrowed to.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{HTMLElement}</code> : elItem<div class="sub-desc">The &lt;li&gt; element item arrowed to.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="itemMouseOutEvent"></a>
+                <div class="mdetail alt">
+                <h3>itemMouseOutEvent</i></h3>
+                <code>public event itemMouseOutEvent</code>
+                <div class="mdetail-desc">
+                Fired when result item has been moused out.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{HTMLElement}</code> : elItem<div class="sub-desc">The &lt;li&gt; element item moused from.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="itemMouseOverEvent"></a>
+                <div class="mdetail">
+                <h3>itemMouseOverEvent</i></h3>
+                <code>public event itemMouseOverEvent</code>
+                <div class="mdetail-desc">
+                Fired when result item has been moused over.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{HTMLElement}</code> : elItem<div class="sub-desc">The &lt;li&gt element item moused to.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="itemSelectEvent"></a>
+                <div class="mdetail alt">
+                <h3>itemSelectEvent</i></h3>
+                <code>public event itemSelectEvent</code>
+                <div class="mdetail-desc">
+                Fired when an item is selected via mouse click, ENTER key, or TAB key.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{HTMLElement}</code> : elItem<div class="sub-desc">The selected &lt;li&gt; element item.</div></li><li><code>{Object}</code> : oData<div class="sub-desc">The data returned for the item, either as an object, or mapped from the schema into an array.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="queryEvent"></a>
+                <div class="mdetail">
+                <h3>queryEvent</i></h3>
+                <code>public event queryEvent</code>
+                <div class="mdetail-desc">
+                Fired when a query is made to the live data source.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The DataSource instance.</div></li><li><code>{Object}</code> : oParent<div class="sub-desc">The requesting object.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="selectionEnforceEvent"></a>
+                <div class="mdetail alt">
+                <h3>selectionEnforceEvent</i></h3>
+                <code>public event selectionEnforceEvent</code>
+                <div class="mdetail-desc">
+                Fired if forceSelection is enabled and the user's input has been cleared
+because it did not match one of the returned query results.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="textboxBlurEvent"></a>
+                <div class="mdetail">
+                <h3>textboxBlurEvent</i></h3>
+                <code>public event textboxBlurEvent</code>
+                <div class="mdetail-desc">
+                Fired when the input field loses focus.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="textboxFocusEvent"></a>
+                <div class="mdetail alt">
+                <h3>textboxFocusEvent</i></h3>
+                <code>public event textboxFocusEvent</code>
+                <div class="mdetail-desc">
+                Fired when the input field receives focus.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="textboxKeyEvent"></a>
+                <div class="mdetail">
+                <h3>textboxKeyEvent</i></h3>
+                <code>public event textboxKeyEvent</code>
+                <div class="mdetail-desc">
+                Fired when the input field receives key input.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{Number}</code> : nKeycode<div class="sub-desc">The keycode number.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="typeAheadEvent"></a>
+                <div class="mdetail alt">
+                <h3>typeAheadEvent</i></h3>
+                <code>public event typeAheadEvent</code>
+                <div class="mdetail-desc">
+                Fired when the input field has been prefilled by the type-ahead
+feature.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The query string.</div></li><li><code>{String}</code> : sPrefill<div class="sub-desc">The prefill string.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                            <a name="unmatchedItemSelectEvent"></a>
+                <div class="mdetail">
+                <h3>unmatchedItemSelectEvent</i></h3>
+                <code>public event unmatchedItemSelectEvent</code>
+                <div class="mdetail-desc">
+                Fired when a user selection does not match any of the displayed result items.
+Note that this event may not behave as expected when delimiter characters
+have been defined.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>{Object}</code> : oSelf<div class="sub-desc">The AutoComplete instance.</div></li><li><code>{String}</code> : sQuery<div class="sub-desc">The user-typed query string.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by AutoComplete.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

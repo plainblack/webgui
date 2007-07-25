@@ -1,0 +1,15 @@
+TD,P,B,INPUT,DIV{font-family:arial,helvetica; font-size:12px}
+.clCMEvent{position:absolute; z-index:300; width:100%; height:100%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:hidden}
+.clCMAbs{position:absolute; width:10; height:10; left:0; top:0; visibility:hidden}
+
+.clT,.clTover,.clS,.clSover,.clS2,.clS2over{position:absolute; overflow:hidden; width:130; height:25; cursor:pointer; cursor:hand}
+.clT,.clTover{padding:4px; font-size:12px; font-weight:bold}
+.clT{color:white; }   
+.clTover{color:#FCCE55;}
+.clS,.clSover{padding:2px; font-size:11px; font-weight:bold}
+.clS2,.clS2over{padding:2px; font-size:11px;}
+.clS,.clS2{color:#006699; background-color:#CDDBEB; layer-background-color:#CDDBEB;}
+.clSover,.clS2over{color:#FCCE55;}
+.clSover,.clS2over,.clTover,.clB,.clBar{layer-background-color:#336699; background-color:#336699;}
+.clB{position:absolute; visibility:hidden; z-index:300}
+.clBar{position:absolute; width:10; height:10; visibility:hidden; }

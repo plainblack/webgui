@@ -1,0 +1,76 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Bezier</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Bezier.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Bezier</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Bezier</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="animation.js.html">animation.js</a></td></tr>
+        </table>
+        <div class="description">
+            Used to calculate Bezier splines for any number of control points.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getPosition">getPosition</a>(<code>Array points</code>, <code>Number t</code>) : Array</td>
+        <td class="msource" rowspan="2">Bezier</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Get the current position of the animated element based on t.
+Each point is an array of "x" and "y" values (0 = x, 1 =...</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="getPosition"></a>
+                <div class="mdetail">
+                <h3>getPosition</i></h3>
+                <code>public function getPosition(<code>Array points</code>, <code>Number t</code>)</code>
+                <div class="mdetail-desc">
+                    Get the current position of the animated element based on t.
+Each point is an array of "x" and "y" values (0 = x, 1 = y)
+At least 2 points are required (start and end).
+First point is start. Last point is end.
+Additional control points are optional.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>points</code> : Array<div class="sub-desc">An array containing Bezier points</div></li><li><code>t</code> : Number<div class="sub-desc">A number between 0 and 1 which is the basis for determining current position</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Array</code><div class="sub-desc">An array containing int x and y member data</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Bezier.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

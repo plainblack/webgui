@@ -1,0 +1,1331 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.CalendarGroup</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.CalendarGroup.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.CalendarGroup</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>CalendarGroup</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Subclasses:</td><td><a href="YAHOO.widget.YAHOO.widget.Calendar2up.html">Calendar2up</a></td></tr>
+                        <tr><td class="label">Defined In:</td><td><a href="calendar.js.html">calendar.js</a></td></tr>
+        </table>
+        <div class="description">
+            YAHOO.widget.CalendarGroup is a special container class for YAHOO.widget.Calendar. This class facilitates
+the ability to have multi-page calendar views that share a single dataset and are
+dependent on each other.
+The calendar group instance will refer to each of its elements using a 0-based index.
+For example, to construct the placeholder for a calendar group widget with id "cal1" and
+containerId of "cal1Container", the markup would be as follows:
+<xmp>
+<div id="cal1Container_0"></div>
+<div id="cal1Container_1"></div>
+</xmp>
+The tables for the calendars ("cal1_0" and "cal1_1") will be inserted into those containers.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_2UPCLOSE&lt;static&gt;">CSS_2UPCLOSE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; CSS class representing the close icon for the 2-up calendar</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_2UPTITLE&lt;static&gt;">CSS_2UPTITLE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; CSS class representing the title for the 2-up calendar</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CONTAINER&lt;static&gt;">CSS_CONTAINER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; CSS class representing the container for the calendar</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_MULTI_UP&lt;static&gt;">CSS_MULTI_UP&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; CSS class representing the container for the calendar</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Locale">Locale</a> : Object</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The local object which contains the CalendarGroup's locale settings</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Options">Options</a> : Object</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The local object which contains the CalendarGroup's options</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : Number
+@default</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The position of the year in a month/day/year date string
+@config MDY_YEAR_POSITION</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#containerId">containerId</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The unique id associated with the CalendarGroup container</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#id">id</a> : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The unique id associated with the CalendarGroup</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#oDomContainer">oDomContainer</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The outer containing element for the CalendarGroup</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#pages">pages</a> : YAHOO.widget.Calendar[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The collection of Calendar pages contained within the CalendarGroup</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CalendarGroup">CalendarGroup</a>(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>)</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addMonthRenderer">addMonthRenderer</a>(<code>Number month</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a month to the render stack. The function reference passed to this method will be executed
+when a date cell matc...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addMonths">addMonths</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds the designated number of months to the current calendar month, and sets the current
+calendar page date to the ne...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addRenderer">addRenderer</a>(<code>String sDates</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a renderer to the render stack. The function reference passed to this method will be executed
+when a date cell m...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addWeekdayRenderer">addWeekdayRenderer</a>(<code>Number weekday</code>, <code>Function fnRender</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a weekday to the render stack. The function reference passed to this method will be executed
+when a date cell ma...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addYears">addYears</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds the designated number of years to the current calendar, and sets the current
+calendar page date to the new month.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#callChildFunction">callChildFunction</a>(<code>String fnName</code>, <code>Array args</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Calls a function within all child Calendars within this CalendarGroup.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clear">clear</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Clears the selected dates in the current calendar widget and sets the calendar
+to the current month and year.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configPageDate">configPageDate</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default Config handler for the "pagedate" property</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configPages">configPages</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default Config handler for the "pages" property</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#constructChild">constructChild</a>(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>) : YAHOO.widget.Calendar</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Constructs a child calendar. This method can be overridden if a subclassed version of the default
+calendar is to be u...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#delegateConfig">delegateConfig</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Delegates a configuration property to the CustomEvents associated with the CalendarGroup's children</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselect">deselect</a>(<code>String/Date/Date[] date</code>) : Date[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Deselects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectAll">deselectAll</a>() : Date[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Deselects all dates on the current calendar.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectCell">deselectCell</a>(<code>Number cellIndex</code>) : Date[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Deselects a date on the current calendar by referencing the index of the cell that should be deselected.
+This method ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getSelectedDates">getSelectedDates</a>() : An</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Gets the list of currently selected dates from the calendar.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the calendar group. All subclasses must call this method in order for the
+group to be initialized properly.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes CalendarGroup's built-in CustomEvents</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextMonth">nextMonth</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Navigates to the next month page in the calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#nextYear">nextYear</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Navigates to the next year in the currently selected month in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#previousMonth">previousMonth</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Navigates to the previous month page in the calendar widget.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#previousYear">previousYear</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Navigates to the previous year in the currently selected month in the calendar widget.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Calls the render function of all child calendars within the group.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderFooter">renderFooter</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders a footer for the 2-up calendar container. By default, this method is
+unimplemented.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderHeader">renderHeader</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the header for the CalendarGroup.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#reset">reset</a>() : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resets the calendar widget to the originally selected month and year, and
+sets the calendar to the initial selection(s).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#select">select</a>(<code>String/Date/Date[] date</code>) : Date[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Selects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render me...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#selectCell">selectCell</a>(<code>Number cellIndex</code>) : Date[]</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Selects a date on the current calendar by referencing the index of the cell that should be selected.
+This method is u...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setChildFunction">setChildFunction</a>(<code>String fnName</code>, <code>Function fn</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Adds a function to all child Calendars within this CalendarGroup.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setMonth">setMonth</a>(<code>Number month</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the calendar group's month explicitly. This month will be set into the first
+page of the multi-page calendar, an...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setYear">setYear</a>(<code>Number year</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the calendar group's year explicitly. This year will be set into the first
+page of the multi-page calendar, and ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subtractMonths">subtractMonths</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Subtracts the designated number of months from the current calendar month, and sets the current
+calendar page date to...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subtractYears">subtractYears</a>(<code>Number count</code>) : void</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Subtcats the designated number of years from the current calendar, and sets the current
+calendar page date to the new...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a string representation of the object.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeDeselectEvent">beforeDeselectEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired before a selection is made</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeRenderEvent">beforeRenderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired before the Calendar is rendered</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeSelectEvent">beforeSelectEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired before a selection is made</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changePageEvent">changePageEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the Calendar page is changed</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clearEvent">clearEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the Calendar is cleared</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#deselectEvent">deselectEvent</a> : (<code>Array Array</code>)</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when a selection is made</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderEvent">renderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when the Calendar is rendered</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetEvent">resetEvent</a> : ()</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired when the Calendar is reset</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#selectEvent">selectEvent</a> : (<code>Array Array</code>)</td>
+        <td class="msource" rowspan="2">CalendarGroup</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired when a selection is made</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="CSS_2UPCLOSE&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_2UPCLOSE&lt;static&gt;</i></h3>
+                <code>public String CSS_2UPCLOSE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; CSS class representing the close icon for the 2-up calendar                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="CSS_2UPTITLE&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_2UPTITLE&lt;static&gt;</i></h3>
+                <code>public String CSS_2UPTITLE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; CSS class representing the title for the 2-up calendar                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="CSS_CONTAINER&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_CONTAINER&lt;static&gt;</i></h3>
+                <code>public String CSS_CONTAINER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; CSS class representing the container for the calendar                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="CSS_MULTI_UP&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_MULTI_UP&lt;static&gt;</i></h3>
+                <code>public String CSS_MULTI_UP&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; CSS class representing the container for the calendar                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="Locale"></a>
+                <div class="mdetail">
+                <h3>Locale</i></h3>
+                <code>public Object Locale</code>
+                <div class="mdetail-desc">
+                    The local object which contains the CalendarGroup's locale settings                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="Options"></a>
+                <div class="mdetail alt">
+                <h3>Options</i></h3>
+                <code>public Object Options</code>
+                <div class="mdetail-desc">
+                    The local object which contains the CalendarGroup's options                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail">
+                <h3>cfg</i></h3>
+                <code>public Number
+@default cfg</code>
+                <div class="mdetail-desc">
+                    The position of the year in a month/day/year date string
+@config MDY_YEAR_POSITION                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="containerId"></a>
+                <div class="mdetail alt">
+                <h3>containerId</i></h3>
+                <code>public String containerId</code>
+                <div class="mdetail-desc">
+                    The unique id associated with the CalendarGroup container                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="id"></a>
+                <div class="mdetail">
+                <h3>id</i></h3>
+                <code>public String id</code>
+                <div class="mdetail-desc">
+                    The unique id associated with the CalendarGroup                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="oDomContainer"></a>
+                <div class="mdetail alt">
+                <h3>oDomContainer</i></h3>
+                <code>public HTMLElement oDomContainer</code>
+                <div class="mdetail-desc">
+                    The outer containing element for the CalendarGroup                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                            <a name="pages"></a>
+                <div class="mdetail">
+                <h3>pages</i></h3>
+                <code>public YAHOO.widget.Calendar[] pages</code>
+                <div class="mdetail-desc">
+                    The collection of Calendar pages contained within the CalendarGroup                </div>
+                <div class="mdetail-def">This property is defined by CalendarGroup.</div>
+                </div>
+                        </div>
+                
+                    <a name="CalendarGroup"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>CalendarGroup</i></h3>
+                <code>public function CalendarGroup(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the table element that will represent the calendar widget</div></li><li><code>containerId</code> : String<div class="sub-desc">The id of the container div element that will wrap the calendar table</div></li><li><code>config</code> : Object<div class="sub-desc">The configuration object containing the Calendar's arguments</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addMonthRenderer"></a>
+                <div class="mdetail">
+                <h3>addMonthRenderer</i></h3>
+                <code>public function addMonthRenderer(<code>Number month</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a month to the render stack. The function reference passed to this method will be executed
+when a date cell matches the month passed to this method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>month</code> : Number<div class="sub-desc">The month (1-12) to associate with this renderer</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="addMonths"></a>
+                <div class="mdetail alt">
+                <h3>addMonths</i></h3>
+                <code>public function addMonths(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Adds the designated number of months to the current calendar month, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of months to add to the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="addRenderer"></a>
+                <div class="mdetail">
+                <h3>addRenderer</i></h3>
+                <code>public function addRenderer(<code>String sDates</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a renderer to the render stack. The function reference passed to this method will be executed
+when a date cell matches the conditions specified in the date string for this renderer.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>sDates</code> : String<div class="sub-desc">A date string to associate with the specified renderer. Valid formats include date (12/24/2005), month/day (12/24), and range (12/1/2004-1/1/2005)</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="addWeekdayRenderer"></a>
+                <div class="mdetail alt">
+                <h3>addWeekdayRenderer</i></h3>
+                <code>public function addWeekdayRenderer(<code>Number weekday</code>, <code>Function fnRender</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a weekday to the render stack. The function reference passed to this method will be executed
+when a date cell matches the weekday passed to this method.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>weekday</code> : Number<div class="sub-desc">The weekday (0-6) to associate with this renderer</div></li><li><code>fnRender</code> : Function<div class="sub-desc">The function executed to render cells that match the render rules for this renderer.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="addYears"></a>
+                <div class="mdetail">
+                <h3>addYears</i></h3>
+                <code>public function addYears(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Adds the designated number of years to the current calendar, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of years to add to the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="callChildFunction"></a>
+                <div class="mdetail alt">
+                <h3>callChildFunction</i></h3>
+                <code>public function callChildFunction(<code>String fnName</code>, <code>Array args</code>)</code>
+                <div class="mdetail-desc">
+                    Calls a function within all child Calendars within this CalendarGroup.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fnName</code> : String<div class="sub-desc">The name of the function</div></li><li><code>args</code> : Array<div class="sub-desc">The arguments to pass to the function</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="clear"></a>
+                <div class="mdetail">
+                <h3>clear</i></h3>
+                <code>public function clear()</code>
+                <div class="mdetail-desc">
+                    Clears the selected dates in the current calendar widget and sets the calendar
+to the current month and year.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="configPageDate"></a>
+                <div class="mdetail alt">
+                <h3>configPageDate</i></h3>
+                <code>public function configPageDate(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default Config handler for the "pagedate" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="configPages"></a>
+                <div class="mdetail">
+                <h3>configPages</i></h3>
+                <code>public function configPages(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default Config handler for the "pages" property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="constructChild"></a>
+                <div class="mdetail alt">
+                <h3>constructChild</i></h3>
+                <code>public function constructChild(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                    Constructs a child calendar. This method can be overridden if a subclassed version of the default
+calendar is to be used.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the table element that will represent the calendar widget</div></li><li><code>containerId</code> : String<div class="sub-desc">The id of the container div element that will wrap the calendar table</div></li><li><code>config</code> : Object<div class="sub-desc">The configuration object containing the Calendar's arguments</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.Calendar</code><div class="sub-desc">The YAHOO.widget.Calendar instance that is constructed</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="delegateConfig"></a>
+                <div class="mdetail">
+                <h3>delegateConfig</i></h3>
+                <code>public function delegateConfig(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Delegates a configuration property to the CustomEvents associated with the CalendarGroup's children                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="deselect"></a>
+                <div class="mdetail alt">
+                <h3>deselect</i></h3>
+                <code>public function deselect(<code>String/Date/Date[] date</code>)</code>
+                <div class="mdetail-desc">
+                    Deselects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render method explicitly. Once deselection has completed, render must be
+called for the changes to be reflected visually.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : String/Date/Date[]<div class="sub-desc">The date string of dates to deselect in the current calendar. Valid formats are individual date(s) (12/24/2005,12/26/2005) or date range(s) (12/24/2005-1/1/2006). Multiple comma-delimited dates can also be passed to this method (12/24/2005,12/11/2005-12/13/2005). This method can also take a JavaScript Date object or an array of Date objects.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="deselectAll"></a>
+                <div class="mdetail">
+                <h3>deselectAll</i></h3>
+                <code>public function deselectAll()</code>
+                <div class="mdetail-desc">
+                    Deselects all dates on the current calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected. Assuming that this function executes properly, the return value should be an empty array. However, the empty array is returned for the sake of being able to check the selection status of the calendar.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="deselectCell"></a>
+                <div class="mdetail alt">
+                <h3>deselectCell</i></h3>
+                <code>public function deselectCell(<code>Number cellIndex</code>)</code>
+                <div class="mdetail-desc">
+                    Deselects a date on the current calendar by referencing the index of the cell that should be deselected.
+This method is used to easily deselect a single cell (usually with a mouse click) without having to do
+a full render. The selected style is removed from the cell directly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>cellIndex</code> : Number<div class="sub-desc">The index of the cell to deselect in the current calendar.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="getSelectedDates"></a>
+                <div class="mdetail">
+                <h3>getSelectedDates</i></h3>
+                <code>public function getSelectedDates()</code>
+                <div class="mdetail-desc">
+                    Gets the list of currently selected dates from the calendar.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>An</code><div class="sub-desc">array of currently selected JavaScript Date objects.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String id</code>, <code>String containerId</code>, <code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                    Initializes the calendar group. All subclasses must call this method in order for the
+group to be initialized properly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the table element that will represent the calendar widget</div></li><li><code>containerId</code> : String<div class="sub-desc">The id of the container div element that will wrap the calendar table</div></li><li><code>config</code> : Object<div class="sub-desc">The configuration object containing the Calendar's arguments</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes CalendarGroup's built-in CustomEvents                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="nextMonth"></a>
+                <div class="mdetail alt">
+                <h3>nextMonth</i></h3>
+                <code>public function nextMonth()</code>
+                <div class="mdetail-desc">
+                    Navigates to the next month page in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="nextYear"></a>
+                <div class="mdetail">
+                <h3>nextYear</i></h3>
+                <code>public function nextYear()</code>
+                <div class="mdetail-desc">
+                    Navigates to the next year in the currently selected month in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="previousMonth"></a>
+                <div class="mdetail alt">
+                <h3>previousMonth</i></h3>
+                <code>public function previousMonth()</code>
+                <div class="mdetail-desc">
+                    Navigates to the previous month page in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="previousYear"></a>
+                <div class="mdetail">
+                <h3>previousYear</i></h3>
+                <code>public function previousYear()</code>
+                <div class="mdetail-desc">
+                    Navigates to the previous year in the currently selected month in the calendar widget.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail alt">
+                <h3>render</i></h3>
+                <code>public function render()</code>
+                <div class="mdetail-desc">
+                    Calls the render function of all child calendars within the group.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="renderFooter"></a>
+                <div class="mdetail">
+                <h3>renderFooter</i></h3>
+                <code>public function renderFooter()</code>
+                <div class="mdetail-desc">
+                    Renders a footer for the 2-up calendar container. By default, this method is
+unimplemented.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="renderHeader"></a>
+                <div class="mdetail alt">
+                <h3>renderHeader</i></h3>
+                <code>public function renderHeader()</code>
+                <div class="mdetail-desc">
+                    Renders the header for the CalendarGroup.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="reset"></a>
+                <div class="mdetail">
+                <h3>reset</i></h3>
+                <code>public function reset()</code>
+                <div class="mdetail-desc">
+                    Resets the calendar widget to the originally selected month and year, and
+sets the calendar to the initial selection(s).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="select"></a>
+                <div class="mdetail alt">
+                <h3>select</i></h3>
+                <code>public function select(<code>String/Date/Date[] date</code>)</code>
+                <div class="mdetail-desc">
+                    Selects a date or a collection of dates on the current calendar. This method, by default,
+does not call the render method explicitly. Once selection has completed, render must be
+called for the changes to be reflected visually.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>date</code> : String/Date/Date[]<div class="sub-desc">The date string of dates to select in the current calendar. Valid formats are individual date(s) (12/24/2005,12/26/2005) or date range(s) (12/24/2005-1/1/2006). Multiple comma-delimited dates can also be passed to this method (12/24/2005,12/11/2005-12/13/2005). This method can also take a JavaScript Date object or an array of Date objects.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="selectCell"></a>
+                <div class="mdetail">
+                <h3>selectCell</i></h3>
+                <code>public function selectCell(<code>Number cellIndex</code>)</code>
+                <div class="mdetail-desc">
+                    Selects a date on the current calendar by referencing the index of the cell that should be selected.
+This method is used to easily select a single cell (usually with a mouse click) without having to do
+a full render. The selected style is applied to the cell directly.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>cellIndex</code> : Number<div class="sub-desc">The index of the cell to select in the current calendar.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Date[]</code><div class="sub-desc">Array of JavaScript Date objects representing all individual dates that are currently selected.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="setChildFunction"></a>
+                <div class="mdetail alt">
+                <h3>setChildFunction</i></h3>
+                <code>public function setChildFunction(<code>String fnName</code>, <code>Function fn</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a function to all child Calendars within this CalendarGroup.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fnName</code> : String<div class="sub-desc">The name of the function</div></li><li><code>fn</code> : Function<div class="sub-desc">The function to apply to each Calendar page object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="setMonth"></a>
+                <div class="mdetail">
+                <h3>setMonth</i></h3>
+                <code>public function setMonth(<code>Number month</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the calendar group's month explicitly. This month will be set into the first
+page of the multi-page calendar, and all other months will be iterated appropriately.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>month</code> : Number<div class="sub-desc">The numeric month, from 0 (January) to 11 (December)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="setYear"></a>
+                <div class="mdetail alt">
+                <h3>setYear</i></h3>
+                <code>public function setYear(<code>Number year</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the calendar group's year explicitly. This year will be set into the first
+page of the multi-page calendar, and all other months will be iterated appropriately.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>year</code> : Number<div class="sub-desc">The numeric 4-digit year</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="subtractMonths"></a>
+                <div class="mdetail">
+                <h3>subtractMonths</i></h3>
+                <code>public function subtractMonths(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Subtracts the designated number of months from the current calendar month, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of months to subtract from the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="subtractYears"></a>
+                <div class="mdetail alt">
+                <h3>subtractYears</i></h3>
+                <code>public function subtractYears(<code>Number count</code>)</code>
+                <div class="mdetail-desc">
+                    Subtcats the designated number of years from the current calendar, and sets the current
+calendar page date to the new month.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>count</code> : Number<div class="sub-desc">The number of years to subtract from the current calendar</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a string representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">A string representation of the CalendarGroup object.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CalendarGroup.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="beforeDeselectEvent"></a>
+                <div class="mdetail">
+                <h3>beforeDeselectEvent</i></h3>
+                <code>public event beforeDeselectEvent</code>
+                <div class="mdetail-desc">
+                Fired before a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="beforeRenderEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeRenderEvent</i></h3>
+                <code>public event beforeRenderEvent</code>
+                <div class="mdetail-desc">
+                Fired before the Calendar is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="beforeSelectEvent"></a>
+                <div class="mdetail">
+                <h3>beforeSelectEvent</i></h3>
+                <code>public event beforeSelectEvent</code>
+                <div class="mdetail-desc">
+                Fired before a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="changePageEvent"></a>
+                <div class="mdetail alt">
+                <h3>changePageEvent</i></h3>
+                <code>public event changePageEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar page is changed                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="clearEvent"></a>
+                <div class="mdetail">
+                <h3>clearEvent</i></h3>
+                <code>public event clearEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is cleared                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="deselectEvent"></a>
+                <div class="mdetail alt">
+                <h3>deselectEvent</i></h3>
+                <code>public event deselectEvent</code>
+                <div class="mdetail-desc">
+                Fired when a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>Array</code> : Array<div class="sub-desc">of Date field arrays in the format [YYYY, MM, DD].</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="renderEvent"></a>
+                <div class="mdetail">
+                <h3>renderEvent</i></h3>
+                <code>public event renderEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="resetEvent"></a>
+                <div class="mdetail alt">
+                <h3>resetEvent</i></h3>
+                <code>public event resetEvent</code>
+                <div class="mdetail-desc">
+                Fired when the Calendar is reset                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                            <a name="selectEvent"></a>
+                <div class="mdetail">
+                <h3>selectEvent</i></h3>
+                <code>public event selectEvent</code>
+                <div class="mdetail-desc">
+                Fired when a selection is made                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>Array</code> : Array<div class="sub-desc">of Date field arrays in the format [YYYY, MM, DD].</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CalendarGroup.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

@@ -1,0 +1,275 @@
+#EventManagerTmpl000001
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+
+<table cellpadding="3" cellspacing="0" style="width:98%" class="EMS_view">
+<tr>
+	<td valign="top">
+
+		<tmpl_if canManageEvents>
+		<br />
+		<table cellpadding="5" cellspacing="0" style="width:100%">
+		<tr style="height:30px;">
+			<td valign="top" style="width:190px;"><a href="<tmpl_var manageEvents.url>">Manage Events</a></td>
+			<td>(Event Directors and Staff)</td>
+		</tr>
+		<tr style="height:30px">
+			<td valign="top" style="width:190px;"><a href="<tmpl_var manageRegistrants.url>">Manage Registrants</a></td>
+			<td>(Event Directors and Staff)</td>
+		</tr>
+		</tmpl_if>
+		
+		<tr style="height:30px">
+			<td valign="top" style="width:190px;"><a href="<tmpl_var managePurchases.url>">Modify Existing Badge</a></td>
+			<td>Add Events to a Badge you've already purchased</td>
+		</tr>
+		</table>
+	</td>
+	<td style="width:250px" valign="top" align="center">
+
+		<tmpl_if cart.purchaseLoop>
+		<div class="cart">
+			<h2>Shopping Cart</h2>
+			
+			<tmpl_loop cart.purchaseLoop>
+			<div class="cartContent">
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tbody>
+				<tr>
+					<td>
+						<b><tmpl_var purchase.mainEventTitle></b><br />
+						<tmpl_loop registrantInfoLoop>
+							Name: <tmpl_var firstName> <tmpl_var lastName>
+						</tmpl_loop>
+						<br />
+						Additional Price: $<tmpl_var newPrice> 					
+					</td>
+				</tr>
+				<tr>
+					<td style="border-top:solid silver 1px;">
+						<a href="<tmpl_var edit.url>" class="button"><img src="^Extras;/toolbar/bullet/edit.gif" style="border-style:none" alt="edit" /></a>
+						<a href="<tmpl_var delete.url>" class="button"><img src="^Extras;/toolbar/bullet/delete.gif" style="border-style:none" alt="delete" /></a>
+					</td>
+				</tr>
+				</tbody>
+				</table>				
+			</div>
+			</tmpl_loop>
+			
+			<a href="<tmpl_var emptyCart.url>">Empty Cart</a><br /><a href="<tmpl_var checkout.url>">Checkout</a>
+		</div>
+		</tmpl_if>
+	</td>
+</tr>
+</table>
+<br />
+
+<div>
+	<span class="StepLabel">Step 1: </span> Choose a badge from the list below, or click the link above to add events to a badge you've already purchased.
+</div>
+<br />
+
+<table width="100%" border="0" cellpadding="8" cellspacing="0">
+<tmpl_loop events_loop>
+<tr>
+	<td valign="top" colspan="7"><tmpl_var event></td>
+</tr>
+</tmpl_loop>
+</table>
+<tmpl_var paginateBar>
+~~~
+
+<style type="text/css">
+.EMS_view {
+	background-color:#F4F4F4;
+	border:solid #E2E2E2 1px;
+	-moz-border-radius:15px;
+}
+.EMS_view a {
+	width:200px;
+	background-color:#E2E2E2;
+	padding:5px;			
+	color:gray;
+	border:solid silver 1px;
+	text-decoration:none;
+	font-weight:bold;						
+	text-align:center;
+	-moz-border-radius:10px;
+	display:block;
+	font-size:7pt;
+	margin-left:10px;
+	-moz-box-sizing:border-box;
+}
+.EMS_view a:hover {
+	background-color:#F0F0F0;
+	border-color:#E2E2E2;
+}
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}
+.manageEvents {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+.datacardtitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:13px;
+}
+
+.leftnav{
+	padding: 1px 1px 1px 1px;
+	background: white;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.leftnavon{
+	padding: 1px 1px 1px 1px;
+	background: yellow;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 2px #3D5690 ridge;
+}
+.calendartitle {
+	background: #3D5690;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.filter-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 105px;
+}
+.compare-select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 76px;
+}
+.filter-text {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 114px;
+}
+.smLink {
+   font-family: verdana;
+   font-size: 10px;
+   font-weight: normal;
+   color: blue;
+}
+
+.StepLabel { font-family: Tahoma; font-size: 14pt; letter-spacing: 2pt; color: #234E9C; 
+               font-weight: bold }
+		.cart {			
+			background-color:#F0F0F0;
+			-moz-border-radius:15px;
+			padding:5px;	
+			-moz-box-sizing:border-box;
+			box-sizing:border-box;
+			font-family:verdana;
+			font-size:9pt;
+			border:solid #E2E2E2 1px;
+			margin-right:10px;
+			text-align:left;
+		}
+		.cart h2 {
+			width:100%;
+			font-size:12.5pt;
+			background-color:#E2E2E2;
+			text-align:center;
+			-moz-border-radius-topLeft:15px;
+			-moz-border-radius-topRight:15px;
+			margin:0px;
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;
+			box-sizing:border-box;
+			color:gray;			
+		}
+		.cartContent {			
+			background-color:#F4F4F4;			
+			margin:0px;
+			margin-top:5px;
+			margin-bottom:5px;
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;
+			box-sizing:border-box;
+			font-family:verdana;
+			font-size:9pt;
+		}
+		.cartContent a.button {
+			background-color:#CF1D1D;
+			padding:5px;			
+			color:white;
+			border:solid #9C1616 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			font-size:7pt;			
+			margin-left:10px;
+			margin-top:2px;
+			width:auto;	
+			display:block;
+			float:right;
+		}
+		.cartContent a.button:hover {
+			background-color:#9C1616;
+			color:#CF1D1D;
+			color:white;		
+		}		
+		.cartFooter {
+			width:100%;
+			background-color:#E2E2E2;			
+			-moz-border-radius-bottomLeft:15px;
+			-moz-border-radius-bottomRight:15px;
+			margin:0px;			
+			border:solid #E0E0E0 1px;
+			padding:5px;
+			-moz-box-sizing:border-box;	
+			box-sizing:border-box;			
+			text-align:center;
+		}
+		.cartFooter a {				
+			
+			background-color:#E2E2E2;
+			padding:5px;			
+			color:gray;
+			border:solid #F4F4F4 1px;
+			text-decoration:none;
+			font-weight:bold;						
+			text-align:center;
+			-moz-border-radius:10px;
+			display:block;
+		}
+		.cartFooter a:hover {
+			background-color:#F0F0F0;
+			color:gray;
+		}		
+</style>

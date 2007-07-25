@@ -1,0 +1,130 @@
+#EventManagerTmpl000005
+<script>
+function confirmDelete(url) {
+if(confirm("Are you sure you wish to delete ALL registrations tied to this purchaseId?")) {
+location.href=url;
+}
+}
+</script>
+
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p><br /><br />
+</tmpl_if>
+<h2><tmpl_var viewPurchaseTitle></h2>
+
+<tmpl_if canReturn><tmpl_if canReturnTransaction>
+	<div style="text-align:right;">
+		(<a href="<tmpl_var appUrl>?func=returnItem;tid=<tmpl_var transactionId>">Return Entire Purchase</a>)
+	</div>
+</tmpl_if></tmpl_if>
+
+<tmpl_loop purchasesLoop>
+<table width="100%" border="0" class="viewPurchase">
+<tr>
+	<td class="badgeTitle">Badge Name</td>
+	<td class="itinerary">
+	Itinerary&nbsp;&nbsp;<tmpl_if canReturn><tmpl_if canReturnItinerary>(<a href="<tmpl_var appUrl>?func=returnItem;pid=<tmpl_var purchaseId>">Return Entire Itinerary</a>)</tmpl_if></tmpl_if>
+	</td>
+</tr>
+<tr>
+	<td class="badgeName" valign="top">
+		<tmpl_var firstName> <tmpl_var lastName><br /><tmpl_if canReturn><a href="<tmpl_var appUrl>?func=editRegistrant;badgeId=<tmpl_var badgeId>"><img src="/extras/toolbar/bullet/edit.gif" border="0" /></a></tmpl_if><br />
+		<a href="<tmpl_var appUrl>?func=viewPurchase;badgeId=<tmpl_var badgeId>">View All Registrations for this Registrant</a>
+<br /><br /><tmpl_unless registrantView>
+<tmpl_if purchaseEventId><tmpl_if canAddEvents><tmpl_if canReturnItinerary><a href="<tmpl_var appUrl>?func=addEventsToBadge;bid=<tmpl_var badgeId>;eventId=<tmpl_var purchaseEventId>">Add Events To Badge</a><tmpl_else>Returned</tmpl_if></tmpl_if></tmpl_if>
+</tmpl_unless>
+	</td>
+	<td valign="top">
+		<table width="100%">
+		<tr>
+			<td><strong>Event Title</strong></td>
+			<td><strong>Event Dates</strong></td>
+		<tmpl_if canReturn>
+			<td><strong>Return Registration</strong></td>
+		</tmpl_if>
+		</tr>
+	<tmpl_loop regLoop>
+		<tr<tmpl_unless __ODD__> class="evenRow"<tmpl_else> class="oddRow"</tmpl_unless>>
+			<td><tmpl_var sku>: <tmpl_var title></td>
+			<td><tmpl_var startDateHuman> - <tmpl_var endDateHuman></td>
+		<tmpl_if canReturn>
+			<td><tmpl_if returned>RETURNED<tmpl_else><a href="<tmpl_var appUrl>?func=returnItem;rid=<tmpl_var registrationId>">Return This Registration</a></tmpl_if></td>
+		</tmpl_if>
+		</tr>
+	</tmpl_loop>
+		</table>
+	</td>
+</tr>
+</table>
+</tmpl_loop>
+
+<br /><br />
+<tmpl_if hasIncompleteTransactions>
+
+<table width="100%">
+<tr><td colspan="6" align="center"><h2>Unpurchased Registrations</h2></td></tr>
+<tr><td colspan="6">Badge Id: <tmpl_var badgeId></td></tr>
+<tr><td height="10" colspan="6">&nbsp;</td></tr>
+<tr><th>Event Number</th>
+    <th>Title</th>
+    <th>RegistrationId</th>
+    <th>Returned</th>
+    <th>Transaction Id</th>
+    <th>Status</th>
+</tr>
+
+<tmpl_loop incompleteTransactions_loop>
+<tr><td height="10" colspan="6">&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="#a0a0a0">Purchase Id: <tmpl_var purchaseId>
+<tmpl_if canDeleteRegistration>
+<br/>
+<a href="javascript:void(confirmDelete('<tmpl_var deleteRegistration.url>'));"><tmpl_var deleteRegistration.label></a>
+</tmpl_if>
+</td>
+<td bgcolor="#a0a0a0"><tmpl_var form.header><tmpl_var form.transactionSelect></td><td bgcolor="#a0a0a0"><tmpl_var form.submit><tmpl_var form.footer></td></tr>
+  <tmpl_loop unpurchased_loop>
+   <tr 
+   <tmpl_if __ODD__>bgcolor="#e0e0e0"
+   <tmpl_else>bgcolor="#c0c0c0"
+</tmpl_if>
+>
+   <td><tmpl_var sku></td>
+   <td><tmpl_var title></td>
+   <td><tmpl_var registrationId></td> 
+   <td align="center"><tmpl_var returned></td>
+   <td><tmpl_var transactionId></td>
+   <td><tmpl_var transactioStatus></td> 
+   </tr>
+  </tmpl_loop>
+</tmpl_loop>
+</table>
+</tmpl_if>
+~~~
+<style type="text/css">
+.viewPurchase {
+	border-bottom:solid silver 2px;
+}
+.viewPurchase td {
+	font-size:10pt;
+}
+tr.oddRow td {
+	background-color:#DADADA;
+	border-right:solid gray 1px;
+}
+tr.evenRow td {
+	background-color:#E8E8E8;
+	border-right:solid gray 1px;
+}
+td.badgeTitle, td.itinerary   {
+	font-size:9pt;
+	font-weight:bold;	
+	border-bottom:solid gray 1px;
+}
+td.badgeName {
+	font-size:9pt;
+	font-style:italic;
+}
+h2 {
+	margin-bottom:3px;
+}
+</style>

@@ -1,0 +1,73 @@
+1.3.1
+ - Fixed a problem where pages that were cut and pasted could have an ordering problem.
+ - Added a missing help icon to the SQL Report (edit).
+ - Cleaned up some code in the some of the default widgets.
+ - The gateway app (index.pl) can now be located in any directory by modifying two lines of code with any ordinary text editor.
+ - Added a link to the help index from every help page.
+ - Fixed a bug in the Syndicated Content widget where you could not edit an existing syndicated content widget due to a syntax error.
+ - Fixed a bug in Syndicated Content where only the first piece of content would be displayed in each instance.
+
+1.3.0
+ - Added a setting to turn off anonymous user registration.
+ - Some WebGUI macros are now configurable. For instance you can now format the date macro so that it will display in whatever format you choose.
+ - Eliminated some additional compatibility problems for Oracle and Postgres databases.
+ - WebGUI has now been verified under IIS as well as Apache.
+ - Had to edit the "Last Reply" column of the Message Board widget for database compliance and as a result gave it additional functionality. It now lists the subject, date, and author of the last reply. However, it is slightly slower using this methodology. Unfortunately we can't get around it if we want to be compliant with PostgreSQL.
+ - You can now use WebGUI macros in the Site Map widget.
+ - You can now choose whether you want the visitor redirected to the home page or to a page not found page if the page they requested does not exist.
+ - Updated the help to reflect all changes.
+ - Rearranged the "Edit Page" screen to be more intuitive. Also added links to user, group, and style management from that screen.
+ - Added distictive privilege messages for vital components and administrative functions. If you try to delete a component that's vital to WebGUI it tells you that you can't do that and why rather than just saying "Permission Denied!". Same goes for users trying to access administrative functions who aren't in the admin group.
+ - Updated documentation to reflect a new required Perl module: Tie::CPHash.
+ - WebGUI has now been verified under Postgres and Oracle.
+ - Fixed a bug where syndicated content would display "$image" instead of the image itself.
+ - Moved the runHourly.pl script out into the WebGUI root.
+ - Modularized the WebGUI Macro system so that it can be altered and expanded by individual organizations.
+ - Fixed a bug where Syndicated Content last fetched date would show in epoch rather than a date/time.
+ - WebGUI 1.3.0 has reached release candidate status.
+
+1.2.1
+ - Fixed a couple of date related bugs in the message board that were introduced in the last release.
+ - Added an update release that fixes a problem with polls for people using WebGUI since the 0.x.x releases.
+
+1.2.0
+ - Moved all date functions internal rather than relying upon the database for them.
+ - Changed all insert and join syntax to be more database friendly.
+ - Updated the "testEnvironment.pl" script to be more crash proof and to check for all types of available database drivers. We believe it's now ready to be deployed as part of the installation process. It will be added to said documentation.
+ - Fixed a bug where you were unable to delete an FAQ question.
+ - Fixed a bug where setting a poll to be postable by visitors could cause problems with other users voting, including other visitors.
+ - Changed a few miscellaneous SQL statements for better compatibility with other databases.
+ - Renamed the <b>user</b> table to <b>users</b> because the word "user" is a reserved word in some databases.
+
+
+1.1.0
+ - Display the title? is defaultly checked on Articles.
+ - Fixed a bug where a user could not update their account info.
+ - Fixed a bug with the javascript image wizard.
+ - Added LDAP authentication.
+ - Added user level authentication schemas.
+ - Updated help to include new features.
+ - Added tally to the bottom of poll results.
+ - Added install instructions to the distribution in addition to those already maintained on the web site.
+ - Added two new menu macros for 2 and 3 level vertical menus from the current level.
+ - Added a new macro that points to the current page's url.
+
+1.0.1
+ - Released 1.0.0 with the wrong create.sql DDL.
+
+1.0.0 - Added the missing help buttons to the Search (MnoGo) and User Submission widgets.
+ - Added a diagnostic tool for checking your system environment to ensure you have the correct requirements installed, that your database and config files are set up properly, and that you have the lastest version of WebGUI.
+ - Changed the widget view headers from H2 to H1 as they were intended to be.
+ - You can now switch admin on or off from the account menu.
+ - Dates are now formatted as mm/dd/yyyy in the User Submissions widget.
+ - Fixed a bug where you couldn't delete an FAQ question.
+ - Changed the version information in WebGUI to reflect the Perl standards.
+ - Changed the pagenation system to be database agnostic by no longer using any sort of <b>limit</b> in the SQL statement. The limit function works differently across many databases and some databases don't even have a limit function.
+ - A "purge trash" function was added to the admin menu.
+ - If a user makes a submission without a title, the submission is labeled as "Untitled".
+ - Added exception handling to SQL Report in case the user gives us an improperly formatted SQL statment.
+ - Added error handler warnings to the SQL Report and Search MnoGo systems to notify the sys admins that their users are probably not formatting things correctly.
+ - Return the user to the proper page after editing an FAQ question.
+ - Fixed a bug that wouldn't allow registered users to post on Polls that were set to visitor posting.
+ - Added a convert carriage returns function to articles and user submissions.
+ - Added a logging system for both errors and warnings.

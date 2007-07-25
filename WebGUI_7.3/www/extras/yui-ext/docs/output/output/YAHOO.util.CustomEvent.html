@@ -1,0 +1,390 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.CustomEvent</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.CustomEvent.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.CustomEvent</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>CustomEvent</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="event.js.html">event.js</a></td></tr>
+        </table>
+        <div class="description">
+            The CustomEvent class lets you define events for your application
+that can be subscribed to by one or more independent component.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#FLAT&lt;static&gt;">FLAT&lt;static&gt;</a> : int</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Subscriber listener sigature constant.  The FLAT type returns two
+parameters: the first argument passe...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#LIST&lt;static&gt;">LIST&lt;static&gt;</a> : int</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Subscriber listener sigature constant.  The LIST type returns three
+parameters: the event type, the ar...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#scope">scope</a> : object</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The scope the the event will fire from by default.  Defaults to the window 
+obj</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#signature">signature</a> : int</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Custom events support two styles of arguments provided to the event
+subscribers.  
+
+YAHOO.util.CustomEvent.LIST: 
+
+pa...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#silent">silent</a> : boolean</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">By default all custom events are logged in the debug build, set silent
+to true to disable logging for this event.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subscribers">subscribers</a> : Subscriber[]</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The subscribers to this event</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#type">type</a> : string</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The type of event, returned to subscribers when the event fires</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CustomEvent">CustomEvent</a>()</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fire">fire</a>(<code>Object* arguments</code>) : void</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Notifies the subscribers.  The callback functions will be executed
+from the scope specified when the event was create...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subscribe">subscribe</a>(<code>Function fn</code>, <code>Object obj</code>, <code>boolean|Object override</code>) : void</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Subscribes the caller to this event</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : void</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc"></td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unsubscribe">unsubscribe</a>(<code>Function fn</code>, <span class="optional" title="Optional">[<code>Object obj</code>]</span>) : boolean</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Unsubscribes the caller from this event</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unsubscribeAll">unsubscribeAll</a>() : void</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes all listeners</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subscribeEvent">subscribeEvent</a> : (<code>Function fn</code>, <code>Object obj</code>, <code>boolean|Object override</code>)</td>
+        <td class="msource" rowspan="2">CustomEvent</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Custom events provide a custom event that fires whenever there is
+a new subscriber to the event.  This provides an op...</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="FLAT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>FLAT&lt;static&gt;</i></h3>
+                <code>public int FLAT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Subscriber listener sigature constant.  The FLAT type returns two
+parameters: the first argument passed to fire and the optional 
+custom object                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="LIST&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>LIST&lt;static&gt;</i></h3>
+                <code>public int LIST&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Subscriber listener sigature constant.  The LIST type returns three
+parameters: the event type, the array of args passed to fire, and
+the optional custom object                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="scope"></a>
+                <div class="mdetail">
+                <h3>scope</i></h3>
+                <code>public object scope</code>
+                <div class="mdetail-desc">
+                    The scope the the event will fire from by default.  Defaults to the window 
+obj                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="signature"></a>
+                <div class="mdetail alt">
+                <h3>signature</i></h3>
+                <code>public int signature</code>
+                <div class="mdetail-desc">
+                    Custom events support two styles of arguments provided to the event
+subscribers.  
+<ul>
+<li>YAHOO.util.CustomEvent.LIST: 
+<ul>
+<li>param1: event name</li>
+<li>param2: array of arguments sent to fire</li>
+<li>param3: <optional> a custom object supplied by the subscriber</li>
+</ul>
+</li>
+<li>YAHOO.util.CustomEvent.FLAT
+<ul>
+<li>param1: the first argument passed to fire.  If you need to
+pass multiple parameters, use and array or object literal</li>
+<li>param2: <optional> a custom object supplied by the subscriber</li>
+</ul>
+</li>
+</ul>                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="silent"></a>
+                <div class="mdetail">
+                <h3>silent</i></h3>
+                <code>public boolean silent</code>
+                <div class="mdetail-desc">
+                    By default all custom events are logged in the debug build, set silent
+to true to disable logging for this event.                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="subscribers"></a>
+                <div class="mdetail alt">
+                <h3>subscribers</i></h3>
+                <code>public Subscriber[] subscribers</code>
+                <div class="mdetail-desc">
+                    The subscribers to this event                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                            <a name="type"></a>
+                <div class="mdetail">
+                <h3>type</i></h3>
+                <code>public string type</code>
+                <div class="mdetail-desc">
+                    The type of event, returned to subscribers when the event fires                </div>
+                <div class="mdetail-def">This property is defined by CustomEvent.</div>
+                </div>
+                        </div>
+                
+                    <a name="CustomEvent"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>CustomEvent</i></h3>
+                <code>public function CustomEvent()</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="fire"></a>
+                <div class="mdetail">
+                <h3>fire</i></h3>
+                <code>public function fire(<code>Object* arguments</code>)</code>
+                <div class="mdetail-desc">
+                    Notifies the subscribers.  The callback functions will be executed
+from the scope specified when the event was created, and with the 
+following parameters:
+<ul>
+<li>The type of event</li>
+<li>All of the arguments fire() was executed with as an array</li>
+<li>The custom object (if any) that was passed into the subscribe() 
+method</li>
+</ul>                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>arguments</code> : Object*<div class="sub-desc">an arbitrary set of parameters to pass to the handler.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CustomEvent.</div>
+                </div>
+                            <a name="subscribe"></a>
+                <div class="mdetail alt">
+                <h3>subscribe</i></h3>
+                <code>public function subscribe(<code>Function fn</code>, <code>Object obj</code>, <code>boolean|Object override</code>)</code>
+                <div class="mdetail-desc">
+                    Subscribes the caller to this event                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The function to execute</div></li><li><code>obj</code> : Object<div class="sub-desc">An object to be passed along when the event fires</div></li><li><code>override</code> : boolean|Object<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener. if an object, that object becomes the the execution scope.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CustomEvent.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                                    
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CustomEvent.</div>
+                </div>
+                            <a name="unsubscribe"></a>
+                <div class="mdetail alt">
+                <h3>unsubscribe</i></h3>
+                <code>public function unsubscribe(<code>Function fn</code>, <span class="optional" title="Optional">[<code>Object obj</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Unsubscribes the caller from this event                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The function to execute</div></li><li><code>obj</code> : Object<div class="sub-desc">The custom object passed to subscribe (optional)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">True if the subscriber was found and detached.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CustomEvent.</div>
+                </div>
+                            <a name="unsubscribeAll"></a>
+                <div class="mdetail">
+                <h3>unsubscribeAll</i></h3>
+                <code>public function unsubscribeAll()</code>
+                <div class="mdetail-desc">
+                    Removes all listeners                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by CustomEvent.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="subscribeEvent"></a>
+                <div class="mdetail">
+                <h3>subscribeEvent</i></h3>
+                <code>public event subscribeEvent</code>
+                <div class="mdetail-desc">
+                Custom events provide a custom event that fires whenever there is
+a new subscriber to the event.  This provides an opportunity to
+handle the case where there is a non-repeating event that has
+already fired has a new subscriber.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>fn</code> : Function<div class="sub-desc">The function to execute</div></li><li><code>obj</code> : Object<div class="sub-desc">An object to be passed along when the event fires</div></li><li><code>override</code> : boolean|Object<div class="sub-desc">If true, the obj passed in becomes the execution scope of the listener. if an object, that object becomes the the execution scope.</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by CustomEvent.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

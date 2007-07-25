@@ -1,0 +1,41 @@
+#PBtmpl0000000000000010
+<h2><tmpl_var title></h2>
+
+<tmpl_if account.message>
+	<tmpl_var account.message>
+</tmpl_if>
+
+<tmpl_var account.form.header>
+<table>
+<tmpl_if account.form.karma>
+<tr>
+	<td class="formDescription" valign="top"><tmpl_var account.form.karma.label></td>
+	<td class="tableData"><tmpl_var account.form.karma></td>
+</tr>
+</tmpl_if>
+<tr>
+	<td class="formDescription" valign="top"><tmpl_var account.form.username.label></td>
+	<td class="tableData"><tmpl_var account.form.username></td>
+</tr>
+<tr>
+	<td class="formDescription" valign="top"><tmpl_var account.form.password.label></td>
+	<td class="tableData"><tmpl_var account.form.password></td>
+</tr>
+<tr>
+	<td class="formDescription" valign="top"><tmpl_var account.form.passwordConfirm.label></td>
+	<td class="tableData"><tmpl_var account.form.passwordConfirm></td>
+</tr>
+<tr>
+	<td class="formDescription" valign="top"></td>
+	<td class="tableData"><tmpl_var account.form.submit></td>
+</tr>
+</table>
+<tmpl_var account.form.footer>
+
+<div class="accountOptions">
+	<ul>
+		<tmpl_loop account.options>
+			<li><tmpl_var options.display></li>
+		</tmpl_loop>
+	</ul>
+</div>

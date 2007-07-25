@@ -1,0 +1,170 @@
+	.text {
+		font-family: Arial , Times, Serif;
+		font-size: 12px;
+		color: #333333;
+	}
+	
+	a.text:link { 
+		color: #333333; 
+		text-decoration: underline; 
+	}
+	
+	a.text:visited { 
+		color: #333333; 
+		text-decoration: underline; 
+	}
+	
+	a.text:hover { 
+		color: #333333; 
+		text-decoration: none; 
+	}
+
+	body { 
+		font-family: Arial , Times, Serif
+	}
+	
+    
+    
+    
+    .movtable th {
+		/*vertical-align: middle;*/
+		color: #FFFFFF; 
+		font-size: 11px; 
+		font-weight : bold; 
+        background-color: #688097; 
+        /*height: 38px; */
+	}
+    
+    .movtable th img { 
+        align: middle 
+	}
+	
+	.thdrag 	{
+        border-width: 50px 50px 50px 50px;
+        text-align:center; color: #333333; 
+        font-size: 11px; 
+        font-weight : bold;
+		background-color: #C3CCD5; 
+		height: 25px; 
+		display:table-cell;
+		background-image: url(images/cellpic3.gif) 
+	}
+	
+	.thdrag a { 
+		color: #000000; 
+		text-decoration: underline 
+	}
+	
+	.thdrag a:visited { 
+		color: #000000; 
+		text-decoration: underline 
+	}
+	
+	.movtable td	{ 
+		white-space:nowrap;
+		text-overflow:ellipsis;
+		overflow: hidden;
+	}
+	
+	.tdSelected {
+		background-color:yellow;
+	}
+	
+	tr.movTableRow1{ 
+		background-color: #E4E4E4; 
+		font-size: 12px;
+	}
+		
+	tr.movTableRow2{ 
+		background-color: #F2F2F2;
+		font-size: 12px;
+	}
+	
+	.movtable a {
+        color: #FFFFFF; 
+        font-size: 11px; 
+        font-weight : bold; 
+        text-decoration: underline
+	}
+	
+	.movtable a:visited {
+        text-decoration: underline 
+	}
+	
+	.movtable a:hover { 
+        text-decoration: none 
+	}
+	
+	
+	.movtable	{ 
+		background-color: #FFFFFF; 
+		border: 1px #688097 solid
+	}
+  		
+
+		
+	form.movtable {	
+		padding:3px;
+		background:#F4F3F3 ;
+		border:1px solid #8E8E8E; 
+		margin-top:7px;
+	}
+	
+	h2 {
+		font-size:14px;
+		font-weight: bold;
+		color: #343436;
+	}
+	
+	input.btn{
+	   	color:#333333;
+	   	font-family:'trebuchet ms',helvetica,sans-serif;
+	   	font-size:75%;
+	   	background-color:#EBEEF1;
+	  	border:1px solid;
+	   	border-top-color:#C3CCD5;
+	   	border-left-color:#C3CCD5;
+	   	border-right-color:#333333;
+	   	border-bottom-color:#333333;
+	}
+
+	input.btnhov{
+   		/*border-top-color:#c63;
+   		border-left-color:#c63;
+   		border-right-color:#930;
+   		border-bottom-color:#930;*/
+   		color:#71BFC6;
+	}
+   
+	input.Special,textarea.Special	{
+		font-family: Verdana;
+		color: #374451;
+		font-size: 11px;
+		/*background-color: #FAFACA;*/
+	}
+	
+	select.Special	{
+		font-family: Verdana;
+		color: #374451;
+		font-size: 11px;
+		/*background-color: #FAFACA;*/
+	}
+
+	#mov_nav {margin-top:7px}
+
+	#mov_filter{width:100%;
+		margin-top:7px;
+		padding:3px;
+		background:#F4F3F3 ;
+		border:1px solid #8E8E8E;
+	}
+	
+	.titunderline
+		{
+	padding-left: 20px;
+	padding:5px; 
+	color: #000000; 
+	background: #DCDBDB; 
+	font-weight: bold; 
+	font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12pt;
+        }

@@ -1,0 +1,28 @@
+FIXED 11/14/02
+
+1. Though the script worked fine in the new Opera 7 beta the script treated it as Explorer.
+	 Therefore I choosed to update the browsercheck a little and now op7 runs more or less
+	 the same way as mozilla (creating elements with DOM) (in the no-frame version)
+	 NOTE: If you are using frames you should also update the browsercheck inside your
+	 menu file (you don't have to though).
+2. A lot of small fixes here and there:
+		f1. mmout - mout bug
+		f2. bug with using short-notation
+		f3. framelevel scroll bug
+		f4. status http://, mailto bug
+		f5. added onclick events (not really a bug but hey)
+		f6. updated selectbox-add-in to work in frames
+		f7. scroll-add_in bug
+		and some more things.
+3. Added a level variable. It's called roundBorder and will give you a border around
+	 all the elements in that level. Sweet. Check the example "menu_with_roundborder.html"
+	 in the zip file for more info.
+3. cm_addins.js: updated hideselectboxes add-in to work with frames
+4. Remove link from statusbar on mouseout.
+5. Fixed status message so it works also with mailto and http:// links.
+6. Added to main variables (they should explain themselfs):
+		openOnClick
+		closeOnClick
+
+NEW ZIP:
+http://www.dhtmlcentral.com/projects/coolmenus/coolmenus4_beta1_06.zip

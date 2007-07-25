@@ -1,0 +1,37 @@
+#PBtmpl0000000000000200
+#create
+#namespace:Search
+#url:default_search
+#title:Default Search
+#menuTitle:Default Search
+<div><a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a></div>
+<tmpl_if showAdmin>
+<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+  <h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+  <p><tmpl_var description></p>
+</tmpl_if>
+
+<tmpl_var form_header>
+<tmpl_var form_keywords> <tmpl_var form_submit>
+<tmpl_var form_footer>
+
+<tmpl_if session.form.doit>
+	<tmpl_loop result_set>
+		<dl>
+			<dt><a href="^/;<tmpl_var url>"><tmpl_var title></a></dt>
+			<dd><tmpl_var synopsis></dd>
+		</dl>
+	</tmpl_loop>
+	<tmpl_if pagination.pageCount.isMultiple>
+		<div class="pagination">
+			<tmpl_var pagination.previousPage> &#183; <tmpl_var pagination.pageList.upTo10> &#183; <tmpl_var pagination.nextPage>
+		</div>
+	</tmpl_if>
+</tmpl_if>
+

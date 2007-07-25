@@ -1,0 +1,57 @@
+#PBtmpl0000000000000100
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<h2><tmpl_var title></h2>
+
+<tmpl_if description>
+	<tmpl_var description><br /><br />
+</tmpl_if>
+
+<form method="post">
+	<input type="hidden" name="func" value="view" />
+	<input type="hidden" name="wid" value="<tmpl_var wobjectId>" />
+	<input type="hidden" name="targetWobjects" value="doGoogleSearch" />
+	<input type="text" name="q"><input type="submit" value="Search" />
+</form>
+
+<tmpl_if results>
+	<tmpl_loop results>
+		<tmpl_if resultElements>
+			<p>You searched for <b><tmpl_var searchQuery></b>. We found around <tmpl_var estimatedTotalResultsCount> matching records.</p>
+		</tmpl_if>
+
+		<tmpl_loop resultElements>
+			<a href="<tmpl_var URL>">
+			<tmpl_if title>
+				<tmpl_var title>
+			<tmpl_else>
+				<tmpl_var url>
+			</tmpl_if>
+			</a><br />
+			<tmpl_if snippet>
+				<tmpl_var snippet><br />
+			</tmpl_if>
+			<div class="googleDetail">
+			<tmpl_if summary>
+				<b>Description:</b> <tmpl_var summary><br />
+			</tmpl_if>
+			<a href="<tmpl_var URL>"><tmpl_var URL></a>
+			<tmpl_if cachedSize>
+				- <tmpl_var cachedSize>
+			</tmpl_if>
+			</div><br />
+		</tmpl_loop>
+	</tmpl_loop>
+<tmpl_else>
+	Could not retrieve results from Google.
+</tmpl_if>
+~~~
+<style type="text/css">
+.googleDetail {
+	font-size: 9px;
+}
+</style>

@@ -1,0 +1,221 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.DomHelper.Template</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.DomHelper.Template.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.DomHelper.Template</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext</td></tr>
+            <tr><td class="label">Class:</td><td>DomHelper.Template</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="DomHelper.js.html">DomHelper.js</a></td></tr>
+        </table>
+        <div class="description">
+            Represents an HTML fragment template.
+For more information see <a href="http://www.jackslocum.com/yui/2006/10/06/domhelper-create-elements-using-dom-html-fragments-or-templates/">this blog post with examples</a>. 
+<br>
+<b>This class is also available as YAHOO.ext.Template</b>.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+        <div class="no-members">This class has no public properties.</div>        <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DomHelper.Template">DomHelper.Template</a>(<code>String html</code>)</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#append">append</a>(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>) : HTMLElement</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Applies the supplied values to the template and append the new node(s) to el</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#applyTemplate">applyTemplate</a>(<code>Object values</code>) : String</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns an HTML fragment of this template with the specified values applied</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#compile">compile</a>() : void</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Compiles the template into an internal function, eliminating the RegEx overhead</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertAfter">insertAfter</a>(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>) : HTMLElement</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Applies the supplied values to the template and inserts the new node(s) after el</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#insertBefore">insertBefore</a>(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>) : HTMLElement</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Applies the supplied values to the template and inserts the new node(s) before el</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#overwrite">overwrite</a>(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>) : HTMLElement</td>
+        <td class="msource" rowspan="2">DomHelper.Template</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Applies the supplied values to the template and overwrites the content of el with the new node(s)</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+        <div class="no-members">This class has no public events.</div>        
+                
+                    <a name="DomHelper.Template"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>DomHelper.Template</i></h3>
+                <code>public function DomHelper.Template(<code>String html</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>html</code> : String<div class="sub-desc">The HTML fragment</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="append"></a>
+                <div class="mdetail">
+                <h3>append</i></h3>
+                <code>public function append(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Applies the supplied values to the template and append the new node(s) to el                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">The context element</div></li><li><code>values</code> : Object<div class="sub-desc">The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})</div></li><li><code>returnElement</code> : Boolean<div class="sub-desc">(optional) true to return a YAHOO.ext.Element</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">The new node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                            <a name="applyTemplate"></a>
+                <div class="mdetail alt">
+                <h3>applyTemplate</i></h3>
+                <code>public function applyTemplate(<code>Object values</code>)</code>
+                <div class="mdetail-desc">
+                    Returns an HTML fragment of this template with the specified values applied                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>values</code> : Object<div class="sub-desc">The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                            <a name="compile"></a>
+                <div class="mdetail">
+                <h3>compile</i></h3>
+                <code>public function compile()</code>
+                <div class="mdetail-desc">
+                    Compiles the template into an internal function, eliminating the RegEx overhead                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                            <a name="insertAfter"></a>
+                <div class="mdetail alt">
+                <h3>insertAfter</i></h3>
+                <code>public function insertAfter(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Applies the supplied values to the template and inserts the new node(s) after el                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">The context element</div></li><li><code>values</code> : Object<div class="sub-desc">The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})</div></li><li><code>returnElement</code> : Boolean<div class="sub-desc">(optional) true to return a YAHOO.ext.Element</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">The new node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                            <a name="insertBefore"></a>
+                <div class="mdetail">
+                <h3>insertBefore</i></h3>
+                <code>public function insertBefore(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Applies the supplied values to the template and inserts the new node(s) before el                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">The context element</div></li><li><code>values</code> : Object<div class="sub-desc">The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})</div></li><li><code>returnElement</code> : Boolean<div class="sub-desc">(optional) true to return a YAHOO.ext.Element</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">The new node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                            <a name="overwrite"></a>
+                <div class="mdetail alt">
+                <h3>overwrite</i></h3>
+                <code>public function overwrite(<code>HTMLElement el</code>, <code>Object values</code>, <span class="optional" title="Optional">[<code>Boolean returnElement</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Applies the supplied values to the template and overwrites the content of el with the new node(s)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : HTMLElement<div class="sub-desc">The context element</div></li><li><code>values</code> : Object<div class="sub-desc">The template values. Can be an array if your params are numeric (i.e. {0}) or an object (i.e. {foo: 'bar'})</div></li><li><code>returnElement</code> : Boolean<div class="sub-desc">(optional) true to return a YAHOO.ext.Element</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>HTMLElement</code><div class="sub-desc">The new node</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by DomHelper.Template.</div>
+                </div>
+                        </div>
+                    
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

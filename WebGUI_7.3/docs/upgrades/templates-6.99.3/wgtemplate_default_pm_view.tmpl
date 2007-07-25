@@ -1,0 +1,145 @@
+#ProjectManagerTMPL0001
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<div class="fontSettings">
+		<tmpl_var description>
+	</div>
+</tmpl_if>
+
+<script>
+   function doDelete(url) {
+      if( confirm('<tmpl_var project.delete.warning>') ) {
+	     location.href=url;
+	  }
+   }
+</script>
+
+<table cellpadding="3" cellspacing="0" border="0" class="projectView">
+   <tr>
+	   <td colspan="3" style="border-style:none;text-align:left;" valign="bottom">
+		   <tmpl_if canEditProjects><a href="<tmpl_var project.create>"><tmpl_var project.create.label></a><tmpl_else>&#160;</tmpl_if>
+	   </td>
+	   <td style="border-style:none;text-align:right" colspan="3">
+	      <form action="" style="margin:0px;">
+		     <p style="margin:0px;">
+			    <select>
+				   <option>All Projects</option>
+				</select>			
+			 </p>
+		  </form>
+	   </td>
+    </tr>
+
+    <tr class="header">
+	   <td><tmpl_var project.name.label></td>
+	   <td><tmpl_var project.startDate.label></td>
+	   <td><tmpl_var project.endDate.label></td>
+	   <td><tmpl_var project.cost.label></td>
+	   <td><tmpl_var project.complete.label></td>
+	   <tmpl_if canEditProjects>
+	      <td><tmpl_var project.actions.label></td>
+	   </tmpl_if>
+    </tr>
+	<tmpl_if noProjects>
+	   <tr><td class="projectNames" colspan="<tmpl_var empty.colspan>"><tmpl_var noProjects></td></tr>
+	<tmpl_else>
+	   <tmpl_loop project.loop>
+	      <tr class="alt">
+	         <td class="projectNames">
+			    <a href="<tmpl_var project.view.url>"><tmpl_var project.name.data></a>
+			 </td>
+	         <td><tmpl_var project.startDate.data></td>
+	         <td><tmpl_var project.endDate.data></td>
+	         <td><tmpl_var project.cost.data.int></td>
+	         <td>
+		        <div class="completeContainer">
+			       <div class="completeBar" style="width:<tmpl_var project.complete.data.int>%;"></div>
+			       <div class="completeText"><tmpl_var project.complete.data.float>%</div>
+		        </div>	
+	         </td>
+			 <tmpl_if canEditProjects>
+	            <td>
+			        <!-- <a href="#"><img src="<tmpl_var extras>/add.gif" style="border-style:none;" alt="" /></a>&nbsp; -->
+				   <a href="<tmpl_var project.edit.url>"><img src="<tmpl_var extras>/edit.gif" style="border-style:none;" title="<tmpl_var project.edit.title>" /></a>&nbsp;
+				   <a href="javascript:void(doDelete('<tmpl_var project.delete.url>'));"><img src="<tmpl_var extras>/delete.gif" style="border-style:none;" title="<tmpl_var project.delete.title>" /></a>
+			    </td>
+             </tmpl_if>
+		  </tr>
+	   </tmpl_loop>
+	</tmpl_if>
+</table>
+
+~~~
+<style type="text/css">
+   .fontSettings {
+	 font-family:arial;
+	 font-size:9pt;
+   }
+   
+   .projectView td {
+      border:solid silver 1px;
+	  border-bottom:solid gray 1px;
+	  font-size:9pt;
+	  font-family:arial;			
+   }
+   .projectView a {
+	  color:#3391DD;
+   }
+   tr.header td {
+	  font-weight:bold;
+   }
+   td.projectNames {
+	  white-space:nowrap;			
+   }
+   td.projectNames a {
+	  display:block;
+	  color:#3391DD;
+   }
+   td.projectNames a.level1 {
+	  margin:0 10px;			
+   }
+   td.projectNames a.level2 {
+	  margin:0px 10px 0px 20px;
+   }
+   td.projectNames a.level3 {
+	  margin:0px 10px 0px 30px;			
+   }	
+   td.projectNames a.level4 {
+	  margin:0px 10px 0px 40px;			
+   }		
+   td.projectNames a.level5 {
+      margin:0px 10px 0px 50px;			
+   }		
+   tr.alt td {
+	  background-color:#F0F0F0;
+   }
+   div.completeContainer {
+	  position:relative;
+	  z-index:0;
+	  background: #000;
+	  color:white;
+	  text-align:center;
+   }
+   div.completeBar {
+	  position:absolute;
+	  height:100%;
+	  top:0px;
+	  left:0px;
+	  background: #7AB7E9;
+	  z-index:1;
+   }
+   div.completeText {
+	  position:relative;
+	  height:100%;
+	  top:0px;
+	  left:0px;			
+	  z-index:2;			
+   }
+</style>

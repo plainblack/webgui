@@ -1,0 +1,53 @@
+#stevestyle000000000003
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<link rel="icon" href="^Extras(favicon.png);" type="image/png" />
+        <link rel="SHORTCUT ICON" href="^Extras(favicon.ico);" />
+<link href="^/;style3/css03.css" rel="stylesheet" type="text/css" />
+	<tmpl_var head.tags>
+	<title>^c; - ^Page(title);</title>
+	</head>
+<body>
+^AdminBar();
+
+^AssetProxy(style3_coolmenu);
+
+<div id="main">
+	<div id="header">
+		<div id="headerTitle">
+			<div id="headerRight">
+				<div id="login">
+					^L("","","PBtmpl0000000000000092"); &middot; ^AdminToggle;
+				</div>
+				<div id="title">
+					<h1>^H(^c;);</h1>
+					<h2>^Page(title);</h2>
+				</div>
+				<a href="http://www.plainblack.com/webgui"><img src="^FileUrl(style3/wg.jpg);" style="border: 0px;" alt="webgui" /></a><br />
+			</div>
+		</div>
+	</div>
+	
+	<div id="mainBody">
+		<div id="contentArea">
+			<tmpl_var body.content>
+		</div>
+		<div id="topCorner">
+			^AssetProxy(style3/main_top.jpg);
+		</div>
+		<div id="bottomCorner"></div>
+
+		<div id="footer">
+			<div id="copyright">
+				&copy; ^D(%y); ^c;
+			</div>
+			<a href="http://www.plainblack.com"><img src="^FileUrl(style3/pb.jpg);" style="border: 0px;" alt="plain black" /></a><br />
+		</div>
+	</div>
+</div>
+
+
+</body>
+</html>

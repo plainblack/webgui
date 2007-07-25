@@ -1,0 +1,36 @@
+.cMenu_skin {
+    background-color: #FFFFFF;
+	background-image: url(office_xp_menu_left.png);
+	background-repeat: repeat-y;
+	border: 1px solid #8A867A;
+	cursor: default;
+	position: absolute; /* Do not alter this line! */
+	visibility: hidden;
+	z-index: 100;
+	color: #000000;
+	font-family: Tahoma, Helvetica, sans, Arial, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	padding-bottom: 3px;
+	padding-left: 30px;
+	padding-right: 15px;
+	padding-top: 3px;
+}
+
+.cMenu_skin A, .cMenu_skin A:link, .cMenu_skin A:visited {
+	font-weight: normal;
+        width: 100%;
+        color: black;
+        text-decoration: none;
+        margin: 1px;
+	font-size: 10px;
+}
+
+.cMenu_skin A:hover {
+	background-color: #C1D2EE;
+	border: 1px solid #316AC5;
+	color: #000000;
+	font-family: Tahoma, Helvetica, sans, Arial, sans-serif;
+	font-size: 12px;
+	position: relative;
+}

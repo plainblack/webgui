@@ -1,0 +1,275 @@
+<html><head><title>BorderLayout.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.BorderLayout
+ * @extends YAHOO.ext.LayoutManager
+ * This class represents a common layout manager used in desktop applications. For screenshots and more details,
+ * please see: &lt;br&gt;&lt;br&gt;
+ * &lt;a href=&quot;</span><span class="hl-url">http://www.jackslocum.com/yui/2006/10/19/cross-browser-web-20-layouts-with-yahoo-ui/</span><span class="hl-comment">&quot;&gt;Cross Browser Layouts - Part 1&lt;/a&gt;&lt;br&gt;
+ * &lt;a href=&quot;</span><span class="hl-url">http://www.jackslocum.com/yui/2006/10/28/cross-browser-web-20-layouts-part-2-ajax-feed-viewer-20/</span><span class="hl-comment">&quot;&gt;Cross Browser Layouts - Part 2&lt;/a&gt;&lt;br&gt;&lt;br&gt;
+ * Example:
+ &lt;pre&gt;&lt;code&gt;
+ var layout = new YAHOO.ext.BorderLayout(document.body, {
+    hideOnLayout: true,
+    north: {
+        initialSize: 25,
+        titlebar: false
+    },
+    west: {
+        split:true,
+        initialSize: 200,
+        minSize: 175,
+        maxSize: 400,
+        titlebar: true,
+        collapsible: true
+    },
+    east: {
+        split:true,
+        initialSize: 202,
+        minSize: 175,
+        maxSize: 400,
+        titlebar: true,
+        collapsible: true
+    },
+    south: {
+        split:true,
+        initialSize: 100,
+        minSize: 100,
+        maxSize: 200,
+        titlebar: true,
+        collapsible: true
+    },
+    center: {
+        titlebar: true,
+        autoScroll:true
+    }
+});
+
+// shorthand
+var CP = YAHOO.ext.ContentPanel;
+
+layout.beginUpdate();
+layout.add('north', new CP('north', 'North'));
+layout.add('south', new CP('south', {title: 'South', closable: true}));
+layout.add('west', new CP('west', {title: 'West'}));
+layout.add('east', new CP('autoTabs', {title: 'Auto Tabs', closable: true}));
+layout.add('center', new CP('center1', {title: 'Close Me', closable: true}));
+layout.add('center', new CP('center2', {title: 'Center Panel', closable: false}));
+layout.getRegion('center').showPanel('center1');
+layout.endUpdate();
+&lt;/code&gt;&lt;/pre&gt;
+* @constructor
+* Create a new BorderLayout
+* @param {String/HTMLElement/Element} container The container this layout is bound to
+* @param {Object} config Configuration options
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">container</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">factory</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">factory</span><span class="hl-code"> || </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-code">.</span><span class="hl-identifier">RegionFactory</span><span class="hl-code">;
+    </span><span class="hl-comment">/** 
+     * True to hide the center panel while performing layouts. This helps when the center region contains 
+     * heavy components such as a yui-ext grid. 
+     * @type Boolean
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hideOnLayout</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-code">.</span><span class="hl-identifier">hideOnLayout</span><span class="hl-code"> || </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">factory</span><span class="hl-code">.</span><span class="hl-identifier">validRegions</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+    	</span><span class="hl-reserved">var </span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">factory</span><span class="hl-code">.</span><span class="hl-identifier">validRegions</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+    	</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">config</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]){
+    	    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">addRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">])</span><span class="hl-code">;
+    	</span><span class="hl-brackets">}
+    }
+    </span><span class="hl-comment">//this.dragOverDelegate = YAHOO.ext.EventManager.wrap(this.onDragOver, this, true);
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">LayoutManager</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Creates and adds a new region if it doesn't already exist.
+     * @param {String} target The target region key (north, south, east, west or center).
+     * @param {Object} config The regions config object
+     * @return {BorderLayoutRegion} The new region
+     */
+    </span><span class="hl-identifier">addRegion</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">r</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">factory</span><span class="hl-code">.</span><span class="hl-identifier">create</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    	    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">r</span><span class="hl-code">;
+    	    </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">visibilitychange</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">paneladded</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">panelremoved</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">invalidated</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">layout</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">resized</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onRegionResized</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">collapsed</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onRegionCollapsed</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">expanded</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onRegionExpanded</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Performs a layout update.
+     */
+    </span><span class="hl-identifier">layout</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-brackets">) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-comment">//var bench = new YAHOO.ext.util.Bench();
+	    //bench.start('Layout...');
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getViewSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">w</span><span class="hl-code"> = </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code">, </span><span class="hl-identifier">h</span><span class="hl-code"> = </span><span class="hl-identifier">size</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">centerW</span><span class="hl-code"> = </span><span class="hl-identifier">w</span><span class="hl-code">, </span><span class="hl-identifier">centerH</span><span class="hl-code"> = </span><span class="hl-identifier">h</span><span class="hl-code">, </span><span class="hl-identifier">centerY</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">centerX</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+        
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">rs</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">n</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">north</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">south</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">west</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">west</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">east</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">, </span><span class="hl-identifier">c</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">center</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hideOnLayout</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">none</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">n</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">n</span><span class="hl-code">.</span><span class="hl-identifier">isVisible</span><span class="hl-brackets">()){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-identifier">n</span><span class="hl-code">.</span><span class="hl-identifier">getBox</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">m</span><span class="hl-code"> = </span><span class="hl-identifier">n</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> = </span><span class="hl-identifier">w</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerY</span><span class="hl-code"> = </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> + </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerH</span><span class="hl-code"> -= </span><span class="hl-identifier">centerY</span><span class="hl-code">;
+            </span><span class="hl-identifier">n</span><span class="hl-code">.</span><span class="hl-identifier">updateBox</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">safeBox</span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">isVisible</span><span class="hl-brackets">()){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">getBox</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">m</span><span class="hl-code"> = </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> = </span><span class="hl-identifier">w</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">totalHeight</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-identifier">h</span><span class="hl-code"> - </span><span class="hl-identifier">totalHeight</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerH</span><span class="hl-code"> -= </span><span class="hl-identifier">totalHeight</span><span class="hl-code">;
+            </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">updateBox</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">safeBox</span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">west</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">west</span><span class="hl-code">.</span><span class="hl-identifier">isVisible</span><span class="hl-brackets">()){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-identifier">west</span><span class="hl-code">.</span><span class="hl-identifier">getBox</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">m</span><span class="hl-code"> = </span><span class="hl-identifier">west</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-identifier">centerH</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-identifier">centerY</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">totalWidth</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerX</span><span class="hl-code"> += </span><span class="hl-identifier">totalWidth</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerW</span><span class="hl-code"> -= </span><span class="hl-identifier">totalWidth</span><span class="hl-code">;
+            </span><span class="hl-identifier">west</span><span class="hl-code">.</span><span class="hl-identifier">updateBox</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">safeBox</span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">isVisible</span><span class="hl-brackets">()){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">b</span><span class="hl-code"> = </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getBox</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">m</span><span class="hl-code"> = </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-identifier">centerH</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">totalWidth</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">x</span><span class="hl-code"> = </span><span class="hl-identifier">w</span><span class="hl-code"> - </span><span class="hl-identifier">totalWidth</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">;
+            </span><span class="hl-identifier">b</span><span class="hl-code">.</span><span class="hl-identifier">y</span><span class="hl-code"> = </span><span class="hl-identifier">centerY</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">;
+            </span><span class="hl-identifier">centerW</span><span class="hl-code"> -= </span><span class="hl-identifier">totalWidth</span><span class="hl-code">;
+            </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">updateBox</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">safeBox</span><span class="hl-brackets">(</span><span class="hl-identifier">b</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">c</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">m</span><span class="hl-code"> = </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">centerBox</span><span class="hl-code"> = </span><span class="hl-brackets">{
+                </span><span class="hl-identifier">x</span><span class="hl-code">: </span><span class="hl-identifier">centerX</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">,
+                </span><span class="hl-identifier">y</span><span class="hl-code">: </span><span class="hl-identifier">centerY</span><span class="hl-code"> + </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">,
+                </span><span class="hl-identifier">width</span><span class="hl-code">: </span><span class="hl-identifier">centerW</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">left</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">right</span><span class="hl-brackets">)</span><span class="hl-code">,
+                </span><span class="hl-identifier">height</span><span class="hl-code">: </span><span class="hl-identifier">centerH</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">+</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-brackets">)
+            }</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hideOnLayout</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">block</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-identifier">c</span><span class="hl-code">.</span><span class="hl-identifier">updateBox</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">safeBox</span><span class="hl-brackets">(</span><span class="hl-identifier">centerBox</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-comment">//this.el.repaint();
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">layout</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-comment">//bench.stop();
+	    //alert(bench.toString());
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">safeBox</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">box</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">width</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">box</span><span class="hl-code">.</span><span class="hl-identifier">height</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">box</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Adds a ContentPanel (or subclass) to this layout.
+     * @param {String} target The target region key (north, south, east, west or center).
+     * @param {YAHOO.ext.ContentPanel} panel The panel to add
+     * @return {YAHOO.ext.ContentPanel} The added panel
+     */
+    </span><span class="hl-identifier">add</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-identifier">panel</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-identifier">target</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">add</span><span class="hl-brackets">(</span><span class="hl-identifier">panel</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Adds a ContentPanel (or subclass) to this layout.
+     * @param {String} target The target region key (north, south, east, west or center).
+     * @param {Number/String/YAHOO.ext.ContentPanel} panel The index, id or panel to remove
+     * @return {YAHOO.ext.ContentPanel} The removed panel
+     */
+    </span><span class="hl-identifier">remove</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-identifier">panel</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-identifier">target</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">remove</span><span class="hl-brackets">(</span><span class="hl-identifier">panel</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Searches all regions for a panel with the specified id
+     * @param {String} panelId
+     * @return {YAHOO.ext.ContentPanel} The panel or null if it wasn't found
+     */
+    </span><span class="hl-identifier">findPanel</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">panelId</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">rs</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">target </span><span class="hl-reserved">in </span><span class="hl-identifier">rs</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">var </span><span class="hl-identifier">p</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">getPanel</span><span class="hl-brackets">(</span><span class="hl-identifier">panelId</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">p</span><span class="hl-brackets">){
+                    </span><span class="hl-reserved">return </span><span class="hl-identifier">p</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }
+        }
+        </span><span class="hl-reserved">return null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Searches all regions for a panel with the specified id and activates (shows) it.
+     * @param {String/ContentPanel} panelId The panels id or the panel itself
+     * @return {YAHOO.ext.ContentPanel} The shown panel or null
+     */
+    </span><span class="hl-identifier">showPanel</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">panelId</span><span class="hl-brackets">) {
+      </span><span class="hl-reserved">var </span><span class="hl-identifier">rs</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">regions</span><span class="hl-code">;
+      </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">target </span><span class="hl-reserved">in </span><span class="hl-identifier">rs</span><span class="hl-brackets">){
+         </span><span class="hl-reserved">var </span><span class="hl-identifier">r</span><span class="hl-code"> = </span><span class="hl-identifier">rs</span><span class="hl-brackets">[</span><span class="hl-identifier">target</span><span class="hl-brackets">]</span><span class="hl-code">;
+         </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">r</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">hasPanel</span><span class="hl-brackets">(</span><span class="hl-identifier">panelId</span><span class="hl-brackets">)){
+               </span><span class="hl-reserved">return </span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">showPanel</span><span class="hl-brackets">(</span><span class="hl-identifier">panelId</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+         }
+      }
+      </span><span class="hl-reserved">return null</span><span class="hl-code">;
+   </span><span class="hl-brackets">}</span><span class="hl-code">,
+   
+   </span><span class="hl-comment">/**
+     * Restores this layouts state using YAHOO.ext.state.Manager or the state provided by the passed provider.
+     * @param {YAHOO.ext.state.Provider} provider (optional) An alternate state provider
+     */
+    </span><span class="hl-identifier">restoreState</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">provider</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">provider</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">provider</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">state</span><span class="hl-code">.</span><span class="hl-identifier">Manager</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">sm</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">LayoutStateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-identifier">sm</span><span class="hl-code">.</span><span class="hl-identifier">init</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">provider</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-default">.</span><span class="hl-identifier">RegionFactory</span><span class="hl-default"> = </span><span class="hl-brackets">{}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-default">.</span><span class="hl-identifier">RegionFactory</span><span class="hl-default">.</span><span class="hl-identifier">validRegions</span><span class="hl-default"> = </span><span class="hl-brackets">[</span><span class="hl-quotes">'</span><span class="hl-string">north</span><span class="hl-quotes">'</span><span class="hl-code">,</span><span class="hl-quotes">'</span><span class="hl-string">south</span><span class="hl-quotes">'</span><span class="hl-code">,</span><span class="hl-quotes">'</span><span class="hl-string">east</span><span class="hl-quotes">'</span><span class="hl-code">,</span><span class="hl-quotes">'</span><span class="hl-string">west</span><span class="hl-quotes">'</span><span class="hl-code">,</span><span class="hl-quotes">'</span><span class="hl-string">center</span><span class="hl-quotes">'</span><span class="hl-brackets">]</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">BorderLayout</span><span class="hl-default">.</span><span class="hl-identifier">RegionFactory</span><span class="hl-default">.</span><span class="hl-identifier">create</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-code">, </span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-identifier">target</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-reserved">switch</span><span class="hl-brackets">(</span><span class="hl-identifier">target</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">north</span><span class="hl-quotes">'</span><span class="hl-code">:
+            </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">NorthLayoutRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">south</span><span class="hl-quotes">'</span><span class="hl-code">:
+            </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SouthLayoutRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">east</span><span class="hl-quotes">'</span><span class="hl-code">:
+            </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">EastLayoutRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">west</span><span class="hl-quotes">'</span><span class="hl-code">:
+            </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">WestLayoutRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">case </span><span class="hl-quotes">'</span><span class="hl-string">center</span><span class="hl-quotes">'</span><span class="hl-code">:
+            </span><span class="hl-reserved">return new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">CenterLayoutRegion</span><span class="hl-brackets">(</span><span class="hl-identifier">mgr</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">throw </span><span class="hl-quotes">'</span><span class="hl-string">Layout region &quot;</span><span class="hl-quotes">'</span><span class="hl-code">+</span><span class="hl-identifier">target</span><span class="hl-code">+</span><span class="hl-quotes">'</span><span class="hl-string">&quot; not supported.</span><span class="hl-quotes">'</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

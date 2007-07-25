@@ -1,0 +1,251 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.KeyListener</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.KeyListener.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.KeyListener</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>KeyListener</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="container_core.js.html">container_core.js</a></td></tr>
+        </table>
+        <div class="description">
+            KeyListener is a utility that provides an easy interface for listening for keydown/keyup events fired against DOM elements.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#KEYDOWN&lt;static&gt;">KEYDOWN&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the DOM "keydown" event.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#KEYUP&lt;static&gt;">KEYUP&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the DOM "keyup" event.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enabled">enabled</a> : Boolean</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Boolean indicating the enabled/disabled state of the Tooltip</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#KeyListener">KeyListener</a>(<code>HTMLElement attachTo</code>, <code>String attachTo</code>, <code>Object keyData</code>, <code>Function handler</code>, <code>Object handler</code>, <code>String event</code>)</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#disable">disable</a>() : void</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Disables the KeyListener by removing the DOM event listeners from the target DOM element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enable">enable</a>() : void</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Enables the KeyListener by attaching the DOM event listeners to the target DOM element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a String representation of the object.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#disabledEvent">disabledEvent</a> : (<code>Object keyData</code>)</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The CustomEvent fired when the KeyListener is disabled via the disable() function</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enabledEvent">enabledEvent</a> : (<code>Object keyData</code>)</td>
+        <td class="msource" rowspan="2">KeyListener</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The CustomEvent fired when the KeyListener is enabled via the enable() function</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="KEYDOWN&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>KEYDOWN&lt;static&gt;</i></h3>
+                <code>public String KEYDOWN&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the DOM "keydown" event.                </div>
+                <div class="mdetail-def">This property is defined by KeyListener.</div>
+                </div>
+                            <a name="KEYUP&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>KEYUP&lt;static&gt;</i></h3>
+                <code>public String KEYUP&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the DOM "keyup" event.                </div>
+                <div class="mdetail-def">This property is defined by KeyListener.</div>
+                </div>
+                            <a name="enabled"></a>
+                <div class="mdetail">
+                <h3>enabled</i></h3>
+                <code>public Boolean enabled</code>
+                <div class="mdetail-desc">
+                    Boolean indicating the enabled/disabled state of the Tooltip                </div>
+                <div class="mdetail-def">This property is defined by KeyListener.</div>
+                </div>
+                        </div>
+                
+                    <a name="KeyListener"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>KeyListener</i></h3>
+                <code>public function KeyListener(<code>HTMLElement attachTo</code>, <code>String attachTo</code>, <code>Object keyData</code>, <code>Function handler</code>, <code>Object handler</code>, <code>String event</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>attachTo</code> : HTMLElement<div class="sub-desc">The element or element ID to which the key event should be attached</div></li><li><code>attachTo</code> : String<div class="sub-desc">The element or element ID to which the key event should be attached</div></li><li><code>keyData</code> : Object<div class="sub-desc">The object literal representing the key(s) to detect. Possible attributes are shift(boolean), alt(boolean), ctrl(boolean) and keys(either an int or an array of ints representing keycodes).</div></li><li><code>handler</code> : Function<div class="sub-desc">The CustomEvent handler to fire when the key event is detected</div></li><li><code>handler</code> : Object<div class="sub-desc">An object literal representing the handler.</div></li><li><code>event</code> : String<div class="sub-desc">Optional. The event (keydown or keyup) to listen for. Defaults automatically to keydown.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="disable"></a>
+                <div class="mdetail">
+                <h3>disable</i></h3>
+                <code>public function disable()</code>
+                <div class="mdetail-desc">
+                    Disables the KeyListener by removing the DOM event listeners from the target DOM element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by KeyListener.</div>
+                </div>
+                            <a name="enable"></a>
+                <div class="mdetail alt">
+                <h3>enable</i></h3>
+                <code>public function enable()</code>
+                <div class="mdetail-desc">
+                    Enables the KeyListener by attaching the DOM event listeners to the target DOM element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by KeyListener.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a String representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the KeyListener</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by KeyListener.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="disabledEvent"></a>
+                <div class="mdetail">
+                <h3>disabledEvent</i></h3>
+                <code>public event disabledEvent</code>
+                <div class="mdetail-desc">
+                The CustomEvent fired when the KeyListener is disabled via the disable() function                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>keyData</code> : Object<div class="sub-desc">The object literal representing the key(s) to detect. Possible attributes are shift(boolean), alt(boolean), ctrl(boolean) and keys(either an int or an array of ints representing keycodes).</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by KeyListener.</div>
+                </div>
+                            <a name="enabledEvent"></a>
+                <div class="mdetail alt">
+                <h3>enabledEvent</i></h3>
+                <code>public event enabledEvent</code>
+                <div class="mdetail-desc">
+                The CustomEvent fired when the KeyListener is enabled via the enable() function                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>keyData</code> : Object<div class="sub-desc">The object literal representing the key(s) to detect. Possible attributes are shift(boolean), alt(boolean), ctrl(boolean) and keys(either an int or an array of ints representing keycodes).</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by KeyListener.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

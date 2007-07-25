@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>Example: Application Menubar (YUI Library)</title>
+
+                <!-- Standard reset and fonts -->
+
+        <link rel="stylesheet" type="text/css" href="../../build/reset/reset.css">
+        <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts.css">
+
+            
+
+        <link rel="stylesheet" type="text/css" href="../../build/container/assets/container.css">
+
+         
+
+        <!-- CSS for Menu -->
+
+        <link rel="stylesheet" type="text/css" href="../../build/menu/assets/menu.css">
+ 
+
+        <!-- Page-specific styles -->
+        <style type="text/css">
+
+            body {
+            
+                background-color:#dfb8df;
+            
+            }
+
+
+            /* Define a new style for each menu bar */
+
+            div.yuimenubar {
+                
+                border-width:1px 0;
+                border-color:#666;
+                border-style:solid;
+                background-color:#ccc;
+
+            }
+            
+            div.yuimenubar div.bd {
+                
+                border-width:1px 0;
+                border-color:#ddd;
+                border-style:solid;
+                
+            }
+
+            div.yuimenubar li.yuimenubaritem {
+
+                border-width:0;
+                border-style:none;
+                padding:4px 12px;
+            
+            }
+
+            div.yuimenubar li.yuimenubaritem img {
+              
+                margin:0;
+                border:0;
+                height:1px;
+                width:1px;
+            
+            }        
+            
+
+            /* Define a new style for each menu */
+
+            div.yuimenu {
+
+                border:solid 1px #666;
+                background-color:#ccc;                
+            
+            }
+
+            div.yuimenu div.bd {
+                
+                border-width:0;
+                border-style:none;
+                
+            }
+
+
+            /* Define a new style for each menu item */
+
+            div.yuimenu li.yuimenuitem {
+
+                padding-top:4px;
+                padding-bottom:4px;
+
+            }
+
+            div.yuimenu li.yuimenuitem img {
+            
+                height:8px;
+                width:8px;
+                margin:0 -16px 0 10px;
+                border:0;
+            
+            }
+
+            div.yuimenu ul {
+            
+                border:solid 1px #666;
+                border-width:1px 0 0 0;
+            
+            }
+
+
+            /* Define a new style for an item's "selected" state */
+
+            div.yuimenu li.selected,
+            div.yuimenubar li.selected {
+            
+                background-color:#039;
+            
+            }
+
+            div.yuimenu li.selected a.selected,
+            div.yuimenubar li.selected a.selected {
+                
+                text-decoration:none;
+                
+            }
+
+
+            /* Define a new style for an item's "disabled" state */
+
+            div.yuimenu li.disabled a.disabled,
+            div.yuimenu li.disabled em.disabled,
+            div.yuimenubar li.disabled a.disabled {
+            
+                color:#666;
+                
+            }
+        
+        </style>
+
+    </head>
+    <body>
+
+                <!-- Namespace source file -->
+
+        <script type="text/javascript" src="../../build/yahoo/yahoo.js"></script>
+
+        <!-- Dependency source files -->
+
+        <script type="text/javascript" src="../../build/event/event.js"></script>
+        <script type="text/javascript" src="../../build/dom/dom.js"></script>
+
+            
+        <script type="text/javascript" src="../../build/dragdrop/dragdrop.js"></script>
+        <script type="text/javascript" src="../../build/animation/animation.js"></script>
+        
+        <!-- Container source file -->
+        <script type="text/javascript" src="../../build/container/container.js"></script>
+
+        <!-- Menu source file -->
+        <script type="text/javascript" src="../../build/menu/menu.js"></script>
+
+        <!-- Page-specific script -->
+        <script type="text/javascript">
+
+            /**
+            * Constant representing the path to the image to be used for the 
+            * submenu arrow indicator.
+            * @final
+            * @type String
+            */
+            YAHOO.widget.MenuBarItem.prototype.SUBMENU_INDICATOR_IMAGE_PATH =
+                "promo/m/irs/blank.gif";
+            
+            
+            /**
+            * Constant representing the path to the image to be used for the 
+            * submenu arrow indicator when a MenuBarItem instance is selected.
+            * @final
+            * @type String
+            */
+            YAHOO.widget.MenuBarItem.prototype.SELECTED_SUBMENU_INDICATOR_IMAGE_PATH =
+                "promo/m/irs/blank.gif";
+            
+            
+            /**
+            * Constant representing the path to the image to be used for the 
+            * submenu arrow indicator when a MenuBarItem instance is disabled.
+            * @final
+            * @type String
+            */
+            YAHOO.widget.MenuBarItem.prototype.DISABLED_SUBMENU_INDICATOR_IMAGE_PATH = 
+                "promo/m/irs/blank.gif";
+
+
+            // "load" event handler for the window
+
+            YAHOO.example.onWindowLoad = function(p_oEvent) {
+
+
+                var aItemData = [
+                
+                    { text:"File", submenu:{  id:"filemenu", itemdata:[
+
+                            { text:"New File", helptext:"Ctrl + N" },
+                            "New Folder",
+                            { text:"Open", helptext:"Ctrl + O" },
+                            { text:"Open With...", submenu: { id:"applications", itemdata: [
+                                    "Application 1", 
+                                    "Application 2", 
+                                    "Application 3", 
+                                    "Application 4"
+                                ] } 
+                            },
+                            { text:"Print", helptext: "Ctrl + P" }
+
+                        ] }
+                    
+                    },
+                    
+                    { text:"Edit", submenu:{ id: "editmenu", itemdata: [
+
+                            [ 
+                                { text:"Undo", helptext: "Ctrl + Z" },
+                                { text:"Redo", helptext: "Ctrl + Y", disabled: true }
+                            ],
+                            
+                            [
+                                { text:"Cut", helptext: "Ctrl + X", disabled: true },
+                                { text:"Copy", helptext: "Ctrl + C", disabled: true },
+                                { text:"Paste", helptext: "Ctrl + V" },
+                                { text:"Delete", helptext: "Del", disabled: true }
+                            ],
+                            
+                            [ { text:"Select All", helptext: "Ctrl + A" } ],
+
+                            [
+                                { text:"Find", helptext: "Ctrl + F" },
+                                { text:"Find Again", helptext: "Ctrl + G" }
+                            ]
+                    
+                        ] }
+
+                    },
+
+                    "View",
+
+                    "Favorites",
+
+                    "Tools",
+
+                    "Help",
+
+                    { text:"Examples Home", url:"index.html" }
+
+                ];
+
+
+                var oMenuBar = new YAHOO.widget.MenuBar("menubar", { itemdata:aItemData });
+
+
+                // Render the MenuBar instance and corresponding submenus
+
+                oMenuBar.render(document.body);
+
+
+                var oPanel = new YAHOO.widget.SimpleDialog(
+                                    "exampleinfo", 
+                                    { 
+                                        constraintoviewport: true,
+                                        fixedcenter:true,
+                                        width:"400px",
+                                        zIndex:1
+                                    }
+                                );
+                
+                
+                oPanel.setHeader("Application Menubar Example");
+                oPanel.setBody("This example demonstrates how to create an application-like menu bar using JavaScript.");
+
+                oPanel.render(document.body);
+              
+                oPanel.show();
+
+
+            }
+
+
+            // Add a "load" handler for the window
+
+            YAHOO.util.Event.addListener(window, "load", YAHOO.example.onWindowLoad);
+
+        </script>
+
+    </body>
+</html>

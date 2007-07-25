@@ -1,0 +1,411 @@
+<html><head><title>yutil.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">namespace</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ext</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">namespace</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ext.util</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">namespace</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ext.grid</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">Strict</span><span class="hl-default"> = </span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">compatMode</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">CSS1Compat</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SSL_SECURE_URL</span><span class="hl-default"> = </span><span class="hl-quotes">'</span><span class="hl-string">javascript:false</span><span class="hl-quotes">'</span><span class="hl-default">;
+</span><span class="hl-comment">// for old browsers
+</span><span class="hl-builtin">window</span><span class="hl-default">.</span><span class="hl-identifier">undefined</span><span class="hl-default"> = </span><span class="hl-identifier">undefined</span><span class="hl-default">;
+</span><span class="hl-comment">/**
+ * @class Function
+ */
+ //
+/**
+ * Creates a callback that passes arguments[0], arguments[1], arguments[2], ...
+ * Call directly on any function. Example: &lt;code&gt;myFunction.createCallback(myarg, myarg2)&lt;/code&gt;
+ * Will create a function that is bound to those 2 args.
+ * @return {Function} The new function
+*/
+</span><span class="hl-builtin">Function</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">createCallback</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-comment">/*args...*/</span><span class="hl-brackets">){
+    </span><span class="hl-comment">// make args available, in function below
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">args</span><span class="hl-code"> = </span><span class="hl-identifier">arguments</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+    </span><span class="hl-reserved">return function</span><span class="hl-brackets">() {
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Creates a delegate (callback) that sets the scope to obj.
+ * Call directly on any function. Example: &lt;code&gt;this.myFunction.createDelegate(this)&lt;/code&gt;
+ * Will create a function that is automatically scoped to this.
+ * @param {Object} obj (optional) The object for which the scope is set
+ * @param {&lt;i&gt;Array&lt;/i&gt;} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
+ * @param {&lt;i&gt;Boolean/Number&lt;/i&gt;} appendArgs (optional) if True args are appended to call args instead of overriding, 
+ *                                             if a number the args are inserted at the specified position
+ * @return {Function} The new function
+ */
+</span><span class="hl-builtin">Function</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">createDelegate</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-code">, </span><span class="hl-identifier">appendArgs</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+    </span><span class="hl-reserved">return function</span><span class="hl-brackets">() {
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">callargs</span><span class="hl-code"> = </span><span class="hl-identifier">args</span><span class="hl-code"> || </span><span class="hl-identifier">arguments</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">appendArgs</span><span class="hl-code"> === </span><span class="hl-reserved">true</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">callArgs</span><span class="hl-code"> = </span><span class="hl-builtin">Array</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">slice</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">callargs</span><span class="hl-code"> = </span><span class="hl-identifier">callArgs</span><span class="hl-code">.</span><span class="hl-identifier">concat</span><span class="hl-brackets">(</span><span class="hl-identifier">args</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">appendArgs</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">number</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">callargs</span><span class="hl-code"> = </span><span class="hl-builtin">Array</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">slice</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-comment">// copy arguments first
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">applyArgs</span><span class="hl-code"> = </span><span class="hl-brackets">[</span><span class="hl-identifier">appendArgs</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">concat</span><span class="hl-brackets">(</span><span class="hl-identifier">args</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-comment">// create method call params
+            </span><span class="hl-builtin">Array</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">splice</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">callargs</span><span class="hl-code">, </span><span class="hl-identifier">applyArgs</span><span class="hl-brackets">)</span><span class="hl-code">; </span><span class="hl-comment">// splice them in
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-code"> || </span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">callargs</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Calls this function after the number of millseconds specified.
+ * @param {Number} millis The number of milliseconds for the setTimeout call
+ * @param {Object} obj (optional) The object for which the scope is set
+ * @param {&lt;i&gt;Array&lt;/i&gt;} args (optional) Overrides arguments for the call. (Defaults to the arguments passed by the caller)
+ * @param {&lt;i&gt;Boolean/Number&lt;/i&gt;} appendArgs (optional) if True args are appended to call args instead of overriding, 
+ *                                             if a number the args are inserted at the specified position
+ * @return {Number} The timeout id that can be used with clearTimeout
+ */
+</span><span class="hl-builtin">Function</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">defer</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">millis</span><span class="hl-code">, </span><span class="hl-identifier">obj</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-code">, </span><span class="hl-identifier">appendArgs</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">setTimeout</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-code">, </span><span class="hl-identifier">appendArgs</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">millis</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+</span><span class="hl-comment">/**
+ * Create a combined function call sequence of the original function + the passed function.
+ * The resulting function returns the results of the original function.
+ * The passed fcn is called with the parameters of the original function
+ * @param {Function} fcn The function to sequence
+ * @param {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
+ * @return {Function} The new function
+ */
+</span><span class="hl-builtin">Function</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">createSequence</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">fcn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">fcn</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+    </span><span class="hl-reserved">return function</span><span class="hl-brackets">() {
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">retval</span><span class="hl-code"> = </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code"> || </span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">fcn</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code"> || </span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">retval</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Creates an interceptor function. The passed fcn is called before the original one. If it returns false, the original one is not called.
+ * The resulting function returns the results of the original function.
+ * The passed fcn is called with the parameters of the original function.
+ * @addon
+ * @param {Function} fcn The function to call before the original
+ * @param {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The scope of the passed fcn (Defaults to scope of original function or window)
+ * @return {Function} The new function
+ */
+</span><span class="hl-builtin">Function</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">createInterceptor</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">fcn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">fcn</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+    </span><span class="hl-reserved">return function</span><span class="hl-brackets">() {
+        </span><span class="hl-identifier">fcn</span><span class="hl-code">.</span><span class="hl-identifier">target</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">;
+        </span><span class="hl-identifier">fcn</span><span class="hl-code">.</span><span class="hl-identifier">method</span><span class="hl-code"> = </span><span class="hl-identifier">method</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">fcn</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code"> || </span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code"> === </span><span class="hl-reserved">false</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">method</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code"> || </span><span class="hl-builtin">window</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">;;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.util.Browser
+ * @singleton
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Browser</span><span class="hl-default"> = </span><span class="hl-reserved">new function</span><span class="hl-brackets">(){
+	</span><span class="hl-reserved">var </span><span class="hl-identifier">ua</span><span class="hl-code"> = </span><span class="hl-builtin">navigator</span><span class="hl-code">.</span><span class="hl-identifier">userAgent</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">;
+	</span><span class="hl-comment">/** @type Boolean */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isOpera</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">opera</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-comment">/** @type Boolean */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSafari</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">webkit</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-comment">/** @type Boolean */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isIE</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-identifier">ActiveXObject</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-comment">/** @type Boolean */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isIE7</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">msie 7</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+   	</span><span class="hl-comment">/** @type Boolean */
+	</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isGecko</span><span class="hl-code"> = !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isSafari</span><span class="hl-code"> &amp;&amp; </span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">gecko</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code"> &gt; -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+	
+	</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">windows</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-code"> || </span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">win32</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-brackets">){
+	    </span><span class="hl-comment">/** @type Boolean */
+	    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isWindows</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-reserved">else if</span><span class="hl-brackets">(</span><span class="hl-identifier">ua</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">macintosh</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> != -</span><span class="hl-number">1</span><span class="hl-brackets">){
+		</span><span class="hl-comment">/** @type Boolean */
+	    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">isMac</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+	</span><span class="hl-brackets">}
+}()</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">print</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">arg1</span><span class="hl-code">, </span><span class="hl-identifier">arg2</span><span class="hl-code">, </span><span class="hl-identifier">etc</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">_console</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">cs</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">DomHelper</span><span class="hl-code">.</span><span class="hl-identifier">insertBefore</span><span class="hl-brackets">(</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">,
+        </span><span class="hl-brackets">{</span><span class="hl-identifier">tag</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-code">,</span><span class="hl-identifier">style</span><span class="hl-code">:</span><span class="hl-quotes">'</span><span class="hl-string">width:250px;height:350px;overflow:auto;border:3px solid #c3daf9;</span><span class="hl-quotes">'</span><span class="hl-code"> +
+                </span><span class="hl-quotes">'</span><span class="hl-string">background:white;position:absolute;right:5px;top:5px;</span><span class="hl-quotes">'</span><span class="hl-code"> +
+                </span><span class="hl-quotes">'</span><span class="hl-string">font:normal 8pt arial,verdana,helvetica;z-index:50000;padding:5px;</span><span class="hl-quotes">'</span><span class="hl-brackets">}</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Resizable</span><span class="hl-brackets">(</span><span class="hl-identifier">cs</span><span class="hl-code">, </span><span class="hl-brackets">{
+            </span><span class="hl-identifier">transparent</span><span class="hl-code">:</span><span class="hl-reserved">true</span><span class="hl-code">,
+            </span><span class="hl-identifier">handles</span><span class="hl-code">: </span><span class="hl-quotes">'</span><span class="hl-string">all</span><span class="hl-quotes">'</span><span class="hl-code">,
+            </span><span class="hl-identifier">pinned</span><span class="hl-code">:</span><span class="hl-reserved">true</span><span class="hl-code">, 
+            </span><span class="hl-identifier">adjustments</span><span class="hl-code">: </span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-code">,</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">, 
+            </span><span class="hl-identifier">wrap</span><span class="hl-code">:</span><span class="hl-reserved">true</span><span class="hl-code">, 
+            </span><span class="hl-identifier">draggable</span><span class="hl-code">:</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">DD</span><span class="hl-code"> ? </span><span class="hl-reserved">true</span><span class="hl-code"> : </span><span class="hl-reserved">false</span><span class="hl-brackets">)
+        })</span><span class="hl-code">;
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">_console</span><span class="hl-code"> = </span><span class="hl-identifier">cs</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">msg</span><span class="hl-code"> = </span><span class="hl-quotes">''</span><span class="hl-code">;
+    </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-identifier">arguments</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">) {
+    	</span><span class="hl-identifier">msg</span><span class="hl-code"> += </span><span class="hl-identifier">arguments</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&lt;hr noshade style=&quot;color:#eeeeee;&quot; size=&quot;1&quot;&gt;</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">_console</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">innerHTML</span><span class="hl-code"> = </span><span class="hl-identifier">msg</span><span class="hl-code"> + </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">_console</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">innerHTML</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">_console</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">scrollTop</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">printf</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">format</span><span class="hl-code">, </span><span class="hl-identifier">arg1</span><span class="hl-code">, </span><span class="hl-identifier">arg2</span><span class="hl-code">, </span><span class="hl-identifier">etc</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">args</span><span class="hl-code"> = </span><span class="hl-builtin">Array</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">slice</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">print</span><span class="hl-brackets">(</span><span class="hl-identifier">format</span><span class="hl-code">.</span><span class="hl-identifier">replace</span><span class="hl-brackets">(
+      </span><span class="hl-quotes">/</span><span class="hl-string">\{\{[^{}]*\}\}|\{(\d+)(,\s*([\w.]+))?\}</span><span class="hl-quotes">/g</span><span class="hl-code">,
+      </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">, </span><span class="hl-identifier">a1</span><span class="hl-code">, </span><span class="hl-identifier">a2</span><span class="hl-code">, </span><span class="hl-identifier">a3</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">chatAt</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">{</span><span class="hl-quotes">'</span><span class="hl-brackets">) {
+          </span><span class="hl-reserved">return </span><span class="hl-identifier">m</span><span class="hl-code">.</span><span class="hl-identifier">slice</span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-code">, -</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">rpl</span><span class="hl-code"> = </span><span class="hl-identifier">args</span><span class="hl-brackets">[</span><span class="hl-identifier">a1</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">a3</span><span class="hl-brackets">) {
+          </span><span class="hl-reserved">var </span><span class="hl-identifier">f</span><span class="hl-code"> = </span><span class="hl-identifier">eval</span><span class="hl-brackets">(</span><span class="hl-identifier">a3</span><span class="hl-brackets">)</span><span class="hl-code">;
+          </span><span class="hl-identifier">rpl</span><span class="hl-code"> = </span><span class="hl-identifier">f</span><span class="hl-brackets">(</span><span class="hl-identifier">rpl</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">rpl</span><span class="hl-code"> ? </span><span class="hl-identifier">rpl</span><span class="hl-code"> : </span><span class="hl-quotes">''</span><span class="hl-code">;
+      </span><span class="hl-brackets">}))</span><span class="hl-code">;
+</span><span class="hl-brackets">}
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.util.CustomEvent
+ */
+ //
+ /**
+ * Enable custom handler signature and event cancelling. Using fireDirect() instead of fire() calls the subscribed event handlers 
+ * with the exact parameters passed to fireDirect, instead of the usual (eventType, args[], obj). IMO this is more intuitive 
+ * and promotes cleaner code. Also, if an event handler returns false, it is returned by fireDirect and no other handlers will be called.&lt;br&gt;
+ * Example:&lt;br&gt;&lt;br&gt;&lt;pre&gt;&lt;code&gt;
+ * if(beforeUpdateEvent.fireDirect(myArg, myArg2) !== false){
+ *     // do update
+ * }&lt;/code&gt;&lt;/pre&gt;
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">fireDirect</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">len</span><span class="hl-code">=</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">subscribers</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">;
+    </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-identifier">len</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">s</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">subscribers</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">scope</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">obj</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">scope</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">fn</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code"> === </span><span class="hl-reserved">false</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">return false</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }
+    </span><span class="hl-reserved">return true</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">subclass</span><span class="hl-code">, </span><span class="hl-identifier">superclass</span><span class="hl-code">, </span><span class="hl-identifier">overrides</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">extend</span><span class="hl-brackets">(</span><span class="hl-identifier">subclass</span><span class="hl-code">, </span><span class="hl-identifier">superclass</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">subclass</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-brackets">(</span><span class="hl-identifier">subclass</span><span class="hl-code">, </span><span class="hl-identifier">o</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">subclass</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">subclass</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">method </span><span class="hl-reserved">in </span><span class="hl-identifier">o</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-identifier">method</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">o</span><span class="hl-brackets">[</span><span class="hl-identifier">method</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}  
+        }</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">overrides</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">subclass</span><span class="hl-code">.</span><span class="hl-identifier">override</span><span class="hl-brackets">(</span><span class="hl-identifier">overrides</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">override</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">origclass</span><span class="hl-code">, </span><span class="hl-identifier">overrides</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">overrides</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">p</span><span class="hl-code"> = </span><span class="hl-identifier">origclass</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">;
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">method </span><span class="hl-reserved">in </span><span class="hl-identifier">overrides</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">p</span><span class="hl-brackets">[</span><span class="hl-identifier">method</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">overrides</span><span class="hl-brackets">[</span><span class="hl-identifier">method</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.util.DelayedTask
+ * Provides a convenient method of performing setTimeout where a new
+ * timeout cancels the old timeout. An example would be performing validation on a keypress.
+ * You can use this class to buffer
+ * the keypress events for a certain number of milliseconds, and perform only if they stop
+ * for that amount of time.
+ * @constructor The parameters to this constructor serve as defaults and are not required.
+ * @param {&lt;i&gt;Function&lt;/i&gt;} fn (optional) The default function to timeout
+ * @param {&lt;i&gt;Object&lt;/i&gt;} scope (optional) The default scope of that timeout
+ * @param {&lt;i&gt;Array&lt;/i&gt;} args (optional) The default Array of arguments
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">DelayedTask</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">timeoutId</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * Cancels any pending timeout and queues a new one
+     * @param {Number} delay The milliseconds to delay
+     * @param {Function} newFn (optional) Overrides function passed to constructor
+     * @param {Object} newScope (optional) Overrides scope passed to constructor
+     * @param {Array} newArgs (optional) Overrides args passed to constructor
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">delay</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">delay</span><span class="hl-code">, </span><span class="hl-identifier">newFn</span><span class="hl-code">, </span><span class="hl-identifier">newScope</span><span class="hl-code">, </span><span class="hl-identifier">newArgs</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">timeoutId</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">clearTimeout</span><span class="hl-brackets">(</span><span class="hl-identifier">timeoutId</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">fn</span><span class="hl-code"> = </span><span class="hl-identifier">newFn</span><span class="hl-code"> || </span><span class="hl-identifier">fn</span><span class="hl-code">;
+        </span><span class="hl-identifier">scope</span><span class="hl-code"> = </span><span class="hl-identifier">newScope</span><span class="hl-code"> || </span><span class="hl-identifier">scope</span><span class="hl-code">;
+        </span><span class="hl-identifier">args</span><span class="hl-code"> = </span><span class="hl-identifier">newArgs</span><span class="hl-code"> || </span><span class="hl-identifier">args</span><span class="hl-code">;
+        </span><span class="hl-identifier">timeoutId</span><span class="hl-code"> = </span><span class="hl-identifier">setTimeout</span><span class="hl-brackets">(</span><span class="hl-identifier">fn</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">args</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">delay</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * Cancel the last queued timeout
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">cancel</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">timeoutId</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">clearTimeout</span><span class="hl-brackets">(</span><span class="hl-identifier">timeoutId</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-identifier">timeoutId</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.util.Observable
+ * Abstract base class that provides a common interface for publishing events. Subclasses are expected to 
+ * to have a property &quot;events&quot; with all the events defined.&lt;br&gt;
+ * For example:
+ * &lt;pre&gt;&lt;code&gt;
+ var Employee = function(name){
+    this.name = name;
+    this.events = {
+        'fired' : new YAHOO.util.CustomEvent('fired'),
+        'quit' : new YAHOO.util.CustomEvent('quit')
+    }
+ }
+ YAHOO.extend(Employee, YAHOO.ext.util.Observable);
+&lt;/code&gt;&lt;/pre&gt;
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Observable</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Observable</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Fires the specified event with the passed parameters (minus the event name).
+     * @param {String} eventName
+     * @param {Object...} args Variable number of parameters are passed to handlers
+     */
+    </span><span class="hl-identifier">fireEvent</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">ce</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">arguments</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()]</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">ce</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">ce</span><span class="hl-code">, </span><span class="hl-builtin">Array</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">slice</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">))</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Appends an event handler to this element
+     * @param {String}   eventName     The type of event to listen for
+     * @param {Function} handler        The method the event invokes
+     * @param {&lt;i&gt;Object&lt;/i&gt;}   scope  (optional) The scope (this object) for the handler
+     * @param {&lt;i&gt;boolean&lt;/i&gt;}  override (optional) If true, scope becomes the scope
+     */
+    </span><span class="hl-identifier">addListener</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">eventName</span><span class="hl-code">, </span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">override</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">eventName</span><span class="hl-code"> = </span><span class="hl-identifier">eventName</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">eventName</span><span class="hl-brackets">]){
+            </span><span class="hl-comment">// added for a better message when subscribing to wrong event
+            </span><span class="hl-reserved">throw </span><span class="hl-quotes">'</span><span class="hl-string">You are trying to listen for an event that does not exist: &quot;</span><span class="hl-quotes">'</span><span class="hl-code"> + </span><span class="hl-identifier">eventName</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">&quot;.</span><span class="hl-quotes">'</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">eventName</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">subscribe</span><span class="hl-brackets">(</span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">override</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Appends an event handler to this element that is delayed the specified number of milliseconds.
+     * @param {String}   eventName     The type of event to listen for
+     * @param {Function} handler        The method the event invokes
+     * @param {&lt;i&gt;Object&lt;/i&gt;}   scope  (optional) The scope (this object) for the handler
+     * @param {&lt;i&gt;Number&lt;/i&gt;}  delay (optional) The number of milliseconds to delay
+     * @return {Function} The wrapped function that was created (can be used to remove the listener)
+     */
+    </span><span class="hl-identifier">delayedListener</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">eventName</span><span class="hl-code">, </span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">delay</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">newFn</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+            </span><span class="hl-identifier">setTimeout</span><span class="hl-brackets">(</span><span class="hl-identifier">fn</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-identifier">scope</span><span class="hl-code">, </span><span class="hl-identifier">arguments</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-identifier">delay</span><span class="hl-code"> || </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-brackets">(</span><span class="hl-identifier">eventName</span><span class="hl-code">, </span><span class="hl-identifier">newFn</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">newFn</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Removes a listener
+     * @param {String}   eventName     The type of event to listen for
+     * @param {Function} handler        The handler to remove
+     * @param {&lt;i&gt;Object&lt;/i&gt;}   scope  (optional) The scope (this object) for the handler
+     */
+    </span><span class="hl-identifier">removeListener</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">eventName</span><span class="hl-code">, </span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">eventName</span><span class="hl-code">.</span><span class="hl-identifier">toLowerCase</span><span class="hl-brackets">()]</span><span class="hl-code">.</span><span class="hl-identifier">unsubscribe</span><span class="hl-brackets">(</span><span class="hl-identifier">fn</span><span class="hl-code">, </span><span class="hl-identifier">scope</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Removes all listeners for this object
+     */
+    </span><span class="hl-identifier">purgeListeners</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">evt </span><span class="hl-reserved">in this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">evt</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+                 </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-brackets">[</span><span class="hl-identifier">evt</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">unsubscribeAll</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }
+}</span><span class="hl-default">;
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Observable</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">on</span><span class="hl-default"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Observable</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default">.</span><span class="hl-identifier">addListener</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.util.Config
+ * Class with one useful method
+ * @singleton
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">util</span><span class="hl-default">.</span><span class="hl-identifier">Config</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-comment">/**
+     * Copies all the properties of config to obj.
+     * @param {Object} obj The receiver of the properties
+     * @param {Object} config The source of the properties
+     * @param {Object} defaults A different object that will also be applied for default values
+     * @return {Object} returns obj
+     */
+    </span><span class="hl-identifier">apply</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-code">, </span><span class="hl-identifier">defaults</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">defaults</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-identifier">obj</span><span class="hl-code">, </span><span class="hl-identifier">defaults</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">config</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">prop </span><span class="hl-reserved">in </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">obj</span><span class="hl-brackets">[</span><span class="hl-identifier">prop</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-brackets">[</span><span class="hl-identifier">prop</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">obj</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-builtin">String</span><span class="hl-code">.</span><span class="hl-identifier">escape</span><span class="hl-brackets">){
+    </span><span class="hl-builtin">String</span><span class="hl-code">.</span><span class="hl-identifier">escape</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">string</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">string</span><span class="hl-code">.</span><span class="hl-identifier">replace</span><span class="hl-brackets">(</span><span class="hl-quotes">/</span><span class="hl-string">('|\\)</span><span class="hl-quotes">/g</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-special">\\</span><span class="hl-string">$1</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-builtin">String</span><span class="hl-default">.</span><span class="hl-identifier">leftPad</span><span class="hl-default"> = </span><span class="hl-reserved">function </span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-code">, </span><span class="hl-identifier">size</span><span class="hl-code">, </span><span class="hl-identifier">ch</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">result</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-builtin">String</span><span class="hl-brackets">(</span><span class="hl-identifier">val</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">ch</span><span class="hl-code"> == </span><span class="hl-reserved">null</span><span class="hl-brackets">) {
+        </span><span class="hl-identifier">ch</span><span class="hl-code"> = </span><span class="hl-quotes">&quot; &quot;</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">while </span><span class="hl-brackets">(</span><span class="hl-identifier">result</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> &lt; </span><span class="hl-identifier">size</span><span class="hl-brackets">) {
+        </span><span class="hl-identifier">result</span><span class="hl-code"> = </span><span class="hl-identifier">ch</span><span class="hl-code"> + </span><span class="hl-identifier">result</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">result</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">// workaround for Safari 1.3 not supporting hasOwnProperty
+</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Connect</span><span class="hl-brackets">){
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Connect</span><span class="hl-code">.</span><span class="hl-identifier">setHeader</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+		</span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">prop </span><span class="hl-reserved">in this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">){
+		    </span><span class="hl-comment">// if(this._http_header.hasOwnProperty(prop)){
+			</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-identifier">prop</span><span class="hl-brackets">]</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">function</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+				</span><span class="hl-identifier">o</span><span class="hl-code">.</span><span class="hl-identifier">conn</span><span class="hl-code">.</span><span class="hl-identifier">setRequestHeader</span><span class="hl-brackets">(</span><span class="hl-identifier">prop</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-brackets">[</span><span class="hl-identifier">prop</span><span class="hl-brackets">])</span><span class="hl-code">;
+			</span><span class="hl-brackets">}
+		}
+		</span><span class="hl-reserved">delete this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_http_header</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+		</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_has_http_headers</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+	</span><span class="hl-brackets">}</span><span class="hl-code">;   
+</span><span class="hl-brackets">}</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

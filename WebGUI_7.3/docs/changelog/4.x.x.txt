@@ -1,0 +1,497 @@
+4.9.5
+ - Fixed a bug where creating a template caused a crash bug.
+ - Fixed a crash bug in LDAP anonymous registration.
+ - Fixed a bug in Site Map where the properties page would not hold the "All Roots" option.
+ - Fixed the survey bug where surveys were automatically completed.
+
+
+
+
+
+4.9.4
+ - Fixed a bug that would crash the survey when it had no questions.
+ - Made macro toolbar match the help.
+ - Fixed a syntax error in the DateTime module.
+ - Changed macro engine not to produce a fatal error if one macro failed.
+ - Fixed a bug that occurred when editing the root folder in the collateral manager.
+ - Fixed a layout bug in the WebGUI 5 style.
+ - Changed the upgrade script to get its variables from the config file.
+ - Fixed POD formatting.
+ - Enabled International message and page caching to increase performance.
+ - Fixed a bug in the statistics system caused when adding a new wobject.
+ - Fixed a bug in international toolbar system where it required the user to have their extras folder in a www folder.
+
+
+
+
+
+
+
+
+
+
+4.9.3
+ - Rewrote image importer for simplicity and to work with the new collateral managment system.
+ - Fixed bug where ^L(); macro would show visitor as a logged in user.
+ - Fixed a bug where the calendar was displaying more months than it should.
+ - Fixed some date math bugs in the DateTime package.
+ - Fixed a bug where an event would be lost forever if the end date was less than the start date.
+ - Fixed another Internet Explorer cookie bug.
+ - Converted template manager to use standard admin navigation.
+ - Fixed a bug where Page Tree and ^rootmenu(); could potentially display system level roots.
+ - Documented the remainder of WebGUI's API in perldoc.
+ - Fixed SiteMap to display roots properly.
+ - Changed active sessions page not to display visitor sessions.
+ - Fixed a bug where the rich editor wasn't showing up on USS submissions.
+ - Removed previousVersion.sql and the upgrade scripts from versions prior to 3.0.0 to reduce the size of the distribution.
+ - Fixed crash bug in Template engine when an invalid template is specified.
+ - Fixed a bunch of incompatibilities for Postgres.
+ - Updated dutch translation thanks to ProcoliX.
+ - Fixed a bug where the system would crash if a submission in the USS that was requested didn't exist.
+ - Removed the rich editor from the style and template edit screens.
+ - Disabled the "edit this template" functionality on wobject editing until it can be implemented in a more robust manner.
+ - Changed Events Calendar so events don't show edit icons when user doesn't have privileges to edit.
+ - Fixed templates for XHTML correctness and compatibility with Netscape 4.
+ - Fixed a bug in the weblog where it displayed the description twice.
+ - Fixed a bug where users couldn't change their password.
+ - Fixed a bug where you could not change an uploaded image in the collateral management system.
+ - Changed account options so that it doesn't display the link for the page you are currently on.
+ - Fixed a typo in the 4.9.2 release of the gotchas file.
+ - Changed wobjects to return to the page by default after adding collateral.
+ - Fixed a bug where you were unable to delete a file from the file manager.
+ - Changed account options not to display "Please deactiveate my account...." if you are an admin.
+ - Updated testEnvironment.pl to reflect new package requirements.
+ - Added mod_perl 2 statement to preload.perl.
+ - No longer show recursive page options or management options that don't make sense.
+ - Added the survey wobject via the fund a feature program.
+ - Added debug output for SQL queries.
+ - Eliminated many unnecessary and redundant database queries.
+ - Synopsis macro now returns all levels if called with no max level.
+ - Clarified various messages.
+ - Fixed a file manager template bug.
+ - Fixed a form quoting bug.
+ - Made session id's more unique. The old way could duplicate identical ids under heavy load.
+ - Updated the dutch translation thanks to ProcoliX.
+ - Updated the spanish translation thanks to AGOFER Ltda.
+
+
+
+
+
+
+4.9.2
+ - Fixed an authentication settings bug.
+ - Fixed a bug where the system would crash if you tried to recover your password.
+ - Fixed a bug where adding a new template could cause WebGUI to crash in some circumstances.
+ - Updated dutch translation thanks to Bart Jol.
+ - Fixed a potential bug with quickHash and quickHashRef returning nulls.
+
+ - Readded a couple of the old rich editors.
+ - Internationalized the new auth system.
+ - Fixed the LDAP authentication module login.
+ - Added an index to the events calendar to speed it up.
+ - Fixed a problem migrating from image groups to collateral folders.
+ - Fixed various inconsequential events calendar bugs.
+ - Fixed a problem where events list wouldn't show the first date if the date was today.
+ - Fixed a bug where you could delete templates that you should not be able to delete.
+
+
+4.9.1
+ - New roots now base themselves on the settings of the default page.
+ - Added a missing image from the new style.
+ - Added indexes to speed up large message boards and USS.
+ - Added an index to the mail form storage for faster queries against it.
+ - Fixed a bug in the thumbnailer.pl script thanks to Michael Henry where images with upper case extensions weren't being thumbnailed.
+ - Updated the imImport.pl script for compatiblity with the new collateral management system.
+ - Updated the userImport.pl script for compatibility with the new pluggable authentication system.
+ - Fixed a bug where recursively changing privileges or styles could affect pages it wasn't supposed to.
+ - Fixed a bug where Swedish was always the default language for every page.
+ - Fixed an email bug that occured with some versions of Net::SMTP.
+ - Fixed the Internet Explorer cookie bug.
+ - Fixed a bug where changing the parameters of a file in the File Manager would delete the file.
+ - Fixed some typos in some of the templates.
+ - Fixed an account update bug.
+ - Fixed a bug where the add content menu was not ordered properly in languages other than english.
+ - Fixed a content preview bug in the collateral system.
+ - Reworked pluggable auth for better extensibility and robustness.
+ - Fixed a bug where the UI would show the old username for one page after the user updated his username.
+
+
+
+
+
+
+
+4.9.0
+ - Updated the help to match all of the recent changes.
+ - Made fixes for Mac OSX compatibility.
+ - Visitors are now given sessions just like regular users. This will enable developers to build visitor driven apps such as shopping carts.
+ - Added email footer setting.
+ - Added "next action" to page properties.
+ - Added per-page language settings.
+ - Added user status (thanks to Martin Kamberbeek).
+ - Converted user manager to use new scratch and pagination systems for better control and speed.
+ - Added thumbnail resizing to collateral manager (thanks to Martin Kamberbeek).
+ - Added the new WebGUI 5 style and propaganda.
+ - Redirect pages now preprocess macros on the URL before redirecting.
+ - Added Tie::IxHash, Tie::CPHash, and Net::LDAP to the default distribution to make installs easier.
+ - Added Russian translation (thanks to Natalia Almazova)
+ - Added pluggable authentication (thanks to Martin Kamberbeek)
+ - Fixed various bugs introduced during the previous two development cycles.
+ - Default format for SQL macro is now ^0;
+ - You can now use special characters safely.
+ - You can now use form elements in textareas safely.
+ - Added new rich text editor (thanks to interactivetools.com).
+ - Added macro toolbar to the rich text editor (thanks to Len Kranendonk).
+ - Added new SMB authentication method (thanks to Martin Kamberbeek)
+ - Templatized the Events Calendar, Site Map, Message Board, Link List, and File Manager wobjects.
+ - Added a small calendar view to the Events Calendar wobject.
+ - Added many specialized properties to the Events Calendar for better control.
+
+
+
+
+
+4.8.0
+ - Updated the Danish translation (thanks to Michael Ugilt).
+ - Fixed a bug copying templates.
+ - You know longer see the "Manage Templates" link unless you can actually manage templates.
+ - Added comma and tab delimited export functions to SQL handler.
+ - Added groups of groups.
+ - Added email to group.
+ - Added a new collateral management system to replace the image manager. The collateral managment system allows you to upload arbitrary files, and text snippets, as well as images.
+ - Cleaned up the code and UI of the administrative functions.
+ - Added page statistics tracking.
+ - Templatized Article.
+ - Added session scratch variables.
+ - Added more new toolbar icon sets.
+ - Added an icon set chooser to the translations manager.
+ - Fixed a bug where message boards were not displaying their full listing.
+ - Made changes for mod_perl 2.0 compatibility.
+ - Added user count to group listing.
+ - SQL Report now reuses DB connection if same as site DB connection.
+ - Added classifieds and guest book templates to the USS.
+
+
+
+
+
+
+
+4.7.0
+ - Converted Item, Product, USS, and FAQ to use the new template system.
+ - Paginator can now paginate arbitrary data sets.
+ - Paginator is now approximately 200% faster and uses about 600% less memory.
+ - Fixed a bug in image group pagination.
+ - Added new Smooth Blues style thanks to Chris Gebhardt at OpenServe.
+ - Added new toolbar icon set.
+ - Added per language settings for toolbar icon sets.
+ - Fixed a small bug where pagination did not retain the keyword when searching on the user list.
+ - Added privilege caching to speed up privilege queries.
+ - Fixed a bug where users with no specified email address could still attempt to recover their password and inadvertantly change the password of another user.
+ - Added Arabic support thanks to Ehab Heikal.
+ - Added support for approximately 30 new attachment types.
+ - Added "action2" mechanism for dual action operations and functions.
+ - Added a hook to allow developers to set the filename of non-html content generated by WebGUI.
+ - The date macro can now accept a second parameter, which is and epoch value. Still defaults to now.
+ - Fixed a bug that occured when WebGUI retrieved the name of the day in a date output.
+ - New HTML::Template engine has been added to allow for better customization of styles, page templates, and wobject interfaces.
+ - Usernames can no longer contain special characters that can cause problems with some systems.
+ - A lot of redundant code cleanup in the existing wobjects.
+ - Form output has been cleaned up so that the HTML is more readable.
+ - Forms package has been separated into basic form elements and the power forms of the HTMLForm package. This should speed the development of custom forms for developers.
+ - Forms, Preferences, Wobjects, and Pages all include UI Levels in order to "dumb down" the interface.
+ - Updated all wobjects, incrementers, and tables to conform to namespace standards.
+ - Added an upgrade utility to make upgrading WebGUI easier, especially on a server with multiple sites.
+ - Added a scheduler plugin to sync LDAP properties with WebGUI user profiles.
+ - Added a utility to rethumbnail your WebGUI images.
+ - Added a scheduler plugin to move expired content to the trash.
+ - Added a scheduler plugin to delete expired events calendar events.
+ - Added a utility to import users from a flat file.
+ - Added a scheduler plugin to delete expired groupings.
+ - Added a utility to import a directory of images into the image manager.
+ - Added a scheduler plugin to decay karma.
+ - Added a utility to import a directory of files into a download manager.
+ - Added a scheduler plugin to empty the trash automatically.
+ - Added a scheduler plugin to clean out the user login log.
+ 
+
+
+
+
+
+
+4.6.9
+ - Updated the Sweedish translation (thanks to info@rit.se)
+ - Updated the Dutch translation (thanks to info@procolix.com)
+ - Fixed a very obsure and unlikely security hole just in case.
+ - Fixed a bug in the translation manager that caused "missing" elements to be uneditable.
+ - Fixed a bug in the AdminText macro that caused it to not function at all.
+ - Fixed a bug in SQL Report where all wobjects on the page that could paginate would paginate when the SQL Report paginated.
+ - Fixed more Chinese character set problems on the Poll.
+ - Changed the email form type to do validation onChange rather than onBlur.
+ - Fixed a duplicate entry error in the messaging system.
+
+
+
+4.6.8
+ - Fixed a bug where under certain versions of Perl, on SQL Reports that used the ^FormParam(); macro, the pagination function would sometimes fail.
+ - Removed a setting that should no longer have been.
+ - Added better error handling of malfunctioning wobjects.
+ - Fixed an Attachment bug that would cause a fatal error when only a warning should have been generated.
+ - Fixed a bug where attachments larger than the max attachment size could be uploaded.
+ - Fixed some problems with the Poll wobject in the Chinese language.
+ - Several Oracle compatibility fixes.
+ - Fixed a bug in the translations manager where all messages were always marked "Out of Date".
+ - Fixed a major security flaw where it was possible to execute commands on the server. Special thanks to Len Kranendonk for discovering and reporting this defect.
+ - Username can no longer start or end with a space.
+
+
+
+4.6.7
+ - Added some missing documentation to the forms package.
+
+ - Added a workaround for a bug in mod_perl (win32).
+ - Fixed a spacing problem with the ^L; macro.
+ - Made significant performance and UI improvements in Translation manager, and fixed an edit bug.
+ - Added some missing help for the USS.
+
+
+
+
+
+4.6.6
+ - Fixed a bug in the SQL Report where a fatal error would occur if the user used a database driver that didn't exist.
+ - Restored the Danish translation. (Special thanks to Michael Ugilt.)
+ - Updated the German translation. (Special thanks to Mattias Kunkel)
+ - Fixed a small translation manager sorting problem. (Special thanks to Koen de Jonge)
+ - Changed thumbnailer so that it no longer scales images up that are smaller than the thumbnail size.
+ - Fixed a bug where Session variables were displayed on fatal error even if debug was not turned on.
+
+
+
+
+
+4.6.5
+ - Content Managers can no longer view pages in the "Manage Page Tree" if they cannot edit them.
+ - Fixed a bug where USS submitters could not edit their own submissions.
+
+
+
+4.6.4
+ - Readded the Macro help that was accidentally deleted in 4.6.3.
+ - Due to popular demand, changed the wobject table to include 5 user definable fields so that external data can be married with WebGUI wobject data.
+
+4.6.3
+ - Fixed an upgrade bug.
+ - Added more debug when macros fail to compile.
+
+
+4.6.2
+ - Fixed a navigation bug where everything was labeled as the selected menu item.
+ - Fixed a problem with the D macro.
+ - Updated the Dutch translation. (Special thanks to ProcoliX)
+ - Added the Chinese (Traditional) translation. (Special thanks to orosor@yahoo.com.tw)
+ - Fixed a bug where admins couldn't delete attachments or images from the USS.
+ - Fixed a bug where having poll with no answers would cause the poll wobject to crash.
+ - Fixed a bug where the reset votes option in the poll would become mangled if the anti-caching mechanism was enabled.
+ - Fixed a bug where redirects would cause WebGUI to crash if the user had installed the latest version of CGI.pm.
+
+
+
+
+
+4.6.1
+ - Massive fixes to restore compatibility with Postgres.
+ - Fixed some spelling errors in the debugging.
+ - Made  the audit trail make more sense.
+ - Allowed slashes "/" in page names.
+ - Made sure that the LoginToggle macro was included in this release since we forgot to include it in the last.
+ - Fixed a bug where the visitor user was receiving unnecessary messages in it's inbox.
+
+
+
+
+
+
+4.6.0
+ - Fixed the column sorting bug on the download manager.
+ - Added the SQL macro.
+ - Edit controls no longer show up when a user does not have the privileges to edit a particular page.
+ - Added some additional methods to the wobject superclass for cleaner code in the subclasses.
+ - Added a basic audit trail to the log.
+ - Added the missing radio method from the forms package.
+
+ - Fixed a bug in the Product wobject where a new wobject would start with a product template other than the default.
+ - Added the LoginToggle macro.
+ - Changed the AdminToggle macro to support alternate messages.
+ - Fixed a bug with the checkbox method in the forms package where overriding the value to "0" wouldn't work.
+
+
+
+
+4.5.0
+ - Updated help to remove unnecessary HTML and be more accurate.
+ - Added a redirect option to pages.
+ - Changed to URL form type to only add http:// if it can find a dot (.) in the url.
+
+ - Fixed a small security hole where a user could potentially view collateral data of a wobject if they knew the right URL.
+ - Added centralized navigation generator and updated old navigation elements to use it.
+ - Several code efficiency improvements.
+ - Fixed a bug where placing a package would result in pages and wobjects in the wrong order.
+ - Fixed a bug where placing a package would cause a fatal error.
+ - Added product templates.
+ - Added benefits column to product templates.
+ - Added overrides for the privileges associated with image, style, and template management.
+ - Added a debugging toggle to the settings to help WebGUI developers debug their code.
+ - Members of the admins group who are not part of the content managers group can now own pages, just like content managers.
+ - Admins can no longer remove themselves from the admins group. However, one admin can remove another admin. The default "Admin" user cannot be removed from the admins group.
+ - Added perldoc for several core modules.
+ - Date form elements are now restricted to 10 characters  and integers are restricted to 11 characters (better client side validation) .
+ - Added an interval data type to the forms package and updated all the other packages that should be using it.
+ - Wobjects now inherit their start and end dates from their parent page.
+ - Poll answers can now be randomized.
+ - WebGUI user is now added to web server access log under mod_perl (accurate user tracking!)
+ - HTML::CalendarMonthSimple is no longer required to be installed on your WebGUI server, because it now comes with the WebGUI distribution.
+ - Changed MailForm dropdown options to remain ordered.
+ - Several mod_perl performance tweaks.
+ - Date and time operations are now more accurate, precise, and should be a little bit faster.
+ - Events Calendar now supports weeks starting on Monday (European Format) rather than Sunday (American Format).
+ - Events Calendars now have unlimited recurring events options.
+ - You can now choose to delete just a single event, or all of its recurrences.
+ - Events Calendar headers are now internationalized.
+
+
+
+
+
+
+4.4.1
+ - Changed the user profile editor to check the validity of the stored value against the profile settings keys prior to using it as default.
+ - Fixed a bug where copying USS or MB would cause a fault.
+ - Fixed a bug where editing user profiles could cause admin's profile to be copied to another user's profile.
+ - Fixed a bug where multiple users in a group would not receive messages through the built-in messaging system.
+ - Added a temporary fix to allow people who are used to content managers being able to use the image manager to continue to allow CMs to do so. This fix will be replaced with a permanent solution in the next release.
+ - After removing a user from a group, you are now returned to the user group page rather than the user account page.
+ - Swapped copy/cut to cut/copy on wobject.
+ - Changed the MailForm wobject to use the built in mail system to avoid complications and add simplicity.
+ - Removed unnecessary pre tags from the Execute macro.
+ - Added explaination to unable to open log file error message.
+
+
+
+
+
+4.4.0
+ - Added an options to exclude wobjects, macros, and hourly plugins.
+ - Added User macro.
+ - Fixed a problem where a user's password would be changed even if they didn't want it changed when they updated their account info.
+
+
+
+
+4.3.0
+ - Fixed a bug in the help editor where it would save the action in the object field.
+ - Added an Italian translation.
+ - Added a new WebGUI style.
+ - Moved the "extras", "uploadsURL", and "uploadsPath" settings to the config file for easier installation.
+ - Updated testEvironment.pl for more improved testing of config files.
+ - Fixed a couple spelling errors.
+ - Added feature to expire pages.
+ - Added edit/delete options to "Manage page tree."
+ - Re-engineered the help system for better usability and translation.
+
+
+
+
+
+
+
+4.2.0
+ - Fixed a bug where Edit FAQ header and help icon weren't being displayed.
+ - Fixed a bug where meta tags weren't being saved.
+ - Added "Run On Registration" option.
+ - Added thread locking to discussions.
+ - Added pre-emptive moderation to discussions.
+ - Added karma listing to account display.
+ - Added GroupText and AdminText macros.
+ - Added previous/next buttons to USS.
+ - Added Product wobject.
+ - Added a maximum image size setting that will resize uploaded images that are too big.
+ - Added Wobject Proxy wobject.
+ - Added an option to use sendmail directly rather than the SMTP protocol.
+ - Updated languages engine to support multiple character sets.
+ - Added Chinese translation (special thanks to Zhou Xiaopeng).
+ - Added Mail Form wobject.
+ - Added translations manager.
+ - Update the user/group manager for better usability.
+
+
+
+
+4.1.0
+ - Changed discussion system so the "Re:" on replies is not repeated.
+ - Added the karma system.
+ - Added ^rootmenu(); macro.
+ - Added stylesheet class and id for wobject types and wobject ids for better style controls.
+ - URLs can now have a trailing slash.
+ - Multiple cookies can be set at once.
+ - The notification system is now capable of lengthy mesages.
+ - Added an image grouping system.
+
+
+4.0.5
+ - Fixed two bugs in the USS. One where any user could see pending and denied submissions through the search utility. Another where searching would return only one result.
+
+4.0.4
+ - Fixed a bug introduced in the last version that caused extra carriage returns to be added unncessarily to posted content.
+ - Fixed a bug where visitors could post to the User Submission System.
+ - Fixed a bug where menu items were displayed on the Message Board even if the user didn't have privileges to use those items.
+
+
+
+
+4.0.3
+ - Fixed a bug where editing Article content on a mac could cause problems.
+ - Fixed a bug where  cutting/pasting a wobject from a page with fewer template postions than the wobject was set to, would cause the wobject to become invisible.
+ - Fixed a bug where  changing a template position to lower than the wobjects on a page would cause those wobjects to disappear.
+ - Changed attachment system so that it no longer lowercases attachment names.
+ - Added class=verticalMenu to the td tags generated by FlexMenu.
+ - Updated icons for Visio, Autocad, Perl Modules, and SQL files.
+ - A couple formatting changes to testEnvironment.pl.
+
+
+
+
+
+
+
+
+
+4.0.2
+ - Updated macro help to fix a documentation problem.
+ - Fixed a bug where a number was artificially added to an image uploaded to the image manager.
+
+
+
+
+4.0.1
+ - Fixed a bug that generated a cosmetic error on Win32 platforms when runHourly.pl was run.
+ - Changed the search engine to filter out pages the user doesn't have permission to view.
+ - Fixed a pagination bug on the search engine.
+ - Fixed a bug where you'd get duplicate display if a 403 error occured.
+ - Fixed a page sequencing problem where sequence numbers were being generated from the page's parent rather than the page itself.
+
+
+4.0.0
+ - Fixed a bug where insufficent privileges messages would cause duplicate output under mod_perl.
+ - Image names in the image manager are now guaranteed unique.
+ - Updated Dutch translation.
+ - Fixed a bug where message board would display first message in the thread twice in "flat" view.
+ - Fixed a bug where the style header wouldn't display on make page printable.
+ - Gracefully die on errors where plugins don't compile or follow API.
+ - Improved performance in USS with large amounts of submissions.
+ - Enhanced file related error logging.
+ - Fixed a bug that would not allow an admin to change the web attachment folder.
+
+

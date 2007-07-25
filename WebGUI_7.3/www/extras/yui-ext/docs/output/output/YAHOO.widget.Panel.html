@@ -1,0 +1,1460 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.Panel</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.Panel.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.Panel</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>Panel</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.widget.Overlay.html">Overlay</a></td></tr>
+                                    <tr><td class="label">Subclasses:</td><td><a href="YAHOO.widget.Dialog.html">Dialog</a></td></tr>
+                        <tr><td class="label">Defined In:</td><td><a href="container.js.html">container.js</a></td></tr>
+        </table>
+        <div class="description">
+            Panel is an implementation of Overlay that behaves like an OS window, with a draggable header and an optional close icon at the top right.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_LEFT&lt;static&gt;">BOTTOM_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context eleme...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#BOTTOM_RIGHT&lt;static&gt;">BOTTOM_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_OVERLAY&lt;static&gt;">CSS_OVERLAY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for an Overlay</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_PANEL&lt;static&gt;">CSS_PANEL&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a Panel</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_PANEL_CONTAINER&lt;static&gt;">CSS_PANEL_CONTAINER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the default CSS class used for a Panel's wrapping container</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_LEFT&lt;static&gt;">TOP_LEFT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alig...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TOP_RIGHT&lt;static&gt;">TOP_RIGHT&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element ali...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : YAHOO.util.KeyListener[]
+@default</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">A KeyListener (or array of KeyListeners) that will be enabled when the Panel is shown, and disabled when the Panel is...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#javascript">javascript</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#javascript">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The URL that will be placed in the iframe</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Panel">Panel</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#align">align</a>(<code>String elementAlign</code>, <code>String contextAlign</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#align">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, T...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildMask">buildMask</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Builds the mask that is laid over the document when the Panel is configured to be modal.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#buildWrapper">buildWrapper</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Builds the wrapping container around the Panel that is used for positioning the shadow and matte underlays. The conta...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#center">center</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#center">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Centers the container in the viewport.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configClose">configClose</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "close" property is changed. The method controls the appending or hiding of ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configConstrainToViewport">configConstrainToViewport</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "constraintoviewport" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configContext">configContext</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configContext">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "context" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configDraggable">configDraggable</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "draggable" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configFixedCenter">configFixedCenter</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "fixedcenter" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHeight">configHeight</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "height" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configIframe">configIframe</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "iframe" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configKeyListeners">configKeyListeners</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "keylisteners" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configModal">configModal</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "modal" property is changed. This handler subscribes or unsubscribes to the ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configUnderlay">configUnderlay</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "underlay" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configVisible">configVisible</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "visible" property is changed. This method is responsible for firing showEve...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configWidth">configWidth</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "width" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configX">configX</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configX">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "x" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configXY">configXY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configXY">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "xy" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configY">configY</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#configY">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler fired when the "y" property is changed.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configzIndex">configzIndex</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The default event handler fired when the "zIndex" property is changed.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#destroy">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the Overlay element from the DOM and sets all child elements to null.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#doCenterOnDOMEvent">doCenterOnDOMEvent</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Center event handler used for centering on scroll/resize, but only if the Overlay is visible</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enforceConstraints">enforceConstraints</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideIframe">hideIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Hides the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMacGeckoScrollbars">hideMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMask">hideMask</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Hides the modality mask.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The Overlay initialization method, which is executed for Overlay and all of its subclasses. This method is automatica...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the class's configurable properties which can be changed using the Panel's Config object (cfg).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveTo">moveTo</a>(<code>Number x</code>, <code>Number y</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDomResize">onDomResize</a>(<code>DOMEvent e</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Event handler fired when the resize monitor element is resized.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#registerDragDrop">registerDragDrop</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Registers the Panel's header for drag & drop capability.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeMask">removeMask</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the modality mask.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>) : boolean</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Renders the Panel by inserting the elements that are not already in the main Panel into their correct places. Optiona...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showIframe">showIframe</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the iframe shim, if it has been enabled</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMacGeckoScrollbars">showMacGeckoScrollbars</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars ca...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMask">showMask</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the modality mask.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sizeMask">sizeMask</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the size of the modality mask to cover the entire scrollable area of the document</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#sizeUnderlay">sizeUnderlay</a>() : void</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adjusts the size of the shadow based on the size of the element.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#syncPosition">syncPosition</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used t...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a String representation of the object.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowResizeHandler&lt;static&gt;">windowResizeHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#windowScrollHandler&lt;static&gt;">windowScrollHandler&lt;static&gt;</a>(<code>DOMEvent e</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowResizeEvent">YAHOO.widget.Overlay.windowResizeEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window resize</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#YAHOO.widget.Overlay.windowScrollEvent">YAHOO.widget.Overlay.windowScrollEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">A singleton CustomEvent used for reacting to the DOM event for window scroll</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeMoveEvent">beforeMoveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired before the Overlay is moved.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dragEvent">dragEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent when the Panel is dragged</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideMaskEvent">hideMaskEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the modality mask is hidden</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#moveEvent">moveEvent</a> : (<code>Number x</code>, <code>Number y</code>)</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the Overlay is moved.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showMaskEvent">showMaskEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Panel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the modality mask is shown</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="BOTTOM_LEFT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>BOTTOM_LEFT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top bottom left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="BOTTOM_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>BOTTOM_RIGHT&lt;static&gt;</i></h3>
+                <code>public String BOTTOM_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the bottom right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#BOTTOM_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="CSS_OVERLAY&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_OVERLAY&lt;static&gt;</i></h3>
+                <code>public String CSS_OVERLAY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for an Overlay                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#CSS_OVERLAY&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="CSS_PANEL&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_PANEL&lt;static&gt;</i></h3>
+                <code>public String CSS_PANEL&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a Panel                </div>
+                <div class="mdetail-def">This property is defined by Panel.</div>
+                </div>
+                            <a name="CSS_PANEL_CONTAINER&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_PANEL_CONTAINER&lt;static&gt;</i></h3>
+                <code>public String CSS_PANEL_CONTAINER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the default CSS class used for a Panel's wrapping container                </div>
+                <div class="mdetail-def">This property is defined by Panel.</div>
+                </div>
+                            <a name="TOP_LEFT&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>TOP_LEFT&lt;static&gt;</i></h3>
+                <code>public String TOP_LEFT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top left corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_LEFT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="TOP_RIGHT&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>TOP_RIGHT&lt;static&gt;</i></h3>
+                <code>public String TOP_RIGHT&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the top right corner of an element, used for configuring the context element alignment                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#TOP_RIGHT&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail alt">
+                <h3>cfg</i></h3>
+                <code>public YAHOO.util.KeyListener[]
+@default cfg</code>
+                <div class="mdetail-desc">
+                    A KeyListener (or array of KeyListeners) that will be enabled when the Panel is shown, and disabled when the Panel is hidden.
+@config keylisteners                </div>
+                <div class="mdetail-def">This property is defined by Panel.</div>
+                </div>
+                            <a name="javascript"></a>
+                <div class="mdetail">
+                <h3>javascript</i></h3>
+                <code>public String javascript</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The URL that will be placed in the iframe                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.Overlay.html#javascript">Overlay</a>.</div>
+                </div>
+                        </div>
+                
+                    <a name="Panel"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Panel</i></h3>
+                <code>public function Panel(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the Panel <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the Panel</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration object literal containing the configuration that should be set for this Panel. See configuration documentation for more details.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="align"></a>
+                <div class="mdetail">
+                <h3>align</i></h3>
+                <code>public function align(<code>String elementAlign</code>, <code>String contextAlign</code>)</code>
+                <div class="mdetail-desc">
+                    Aligns the Overlay to its context element using the specified corner points (represented by the constants TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, and BOTTOM_RIGHT.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>elementAlign</code> : String<div class="sub-desc">The String representing the corner of the Overlay that should be aligned to the context element</div></li><li><code>contextAlign</code> : String<div class="sub-desc">The corner of the context element that the elementAlign corner should stick to.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#align">Overlay</a>.</div>
+                </div>
+                            <a name="buildMask"></a>
+                <div class="mdetail alt">
+                <h3>buildMask</i></h3>
+                <code>public function buildMask()</code>
+                <div class="mdetail-desc">
+                    Builds the mask that is laid over the document when the Panel is configured to be modal.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="buildWrapper"></a>
+                <div class="mdetail">
+                <h3>buildWrapper</i></h3>
+                <code>public function buildWrapper()</code>
+                <div class="mdetail-desc">
+                    Builds the wrapping container around the Panel that is used for positioning the shadow and matte underlays. The container element is assigned to a  local instance variable called container, and the element is reinserted inside of it.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="center"></a>
+                <div class="mdetail alt">
+                <h3>center</i></h3>
+                <code>public function center()</code>
+                <div class="mdetail-desc">
+                    Centers the container in the viewport.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#center">Overlay</a>.</div>
+                </div>
+                            <a name="configClose"></a>
+                <div class="mdetail">
+                <h3>configClose</i></h3>
+                <code>public function configClose(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "close" property is changed. The method controls the appending or hiding of the close icon at the top right of the Panel.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configConstrainToViewport"></a>
+                <div class="mdetail alt">
+                <h3>configConstrainToViewport</i></h3>
+                <code>public function configConstrainToViewport(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "constraintoviewport" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configConstrainToViewport">Overlay</a>.</div>
+                </div>
+                            <a name="configContext"></a>
+                <div class="mdetail">
+                <h3>configContext</i></h3>
+                <code>public function configContext(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "context" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configContext">Overlay</a>.</div>
+                </div>
+                            <a name="configDraggable"></a>
+                <div class="mdetail alt">
+                <h3>configDraggable</i></h3>
+                <code>public function configDraggable(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "draggable" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configFixedCenter"></a>
+                <div class="mdetail">
+                <h3>configFixedCenter</i></h3>
+                <code>public function configFixedCenter(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "fixedcenter" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configFixedCenter">Overlay</a>.</div>
+                </div>
+                            <a name="configHeight"></a>
+                <div class="mdetail alt">
+                <h3>configHeight</i></h3>
+                <code>public function configHeight(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "height" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configIframe"></a>
+                <div class="mdetail">
+                <h3>configIframe</i></h3>
+                <code>public function configIframe(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "iframe" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configIframe">Overlay</a>.</div>
+                </div>
+                            <a name="configKeyListeners"></a>
+                <div class="mdetail alt">
+                <h3>configKeyListeners</i></h3>
+                <code>public function configKeyListeners(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "keylisteners" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configModal"></a>
+                <div class="mdetail">
+                <h3>configModal</i></h3>
+                <code>public function configModal(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "modal" property is changed. This handler subscribes or unsubscribes to the show and hide events to handle the display or hide of the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configUnderlay"></a>
+                <div class="mdetail alt">
+                <h3>configUnderlay</i></h3>
+                <code>public function configUnderlay(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "underlay" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configVisible"></a>
+                <div class="mdetail">
+                <h3>configVisible</i></h3>
+                <code>public function configVisible(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "visible" property is changed. This method is responsible for firing showEvent and hideEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configVisible">Overlay</a>.</div>
+                </div>
+                            <a name="configWidth"></a>
+                <div class="mdetail alt">
+                <h3>configWidth</i></h3>
+                <code>public function configWidth(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "width" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="configX"></a>
+                <div class="mdetail">
+                <h3>configX</i></h3>
+                <code>public function configX(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "x" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configX">Overlay</a>.</div>
+                </div>
+                            <a name="configXY"></a>
+                <div class="mdetail alt">
+                <h3>configXY</i></h3>
+                <code>public function configXY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "xy" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configXY">Overlay</a>.</div>
+                </div>
+                            <a name="configY"></a>
+                <div class="mdetail">
+                <h3>configY</i></h3>
+                <code>public function configY(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "y" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#configY">Overlay</a>.</div>
+                </div>
+                            <a name="configzIndex"></a>
+                <div class="mdetail alt">
+                <h3>configzIndex</i></h3>
+                <code>public function configzIndex(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler fired when the "zIndex" property is changed.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    Removes the Overlay element from the DOM and sets all child elements to null.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#destroy">Overlay</a>.</div>
+                </div>
+                            <a name="doCenterOnDOMEvent"></a>
+                <div class="mdetail alt">
+                <h3>doCenterOnDOMEvent</i></h3>
+                <code>public function doCenterOnDOMEvent()</code>
+                <div class="mdetail-desc">
+                    Center event handler used for centering on scroll/resize, but only if the Overlay is visible                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#doCenterOnDOMEvent">Overlay</a>.</div>
+                </div>
+                            <a name="enforceConstraints"></a>
+                <div class="mdetail">
+                <h3>enforceConstraints</i></h3>
+                <code>public function enforceConstraints(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    The default event handler executed when the moveEvent is fired, if the "constraintoviewport" is set to true.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#enforceConstraints">Overlay</a>.</div>
+                </div>
+                            <a name="hideIframe"></a>
+                <div class="mdetail alt">
+                <h3>hideIframe</i></h3>
+                <code>public function hideIframe()</code>
+                <div class="mdetail-desc">
+                    Hides the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideIframe">Overlay</a>.</div>
+                </div>
+                            <a name="hideMacGeckoScrollbars"></a>
+                <div class="mdetail">
+                <h3>hideMacGeckoScrollbars</i></h3>
+                <code>public function hideMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Adds a special CSS class to the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#hideMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="hideMask"></a>
+                <div class="mdetail alt">
+                <h3>hideMask</i></h3>
+                <code>public function hideMask()</code>
+                <div class="mdetail-desc">
+                    Hides the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail">
+                <h3>init</i></h3>
+                <code>public function init(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                    The Overlay initialization method, which is executed for Overlay and all of its subclasses. This method is automatically called by the constructor, and  sets up all DOM references for pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the Overlay <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the Overlay</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration object literal containing the configuration that should be set for this Overlay. See configuration documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail alt">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    Initializes the class's configurable properties which can be changed using the Panel's Config object (cfg).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="moveTo"></a>
+                <div class="mdetail alt">
+                <h3>moveTo</i></h3>
+                <code>public function moveTo(<code>Number x</code>, <code>Number y</code>)</code>
+                <div class="mdetail-desc">
+                    Moves the Overlay to the specified position. This function is identical to calling this.cfg.setProperty("xy", [x,y]);                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">The Overlay's new x position</div></li><li><code>y</code> : Number<div class="sub-desc">The Overlay's new y position</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#moveTo">Overlay</a>.</div>
+                </div>
+                            <a name="onDomResize"></a>
+                <div class="mdetail">
+                <h3>onDomResize</i></h3>
+                <code>public function onDomResize(<code>DOMEvent e</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Event handler fired when the resize monitor element is resized.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The resize DOM event</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="registerDragDrop"></a>
+                <div class="mdetail alt">
+                <h3>registerDragDrop</i></h3>
+                <code>public function registerDragDrop()</code>
+                <div class="mdetail-desc">
+                    Registers the Panel's header for drag & drop capability.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="removeMask"></a>
+                <div class="mdetail">
+                <h3>removeMask</i></h3>
+                <code>public function removeMask()</code>
+                <div class="mdetail-desc">
+                    Removes the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail alt">
+                <h3>render</i></h3>
+                <code>public function render(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the Panel by inserting the elements that are not already in the main Panel into their correct places. Optionally appends the Panel to the specified node prior to the render's execution. NOTE: For Panels without existing markup, the appendToNode argument is REQUIRED. If this argument is ommitted and the current element is not present in the document, the function will return false, indicating that the render was a failure.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>appendToNode</code> : String<div class="sub-desc">The element id to which the Module should be appended to prior to rendering <em>OR</em></div></li><li><code>appendToNode</code> : HTMLElement<div class="sub-desc">The element to which the Module should be appended to prior to rendering</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>boolean</code><div class="sub-desc">Success or failure of the render</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="showIframe"></a>
+                <div class="mdetail">
+                <h3>showIframe</i></h3>
+                <code>public function showIframe()</code>
+                <div class="mdetail-desc">
+                    Shows the iframe shim, if it has been enabled                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showIframe">Overlay</a>.</div>
+                </div>
+                            <a name="showMacGeckoScrollbars"></a>
+                <div class="mdetail alt">
+                <h3>showMacGeckoScrollbars</i></h3>
+                <code>public function showMacGeckoScrollbars()</code>
+                <div class="mdetail-desc">
+                    Removes a special CSS class from the Overlay when Mac/Gecko is in use, to work around a Gecko bug where
+scrollbars cannot be hidden. See https://bugzilla.mozilla.org/show_bug.cgi?id=187435                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#showMacGeckoScrollbars">Overlay</a>.</div>
+                </div>
+                            <a name="showMask"></a>
+                <div class="mdetail">
+                <h3>showMask</i></h3>
+                <code>public function showMask()</code>
+                <div class="mdetail-desc">
+                    Shows the modality mask.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="sizeMask"></a>
+                <div class="mdetail alt">
+                <h3>sizeMask</i></h3>
+                <code>public function sizeMask()</code>
+                <div class="mdetail-desc">
+                    Sets the size of the modality mask to cover the entire scrollable area of the document                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="sizeUnderlay"></a>
+                <div class="mdetail">
+                <h3>sizeUnderlay</i></h3>
+                <code>public function sizeUnderlay()</code>
+                <div class="mdetail-desc">
+                    Adjusts the size of the shadow based on the size of the element.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="syncPosition"></a>
+                <div class="mdetail alt">
+                <h3>syncPosition</i></h3>
+                <code>public function syncPosition()</code>
+                <div class="mdetail-desc">
+                    Synchronizes the Panel's "xy", "x", and "y" properties with the Panel's position in the DOM. This is primarily used to update position information during drag & drop.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#syncPosition">Overlay</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a String representation of the object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the Panel.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Panel.</div>
+                </div>
+                            <a name="windowResizeHandler&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>windowResizeHandler&lt;static&gt;</i></h3>
+                <code>public function windowResizeHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window resize                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM resize event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowResizeHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                            <a name="windowScrollHandler&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>windowScrollHandler&lt;static&gt;</i></h3>
+                <code>public function windowScrollHandler&lt;static&gt;(<code>DOMEvent e</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; The DOM event handler used to fire the CustomEvent for window scroll                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM scroll event</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.Overlay.html#windowScrollHandler&lt;static&gt;">Overlay</a>.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="YAHOO.widget.Overlay.windowResizeEvent"></a>
+                <div class="mdetail">
+                <h3>YAHOO.widget.Overlay.windowResizeEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowResizeEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window resize                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowResizeEvent">Overlay</a>.</div>
+                </div>
+                            <a name="YAHOO.widget.Overlay.windowScrollEvent"></a>
+                <div class="mdetail alt">
+                <h3>YAHOO.widget.Overlay.windowScrollEvent</i></h3>
+                <code>public event YAHOO.widget.Overlay.windowScrollEvent</code>
+                <div class="mdetail-desc">
+                A singleton CustomEvent used for reacting to the DOM event for window scroll                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#YAHOO.widget.Overlay.windowScrollEvent">Overlay</a>.</div>
+                </div>
+                            <a name="beforeMoveEvent"></a>
+                <div class="mdetail">
+                <h3>beforeMoveEvent</i></h3>
+                <code>public event beforeMoveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#beforeMoveEvent">Overlay</a>.</div>
+                </div>
+                            <a name="dragEvent"></a>
+                <div class="mdetail alt">
+                <h3>dragEvent</i></h3>
+                <code>public event dragEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent when the Panel is dragged                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Panel.</div>
+                </div>
+                            <a name="hideMaskEvent"></a>
+                <div class="mdetail">
+                <h3>hideMaskEvent</i></h3>
+                <code>public event hideMaskEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the modality mask is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Panel.</div>
+                </div>
+                            <a name="moveEvent"></a>
+                <div class="mdetail alt">
+                <h3>moveEvent</i></h3>
+                <code>public event moveEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Overlay is moved.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>x</code> : Number<div class="sub-desc">x coordinate</div></li><li><code>y</code> : Number<div class="sub-desc">y coordinate</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.Overlay.html#moveEvent">Overlay</a>.</div>
+                </div>
+                            <a name="showMaskEvent"></a>
+                <div class="mdetail">
+                <h3>showMaskEvent</i></h3>
+                <code>public event showMaskEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the modality mask is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Panel.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

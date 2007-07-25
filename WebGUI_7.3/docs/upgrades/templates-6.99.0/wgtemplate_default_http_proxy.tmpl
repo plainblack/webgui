@@ -1,0 +1,37 @@
+#PBtmpl0000000000000033
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description>
+	<p />
+</tmpl_if>
+
+<tmpl_if search.for>
+	<tmpl_if content>
+		<!-- Display search string. Remove if unwanted -->
+		<tmpl_var search.for>
+	<tmpl_else>
+		<!-- Error: Starting point not found -->
+		<b>Error: Search string <i><tmpl_var search.for></i> not found in content.</b>
+	</tmpl_if>
+</tmpl_if>
+
+<tmpl_var content>
+
+<tmpl_if stop.at>
+	<tmpl_if content.trailing>
+		<!-- Display stop search string. Remove if unwanted -->
+		<tmpl_var stop.at>
+	<tmpl_else>
+		<!-- Warning: End point not found -->
+		<b>Warning: Ending search point <i><tmpl_var stop.at></i> not found in content.</b>
+	</tmpl_if>
+</tmpl_if>

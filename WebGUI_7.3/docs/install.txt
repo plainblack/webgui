@@ -1,0 +1,70 @@
+##################################################################
+#              Quick And Dirty Install Instructions              #
+##################################################################
+
+The following is a rough overview of how to install WebGUI. For
+more detailed instructions read the WebGUI installation 
+documentation.
+   
+  http://wiki.webgui.org/installation-options
+
+QnD INSTALL INSTRUCTIONS:
+
+1. Install Perl 5.8 or higher.
+
+2. Install Apache 2.0 with mod_perl 2.0 and set up your config. Add the
+following directives to mod_perl (See WebGUI Done Right for more detail.)
+
+LoadModule apreq_module modules/mod_apreq2.so
+LoadModule perl_module modules/mod_perl.so
+PerlSetVar WebguiRoot /data/WebGUI
+PerlCleanupHandler Apache2::SizeLimit
+PerlRequire /data/WebGUI/sbin/preload.perl
+
+<VirtualHost *:80>
+        ServerName www.example.com 
+        ServerAlias example.com
+        DocumentRoot /data/domains/example.com/www/public
+        SetHandler perl-script
+        PerlInitHandler WebGUI
+        PerlSetVar WebguiConfig www.example.com.conf
+</VirtualHost>
+
+3. Install MySQL 5.0.10 or higher.
+
+4. Install Image Magick 6.0 or higher.
+
+5. Extract WebGUI into your webroot.
+
+6. Start MySQL.
+
+7. Run the following Database commands. (You should modify the
+   commands to match your database, username, and password.)
+
+   mysql -e "create database WebGUI"
+   mysql -e "grant all privileges on WebGUI.* to webgui@localhost identified by 'password'"
+   mysql -e "flush privileges"
+   mysql -uwebgui -ppassword WebGUI < docs/create.sql
+
+8. Edit "etc/WebGUI.conf" to match your DB settings and log directory.
+
+9. Edit "etc/spectre.conf" to define port and worker settings for spectre
+
+10. Run the following command from your WebGUI/sbin directory to install
+   the required perl modules and determine whether you've configured 
+   your system correctly.
+
+   perl testEnvironment.pl
+
+   If it returns all "OK" then you're done. 
+
+11. Start Apache.
+
+12. Start Spectre.
+
+	cd /data/WebGUI/sbin
+	perl spectre.pl --daemon
+
+13. Browse to your site. You'll be guided through a few quick questions
+   to setup an admin account.
+

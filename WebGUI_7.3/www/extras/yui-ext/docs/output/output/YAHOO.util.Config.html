@@ -1,0 +1,1575 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.util.Config</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.util.Config.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.util.Config</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.util</td></tr>
+            <tr><td class="label">Class:</td><td>Config</td></tr>
+                        <tr><td class="label">Extends:</td><td>Object</td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="container_core.js.html">container_core.js</a></td></tr>
+        </table>
+        <div class="description">
+            Config is a utility used within an Object to allow the implementer to maintain a list of local configuration properties and listen for changes to those properties dynamically using CustomEvent. The initial values are also maintained so that the configuration can be reset at any given point to its initial state.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_BODY&lt;static&gt;">CSS_BODY&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the module body</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_FOOTER&lt;static&gt;">CSS_FOOTER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the module footer</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_HEADER&lt;static&gt;">CSS_HEADER&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the module header</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_MODULE&lt;static&gt;">CSS_MODULE&lt;static&gt;</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant for the default CSS class name that represents a Module</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#body">body</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The body element, denoted with CSS class "bd"</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#browser">browser</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">String representing the current user-agent browser</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#cfg">cfg</a> : YAHOO.util.Config</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The Module's Config object used for monitoring configuration properties.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#contructor">contructor</a> : Function</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The class's constructor function</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#element">element</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The main module element that contains the header, body, and footer</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#footer">footer</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The footer element, denoted with CSS class "ft"</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#header">header</a> : HTMLElement</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The header element, denoted with CSS class "hd"</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#http">http</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">&lt;static&gt; Constant representing the prefix path to use for non-secure images</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#https">https</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the prefix path to use for securely served images</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#id">id</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The id of the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#imageRoot">imageRoot</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The String representing the image root</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isSecure">isSecure</a> : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Boolean representing whether or not the current browsing context is secure (https)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#javascript">javascript</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Constant representing the url for the "src" attribute of the iframe used to monitor changes to the bro...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#owner">owner</a> : Object</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Object reference to the owner of this Config Object</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#platform">platform</a> : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">String representing the current user-agent platform</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queueInProgress">queueInProgress</a> : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Boolean flag that specifies whether a queue is currently being executed</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Config">Config</a>(<code>Object owner</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addProperty">addProperty</a>(<code>String key</code>, <code>Object propertyObject</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Adds a property to the Config Object's private config hash.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#alreadySubscribed&lt;static&gt;">alreadySubscribed&lt;static&gt;</a>(<code>YAHOO.util.CustomEvent evt</code>, <code>Function fn</code>, <code>Object obj</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">&lt;static&gt; Checks to determine if a particular function/Object pair are already subscribed to the specified Custo...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToBody">appendToBody</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends the passed element to the body. If no body is present, one will be automatically created.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToFooter">appendToFooter</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends the passed element to the footer. If no footer is present, one will be automatically created.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendToHeader">appendToHeader</a>(<code>HTMLElement element</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends the passed element to the header. If no header is present, one will be automatically created.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#applyConfig">applyConfig</a>(<code>Object userConfig</code>, <code>Boolean init</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Applies a key-value Object literal to the configuration, replacing any existing values, and queueing the property eve...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#checkBoolean">checkBoolean</a>(<code>Object val</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Validates that the value passed in is a Boolean.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#checkNumber">checkNumber</a>(<code>Object val</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Validates that the value passed in is a number.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configMonitorResize">configMonitorResize</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Default event handler for the "monitorresize" configuration property</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configVisible">configVisible</a>(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Default event handler for changing the visibility property of a Module. By default, this is achieved by switching the...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes the Module element from the DOM and sets all child elements to null.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fireQueue">fireQueue</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires the normalized list of queued property change events</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getConfig">getConfig</a>() : Object</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a key-value configuration map of the values currently set in the Config Object.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getProperty">getProperty</a>(<code>String key</code>) : Object</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the value of specified property.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hide">hide</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the Module element by setting the visible configuration property to false. Also fires two events: beforeHideEve...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The Module class's initialization method, which is executed for Module and all of its subclasses. This method is auto...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvents">initEvents</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initResizeMonitor">initResizeMonitor</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Initialized an empty IFRAME that is placed out of the visible area that can be used to detect text resize.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#onDomResize">onDomResize</a>(<code>DOMEvent e</code>, <code>Object obj</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Event handler fired when the resize monitor element is resized.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#outputEventQueue">outputEventQueue</a>() : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a string representation of the Config object's current CustomEvent queue</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#queueProperty">queueProperty</a>(<code>String key</code>, <code>String value</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the value of a property and queues its event to execute. If the event is already scheduled to execute, it is
+mov...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#refireEvent">refireEvent</a>(<code>String key</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires the event for a property using the property's current value.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#refresh">refresh</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Refires the events for all configuration properties using their current values.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#render">render</a>(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>, <code>HTMLElement moduleElement</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Renders the Module by inserting the elements that are not already in the main Module into their correct places. Optio...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resetProperty">resetProperty</a>(<code>String key</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Resets the specified property's value to its initial value.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setBody">setBody</a>(<code>String bodyContent</code>, <code>HTMLElement bodyContent</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the Module's body content to the HTML specified, or appends the passed element to the body. If no body is presen...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setFooter">setFooter</a>(<code>String footerContent</code>, <code>HTMLElement footerContent</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the Module's footer content to the HTML specified, or appends the passed element to the footer. If no footer is ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setHeader">setHeader</a>(<code>String headerContent</code>, <code>HTMLElement headerContent</code>) : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Sets the Module's header content to the HTML specified, or appends the passed element to the header. If no header is ...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setProperty">setProperty</a>(<code>String key</code>, <code>String value</code>, <code>Boolean silent</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Sets the value of a property. If the silent property is passed as true, the property's event will not be fired.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#show">show</a>() : void</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Shows the Module element by setting the visible configuration property to true. Also fires two events: beforeShowEven...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#subscribeToConfigEvent">subscribeToConfigEvent</a>(<code>String key</code>, <code>Function handler</code>, <code>Object obj</code>, <code>Boolean override</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Subscribes an external handler to the change event for any given property.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns a String representation of the Object.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unsubscribeFromConfigEvent">unsubscribeFromConfigEvent</a>(<code>String key</code>, <code>Function handler</code>, <code>Object obj</code>) : Boolean</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Unsubscribes an external handler from the change event for any given property.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#appendEvent">appendEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the Module is appended to the DOM</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeHideEvent">beforeHideEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired before the Module is hidden</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeInitEvent">beforeInitEvent</a> : (<code>class classRef</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired prior to class initalization.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeRenderEvent">beforeRenderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired before the Module is rendered</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beforeShowEvent">beforeShowEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired before the Module is shown</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changeBodyEvent">changeBodyEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired when the body content of the Module is modified</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changeContentEvent">changeContentEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the content of the Module is modified</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changeFooterEvent">changeFooterEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired when the footer content of the Module is modified</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#changeHeaderEvent">changeHeaderEvent</a> : (<code>String/HTMLElement content</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the header content of the Module is modified</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configChangedEvent">configChangedEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Object reference to the owner of this Config Object</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroyEvent">destroyEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired when the Module is destroyed</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideEvent">hideEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the Module is hidden</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initEvent">initEvent</a> : (<code>class classRef</code>)</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after class initalization.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#renderEvent">renderEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">CustomEvent fired after the Module is rendered</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#showEvent">showEvent</a> : ()</td>
+        <td class="msource" rowspan="2">Config</td>
+    </tr>
+    <tr>
+        <td class="mdesc">CustomEvent fired after the Module is shown</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="CSS_BODY&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_BODY&lt;static&gt;</i></h3>
+                <code>public String CSS_BODY&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module body                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="CSS_FOOTER&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_FOOTER&lt;static&gt;</i></h3>
+                <code>public String CSS_FOOTER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module footer                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="CSS_HEADER&lt;static&gt;"></a>
+                <div class="mdetail">
+                <h3>CSS_HEADER&lt;static&gt;</i></h3>
+                <code>public String CSS_HEADER&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the module header                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="CSS_MODULE&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>CSS_MODULE&lt;static&gt;</i></h3>
+                <code>public String CSS_MODULE&lt;static&gt;</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant for the default CSS class name that represents a Module                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="body"></a>
+                <div class="mdetail">
+                <h3>body</i></h3>
+                <code>public HTMLElement body</code>
+                <div class="mdetail-desc">
+                    The body element, denoted with CSS class "bd"                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="browser"></a>
+                <div class="mdetail alt">
+                <h3>browser</i></h3>
+                <code>public String browser</code>
+                <div class="mdetail-desc">
+                    String representing the current user-agent browser                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="cfg"></a>
+                <div class="mdetail">
+                <h3>cfg</i></h3>
+                <code>public YAHOO.util.Config cfg</code>
+                <div class="mdetail-desc">
+                    The Module's Config object used for monitoring configuration properties.                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="contructor"></a>
+                <div class="mdetail alt">
+                <h3>contructor</i></h3>
+                <code>public Function contructor</code>
+                <div class="mdetail-desc">
+                    The class's constructor function                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="element"></a>
+                <div class="mdetail">
+                <h3>element</i></h3>
+                <code>public HTMLElement element</code>
+                <div class="mdetail-desc">
+                    The main module element that contains the header, body, and footer                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="footer"></a>
+                <div class="mdetail alt">
+                <h3>footer</i></h3>
+                <code>public HTMLElement footer</code>
+                <div class="mdetail-desc">
+                    The footer element, denoted with CSS class "ft"                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="header"></a>
+                <div class="mdetail">
+                <h3>header</i></h3>
+                <code>public HTMLElement header</code>
+                <div class="mdetail-desc">
+                    The header element, denoted with CSS class "hd"                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="http"></a>
+                <div class="mdetail alt">
+                <h3>http</i></h3>
+                <code>public String http</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the prefix path to use for non-secure images                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="https"></a>
+                <div class="mdetail">
+                <h3>https</i></h3>
+                <code>public String https</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the prefix path to use for securely served images                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="id"></a>
+                <div class="mdetail alt">
+                <h3>id</i></h3>
+                <code>public String id</code>
+                <div class="mdetail-desc">
+                    The id of the element                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="imageRoot"></a>
+                <div class="mdetail">
+                <h3>imageRoot</i></h3>
+                <code>public String imageRoot</code>
+                <div class="mdetail-desc">
+                    The String representing the image root                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="isSecure"></a>
+                <div class="mdetail alt">
+                <h3>isSecure</i></h3>
+                <code>public Boolean isSecure</code>
+                <div class="mdetail-desc">
+                    Boolean representing whether or not the current browsing context is secure (https)                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="javascript"></a>
+                <div class="mdetail">
+                <h3>javascript</i></h3>
+                <code>public String javascript</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Constant representing the url for the "src" attribute of the iframe used to monitor changes to the browser's base font size                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="owner"></a>
+                <div class="mdetail alt">
+                <h3>owner</i></h3>
+                <code>public Object owner</code>
+                <div class="mdetail-desc">
+                    Object reference to the owner of this Config Object                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="platform"></a>
+                <div class="mdetail">
+                <h3>platform</i></h3>
+                <code>public String platform</code>
+                <div class="mdetail-desc">
+                    String representing the current user-agent platform                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                            <a name="queueInProgress"></a>
+                <div class="mdetail alt">
+                <h3>queueInProgress</i></h3>
+                <code>public Boolean queueInProgress</code>
+                <div class="mdetail-desc">
+                    Boolean flag that specifies whether a queue is currently being executed                </div>
+                <div class="mdetail-def">This property is defined by Config.</div>
+                </div>
+                        </div>
+                
+                    <a name="Config"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Config</i></h3>
+                <code>public function Config(<code>Object owner</code>)</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>owner</code> : Object<div class="sub-desc">The owner Object to which this Config Object belongs</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addProperty"></a>
+                <div class="mdetail">
+                <h3>addProperty</i></h3>
+                <code>public function addProperty(<code>String key</code>, <code>Object propertyObject</code>)</code>
+                <div class="mdetail-desc">
+                    Adds a property to the Config Object's private config hash.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The configuration property's name</div></li><li><code>propertyObject</code> : Object<div class="sub-desc">The Object containing all of this property's arguments</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="alreadySubscribed&lt;static&gt;"></a>
+                <div class="mdetail alt">
+                <h3>alreadySubscribed&lt;static&gt;</i></h3>
+                <code>public function alreadySubscribed&lt;static&gt;(<code>YAHOO.util.CustomEvent evt</code>, <code>Function fn</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    &lt;static&gt; Checks to determine if a particular function/Object pair are already subscribed to the specified CustomEvent                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>evt</code> : YAHOO.util.CustomEvent<div class="sub-desc">The CustomEvent for which to check the subscriptions</div></li><li><code>fn</code> : Function<div class="sub-desc">The function to look for in the subscribers list</div></li><li><code>obj</code> : Object<div class="sub-desc">The execution scope Object for the subscription</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true, if the function/Object pair is already subscribed to the CustomEvent passed in</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="appendToBody"></a>
+                <div class="mdetail">
+                <h3>appendToBody</i></h3>
+                <code>public function appendToBody(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the body. If no body is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the body</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="appendToFooter"></a>
+                <div class="mdetail alt">
+                <h3>appendToFooter</i></h3>
+                <code>public function appendToFooter(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the footer. If no footer is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the footer</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="appendToHeader"></a>
+                <div class="mdetail">
+                <h3>appendToHeader</i></h3>
+                <code>public function appendToHeader(<code>HTMLElement element</code>)</code>
+                <div class="mdetail-desc">
+                    Appends the passed element to the header. If no header is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>element</code> : HTMLElement<div class="sub-desc">The element to append to the header</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="applyConfig"></a>
+                <div class="mdetail alt">
+                <h3>applyConfig</i></h3>
+                <code>public function applyConfig(<code>Object userConfig</code>, <code>Boolean init</code>)</code>
+                <div class="mdetail-desc">
+                    Applies a key-value Object literal to the configuration, replacing any existing values, and queueing the property events.
+Although the values will be set, fireQueue() must be called for their associated events to execute.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>userConfig</code> : Object<div class="sub-desc">The configuration Object literal</div></li><li><code>init</code> : Boolean<div class="sub-desc">When set to true, the initialConfig will be set to the userConfig passed in, so that calling a reset will reset the properties to the passed values.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="checkBoolean"></a>
+                <div class="mdetail">
+                <h3>checkBoolean</i></h3>
+                <code>public function checkBoolean(<code>Object val</code>)</code>
+                <div class="mdetail-desc">
+                    Validates that the value passed in is a Boolean.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>val</code> : Object<div class="sub-desc">The value to validate</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true, if the value is valid</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="checkNumber"></a>
+                <div class="mdetail alt">
+                <h3>checkNumber</i></h3>
+                <code>public function checkNumber(<code>Object val</code>)</code>
+                <div class="mdetail-desc">
+                    Validates that the value passed in is a number.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>val</code> : Object<div class="sub-desc">The value to validate</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true, if the value is valid</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="configMonitorResize"></a>
+                <div class="mdetail">
+                <h3>configMonitorResize</i></h3>
+                <code>public function configMonitorResize(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Default event handler for the "monitorresize" configuration property                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="configVisible"></a>
+                <div class="mdetail alt">
+                <h3>configVisible</i></h3>
+                <code>public function configVisible(<code>String type</code>, <code>Object[] args</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Default event handler for changing the visibility property of a Module. By default, this is achieved by switching the "display" style between "block" and "none".
+This method is responsible for firing showEvent and hideEvent.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>type</code> : String<div class="sub-desc">The CustomEvent type (usually the property name)</div></li><li><code>args</code> : Object[]<div class="sub-desc">The CustomEvent arguments. For configuration handlers, args[0] will equal the newly applied value for the property.</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object. For configuration handlers, this will usually equal the owner.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    Removes the Module element from the DOM and sets all child elements to null.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="fireQueue"></a>
+                <div class="mdetail alt">
+                <h3>fireQueue</i></h3>
+                <code>public function fireQueue()</code>
+                <div class="mdetail-desc">
+                    Fires the normalized list of queued property change events                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="getConfig"></a>
+                <div class="mdetail">
+                <h3>getConfig</i></h3>
+                <code>public function getConfig()</code>
+                <div class="mdetail-desc">
+                    Returns a key-value configuration map of the values currently set in the Config Object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object</code><div class="sub-desc">The current config, represented in a key-value map</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="getProperty"></a>
+                <div class="mdetail alt">
+                <h3>getProperty</i></h3>
+                <code>public function getProperty(<code>String key</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the value of specified property.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The name of the property</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Object</code><div class="sub-desc">The value of the specified property</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="hide"></a>
+                <div class="mdetail">
+                <h3>hide</i></h3>
+                <code>public function hide()</code>
+                <div class="mdetail-desc">
+                    Hides the Module element by setting the visible configuration property to false. Also fires two events: beforeHideEvent prior to the visibility change, and hideEvent after.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String el</code>, <code>HTMLElement el</code>, <code>Object userConfig</code>)</code>
+                <div class="mdetail-desc">
+                    The Module class's initialization method, which is executed for Module and all of its subclasses. This method is automatically called by the constructor, and  sets up all DOM references for pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String<div class="sub-desc">The element ID representing the Module <em>OR</em></div></li><li><code>el</code> : HTMLElement<div class="sub-desc">The element representing the Module</div></li><li><code>userConfig</code> : Object<div class="sub-desc">The configuration Object literal containing the configuration that should be set for this module. See configuration documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="initEvents"></a>
+                <div class="mdetail alt">
+                <h3>initEvents</i></h3>
+                <code>public function initEvents()</code>
+                <div class="mdetail-desc">
+                    Initializes the custom events for Module which are fired automatically at appropriate times by the Module class.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="initResizeMonitor"></a>
+                <div class="mdetail">
+                <h3>initResizeMonitor</i></h3>
+                <code>public function initResizeMonitor()</code>
+                <div class="mdetail-desc">
+                    Initialized an empty IFRAME that is placed out of the visible area that can be used to detect text resize.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="onDomResize"></a>
+                <div class="mdetail alt">
+                <h3>onDomResize</i></h3>
+                <code>public function onDomResize(<code>DOMEvent e</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Event handler fired when the resize monitor element is resized.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>e</code> : DOMEvent<div class="sub-desc">The DOM resize event</div></li><li><code>obj</code> : Object<div class="sub-desc">The scope object passed to the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="outputEventQueue"></a>
+                <div class="mdetail">
+                <h3>outputEventQueue</i></h3>
+                <code>public function outputEventQueue()</code>
+                <div class="mdetail-desc">
+                    Returns a string representation of the Config object's current CustomEvent queue                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string list of CustomEvents currently queued for execution</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="queueProperty"></a>
+                <div class="mdetail alt">
+                <h3>queueProperty</i></h3>
+                <code>public function queueProperty(<code>String key</code>, <code>String value</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the value of a property and queues its event to execute. If the event is already scheduled to execute, it is
+moved from its current position to the end of the queue.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The name of the property</div></li><li><code>value</code> : String<div class="sub-desc">The value to set the property to</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">true, if the set was successful, false if it failed.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="refireEvent"></a>
+                <div class="mdetail">
+                <h3>refireEvent</i></h3>
+                <code>public function refireEvent(<code>String key</code>)</code>
+                <div class="mdetail-desc">
+                    Fires the event for a property using the property's current value.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The name of the property</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="refresh"></a>
+                <div class="mdetail alt">
+                <h3>refresh</i></h3>
+                <code>public function refresh()</code>
+                <div class="mdetail-desc">
+                    Refires the events for all configuration properties using their current values.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="render"></a>
+                <div class="mdetail">
+                <h3>render</i></h3>
+                <code>public function render(<code>String appendToNode</code>, <code>HTMLElement appendToNode</code>, <code>HTMLElement moduleElement</code>)</code>
+                <div class="mdetail-desc">
+                    Renders the Module by inserting the elements that are not already in the main Module into their correct places. Optionally appends the Module to the specified node prior to the render's execution. NOTE: For Modules without existing markup, the appendToNode argument is REQUIRED. If this argument is ommitted and the current element is not present in the document, the function will return false, indicating that the render was a failure.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>appendToNode</code> : String<div class="sub-desc">The element id to which the Module should be appended to prior to rendering <em>OR</em></div></li><li><code>appendToNode</code> : HTMLElement<div class="sub-desc">The element to which the Module should be appended to prior to rendering</div></li><li><code>moduleElement</code> : HTMLElement<div class="sub-desc">OPTIONAL. The element that represents the actual Standard Module container.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">Success or failure of the render</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="resetProperty"></a>
+                <div class="mdetail alt">
+                <h3>resetProperty</i></h3>
+                <code>public function resetProperty(<code>String key</code>)</code>
+                <div class="mdetail-desc">
+                    Resets the specified property's value to its initial value.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The name of the property</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True is the property was reset, false if not</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="setBody"></a>
+                <div class="mdetail">
+                <h3>setBody</i></h3>
+                <code>public function setBody(<code>String bodyContent</code>, <code>HTMLElement bodyContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's body content to the HTML specified, or appends the passed element to the body. If no body is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>bodyContent</code> : String<div class="sub-desc">The HTML used to set the body <em>OR</em></div></li><li><code>bodyContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the body</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="setFooter"></a>
+                <div class="mdetail alt">
+                <h3>setFooter</i></h3>
+                <code>public function setFooter(<code>String footerContent</code>, <code>HTMLElement footerContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's footer content to the HTML specified, or appends the passed element to the footer. If no footer is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>footerContent</code> : String<div class="sub-desc">The HTML used to set the footer <em>OR</em></div></li><li><code>footerContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the footer</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="setHeader"></a>
+                <div class="mdetail">
+                <h3>setHeader</i></h3>
+                <code>public function setHeader(<code>String headerContent</code>, <code>HTMLElement headerContent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the Module's header content to the HTML specified, or appends the passed element to the header. If no header is present, one will be automatically created.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>headerContent</code> : String<div class="sub-desc">The HTML used to set the header <em>OR</em></div></li><li><code>headerContent</code> : HTMLElement<div class="sub-desc">The HTMLElement to append to the header</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="setProperty"></a>
+                <div class="mdetail alt">
+                <h3>setProperty</i></h3>
+                <code>public function setProperty(<code>String key</code>, <code>String value</code>, <code>Boolean silent</code>)</code>
+                <div class="mdetail-desc">
+                    Sets the value of a property. If the silent property is passed as true, the property's event will not be fired.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The name of the property</div></li><li><code>value</code> : String<div class="sub-desc">The value to set the property to</div></li><li><code>silent</code> : Boolean<div class="sub-desc">Whether the value should be set silently, without firing the property event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True, if the set was successful, false if it failed.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="show"></a>
+                <div class="mdetail">
+                <h3>show</i></h3>
+                <code>public function show()</code>
+                <div class="mdetail-desc">
+                    Shows the Module element by setting the visible configuration property to true. Also fires two events: beforeShowEvent prior to the visibility change, and showEvent after.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="subscribeToConfigEvent"></a>
+                <div class="mdetail alt">
+                <h3>subscribeToConfigEvent</i></h3>
+                <code>public function subscribeToConfigEvent(<code>String key</code>, <code>Function handler</code>, <code>Object obj</code>, <code>Boolean override</code>)</code>
+                <div class="mdetail-desc">
+                    Subscribes an external handler to the change event for any given property.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The property name</div></li><li><code>handler</code> : Function<div class="sub-desc">The handler function to use subscribe to the property's event</div></li><li><code>obj</code> : Object<div class="sub-desc">The Object to use for scoping the event handler (see CustomEvent documentation)</div></li><li><code>override</code> : Boolean<div class="sub-desc">Optional. If true, will override "this" within the handler to map to the scope Object passed into the method.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True, if the subscription was successful, otherwise false.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    Returns a String representation of the Object.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code><div class="sub-desc">The string representation of the Module</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                            <a name="unsubscribeFromConfigEvent"></a>
+                <div class="mdetail alt">
+                <h3>unsubscribeFromConfigEvent</i></h3>
+                <code>public function unsubscribeFromConfigEvent(<code>String key</code>, <code>Function handler</code>, <code>Object obj</code>)</code>
+                <div class="mdetail-desc">
+                    Unsubscribes an external handler from the change event for any given property.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>key</code> : String<div class="sub-desc">The property name</div></li><li><code>handler</code> : Function<div class="sub-desc">The handler function to use subscribe to the property's event</div></li><li><code>obj</code> : Object<div class="sub-desc">The Object to use for scoping the event handler (see CustomEvent documentation)</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">True, if the unsubscription was successful, otherwise false.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Config.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="appendEvent"></a>
+                <div class="mdetail">
+                <h3>appendEvent</i></h3>
+                <code>public event appendEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the Module is appended to the DOM                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="beforeHideEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeHideEvent</i></h3>
+                <code>public event beforeHideEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="beforeInitEvent"></a>
+                <div class="mdetail">
+                <h3>beforeInitEvent</i></h3>
+                <code>public event beforeInitEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired prior to class initalization.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>classRef</code> : class<div class="sub-desc">class reference of the initializing class, such as this.beforeInitEvent.fire(YAHOO.widget.Module)</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="beforeRenderEvent"></a>
+                <div class="mdetail alt">
+                <h3>beforeRenderEvent</i></h3>
+                <code>public event beforeRenderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="beforeShowEvent"></a>
+                <div class="mdetail">
+                <h3>beforeShowEvent</i></h3>
+                <code>public event beforeShowEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired before the Module is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="changeBodyEvent"></a>
+                <div class="mdetail alt">
+                <h3>changeBodyEvent</i></h3>
+                <code>public event changeBodyEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the body content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new body content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="changeContentEvent"></a>
+                <div class="mdetail">
+                <h3>changeContentEvent</i></h3>
+                <code>public event changeContentEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="changeFooterEvent"></a>
+                <div class="mdetail alt">
+                <h3>changeFooterEvent</i></h3>
+                <code>public event changeFooterEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the footer content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new footer content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="changeHeaderEvent"></a>
+                <div class="mdetail">
+                <h3>changeHeaderEvent</i></h3>
+                <code>public event changeHeaderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the header content of the Module is modified                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>content</code> : String/HTMLElement<div class="sub-desc">String/element representing the new header content</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="configChangedEvent"></a>
+                <div class="mdetail alt">
+                <h3>configChangedEvent</i></h3>
+                <code>public event configChangedEvent</code>
+                <div class="mdetail-desc">
+                Object reference to the owner of this Config Object                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="destroyEvent"></a>
+                <div class="mdetail">
+                <h3>destroyEvent</i></h3>
+                <code>public event destroyEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired when the Module is destroyed                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="hideEvent"></a>
+                <div class="mdetail alt">
+                <h3>hideEvent</i></h3>
+                <code>public event hideEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is hidden                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="initEvent"></a>
+                <div class="mdetail">
+                <h3>initEvent</i></h3>
+                <code>public event initEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after class initalization.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>classRef</code> : class<div class="sub-desc">class reference of the initializing class, such as this.beforeInitEvent.fire(YAHOO.widget.Module)</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="renderEvent"></a>
+                <div class="mdetail alt">
+                <h3>renderEvent</i></h3>
+                <code>public event renderEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is rendered                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                            <a name="showEvent"></a>
+                <div class="mdetail">
+                <h3>showEvent</i></h3>
+                <code>public event showEvent</code>
+                <div class="mdetail-desc">
+                CustomEvent fired after the Module is shown                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Config.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

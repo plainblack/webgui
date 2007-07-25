@@ -1,0 +1,740 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.Resizable</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.Resizable.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.Resizable</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext</td></tr>
+            <tr><td class="label">Class:</td><td>Resizable</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.ext.util.Observable.html">Observable</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="Resizable.js.html">Resizable.js</a></td></tr>
+        </table>
+        <div class="description">
+            <p>Applies drag handles to an element to make it resizable. The drag handles are inserted into the element 
+and positioned absolute. Some elements, such as a textarea or image, don't support this. To overcome that, you can wrap
+the textarea in a div and set "resizeChild" to true (or the id of the textarea), <b>or</b> set wrap:true in your config and
+the element will be wrapped for you automatically.</p><br/>
+Here's a Resizable with every possible config option and it's default value:
+<pre><code>
+var resizer = new YAHOO.ext.Resizable('element-id', {
+    resizeChild : false,
+    adjustments : [0, 0],
+    minWidth : 5,
+    minHeight : 5,
+    maxWidth : 10000,
+    maxHeight : 10000,
+    enabled : true,
+    wrap: false, // true to wrap the element
+    width: null, // initial size
+    height: null, // initial size
+    animate : false,
+    duration : .35,
+    dynamic : false,
+    handles : false,
+    multiDirectional : false,
+    disableTrackOver : false,
+    easing : YAHOO.util.Easing ? YAHOO.util.Easing.easeOutStrong : null,
+    widthIncrement : 0,
+    heightIncrement : 0,
+    pinned : false,
+    width : null,
+    height : null,
+    preserveRatio : false,
+    transparent: false,
+    minX: 0,
+    minY: 0,
+    draggable: false
+});
+resizer.on('resize', myHandler);
+</code></pre>
+<p>
+To hide a particular handle, set it's display to none in CSS, or through script:<br>
+resizer.east.setDisplayed(false);
+</p>        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#adjustments">adjustments</a> : Array/String</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">String "auto" or an array [width, height] with values to be <b>added</b> to the resize operation's new size.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#animate">animate</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">True to animate the resize (not compatible with dynamic sizing)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#disableTrackOver">disableTrackOver</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">true to disable mouse tracking. This is only applied at config time.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#draggable">draggable</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">convenience to initialize drag drop.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#duration">duration</a> : Float</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Animation duration</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#dynamic">dynamic</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">True to resize the element while dragging instead of using a proxy</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#easing">easing</a> : YAHOO.util.Easing</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Animation easing</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enabled">enabled</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">false to disable resizing</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#handles">handles</a> : String</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">String consisting of the resize handles to display. Valid handles are 
+n (north), s (south) e (east), w (west), ne (n...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#height">height</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The initial height for the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#heightIncrement">heightIncrement</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The increment to snap the height resize in pixels (dynamic must be true)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#maxHeight">maxHeight</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The maximum height for the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#maxWidth">maxWidth</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The maximum width for the element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minHeight">minHeight</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The minimum height for the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minWidth">minWidth</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The minimum width for the element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minX">minX</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The minimum allowed page X for the element (only used for west resizing, defaults to 0)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minY">minY</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The minimum allowed page Y for the element (only used for north resizing, defaults to 0)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#pinned">pinned</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">true to pin the resize handles. This is only applied at config time.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#preserveRatio">preserveRatio</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">true to preserve the initial size ratio.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resizeChild">resizeChild</a> : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">True to resizeSize the first child or id/element to resize</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#transparent">transparent</a> : Boolean</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">true for transparent handles. This is only applied at config time.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#width">width</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The initial width for the element</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#widthIncrement">widthIncrement</a> : Number</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The increment to snap the width resize in pixels (dynamic must be true)</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#Resizable">Resizable</a>(<code>String/HTMLElement/YAHOO.ext.Element el</code>, <code>Object config</code>)</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Create a new resizable component</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addListener">addListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>boolean override</code>]</span>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#addListener">Observable</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends an event handler to this element</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#delayedListener">delayedListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>Number delay</code>]</span>) : Function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#delayedListener">Observable</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends an event handler to this element that is delayed the specified number of milliseconds.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fireEvent">fireEvent</a>(<code>String eventName</code>, <code>Object... args</code>) : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#fireEvent">Observable</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires the specified event with the passed parameters (minus the event name).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getEl">getEl</a>() : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the element this component is bound to.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getResizeChild">getResizeChild</a>() : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Returns the resizeChild element (or null).</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#purgeListeners">purgeListeners</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#purgeListeners">Observable</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes all listeners for this object</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeListener">removeListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#removeListener">Observable</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes a listener</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resizeTo">resizeTo</a>(<code>Number width</code>, <code>Number height</code>) : void</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Perform a manual resize</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforeresize">beforeresize</a> : (<code>YAHOO.ext.Resizable this</code>, <code>YAHOO.ext.EventObject e</code>)</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fired before resize is allowed. Set enabled to false to cancel resize.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-resize">resize</a> : (<code>YAHOO.ext.Resizable this</code>, <code>Number width</code>, <code>Number height</code>, <code>YAHOO.ext.EventObject e</code>)</td>
+        <td class="msource" rowspan="2">Resizable</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fired after a resize.</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="adjustments"></a>
+                <div class="mdetail">
+                <h3>adjustments</i></h3>
+                <code>public Array/String adjustments</code>
+                <div class="mdetail-desc">
+                    String "auto" or an array [width, height] with values to be <b>added</b> to the resize operation's new size.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="animate"></a>
+                <div class="mdetail alt">
+                <h3>animate</i></h3>
+                <code>public Boolean animate</code>
+                <div class="mdetail-desc">
+                    True to animate the resize (not compatible with dynamic sizing)                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="disableTrackOver"></a>
+                <div class="mdetail">
+                <h3>disableTrackOver</i></h3>
+                <code>public Boolean disableTrackOver</code>
+                <div class="mdetail-desc">
+                    true to disable mouse tracking. This is only applied at config time.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="draggable"></a>
+                <div class="mdetail alt">
+                <h3>draggable</i></h3>
+                <code>public Boolean draggable</code>
+                <div class="mdetail-desc">
+                    convenience to initialize drag drop.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="duration"></a>
+                <div class="mdetail">
+                <h3>duration</i></h3>
+                <code>public Float duration</code>
+                <div class="mdetail-desc">
+                    Animation duration                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="dynamic"></a>
+                <div class="mdetail alt">
+                <h3>dynamic</i></h3>
+                <code>public Boolean dynamic</code>
+                <div class="mdetail-desc">
+                    True to resize the element while dragging instead of using a proxy                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="easing"></a>
+                <div class="mdetail">
+                <h3>easing</i></h3>
+                <code>public YAHOO.util.Easing easing</code>
+                <div class="mdetail-desc">
+                    Animation easing                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="enabled"></a>
+                <div class="mdetail alt">
+                <h3>enabled</i></h3>
+                <code>public Boolean enabled</code>
+                <div class="mdetail-desc">
+                    false to disable resizing                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="handles"></a>
+                <div class="mdetail">
+                <h3>handles</i></h3>
+                <code>public String handles</code>
+                <div class="mdetail-desc">
+                    String consisting of the resize handles to display. Valid handles are 
+n (north), s (south) e (east), w (west), ne (northeast), nw (northwest), se (southeast), sw (southwest) 
+and all (which applies them all). If this is blank it defaults to "e,s,se". Handles can be delimited using
+a space, comma or semi-colon. This is only applied at config time.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="height"></a>
+                <div class="mdetail alt">
+                <h3>height</i></h3>
+                <code>public Number height</code>
+                <div class="mdetail-desc">
+                    The initial height for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="heightIncrement"></a>
+                <div class="mdetail">
+                <h3>heightIncrement</i></h3>
+                <code>public Number heightIncrement</code>
+                <div class="mdetail-desc">
+                    The increment to snap the height resize in pixels (dynamic must be true)                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="maxHeight"></a>
+                <div class="mdetail alt">
+                <h3>maxHeight</i></h3>
+                <code>public Number maxHeight</code>
+                <div class="mdetail-desc">
+                    The maximum height for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="maxWidth"></a>
+                <div class="mdetail">
+                <h3>maxWidth</i></h3>
+                <code>public Number maxWidth</code>
+                <div class="mdetail-desc">
+                    The maximum width for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="minHeight"></a>
+                <div class="mdetail alt">
+                <h3>minHeight</i></h3>
+                <code>public Number minHeight</code>
+                <div class="mdetail-desc">
+                    The minimum height for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="minWidth"></a>
+                <div class="mdetail">
+                <h3>minWidth</i></h3>
+                <code>public Number minWidth</code>
+                <div class="mdetail-desc">
+                    The minimum width for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="minX"></a>
+                <div class="mdetail alt">
+                <h3>minX</i></h3>
+                <code>public Number minX</code>
+                <div class="mdetail-desc">
+                    The minimum allowed page X for the element (only used for west resizing, defaults to 0)                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="minY"></a>
+                <div class="mdetail">
+                <h3>minY</i></h3>
+                <code>public Number minY</code>
+                <div class="mdetail-desc">
+                    The minimum allowed page Y for the element (only used for north resizing, defaults to 0)                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="pinned"></a>
+                <div class="mdetail alt">
+                <h3>pinned</i></h3>
+                <code>public Boolean pinned</code>
+                <div class="mdetail-desc">
+                    true to pin the resize handles. This is only applied at config time.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="preserveRatio"></a>
+                <div class="mdetail">
+                <h3>preserveRatio</i></h3>
+                <code>public Boolean preserveRatio</code>
+                <div class="mdetail-desc">
+                    true to preserve the initial size ratio.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="resizeChild"></a>
+                <div class="mdetail alt">
+                <h3>resizeChild</i></h3>
+                <code>public YAHOO.ext.Element resizeChild</code>
+                <div class="mdetail-desc">
+                    True to resizeSize the first child or id/element to resize                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="transparent"></a>
+                <div class="mdetail">
+                <h3>transparent</i></h3>
+                <code>public Boolean transparent</code>
+                <div class="mdetail-desc">
+                    true for transparent handles. This is only applied at config time.                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="width"></a>
+                <div class="mdetail alt">
+                <h3>width</i></h3>
+                <code>public Number width</code>
+                <div class="mdetail-desc">
+                    The initial width for the element                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                            <a name="widthIncrement"></a>
+                <div class="mdetail">
+                <h3>widthIncrement</i></h3>
+                <code>public Number widthIncrement</code>
+                <div class="mdetail-desc">
+                    The increment to snap the width resize in pixels (dynamic must be true)                </div>
+                <div class="mdetail-def">This property is defined by Resizable.</div>
+                </div>
+                        </div>
+                
+                    <a name="Resizable"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>Resizable</i></h3>
+                <code>public function Resizable(<code>String/HTMLElement/YAHOO.ext.Element el</code>, <code>Object config</code>)</code>
+                <div class="mdetail-desc">
+                Create a new resizable component                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>el</code> : String/HTMLElement/YAHOO.ext.Element<div class="sub-desc">The id or element to resize</div></li><li><code>config</code> : Object<div class="sub-desc">configuration options</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="addListener"></a>
+                <div class="mdetail">
+                <h3>addListener</i></h3>
+                <code>public function addListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>boolean override</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler to this element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">(optional) If true, scope becomes the scope</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#addListener">Observable</a>.</div>
+                </div>
+                            <a name="delayedListener"></a>
+                <div class="mdetail alt">
+                <h3>delayedListener</i></h3>
+                <code>public function delayedListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>Number delay</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler to this element that is delayed the specified number of milliseconds.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li><li><code>delay</code> : Number<div class="sub-desc">(optional) The number of milliseconds to delay</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Function</code><div class="sub-desc">The wrapped function that was created (can be used to remove the listener)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#delayedListener">Observable</a>.</div>
+                </div>
+                            <a name="fireEvent"></a>
+                <div class="mdetail">
+                <h3>fireEvent</i></h3>
+                <code>public function fireEvent(<code>String eventName</code>, <code>Object... args</code>)</code>
+                <div class="mdetail-desc">
+                    Fires the specified event with the passed parameters (minus the event name).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc"></div></li><li><code>args</code> : Object...<div class="sub-desc">Variable number of parameters are passed to handlers</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">returns false if any of the handlers return false otherwise it returns true</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#fireEvent">Observable</a>.</div>
+                </div>
+                            <a name="getEl"></a>
+                <div class="mdetail alt">
+                <h3>getEl</i></h3>
+                <code>public function getEl()</code>
+                <div class="mdetail-desc">
+                    Returns the element this component is bound to.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.Element</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Resizable.</div>
+                </div>
+                            <a name="getResizeChild"></a>
+                <div class="mdetail">
+                <h3>getResizeChild</i></h3>
+                <code>public function getResizeChild()</code>
+                <div class="mdetail-desc">
+                    Returns the resizeChild element (or null).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.Element</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Resizable.</div>
+                </div>
+                            <a name="purgeListeners"></a>
+                <div class="mdetail alt">
+                <h3>purgeListeners</i></h3>
+                <code>public function purgeListeners()</code>
+                <div class="mdetail-desc">
+                    Removes all listeners for this object                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#purgeListeners">Observable</a>.</div>
+                </div>
+                            <a name="removeListener"></a>
+                <div class="mdetail">
+                <h3>removeListener</i></h3>
+                <code>public function removeListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Removes a listener                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The handler to remove</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#removeListener">Observable</a>.</div>
+                </div>
+                            <a name="resizeTo"></a>
+                <div class="mdetail alt">
+                <h3>resizeTo</i></h3>
+                <code>public function resizeTo(<code>Number width</code>, <code>Number height</code>)</code>
+                <div class="mdetail-desc">
+                    Perform a manual resize                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>width</code> : Number<div class="sub-desc"></div></li><li><code>height</code> : Number<div class="sub-desc"></div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by Resizable.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="event-beforeresize"></a>
+                <div class="mdetail">
+                <h3>beforeresize</i></h3>
+                <code>public event beforeresize</code>
+                <div class="mdetail-desc">
+                Fired before resize is allowed. Set enabled to false to cancel resize.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>this</code> : YAHOO.ext.Resizable<div class="sub-desc"></div></li><li><code>e</code> : YAHOO.ext.EventObject<div class="sub-desc">The mousedown event</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Resizable.</div>
+                </div>
+                            <a name="event-resize"></a>
+                <div class="mdetail alt">
+                <h3>resize</i></h3>
+                <code>public event resize</code>
+                <div class="mdetail-desc">
+                Fired after a resize.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>this</code> : YAHOO.ext.Resizable<div class="sub-desc"></div></li><li><code>width</code> : Number<div class="sub-desc">The new width</div></li><li><code>height</code> : Number<div class="sub-desc">The new height</div></li><li><code>e</code> : YAHOO.ext.EventObject<div class="sub-desc">The mouseup event</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by Resizable.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

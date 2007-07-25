@@ -1,0 +1,40 @@
+#GNvjCFQWjY2AF2uf0aCM8Q
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description><p />
+</tmpl_if>
+
+<h2>
+<tmpl_if channel.link>
+	<a href="<tmpl_var channel.link>"><tmpl_var channel.title></a>
+<tmpl_else>
+	<tmpl_var channel.title>
+</tmpl_if>
+</h2>
+
+<tmpl_if channel.description>
+	<tmpl_var channel.description><p />
+</tmpl_if>
+
+<tmpl_loop item_loop>
+	<b><tmpl_var title></b>
+	<tmpl_if description>
+		<br />
+		<tmpl_var description>
+	</tmpl_if>
+	<tmpl_if link>
+		<br />
+		<a href="<tmpl_var link>" style="font-size: 9px;">Read More...</a>
+	</tmpl_if>
+	<br />
+	<br />
+</tmpl_loop>

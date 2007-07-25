@@ -1,0 +1,49 @@
+.qbtd {
+	height: 20px;
+	background-image: url(/extras/wobject/WobjectProxy/hline.gif);
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.qbtdleft {
+	height: 20px;
+	background-image: url(/extras/wobject/WobjectProxy/hline.gif);
+	padding-right: 5px;
+}
+
+.qbtdright {
+	height: 20px;
+	background-image: url(/extras/wobject/WobjectProxy/vline.gif);
+	background-repeat: repeat-y;
+	align: right;
+}
+
+.qbfieldLabel {
+	text-align: left;	
+	font-size: 12px;
+	border-style: solid;
+	border-width: 1px;
+	padding-right: 4px;
+	padding-left: 4px;
+	background-color: white;
+}
+
+.qbselect {
+	height: 20px;
+	font-size: 12px;
+}
+
+.qbButton {
+	height: 20px;
+        font-size: 12px;
+	border-width: 1px;
+	-moz-border-radius: 0px;
+}
+
+.qbText {
+	background-color: white;
+	text-align: left;
+        font-size: 12px;
+
+}
+

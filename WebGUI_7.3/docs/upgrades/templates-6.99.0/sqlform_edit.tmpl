@@ -1,0 +1,33 @@
+#SQLFormEditTmpl0000001
+#create
+#title:Default SQLForm Edit template
+#menuTitle:Default SQLForm Edit template
+#url:default_sqlform_edit_template
+#namespace:SQLForm/Edit
+<a name="id<tmpl_var assetId>"></a>
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<div class="SQLForm-contentBox">
+<tmpl_if displayTitle>
+	<h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_unless isNew>
+	<a href="<tmpl_var viewHistory.url>"><tmpl_var viewHistory.label></a><br /><br />
+</tmpl_unless>
+
+<tmpl_if errorOccurred>
+	<h1>Some errors occurred</h1>
+	<ul>
+	<tmpl_loop errorLoop>
+		<li><tmpl_var error.message></li>
+	</tmpl_loop>
+	</ul>
+</tmpl_if>
+
+<tmpl_var managementLinks>
+
+<tmpl_var completeForm>
+</div>

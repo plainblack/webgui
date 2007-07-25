@@ -1,0 +1,20 @@
+#PBtmpl0000000000000018
+<table border="1" cellpadding="5" cellspacing="0">
+  <tr>
+    <th>Transaction description</th>
+    <th>Price</th>
+    <th>Status</th>
+    <th>Error</th>
+  </tr>
+<tmpl_loop resultLoop>
+  <tr>
+    <td align="left"><tmpl_var purchaseDescription></td>
+    <td align="right"><tmpl_var purchaseAmount></td>
+    <td><tmpl_var status></td>
+    <td align="left"><tmpl_var error> (<tmpl_var errorCode>)</td>
+  </tr>
+</tmpl_loop>
+</table><br />
+<br />
+
+<tmpl_var statusExplanation>

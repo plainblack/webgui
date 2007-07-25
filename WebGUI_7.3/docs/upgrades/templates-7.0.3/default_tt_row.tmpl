@@ -1,0 +1,64 @@
+#TimeTrackingTMPL000003
+<table class="timeTracking02" cellpadding="3" cellspacing="0">
+<tbody id="ttbody">
+   <tr class="tt_title" id="tt_title">
+      <td colspan="4" align="left"><tmpl_var time.report.header></td>
+	  <td colspan="2" align="right"><tmpl_var time.report.totalHours.label> <strong style="color:red;" id="totalHours"><tmpl_var time.totalHours></strong></td>
+   </tr>
+   <tr class="tt_header" id="tt_header">
+      <td width="10%"><tmpl_var time.report.date.label></td>
+	  <td width="20%"><tmpl_var time.report.project.label></td>
+	  <td width="20%"><tmpl_var time.report.task.label></td>
+	  <td width="10%"><tmpl_var time.report.hours.label></td>
+	  <td width="40%"><tmpl_var time.report.comments.label></td>
+	  <td>&#160;</td>
+   </tr>
+   <tmpl_loop time.entry.loop>
+      <tr id="<tmpl_var row.id>">
+         <td class="cell"><tmpl_var form.taskEntryId><tmpl_var form.date></td>
+         <td class="cell"><tmpl_var form.project></td>
+         <td class="cell"><tmpl_var form.task></td>
+         <td class="cell"><tmpl_var form.hours></td>
+         <td class="cell"><tmpl_var form.comments></td>
+         <td><img src="<tmpl_var extras>/delete.gif" border="0" onclick="removeRow('<tmpl_var row.id>')" style="cursor:pointer" alt="delete" /></td>
+      </tr>
+   </tmpl_loop>
+   <tr class="tt_empty" id="tt_empty">
+      <td colspan="6" style="border-top:solid gray 2px;">
+	     <table width="100%" cellpadding="2" cellspacing="0">
+			<tr>
+				<td align="left"><a href="<tmpl_var report.lastWeek.url>" class="PM_blueLink"><b>&lsaquo;</b> Last Week</a></td>
+				<td align="right"><a href="<tmpl_var report.nextWeek.url>" class="PM_blueLink">Next Week <b>&rsaquo;</b></a></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="border-bottom:solid #F0F0F0 1px;">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="width:60%;" align="left">
+					<tmpl_var time.report.complete.label><tmpl_var form.isComplete>
+				</td>
+				<td style="width:40%" align="right">
+					<input type="button" value="<tmpl_var time.add.row.label>" onclick="addRow();" /> &#160; <input type="submit" value="<tmpl_var time.save.label>" />
+				</td>			
+			</tr>
+	      </table>		
+	   </td>
+	</tr>
+ </tbody>
+</table>
+
+<tmpl_unless report.isComplete>
+<table style="display:none" id="tt_table">
+   <tbody>
+      <tr id="<tmpl_var row.id>">
+         <td class="cell"><tmpl_var form.taskEntryId><tmpl_var form.date></td>
+         <td class="cell"><tmpl_var form.project></td>
+         <td class="cell"><tmpl_var form.task></td>
+         <td class="cell"><tmpl_var form.hours></td>
+         <td class="cell"><tmpl_var form.comments></td>
+         <td><img src="<tmpl_var extras>/delete.gif" border="0" onclick="removeRow()" style="cursor:pointer" alt="delete" /></td>
+      </tr>
+   </tbody>
+</table>
+</tmpl_unless>
+~~~

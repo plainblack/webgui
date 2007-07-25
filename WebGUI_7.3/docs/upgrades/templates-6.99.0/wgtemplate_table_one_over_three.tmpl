@@ -1,0 +1,151 @@
+#PBtmpl00000000table109
+#title:One Over Three (Table)
+#menuTitle:One Over Three (Table)
+#url:one_over_three_table
+<div><a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a></div>
+
+<tmpl_if showAdmin>
+<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+  <h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+  <p><tmpl_var description></p>
+</tmpl_if>
+
+<table cellpadding="5">
+<tr>
+	<td colspan="3" align="left" valign="top">
+		<!-- begin position 1 -->
+		<div class="layoutColumnPadding">
+		<tmpl_if showAdmin>
+			<table border="0" id="position1" class="content"><tbody>
+		</tmpl_if>
+
+		<tmpl_loop position1_loop>
+			<tmpl_if showAdmin>
+		            	<tr id="td<tmpl_var id>">
+		            		<td><div id="td<tmpl_var id>_div" class="dragable">
+			</tmpl_if>
+
+			<div class="content"><tmpl_var dragger.icon><tmpl_var content></div>
+
+			<tmpl_if showAdmin>
+		         			</div></td>
+		            	</tr>
+			</tmpl_if>
+		</tmpl_loop>
+
+		<tmpl_if showAdmin>
+		            </tbody></table>
+		</tmpl_if>
+		</div>
+		<!-- end position 1 -->	
+	</td>
+</tr>
+<tr>
+	<td class="firstColumn" align="left" valign="top">
+		<!-- begin position 2 -->
+		<div class="layoutColumnPadding">
+		<tmpl_if showAdmin>
+			<table border="0" id="position2" class="content"><tbody>
+		</tmpl_if>
+
+		<tmpl_loop position2_loop>
+			<tmpl_if showAdmin>
+		            	<tr id="td<tmpl_var id>">
+		            		<td><div id="td<tmpl_var id>_div" class="dragable">
+			</tmpl_if>
+
+			<div class="content"><tmpl_var dragger.icon><tmpl_var content></div>
+
+			<tmpl_if showAdmin>
+		         			</div></td>
+		            	</tr>
+			</tmpl_if>
+		</tmpl_loop>
+
+		<tmpl_if showAdmin>
+		            </tbody></table>
+		</tmpl_if>
+		</div>
+		<!-- end position 2 -->	
+	</td>
+	<td class="secondColumn" align="left" valign="top">
+		<!-- begin position 3 -->
+		<div class="layoutColumnPadding">
+		<tmpl_if showAdmin>
+			<table border="0" id="position3" class="content"><tbody>
+		</tmpl_if>
+
+		<tmpl_loop position3_loop>
+			<tmpl_if showAdmin>
+		            	<tr id="td<tmpl_var id>">
+		            		<td><div id="td<tmpl_var id>_div" class="dragable">
+			</tmpl_if>
+
+			<div class="content"><tmpl_var dragger.icon><tmpl_var content></div>
+
+			<tmpl_if showAdmin>
+		         			</div></td>
+		            	</tr>
+			</tmpl_if>
+		</tmpl_loop>
+
+		<tmpl_if showAdmin>
+		            </tbody></table>
+		</tmpl_if>
+		</div>
+		<!-- end position 3 -->	
+	</td>
+	<td class="thirdColumn" align="left" valign="top">
+		<!-- begin position 4 -->
+		<div class="layoutColumnPadding">
+		<tmpl_if showAdmin>
+			<table border="0" id="position4" class="content"><tbody>
+		</tmpl_if>
+
+		<tmpl_loop position4_loop>
+			<tmpl_if showAdmin>
+		            	<tr id="td<tmpl_var id>">
+		            		<td><div id="td<tmpl_var id>_div" class="dragable">
+			</tmpl_if>
+
+			<div class="content"><tmpl_var dragger.icon><tmpl_var content></div>
+
+			<tmpl_if showAdmin>
+		         			</div></td>
+		            	</tr>
+			</tmpl_if>
+		</tmpl_loop>
+
+		<tmpl_if showAdmin>
+		            </tbody></table>
+		</tmpl_if>
+		</div>
+		<!-- end position 4 -->	
+	</td>
+</tr>
+</table>
+
+
+<tmpl_if showAdmin>
+	<table><tr id="blank" class="hidden"><td><div><div class="empty">&nbsp;</div></div></td></tr></table>
+            <tmpl_var dragger.init>
+</tmpl_if>
+~~~
+<style type="text/css">
+.firstColumn {
+	width: 33%;
+}
+.secondColumn {
+    width: 33%;
+}
+.thirdColumn {
+    width: 33%;
+}
+</style>
+

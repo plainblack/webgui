@@ -1,0 +1,40 @@
+#WeatherDataTmpl0000001
+<a name="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+	<h2><tmpl_var title></h2>
+</tmpl_if>
+
+<tmpl_if description>
+	<tmpl_var description><p></p>
+</tmpl_if>
+
+<tmpl_loop ourLocations.loop>
+<table border="0" width="100%">
+<tr>
+	<td rowspan="3" style="width:55px;"><img src="<tmpl_var iconUrl>" alt="<tmpl_var iconUrl>" /></td>
+	<td style="background-color:#E0E0E0;">
+		<div class="weatherTitle">
+			<div style="float:left;">&#160;<b><tmpl_var cityState></b></div>
+
+			<div style="float:right;margin-right:1px;margin-top:2px;vertical-align:middle;">
+				<a href="#" style="color:gray;font-weight:bold;">X</a>
+			</div>
+		</div>
+	</td>
+</tr>
+<tr>
+	<td>
+		<tmpl_var sky><br /><tmpl_var tempF>&deg;F<br />
+	</td>
+</tr>
+<tr>
+	<td><br /></td>
+</tr>
+</table>
+
+</tmpl_loop>

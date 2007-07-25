@@ -1,0 +1,451 @@
+<html><head><title>SplitBar.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/*
+ * splitbar.js, version .7
+ * Copyright(c) 2006, Jack Slocum.
+ * Code licensed under the BSD License
+ */
+</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">DragDropMgr</span><span class="hl-brackets">){
+  </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">DragDropMgr</span><span class="hl-code">.</span><span class="hl-identifier">clickTimeThresh</span><span class="hl-code"> = </span><span class="hl-number">350</span><span class="hl-code">;
+</span><span class="hl-brackets">}
+</span><span class="hl-comment">/**
+ * @class YAHOO.ext.SplitBar
+ * @extends YAHOO.ext.util.Observable
+ * Creates draggable splitter bar functionality from two elements.
+ * &lt;br&gt;&lt;br&gt;
+ * Usage:
+ * &lt;pre&gt;&lt;code&gt;
+var split = new YAHOO.ext.SplitBar('elementToDrag', 'elementToSize', 
+                   YAHOO.ext.SplitBar.HORIZONTAL, YAHOO.ext.SplitBar.LEFT);
+split.setAdapter(new YAHOO.ext.SplitBar.AbsoluteLayoutAdapter(&quot;container&quot;));
+split.minSize = 100;
+split.maxSize = 600;
+split.animate = true;
+split.onMoved.subscribe(splitterMoved);
+&lt;/code&gt;&lt;/pre&gt;
+ * @requires YAHOO.ext.Element
+ * @requires YAHOO.util.Dom
+ * @requires YAHOO.util.Event
+ * @requires YAHOO.util.CustomEvent 
+ * @requires YAHOO.util.DDProxy
+ * @requires YAHOO.util.Anim (optional) to support animation
+ * @requires YAHOO.util.Easing (optional) to support animation
+ * @constructor
+ * Create a new SplitBar
+ * @param {String/HTMLElement/Element} dragElement The element to be dragged and act as the SplitBar. 
+ * @param {String/HTMLElement/Element} resizingElement The element to be resized based on where the SplitBar element is dragged 
+ * @param {Number} orientation (optional) Either YAHOO.ext.SplitBar.HORIZONTAL or YAHOO.ext.SplitBar.VERTICAL. (Defaults to HORIZONTAL)
+ * @param {Number} placement (optional) Either YAHOO.ext.SplitBar.LEFT or YAHOO.ext.SplitBar.RIGHT for horizontal or  
+                        YAHOO.ext.SplitBar.TOP or YAHOO.ext.SplitBar.BOTTOM for vertical. (By default, this is determined automatically by the intial position 
+                        position of the SplitBar).
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">dragElement</span><span class="hl-code">, </span><span class="hl-identifier">resizingElement</span><span class="hl-code">, </span><span class="hl-identifier">orientation</span><span class="hl-code">, </span><span class="hl-identifier">placement</span><span class="hl-brackets">){
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Element</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">dragElement</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">unselectable</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">on</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Element</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">resizingElement</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * @private
+     * The orientation of the split. Either YAHOO.ext.SplitBar.HORIZONTAL or YAHOO.ext.SplitBar.VERTICAL. (Defaults to HORIZONTAL)
+     * </span><span class="hl-inlinedoc">Note:</span><span class="hl-comment"> If this is changed after creating the SplitBar, the placement property must be manually updated
+     * @type Number
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> = </span><span class="hl-identifier">orientation</span><span class="hl-code"> || </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * The minimum size of the resizing element. (Defaults to 0)
+     * @type Number
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">minSize</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * The maximum size of the resizing element. (Defaults to 2000)
+     * @type Number
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">maxSize</span><span class="hl-code"> = </span><span class="hl-number">2000</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onMoved</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">SplitBarMoved</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * Whether to animate the transition to the new size
+     * @type Boolean
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * Whether to create a transparent shim that overlays the page when dragging, enables dragging across iframes.
+     * @type Boolean
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">useShim</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">shim</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">proxy</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">createProxy</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">DDProxy</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">SplitBars</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-brackets">{</span><span class="hl-identifier">dragElId</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">proxy</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">})</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">b4StartDrag</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onStartProxyDrag</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">endDrag</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onEndProxyDrag</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">/**
+     * @private The adapter to use to positon and resize elements
+     */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">BasicLayoutAdapter</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">.</span><span class="hl-identifier">init</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+        </span><span class="hl-comment">/** @private */
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> = </span><span class="hl-identifier">placement</span><span class="hl-code"> || </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getX</span><span class="hl-brackets">()</span><span class="hl-code"> &gt; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getX</span><span class="hl-brackets">()</span><span class="hl-code"> ? </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">LEFT</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">RIGHT</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">cursor</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">e-resize</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+        </span><span class="hl-comment">/** @private */
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> = </span><span class="hl-identifier">placement</span><span class="hl-code"> || </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getY</span><span class="hl-brackets">()</span><span class="hl-code"> &gt; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getY</span><span class="hl-brackets">()</span><span class="hl-code"> ? </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">TOP</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">BOTTOM</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">cursor</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">n-resize</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-comment">/**
+         * @event resize
+         * Fires when the splitter is moved (alias for moved)
+         * @param {YAHOO.ext.SplitBar} this
+         * @param {Number} newSize the new width or height
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">resize</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onMoved</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event moved
+         * Fires when the splitter is moved
+         * @param {YAHOO.ext.SplitBar} this
+         * @param {Number} newSize the new width or height
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">moved</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onMoved</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event beforeresize
+         * Fires before the splitter is dragged
+         * @param {YAHOO.ext.SplitBar} this
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">beforeresize</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforeresize</span><span class="hl-quotes">'</span><span class="hl-brackets">)
+    }
+}
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extendX</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">, </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">onStartProxyDrag</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforeresize</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">useShim</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">shim</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">shim</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">createShim</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">shim</span><span class="hl-code">.</span><span class="hl-identifier">setVisible</span><span class="hl-brackets">(</span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">block</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">size</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">.</span><span class="hl-identifier">getElementSize</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMinSize</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getMinimumSize</span><span class="hl-brackets">()</span><span class="hl-code">;;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMaxSize</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getMaximumSize</span><span class="hl-brackets">()</span><span class="hl-code">;;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">c1</span><span class="hl-code"> = </span><span class="hl-identifier">size</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMinSize</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">c2</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMaxSize</span><span class="hl-code"> - </span><span class="hl-identifier">size</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">resetConstraints</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">setXConstraint</span><span class="hl-brackets">(
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">LEFT</span><span class="hl-code"> ? </span><span class="hl-identifier">c1</span><span class="hl-code"> : </span><span class="hl-identifier">c2</span><span class="hl-code">, 
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">LEFT</span><span class="hl-code"> ? </span><span class="hl-identifier">c2</span><span class="hl-code"> : </span><span class="hl-identifier">c1
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">setYConstraint</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">resetConstraints</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">setXConstraint</span><span class="hl-brackets">(</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">.</span><span class="hl-identifier">setYConstraint</span><span class="hl-brackets">(
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">TOP</span><span class="hl-code"> ? </span><span class="hl-identifier">c1</span><span class="hl-code"> : </span><span class="hl-identifier">c2</span><span class="hl-code">, 
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">TOP</span><span class="hl-code"> ? </span><span class="hl-identifier">c2</span><span class="hl-code"> : </span><span class="hl-identifier">c1
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+         </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startSize</span><span class="hl-code"> = </span><span class="hl-identifier">size</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startPoint</span><span class="hl-code"> = </span><span class="hl-brackets">[</span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">]</span><span class="hl-code">;
+        
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">DDProxy</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">b4StartDrag</span><span class="hl-code">.</span><span class="hl-identifier">call</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dd</span><span class="hl-code">, </span><span class="hl-identifier">x</span><span class="hl-code">, </span><span class="hl-identifier">y</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** 
+     * @private Called after the drag operation by the DDProxy
+     */
+    </span><span class="hl-identifier">onEndProxyDrag</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">none</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">endPoint</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Event</span><span class="hl-code">.</span><span class="hl-identifier">getXY</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">useShim</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">shim</span><span class="hl-code">.</span><span class="hl-identifier">setVisible</span><span class="hl-brackets">(</span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">newSize</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">newSize</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startSize</span><span class="hl-code"> + 
+                </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">LEFT</span><span class="hl-code"> ?
+                    </span><span class="hl-identifier">endPoint</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startPoint</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> :
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startPoint</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-identifier">endPoint</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]
+                )</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-identifier">newSize</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startSize</span><span class="hl-code"> + 
+                </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">TOP</span><span class="hl-code"> ?
+                    </span><span class="hl-identifier">endPoint</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startPoint</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> :
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startPoint</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]</span><span class="hl-code"> - </span><span class="hl-identifier">endPoint</span><span class="hl-brackets">[</span><span class="hl-number">1</span><span class="hl-brackets">]
+                )</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">newSize</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">min</span><span class="hl-brackets">(</span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMinSize</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activeMaxSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-code"> != </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">dragSpecs</span><span class="hl-code">.</span><span class="hl-identifier">startSize</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">.</span><span class="hl-identifier">setElementSize</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onMoved</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the adapter this SplitBar uses
+     * @return The adapter object
+     */
+    </span><span class="hl-identifier">getAdapter</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set the adapter this SplitBar uses
+     * @param {Object} adapter A SplitBar adapter object
+     */
+    </span><span class="hl-identifier">setAdapter</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">adapter</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code"> = </span><span class="hl-identifier">adapter</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">.</span><span class="hl-identifier">init</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets the minimum size for the resizing element
+     * @return {Number} The minimum size
+     */
+    </span><span class="hl-identifier">getMinimumSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">minSize</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Sets the minimum size for the resizing element
+     * @param {Number} minSize The minimum size
+     */
+    </span><span class="hl-identifier">setMinimumSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">minSize</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">minSize</span><span class="hl-code"> = </span><span class="hl-identifier">minSize</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Gets the maximum size for the resizing element
+     * @return {Number} The maximum size
+     */
+    </span><span class="hl-identifier">getMaximumSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">maxSize</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Sets the maximum size for the resizing element
+     * @param {Number} maxSize The maximum size
+     */
+    </span><span class="hl-identifier">setMaximumSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">maxSize</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">maxSize</span><span class="hl-code"> = </span><span class="hl-identifier">maxSize</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Sets the initialize size for the resizing element
+     * @param {Number} size The initial size
+     */
+    </span><span class="hl-identifier">setCurrentSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">size</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">oldAnimate</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">adapter</span><span class="hl-code">.</span><span class="hl-identifier">setElementSize</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">size</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-code"> = </span><span class="hl-identifier">oldAnimate</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+})</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @private static Create the shim to drag over iframes
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">createShim</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">shim</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">shim</span><span class="hl-code">.</span><span class="hl-identifier">unselectable</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">on</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">generateId</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">split-shim</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">width</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">100%</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">height</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">100%</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">background</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">white</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">z-index</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-number">11000</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">shimEl</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Element</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">shim</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">shimEl</span><span class="hl-code">.</span><span class="hl-identifier">setOpacity</span><span class="hl-brackets">(</span><span class="hl-number">.01</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">shimEl</span><span class="hl-code">.</span><span class="hl-identifier">setXY</span><span class="hl-brackets">([</span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-number">0</span><span class="hl-brackets">])</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">shimEl</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * @private static Create our own proxy element element. So it will be the same same size on all browsers, we won't use borders. Instead we use a background color.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">createProxy</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">orientation</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">proxy</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">proxy</span><span class="hl-code">.</span><span class="hl-identifier">unselectable</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">on</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">generateId</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">split-proxy</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">visibility</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">hidden</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">z-index</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-number">11001</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">background-color</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">#aaa</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">cursor</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">e-resize</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+        </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">cursor</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">n-resize</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-comment">// the next 2 fix IE abs position div height problem
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">line-height</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">0px</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">font-size</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">0px</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-builtin">window</span><span class="hl-code">.</span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">proxy</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">proxy</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/** 
+ * @class YAHOO.ext.SplitBar.BasicLayoutAdapter
+ * Default Adapter. It assumes the splitter and resizing element are not positioned
+ * elements and only gets/sets the width of the element. Generally used for table based layouts.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">BasicLayoutAdapter</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">BasicLayoutAdapter</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-comment">// do nothing for now
+    </span><span class="hl-identifier">init</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+    
+    }</span><span class="hl-code">,
+    </span><span class="hl-comment">/**
+     * Called before drag operations to get the current size of the resizing element. 
+     * @param {YAHOO.ext.SplitBar} s The SplitBar using this adapter
+     */
+     </span><span class="hl-identifier">getElementSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getHeight</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Called after drag operations to set the size of the resizing element.
+     * @param {YAHOO.ext.SplitBar} s The SplitBar using this adapter
+     * @param {Number} newSize The new size to set
+     * @param {Function} onComplete A function to be invoke when resizing is complete
+     */
+    </span><span class="hl-identifier">setElementSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-identifier">onComplete</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">orientation</span><span class="hl-code"> == </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Anim</span><span class="hl-code"> || !</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">onComplete</span><span class="hl-brackets">){
+                    </span><span class="hl-identifier">onComplete</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-number">.1</span><span class="hl-code">, </span><span class="hl-identifier">onComplete</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">easeOut</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Anim</span><span class="hl-code"> || !</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">animate</span><span class="hl-brackets">){
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">setHeight</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">onComplete</span><span class="hl-brackets">){
+                    </span><span class="hl-identifier">onComplete</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+            }</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">setHeight</span><span class="hl-brackets">(</span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-code">, </span><span class="hl-number">.1</span><span class="hl-code">, </span><span class="hl-identifier">onComplete</span><span class="hl-code">, </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Easing</span><span class="hl-code">.</span><span class="hl-identifier">easeOut</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/** 
+ *@class YAHOO.ext.SplitBar.AbsoluteLayoutAdapter
+ * @extends YAHOO.ext.SplitBar.BasicLayoutAdapter
+ * Adapter that  moves the splitter element to align with the resized sizing element. 
+ * Used with an absolute positioned SplitBar.
+ * @param {String/HTMLElement/Element} container The container that wraps around the absolute positioned content. If it's
+ * document.body, make sure you assign an id to the body element.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">AbsoluteLayoutAdapter</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">basic</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">.</span><span class="hl-identifier">BasicLayoutAdapter</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-brackets">)</span><span class="hl-code">;
+</span><span class="hl-brackets">}
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">AbsoluteLayoutAdapter</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">init</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">basic</span><span class="hl-code">.</span><span class="hl-identifier">init</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-comment">//YAHOO.util.Event.on(window, 'resize', this.moveSplitter.createDelegate(this, [s]));
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">getElementSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">basic</span><span class="hl-code">.</span><span class="hl-identifier">getElementSize</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setElementSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-identifier">onComplete</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">basic</span><span class="hl-code">.</span><span class="hl-identifier">setElementSize</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">, </span><span class="hl-identifier">newSize</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">moveSplitter</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">s</span><span class="hl-brackets">]))</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">moveSplitter</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">yes</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">SplitBar</span><span class="hl-code">;
+        </span><span class="hl-reserved">switch</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">placement</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">case </span><span class="hl-identifier">yes</span><span class="hl-code">.</span><span class="hl-identifier">LEFT</span><span class="hl-code">:
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setX</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getRight</span><span class="hl-brackets">())</span><span class="hl-code">;
+                </span><span class="hl-reserved">break</span><span class="hl-code">;
+            </span><span class="hl-reserved">case </span><span class="hl-identifier">yes</span><span class="hl-code">.</span><span class="hl-identifier">RIGHT</span><span class="hl-code">:
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">right</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()</span><span class="hl-code"> - </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getLeft</span><span class="hl-brackets">())</span><span class="hl-code"> + </span><span class="hl-quotes">'</span><span class="hl-string">px</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+                </span><span class="hl-reserved">break</span><span class="hl-code">;
+            </span><span class="hl-reserved">case </span><span class="hl-identifier">yes</span><span class="hl-code">.</span><span class="hl-identifier">TOP</span><span class="hl-code">:
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setY</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getBottom</span><span class="hl-brackets">())</span><span class="hl-code">;
+                </span><span class="hl-reserved">break</span><span class="hl-code">;
+            </span><span class="hl-reserved">case </span><span class="hl-identifier">yes</span><span class="hl-code">.</span><span class="hl-identifier">BOTTOM</span><span class="hl-code">:
+                </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">setY</span><span class="hl-brackets">(</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">resizingEl</span><span class="hl-code">.</span><span class="hl-identifier">getTop</span><span class="hl-brackets">()</span><span class="hl-code"> - </span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getHeight</span><span class="hl-brackets">())</span><span class="hl-code">;
+                </span><span class="hl-reserved">break</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Orientation constant - Create a vertical SplitBar
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">VERTICAL</span><span class="hl-default"> = </span><span class="hl-number">1</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Orientation constant - Create a horizontal SplitBar
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">HORIZONTAL</span><span class="hl-default"> = </span><span class="hl-number">2</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Placement constant - The resizing element is to the left of the splitter element
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">LEFT</span><span class="hl-default"> = </span><span class="hl-number">1</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Placement constant - The resizing element is to the right of the splitter element
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">RIGHT</span><span class="hl-default"> = </span><span class="hl-number">2</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Placement constant - The resizing element is positioned above the splitter element
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">TOP</span><span class="hl-default"> = </span><span class="hl-number">3</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Placement constant - The resizing element is positioned under splitter element
+ * @static
+ * @type Number
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">SplitBar</span><span class="hl-default">.</span><span class="hl-identifier">BOTTOM</span><span class="hl-default"> = </span><span class="hl-number">4</span><span class="hl-default">;
+</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

@@ -1,0 +1,231 @@
+<html>
+<head>
+	<title>Coolmenus example - CoolMenus4 DHTML script made by Thomas Brattli from DHTMLCentral.com. Visit for more great scripts.</title>
+<style>
+/* CoolMenus 4 - default styles - do not edit */
+.clCMEvent{position:absolute; width:99%; height:99%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:visible}
+.clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+/* CoolMenus 4 - default styles - end */
+  
+/*Style for the background-bar*/
+.clBar{position:absolute; width:10; height:10; background-color:Navy; layer-background-color:Navy; visibility:hidden}
+
+/*Styles for level 0*/
+.clLevel0,.clLevel0over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:12px; font-weight:bold}
+.clLevel0{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel0over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel0border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+
+/*Styles for level 1*/
+.clLevel1, .clLevel1over{position:absolute; padding:2px; font-family:tahoma, arial,helvetica; font-size:11px; font-weight:bold}
+.clLevel1{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel1over{background-color:#336699; layer-background-color:#336699; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel1border{position:absolute; z-index:500; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+
+/*Styles for level 2*/
+.clLevel2, .clLevel2over{position:absolute; padding:2px; font-family:tahoma,arial,helvetica; font-size:10px; font-weight:bold}
+.clLevel2{background-color:Navy; layer-background-color:Navy; color:white;}
+.clLevel2over{background-color:#0099cc; layer-background-color:#0099cc; color:Yellow; cursor:pointer; cursor:hand; }
+.clLevel2border{position:absolute; visibility:hidden; background-color:#006699; layer-background-color:#006699}
+</style>
+<script language="JavaScript1.2" src="coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+</head>
+<body marginwidth="0" marginheight="0">
+<table width="100%" border="1" cellspacing="0" cellpadding="0">
+<tr>
+  <td colspan="5"><h3>Page heading</h3></td>
+</tr>
+<tr>
+  <!-- MENU TD'S -->
+  <td width="20%">
+  <!-- You need all this START --- ITEM 0 -->
+  <ilayer id="layerMenu0"><div id="divMenu0">
+    <img src="cm_fill.gif" width="6" height="25" alt="" border="0">
+  </div></ilayer>  
+  <!-- END -->
+  </td>
+  <td width="20%">
+  <!-- You need all this START --- ITEM 1 -->
+  <ilayer id="layerMenu1"><div id="divMenu1">
+    <img src="cm_fill.gif" width="6" height="25" alt="" border="0">
+  </div></ilayer>  
+  <!-- END -->
+  </td>
+  <td width="20%">
+  <!-- You need all this START --- ITEM 2 -->
+  <ilayer id="layerMenu2"><div id="divMenu2">
+    <img src="cm_fill.gif" width="6" height="25" alt="" border="0">
+  </div></ilayer>  
+  <!-- END -->
+  </td>
+  <td width="20%">
+  <!-- You need all this START --- ITEM 3 -->
+  <ilayer id="layerMenu3"><div id="divMenu3">
+    <img src="cm_fill.gif" width="6" height="25" alt="" border="0">
+  </div></ilayer>  
+  <!-- END -->
+  </td>
+  <td width="20%">
+  <!-- You need all this START --- ITEM 4 -->
+  <ilayer id="layerMenu4"><div id="divMenu4">
+    <img src="cm_fill.gif" width="6" height="25" alt="" border="0">
+  </div></ilayer>  
+  <!-- END -->
+  </td>
+</tr>
+<td valign="top"  colspan="5">
+  This one is more complicated then the previous because it tries to place
+  all the top items in different TD's. 
+  <br>
+  We use a fill image inside the TD's to force the size of the TD to the size of the menu. 
+  Then we try to find the position of the div/layer surrounding the layer and
+  then places the menu where that layer/div is. We place a fill image inside
+  the TD to force the height of the items to the same as the height of the menuitems.
+  <br>
+  <br>
+  For this to work the menucode have to be placed AFTER the table. Which again means that
+  it's VERY important that the code inside the table is correct (correctly nested tags, close all P tags and so on), if
+  not Netscape 4 WILL break.
+  <br>
+  <br>
+  We set the width of the TD's and the top items to 20%. This technique can also be used to
+  place menus totally different places on the page.
+  <br>
+  <br>
+</td>
+</tr>
+</table>
+<script>
+/*** 
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+//Menu object creation
+oCMenu=new makeCM("oCMenu") //Making the menu object. Argument: menuname
+
+//Menu properties   
+oCMenu.pxBetween=0
+//Using the cm_page object to place the menu ----
+oCMenu.fromLeft=0
+oCMenu.fromTop=0
+oCMenu.rows=1
+oCMenu.menuPlacement=0
+                                                             
+oCMenu.offlineRoot="file:///C|/Inetpub/wwwroot/dhtmlcentral/projects/coolmenus/examples/" 
+oCMenu.onlineRoot="/coolmenus/" 
+oCMenu.resizeCheck=1 
+oCMenu.wait=1000 
+oCMenu.fillImg="cm_fill.gif"
+oCMenu.zIndex=0
+
+//Background bar properties
+oCMenu.useBar=0
+
+//Level properties - ALL properties have to be spesified in level 0
+oCMenu.level[0]=new cm_makeLevel() //Add this for each new level
+oCMenu.level[0].width="19%"
+oCMenu.level[0].height=25 
+oCMenu.level[0].regClass="clLevel0"
+oCMenu.level[0].overClass="clLevel0over"
+oCMenu.level[0].borderX=1
+oCMenu.level[0].borderY=1
+oCMenu.level[0].borderClass="clLevel0border"
+oCMenu.level[0].offsetX=0
+oCMenu.level[0].offsetY=0
+oCMenu.level[0].rows=0
+oCMenu.level[0].arrow=0
+oCMenu.level[0].arrowWidth=0
+oCMenu.level[0].arrowHeight=0
+oCMenu.level[0].align="bottom"
+
+
+/******************************************
+Menu item creation:
+myCoolMenu.makeMenu(name, parent_name, text, link, target, width, height, regImage, overImage, regClass, overClass , align, rows, nolink, onclick, onmouseover, onmouseout) 
+*************************************/
+oCMenu.makeMenu('top0','','&nbsp;News','example2.html','')
+  oCMenu.makeMenu('sub00','top0','Newest news','/news/index.asp')
+	
+oCMenu.makeMenu('top1','','&nbsp;Scripts','/scripts/index.asp')
+	oCMenu.makeMenu('sub10','top1','New scripts','/scripts/index.asp?show=new')
+
+	
+oCMenu.makeMenu('top2','','&nbsp;Articles','/articles/index.asp')
+	oCMenu.makeMenu('sub21','top2','Tutorials','/tutorials/index.asp')
+
+oCMenu.makeMenu('top3','','&nbsp;Forums','/forums/')
+	oCMenu.makeMenu('sub30','top3','General','/forums/forum.asp?FORUM_ID=6&CAT_ID=1&Forum_Title=General+DHTML+issues')
+	oCMenu.makeMenu('sub31','top3','Scripts','/forums/forum.asp?FORUM_ID=4&CAT_ID=1&Forum_Title=DHTML+Scripts')
+
+
+oCMenu.makeMenu('top4','','&nbsp;Forums','/forums/')
+	oCMenu.makeMenu('sub40','top4','General','/forums/forum.asp?FORUM_ID=6&CAT_ID=1&Forum_Title=General+DHTML+issues')
+	oCMenu.makeMenu('sub41','top4','Scripts','/forums/forum.asp?FORUM_ID=4&CAT_ID=1&Forum_Title=DHTML+Scripts')
+
+//Leave this line - it constructs the menu
+oCMenu.construct()		
+
+
+//Extra code to find position:
+function findPos(num){
+  //alert(num)
+  if(bw.ns4){   //Netscape 4
+    x = document.layers["layerMenu"+num].pageX
+    y = document.layers["layerMenu"+num].pageY
+  }else{ //other browsers
+    x=0; y=0; var el,temp
+    el = bw.ie4?document.all["divMenu"+num]:document.getElementById("divMenu"+num);
+    if(el.offsetParent){
+      temp = el
+      while(temp.offsetParent){ //Looping parent elements to get the offset of them as well
+        temp=temp.offsetParent; 
+        x+=temp.offsetLeft
+        y+=temp.offsetTop;
+      }
+    }
+    x+=el.offsetLeft
+    y+=el.offsetTop
+  }
+  //Returning the x and y as an array
+  return [x,y]
+}
+function placeElements(){
+  //Changing the position of ALL top items:
+  pos = findPos(0)
+  oCMenu.m["top0"].b.moveIt(pos[0],pos[1])
+  pos = findPos(1)
+  oCMenu.m["top1"].b.moveIt(pos[0],pos[1])
+  pos = findPos(2)
+  oCMenu.m["top2"].b.moveIt(pos[0],pos[1])
+  pos = findPos(3)
+  oCMenu.m["top3"].b.moveIt(pos[0],pos[1])
+  pos = findPos(4)
+  oCMenu.m["top4"].b.moveIt(pos[0],pos[1])
+  
+  //Setting the fromtop value
+  oCMenu.fromTop = pos[1]
+}
+placeElements()
+//Setting it to re place the elements after resize - the resize is not perfect though..
+oCMenu.onafterresize="placeElements()"
+</script>
+</body>
+</html>

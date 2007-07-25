@@ -1,0 +1,107 @@
+
+	.linedRow{
+		border-bottom: 1px black ridge;
+	}
+	.object_note {
+			font-family: verdana;
+			font-size: 10px;
+			font-weight: normal;
+			color: black;
+	}
+ .system_message_table {
+ 	border: 1px 1px 1px 1px groove gray;
+	background:silver;
+	
+ }
+ .system_message_cell {
+ 	font-size:11px;
+	color:black;
+ }
+ .system_message_title {
+ 	background:#003366;
+ 	font-size:13px;
+	color:white;
+	font-weight:bold;
+	border: 1px 1px 1px 1px white ridge;
+	font-weight:bold;
+ }
+ .tab {
+ 	border-left:1px groove #eeeeee;
+	border-bottom: 3px solid gray;
+	border-top:1px ridge silver;
+	border-right: 1px ridge whilte;
+	spacing-bottom:3px;
+	padding-top:3px;
+	background: #efefef;
+	color:black;
+	font-weight:bold;
+	width:90px;
+ }
+ 
+ .tab_selected {
+ 	border-left:1px groove #eeeeee;
+	border-bottom: 3px solid black;
+	border-top:1px ridge silver;
+	border-right: 1px ridge whilte;
+	background:#a2a2a2;
+	padding-top:3px;
+	font-weight:bold;
+	width:90px;
+	color:#f6f6f6;
+	cursor:hand;
+ }
+ .tab_hover {
+ 	border-left:1px groove #eeeeee;
+	border-bottom: 3px solid black;
+	border-top:1px ridge silver;
+	border-right: 1px ridge whilte;
+	background:white;
+	padding-top:3px;
+	font-weight:bold;
+	width:90px;
+	color:black;
+	cursor:hand;
+ }
+ .tabs_header{
+	font-weight:bold;
+	font-size:13px;
+	border-left:1px ridge black;
+	border-bottom: 3px solid black;
+	border-right: 1px ridge whilte;
+	padding: 2px 2px 2px 2px;
+ }
+.calendar_row_data{
+}
+.calendar_week {
+	border: 1px groove black;
+}
+.calendar_week_cell {
+	border: 1px groove silver;
+}
+.calendar_weekday{
+	border: 1px ridge black;
+	height:100px;
+}
+.calendar_week_subheader{
+	border: 1px ridge black;
+	background:#EEEEEE;
+	font-weight:bold;
+}
+.calendar_inner_row{
+	border-bottom: 1px dotted silver;
+}
+.contactlistsmall {
+	border-bottom: 1px dotted black;
+	font-size:9px;
+	font-weight:normal;
+	color:gray;
+	background:#eeeeee;
+}
+.contactlistsmallover {
+	border-bottom: 1px dotted black;
+	font-size:9px;
+	font-weight:normal;
+	color:white;
+	background:silver;
+	cursor:hand;
+}

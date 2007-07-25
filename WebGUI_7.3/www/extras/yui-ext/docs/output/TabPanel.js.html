@@ -1,0 +1,705 @@
+<html><head><title>TabPanel.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/**
+ * @class YAHOO.ext.TabPanel
+ * @extends YAHOO.ext.util.Observable
+ * Creates a lightweight TabPanel component using Yahoo! UI.
+ * &lt;br&gt;&lt;br&gt;
+ * Usage:
+ * &lt;pre&gt;&lt;code&gt;
+    &lt;font color=&quot;#008000&quot;&gt;// basic tabs 1, built from existing content&lt;/font&gt;
+    var tabs = new YAHOO.ext.TabPanel('tabs1');
+    tabs.addTab('script', &quot;View Script&quot;);
+    tabs.addTab('markup', &quot;View Markup&quot;);
+    tabs.activate('script');
+    
+    &lt;font color=&quot;#008000&quot;&gt;// more advanced tabs, built from javascript&lt;/font&gt;
+    var jtabs = new YAHOO.ext.TabPanel('jtabs');
+    jtabs.addTab('jtabs-1', &quot;Normal Tab&quot;, &quot;My content was added during construction.&quot;);
+    
+    &lt;font color=&quot;#008000&quot;&gt;// set up the UpdateManager&lt;/font&gt;
+    var tab2 = jtabs.addTab('jtabs-2', &quot;Ajax Tab 1&quot;);
+    var updater = tab2.getUpdateManager();
+    updater.setDefaultUrl('ajax1.htm');
+    tab2.onActivate.subscribe(updater.refresh, updater, true);
+    
+    &lt;font color=&quot;#008000&quot;&gt;// Use setUrl for Ajax loading&lt;/font&gt;
+    var tab3 = jtabs.addTab('jtabs-3', &quot;Ajax Tab 2&quot;);
+    tab3.setUrl('ajax2.htm', null, true);
+    
+    &lt;font color=&quot;#008000&quot;&gt;// Disabled tab&lt;/font&gt;
+    var tab4 = jtabs.addTab('tabs1-5', &quot;Disabled Tab&quot;, &quot;Can't see me cause I'm disabled&quot;);
+    tab4.disable();
+    
+    jtabs.activate('jtabs-1');
+}
+ * &lt;/code&gt;&lt;/pre&gt;
+ * @requires YAHOO.ext.Element
+ * @requires YAHOO.ext.UpdateManager
+ * @requires YAHOO.util.Dom
+ * @requires YAHOO.util.Event
+ * @requires YAHOO.util.CustomEvent 
+ * @requires YAHOO.util.Connect (optional)
+ * @constructor
+ * Create new TabPanel.
+ * @param {String/HTMLElement/Element} container The id, DOM element or YAHOO.ext.Element container where this TabPanel is to be rendered. 
+ * @param {Boolean} config Config object to set any properties for this TabPanel or true to render the tabs on the bottom. 
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">TabPanel</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">){
+    </span><span class="hl-comment">/**
+    * The container element for this TabPanel.
+    * @type YAHOO.ext.Element
+    */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The position of the tabs. Can be 'top' or 'bottom' @type String */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPosition</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">top</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentTabWidth</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The minimum width of a tab (ignored if resizeTabs is not true). @type Number */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">minTabWidth</span><span class="hl-code"> = </span><span class="hl-number">40</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The maximum width of a tab (ignored if resizeTabs is not true). @type Number */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">maxTabWidth</span><span class="hl-code"> = </span><span class="hl-number">250</span><span class="hl-code">;
+    </span><span class="hl-comment">/** The preferred (default) width of a tab (ignored if resizeTabs is not true). @type Number */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">preferredTabWidth</span><span class="hl-code"> = </span><span class="hl-number">175</span><span class="hl-code">;
+    </span><span class="hl-comment">/** Set this to true to enable dynamic tab resizing. @type Boolean */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeTabs</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+    </span><span class="hl-comment">/** Set this to true to turn on window resizing monitoring (ignored if resizeTabs is not true). @type Boolean */
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">monitorResize</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">config</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">config</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">boolean</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPosition</span><span class="hl-code"> = </span><span class="hl-identifier">config</span><span class="hl-code"> ? </span><span class="hl-quotes">'</span><span class="hl-string">bottom</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-quotes">'</span><span class="hl-string">top</span><span class="hl-quotes">'</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Config</span><span class="hl-code">.</span><span class="hl-identifier">apply</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">config</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPosition</span><span class="hl-code"> == </span><span class="hl-quotes">'</span><span class="hl-string">bottom</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createBody</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ytabs-bottom</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripWrap</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createStrip</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripEl</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createStripList</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripWrap</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripBody</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripWrap</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPosition</span><span class="hl-code"> != </span><span class="hl-quotes">'</span><span class="hl-string">bottom</span><span class="hl-quotes">'</span><span class="hl-brackets">){
+    </span><span class="hl-comment">/** The body element that contains TabPaneItem bodies. 
+     * @type YAHOO.ext.Element
+     */
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code"> = </span><span class="hl-identifier">getEl</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createBody</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">))</span><span class="hl-code">;
+      </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">ytabs-top</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code"> = </span><span class="hl-brackets">[]</span><span class="hl-code">;
+    
+    </span><span class="hl-comment">// add indexOf to array if it isn't present
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">o</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">for</span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">, </span><span class="hl-identifier">len</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code"> &lt; </span><span class="hl-identifier">len</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">++</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code"> == </span><span class="hl-identifier">o</span><span class="hl-brackets">) </span><span class="hl-reserved">return </span><span class="hl-identifier">i</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">return</span><span class="hl-code"> -</span><span class="hl-number">1</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> = </span><span class="hl-reserved">null</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onTabChange</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">TabItem.onTabChange</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activateDelegate</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">activate</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+    
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">events</span><span class="hl-code"> = </span><span class="hl-brackets">{
+        </span><span class="hl-comment">/**
+         * @event tabchange
+         * Fires when the active tab changes
+         * @param {YAHOO.ext.TabPanel} this
+         * @param {YAHOO.ext.TabPanelItem} activePanel The new active tab
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">tabchange</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onTabChange</span><span class="hl-code">,
+        </span><span class="hl-comment">/**
+         * @event beforetabchange
+         * Fires before the active tab changes, set cancel to true on the &quot;e&quot; parameter to cancel the change
+         * @param {YAHOO.ext.TabPanel} this
+         * @param {Object} e Set cancel to true on this object to cancel the tab change
+         * @param {YAHOO.ext.TabPanelItem} tab The tab being changed to
+         */
+        </span><span class="hl-quotes">'</span><span class="hl-string">beforetabchange</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">CustomEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforechange</span><span class="hl-quotes">'</span><span class="hl-brackets">)
+    }</span><span class="hl-code">;
+    
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">EventManager</span><span class="hl-code">.</span><span class="hl-identifier">onWindowResize</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-builtin">onResize</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">cpad</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">lr</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hiddenCount</span><span class="hl-code"> = </span><span class="hl-number">0</span><span class="hl-code">;
+</span><span class="hl-brackets">}
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">ext</span><span class="hl-default">.</span><span class="hl-identifier">TabPanel</span><span class="hl-default">.</span><span class="hl-identifier">prototype</span><span class="hl-default"> = </span><span class="hl-brackets">{
+    </span><span class="hl-identifier">fireEvent</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-code">,
+    </span><span class="hl-identifier">on</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">on</span><span class="hl-code">,
+    </span><span class="hl-identifier">addListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">addListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">delayedListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">delayedListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">removeListener</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">removeListener</span><span class="hl-code">,
+    </span><span class="hl-identifier">purgeListeners</span><span class="hl-code"> : </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">purgeListeners</span><span class="hl-code">,
+    </span><span class="hl-comment">/**
+     * Creates a new TabPanelItem by looking for an existing element with the provided id - if it's not found it creates one.
+     * @param {String} id The id of the div to use &lt;b&gt;or create&lt;/b&gt;
+     * @param {String} text The text for the tab
+     * @param {&lt;i&gt;String&lt;/i&gt;} content (optional) Content to put in the TabPanelItem body
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} closable (optional) True to create a close icon on the tab
+     * @return {YAHOO.ext.TabPanelItem} The created TabPanelItem
+     */
+    </span><span class="hl-identifier">addTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-code">, </span><span class="hl-identifier">text</span><span class="hl-code">, </span><span class="hl-identifier">content</span><span class="hl-code">, </span><span class="hl-identifier">closable</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">id</span><span class="hl-code">, </span><span class="hl-identifier">text</span><span class="hl-code">, </span><span class="hl-identifier">closable</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">addTabItem</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">setContent</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">item</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Returns the TabPanelItem with the specified id/index
+     * @param {String/Number} id The id or index of the TabPanelItem to fetch.
+     * @return {YAHOO.ext.TabPanelItem}
+     */
+    </span><span class="hl-identifier">getTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Hides the TabPanelItem with the specified id/index
+     * @param {String/Number} id The id or index of the TabPanelItem to hide.
+     */
+    </span><span class="hl-identifier">hideTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">isHidden</span><span class="hl-brackets">()){
+           </span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">setHidden</span><span class="hl-brackets">(</span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">;
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hiddenCount</span><span class="hl-code">++;
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * &quot;Unhides&quot; the TabPanelItem with the specified id/index
+     * @param {String/Number} id The id or index of the TabPanelItem to unhide.
+     */
+    </span><span class="hl-identifier">unhideTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">t</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">isHidden</span><span class="hl-brackets">()){
+           </span><span class="hl-identifier">t</span><span class="hl-code">.</span><span class="hl-identifier">setHidden</span><span class="hl-brackets">(</span><span class="hl-reserved">false</span><span class="hl-brackets">)</span><span class="hl-code">;
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hiddenCount</span><span class="hl-code">--;
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Add an existing TabPanelItem.
+     * @param {YAHOO.ext.TabPanelItem} item The TabPanelItem to add
+     */
+    </span><span class="hl-identifier">addTabItem</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">item</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">push</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeTabs</span><span class="hl-brackets">){
+           </span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">currentTabWidth</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">preferredTabWidth</span><span class="hl-brackets">)
+           </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}</span><span class="hl-reserved">else</span><span class="hl-brackets">{
+            </span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">autoSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+        
+    </span><span class="hl-comment">/**
+     * Remove a TabPanelItem.
+     * @param {String/Number} id The id or index of the TabPanelItem to remove.
+     */
+    </span><span class="hl-identifier">removeTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">items</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">tab</span><span class="hl-code"> = </span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">tab</span><span class="hl-brackets">) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">index</span><span class="hl-code"> = </span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">indexOf</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> == </span><span class="hl-identifier">tab</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code"> &gt; </span><span class="hl-number">1</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">newTab</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">getNextAvailable</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">newTab</span><span class="hl-brackets">)</span><span class="hl-identifier">newTab</span><span class="hl-code">.</span><span class="hl-identifier">activate</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">purgeListeners</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">parentNode</span><span class="hl-code"> == </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">){ </span><span class="hl-comment">// if it was moved already prevent error
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">removeChild</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">splice</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code">, </span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">delete this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">getNextAvailable</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">start</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">items</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">index</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">;
+        </span><span class="hl-comment">// look for a next tab that will slide over to
+        // replace the one being removed
+        </span><span class="hl-reserved">while</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code"> &lt; </span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-code">++</span><span class="hl-identifier">index</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">isHidden</span><span class="hl-brackets">()){
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">item</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-comment">// if one isn't found select the previous tab (on the left)
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">index</span><span class="hl-code"> = </span><span class="hl-identifier">start</span><span class="hl-code">;
+        </span><span class="hl-reserved">while</span><span class="hl-brackets">(</span><span class="hl-identifier">index</span><span class="hl-code"> &gt;= </span><span class="hl-number">0</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">item</span><span class="hl-code"> = </span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-code">--</span><span class="hl-identifier">index</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">item</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">item</span><span class="hl-code">.</span><span class="hl-identifier">isHidden</span><span class="hl-brackets">()){
+                </span><span class="hl-reserved">return </span><span class="hl-identifier">item</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+        </span><span class="hl-reserved">return null</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Disable a TabPanelItem. &lt;b&gt;It cannot be the active tab, if it is this call is ignored.&lt;/b&gt;. 
+     * @param {String/Number} id The id or index of the TabPanelItem to disable.
+     */
+    </span><span class="hl-identifier">disableTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">tab</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-code"> &amp;&amp; </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> != </span><span class="hl-identifier">tab</span><span class="hl-brackets">){
+            </span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">disable</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Enable a TabPanelItem that is disabled.
+     * @param {String/Number} id The id or index of the TabPanelItem to enable.
+     */
+    </span><span class="hl-identifier">enableTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">tab</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">enable</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Activate a TabPanelItem. The currently active will be deactivated. 
+     * @param {String/Number} id The id or index of the TabPanelItem to activate.
+     */
+    </span><span class="hl-identifier">activate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">tab</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">tab</span><span class="hl-code"> == </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">return </span><span class="hl-identifier">tab</span><span class="hl-code">;
+        </span><span class="hl-brackets">} 
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">e</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforetabchange</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-code">, </span><span class="hl-identifier">tab</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">cancel</span><span class="hl-code"> !== </span><span class="hl-reserved">true</span><span class="hl-code"> &amp;&amp; !</span><span class="hl-identifier">tab</span><span class="hl-code">.</span><span class="hl-identifier">disabled</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-brackets">){
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code">.</span><span class="hl-identifier">hide</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-brackets">[</span><span class="hl-identifier">id</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code">.</span><span class="hl-identifier">show</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onTabChange</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">tab</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the active TabPanelItem
+     * @return {YAHOO.ext.TabPanelItem} The active TabPanelItem or null if none are active.
+     */
+    </span><span class="hl-identifier">getActiveTab</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Updates the tab body element to fit the height of the container element
+     * for overflow scrolling
+     * @param {Number} targetHeight (optional) Override the starting height from the elements height
+     */
+    </span><span class="hl-identifier">syncHeight</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">targetHeight</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">height</span><span class="hl-code"> = </span><span class="hl-brackets">(</span><span class="hl-identifier">targetHeight</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getHeight</span><span class="hl-brackets">())</span><span class="hl-code">-</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getBorderWidth</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">tb</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">-</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">tb</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">bm</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">getMargins</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">newHeight</span><span class="hl-code"> = </span><span class="hl-identifier">height</span><span class="hl-code">-</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripWrap</span><span class="hl-code">.</span><span class="hl-identifier">getHeight</span><span class="hl-brackets">())</span><span class="hl-code">-</span><span class="hl-brackets">(</span><span class="hl-identifier">bm</span><span class="hl-code">.</span><span class="hl-identifier">top</span><span class="hl-code">+</span><span class="hl-identifier">bm</span><span class="hl-code">.</span><span class="hl-identifier">bottom</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setHeight</span><span class="hl-brackets">(</span><span class="hl-identifier">newHeight</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">newHeight</span><span class="hl-code">; 
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-builtin">onResize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">monitorResize</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+
+    </span><span class="hl-comment">/**
+     * Disables tab resizing while tabs are being added (if resizeTabs is false this does nothing)
+     */
+    </span><span class="hl-identifier">beginUpdate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;    
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Stops an update and resizes the tabs (if resizeTabs is false this does nothing)
+     */
+    </span><span class="hl-identifier">endUpdate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSizeTabs</span><span class="hl-brackets">()</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Manual call to resize the tabs (if resizeTabs is false this does nothing)
+     */
+    </span><span class="hl-identifier">autoSizeTabs</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">count</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">items</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">vcount</span><span class="hl-code"> = </span><span class="hl-identifier">count</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hiddenCount</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">resizeTabs</span><span class="hl-code"> || </span><span class="hl-identifier">count</span><span class="hl-code"> &lt; </span><span class="hl-number">1</span><span class="hl-code"> || </span><span class="hl-identifier">vcount</span><span class="hl-code"> &lt; </span><span class="hl-number">1</span><span class="hl-code"> || </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">updating</span><span class="hl-brackets">) </span><span class="hl-reserved">return</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">w</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">max</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">cpad</span><span class="hl-code">, </span><span class="hl-number">10</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">availWidth</span><span class="hl-code"> = </span><span class="hl-builtin">Math</span><span class="hl-code">.</span><span class="hl-identifier">floor</span><span class="hl-brackets">(</span><span class="hl-identifier">w </span><span class="hl-quotes">/</span><span class="hl-string"> vcount);
+        var b = this.stripBody;
+        if(b.getWidth() &gt; w){
+            var tabs = this.items;
+            this.setTabWidth(Math.max(availWidth, this.minTabWidth));
+            if(availWidth &lt; this.minTabWidth){
+                </span><span class="hl-quotes">/</span><span class="hl-code">*</span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sleft</span><span class="hl-brackets">){    </span><span class="hl-comment">// incomplete scrolling code
+                    </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">createScrollButtons</span><span class="hl-brackets">()</span><span class="hl-code">;
+                </span><span class="hl-brackets">}
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">showScroll</span><span class="hl-brackets">()</span><span class="hl-code">;
+                </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">stripClip</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">w</span><span class="hl-code"> - </span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sleft</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()</span><span class="hl-code">+</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">sright</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()))</span><span class="hl-code">;*</span><span class="hl-quotes">/</span><span class="hl-string">
+            }
+        }else{
+            if(this.currentTabWidth &lt; this.preferredTabWidth){
+                this.setTabWidth(Math.min(availWidth, this.preferredTabWidth));
+            }
+        }
+    },
+    
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">Resizes all the tabs to the passed width</span><span class="hl-code">
+     * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-builtin">Number</span><span class="hl-brackets">} </span><span class="hl-identifier">The </span><span class="hl-reserved">new </span><span class="hl-identifier">width</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    setTabWidth : function(width){
+        this.currentTabWidth = width;
+        for(var i = 0, len = this.items.length; i &lt; len; i++) {
+        	if(!this.items[i].isHidden())this.items[i].setWidth(width);
+        }
+    },
+    
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">Destroys </span><span class="hl-reserved">this </span><span class="hl-identifier">TabPanel</span><span class="hl-code">
+     * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">Boolean</span><span class="hl-brackets">} </span><span class="hl-identifier">removeEl </span><span class="hl-brackets">(</span><span class="hl-identifier">optional</span><span class="hl-brackets">) </span><span class="hl-identifier">True to remove the element from the DOM as well</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    destroy : function(removeEl){
+        YAHOO.ext.EventManager.removeResizeListener(this.onResize, this);
+        for(var i = 0, len = this.items.length; i &lt; len; i++){
+            this.items[i].purgeListeners();
+        }
+        if(removeEl === true){
+            this.el.update('');
+            this.el.remove();
+        }
+    }
+};
+
+</span><span class="hl-quotes">/</span><span class="hl-code">**
+* @</span><span class="hl-reserved">class </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-code">
+* @</span><span class="hl-reserved">extends </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Observable</span><span class="hl-code">
+*</span><span class="hl-quotes">/</span><span class="hl-string"> 
+YAHOO.ext.TabPanelItem = function(tabPanel, id, text, closable){
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">The TabPanel </span><span class="hl-reserved">this </span><span class="hl-identifier">TabPanelItem belongs to</span><span class="hl-code">
+     * @</span><span class="hl-identifier">type YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.tabPanel = tabPanel;
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">The id </span><span class="hl-reserved">for this </span><span class="hl-identifier">TabPanelItem</span><span class="hl-code">
+     * @</span><span class="hl-identifier">type </span><span class="hl-builtin">String</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.id = id;
+    </span><span class="hl-quotes">/</span><span class="hl-code">** @</span><span class="hl-reserved">private</span><span class="hl-code"> *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.disabled = false;
+    </span><span class="hl-quotes">/</span><span class="hl-code">** @</span><span class="hl-reserved">private</span><span class="hl-code"> *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.text = text;
+    </span><span class="hl-quotes">/</span><span class="hl-code">** @</span><span class="hl-reserved">private</span><span class="hl-code"> *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.loaded = false;
+    this.closable = closable;
+    
+    </span><span class="hl-quotes">/</span><span class="hl-code">** 
+     * </span><span class="hl-identifier">The body element </span><span class="hl-reserved">for this </span><span class="hl-identifier">TabPanelItem</span><span class="hl-code">
+     * @</span><span class="hl-identifier">type YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Element</span><span class="hl-code">
+     *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.bodyEl = getEl(tabPanel.createItemBody(tabPanel.bodyEl.dom, id));
+    this.bodyEl.setVisibilityMode(YAHOO.ext.Element.VISIBILITY);
+    this.bodyEl.setStyle('display', 'block');
+    this.hideAction();
+    
+    var els = tabPanel.createStripElements(tabPanel.stripEl.dom, text, closable);
+    </span><span class="hl-quotes">/</span><span class="hl-code">** @</span><span class="hl-reserved">private</span><span class="hl-code"> *</span><span class="hl-quotes">/</span><span class="hl-string">
+    this.el = getEl(els.el, true);
+    this.inner = getEl(els.inner, true);
+    this.textEl = getEl(this.el.dom.firstChild.firstChild.firstChild, true);
+    this.pnode = getEl(els.el.parentNode, true);
+    this.el.mon('click', this.onTabClick, this, true);
+    </span><span class="hl-quotes">/</span><span class="hl-code">** @</span><span class="hl-reserved">private</span><span class="hl-code"> *</span><span class="hl-quotes">/</span><span class="hl-string">
+    if(closable){
+        var c = getEl(els.close, true);
+        c.dom.title = this.closeText;
+        c.addClassOnOver('close-over');
+        c.mon('click', this.closeClick, this, true);
+     }
+    
+    </span><span class="hl-quotes">//</span><span class="hl-string"> these two are now private and deprecated
+    this.onActivate = new YAHOO.util.CustomEvent('TabItem.onActivate');
+    this.onDeactivate = new YAHOO.util.CustomEvent('TabItem.onDeactivate');
+    
+    this.events = {
+         </span><span class="hl-quotes">/</span><span class="hl-code">**
+         * @</span><span class="hl-identifier">event activate</span><span class="hl-code">
+         * </span><span class="hl-identifier">Fires when </span><span class="hl-reserved">this </span><span class="hl-identifier">tab becomes the active tab</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-brackets">} </span><span class="hl-identifier">tabPanel</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-brackets">} </span><span class="hl-reserved">this</span><span class="hl-code">
+         *</span><span class="hl-quotes">/</span><span class="hl-string">
+        'activate': this.onActivate,
+        </span><span class="hl-quotes">/</span><span class="hl-code">**
+         * @</span><span class="hl-identifier">event beforeclose</span><span class="hl-code">
+         * </span><span class="hl-identifier">Fires before </span><span class="hl-reserved">this </span><span class="hl-identifier">tab is closed</span><span class="hl-code">. </span><span class="hl-identifier">To cancal the close</span><span class="hl-code">, </span><span class="hl-identifier">set cancel to </span><span class="hl-reserved">true </span><span class="hl-identifier">on e</span><span class="hl-code">. </span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">cancel</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-brackets">)</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-brackets">} </span><span class="hl-reserved">this</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">Object</span><span class="hl-brackets">} </span><span class="hl-identifier">e Set cancel to </span><span class="hl-reserved">true </span><span class="hl-identifier">on </span><span class="hl-reserved">this </span><span class="hl-identifier">object to cancel the close</span><span class="hl-code">.
+         *</span><span class="hl-quotes">/</span><span class="hl-string">
+        'beforeclose': new YAHOO.util.CustomEvent('beforeclose'),
+        </span><span class="hl-quotes">/</span><span class="hl-code">**
+         * @</span><span class="hl-identifier">event close</span><span class="hl-code">
+         * </span><span class="hl-identifier">Fires when </span><span class="hl-reserved">this </span><span class="hl-identifier">tab is closed</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-brackets">} </span><span class="hl-reserved">this</span><span class="hl-code">
+         *</span><span class="hl-quotes">/</span><span class="hl-string">
+         'close': new YAHOO.util.CustomEvent('close'),
+        </span><span class="hl-quotes">/</span><span class="hl-code">**
+         * @</span><span class="hl-identifier">event deactivate</span><span class="hl-code">
+         * </span><span class="hl-identifier">Fires when </span><span class="hl-reserved">this </span><span class="hl-identifier">tab is no longer the active tab</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-brackets">} </span><span class="hl-identifier">tabPanel</span><span class="hl-code">
+         * @</span><span class="hl-identifier">param </span><span class="hl-brackets">{</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanelItem</span><span class="hl-brackets">} </span><span class="hl-reserved">this</span><span class="hl-code">
+         *</span><span class="hl-quotes">/</span><span class="hl-string">
+         'deactivate' : this.onDeactivate  
+    };
+    this.hidden = false;
+};
+
+YAHOO.ext.TabPanelItem.prototype = {
+    fireEvent : YAHOO.ext.util.Observable.prototype.fireEvent,
+    on : YAHOO.ext.util.Observable.prototype.on,
+    addListener : YAHOO.ext.util.Observable.prototype.addListener,
+    delayedListener : YAHOO.ext.util.Observable.prototype.delayedListener,
+    removeListener : YAHOO.ext.util.Observable.prototype.removeListener,
+    purgeListeners : function(){
+       YAHOO.ext.util.Observable.prototype.purgeListeners.call(this);
+       this.el.removeAllListeners(); 
+    },
+    </span><span class="hl-quotes">/</span><span class="hl-code">**
+     * </span><span class="hl-identifier">Show </span><span class="hl-reserved">this </span><span class="hl-identifier">TabPanelItem</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code"> &lt;</span><span class="hl-identifier">b</span><span class="hl-code">&gt;</span><span class="hl-identifier">does not</span><span class="hl-code">&lt;</span><span class="hl-quotes">/</span><span class="hl-string">b&gt; deactivate the currently active TabPanelItem.
+     *</span><span class="hl-quotes">/
+    </span><span class="hl-identifier">show</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">on</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">showAction</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Browser</span><span class="hl-code">.</span><span class="hl-identifier">isOpera</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">stripWrap</span><span class="hl-code">.</span><span class="hl-identifier">repaint</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onActivate</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">; 
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Hide this TabPanelItem - if you don't activate another TabPanelItem this could look odd.
+     */
+    </span><span class="hl-identifier">hide</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">on</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hideAction</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onDeactivate</span><span class="hl-code">.</span><span class="hl-identifier">fireDirect</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">; 
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">hideAction</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">absolute</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setLeft</span><span class="hl-brackets">(</span><span class="hl-code">-</span><span class="hl-number">20000</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setTop</span><span class="hl-brackets">(</span><span class="hl-code">-</span><span class="hl-number">20000</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">hide</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">showAction</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setLeft</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setTop</span><span class="hl-brackets">(</span><span class="hl-quotes">''</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">position</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">static</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">show</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setTooltip</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">text</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">titleEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">title</span><span class="hl-code"> = </span><span class="hl-identifier">text</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">onTabClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">preventDefault</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">activate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">getWidth</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">inner</span><span class="hl-code">.</span><span class="hl-identifier">getWidth</span><span class="hl-brackets">()</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setWidth</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">iwidth</span><span class="hl-code"> = </span><span class="hl-identifier">width</span><span class="hl-code"> - </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">lr</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">inner</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">iwidth</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">textEl</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">iwidth</span><span class="hl-code">-</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">inner</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">lr</span><span class="hl-quotes">'</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-identifier">width</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setHidden</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">hidden</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">hidden</span><span class="hl-code"> = </span><span class="hl-identifier">hidden</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">setStyle</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">display</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-identifier">hidden</span><span class="hl-code"> ? </span><span class="hl-quotes">'</span><span class="hl-string">none</span><span class="hl-quotes">'</span><span class="hl-code"> : </span><span class="hl-quotes">'</span><span class="hl-string">block</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">isHidden</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">hidden</span><span class="hl-code">;  
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">getText</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">text</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">autoSize</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">beginMeasure</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">textEl</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-number">1</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">setWidth</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">textEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">scrollWidth</span><span class="hl-code">+</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">lr</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">+</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">inner</span><span class="hl-code">.</span><span class="hl-identifier">getPadding</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">lr</span><span class="hl-quotes">'</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">endMeasure</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-identifier">setText</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">text</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">text</span><span class="hl-code"> = </span><span class="hl-identifier">text</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">textEl</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-identifier">text</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">textEl</span><span class="hl-code">.</span><span class="hl-identifier">dom</span><span class="hl-code">.</span><span class="hl-identifier">title</span><span class="hl-code"> = </span><span class="hl-identifier">text</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">resizeTabs</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">autoSize</span><span class="hl-brackets">()</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    </span><span class="hl-comment">/**
+     * Activate this TabPanelItem - this &lt;b&gt;does&lt;/b&gt; deactivate the currently active TabPanelItem.
+     */
+    </span><span class="hl-identifier">activate</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">activate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Disable this TabPanelItem - this call is ignore if this is the active TabPanelItem.
+     */
+    </span><span class="hl-identifier">disable</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">active</span><span class="hl-code"> != </span><span class="hl-reserved">this</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">disabled</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">disabled</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Enable this TabPanelItem if it was previously disabled.
+     */
+    </span><span class="hl-identifier">enable</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">disabled</span><span class="hl-code"> = </span><span class="hl-reserved">false</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">pnode</span><span class="hl-code">.</span><span class="hl-identifier">removeClass</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">disabled</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set the content for this TabPanelItem.
+     * @param {String} content The content
+     * @param {Boolean} loadScripts true to look for and load scripts
+     */
+    </span><span class="hl-identifier">setContent</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-code">, </span><span class="hl-identifier">loadScripts</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-identifier">content</span><span class="hl-code">, </span><span class="hl-identifier">loadScripts</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Get the {@link YAHOO.ext.UpdateManager} for the body of this TabPanelItem. Enables you to perform Ajax updates.
+     * @return {YAHOO.ext.UpdateManager} The UpdateManager
+     */
+    </span><span class="hl-identifier">getUpdateManager</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/**
+     * Set a URL to be used to load the content for this TabPanelItem.
+     * @param {String/Function} url The url to load the content from or a function to call to get the url
+     * @param {&lt;i&gt;String/Object&lt;/i&gt;} params (optional) The string params for the update call or an object of the params. See {@link YAHOO.ext.UpdateManager#update} for more details. (Defaults to null)
+     * @param {&lt;i&gt;Boolean&lt;/i&gt;} loadOnce (optional) Whether to only load the content once. If this is false it makes the Ajax call every time this TabPanelItem is activated. (Defaults to false)
+     * @return {YAHOO.ext.UpdateManager} The UpdateManager
+     */
+    </span><span class="hl-identifier">setUrl</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onActivate</span><span class="hl-code">.</span><span class="hl-identifier">unsubscribe</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_handleRefresh</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-brackets">[</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">])</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">onActivate</span><span class="hl-code">.</span><span class="hl-identifier">subscribe</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">refreshDelegate</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">return this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-identifier">_handleRefresh</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-identifier">loadOnce</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">loadOnce</span><span class="hl-code"> || !</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loaded</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">var </span><span class="hl-identifier">updater</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">getUpdateManager</span><span class="hl-brackets">()</span><span class="hl-code">;
+            </span><span class="hl-identifier">updater</span><span class="hl-code">.</span><span class="hl-identifier">update</span><span class="hl-brackets">(</span><span class="hl-identifier">url</span><span class="hl-code">, </span><span class="hl-identifier">params</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">_setLoaded</span><span class="hl-code">.</span><span class="hl-identifier">createDelegate</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-brackets">))</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-identifier">_setLoaded</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(){
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">loaded</span><span class="hl-code"> = </span><span class="hl-reserved">true</span><span class="hl-code">;
+    </span><span class="hl-brackets">}</span><span class="hl-code">,
+    
+    </span><span class="hl-comment">/** @private */
+    </span><span class="hl-identifier">closeClick</span><span class="hl-code"> : </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-brackets">){
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">e</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+        </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">beforeclose</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-code">, </span><span class="hl-identifier">e</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">e</span><span class="hl-code">.</span><span class="hl-identifier">cancel</span><span class="hl-code"> !== </span><span class="hl-reserved">true</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabPanel</span><span class="hl-code">.</span><span class="hl-identifier">removeTab</span><span class="hl-brackets">(</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">fireEvent</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">close</span><span class="hl-quotes">'</span><span class="hl-code">, </span><span class="hl-reserved">this</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }</span><span class="hl-code">,
+    </span><span class="hl-comment">/**
+     * The text displayed in the tooltip for the close icon.
+     * @type String
+     */
+    </span><span class="hl-identifier">closeText</span><span class="hl-code"> : </span><span class="hl-quotes">'</span><span class="hl-string">Close this tab</span><span class="hl-quotes">'</span><span class="hl-code">
+};
+
+</span><span class="hl-comment">/** @private */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">createStrip</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">strip</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">strip</span><span class="hl-code">.</span><span class="hl-identifier">className</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">ytab-wrap</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">strip</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">strip</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-comment">/** @private */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">createStripList</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">strip</span><span class="hl-brackets">){
+    </span><span class="hl-comment">// div wrapper for retard IE
+    </span><span class="hl-identifier">strip</span><span class="hl-code">.</span><span class="hl-identifier">innerHTML</span><span class="hl-code"> = </span><span class="hl-quotes">'</span><span class="hl-string">&lt;div class=&quot;ytab-strip-wrap&quot;&gt;&lt;table class=&quot;ytab-strip&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</span><span class="hl-quotes">'</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">strip</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">.</span><span class="hl-identifier">firstChild</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-comment">/** @private */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">createBody</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">container</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">body</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">generateId</span><span class="hl-brackets">(</span><span class="hl-identifier">body</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">tab-body</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">body</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">yui-ext-tabbody</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">container</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">body</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">body</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-comment">/** @private */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">createItemBody</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">bodyEl</span><span class="hl-code">, </span><span class="hl-identifier">id</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">body</span><span class="hl-code"> = </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">get</span><span class="hl-brackets">(</span><span class="hl-identifier">id</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">body</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">body</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">body</span><span class="hl-code">.</span><span class="hl-identifier">id</span><span class="hl-code"> = </span><span class="hl-identifier">id</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+    </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">util</span><span class="hl-code">.</span><span class="hl-identifier">Dom</span><span class="hl-code">.</span><span class="hl-identifier">addClass</span><span class="hl-brackets">(</span><span class="hl-identifier">body</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">yui-ext-tabitembody</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">bodyEl</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">body</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">body</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-code">;
+</span><span class="hl-comment">/** @private */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">TabPanel</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">createStripElements</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">stripEl</span><span class="hl-code">, </span><span class="hl-identifier">text</span><span class="hl-code">, </span><span class="hl-identifier">closable</span><span class="hl-brackets">){
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">td</span><span class="hl-code"> = </span><span class="hl-builtin">document</span><span class="hl-code">.</span><span class="hl-identifier">createElement</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">td</span><span class="hl-quotes">'</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-identifier">stripEl</span><span class="hl-code">.</span><span class="hl-identifier">appendChild</span><span class="hl-brackets">(</span><span class="hl-identifier">td</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">closable</span><span class="hl-brackets">){
+        </span><span class="hl-identifier">td</span><span class="hl-code">.</span><span class="hl-identifier">className</span><span class="hl-code"> = </span><span class="hl-quotes">&quot;</span><span class="hl-string">ytab-closable</span><span class="hl-quotes">&quot;</span><span class="hl-code">;
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">closeTpl</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">closeTpl</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Template</span><span class="hl-brackets">(
+               </span><span class="hl-quotes">'</span><span class="hl-string">&lt;a href=&quot;#&quot; class=&quot;ytab-right&quot;&gt;&lt;span class=&quot;ytab-left&quot;&gt;&lt;em class=&quot;ytab-inner&quot;&gt;</span><span class="hl-quotes">'</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">&lt;span unselectable=&quot;on&quot; title=&quot;{text}&quot; class=&quot;ytab-text&quot;&gt;{text}&lt;/span&gt;</span><span class="hl-quotes">'</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">&lt;div unselectable=&quot;on&quot; class=&quot;close-icon&quot;&gt;&amp;#160;&lt;/div&gt;&lt;/em&gt;&lt;/span&gt;&lt;/a&gt;</span><span class="hl-quotes">'
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">closeTpl</span><span class="hl-code">.</span><span class="hl-identifier">overwrite</span><span class="hl-brackets">(</span><span class="hl-identifier">td</span><span class="hl-code">, </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">text</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">text</span><span class="hl-brackets">})</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">close</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getElementsByTagName</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">div</span><span class="hl-quotes">'</span><span class="hl-brackets">)[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">inner</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getElementsByTagName</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">em</span><span class="hl-quotes">'</span><span class="hl-brackets">)[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">el</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">close</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">close</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">inner</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">inner</span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+        </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabTpl</span><span class="hl-brackets">){
+            </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabTpl</span><span class="hl-code"> = </span><span class="hl-reserved">new </span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">ext</span><span class="hl-code">.</span><span class="hl-identifier">Template</span><span class="hl-brackets">(
+               </span><span class="hl-quotes">'</span><span class="hl-string">&lt;a href=&quot;#&quot; class=&quot;ytab-right&quot;&gt;&lt;span class=&quot;ytab-left&quot;&gt;&lt;em class=&quot;ytab-inner&quot;&gt;</span><span class="hl-quotes">'</span><span class="hl-code"> +
+               </span><span class="hl-quotes">'</span><span class="hl-string">&lt;span unselectable=&quot;on&quot; title=&quot;{text}&quot; class=&quot;ytab-text&quot;&gt;{text}&lt;/span&gt;&lt;/em&gt;&lt;/span&gt;&lt;/a&gt;</span><span class="hl-quotes">'
+            </span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">el</span><span class="hl-code"> = </span><span class="hl-reserved">this</span><span class="hl-code">.</span><span class="hl-identifier">tabTpl</span><span class="hl-code">.</span><span class="hl-identifier">overwrite</span><span class="hl-brackets">(</span><span class="hl-identifier">td</span><span class="hl-code">, </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">text</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">text</span><span class="hl-brackets">})</span><span class="hl-code">;
+        </span><span class="hl-reserved">var </span><span class="hl-identifier">inner</span><span class="hl-code"> = </span><span class="hl-identifier">el</span><span class="hl-code">.</span><span class="hl-identifier">getElementsByTagName</span><span class="hl-brackets">(</span><span class="hl-quotes">'</span><span class="hl-string">em</span><span class="hl-quotes">'</span><span class="hl-brackets">)[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-reserved">return </span><span class="hl-brackets">{</span><span class="hl-quotes">'</span><span class="hl-string">el</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">el</span><span class="hl-code">, </span><span class="hl-quotes">'</span><span class="hl-string">inner</span><span class="hl-quotes">'</span><span class="hl-code">: </span><span class="hl-identifier">inner</span><span class="hl-brackets">}</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-code">;</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

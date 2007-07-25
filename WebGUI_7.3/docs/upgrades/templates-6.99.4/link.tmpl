@@ -1,0 +1,325 @@
+#PBtmpl0000000000000113
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a> 
+
+<tmpl_if session.var.adminOn> 
+	<p><tmpl_var controls></p>
+</tmpl_if>
+
+<h2><tmpl_var title></h2>
+
+<tmpl_if user.isModerator>
+	<div style="float: right; font-size: 11px; border: 1px solid #cccccc; padding: 2px; margin: 2px;">
+		<b><tmpl_var status.label>:</b> <tmpl_var status> &nbsp; &nbsp; [ <tmpl_if isArchived><a href="<tmpl_var unarchive.url>"><tmpl_var unarchive.label></a> <tmpl_else> <a href="<tmpl_var archive.url>"><tmpl_var archive.label></a></tmpl_if> ]<br />
+	</div>
+</tmpl_if>	
+
+<tmpl_if content>
+	<div class="linkContent">
+	<b>Link Description</b><br /><br />
+	<tmpl_var content><br />
+	
+	<b>Link URL</b><br /><br />
+	<a href="<tmpl_var userDefined1>"><tmpl_var userDefined1></a><br /><br />
+	</div>
+</tmpl_if>
+
+
+
+<tmpl_if attachment_loop>
+	<br />
+		<tmpl_loop attachment_loop>
+			<div style="float: left; padding: 5px;">
+				<a href="<tmpl_var url>">
+					<tmpl_if isImage>
+						<img src="<tmpl_var thumbnail>" style="border-style:none;" alt="<tmpl_var filename>" />
+					<tmpl_else>
+						<img src="<tmpl_var icon>" style="border-style:none;vertical-align:middle;" alt="<tmpl_var filename>" /></a> <a href="<tmpl_var url>"><tmpl_var filename>
+					</tmpl_if>
+				</a>
+			</div>
+		</tmpl_loop>
+		<div style="clear: both;"></div>
+	<br />
+</tmpl_if>
+
+<tmpl_unless isLocked>
+	<div class="postControls">
+		<tmpl_if user.canReply>
+			<a href="<tmpl_var reply.url>"><tmpl_var reply.label></a>
+			&bull;
+		</tmpl_if>
+		<tmpl_if user.canEdit>
+			<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a>
+			&bull;
+			<a href="<tmpl_var delete.url>"><tmpl_var delete.label></a>
+		</tmpl_if>
+	</div>
+</tmpl_unless>
+
+<tmpl_if repliesAllowed>
+
+	<div style="float: left; width: 70%">
+		<h2><tmpl_var replies.label></h2>
+	</div>
+	<div style="width: 30%; float: left; text-align: right;">
+	<tmpl_if layout.isFlat>
+		<a href="<tmpl_var layout.nested.url>"><tmpl_var layout.nested.label></a>
+	<tmpl_else>
+		<a href="<tmpl_var layout.flat.url>"><tmpl_var layout.flat.label></a>
+	</tmpl_if>
+	</div>
+	<div style="clear: both;"></div>
+	
+	<tmpl_if layout.isFlat>
+	<!-- begin flat layout -->
+		<tmpl_loop post_loop>
+			<tmpl_unless isThreadRoot>
+				<div class="postBorder<tmpl_if isCurrent>Current</tmpl_if>">
+					<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+					<div class="postSubject">
+						<tmpl_var title>
+					</div>
+					<div class="postData">
+						<div style="float: left; width: 50%">
+							<b><tmpl_var user.label>:</b> 
+								<tmpl_if user.isVisitor>
+									<tmpl_var username>
+								<tmpl_else>
+									<a href="<tmpl_var userProfile.url>"><tmpl_var username></a>
+								</tmpl_if>
+								<br />
+							<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />
+						</div>	
+						<div>
+							<b><tmpl_var views.label>:</b> <tmpl_var views><br />
+							<b><tmpl_var rating.label>:</b> <tmpl_var rating>
+								<tmpl_unless hasRated>
+								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
+								</tmpl_unless>
+								<br />
+								<tmpl_if user.isPoster>
+									<b><tmpl_var status.label>:</b> <tmpl_var status><br />
+								</tmpl_if>	
+						</div>	
+					</div>
+					<div class="postMessage">
+						<tmpl_var content>
+						<tmpl_loop attachment_loop>
+							<div style="float: left; padding: 5px;">
+								<a href="<tmpl_var url>">
+									<tmpl_if isImage>
+										<img src="<tmpl_var thumbnail>" style="border-style:none;" alt="<tmpl_var filename>" />
+									<tmpl_else>
+										<img src="<tmpl_var icon>" style="border-style:none;vertical-align:middle;" alt="<tmpl_var filename>" /></a> <a href="<tmpl_var url>"><tmpl_var filename>
+									</tmpl_if>
+								</a>
+							</div>
+						</tmpl_loop>
+						<div style="clear: both;"></div>
+					</div>
+					<tmpl_unless isLocked>
+						<div class="postControls">
+							<tmpl_if user.canReply>
+								<a href="<tmpl_var reply.url>"><tmpl_var reply.label></a> &bull; 
+							</tmpl_if>
+							<tmpl_if user.canEdit>
+								<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a> &bull;
+								<a href="<tmpl_var delete.url>"><tmpl_var delete.label></a>
+							</tmpl_if>
+						</div>
+					</tmpl_unless>
+				</div>
+			</tmpl_unless>
+		</tmpl_loop>
+	<!-- end flat layout -->
+	</tmpl_if>
+	
+	<tmpl_if layout.isNested>
+	<!-- begin nested layout -->
+		<tmpl_loop post_loop>
+			<tmpl_unless isThreadRoot>
+				<div style="margin-left: <tmpl_var depthX10>px;">
+					<div class="postBorder<tmpl_if isCurrent>Current</tmpl_if>">
+						<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+						<div class="postSubject">
+							<tmpl_var title>
+						</div>
+						<div class="postData">
+							<div style="float: left; width: 50%">
+								<b><tmpl_var user.label>:</b> 
+									<tmpl_if user.isVisitor>
+										<tmpl_var username>
+									<tmpl_else>
+										<a href="<tmpl_var userProfile.url>"><tmpl_var username></a>
+									</tmpl_if>
+									<br />
+								<b><tmpl_var date.label>:</b> <tmpl_var dateSubmitted.human><br />
+							</div>	
+							<div>
+								<b><tmpl_var views.label>:</b> <tmpl_var views><br />
+								<b><tmpl_var rating.label>:</b> <tmpl_var rating>
+									<tmpl_unless hasRated>
+								&nbsp; &nbsp;<tmpl_var rate.label> [ <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsUp>"><img src="<tmpl_var thumbsUp.icon.url>" alt="+" style="border: 0px;vertical-align:middle;" /></a></p> | <p style="display:inline;vertical-align:middle;"><a href="<tmpl_var rate.url.thumbsDown>"><img src="<tmpl_var thumbsDown.icon.url>" alt="-" style="border: 0px;vertical-align:middle;" /></a></p> ]
+									</tmpl_unless>
+									<br />
+									<tmpl_if user.isPoster>
+										<b><tmpl_var status.label>:</b> <tmpl_var status><br />
+									</tmpl_if>	
+							</div>	
+						</div>
+						<div class="postMessage">
+							<tmpl_var content>
+							<tmpl_loop attachment_loop>
+								<div style="float: left; padding: 5px;">
+									<a href="<tmpl_var url>">
+										<tmpl_if isImage>
+											<img src="<tmpl_var thumbnail>" style="border-style:none;" alt="<tmpl_var filename>" />
+										<tmpl_else>
+											<img src="<tmpl_var icon>" style="border-style:none;vertical-align:middle;" alt="<tmpl_var filename>" /></a> <a href="<tmpl_var url>"><tmpl_var filename>
+										</tmpl_if>
+									</a>
+								</div>
+							</tmpl_loop>
+							<div style="clear: both;"></div>
+						</div>
+						<tmpl_unless isLocked>
+							<div class="postControls">
+								<tmpl_if user.canReply>
+									<a href="<tmpl_var reply.url>"><tmpl_var reply.label></a> &bull;
+								</tmpl_if>
+								<tmpl_if user.canEdit>
+									<a href="<tmpl_var edit.url>"><tmpl_var edit.label></a> &bull; 
+									<a href="<tmpl_var delete.url>"><tmpl_var delete.label></a>
+								</tmpl_if>
+							</div>
+						</tmpl_unless>
+					</div>
+				</div>
+			</tmpl_unless>
+		</tmpl_loop>
+	<!-- end nested layout -->
+	</tmpl_if>
+	
+	<tmpl_if pagination.pageCount.isMultiple>
+		<div class="pagination" style="margin-top: 20px;">
+			[ <tmpl_var pagination.previousPage> | <tmpl_var pagination.pageList.upTo10> | <tmpl_var pagination.nextPage> ]
+		</div>
+	</tmpl_if>
+</tmpl_if>	
+
+<div class="postControls">
+	<tmpl_if previous.url>
+		<a href="<tmpl_var previous.url>"><tmpl_var previous.label></a> 
+		&bull;
+	</tmpl_if>	
+	<a href="<tmpl_var collaboration.url>">List All Links</a>
+	<tmpl_if next.url>
+		&bull;
+		<a href="<tmpl_var next.url>"><tmpl_var next.label></a> 
+	</tmpl_if>	
+	<tmpl_if user.canPost>
+		&bull;
+		<a href="<tmpl_var add.url>"><tmpl_var add.label></a>
+	</tmpl_if>
+	<tmpl_if user.isModerator>
+		&bull;
+		<tmpl_if isSticky>
+			<a href="<tmpl_var unstick.url>"><tmpl_var unstick.label></a>
+			&bull;
+		<tmpl_else>
+			<a href="<tmpl_var stick.url>"><tmpl_var stick.label></a>
+			&bull;
+		</tmpl_if>
+		<tmpl_if isLocked>
+			<a href="<tmpl_var unlock.url>"><tmpl_var unlock.label></a>
+			&bull;
+		<tmpl_else>
+			<a href="<tmpl_var lock.url>"><tmpl_var lock.label></a>
+			&bull;
+		</tmpl_if>
+	</tmpl_if>
+	<tmpl_unless user.isVisitor>
+		<tmpl_if user.isSubscribed>
+			<a href="<tmpl_var unsubscribe.url>"><tmpl_var unsubscribe.label></a>
+		<tmpl_else>
+			<a href="<tmpl_var subscribe.url>"><tmpl_var subscribe.label></a>
+		</tmpl_if>
+	</tmpl_unless>
+</div>
+~~~
+<style type="text/css">
+.postBorder {
+	border: 1px solid #cccccc;
+	margin-bottom: 10px;
+}
+.postBorderCurrent {
+	border: 3px dotted black;
+	margin-bottom: 10px;
+}
+.postSubject {
+	border-bottom: 1px solid #cccccc;
+	font-weight: bold;
+	font-family:arial;
+	font-size:9pt;
+	padding: 3px;
+}
+.postData {
+	border-bottom: 1px solid #cccccc;
+	font-family:arial;
+	font-size:9pt;
+	background-color: #eeeeee;
+	color: black;
+	padding: 3px;
+}
+.postControls
+{
+	background:#676767;
+	display:block;
+	text-align:right;
+	padding:3px;
+	font-size:9pt;
+	font-family:arial;
+	margin-top: 1px;	
+}
+.postControls a:link, .postControls a:visited
+{
+	color:white;
+	text-decoration:underline;
+}
+.postControls a:hover {
+	text-decoration:none;
+}
+.postMessage {
+	padding: 3px;
+}
+.currentThread {
+	background-color: #eeeeee;
+}
+.threadHead {
+	font-weight: bold;
+	border-bottom: 1px solid #cccccc;
+	font-family:arial;
+	font-size:9pt;
+	background-color: #eeeeee;
+	color: black;
+	padding: 3px;
+}
+.threadData {
+	font-family:arial;
+	font-size:9pt;
+	padding: 3px;
+}
+.linkContent
+{
+	font-family:arial;
+	font-size:9pt;
+}
+.linkContent a
+{
+	color:#29587E;
+}
+h2
+{
+	font-family:arial;
+}
+</style>

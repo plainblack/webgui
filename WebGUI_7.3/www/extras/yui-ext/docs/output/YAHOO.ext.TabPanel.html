@@ -1,0 +1,813 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.ext.TabPanel</title>
+        <link rel="stylesheet" type="text/css" href="../resources/reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../resources/print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="../resources/print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.ext.TabPanel.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.ext.TabPanel</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.ext</td></tr>
+            <tr><td class="label">Class:</td><td>TabPanel</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.ext.util.Observable.html">Observable</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="TabPanel.js.html">TabPanel.js</a></td></tr>
+        </table>
+        <div class="description">
+            Creates a lightweight TabPanel component using Yahoo! UI.
+<br><br>
+Usage:
+<pre><code>
+    <font color="#008000">// basic tabs 1, built from existing content</font>
+    var tabs = new YAHOO.ext.TabPanel('tabs1');
+    tabs.addTab('script', "View Script");
+    tabs.addTab('markup', "View Markup");
+    tabs.activate('script');
+    
+    <font color="#008000">// more advanced tabs, built from javascript</font>
+    var jtabs = new YAHOO.ext.TabPanel('jtabs');
+    jtabs.addTab('jtabs-1', "Normal Tab", "My content was added during construction.");
+    
+    <font color="#008000">// set up the UpdateManager</font>
+    var tab2 = jtabs.addTab('jtabs-2', "Ajax Tab 1");
+    var updater = tab2.getUpdateManager();
+    updater.setDefaultUrl('ajax1.htm');
+    tab2.onActivate.subscribe(updater.refresh, updater, true);
+    
+    <font color="#008000">// Use setUrl for Ajax loading</font>
+    var tab3 = jtabs.addTab('jtabs-3', "Ajax Tab 2");
+    tab3.setUrl('ajax2.htm', null, true);
+    
+    <font color="#008000">// Disabled tab</font>
+    var tab4 = jtabs.addTab('tabs1-5', "Disabled Tab", "Can't see me cause I'm disabled");
+    tab4.disable();
+    
+    jtabs.activate('jtabs-1');
+}
+</code></pre>        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#bodyEl">bodyEl</a> : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The body element that contains TabPaneItem bodies.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#el">el</a> : YAHOO.ext.Element</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The container element for this TabPanel.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#maxTabWidth">maxTabWidth</a> : Number</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">The maximum width of a tab (ignored if resizeTabs is not true).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#minTabWidth">minTabWidth</a> : Number</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The minimum width of a tab (ignored if resizeTabs is not true).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#monitorResize">monitorResize</a> : Boolean</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Set this to true to turn on window resizing monitoring (ignored if resizeTabs is not true).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#preferredTabWidth">preferredTabWidth</a> : Number</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The preferred (default) width of a tab (ignored if resizeTabs is not true).</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#resizeTabs">resizeTabs</a> : Boolean</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Set this to true to enable dynamic tab resizing.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#tabPosition">tabPosition</a> : String</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">The position of the tabs. Can be 'top' or 'bottom'</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#TabPanel">TabPanel</a>(<code>String/HTMLElement/Element container</code>, <code>Boolean config</code>)</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Create new TabPanel.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#activate">activate</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Activate a TabPanelItem. The currently active will be deactivated.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addListener">addListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>boolean override</code>]</span>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#addListener">Observable</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Appends an event handler to this element</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addTab">addTab</a>(<code>String id</code>, <code>String text</code>, <span class="optional" title="Optional">[<code>String content</code>]</span>, <span class="optional" title="Optional">[<code>Boolean closable</code>]</span>) : YAHOO.ext.TabPanelItem</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Creates a new TabPanelItem by looking for an existing element with the provided id - if it's not found it creates one.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#addTabItem">addTabItem</a>(<code>YAHOO.ext.TabPanelItem item</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Add an existing TabPanelItem.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#autoSizeTabs">autoSizeTabs</a>() : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Manual call to resize the tabs (if resizeTabs is false this does nothing)</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#beginUpdate">beginUpdate</a>() : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Disables tab resizing while tabs are being added (if resizeTabs is false this does nothing)</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#delayedListener">delayedListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>Number delay</code>]</span>) : Function</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#delayedListener">Observable</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Appends an event handler to this element that is delayed the specified number of milliseconds.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>(<span class="optional" title="Optional">[<code>Boolean removeEl</code>]</span>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Destroys this TabPanel</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#disableTab">disableTab</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Disable a TabPanelItem. <b>It cannot be the active tab, if it is this call is ignored.</b>.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#enableTab">enableTab</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Enable a TabPanelItem that is disabled.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#endUpdate">endUpdate</a>() : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Stops an update and resizes the tabs (if resizeTabs is false this does nothing)</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#fireEvent">fireEvent</a>(<code>String eventName</code>, <code>Object... args</code>) : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#fireEvent">Observable</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires the specified event with the passed parameters (minus the event name).</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getActiveTab">getActiveTab</a>() : YAHOO.ext.TabPanelItem</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Get the active TabPanelItem</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getTab">getTab</a>(<code>String/Number id</code>) : YAHOO.ext.TabPanelItem</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Returns the TabPanelItem with the specified id/index</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#hideTab">hideTab</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Hides the TabPanelItem with the specified id/index</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#purgeListeners">purgeListeners</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#purgeListeners">Observable</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">Removes all listeners for this object</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeListener">removeListener</a>(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.ext.util.Observable.html#removeListener">Observable</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Removes a listener</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#removeTab">removeTab</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Remove a TabPanelItem.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#setTabWidth">setTabWidth</a>(<code>Number The</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Resizes all the tabs to the passed width</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#syncHeight">syncHeight</a>(<span class="optional" title="Optional">[<code>Number targetHeight</code>]</span>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Updates the tab body element to fit the height of the container element
+for overflow scrolling</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#unhideTab">unhideTab</a>(<code>String/Number id</code>) : void</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">"Unhides" the TabPanelItem with the specified id/index</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-beforetabchange">beforetabchange</a> : (<code>YAHOO.ext.TabPanel this</code>, <code>Object e</code>, <code>YAHOO.ext.TabPanelItem tab</code>)</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr>
+        <td class="mdesc">Fires before the active tab changes, set cancel to true on the "e" parameter to cancel the change</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#event-tabchange">tabchange</a> : (<code>YAHOO.ext.TabPanel this</code>, <code>YAHOO.ext.TabPanelItem activePanel</code>)</td>
+        <td class="msource" rowspan="2">TabPanel</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">Fires when the active tab changes</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="bodyEl"></a>
+                <div class="mdetail">
+                <h3>bodyEl</i></h3>
+                <code>public YAHOO.ext.Element bodyEl</code>
+                <div class="mdetail-desc">
+                    The body element that contains TabPaneItem bodies.                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="el"></a>
+                <div class="mdetail alt">
+                <h3>el</i></h3>
+                <code>public YAHOO.ext.Element el</code>
+                <div class="mdetail-desc">
+                    The container element for this TabPanel.                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="maxTabWidth"></a>
+                <div class="mdetail">
+                <h3>maxTabWidth</i></h3>
+                <code>public Number maxTabWidth</code>
+                <div class="mdetail-desc">
+                    The maximum width of a tab (ignored if resizeTabs is not true).                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="minTabWidth"></a>
+                <div class="mdetail alt">
+                <h3>minTabWidth</i></h3>
+                <code>public Number minTabWidth</code>
+                <div class="mdetail-desc">
+                    The minimum width of a tab (ignored if resizeTabs is not true).                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="monitorResize"></a>
+                <div class="mdetail">
+                <h3>monitorResize</i></h3>
+                <code>public Boolean monitorResize</code>
+                <div class="mdetail-desc">
+                    Set this to true to turn on window resizing monitoring (ignored if resizeTabs is not true).                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="preferredTabWidth"></a>
+                <div class="mdetail alt">
+                <h3>preferredTabWidth</i></h3>
+                <code>public Number preferredTabWidth</code>
+                <div class="mdetail-desc">
+                    The preferred (default) width of a tab (ignored if resizeTabs is not true).                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="resizeTabs"></a>
+                <div class="mdetail">
+                <h3>resizeTabs</i></h3>
+                <code>public Boolean resizeTabs</code>
+                <div class="mdetail-desc">
+                    Set this to true to enable dynamic tab resizing.                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                            <a name="tabPosition"></a>
+                <div class="mdetail alt">
+                <h3>tabPosition</i></h3>
+                <code>public String tabPosition</code>
+                <div class="mdetail-desc">
+                    The position of the tabs. Can be 'top' or 'bottom'                </div>
+                <div class="mdetail-def">This property is defined by TabPanel.</div>
+                </div>
+                        </div>
+                
+                    <a name="TabPanel"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>TabPanel</i></h3>
+                <code>public function TabPanel(<code>String/HTMLElement/Element container</code>, <code>Boolean config</code>)</code>
+                <div class="mdetail-desc">
+                Create new TabPanel.                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>container</code> : String/HTMLElement/Element<div class="sub-desc">The id, DOM element or YAHOO.ext.Element container where this TabPanel is to be rendered.</div></li><li><code>config</code> : Boolean<div class="sub-desc">Config object to set any properties for this TabPanel or true to render the tabs on the bottom.</div></li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="activate"></a>
+                <div class="mdetail">
+                <h3>activate</i></h3>
+                <code>public function activate(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Activate a TabPanelItem. The currently active will be deactivated.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to activate.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="addListener"></a>
+                <div class="mdetail alt">
+                <h3>addListener</i></h3>
+                <code>public function addListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>boolean override</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler to this element                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li><li><code>override</code> : boolean<div class="sub-desc">(optional) If true, scope becomes the scope</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#addListener">Observable</a>.</div>
+                </div>
+                            <a name="addTab"></a>
+                <div class="mdetail">
+                <h3>addTab</i></h3>
+                <code>public function addTab(<code>String id</code>, <code>String text</code>, <span class="optional" title="Optional">[<code>String content</code>]</span>, <span class="optional" title="Optional">[<code>Boolean closable</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Creates a new TabPanelItem by looking for an existing element with the provided id - if it's not found it creates one.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String<div class="sub-desc">The id of the div to use <b>or create</b></div></li><li><code>text</code> : String<div class="sub-desc">The text for the tab</div></li><li><code>content</code> : String<div class="sub-desc">(optional) Content to put in the TabPanelItem body</div></li><li><code>closable</code> : Boolean<div class="sub-desc">(optional) True to create a close icon on the tab</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.TabPanelItem</code><div class="sub-desc">The created TabPanelItem</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="addTabItem"></a>
+                <div class="mdetail alt">
+                <h3>addTabItem</i></h3>
+                <code>public function addTabItem(<code>YAHOO.ext.TabPanelItem item</code>)</code>
+                <div class="mdetail-desc">
+                    Add an existing TabPanelItem.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>item</code> : YAHOO.ext.TabPanelItem<div class="sub-desc">The TabPanelItem to add</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="autoSizeTabs"></a>
+                <div class="mdetail">
+                <h3>autoSizeTabs</i></h3>
+                <code>public function autoSizeTabs()</code>
+                <div class="mdetail-desc">
+                    Manual call to resize the tabs (if resizeTabs is false this does nothing)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="beginUpdate"></a>
+                <div class="mdetail alt">
+                <h3>beginUpdate</i></h3>
+                <code>public function beginUpdate()</code>
+                <div class="mdetail-desc">
+                    Disables tab resizing while tabs are being added (if resizeTabs is false this does nothing)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="delayedListener"></a>
+                <div class="mdetail">
+                <h3>delayedListener</i></h3>
+                <code>public function delayedListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>, <span class="optional" title="Optional">[<code>Number delay</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Appends an event handler to this element that is delayed the specified number of milliseconds.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The method the event invokes</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li><li><code>delay</code> : Number<div class="sub-desc">(optional) The number of milliseconds to delay</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Function</code><div class="sub-desc">The wrapped function that was created (can be used to remove the listener)</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#delayedListener">Observable</a>.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail alt">
+                <h3>destroy</i></h3>
+                <code>public function destroy(<span class="optional" title="Optional">[<code>Boolean removeEl</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Destroys this TabPanel                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>removeEl</code> : Boolean<div class="sub-desc">(optional) True to remove the element from the DOM as well</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="disableTab"></a>
+                <div class="mdetail">
+                <h3>disableTab</i></h3>
+                <code>public function disableTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Disable a TabPanelItem. <b>It cannot be the active tab, if it is this call is ignored.</b>.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to disable.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="enableTab"></a>
+                <div class="mdetail alt">
+                <h3>enableTab</i></h3>
+                <code>public function enableTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Enable a TabPanelItem that is disabled.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to enable.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="endUpdate"></a>
+                <div class="mdetail">
+                <h3>endUpdate</i></h3>
+                <code>public function endUpdate()</code>
+                <div class="mdetail-desc">
+                    Stops an update and resizes the tabs (if resizeTabs is false this does nothing)                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="fireEvent"></a>
+                <div class="mdetail alt">
+                <h3>fireEvent</i></h3>
+                <code>public function fireEvent(<code>String eventName</code>, <code>Object... args</code>)</code>
+                <div class="mdetail-desc">
+                    Fires the specified event with the passed parameters (minus the event name).                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc"></div></li><li><code>args</code> : Object...<div class="sub-desc">Variable number of parameters are passed to handlers</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>Boolean</code><div class="sub-desc">returns false if any of the handlers return false otherwise it returns true</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#fireEvent">Observable</a>.</div>
+                </div>
+                            <a name="getActiveTab"></a>
+                <div class="mdetail">
+                <h3>getActiveTab</i></h3>
+                <code>public function getActiveTab()</code>
+                <div class="mdetail-desc">
+                    Get the active TabPanelItem                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.TabPanelItem</code><div class="sub-desc">The active TabPanelItem or null if none are active.</div></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="getTab"></a>
+                <div class="mdetail alt">
+                <h3>getTab</i></h3>
+                <code>public function getTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Returns the TabPanelItem with the specified id/index                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to fetch.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.ext.TabPanelItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="hideTab"></a>
+                <div class="mdetail">
+                <h3>hideTab</i></h3>
+                <code>public function hideTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Hides the TabPanelItem with the specified id/index                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to hide.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="purgeListeners"></a>
+                <div class="mdetail alt">
+                <h3>purgeListeners</i></h3>
+                <code>public function purgeListeners()</code>
+                <div class="mdetail-desc">
+                    Removes all listeners for this object                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#purgeListeners">Observable</a>.</div>
+                </div>
+                            <a name="removeListener"></a>
+                <div class="mdetail">
+                <h3>removeListener</i></h3>
+                <code>public function removeListener(<code>String eventName</code>, <code>Function handler</code>, <span class="optional" title="Optional">[<code>Object scope</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Removes a listener                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>eventName</code> : String<div class="sub-desc">The type of event to listen for</div></li><li><code>handler</code> : Function<div class="sub-desc">The handler to remove</div></li><li><code>scope</code> : Object<div class="sub-desc">(optional) The scope (this object) for the handler</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.ext.util.Observable.html#removeListener">Observable</a>.</div>
+                </div>
+                            <a name="removeTab"></a>
+                <div class="mdetail alt">
+                <h3>removeTab</i></h3>
+                <code>public function removeTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    Remove a TabPanelItem.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to remove.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="setTabWidth"></a>
+                <div class="mdetail">
+                <h3>setTabWidth</i></h3>
+                <code>public function setTabWidth(<code>Number The</code>)</code>
+                <div class="mdetail-desc">
+                    Resizes all the tabs to the passed width                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>The</code> : Number<div class="sub-desc">new width</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="syncHeight"></a>
+                <div class="mdetail alt">
+                <h3>syncHeight</i></h3>
+                <code>public function syncHeight(<span class="optional" title="Optional">[<code>Number targetHeight</code>]</span>)</code>
+                <div class="mdetail-desc">
+                    Updates the tab body element to fit the height of the container element
+for overflow scrolling                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>targetHeight</code> : Number<div class="sub-desc">(optional) Override the starting height from the elements height</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                            <a name="unhideTab"></a>
+                <div class="mdetail">
+                <h3>unhideTab</i></h3>
+                <code>public function unhideTab(<code>String/Number id</code>)</code>
+                <div class="mdetail-desc">
+                    "Unhides" the TabPanelItem with the specified id/index                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>id</code> : String/Number<div class="sub-desc">The id or index of the TabPanelItem to unhide.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by TabPanel.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="event-beforetabchange"></a>
+                <div class="mdetail">
+                <h3>beforetabchange</i></h3>
+                <code>public event beforetabchange</code>
+                <div class="mdetail-desc">
+                Fires before the active tab changes, set cancel to true on the "e" parameter to cancel the change                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>this</code> : YAHOO.ext.TabPanel<div class="sub-desc"></div></li><li><code>e</code> : Object<div class="sub-desc">Set cancel to true on this object to cancel the tab change</div></li><li><code>tab</code> : YAHOO.ext.TabPanelItem<div class="sub-desc">The tab being changed to</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by TabPanel.</div>
+                </div>
+                            <a name="event-tabchange"></a>
+                <div class="mdetail alt">
+                <h3>tabchange</i></h3>
+                <code>public event tabchange</code>
+                <div class="mdetail-desc">
+                Fires when the active tab changes                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li><code>this</code> : YAHOO.ext.TabPanel<div class="sub-desc"></div></li><li><code>activePanel</code> : YAHOO.ext.TabPanelItem<div class="sub-desc">The new active tab</div></li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by TabPanel.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    

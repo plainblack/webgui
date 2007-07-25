@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Coolmenus example - CoolMenus4 DHTML script made by Thomas Brattli from DHTMLCentral.com. Visit for more great scripts.</title>
+<style type="text/css">
+  .clCMEvent{position:absolute; width:99%; height:99%; left:0px; top:0px; visibility:visible}
+  .clCMAbs{position:absolute; visibility:hidden; left:0px; top:0px}
+  .clT,.clTover{position:absolute; padding:4px; font-size:12px; font-weight:bold; width:120px; font-family:arial,helvetica,serif; cursor:pointer;}
+  .clT{color:#006699; background-color:#CDDBEB;}
+  .clTover{color:#FCCE55; background-color:#336699;}
+  .clB{position:absolute; color:#FFFFFF; background-color: #ff0000; visibility:hidden}
+  .clB1{position:absolute; color:#FFFFFF; background-color: #996600; visibility:hidden}
+  .clBar{position:absolute; color:#FFFFFF; width:10px; height:10px; visibility:hidden;  background-color: #336699;}
+</style>
+<script src="coolmenus4.js" type="text/javascript">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+<script src="cm_addins.js" type="text/javascript">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+Coolmenus add-in file for more advanced featuers..
+******************************************************************************/
+</script>
+</head>
+<body>
+
+<script type="text/javascript">
+/*** 
+This is the menu creation code - place it right after you body tag
+Feel free to add this to a stand-alone js file and link it to your page.
+**/
+
+//Setting IE5.5 and IE6 to use dom creation for standard compatability - though you don't really need to
+//bw.usedom=bw.ns6||bw.ie6||bw.ie55
+
+var oM=new makeCM("oM")
+oM.pxBetween =0
+oM.fromTop=0
+oM.fromLeft=10
+oM.menuPlacement="center"
+oM.wait=600
+oM.fillImg="cm_fill.gif"
+oM.zIndex=100 
+oM.resizeCheck=1
+oM.zIndex=100  
+
+oM.onlineRoot=""
+oM.offlineRoot="file:///C|/myfiles/"
+
+oM.rows=1
+
+//Background bar properties
+oM.useBar=1
+oM.barWidth="100%" 
+oM.barHeight="menu"
+oM.barX=0
+oM.barY="menu"
+oM.barClass="clBar" 
+oM.barBorderX=0
+oM.barBorderY=2
+oM.barBorderClass="clB1"
+
+
+//Level properties
+//Syntax for fast creation (advanced users only)
+//oM.level[1]=new cm_makeLevel(width,height,regClass,overClass,borderX,borderY,borderClass,rows,align,offsetX,offsetY,arrow,arrowWidth,arrowHeight)
+
+oM.level[0]=new cm_makeLevel()
+oM.level[0].width=120
+oM.level[0].height=20
+oM.level[0].regClass="clT" 
+oM.level[0].overClass="clTover"  
+oM.level[0].borderX=1
+oM.level[0].borderY=1
+oM.level[0].borderClass="clB" 
+oM.level[0].rows=0
+oM.level[0].align="bottom"
+oM.level[0].offsetX=0
+oM.level[0].offsetY=0
+oM.level[0].arrow="menu_arrow.gif"
+oM.level[0].arrowWidth=10
+oM.level[0].arrowHeight=10
+
+
+/******************************************
+Menu item creation:
+myCoolMenu.makeMenu(name, parent_name, text, link, target, width, height, regImage, overImage, regClass, overClass , align, rows, nolink, onclick, onmouseover, onmouseout) 
+*************************************/
+oM.makeMenu('top0','','Align left','other_tests/test.html','',100)
+	oM.makeMenu('0sub10','top0','New scripts','test.html','',110,20)
+	oM.makeMenu('0sub11','top0','All scripts','script/index.asp','',110,30)
+	oM.makeMenu('0sub13','top0','Sub columns','','',110,80,'','','',0,'right')
+    oM.makeMenu('','0sub13','Item') 
+    oM.makeMenu('','0sub13','Item') 
+
+
+oM.makeMenu('top1','','','','',100,0,'img1.gif','img1_on.gif')
+	oM.makeMenu('1sub10','top1','Different class','script/index.asp?new=1','',150,30)
+	oM.makeMenu('1sub11','top1','Different class','script/index.asp','',150,20)
+	oM.makeMenu('1sub12','top1','Regular','','',150,30)
+	oM.makeMenu('1sub13','top1','Different class','script/index.asp')
+	oM.makeMenu('1sub14','top1','Subs','','',150,20)
+    oM.makeMenu('','1sub14','Item') 
+    oM.makeMenu('bb','1sub14','Subs aligned top')   
+      oM.makeMenu('','bb','Item') 
+      oM.makeMenu('','bb','Item') 
+    oM.makeMenu('','1sub14','Item') 
+   
+oM.construct()
+
+
+function loopNodes(){
+  
+}
+</script>
+<p>
+<br />
+<br />
+<br />
+
+Small example using a "proper" xhtml DTD.
+<br />
+<br />
+This will work in all browsers but NS4 will not show a proper background-color because of the missing layer-background-color 
+in the stylesheet.
+<br />
+<br />
+The output for NS4 will not validate because of the name attribute added to images, but then again NS4 is the only
+browser that will see that (NS4 also writes all tags upper-case when you use document.write). You
+can see the NS4 output <a href="html/ns4_DTD_output.html">here</a>.
+<br />
+<br />
+The output for Opera will not validate either because I have to use border="0" on the image tags. You can 
+see the Opera output <a href="html/opera_DTD_output.html">here</a>
+<br />
+<br />
+The output for IE4 and IE5 (and IE5.5 and IE6 if you don't use dom creation) will validate.
+You can see the output <a href="html/ie_DTD_output.html">here</a>
+<br />
+<br />
+The output for the DOM browsers is a little worse to display. But if your using mozilla you can try the dom
+inspector on this page.
+<br />
+<br />
+You have to view source on the source pages to see the actual output. The script creation is removed so 
+the pages will not work.
+</p>
+</body>
+</html>

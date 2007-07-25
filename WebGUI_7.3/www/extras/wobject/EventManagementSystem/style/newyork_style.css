@@ -1,0 +1,494 @@
+#crmcalendar {  }
+
+/*body,td,li {
+
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+
+A {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:#333399;
+	font-weight:bold
+}	
+A:hover {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:#333399;
+	background:#cccc66;
+	font-weight:bold;
+}	
+A:visited {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:#333399;
+	font-weight:bold;
+}	
+*/
+td.searchDisplay {
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+.header {
+	font-family: verdana;
+	font-size: 13px;
+	font-weight:bold;
+}
+.footnote {
+	font-family: verdana;
+	font-size: 9px;
+	font-weight: normal;
+	color: gray;
+}
+.select {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width:190px;
+}
+
+.smselect {
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: normal;
+	color: black;
+	width: 150px;
+}
+
+.button {	
+	background: #47404C;
+	font-family: verdana;
+	font-size: 11px;
+	font-weight: bold;
+	color: white;
+	border: solid #D4D3D4 1px 1px 1px 1px;
+	width: 15px;
+}
+.button_login {	
+	background: #47404C;
+	font-family: verdana;
+	font-size: 11px;
+	font-weight: bold;
+	color: white;
+	padding: 2px 10px 2px 10px;
+	border: solid #D4D3D4 1px 1px 1px 1px;
+}
+
+.datatitle {
+	padding: 1px 1px 1px 5px;
+	background: #688097;
+	color: white;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+	border-bottom: 1px ridge white groove;
+}
+
+.datafield {
+	padding: 1px 1px 1px 1px;
+	background: #EEEEEE;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+	border-bottom: 1px ridge white groove;
+}
+
+.datacard {
+	padding: 1px 1px 1px 1px;
+	border: 1px solid #688097;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+
+.datacardtitle {
+	background: silver;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:13px;
+}
+
+.datalist {
+	padding: 1px 1px 1px 1px;
+	border: 1px ridge black;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+
+.datalistrow {
+	padding: 5px;
+	background: #F2F2F2;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+	/*border-bottom: 1px ridge black;
+	border-left: 1px ridge black;*/
+}
+
+.journal {
+	padding: 1px 1px 1px 1px;
+	border: 1px ridge black;
+	background: #ffff99;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+.journalrowtime {
+	padding: 1px 1px 1px 1px;
+	border-left: 1px ridge black;
+	border-bottom: 1px ridge black;
+	background: #ffff99;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:13px;
+}
+.journalrow {
+	padding: 1px 1px 1px 1px;
+	border-left: 1px ridge black;
+	border-bottom: 1px ridge black;
+	background: #ffff99;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+.journalrowempty {
+	padding: 1px 1px 1px 1px;
+	border-left: 1px ridge black;
+	border-bottom: 1px ridge black;
+	background: #ffcc66;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+.crmcalendar {
+	padding: 1px 1px 1px 1px;
+	border: 1px ridge black;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:10px;
+}
+.calendartitle {
+	background: #EEEEEE;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.calendarselected {
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: silver;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+.calendarcell {
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: #EEEEEE;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+.calendarcellfull {
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: #cccc00;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+.calendarcellfullselected {
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: yellow;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+
+.calendaremptycell {
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: white;
+	color: silver;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+
+.navlink_selected {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:#663366;
+	font-weight:bold
+}
+A.navlink {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:white;
+	font-weight:bold
+}	
+A.navlink:hover {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:yellow;
+	font-weight:bold;
+}	
+A.navlink:visited {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:white;
+	font-weight:bold;
+}	
+.status {
+	font-family: verdana;
+	font-size: 11px;
+	text-decoration: none;
+	color:white;
+	font-weight:bold;
+}
+.fieldset { 
+	background:#ECEBED;
+	font-family: verdana;
+	font-size: 11px;
+	color:black;
+	font-weight:bold;
+	padding: 2px 2px 2px 2px;
+}
+.header {
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:17px;
+}
+.listing_header {
+	padding: 1px 1px 1px 1px;
+	background: #ECEBED;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:12px;
+}
+.listing {
+	padding: 1px 1px 1px 1px;
+	background: #ECEBED;
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:11px;
+}
+.listing_space {
+	padding: 0px 0px 0px 0px;
+	background: white;
+}
+.nav_white {
+	padding: 1px 2px 2px 2px;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.nav_dark {
+	padding: 2px 2px 2px 2px;
+	background: #7B7782;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.nav_dark_on {
+	padding: 2px 2px 2px 2px;
+	border: 2px ridge red;
+	background: silver;
+	color: white;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+}
+.error_login {
+	color: red;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+} 
+.title {
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:14px;
+}
+A.small_link {
+	font-family: verdana;
+	font-size: 10px;
+	text-decoration: none;
+	color:navyblue;
+	font-weight:normal;
+}	
+A.small_link:hover {
+	font-family: verdana;
+	font-size: 10px;
+	text-decoration: underline;
+	color:red;
+	font-weight:normal;
+}	
+A.small_link:visited {
+	font-family: verdana;
+	font-size: 10px;
+	text-decoration: none;
+	color:navyblue;
+	font-weight:normal;
+}	
+.borderedframe {
+	border: 1px ridge black;
+	scrollbar-3dlight-color : Aqua;
+	scrollbar-arrow-color : Black;
+	scrollbar-base-color : Fuchsia;
+	scrollbar-darkshadow-color : Gray;
+	scrollbar-face-color : Lime;
+	scrollbar-highlight-color : #FF1493;
+	scrollbar-shadow-color : #9400D3;
+	scrollbar-track-color : Blue;
+}
+.disabled {
+	background: #EEEEEE;
+	color: gray;
+}
+.searchhead {
+	background:#ECEBED;
+	color: black;
+	font-family: verdana;
+	font-size: 13px;
+	font-weight:bold;
+}
+.a2z{
+	border-left: 1px ridge silver;
+	border-bottom: 1px ridge silver;
+	background: white;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:10px;
+}
+.small{
+	color: black;
+	font-family: verdana;
+	font-weight: normal;
+	font-size:9px;
+}
+
+.headertable {
+	background:#00518B;
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9px;
+	color:white;
+}
+.headertable2 {
+	background:#B21BB0;
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9px;
+	color:white;
+}
+.headertext {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 9px;
+	color:white;
+}
+
+.topnavlink {
+	font-family: verdana;
+	font-size: 11px;
+	font-weight:bold;
+}
+A.topnavlink {
+	font-family: verdana;
+	font-size: 11px;
+	font-weight:bold;
+}	
+A.topnavlink:hover {
+	font-family: verdana;
+	font-size: 11px;
+	font-weight:bold;
+	background:none;
+}	
+A.topnavlink:visited {
+	font-family: verdana;
+	font-size: 11px;
+	font-weight:bold;
+}	
+.leftnav{
+	padding: 1px 1px 1px 1px;
+	background: white;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 1px black ridge;
+	cursor:hand;
+}
+.leftnavon{
+	padding: 1px 1px 1px 1px;
+	background: yellow;
+	color: black;
+	font-family: verdana;
+	font-weight: bold;
+	font-size:11px;
+	border: 1px black ridge;
+	cursor:hand;
+}
+.termswindow{
+	padding: 1px 1px 1px 1px;
+	border: 1px ridge black;
+	background: #f5f5f5;
+	color: black;
+}
+.treecell {
+	border-bottom: 1px groove silver;
+}
+
+input.btn{
+	color:#333333;
+   	font-family:'trebuchet ms',helvetica,sans-serif;
+   	
+   	background-color:#EBEEF1;
+  	border:1px solid;
+   	border-top-color:#C3CCD5;
+   	border-left-color:#C3CCD5;
+   	border-right-color:#333333;
+   	border-bottom-color:#333333;
+}
+
+input.btnhov{
+	color:#71BFC6;
+}

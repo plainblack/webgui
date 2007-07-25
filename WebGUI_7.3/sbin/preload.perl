@@ -1,0 +1,89 @@
+my $webguiRoot;
+
+BEGIN {
+        $webguiRoot = "/data/WebGUI";
+        unshift (@INC, $webguiRoot."/lib");
+}
+
+$|=1;
+
+use strict;
+print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
+
+
+#----------------------------------------
+# Logger
+#----------------------------------------
+use Log::Log4perl;
+Log::Log4perl->init( $webguiRoot."/etc/log.conf" );   
+
+
+#----------------------------------------
+# Database connectivity.
+#----------------------------------------
+#use Apache::DBI (); # Uncomment if you want to enable connection pooling. Not recommended on servers with many sites, or those using db slaves.
+use Log::Log4perl ();
+use DBI ();
+DBI->install_driver("mysql"); # Change to match your database driver.
+
+
+
+#----------------------------------------
+# WebGUI modules.
+#----------------------------------------
+use WebGUI ();
+
+use WebGUI::Utility ();
+use File::Find ();
+my @modules = ();
+# these modules should always be skipped
+my @excludes = qw(WebGUI::i18n::English::Automated_Information WebGUI::PerformanceProfiler);
+open(FILE,"<".$webguiRoot."/sbin/preload.exclude");
+while (<FILE>) {
+	chomp;
+	push(@excludes,$_);
+}
+close(FILE);
+File::Find::find(\&getWebGUIModules, $webguiRoot."/lib/WebGUI");
+foreach my $package (@modules) {
+	next if (WebGUI::Utility::isIn($package,@excludes));
+	my $use = "use ".$package." ()";
+	eval($use);
+}
+
+use Apache2::ServerUtil ();
+{
+    # Add WebGUI to Apache version tokens
+    my $server = Apache2::ServerUtil->server;
+    my $sub = sub {
+	$server->add_version_component("WebGUI/".$WebGUI::VERSION);	
+    };
+    $server->push_handlers(PerlPostConfigHandler => $sub);
+}
+
+
+use APR::Request::Apache2 ();
+use Apache2::Cookie ();
+
+#----------------------------------------
+# Preload all site configs.
+#----------------------------------------
+WebGUI::Config->loadAllConfigs($webguiRoot);
+
+
+print "WebGUI Started!\n";
+
+
+#----------------------------------------
+sub getWebGUIModules {
+        my $filename = $File::Find::dir."/".$_;
+        return unless $filename =~ m/\.pm$/;
+        my $package = $filename;
+        $package =~ s/^$webguiRoot\/lib\/(.*)\.pm$/$1/;
+        $package =~ s/\//::/g;
+        push(@modules,$package);
+}
+
+1;
+
+

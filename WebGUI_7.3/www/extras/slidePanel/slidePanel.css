@@ -1,0 +1,79 @@
+#slidePanel {
+	position:absolute;
+	font: bold 12px sans-serif;
+	line-height:20px;
+  	text-align: left;
+	left:0px; 
+	top:0px;
+}
+
+.slidePanelButton {
+	width:300px;
+	text-align:center; 
+	font-family: sans-serif; 
+	font-size:11px; 
+	cursor: pointer; 
+	border-width:1px; 	 
+	border-color: #ACACAC; 
+	background-color:#dddddd;
+	background-image: url(btn_bg.jpg);
+	position:absolute; 
+	left:0px;
+	top: 0px;
+	border-style: solid;
+} 
+
+.slidePanelButton A, .slidePanelButton A:visited, .slidePanelButton A:link {
+	text-decoration: none;
+	color: black;
+}
+
+.scrollPanelUp {
+	position:absolute; 
+	top: 40px;
+}
+
+.scrollPanelDown {
+	position: absolute;
+}
+
+.slidePanel {
+	position:absolute;
+	background-color: #eeeeee;
+	z-index: 100;
+}
+
+.panel, .panelLinkHolder {
+	position:absolute; 
+	left:0px;
+	background-color: #eeeeee;
+	background-image: url(panel_bg.jpg);
+	background-repeat: repeat-x;
+	color: black;
+}
+
+.panelLinkOut {
+	position: absolute; 
+	overflow: hidden;
+	height: 20px;
+	cursor: pointer;
+	left: 0px; 
+	font-size: 11px;
+	color: black;
+	font-family: sans-serif;
+}
+
+.panelLinkIn {
+	position:absolute; 
+	cursor: pointer;
+	height: 20px;
+	overflow: hidden;
+	cursor: pointer;
+	left:0px; 
+	border: 1px solid #DEDCDC;
+	font-size: 11px;
+	font-family: sans-serif;
+	color: black;
+	background-color: #F5F5F5;
+}
+

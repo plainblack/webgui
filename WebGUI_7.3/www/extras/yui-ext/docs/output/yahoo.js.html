@@ -1,0 +1,146 @@
+<html><head><title>yahoo.js</title><link rel="stylesheet" type="text/css" href="../style.css" media="screen"/></head><body><div class="hl-main"><pre><span class="hl-comment">/*                                                                                                                                                      
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+</span><span class="hl-url">http://developer.yahoo.net/yui/license.txt</span><span class="hl-comment">
+version: 0.12.0
+*/
+// holder
+/**
+ * The YAHOO object is the single global object used by YUI Library.  It
+ * contains utility function for setting up namespaces, inheritance, and
+ * logging.  YAHOO.util, YAHOO.widget, and YAHOO.example are namespaces
+ * created automatically for and used by the library.
+ * @module yahoo
+ * @title  YAHOO Global
+ */
+// holder
+/**
+ * The YAHOO global namespace object
+ * @class YAHOO
+ * @static
+ */
+</span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-reserved">typeof </span><span class="hl-identifier">YAHOO</span><span class="hl-code"> == </span><span class="hl-quotes">&quot;</span><span class="hl-string">undefined</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">YAHOO</span><span class="hl-code"> = </span><span class="hl-brackets">{}</span><span class="hl-code">;
+</span><span class="hl-brackets">}
+
+</span><span class="hl-comment">/**
+ * Returns the namespace specified and creates it if it doesn't exist
+ * &lt;pre&gt;
+ * YAHOO.namespace(&quot;property.package&quot;);
+ * YAHOO.namespace(&quot;YAHOO.property.package&quot;);
+ * &lt;/pre&gt;
+ * Either of the above would create YAHOO.property, then
+ * YAHOO.property.package
+ *
+ * Be careful when naming packages. Reserved words may work in some browsers
+ * and not others. For instance, the following will fail in Safari:
+ * &lt;pre&gt;
+ * YAHOO.namespace(&quot;really.long.nested.namespace&quot;);
+ * &lt;/pre&gt;
+ * This fails because &quot;long&quot; is a future reserved word in ECMAScript
+ *
+ * @method namespace
+ * @static
+ * @param  {String*} arguments 1-n namespaces to create 
+ * @return {Object}  A reference to the last namespace object created
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">namespace</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">a</span><span class="hl-code">=</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-identifier">o</span><span class="hl-code">=</span><span class="hl-reserved">null</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-code">, </span><span class="hl-identifier">j</span><span class="hl-code">, </span><span class="hl-identifier">d</span><span class="hl-code">;
+    </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-identifier">a</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+        </span><span class="hl-identifier">d</span><span class="hl-code">=</span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">.</span><span class="hl-identifier">split</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">.</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code">;
+        </span><span class="hl-identifier">o</span><span class="hl-code">=</span><span class="hl-identifier">YAHOO</span><span class="hl-code">;
+
+        </span><span class="hl-comment">// YAHOO is implied, so it is ignored if it is included
+        </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-identifier">j</span><span class="hl-code">=</span><span class="hl-brackets">(</span><span class="hl-identifier">d</span><span class="hl-brackets">[</span><span class="hl-number">0</span><span class="hl-brackets">]</span><span class="hl-code"> == </span><span class="hl-quotes">&quot;</span><span class="hl-string">YAHOO</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-code"> ? </span><span class="hl-number">1</span><span class="hl-code"> : </span><span class="hl-number">0</span><span class="hl-code">; </span><span class="hl-identifier">j</span><span class="hl-code">&lt;</span><span class="hl-identifier">d</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; ++</span><span class="hl-identifier">j</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">o</span><span class="hl-brackets">[</span><span class="hl-identifier">d</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]]</span><span class="hl-code">=</span><span class="hl-identifier">o</span><span class="hl-brackets">[</span><span class="hl-identifier">d</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]]</span><span class="hl-code"> || </span><span class="hl-brackets">{}</span><span class="hl-code">;
+            </span><span class="hl-identifier">o</span><span class="hl-code">=</span><span class="hl-identifier">o</span><span class="hl-brackets">[</span><span class="hl-identifier">d</span><span class="hl-brackets">[</span><span class="hl-identifier">j</span><span class="hl-brackets">]]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+
+    </span><span class="hl-reserved">return </span><span class="hl-identifier">o</span><span class="hl-code">;
+</span><span class="hl-brackets">}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Uses YAHOO.widget.Logger to output a log message, if the widget is available.
+ *
+ * @method log
+ * @static
+ * @param  {String}  msg  The message to log.
+ * @param  {String}  cat  The log category for the message.  Default
+ *                        categories are &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, time&quot;.
+ *                        Custom categories can be used as well. (opt)
+ * @param  {String}  src  The source of the the message (opt)
+ * @return {Boolean}      True if the log operation was successful.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">log</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">msg</span><span class="hl-code">, </span><span class="hl-identifier">cat</span><span class="hl-code">, </span><span class="hl-identifier">src</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">l</span><span class="hl-code">=</span><span class="hl-identifier">YAHOO</span><span class="hl-code">.</span><span class="hl-identifier">widget</span><span class="hl-code">.</span><span class="hl-identifier">Logger</span><span class="hl-code">;
+    </span><span class="hl-reserved">if</span><span class="hl-brackets">(</span><span class="hl-identifier">l</span><span class="hl-code"> &amp;&amp; </span><span class="hl-identifier">l</span><span class="hl-code">.</span><span class="hl-identifier">log</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">return </span><span class="hl-identifier">l</span><span class="hl-code">.</span><span class="hl-identifier">log</span><span class="hl-brackets">(</span><span class="hl-identifier">msg</span><span class="hl-code">, </span><span class="hl-identifier">cat</span><span class="hl-code">, </span><span class="hl-identifier">src</span><span class="hl-brackets">)</span><span class="hl-code">;
+    </span><span class="hl-brackets">} </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+        </span><span class="hl-reserved">return false</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Utility to set up the prototype, constructor and superclass properties to
+ * support an inheritance strategy that can chain constructors and methods.
+ *
+ * @method extend
+ * @static
+ * @param {Function} subc   the object to modify
+ * @param {Function} superc the object to inherit
+ * @param {String[]} overrides  additional properties/methods to add to the
+ *                              subclass prototype.  These will override the
+ *                              matching items obtained from the superclass 
+ *                              if present.
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">extend</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">subc</span><span class="hl-code">, </span><span class="hl-identifier">superc</span><span class="hl-code">, </span><span class="hl-identifier">overrides</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">F</span><span class="hl-code"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">() {}</span><span class="hl-code">;
+    </span><span class="hl-identifier">F</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">=</span><span class="hl-identifier">superc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">;
+    </span><span class="hl-identifier">subc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">=</span><span class="hl-reserved">new </span><span class="hl-identifier">F</span><span class="hl-brackets">()</span><span class="hl-code">;
+    </span><span class="hl-identifier">subc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">=</span><span class="hl-identifier">subc</span><span class="hl-code">;
+    </span><span class="hl-identifier">subc</span><span class="hl-code">.</span><span class="hl-identifier">superclass</span><span class="hl-code">=</span><span class="hl-identifier">superc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">;
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">superc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code"> == </span><span class="hl-identifier">Object</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-brackets">) {
+        </span><span class="hl-identifier">superc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">.</span><span class="hl-identifier">constructor</span><span class="hl-code">=</span><span class="hl-identifier">superc</span><span class="hl-code">;
+    </span><span class="hl-brackets">}
+
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">overrides</span><span class="hl-brackets">) {
+        </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-reserved">var </span><span class="hl-identifier">i </span><span class="hl-reserved">in </span><span class="hl-identifier">overrides</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">subc</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">=</span><span class="hl-identifier">overrides</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-comment">/**
+ * Applies all prototype properties in the supplier to the receiver if the
+ * receiver does not have these properties yet.  Optionally, one or more
+ * methods/properties can be specified (as additional parameters).  This
+ * option will overwrite the property if receiver has it already.
+ *
+ * @method augment
+ * @static
+ * @param {Function} r  the object to receive the augmentation
+ * @param {Function} s  the object that supplies the properties to augment
+ * @param {String*}  arguments zero or more properties methods to augment the
+ *                             receiver with.  If none specified, everything
+ *                             in the supplier will be used unless it would
+ *                             overwrite an existing property in the receiver
+ */
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">augment</span><span class="hl-default"> = </span><span class="hl-reserved">function</span><span class="hl-brackets">(</span><span class="hl-identifier">r</span><span class="hl-code">, </span><span class="hl-identifier">s</span><span class="hl-brackets">) {
+    </span><span class="hl-reserved">var </span><span class="hl-identifier">rp</span><span class="hl-code">=</span><span class="hl-identifier">r</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">, </span><span class="hl-identifier">sp</span><span class="hl-code">=</span><span class="hl-identifier">s</span><span class="hl-code">.</span><span class="hl-identifier">prototype</span><span class="hl-code">, </span><span class="hl-identifier">a</span><span class="hl-code">=</span><span class="hl-identifier">arguments</span><span class="hl-code">, </span><span class="hl-identifier">i</span><span class="hl-code">, </span><span class="hl-identifier">p</span><span class="hl-code">;
+    </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-number">2</span><span class="hl-brackets">]) {
+        </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-identifier">i</span><span class="hl-code">=</span><span class="hl-number">2</span><span class="hl-code">; </span><span class="hl-identifier">i</span><span class="hl-code">&lt;</span><span class="hl-identifier">a</span><span class="hl-code">.</span><span class="hl-identifier">length</span><span class="hl-code">; ++</span><span class="hl-identifier">i</span><span class="hl-brackets">) {
+            </span><span class="hl-identifier">rp</span><span class="hl-brackets">[</span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]]</span><span class="hl-code"> = </span><span class="hl-identifier">sp</span><span class="hl-brackets">[</span><span class="hl-identifier">a</span><span class="hl-brackets">[</span><span class="hl-identifier">i</span><span class="hl-brackets">]]</span><span class="hl-code">;
+        </span><span class="hl-brackets">}
+    } </span><span class="hl-reserved">else </span><span class="hl-brackets">{
+        </span><span class="hl-reserved">for </span><span class="hl-brackets">(</span><span class="hl-identifier">p </span><span class="hl-reserved">in </span><span class="hl-identifier">sp</span><span class="hl-brackets">) { 
+            </span><span class="hl-reserved">if </span><span class="hl-brackets">(</span><span class="hl-code">!</span><span class="hl-identifier">rp</span><span class="hl-brackets">[</span><span class="hl-identifier">p</span><span class="hl-brackets">]) {
+                </span><span class="hl-identifier">rp</span><span class="hl-brackets">[</span><span class="hl-identifier">p</span><span class="hl-brackets">]</span><span class="hl-code"> = </span><span class="hl-identifier">sp</span><span class="hl-brackets">[</span><span class="hl-identifier">p</span><span class="hl-brackets">]</span><span class="hl-code">;
+            </span><span class="hl-brackets">}
+        }
+    }
+}</span><span class="hl-default">;
+
+</span><span class="hl-identifier">YAHOO</span><span class="hl-default">.</span><span class="hl-identifier">namespace</span><span class="hl-brackets">(</span><span class="hl-quotes">&quot;</span><span class="hl-string">util</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">widget</span><span class="hl-quotes">&quot;</span><span class="hl-code">, </span><span class="hl-quotes">&quot;</span><span class="hl-string">example</span><span class="hl-quotes">&quot;</span><span class="hl-brackets">)</span><span class="hl-default">;
+
+</span></pre></div><hr>Copyright &copy; 2006 Jack Slocum. All rights reserved.</body></html>

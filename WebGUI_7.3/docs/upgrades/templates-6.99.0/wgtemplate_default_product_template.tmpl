@@ -1,0 +1,19 @@
+#PBtmplCP00000000000001
+<h2><tmpl_var title></h2>
+<tmpl_var description><br />
+<br />
+<tmpl_var variants.message><br />
+
+<table>
+	<tmpl_loop variantLoop>
+	<tr>
+		<td style="text-indent: 40px;">
+		<tmpl_loop variant.compositionLoop>
+			<tmpl_var parameter>: <tmpl_var value><tmpl_unless __LAST__>,</tmpl_unless>
+		</tmpl_loop>
+		</td>
+		<td>$ <tmpl_var variant.price></td>
+		<td><a href="<tmpl_var variant.addToCart.url>"><tmpl_var variant.addToCart.label></a></td>
+	</tr>
+	</tmpl_loop>
+</table>

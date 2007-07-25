@@ -1,0 +1,43 @@
+#PBtmpl0000000000000005
+<h2>
+   <tmpl_var title>
+</h2>
+<tmpl_if create.message>
+   <tmpl_var create.message>
+</tmpl_if>
+
+<tmpl_var create.form.header>
+<table>
+<tmpl_var create.form.hidden>
+<tr>
+   <td class="formDescription" valign="top"><tmpl_var create.form.ldapConnection.label></td>
+   <td class="tableData"><tmpl_var create.form.ldapConnection></td>
+</tr>
+<tr>
+   <td class="formDescription" valign="top"><tmpl_var create.form.ldapId.label></td>
+   <td class="tableData"><tmpl_var create.form.ldapId></td>
+</tr>
+<tr>
+   <td class="formDescription" valign="top"><tmpl_var create.form.password.label></td>
+   <td class="tableData"><tmpl_var create.form.password></td>
+</tr>
+<tmpl_loop create.form.profile>
+<tr>
+   <td class="formDescription" valign="top"><tmpl_var profile.formElement.label></td>
+   <td class="tableData"><tmpl_var profile.formElement></td>
+</tr>
+</tmpl_loop>
+<tr>
+   <td class="formDescription" valign="top"></td>
+   <td class="tableData"><tmpl_var create.form.submit></td>
+</tr>
+</table>
+<tmpl_var create.form.footer>
+
+
+<div class="accountOptions">
+   <ul>
+     <li><a href="<tmpl_var login.url>"><tmpl_var login.label></a></li>
+ 
+  </ul>
+</div>

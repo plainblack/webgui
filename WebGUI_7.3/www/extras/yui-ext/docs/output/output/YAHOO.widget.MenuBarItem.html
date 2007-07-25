@@ -1,0 +1,1384 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>YAHOO.widget.MenuBarItem</title>
+        <link rel="stylesheet" type="text/css" href="../reset.css"/>
+        <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="../print.css" media="print">
+    </head>
+    <body>
+        <div class="body-wrap">
+        <div class="top-tools"><img src="print.gif" width="16" height="16" align="absmiddle">&nbsp;<a href="YAHOO.widget.MenuBarItem.html" target="_blank">Print Friendly</a></div>
+        <h1>Class YAHOO.widget.MenuBarItem</h1>
+        <table cellspacing="0">
+            <tr><td class="label">Package:</td><td>YAHOO.widget</td></tr>
+            <tr><td class="label">Class:</td><td>MenuBarItem</td></tr>
+                        <tr><td class="label">Extends:</td><td><a href="YAHOO.widget.MenuItem.html">MenuItem</a></td></tr>
+                                    <tr><td class="label">Defined In:</td><td><a href="menu.js.html">menu.js</a></td></tr>
+        </table>
+        <div class="description">
+            Creates an item for a menu bar.        </div>
+        <hr />
+        <a name="properties"></a>
+        <h2>Public Properties</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Property</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CHECKED_IMAGE_ALT_TEXT">CHECKED_IMAGE_ALT_TEXT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#CHECKED_IMAGE_ALT_TEXT">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the alt text for the image to be used
+for the checked image.
+@default "Checked."
+@final</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CHECKED_IMAGE_PATH">CHECKED_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#CHECKED_IMAGE_PATH">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the path to the image to be used for
+the checked state.
+@default "nt/ic/ut/bsc/menuc...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT">COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the alt text for the image to be used
+for the submenu arrow indicator.
+@default "Col...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#CSS_CLASS_NAME">CSS_CLASS_NAME</a> : String</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the CSS class(es) to be applied to the
+&#60;li&#62; element of the menu bar item.
+@d...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISABLED_CHECKED_IMAGE_ALT_TEXT">DISABLED_CHECKED_IMAGE_ALT_TEXT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#DISABLED_CHECKED_IMAGE_ALT_TEXT">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the alt text for the image to be used
+for the checked image when the item is disable...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISABLED_CHECKED_IMAGE_PATH">DISABLED_CHECKED_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#DISABLED_CHECKED_IMAGE_PATH">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the path to the image to be used for
+the disabled checked state.
+@default "nt/ic/ut/...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISABLED_SUBMENU_INDICATOR_ALT_TEXT">DISABLED_SUBMENU_INDICATOR_ALT_TEXT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#DISABLED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the alt text for the image to be used
+for the submenu arrow indicator when the menu ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#DISABLED_SUBMENU_INDICATOR_IMAGE_PATH">DISABLED_SUBMENU_INDICATOR_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the path to the image to be used for the
+submenu arrow indicator when the menu bar i...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#EXPANDED_SUBMENU_INDICATOR_ALT_TEXT">EXPANDED_SUBMENU_INDICATOR_ALT_TEXT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#EXPANDED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the alt text for the image to be used
+for the submenu arrow indicator when the subme...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#IMG_ROOT">IMG_ROOT</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#IMG_ROOT">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the prefix path to use for
+non-secure images.
+@default "http://us.i1.yimg.com/us.yim...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#IMG_ROOT_SSL">IMG_ROOT_SSL</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#IMG_ROOT_SSL">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the prefix path to use for securely
+served images.
+@default "https://a248.e.akamai.n...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SELECTED_CHECKED_IMAGE_PATH">SELECTED_CHECKED_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#SELECTED_CHECKED_IMAGE_PATH">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the path to the image to be used for
+the selected checked state.
+@default "nt/ic/ut/...</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SELECTED_SUBMENU_INDICATOR_IMAGE_PATH">SELECTED_SUBMENU_INDICATOR_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description String representing the path to the image to be used for the
+submenu arrow indicator when the menu bar i...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SUBMENU_INDICATOR_IMAGE_PATH">SUBMENU_INDICATOR_IMAGE_PATH</a> : String</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the path to the image to be used for the
+menu bar item's submenu arrow indicator.
+@d...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#SUBMENU_TYPE">SUBMENU_TYPE</a> : YAHOO.widget.Menu</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#SUBMENU_TYPE">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object representing the type of menu to instantiate and
+add when parsing the child nodes of the menu ite...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#browser">browser</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#browser">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the browser.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHelpText">configHelpText</a> : String|<a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configHelpText">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@config helptext
+@description String specifying additional instructional text to
+accompany the text for the nenu item...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configSubmenu">configSubmenu</a> : Menu|String|Object|<a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configSubmenu">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@config submenu
+@description Object specifying the submenu to be appended to the
+menu item.  The value can be one of ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#constructor">constructor</a> : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#constructor">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object reference to the menu item's constructor function.
+@default YAHOO.widget.MenuItem</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#element">element</a> : <a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#element">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Object reference to the menu item's
+<code>&#60;li&#62;</code> element.
+@default <a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level
+-one-html.html#ID-74680021">HTMLLIElement</a></td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#groupIndex">groupIndex</a> : Number</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#groupIndex">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Number indicating the index of the group to which the menu
+item belongs.
+@default null</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#imageRoot">imageRoot</a> : String</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#imageRoot">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description String representing the root path for all of the menu
+item's images.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#index">index</a> : Number</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#index">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Number indicating the ordinal position of the menu item in
+its group.
+@default null</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#isSecure">isSecure</a> : Boolean</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#isSecure">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Boolean representing whether or not the current browsing
+context is secure (HTTPS).</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#parent">parent</a> : YAHOO.widget.Menu</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#parent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object reference to the menu item's parent menu.
+@default null</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#srcElement">srcElement</a> : <a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#srcElement">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Object reference to the HTML element (either
+&#60;li&#62;, &#60;optgroup&#62; or
+&#60;option&#62;) used ...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#submenuIndicator">submenuIndicator</a> : <a</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#submenuIndicator">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Object reference to the &#60;img&#62; element
+used to create the submenu indicator for the menu item.
+@d...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#value">value</a> : Object</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#value">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Object reference to the menu item's value.
+@default null</td>
+    </tr>
+            </table>
+                <a name="methods"></a>
+        <h2>Public Methods</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Method</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#MenuBarItem">MenuBarItem</a>()</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr>
+        <td class="mdesc"></td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#blur">blur</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#blur">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Causes the menu item to lose focus and fires the
+onblur event.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configChecked">configChecked</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configChecked">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Event handler for when the "checked" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configDisabled">configDisabled</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configDisabled">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "disabled" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configEmphasis">configEmphasis</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configEmphasis">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Event handler for when the "emphasis" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configHelpText">configHelpText</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configHelpText">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "helptext" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configSelected">configSelected</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configSelected">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Event handler for when the "selected" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configStrongEmphasis">configStrongEmphasis</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configStrongEmphasis">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "strongemphasis" configuration
+property of the menu item changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configSubmenu">configSubmenu</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configSubmenu">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Event handler for when the "submenu" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configTarget">configTarget</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configTarget">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "target" configuration property
+of the menu item changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configText">configText</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configText">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Event handler for when the "text" configuration property of
+the menu item changes.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#configURL">configURL</a>(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>) : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#configURL">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Event handler for when the "url" configuration property of
+the menu item changes.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroy">destroy</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#destroy">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Removes the menu item's <code>&#60;li&#62;</code> element
+from its parent <code>&#60;ul&#62;</code> element.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focus">focus</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#focus">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Causes the menu item to receive the focus and fires the
+focus event.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getNextEnabledSibling">getNextEnabledSibling</a>() : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#getNextEnabledSibling">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Finds the menu item's next enabled sibling.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#getPreviousEnabledSibling">getPreviousEnabledSibling</a>() : YAHOO.widget.MenuItem</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#getPreviousEnabledSibling">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Finds the menu item's previous enabled sibling.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#init">init</a>(<code>String p_oObject</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code>Object p_oConfig</code>) : void</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description The MenuBarItem class's initialization method. This method is
+automatically called by the constructor, a...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#initDefaultConfig">initDefaultConfig</a>() : void</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#initDefaultConfig">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Initializes an item's configurable properties.</td>
+    </tr>
+        <tr>
+        <td class="micon" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#toString">toString</a>() : String</td>
+        <td class="msource" rowspan="2">MenuBarItem</td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Returns a string representing the menu bar item.</td>
+    </tr>
+            </table>
+                <a name="events"></a>
+        <h2>Public Events</h2>
+                <table cellspacing="0" class="member-table">
+            <tr>
+                <th class="sig-header" colspan="2">Event</th>
+                <th class="msource-header">Defined By</th>
+            </tr>
+                <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#blurEvent">blurEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#blurEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the menu item loses the input focus.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#clickEvent">clickEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#clickEvent">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user clicks the on the menu item.  Passes
+back the DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#destroyEvent">destroyEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#destroyEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the menu item's <code>&#60;li&#62;</code>
+element is removed from its parent <code>&#60;ul&#62;</code> element.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#focusEvent">focusEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#focusEvent">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the menu item receives focus.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyDownEvent">keyDownEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#keyDownEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user presses a key when the menu item has
+focus.  Passes back the DOM Event object as an ...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyPressEvent">keyPressEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#keyPressEvent">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user presses an alphanumeric key when the
+menu item has focus.  Passes back the DOM Event...</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#keyUpEvent">keyUpEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#keyUpEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user releases a key when the menu item has
+focus.  Passes back the DOM Event object as an...</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseDownEvent">mouseDownEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#mouseDownEvent">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the user mouses down on the menu item.  Passes
+back the DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseOutEvent">mouseOutEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#mouseOutEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the mouse has left the menu item.  Passes back
+the DOM Event object as an argument.</td>
+    </tr>
+        <tr class="alt">
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseOverEvent">mouseOverEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#mouseOverEvent">MenuItem</a></td>
+    </tr>
+    <tr class="alt">
+        <td class="mdesc">@description Fires when the mouse has entered the menu item.  Passes
+back the DOM Event object as an argument.</td>
+    </tr>
+        <tr>
+        <td class="micon inherited" title="Inherited" rowspan="2">&nbsp;</td>
+        <td class="sig"><a class="mlink" href="#mouseUpEvent">mouseUpEvent</a> : ()</td>
+        <td class="msource" rowspan="2"><a href="YAHOO.widget.MenuItem.html#mouseUpEvent">MenuItem</a></td>
+    </tr>
+    <tr>
+        <td class="mdesc">@description Fires when the user releases a mouse button while the mouse
+is over the menu item.  Passes back the DOM ...</td>
+    </tr>
+            </table>
+                
+                    <h2 class="mdetail-head">Property Details</h2>
+            <div class="detail-wrap">
+                            <a name="CHECKED_IMAGE_ALT_TEXT"></a>
+                <div class="mdetail">
+                <h3>CHECKED_IMAGE_ALT_TEXT</i></h3>
+                <code>public String CHECKED_IMAGE_ALT_TEXT</code>
+                <div class="mdetail-desc">
+                    @description String representing the alt text for the image to be used
+for the checked image.
+@default "Checked."
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#CHECKED_IMAGE_ALT_TEXT">MenuItem</a>.</div>
+                </div>
+                            <a name="CHECKED_IMAGE_PATH"></a>
+                <div class="mdetail alt">
+                <h3>CHECKED_IMAGE_PATH</i></h3>
+                <code>public String CHECKED_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for
+the checked state.
+@default "nt/ic/ut/bsc/menuchk8_nrm_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#CHECKED_IMAGE_PATH">MenuItem</a>.</div>
+                </div>
+                            <a name="COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT"></a>
+                <div class="mdetail">
+                <h3>COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT</i></h3>
+                <code>public String COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT</code>
+                <div class="mdetail-desc">
+                    @description String representing the alt text for the image to be used
+for the submenu arrow indicator.
+@default "Collapsed.  Click to expand."
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#COLLAPSED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a>.</div>
+                </div>
+                            <a name="CSS_CLASS_NAME"></a>
+                <div class="mdetail alt">
+                <h3>CSS_CLASS_NAME</i></h3>
+                <code>public String CSS_CLASS_NAME</code>
+                <div class="mdetail-desc">
+                    @description String representing the CSS class(es) to be applied to the
+<code>&#60;li&#62;</code> element of the menu bar item.
+@default "yuimenubaritem"
+@final                </div>
+                <div class="mdetail-def">This property is defined by MenuBarItem.</div>
+                </div>
+                            <a name="DISABLED_CHECKED_IMAGE_ALT_TEXT"></a>
+                <div class="mdetail">
+                <h3>DISABLED_CHECKED_IMAGE_ALT_TEXT</i></h3>
+                <code>public String DISABLED_CHECKED_IMAGE_ALT_TEXT</code>
+                <div class="mdetail-desc">
+                    @description String representing the alt text for the image to be used
+for the checked image when the item is disabled.
+@default "Checked. (Item disabled.)"
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#DISABLED_CHECKED_IMAGE_ALT_TEXT">MenuItem</a>.</div>
+                </div>
+                            <a name="DISABLED_CHECKED_IMAGE_PATH"></a>
+                <div class="mdetail alt">
+                <h3>DISABLED_CHECKED_IMAGE_PATH</i></h3>
+                <code>public String DISABLED_CHECKED_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for
+the disabled checked state.
+@default "nt/ic/ut/bsc/menuchk8_dim_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#DISABLED_CHECKED_IMAGE_PATH">MenuItem</a>.</div>
+                </div>
+                            <a name="DISABLED_SUBMENU_INDICATOR_ALT_TEXT"></a>
+                <div class="mdetail">
+                <h3>DISABLED_SUBMENU_INDICATOR_ALT_TEXT</i></h3>
+                <code>public String DISABLED_SUBMENU_INDICATOR_ALT_TEXT</code>
+                <div class="mdetail-desc">
+                    @description String representing the alt text for the image to be used
+for the submenu arrow indicator when the menu item is disabled.
+@default "Disabled."
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#DISABLED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a>.</div>
+                </div>
+                            <a name="DISABLED_SUBMENU_INDICATOR_IMAGE_PATH"></a>
+                <div class="mdetail alt">
+                <h3>DISABLED_SUBMENU_INDICATOR_IMAGE_PATH</i></h3>
+                <code>public String DISABLED_SUBMENU_INDICATOR_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for the
+submenu arrow indicator when the menu bar item is disabled.
+@default "nt/ic/ut/alt1/menuarodwn8_dim_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by MenuBarItem.</div>
+                </div>
+                            <a name="EXPANDED_SUBMENU_INDICATOR_ALT_TEXT"></a>
+                <div class="mdetail">
+                <h3>EXPANDED_SUBMENU_INDICATOR_ALT_TEXT</i></h3>
+                <code>public String EXPANDED_SUBMENU_INDICATOR_ALT_TEXT</code>
+                <div class="mdetail-desc">
+                    @description String representing the alt text for the image to be used
+for the submenu arrow indicator when the submenu is visible.
+@default "Expanded.  Click to collapse."
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#EXPANDED_SUBMENU_INDICATOR_ALT_TEXT">MenuItem</a>.</div>
+                </div>
+                            <a name="IMG_ROOT"></a>
+                <div class="mdetail alt">
+                <h3>IMG_ROOT</i></h3>
+                <code>public String IMG_ROOT</code>
+                <div class="mdetail-desc">
+                    @description String representing the prefix path to use for
+non-secure images.
+@default "http://us.i1.yimg.com/us.yimg.com/i/"                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#IMG_ROOT">MenuItem</a>.</div>
+                </div>
+                            <a name="IMG_ROOT_SSL"></a>
+                <div class="mdetail">
+                <h3>IMG_ROOT_SSL</i></h3>
+                <code>public String IMG_ROOT_SSL</code>
+                <div class="mdetail-desc">
+                    @description String representing the prefix path to use for securely
+served images.
+@default "https://a248.e.akamai.net/sec.yimg.com/i/"                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#IMG_ROOT_SSL">MenuItem</a>.</div>
+                </div>
+                            <a name="SELECTED_CHECKED_IMAGE_PATH"></a>
+                <div class="mdetail alt">
+                <h3>SELECTED_CHECKED_IMAGE_PATH</i></h3>
+                <code>public String SELECTED_CHECKED_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for
+the selected checked state.
+@default "nt/ic/ut/bsc/menuchk8_hov_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#SELECTED_CHECKED_IMAGE_PATH">MenuItem</a>.</div>
+                </div>
+                            <a name="SELECTED_SUBMENU_INDICATOR_IMAGE_PATH"></a>
+                <div class="mdetail">
+                <h3>SELECTED_SUBMENU_INDICATOR_IMAGE_PATH</i></h3>
+                <code>public String SELECTED_SUBMENU_INDICATOR_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for the
+submenu arrow indicator when the menu bar item is selected.
+@default "nt/ic/ut/alt1/menuarodwn8_hov_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by MenuBarItem.</div>
+                </div>
+                            <a name="SUBMENU_INDICATOR_IMAGE_PATH"></a>
+                <div class="mdetail alt">
+                <h3>SUBMENU_INDICATOR_IMAGE_PATH</i></h3>
+                <code>public String SUBMENU_INDICATOR_IMAGE_PATH</code>
+                <div class="mdetail-desc">
+                    @description String representing the path to the image to be used for the
+menu bar item's submenu arrow indicator.
+@default "nt/ic/ut/alt1/menuarodwn8_nrm_1.gif"
+@final                </div>
+                <div class="mdetail-def">This property is defined by MenuBarItem.</div>
+                </div>
+                            <a name="SUBMENU_TYPE"></a>
+                <div class="mdetail">
+                <h3>SUBMENU_TYPE</i></h3>
+                <code>public YAHOO.widget.Menu SUBMENU_TYPE</code>
+                <div class="mdetail-desc">
+                    @description Object representing the type of menu to instantiate and
+add when parsing the child nodes of the menu item's source HTML element.
+@final                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#SUBMENU_TYPE">MenuItem</a>.</div>
+                </div>
+                            <a name="browser"></a>
+                <div class="mdetail alt">
+                <h3>browser</i></h3>
+                <code>public String browser</code>
+                <div class="mdetail-desc">
+                    @description String representing the browser.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#browser">MenuItem</a>.</div>
+                </div>
+                            <a name="configHelpText"></a>
+                <div class="mdetail">
+                <h3>configHelpText</i></h3>
+                <code>public String|<a configHelpText</code>
+                <div class="mdetail-desc">
+                    @config helptext
+@description String specifying additional instructional text to
+accompany the text for the nenu item.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#configHelpText">MenuItem</a>.</div>
+                </div>
+                            <a name="configSubmenu"></a>
+                <div class="mdetail alt">
+                <h3>configSubmenu</i></h3>
+                <code>public Menu|String|Object|<a configSubmenu</code>
+                <div class="mdetail-desc">
+                    @config submenu
+@description Object specifying the submenu to be appended to the
+menu item.  The value can be one of the following: <ul><li>Object
+specifying a Menu instance.</li><li>Object literal specifying the
+menu to be created.  Format: <code>{ id: [menu id], itemdata:
+[<a href="YAHOO.widget.Menu.html#itemData">array of values for
+items</a>] }</code>.</li><li>String specifying the id attribute
+of the <code>&#60;div&#62;</code> element of the menu.</li><li>
+Object specifying the <code>&#60;div&#62;</code> element of the
+menu.</li></ul>
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#configSubmenu">MenuItem</a>.</div>
+                </div>
+                            <a name="constructor"></a>
+                <div class="mdetail">
+                <h3>constructor</i></h3>
+                <code>public YAHOO.widget.MenuItem constructor</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the menu item's constructor function.
+@default YAHOO.widget.MenuItem                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#constructor">MenuItem</a>.</div>
+                </div>
+                            <a name="element"></a>
+                <div class="mdetail alt">
+                <h3>element</i></h3>
+                <code>public <a element</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the menu item's
+<code>&#60;li&#62;</code> element.
+@default <a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level
+-one-html.html#ID-74680021">HTMLLIElement</a>                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#element">MenuItem</a>.</div>
+                </div>
+                            <a name="groupIndex"></a>
+                <div class="mdetail">
+                <h3>groupIndex</i></h3>
+                <code>public Number groupIndex</code>
+                <div class="mdetail-desc">
+                    @description Number indicating the index of the group to which the menu
+item belongs.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#groupIndex">MenuItem</a>.</div>
+                </div>
+                            <a name="imageRoot"></a>
+                <div class="mdetail alt">
+                <h3>imageRoot</i></h3>
+                <code>public String imageRoot</code>
+                <div class="mdetail-desc">
+                    @description String representing the root path for all of the menu
+item's images.                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#imageRoot">MenuItem</a>.</div>
+                </div>
+                            <a name="index"></a>
+                <div class="mdetail">
+                <h3>index</i></h3>
+                <code>public Number index</code>
+                <div class="mdetail-desc">
+                    @description Number indicating the ordinal position of the menu item in
+its group.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#index">MenuItem</a>.</div>
+                </div>
+                            <a name="isSecure"></a>
+                <div class="mdetail alt">
+                <h3>isSecure</i></h3>
+                <code>public Boolean isSecure</code>
+                <div class="mdetail-desc">
+                    @description Boolean representing whether or not the current browsing
+context is secure (HTTPS).                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#isSecure">MenuItem</a>.</div>
+                </div>
+                            <a name="parent"></a>
+                <div class="mdetail">
+                <h3>parent</i></h3>
+                <code>public YAHOO.widget.Menu parent</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the menu item's parent menu.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#parent">MenuItem</a>.</div>
+                </div>
+                            <a name="srcElement"></a>
+                <div class="mdetail alt">
+                <h3>srcElement</i></h3>
+                <code>public <a srcElement</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the HTML element (either
+<code>&#60;li&#62;</code>, <code>&#60;optgroup&#62;</code> or
+<code>&#60;option&#62;</code>) used create the menu item.
+@default <a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/
+level-one-html.html#ID-74680021">HTMLLIElement</a>|<a href="http://www.
+w3.org/TR/2000/WD-DOM-Level-1-20000929/level-one-html.html#ID-38450247"
+>HTMLOptGroupElement</a>|<a href="http://www.w3.org/TR/2000/WD-DOM-
+Level-1-20000929/level-one-html.html#ID-70901257">HTMLOptionElement</a>                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#srcElement">MenuItem</a>.</div>
+                </div>
+                            <a name="submenuIndicator"></a>
+                <div class="mdetail">
+                <h3>submenuIndicator</i></h3>
+                <code>public <a submenuIndicator</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the <code>&#60;img&#62;</code> element
+used to create the submenu indicator for the menu item.
+@default <a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/
+level-one-html.html#ID-17701901">HTMLImageElement</a>                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#submenuIndicator">MenuItem</a>.</div>
+                </div>
+                            <a name="value"></a>
+                <div class="mdetail alt">
+                <h3>value</i></h3>
+                <code>public Object value</code>
+                <div class="mdetail-desc">
+                    @description Object reference to the menu item's value.
+@default null                </div>
+                <div class="mdetail-def">This property is defined by <a href="YAHOO.widget.MenuItem.html#value">MenuItem</a>.</div>
+                </div>
+                        </div>
+                
+                    <a name="MenuBarItem"></a>
+            <h2 class="mdetail-head">Constructor Details</h2>
+            <div class="detail-wrap">
+                <div class="mdetail">
+                <h3>MenuBarItem</i></h3>
+                <code>public function MenuBarItem()</code>
+                <div class="mdetail-desc">
+                                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                </div>
+            </div>
+                 
+                    <h2 class="mdetail-head">Method Details</h2>
+            <div class="detail-wrap">
+                            <a name="blur"></a>
+                <div class="mdetail">
+                <h3>blur</i></h3>
+                <code>public function blur()</code>
+                <div class="mdetail-desc">
+                    @description Causes the menu item to lose focus and fires the
+onblur event.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#blur">MenuItem</a>.</div>
+                </div>
+                            <a name="configChecked"></a>
+                <div class="mdetail alt">
+                <h3>configChecked</i></h3>
+                <code>public function configChecked(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "checked" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configChecked">MenuItem</a>.</div>
+                </div>
+                            <a name="configDisabled"></a>
+                <div class="mdetail">
+                <h3>configDisabled</i></h3>
+                <code>public function configDisabled(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "disabled" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configDisabled">MenuItem</a>.</div>
+                </div>
+                            <a name="configEmphasis"></a>
+                <div class="mdetail alt">
+                <h3>configEmphasis</i></h3>
+                <code>public function configEmphasis(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "emphasis" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configEmphasis">MenuItem</a>.</div>
+                </div>
+                            <a name="configHelpText"></a>
+                <div class="mdetail">
+                <h3>configHelpText</i></h3>
+                <code>public function configHelpText(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "helptext" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configHelpText">MenuItem</a>.</div>
+                </div>
+                            <a name="configSelected"></a>
+                <div class="mdetail alt">
+                <h3>configSelected</i></h3>
+                <code>public function configSelected(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "selected" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configSelected">MenuItem</a>.</div>
+                </div>
+                            <a name="configStrongEmphasis"></a>
+                <div class="mdetail">
+                <h3>configStrongEmphasis</i></h3>
+                <code>public function configStrongEmphasis(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "strongemphasis" configuration
+property of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configStrongEmphasis">MenuItem</a>.</div>
+                </div>
+                            <a name="configSubmenu"></a>
+                <div class="mdetail alt">
+                <h3>configSubmenu</i></h3>
+                <code>public function configSubmenu(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "submenu" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configSubmenu">MenuItem</a>.</div>
+                </div>
+                            <a name="configTarget"></a>
+                <div class="mdetail">
+                <h3>configTarget</i></h3>
+                <code>public function configTarget(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "target" configuration property
+of the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configTarget">MenuItem</a>.</div>
+                </div>
+                            <a name="configText"></a>
+                <div class="mdetail alt">
+                <h3>configText</i></h3>
+                <code>public function configText(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "text" configuration property of
+the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configText">MenuItem</a>.</div>
+                </div>
+                            <a name="configURL"></a>
+                <div class="mdetail">
+                <h3>configURL</i></h3>
+                <code>public function configURL(<code>String p_sType</code>, <code>Array p_aArgs</code>, <code>YAHOO.widget.MenuItem p_oItem</code>)</code>
+                <div class="mdetail-desc">
+                    @description Event handler for when the "url" configuration property of
+the menu item changes.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_sType</code> : String<div class="sub-desc">String representing the name of the event that was fired.</div></li><li><code>p_aArgs</code> : Array<div class="sub-desc">Array of arguments sent when the event was fired.</div></li><li><code>p_oItem</code> : YAHOO.widget.MenuItem<div class="sub-desc">Object representing the menu item that fired the event.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#configURL">MenuItem</a>.</div>
+                </div>
+                            <a name="destroy"></a>
+                <div class="mdetail alt">
+                <h3>destroy</i></h3>
+                <code>public function destroy()</code>
+                <div class="mdetail-desc">
+                    @description Removes the menu item's <code>&#60;li&#62;</code> element
+from its parent <code>&#60;ul&#62;</code> element.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#destroy">MenuItem</a>.</div>
+                </div>
+                            <a name="focus"></a>
+                <div class="mdetail">
+                <h3>focus</i></h3>
+                <code>public function focus()</code>
+                <div class="mdetail-desc">
+                    @description Causes the menu item to receive the focus and fires the
+focus event.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#focus">MenuItem</a>.</div>
+                </div>
+                            <a name="getNextEnabledSibling"></a>
+                <div class="mdetail alt">
+                <h3>getNextEnabledSibling</i></h3>
+                <code>public function getNextEnabledSibling()</code>
+                <div class="mdetail-desc">
+                    @description Finds the menu item's next enabled sibling.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#getNextEnabledSibling">MenuItem</a>.</div>
+                </div>
+                            <a name="getPreviousEnabledSibling"></a>
+                <div class="mdetail">
+                <h3>getPreviousEnabledSibling</i></h3>
+                <code>public function getPreviousEnabledSibling()</code>
+                <div class="mdetail-desc">
+                    @description Finds the menu item's previous enabled sibling.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>YAHOO.widget.MenuItem</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#getPreviousEnabledSibling">MenuItem</a>.</div>
+                </div>
+                            <a name="init"></a>
+                <div class="mdetail alt">
+                <h3>init</i></h3>
+                <code>public function init(<code>String p_oObject</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code><a href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code>, <code>Object p_oConfig</code>)</code>
+                <div class="mdetail-desc">
+                    @description The MenuBarItem class's initialization method. This method is
+automatically called by the constructor, and sets up all DOM references for
+pre-existing markup, and creates required markup if it is not already present.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li><code>p_oObject</code> : String<div class="sub-desc">String specifying the text of the menu bar item.</div></li><li><code>href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code> : <a<div class="sub-desc">one-html.html#ID-74680021">HTMLLIElement</a>} p_oObject Object specifying the <code>&#60;li&#62;</code> element of the menu bar item.</div></li><li><code>href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code> : <a<div class="sub-desc">one-html.html#ID-38450247">HTMLOptGroupElement</a>} p_oObject Object specifying the <code>&#60;optgroup&#62;</code> element of the menu bar item.</div></li><li><code>href="http://www.w3.org/TR/2000/WD-DOM-Level-1-20000929/level-</code> : <a<div class="sub-desc">one-html.html#ID-70901257">HTMLOptionElement</a>} p_oObject Object specifying the <code>&#60;option&#62;</code> element of the menu bar item.</div></li><li><code>p_oConfig</code> : Object<div class="sub-desc">Optional. Object literal specifying the configuration for the menu bar item. See configuration class documentation for more details.</div></li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by MenuBarItem.</div>
+                </div>
+                            <a name="initDefaultConfig"></a>
+                <div class="mdetail">
+                <h3>initDefaultConfig</i></h3>
+                <code>public function initDefaultConfig()</code>
+                <div class="mdetail-desc">
+                    @description Initializes an item's configurable properties.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>void</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by <a href="YAHOO.widget.MenuItem.html#initDefaultConfig">MenuItem</a>.</div>
+                </div>
+                            <a name="toString"></a>
+                <div class="mdetail alt">
+                <h3>toString</i></h3>
+                <code>public function toString()</code>
+                <div class="mdetail-desc">
+                    @description Returns a string representing the menu bar item.                
+                <div class="mdetail-params">
+                    <strong>Parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                    <strong>Returns:</strong>
+                    <ul>
+                        <li><code>String</code></li>
+                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This method is defined by MenuBarItem.</div>
+                </div>
+                        </div>
+                    
+                    <h2 class="mdetail-head">Event Details</h2>
+            <div class="detail-wrap">
+                            <a name="blurEvent"></a>
+                <div class="mdetail">
+                <h3>blurEvent</i></h3>
+                <code>public event blurEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the menu item loses the input focus.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#blurEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="clickEvent"></a>
+                <div class="mdetail alt">
+                <h3>clickEvent</i></h3>
+                <code>public event clickEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user clicks the on the menu item.  Passes
+back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#clickEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="destroyEvent"></a>
+                <div class="mdetail">
+                <h3>destroyEvent</i></h3>
+                <code>public event destroyEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the menu item's <code>&#60;li&#62;</code>
+element is removed from its parent <code>&#60;ul&#62;</code> element.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#destroyEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="focusEvent"></a>
+                <div class="mdetail alt">
+                <h3>focusEvent</i></h3>
+                <code>public event focusEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the menu item receives focus.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#focusEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="keyDownEvent"></a>
+                <div class="mdetail">
+                <h3>keyDownEvent</i></h3>
+                <code>public event keyDownEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user presses a key when the menu item has
+focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#keyDownEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="keyPressEvent"></a>
+                <div class="mdetail alt">
+                <h3>keyPressEvent</i></h3>
+                <code>public event keyPressEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user presses an alphanumeric key when the
+menu item has focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#keyPressEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="keyUpEvent"></a>
+                <div class="mdetail">
+                <h3>keyUpEvent</i></h3>
+                <code>public event keyUpEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user releases a key when the menu item has
+focus.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#keyUpEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="mouseDownEvent"></a>
+                <div class="mdetail alt">
+                <h3>mouseDownEvent</i></h3>
+                <code>public event mouseDownEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user mouses down on the menu item.  Passes
+back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#mouseDownEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="mouseOutEvent"></a>
+                <div class="mdetail">
+                <h3>mouseOutEvent</i></h3>
+                <code>public event mouseOutEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the mouse has left the menu item.  Passes back
+the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#mouseOutEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="mouseOverEvent"></a>
+                <div class="mdetail alt">
+                <h3>mouseOverEvent</i></h3>
+                <code>public event mouseOverEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the mouse has entered the menu item.  Passes
+back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#mouseOverEvent">MenuItem</a>.</div>
+                </div>
+                            <a name="mouseUpEvent"></a>
+                <div class="mdetail">
+                <h3>mouseUpEvent</i></h3>
+                <code>public event mouseUpEvent</code>
+                <div class="mdetail-desc">
+                @description Fires when the user releases a mouse button while the mouse
+is over the menu item.  Passes back the DOM Event object as an argument.                
+                <div class="mdetail-params">
+                    <strong style="font-weight:normal;">Subscribers will be called with the following parameters:</strong>
+                    <ul><li>None.</li>                    </ul>
+                </div>
+                </div>
+                <div class="mdetail-def">This event is defined by <a href="YAHOO.widget.MenuItem.html#mouseUpEvent">MenuItem</a>.</div>
+                </div>
+                        </div>
+                </div>
+    <hr>
+    Copyright &copy; 2006 Jack Slocum. All rights reserved.
+    </body>
+</html>
+    
