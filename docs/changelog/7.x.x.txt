@@ -5,6 +5,14 @@
    WebGUI::Operation::Workflow::www_activityHelper for details.
  - api: Asset properties that have default values are now enforced by the API
    as they always have been by the user interface.
+ - api: You may now use a displayOnly attribute in your asset properties list
+   that will display a field, but is not settable via the update() method.
+ - api: You may now use a customDrawMethod attribute in your asset properties
+   list that will enable you to add custom display options for that fields when 
+   the edit form is automatically generated.
+ - Added file attachments to the Wiki.
+ - Added a new attachments form control.
+ - Added a form control skeleton.
  - Added Site Starter to WebGUI Initial Configuration.
  - Added pagination to purchase history in commerce.
  - Replaced color picker form control with a more robust version.

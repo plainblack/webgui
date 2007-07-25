@@ -14,8 +14,8 @@ use base 'WebGUI::Asset';
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
-use WebGUI::Storage::Image;
 use WebGUI::Utility;
+use WebGUI::VersionTag;
 
 
 #-------------------------------------------------------------------
@@ -41,10 +41,6 @@ Override the default method in order to deal with attachments.
 sub addRevision {
         my $self = shift;
         my $newSelf = $self->SUPER::addRevision(@_);
-        if ($self->get("storageId")) {
-                my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
-                $newSelf->update({storageId=>$newStorage->getId});
-        }
 	my $now = time();
 	$newSelf->update({
 		isHidden => 1,
@@ -80,8 +76,6 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	%properties =
 	    (
-	     storageId => { fieldType => 'image',
-			    defaultValue => undef },
 	     content => { fieldType => "HTMLArea",
 			  defaultValue => undef },
 		views => {
@@ -150,16 +144,16 @@ sub getEditForm {
 		formHeader => WebGUI::Form::formHeader($session, { action => $url}) 
 			.WebGUI::Form::hidden($session, { name => 'func', value => 'editSave' }) 
 			.WebGUI::Form::hidden($session, { name=>"proceed", value=>"showConfirmation" }),
-	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, value => $self->get('title') }),
-		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }),
+	 	formTitle => WebGUI::Form::text($session, { name => 'title', maxlength => 255, size => 40, 
+                value => $self->get('title'), defaultValue=>$form->get("title","text") }),
+		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }) ,
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
-		formAttachment => '',
         formKeywords => WebGUI::Form::text($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
             }),
-		allowsAttachments => $wiki->get("maxAttachments"),
+		allowsAttachments => $wiki->get("allowAttachments"),
 		formFooter => WebGUI::Form::formFooter($session),
 		isNew => ($self->getId eq "new"),
 		canAdminister => $wiki->canAdminister,
@@ -172,25 +166,18 @@ sub getEditForm {
 		protectQuestionLabel => $i18n->get("protectQuestionLabel"),
 		isProtected => $self->isProtected
 		};
+    my $children = [];
 	if ($self->getId eq "new") {
 		$var->{formHeader} .= WebGUI::Form::hidden($session, { name=>"assetId", value=>"new" }) 
 			.WebGUI::Form::hidden($session, { name=>"class", value=>$form->process("class","className") });
-	}
+	} else {
+        $children = $self->getLineage(["children"]);
+    }
+    $var->{formAttachment} = WebGUI::Form::Attachments($session, { 
+        value           => $children,
+        maxAttachments  => $wiki->get("allowAttachments")
+        });
 	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
-}
-
-#-------------------------------------------------------------------
-sub getStorageLocation {
-	my $self = shift;
-	unless (exists $self->{_storageLocation}) {
-		if ($self->get("storageId") eq "") {
-			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
-			$self->update({storageId=>$self->{_storageLocation}->getId});
-		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
-		}
-	}
-	return $self->{_storageLocation};
 }
 
 #-------------------------------------------------------------------
@@ -249,29 +236,26 @@ sub processPropertiesFromFormPost {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
 
-	delete $self->{_storageLocation};
-	my $size = 0;
-        my $storage = $self->getStorageLocation;
-
-        foreach my $file (@{$storage->getFiles}) {
-                if ($storage->isImage($file)) {
-                    my ($w, $h) = $storage->getSizeInPixels($file);
-                    my $max_size = $self->getWiki->get("maxImageSize")
-                        || $self->session->setting->get("maxImageSize");
-                    if($w > $max_size || $h > $max_size) {
-                        if($w > $h) {
-                            $storage->resize($file, $max_size);
-                        }
-                        else {
-                            $storage->resize($file, 0, $max_size);
-                        }
-                    }
-                        $storage->generateThumbnail($file, $self->getWiki->get("thumbnailSize"));
-                }
-                $size += $storage->getFileSize($file);
+    my @attachments = $self->session->form->param("attachments");
+    my @tags = ();
+    foreach my $assetId (@attachments) {
+        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
+        if (defined $asset) {
+            unless ($asset->get("parentId") eq $self->getId) {
+                $asset->setParent($self);
+            }
+            push(@tags, $asset->get("tagId"));
+            $asset->setVersionTag($self->get("tagId"));
         }
-
-        $self->setSize($size);
+    }
+    foreach my $tag (@tags) {
+        my $version = WebGUI::VersionTag->new($self->session, $tag);
+        if (defined $version) {
+            if ($version->getAssetCount == 0) {
+                $version->rollback;
+            }
+        }
+    }
 	$self->requestAutoCommit;
 }	
 
@@ -332,21 +316,22 @@ sub view {
             });
     }
 	my $var = {
-        keywordsLoop => \@keywordsLoop,
-		viewLabel => $i18n->get("viewLabel"),
-		editLabel => $i18n->get("editLabel"),
-		historyLabel => $i18n->get("historyLabel"),
-		wikiHomeLabel=>$i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
-		searchLabel=>$i18n->get("searchLabel", "Asset_WikiMaster"),	
-		searchUrl=>$self->getParent->getUrl("func=search"),
-		recentChangesUrl=>$self->getParent->getUrl("func=recentChanges"),
-		recentChangesLabel=>$i18n->get("recentChangesLabel", "Asset_WikiMaster"),
-		mostPopularUrl=>$self->getParent->getUrl("func=mostPopular"),
-		mostPopularLabel=>$i18n->get("mostPopularLabel", "Asset_WikiMaster"),
-		wikiHomeUrl=>$self->getParent->getUrl,
-		historyUrl=>$self->getUrl("func=getHistory"),
-		editContent=>$self->getEditForm,
-		content => $self->getWiki->autolinkHtml($self->scrubContent),	
+        keywordsLoop        => \@keywordsLoop,
+		viewLabel           => $i18n->get("viewLabel"),
+		editLabel           => $i18n->get("editLabel"),
+		historyLabel        => $i18n->get("historyLabel"),
+		wikiHomeLabel       => $i18n->get("wikiHomeLabel", "Asset_WikiMaster"),
+		searchLabel         => $i18n->get("searchLabel", "Asset_WikiMaster"),	
+		searchUrl           => $self->getParent->getUrl("func=search"),
+		recentChangesUrl    => $self->getParent->getUrl("func=recentChanges"),
+		recentChangesLabel  => $i18n->get("recentChangesLabel", "Asset_WikiMaster"),
+		mostPopularUrl      => $self->getParent->getUrl("func=mostPopular"),
+		mostPopularLabel    => $i18n->get("mostPopularLabel", "Asset_WikiMaster"),
+		wikiHomeUrl         => $self->getParent->getUrl,
+		historyUrl          => $self->getUrl("func=getHistory"),
+		editContent         => $self->getEditForm,
+        allowsAttachments   => $self->getWiki->get("allowAttachments"),
+		content             => $self->getWiki->autolinkHtml($self->scrubContent),	
 		};
 	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
 }

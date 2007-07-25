@@ -334,7 +334,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('104 description'),
 					    uiLevel=>3,
                         fieldType=>'text',
-                        defaultValue=>undef,
+                        defaultValue=>'',
 					    filter=>'fixUrl'
                     },
 				    isHidden=>{
@@ -865,7 +865,16 @@ sub getEditForm {
 			}
 
 			my $tab = $fieldHash{tab} || "properties";
-			$tabform->getTab($tab)->dynamicField(%params);
+
+            # use a custom draw method
+            my $drawMethod = $properties->{$fieldName}{customDrawMethod};
+            if ($drawMethod) {
+                $params{value} = $self->$drawMethod(\%params);
+                $params{fieldType} = "readOnly";
+            }
+
+            #draw the field
+		    $tabform->getTab($tab)->dynamicField(%params);
 		}
 	}
 
@@ -1078,6 +1087,25 @@ sub getRoot {
 	my $class = shift;
 	my $session = shift;
 	return WebGUI::Asset->new($session, "PBasset000000000000001");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getTempspace ( session )
+
+Constructor. Returns the tempspace folder.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getTempspace {
+	my $class = shift;
+	my $session = shift;
+	return WebGUI::Asset->newByDynamicClass($session, "tempspace0000000000000");
 }
 
 
@@ -2025,11 +2053,16 @@ sub update {
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
-            
+
             # skip a property unless it was specified to be set by the properties field or has a default value
 			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+
+            # skip a property if it has the display only flag set
+            next if ($properties->{property}{displayOnly});
+
             # use the update value
 			my $value = $properties->{$property};
+
             # use the current value because the update value was undef
             unless (defined $value) {
                 $value = $self->get($property);

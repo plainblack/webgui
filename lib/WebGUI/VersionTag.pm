@@ -420,7 +420,7 @@ sub requestCommit {
 
 =head2 rollback ( )
 
-A class method. Eliminates all revisions of all assets created under a specific version tag. Also removes the version tag.
+Eliminates all revisions of all assets created under a specific version tag. Also removes the version tag.
 
 =cut
 

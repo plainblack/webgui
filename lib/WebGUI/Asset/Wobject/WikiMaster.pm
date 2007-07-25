@@ -40,11 +40,12 @@ sub appendRecentChanges {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->get("recentChangesCount") || 50;
-	my $rs = $self->session->db->read("select asset.assetId, revisionDate from assetData left join asset on assetData.assetId=asset.assetId where
-		lineage like ? and lineage<>? and status='approved' order by revisionDate desc limit ?",
-        [$self->get("lineage").'%', $self->get("lineage"), $limit]);
-	while (my ($id, $version) = $rs->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::WikiPage", $version);
+    foreach my $asset (@{$self->getLineage(["children"], {
+            returnObjects       => 1, 
+            limit               => $limit, 
+            includeOnlyClasses  =>["WebGUI::Asset::WikiPage"],
+            orderByClause       => "assetData.revisionDate desc"
+            })}) {
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
 		my $specialAction = '';
 		my $isAvailable = 1;
@@ -296,6 +297,13 @@ sub definition {
 			label => $i18n->get("max image size"),
 			hoverHelp => $i18n->get("max image size help")
 			},
+        allowAttachments => {
+            fieldType       => "integer",
+            defaultValue    => 0,
+            tab             => "security",
+            label           => $i18n->get("allow attachments"),
+            hoverHelp       => $i18n->get("allow attachments help"),
+            },
 		useContentFilter =>{
                         fieldType=>"yesNo",
                         defaultValue=>1,
@@ -390,7 +398,6 @@ sub www_byKeyword {
         });
     $p->setBaseUrl($self->getUrl("func=byKeyword"));
     foreach my $assetData (@{$p->getPageData}) {
-$self->session->errorHandler->warn($assetData->{assetId});
         my $asset = WebGUI::Asset->newByDynamicClass($self->session, $assetData->{assetId});
         next unless defined $asset;
         push(@pages, {
@@ -447,6 +454,7 @@ sub www_recentChanges {
 sub www_search {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset_WikiMaster");
+	my $queryString = $self->session->form->process('query', 'text');
 	my $var = {
 		resultsLabel=>$i18n->get("resultsLabel"),
 		notWhatYouWanted=>$i18n->get("notWhatYouWantedLabel"),
@@ -459,9 +467,8 @@ sub www_search {
 		mostPopularUrl=>$self->getUrl("func=mostPopular"),
 		mostPopularLabel=>$i18n->get("mostPopularLabel"),
 		wikiHomeUrl=>$self->getUrl,
-		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage"),
+		addPageUrl=>$self->getUrl("func=add;class=WebGUI::Asset::WikiPage;title=".$queryString),
 		};
-	my $queryString = $self->session->form->process('query', 'text');
     if (defined $queryString) {
         $self->session->scratch->set('wikiSearchQueryString', $queryString);
     }

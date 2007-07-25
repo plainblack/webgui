@@ -141,6 +141,7 @@ sub definition {
         return $class->SUPER::definition($session, $definition);
 }
 
+
 #-------------------------------------------------------------------
 
 sub duplicate {

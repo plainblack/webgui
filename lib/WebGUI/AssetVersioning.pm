@@ -357,8 +357,28 @@ Sets the versioning lock to "on" so that this piece of content may not be edited
 
 sub setVersionLock {
 	my $self = shift;
-	$self->session->db->write("update asset set isLockedBy=".$self->session->db->quote($self->session->user->userId)." where assetId=".$self->session->db->quote($self->getId));
+	$self->session->db->write("update asset set isLockedBy=? where assetId=?", [$self->session->user->userId, $self->getId]);
 	$self->updateHistory("locked");
+	$self->purgeCache;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setVersionTag ( tagId )
+
+Changes the version tag associated with this revision to something new.
+
+=head3 tagId
+
+A new version tag id.
+
+=cut
+
+sub setVersionTag {
+	my $self = shift;
+    my $tagId = shift;
+	$self->session->db->write("update assetData set tagId=? where assetId=?", [$tagId, $self->getId]);
+	$self->updateHistory("changed version tag to $tagId");
 	$self->purgeCache;
 }
 
