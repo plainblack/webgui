@@ -21,6 +21,10 @@ save you many hours of grief.
    the userProfileData table will need to be updated to reflect these
    changes.
 
+ * DatabaseLinks no longer automatically set LongReadLen and LongTruncOk
+   for Oracle or ODBC databases.  These parameters, and others, can now
+   be set in the DatabaseLink.
+
  * WebGUI now requires the following additional perl modules to operate,
    and you should install them prior to upgrading:
 

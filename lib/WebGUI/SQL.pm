@@ -312,20 +312,27 @@ The password to use to connect to the database defined by dsn.
 =cut
 
 sub connect {
-	my $class = shift;
+	my $class   = shift;
 	my $session = shift;
-	my $dsn = shift;
-	my $user = shift;
-	my $pass = shift;
+	my $dsn     = shift;
+	my $user    = shift;
+	my $pass    = shift;
+    my $params  = shift;
+
 	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 });
+
 	unless (defined $dbh) {
 		$session->errorHandler->error("Couldn't connect to database: $dsn");
 		return undef;
 	}
-	if ( $dsn =~ /Oracle/ || $dsn =~ /ODBC/ ) { # Set specific attributes for long Oracle and ODBC DSNs
-		$dbh->{LongReadLen} = 512 * 1024;
-		$dbh->{LongTruncOk} = 1;
-	}
+
+    ##Set specific attributes for this database.
+    my @params = split /\s*\n\s*/, $params;
+    foreach my $param ( @params ) {
+        my ($paramName, $paramValue) = split /\s*=\s*/, $param;
+        $dbh->{$paramName} = $paramValue;
+    }
+
 	bless {_dbh=>$dbh, _session=>$session}, $class;
 }
 

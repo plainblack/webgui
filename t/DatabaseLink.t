@@ -147,6 +147,7 @@ cmp_deeply(
         title      => undef,
         allowedKeywords => undef,
         allowMacroAccess => 0,
+        additionalParameters => '',
     },
     'create: passing no params autovivifies the databaseLinkId, but that is all',
 );
@@ -156,13 +157,14 @@ $dbLink->delete();
 is(scalar keys %{WebGUI::DatabaseLink->getList($session)}, $startingDbLinks, 'new DatabaseLink deleted');
 
 my $dbLinkParams = {
-                       DSN        => 'DBI:mysql:myDb:myHost',
-                       username   => 'dbUser',
-                       identifier => 'dbPass',
-                       title      => 'Access to my Awesome DB',
-                       allowedKeywords => 'SELECT UPDATE',
-                       databaseLinkId  => 'fooBarBaz',
-                       allowMacroAccess => 0,
+                    DSN        => 'DBI:mysql:myDb:myHost',
+                    username   => 'dbUser',
+                    identifier => 'dbPass',
+                    title      => 'Access to my Awesome DB',
+                    allowedKeywords => 'SELECT UPDATE',
+                    databaseLinkId  => 'fooBarBaz',
+                    allowMacroAccess => 0,
+                    additionalParameters => '',
                    };
 
 $dbLink = WebGUI::DatabaseLink->create($session, $dbLinkParams);

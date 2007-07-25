@@ -97,6 +97,8 @@
  - Add user to transactions list and pending transactions.
  - fix: autolinking in wiki pages with manual links didn't work properly
  - fix: javascript errors in SQL Form date inputs in IE
+ - Added optional parameters for DatabaseLinks so that users can setup their
+   database's with things like LongReadLen, etc.
 
 7.3.22
  - fix: relative links sent out in emails don't work properly

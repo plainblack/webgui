@@ -229,14 +229,17 @@ sub db {
 	if (defined $self->{_dbh}) {
 		return $self->{_dbh};
 	}
-	my $dsn = $self->{_databaseLink}{DSN};
-	my $username = $self->{_databaseLink}{username};
+
+	my $dsn        = $self->{_databaseLink}{DSN};
+	my $username   = $self->{_databaseLink}{username};
 	my $identifier = $self->{_databaseLink}{identifier};
+	my $parameters = $self->{_databaseLink}{additionalParameters};
+
 	if ($self->getId eq "0") {
 		$self->{_dbh} = $self->session->db;
 		return $self->{_dbh};
 	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
-		my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier);
+		my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
 		unless (defined $dbh) {
 			$self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
 		}
@@ -331,6 +334,7 @@ sub new {
 				title=>"WebGUI Database",
 				allowedKeywords=>"select\ndescribe\ndesc\nshow\ncall",
                 allowMacroAccess=>0,
+                additionalParameters=>'',
 				);
 		} else {
 			%databaseLink = $session->db->quickHash("select * from databaseLink where databaseLinkId=?",[$databaseLinkId]);

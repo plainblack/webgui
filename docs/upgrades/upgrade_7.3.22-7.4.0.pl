@@ -33,18 +33,21 @@ addNewsletter($session);
 addHttpProxyUrlPatternFilter($session);
 addCanStartThreadToCS($session);
 addPostCaptchaToCS($session);
-addMacroAccessToDatabaseLinks($session);
+addFieldsToDatabaseLinks($session);
 
 finish($session); # this line required
 
 #-------------------------------------------------
 
-sub addMacroAccessToDatabaseLinks {
+sub addFieldsToDatabaseLinks {
     my $session = shift;
-    print "\tAdding allowMacroAccess setting to Database Links..." unless ($quiet);
-    
+    print "\tAdding new fields to Database Links...\n" unless ($quiet);
+    print "\t\tAdding allowMacroAccess setting to Database Links...\n" unless ($quiet);
     $session->db->write("ALTER TABLE databaseLink add column allowMacroAccess integer NOT NULL default 0");
     
+    print "\t\tAdding additionalParameters setting to Database Links..." unless ($quiet);
+    $session->db->write("ALTER TABLE databaseLink add column additionalParameters VARCHAR(255) NOT NULL default ''");
+
     print "OK\n";
     return;
 }

@@ -3315,10 +3315,28 @@ a user.|,
 		lastUpdated => 1165511447,
 	},
 
-	'allow access from macros' => {
-                message => q|Allow access from Macro's|,
-                lastUpdated => 0,
-        },
+    'allow access from macros' => {
+        message => q|Allow access from Macro's|,
+        lastUpdated => 0,
+    },
+
+    'allow access from macros help' => {
+        message => q|Are macros allowed to access this DatabaseLink?|,
+        lastUpdated => 1185397688,
+    },
+
+    'additional parameters' => {
+        message => q|Additional database parameters|,
+        lastUpdated => 1185397688,
+    },
+
+    'additional parameters help' => {
+        message => q|<p>Specify additional parameters for your database connection.  Use 1 per line, and separate the name of the parameter from the value with an equal sign, like this: </p>
+<p>LongReadLen=1024<br />
+LongTruncOk=1</p>
+|,
+        lastUpdated => 1185397688,
+    },
 
 	'preview' => {
 		message => q|Preview|,

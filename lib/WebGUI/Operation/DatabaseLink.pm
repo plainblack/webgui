@@ -193,11 +193,19 @@ sub www_editDatabaseLink {
 		-hoverHelp => $i18n->get('allowed keywords description'),
 		-value => $db{allowedKeywords},
 	);
-        $f->yesNo(
+    $f->yesNo(
 		-name => "allowMacroAccess",
 		-label => $i18n->get('allow access from macros'),
-                -defaultValue=>0,
+		-hoverHelp => $i18n->get('allow access from macros help'),
+        -defaultValue=>0,
 		-value => $db{allowMacroAccess},
+	);
+    $f->textarea(
+		-name => "additionalParameters",
+		-label => $i18n->get('additional parameters'),
+		-hoverHelp => $i18n->get('additional parameters help'),
+        -defaultValue=>'',
+		-value => $db{additionalParameters},
 	);
 	$f->submit;
 	$output .= $f->print;
@@ -228,7 +236,8 @@ sub www_editDatabaseLinkSave {
 		DSN=>$session->form->process("DSN"),
 		allowedKeywords=>$allowedKeywords,
 		allowMacroAccess=>$session->form->process("allowMacroAccess"),
-		};
+		additionalParameters=>$session->form->process("additionalParameters"),
+    };
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
 	} else {
