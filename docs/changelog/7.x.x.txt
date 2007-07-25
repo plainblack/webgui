@@ -90,12 +90,24 @@
  - fix: autolinking in wiki pages with manual links didn't work properly
  - fix: javascript errors in SQL Form date inputs in IE
 
+7.3.22
+ - fix: relative links sent out in emails don't work properly
+ - fix: macros not processed in HttpProxy template
+    http://www.webgui.org/bugs/tracker/macro-not-working-i-httpproxy
+ - fix: navigation shows toolbar for users who can't edit it
+    http://www.webgui.org/bugs/tracker/navigation-shows-edit-button-to-users-without-permission
+ - fix: additional template editing problems
+ - Add user to transactions list and pending transactions.
+ - Allow editing previous revisions of assets in the current version tag
+ - fix: autolinking in wiki pages with manual links didn't work properly
+ - fix: javascript errors in SQL Form date inputs in IE
+
 7.3.21
+ - fix: SQLForm says Databaselink does not have enough privileges (perlDreamer Consulting, LLC)
+    http://www.webgui.org/bugs/tracker/sqlform-says-databaselink-does-not-have-enough-privileges
  - fix: Self-deactivation doesn't show login screen after success
  - fix regression: Calendar events on the last day of the month do not appear on the month view
     http://www.webgui.org/bugs/tracker/fixed-calendar-events-on-the-last-day-of-the-month-do-not-appear-on-the-month-view
- - fix: SQLForm says Databaselink does not have enough privileges (perlDreamer Consulting, LLC)
-    http://www.webgui.org/bugs/tracker/sqlform-says-databaselink-does-not-have-enough-privileges
  - fix: List pending Transactions (perlDreamer Consulting, LLC)
     http://www.webgui.org/bugs/tracker/list-pending-transactions
  - fix: syndicated content fails if feeds have items with single and multiple category entries
