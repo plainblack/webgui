@@ -113,6 +113,7 @@
  - Add: Label to payment gateways.  Itransact now has a default display value of "Credit Card".  Users will no longer need to choose "Itransact" as a payment gateway.
  - fix: Fixed a bug in the Time Tracker which did not sort the list of users alphabetically making it difficult to assign resources to projects.
  - fix: project management screen of Time Tracker now uses WebGUI standard icons.
+ - Add: Dutch and German date formats have been added as default choices for user profiles
  
 7.3.22
  - fix: relative links sent out in emails don't work properly
