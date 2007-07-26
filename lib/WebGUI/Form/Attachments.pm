@@ -69,6 +69,16 @@ How many attachments will be allowed to be uploaded.  Defaults to 1.
 
 An array reference of asset objects (not ids, but objects) that should be displayed in the attachments box.
 
+=head4 maxImageSize
+
+An integer (in pixels) of the maximum height or width an image can be. Defaults to the size in the main settings if
+not specified.
+
+=head4 thumbnailSize
+
+An integer (in pixels) of the proportional size of a thumbnail for an image. Defaults to the size in the main
+settings if not specified.
+
 =cut
 
 sub definition {
@@ -86,6 +96,8 @@ sub definition {
 		maxAttachments=>{
 			defaultValue=>1
 			},
+        maxImageSize=>{},
+        thumbnailSize=>{},
 		profileEnabled=>{
 			defaultValue=>0
 			},
@@ -122,11 +134,14 @@ Renders an attachments control.
 sub toHtml {
 	my $self = shift;
     my @assetIds = @{$self->get("value")};
+    my $thumbnail = $self->get("thumbnailSize") || $self->session->setting->get("thumbnailSize");
+    my $image = $self->get("maxImageSize") || $self->session->setting->get("maxImageSize");
     my $attachmentsList = "attachments=".join(";attachments=", @assetIds) if (scalar(@assetIds));
     return '<iframe src="'
         .$self->session->url->page("op=formHelper;class=Attachments;sub=show;name=".$self->get("name")
-        .";maxAttachments=".$self->get("maxAttachments")).";".$attachmentsList
-        .'" style="width: 100%; height: 110px;"></iframe><div id="'.$self->get("name").'_formId"></div>';
+        .";maxAttachments=".$self->get("maxAttachments")).";maxImageSize=".$image.";thumbnailSize="
+        .$thumbnail.";".$attachmentsList
+        .'" style="width: 100%; height: 120px;"></iframe><div id="'.$self->get("name").'_formId"></div>';
 }
 
 
@@ -200,6 +215,8 @@ sub www_show {
             <a href="#" onclick="WebguiAttachmentUploadForm.hide();" id="uploadFormCloser">X</a>
             <form action="'.$url->page.'" enctype="multipart/form-data" method="post">
             <input type="hidden" name="maxAttachments" value="'.$form->param("maxAttachments").'" />
+            <input type="hidden" name="maxImageSize" value="'.$form->param("maxImageSize").'" />
+            <input type="hidden" name="thumbnailSize" value="'.$form->param("thumbnailSize").'" />
             <input type="hidden" name="name" value="'.$form->param("name").'" />
             <input type="hidden" name="op" value="formHelper" />
             <input type="hidden" name="class" value="Attachments" />
@@ -215,7 +232,8 @@ sub www_show {
         my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
         if (defined $asset) {
             $attachments .= '<div class="attachment"><a href="'
-                .$url->page("op=formHelper;class=Attachments;sub=delete;maxAttachments=".$form->param("maxAttachments").";"
+                .$url->page("op=formHelper;class=Attachments;sub=delete;maxAttachments=".$form->param("maxAttachments")
+                .";maxImageSize=".$form->param("maxImageSize").";thumbnailSize=".$form->param("thumbnailSize").";"
                 .$attachmentsList.";assetId=".$assetId.";name=".$form->param("name")).'" class="deleteAttachment">X</a>
                 ';
             if ($asset->isa("WebGUI::Asset::File::Image")) {
@@ -257,31 +275,31 @@ sub www_upload {
     my $storage = WebGUI::Storage::Image->createTemp($session);
     my $filename = $storage->addFileFromFormPost("attachment");
     my $tempspace = WebGUI::Asset->getTempspace($session);
+    my $asset = "";
+
+    # prevent malicious visitors from being able to publish children things they've published to tempsace
+    my $owner = ($session->user->userId eq "1") ? "3" : $session->user->userId;
+
+    my %properties = (
+        title       => $filename,
+        url         => "attachments/".$filename,
+        filename    => $filename,
+        ownerUserId => $owner,
+        groupIdEdit => "3",
+        groupIdView => "7",
+        );
     if ($storage->isImage($filename)) {
-        my $image = $tempspace->addChild({
-            title       => $filename,
-            url         => "attachments/".$filename,
-            className   => "WebGUI::Asset::File::Image",
-            filename    => $filename,
-            templateId  => "PBtmpl0000000000000088",
-            });
-        $image->getStorageLocation->addFileFromFilesystem($storage->getPath($filename));
-        $image->generateThumbnail();
-        $image->setSize;
-        push(@assetIds, $image->getId);
+        $properties{className}  = "WebGUI::Asset::File::Image";
+        $properties{templateId} = "PBtmpl0000000000000088";
     }
     else {
-        my $file = $tempspace->addChild({
-            title       => $filename,
-            url         => "attachments/".$filename,
-            className   => "WebGUI::Asset::File",
-            filename    => $filename,
-            templateId  => "PBtmpl0000000000000024",
-            });
-        $file->getStorageLocation->addFileFromFilesystem($storage->getPath($filename));
-        $file->setSize; 
-        push(@assetIds, $file->getId);
+        $properties{className}  = "WebGUI::Asset::File";
+        $properties{templateId} = "PBtmpl0000000000000024";
     }
+    $asset = $tempspace->addChild(\%properties);
+    $asset->getStorageLocation->addFileFromFilesystem($storage->getPath($filename));
+    $asset->applyConstraints;
+    push(@assetIds, $asset->getId);
     if ($session->setting->get("autoRequestCommit")) {
         WebGUI::VersionTag->getWorking($session)->requestCommit;
     }

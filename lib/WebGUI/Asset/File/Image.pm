@@ -48,6 +48,53 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 applyConstraints ( options ) 
+
+Things that are done after a new file is attached.
+
+=head3 options
+
+A hash reference of optional parameters.
+
+=head4 maxImageSize
+
+An integer (in pixels) representing the longest edge the image may have.
+
+=head4 thumbnailSize
+
+An integer (in pixels) representing the longest edge a thumbnail may have.
+
+=cut
+
+sub applyConstraints {
+    my $self = shift;
+    my $options = shift;
+    $self->SUPER::applyConstraints($options);
+    my $maxImageSize = $options->{maxImageSize} || $self->session->setting->get("maxImageSize");
+    my $thumbnailSize = $options->{thumbnailSize} || $self->session->setting->get("thumbnailSize");
+	my $parameters = $self->get("parameters");
+    my $storage = $self->getStorageLocation;
+	unless ($parameters =~ /alt\=/) {
+		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
+	}
+    my $file = $self->get("filename");
+    my ($w, $h) = $storage->getSizeInPixels($file);
+    if($w > $maxImageSize || $h > $maxImageSize) {
+        if($w > $h) {
+            $storage->resize($file, $maxImageSize);
+        }
+        else {
+            $storage->resize($file, 0, $maxImageSize);
+        }
+    }
+	$self->generateThumbnail($thumbnailSize);
+    $self->setSize;
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -219,23 +266,7 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my $parameters = $self->get("parameters");
-    my $storage = $self->getStorageLocation;
-	unless ($parameters =~ /alt\=/) {
-		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
-	}
-    my $max_size = $self->session->setting->get("maxImageSize");
-    my $file = $self->get("filename");
-    my ($w, $h) = $storage->getSizeInPixels($file);
-    if($w > $max_size || $h > $max_size) {
-        if($w > $h) {
-            $storage->resize($file, $max_size);
-        }
-        else {
-            $storage->resize($file, 0, $max_size);
-        }
-    }
-	$self->generateThumbnail($self->session->form->process("thumbnailSize"));
+    $self->applyConstraints;
 }
 
 #-------------------------------------------------------------------

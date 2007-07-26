@@ -260,11 +260,12 @@ A hash reference comprising modifiers to relative listing. Rules include:
 
 =head4 statesToInclude
 
-An array reference containing a list of states that should be returned. Defaults to 'published'. Options include 'published', 'trash', 'cliboard', 'clipboard-limbo' and 'trash-limbo'.
+An array reference containing a list of states that should be returned. Defaults to 'published'. Options include
+'published', 'trash', 'clipboard', 'clipboard-limbo' and 'trash-limbo'.
 
 =head4 statusToInclude
 
-An array reference containing a list of status that should be returned. Defaults to 'approved'. Options include 'approved', 'pending', 'deleted', and 'archived'.
+An array reference containing a list of status that should be returned. Defaults to 'approved'. Options include 'approved', 'pending', and 'archived'.
 
 =head4 endingLineageLength
 

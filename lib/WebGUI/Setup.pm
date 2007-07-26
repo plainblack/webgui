@@ -478,7 +478,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # commit the working tag
         my $working = WebGUI::VersionTag->getWorking($session);
-        $working->set({title=>"Initial Site Setup"});
+        $working->set({name=>"Initial Site Setup"});
         $working->commit;
 
         # remove init state

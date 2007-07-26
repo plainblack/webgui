@@ -95,7 +95,8 @@ sub getAssetsInTrash {
 
 =head2 purge (  [ options ] )
 
-Deletes an asset from tables and removes anything bound to that asset, including descendants.
+Deletes an asset from tables and removes anything bound to that asset, including descendants. Returns 1 on success
+and 0 on failure.
 
 =head3 options
 
@@ -110,30 +111,66 @@ A boolean that, if true, will skip dealing with exported files.
 sub purge {
 	my $self = shift;
 	my $options = shift;
-	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get("isSystem"));
+    my $session = $self->session;
+
+    # can't delete if it's one of these things
+	if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage") || $self->get("isSystem")) {
+        $session->errorHandler->security("delete a system protected page (".$self->getId.")");
+        return 0;
+    }
+
+    # assassinate the offspring
+	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
+	foreach my $kid (@{$kids}) {
+		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
+        if (defined $kid) {
+            unless ($kid->purge) {
+                $self->errorHandler->security("delete one of (".$self->getId.")'s children which is a system protected page");
+                return 0;
+            }
+        }
+        else {
+			$session->errorHandler->error("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
+        }
+	}
+
+    # gotta delete stuff we've exported
 	unless ($options->{skipExported}) {
 		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
 	}
 
-	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
-	foreach my $kid (@{$kids}) {
-		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
-		(defined $kid) ? $kid->purge :
-			$self->session->errorHandler->warn("getLineage returned an undefined object in the AssetTrash->purge method.  Unable to purge asset.");
-	}
-    WebGUI::Keyword->new($self->session)->deleteKeywordsForAsset($self);
+    # gonna need this at the end
+    my $tagId = $self->get("tagId");
+
+    # clean up keywords
+    WebGUI::Keyword->new($session)->deleteKeywordsForAsset($self);
+
+    # clean up search engine
     WebGUI::Search::Index->new($self)->delete;
-	$self->session->db->beginTransaction;
-	$self->session->db->write("delete from metaData_values where assetId = ".$self->session->db->quote($self->getId));
-	foreach my $definition (@{$self->definition($self->session)}) {
-		$self->session->db->write("delete from ".$definition->{tableName}." where assetId=".$self->session->db->quote($self->getId));
-	}
-	$self->session->db->write("delete from asset where assetId=".$self->session->db->quote($self->getId));
-	$self->session->db->commit;
+
+    # clean up cache
+	WebGUI::Cache->new($session)->deleteChunk(["asset",$self->getId]);
 	$self->purgeCache;
-	WebGUI::Cache->new($self->session)->deleteChunk(["asset",$self->getId]);
+
+    # delete stuff out of the asset tables
+	$session->db->beginTransaction;
+	$session->db->write("delete from metaData_values where assetId = ?",[$self->getId]);
+	foreach my $definition (@{$self->definition($session)}) {
+		$session->db->write("delete from ".$definition->{tableName}." where assetId=?", [$self->getId]);
+	}
+	$session->db->write("delete from asset where assetId=?", [$self->getId]);
+	$session->db->commit;
+
+    # log that we've purged this asset
 	$self->updateHistory("purged");
 	$self = undef;
+
+    # clean up version tag if empty
+    my $versionTag = WebGUI::VersionTag->new($session, $tagId);
+    if ($versionTag->getAssetCount == 0) {
+        $versionTag->rollback;
+    }
+    return 1;
 }
 
 

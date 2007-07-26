@@ -175,7 +175,9 @@ sub getEditForm {
     }
     $var->{formAttachment} = WebGUI::Form::Attachments($session, { 
         value           => $children,
-        maxAttachments  => $wiki->get("allowAttachments")
+        maxAttachments  => $wiki->get("allowAttachments"),
+        maxImageSize    => $wiki->get("maxImageSize"),
+        thumbnailSize   => $wiki->get("thumbnailSize"),
         });
 	return $self->processTemplate($var, $wiki->getValue('pageEditTemplateId'));
 }
@@ -236,6 +238,7 @@ sub processPropertiesFromFormPost {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
 
+    # deal with attachments from the attachments form control
     my @attachments = $self->session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
@@ -243,11 +246,18 @@ sub processPropertiesFromFormPost {
         if (defined $asset) {
             unless ($asset->get("parentId") eq $self->getId) {
                 $asset->setParent($self);
+                $asset->update({
+                    ownerUserId => $self->get("ownerUserId"),
+                    groupIdEdit => $self->get("groupIdEdit"),
+                    groupIdView => $self->get("groupIdView"),
+                    });
             }
             push(@tags, $asset->get("tagId"));
             $asset->setVersionTag($self->get("tagId"));
         }
     }
+
+    # clean up empty tags
     foreach my $tag (@tags) {
         my $version = WebGUI::VersionTag->new($self->session, $tag);
         if (defined $version) {
@@ -256,6 +266,8 @@ sub processPropertiesFromFormPost {
             }
         }
     }
+
+    # wiki pages are auto committed
 	$self->requestAutoCommit;
 }	
 

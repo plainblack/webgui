@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use File::Path;
 use File::stat;
+use WebGUI::Asset;
 
 
 =head1 NAME
@@ -102,7 +103,27 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	$self->recurseFileSystem($self->session->config->get("uploadsPath")."/temp");
+    my $start = time();
+
+    # kill temporary assets
+    my $tempspace = WebGUI::Asset->getTempspace($self->session);
+    my $children = $tempspace->getLineage(["children"], {
+        returnObjects   => 1, 
+        statesToInclude => [qw(trash clipboard published)],
+        statusToInclude => [qw(pending archived approved)],
+        });
+    foreach my $asset (@{$children}) {
+        if (time() - $asset->get("revisionDate") > $self->get("storageTimeout")) {
+            unless ($asset->purge) {
+                return $self->ERROR;
+            }
+        }
+        # taking too long, give up
+        return $self->WAITING if (time() - $start > 50);
+    }
+
+    # kill temporary files
+	return $self->recurseFileSystem($start, $self->session->config->get("uploadsPath")."/temp");
 }
 
 
@@ -120,20 +141,27 @@ The starting path.
 
 sub recurseFileSystem {
 	my $self = shift;
+    my $start = shift;
 	my $path = shift;
-        my (@filelist, $file);
-        if (opendir(DIR,$path)) {
-                @filelist = readdir(DIR);
-                closedir(DIR);
-                foreach $file (@filelist) {
-                        unless ($file eq "." || $file eq "..") {
-                                $self->recurseFileSystem($path."/".$file);
-                                if ($self->checkFileAge($path."/".$file)) {
-                                        rmtree($path."/".$file);
-                                }
-                        }
+    my (@filelist, $file);
+    if (opendir(DIR,$path)) {
+        @filelist = readdir(DIR);
+        closedir(DIR);
+        foreach $file (@filelist) {
+            unless ($file eq "." || $file eq "..") {
+                # taking too long, time to abort
+                return $self->WAITING if (time() - $start > 50);             
+
+                # must search for children
+                $self->recurseFileSystem($start, $path."/".$file);
+
+                # if it's old enough, let's kill it
+                if ($self->checkFileAge($path."/".$file)) {
+                    rmtree($path."/".$file);
                 }
+            }
         }
+    }
 	return $self->COMPLETE;
 }
 

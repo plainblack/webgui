@@ -165,20 +165,6 @@ sub editSave {
 		$data{templateId} = 'PBtmpl0000000000000024';
 		if ($selfName eq  "WebGUI::Asset::File::Image") {
 			$data{templateId} = 'PBtmpl0000000000000088';
-			$data{parameters} = 'alt="'.$self->get("title").'"';
-
-            # Resize image if it is bigger than the max allowed image size.
-            my $maxSize = $self->session->setting->get("maxImageSize");
-            my ($width, $height) = $tempStorage->getSizeInPixels($filename);
-            if($width > $maxSize || $height > $maxSize) {
-                if($width > $height) {
-                    $tempStorage->resize($filename, $maxSize);
-                }
-                else {
-                    $tempStorage->resize($filename, 0, $maxSize);
-                }
-            }
-
 		}
 		$data{url} = $self->getParent->get('url').'/'.$filename;
 		
@@ -188,11 +174,7 @@ sub editSave {
 		#Get the current storage location
 		my $storage = $newAsset->getStorageLocation();
 		$storage->addFileFromFilesystem($tempStorage->getPath($filename));
-		$storage->setPrivileges($data{"ownerUserId"},$data{"groupIdView"},$data{"groupIdEdit"});
-		
-		$newAsset->setSize($tempStorage->getFileSize($filename));
-		$newAsset->generateThumbnail if ($selfName eq "WebGUI::Asset::File::Image");
-		$newAsset->update({ storageId=> $storage->getId });
+        $newAsset->applyConstraints;
 		
 		#Now remove the reference to the storeage location to prevent problems with different revisions.
 		delete $newAsset->{_storageLocation};

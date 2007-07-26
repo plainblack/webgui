@@ -98,6 +98,7 @@ sub addWikiAttachments {
     $db->write("alter table WikiPage drop column storageId");
     my $root = WebGUI::Asset->getRoot($session);
     $root->addChild({title=>"Tempspace", url=>"tempspace", className=>"WebGUI::Asset::Wobject::Folder"}, "tempspace0000000000000"); 
+    $db->write("update asset set isSystem=1 where assetId=?", ["tempspace0000000000000"]);
 }
 
 #-------------------------------------------------

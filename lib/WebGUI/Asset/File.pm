@@ -69,6 +69,25 @@ sub addRevision {
 
 #-------------------------------------------------------------------
 
+=head2 applyConstraints ( options )
+
+Enforce certain things when new files are uploaded.
+
+=head3 options
+
+A hash reference of optional parameters. None at this time.
+
+=cut
+
+sub applyConstraints {
+    my $self = shift;
+	$self->getStorageLocation->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
+    $self->setSize;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -285,7 +304,6 @@ sub processPropertiesFromFormPost {
     my $storage = $self->getStorageFromPost($storageId);
 
 	if (defined $storage) {
-		$storage->setPrivileges($self->get('ownerUserId'), $self->get('groupIdView'), $self->get('groupIdEdit'));
 		my $filename = $storage->getFiles()->[0];
 
 		if (defined $filename) {
@@ -299,6 +317,7 @@ sub processPropertiesFromFormPost {
 			$self->update(\%data);
 		}
 	}
+    $self->applyConstraints;
 }
 
 
