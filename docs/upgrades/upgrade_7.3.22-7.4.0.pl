@@ -38,6 +38,7 @@ addPostCaptchaToCS($session);
 addFieldsToDatabaseLinks($session);
 addWikiAttachments($session);
 addAdminConsoleGroupSettings($session);
+updateCommerce($session);
 
 finish($session); # this line required
 
@@ -457,7 +458,37 @@ sub addHttpProxyUrlPatternFilter {
     print "OK!\n" unless ($quiet);
 }
 
-
+#-------------------------------------------------
+sub updateCommerce {
+	my $session = shift;
+	print "\tUpdating Commerce...." unless ($quiet); 
+    $session->db->write("delete from settings where name='commerceTransactionErrorTemplateId'");
+    
+    #Remove Transaction Error Template
+    my @templates = $session->db->buildArray("select distinct assetId from template where namespace='Commerce/TransactionError'");
+    foreach my $templateId (@templates) {
+        my $template = WebGUI::Asset->newByDynamicClass($session,$templateId);
+        $template->purge;
+    }
+    
+    #Add the Check payment gateway to the config file
+    my $paymentPlugins = $session->config->get('paymentPlugins');
+    push(@{$paymentPlugins},'Check');
+    $session->config->set('paymentPlugins',$paymentPlugins);
+    
+    #Enable the check payment gateway if cash is enabled
+    my ($cashEnabled) = $session->db->quickArray("select fieldValue from commerceSettings where namespace='Cash' and fieldName='enabled'");
+    if($cashEnabled) {
+        my $sth = $session->db->read("select * from commerceSettings where namespace='Cash'");
+        while (my $hash = $sth->hashRef) {
+            my $array = [$hash->{fieldName},$hash->{fieldValue},'Check',$hash->{type}];
+            $session->db->write("insert into commerceSettings values (?,?,?,?)",$array);
+        }
+    }
+    
+    
+    print "OK!\n" unless $quiet;
+}
 
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
