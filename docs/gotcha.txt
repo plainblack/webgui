@@ -47,6 +47,11 @@ save you many hours of grief.
  * Any customizations made to the Inbox or Inbox/Message tempalates 
    will be lost. Please back up your custom templates before running
    the upgrade
+   
+ * The Transaction Error template in commerce has been merged with the Checkout 
+   template.  All Transaction Error templates are purged from the system on upgrade.
+   Make sure you back up your custom templates and apply them to the Checkout template.
+   None of the tempalte variables have changed.
 
 
 7.3.19
