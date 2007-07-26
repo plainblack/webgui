@@ -14,6 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Storage;
+use WebGUI::Asset;
 
 my $toVersion = "7.4.0"; # make this match what version you're going to
 my $quiet; # this line required
@@ -43,7 +44,7 @@ finish($session); # this line required
 
 sub addWikiAttachments {
     my $session = shift;
-    print "\tAdding support for attachmetns to wikis.\n" unless ($quiet);
+    print "\tAdding support for attachments to wikis.\n" unless ($quiet);
     my $db = $session->db;
     $db->write("alter table WikiMaster add column allowAttachments int not null default 0");
     my $sth = $db->read("select storageId from WikiPage");
@@ -54,6 +55,8 @@ sub addWikiAttachments {
         }
     }
     $db->write("alter table WikiPage drop column storageId");
+    my $root = WebGUI::Asset->getRoot($session);
+    $root->addChild({title=>"Tempspace", url=>"tempspace", className=>"WebGUI::Asset::Wobject::Folder"}, "tempspace0000000000000"); 
 }
 
 #-------------------------------------------------

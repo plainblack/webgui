@@ -285,19 +285,18 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         $f->hidden(name=>"step", value=>"7");
         $f->hidden(name=>"styleTemplateId", value=>$style->getId);
         $f->yesNo(name=>"contactUs",label=>"Contact Us");
-        $f->yesNo(name=>"aboutUs",label=>"About Us",
-            extras=>'onchange="document.getElementById(\'aboutUsContent_formId_row\').style.display=\'table-row\';"');
-        $f->HTMLArea(name=>"aboutUsContent", richEditId=>"PBrichedit000000000002", 
-            value=>"Put your about us content here.");
-        if (isIn("WebGUI::Asset::Wobject::Collaboration", @{$session->config->get("assets")})) {
-            $f->yesNo(name=>"forums",label=>"Forums",
-                extras=>'onchange="document.getElementById(\'forumNames_formId_row\').style.display=\'table-row\'"');
-            $f->textarea(name=>"forumNames",subtext=>"One forum name per line", value=>"Support\nGeneral Discussion");
-            $f->yesNo(name=>"news",label=>"News");
-        }
         $f->yesNo(name=>"calendar",label=>"Calendar");
         $f->yesNo(name=>"wiki",label=>"Wiki");
         $f->yesNo(name=>"search",label=>"Search");
+        $f->yesNo(name=>"aboutUs",label=>"About Us");
+        $f->HTMLArea(name=>"aboutUsContent", richEditId=>"PBrichedit000000000002", 
+            value=>"Put your about us content here.");
+        if (isIn("WebGUI::Asset::Wobject::Collaboration", @{$session->config->get("assets")})) {
+            $f->yesNo(name=>"news",label=>"News");
+            $f->yesNo(name=>"forums",label=>"Forums");
+            $f->textarea(name=>"forumNames",subtext=>"One forum name per line", 
+                value=>"Support\nGeneral Discussion");
+        }
         $f->submit;
         $legend = "Initial Pages";
         $output .= $f->print;
@@ -535,12 +534,12 @@ return props[propName];
             top: 5%; left: 10%; position: absolute;
             }
             #initBoxSleeve {
-                overflow: auto;
-                width: 700px;
+                width: 770px;
                 height: 475px;
             }
 		a { color: black; }
 		a:visited { color: black;}
+        body { margin: 0; }
             ';
     }
     else {
@@ -551,16 +550,9 @@ return props[propName];
         }
         ';
     }
-    if ($session->form->process("step") == 6) {
-        $page .= '
-            #forumNames_formId_row, #aboutUsContent_formId_row {
-               display: none;
-            }
-            ';
-    }
     $page .= ' </style> </head> <body> 
             <div id="initBox"><h1>'.$legend.'</h1><div id="initBoxSleeve"> '.$output.'</div></div>
-         <img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;" />
+         <img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 1000px; z-index: 1;" />
 	</body> </html>';
 	$session->http->setCacheControl("none");
 	$session->http->setMimeType("text/html");
