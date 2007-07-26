@@ -73,20 +73,45 @@ Generates a captcha image (105px x 26px) and returns the filename and challenge 
 
 sub addFileFromCaptcha {
 	my $self = shift;
+    my $error = "";
 	my $challenge;
-	srand;
+    srand;
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
-	my $filename = "captcha.".$self->session->id->generate().".png";
+	my $filename = "captcha.".$self->session->id->generate().".gif";
 	my $image = $graphicsPackage->new();
-	$image->Set(size=>'105x26');
-	$image->ReadImage('xc:white');
-	$image->AddNoise(noise=>"Multiplicative");
-	$image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'black', antialias=>'true', text=>$challenge);
-	$image->Blur(geometry=>"1");
-	$image->Set(type=>"Grayscale");
-	$image->Border(fill=>'black', width=>1, height=>1);
-	$image->Write($self->getPath($filename));
-	return ($filename, $challenge);
+	$error = $image->Set(size=>'105x26');
+	if($error) {
+        $self->session->errorHandler->warn("Error setting captcha image size: $error");
+    }
+    $error = $image->ReadImage('xc:white');
+	if($error) {
+        $self->session->errorHandler->warn("Error initializing image: $error");
+    }
+    $error = $image->AddNoise(noise=>"Multiplicative");
+	if($error) {
+        $self->session->errorHandler->warn("Error adding noise: $error");
+    }
+    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'black', antialias=>'true', text=>$challenge);
+	if($error) {
+        $self->session->errorHandler->warn("Error Annotating image: $error");
+    }
+    $error = $image->Blur(geometry=>"1");
+	if($error) {
+        $self->session->errorHandler->warn("Error blurring image: $error");
+    }
+    $error = $image->Set(type=>"Grayscale");
+	if($error) {
+        $self->session->errorHandler->warn("Error setting grayscale: $error");
+    }
+    $error = $image->Border(fill=>'black', width=>1, height=>1);
+	if($error) {
+        $self->session->errorHandler->warn("Error setting border: $error");
+    }
+    $error = $image->Write($self->getPath($filename));
+	if($error) {
+        $self->session->errorHandler->warn("Error writing image: $error");
+    }
+    return ($filename, $challenge);
 }
 
 #-------------------------------------------------------------------
