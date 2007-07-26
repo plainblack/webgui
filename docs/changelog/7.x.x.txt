@@ -106,6 +106,11 @@
  - Added optional parameters for DatabaseLinks so that users can setup their
    database's with things like LongReadLen, etc.
  - Added ability to restrict admin console items to specific groups.
+ - add: Use Post Captcha option to collaboration systems.  When enabled, users will have to verify their humnity by means of captcha when attempting to post to a Collaboration system
+ - fix: Fixed a bug which would print "Asset constructor new() requires an assetId" to the WebGUI log whenever the first thread in a collaboration system was accessed.
+ - Changed credit card transaction failures so that the error is displayed on the checkout screen allowing users to change and resubmit information
+ - Split Cash payment plugin into two seperate plugins: Cash & Check.  Removed the second payment selector on the cash transaction screen.  Users now choose Cash or Check on the payment gateway selection screen.
+ - Add: Label to payment gateways.  Itransact now has a default display value of "Credit Card".  Users will no longer need to choose "Itransact" as a payment gateway.
 
 7.3.22
  - fix: relative links sent out in emails don't work properly
