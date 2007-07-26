@@ -163,7 +163,6 @@ sub _acWrapper {
 	my $title = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $ac = $self->getAdminConsole;
-		unless $ac->getHelp;
 	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	$ac->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));

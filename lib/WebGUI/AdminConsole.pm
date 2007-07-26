@@ -69,13 +69,24 @@ sub _formatFunction {
 		$url = $self->session->url->page("op=".$function->{op});
 	}
 	my $i18n = WebGUI::International->new($self->session);
+
+    # Determine if the user can use this control
+    my $canUse  = 0;
+    if ($function->{class} && $function->{class}->can('canView')) {
+        eval { require $function->{class}; };
+        $canUse = $function->{class}->can('canView')->($self->session);
+    }
+    else {
+        $canUse = $self->session->user->isInGroup( $function->{group} );
+    }
+        
 	return {
-		title=>$i18n->get($function->{title}{id}, $function->{title}{namespace}),
-		icon=>$self->session->url->extras("/adminConsole/".$function->{icon}),
-		'icon.small'=>$self->session->url->extras("adminConsole/small/".$function->{icon}),
-		url=>$url,
-		canUse=>$self->session->user->isInGroup($function->{group}),
-		isCurrentOpFunc=>($self->session->form->process("op") eq $function->{op} || $self->session->form->process("func") eq $function->{func})
+		title           => $i18n->get($function->{title}{id}, $function->{title}{namespace}),
+		icon            => $self->session->url->extras("/adminConsole/".$function->{icon}),
+		'icon.small'    => $self->session->url->extras("adminConsole/small/".$function->{icon}),
+		url             => $url,
+		canUse          => $canUse,
+		isCurrentOpFunc => ($self->session->form->process("op") eq $function->{op} || $self->session->form->process("func") eq $function->{func})
 	};
 }
 
@@ -188,239 +199,239 @@ sub getAdminFunction {
 	my $id = shift;
 	my $testing = shift;
 	my $functions = {		# at some point in the future we'll need to make this pluggable/configurable
-		"spectre"=>{
-			title=>{
-				id=>"spectre",
-				namespace=>"Spectre"
+		"spectre" => {
+			title => {
+				id          => "spectre",
+				namespace   => "Spectre",
 			},
-			icon=>"spectre.gif",
-			op=>"spectreStatus",
-			group=>"3"
+			icon    => "spectre.gif",
+			op      => "spectreStatus",
+            class   => "WebGUI::Operation::Spectre",
 		},
-		"assets"=>{
-			title=>{
-				id=>"assets",
-				namespace=>"Asset"
+		"assets" => {
+			title   => {
+				id          => "assets",
+				namespace   => "Asset",
 			},
-			icon=>"assets.gif",
-			func=>"manageAssets",
-			group=>"12"
+			icon    => "assets.gif",
+			func    => "manageAssets",
+			group   => "12",
 		},
-		"versions"=>{
-			title=>{
-				id=>"version tags",
-				namespace=>"VersionTag"
+		"versions" => {
+			title => {
+				id          => "version tags",
+				namespace   => "VersionTag",
 			},
-			icon=>"versionTags.gif",
-			op=>"manageVersions",
-			group=>"12"
+			icon    => "versionTags.gif",
+			op      => "manageVersions",
+            class   => "WebGUI::Operation::VersionTag",
 		},
-		"workflow"=>{
-			title=>{
-				id=>"topicName",
-				namespace=>"Workflow"
+		"workflow" => {
+			title => {
+				id          => "topicName",
+				namespace   => "Workflow",
 			},
-			icon=>"workflow.gif",
-			op=>"manageWorkflows",
-			group=>"pbgroup000000000000015"
+			icon    => "workflow.gif",
+			op      => "manageWorkflows",
+            class   => 'WebGUI::Operation::Workflow',
 		},
-		"adSpace"=>{
-			title=>{
-				id=>"topicName",
-				namespace=>"AdSpace"
+		"adSpace" => {
+			title => {
+				id          => "topicName",
+				namespace   => "AdSpace",
 			},
-			icon=>"advertising.gif",
-			op=>"manageAdSpaces",
-			group=>"pbgroup000000000000017"
+			icon    => "advertising.gif",
+			op      => "manageAdSpaces",
+            class   => 'WebGUI::Operation::AdSpace',
 		},
-		"cron"=>{
-			title=>{
-				id=>"topicName",
-				namespace=>"Workflow_Cron"
+		"cron" => {
+			title => {
+				id          => "topicName",
+				namespace   => "Workflow_Cron",
 			},
-			icon=>"cron.gif",
-			op=>"manageCron",
-			group=>"3"
+			icon    => "cron.gif",
+			op      => "manageCron",
+            class   => 'WebGUI::Operation::Cron',
 		},
-		"users"=>{
-			title=>{
-				id=>"149",
-				namespace=>"WebGUI"
+		"users" => {
+			title => {
+				id          => "149",
+				namespace   => "WebGUI",
 			},
-			icon=>"users.gif",
-			op=>"listUsers",
-			group=>"11"
+			icon    => "users.gif",
+			op      => "listUsers",
+            class   => 'WebGUI::Operation::User',
 		},
-		"clipboard"=>{
-			title=>{
-				id=>"948",
-				namespace=>"WebGUI"
+		"clipboard" => {
+			title => {
+				id          => "948",
+				namespace   => "WebGUI",
 			},
-			icon=>"clipboard.gif",
-			func=>"manageClipboard",
-			group=>"12"
+			icon    => "clipboard.gif",
+			func    => "manageClipboard",
+			group   => "12",
 		},
-		"trash"=>{
-			title=>{
-				id=>"trash",
-				namespace=>"WebGUI"
+		"trash" => {
+			title => {
+				id          => "trash",
+				namespace   => "WebGUI",
 			},
-			icon=>"trash.gif",
-			func=>"manageTrash",
-			group=>"12"
+			icon    => "trash.gif",
+			func    => "manageTrash",
+			group   => "12",
 		},
-		"databases"=>{
-			title=>{
-				id=>"databases",
-				namespace=>"WebGUI"
+		"databases" => {
+			title => {
+				id          => "databases",
+				namespace   => "WebGUI",
 			},
-			icon=>"databases.gif",
-			op=>"listDatabaseLinks",
-			group=>"3"
+			icon    => "databases.gif",
+			op      => "listDatabaseLinks",
+            class   => 'WebGUI::Operation::DatabaseLink',
 		},
-		"ldapconnections"=>{
-			title=>{
-				id=>"ldapconnections",
-				namespace=>"AuthLDAP"
+		"ldapconnections" => {
+			title => {
+				id          => "ldapconnections",
+				namespace   => "AuthLDAP",
 			},
-			icon=>"ldap.gif",
-			op=>"listLDAPLinks",
-			group=>"3"
+			icon    => "ldap.gif",
+			op      => "listLDAPLinks",
+            class   => 'WebGUI::Operation::LDAPLink',
 		},
-		"groups"=>{
-			title=>{
-				id=>"89",
-				namespace=>"WebGUI"
+		"groups" => {
+			title => {
+				id          => "89",
+				namespace   => "WebGUI",
 			},
-			icon=>"groups.gif",
-			op=>"listGroups",
-			group=>"11"
+			icon    => "groups.gif",
+			op      => "listGroups",
+			class   => 'WebGUI::Operation::Group',
 		},
-		"settings"=>{
-			title=>{
-				id=>"settings",
-				namespace=>"WebGUI"
+		"settings" => {
+			title => {
+				id          => "settings",
+				namespace   => "WebGUI",
 			},
-			icon=>"settings.gif",
-			op=>"editSettings",
-			group=>"3"
+			icon    => "settings.gif",
+			op      => "editSettings",
+			class   => 'WebGUI::Operation::Settings',
 		},
-		"help"=>{
-			title=>{
-				id=>"help",
-				namespace=>"WebGUI"
+		"help" => {
+			title => {
+				id          => "help",
+				namespace   => "WebGUI",
 			},
-			icon=>"help.gif",
-			op=>"viewHelpIndex",
-			group=>"7"
+			icon    => "help.gif",
+			op      => "viewHelpIndex",
+            class   => 'WebGUI::Operation::Help',
 		},
-		"statistics"=>{
-			title=>{
-				id=>"437",
-				namespace=>"WebGUI"
+		"statistics" => {
+			title => {
+				id          => "437",
+				namespace   => "WebGUI",
 			},
-			icon=>"statistics.gif",
-			op=>"viewStatistics",
-			group=>"3"
+			icon    => "statistics.gif",
+			op      => "viewStatistics",
+            class   => 'WebGUI::Operation::Statistics',
 		},
-		"contentProfiling"=>{
-			title=>{
-				id=>"content profiling",
-				namespace=>"Asset"
+		"contentProfiling" => {
+			title => {
+				id          => "content profiling",
+				namespace   => "Asset",
 			},
-			icon=>"contentProfiling.gif",
-			func=>"manageMetaData",
-			group=>"4"
+			icon    => "contentProfiling.gif",
+			func    => "manageMetaData",
+			group   => "4",
 		},
-		"contentFilters"=>{
-			title=>{
-				id=>"content filters",
-				namespace=>"WebGUI"
+		"contentFilters" => {
+			title => {
+				id          => "content filters",
+				namespace   => "WebGUI",
 			},
-			icon=>"contentFilters.gif",
-			op=>"listReplacements",
-			group=>"3"
+			icon    => "contentFilters.gif",
+			op      => "listReplacements",
+            class   => 'WebGUI::Operation::Replacements',
 		},
-		"userProfiling"=>{
-			title=>{
-				id=>"user profiling",
-				namespace=>"WebGUIProfile"
+		"userProfiling" => {
+			title => {
+				id          => "user profiling",
+				namespace   => "WebGUIProfile",
 			},
-			icon=>"userProfiling.gif",
-			op=>"editProfileSettings",
-			group=>"3"
+			icon    => "userProfiling.gif",
+			op      => "editProfileSettings",
+            class   => 'WebGUI::Operation::ProfileSettings',
 		},
-		"loginHistory"=>{
-			title=>{
-				id=>"426",
-				namespace=>"WebGUI"
+		"loginHistory" => {
+			title => {
+				id          => "426",
+				namespace   => "WebGUI",
 			},
-			icon=>"loginHistory.gif",
-			op=>"viewLoginHistory",
-			group=>"3"
+			icon    => "loginHistory.gif",
+			op      => "viewLoginHistory",
+            class   => 'WebGUI::Operation::LoginHistory',
 		},
-		"inbox"=>{
-			title=>{
-				id=>"159",
-				namespace=>"WebGUI"
+		"inbox" => {
+			title => {
+				id          => "159",
+				namespace   => "WebGUI",
 			},
-			icon=>"inbox.gif",
-			op=>"viewInbox",
-			group=>"2"
+			icon    => "inbox.gif",
+			op      => "viewInbox",
+			group   => "2",
 		},
-		"activeSessions"=>{
-			title=>{
-				id=>"425",
-				namespace=>"WebGUI"
+		"activeSessions" => {
+			title => {
+				id          => "425",
+				namespace   => "WebGUI",
 			},
-			icon=>"activeSessions.gif",
-			op=>"viewActiveSessions",
-			group=>"3"
+			icon    => "activeSessions.gif",
+			op      => "viewActiveSessions",
+            class   => 'WebGUI::Operation::ActiveSessions',
 		},
-		"commerce"=>{
-			title=>{
-				id=>"commerce settings",
-				namespace=>"Commerce"
+		"commerce" => {
+			title => {
+				id          => "commerce settings",
+				namespace   => "Commerce",
 			},
-			icon=>"commerce.gif",
-			op=>"editCommerceSettings",
-			group=>"3"
+			icon    => "commerce.gif",
+			op      => "editCommerceSettings",
+            class   => 'WebGUI::Operation::Commerce',
 		},
-		"subscriptions"=>{
-			title=>{
-				id=>"manage subscriptions",
-				namespace=>"Subscription"
+		"subscriptions" => {
+			title => {
+				id          => "manage subscriptions",
+				namespace   => "Subscription",
 			},
-			icon=>"subscriptions.gif",
-			op=>"listSubscriptions",
-			group=>"3"
+			icon    => "subscriptions.gif",
+			op      => "listSubscriptions",
+            class   => 'WebGUI::Operation::Subscription',
 		},
-		"productManager"=>{
-			title=>{
-				id=>"manage products",
-				namespace=>"ProductManager"
+		"productManager" => {
+			title => {
+				id          => "manage products",
+				namespace   => "ProductManager",
 			},
-			icon=>"productManager.gif",
-			op=>"listProducts",
-			group=>"14"
+			icon    => "productManager.gif",
+			op      => "listProducts",
+            class   => 'WebGUI::Operation::ProductManager',
 		},
-		"cache"=>{
-                        title=>{
-                                id=>"manage cache",
-                                namespace=>"WebGUI"
-                        },
-                        icon=>"cache.gif",
-                        op=>"manageCache",
-                        group=>"3"
-                },
-		"graphics"=>{
-			title=>{
-				id=>"manage graphics",
-				namespace=>"Graphics",
+		"cache" => {
+            title => {
+                id          => "manage cache",
+                namespace   => "WebGUI",
+            },
+            icon    => "cache.gif",
+            op      => "manageCache",
+            class   => 'WebGUI::Operation::Cache',
+        },
+		"graphics" => {
+			title => {
+				id          => "manage graphics",
+				namespace   => "Graphics",,
 			},
-			icon=>"graphics.gif",
-			op=>"listGraphicsOptions",
-			group=>"3",
+			icon    => "graphics.gif",
+			op      => "listGraphicsOptions",
+            class   => 'WebGUI::Operation::Graphics',
 		},
 	};
     return $functions if $testing;

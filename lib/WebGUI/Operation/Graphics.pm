@@ -90,12 +90,27 @@ sub _getColorForm {
 	return $f->printRowsOnly;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminGraphics") );
+}
+
 #-------------------------------------------------------------------
 sub www_addColorToPalette {
 	my ($f);
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
@@ -120,7 +135,7 @@ sub www_addColorToPalette {
 sub www_addColorToPaletteSave {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 my	$color = WebGUI::Image::Color->new($session, $session->form->process('cid'));
 	if ($session->form->process('cid') eq 'new') {
@@ -141,7 +156,7 @@ my	$palette = WebGUI::Image::Palette->new($session, $session->form->process('pid
 sub www_deleteFont {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 	my $font = WebGUI::Image::Font->new($session, $session->form->process('fid'));
 	$font->delete;
@@ -153,7 +168,7 @@ sub www_deleteFont {
 sub www_deletePalette {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 	my $palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
 	$palette->delete;
@@ -166,7 +181,7 @@ sub www_editColor {
 	my ($f);
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $colorId = $session->form->process('cid');
 	return www_listPalettes($session) if ($colorId eq 'new');
@@ -194,7 +209,7 @@ sub www_editColor {
 sub www_editColorSave {
 	my $session = shift;
 	
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $colorId = $session->form->process('cid');
 	return www_listPalettes($session) if ($colorId eq 'new');
@@ -215,7 +230,7 @@ sub www_editFont {
 	my ($f, $fontName);
 	my $session = shift;
 	
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, "Graphics");
 	
@@ -253,7 +268,7 @@ sub www_editFont {
 sub www_editFontSave {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	if ($session->form->process('fid') eq 'new') {
 
@@ -278,7 +293,7 @@ sub www_editPalette {
 	my $session = shift;
 	my $paletteId = shift || $session->form->process('pid');
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, 'Graphics');
 	
@@ -333,7 +348,7 @@ sub www_editPalette {
 sub www_editPaletteSave {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
 	$palette->setName($session->form->process('paletteName'));
@@ -346,7 +361,7 @@ sub www_listGraphicsOptions {
 	my ($output);
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 	my $i18n = WebGUI::International->new($session, 'Graphics');	
 	
@@ -361,7 +376,7 @@ sub www_listPalettes {
 	my ($output);
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, 'Graphics');
 	
@@ -420,7 +435,7 @@ sub www_listFonts {
 	my ($output);
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 	my $i18n = WebGUI::International->new($session, 'Graphics');
 	
@@ -448,7 +463,7 @@ sub www_listFonts {
 sub www_removeColorFromPalette {
 	my $session = shift;
 
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $palette = WebGUI::Image::Palette->new($session, $session->form->process('pid'));
 	$palette->removeColor($session->form->process('index'));

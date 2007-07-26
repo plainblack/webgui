@@ -40,9 +40,9 @@ Returns an array reference used by www_editSettings and www_editSettingsSave to 
 =cut
 
 sub definition {
-	my $session = shift;
-	my $i18n = shift;
-	my @fields = ();
+	my $session     = shift;
+	my $i18n        = shift;
+	my @fields      = ();
 	# company info
 	push(@fields, {
 		tab=>"company",
@@ -434,6 +434,47 @@ sub definition {
 		hoverHelp=>$i18n->get('164 description'),
 		defaultValue=>[$session->setting->get("authMethod")],
 		});
+
+    # Administrative permissions
+    my @groupSettings = qw(
+        groupIdAdminActiveSessions
+        groupIdAdminAdSpace
+        groupIdAdminCache
+        groupIdAdminCommerce
+        groupIdAdminCron
+        groupIdAdminDatabaseLink
+        groupIdAdminGraphics
+        groupIdAdminGroup
+        groupIdAdminGroupAdmin
+        groupIdAdminHelp
+        groupIdAdminLDAPLink
+        groupIdAdminLoginHistory
+        groupIdAdminProductManager
+        groupIdAdminProfileSettings
+        groupIdAdminReplacements
+        groupIdAdminSpectre
+        groupIdAdminStatistics
+        groupIdAdminSubscription
+        groupIdAdminTransactionLog
+        groupIdAdminUser
+        groupIdAdminUserAdd
+        groupIdAdminVersionTag
+        groupIdAdminWorkflow
+        groupIdAdminWorkflowRun
+    );
+
+    for my $group (@groupSettings) {
+        push @fields, {
+            tab             => 'perms',
+            fieldType       => 'group',
+            name            => $group,
+            label           => $i18n->get("settings $group label"),
+            hoverHelp       => $i18n->get("settings $group hoverHelp"),
+            defaultValue    => $session->setting->get($group),
+        };
+    }
+
+
 	return \@fields;
 }
 
@@ -486,6 +527,7 @@ sub www_editSettings {
         misc        => { label => $i18n->get("misc") },
         user        => { label => $i18n->get("user") },
         auth        => { label => $i18n->get("authentication") },
+        perms       => { label => $i18n->get("permissions") },
     );
 
     # Start the form

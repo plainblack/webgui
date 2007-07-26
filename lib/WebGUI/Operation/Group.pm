@@ -23,16 +23,7 @@ use WebGUI::Paginator;
 use WebGUI::SQL;
 use WebGUI::Utility;
 
-#-------------------------------------------------------------------
-sub _hasSecondaryPrivilege {
-	my $session = shift;
-	return 0 unless ($session->user->isInGroup(11));
-	my $group = WebGUI::Group->new($session,$_[0]);
-	return $group->userIsAdmin($session->user->userId);
-}
-
-
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
         my $workarea = shift;
@@ -40,10 +31,10 @@ sub _submenu {
 	my $i18n = WebGUI::International->new($session);
         $title = $i18n->get($title) if ($title);
         my $ac = WebGUI::AdminConsole->new($session,"groups");
-	if ($session->user->isInGroup(3)) {
+	if (canEditAll($session)) {
 	        $ac->addSubmenuItem($session->url->page('op=editGroup;gid=new'), $i18n->get(90));
 	}
-	if ($session->user->isInGroup(11)) {
+	if (canView($session)) {
         	unless ($session->form->process("op") eq "listGroups" 
 			|| $session->form->process("gid") eq "new" 
 			|| $session->form->process("op") eq "deleteGroupConfirm") {
@@ -55,9 +46,64 @@ sub _submenu {
 	        }
         	$ac->addSubmenuItem($session->url->page("op=listGroups"), $i18n->get(756));
 	}
-        return $ac->render($workarea, $title);
+    return $ac->render($workarea, $title);
 }
 
+
+#----------------------------------------------------------------------------
+
+=head2 canEditAll ( session [, user] )
+
+Returns true if the user is allowed to edit all groups. user defaults to the
+current user.
+
+=cut
+
+sub canEditAll {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminGroup") );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEditGroup ( session, group [, user] )
+
+Returns true if the user can edit the specified group. user defaults to the
+current user.
+
+=cut
+
+sub canEditGroup {
+    my $session     = shift;
+    my $groupId     = shift;
+    my $user        = shift || $session->user;
+    
+    return 1 if canEditAll($session, $user);
+
+	my $group = WebGUI::Group->new($session,$groupId);
+    return $user->isInGroup( $session->setting->get("groupIdAdminGroupAdmin") )  
+        && $group->userIsAdmin( $user->userId )
+        ;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user is allowed to use this control in any capacity. user
+defaults to the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    
+    return canEditAll($session, $user)
+        || $user->isInGroup( $session->setting->get("groupIdAdminGroupAdmin") )
+        ;
+}
 
 #-------------------------------------------------------------------
 sub doGroupSearch {
@@ -160,7 +206,7 @@ sub walkGroups {
 #-------------------------------------------------------------------
 sub www_addGroupsToGroupSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	my @groups = $session->form->group('groups');
 	$group->addGroups(\@groups);
@@ -170,7 +216,7 @@ sub www_addGroupsToGroupSave {
 #-------------------------------------------------------------------
 sub www_addUsersToGroupSave {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
         my @users = $session->form->selectList('users');
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$group->addUsers(\@users);
@@ -202,7 +248,7 @@ sub www_autoDeleteFromGroup {
 #-------------------------------------------------------------------
 sub www_deleteGroup {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
 	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->delete;
@@ -212,7 +258,7 @@ sub www_deleteGroup {
 #-------------------------------------------------------------------
 sub www_deleteGroupGrouping {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup('3') || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$group->deleteGroups([$session->form->process("delete")]);
 	return www_manageGroupsInGroup($session);
@@ -222,7 +268,7 @@ sub www_deleteGroupGrouping {
 
 =head2 www_deleteGrouping ( )
 
-Deletes a set of users from a set of groups.  Only Admins may perform this function.
+Deletes a set of users from a set of groups.  
 The user and group lists are expected to
 be found in form fields names uid and gid, respectively.  Visitors are not allowed to
 perform this operation.
@@ -231,7 +277,7 @@ perform this operation.
 
 sub www_deleteGrouping {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
         if (($session->user->userId eq $session->form->process("uid") || $session->form->process("uid") eq '3') && $session->form->process("gid") eq '3') {
                 return $session->privilege->vitalComponent();
         }
@@ -248,7 +294,7 @@ sub www_deleteGrouping {
 #-------------------------------------------------------------------
 sub www_editGroup {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
         my ($output, $f, $g);
 	if ($session->form->process("gid") eq "new") {
 		$g = WebGUI::Group->new($session,"");
@@ -414,7 +460,7 @@ sub www_editGroup {
 #-------------------------------------------------------------------
 sub www_editGroupSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->description($session->form->process("description"));
 	$g->name($session->form->process("groupName"));
@@ -442,7 +488,7 @@ sub www_editGroupSave {
 #-------------------------------------------------------------------
 sub www_editGrouping {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
@@ -490,7 +536,7 @@ sub www_editGrouping {
 #-------------------------------------------------------------------
 sub www_editGroupingSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
         $group->userGroupExpireDate($session->form->process("uid"),$session->datetime->setToEpoch($session->form->process("expireDate")));
         $group->userIsAdmin($session->form->process("uid"),$session->form->process("groupAdmin"));
@@ -500,7 +546,7 @@ sub www_editGroupingSave {
 #-------------------------------------------------------------------
 sub www_emailGroup {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my ($output,$f);
 	my $i18n = WebGUI::International->new($session);
 	$f = WebGUI::HTMLForm->new($session);
@@ -536,7 +582,7 @@ sub www_emailGroup {
 #-------------------------------------------------------------------
 sub www_emailGroupSend {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $mail = WebGUI::Mail::Send->create($session, {toGroup=>$session->form->process("gid"),subject=>$session->form->process("subject"),from=>$session->form->process("from")});
 	$mail->addHtml($session->form->process("message","HTMLArea"));
 	$mail->addFooter;
@@ -549,7 +595,7 @@ sub www_emailGroupSend {
 sub www_listGroups {
 	my $session = shift;
 	my $i18n = WebGUI::International->new($session);
-	if ($session->user->isInGroup(3)) {
+	if (canEditAll($session)) {
 		my $output = getGroupSearchForm($session, "listGroups");
 		my ($groupCount) = $session->db->quickArray("select count(*) from groups where isEditable=1");
         return _submenu($session,$output) unless ($session->form->process("doit") || $groupCount<250 || $session->form->process("pn") > 1);
@@ -571,7 +617,7 @@ sub www_listGroups {
         	$output .= '</table>';
 		$output .= $p->getBarTraditional;
 		return _submenu($session,$output);
-	} elsif ($session->user->isInGroup(11)) {
+	} elsif (canView($session)) {
 		my ($output, $p, $sth, @data, @row, $i, $userCount);
         	my @editableGroups = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($session->user->userId)." and groupAdmin=1");
         	push (@editableGroups,0);
@@ -599,14 +645,16 @@ sub www_listGroups {
         	$output .= $p->getBarTraditional($session->form->process("pn"));
         	return _submenu($session,$output,'89');
 	}
-	return $session->privilege->adminOnly();
+    else {
+	    return $session->privilege->adminOnly();
+    }
 }
 
 
 #-------------------------------------------------------------------
 sub www_manageGroupsInGroup {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
         my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
         $f->hidden(
@@ -640,7 +688,7 @@ sub www_manageGroupsInGroup {
 #-------------------------------------------------------------------
 sub www_manageUsersInGroup {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3) || _hasSecondaryPrivilege($session,$session->form->process("gid")));
+        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $output = WebGUI::Form::formHeader($session,)
 		.WebGUI::Form::hidden($session,{

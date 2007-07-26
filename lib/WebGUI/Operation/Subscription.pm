@@ -84,6 +84,23 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminSubscription") );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_createSubscriptionCodeBatch ( $session, error )
 
 Form to accept parameters to create a batch of subscription codes.
@@ -98,12 +115,10 @@ An HTML scalar of an error message to be returned to the user.
 
 =cut
 
-
-#-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatch {
 	my $session = shift;
 	my (%subscriptions, $f, $error, $errorMessage);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	$error = shift;
 	my $i18n = WebGUI::International->new($session, "Subscription");
@@ -174,7 +189,7 @@ sub www_createSubscriptionCodeBatchSave {
 	my $session = shift;
 	my ($numberOfCodes, $description, $expires, $batchId, @codeElements, $currentCode, $code, $i, @subscriptions, 
 		@error, $creationEpoch);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, "Subscription");	
 	
@@ -224,7 +239,7 @@ The current WebGUI session object.
 #-------------------------------------------------------------------
 sub www_deleteSubscription {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	WebGUI::Subscription->new($session,$session->form->process("sid"))->delete;
 	return www_listSubscriptions($session);
@@ -244,7 +259,7 @@ The current WebGUI session object.
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodeBatch {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	$session->db->write("delete from subscriptionCodeBatch where batchId=".$session->db->quote($session->form->process("bid")));
 	$session->db->write("delete from subscriptionCode where batchId=".$session->db->quote($session->form->process("bid")));
@@ -266,7 +281,7 @@ The current WebGUI session object.
 #-------------------------------------------------------------------
 sub www_deleteSubscriptionCodes {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	if ($session->form->process("selection") eq 'dc') {
 		$session->db->write("delete from subscriptionCode where dateCreated >= ".$session->db->quote($session->form->process("dcStart")).
@@ -294,7 +309,7 @@ The current WebGUI session object.
 sub www_editSubscription {
 	my $session = shift;
 	my ($properties, $subscriptionId, $durationInterval, $durationUnits, $f);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	
@@ -388,7 +403,7 @@ The current WebGUI session object.
 sub www_editSubscriptionSave {
 	my $session = shift;
 	my (@relevantFields);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $properties = {};
 	@relevantFields = qw(subscriptionId name useSalesTax price description subscriptionGroup duration executeOnSubscription karma);
@@ -415,7 +430,7 @@ The current WebGUI session object.
 sub www_listSubscriptionCodeBatches {
 	my $session = shift;
 	my ($p, $batches, $output);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	
@@ -456,7 +471,7 @@ The current WebGUI session object.
 sub www_listSubscriptionCodes {
 	my $session = shift;
 	my ($p, $codes, $output, $where, $ops, $delete);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	
@@ -549,7 +564,7 @@ The current WebGUI session object.
 sub www_listSubscriptions {
 	my $session = shift;
 	my ($p, $subscriptions, $output);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	my $i18n = WebGUI::International->new($session, "Subscription");
 	

@@ -49,6 +49,21 @@ sub _submenu {
 	return $ac->render($workarea, $title);
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminProductManager") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_deleteProductParameterOption ( $session )
@@ -65,7 +80,7 @@ sub www_deleteProductParameterOption {
 	my $session = shift;
 	my $optionId = $session->form->process("optionId");
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	WebGUI::Product->getByOptionId($session,$optionId)->deleteOption($optionId);
 
@@ -88,7 +103,7 @@ sub www_deleteProductParameter {
 	my $session = shift;
 	my $parameterId = $session->form->process("parameterId");
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	WebGUI::Product->getByParameterId($session,$parameterId)->deleteParameter($parameterId);
 
@@ -111,7 +126,7 @@ sub www_deleteProduct {
 	my $session = shift;
 	my $productId = $session->form->process("productId");
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	WebGUI::Product->new($session,$productId)->delete;
 
@@ -134,7 +149,7 @@ sub www_editProduct {
 	my $session = shift;
 	my ($productId, $product, $f, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	$i18n = WebGUI::International->new($session, 'ProductManager');	
 	$productId = $session->form->process("productId");
@@ -260,7 +275,7 @@ sub www_editProductSave {
 	my $session = shift;
 	my ($self, @error, $productId, $product, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
@@ -307,7 +322,7 @@ sub www_editProductParameter {
 	my $session = shift;
 	my ($parameterId, $product, $productId, $parameter, $f, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
@@ -366,7 +381,7 @@ sub www_editProductParameterSave {
 	my $session = shift;
 	my (@error, $parameterId, $product, $i18n, $skuTemplate, $oldName, $newName);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 
@@ -416,7 +431,7 @@ sub www_editProductParameterOption {
 	my $session = shift;
 	my ($self, $optionId, $option, $f, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
@@ -492,7 +507,7 @@ sub www_editProductParameterOptionSave {
 	my $session = shift;
 	my ($self, @error, $optionId, $product, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 
@@ -530,7 +545,7 @@ sub www_editProductVariant {
 	my $session = shift;
 	my ($variantId, $variant, $f, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
@@ -596,7 +611,7 @@ sub www_editProductVariantSave {
 	my $session = shift;
 my	$variantId = $session->form->process("variantId");
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	WebGUI::Product->getByVariantId($session,$variantId)->setVariant($variantId, $session->form->paramsHashRef);
 
@@ -619,7 +634,7 @@ sub www_editSkuTemplate {
 	my $session = shift;
 	my ($product, $productId, $output, $f, $name, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
@@ -671,7 +686,7 @@ sub www_editSkuTemplateSave {
 	my $session = shift;
 	my ($productId) = $session->form->process("productId");
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	WebGUI::Product->new($session,$productId)->set({
 		skuTemplate	=> $session->form->process("skuTemplate"),
@@ -696,7 +711,7 @@ sub www_listProducts {
 	my $session = shift;
 	my ($self, $sth, $output, $row, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'ProductManager');
 	
@@ -735,7 +750,7 @@ sub www_listProductVariants {
 	my $session = shift;
 	my ($productId, $product, @variants, %parameters, %options, $output, %composition, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	
@@ -808,7 +823,7 @@ The current WebGUI session object.
 sub www_listProductVariantsSave {
 	my $session = shift;
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 	
 	my %availableVariants = map {$_ => 1} $session->form->selectList('available');
 
@@ -839,7 +854,7 @@ sub www_manageProduct {
 	my $session = shift;
 	my ($product, $output, $parameter, $option, $optionId, $i18n);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(14));
+	return $session->privilege->insufficient unless canView($session);
 
 	$i18n = WebGUI::International->new($session, "ProductManager");
 	

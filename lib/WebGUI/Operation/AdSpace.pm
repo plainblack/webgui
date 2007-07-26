@@ -28,6 +28,21 @@ Operation handler for advertising functions.
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user is allowed to use this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminAdSpace") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_clickAd ( )
@@ -55,7 +70,7 @@ Deletes an ad.
 
 sub www_deleteAd {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	WebGUI::AdSpace::Ad->new($session, $session->form->param("adId"))->delete;
 	return www_editAdSpace($session);
 }
@@ -70,7 +85,7 @@ Deletes an ad space.
 
 sub www_deleteAdSpace {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	WebGUI::AdSpace->new($session, $session->form->param("adSpaceId"))->delete;
 	return www_manageAdSpaces($session);
 }
@@ -85,7 +100,7 @@ Displays form for editing an ad.
 
 sub www_editAd {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	my $id = $session->form->param("adId") || "new";
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
@@ -224,7 +239,7 @@ The save method for www_editAd()
 
 sub www_editAdSave {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	my %properties = (
 		type=>$session->form->process("type", "selectBox"),	
 		url=>$session->form->process("url", "url"),	
@@ -265,7 +280,7 @@ Edit or add an ad space form.
 sub www_editAdSpace {
 	my $session = shift;
 	my $adSpace = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	my $id;
 	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
@@ -346,7 +361,7 @@ Save the www_editAdSpace method.
 
 sub www_editAdSpaceSave {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	my %properties = (
 		name=>$session->form->process("name", "text"),	
 		title=>$session->form->process("title", "text"),	
@@ -374,7 +389,7 @@ Manage ad spaces.
 
 sub www_manageAdSpaces {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup("pbgroup000000000000017"));
+	return $session->privilege->insufficient unless canView($session);
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
 	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my $output = "";

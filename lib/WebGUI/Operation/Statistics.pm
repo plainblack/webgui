@@ -25,6 +25,8 @@ Package WebGUI::Operation::Statistics
 Handles displaying statistics about WebGUI.  This isn't page count, but rather information
 about the number of assets, users, groups, etc.
 
+#-------------------------------------------------------------------
+
 =head2 _submenu ( $session, $workarea, $title, $help )
 
 Utility routine for creating the AdminConsole for Statistics functions.
@@ -49,8 +51,6 @@ as a link to the user.
 
 =cut
 
-
-#-------------------------------------------------------------------
 sub _submenu {
 	my $session = shift;
 	my $workarea = shift;
@@ -63,6 +63,23 @@ sub _submenu {
 	}
         return $ac->render($workarea, $title);
 }
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminStatistics") );
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_viewStatistics ( $session )
 
@@ -109,10 +126,9 @@ Number of groups.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_viewStatistics {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
         my ($output, $data);
 	my $i18n = WebGUI::International->new($session);
 	my $url = "http://update.webgui.org/latest-version.txt";

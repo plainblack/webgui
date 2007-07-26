@@ -25,8 +25,7 @@ Shared routines for WebGUI Operations.
 
 =head2 accountOptions ( $session )
 
-Copies the requested database link in the form variable C<dlid> if the user
-is in group Admin (3).  Returns the user to the List Database Links screen.
+TODO: DOCUMENT ME
 
 =cut
 

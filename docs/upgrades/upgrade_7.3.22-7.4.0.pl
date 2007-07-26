@@ -37,8 +37,49 @@ addCanStartThreadToCS($session);
 addPostCaptchaToCS($session);
 addFieldsToDatabaseLinks($session);
 addWikiAttachments($session);
+addAdminConsoleGroupSettings($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+# Add the default admin console group settings
+sub addAdminConsoleGroupSettings {
+    my $session     = shift;
+    print "\tAdding default admin console group settings... " unless $quiet;
+
+    my %groupDefaults  = ( 
+        groupIdAdminActiveSessions      => 3,
+        groupIdAdminAdSpace             => 3,
+        groupIdAdminCache               => 3,
+        groupIdAdminCommerce            => 3,
+        groupIdAdminCron                => 3,
+        groupIdAdminDatabaseLink        => 3,
+        groupIdAdminGraphics            => 3,
+        groupIdAdminGroup               => 3,
+        groupIdAdminGroupAdmin          => 11,
+        groupIdAdminHelp                => 7,
+        groupIdAdminLDAPLink            => 3,
+        groupIdAdminLoginHistory        => 3,
+        groupIdAdminProductManager      => 14,
+        groupIdAdminProfileSettings     => 3,
+        groupIdAdminReplacements        => 3,
+        groupIdAdminSpectre             => 3,
+        groupIdAdminStatistics          => 3,
+        groupIdAdminSubscription        => 3,
+        groupIdAdminTransactionLog      => 3,
+        groupIdAdminUser                => 3,
+        groupIdAdminUserAdd             => 11,
+        groupIdAdminVersionTag          => 12,
+        groupIdAdminWorkflow            => 'pbgroup000000000000015',
+        groupIdAdminWorkflowRun         => 3,
+    );
+    
+    for my $setting (keys %groupDefaults) {
+        $session->setting->add($setting, $groupDefaults{$setting});
+    }
+
+    print "DONE!\n" unless $quiet;
+}
 
 #-------------------------------------------------
 

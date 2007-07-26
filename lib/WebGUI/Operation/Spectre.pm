@@ -27,6 +27,21 @@ Operations for Spectre.
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminSpectre") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_spectreGetSiteData ( )
@@ -36,7 +51,7 @@ Checks to ensure the requestor is who we think it is, and then returns a JSON st
 =cut
 
 sub www_spectreGetSiteData {
-        my $session = shift;
+    my $session = shift;
 	$session->http->setMimeType("text/json");
 	$session->http->setCacheControl("none");
 	my %siteData = ();
@@ -92,17 +107,13 @@ Show information about Spectre's current workload.
 sub www_spectreStatus {
     my $session = shift;
     
-    return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
+    return $session->privilege->adminOnly unless canView($session);
 
     # start to prepare the display
     my $ac = WebGUI::AdminConsole->new($session, 'spectre');
     my $i18n = WebGUI::International->new($session, 'Spectre');
 
     $session->http->setCacheControl("none");
-    unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
-	$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
-	return "subnet";
-    }
 
     my $remote = create_ikc_client(
 		port=>$session->config->get("spectrePort"),
@@ -112,14 +123,14 @@ sub www_spectreStatus {
     );
 
     if (!$remote) {
-	return $ac->render($i18n->get('not running'), $i18n->get('spectre'));
+        return $ac->render($i18n->get('not running'), $i18n->get('spectre'));
     }
 
     my $sitename = $session->config()->get('sitename')->[0];
     my $workflowResult = $remote->post_respond('workflow/getJsonStatus',$sitename);
     if (!$workflowResult) {
         $remote->disconnect();
-	return $ac->render($i18n->get('workflow status error'), $i18n->get('spectre'));
+        return $ac->render($i18n->get('workflow status error'), $i18n->get('spectre'));
     }
 
     my $cronResult = $remote->post_respond('cron/getJsonStatus',$sitename);

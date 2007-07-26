@@ -14,21 +14,19 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::Operation::Admin
+WebGUI::Operation::SSO
 
 =head1 DESCRIPTION
 
-Operation handler for admin functions
+TODO
 
 =cut
 
 #-------------------------------------------------------------------
 
-=head2 www_switchOffAdmin ( )
+=head2 www_ssoViaSessionId
 
-If the current user is in the Turn On Admin Group, then allow them to turn off Admin mode
-via WebGUI::Session::Var::switchAdminOff()
-
+TODO: DOCUMENT ME
 
 =cut
 

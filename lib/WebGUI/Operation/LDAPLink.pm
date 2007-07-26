@@ -25,8 +25,7 @@ Package WebGUI::Operation::LDAPLink
 
 =head1 DESCRIPTION
 
-Operational handler for creating, managing and deleting LDAP Links.  Only users
-in group Admin (3) are allowed to execute subroutines in this package.
+Operational handler for creating, managing and deleting LDAP Links.
 
 =cut
 
@@ -70,6 +69,21 @@ sub _submenu {
 		$ac->addSubmenuItem($session->url->page('op=listLDAPLinks'.$returnUrl), $i18n->get("LDAPLink_986"));
 	}
 	return $ac->render($workarea, $title);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminLDAPLink") );
 }
 
 #-------------------------------------------------------------------
@@ -123,7 +137,7 @@ Returns the user to the List LDAP Links screen.
 
 sub www_copyLDAPLink {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 	my (%db);
 	tie %db, 'Tie::CPHash';
 	%db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
@@ -143,7 +157,7 @@ Deletes the requested LDAP Link in the form variable C<llid>.  Returns the user 
 
 sub www_deleteLDAPLink {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 	$session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
 	$session->form->process("op") = "listLDAPLinks";
 	return www_listLDAPLinks($session);
@@ -161,7 +175,7 @@ Calls www_editLDAPLinkSave when done.
 sub www_editLDAPLink {
 	my $session = shift;
 	my $errors = shift;
-   return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+   return $session->privilege->insufficient unless canView($session);
    my ($output, %db, $f);
 
 
@@ -298,7 +312,7 @@ Returns the user to www_listLDAPLinks when done.
 
 sub www_editLDAPLinkSave {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 	
 	# Check for errors
 	my $errors = validateForm($session);
@@ -338,7 +352,7 @@ links.  Each LDAP link is tested and the status of that test is returned.
 
 sub www_listLDAPLinks {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	my ($output, $p, $sth, $data, @row, $i);
 	my $i18n = WebGUI::International->new($session,"AuthLDAP");
 	my $returnUrl = "";

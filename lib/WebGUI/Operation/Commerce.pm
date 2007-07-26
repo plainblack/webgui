@@ -42,17 +42,16 @@ The i18n key of the title of this workarea.
 =cut
 
 sub _submenu {
-	my $session = shift;
-	my $i18n = WebGUI::International->new($session, "Commerce");
-
-	my $workarea = shift;
-        my $title = shift;
-        $title = $i18n->get($title) if ($title);
-        my $ac = WebGUI::AdminConsole->new($session,"commerce");
-	$ac->addSubmenuItem($session->url->page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
-	$ac->addSubmenuItem($session->url->page('op=listTransactions'), $i18n->get('list transactions')); 
-	$ac->addSubmenuItem($session->url->page('op=listPendingTransactions'), $i18n->get('list pending transactions')); 
-        return $ac->render($workarea, $title);
+    my $session     = shift;
+    my $i18n        = WebGUI::International->new($session, "Commerce");
+    my $workarea    = shift;
+    my $title       = shift;
+    $title          = $i18n->get($title) if ($title);
+    my $ac          = WebGUI::AdminConsole->new($session,"commerce");
+    $ac->addSubmenuItem($session->url->page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
+    $ac->addSubmenuItem($session->url->page('op=listTransactions'), $i18n->get('list transactions')); 
+    $ac->addSubmenuItem($session->url->page('op=listPendingTransactions'), $i18n->get('list pending transactions')); 
+    return $ac->render($workarea, $title);
 }
 
 #-------------------------------------------------------------------
@@ -64,9 +63,9 @@ A wrapper around _clearShippingScratch and _clearPaymentScratch.
 =cut
 
 sub _clearCheckoutScratch {
-	my $session = shift;
-	_clearShippingScratch($session);
-	_clearPaymentScratch($session);
+    my $session = shift;
+    _clearShippingScratch($session);
+    _clearPaymentScratch($session);
 }
 
 #-------------------------------------------------------------------
@@ -78,8 +77,8 @@ Clears the C<paymentGateway> scratch variable.
 =cut
 
 sub _clearPaymentScratch {
-	my $session = shift;
-	$session->scratch->delete('paymentGateway');
+    my $session = shift;
+    $session->scratch->delete('paymentGateway');
 }
 
 #-------------------------------------------------------------------
@@ -160,6 +159,21 @@ sub _validateState {
 	##the state field so we don't do sales tax.
 	$state = '' unless exists $stateObj->{state2code}->{$state};
 	return $state;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminCommerce") );
 }
 
 #-------------------------------------------------------------------
@@ -535,8 +549,7 @@ sub www_checkoutSubmit {
 
 =head2 www_completePendingTransaction ( $session )
 
-You must be in group Admin (3) to execute the subroutine.  Completes
-the transaction specified in the form variable C<tid> by calling
+Completes the transaction specified in the form variable C<tid> by calling
 WebGUI::Commerce::Transaction->completeTransaction.  Returns the user
 to the C<listPendingTransactions> operation.
 
@@ -544,7 +557,7 @@ to the C<listPendingTransactions> operation.
 
 sub www_completePendingTransaction {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly unless canView($session);
 
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->completeTransaction;
 
@@ -581,8 +594,7 @@ transaction, but only if the plugin's C<confirmTransaction> returns true.
 
 sub www_confirmTransaction {
 	my $session = shift;
-	my($plugin, %var);
-	$plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg","className"));
+	my $plugin = WebGUI::Commerce::Payment->load($session, $session->form->process("pg","className"));
 
 	if ($plugin->confirmTransaction) {
 		WebGUI::Commerce::Transaction->new($session, $plugin->getTransactionId)->completeTransaction;
@@ -609,8 +621,6 @@ sub www_deleteCartItem {
 
 =head2 www_editCommerceSettings ( $session )
 
-Only users in group Admin (3) can execute the subroutine.
-
 Site wide setting for commerce, including payment plugins, shipping plugins
 and templates.
 
@@ -623,17 +633,17 @@ sub www_editCommerceSettings {
 	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	tie %tabs, 'Tie::IxHash';
  	%tabs = (
-       		general=>{label=>$i18n->get('general tab')},
-		payment=>{label=>$i18n->get('payment tab')},
-		shipping=>{label=>$i18n->get('shipping tab')},
-		salesTax=>{label=>$i18n->get('salesTax tab')},
-        );
+        general=>{label=>$i18n->get('general tab')},
+        payment=>{label=>$i18n->get('payment tab')},
+        shipping=>{label=>$i18n->get('shipping tab')},
+        salesTax=>{label=>$i18n->get('salesTax tab')},
+    );
 
 	$paymentPlugin = $session->config->get("paymentPlugins")->[0];
 	$shippingPlugin = $session->config->get("shippingPlugins")->[0];
@@ -794,8 +804,6 @@ sub www_editCommerceSettings {
 
 =head2 www_editCommerceSettingsSave ( $session )
 
-Only users in group Admin (3) can execute the subroutine.
-
 Form post processor for C<www_editCommerceSettings>.  Plugin
 configuration data is stored in a special table for security and all
 other settings in the WebGUI settings table for easy access.
@@ -806,7 +814,7 @@ Returns the user to C<www_editCommerceSettings>.
 
 sub www_editCommerceSettingsSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	PARAM: foreach ($session->form->param) {
 
@@ -845,7 +853,7 @@ links so the Admin can complete any pending transaction.
 sub www_listPendingTransactions {
 	my $session = shift;
 	my ($p, $transactions, $output, $properties, $i18n);
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	
 	$i18n = WebGUI::International->new($session, "Commerce");
 
@@ -894,7 +902,7 @@ sub www_listTransactions {
 	my $session = shift;
 	my ($output, %criteria, $transaction, @transactions);
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 
 	my $i18n = WebGUI::International->new($session, 'TransactionLog');
 

@@ -69,11 +69,11 @@ sub _submenu {
 	my $title;
 	$title = $i18n->get($properties->{title}) if ($properties->{title});
 
-	if ($session->user->isInGroup(11)) {
+	if (canEdit($session)) {
 		$ac->addSubmenuItem($session->url->page("op=editUser;uid=new"), $i18n->get(169));
 	}
 
-	if ($session->user->isInGroup(3)) {
+	if (canEdit($session)) {
 		unless ($session->form->process("op") eq "listUsers" 
 			|| $session->form->process("op") eq "deleteUserConfirm"
 			|| $userId eq "new") {
@@ -88,6 +88,55 @@ sub _submenu {
 	}
         return $ac->render($workarea, $title);
 }
+
+#----------------------------------------------------------------------------
+
+=head2 canAdd ( session [, user] )
+
+Returns true if the user is allowed to add other users. user defaults to the
+current user.
+
+=cut
+
+sub canAdd {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminUserAdd") )
+        || canEdit($session, $user)
+        ;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEdit ( session [, user] )
+
+Returns true if the user is allowed to do everything in this module. user 
+defaults to the current user.
+
+=cut
+
+sub canEdit {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminUser") );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user is allowed to see this module. user defaults to the
+current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return canAdd($session, $user);
+}
+
+#-------------------------------------------------------------------
 
 =head2 doUserSearch ( session, op, returnPaginator, userFilter )
 
@@ -112,7 +161,6 @@ Array reference, used to screen out user names via a SQL "not in ()" clause.
 
 =cut
 
-#-------------------------------------------------------------------
 sub doUserSearch {
 	my $session = shift;
 	my $op = shift;
@@ -151,7 +199,7 @@ sub doUserSearch {
 
 #-------------------------------------------------------------------
 
-=head2 doUserSearchForm ( session, op, params, noStatus )
+=head2 getUserSearchForm ( session, op, params, noStatus )
 
 Form front-end and display for searching for users.
 
@@ -246,7 +294,7 @@ Allows an administrator to assume another user.
 
 sub www_becomeUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canEdit($session);
 	return unless WebGUI::User->validUserId($session, $session->form->process("uid"));
 	$session->var->end($session->var->get("sessionId"));
 	$session->user({userId=>$session->form->process("uid")});
@@ -265,7 +313,7 @@ after this.
 
 sub www_deleteUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canEdit($session);
 	my ($u);
         if ($session->form->process("uid") eq '1' || $session->form->process("uid") eq '3') {
 	   return WebGUI::AdminConsole->new($session,"users")->render($session->privilege->vitalComponent());
@@ -279,7 +327,7 @@ sub www_deleteUser {
 #-------------------------------------------------------------------
 sub www_editUser {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(11));
+	return $session->privilege->adminOnly() unless canAdd($session);
 	my $error = shift;
 	my $uid = shift || $session->form->process("uid");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
@@ -400,7 +448,7 @@ sub www_editUser {
 sub www_editUserSave {
 	my $session = shift;
 	my $postedUserId = $session->form->process("uid"); #userId posted from www_editUser form
-	my $isAdmin = $session->user->isInGroup(3);
+	my $isAdmin = canEdit($session);
 	my $isSecondary;
 	my $i18n = WebGUI::International->new($session);
 	my ($existingUserId) = $session->db->quickArray("select userId from users where username=".$session->db->quote($session->form->process("username")));
@@ -408,7 +456,7 @@ sub www_editUserSave {
 	my $actualUserId;  #userId returned from the user object
 
 	unless ($isAdmin) {
-		$isSecondary = ($session->user->isInGroup(11) && $postedUserId eq "new");
+		$isSecondary = (canAdd($session) && $postedUserId eq "new");
 	}
 
 	return $session->privilege->adminOnly() unless ($isAdmin || $isSecondary);
@@ -474,7 +522,7 @@ sub www_editUserSave {
 #-------------------------------------------------------------------
 sub www_editUserKarma {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canEdit($session);
         my ($output, $f, $a, %user, %data, $method, $values, $category, $label, $default, $previousCategory);
 	my $i18n = WebGUI::International->new($session);
         $f = WebGUI::HTMLForm->new($session);
@@ -510,7 +558,7 @@ sub www_editUserKarma {
 #-------------------------------------------------------------------
 sub www_editUserKarmaSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canEdit($session);
         my ($u);
         $u = WebGUI::User->new($session,$session->form->process("uid"));
         $u->karma($session->form->process("amount"),$session->user->username." (".$session->user->userId.")",$session->form->process("description"));
@@ -542,8 +590,8 @@ sub www_formUsers {
 	foreach my $data (@{$p->getPageData}) {
 		$output .= '<li><a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId").'\').value=\''.$data->{userId}.'\';window.opener.document.getElementById(\''.$session->form->process("formId").'_display\').value=\''.$data->{username}.'\';window.close();">'.$data->{username}.'</a></li>';
 	}
-        $output .= '</ul>';
-        $output .= $p->getBarTraditional;
+    $output .= '</ul>';
+    $output .= $p->getBarTraditional;
 	return $output;
 }
 
@@ -551,12 +599,17 @@ sub www_formUsers {
 #-------------------------------------------------------------------
 sub www_listUsers {
 	my $session = shift;
-	unless ($session->user->isInGroup(3)) {
-		if ($session->user->isInGroup(11)) {
+
+    # If the user is only allowed to add users, send them right there.
+	unless (canEdit($session)) {
+		if (canAdd($session)) {
 			return www_editUser($session, undef, "new");
 		}
-		return $session->privilege->adminOnly();
+        else {
+		    return $session->privilege->adminOnly();
+        }
 	}
+
 	my %status;
 	my $i18n = WebGUI::International->new($session);
 	my $output = getUserSearchForm($session,"listUsers");

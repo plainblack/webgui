@@ -18,6 +18,21 @@ Operations for dealing with transactions from the WebGUI Commerce System.
 =cut
 
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminTransactionLog") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_viewPurchaseHistory ( errorMessage )
@@ -108,7 +123,7 @@ sub www_deleteTransaction {
 	my $session = shift;
 	my $transactionId;
 
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 
 	$transactionId = $session->form->process("tid");
 
@@ -120,7 +135,7 @@ sub www_deleteTransaction {
 #-------------------------------------------------------------------
 sub www_deleteTransactionItem {
 	my $session = shift;
-	return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+	return $session->privilege->insufficient unless canView($session);
 	
 	WebGUI::Commerce::Transaction->new($session, $session->form->process("tid"))->deleteItem($session->form->process("iid"), $session->form->process("itype"));
 

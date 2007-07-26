@@ -277,6 +277,21 @@ sub _columnar {
 	return $output;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminHelp") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_viewHelp ( $session )
@@ -289,7 +304,7 @@ UI level, and this can be toggled on and off by another form parameter, uiOverri
 
 sub www_viewHelp {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
+	return $session->privilege->insufficient() unless canView($session);
 	my $ac = WebGUI::AdminConsole->new($session,"help");
 	$session->style->setLink($session->url->extras("/help.css"), {rel=>"stylesheet", type=>"text/css"});
 	my $namespace = $session->form->process("namespace","className") || "WebGUI";
@@ -372,7 +387,7 @@ Display the index of all help entries in all namespaces.
 
 sub www_viewHelpIndex {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(7));
+	return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
         my @helpIndex;
 	my $i;
@@ -415,11 +430,13 @@ Utility method that returns link to the WebGUI Community Wiki with i18n'ed text.
 
 sub wikiHelpLink {
 	my $session = shift;
+	return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
     return sprintf q!<p>%s <a href="%s">%s</a></p>!, 
         $i18n->get('wiki help label leadin'),
         'http://www.webgui.org/community-wiki',
         $i18n->get('wiki help target'),
+        ;
 }
 
 1;

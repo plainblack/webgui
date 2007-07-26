@@ -26,6 +26,21 @@ Operation handler for displaying and killing active sessions.
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the given user is allowed to use this operation. user must be
+a WebGUI::User object. By default, checks the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminActiveSessions") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_killSession ( )
@@ -39,7 +54,7 @@ $session->form->process("sid").  Afterwards, it calls www_viewActiveSessions.
 sub www_killSession {
 	my $session = shift;
 	return www_viewActiveSessions($session) if $session->form->process("sid") eq $session->var->get("sessionId");
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly unless canView($session);
 	$session->db->write("delete from userSession where sessionId=?",[$session->form->process("sid")]);
 	$session->db->write("delete from userSessionScratch where sessionId=?", [$session->form->process("sid")]);
 	return www_viewActiveSessions($session);
@@ -55,8 +70,8 @@ delete (kill) each one via www_killSession
 =cut
 
 sub www_viewActiveSessions {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    my $session = shift;
+    return $session->privilege->adminOnly unless canView($session);
 	my ($output, $p, @row, $i, $sth, %data);
 	tie %data, 'Tie::CPHash';
 	$sth = $session->db->read("select users.username,users.userId,userSession.sessionId,userSession.expires,

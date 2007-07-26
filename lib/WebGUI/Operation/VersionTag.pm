@@ -40,6 +40,20 @@ These methods are available from this class:
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminVersionTag") );
+}
 
 #-------------------------------------------------------------------
 
@@ -86,7 +100,7 @@ An open tag id. This is optional as it normally grabs this value from a form pos
 
 sub www_editVersionTag {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
+        return $session->privilege->insufficient() unless canView($session);
 	my $tagId = shift || $session->form->param("tagId");
 	my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
@@ -113,7 +127,7 @@ sub www_editVersionTag {
 		);
 	my $workflowId = (defined $tag) ? $tag->get("workflowId") : $session->setting->get("defaultVersionTagWorkflow");
 	my $groupId = (defined $tag) ? $tag->get("groupToUse") : "12";
-	if ($session->user->isInGroup("pbgroup000000000000016")) {
+	if (canView($session)) {
 		$f->workflow(
 			value=>$workflowId,
 			type=>"WebGUI::VersionTag",
@@ -154,7 +168,7 @@ A reference to the current session.
 
 sub www_editVersionTagSave {
 	my $session = shift;
-        return $session->session->privilege->insufficient() unless ($session->user->isInGroup(12));
+        return $session->session->privilege->insufficient() unless canView($session);
 	if ($session->form->param("tagId") eq "new") {
 		my $tag = WebGUI::VersionTag->create($session, {
 			name=>$session->form->process("name","text", "Untitled"),
@@ -274,14 +288,14 @@ A reference to the current session.
 
 sub www_manageCommittedVersions {
     my $session = shift;
-    return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    return $session->privilege->adminOnlycanView($session);
     my $ac = WebGUI::AdminConsole->new($session,"versions");
     my $i18n = WebGUI::International->new($session,"VersionTag");
     my $rollback = $i18n->get('rollback');
     my $rollbackPrompt = $i18n->get('rollback version tag confirm');
     $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-    $ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
+    $ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
     my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("committed on").'</th><th>'.$i18n->get("committed by").'</th><th></th></tr> ';
     my $paginator = WebGUI::Paginator->new($session, $session->url->page("op=manageCommittedVersions"));
@@ -315,12 +329,12 @@ A reference to the current session.
 
 sub www_managePendingVersions {
         my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
         my $ac = WebGUI::AdminConsole->new($session,"versions");
         my $i18n = WebGUI::International->new($session,"VersionTag");
         $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
         $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
         my $output = '<table width="100%" class="content">
         <tr><th>'.$i18n->get("version tag name").'</th></tr> ';
         my $sth = $session->db->read("select tagId,name,commitDate,committedBy from assetVersionTag where isCommitted=0 and isLocked=1");
@@ -349,12 +363,12 @@ A reference to the current session.
 
 sub www_manageVersions {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
+        return $session->privilege->insufficient() unless canView($session);
         my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
@@ -369,7 +383,7 @@ sub www_manageVersions {
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>';
-        if ($session->user->isInGroup(3)) {
+        if (canView($session)) {
 				$output .= $session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
         }
         $output .= $session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
@@ -410,7 +424,7 @@ sub www_manageRevisionsInTag {
 	my $ac = WebGUI::AdminConsole->new($session,"versions");
         my $i18n = WebGUI::International->new($session,"VersionTag");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));
+	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
         $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
         my $output = "";
 	if ($session->form->param("workflowInstanceId")) {
@@ -488,7 +502,7 @@ A reference to the current session.
 
 sub www_rollbackVersionTag {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless $session->user->isInGroup(3);
+	return $session->privilege->adminOnly() unless canView($session);
 	my $tagId = $session->form->process("tagId");
 	return $session->privilege->vitalComponent() if ($tagId eq "pbversion0000000000001");
 	if ($tagId) {

@@ -25,6 +25,8 @@ Package WebGUI::Operation::Replacements
 Operation handler for conditional editing of submitted WebGUI content, similar to
 a search and replace function in word processors.
 
+#----------------------------------------------------------------------------
+
 =head2 _submenu ( $session, $workarea, $title )
 
 Utility routine for creating the AdminConsole for Replacement functions.
@@ -44,34 +46,50 @@ table in the WebGUI namespace.
 
 =cut
 
-#-------------------------------------------------------------------
 sub _submenu {
-	my $session = shift;
-        my $workarea = shift;
-        my $title = shift;
-	my $i18n = WebGUI::International->new($session);
-        $title = $i18n->get($title) if ($title);
-        my $ac = WebGUI::AdminConsole->new($session,"contentFilters");
-        $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), $i18n->get(1047));
-        $ac->addSubmenuItem($session->url->page("op=listReplacements"), $i18n->get("content filters"));
-        return $ac->render($workarea, $title);
+    my $session = shift;
+    my $workarea = shift;
+    my $title = shift;
+    my $i18n = WebGUI::International->new($session);
+    $title = $i18n->get($title) if ($title);
+    my $ac = WebGUI::AdminConsole->new($session,"contentFilters");
+    $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), $i18n->get(1047));
+    $ac->addSubmenuItem($session->url->page("op=listReplacements"), $i18n->get("content filters"));
+    return $ac->render($workarea, $title);
 }
 
+#----------------------------------------------------------------------------
 
-=head2 www_deleteReplacement ( $session )
+=head2 canView ( session [, user] )
 
-Delete a replacement specified by the form variable C<replacementId> if the user is in group Admin (3).  Returns the
-user to the List Replacements screen, www_listReplacements.
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
 
 =cut
 
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminReplacements") );
+}
+
 #-------------------------------------------------------------------
+
+=head2 www_deleteReplacement ( $session )
+
+Delete a replacement specified by the form variable C<replacementId>.
+Returns the user to the List Replacements screen, www_listReplacements.
+
+=cut
+
 sub www_deleteReplacement {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	$session->db->write("delete from replacements where replacementId=".$session->db->quote($session->form->process("replacementId")));
 	return www_listReplacements($session);
 }
+
+#-------------------------------------------------------------------
 
 =head2 www_editReplacement ( $session )
 
@@ -83,10 +101,9 @@ Calls www_editReplacementSave on submission.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_editReplacement {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	my $data = $session->db->getRow("replacements","replacementId",$session->form->process("replacementId"));
 	my $i18n = WebGUI::International->new($session);
 	my $f = WebGUI::HTMLForm->new($session);
@@ -119,19 +136,19 @@ sub www_editReplacement {
 	return _submenu($session,$f->print,"1052");
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_editReplacementSave ( $session )
 
-Form post processor for www_editReplacement.  You must be in group Admin (3) to
-execute this function.
+Form post processor for www_editReplacement. 
 
 Returns the user to www_listReplacements.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_editReplacementSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	$session->db->setRow("replacements","replacementId",{
 		replacementId=>$session->form->process("replacementId"),
 		searchFor=>$session->form->process("searchFor"),
@@ -140,17 +157,18 @@ sub www_editReplacementSave {
 	return www_listReplacements($session);
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_listReplacements ( $session )
 
-List all replacements if the user is in group Admin (3) and provides URls for replacements
-to be added or deleted.
+List all replacements and provides URls for replacements to be added or 
+deleted.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_listReplacements {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
 	my $output = '<table>';
 	$output .= '<tr><td></td><td class="tableHeader">'.$i18n->get(1050).'</td><td class="tableHeader">'.$i18n->get(1051).'</td></tr>';

@@ -29,6 +29,21 @@ Operation handler for managing scheduler activities.
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminCron") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_deleteCronJob ( )
@@ -38,11 +53,11 @@ Deletes a cron job.
 =cut
 
 sub www_deleteCronJob {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $cron = WebGUI::Workflow::Cron->new($session, $session->form->get("id"));
-	$cron->delete if defined $cron;
-	return www_manageCron($session);
+    my $session = shift;
+    return $session->privilege->adminOnly unless canView($session);
+    my $cron = WebGUI::Workflow::Cron->new($session, $session->form->get("id"));
+    $cron->delete if defined $cron;
+    return www_manageCron($session);
 }
 
 #-------------------------------------------------------------------
@@ -55,7 +70,7 @@ Displays an edit form for a cron job.
 
 sub www_editCronJob {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    return $session->privilege->adminOnly unless canView($session);
 	my $i18n = WebGUI::International->new($session, "Workflow_Cron");
 	my $cron = WebGUI::Workflow::Cron->new($session, $session->form->get("id"));
 	my $f = WebGUI::HTMLForm->new($session);
@@ -180,7 +195,7 @@ Saves the results of www_editCronJob()
 
 sub www_editCronJobSave {
 	my $session = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly unless canView($session);
 	if ($session->form->get("id") eq "new") {
 		WebGUI::Workflow::Cron->create($session,{
 			monthOfYear=>$session->form->get("monthOfYear"),
@@ -223,7 +238,7 @@ Display a list of the scheduler activities.
 
 sub www_manageCron {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly unless canView($session);
 	my $i18n = WebGUI::International->new($session, "Workflow_Cron");
 	my $output = '<table width="100%">'; 
 	my $rs = $session->db->read("select taskId, title, concat(minuteOfHour, ' ', hourOfDay, ' ', dayOfMonth, ' ', monthOfYear, ' ', dayOfWeek), enabled from WorkflowSchedule");
@@ -256,7 +271,7 @@ sub www_runCronJob {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || $session->user->isInGroup("3")) {
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || canView($session)) {
 		$session->errorHandler->security("make a Spectre cron job runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}

@@ -102,6 +102,7 @@
  - fix: javascript errors in SQL Form date inputs in IE
  - Added optional parameters for DatabaseLinks so that users can setup their
    database's with things like LongReadLen, etc.
+ - Added ability to restrict admin console items to specific groups.
 
 7.3.22
  - fix: relative links sent out in emails don't work properly

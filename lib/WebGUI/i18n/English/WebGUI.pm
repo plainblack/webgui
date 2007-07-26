@@ -3591,6 +3591,251 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+    'permissions'   => {
+        message     => q{Permissions},
+        lastUpdated => 0,
+        context     => q{The label for the Permissions tab of the Settings Admin panel},
+    },
+
+    'settings groupIdAdminActiveSessions label' => {
+        message     => q{Active Sessions},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminActiveSessions hoverHelp' => {
+        message     => q{Group to view and expire active sessions.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminAdSpace label' => {
+        message     => q{AdSpace},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminAdSpace hoverHelp' => {
+        message     => q{Group to manage advertising.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminCache label' => {
+        message     => q{Cache},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminCache hoverHelp' => {
+        message     => q{Group to view and flush cache.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminCommerce label' => {
+        message     => q{Commerce},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminCommerce hoverHelp' => {
+        message     => q{Group to manage Commerce settings.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminCron label' => {
+        message     => q{Cron},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminCron hoverHelp' => {
+        message     => q{Group to manage scheduled workflows.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminDatabaseLink label' => {
+        message     => q{Database Link},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminDatabaseLink hoverHelp' => {
+        message     => q{Group to manage database links.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminGraphics label' => {
+        message     => q{Graphics},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminGraphics hoverHelp' => {
+        message     => q{Group to manage fonts and palettes.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminGroup label' => {
+        message     => q{Groups},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminGroup hoverHelp' => {
+        message     => q{Group to manage all groups.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminGroupAdmin label' => {
+        message     => q{Groups (limited)},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminGroupAdmin hoverHelp' => {
+        message     => q{Group to manage groups that user is administrator of.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminHelp label' => {
+        message     => q{Help},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminHelp hoverHelp' => {
+        message     => q{Group that can view help.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminLDAPLink label' => {
+        message     => q{LDAP},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminLDAPLink hoverHelp' => {
+        message     => q{Group to manage LDAP links.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminLoginHistory label' => {
+        message     => q{Login History},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminLoginHistory hoverHelp' => {
+        message     => q{Group to view login history.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminProductManager label' => {
+        message     => q{Products},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminProductManager hoverHelp' => {
+        message     => q{Group to manage products},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminProfileSettings label' => {
+        message     => q{User Profiling},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminProfileSettings hoverHelp' => {
+        message     => q{Group to manage user profile fields.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminReplacements label' => {
+        message     => q{Content Filters},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminReplacements hoverHelp' => {
+        message     => q{Group to manage content filters.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminSpectre label' => {
+        message     => q{Spectre},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminSpectre hoverHelp' => {
+        message     => q{Group to view Spectre status},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminStatistics label' => {
+        message     => q{Statistics},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminStatistics hoverHelp' => {
+        message     => q{Group to view statistics},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminSubscription label' => {
+        message     => q{Subscriptions},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminSubscription hoverHelp' => {
+        message     => q{Group to manage subscriptions.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminTransactionLog label' => {
+        message     => q{Transactions},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminTransactionLog hoverHelp' => {
+        message     => q{Group to manage transactions.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminUser label' => {
+        message     => q{Users},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminUser hoverHelp' => {
+        message     => q{Group to manage users. Can add and edit users.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminUserAdd label' => {
+        message     => q{Users (add only)},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminUserAdd hoverHelp' => {
+        message     => q{Group that can only add new users.},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminVersionTag label' => {
+        message     => q{Version Tags},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminVersionTag hoverHelp' => {
+        message     => q{Group to manage version tags},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminWorkflow label' => {
+        message     => q{Workflow},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminWorkflow hoverHelp' => {
+        message     => q{Group to manage workflows},
+        lastUpdated => 0,
+    },
+        
+
+    'settings groupIdAdminWorkflowRun label' => {
+        message     => q{Workflow (run)},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminWorkflowRun hoverHelp' => {
+        message     => q{Group that is allowed to run workflows from the admin console.},
+        lastUpdated => 0,
+    },
+
     'wiki help label leadin' => {
         message     => q{For more help, visit the},
         lastUpdated => 1185162265,

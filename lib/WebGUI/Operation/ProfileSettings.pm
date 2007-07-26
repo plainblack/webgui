@@ -74,6 +74,23 @@ sub _submenu {
         return $ac->render($workarea, $title);
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminProfileSettings") );
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteProfileCategoryConfirm ( $session )
 
 Deletes the profile category in form variable C<cid>, unless the category is
@@ -82,10 +99,9 @@ Othewise, it returns the user to www_editProfileSettings.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_deleteProfileCategoryConfirm {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my $category = WebGUI::ProfileCategory->new($session,$session->form->process("cid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($category->isProtected);
 	$category->delete;	
@@ -103,7 +119,7 @@ Othewise, it returns the user to www_editProfileSettings.
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
         return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($field->isProtected);
 	$field->delete;
@@ -120,7 +136,7 @@ Add or edit a profile category specified in form variable C<cid>.  Calls www_edi
 #-------------------------------------------------------------------
 sub www_editProfileCategory {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my $data = {};
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
 	my $f = WebGUI::HTMLForm->new($session);
@@ -179,7 +195,7 @@ Returns the user to www_editProfileSettings when done.
 #-------------------------------------------------------------------
 sub www_editProfileCategorySave {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my %data = (
 		label=>$session->form->text("label"),
 		visible=>$session->form->yesNo("visible"),
@@ -202,7 +218,7 @@ Add or edit a profile field specified in form variable C<fid>.  Calls www_editPr
 #-------------------------------------------------------------------
 sub www_editProfileField {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
         my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
@@ -337,7 +353,7 @@ Returns the user to www_editProfileSettings when done.
 #-------------------------------------------------------------------
 sub www_editProfileFieldSave {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 
 	# Special case for WebGUI auth password recovery.
 	my $requiredForPasswordRecovery = $session->form->yesNo('requiredForPasswordRecovery');
@@ -381,7 +397,7 @@ Allows profile categories and fields to be managed (added, edited, deleted or mo
 #-------------------------------------------------------------------
 sub www_editProfileSettings {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
 	my $output = "";
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
@@ -414,7 +430,7 @@ Returns the user to www_editProfileSettings.
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryDown {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveDown;
         return www_editProfileSettings($session);
 }
@@ -429,7 +445,7 @@ Returns the user to www_editProfileSettings.
 #-------------------------------------------------------------------
 sub www_moveProfileCategoryUp {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	WebGUI::ProfileCategory->new($session,$session->form->process("cid"))->moveUp;
         return www_editProfileSettings($session);
 }
@@ -445,7 +461,7 @@ Returns the user to www_editProfileSettings.
 #-------------------------------------------------------------------
 sub www_moveProfileFieldDown {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveDown;
         return www_editProfileSettings($session);
 }
@@ -461,7 +477,7 @@ Returns the user to www_editProfileSettings.
 #-------------------------------------------------------------------
 sub www_moveProfileFieldUp {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	WebGUI::ProfileField->new($session,$session->form->process("fid"))->moveUp;
         return www_editProfileSettings($session);
 }

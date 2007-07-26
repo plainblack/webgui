@@ -22,6 +22,21 @@ Package WebGUI::Operation::LoginHistory
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminLoginHistory") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_viewLoginHistory ( )
@@ -35,7 +50,7 @@ they used.
 
 sub www_viewLoginHistory {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+        return $session->privilege->adminOnly() unless canView($session);
 	my ($output, $p, @row, $i, $sth, %data);
 	my $i18n = WebGUI::International->new($session);
 	tie %data, 'Tie::CPHash';

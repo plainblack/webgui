@@ -55,41 +55,57 @@ sub _submenu {
 	$ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid=new'), $i18n->get(982));
 	my $dlid = $session->form->process("dlid");
 	if (($session->form->process("op") eq "editDatabaseLink" && $dlid ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
-                $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$dlid), $i18n->get(983));
-                $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$dlid), $i18n->get(984));
-		$ac->addConfirmedSubmenuItem($session->url->page("op=deleteDatabaseLinkConfirm;dlid=".$dlid), $i18n->get(985), $i18n->get(988));
-		$ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), $i18n->get(986));
+        $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$dlid), $i18n->get(983));
+        $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$dlid), $i18n->get(984));
+        $ac->addConfirmedSubmenuItem($session->url->page("op=deleteDatabaseLinkConfirm;dlid=".$dlid), $i18n->get(985), $i18n->get(988));
+        $ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), $i18n->get(986));
 	}
         return $ac->render($workarea, $title);
 }
 
-=head2 www_copyDatabaseLink ( $session )
+#----------------------------------------------------------------------------
 
-Copies the requested database link in the form variable C<dlid> if the user
-is in group Admin (3).  Returns the user to the List Database Links screen.
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
 
 =cut
 
-#-------------------------------------------------------------------
-sub www_copyDatabaseLink {
-	my $session = shift;
-        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
-	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->copy;
-        return www_listDatabaseLinks($session);
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminDatabaseLink") );
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_copyDatabaseLink ( $session )
+
+Copies the requested database link in the form variable C<dlid> if the user
+is in the correct group. Returns the user to the List Database Links screen.
+
+=cut
+
+sub www_copyDatabaseLink {
+    my $session = shift;
+    return $session->privilege->insufficient unless canView($session);
+    WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->copy;
+    return www_listDatabaseLinks($session);
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_deleteDatabaseLink ( $session )
 
 Requests that the user confirm the deletion of the database link in
-the form variable C<dlid>.  Returns Insufficient privilege if the
-user is not in group Admin (3).
+the form variable C<dlid>.  
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_deleteDatabaseLink {
 	my $session = shift;
-        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+        return $session->privilege->insufficient unless canView($session);
 	return $session->privilege->vitalComponent if ($session->form->process("dlid") eq '0');
 	my $i18n = WebGUI::International->new($session);
         my ($output);
@@ -102,6 +118,8 @@ sub www_deleteDatabaseLink {
         return _submenu($session,$output,"987");
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_deleteDatabaseLinkConfirm ( $session )
 
 Deletes the requested database link in the form variable C<dlid> if the user
@@ -112,15 +130,16 @@ Returns the user to the List Database Links screen.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_deleteDatabaseLinkConfirm {
 	my $session = shift;
-        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+        return $session->privilege->insufficient unless canView($session);
 	return $session->privilege->vitalComponent if ($session->form->process("dlid") eq '0');
 
 	WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->delete;
         return www_listDatabaseLinks($session);
 }
+
+#-------------------------------------------------------------------
 
 =head2 www_editDatabaseLink ( $session )
 
@@ -131,10 +150,9 @@ Calls www_editDatabaseLinkSave on user submission.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_editDatabaseLink {
 	my $session = shift;
-        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+        return $session->privilege->insufficient unless canView($session);
         my ($output, %db, $f);
 	tie %db, 'Tie::CPHash';
 	if ($session->form->process("dlid") eq "new") {
@@ -212,6 +230,8 @@ sub www_editDatabaseLink {
         return _submenu($session,$output,"990");
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_editDatabaseLinkSave ( $session )
 
 Form postprocessor for www_editDatabaseLink.  Only users in group Admin (3)
@@ -221,11 +241,10 @@ Returns the user the Link Database Links screen.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_editDatabaseLinkSave {
 	my ($allowedKeywords);
 	my $session = shift;
-        return $session->privilege->insufficient unless ($session->user->isInGroup(3));
+        return $session->privilege->insufficient unless canView($session);
 	
 	# Convert enters to a single \n.
 	($allowedKeywords = $session->form->process("allowedKeywords")) =~ s/\s+/\n/g;
@@ -246,6 +265,8 @@ sub www_editDatabaseLinkSave {
         return www_listDatabaseLinks($session);
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_listDatabaseLinks ( $session )
 
 List all Database links and allow the user to edit, copy or delete them.
@@ -253,10 +274,9 @@ Only users in group Admin (3) are allowed to see this screen.
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_listDatabaseLinks {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless($session->user->isInGroup(3));
+    return $session->privilege->adminOnly() unless canView($session);
 	my $links = WebGUI::DatabaseLink->getList($session);
         my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
 	my $i18n = WebGUI::International->new($session);

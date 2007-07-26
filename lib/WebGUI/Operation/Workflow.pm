@@ -32,6 +32,36 @@ Operation handler for managing workflows.
 
 =cut
 
+#----------------------------------------------------------------------------
+
+=head2 canRunWorkflow ( session [, user] )
+
+Returns true if the user can run workflows from this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canRunWorkflow {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminWorkflowRun") );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canView ( session [, user] )
+
+Returns true if the user can administrate this operation. user defaults to 
+the current user.
+
+=cut
+
+sub canView {
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    return $user->isInGroup( $session->setting->get("groupIdAdminWorkflow") );
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_activityHelper ( session )
@@ -78,7 +108,7 @@ Allows the user to choose the type of workflow that's going to be created.
 
 sub www_addWorkflow {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
@@ -117,7 +147,7 @@ Saves the results from www_addWorkflow().
 
 sub www_addWorkflowSave {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->create($session, {type=>$session->form->get("type")});	
 	return www_editWorkflow($session, $workflow);
 }
@@ -132,7 +162,7 @@ Deletes an entire workflow.
 
 sub www_deleteWorkflow {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
 	$workflow->delete if defined $workflow;
 	return www_manageWorkflows($session);
@@ -148,7 +178,7 @@ Deletes an activity from a workflow.
 
 sub www_deleteWorkflowActivity {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
 	if (defined $workflow) {
 		$workflow->deleteActivity($session->form->get("activityId"));
@@ -170,7 +200,7 @@ A reference to the current session.
 
 sub www_demoteWorkflowActivity {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->demoteActivity($session->form->param("activityId"));
 	return www_editWorkflow($session);
@@ -187,7 +217,7 @@ Displays displays the editable properties of a workflow.
 sub www_editWorkflow {
 	my $session = shift;
 	my $workflow = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	$workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId")) unless (defined $workflow);
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $workflowActivities = $session->config->get("workflowActivities");
@@ -331,7 +361,7 @@ Saves the results of www_editWorkflow()
 
 sub www_editWorkflowSave {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->set({
 		enabled     => $session->form->get("enabled",     "yesNo"),
@@ -353,7 +383,7 @@ Displays a form to edit the properties of a workflow activity.
 
 sub www_editWorkflowActivity {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $activity = '';
 	if ($session->form->process("className","className")) {
 		$activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {activityId=>"new",className=>$session->form->process("className","className")});
@@ -381,7 +411,7 @@ Saves the results of www_editWorkflowActivity().
 
 sub www_editWorkflowActivitySave {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->get("workflowId"));
 	if (defined $workflow) {
 		my $activityId = $session->form->get("activityId");
@@ -406,7 +436,7 @@ Display a list of the workflows.
 
 sub www_manageWorkflows {
 	my $session = shift;
-        return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+        return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session, "Workflow");
 	my $output = '<table width="100%">'; 
 	my $rs = $session->db->read("select workflowId, title, enabled from Workflow order by title");
@@ -440,7 +470,7 @@ A reference to the current session.
 
 sub www_promoteWorkflowActivity {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+	return $session->privilege->insufficient() unless canView($session);
 	my $workflow = WebGUI::Workflow->new($session, $session->form->param("workflowId"));
 	$workflow->promoteActivity($session->form->param("activityId"));
 	return www_editWorkflow($session);
@@ -458,7 +488,7 @@ sub www_runWorkflow {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || $session->user->isInGroup("3")) {
+	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || canRunWorkflow($session)) {
 		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
@@ -487,11 +517,11 @@ Display a list of the running workflow instances.
 sub www_showRunningWorkflows {
     my $session = shift;
 
-    return $session->privilege->insufficient() unless ($session->user->isInGroup("pbgroup000000000000015"));
+    return $session->privilege->insufficient() unless canView($session);
 
     my $i18n = WebGUI::International->new($session, "Workflow");
     my $ac = WebGUI::AdminConsole->new($session,"workflow");
-    my $isAdmin = $session->user->isInGroup("3");
+    my $isAdmin = canRunWorkflow($session);
 
     # javascript for creating/showing/hiding the edit priority form
     my $cancel = $i18n->get('edit priority cancel');
