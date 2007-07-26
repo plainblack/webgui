@@ -39,6 +39,7 @@ addFieldsToDatabaseLinks($session);
 addWikiAttachments($session);
 addAdminConsoleGroupSettings($session);
 updateCommerce($session);
+updateProfileDateFormats($session);
 
 finish($session); # this line required
 
@@ -486,10 +487,29 @@ sub updateCommerce {
         }
     }
     
+    print "OK!\n" unless $quiet;    
+}
+
+#-------------------------------------------------
+sub updateProfileDateFormats {
+	my $session = shift;
+    my $db = $session->db;
+	print "\tUpdating Date Formats in User Profile...." unless ($quiet); 
+    
+    my ($dateFormat) = $db->quickArray("select possibleValues from userProfileField where fieldName='dateFormat'");
+
+    if($dateFormat) {
+        #Replace first character with new string
+        my $newFormats = q|{
+'%d-%m-%y'=>WebGUI::DateTime::epochToHuman("","%d-%m-%y"),
+'%d.%m.%y'=>WebGUI::DateTime::epochToHuman("","%d.%m.%y"),|;
+    
+        $dateFormat = $newFormats.substr($dateFormat,1,length($dateFormat));
+        $db->write("update userProfileField set possibleValues=? where fieldName='dateFormat'",[$dateFormat]);
+    }
     
     print "OK!\n" unless $quiet;
 }
-
 # ---- DO NOT EDIT BELOW THIS LINE ----
 
 #-------------------------------------------------
