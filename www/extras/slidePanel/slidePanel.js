@@ -1,77 +1,23 @@
-var slidePanelButtonHeight = 23;
-var slidePanelLinkTop = slidePanelButtonHeight+2;
+/* this is a freakesh hack that should only be in place until the new admin console goes in. If you want to see the
+ * real accorrdion look in the accordion folder */
 
 //add one button to a panel
 function sp_addLink(img, label, action) {
-  	this.img[this.img.length]=img;
-  	this.lbl[this.lbl.length]=label;
-  	this.act[this.act.length]=action;
-  	this.sta[this.sta.length]=0;
+  	this.img.push(img);
+  	this.lbl.push(label);
+  	this.act.push(action);
   	return this
 }
 
-//test if scroll buttons should be visible
-function sp_testScroll() {
-    	var i=parseInt(this.obj.style.height);
-    	var j=parseInt(this.objf.style.height);
-  	var k=parseInt(this.objf.style.top);
-  	if (k==slidePanelLinkTop)
-    		this.objm1.style.visibility='hidden';
-  	else
-    		this.objm1.style.visibility='visible';
-  	if ((j+k)<i)
-    		this.objm2.style.visibility='hidden';
-  	else
-    		this.objm2.style.visibility='visible';
-}
-
-//scroll the panel content up
-function sp_up(nr) {
-	this.ftop = this.ftop - 5;
-    	this.objf.style.top=(this.ftop+'px');
-    	//this.objf.style.zIndex=1;
-	nr--;
-    	if (nr>0)
-      		setTimeout(this.v+'.up('+nr+');',10);
-    	else
-      		this.testScroll();
-}
-
-//scroll the panel content down
-function sp_down(nr) {
-	this.ftop = this.ftop + 5;
-    	if (this.ftop>=slidePanelLinkTop) {
-      		this.ftop=slidePanelLinkTop;
-      		nr=0;
-    	}
-    	this.objf.style.top=(this.ftop+'px');
-    	nr--;
-    	if (nr>0)
-      		setTimeout(this.v+'.down('+nr+');',10);
-    	else
-      		this.testScroll();
-}
 
 //create one panel
 function createPanel(name,caption) {
   	this.name=name;                  // panel layer ID
-  	this.ftop=slidePanelLinkTop;                    // actual panel scroll position
-  	this.obj=null;                   // panel layer object
-  	this.objc=null;                  // caption layer object
-  	this.objf=null;                  // panel field layer object
-  	this.objm1=null;                 // scroll button up
-  	this.objm2=null;                 // scroll button down
   	this.caption=caption;            // panel caption
-  	this.img=new Array();            // button images
-  	this.lbl=new Array();            // button labels
-  	this.act=new Array();            // button actions
-  	this.sta=new Array();            // button status (internal)
+    this.img=new Array();
+    this.lbl=new Array();
+    this.act=new Array();
   	this.addLink=sp_addLink;      // add one button to panel
-    	this.testScroll=sp_testScroll;    // test if scroll buttons should be visible
-    	this.up=sp_up;                    // scroll panel buttons up
-    	this.down=sp_down;                // scroll panel buttons down
-  	this.v = this.name + "var";   // global var of 'this'
-  	eval(this.v + "=this");
   	return this
 }
 
@@ -81,147 +27,33 @@ function sp_addPanel(panel) {
   	this.panels[this.panels.length] = panel;
 }
 
-
+var lastAdminBarPanel = 0;
 // Draw the slider
 function sp_draw() {
-	document.body.style.marginLeft = this.width+'px';	
-	var i;
-	var j;
-	var t=0;
-	var h;
-	var c=3;
+    document.write('<dl class="accordion-menu">');
+    for (var i=0; i < this.panels.length; i++) {    
+        document.write('<dt id="wgabdt'+i+'" class="a-m-t">' + this.panels[i].caption + '</dt>');
+        document.write('<dd class="a-m-d">');
+        lastAdminBarPanel = i;
+        for (var j=0; j < this.panels[i].img.length; j++) {
+            document.write('<a class="link" href="'+ this.panels[i].act[j] +'">');
+            document.write('<img src="'+this.panels[i].img[j]+'" style="border: 0px; vertical-align: middle;" alt="icon" />');
+            document.write(this.panels[i].lbl[j] + '</a>');
+        }
+        document.write('</dd>');
+    }
+    document.write('</dl>');
+}
 
-	//slide panel 
-	document.write('<div id="slidePanel" style="width:'+this.width+'px; ');
-	document.write('height:'+this.height+'px; overflow:hidden">');
-    	document.write('<div class="slidePanel" id="'+this.name+'" style="left:');
-    	document.write(this.xpos+'px; top:'+this.ypos+'px; width:'+this.width);
-    	document.write('px; height:'+this.height+'px; ')
-    	document.write('; clip:rect(0px,'+this.width+'px,'+this.height+'px,0px)">');
-    	h=this.height-((this.panels.length-1)*slidePanelButtonHeight)
-
-    	//one layer for every panel...
-    	for (i=0;i<this.panels.length;i++) {
-      		document.write('<div class="panel" id="'+this.name+'_panel'+i);
-      		document.write('" style="top:'+t);
-      		document.write('px; width:'+this.width+'px; height:'+h+'px; clip:rect(0px, ');
-      		document.write(this.width+'px, '+h+'px, 0px);">');
-      		t=t+slidePanelButtonHeight;
-
-       		//one layer to host the panel links 
-      		document.write('<div class="panelLinkHolder" id="'+this.name+'_panel'+i);
-      		document.write('_f" style="top:'+slidePanelLinkTop+'px; width:');
-      		document.write(this.width+'px; height:');
-      		document.write((this.panels[i].img.length*this.buttonspace)+'px;">');
-      		mtop=0
-
-      		for (j=0;j<this.panels[i].img.length;j++) {
-			document.write('<div id="'+this.name+'_panel'+i+'_b'+j+'" class="panelLinkOut" style="top:'+mtop+'px;width:'+this.width+'px;" onmouseover="this.className=\'panelLinkIn\';" onmouseup="document.location=\''+this.panels[i].act[j]+'\';" onmouseout="this.className=\'panelLinkOut\';">');
-			document.write('<p style="display:inline;vertical-align:middle;"><img src="'+this.panels[i].img[j]+'" style="border: 0px; vertical-align: middle;" alt="icon" />');
-			document.write(' '+this.panels[i].lbl[j]);
-			document.write('</p></div>');
-        		mtop=mtop+this.buttonspace;
-      		}
-
-      		document.write('</div>');
-
-        	document.write('<div id="'+this.name+'_panel'+i+'_c" class="slidePanelButton" ');
-        	document.write('onClick="javascript:'+this.v+'.showPanel('+i);
-        	document.write(');" style="width:');
-        	document.write((this.width-c)+'px; height:'+(slidePanelButtonHeight-c)+'px;"><a href="#" ');
-        	document.write('onClick="'+this.v+'.showPanel('+i+');this.blur();');
-        	document.write('return false;">');
-        	document.write(this.panels[i].caption);
-        	document.write('</a></div>')
-
-      		// scroll-up
-      		document.write('<div id="'+this.name+'_panel'+i);
-      		document.write('_m1" class="scrollPanelUp" style="left:');
-      		document.write((this.width-20)+'px;"><a href="#" onclick="');
-      		document.write(this.panels[i].v+'.down(16);this.blur();return false;" >');
-      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowup.gif" style="border: 0px;" alt="scroll up" />');
-      		document.write('</a></div>');
-
-		// scroll-down
-      		document.write('<div class="scrollPanelDown" id="'+this.name+'_panel'+i);
-      		document.write('_m2" style="top:');
-      		document.write((this.height-(this.panels.length)*slidePanelButtonHeight)+'px; left:');
-      		document.write((this.width-20)+'px;"><a href="#" onclick="');
-      		document.write(this.panels[i].v+'.up(16);this.blur();return false">');
-      		document.write('<img src="'+getWebguiProperty("extrasURL")+'/slidePanel/arrowdown.gif" style="border: 0px;" alt="scroll down" />');
-      		document.write('</a></div>');
-
-      		document.write('</div>')
-
-    	}
-    	document.write('</div></div>')
-
-  	for (i=0;i<this.panels.length;i++) {
-    		this.panels[i].obj=document.getElementById(this.name+'_panel'+i);
-      		this.panels[i].obj.style.zIndex=10000;
-		this.panels[i].objc=document.getElementById(this.name+'_panel'+i+'_c');
-      		this.panels[i].objf=document.getElementById(this.name+'_panel'+i+'_f');
-      		this.panels[i].objm1=document.getElementById(this.name+'_panel'+i+'_m1');
-      		this.panels[i].objm2=document.getElementById(this.name+'_panel'+i+'_m2');
-    		this.panels[i].testScroll();
-  	}
-  	//activate last panel
+/*
     	//actual panel is saved in a cookie
 	var cookie = sp_readCookie("slidePanel");
     	if (cookie)
       		this.showPanel(cookie);
         else
       		this.showPanel(this.panels.length-1);
-	//float the panel as someone scrolls
-        startY = 0;
-        var d = document;
-        function ml(id) {
-                var el=d.getElementById?d.getElementById(id):d.all?d.all[id]:d.layers[id];
-                if(d.layers)el.style=el;
-                el.sP=function(y){this.style.top=y+"px";};
-                el.y = startY;
-                return el;
-        }
-        window.floatSlidePanelWithScroll=function() {
-		//Added to allow support for xhtml transitional
-		var docElement = document.documentElement;
-		if (document.compatMode && document.compatMode == "BackCompat") {
-			docElement = document.body;
-		}
-		//var pY = document.body.scrollTop;
-                var pY = docElement.scrollTop;
-		ftlObj.y += (pY + startY - ftlObj.y)/1;
-		if (ftlObj.y < 0) {
-			ftlObj.y = 0
-		}
-                ftlObj.sP(ftlObj.y);
-                setTimeout("floatSlidePanelWithScroll()", 10);
-        }
-        ftlObj = ml("slidePanel");
-        floatSlidePanelWithScroll();
-}
+*/
 
-
-
-function sp_showPanel(nr) {
-	var i
-	var l
-	var o
-	sp_createCookie("slidePanel",nr,1);
-  	this.aktPanel=nr;
-  	l = this.panels.length;
-  	for (i=0;i<l;i++) {
-    	   //alert(nr);		
-	   if (i>nr) {
-      	      this.panels[i].obj.style.top=this.height-((l-i)*slidePanelButtonHeight)+"px";
-    	   } else {
-      	      this.panels[i].obj.style.top=i*slidePanelButtonHeight+"px";
-    	   }
-
-	   // Fix bug with bits of other panels showing through.
-	   this.panels[i].objf.style.visibility = (i == nr)? 'visible' : 'hidden';
-  	}
-}
 
 function createSlidePanelBar(name) {
 	//Added to allow support for xhtml transitional
@@ -231,18 +63,9 @@ function createSlidePanelBar(name) {
 	}  	
 	this.aktPanel=0;                        // last open panel
   	this.name=name;                          // name
-  	this.xpos=0;                            // bar x-pos
-  	this.ypos=0;                            // bar y-pos
-  	this.width=160;                       // bar width
-  	//this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:document.body.offsetHeight)-10;                     // bar height
-	this.height=((navigator.appVersion.indexOf("MSIE ") == -1)?innerHeight:docElement.offsetHeight)*0.95;                   // bar height
-  	this.buttonspace=slidePanelButtonHeight-1;                     // distance of panel buttons
   	this.panels=new Array();                 // panels
   	this.addPanel=sp_addPanel;               // add new panel to bar
   	this.draw=sp_draw;                       // write HTML code of bar
-    	this.showPanel=sp_showPanel;           // make a panel visible
-  	this.v = name + "var";                  // global var of 'this'
-  	eval(this.v + "=this");
   	return this;
 }
 
@@ -274,4 +97,412 @@ function sp_eraseCookie(name) {
 	sp_createCookie(name,"",-1);
 }
 
+
+var AccordionMenu = new function()
+{
+	var YUD = YAHOO.util.Dom;
+	var YUE = YAHOO.util.Event;
+	var oMenuSetting = {};
+	var oMenuCache = {};
+	var dLastHoverTitle ;
+	YUD.addClass(document.documentElement,'accordion-menu-js');
+
+	function getDT(e)
+	{
+		var dEl = e.srcElement || e.target;
+			
+		if(	(e.tagName + '').toUpperCase()=='DD' )
+		{	
+			var dt = e.previousSibling ;
+			while(dt)
+			{
+				if(dt.tagName &&  dt.tagName.toUpperCase() == 'DT'){break;};
+				dt = dt.previousSibling
+			};
+			
+			if(!dt || dt.tagName.toUpperCase() != 'DT'){return;}
+			else{return dt};
+		}
+		else if(e.clientX)
+		{
+			var found = false;
+			while( dEl.parentNode)
+			{
+				if(YUD.hasClass(dEl,'a-m-t')){ found  = true ; break;};
+				dEl = dEl.parentNode;
+			};
+			if(!found){return null}
+			else{return dEl };	
+		};		
+	};
+	
+	
+	
+	function getDD(dt)
+	{
+		if(!dt){return null;};
+		var dd = dt.nextSibling ;
+	
+		while(dd)
+		{	
+			if(dd.tagName && dd.tagName.toUpperCase() == 'DD'){break;};
+			dd = dd.nextSibling;
+			
+		};
+		if(!dd || dd.tagName.toUpperCase() != 'DD'){return;}
+		else{return dd};
+	};
+	
+	function expand(dl,dt,dd)
+	{
+    var bodyPanels = YUD.getElementsByClassName("a-m-d", "dd",dl); 
+    var bodyPanelHeight = YUD.getViewportHeight() - (20 * bodyPanels.length) - 5;
+	
+		dl.hasAnimation +=1;
+		YUD.addClass(dd,'a-m-d-before-expand');		
+		var oAttr = {height:{from:0,to:bodyPanelHeight }};
+		
+		YUD.removeClass(dd,'a-m-d-before-expand');
+		
+		var onComplete = function()
+		{	
+			oAnim.onComplete.unsubscribe(onComplete);
+			oAnim.stop();
+			YUD.removeClass(dd,'a-m-d-anim');
+			YUD.addClass(dd,'a-m-d-expand');
+			onComplete = null;	
+			dl.hasAnimation -=1;
+			var dt = getDT(dd);	
+			YUD.addClass(dt,'a-m-t-expand');
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].onOpen && dd.style.height!=bodyPanelHeight + "px" )
+			{	
+				oMenuCache[ dl.id ].onOpen(	 {dl:dl,dt:dt,dd:dd} );								
+			};	
+			dd.style.height = bodyPanelHeight + "px";
+		
+		};
+		
+		var onTween = function()
+		{
+			if(dd.style.height)
+			{	
+				YUD.addClass(dd,'a-m-d-anim');				
+				oAnim.onTween.unsubscribe(onTween);
+				onTween = null;
+				dd.oAnim = null;
+			};
+			
+		};
+		
+		if(dd.oAnim)
+		{
+			dd.oAnim.stop();
+			dd.oAnim = null;
+			dl.hasAnimation -=1;	
+		};
+		var oEaseType = YAHOO.util.Easing.easeOut;
+		var seconds = 0.5;
+		if(oMenuCache[ dl.id ] )
+		{
+			oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
+			seconds =  oMenuCache[ dl.id ]['seconds'];
+			
+			if( !oMenuCache[ dl.id ]['animation'] )
+			{
+				var oAnim = {onComplete:{unsubscribe:function(){}},stop:function(){}};
+				onComplete();
+				return;
+			};
+		};
+		
+		
+		var oAnim = new YAHOO.util.Anim(dd,oAttr,seconds ,oEaseType);
+		oAnim.onComplete.subscribe(onComplete);	
+		oAnim.onTween.subscribe(onTween);
+		oAnim.animate();
+		dd.oAnim = oAnim ;
+	
+	};
+	
+	function collapse(dl,dt,dd)
+	{
+		dl.hasAnimation +=1;
+		YUD.addClass(dd,'a-m-d-anim');
+		var oAttr = {height:{from:dd.offsetHeight,to:0}};
+		
+		
+		var onComplete = function()
+		{
+			oAnim.onComplete.unsubscribe(onComplete);
+			YUD.removeClass(dd,'a-m-d-anim');
+			YUD.removeClass(dd,'a-m-d-expand');
+			dd.style.height = '';
+			dd.oAnim = null;
+			onComplete = null;	
+			dl.hasAnimation -=1;	
+			var dt = getDT(dd);	
+			YUD.removeClass(dt,'a-m-t-expand');	
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].onOpen )
+			{				
+				oMenuCache[ dl.id ].onClose(	 {dl:dl,dt:dt,dd:dd} );
+			};			
+			
+		};
+		
+		if(dd.oAnim)
+		{
+			dd.oAnim.stop();
+			dd.oAnim = null;
+			dl.hasAnimation -=1;	
+		};
+		
+		var oEaseType = YAHOO.util.Easing.easeOut;
+		var seconds = 0.5;
+		if(oMenuCache[ dl.id ] )
+		{
+			oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
+			seconds =  oMenuCache[ dl.id ]['seconds'];
+			if( !oMenuCache[ dl.id ]['animation'] )
+			{
+				var oAnim = {onComplete:{unsubscribe:function(){}},stop:function(){}};
+				onComplete();
+				return;
+			};	
+		};
+		
+		var oAnim = new YAHOO.util.Anim(dd,oAttr,seconds ,oEaseType);	
+		oAnim.onComplete.subscribe(onComplete);	
+		oAnim.animate();
+		dd.oAnim = oAnim ;
+	};
+	
+	function collapseAll(dl,dt,dd)
+	{
+		var aOtherDD = YUD.getElementsByClassName('a-m-d-expand','dd',dl);
+		for(var i=0;i<aOtherDD.length;i++)
+		{
+			var otherDD = aOtherDD[i] ;
+			if( otherDD !=dd )
+			{
+				collapse(dl,null,otherDD);
+			};				
+		};
+	}
+	
+	
+	var onMenuMouseover = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};
+		if(dLastHoverTitle)
+		{
+			YUD.removeClass(dLastHoverTitle,'a-m-t-hover');
+		};		
+		YUD.addClass(dMenuTitle,'a-m-t-hover');
+		dLastHoverTitle = dMenuTitle ;
+		YUE.stopEvent(e);
+		return false;		
+	};
+	
+	var onMenuMouseout = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};
+		if(dLastHoverTitle && dLastHoverTitle!=dMenuTitle)
+		{
+			YUD.removeClass(dLastHoverTitle,'a-m-t-hover');
+			YUD.removeClass(dLastHoverTitle,'a-m-t-down');
+		};	
+		YUD.removeClass(dMenuTitle,'a-m-t-down');	
+		YUD.removeClass(dMenuTitle,'a-m-t-hover');
+		dLastHoverTitle = null ;
+		YUE.stopEvent(e);
+		return false;		
+	};
+	
+	var onMenuMousedown = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};			
+		YUD.addClass(dMenuTitle,'a-m-t-down');
+		YUE.stopEvent(e);
+		return false;	
+	};
+	
+	var onMenuClick = function(e)
+	{
+		var dt = getDT(e);
+		if(!dt){return;};
+		var dd = getDD(dt);
+		
+	
+		
+		if(!dd){return;};
+		var dl = dt.parentNode;
+		
+		if(dl.hasAnimation==null)
+		{
+			dl.hasAnimation = 0;
+		}	
+		if(dl.hasAnimation > 0 ){return;};
+		YUD.removeClass(dt,'a-m-t-down');
+		
+		if(YUD.hasClass(dd,'a-m-d-expand'))
+		{	
+			collapse(dl,dt,dd);
+		}
+		else
+		{			
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].dependent == false ){}
+			else{collapseAll(dl,dt,dd);}
+			expand(dl,dt,dd);
+		};		
+		YUE.stopEvent(e);
+		return false;
+	};
+	
+	
+	YUE.addListener( document,'mouseover',onMenuMouseover);
+	YUE.addListener( document,'mouseout',onMenuMouseout);
+	YUE.addListener( document,'mousedown',onMenuMousedown);
+	YUE.addListener( document,'click',onMenuClick);
+	
+	this.openDtById = function(sId)
+	{
+		var dt = document.getElementById(sId);
+		if(!dt){return;};
+		if(!YUD.hasClass(dt,'a-m-t')){return;};
+		var dl = dt.parentNode;
+		var dd = getDD(dt);
+		if(dl.hasAnimation==null){dl.hasAnimation = 0;};
+		
+		if(dl.hasAnimation > 0 ){return;};
+		if(YUD.hasClass(dd,'a-m-d-expand')){return;};
+		if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].dependent == false ){}
+		else{collapseAll(dl,dt,dd);}
+		expand(dl,dt,dd);
+	};
+	
+	this.closeDtById = function(sId)
+	{
+		var dt = document.getElementById(sId);
+		if(!dt){return;};
+		if(!YUD.hasClass(dt,'a-m-t')){return;};
+		var dl = dt.parentNode;
+		var dd = getDD(dt);
+		if(dl.hasAnimation==null){dl.hasAnimation = 0;};
+		if(dl.hasAnimation > 0 ){return;};
+		if(!YUD.hasClass(dd,'a-m-d-expand')){return;};
+		collapse(dl,dt,dd);
+	};
+	
+	
+	this.setting = function(id,oOptions)
+	{	
+		if( !oOptions ){return;};
+	
+		if( typeof(id)!='string' ){return;};
+	
+		var setMunu = function(dl)
+		{	
+			dl = dl || this;
+			dl.hasAnimation = 0;
+			oMenuCache[ dl.id ] = 
+			{
+				element:dl,
+				dependent:true,
+				onOpen:function(){},
+				onClose:function(){},
+				seconds:0.5,
+				easeOut:true,
+				openedIds:[],
+				animation:true
+			};
+			oMenu =  oMenuCache[ dl.id ] ;
+			
+			if(typeof(oOptions['animation'])=='boolean')
+			{
+				oMenu['animation'] = !!oOptions['animation']; 
+				
+			};
+			
+			
+			if(typeof(oOptions['dependent'])=='boolean')
+			{
+				oMenu['dependent'] = !!oOptions['dependent']; 
+			};
+			
+			if(typeof(oOptions['easeOut'])=='boolean')
+			{
+				oMenu['easeOut'] = !!oOptions['easeOut']; 
+			};
+			
+			if(typeof(oOptions['seconds'])=='number')
+			{
+				oMenu['seconds'] = Math.max(0 , oOptions['seconds'] ); 
+			};
+			
+			if(typeof(oOptions['onOpen'])=='function')
+			{
+				oMenu['onOpen'] = oOptions['onOpen'];
+			};
+			
+			if(typeof(oOptions['onClose'])=='function')
+			{
+				oMenu['onClose'] = oOptions['onClose'];
+			};
+		
+			if(oOptions['openedIds'].shift)
+			{
+				oMenu['openedIds'] = oOptions['openedIds'];
+			};
+			
+			
+			for(var i=0;i<oMenu['openedIds'].length;i++)
+			{
+				var sId = oMenu['openedIds'][i];
+				var dt = document.getElementById( sId  );
+				
+				if(dt && dt.tagName.toUpperCase() == 'DT')
+				{
+					var dl = dt.parentNode;
+					var dd = getDD(dt);
+					expand(dl,dt,dd);
+				}
+				else if(!dt)
+				{
+					function onDtAvailable()
+					{
+						var dt = this;
+						if(dt.tagName.toUpperCase() == 'DT')
+						{
+							var dl = dt.parentNode;
+							var dd = getDD(dt);
+							expand(dl,dt,dd);
+						};	
+					};
+					
+					YUE.onAvailable(sId,onDtAvailable);
+				}			
+			};
+			
+			
+		};
+		
+		if(document.getElementById(id))
+		{
+			setMunu(document.getElementById(id))
+		}
+		else
+		{	
+			YUE.onAvailable(id,setMunu);	
+		};	
+	};
+
+};
+
+YAHOO.util.Event.on(window, "load", function () { 
+    document.body.style.marginLeft = "160px"; 
+    AccordionMenu.openDtById("wgabdt"+lastAdminBarPanel);
+});
 

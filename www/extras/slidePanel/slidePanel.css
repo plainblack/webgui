@@ -1,79 +1,123 @@
-#slidePanel {
-	position:absolute;
-	font: bold 12px sans-serif;
-	line-height:20px;
-  	text-align: left;
-	left:0px; 
-	top:0px;
+dl.accordion-menu {
+	margin: 0;
+	padding: 0;
+	width: 160px;
+	background: #eeeeee;
+    position:fixed; 
+    _position:absolute; 
+    top:0; 
+    _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); 
+    left:0;
+    z-index: 100;
 }
 
-.slidePanelButton {
-	width:300px;
-	text-align:center; 
-	font-family: sans-serif; 
-	font-size:11px; 
-	cursor: pointer; 
-	border-width:1px; 	 
-	border-color: #ACACAC; 
-	background-color:#dddddd;
-	background-image: url(btn_bg.jpg);
-	position:absolute; 
-	left:0px;
-	top: 0px;
-	border-style: solid;
-} 
-
-.slidePanelButton A, .slidePanelButton A:visited, .slidePanelButton A:link {
-	text-decoration: none;
-	color: black;
+dl.accordion-menu dt.a-m-t {
+	margin: 0;
+	padding: 0;
+    background-color:#dddddd;
+    background-image: url(btn_bg.jpg);
+    font-weight: bold;
+    height: 20px;
+	color: #444444;
+    border: 1px solid #ACACAC; 
+    line-height: 20px;
+    font-size: 12px;
+    text-align:center;
+    font-family: sans-serif;
 }
 
-.scrollPanelUp {
-	position:absolute; 
-	top: 40px;
+dl.accordion-menu dt.a-m-t-hover{
+	margin: 0;
+	padding: 0;
+	background:#cdcdcd;
 }
 
-.scrollPanelDown {
-	position: absolute;
+
+dl.accordion-menu dt.a-m-t-down{
+	margin: 0;
+	padding: 0;
+	border: solid 1px #222222;
+	border-right-color: #dfdfdf;
+	border-bottom-color: #dfdfdf;
 }
 
-.slidePanel {
-	position:absolute;
-	background-color: #eeeeee;
-	z-index: 100;
+
+html.accordion-menu-js dt.a-m-t{
+	margin: 0;
+	padding: 0;
+	cursor:pointer;
+	zoom:1;
 }
 
-.panel, .panelLinkHolder {
-	position:absolute; 
-	left:0px;
-	background-color: #eeeeee;
-	background-image: url(panel_bg.jpg);
-	background-repeat: repeat-x;
-	color: black;
+dl.accordion-menu dd.a-m-d {
+	margin: 0;
+	padding: 0;
+    overflow: auto;
+    background-color: #eeeeee;
+    background-image: url(panel_bg.jpg);
+    background-repeat: repeat-x;
 }
 
-.panelLinkOut {
-	position: absolute; 
-	overflow: hidden;
-	height: 20px;
-	cursor: pointer;
-	left: 0px; 
-	font-size: 11px;
-	color: black;
-	font-family: sans-serif;
+dl.accordion-menu dd.a-m-d .link {
+	margin: 0;
+	padding: 0;
+    display: block;
+    width: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-decoration: none;
+    color: black;
+    height: 20px;
+    font-family: sans-serif;
+    cursor: pointer;
+    font-size: 12px;
 }
 
-.panelLinkIn {
-	position:absolute; 
-	cursor: pointer;
-	height: 20px;
-	overflow: hidden;
-	cursor: pointer;
-	left:0px; 
-	border: 1px solid #DEDCDC;
-	font-size: 11px;
-	font-family: sans-serif;
-	color: black;
-	background-color: #F5F5F5;
+dl.accordion-menu dd.a-m-d .link:hover {
+	margin: 0;
+	padding: 0;
+    color: black;
+    background-color: #F5F5F5;
+}
+
+html.accordion-menu-js dd.a-m-d{
+	margin: 0;
+	padding: 0;
+	display:none;
+}
+
+
+html.accordion-menu-js dd.a-m-d-expand {
+	margin: 0;
+	padding: 0;
+	display:block;
+}
+
+html.accordion-menu-js dd.a-m-d-before-expand {
+	margin: 0;
+	padding: 0;
+	display:block;
+	position:relative;
+	z-index:-1;
+	opacity:0;
+	height:auto !important;
+	visibility:hidden;
+	overflow:visible;
+}
+
+
+html.accordion-menu-js dt.a-m-t-expand {
+	margin: 0;
+	padding: 0;
+	border-left-color:#222222;
+	color:black;
+	background:#c0c0c0;
+}
+
+html.accordion-menu-js dd.a-m-d-anim {
+	margin: 0;
+	padding: 0;
+	overflow:hidden;
+	display:block;	
 }
 

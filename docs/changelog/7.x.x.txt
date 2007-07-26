@@ -13,6 +13,8 @@
  - Graphics::Magick is now the standard graphics package in WebGUI, but
    Image::Magick will be supported for backwards compatibility. See gotcha.txt
    for details.
+ - rfe: Admin bar doesn't resize with the browser
+ - fix: Left Admin Bar overlap problem
  - fix: A bug where it was possible to delete a system page if it were made
    the child of a non-system page that you had edit rights to.
  - api: Added a unified contraints system for the file and image assets.
