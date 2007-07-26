@@ -1,7 +1,12 @@
 package WebGUI::i18n::English::CommercePaymentITransact;
 
 our $I18N = {
-	'phone' => {
+	'label' => {
+                message => q|Credit Card|,
+                lastUpdated => 0,
+                context => q|Default ITransact payment gateway label|
+        },
+    'phone' => {
                 message => q|Telephone Number|,
                 lastUpdated => 0,
                 context => q|Form label in the checkout form of the iTransact module.|

@@ -1,10 +1,10 @@
-package WebGUI::i18n::English::CommercePaymentCash;
+package WebGUI::i18n::English::CommercePaymentCheck;
 
 our $I18N = {
 	'label' => {
-                message => q|Cash|,
+                message => q|Check|,
                 lastUpdated => 0,
-                context => q|Default Cash payment gateway label|
+                context => q|Default Check payment gateway label|
         },
     'phone' => {
                 message => q|Telephone Number|,

@@ -272,7 +272,9 @@ sub www_checkoutConfirm {
 	my $session = shift;
 	my ($plugin, $f, %var, $errors, $i18n, $shoppingCart, $normal, $recurring, $shipping, $total, $subTotal);
 	$errors = shift;
-	
+    my $inVars = shift;
+	%var = %{$inVars} if (defined $inVars);
+    
 	$i18n = WebGUI::International->new($session, 'Commerce');
 	
 	# If the user isn't logged in yet, let him do so or have him create an account
@@ -530,21 +532,23 @@ sub www_checkoutSubmit {
 		push(@resultLoop, $var);
 	}
 
-	$shoppingCart->empty unless ($checkoutError);
-
-	$param{title} = $i18n->get('transaction error title');
-	$param{statusExplanation} = $i18n->get('status codes information');
-	$param{resultLoop} = \@resultLoop;
-
+    if($checkoutError) {
+        $param{'title'            } = $i18n->get('transaction error title');
+	    $param{'statusExplanation'} = $i18n->get('status codes information');
+	    $param{'resultLoop'       } = \@resultLoop;
+        $param{'purchaseError'    } = "true";
+        return www_checkoutConfirm($session,undef,\%param);
+    }
+    
+    #Empty shopping cart
+    $shoppingCart->empty;
+    #Clear Checkout Scratch
 	_clearCheckoutScratch($session);
 	
 	# If everythings ok show the purchase history
-	return WebGUI::Operation::TransactionLog::www_viewPurchaseHistory($session) unless ($checkoutError);
-	
-	# If an error has occurred show the template errorlog
-	return $session->style->userStyle(WebGUI::Asset->newByDynamicClass($session,$session->setting->get("commerceTransactionErrorTemplateId"))->process(\%param));
+	return WebGUI::Operation::TransactionLog::www_viewPurchaseHistory($session);
 }
-
+    
 #-------------------------------------------------------------------
 
 =head2 www_completePendingTransaction ( $session )
@@ -665,13 +669,6 @@ sub www_editCommerceSettings {
 		-hoverHelp	=> $i18n->get('purchase history template description'),
 		-value		=> $session->setting->get('commercePurchaseHistoryTemplateId'),
 		-namespace	=> 'Commerce/ViewPurchaseHistory'
-		);
-	$tabform->getTab('general')->template(
-		-name		=> 'commerceTransactionErrorTemplateId',
-		-label		=> $i18n->get('transaction error template'),
-		-hoverHelp	=> $i18n->get('transaction error template description'),
-		-value		=> $session->setting->get('commerceTransactionErrorTemplateId'),
-		-namespace	=> 'Commerce/TransactionError'
 		);
 	$tabform->getTab('general')->template(
 		-name		=> 'commerceCheckoutCanceledTemplateId',
@@ -1129,6 +1126,7 @@ sub www_selectPaymentGateway {
 		foreach (@$plugins) {
 			push(@pluginLoop, {
 				name		=> $_->name,
+                label       => $_->label,
 				namespace	=> $_->namespace,
 				formElement	=> WebGUI::Form::radio($session,{name=>'paymentGateway', value=>$_->namespace})
 				}) if ($session->user->isInGroup($_->get('whoCanUse')));

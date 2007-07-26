@@ -44,22 +44,16 @@ sub checkoutForm {
 	my ($self, $u, $f, %months, %years, $i18n);
 	$self = shift;
 	
-	$i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
+	$i18n = $self->i18n;
 
 	$u = WebGUI::User->new($self->session,$self->session->user->userId);
 
 	$f = WebGUI::HTMLForm->new($self->session);
 
-	$f->selectBox(
-                -name=>"paymentMethod",
-                -label=>$i18n->get("payment method"),
-                -value=>[$self->session->form->process("paymentMethod")],
-                -defaultValue=>['cash'],
-                -options=> { 'cash' => $i18n->get('cash'),
-			     'check' => $i18n->get('check'),
-			     'other' => $i18n->get('other'),
-			   }
-                );
+    $f->readOnly(
+        -label=>$i18n->get("payment method"),
+        -value=>ucfirst($self->getPaymentMethod),
+    );
 
 	$f->text(
 		-name	=> 'firstName',
@@ -115,8 +109,7 @@ sub checkoutForm {
 sub configurationForm {
 	my ($self, $f, $i18n);
 	$self = shift;
- 	$i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
-
+ 	$i18n = $self->i18n;
 	$f = WebGUI::HTMLForm->new($self->session);
 
 	$f->textarea(
@@ -131,7 +124,6 @@ sub configurationForm {
 		-label 	=> $i18n->get('complete transaction'),
 		-hoverHelp => $i18n->get('complete transaction description'),
 		);
-		
 	return $self->SUPER::configurationForm($f->printRowsOnly);
 }
 
@@ -139,6 +131,15 @@ sub configurationForm {
 sub confirmTransaction {
 
 	return 0;
+}
+
+#-------------------------------------------------------------------
+sub i18n {
+	my $self = shift;
+    unless (exists $self->{_i18n}) {
+       $self->{_i18n} = WebGUI::International->new($self->session,'CommercePaymentCash');
+    }
+    return $self->{_i18n};
 }
 
 #-------------------------------------------------------------------
@@ -161,23 +162,43 @@ sub init {
 	my ($class, $self);
 	$class = shift;
 	my $session = shift;
-	$self = $class->SUPER::init($session,'Cash');
-
+    my $namespace = shift || 'Cash';
+	$self = $class->SUPER::init($session,$namespace);
 	return $self;
 }
 
 #-------------------------------------------------------------------
 sub gatewayId {
 	my $self = shift;
-	
-	return $self->get('paymentMethod').":".$self->session->id->generate;
+	return $self->getPaymentMethod.":".$self->session->id->generate;
 }
 
+#-------------------------------------------------------------------
+sub getPaymentMethod {
+	my $self = shift;
+    unless($self->{_paymentMethod}) { 
+        $self->{_paymentMethod} = "cash";
+    }
+    return $self->{_paymentMethod};
+}
 
 #-------------------------------------------------------------------
 sub errorCode {
 	my $self = shift;
 	return $self->{_error}->{code};
+}
+
+#-------------------------------------------------------------------
+=head2 label ( )
+
+Returns the label for the commerce plugin.
+
+=cut
+
+sub label {
+    my $self = shift;
+    my $i18n = $self->i18n;
+	return $self->get("label") || $i18n->get("label");
 }
 
 #-------------------------------------------------------------------
@@ -198,7 +219,7 @@ sub normalTransaction {
 	$normal = shift;
 
 	if ($normal) {
-		my $i18n = WebGUI::International->new($self->session, 'CommercePaymentCash');
+		my $i18n = $self->i18n;
 		$self->{_transactionParams} = {
 			AMT		=> sprintf('%.2f', $normal->{amount}),
 			DESCRIPTION	=> $normal->{description} || $i18n->get('no description'),
@@ -260,7 +281,7 @@ sub validateFormData {
 	my ($self, @error, $i18n, $currentYear, $currentMonth);
 	$self = shift;
 
-	$i18n = WebGUI::International->new($self->session,'CommercePaymentCash');
+	$i18n = $self->i18n;
 
 	push (@error, $i18n->get('invalid firstName')) unless ($self->session->form->process("firstName"));
 	push (@error, $i18n->get('invalid lastName')) unless ($self->session->form->process("lastName"));
@@ -271,7 +292,8 @@ sub validateFormData {
 	
 	unless (@error) {
 		$self->{_paymentData} = {
-			PAYMENTMETHOD	=> $self->session->form->process("paymentMethod"),
+			PAYMENTMETHOD	=> $self->getPaymentMethod,
+            #$self->session->form->process("paymentMethod"),
 		};	
 		
 		$self->{_userData} = {

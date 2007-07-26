@@ -643,7 +643,17 @@ our $I18N = {
 		lastUpdated => 1128920490,
 	},
 
-
+     'label' => {
+		message => q|Label|,
+		lastUpdated => 0,
+		context => q|Commerce Payment Plugin Label|
+	},
+    
+    'label hoverhelp' => {
+		message => q|Label for displaying payment plugin to users.  This will be the display if user can choose from different payment gateways available.|,
+		lastUpdated => 0,
+		context => q|Hoverhelp for Commerce Payment Plugin Label|
+	},
 };
 
 1;

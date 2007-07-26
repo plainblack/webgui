@@ -354,6 +354,20 @@ sub errorCode {
 }
 
 #-------------------------------------------------------------------
+
+=head2 label ( )
+
+Returns the label for the commerce plugin.
+
+=cut
+
+sub label {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session,'CommercePaymentITransact');
+	return $self->get("label") || $i18n->get("label");
+}
+
+#-------------------------------------------------------------------
 sub name {
 	return 'ITransact';
 }

@@ -97,7 +97,13 @@ sub configurationForm {
 
 	$f = WebGUI::HTMLForm->new($self->session);
 	my $i18n = WebGUI::International->new($self->session, 'Commerce');
-	$f->yesNo(
+	$f->text(
+        -name   => $self->prepend('label'),
+        -value  => $self->label,
+        -label  => $i18n->get('label'),
+        -hoverHelp => $i18n->get('label hoverhelp'),
+    );
+    $f->yesNo(
 		-name	=> $self->prepend('enabled'),
 		-value	=> $self->enabled,
 		-label	=> $i18n->get('enable'),
@@ -285,6 +291,19 @@ Returns the error code of the last submission.
 sub errorCode {
 	my ($self) = @_;
 	return $self->session->errorHandler->fatal("You must override thie errorCode method in the payment plugin.");
+}
+
+#-------------------------------------------------------------------
+
+=head2 label ( )
+
+Returns the label for the commerce plugin.
+
+=cut
+
+sub label {
+    my $self = shift;
+	return $self->get("label") || $self->namespace;
 }
 
 #-------------------------------------------------------------------
