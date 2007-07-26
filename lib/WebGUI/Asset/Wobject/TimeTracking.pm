@@ -499,12 +499,14 @@ sub www_manageProjects {
 	   }
 	   my $resourceList = join("<br />",@resources);
 	   
-	   my $editUrl = $self->getUrl("func=editProject;projectId=".$projectId);
-	   my $editLink = qq|<a href="$editUrl"><img src="$extras/edit.gif" border="0"|.$i18n->get('Edit', 'Icon').q| /></a>|;
+	   my $editUrl      = $self->getUrl("func=editProject;projectId=".$projectId);
+       my $editIcon     = $session->icon->getBaseURL."edit.gif";
+	   my $editLink     = qq|<a href="$editUrl"><img src="$editIcon" border="0"|.$i18n->get('Edit', 'Icon').q| /></a>|;
 	   my $deletePrompt = $i18n->echo("Deleting this project will also delete all associated resources and tasks.  Are you sure you'd like to continue?");
-	   $deletePrompt =~ s/'/\\'/g;
-	   my $deleteUrl = $self->getUrl("func=deleteProject;projectId=".$projectId);
-	   my $deleteLink = qq|<span style="cursor:pointer;" onclick="if(confirm('$deletePrompt')){window.location.href='$deleteUrl';}"><img src="$extras/delete.gif" border="0" |.$i18n->get('Delete', 'Icon').q|/></span>|;
+	   $deletePrompt    =~ s/'/\\'/g;
+	   my $deleteUrl    = $self->getUrl("func=deleteProject;projectId=".$projectId);
+	   my $deleteIcon   = $session->icon->getBaseURL."delete.gif";
+       my $deleteLink   = qq|<span style="cursor:pointer;" onclick="if(confirm('$deletePrompt')){window.location.href='$deleteUrl';}"><img src="$deleteIcon" border="0" |.$i18n->get('Delete', 'Icon').q|/></span>|;
 	   
 	   my $cl = "";
 	   $cl = q|class="alt"| if($count++ % 2 eq 0);
