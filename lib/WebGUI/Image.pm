@@ -1,8 +1,23 @@
 package WebGUI::Image;
 
 use strict;
-use Image::Magick;
 use WebGUI::Image::Palette;
+use Carp qw(croak);
+eval 'use Graphics::Magick';
+my $graphicsMagickAvailable = ($@) ? 0 : 1;
+eval 'use Image::Magick';
+my $imageMagickAvailable = ($@) ? 0 : 1;
+my $graphicsPackage = '';
+if ($imageMagickAvailable) {
+    $graphicsPackage = "Image::Magick";
+}
+elsif ($graphicsMagickAvailable) {
+    $graphicsPackage = "Graphics::Magick";
+}
+else {
+    croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
+}
+
 
 =head1 NAME
 
@@ -173,7 +188,7 @@ sub new {
 	my $width = shift || 300;
 	my $height = shift || 300;
 
-	my $img = Image::Magick->new(
+	my $img = $graphicsPackage->new(
 		size => $width.'x'.$height,
 	);
 

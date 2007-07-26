@@ -10,6 +10,9 @@
  - api: You may now use a customDrawMethod attribute in your asset properties
    list that will enable you to add custom display options for that fields when 
    the edit form is automatically generated.
+ - Graphics::Magick is now the standard graphics package in WebGUI, but
+   Image::Magick will be supported for backwards compatibility. See gotcha.txt
+   for details.
  - Added file attachments to the Wiki.
  - Added a new attachments form control.
  - Added a form control skeleton.

@@ -33,6 +33,17 @@ save you many hours of grief.
     Class::InsideOut
     HTML::TagCloud
 
+ * WebGUI now uses Graphics::Magick instead of Image::Magick for
+   image processing functions. However, for the next few versions you
+   will still be able to use Image::Magick if you already have it
+   installed, to make the transition easier. Graphics::Magick is a
+   fork of Image::Magick, but it's focus is stability and compatibility
+   over adding new features. Another note will be added to this file
+   when support for Image::Magick is officially removed. That will
+   most likely happen in WebGUI 7.6.0. Note that WRE 0.8.0 includes
+   Graphics::Magick, so if you upgrade to WRE 0.8.0 then you'll
+   automatically be ready for the future.
+
  * Any customizations made to the Inbox or Inbox/Message tempalates 
    will be lost. Please back up your custom templates before running
    the upgrade

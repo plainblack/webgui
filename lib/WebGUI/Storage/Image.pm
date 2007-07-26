@@ -14,10 +14,25 @@ package WebGUI::Storage::Image;
 
 =cut
 
-use Image::Magick;
 use strict;
 use WebGUI::Storage;
 use WebGUI::Utility;
+use Carp qw(croak);
+eval 'use Graphics::Magick';
+my $graphicsMagickAvailable = ($@) ? 0 : 1;
+eval 'use Image::Magick';
+my $imageMagickAvailable = ($@) ? 0 : 1;
+my $graphicsPackage = '';
+if ($imageMagickAvailable) {
+    $graphicsPackage = "Image::Magick";
+}
+elsif ($graphicsMagickAvailable) {
+    $graphicsPackage = "Graphics::Magick";
+}
+else {
+    croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
+}
+
 
 our @ISA = qw(WebGUI::Storage);
 
@@ -62,7 +77,7 @@ sub addFileFromCaptcha {
 	srand;
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".$self->session->id->generate().".png";
-	my $image = Image::Magick->new();
+	my $image = $graphicsPackage->new();
 	$image->Set(size=>'105x26');
 	$image->ReadImage('xc:white');
 	$image->AddNoise(noise=>"Multiplicative");
@@ -144,7 +159,7 @@ sub generateThumbnail {
 		$self->session->errorHandler->warn("Can't generate a thumbnail for something that's not an image.");
 		return 0;
 	}
-        my $image = Image::Magick->new;
+        my $image = $graphicsPackage->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
 		$self->session->errorHandler->error("Couldn't read image for thumbnail creation: ".$error);
@@ -211,7 +226,7 @@ sub getSizeInPixels {
 		$self->session->errorHandler->error("Can't check the size of something that's not an image.");
 		return 0;
 	}
-        my $image = Image::Magick->new;
+        my $image = $graphicsPackage->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
 		$self->session->errorHandler->error("Couldn't read image to check the size of it: ".$error);
@@ -303,7 +318,7 @@ sub resize {
 		$self->session->errorHandler->error("Can't resize with no resizing parameters.");
 		return 0;
 	}
-        my $image = Image::Magick->new;
+        my $image = $graphicsPackage->new;
         my $error = $image->Read($self->getPath($filename));
 	if ($error) {
 		$self->session->errorHandler->error("Couldn't read image for resizing: ".$error);

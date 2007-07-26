@@ -1118,8 +1118,8 @@ sub processDataset {
 	}
 
 	my $dataIndex = 0;
-
-	my $stepsize = ($self->getTopHeight + $self->getBottomHeight) / scalar(@{$self->getDataset});
+    my $divisor = scalar(@{$self->getDataset}) || 1; # avoid division by zero
+	my $stepsize = ($self->getTopHeight + $self->getBottomHeight) / $divisor;
 	foreach (@{$self->getDataset}) {
 		$self->addSlice({
 			percentage	=> $_ / $total, 
