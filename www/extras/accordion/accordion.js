@@ -1,79 +1,404 @@
-// This is a modified version of the accordion tutorial from www.webthreads.de
+var AccordionMenu = new function()
+{
+	var YUD = YAHOO.util.Dom;
+	var YUE = YAHOO.util.Event;
+	var oMenuSetting = {};
+	var oMenuCache = {};
+	var dLastHoverTitle ;
+	YUD.addClass(document.documentElement,'accordion-menu-js');
+    YAHOO.util.Event.on(window, "load", function () { document.body.style.marginLeft = "250px"; });
 
-
-/* 
-
-var myAccordion = new Accordion(id [, height]);
-
-	id: The id of the div that contains the accordion structure.
-
-	height: An integer representing the height that the accordion should be drawn in pixels. Defaults to the viewport height minus one header width.
-
-*/
-
-function Accordion(id, accordionHeight) {
-  	// pointer to the accordion container
-  	this.accContainer = document.getElementById(id);
-
-  	// all items with class = accordionItem
-  	this.accItems = YAHOO.util.Dom.getElementsByClassName("accordionItem", "div", this.accContainer);
-  
-	// scale the acccordion to the appropriate height
-	this.accordionHeight = 0;
-	var headerHeight = YAHOO.util.Dom.getElementsByClassName("accordionHeader", "div", this.accItems[0])[0].offsetHeight;
-	if (accordionHeight > 0) {
-		this.accordionHeight = accordionHeight;
-	} else {
-		this.accordionHeight = YAHOO.util.Dom.getViewportHeight() - headerHeight;
-	}	
-	this.accContainer.style.height = this.accordionHeight + "px";
-	var bodyHeight = this.accordionHeight - (headerHeight * this.accItems.length);
-	YAHOO.util.Dom.getElementsByClassName("accordionBody", "div", this.accItems[0])[0].style.height = bodyHeight + "px";
+	function getDT(e)
+	{
+		var dEl = e.srcElement || e.target;
+			
+		if(	(e.tagName + '').toUpperCase()=='DD' )
+		{	
+			var dt = e.previousSibling ;
+			while(dt)
+			{
+				if(dt.tagName &&  dt.tagName.toUpperCase() == 'DT'){break;};
+				dt = dt.previousSibling
+			};
+			
+			if(!dt || dt.tagName.toUpperCase() != 'DT'){return;}
+			else{return dt};
+		}
+		else if(e.clientX)
+		{
+			var found = false;
+			while( dEl.parentNode)
+			{
+				if(YUD.hasClass(dEl,'a-m-t')){ found  = true ; break;};
+				dEl = dEl.parentNode;
+			};
+			if(!found){return null}
+			else{return dEl };	
+		};		
+	};
 	
-  	// set the default accordion body height 
-  	this.accItemBodyHeight = 0;
-  
-  	// iterate over all the accordian elements and store them in an array
-  	for (var i=0; i<this.accItems.length; i++) {
-    		// set current accordion element as parent to header and body
-    		this.accItems[i].parent = this;
-    		// set current accordion element's header and body	
-    		this.accItems[i].header = YAHOO.util.Dom.getElementsByClassName("accordionHeader", "div", this.accItems[i])[0];
-    		this.accItems[i].body = YAHOO.util.Dom.getElementsByClassName("accordionBody", "div", this.accItems[i])[0];
-   
-		// determine and set the active accordion element 
-    		if (this.accItems[i].body.offsetHeight > this.accItemBodyHeight) {
-      			this.accItemBodyHeight = this.accItems[i].body.offsetHeight;
-      			this.activeItem = this.accItems[i];
-      			this.activeItem.body.style.height = this.accItemBodyHeight + "px";
-    		}
-    
-    		// register the click event on the header for changing the active element in the accordion
-    		YAHOO.util.Event.addListener(this.accItems[i].header, "click", function(){
-      			// do nothing if they click on the active header
-	      		if(this.parent.activeItem == this){
-        			return;
-      			}
-
-	      		// shrink animation
-      			var shrinkLastAccAnim = new YAHOO.util.Anim(this.parent.activeItem.body, {height:{from:this.parent.accItemBodyHeight, to:0}}, 0.1);
-		    
-      			// expand animation
-      			var expandNewActiveAccAnim = new YAHOO.util.Anim(this.body, {height:{from:0, to:this.parent.accItemBodyHeight}}, 0.1);
-		    	
-      			// set the selected element as active
-      			expandNewActiveAccAnim.onStart.subscribe(function() { this.parent.activeItem = this; }, this, true);
+	
+	
+	function getDD(dt)
+	{
+		if(!dt){return null;};
+		var dd = dt.nextSibling ;
+	
+		while(dd)
+		{	
+			if(dd.tagName && dd.tagName.toUpperCase() == 'DD'){break;};
+			dd = dd.nextSibling;
+			
+		};
+		if(!dd || dd.tagName.toUpperCase() != 'DD'){return;}
+		else{return dd};
+	};
+	
+	function expand(dl,dt,dd)
+	{
+    var bodyPanels = YUD.getElementsByClassName("a-m-d", "dd",dl); 
+    var bodyPanelHeight = YUD.getViewportHeight() - (30 * bodyPanels.length) - 20;
+	
+		dl.hasAnimation +=1;
+		YUD.addClass(dd,'a-m-d-before-expand');		
+		var oAttr = {height:{from:0,to:bodyPanelHeight }};
 		
-      			// execute the animation
-      			shrinkLastAccAnim.animate();
-      			expandNewActiveAccAnim.animate();
-    			}, this.accItems[i], true);
-  	}
-  
-	// only the active element remains expanded
-  	for(var i=0; i<this.accItems.length; i++){
-    		if(this.activeItem != this.accItems[i]){
-      			this.accItems[i].body.style.height = 0 + "px";
-    		}
-  	}
+		YUD.removeClass(dd,'a-m-d-before-expand');
+		
+		var onComplete = function()
+		{	
+			oAnim.onComplete.unsubscribe(onComplete);
+			oAnim.stop();
+			YUD.removeClass(dd,'a-m-d-anim');
+			YUD.addClass(dd,'a-m-d-expand');
+			onComplete = null;	
+			dl.hasAnimation -=1;
+			var dt = getDT(dd);	
+			YUD.addClass(dt,'a-m-t-expand');
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].onOpen && dd.style.height!=bodyPanelHeight + "px" )
+			{	
+				oMenuCache[ dl.id ].onOpen(	 {dl:dl,dt:dt,dd:dd} );								
+			};	
+			dd.style.height = bodyPanelHeight + "px";
+		
+		};
+		
+		var onTween = function()
+		{
+			if(dd.style.height)
+			{	
+				YUD.addClass(dd,'a-m-d-anim');				
+				oAnim.onTween.unsubscribe(onTween);
+				onTween = null;
+				dd.oAnim = null;
+			};
+			
+		};
+		
+		if(dd.oAnim)
+		{
+			dd.oAnim.stop();
+			dd.oAnim = null;
+			dl.hasAnimation -=1;	
+		};
+		var oEaseType = YAHOO.util.Easing.easeOut;
+		var seconds = 0.5;
+		if(oMenuCache[ dl.id ] )
+		{
+			oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
+			seconds =  oMenuCache[ dl.id ]['seconds'];
+			
+			if( !oMenuCache[ dl.id ]['animation'] )
+			{
+				var oAnim = {onComplete:{unsubscribe:function(){}},stop:function(){}};
+				onComplete();
+				return;
+			};
+		};
+		
+		
+		var oAnim = new YAHOO.util.Anim(dd,oAttr,seconds ,oEaseType);
+		oAnim.onComplete.subscribe(onComplete);	
+		oAnim.onTween.subscribe(onTween);
+		oAnim.animate();
+		dd.oAnim = oAnim ;
+	
+	};
+	
+	function collapse(dl,dt,dd)
+	{
+		dl.hasAnimation +=1;
+		YUD.addClass(dd,'a-m-d-anim');
+		var oAttr = {height:{from:dd.offsetHeight,to:0}};
+		
+		
+		var onComplete = function()
+		{
+			oAnim.onComplete.unsubscribe(onComplete);
+			YUD.removeClass(dd,'a-m-d-anim');
+			YUD.removeClass(dd,'a-m-d-expand');
+			dd.style.height = '';
+			dd.oAnim = null;
+			onComplete = null;	
+			dl.hasAnimation -=1;	
+			var dt = getDT(dd);	
+			YUD.removeClass(dt,'a-m-t-expand');	
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].onOpen )
+			{				
+				oMenuCache[ dl.id ].onClose(	 {dl:dl,dt:dt,dd:dd} );
+			};			
+			
+		};
+		
+		if(dd.oAnim)
+		{
+			dd.oAnim.stop();
+			dd.oAnim = null;
+			dl.hasAnimation -=1;	
+		};
+		
+		var oEaseType = YAHOO.util.Easing.easeOut;
+		var seconds = 0.5;
+		if(oMenuCache[ dl.id ] )
+		{
+			oEaseType = oMenuCache[ dl.id ]['easeOut']?oEaseType:YAHOO.util.Easing.easeIn;
+			seconds =  oMenuCache[ dl.id ]['seconds'];
+			if( !oMenuCache[ dl.id ]['animation'] )
+			{
+				var oAnim = {onComplete:{unsubscribe:function(){}},stop:function(){}};
+				onComplete();
+				return;
+			};	
+		};
+		
+		var oAnim = new YAHOO.util.Anim(dd,oAttr,seconds ,oEaseType);	
+		oAnim.onComplete.subscribe(onComplete);	
+		oAnim.animate();
+		dd.oAnim = oAnim ;
+	};
+	
+	function collapseAll(dl,dt,dd)
+	{
+		var aOtherDD = YUD.getElementsByClassName('a-m-d-expand','dd',dl);
+		for(var i=0;i<aOtherDD.length;i++)
+		{
+			var otherDD = aOtherDD[i] ;
+			if( otherDD !=dd )
+			{
+				collapse(dl,null,otherDD);
+			};				
+		};
+	}
+	
+	
+	var onMenuMouseover = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};
+		if(dLastHoverTitle)
+		{
+			YUD.removeClass(dLastHoverTitle,'a-m-t-hover');
+		};		
+		YUD.addClass(dMenuTitle,'a-m-t-hover');
+		dLastHoverTitle = dMenuTitle ;
+		YUE.stopEvent(e);
+		return false;		
+	};
+	
+	var onMenuMouseout = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};
+		if(dLastHoverTitle && dLastHoverTitle!=dMenuTitle)
+		{
+			YUD.removeClass(dLastHoverTitle,'a-m-t-hover');
+			YUD.removeClass(dLastHoverTitle,'a-m-t-down');
+		};	
+		YUD.removeClass(dMenuTitle,'a-m-t-down');	
+		YUD.removeClass(dMenuTitle,'a-m-t-hover');
+		dLastHoverTitle = null ;
+		YUE.stopEvent(e);
+		return false;		
+	};
+	
+	var onMenuMousedown = function(e)
+	{
+		var dMenuTitle = getDT(e);
+		if(!dMenuTitle){return;};			
+		YUD.addClass(dMenuTitle,'a-m-t-down');
+		YUE.stopEvent(e);
+		return false;	
+	};
+	
+	var onMenuClick = function(e)
+	{
+		var dt = getDT(e);
+		if(!dt){return;};
+		var dd = getDD(dt);
+		
+	
+		
+		if(!dd){return;};
+		var dl = dt.parentNode;
+		
+		if(dl.hasAnimation==null)
+		{
+			dl.hasAnimation = 0;
+		}	
+		if(dl.hasAnimation > 0 ){return;};
+		YUD.removeClass(dt,'a-m-t-down');
+		
+		if(YUD.hasClass(dd,'a-m-d-expand'))
+		{	
+			collapse(dl,dt,dd);
+		}
+		else
+		{			
+			if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].dependent == false ){}
+			else{collapseAll(dl,dt,dd);}
+			expand(dl,dt,dd);
+		};		
+		YUE.stopEvent(e);
+		return false;
+	};
+	
+	
+	YUE.addListener( document,'mouseover',onMenuMouseover);
+	YUE.addListener( document,'mouseout',onMenuMouseout);
+	YUE.addListener( document,'mousedown',onMenuMousedown);
+	YUE.addListener( document,'click',onMenuClick);
+	
+	this.openDtById = function(sId)
+	{
+		var dt = document.getElementById(sId);
+		if(!dt){return;};
+		if(!YUD.hasClass(dt,'a-m-t')){return;};
+		var dl = dt.parentNode;
+		var dd = getDD(dt);
+		if(dl.hasAnimation==null){dl.hasAnimation = 0;};
+		
+		if(dl.hasAnimation > 0 ){return;};
+		if(YUD.hasClass(dd,'a-m-d-expand')){return;};
+		if( oMenuCache[ dl.id ] &&  oMenuCache[ dl.id ].dependent == false ){}
+		else{collapseAll(dl,dt,dd);}
+		expand(dl,dt,dd);
+	};
+	
+	this.closeDtById = function(sId)
+	{
+		var dt = document.getElementById(sId);
+		if(!dt){return;};
+		if(!YUD.hasClass(dt,'a-m-t')){return;};
+		var dl = dt.parentNode;
+		var dd = getDD(dt);
+		if(dl.hasAnimation==null){dl.hasAnimation = 0;};
+		if(dl.hasAnimation > 0 ){return;};
+		if(!YUD.hasClass(dd,'a-m-d-expand')){return;};
+		collapse(dl,dt,dd);
+	};
+	
+	
+	this.setting = function(id,oOptions)
+	{	
+		if( !oOptions ){return;};
+	
+		if( typeof(id)!='string' ){return;};
+	
+		var setMunu = function(dl)
+		{	
+			dl = dl || this;
+			dl.hasAnimation = 0;
+			oMenuCache[ dl.id ] = 
+			{
+				element:dl,
+				dependent:true,
+				onOpen:function(){},
+				onClose:function(){},
+				seconds:0.5,
+				easeOut:true,
+				openedIds:[],
+				animation:true
+			};
+			oMenu =  oMenuCache[ dl.id ] ;
+			
+			if(typeof(oOptions['animation'])=='boolean')
+			{
+				oMenu['animation'] = !!oOptions['animation']; 
+				
+			};
+			
+			
+			if(typeof(oOptions['dependent'])=='boolean')
+			{
+				oMenu['dependent'] = !!oOptions['dependent']; 
+			};
+			
+			if(typeof(oOptions['easeOut'])=='boolean')
+			{
+				oMenu['easeOut'] = !!oOptions['easeOut']; 
+			};
+			
+			if(typeof(oOptions['seconds'])=='number')
+			{
+				oMenu['seconds'] = Math.max(0 , oOptions['seconds'] ); 
+			};
+			
+			if(typeof(oOptions['onOpen'])=='function')
+			{
+				oMenu['onOpen'] = oOptions['onOpen'];
+			};
+			
+			if(typeof(oOptions['onClose'])=='function')
+			{
+				oMenu['onClose'] = oOptions['onClose'];
+			};
+		
+			if(oOptions['openedIds'].shift)
+			{
+				oMenu['openedIds'] = oOptions['openedIds'];
+			};
+			
+			
+			for(var i=0;i<oMenu['openedIds'].length;i++)
+			{
+				var sId = oMenu['openedIds'][i];
+				var dt = document.getElementById( sId  );
+				
+				if(dt && dt.tagName.toUpperCase() == 'DT')
+				{
+					var dl = dt.parentNode;
+					var dd = getDD(dt);
+					expand(dl,dt,dd);
+				}
+				else if(!dt)
+				{
+					function onDtAvailable()
+					{
+						var dt = this;
+						if(dt.tagName.toUpperCase() == 'DT')
+						{
+							var dl = dt.parentNode;
+							var dd = getDD(dt);
+							expand(dl,dt,dd);
+						};	
+					};
+					
+					YUE.onAvailable(sId,onDtAvailable);
+				}			
+			};
+			
+			
+		};
+		
+		if(document.getElementById(id))
+		{
+			setMunu(document.getElementById(id))
+		}
+		else
+		{	
+			YUE.onAvailable(id,setMunu);	
+		};	
+	};
+
 };
+
