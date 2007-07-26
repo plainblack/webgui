@@ -330,7 +330,7 @@ sub www_editProject {
     );
 	
 	tie my %users, "Tie::IxHash";
-	%users = $db->buildHash("select userId,username from users where userId not in ('1','3')");
+	%users = $db->buildHash("select userId,username from users where userId not in ('1','3') order by username");
 	my $resources = $db->buildArrayRef("select resourceId from TT_projectResourceList where projectId=".$db->quote($projectId));
 	
 	$f->selectList(
