@@ -37,7 +37,7 @@ function sp_draw() {
         lastAdminBarPanel = i;
         for (var j=0; j < this.panels[i].img.length; j++) {
             document.write('<a class="link" href="'+ this.panels[i].act[j] +'">');
-            document.write('<img src="'+this.panels[i].img[j]+'" style="border: 0px; vertical-align: middle;" alt="icon" />');
+            document.write('<img src="'+this.panels[i].img[j]+'" style="border: 0px; vertical-align: middle;" alt="icon" /> ');
             document.write(this.panels[i].lbl[j] + '</a>');
         }
         document.write('</dd>');
