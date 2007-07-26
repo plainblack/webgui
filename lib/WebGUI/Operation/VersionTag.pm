@@ -136,7 +136,6 @@ sub www_editVersionTag {
 			);
 	}
 	$f->submit;
-	$ac->setHelp('edit version tag', 'VersionTag');
         return $ac->render($f->print,$i18n->get("edit version tag"));	
 }
 
@@ -216,7 +215,6 @@ sub www_commitVersionTag {
 				);
 			$f->submit;
         		my $ac = WebGUI::AdminConsole->new($session,"versions");
-        		$ac->setHelp('commit version tag', 'VersionTag');
 			return $ac->render($f->print);
 		}
 	}
@@ -300,7 +298,6 @@ sub www_manageCommittedVersions {
     }
     $output .= '</table>';
 	$output .= $paginator->getBarTraditional();
-    $ac->setHelp('manage committed versions', 'VersionTag');
     return $ac->render($output,$i18n->get("committed versions"));
 }
 
@@ -334,7 +331,6 @@ sub www_managePendingVersions {
         }
         $sth->finish;
         $output .= '</table>';
-	$ac->setHelp('manage pending versions', 'VersionTag');
         return $ac->render($output,$i18n->get("pending versions"));
 }
 
@@ -356,7 +352,6 @@ sub www_manageVersions {
         return $session->privilege->insufficient() unless ($session->user->isInGroup(12));
         my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
-	$ac->setHelp("versions manage", "VersionTag");
 	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
 	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if ($session->user->isInGroup(3));
 	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if ($session->user->isInGroup(3));

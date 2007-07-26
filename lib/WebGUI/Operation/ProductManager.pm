@@ -28,10 +28,6 @@ A scalar of HTML that defines the current workarea.
 
 The i18n key of the title of this workarea.
 
-=head3 help
-
-The i18n key of the help link for this workarea.
-
 =cut
 
 sub _submenu {
@@ -41,11 +37,7 @@ sub _submenu {
 	my $workarea = shift;
         my $title = shift;
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"productManager");
-        if ($help) {
-		$ac->setHelp($help, 'ProductManager');
-        }
 
 	my $productId = $session->form->process("productId") || $session->scratch->get('managingProduct');
 	undef $productId if ($productId eq 'new');
@@ -249,7 +241,7 @@ sub www_editProduct {
 
 
 
-	return _submenu($session,$f->print, 'edit product', 'edit product', 'ProductManager');
+	return _submenu($session,$f->print, 'edit product');
 }
 
 #-------------------------------------------------------------------
@@ -355,7 +347,7 @@ sub www_editProductParameter {
 	);
 	$f->submit;
 
-	return _submenu($session,$f->print, 'edit parameter', 'edit parameter', 'ProductManager');
+	return _submenu($session,$f->print, 'edit parameter');
 }
 
 #-------------------------------------------------------------------
@@ -481,7 +473,7 @@ sub www_editProductParameterOption {
 	);
 	$f->submit;
 
-	return _submenu($session,$f->print, 'edit option', 'edit option', 'ProductManager');
+	return _submenu($session,$f->print, 'edit option');
 }
 
 #-------------------------------------------------------------------
@@ -585,7 +577,7 @@ sub www_editProductVariant {
 	);
 	$f->submit;
 
-	return _submenu($session,$f->print, 'edit variant', 'edit variant', 'ProductManager');
+	return _submenu($session,$f->print, 'edit variant');
 }
 
 #-------------------------------------------------------------------
@@ -660,7 +652,7 @@ sub www_editSkuTemplate {
 	$f->submit;
 	$output .= $f->print;
 
-	return _submenu($session,$output, 'edit sku composition label', 'edit sku template', 'ProductManager');
+	return _submenu($session,$output, 'edit sku composition label');
 }
 
 #-------------------------------------------------------------------
@@ -724,7 +716,7 @@ sub www_listProducts {
 	}
 	$output .= '</table>';
 
-	return _submenu($session,$output, 'list products', 'list products', 'ProductManager');
+	return _submenu($session,$output, 'list products');
 }
 
 #-------------------------------------------------------------------
@@ -798,7 +790,7 @@ sub www_listProductVariants {
 	$output .= WebGUI::Form::submit($session,);
 	$output .= WebGUI::Form::formFooter($session,);
 
-	return _submenu($session,$output, 'list variants label', 'list variants', 'ProductManager');
+	return _submenu($session,$output, 'list variants label');
 }
 
 #-------------------------------------------------------------------
@@ -891,7 +883,7 @@ sub www_manageProduct {
 		$output .= '<br />';
 	}
 
-	return _submenu($session,$output, 'manage product', 'manage product', 'ProductManager');
+	return _submenu($session,$output, 'manage product');
 }
 
 1;

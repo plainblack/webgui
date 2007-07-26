@@ -537,6 +537,8 @@ sub render {
 
 Sets the _helpUrl to the urlized page.
 
+B<NOTE:> This method is depricated and may be removed from a future version.
+
 =head3 id
 
 If not provided, this method does nothing.

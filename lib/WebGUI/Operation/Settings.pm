@@ -512,7 +512,6 @@ sub www_editSettings {
     $output .= $tabform->print;
 
 	my $ac = WebGUI::AdminConsole->new($session,"settings");
-	$ac->setHelp("settings");
 	return $ac->render($output);
 }
 

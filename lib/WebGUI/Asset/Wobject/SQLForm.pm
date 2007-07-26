@@ -1928,7 +1928,6 @@ my	$js = "<script type=\"text/javascript\">\n";
 	$output = '<h2>'.$i18n->get('ef errors occurred').'</h2><ul><li>'.join('</li><li>', @{$errors}).'</li></ul><br />' if ($errors);
 	$output .= $tabForm->print . $js;
 
-	$self->getAdminConsole->setHelp("edit field", "Asset_SQLForm");
 	return $self->getAdminConsoleWithSubmenu->render($output, $i18n->get('edit field title'));
 }
 
@@ -2287,7 +2286,6 @@ sub www_editFieldType {
 			})
 	);
 
-	$self->getAdminConsole->setHelp("edit field type", "Asset_SQLForm");
 	return $self->getAdminConsoleWithSubmenu->render($f->print, $i18n->get('edit field type title'));
 }
 
@@ -2898,7 +2896,6 @@ sub www_editRegex {
 			})
 	);
 	
-	$self->getAdminConsole->setHelp("edit regex", "Asset_SQLForm");
 	return $self->getAdminConsoleWithSubmenu->render($f->print, $i18n->get('edit regex title'));
 }
 
@@ -2987,7 +2984,6 @@ sub www_listFields {
 	
 	$output .= '<br /><a href="'.$self->getUrl('func=editField;fid=new').'">'.$i18n->get('lf add field').'</a>';
 
-	$self->getAdminConsole->setHelp("manage fields", "Asset_SQLForm");
 	return $self->getAdminConsoleWithSubmenu->render($output, $i18n->get('manage fields title'));
 }
 
@@ -3065,7 +3061,6 @@ my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 	$output .= '</table>';
 	$output .= '<a href="'.$self->getUrl('func=editFieldType;ftid=new').'">'.$i18n->get('lft add field type').'</a>';
 
-	$self->getAdminConsole->setHelp("manage field types", "Asset_SQLForm");
 	return $self->getAdminConsoleWithSubmenu->render($output,$i18n->get('manage field types title'));
 }
 
@@ -3143,7 +3138,6 @@ my		$currentRow = '<tr align="left" bgcolor="#bbbbbb">';
 	$output .= '</table>';
 	$output .= '<a href="'.$self->getUrl('func=editRegex;regexId=new').'">'.$i18n->get('lr add regex').'</a>';
 
-	$self->getAdminConsole->setHelp("manage regexes", "Asset_SQLForm");	
 	return $self->getAdminConsoleWithSubmenu->render($output,$i18n->get('manage regexes title'));
 }
 

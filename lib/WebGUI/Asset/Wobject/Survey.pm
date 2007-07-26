@@ -881,7 +881,6 @@ sub www_editAnswer {
         }
         $f->submit;
 
-#	$self->getAdminConsole->setHelp("answer add/edit","Asset_Survey");
 	return $self->getAdminConsole->render($f->print, $i18n->get(18));
 
 }
@@ -1024,7 +1023,6 @@ sub www_editQuestion {
 		}
 		$sth->finish;
 	}
-	$self->getAdminConsole->setHelp("question add/edit","Asset_Survey");
 	return $self->getAdminConsole->render($output, $i18n->get(17));
 }
 

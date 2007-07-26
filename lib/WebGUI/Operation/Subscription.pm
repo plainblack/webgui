@@ -65,10 +65,6 @@ A scalar of HTML that defines the current workarea.
 
 The i18n key of the title of this workarea.
 
-=head3 help
-
-The i18n key of the help link for this workarea.
-
 =cut
 
 #-------------------------------------------------------------------
@@ -79,11 +75,7 @@ sub _submenu {
 	my $workarea = shift;
         my $title = shift;
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"subscriptions");
-        if ($help) {
-                $ac->setHelp($help, 'Subscription');
-        }
 	$ac->addSubmenuItem($session->url->page('op=editSubscription;sid=new'), $i18n->get('add subscription'));
 	$ac->addSubmenuItem($session->url->page('op=createSubscriptionCodeBatch'), $i18n->get('generate batch')); 
 	$ac->addSubmenuItem($session->url->page('op=listSubscriptionCodes'), $i18n->get('manage codes'));
@@ -163,7 +155,7 @@ sub www_createSubscriptionCodeBatch {
 		);
 	$f->submit;
 
-	return _submenu($session,$errorMessage.$f->print, 'create batch menu', 'create batch');
+	return _submenu($session,$errorMessage.$f->print, 'create batch menu');
 }
 
 =head2 www_createSubscriptionCodeBatchSave ( $session )
@@ -378,7 +370,7 @@ sub www_editSubscription {
 			);
 	}
 	$f->submit;
-	return _submenu($session,$f->print, 'edit subscription title', 'subscription add/edit');
+	return _submenu($session,$f->print, 'edit subscription title');
 }
 
 =head2 www_editSubscriptionSave ( $session )
@@ -446,7 +438,7 @@ sub www_listSubscriptionCodeBatches {
 	
 	$output = $i18n->get('no subscription code batches') unless (@{$batches});
 
-	return _submenu($session,$output, 'manage batches', 'manage batch');
+	return _submenu($session,$output, 'manage batches');
 }
 
 =head2 www_listSubscriptionCodes ( $session )
@@ -510,7 +502,7 @@ sub www_listSubscriptionCodes {
 		$ops = ';bid='.$session->form->process("bid").';selection=b';
 		$delete = '<a href="'.$session->url->page('op=deleteSubscriptionCodeBatch'.$ops).'">'.$i18n->get('delete codes').'</a>';
 	} else {
-		return _submenu($session,$output, 'listSubscriptionCodes title', 'subscription codes manage');
+		return _submenu($session,$output, 'listSubscriptionCodes title');
 	}
 	
 	$p = WebGUI::Paginator->new($session,$session->url->page('op=listSubscriptionCodes'.$ops));
@@ -539,7 +531,7 @@ sub www_listSubscriptionCodes {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	return _submenu($session,$output, 'listSubscriptionCodes title', 'subscription codes manage');
+	return _submenu($session,$output, 'listSubscriptionCodes title');
 }
 
 =head2 www_listSubscriptions ( $session )
@@ -579,7 +571,7 @@ sub www_listSubscriptions {
 	
 	$output = $i18n->get('no subscriptions') unless (@{$subscriptions});
 	
-	return _submenu($session,$output, 'manage subscriptions', 'subscription manage');
+	return _submenu($session,$output, 'manage subscriptions');
 }
 
 =head2 www_purchaseSubscription ( $session )

@@ -39,11 +39,7 @@ sub _submenu {
         my $title = shift;
 	my $i18n = WebGUI::International->new($session);
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"groups");
-        if ($help) {
-                $ac->setHelp($help);
-        }
 	if ($session->user->isInGroup(3)) {
 	        $ac->addSubmenuItem($session->url->page('op=editGroup;gid=new'), $i18n->get(90));
 	}
@@ -412,7 +408,7 @@ sub www_editGroup {
 		);
 	$f->submit;
 	$output .= $f->print;
-        return _submenu($session,$output,'87',"group add/edit");
+        return _submenu($session,$output,'87');
 }
 
 #-------------------------------------------------------------------
@@ -488,7 +484,7 @@ sub www_editGrouping {
 		-value=>$group->userIsAdmin($session->form->process("uid"))
 		);
 	$f->submit;
-        return _submenu($session,$f->print,'370','grouping edit');
+        return _submenu($session,$f->print,'370');
 }
 
 #-------------------------------------------------------------------
@@ -574,7 +570,7 @@ sub www_listGroups {
 		}
         	$output .= '</table>';
 		$output .= $p->getBarTraditional;
-		return _submenu($session,$output,'',"groups manage");
+		return _submenu($session,$output);
 	} elsif ($session->user->isInGroup(11)) {
 		my ($output, $p, $sth, @data, @row, $i, $userCount);
         	my @editableGroups = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($session->user->userId)." and groupAdmin=1");
@@ -638,7 +634,7 @@ sub www_manageGroupsInGroup {
         my $output = $f->print;
 	$output .= '<p />';
 	$output .= walkGroups($session, $session->form->process("gid"));
-	return _submenu($session,$output,'813', 'manage groups in group');
+	return _submenu($session,$output,'813');
 }
 
 #-------------------------------------------------------------------

@@ -127,7 +127,6 @@ sub _submenu {
 	my $title = shift;
 	my $help = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"shortcutmanager");
-	$ac->setHelp($help) if ($help);
 	$ac->setIcon($self->getIcon);
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	$ac->addSubmenuItem($self->getUrl('func=edit'), $i18n->get("Back to Edit Shortcut"));
@@ -689,7 +688,6 @@ sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	$self->getAdminConsole->setHelp("shortcut add/edit","Asset_Shortcut");
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl("func=manageOverrides"),$i18n->get("Manage Shortcut Overrides"));
 	return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get(2));

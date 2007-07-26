@@ -129,7 +129,6 @@ sub edit {
 		-hoverHelp=>$i18n->get("upload files description"),
 		-maxAttachments=>100
 		);
-        $self->getAdminConsole->setHelp("file pile add/edit","Asset_FilePile");
 	return $self->getAdminConsole->render($tabform->print,$i18n->get("add pile"));
 }
 

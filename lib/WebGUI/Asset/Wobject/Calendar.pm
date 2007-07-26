@@ -1431,7 +1431,6 @@ sub www_edit {
     
     return $session->privilege->insufficient() unless $self->canEdit;
     
-    $self->getAdminConsole->setHelp("Calendar add/edit", "Calendar");
     
     return $self->getAdminConsole->render(
             $self->getEditForm->print,

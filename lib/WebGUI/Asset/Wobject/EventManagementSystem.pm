@@ -163,7 +163,6 @@ sub _acWrapper {
 	my $title = shift;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $ac = $self->getAdminConsole;
-	$ac->setHelp('add/edit event','Asset_EventManagementSystem')
 		unless $ac->getHelp;
 	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
@@ -1743,7 +1742,6 @@ sub www_edit {
 	my $tag2 = $tag;
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
-	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
 	my $i18n  = WebGUI::International->new($self->session,'Asset_Wobject');
 	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata', 'Asset_EventManagementSystem'));
@@ -2034,7 +2032,6 @@ changePassType();
 	$f->submit;
 
 	my $output = $f->print;
-	$self->getAdminConsole->setHelp('add/edit event','Asset_EventManagementSystem');
 	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
 	return $self->_acWrapper($output, $addEdit.' '.$i18n->get('event'));
 }
@@ -2627,7 +2624,6 @@ sub www_importEvents {
 	$f->fieldSetEnd;
 	$f->submit(-value=>$i18n->get('import events'));
 
-	$self->getAdminConsole->setHelp('import events','Asset_EventManagementSystem');
 	return $self->_acWrapper($page_header.'<p/>'.$f->print, $i18n->get('import events'));
 }
 
@@ -3440,7 +3436,6 @@ sub www_editEventMetaDataField {
 		$hash{$category->getId} = $category->getLabel;
 	}
 	$f->submit;
-	$self->getAdminConsole->setHelp('edit event metadata field','Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n2->get("add new event metadata field"));
 	return $self->_acWrapper($f->print, $i18n2->get("add/edit event metadata field"));
 }
@@ -4490,7 +4485,6 @@ function resetToInitial() {
 	);
 	$f->submit;
 	$f->raw($self->www_viewPurchase('noStyle',$badgeId));
-	$self->getAdminConsole->setHelp('edit registrant','Asset_EventManagementSystem');
 	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
 }
 
@@ -4610,7 +4604,6 @@ sub www_manageDiscountPasses {
 				"&nbsp;&nbsp;".$data->{name}."&nbsp;&nbsp;(".$data->{type}."&nbsp;".$data->{amount}."&nbsp;)</div>";
 		}
 	}
-	$self->getAdminConsole->setHelp('manage discount passes', 'Asset_EventManagementSystem');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editDiscountPass;passId=new'), $i18n->get('add discount pass'));
 	return $self->_acWrapper($output, $i18n->get("manage discount passes"));
 }
@@ -4674,7 +4667,6 @@ sub www_editDiscountPass {
 		value=>$data->{amount} || '0.00'
 	);
 	$f->submit;
-	$self->getAdminConsole->setHelp('edit discount pass', 'Asset_EventManagementSystem');
 	return $self->_acWrapper($f->print, $i18n->get("edit discount pass"));
 }
 

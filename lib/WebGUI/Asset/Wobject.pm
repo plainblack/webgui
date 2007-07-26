@@ -492,7 +492,6 @@ sub www_edit {
 	my $tag2 = $tag;
 	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
 	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
-	$self->getAdminConsole->setHelp(lc($tag)." add/edit", "Asset_".$tag2);
 	return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 

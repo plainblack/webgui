@@ -288,7 +288,6 @@ sub www_edit {
 		-hoverHelp=>$i18n->get('image template description'),
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
-        $self->getAdminConsole->setHelp("image add/edit","Asset_Image");
         return $self->getAdminConsole->render($tabform->print,$i18n->get("edit image"));
 }
 
@@ -331,7 +330,6 @@ sub www_resize {
 		);
 	$f->submit;
 	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" /></div>';
-        $self->getAdminConsole->setHelp("image resize","Asset_Image");
         return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
 }
 

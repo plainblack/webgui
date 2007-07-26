@@ -32,7 +32,7 @@ profile and managing them.
 
 Only users in group Admin (3) are allowed to call subroutines in this package.
 
-=head2 _submenu ( $session, $workarea, $title, $help )
+=head2 _submenu ( $session, $workarea, $title )
 
 Utility routine for creating the AdminConsole for ProfileSetting functions.
 
@@ -49,11 +49,6 @@ The content to display to the user.
 The title of the Admin Console.  This should be an entry in the i18n
 table in the WebGUI namespace.
 
-=head3 $help
-
-An entry in the Help system in the WebGUI namespace.  This will be shown
-as a link to the user.
-
 =cut
 
 #-------------------------------------------------------------------
@@ -61,14 +56,10 @@ sub _submenu {
 	my $session = shift;
         my $workarea = shift;
         my $title = shift;
-        my $help = shift;
 	my $namespace = shift;
 	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
         $title = $i18n->get($title,$namespace) if ($title);
         my $ac = WebGUI::AdminConsole->new($session,"userProfiling");
-        if ($help) {
-                $ac->setHelp($help,"WebGUIProfile");
-        }
 	$ac->addSubmenuItem($session->url->page("op=editProfileCategory;cid=new"), $i18n->get(490));
 	$ac->addSubmenuItem($session->url->page("op=editProfileField;fid=new"), $i18n->get(491));
         if ((($session->form->process("op") eq "editProfileField" && $session->form->process("fid") ne "new") || $session->form->process("op") eq "deleteProfileFieldConfirm") && $session->form->process("cid") eq "") {
@@ -174,7 +165,7 @@ sub www_editProfileCategory {
 		-hoverHelp=>$i18n->get('897 description'),
 		);
 	$f->submit;
-	return _submenu($session,$f->print,'468','user profile category add/edit','WebGUIProfile');
+	return _submenu($session,$f->print,'468','WebGUIProfile');
 }
 
 =head2 www_editProfileCategorySave ( $session )
@@ -333,7 +324,7 @@ sub www_editProfileField {
 		-value=>$data->{profileCategoryId}
 		);
         $f->submit;
-	return _submenu($session,$f->print,'471','profile settings edit',"WebGUIProfile");
+	return _submenu($session,$f->print,'471',"WebGUIProfile");
 }
 
 =head2 www_editProfileFieldSave ( $session )
@@ -409,7 +400,7 @@ sub www_editProfileSettings {
                        	$output .= ' '.$field->getLabel.'<br />';
 		}
 	}
-	return _submenu($session,$output,undef,"profile settings edit",'WebGUIProfile');
+	return _submenu($session,$output,undef,'WebGUIProfile');
 }
 
 =head2 www_moveProfileCategoryDown ( $session )

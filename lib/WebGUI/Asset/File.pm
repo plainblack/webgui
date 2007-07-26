@@ -424,7 +424,6 @@ sub www_edit {
 		-hoverHelp=>$i18n->get('file template description','Asset_File'),
 		-namespace=>"FileAsset"
 	);
-	$self->getAdminConsole->setHelp("file add/edit", "Asset_File");
 	return $self->getAdminConsole->render($tabform->print,$self->addEditLabel);
 }
 

@@ -15,11 +15,7 @@ sub _submenu {
 	my $workarea = shift;
         my $title = shift;
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"graphics");
-        if ($help) {
-                $ac->setHelp($help, 'Commerce');
-        }
 	$ac->addSubmenuItem($session->url->page('op=listPalettes'), $i18n->get('manage palettes'));
 	$ac->addSubmenuItem($session->url->page('op=listFonts'), $i18n->get('manage fonts'));
 	$ac->addSubmenuItem($session->url->page('op=editPalette;pid=new'), $i18n->get('add palette'));

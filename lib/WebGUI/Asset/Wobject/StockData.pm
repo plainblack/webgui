@@ -226,25 +226,6 @@ sub _getStockSources {
 
 #-------------------------------------------------------------------
 
-=head2 _submenu
-
-Renders the admin console view
-
-=cut
-
-sub _submenu {
-   my $self = shift;
-   my $workarea = shift;
-   my $title = shift;
-   my $help = shift;
-   my $ac = WebGUI::AdminConsole->new($self->session,"editstocks");
-   $ac->setHelp($help) if ($help);
-   $ac->setIcon($self->getIcon);
-   return $ac->render($workarea, $title);
-}
-
-#-------------------------------------------------------------------
-
 =head2 _trim ( str )
 
 Trims whitespace form front and end of a string

@@ -211,7 +211,6 @@ sub www_editAd {
 		);
 	$f->fieldSetEnd;
 	$f->submit;
-	$ac->setHelp('edit ad', 'AdSpace');
 	$ac->render($f->print, $i18n->get("edit advertisement"));
 }
 
@@ -333,7 +332,6 @@ sub www_editAdSpace {
 		}
 		$ads .= '<div style="clear: both;"></div>';
 	}
-	$ac->setHelp('edit ad space', 'AdSpace');
 	$ac->render($code.$f->print.$ads, $i18n->get("edit ad space"));
 }
 
@@ -390,7 +388,6 @@ sub www_manageAdSpaces {
 	}	
 	$output .= '<div style="clear: both;"></div>';
 	$ac->addSubmenuItem($session->url->page("op=editAdSpace"), $i18n->get("add ad space"));
-	$ac->setHelp('manage ad spaces', 'AdSpace');
 	return $ac->render($output);
 }
 

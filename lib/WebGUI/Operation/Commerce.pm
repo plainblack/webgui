@@ -39,10 +39,6 @@ A scalar of HTML that defines the current workarea.
 
 The i18n key of the title of this workarea.
 
-=head3 help
-
-The i18n key of the help link for this workarea.
-
 =cut
 
 sub _submenu {
@@ -52,11 +48,7 @@ sub _submenu {
 	my $workarea = shift;
         my $title = shift;
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"commerce");
-        if ($help) {
-                $ac->setHelp($help, 'Commerce');
-        }
 	$ac->addSubmenuItem($session->url->page('op=editCommerceSettings'), $i18n->get('manage commerce settings'));
 	$ac->addSubmenuItem($session->url->page('op=listTransactions'), $i18n->get('list transactions')); 
 	$ac->addSubmenuItem($session->url->page('op=listPendingTransactions'), $i18n->get('list pending transactions')); 
@@ -795,7 +787,7 @@ sub www_editCommerceSettings {
 
 	$session->style->setScript($session->url->extras('swapLayers.js'),{type=>"text/javascript"});
 	
-	return _submenu($session,$tabform->print, 'edit commerce settings title', 'commerce manage');
+	return _submenu($session,$tabform->print, 'edit commerce settings title');
 }
 
 #-------------------------------------------------------------------
@@ -883,7 +875,7 @@ sub www_listPendingTransactions {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 
-	_submenu($session,$output, 'list pending transactions', 'list pending transactions');
+	_submenu($session,$output, 'list pending transactions');
 }
 
 #-------------------------------------------------------------------

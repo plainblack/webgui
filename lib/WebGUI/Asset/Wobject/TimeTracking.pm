@@ -385,7 +385,6 @@ sub www_editProject {
 	$f->submit();
 	my $ac = $self->getAdminConsole;
 	my $newProjectUrl = $self->getUrl('func=editProject;projectId=new');
-	$ac->setHelp('edit projects', 'Asset_TimeTracking');
 	$ac->addSubmenuItem($newProjectUrl,$i18n->get("add project label"));
 	return $ac->render($f->print,$i18n->get("edit project screen label"));
 
@@ -567,7 +566,6 @@ sub www_manageProjects {
 	
 	my $ac = $self->getAdminConsole;
 	$ac->addSubmenuItem($newProjectUrl,$i18n->get("add project label"));
-	$ac->setHelp('manage projects', 'Asset_TimeTracking');
 	return $ac->render($output,$i18n->get("manage projects screen label"));
 }
 

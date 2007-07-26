@@ -292,7 +292,6 @@ sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    $self->getAdminConsole->setHelp("in out board add/edit","Asset_InOutBoard");
     return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 

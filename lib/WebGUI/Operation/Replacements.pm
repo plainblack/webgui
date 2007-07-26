@@ -25,7 +25,7 @@ Package WebGUI::Operation::Replacements
 Operation handler for conditional editing of submitted WebGUI content, similar to
 a search and replace function in word processors.
 
-=head2 _submenu ( $session, $workarea, $title, $help )
+=head2 _submenu ( $session, $workarea, $title )
 
 Utility routine for creating the AdminConsole for Replacement functions.
 
@@ -42,11 +42,6 @@ The content to display to the user.
 The title of the Admin Console.  This should be an entry in the i18n
 table in the WebGUI namespace.
 
-=head3 $help
-
-An entry in the Help system in the WebGUI namespace.  This will be shown
-as a link to the user.
-
 =cut
 
 #-------------------------------------------------------------------
@@ -56,11 +51,7 @@ sub _submenu {
         my $title = shift;
 	my $i18n = WebGUI::International->new($session);
         $title = $i18n->get($title) if ($title);
-        my $help = shift;
         my $ac = WebGUI::AdminConsole->new($session,"contentFilters");
-        if ($help) {
-                $ac->setHelp($help);
-        }
         $ac->addSubmenuItem($session->url->page("op=editReplacement;replacementId=new"), $i18n->get(1047));
         $ac->addSubmenuItem($session->url->page("op=listReplacements"), $i18n->get("content filters"));
         return $ac->render($workarea, $title);
@@ -125,7 +116,7 @@ sub www_editReplacement {
 		-value=>$data->{replaceWith}
 		);
 	$f->submit;
-	return _submenu($session,$f->print,"1052",'replacements edit');
+	return _submenu($session,$f->print,"1052");
 }
 
 =head2 www_editReplacementSave ( $session )

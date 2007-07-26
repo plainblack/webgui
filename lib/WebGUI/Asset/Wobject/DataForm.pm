@@ -979,7 +979,6 @@ sub www_editField {
 	}
         $f->submit;
 	my $ac = $self->getAdminConsole;
-	$ac->setHelp("data form fields add/edit","Asset_DataForm");
         return $ac->render($f->print,$i18n->get('20'));
 }
 
@@ -1061,7 +1060,6 @@ sub www_editTab {
 	}
         $f->submit;
 	my $ac = $self->getAdminConsole;
-	$ac->setHelp("data form fields add/edit","Asset_DataForm");
 	return $ac->render($f->print,$i18n->get('103')) if $tid eq "new";
 	return $ac->render($f->print,$i18n->get('102'));
 }

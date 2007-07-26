@@ -104,7 +104,6 @@ sub www_addWorkflow {
 	$f->submit;
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	$ac->setHelp('add a new workflow', 'Workflow');
 	return $ac->render($f->print, 'add a new workflow');
 }
 
@@ -265,7 +264,6 @@ sub www_editWorkflow {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	$ac->setHelp('edit workflow','Workflow');
 	return $ac->render($f->print.$addmenu.$steps, 'edit workflow');
 }
 
@@ -285,7 +283,6 @@ sub www_editWorkflowPriority {
     my $i18n = WebGUI::International->new($session, 'Workflow');
     my $ac = WebGUI::AdminConsole->new($session,"workflow");
     $ac->addSubmenuItem($session->url->page("op=showRunningWorkflows"), $i18n->get('show running workflows'));
-    $ac->setHelp('manage workflows', 'Workflow');
 
     # make sure the input is good
     my $instanceId  = $session->form->get('instanceId')  || '';
@@ -425,7 +422,6 @@ sub www_manageWorkflows {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=showRunningWorkflows"), $i18n->get("show running workflows"));
-	$ac->setHelp('manage workflows', 'Workflow');
 	return $ac->render($output, 'manage workflows');
 }
 
@@ -612,7 +608,6 @@ ENDCODE
  
     $ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
     $ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-    $ac->setHelp('show running workflows', 'Workflow');
 
     return $ac->render($output, 'show running workflows');
 }

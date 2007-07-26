@@ -32,7 +32,7 @@ in group Admin (3) are allowed to execute subroutines in this package.
 
 #-------------------------------------------------------------------
 
-=head2 _submenu ( $session, $workarea, $title, $help )
+=head2 _submenu ( $session, $workarea, $title )
 
 Utility routine for creating the AdminConsole for LDAPLink functions.
 
@@ -49,11 +49,6 @@ The content to display to the user.
 The title of the Admin Console.  This should be an entry in the i18n
 table in the WebGUI namespace.
 
-=head3 $help
-
-An entry in the Help system in the WebGUI namespace.  This will be shown
-as a link to the user.
-
 =cut
 
 sub _submenu {
@@ -62,11 +57,7 @@ sub _submenu {
 	my $title = shift;
 	my $i18n = WebGUI::International->new($session,"AuthLDAP");
 	$title = $i18n->get($title) if ($title);
-	my $help = shift;
 	my $ac = WebGUI::AdminConsole->new($session,"ldapconnections");
-	if ($help) {
-		$ac->setHelp($help,"AuthLDAP");
-	}
 	my $returnUrl = "";
 	if($session->form->process("returnUrl")) {
 		$returnUrl = ";returnUrl=".$session->url->escape($session->form->process("returnUrl"));
@@ -293,7 +284,7 @@ sub www_editLDAPLink {
    
    $f->submit;
    $output .= $f->print;
-   return _submenu($session,$output,"LDAPLink_990","ldap connection add/edit");
+   return _submenu($session,$output,"LDAPLink_990");
 }
 
 #-------------------------------------------------------------------
