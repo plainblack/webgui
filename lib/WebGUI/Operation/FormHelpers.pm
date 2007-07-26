@@ -42,24 +42,31 @@ parameters you wish the form helper to use. Here's an example:
 =cut
 
 sub www_formHelper {
-    my $session = shift;
-    my $form = $session->form;
-    my $class = "WebGUI::Form::".$form->get("class");
-    my $sub = $form->get("sub");
+    my $session     = shift;
+    my $form        = $session->form;
+    my $class       = "WebGUI::Form::".$form->get("class");
+    my $sub         = $form->get("sub");
     return "ERROR" unless (defined $sub && defined $class);
+    
+    # Load the form helper class
     my $load = "use ".$class;
     eval($load);
     if ($@) {
         $session->errorHandler->error("Couldn't load form helper class $class because $@"); 
         return "ERROR";
     }
-    my $output = "";
-    my $command = $class.'::www_'.$sub;
-    no strict;
-    my $output = eval { &$command($session) };
-    use strict;
+   
+    # Make sure the subroutine exists
+    my $command = $class->can('www_'.$sub);
+    if (!$command) {
+        $session->errorHandler->error("Could not execute form helper: Couldn't find subroutine www_$sub via class $class");
+        return "ERROR";
+    }
+
+    # Run the subroutine
+    my $output = eval { $command->($session) };
     if ($@) {
-        $session->errorHandler->error("Couldn't execute form helper subroutine $sub because $@"); 
+        $session->errorHandler->error("Couldn't execute form helper ${class}::www_${sub} because $@"); 
         return "ERROR";
     }
     return $output;

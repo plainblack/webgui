@@ -74,24 +74,31 @@ parameters you wish the activity helper to use. Here's an example:
 =cut
 
 sub www_activityHelper {
-    my $session = shift;
-    my $form = $session->form;
-    my $class = "WebGUI::Workflow::Activity::".$form->get("class");
-    my $sub = $form->get("sub");
+    my $session     = shift;
+    my $form        = $session->form;
+    my $class       = "WebGUI::Workflow::Activity::".$form->get("class");
+    my $sub         = $form->get("sub");
     return "ERROR" unless (defined $sub && defined $class);
+
+    # Load the modules
     my $load = "use ".$class;
     eval($load);
     if ($@) {
         $session->errorHandler->error("Couldn't load activity helper class $class because $@"); 
         return "ERROR";
     }
-    my $output = "";
-    my $command = $class.'::www_'.$sub;
-    no strict;
-    my $output = eval { &$command($session) };
-    use strict;
+
+    # Make sure the subroutine exists
+    my $command = $class->can('www_'.$sub);
+    if (!$command) {
+        $session->errorHandler->error("Couldn't execute activity helper ${class}::www_${sub} because subroutine does not exist");
+        return "ERROR";
+    }
+
+    # Execute
+    my $output = eval { $command->($session) };
     if ($@) {
-        $session->errorHandler->error("Couldn't execute activity helper subroutine $sub because $@"); 
+        $session->errorHandler->error("Couldn't execute activity helper ${class}::www_${sub} because $@"); 
         return "ERROR";
     }
     return $output;
