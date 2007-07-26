@@ -143,8 +143,12 @@ sub addCanStartThreadToCS {
 
     # add it to the config file
     my $workflowActivities = $session->config->get('workflowActivities');
-    push @{ $workflowActivities->{None} }, 'WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags';
-    $session->config->set('workflowActivities',$workflowActivities);
+    if(!scalar
+        grep {$_ eq 'WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags'} @{$workflowActivities->{None}}
+    ) {
+        push @{ $workflowActivities->{None} }, 'WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags';
+        $session->config->set('workflowActivities',$workflowActivities);
+    }
 
     return;
 }
