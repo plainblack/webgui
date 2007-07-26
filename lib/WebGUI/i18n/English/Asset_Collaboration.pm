@@ -1606,9 +1606,23 @@ the Collaboration Asset, the user will be notified.|,
     
     'subscription group hoverHelp' => {
         message => q|Manage the users in the subscription group for this Collaboration System|,
+        lastUpdated => 1170543345,
+    },
+    
+    'use captcha label' => {
+        message => q|Use Post Captcha|,
+        lastUpdated => 1170543345,
     },
 
-
+    'use captcha hover help' => {
+        message => q|Choose whether or not to make users verify their humnanity before being able to post to this collaboration system|,
+        lastUpdated => 1170543345,
+    },
+    
+    'captcha label' => {
+        message => q|Verify your humanity|,
+        lastUpdated => 1170543345,
+    },
 };
 
 1;
