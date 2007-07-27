@@ -56,6 +56,7 @@ dl.accordion-menu dd.a-m-d {
     background-color: #eeeeee;
     background-image: url(panel_bg.jpg);
     background-repeat: repeat-x;
+    font-weight: normal;
 }
 
 dl.accordion-menu dd.a-m-d .link {
@@ -70,6 +71,7 @@ dl.accordion-menu dd.a-m-d .link {
     height: 20px;
     font-family: sans-serif;
     cursor: pointer;
+    font-weight: normal;
     font-size: 12px;
 }
 
