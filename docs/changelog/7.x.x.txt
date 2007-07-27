@@ -15,6 +15,7 @@
    for details.
  - rfe: Admin bar doesn't resize with the browser
  - fix: Left Admin Bar overlap problem
+ - Color coded most buttons, green for proceed and red for go back.
  - fix: A bug where it was possible to delete a system page if it were made
    the child of a non-system page that you had edit rights to.
  - api: Added a unified contraints system for the file and image assets.

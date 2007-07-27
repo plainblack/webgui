@@ -791,7 +791,10 @@ sub getEditForm {
 	$uiLevelOverride =~ s/\:\:/_/g;
 	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
 	if ($self->session->config->get("enableSaveAndCommit")) {
-		$tabform->submitAppend(WebGUI::Form::submit($self->session, {name=>"saveAndCommit", value=>$i18n->get("save and commit")}));
+		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
+            name    => "saveAndCommit", 
+            value   => $i18n->get("save and commit"),
+            }));
 	}
 	$tabform->hidden({
 		name=>"func",

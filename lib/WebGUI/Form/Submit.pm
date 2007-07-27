@@ -68,12 +68,13 @@ Renders a button.
 sub toHtml {
 	my $self = shift;
 	my $value = $self->fixQuotes($self->get("value"));
+    my $extras = $self->get("extras") || q|class="forwardButton"|;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->{_params}{extras} ||= 'onclick="this.value=\''.$i18n->get(452).'\'"';
 	my $html = '<input type="submit" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");
-	$html .= 'value="'.$value.'" '.$self->get("extras").' />';
+	$html .= 'value="'.$value.'" '.$extras.' />';
 	return $html;
 }
 

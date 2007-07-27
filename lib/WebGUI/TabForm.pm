@@ -208,9 +208,11 @@ sub new {
 	my $i18n = WebGUI::International->new($session);
 	my $cancel = WebGUI::Form::button($session,{
 			value=>$i18n->get('cancel'),
-			extras=>q|onclick="history.go(-1);"|
+			extras=>q|onclick="history.go(-1);" class="backwardButton"|
 			});
-	bless {	_session=>$session, _uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel, _submit=>WebGUI::Form::submit($session), _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
+	bless {	_session=>$session, _uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel,
+        _submit=>WebGUI::Form::submit($session), 
+        _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
 

@@ -3,6 +3,18 @@ html,body {
    padding: 0px;
 }
 
+.forwardButton {
+    background-color: #008000;
+    border: 2px outset #00a000;
+    color: white; 
+}
+
+.backwardButton {
+    background-color: #800000;
+    border: 2px outset #a00000;
+    color: white; 
+}
+
 .wrapper {
 	background-image: url(bg.jpg);
 	background-repeat: repeat-x;
