@@ -10,7 +10,8 @@
         <div class="yui-content">
             <div id="wikipagecontent">
                 <tmpl_var content>
-                <p>^International("keywords","Asset");: <tmpl_loop keywordsLoop><a href="<tmpl_var url>"><tmpl_var keyword></a> </tmpl_loop></p>
+                <p>^International("keywords","Asset");: <tmpl_loop keywordsLoop><a href="<tmpl_var url>"><tmpl_var
+keyword></a> </tmpl_loop></p>
             </div>
             <div id="wikipageedit">
                 <tmpl_var editContent>
@@ -18,26 +19,30 @@
         </div>
     </div>
 <script type="text/javascript">
-initWikiTabs = function() {
+( function() {
         var tabView = new YAHOO.widget.TabView('wikipage');
-                tabView.addTab(new YAHOO.widget.Tab({
-                label: '<tmpl_var historyLabel>',
-                dataSrc: '<tmpl_var historyUrl>',
-                cacheData: true
-        }));
-};
-initWikiTabs();
+        tabView.on('contentReady', function() {
+        tabView.addTab(new YAHOO.widget.Tab({
+                    label: '<tmpl_var historyLabel>',
+                    dataSrc: '<tmpl_var historyUrl>',
+                    cacheData: true
+            }));
+    });
+    
+
+})();
 </script>
 <div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var
 mostPopularUrl>"><tmpl_var mostPopularLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var
 recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
 ~~~
-<link rel="stylesheet" type="text/css" href="^Extras(yui/build/tabview/assets/tabs.css);">
-<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo.js);"></script>
-<script type="text/javascript" src="^Extras(yui/build/event/event.js);"></script>
-<script type="text/javascript" src="^Extras(yui/build/dom/dom.js);"></script>
-<script type="text/javascript" src="^Extras(yui/build/connection/connection.js);"></script>
-<script type="text/javascript" src="^Extras(yui/build/tabview/tabview.js);"></script>
+<link rel="stylesheet" type="text/css" href="^Extras(yui/build/tabview/assets/tabview.css);" />
+<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/event/event-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/dom/dom-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/connection/connection-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/element/element-beta-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/tabview/tabview-min.js);"></script>
 
 <style type="text/css">
 #wikipage.yui-navset .yui-nav li a {
@@ -49,12 +54,18 @@ recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLab
         border-bottom: 1px solid #000;
 }
 
+#wikipage.yui-navset .yui-nav .selected a, #wikipage.yui-navset .yui-nav a:hover {
     background-color:#f6f7ee; /* active tab, tab hover, and content bgcolor */
 }
+
+#wikipage.yui-navset .yui-nav li em { padding:.5em; } /* tab padding */
+
 
 #wikipage.yui-navset .yui-nav .selected a {
     background-color:black; /* active tab, tab hover, and content bgcolor */
         color: white;
+    border-bottom-width:0; /* no bottom border for active tab */
+    padding-bottom:1px; /* to match height of other tabs */
 }
 
 #wikipage.yui-navset-top .yui-nav .selected a {
@@ -66,40 +77,12 @@ recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLab
     margin-top:-1px; /* for active tab overlap */
 }
 
-#wikipage.yui-navset-bottom .yui-nav .selected a {
-    border-top:0; /* no bottom border for active tab */
-    padding-top:1px; /* to match height of other tabs */
-}
-
-#wikipage.yui-navset-bottom .yui-content {
-    margin-bottom:-1px; /* for active tab overlap */
-}
-
-#wikipage.yui-navset-left .yui-nav li.selected a {
-    border-right:0; /* no bottom border for active tab */
-    padding-right:1px; /* to match height of other tabs */
-}
-
-#wikipage.yui-navset-left .yui-content {
-    margin-left:-1px; /* for active tab overlap */
-}
-
-#wikipage.yui-navset-right .yui-nav li.selected a {
-    border-left:0; /* no bottom border for active tab */
-    padding-left:1px; /* to match height of other tabs */
-}
-
-#wikipage.yui-navset-right .yui-content {
-    margin-right:-1px; /* for active tab overlap */
-    *margin-right:0; /* except IE */
-}
-
 #wikipage .yui-content {
     padding-top:1em; 
     padding-bottom:1em; 
 }
 #wikipage .loading {
-    background-image:url(^Extras(yui/build/tabview/img/loading.gif););
+    background-image:url(^Extras(yui/examples/tabview/img/loading.gif););
     background-position:center center;
     background-repeat:no-repeat;
 }
@@ -107,4 +90,7 @@ recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLab
 #wikipage .loading * {
     display:none;
 }
+
+
 </style>
+

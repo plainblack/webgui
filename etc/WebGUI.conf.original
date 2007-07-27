@@ -229,7 +229,6 @@
 	"WebGUI::Asset::Wobject::Calendar", 
 	"WebGUI::Asset::Wobject::EventManagementSystem", 
 	"WebGUI::Asset::Wobject::HttpProxy", 
-	"WebGUI::Asset::Wobject::MessageBoard", 
 	"WebGUI::Asset::Wobject::Navigation", 
 	"WebGUI::Asset::Wobject::Matrix", 
 	"WebGUI::Asset::Wobject::Poll", 
@@ -246,8 +245,7 @@
 	"WebGUI::Asset::Wobject::InOutBoard",
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
-	"WebGUI::Asset::Wobject::SQLForm",
-	"WebGUI::Asset::Wobject::WikiMaster"
+	"WebGUI::Asset::Wobject::SQLForm"
 	],
 
 # Specify the list assets that are used for utility purposes only
@@ -261,7 +259,11 @@
 # These items are typically not content themselves, but rather
 # layout mechanisms.
 
-"assetContainers" : ["WebGUI::Asset::Wobject::Layout", "WebGUI::Asset::Wobject::Folder", "WebGUI::Asset::Wobject::Dashboard"],
+"assetContainers" : [
+    "WebGUI::Asset::Wobject::Layout", "WebGUI::Asset::Wobject::Folder",
+    "WebGUI::Asset::Wobject::Dashboard", "WebGUI::Asset::Wobject::MessageBoard", 
+	"WebGUI::Asset::Wobject::WikiMaster"
+    ],
 
 # Optionally specify a group id for assets to tell WebGUI what
 # group a user needs to be part of in order to add that type of
