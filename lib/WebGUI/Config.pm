@@ -330,11 +330,12 @@ sub new {
 	my $webguiPath = shift;
 	my $filename = shift;
 	my $noCache = shift;
+    my $fullPath = $webguiPath.'/etc/'.$filename;
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
 		my $json = "";
-		if (open(my $FILE,"<",$webguiPath.'/etc/'.$filename)) {
+		if (open(my $FILE,"<",$fullPath)) {
 			while (my $line = <$FILE>) {
         			$json .= $line unless ($line =~ /^\s*#/);
 			}
@@ -347,7 +348,7 @@ sub new {
 			$config{$filename} = $self unless $noCache;
 			return $self;
 		} else {
-			warn "Cannot open config file: ".$filename;
+			warn "Cannot open config file: ".$fullPath;
 			return undef;
 		}
 	}
