@@ -403,8 +403,8 @@ sub buildNewUserProfileTable {
         # Write to the temp table
         my $sql 
             = q{INSERT INTO tmp_userProfileData } 
-            . q{(userId,} . join(",", map { $db->dbh->quote_identifier($_) } keys %profile) . q{)} 
-            . q{VALUES (?,} . join(",",("?")x values %profile) . q{)}
+            . q{(} . join(", ", "userId", map { $db->dbh->quote_identifier($_) } keys %profile) . q{)} 
+            . q{ VALUES (} . join(", ", "?", ("?")x values %profile) . q{)}
             ;
         $db->write($sql, [$user->{userId},values %profile]);
     }
