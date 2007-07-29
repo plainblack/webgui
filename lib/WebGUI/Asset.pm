@@ -274,14 +274,20 @@ Returns error messages if a user can't view due to publishing problems, otherwis
 sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	my ($var, $http) = $self->session->quick(qw(var http));
-	if ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
+	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
+        $http->setRedirect("https://".$conf->get("sitename")->[0].$self->getUrl);
+        return "redirect";
+	}
+    elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
 		$http->setRedirect($self->getUrl("func=manageTrash"));
 		return "redirect";
-	} elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
+	} 
+    elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
 		$http->setRedirect($self->getUrl("func=manageClipboard"));
 		return "redirect";
-	} elsif ($self->get("state") ne "published" && $self->get("state") ne "archived") { # tell em it doesn't exist anymore
+	} 
+    elsif ($self->get("state") ne "published" && $self->get("state") ne "archived") { # tell em it doesn't exist anymore
 		$http->setStatus("410");
 		my $notFound = WebGUI::Asset->getNotFound($self->session);
 		$self->session->asset($notFound);
@@ -354,12 +360,12 @@ sub definition {
 					    defaultValue=>0
 					},
 				    encryptPage=>{
-					    fieldType=>'yesNo',
-					    tab=>"security",
-					    label=>$i18n->get('encrypt page'),
-					    hoverHelp=>$i18n->get('encrypt page description'),
-					    uiLevel=>6,
-					    defaultValue=>0
+					    fieldType       => ($session->config->get("sslEnabled") ? 'yesNo' : 'hidden'),
+					    tab             => "security",
+					    label           => $i18n->get('encrypt page'),
+					    hoverHelp       => $i18n->get('encrypt page description'),
+					    uiLevel         => 6,
+					    defaultValue    => 0,
 					},
                     ownerUserId=>{
 					    tab=>"security",

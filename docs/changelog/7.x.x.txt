@@ -16,6 +16,10 @@
  - rfe: Admin bar doesn't resize with the browser
  - fix: Left Admin Bar overlap problem
  - Color coded most buttons, green for proceed and red for go back.
+ - Encrypt page now forces SSL and can check for the SSLPROXY pass through
+   variable in addition to the HTTPS variable.
+ - Encrypt page no longer shows up unless SSL mode is enabled in the config
+   file.
  - fix: A bug where it was possible to delete a system page if it were made
    the child of a non-system page that you had edit rights to.
  - api: Added a unified contraints system for the file and image assets.
@@ -29,7 +33,6 @@
  - Added keyword tagging to Wiki.
  - Upgraded TinyMCE to 2.1.1.1.
  - Safari 3 and above now fully supported in admin interface.
- - improved performance of EMS
  - upgraded YUI to 2.2.2 and YUI-ext to 1.0.1a
  - Improved error handling in Spectre when WebGUI hands it bad data.
  - Fixed a problem where Spectre dropped cron jobs that were erroring
@@ -57,11 +60,14 @@
    description from the RSS feed.
  - Added an index on the userId column of the groupings table to speed up
    queries for groupIds by userId (instead of the usual userIds by groupId)
- - fix: bad javascript string escaping in EMS
  - fix: Unable to upload images or edit listings for Matrix
+ - fix: bad javascript string escaping in EMS
+ - improved performance of EMS
  - Added import/export mechanism for EMS events.
- - Removed the long depricated Memcached cache module.
  - fix: Show edit links on EMS search view without being in Admin group
+ - Added new registration search and management interface to the EMS.
+ - Added badge printing support to the EMS.
+ - Removed the long depricated Memcached cache module.
  - fix: Fixed a typo in the Article with attachments template (perlDreamer
    Consulting, LLC)
  - fix: Order of content position loops in Page Layout (Yung Han Khoe, United Knowledge)

@@ -40,8 +40,17 @@ addWikiAttachments($session);
 addAdminConsoleGroupSettings($session);
 updateCommerce($session);
 updateProfileDateFormats($session);
+addEmsBadgePrinting($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addEmsBadgePrinting {
+    my $session     = shift;
+    print "\tAdding badge printing support to EMS.\n" unless $quiet;
+    $session->db->write("alter table EventManagementSystem add column badgePrinterTemplateId varchar(22) binary not null default 'emsbadgeprintout000000'");
+    $session->db->write("alter table EventManagementSystem add column ticketPrinterTemplateId varchar(22) binary not null default 'emsticketprintout00000'");
+}
 
 #-------------------------------------------------
 # Add the default admin console group settings

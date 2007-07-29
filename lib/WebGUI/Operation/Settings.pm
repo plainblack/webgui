@@ -379,12 +379,12 @@ sub definition {
 		defaultValue=>$session->setting->get("selfDeactivation")
 		});
 	push(@fields, {
-		tab=>"user",
-		fieldType=>"yesNo",
-		name=>"encryptLogin",
-		label=>$i18n->get(1006),
-		hoverHelp=>$i18n->get('1006 description'),
-		defaultValue=>$session->setting->get("encryptLogin")
+		tab         => "user",
+		fieldType   => ($session->config->get("sslEnabled") ? 'yesNo' : 'hidden'),
+		name        => "encryptLogin",
+		label       => $i18n->get(1006),
+		hoverHelp   => $i18n->get('1006 description'),
+		defaultValue=> $session->setting->get("encryptLogin"),
 		});
 	push(@fields, {
 		tab=>"user",

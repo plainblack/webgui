@@ -8,6 +8,10 @@
 
 "sitename" : [ "www.example.com", "example.com"],
 
+# Set to 1 if you want to use WebGUI's SSL functions.
+
+"sslEnabled" : 0, 
+
 # Rename the WebGUI Session cookie if you like.
 
 "cookieName" : "wgSession",

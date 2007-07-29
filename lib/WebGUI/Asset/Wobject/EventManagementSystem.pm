@@ -166,7 +166,7 @@ sub _acWrapper {
 	$ac->addSubmenuItem($self->getUrl('func=search'),$i18n->get("manage events"));
 	$ac->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata'));
 	$ac->addSubmenuItem($self->getUrl('func=managePrereqSets'), $i18n->get('manage prerequisite sets'));
-	$ac->addSubmenuItem($self->getUrl('func=manageRegistrants'), $i18n->get('manage registrants'));
+	$ac->addSubmenuItem($self->getUrl('func=searchBadges'), "Search Badges");
 	$ac->addSubmenuItem($self->getUrl('func=manageDiscountPasses'), $i18n->get('manage discount passes'));
 	$ac->addSubmenuItem($self->getUrl('func=importEvents'), $i18n->get('import events'));
 	$ac->addSubmenuItem($self->getUrl('func=exportEvents'), $i18n->get('export events'));
@@ -494,6 +494,20 @@ sub definition {
                 		hoverHelp=>$i18n->get('search template description'),
                 		label=>$i18n->get('search template')
 				},
+            badgePrinterTemplateId => {
+                fieldType       => "template",
+                defaultValue    => "emsbadgeprintout000000",
+                tab             => "display",
+                namespace       => "emsbadgeprint",
+                lable           => "Badge Printer Template",
+                },
+            ticketPrinterTemplateId => {
+                fieldType       => "template",
+                defaultValue    => "emsticketprintout00000",
+                tab             => "display",
+                namespace       => "emsticketprint",
+                lable           => "Ticket Printer Template",
+                },
 			paginateAfter =>{
 				fieldType=>"integer",
 				defaultValue=>10,
@@ -3324,7 +3338,7 @@ sub www_returnItem {
 	foreach (@regs) {
 		$self->session->db->write("update EventManagementSystem_registrations set returned=1 where registrationId=?",[$_]);
 	}
-	return $self->www_managePurchases;
+	return $self->www_editBadge;
 }
 
 #-------------------------------------------------------------------
@@ -3830,7 +3844,6 @@ sub www_search {
 	}
 	my $searchPhrases;
 	if (scalar(@keys)) {
-		#$searchPhrases = " and ( ";
 		my $count = 0;
 		foreach my $word (@keys) {
              if ($count) {
@@ -3841,12 +3854,10 @@ sub www_search {
                         $searchPhrases .= ' and ';
                    }
               } 
-			$searchPhrases .= ' and ' if $count;
 			my $val = $self->session->db->quote('%'.$word.'%');
 			$searchPhrases .= "(p.title like $val or p.description like $val or p.sku like $val)";
 			$count++;
 		}
-		#$searchPhrases .= " )";
 	}
 	my $basicSearch = $searchPhrases;
 	my %reqHash;
@@ -4099,7 +4110,7 @@ $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$master
 	$var{'price.label'} = $i18n->get("price");
 	$var{'seats.label'} = $i18n->get("seats available");
 	$var{'addToBadgeMessage'} = $addToBadgeMessage;
-	$var{'manageRegistrants'} = $self->getUrl("func=manageRegistrants");
+	$var{'manageRegistrants'} = $self->getUrl("func=searchBadges");
 	$var{'emptyCart.url'} = $self->getUrl("func=emptyCart");
 	$var{'checkout.url'} = $self->getUrl("func=checkout");
 	
@@ -4181,7 +4192,7 @@ sub view {
 	$var{'managePurchases.url'} = $self->getUrl('func=managePurchases');
 	$var{'managePurchases.label'} = $i18n->get('manage purchases');
 	$var{'canManageEvents'} = $self->canApproveEvents;
-	$var{'manageRegistrants.url'} = $self->getUrl("func=manageRegistrants");
+	$var{'manageRegistrants.url'} = $self->getUrl("func=searchBadges");
 	$var{'emptyCart.url'} = $self->getUrl("func=emptyCart");
 
 	
@@ -4190,6 +4201,57 @@ sub view {
 #	my $templateId = $self->get("displayTemplateId");
 
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
+}
+
+#-------------------------------------------------------------------
+
+sub www_searchBadges {
+    my $self = shift;
+    my $session = $self->session;
+    my $db = $session->db;
+    my $query = $session->form->param("query");
+    my $searchForm = WebGUI::Form::formHeader($session, {action=>$self->getUrl})
+        .WebGUI::Form::hidden($session, {name=>"func", value=>"searchBadges"})
+        .WebGUI::Form::text($session, {name=>"query", value=>$query, extras=>q|title="First Name, Last Name, Badge ID, or Email Address"|})
+        .WebGUI::Form::submit($session, {value=>"Search"})
+        .WebGUI::Form::formFooter($session);
+    my $results = "";
+    if ($query ne "") {
+        $session->style->setRawHeadTags(q|
+        <style type="text/css">
+        #badgeSearchResults { font-family: sans-serif; font-size: 12px; }
+        #badgeSearchResults th { font-weight: bold; color: black; background-color: white; text-align: left; }
+        #badgeSearchResults tbody { border: 1px dashed #cccccc; margin-bottom: 3px; }
+        </style>
+        |);
+        $results = "<p>You searched for: <b>$query</b></p>";
+        my $wildQuery = '%'.$query.'%';
+        my $badges = $db->read("select badgeId, lastName, firstName, city, state, email from EventManagementSystem_badges 
+            where assetId=? and (lastName like ? or firstName like ? or email like ? or badgeId like ?)  
+            order by lastName, firstName", [$self->getId, $wildQuery, $wildQuery, $wildQuery, $wildQuery]);
+        $results .= q|<table id="badgeSearchResults">|;
+        while (my ($badgeId, $last, $first, $city, $state, $email) = $badges->array) {
+            $results .= q|<tbody><tr><th>Name</th><th>Location</th><th>Email</th><th>Badge ID</th></tr>|; 
+            $results .= qq|<tr><td><b>$last, $first</b></td><td>$city, $state</td><td>$email</td>
+                <td><a href="|.$self->getUrl("func=editBadge;badgeId=".$badgeId).qq|">$badgeId</a></td></tr>|; 
+            $results .= q|<tr><td colspan="4"><hr></td></tr>|;
+            my $events = $db->read(q|select b.productId, c.sku, c.title, c.price, g.gateway,
+                from_unixtime(d.startDate,"%a %M:%i"), from_unixtime(d.endDate,"%a %H:%i")
+                from EventManagementSystem_registrations b left join products c on c.productId=b.productId
+                left join EventManagementSystem_products d ON d.productId=b.productId
+                left join EventManagementSystem_purchases f ON b.purchaseId=f.purchaseId
+                left join transaction g ON f.transactionId=g.transactionId where b.returned='0' and b.badgeId=?
+                order by d.startDate,d.endDate,c.title|,[$badgeId]);
+            while (my ($productId, $sku, $title, $price, $gateway, $start, $end) = $events->array) {
+                $results .= qq|<tr><td colspan="2">$sku : $title</td>
+                    <td>$start - $end</td><td style="text-align: right;">($gateway) $price</td></tr>|; 
+            } 
+            $results .= q|<tr><td colspan="4"><hr></td></tr>|;
+            $results .= q|</tbody>|;
+        }
+        $results .= q|</table>|.$searchForm;
+    }
+    return $self->processStyle("<h1>Search Badges</h1>".$searchForm.$results);
 }
 
 #-------------------------------------------------------------------
@@ -4325,49 +4387,48 @@ sub www_editPrereqSetSave {
 	return $self->www_managePrereqSets();
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 www_manageRegistrants ( )
-
-Method to display the registrant management console.
-
-=cut
-
-sub www_manageRegistrants {
-	my $self = shift;
-
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-
-	my $output;
-	my $sql = "select * from EventManagementSystem_badges where assetId=? order by lastName, firstName";
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=manageRegistrants'),50);
-	#$p->setDataByArrayRef($self->session->db->buildArrayRefOfHashRefs($sql),[$self->getId]);
-	$p->setDataByQuery($sql,undef,undef,[$self->getId]);
-	$p->setAlphabeticalKey('lastName');
-	foreach my $badge (@{$p->getPageData}) {
-		$output .= "<div>";
-	#	$output .= $self->session->icon->delete('func=deleteRegistrant;psid='.$_->{badgeId}, $self->get('url'));
-		$output .= $self->session->icon->edit('func=editRegistrant;badgeId='.$badge->{badgeId}, $self->get('url')).
-			"&nbsp;&nbsp;".$badge->{lastName}.",&nbsp;".$badge->{firstName}."&nbsp;&nbsp;(&nbsp;".$badge->{email}."&nbsp;)</div>";
-	}
-	$output .= '<div>'.$p->getBarAdvanced.'</div>';
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editRegistrant;badgeId=new'), $i18n->get('add registrant'));
-	return $self->_acWrapper($output, $i18n->get("manage registrants"));
+sub getPrintingVariables {
+    my $self = shift;
+    my $registrationId = shift;
+    my %event = $self->session->db->quickHash(
+        "select * from products a 
+        join EventManagementSystem_products b on a.productId=b.productId 
+        join EventManagementSystem_registrations c on b.productId=c.productId 
+        join EventManagementSystem_badges d on c.badgeId=d.badgeId 
+        join EventManagementSystem_purchases f on c.purchaseId=f.purchaseId 
+        join transaction g on f.transactionId=g.transactionId 
+        where c.registrationId=?",
+        [$registrationId]);
+    $event{emsTitle} = $self->getTitle;
+    my %meta = $self->session->db->buildHash(
+        "select name,fieldData from EventManagementSystem_metaData a
+        join EventManagementSystem_metaField b on a.fieldId=b.fieldId
+        where productId=?",
+        [$event{productId}]);
+    my %var = (%meta, %event);
+    return \%var;
 }
 
+sub www_printBadge {
+    my $self = shift;
+    my $var = $self->getPrintingVariables($self->session->form->param("registrationId"));
+    return $self->processTemplate($var,$self->get("badgePrinterTemplateId"));
+}
+
+sub www_printTicket {
+    my $self = shift;
+    my $var = $self->getPrintingVariables($self->session->form->param("registrationId"));
+    return $self->processTemplate($var,$self->get("ticketPrinterTemplateId"));
+}
 
 #-------------------------------------------------------------------
-sub www_editRegistrant {
+sub www_editBadge {
 	my $self = shift;
 	my $badgeId = shift || $self->session->form->process("badgeId") || 'new';
 	my $error = shift;
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl("func=editRegistrantSave;badgeId=".$badgeId)
-	));
+	my $f = WebGUI::HTMLForm->new($self->session, action => $self->getUrl("func=editBadgeSave;badgeId=".$badgeId));
 	my $data = {};
 	if ($error) {
 		# load submitted data.
@@ -4483,12 +4544,63 @@ function resetToInitial() {
 		value=>$data->{email}
 	);
 	$f->submit;
-	$f->raw($self->www_viewPurchase('noStyle',$badgeId));
-	return $self->_acWrapper($f->print, $i18n->get("edit registrant"));
+    my $tickets = q|<table id="emsTickets">|;
+    my $events = $self->session->db->read(q|select b.productId, c.sku, c.title, c.price, g.gateway,
+        from_unixtime(d.startDate), from_unixtime(d.endDate), d.prerequisiteId, b.registrationId,
+        f.transactionId
+        from EventManagementSystem_registrations b left join products c on c.productId=b.productId
+        left join EventManagementSystem_products d ON d.productId=b.productId
+        left join EventManagementSystem_purchases f ON b.purchaseId=f.purchaseId
+        left join transaction g ON f.transactionId=g.transactionId where b.returned='0' and b.badgeId=?
+        order by d.startDate,d.endDate,c.title|,[$badgeId]);
+    my $ticker = 1;
+    while (my ($productId, $sku, $title, $price, $gateway, $start, $end, $prereq, $registrationId, $transactionId) = $events->array) {
+        my $isMaster = ($prereq eq "");
+        my $class = ($ticker) ? q|oddEvent| : q|evenEvent|;
+        $class = "masterEvent" if $isMaster;
+        $tickets .= qq|<tr class="$class"><td>$sku : $title</td>
+                    <td>$start - $end</td>
+                    <td style="text-align: right;">($gateway) $price</td>|;
+        if ($isMaster) {
+            $tickets .= qq|
+                    <td><form><input type="hidden" name="func" value="addEventsToBadge" />
+                        <input type="hidden" name="bid" value="$badgeId" />
+                        <input type="hidden" name="eventId" value="$productId" />
+                        <input type="submit" value="Add Events" /></form></td>
+                    <td><form target="_blank"><input type="hidden" name="func" value="printBadge" />
+                        <input type="hidden" name="registrationId" value="$registrationId" />
+                        <input type="submit" value="Print" /></form></td>
+                    |;
+        }
+        else {
+            $tickets .= qq|
+                    <td></td>
+                    <td><form target="_blank"><input type="hidden" name="func" value="printTicket" />
+                        <input type="hidden" name="registrationId" value="$registrationId" />
+                        <input type="submit" value="Print" /></form></td>|;
+        }
+         $tickets .= qq|
+                    <td><form><input type="hidden" name="func" value="returnItem" />
+                        <input type="hidden" name="badgeId" value="$badgeId" />
+                        <input type="hidden" name="rid" value="$registrationId" />
+                        <input type="submit" onclick="confirm('Do you really want to return this event?');" value="Return" /></form></td>
+                    </tr>|; 
+        $ticker = ($ticker == 1) ? 0 : 1;
+    } 
+    $tickets .= q|</table>|;
+    $self->session->style->setRawHeadTags(q|
+        <style type="text/css">
+        #emsTickets { font-size: 11px; }
+        .masterEvent { background-color: black; color: white; }
+        .evenEvent { background-color: white; color: black; }
+        .oddEvent { background-color: #dddddd; color: black; }
+        </style>
+        |);
+	return $self->processStyle("<h1>Edit Badge</h1>".$f->print.$tickets);
 }
 
 #-------------------------------------------------------------------
-sub www_editRegistrantSave {
+sub www_editBadgeSave {
 	my $self = shift;
 	return $self->session->privilege->insufficient unless ($self->canAddEvents);
 	my $error = '';
@@ -4498,7 +4610,7 @@ sub www_editRegistrantSave {
 			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
 		}
 	}
-	return $self->www_editRegistrant(undef,$error) if $error;
+	return $self->www_editBadge(undef,$error) if $error;
 	my $badgeId = $self->session->form->process('badgeId');
 	my $userId = $self->session->form->get("userId", "user");
 	my $firstName = $self->session->form->get("firstName", "text");
@@ -4573,7 +4685,7 @@ sub www_editRegistrantSave {
                 	$u->profileField('email',$email) if ($email ne "");
 		}
 	}
-	return $self->www_manageRegistrants();
+	return $self->www_searchBadges();
 }
 
 
