@@ -2067,7 +2067,7 @@ sub update {
 			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
 
             # skip a property if it has the display only flag set
-            next if ($properties->{property}{displayOnly});
+            next if ($definition->{properties}{$property}{displayOnly});
 
             # use the update value
 			my $value = $properties->{$property};

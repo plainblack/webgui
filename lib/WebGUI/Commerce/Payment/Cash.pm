@@ -189,6 +189,7 @@ sub errorCode {
 }
 
 #-------------------------------------------------------------------
+
 =head2 label ( )
 
 Returns the label for the commerce plugin.

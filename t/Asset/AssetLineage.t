@@ -245,10 +245,10 @@ is(scalar @snippets, $folder->getChildCount,  'changing lineage does not change 
 is(1               , $folder2->getChildCount, 'changing lineage does not change relationship in folder2');
 
 ##Reinstance the asset object due to db manipulation
-$folder  = WebGUI::Asset->newByUrl($session, $folder->get('url'));
-$folder2 = WebGUI::Asset->newByUrl($session, $folder2->get('url'));
-@snippets = map { WebGUI::Asset->newByUrl($session, "snippet$_") } 0..6;
-$snippet2 = WebGUI::Asset->newByUrl($session, $snippet2->get('url'));
+$folder  = WebGUI::Asset->newByDynamicClass($session, $folder->getId);
+$folder2 = WebGUI::Asset->newByDynamicClass($session, $folder2->getId);
+@snippets = map { WebGUI::Asset->newByDynamicClass($session, $snippets[$_]->getId) } 0..6;
+$snippet2 = WebGUI::Asset->newByDynamicClass($session, $snippet2->getId);
 
 ####################################################
 #
