@@ -1,6 +1,30 @@
 package WebGUI::i18n::English::WebGUI;
 
 our $I18N = {
+	'run on admin create user' => {
+		message => q|On Create User (Admin)|,
+		context => q|field in trigger manager|,
+		lastUpdated => 0,
+	},
+
+	'run on admin create user help' => {
+		message => q|Run when an admin creates a user.|,
+		context => q|help for field in trigger manager|,
+		lastUpdated => 0,
+	},
+
+	'run on admin update user' => {
+		message => q|On Update User (Admin)|,
+		context => q|field in trigger manager|,
+		lastUpdated => 0,
+	},
+
+	'run on admin update user help' => {
+		message => q|Run when an admin updates a user.|,
+		context => q|help for field in trigger manager|,
+		lastUpdated => 0,
+	},
+
 	'skip commit comments' => {
 		message => q|Skip commit comments?|,
 		lastUpdated => 0,
@@ -120,8 +144,8 @@ our $I18N = {
 	},
 
 	'559' => {
-		message => q|Run On Registration|,
-		lastUpdated => 1031514049
+		message => q|On Create User (User)|,
+		lastUpdated => 1185738895
 	},
 
 	'1049' => {

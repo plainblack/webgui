@@ -18,8 +18,9 @@
  - Color coded most buttons, green for proceed and red for go back.
  - Encrypt page now forces SSL and can check for the SSLPROXY pass through
    variable in addition to the HTTPS variable.
- - Encrypt page no longer shows up unless SSL mode is enabled in the config
-   file.
+ - Added sslEnabled directive to the config file, which disables SSL related
+   features unless this directive is set.
+ - Added a trigger for when a user is created or updated by an admin.
  - fix: A bug where it was possible to delete a system page if it were made
    the child of a non-system page that you had edit rights to.
  - api: Added a unified contraints system for the file and image assets.

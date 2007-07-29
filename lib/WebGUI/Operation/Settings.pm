@@ -43,6 +43,7 @@ sub definition {
 	my $session     = shift;
 	my $i18n        = shift;
 	my @fields      = ();
+    my $setting     = $session->setting;
 	# company info
 	push(@fields, {
 		tab=>"company",
@@ -50,7 +51,7 @@ sub definition {
 		name=>"companyName",
 		label=>$i18n->get(125),
 		hoverHelp=>$i18n->get('125 description'),
-		defaultValue=>$session->setting->get("companyName")
+		defaultValue=>$setting->get("companyName")
 		});
 	push(@fields, {
 		tab=>"company",
@@ -58,7 +59,7 @@ sub definition {
 		name=>"companyEmail",
 		label=>$i18n->get(126),
 		hoverHelp=>$i18n->get('126 description'),
-		defaultValue=>$session->setting->get("companyEmail")
+		defaultValue=>$setting->get("companyEmail")
 		});
 	push(@fields, {
 		tab=>"company",
@@ -66,7 +67,7 @@ sub definition {
 		name=>"companyURL",
 		label=>$i18n->get(127),
 		hoverHelp=>$i18n->get('127 description'),
-		defaultValue=>$session->setting->get("companyURL")
+		defaultValue=>$setting->get("companyURL")
 		});
 
 	# content settings
@@ -74,7 +75,7 @@ sub definition {
 		tab=>"content",
 		fieldType=>"workflow",
 		name=>"defaultVersionTagWorkflow",
-		defaultValue=>$session->setting->get("defaultVersionTagWorkflow"),
+		defaultValue=>$setting->get("defaultVersionTagWorkflow"),
 		type=>"WebGUI::VersionTag",
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help'),
@@ -86,7 +87,7 @@ sub definition {
         name=>"autoRequestCommit",
         label=>$i18n->get("auto request commit"),
         hoverHelp=>$i18n->get("auto request commit help"),
-        defaultValue=>$session->setting->get("autoRequestCommit")
+        defaultValue=>$setting->get("autoRequestCommit")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -94,13 +95,13 @@ sub definition {
         name=>"skipCommitComments",
         label=>$i18n->get("skip commit comments"),
         hoverHelp=>$i18n->get("skip commit comments"),
-        defaultValue=>$session->setting->get("skipCommitComments")
+        defaultValue=>$setting->get("skipCommitComments")
 		});
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"workflow",
 		name=>"trashWorkflow",
-		defaultValue=>$session->setting->get("trashWorkflow"),
+		defaultValue=>$setting->get("trashWorkflow"),
 		type=>"None",
 		label=>$i18n->get("trash workflow"),
 		hoverHelp=>$i18n->get('trash workflow help')
@@ -109,7 +110,7 @@ sub definition {
 		tab=>"content",
 		fieldType=>"workflow",
 		name=>"purgeWorkflow",
-		defaultValue=>$session->setting->get("purgeWorkflow"),
+		defaultValue=>$setting->get("purgeWorkflow"),
 		type=>"None",
 		label=>$i18n->get("purge workflow"),
 		hoverHelp=>$i18n->get('purge workflow help')
@@ -118,7 +119,7 @@ sub definition {
 		tab=>"content",
 		fieldType=>"workflow",
 		name=>"changeUrlWorkflow",
-		defaultValue=>$session->setting->get("changeUrlWorkflow"),
+		defaultValue=>$setting->get("changeUrlWorkflow"),
 		type=>"None",
 		label=>$i18n->get("changeUrl workflow"),
 		hoverHelp=>$i18n->get('changeUrl workflow help')
@@ -136,7 +137,7 @@ sub definition {
 		name=>"defaultPage",
 		label=>$i18n->get(527),
 		hoverHelp=>$i18n->get('527 description'),
-		defaultValue=>$session->setting->get("defaultPage")
+		defaultValue=>$setting->get("defaultPage")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -144,13 +145,13 @@ sub definition {
 		name=>"notFoundPage",
 		label=>$i18n->get(141),
 		hoverHelp=>$i18n->get('141 description'),
-		defaultValue=>$session->setting->get("notFoundPage")
+		defaultValue=>$setting->get("notFoundPage")
 		});
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"text",
 		name=>"urlExtension",
-		defaultValue=>$session->setting->get("urlExtension"),
+		defaultValue=>$setting->get("urlExtension"),
 		label=>$i18n->get("url extension"),
 		hoverHelp=>$i18n->get("url extension description"),
 		});
@@ -160,7 +161,7 @@ sub definition {
 		name=>"maxAttachmentSize",
 		label=>$i18n->get(130),
 		hoverHelp=>$i18n->get('130 description'),
-		defaultValue=>$session->setting->get("maxAttachmentSize")
+		defaultValue=>$setting->get("maxAttachmentSize")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -168,7 +169,7 @@ sub definition {
 		name=>"maxImageSize",
 		label=>$i18n->get(583),
 		hoverHelp=>$i18n->get('583 description'),
-		defaultValue=>$session->setting->get("maxImageSize")
+		defaultValue=>$setting->get("maxImageSize")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -176,7 +177,7 @@ sub definition {
 		name=>"thumbnailSize",
 		label=>$i18n->get(406),
 		hoverHelp=>$i18n->get('406 description'),
-		defaultValue=>$session->setting->get("thumbnailSize")
+		defaultValue=>$setting->get("thumbnailSize")
 		});
 	push(@fields, {
 		tab=>"content",
@@ -184,7 +185,7 @@ sub definition {
         name=>"metaDataEnabled",
         label=>$i18n->get("Enable Metadata"),
         hoverHelp=>$i18n->get("Enable Metadata description"),
-        defaultValue=>$session->setting->get("metaDataEnabled")
+        defaultValue=>$setting->get("metaDataEnabled")
 		});
 	# user interface settings
 	push(@fields, {
@@ -193,7 +194,7 @@ sub definition {
 		name=>"richEditor",
 		label=>$i18n->get("default rich editor"),
 		hoverHelp=>$i18n->get("default rich editor description"),
-		defaultValue=>[$session->setting->get("richEditor") || "PBrichedit000000000001"],
+		defaultValue=>[$setting->get("richEditor") || "PBrichedit000000000001"],
 		options=>WebGUI::Asset::RichEdit->getList($session)
 		});
 	push(@fields, {
@@ -202,7 +203,7 @@ sub definition {
 		name=>"textBoxSize",
 		label=>$i18n->get(465),
 		hoverHelp=>$i18n->get('465 description'),
-		defaultValue=>$session->setting->get("textBoxSize")
+		defaultValue=>$setting->get("textBoxSize")
 		});
 	push(@fields, {
 		tab=>"ui",
@@ -211,7 +212,7 @@ sub definition {
 		label=>$i18n->get('user function style'),
 		hoverHelp=>$i18n->get('user function style description'),
 		namespace=>"style",
-		defaultValue=>$session->setting->get("userFunctionStyleId")
+		defaultValue=>$setting->get("userFunctionStyleId")
 		});
 	push(@fields, {
 		tab=>"ui",
@@ -220,43 +221,43 @@ sub definition {
 		label=>$i18n->get('admin console template'),
 		hoverHelp=>$i18n->get('admin console template description'),
 		namespace=>"AdminConsole",
-		defaultValue=>$session->setting->get("AdminConsoleTemplate")
+		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
+	# messaging settings
     push(@fields, {
-		tab=>"ui",
+		tab=>"messaging",
 		fieldType=>"template",
 		name=>"viewInboxTemplateId",
 		label=>$i18n->get('view inbox template'),
 		hoverHelp=>$i18n->get('view inbox template description'),
 		namespace=>"Inbox",
-		defaultValue=>$session->setting->get("viewInboxTemplateId"),
+		defaultValue=>$setting->get("viewInboxTemplateId"),
 		});
     push(@fields, {
-		tab=>"ui",
+		tab=>"messaging",
 		fieldType=>"template",
 		name=>"viewInboxMessageTemplateId",
 		label=>$i18n->get('view inbox message template'),
 		hoverHelp=>$i18n->get('view inbox message template description'),
 		namespace=>"Inbox/Message",
-		defaultValue=>$session->setting->get("viewInboxMessageTemplateId"),
+		defaultValue=>$setting->get("viewInboxMessageTemplateId"),
 		});    
     push(@fields, {
-		tab=>"ui",
+		tab=>"messaging",
 		fieldType=>"template",
 		name=>"sendPrivateMessageTemplateId",
 		label=>$i18n->get('send private message template'),
 		hoverHelp=>$i18n->get('send private message template description'),
 		namespace=>"Inbox/SendPrivateMessage",
-		defaultValue=>$session->setting->get("sendPrivateMessageTemplateId"),
+		defaultValue=>$setting->get("sendPrivateMessageTemplateId"),
 		});    
-	# messaging settings
 	push(@fields, {
 		tab=>"messaging",
 		fieldType=>"text",
 		name=>"smtpServer",
 		label=>$i18n->get(135),
 		hoverHelp=>$i18n->get('135 description'),
-		defaultValue=>$session->setting->get("smtpServer")
+		defaultValue=>$setting->get("smtpServer")
 		});
 	push(@fields, {
 		tab=>"messaging",
@@ -264,7 +265,7 @@ sub definition {
 		name=>"mailFooter",
 		label=>$i18n->get(824),
 		hoverHelp=>$i18n->get('824 description'),
-		defaultValue=>$session->setting->get("mailFooter")
+		defaultValue=>$setting->get("mailFooter")
 		});
 	push(@fields, {
 		tab=>"messaging",
@@ -272,7 +273,7 @@ sub definition {
 		name=>"mailReturnPath",
 		label=>$i18n->get("mail return path"),
 		hoverHelp=>$i18n->get('mail return path help'),
-		defaultValue=>$session->setting->get("mailReturnPath")
+		defaultValue=>$setting->get("mailReturnPath")
 		});
 	# misc
 	push(@fields, {
@@ -281,7 +282,7 @@ sub definition {
 		name=>"preventProxyCache",
 		label=>$i18n->get(400),
 		hoverHelp=>$i18n->get('400 description'),
-		defaultValue=>$session->setting->get("preventProxyCache")
+		defaultValue=>$setting->get("preventProxyCache")
 		});
 	push(@fields, {
 		tab=>"misc",
@@ -289,7 +290,7 @@ sub definition {
 		name=>"debugIp",
 		label=>$i18n->get("debug ip"),
 		hoverHelp=>$i18n->get("debug ip description"),
-		defaultValue=>$session->setting->get("debugIp")
+		defaultValue=>$setting->get("debugIp")
 		});
 	push(@fields, {
 		tab=>"misc",
@@ -297,7 +298,7 @@ sub definition {
 		name=>"showDebug",
 		label=>$i18n->get(707),
 		hoverHelp=>$i18n->get('707 description'),
-		defaultValue=>$session->setting->get("showDebug")
+		defaultValue=>$setting->get("showDebug")
 		});
 	push(@fields, {
 		tab=>"misc",
@@ -305,13 +306,13 @@ sub definition {
 		name=>"showPerformanceIndicators",
 		label=>$i18n->get('show performance indicators'),
 		hoverHelp=>$i18n->get('show performance indicators description'),
-		defaultValue=>$session->setting->get("showPerformanceIndicators")
+		defaultValue=>$setting->get("showPerformanceIndicators")
 		});
 	push(@fields, {
 		tab=>"misc",
 		fieldType=>"selectBox",
 		name=>"hostToUse",
-		defaultValue=>[$session->setting->get("hostToUse")],
+		defaultValue=>[$setting->get("hostToUse")],
 		options=>{
 			sitename=>$i18n->get(1070),
 			HTTP_HOST=>$i18n->get(1071)
@@ -326,7 +327,7 @@ sub definition {
 		name=>"anonymousRegistration",
 		label=>$i18n->get(118),
 		hoverHelp=>$i18n->get('118 description'),
-		defaultValue=>$session->setting->get("anonymousRegistration")
+		defaultValue=>$setting->get("anonymousRegistration")
 		});
 	push(@fields, {
 		tab=>"user",
@@ -334,7 +335,7 @@ sub definition {
                 name=>"automaticLDAPRegistration",
                 label=>$i18n->echo("Automatic LDAP Registration"),
                 hoverHelp=>$i18n->echo('When set to yes, a WebGUI user account will be created and the user logged in, if the credentials entered are validated by LDAP.'),
-		defaultValue=>$session->setting->get("automaticLDAPRegistration")
+		defaultValue=>$setting->get("automaticLDAPRegistration")
                 });
 	push(@fields, {
 		tab=>"user",
@@ -344,15 +345,35 @@ sub definition {
 		name=>"runOnRegistration",
 		label=>$i18n->get(559),
 		hoverHelp=>$i18n->get('559 description'),
-		defaultValue=>$session->setting->get("runOnRegistration")
+		defaultValue=>$setting->get("runOnRegistration")
 		});
+    push(@fields, { 
+        fieldType       => "workflow",
+        tab             => "user",
+        none            => 1,
+        name            => "runOnAdminCreateUser",
+        defaultValue    => $setting->get("runOnAdminCreateUser"),
+        label           => $i18n->get("run on admin create user"),
+        hoverHelp       => $i18n->get("run on admin create user help"),
+        type            => "WebGUI::User",
+        });
+    push(@fields, { 
+        fieldType       => "workflow",
+        tab             => "user",
+        none            => 1,
+        name            => "runOnAdminUpdateUser",
+        defaultValue    => $setting->get("runOnAdminUpdateUser"),
+        label           => $i18n->get("run on admin update user"),
+        hoverHelp       => $i18n->get("run on admin update user help"),
+        type            => "WebGUI::User",
+        });
 	push(@fields, {
 		tab=>"user",
 		fieldType=>"yesNo",
 		name=>"useKarma",
 		label=>$i18n->get(539),
 		hoverHelp=>$i18n->get('539 description'),
-		defaultValue=>$session->setting->get("useKarma")
+		defaultValue=>$setting->get("useKarma")
 		});
 	push(@fields, {
 		tab=>"user",
@@ -360,7 +381,7 @@ sub definition {
 		name=>"karmaPerLogin",
 		label=>$i18n->get(540),
 		hoverHelp=>$i18n->get('540 description'),
-		defaultValue=>$session->setting->get("karmaPerLogin")
+		defaultValue=>$setting->get("karmaPerLogin")
 		});
 	push(@fields, {
 		tab=>"user",
@@ -368,7 +389,7 @@ sub definition {
 		name=>"sessionTimeout",
 		label=>$i18n->get(142),
 		hoverHelp=>$i18n->get('142 description'),
-		defaultValue=>$session->setting->get("sessionTimeout")
+		defaultValue=>$setting->get("sessionTimeout")
 		});
 	push(@fields, {
 		tab=>"user",
@@ -376,7 +397,7 @@ sub definition {
 		name=>"selfDeactivation",
 		label=>$i18n->get(885),
 		hoverHelp=>$i18n->get('885 description'),
-		defaultValue=>$session->setting->get("selfDeactivation")
+		defaultValue=>$setting->get("selfDeactivation")
 		});
 	push(@fields, {
 		tab         => "user",
@@ -384,7 +405,7 @@ sub definition {
 		name        => "encryptLogin",
 		label       => $i18n->get(1006),
 		hoverHelp   => $i18n->get('1006 description'),
-		defaultValue=> $session->setting->get("encryptLogin"),
+		defaultValue=> $setting->get("encryptLogin"),
 		});
 	push(@fields, {
 		tab=>"user",
@@ -392,7 +413,7 @@ sub definition {
                 name=>"passiveProfilingEnabled",
                 label=>$i18n->get("Enable passive profiling"),
                 hoverHelp=>$i18n->get("Enable passive profiling description"),
-                defaultValue=>$session->setting->get("passiveProfilingEnabled"),
+                defaultValue=>$setting->get("passiveProfilingEnabled"),
                 extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
 		});
     push(@fields, {
@@ -401,7 +422,7 @@ sub definition {
         name=>"userInvitationsEnabled",
         label=>$i18n->get("Enable user invitations"),
         hoverHelp=>$i18n->get("Enable user invitations description"),
-        defaultValue=>$session->setting->get("userInvitationsEnabled"),
+        defaultValue=>$setting->get("userInvitationsEnabled"),
     });
     push(@fields, {
         tab=>"user",
@@ -409,7 +430,7 @@ sub definition {
         name=>"userInvitationsEmailExists",
         label=>$i18n->get("user invitations email exists"),
         hoverHelp=>$i18n->get("user invitations email exists description"),
-        defaultValue=>$session->setting->get("userInvitationsEmailExists"),
+        defaultValue=>$setting->get("userInvitationsEmailExists"),
     });
     push(@fields, {
 		tab=>"user",
@@ -418,7 +439,7 @@ sub definition {
 		label=>$i18n->get('user email template'),
 		hoverHelp=>$i18n->get('user email template description'),
 		namespace=>"userInvite/Email",
-		defaultValue=>$session->setting->get("userInvitationsEmailTemplateId"),
+		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
 		});    
 	# auth settings 
    	my $options;
@@ -432,7 +453,7 @@ sub definition {
 		options=>$options,
 		label=>$i18n->get(164),
 		hoverHelp=>$i18n->get('164 description'),
-		defaultValue=>[$session->setting->get("authMethod")],
+		defaultValue=>[$setting->get("authMethod")],
 		});
 
     # Administrative permissions
@@ -470,7 +491,7 @@ sub definition {
             name            => $group,
             label           => $i18n->get("settings $group label"),
             hoverHelp       => $i18n->get("settings $group hoverHelp"),
-            defaultValue    => $session->setting->get($group),
+            defaultValue    => $setting->get($group),
         };
     }
 

@@ -505,7 +505,30 @@ sub www_editUserSave {
 		$u->addToGroups(\@groups);
 		@groups = $session->form->group("groupsToDelete");
 		$u->deleteFromGroups(\@groups);
-		
+	
+        # trigger workflows	
+        if ($postedUserId eq "new") {
+	        if ($session->setting->get("runOnAdminCreateUser")) {
+		        WebGUI::Workflow::Instance->create($session, {
+			        workflowId=>$session->setting->get("runOnAdminCreateUser"),
+			        methodName=>"new",
+			        className=>"WebGUI::User",
+			        parameters=>$u->userId,
+			        priority=>1
+			        });
+	        }
+        }
+        else {
+	        if ($session->setting->get("runOnAdminUpdateUser")) {
+		        WebGUI::Workflow::Instance->create($session, {
+			        workflowId=>$session->setting->get("runOnAdminUpdateUser"),
+			        methodName=>"new",
+			        className=>"WebGUI::User",
+			        parameters=>$u->userId,
+			        priority=>1
+			        });
+	        }
+        }
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	
 	} else {
        		$error = '<ul>' . sprintf($i18n->get(77), $postedUsername, $postedUsername, $postedUsername, $session->datetime->epochToHuman($session->datetime->time(),"%y")).'</ul>';
