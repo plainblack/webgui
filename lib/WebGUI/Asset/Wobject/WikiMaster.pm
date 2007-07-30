@@ -98,7 +98,7 @@ sub autolinkHtml {
         $key =~ s{\)}{\\\)}gxms; # escape parens
 		$mapping{$key} = $self->session->url->gateway($mapping{$key});
 	}
-	my $matchString = join('|', map{quotemeta} keys %mapping);
+	my $matchString = join('|', map{quotemeta} sort {length($b) <=> length($a)} keys %mapping);
 	my $regexp = qr/($matchString)/i;
 	my @acc = ();
 	my $in_a = 0;

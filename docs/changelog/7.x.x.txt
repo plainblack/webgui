@@ -3,7 +3,7 @@
  - Fixed a bug in the Collaboration System where posts from the Safari browser
    would be submitted without changes.
  - fix: New pagination breaks SQL Reports with semicolons
-
+ - Wiki autolinks prefer longest title match
 
 7.4.0
  - api: Form Controls and Workflow Activities may now include web based helper
