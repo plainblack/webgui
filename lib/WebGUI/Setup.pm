@@ -111,6 +111,7 @@ The current WebGUI::Session object.
 
 sub setup {
 	my $session = shift;
+	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
     my ($output,$legend) = "";
 	if ($session->form->process("step") eq "2") {
@@ -484,7 +485,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # remove init state
 		$session->setting->remove('specialState');
-		$session->http->setRedirect($session->url->gateway());
+		$session->http->setRedirect($session->url->gateway("?setup=complete"));
 		return undef;
 	} 
     else {
@@ -555,7 +556,6 @@ return props[propName];
             <div id="initBox"><h1>'.$legend.'</h1><div id="initBoxSleeve"> '.$output.'</div></div>
          <img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 1000px; z-index: 1;" />
 	</body> </html>';
-	$session->http->setCacheControl("none");
 	$session->http->setMimeType("text/html");
     return $page;
 }
