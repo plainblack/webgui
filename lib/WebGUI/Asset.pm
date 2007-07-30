@@ -1652,15 +1652,7 @@ sub new {
 		return undef;
 	}
 
-	my $assetRevision = $session->stow->get("assetRevision");
-	my $revisionDate = shift || $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
-	unless ($revisionDate) {
-		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and
-			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate",
-			[$assetId, $session->scratch->get("versionTag")]);
-		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
-		$session->stow->set("assetRevision",$assetRevision);
-	}
+	my $revisionDate = shift || $class->getCurrentRevisionDate($session, $assetId);
 	return undef unless ($revisionDate);
 
 	unless ($class ne 'WebGUI::Asset' or defined $className) {

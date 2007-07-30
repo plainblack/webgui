@@ -75,19 +75,49 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-        my $sth = $self->session->db->read("select assetData.assetId,asset.className,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.revisionDate<? order by assetData.revisionDate asc", [time() - $self->get("purgeAfter")]);
-        while (my ($id, $class, $version) = $sth->array) {
-        	my $asset = WebGUI::Asset->new($self->session, $id,$class,$version);
-		if (defined $asset) {
-                	if ($asset->getRevisionCount("approved") > 1) {
-                		$asset->purgeRevision;
-                	}
-		} else {
-			$self->session->errorHandler->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
-		}
+	my ($self, $nothing, $instance) = @_;
+    my $session = $self->session;
+    my $log = $session->errorHandler;
+
+    # keep track of how much time it's taking
+    my $start = time();
+
+    # figure out if we left off somewhere
+    my $lastRunVersion = $instance->getScratch("purgeOldAssetsLastRevisionDate");
+    my $suspectDate = time() - $self->get("purgeAfter");
+    $suspectDate = ($suspectDate > $lastRunVersion) ? $suspectDate : $lastRunVersion;
+
+    # the query to find old revisions
+    my $sth = $session->db->read("select assetData.assetId,asset.className,assetData.revisionDate from asset
+        left join assetData on asset.assetId=assetData.assetId where assetData.revisionDate<? 
+        order by assetData.revisionDate asc", [$suspectDate]);
+    while (my ($id, $class, $version) = $sth->array) {
+
+        # we never want to purge the current version
+        if (WebGUI::Asset->getCurrentRevisionDate($session, $id) == $version) {
+            next;
         }
-	$sth->finish;
+
+        # instanciate and purge
+        my $asset = WebGUI::Asset->new($session, $id,$class,$version);
+		if (defined $asset) {
+            if ($asset->getRevisionCount("approved") > 1) {
+                $log->info("Purging revision $version for asset $id.");
+                $asset->purgeRevision;
+            }
+		}
+        else {
+			$log->error("Could not instanciate asset $id $class $version perhaps it is corrupt.")
+		}
+
+        # give up if we're taking too long
+        if (time() - $start > 55) { 
+            $log->info("Ran out of time, will pick up with revision $version when we start again."); 
+            $instance->setScratch("purgeOldAssetsLastRevisionDate", $version);
+            $sth->finish;
+            return $self->WAITING;
+        } 
+    }
 	return $self->COMPLETE;
 }
 

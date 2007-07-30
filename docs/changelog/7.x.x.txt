@@ -1,8 +1,10 @@
 7.4.1
- - Fixed a bug where crons wouldn't load into spectre's queue at startup.
- - Fixed a bug in the Collaboration System where posts from the Safari browser
-   would be submitted without changes.
+ - fix: crons wouldn't load into spectre's queue at startup.
+ - fix: in the Collaboration System, posts from the Safari browser
+   are submitted without changes.
  - fix: New pagination breaks SQL Reports with semicolons
+ - fix: purge old asset revisions could purge the most recent revision if the
+   database had some referential integrity probems
  - Wiki autolinks prefer longest title match
 
 7.4.0

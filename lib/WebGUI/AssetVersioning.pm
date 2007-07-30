@@ -178,6 +178,40 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
+=head2 getCurrentRevisionDate ( session, assetId )
+
+This is a class method. Returns the revision date for the revision of the specified asset that is the currently
+published revision for the version tag that we're currently operating under. If no version tag, then the revision
+that will be displayed publicly is the one returned.
+
+=head3 session
+
+A session object.
+
+=head3 assetId
+
+The unique identifier for an asset.
+
+=cut
+
+sub getCurrentRevisionDate  {
+    my $class = shift;
+    my $session = shift;
+    my $assetId = shift;
+	my $assetRevision = $session->stow->get("assetRevision");
+	my $revisionDate = $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
+	unless ($revisionDate) {
+		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and
+			(status='approved' or status='archived' or tagId=?) order by assetData.revisionDate",
+			[$assetId, $session->scratch->get("versionTag")]);
+		$assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'} = $revisionDate;
+		$session->stow->set("assetRevision",$assetRevision);
+	}
+    return $revisionDate;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRevisionCount ( [ status ] )
 
 Returns the number of revisions available for this asset.
