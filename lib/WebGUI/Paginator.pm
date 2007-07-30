@@ -691,6 +691,7 @@ sub setDataByQuery {
     my $start = ( ($pageNumber - 1) * $rowsPerPage );
     
     #Set the query limits
+    $sql =~ s/;\s+$//;
     $sql .= " limit $start,$rowsPerPage";  
     $sql =~ s/select/select SQL_CALC_FOUND_ROWS /;
     
