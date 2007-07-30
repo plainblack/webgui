@@ -127,7 +127,7 @@ An integer (1,2,3) that determines what priority the workflow should be executed
 sub addJob {
 	my ($self, $params) = @_[OBJECT, ARG0];
 	my $id = $params->{config}."-".$params->{taskId};
-    if ($params->{config} eq "" || $params->{taskId}) {
+    if ($params->{config} eq "" || $params->{taskId} eq "") {
         $self->error("Can't add a schedule with missing data: $id");
     }   
     else {
