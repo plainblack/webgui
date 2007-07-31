@@ -343,7 +343,10 @@ sub view {
 		historyUrl          => $self->getUrl("func=getHistory"),
 		editContent         => $self->getEditForm,
         allowsAttachments   => $self->getWiki->get("allowAttachments"),
-		content             => $self->getWiki->autolinkHtml($self->scrubContent),	
+		content             => $self->getWiki->autolinkHtml(
+            $self->scrubContent,
+            {skipTitles => [$self->get('title')]},
+        ),	
 		};
 	return $self->processTemplate($var, $self->getWiki->get("pageTemplateId"));
 }

@@ -6,9 +6,13 @@
  - fix: purge old asset revisions could purge the most recent revision if the
    database had some referential integrity probems
  - Wiki autolinks prefer longest title match
+    http://www.webgui.org/bugs/tracker/wiki-automatic-link-creator-not-greedy-enough
+ - Wiki pages no longer autolink themselves
+    http://www.webgui.org/bugs/tracker/wrong-an-unnecessary-links-in-wiki
  - fix: Recover Password by Profile Field can now work with subclasses of
    WebGUI::Auth::WebGUI and with custom WebGUI::Form::Controls as profile 
    fields.
+
 
 7.4.0
  - api: Form Controls and Workflow Activities may now include web based helper

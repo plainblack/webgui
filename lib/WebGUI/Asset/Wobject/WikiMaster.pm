@@ -90,14 +90,22 @@ sub appendSearchBoxVars {
 sub autolinkHtml {
 	my $self = shift;
 	my $html = shift;
-	# TODO: ignore caching for now, but maybe do it later.
+    # opts is always the last parameter, and a hash ref
+    my %opts = ref $_[-1] eq 'HASH' ? %{pop @_} : ();
+    my $skipTitles = $opts{skipTitles} || [];
+    # TODO: ignore caching for now, but maybe do it later.
 	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
 	return $html unless %mapping;
 	foreach my $key (keys %mapping) {
+        if (grep {lc $_ eq $key} @$skipTitles) {
+            delete $mapping{$key};
+            next;
+        }
         $key =~ s{\(}{\\\(}gxms; # escape parens
         $key =~ s{\)}{\\\)}gxms; # escape parens
 		$mapping{$key} = $self->session->url->gateway($mapping{$key});
 	}
+    # sort by length so it prefers matching longer titles 
 	my $matchString = join('|', map{quotemeta} sort {length($b) <=> length($a)} keys %mapping);
 	my $regexp = qr/($matchString)/i;
 	my @acc = ();
@@ -121,7 +129,6 @@ sub autolinkHtml {
 	$p->handler(default => sub { push @acc, $_[0] }, 'text');
 	$p->parse($html);
 	$p->eof;
-	undef $p;		# Just in case there might be reference loops.
 	return join '', @acc;
 }
 
