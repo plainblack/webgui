@@ -816,6 +816,7 @@ sub recoverPasswordFinish {
  
 sub profileRecoverPasswordFinish {
     my $self        = shift;
+    my $session     = $self->session;
     my $i18n        = WebGUI::International->new($self->session);
     my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
     return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
@@ -848,12 +849,13 @@ sub profileRecoverPasswordFinish {
 	my @fieldValues = values %fieldValues;
 	my $wheres = join(' ', map{"AND upd.$fieldNames[$_] = ?"} (0..$#fieldNames));
 	$wheres .= ' AND u.username = ?' if defined $username;
-	my $sql = "SELECT u.userId FROM users AS u JOIN userProfileData AS upd ON u.userId=upd.userId WHERE u.authMethod = 'WebGUI' $wheres";
-	my @userIds = $self->session->db->buildArray($sql, [@fieldValues, (defined($username)? ($username) : ())]);
+	my $sql = "SELECT u.userId FROM users AS u JOIN userProfileData AS upd ON u.userId=upd.userId WHERE u.authMethod = ? $wheres";
+	my @userIds = $self->session->db->buildArray($sql, [$self->authMethod, @fieldValues, (defined($username)? ($username) : ())]);
 
 	if (@userIds == 0) {
 		return $self->recoverPassword($i18n2->get('password recovery no results'));
-	} elsif (@userIds > 1) {
+	} 
+    elsif (@userIds > 1) {
 		return $self->recoverPassword($i18n2->get('password recovery multiple results'));
 	}
 
@@ -865,14 +867,27 @@ sub profileRecoverPasswordFinish {
 		my $vars = {};
 		$vars->{title} = $i18n->get(71);
 		$vars->{'recoverFormHeader'} = "\n\n" . WebGUI::Form::formHeader($self->session, {});
-		$vars->{'recoverFormHidden'} =
-		    (WebGUI::Form::hidden($self->session, {name => 'op', value => 'auth'})
-		     . WebGUI::Form::hidden($self->session, {name => 'method', value => 'recoverPasswordFinish'})
-		     . (defined($username)?
-			WebGUI::Form::hidden($self->session, {name => 'authWebGUI.username',
-							      value => $username}) : '')
-		     . join('', map{WebGUI::Form::hidden($self->session, {name => $_, value => $fieldValues{$_}})}
-			    keys %fieldValues));
+		$vars->{'recoverFormHidden'}
+		    = WebGUI::Form::hidden($session, {name => 'op', value => 'auth'})
+		    . WebGUI::Form::hidden($session, {name => 'method', value => 'recoverPasswordFinish'})
+		    . ( defined($username) 
+            ? WebGUI::Form::hidden($session, {name => 'authWebGUI.username', value => $username}) 
+            : '')
+            ;
+
+        # Add hidden fields for each required profile field
+        for my $profileField (@fields) {
+            my $formField   
+                = $profileField->getFormControlClass->new($session, 
+                    $profileField->formProperties({
+                        name    => $profileField->getId,
+                        value   => $fieldValues{ $profileField->getId },
+                    })
+                );
+            
+            $vars->{'recoverFormHidden'} .= $formField->toHtmlAsHidden;
+        }
+
 		$vars->{'recoverFormSubmit'} = WebGUI::Form::submit($self->session, {});
 		$vars->{'recoverFormFooter'} = WebGUI::Form::formFooter($self->session);
 

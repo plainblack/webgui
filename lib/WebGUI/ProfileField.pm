@@ -122,7 +122,7 @@ sub create {
     $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = 'WebGUI::Form::' . ucfirst $properties->{fieldType};
     eval "use $formClass;";
-    my $dbDataType = $formClass->new($session, $self->_formProperties($properties))->get("dbDataType");
+    my $dbDataType = $formClass->new($session, $self->formProperties($properties))->get("dbDataType");
 
     # Add the column to the userProfileData table
     $db->write(
@@ -157,8 +157,16 @@ sub delete {
 
 
 #-------------------------------------------------------------------
-# Get a hashref of properties to give to a WebGUI::Form::Control
-sub _formProperties {
+
+=head2 formProperties ( hashRef )
+
+Get a hashref of properties to give to a WebGUI::Form::Control. The
+hashRef argument allows you to specify some additional items (such as
+a value) that are not known by the ProfileField.
+
+=cut
+
+sub formProperties {
 	my $self        = shift;
 	my $properties  = shift || {};
     
@@ -187,6 +195,12 @@ sub _formProperties {
     return \%properties;
 }
 
+#-- This is here in case people did not understand that _ means private
+#-- this can be removed when the API is unlocked.
+sub _formProperties { my $self = shift; return $self->formProperties(@_); }
+
+#-------------------------------------------------------------------
+
 =head2 formField ( [ formProperties, withWrapper, userObject ] )
 
 Returns an HTMLified form field element.
@@ -207,7 +221,7 @@ A WebGUI::User object reference to use instead of the currently logged in user.
 
 sub formField {
 	my $self = shift;
-    my $properties = $self->_formProperties(shift);
+    my $properties = $self->formProperties(shift);
 	my $withWrapper = shift;
 	my $u = shift || $self->session->user;
 	my $skipDefault = shift;
@@ -251,7 +265,7 @@ Returns the value retrieved from a form post.
 sub formProcess {
 	my $self = shift;
     my $u = shift || $self->session->user;
-    my $properties = $self->_formProperties({value => $u->profileField($self->getId)});
+    my $properties = $self->formProperties({value => $u->profileField($self->getId)});
 	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
 	if (ref $result eq "ARRAY") {
 		my @results = @$result;
@@ -578,7 +592,7 @@ sub rename {
     # Rename the userProfileData column
     my $fieldClass  = $self->getFormControlClass;
     eval "use $fieldClass;";
-    my $dbDataType  = $fieldClass->new($session, $self->_formProperties)->get("dbDataType");
+    my $dbDataType  = $fieldClass->new($session, $self->formProperties)->get("dbDataType");
 
     $self->session->db->write(
         "ALTER TABLE userProfileData "
@@ -684,7 +698,7 @@ sub set {
         my $fieldClass  = "WebGUI::Form::".ucfirst($properties->{fieldType});
         eval "use $fieldClass;";
         my $dbDataType 
-            = $fieldClass->new($session, $self->_formProperties($properties))->get("dbDataType");
+            = $fieldClass->new($session, $self->formProperties($properties))->get("dbDataType");
         
         my $sql 
             = "ALTER TABLE userProfileData MODIFY COLUMN " 
