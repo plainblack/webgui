@@ -12,6 +12,7 @@
  - fix: Recover Password by Profile Field can now work with subclasses of
    WebGUI::Auth::WebGUI and with custom WebGUI::Form::Controls as profile 
    fields.
+ - Add indicator to trash and clipboard in asset has children
 
 
 7.4.0

@@ -390,13 +390,14 @@ $self->session->style->setLink($self->session->url->extras('assetManager/assetMa
          \n";
         foreach my $child (@{$self->getAssetsInClipboard($limit)}) {
 		my $title = $child->getTitle;
+		my $plus = $child->getChildCount({includeTrash => 1}) ? "+ " : "&nbsp;&nbsp;&nbsp;&nbsp;";
                 $title =~ s/\'/\\\'/g;
                 $output .= "assetManager.AddLine('"
                         .WebGUI::Form::checkbox($self->session,{
                                 name=>'assetId',
                                 value=>$child->getId
                                 })
-                        ."','<a href=\"".$child->getUrl("func=manageAssets")."\">".$title
+                        ."','" . $plus . "<a href=\"".$child->getUrl("func=manageAssets")."\">" . $title
                         ."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"border-style:none;vertical-align:middle;\" alt=\"".$child->getName."\" /></p> ".$child->getName
                         ."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";

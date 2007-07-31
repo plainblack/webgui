@@ -176,7 +176,9 @@ Returns the number of children this asset has. This excludes assets in the trash
 
 sub getChildCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from asset where state in ('published','archived') and parentId=?", [$self->getId]);
+    my $opts = shift || {};
+	my $stateWhere = $opts->{includeTrash} ? '' : "state in ('published','archived') and";
+	my ($count) = $self->session->db->quickArray("select count(*) from asset where $stateWhere parentId=?", [$self->getId]);
 	return $count;
 }
 
