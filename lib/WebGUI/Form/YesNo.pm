@@ -109,16 +109,9 @@ An optional value to process, instead of POST input. This should be in the form 
 
 sub getValueFromPost {
 	my $self = shift;
-	my $formValue;
-
-	if (@_) {
-		my $value = shift;
-		return '' unless length $value; # empty import value?
-		return ($value =~ /^y/i || $value eq '1') ? 1 : 0;
-	}
-	else {
-		return $self->SUPER::getValueFromPost;
-	}
+    my $value = shift;
+    $value = $self->SUPER::getValueFromPost unless (defined $value);
+	return ($value =~ /^y/i || $value eq '1') ? 1 : 0;
 }
 
 #-------------------------------------------------------------------
