@@ -463,7 +463,15 @@ sub www_editGroupSave {
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
 	$g->description($session->form->process("description"));
-	$g->name($session->form->process("groupName"));
+	# We don't want them to use an existing name.  If needed, we'll ad a number to the name to keep it unique.
+	my $groupName = $session->form->process("groupName");
+	while (WebGUI::Group->find($session, $groupName)->getId) {
+	    $groupName =~ s/\A(.*?)(\d*)\z/
+	        my $newNum = ($2 || 0) + 1;
+	        substr($1, 0, 100 - length($newNum)) . $newNum;  #prevent name from growing over 100 chars
+	    /emsx;
+    }
+	$g->name($groupName);
 	$g->expireOffset($session->form->interval("expireOffset"));
 	$g->karmaThreshold($session->form->process("karmaThreshold"));
 	$g->ipFilter($session->form->process("ipFilter"));

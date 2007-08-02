@@ -1,5 +1,6 @@
 7.4.2
  - Group names can now be 100 characters long
+ - prevent groups being created with duplicate names
 
 7.4.1
  - fix: crons wouldn't load into spectre's queue at startup.
