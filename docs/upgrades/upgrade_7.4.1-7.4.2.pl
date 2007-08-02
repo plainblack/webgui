@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+increaseGroupNameSize($session);
 
 finish($session); # this line required
 
@@ -121,5 +122,9 @@ sub createNewTemplatesFolder {
 	return $newFolder;
 }
 
-
+sub increaseGroupNameSize {
+    my $session = shift;
+    print "\tIncreasing size of group name field.\n" unless $quiet;
+    $session->db->write("alter table groups modify groupName varchar(100)");
+}
 
