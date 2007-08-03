@@ -288,7 +288,8 @@ A reference to the current session.
 
 sub www_manageCommittedVersions {
     my $session = shift;
-    return $session->privilege->adminOnlycanView($session);
+    return $session->privilege->adminOnly
+        unless canView($session);
     my $ac = WebGUI::AdminConsole->new($session,"versions");
     my $i18n = WebGUI::International->new($session,"VersionTag");
     my $rollback = $i18n->get('rollback');
