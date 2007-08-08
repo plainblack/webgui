@@ -683,9 +683,11 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 recoverPassword ( )
+=head2 recoverPassword ( args )
 
-Initiates the password recovery process.  Checks for recovery type, and then runs the appropriate method.
+Initiates the password recovery process.  Checks for recovery type, 
+and then runs the appropriate method. arguments to this sub are
+passed directly to the approprate method.
 
 =cut
 
@@ -699,10 +701,10 @@ sub recoverPassword {
     #$self->session->errorHandler->warn("recovery type: $type");
 
     if ($type eq 'profile') {
-        $self->profileRecoverPassword;
+        $self->profileRecoverPassword(@_);
     } 
     elsif ($type eq 'email') {
-        $self->emailRecoverPassword;
+        $self->emailRecoverPassword(@_);
     }
 }
  
@@ -794,9 +796,11 @@ sub profileRecoverPassword {
   
 #-------------------------------------------------------------------
 
-=head2 recoverPasswordFinish ( ) 
+=head2 recoverPasswordFinish ( args ) 
 
-Handles data for recovery of password.  Gets password recovery type, and then runs the appropriate method.
+Handles data for recovery of password.  Gets password recovery type, 
+and then runs the appropriate method. Arguments are passed directly
+to the appropriate method.
 
 =cut
 
@@ -806,9 +810,9 @@ sub recoverPasswordFinish {
     my $type = $self->getPasswordRecoveryType;
 
     if ($type eq 'profile') {
-        $self->profileRecoverPasswordFinish;
+        $self->profileRecoverPasswordFinish(@_);
     } elsif ($type eq 'email') {
-        $self->emailRecoverPasswordFinish;
+        $self->emailRecoverPasswordFinish(@_);
     }
  }
  

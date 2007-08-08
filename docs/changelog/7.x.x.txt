@@ -3,6 +3,7 @@
  - prevent groups being created with duplicate names
  - fix: Version Tags->Manage Committed Versions Not Working
     http://www.webgui.org/bugs/tracker/version-tags-manage-committed-versions-not-working
+ - fix: Recover Password error messages not displaying
 
 7.4.1
  - fix: crons wouldn't load into spectre's queue at startup.
