@@ -738,7 +738,14 @@ sub sendEmail {
 	    @{$self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}})}
 		: ();
 	if ($to =~ /\@/) {
-		my $mail = WebGUI::Mail::Send->create($self->session,{to=>$to, subject=>$subject, cc=>$cc, from=>$from, bcc=>$bcc});
+		my $mail = WebGUI::Mail::Send->create($self->session,{
+		    to      => $to,
+		    replyTo => $from,
+		    subject => $subject,
+		    cc      => $cc,
+		    from    => $from,
+		    bcc     => $bcc,
+		});
 		$mail->addHtml($message);
 		$mail->addFooter;
 		$mail->addAttachment($_) for (@attachments);
@@ -760,22 +767,22 @@ sub sendEmail {
 				message=>$message,
 				status=>'complete'
 				});
-                        my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, subject=>$subject, from=>$from});
 			if ($cc) {
+                my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, replyTo=>$from, subject=>$subject, from=>$from});
 				$mail->addHtml($message);
 				$mail->addAttachment($_) for (@attachments);
 				$mail->addFooter;
 				$mail->queue;
-                        }
-                        if ($bcc) {
-                                WebGUI::Mail::Send->create($self->session, {to=>$bcc, subject=>$subject, from=>$from});
+            }
+            if ($bcc) {
+                my $mail = WebGUI::Mail::Send->create($self->session, {to=>$bcc, replyTo=>$from, subject=>$subject, from=>$from});
 				$mail->addHtml($message);
 				$mail->addAttachment($_) for (@attachments);
 				$mail->addFooter;
 				$mail->queue;
-                        }
-                }
+            }
         }
+    }
 }
 
 #-------------------------------------------------------------------

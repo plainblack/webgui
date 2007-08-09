@@ -1,3 +1,7 @@
+7.4.3
+ - Data Forms set reply to to the same as the from field
+
+
 7.4.2
  - Group names can now be 100 characters long
  - prevent groups being created with duplicate names
