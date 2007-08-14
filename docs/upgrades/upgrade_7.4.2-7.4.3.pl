@@ -12,7 +12,9 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::Workflow::Cron;
+use WebGUI::Asset;
+use WebGUI::Utility;
 
 my $toVersion = "7.4.3"; # make this match what version you're going to
 my $quiet; # this line required
@@ -22,16 +24,32 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 reserializePollGraphConfigs($session);
+fixCsMailWorkflow($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixCsMailWorkflow {
+	my $session = shift;
+	print "\tFixing CS Mail workflows and crons.\n" unless ($quiet);
+    # get valid crons
+    my $collaborations = $session->db->read("select assetId from asset where className like 'WebGUI::Asset::Wobject::Collaboration%'");
+    my @cronIds = ();
+    while (my ($id) = $collaborations->array) {
+        my $cs = WebGUI::Asset->newByDynamicClass($session, $id);
+        if (defined $cs) {
+            push(@cronIds, $cs->get("getMailCronId"));
+        }
+    }
+    # delete invalid crons
+    for my $task (@{WebGUI::Workflow::Cron->getAllTasks($session)}) {
+        next unless ($task->get("className") =~ m/WebGUI::Asset::Wobject::Collaboration/);
+        unless (isIn($task->getId, @cronIds)) {
+            $task->delete;
+        }
+    }
+}
 
 #-------------------------------------------------
 sub reserializePollGraphConfigs {

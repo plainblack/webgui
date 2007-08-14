@@ -3,6 +3,7 @@
  - Config file bugs fixed, see gotcha.txt for details.
  - Added export to context menu in asset manager
  - fix: XHTML 1.0 strict, FileUploadControl.js, resizable textarea
+ - fix: undefined activity
  - Polls now use JSON instead of Storable to serialize graph config
 
 

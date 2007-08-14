@@ -324,7 +324,7 @@ sub commit {
 		$cron = WebGUI::Workflow::Cron->create($self->session, {
 			title=>$self->getTitle." ".$i18n->get("mail"),
 			minuteOfHour=>"*/".($self->get("getMailInterval")/60),
-			className=>"WebGUI::Asset::Wobject::Collaboration",
+			className=>(ref $self),
 			methodName=>"new",
 			parameters=>$self->getId,
 			workflowId=>"csworkflow000000000001"
