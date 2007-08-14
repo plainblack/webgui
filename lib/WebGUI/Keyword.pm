@@ -37,8 +37,6 @@ These methods are available from this class:
 
 =cut
 
-# begin inside out object
-{
 
 #-------------------------------------------------------------------
 
@@ -269,18 +267,19 @@ sub setKeywordsForAsset {
     }
     $self->deleteKeywordsForAsset($options->{asset});
     my $assetId = $options->{asset}->getId;
-    my $sth = $self->session->db->prepare("insert into assetKeyword (assetId, keyword) values (?,?)");
-    foreach my $keyword (@{$keywords}) {
-        next if ($keyword eq "");
-        $sth->execute([$assetId, lc($keyword)]);
+    if (scalar(@{$keywords})) {
+        my $sth = $self->session->db->prepare("insert into assetKeyword (assetId, keyword) values (?,?)");
+        foreach my $keyword (@{$keywords}) {
+            next if ($keyword eq "");
+            $sth->execute([$assetId, lc($keyword)]);
+        }
     }
+    else {
+        $self->deleteKeywordsForAsset($options->{asset});
+    }   
 }
 
 
-
-
-# end inside out object
-}
 
 1;
 

@@ -1859,9 +1859,7 @@ sub processPropertiesFromFormPost {
 				);
 		}
 	}
-    if ($form->process("keywords")) {
-        $data{keywords} = $form->process("keywords");
-    }
+    $data{keywords} = $form->process("keywords");
     if ($self->session->setting->get("metaDataEnabled")) {
         my $meta = $self->getMetaDataFields;
 	    foreach my $field (keys %{$meta}) {
