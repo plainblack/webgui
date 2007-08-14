@@ -666,11 +666,7 @@ sub view {
 		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	}
 
-	if(@$rss_feeds > 1){
-	    #If there is more than one (valid) feed in this wobject, put in the wobject description info.
-	    $var{'channel.title'} = $title;
-	    $var{'channel.description'} = $self->get('description');
-	} else {
+	if(@$rss_feeds == 1){
 	    #One feed. Put in the info from the feed.
 	    $var{'channel.title'} = $rss_feeds->[0]->{channel}->{title} || $title;
 	    $var{'channel.link'} = $rss_feeds->[0]->{channel}->{link};
