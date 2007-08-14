@@ -112,11 +112,12 @@ sub toHtml {
  	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
-	my $style = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-	my $out = '<textarea rows="#" cols="#" id="'.$self->get('id').'" name="'.$self->get("name").'" style="'.$style.'" '.$self->get("extras").'>'.$value.'</textarea>';
+	my ($style, $url) = $self->session->quick(qw(style url));
+	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
+    $style->setRawHeadTags(qq|<style type="text/css">\n#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
+	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#">'.$value.'</textarea>';
 	if ($self->get("resizable")) {
 		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
-		my ($style, $url) = $self->session->quick(qw(style url));
 		$style->setScript($url->extras("yui/build/yahoo/yahoo-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
 		$style->setScript($url->extras("yui/build/dom/dom-min.js"), {type=>"text/javascript"});

@@ -2,6 +2,7 @@
  - Data Forms set reply to to the same as the from field
  - Config file bugs fixed, see gotcha.txt for details.
  - Added export to context menu in asset manager
+ - fix: XHTML 1.0 strict, FileUploadControl.js, resizable textarea
  - Polls now use JSON instead of Storable to serialize graph config
 
 

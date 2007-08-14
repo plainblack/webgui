@@ -137,6 +137,50 @@ sub displayValue {
 
 #-------------------------------------------------------------------
 
+=head2 getFilePreview ( storage )
+
+Returns a preview of the files attached to this form control. 
+
+=head3 storage
+
+A WebGUI::Storage object.
+
+=cut
+
+sub getFilePreview {
+    my $self = shift;
+    my $storage = shift;
+    my $preview = "";
+	foreach my $file (@{$storage->getFiles}) {
+		if ($self->get("deleteFileUrl")) {
+			$preview = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
+			    .'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
+		}
+		my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
+		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
+		    .'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
+			.$file.'" /> '.$file.'</a></p><br />';
+	}
+    return $preview;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStorageLocation ( )
+
+Returns the WebGUI::Storage object for this control.
+
+=cut
+
+sub getStorageLocation {
+    my $self = shift;
+	my $storage = WebGUI::Storage::Image->get($self->session, $self->get("value")) if ($self->get("value"));
+    return $storage;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getValueFromPost ( )
 
 See WebGUI::Form::File::getValueFromPost() for details. Generates a thumbnail.
@@ -163,55 +207,5 @@ sub getValueFromPost {
 	return $id;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a file upload control.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session);
-	my $uploadControl = undef;
-	my $storage = WebGUI::Storage::Image->get($self->session, $self->get("value")) if ($self->get("value"));
-	my @files = defined($storage)? @{$storage->getFiles} : ();
-	my $maxNewFiles = $self->get('maxAttachments') - scalar(@files);
-	if ($maxNewFiles > 0) {
-        	$self->session->style->setScript($self->session->url->extras('/FileUploadControl.js'),{type=>"text/javascript"});
-        	$uploadControl = '<script type="text/javascript">
-                	var fileIcons = new Array();
-                	';
-        	opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
-        	my @icons = readdir(DIR);
-        	closedir(DIR);
-        	foreach my $file (@icons) {
-                	unless ($file eq "." || $file eq "..") {
-                        	my $ext = $file;
-	                        $ext =~ s/(.*?)\.gif/$1/;
-        	                $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
-                	}
-        	}
-        	$uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow(); </script>!, 
-			$self->get("name")."_file", $i18n->get("removeLabel"), $maxNewFiles, $self->get("size");
-		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'upload'})->toHtml()."<br />";
-	} else {
-		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->get("name"), -value => $self->get("value")})->toHtml()."<br />";
-		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'keep'})->toHtml()."<br />";
-	}
-	foreach my $file (@files) {
-		if ($self->get("deleteFileUrl")) {
-			$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
-			    .'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
-		}
-		my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
-		$uploadControl .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
-		    .'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
-			.$file.'" /> '.$file.'</a></p><br />';
-	}
-        return $uploadControl;
-}
 
 1;

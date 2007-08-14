@@ -20,10 +20,10 @@ function FileUploadControl(fieldName, imageArray, removeLabel, fileLimit, size) 
 	
 	str +='<table style="display: none;">'
 	
-	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td style="display:none;"><img src="' + imageArray["unknown"] + '" style="visibility: hidden;"></td>';
+	str += '<tr id="' + workspaceId + '.template" class="fileUploadRow"><td style="display:none;"><img src="' + imageArray["unknown"] + '" style="visibility: hidden;" /></td>';
 	str +='<td colspan="2"><input type="file" name="'+fieldName+'" ';
         str += ' size="'+ size + '" ';
-    str +=' onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)"></td></tr>';
+    str +=' onchange="FileUploadControl_valueChange(event)"></td><td><input type="button" value="' + removeLabel + '" onclick="FileUploadControl_removeButtonClick(event)" alt="unknown filetype" /></td></tr>';
 	
 	str += '</table>';
 	
@@ -69,11 +69,13 @@ function FileUploadControl_swapImage(firedobj) {
 	
 	var parts = firedobj.value.split('.');
 	var imgPath = this.images["unknown"];
+    var alternative;
 	
 	if (parts.length !=1) {
 			var extension = parts[parts.length -1].toLowerCase();
 			if (this.images[extension]) {
 				imgPath = this.images[extension];
+                alternative = extension;
 			}
 	}		
 	var row = this.getRow(firedobj);
@@ -83,6 +85,7 @@ function FileUploadControl_swapImage(firedobj) {
 	var img = row.childNodes[0].childNodes[0];
 	img.src = imgPath;
 	img.style.visibility="visible";
+    img.alt = alternate;
 }
 
 //removes a row from the control
@@ -94,7 +97,8 @@ function FileUploadControl_removeRow(firedobj) {
 //adds a row to the control
 function FileUploadControl_addRow() {
 	var row = this.rowTemplate.cloneNode(true);	
-	row.id = new Date().getTime();	
+    row.id = "id";
+	row.id += new Date().getTime();	
 	this.tbody.appendChild(row);
 }
 
