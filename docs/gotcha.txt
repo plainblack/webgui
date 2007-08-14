@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.4.3
+--------------------------------------------------------------------
+
+ * You must upgrade to Config::JSON 1.1.0 or higher prior to upgrading.
+    Due to a bug in CPAN you should type "force install Config::JSON" in
+    order to upgrade to this version.
+
+
 7.4.0
 --------------------------------------------------------------------
 

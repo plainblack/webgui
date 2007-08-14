@@ -104,7 +104,7 @@ checkModule("HTML::Template",2.9);
 checkModule("HTML::Template::Expr",0.05,2);
 checkModule("XML::RSSLite",0.11);
 checkModule("JSON",0.991);
-checkModule("Config::JSON","1.0.3");
+checkModule("Config::JSON","1.1.0");
 checkModule("Text::CSV_XS","0.26");
 checkModule("Net::Subnets",0.21);
 checkModule("Finance::Quote",1.08);
