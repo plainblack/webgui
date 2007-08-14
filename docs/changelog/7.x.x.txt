@@ -2,6 +2,7 @@
  - Data Forms set reply to to the same as the from field
  - Config file bugs fixed, see gotcha.txt for details.
  - Added export to context menu in asset manager
+ - Polls now use JSON instead of Storable to serialize graph config
 
 
 7.4.2

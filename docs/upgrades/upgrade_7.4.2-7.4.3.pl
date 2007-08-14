@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+reserializePollGraphConfigs($session);
 
 finish($session); # this line required
 
@@ -31,6 +32,41 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub reserializePollGraphConfigs {
+    my $session = shift;
+    print "\tRe-serializing Poll Graph configuration... " unless ($quiet);
+    
+    use Storable;
+    $Storable::canonical = 1;
+    use JSON;
+
+    my $sth = $session->db->read(
+        "SELECT assetId, revisionDate, graphConfiguration FROM Poll"
+    );
+
+    while (my %data = $sth->hash) {
+        next unless $data{graphConfiguration};
+        my ($assetId, $revisionDate, $graphConfiguration) 
+            = @data{'assetId', 'revisionDate', 'graphConfiguration'};
+
+        my $thawed  = eval { Storable::thaw($graphConfiguration) };
+        if ($@) {
+            print "\n\t!!! Could not fix graph configuration for assetId '$assetId' revisionDate '$revisionDate' !!!";
+            next;
+        }
+
+        $graphConfiguration = objToJson( $thawed );
+
+        $session->db->write(
+            "UPDATE Poll SET graphConfiguration=? WHERE assetId=? AND revisionDate=?",
+            [$graphConfiguration, $assetId, $revisionDate],
+        );
+    }
+    
+    print "OK!\n" unless $quiet;
+}
 
 
 

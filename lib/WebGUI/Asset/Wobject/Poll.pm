@@ -21,7 +21,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
 use WebGUI::Storage::Image;
-use Storable;
+use JSON;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -179,6 +179,23 @@ sub duplicate {
 	return $newAsset;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 freezeGraphConfig 
+
+Serializes graph configuration. Returns a scalar containing the serialized
+structure.
+
+=cut
+
+sub freezeGraphConfig {
+    my $self        = shift;
+    my $obj         = shift;
+    
+    return JSON::objToJson($obj);
+}
+
+
 #-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
@@ -254,10 +271,7 @@ sub getEditForm {
 
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
-		my $config = {};
-		if ($self->get('graphConfiguration')) {
-			$config = Storable::thaw($self->get('graphConfiguration'));
-		}
+		my $config = $self->getGraphConfig;
 
 		$tabform->addTab('graph', 'Graphing');
 		$tabform->getTab('graph')->yesNo(
@@ -270,6 +284,23 @@ sub getEditForm {
 	}
 
 	return $tabform;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getGraphConfig
+
+Gets and thaws the graph configuration. Returns a reference to the original
+data structure.
+
+=cut
+
+sub getGraphConfig {
+    my $self    = shift;
+    my $config  = $self->get("graphConfiguration");
+
+    return unless $config;
+    return $self->thawGraphConfig($config);
 }
 
 #-------------------------------------------------------------------
@@ -316,7 +347,7 @@ sub processPropertiesFromFormPost {
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);
-		$property->{graphConfiguration} = Storable::freeze($graph->getConfiguration);
+		$self->setGraphConfig( $graph->getConfiguration );
 	}
 
 	$self->update($property);
@@ -331,6 +362,23 @@ sub purge {
 	$self->SUPER::purge();
 }	
 
+#----------------------------------------------------------------------------
+
+=head2 setGraphConfig
+
+Freezes and stores the configuration for the graphing of this poll. 
+
+=cut
+
+sub setGraphConfig {
+    my $self    = shift;
+    my $obj     = shift;
+
+    $self->update({
+        graphConfiguration  => $self->freezeGraphConfig($obj),
+    });
+}
+
 #-------------------------------------------------------------------
 sub setVote {
 	my $self = shift;
@@ -339,6 +387,21 @@ sub setVote {
 	my $ip = shift;
        	$self->session->db->write("insert into Poll_answer (assetId, answer, userId, ipAddress) values (".$self->session->db->quote($self->getId).", 
 		".$self->session->db->quote($answer).", ".$self->session->db->quote($userId).", '$ip')");
+}
+
+#----------------------------------------------------------------------------
+
+=head2 thawGraphConfig 
+
+Deserializes the graph configuration and returns the data structure.
+
+=cut
+
+sub thawGraphConfig {
+    my $self        = shift;
+    my $string      = shift;
+    
+    return JSON::jsonToObj($string);
 }
 
 #-------------------------------------------------------------------
@@ -387,27 +450,23 @@ sub view {
 	$var{answer_loop} = \@answers;
 
 	if ($self->getValue('generateGraph')) {
-		my $config = {};
-		if ($self->get('graphConfiguration')) {
-			$config = Storable::thaw($self->get('graphConfiguration'));
+		my $config = $self->getGraphConfig;
+        if ($config) {
+            my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
+            $graph->addDataset(\@dataset);
+            $graph->setLabels(\@labels);
 
-			if ($config) {
-				my $graph = WebGUI::Image::Graph->loadByConfiguration($self->session, $config);
-				$graph->addDataset(\@dataset);
-				$graph->setLabels(\@labels);
+            $graph->draw;
 
-				$graph->draw;
+            my $storage = WebGUI::Storage::Image->createTemp($self->session);
+            my $filename = 'poll'.$self->session->id->generate.".png";
+            $graph->saveToStorageLocation($storage, $filename);
 
-				my $storage = WebGUI::Storage::Image->createTemp($self->session);
-				my $filename = 'poll'.$self->session->id->generate.".png";
-				$graph->saveToStorageLocation($storage, $filename);
-
-				$var{graphUrl} = $storage->getUrl($filename);
-				$var{hasImageGraph} = 1;
-			} else {
-				$self->session->errorHandler->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
-			}
-		}
+            $var{graphUrl} = $storage->getUrl($filename);
+            $var{hasImageGraph} = 1;
+        } else {
+            $self->session->errorHandler->error('The graph configuration hash of the Poll ('.$self->getUrl.') is corrupt.');
+        }
 	}
 	
 	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});

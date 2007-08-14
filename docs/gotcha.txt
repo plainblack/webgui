@@ -13,6 +13,14 @@ save you many hours of grief.
  * You must upgrade to Config::JSON 1.1.0 or higher prior to upgrading.
     Due to a bug in CPAN you should type "force install Config::JSON" in
     order to upgrade to this version.
+ 
+ * For Poll Wobjects, we're using a new way to store the graph 
+    configuration. If you were having problems with your Poll graphs, 
+    you will need to re-create the graph's configuration. It may not
+    be possible to read your graph configuration, so if you have 
+    problems with the Poll graphs you will need to re-create the graph's
+    configuration. After you create a new configuration, everything will
+    work fine.
 
 
 7.4.0
