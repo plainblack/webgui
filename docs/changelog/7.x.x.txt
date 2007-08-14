@@ -8,7 +8,8 @@
  - fix: XHTML 1.0 strict, FileUploadControl.js, resizable textarea
  - fix: undefined activity
  - Polls now use JSON instead of Storable to serialize graph config
-
+ - Weather bug fixed which wouldn't display icons under certain weather conditions.  
+ - New weather icons added which are more appropriate to the available weather conditions provided by weather.com
 
 7.4.2
  - Group names can now be 100 characters long
