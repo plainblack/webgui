@@ -31,6 +31,18 @@ A base class for all Cache modules to extend.
 =head1 SYNOPSIS
 
  use WebGUI::Cache;
+ 
+ my $cache = WebGUI::Cache->new($session, "my app cache");
+ my $cache = WebGUI::Cache->new($session, [ "my app", $assetId, $version ]);
+
+ $cache->set($value);
+ $cache->setByHTTP("http://www.google.com/");
+
+ my $value = $cache->get;
+
+ $cache->delete;
+ $cache->deleteChunk("my app cache");
+ $cache->deleteChunk([ "my app", $assetId ]);
 
 =head1 METHODS
 
@@ -106,7 +118,9 @@ A reference to the current session.
 
 =head3 key
 
-A key to store the value under or retrieve it from.
+A key to store the value under or retrieve it from. Can either be a scalar or an array reference of pieces (called
+a composite key). Composite keys are useful for deleting a chunk (see deleteChunk()) of cache data all at once, and
+for using multi-level identifiers like assetId/revisionDate.
 
 =head3 namespace
 

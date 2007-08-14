@@ -4,6 +4,7 @@
  - Added export to context menu in asset manager
  - fix: Empty user-created version tags
  - fix: TagCloud (Keywords.pm)
+ - fix: Cache pod does not accurately reflect the Module usage
  - fix: XHTML 1.0 strict, FileUploadControl.js, resizable textarea
  - fix: undefined activity
  - Polls now use JSON instead of Storable to serialize graph config
