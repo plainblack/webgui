@@ -199,60 +199,103 @@ print "\nTesting complete!\n\n";
 
 #----------------------------------------
 sub checkModule {
-        my $module = shift;
+    my $module = shift;
 	my $version = shift || 0;
 	my $skipInstall = shift;
-        my $afterinstall = shift;	
-        unless (defined $afterinstall) { $afterinstall = 0; }
-        printTest("Checking for module $module");
-        my $statement = "require ".$module.";";
+    my $afterinstall = shift;	
+    unless (defined $afterinstall) { $afterinstall = 0; }
+    printTest("Checking for module $module");
+    my $statement = "require ".$module.";";
 
-        if ($afterinstall == 1) {
-                failAndExit("Install of $module failed!") unless eval($statement);
-                # //todo: maybe need to check new install module version 
+    # we tried installing, now what?
+    if ($afterinstall == 1) {
+        failAndExit("Install of $module failed!") unless eval($statement);
+        # //todo: maybe need to check new install module version 
 		printResult("OK");
 		return;
-	    
-        } elsif (eval($statement)) {
+    } 
+
+    # let's see if the module is installed
+    elsif (eval($statement)) {
 		$statement = '$'.$module."::VERSION";
 		my $currentVersion = eval($statement);
+
+        # is it the correct version
 		if ($currentVersion >= $version) {
 			printResult("OK");
-		} else {
-                	printResult("Outdated - Current: ".$currentVersion." / Required: ".$version);
-			return if $simpleReport;
-			if ( isRootRequirementMet()) {
-                		my $installThisModule = prompt ("The perl module $module is outdated, do you want to upgrade it now?", "y", "y", "n");
-                		if ($installThisModule eq "y") {
-                        		installModule($module);
-                        		checkModule($module,$version,$skipInstall,1);
-                		} else {
-                        #		failAndExit("Aborting test due to user input!");
-                		}
-			} else {
-				failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
-			}
-}
-        } else {
-		if ($skipInstall == 2) {
-			printResult("Not Installed, but it's optional anyway");
-		} else {
-                	printResult("Not Installed");
-		}
-		return if $simpleReport;
-		if (  isRootRequirementMet()) {
-                	my $installThisModule = prompt ("The perl module $module is not installed, do you want to install it now?", "y", "y", "n");
-                	if ($installThisModule eq "y") {
-                        	installModule($module);
-                        	checkModule($module,$version,$skipInstall,1);
-                	} else {
-#                        	failAndExit("Aborting test due to user input!");
-                	}
-		} else {
-			failAndExit("Aborting test, not all modules available, and you're not root so I can't install them.");
+	    } 
+
+        # not the correct version, now what?
+        else {
+
+            # do nothing we're just reporting the modules.
+		    if ($simpleReport) {
+                printResult("Outdated - Current: ".$currentVersion." / Required: ".$version);
+            }
+
+            # do nothing, this module isn't required 
+	        elsif ( $skipInstall == 2 ) {
+                printResult("Outdated - Current: ".$currentVersion." / Required: ".$version.", but it's optional anyway");
+            } 
+
+            # if we're an admin let's offer to install it
+            elsif (isRootRequirementMet()) {
+                my $installThisModule = prompt ("$currentVersion is installed, but we need at least "
+                    ."$version, do you want to upgrade it now?", "y", "y", "n");
+
+                # does the user wish to install it
+                if ($installThisModule eq "y") {
+                    installModule($module);
+                    checkModule($module,$version,$skipInstall,1);
+                } 
+
+                # user doesn't wish to install it
+                else {
+                    printResult("Upgrade aborted by user input.");
+                }
+            } 
+
+            # we're not root so lets skip it
+            else {
+                printResult("Outdated - Current: ".$currentVersion." / Required: ".$version
+                    .", but you're not root, so you need to ask your administrator to upgrade it.");
+		    }
+        }
+
+    # module isn't installed, now what?
+    } else {
+
+        # skip optional module
+        if ($skipInstall == 2) {
+            printResult("Not Installed, but it's optional anyway");
+		} 
+
+        # skip  
+        elsif ($simpleReport) {
+           	printResult("Not Installed");
 		}
 
-        }
+        # if we're root lets try and install it
+		elsif (  isRootRequirementMet()) {
+            my $installThisModule = prompt ("Not installed, do you want to install it now?", "y", "y", "n");
+
+            # user wishes to upgrade
+            if ($installThisModule eq "y") {
+                installModule($module);
+                checkModule($module,$version,$skipInstall,1);
+            } 
+
+            # install aborted by user
+            else {
+                printResult("Install aborted by user input.");
+            }
+		} 
+
+        # can't install, not root        
+        else {
+			printResult("Not installed, but you're not root, so you need to ask your administrator to install it.");
+		}
+    }
 }
 
 #----------------------------------------
@@ -264,26 +307,27 @@ sub failAndExit {
 
 #----------------------------------------
 sub getLatestWebguiVersion {
-        printTest("Getting current WebGUI version");
-        my $currentversionUserAgent = new LWP::UserAgent;
+    printTest("Getting current WebGUI version");
+    my $currentversionUserAgent = new LWP::UserAgent;
 	$currentversionUserAgent->env_proxy;
 	$currentversionUserAgent->agent("WebGUI-Check/2.1");
-        $currentversionUserAgent->timeout(30);
-        $currentversionUserAgent->env_proxy();
-        my $header = new HTTP::Headers;
-        my $referer = "http://".`hostname`."/webgui-cli-version";
-        chomp $referer;
-        $header->referer($referer);
-        my $currentversionRequest = new HTTP::Request (GET => "http://update.webgui.org/latest-version.txt", $header);
-        my $currentversionResponse = $currentversionUserAgent->request($currentversionRequest);
-        my $version = $currentversionResponse->content;
-        chomp $version;
-        if ($currentversionResponse->is_error || $version eq "") {
-                printResult("Failed! Continuing without it.");
-        } else {
-                printResult("OK");
-        }
-        return $version;
+    $currentversionUserAgent->timeout(30);
+    $currentversionUserAgent->env_proxy();
+    my $header = new HTTP::Headers;
+    my $referer = "http://".`hostname`."/webgui-cli-version";
+    chomp $referer;
+    $header->referer($referer);
+    my $currentversionRequest = new HTTP::Request (GET => "http://update.webgui.org/latest-version.txt", $header);
+    my $currentversionResponse = $currentversionUserAgent->request($currentversionRequest);
+    my $version = $currentversionResponse->content;
+    chomp $version;
+    if ($currentversionResponse->is_error || $version eq "") {
+        printResult("Failed! Continuing without it.");
+    } 
+    else {
+        printResult("OK");
+    }
+    return $version;
 }
 
 #----------------------------------------
@@ -320,7 +364,7 @@ sub isRootRequirementMet {
 #----------------------------------------
 sub printTest {
         my $test = shift;
-        print sprintf("%-45s", $test.": ");
+        print sprintf("%-50s", $test.": ");
 }
 
 #----------------------------------------

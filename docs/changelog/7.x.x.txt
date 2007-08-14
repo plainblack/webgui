@@ -6,6 +6,8 @@
  - fix: TagCloud (Keywords.pm)
  - fix: Cache pod does not accurately reflect the Module usage
  - fix: User administration search
+ - fix: dynamic field type bug in EMS
+ - fix: testEnvironment.pl Problems
  - fix: XHTML 1.0 strict, FileUploadControl.js, resizable textarea
  - fix: undefined activity
  - Polls now use JSON instead of Storable to serialize graph config
