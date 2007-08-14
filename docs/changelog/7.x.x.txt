@@ -1,6 +1,7 @@
 7.4.3
  - Data Forms set reply to to the same as the from field
  - Config file bugs fixed, see gotcha.txt for details.
+ - Added export to context menu in asset manager
 
 
 7.4.2

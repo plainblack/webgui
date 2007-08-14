@@ -1367,6 +1367,9 @@ sub manageAssets {
                 		ct_contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'"); '."\n";
 			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=edit;proceed=manageAssets").'","'.$i18n->get("edit").'");' unless ($self->isLocked);
 			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($self->isLocked);
+            if (defined $self->session->config->get("exportPath")) {
+                $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
+            }
 			$more .= "\nct_contextMenu.print();\n</script>\n";
                 	push(@crumbtrail,$more);
 		} else {
@@ -1396,6 +1399,9 @@ sub manageAssets {
 		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
                 contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
 		$output .= 'contextMenu.addLink("'.$child->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($child->isLocked);
+        if (defined $self->session->config->get("exportPath")) {
+            $output .= 'contextMenu.addLink("'.$child->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
+            }
 		my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
 		my $locked;
