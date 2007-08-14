@@ -181,15 +181,15 @@ sub doUserSearch {
 	} else {
 		$keyword = "%".$keyword;
 	}
-	$keyword = $session->db->quote($keyword);
 	my $sql = "select users.userId, users.username, users.status, users.dateCreated, users.lastUpdated,
                 userProfileData.email from users 
                 left join userProfileData on users.userId=userProfileData.userId 
-                where $selectedStatus  and (users.username like ".$keyword." or alias like ".$keyword." or email like ".$keyword.") 
+                where $selectedStatus  and (users.username like ? or alias like ? or email like ? 
+                    or firstName like ? or lastName like ?) 
                 and users.userId not in (".$session->db->quoteAndJoin($userFilter).")  order by users.username";
 	if ($returnPaginator) {
         	my $p = WebGUI::Paginator->new($session,$session->url->page("op=".$op));
-		$p->setDataByQuery($sql);
+		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $p;
 	} else {
 		my $sth = $session->db->read($sql);
