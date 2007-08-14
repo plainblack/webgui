@@ -275,7 +275,7 @@ sub getEditForm {
                           #      this.form.func.value='preview';
                           #      this.form.target = 'navPreview';
                           #      this.form.submit()">};
-	my $saveButton = ' <input type="button" value="'.$i18n->get(62,'WebGUI').'" onclick="
+	my $saveButton = ' <input type="button" class="forwardButton" value="'.$i18n->get(62,'WebGUI').'" onclick="
 		this.value=\''.$i18n->get(452,'WebGUI').'\';
 		this.form.func.value=\'editSave\';
 		this.form.target=\'_self\';
