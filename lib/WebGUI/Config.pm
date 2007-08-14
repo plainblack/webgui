@@ -172,6 +172,7 @@ sub new {
 	} else {
         my $self = Config::JSON->new($webguiPath."/etc/".$filename);
         register($self, $class);
+        $webguiConfig{id $self} = $webguiPath;
 		$config{$filename} = $self unless $noCache;
 		return $self;
 	}
