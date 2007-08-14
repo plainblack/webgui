@@ -11,7 +11,8 @@
  - Polls now use JSON instead of Storable to serialize graph config
  - Weather bug fixed which wouldn't display icons under certain weather conditions.  
  - New weather icons added which are more appropriate to the available weather conditions provided by weather.com
-
+ - fix:  Fixed a bug for which aggregate RSS feeds would display a duplicate title
+ 
 7.4.2
  - Group names can now be 100 characters long
  - prevent groups being created with duplicate names
