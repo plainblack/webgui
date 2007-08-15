@@ -242,8 +242,8 @@ our $I18N = {
 	},
 
 	'webguiPasswordRecovery hoverHelp' => {
-		message => q|Select "Yes" to permit users who know a particular combination of their profile fields to recover their passwords.  In order for this to take effect, at least one profile field must have its "Required for password recovery?" flag turned on.  It is highly advisable to pick several fields, as using only one field is usually very easy to break; remember that anyone who discovers all of those fields for a user can reset that user's password.|,
-		lastUpdated => 1071507760
+		message => q|Select "Profile field" to permit users who know a particular combination of their profile fields to recover their passwords.  In order for this to take effect, at least one profile field must have its "Required for password recovery?" flag turned on.  It is highly advisable to pick several fields, as using only one field is usually very easy to break; remember that anyone who discovers all of those fields for a user can reset that user's password.  Select "Email" to permit users to have an email sent to them with a link that will let them reset their password.|,
+		lastUpdated => 1187205604
 	},
 
 	'webguiPasswordRecoveryRequireUsername hoverHelp' => {
