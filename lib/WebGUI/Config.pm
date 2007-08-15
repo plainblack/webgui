@@ -61,21 +61,6 @@ These subroutines are available from this package:
 
 =cut
 
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        $self->DEMOLISH;
-        undef $self;
-}
-
 #-------------------------------------------------------------------
 
 =head2 getCookieName ( ) 
