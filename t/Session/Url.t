@@ -82,7 +82,8 @@ is( $url2, $url.'?a=b;c=d', 'append second pair');
 #
 #######################################
 
-$session->config->{_config}->{'gateway'} = '/';
+my $gateway = $session->config->get('gateway');
+$session->config->set('gateway', '/');
 
 is( $session->config->get('gateway'), '/', 'Set gateway for downstream tests');
 
@@ -316,6 +317,8 @@ END {  ##Always clean-up
 	$session->config->set('sitename', \@config_sitename);
 	$session->setting->set('hostToUse', $setting_hostToUse);
 	$session->setting->set('preventProxyCache', $preventProxyCache);
+    $session->config->set('gateway', $gateway);
+
 	if ($config_port) {
 		$session->config->set($config_port);
 	}

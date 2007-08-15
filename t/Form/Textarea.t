@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 12 + scalar @{ $testBlock } + 5;
+my $numTests = 7 + scalar @{ $testBlock } + 5;
 
 
 plan tests => $numTests;
@@ -74,9 +74,6 @@ my $input = $inputs[0];
 is($input->name, 'TestText', 'Checking input name');
 is($input->type, $formType, 'Checking input type');
 is($input->value, 'Some text in here', 'Checking default value');
-like($input->{style}, qr/width:\s+\d+px;\s+height:\s+\d+px/, 'basic style format');
-like($input->{style}, qr/height: 150/, 'Default height');
-like($input->{style}, qr/width: 400/, 'Default width');
 
 $html = join "\n",
 	$header, 
@@ -93,8 +90,6 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preTestText', 'Checking input name');
 is($input->value, 'Some & text in " here', 'Checking default value');
-like($input->{style}, qr/height: 200/, 'Custom height');
-like($input->{style}, qr/width: 500/, 'Custom width');
 
 ##Test Form Output parsing
 

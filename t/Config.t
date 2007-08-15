@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 15; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
 use Test::Deep;
 
 my $config     = WebGUI::Test->config;
@@ -26,7 +26,6 @@ is( ref $config->get("macros"), "HASH", "get() hash" );
 is( ref $config->get("assets"), "ARRAY", "get() array" );
 is( $config->getFilename,$configFile,"getFilename()" );
 is( $config->getWebguiRoot, $webguiRoot, "getWebguiRoot()" );
-ok( exists $WebGUI::Config::config{$configFile}, "loadAllConfigs" );
 ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
 $config->addToArray("assets","TEST");
 my $found = 0;
