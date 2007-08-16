@@ -1,4 +1,6 @@
 7.4.4
+- fix: bug in EMS purge
+- fix: bug in poll where you can't edit it to have less answers
 
 
 7.4.3

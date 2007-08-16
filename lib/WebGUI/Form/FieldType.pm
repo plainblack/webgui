@@ -139,6 +139,7 @@ sub toHtml {
                 	$self->session->errorHandler->error("Couldn't compile form control: ".$type.". Root cause: ".$@);
 			next;
         	} 
+        next unless $class->isProfileEnabled($self->session);
 		$options{$type} = $class->getName($self->session);
 	}
 	$self->set('options',\%options);

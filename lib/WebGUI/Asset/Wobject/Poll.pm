@@ -339,11 +339,13 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
-	my (@answer, $i, $property);
-	@answer = split("\n",$self->session->form->process("answers"));
-        for ($i=1; $i<=20; $i++) {
-             	$property->{'a'.$i} = $answer[($i-1)];
-        }
+	my $property = {};
+    my $answers = $self->session->form->process("answers");
+    $answers =~ s{\r}{}xmsg;
+    my @answer = split("\n",$answers);
+    for (my $i=1; $i<=20; $i++) {
+        $property->{'a'.$i} = $answer[($i-1)] || "";
+    }
 
 	if (WebGUI::Image::Graph->getPluginList($self->session)) {
 		my $graph = WebGUI::Image::Graph->processConfigurationForm($self->session);

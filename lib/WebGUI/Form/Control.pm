@@ -442,6 +442,23 @@ sub getValueFromPost {
 
 #-------------------------------------------------------------------
 
+=head2 isProfileEnabled ( session )
+
+A class method. Returns a 1 if this control can be used by the profiling system. In general that means that the
+field is safe for dynamic generation.
+
+=cut
+
+
+sub isProfileEnabled {
+    my $class = shift;
+    my $session = shift;
+    return $class->definition($session)->[0]{profileEnabled};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, parameters )
 
 Constructor. Creates a new form field object.

@@ -873,10 +873,10 @@ sub getEventMetaDataFields {
 	my $sql = "select f.*, d.fieldData
 		from EventManagementSystem_metaField f
 		left join EventManagementSystem_metaData d on f.fieldId=d.fieldId
-		and d.productId=".$self->session->db->quote($productId)." $globalWhere
+		and d.productId=? $globalWhere
 		order by f.sequenceNumber";
 	tie my %hash, 'Tie::IxHash';
-	my $sth = $self->session->db->read($sql);
+	my $sth = $self->session->db->read($sql,[$productId]);
 	while( my $h = $sth->hashRef) {
 		foreach(keys %$h) {
 			$hash{$h->{fieldId}}{$_} = $h->{$_};
@@ -1080,7 +1080,7 @@ sub purge {
         $self->deletePrereqSet($id);
     }
     # delete badges
-    my $sth = $db->read("select fieldId from EventManagementSystem_badges where assetId=?",[$self->getId]);
+    my $sth = $db->read("select badgeId from EventManagementSystem_badges where assetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $self->deleteBadge($id);
     }
@@ -3408,24 +3408,13 @@ sub www_editEventMetaDataField {
 		-hoverHelp=>$i18n->get('474 description'),
 		-value=>$data->{required}
 	);
-	my $fieldType = WebGUI::Form::FieldType->new($self->session,
-		-name=>"dataType",
-		-label=>$i18n->get(486),
-		-hoverHelp=>$i18n->get('486 description'),
-		-value=>ucfirst $data->{dataType},
-		-defaultValue=>"Text",
-	);
-	my @profileForms = ();
-	foreach my $form ( sort @{ $fieldType->get("types") }) {
-		next if $form eq 'DynamicField';
-		my $cmd = join '::', 'WebGUI::Form', $form;
-		eval "use $cmd";
-		my $w = eval {"$cmd"->new($self->session)};
-		push @profileForms, $form if $w->get("profileEnabled");
-	}
-
-	$fieldType->set("types", \@profileForms);
-	$f->raw($fieldType->toHtmlWithWrapper());
+    $f->fieldType(
+        -name=>"dataType",        
+        -label=>$i18n->get(486),        
+        -hoverHelp=>$i18n->get('486 description'),
+        -value=>ucfirst $data->{dataType},        
+        -defaultValue=>"Text",
+        );
 	$f->textarea(
 		-name => "possibleValues",
 		-label => $i18n->get(487),
