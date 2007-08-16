@@ -1,3 +1,6 @@
+7.4.4
+
+
 7.4.3
  - Data Forms set reply to to the same as the from field
  - Config file bugs fixed, see gotcha.txt for details.
