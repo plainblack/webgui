@@ -459,20 +459,24 @@ sub www_editGroup {
 
 #-------------------------------------------------------------------
 sub www_editGroupSave {
-	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
-	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
-	$g->description($session->form->process("description"));
-	# We don't want them to use an existing name.  If needed, we'll ad a number to the name to keep it unique.
-	my $groupName = $session->form->process("groupName");
-	while (WebGUI::Group->find($session, $groupName)->getId) {
-	    $groupName =~ s/\A(.*?)(\d*)\z/
-	        my $newNum = ($2 || 0) + 1;
-	        substr($1, 0, 100 - length($newNum)) . $newNum;  #prevent name from growing over 100 chars
-	    /emsx;
+    my $session = shift;
+    my $gid = $session->form->process("gid");
+    return $session->privilege->adminOnly
+        unless canEditGroup($session, $gid);
+    my $g = WebGUI::Group->new($session, $gid);
+    # We don't want them to use an existing name.  If needed, we'll ad a number to the name to keep it unique.
+    my $groupName = $session->form->process("groupName");
+    while (my $existingGroupId = WebGUI::Group->find($session, $groupName)->getId) {
+        last
+            if $existingGroupId eq $gid;
+        $groupName =~ s/\A(.*?)(\d*)\z/
+            my $newNum = ($2 || 0) + 1;
+            substr($1, 0, 100 - length($newNum)) . $newNum;  #prevent name from growing over 100 chars
+        /emsx;
     }
-	$g->name($groupName);
-	$g->expireOffset($session->form->interval("expireOffset"));
+    $g->name($groupName);
+    $g->description($session->form->process("description"));
+    $g->expireOffset($session->form->interval("expireOffset"));
 	$g->karmaThreshold($session->form->process("karmaThreshold"));
 	$g->ipFilter($session->form->process("ipFilter"));
 	$g->scratchFilter($session->form->process("scratchFilter"));

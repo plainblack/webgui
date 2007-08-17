@@ -1,7 +1,8 @@
 7.4.4
-- fix: bug in EMS purge
-- fix: bug in poll where you can't edit it to have less answers
-
+ - fix: Changing group detail adds number to group name
+    http://www.webgui.org/bugs/tracker/changing-group-detail-adds-number-to-group-name
+ - fix: bug in EMS purge
+ - fix: bug in poll where you can't edit it to have less answers
 
 7.4.3
  - Data Forms set reply to to the same as the from field
