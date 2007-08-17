@@ -70,8 +70,6 @@ foreach my $package (@modules) {
 	next if (WebGUI::Utility::isIn($package,@excludes));
 	my $use = "use ".$package." ()";
 	eval($use);
-	print $@
-		if $@;
 }
 
 use Apache2::ServerUtil ();
