@@ -114,7 +114,7 @@ sub toHtml {
 	my $height = $self->get('height') || 150;
 	my ($style, $url) = $self->session->quick(qw(style url));
 	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
-    $style->setRawHeadTags(qq|<style type="text/css">\n#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
+    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
 	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#">'.$value.'</textarea>';
 	if ($self->get("resizable")) {
 		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';

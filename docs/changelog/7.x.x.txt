@@ -3,6 +3,7 @@
     http://www.webgui.org/bugs/tracker/changing-group-detail-adds-number-to-group-name
  - fix: bug in EMS purge
  - fix: bug in poll where you can't edit it to have less answers
+ - fix: CS post title form field sized too large
 
 7.4.3
  - Data Forms set reply to to the same as the from field
