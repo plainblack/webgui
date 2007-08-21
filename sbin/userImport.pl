@@ -15,9 +15,10 @@ BEGIN {
 	unshift (@INC, $webguiRoot."/lib"); 
 }
 
+use strict;
 use Digest::MD5;
 use Getopt::Long;
-use strict;
+use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Session;
 use WebGUI::User;
@@ -244,6 +245,9 @@ while(<FILE>) {
 		$user{status} = $status if ($user{status} eq "");
 		$user{expireOffset} = $expireOffset if ($user{expireOffset} eq "");
 		$user{expireOffset} = calculateExpireOffset($user{expireOffset},$expireUnits);
+        if ($user{birthdate}) {
+            $user{birthdate} = WebGUI::DateTime->new($user{birthdate}." 00:00:00")->epoch();
+        }
                if ($user{changePassword} eq "") {
                        if ($canChangePass) {
                                $user{changePassword} = 1;
