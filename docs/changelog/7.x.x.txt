@@ -6,6 +6,7 @@
  - fix: CS post title form field sized too large
  - fix: asset manager doesn't obey ui levels
  - fix: pagination broken on SQL Reports
+ - fix: calendar events are always given start/end times
 
 7.4.3
  - Data Forms set reply to to the same as the from field

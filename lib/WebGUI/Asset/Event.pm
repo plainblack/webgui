@@ -77,11 +77,13 @@ sub definition {
         },
         'startTime' => {
             fieldType       => "TimeField",
-            defaultValue    => $dt->toMysqlTime,
+            defaultValue    => undef,
+            format          => 'mysql',
         },
         'endTime' => {
             fieldType       => "TimeField",
-            defaultValue    => $dt->toMysqlTime,
+            defaultValue    => undef,
+            format          => 'mysql',
         },
         
         'recurId' => {
@@ -1425,9 +1427,9 @@ sub processPropertiesFromFormPost {
     # Fix times according to input (allday, timezone)
     # All day events have no time
     if ($form->param("allday")) {
-        $self->update({    
-            startTime   => undef,
-            endTime     => undef,
+        $self->update({
+            startTime   => '',
+            endTime     => '',
         });
     }
     # Non-allday events need timezone conversion
@@ -1660,7 +1662,7 @@ Wrap update so that isHidden is always set to be a 1.
 
 sub update {
     my $self = shift;
-    my $properties = shift;
+    my $properties = shift;    
     $properties->{isHidden} = 1;
     return $self->SUPER::update($properties);
 }

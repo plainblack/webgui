@@ -87,7 +87,10 @@ sub definition {
 		size=>{
 			defaultValue=>8
 			},
-		profileEnabled=>{
+		format => {
+            defaultValue => undef,
+        }.
+        profileEnabled=>{
 			defaultValue=>1
 			},
         dbDataType  => {
@@ -118,10 +121,11 @@ sub getValueFromPost {
 
 	if (@_) {
 		my $value = shift;
-		if (!$self->get("defaultValue") 
+		if ($self->get('format') ne 'mysql' && (
+            !$self->get("defaultValue") 
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$value     
-        || $value =~ m/^\d+$/) {
+        || $value =~ m/^\d+$/)) {
 			return $self->session->datetime->timeToSeconds($value)-($self->session->user->profileField("timeOffset")*3600);
 		}
 		elsif ($value =~ /^\d{2}\D\d{2}(\D\d{2})?$/) {
