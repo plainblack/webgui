@@ -1176,8 +1176,8 @@ the original poster.|,
         },
 
         'rich editor description' => {
-                message => q|Select "Yes" to enable Rich Editing of content in Posts.|,
-                lastUpdated => 1119070429,
+                message => q|Select which Rich Editor to use for the content of Posts.|,
+                lastUpdated => 1187991394,
         },
 
         'content filter description' => {
