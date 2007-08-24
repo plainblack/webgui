@@ -5,6 +5,7 @@
  - fix: bug in poll where you can't edit it to have less answers
  - fix: CS post title form field sized too large
  - fix: asset manager doesn't obey ui levels
+ - fix: pagination broken on SQL Reports
 
 7.4.3
  - Data Forms set reply to to the same as the from field

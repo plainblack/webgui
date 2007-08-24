@@ -693,7 +693,7 @@ sub setDataByQuery {
     #Set the query limits
     $sql =~ s/;\s+$//;
     $sql .= " limit $start,$rowsPerPage";  
-    $sql =~ s/select/select SQL_CALC_FOUND_ROWS /;
+    $sql =~ s/\bSELECT\s/SELECT SQL_CALC_FOUND_ROWS /i;
     
     #$self->session->errorHandler->warn($sql);    
     #Get only the data necessary from the database
