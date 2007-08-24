@@ -1352,6 +1352,8 @@ Main page to manage assets. Renders an AdminConsole with a list of assets. If ca
 sub manageAssets {
 	my $self = shift;
         my $i18n = WebGUI::International->new($self->session, "Asset");
+    my $userUILevel = $self->session->user->profileField("uiLevel");
+    my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
 	my $ancestors = $self->getLineage(["self","ancestors"],{returnObjects=>1});
         my @crumbtrail;
         foreach my $ancestor (@{$ancestors}) {
@@ -1359,15 +1361,22 @@ sub manageAssets {
 			my $title = $self->getTitle;
 			$title =~ s/\'/\\\'/g;
 			my $more = '<script type="text/javascript">
-				var ct_contextMenu = new contextMenu_createWithLink("ct_'.$self->getId.'","'.$title.'");
-               		 	ct_contextMenu.addLink("'.$self->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");
-                		ct_contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
-                		ct_contextMenu.addLink("'.$self->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
-				ct_contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-                		ct_contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'"); '."\n";
-			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=edit;proceed=manageAssets").'","'.$i18n->get("edit").'");' unless ($self->isLocked);
-			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($self->isLocked);
-            if (defined $self->session->config->get("exportPath")) {
+				var ct_contextMenu = new contextMenu_createWithLink("ct_'.$self->getId.'","'.$title.'");';
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");'
+                if $userUILevel >= $uiLevels->{"changeUrl"};
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");'
+                if $userUILevel >= $uiLevels->{"editBranch"};
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");'
+                if $userUILevel >= $uiLevels->{"shortcut"};
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");'
+                if $userUILevel >= $uiLevels->{"revisions"};
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'"); '."\n"
+                if $userUILevel >= $uiLevels->{"view"};
+			$more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=edit;proceed=manageAssets").'","'.$i18n->get("edit").'");'
+                if $userUILevel >= $uiLevels->{"edit"} && !$self->isLocked;
+            $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");'
+                if $userUILevel >= $uiLevels->{"lock"} && !$self->isLocked;
+            if (defined $self->session->config->get("exportPath") && $userUILevel >= $uiLevels->{"export"}) {
                 $more .= 'ct_contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
             }
 			$more .= "\nct_contextMenu.print();\n</script>\n";
@@ -1392,17 +1401,22 @@ sub manageAssets {
 	$self->session->output->print($output);
 	$output = '';
 	foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
-		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");
-                contextMenu.addLink("'.$child->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");
-                contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");
-                contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");
-		contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");
-                contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n";
-		$output .= 'contextMenu.addLink("'.$child->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");' unless ($child->isLocked);
-        if (defined $self->session->config->get("exportPath")) {
-            $output .= 'contextMenu.addLink("'.$child->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
-            }
-		my $title = $child->getTitle;
+		$output .= 'var contextMenu = new contextMenu_createWithLink("'.$child->getId.'","More");';
+        $output .= 'contextMenu.addLink("'.$child->getUrl("func=changeUrl;proceed=manageAssets").'","'.$i18n->get("change url").'");'
+            if $userUILevel >= $uiLevels->{"changeUrl"};
+        $output .= 'contextMenu.addLink("'.$child->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");'
+            if $userUILevel >= $uiLevels->{"editBranch"};
+        $output .= 'contextMenu.addLink("'.$child->getUrl("func=createShortcut;proceed=manageAssets").'","'.$i18n->get("create shortcut").'");'
+            if $userUILevel >= $uiLevels->{"shortcut"};
+        $output .= 'contextMenu.addLink("'.$child->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");'
+            if $userUILevel >= $uiLevels->{"revisions"};
+        $output .= 'contextMenu.addLink("'.$child->getUrl.'","'.$i18n->get("view").'"); '."\n"
+            if $userUILevel >= $uiLevels->{"view"};
+		$output .= 'contextMenu.addLink("'.$child->getUrl("func=lock;proceed=manageAssets").'","'.$i18n->get("lock").'");'
+            if $userUILevel >= $uiLevels->{"changeUrl"} && !$child->isLocked;
+        $output .= 'contextMenu.addLink("'.$child->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");'
+            if $userUILevel >= $uiLevels->{"export"} && defined $self->session->config->get("exportPath");
+        my $title = $child->getTitle;
 		$title =~ s/\'/\\\'/g;
 		my $locked;
 		my $edit;
