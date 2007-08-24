@@ -1,3 +1,6 @@
+7.4.5
+
+
 7.4.4
  - fix: Changing group detail adds number to group name
     http://www.webgui.org/bugs/tracker/changing-group-detail-adds-number-to-group-name
