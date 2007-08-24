@@ -355,7 +355,7 @@ A reference to the text to be encoded.
 sub makeParameterSafe {
 	my $text = shift;
 	${ $text } =~ s/,/&#44;/g;
-	${ $text } =~ s/'/&quot;/g;
+	${ $text } =~ s/'/&#39;/g;
 	return;
 }
 
