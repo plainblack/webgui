@@ -22,8 +22,6 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset::File;
 
-use Image::Magick;
-
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 plan tests => 9;

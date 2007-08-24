@@ -89,7 +89,7 @@ sub definition {
 			},
 		format => {
             defaultValue => undef,
-        }.
+        },
         profileEnabled=>{
 			defaultValue=>1
 			},

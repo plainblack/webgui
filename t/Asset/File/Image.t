@@ -23,8 +23,6 @@ use WebGUI::Image;
 use WebGUI::Storage::Image;
 use WebGUI::Asset::File::Image;
 
-use Image::Magick;
-
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 plan tests => 8;
