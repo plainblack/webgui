@@ -339,7 +339,6 @@ sub www_viewHelp {
 
 	$ac->addSubmenuItem(_link($session, $session->form->process("hid"), $namespace).";uiOverride=".!$uiOverride, $uiOverrideText) if $userUiLevel < 9;
     $ac->addSubmenuItem($session->url->page('op=viewHelpIndex'),$i18n->get(95, 'WebGUI'));
-    $ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents', 'WebGUI'));
 
 	WebGUI::Macro::process($session,\$body);
 
@@ -416,7 +415,6 @@ sub www_viewHelpIndex {
 	}
 	$output .= '</td></tr></table>';
     my $ac = WebGUI::AdminConsole->new($session,"help");
-    $ac->addSubmenuItem($session->url->page('op=viewHelpTOC'),$i18n->get('help contents'));
     return $ac->render(wikiHelpLink($session).$output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 

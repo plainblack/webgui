@@ -1,5 +1,6 @@
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
+ - Remove Help TOC links
 
 7.4.4
  - fix: Changing group detail adds number to group name
