@@ -2,6 +2,7 @@
  - fix: Apostrophy incorrectly escaped as double quote in some places
  - Remove Help TOC links
  - Fix hover help for collaboration system rich editor
+ - Fix using statements other than SELECT in SQL Reports
 
 7.4.4
  - fix: Changing group detail adds number to group name

@@ -690,10 +690,10 @@ sub setDataByQuery {
     #Calculate where to start
     my $start = ( ($pageNumber - 1) * $rowsPerPage );
     
-    #Set the query limits
-    $sql =~ s/;\s+$//;
-    $sql .= " limit $start,$rowsPerPage";  
-    $sql =~ s/\bSELECT\s/SELECT SQL_CALC_FOUND_ROWS /i;
+    #Set the query limits, but only for select queries
+    if ($sql =~ s/^\s*SELECT\s/SELECT SQL_CALC_FOUND_ROWS /i) {
+        $sql =~ s/;?\s*$/ LIMIT $start,$rowsPerPage/;
+    }
     
     #$self->session->errorHandler->warn($sql);    
     #Get only the data necessary from the database
