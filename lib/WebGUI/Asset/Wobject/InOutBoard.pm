@@ -274,9 +274,9 @@ order by department, lastName, firstName";
 		  $row{'username'} = $data->{username};
 		}
 		
-		$row{'status'} = ($data->{status}||$i18n->get(15));
-		$row{'dateStamp'} = $self->session->datetime->epochToHuman($data->{dateStamp});
-		$row{'message'} = ($data->{message}||"&nbsp;");
+		$row{'status'} = ($data->{status} || $i18n->get(15));
+		$row{'dateStamp'} = $data->{status} ? $self->session->datetime->epochToHuman($data->{dateStamp}) : "&nbsp;";
+		$row{'message'} = ($data->{message} || "&nbsp;");
 		
 		push (@rows, \%row);
 	}
