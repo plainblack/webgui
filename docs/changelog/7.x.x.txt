@@ -5,6 +5,7 @@
  - Fix using statements other than SELECT in SQL Reports
  - Fix manage users in group not displaying user list
  - Fix In/Out Board showing current time for users that have never checked in
+ - Fix changing subscriptions on a newsletter asset
 
 7.4.4
  - fix: Changing group detail adds number to group name

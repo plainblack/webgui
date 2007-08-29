@@ -146,7 +146,7 @@ sub setUserSubscriptions {
     my $self = shift;
     my $subscriptions = shift;
     my $userId = shift || $self->session->user->userId;
-    $self->session->db->write("replace into Newsletter_subscriptions (assetId, userId, subscriptions, lastSendTime) 
+    $self->session->db->write("replace into Newsletter_subscriptions (assetId, userId, subscriptions, lastTimeSent) 
         values (?,?,?,?)", [$self->getId, $userId, $subscriptions, time()]);
 }
 
