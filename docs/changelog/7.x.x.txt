@@ -3,6 +3,7 @@
  - Remove Help TOC links
  - Fix hover help for collaboration system rich editor
  - Fix using statements other than SELECT in SQL Reports
+ - Fix manage users in group not displaying user list
 
 7.4.4
  - fix: Changing group detail adds number to group name

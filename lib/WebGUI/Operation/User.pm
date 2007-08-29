@@ -192,7 +192,7 @@ sub doUserSearch {
 		$p->setDataByQuery($sql, undef, undef, [$keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $p;
 	} else {
-		my $sth = $session->db->read($sql);
+		my $sth = $session->dbSlave->read($sql, [$keyword, $keyword, $keyword, $keyword, $keyword]);
 		return $sth;
 	}
 }
