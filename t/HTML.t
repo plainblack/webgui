@@ -91,7 +91,7 @@ my @macroParamSets = (
 	},
 	{
 		inputText => q|'|,
-		output => q|&quot;|,
+		output => q|&#39;|,
 		comment => 'single quote',
 	},
 );

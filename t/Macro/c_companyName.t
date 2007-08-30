@@ -38,7 +38,7 @@ is($output, $originalCompanyName, "Testing companyName");
 
 $session->setting->set('companyName', q|Gooey's Consulting, LLC|);
 $output = WebGUI::Macro::c_companyName::process($session);
-is($output, q|Gooey&quot;s Consulting&#44; LLC|, "Testing companyName with embedded quote and comma");
+is($output, q|Gooey&#39;s Consulting&#44; LLC|, "Testing companyName with embedded quote and comma");
 
 }
 
