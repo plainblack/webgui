@@ -1,3 +1,6 @@
+7.4.6
+
+
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
  - Remove Help TOC links
