@@ -69,12 +69,6 @@ TODO: DOCUMENT ME
 		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.$i18n->get('redeem code', 'Subscription').'</a>'});
 	}
 	
-    my $uid = $session->form->get("uid");
-	if($op eq "viewProfile" && $uid ne $session->user->userId) {
-        push(@array, {'options.display' => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$uid).'">'.$i18n->get('send private message').'</a>'});
-    }
-	
-		
     if ($session->setting->get('userInvitationsEnabled')) {
         push @array, {
             'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=inviteUser'), $i18n->get('invite a friend')),

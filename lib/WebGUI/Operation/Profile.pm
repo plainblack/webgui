@@ -304,6 +304,9 @@ sub www_viewProfile {
 	if ($session->user->userId eq $session->form->process("uid")) {
 		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
 	}
+    else {
+        push(@{$vars->{'profile.accountOptions'}}, {'options.display' => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$session->form->process("uid")).'">'.$i18n->get('send private message').'</a>'});
+    }
 
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
 }
