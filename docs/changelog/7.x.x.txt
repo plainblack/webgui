@@ -1,6 +1,6 @@
 7.4.6
+ - Prevent Help index from trying to link to non-existant documentation
  - fix: can't see the send private message link
-
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

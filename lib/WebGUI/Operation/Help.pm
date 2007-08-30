@@ -389,21 +389,20 @@ sub www_viewHelpIndex {
 	return $session->privilege->insufficient() unless canView($session);
 	my $i18n = WebGUI::International->new($session);
         my @helpIndex;
-	my $i;
 	my @files = _getHelpFilesList($session,);
         foreach my $fileSet (@files) {
 		my $namespace = $fileSet->[1];
 		my $help = _load($session,$namespace);
 		foreach my $key (keys %{$help}) {
             next if $help->{$key}{private};
-			push @helpIndex, [$namespace, $key,
-					$i18n->get($help->{$key}{title},$namespace)];
-			$i++;
+            my $title = $i18n->get($help->{$key}{title},$namespace);
+            next unless $title;
+			push @helpIndex, [$namespace, $key, $title];
 		}
         }
 	my $output = '<table width="100%" class="content"><tr><td valign="top">';
-	my $halfway = round($i/2);
-	$i = 0;
+	my $halfway = round(@helpIndex / 2);
+	my $i = 0;
         @helpIndex = sort { $a->[2] cmp $b->[2] } @helpIndex;
         foreach my $helpEntry (@helpIndex) {
                 my ($namespace, $id, $title) = @{ $helpEntry };
