@@ -75,7 +75,7 @@ sub _submenu {
 
 	if (canEdit($session)) {
 		unless ($session->form->process("op") eq "listUsers" 
-			|| $session->form->process("op") eq "deleteUserConfirm"
+			|| $session->form->process("op") eq "deleteUser"
 			|| $userId eq "new") {
 			$ac->addSubmenuItem($session->url->page("op=editUser;uid=$userId"), $i18n->get(457));
 			$ac->addSubmenuItem($session->url->page("op=becomeUser;uid=$userId"), $i18n->get(751));
