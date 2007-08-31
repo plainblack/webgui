@@ -82,7 +82,7 @@ function contextMenu_draw(){
 	output += '</div>';
 	if (this.type == "image") {
                 if (this.addContext)
-                        output += '<p style="display: inline; vertical-align: middle;"><a href="javascript:void(0)">';
+                        output += '<p class="toolbarIcon" style="display: inline; vertical-align: middle;"><a href="javascript:void(0)">';
                 output += '<img src="' + this.imagePath + '" id="contextMenu_' + this.id + '_2" onclick="return contextMenu_renderLeftClick(\'contextMenu_' + this.id + '_menu\',event)" alt="' + this.name + '" title="' + this.name + '" align="absmiddle" ';
                 if (this.addContext)
                         output += 'style="border: 0px none; vertical-align: middle;"';
