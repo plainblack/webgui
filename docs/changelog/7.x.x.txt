@@ -5,6 +5,7 @@
  - All toolbar icons now have a class called "toolbarIcon" so they can be
    styled by external CSS.
  - Profile fields and categories and have confirmation boxes when deleting using the side menu
+ - Clicking active version tag in sidebar opens up version tag edit screen
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

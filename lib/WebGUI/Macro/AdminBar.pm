@@ -119,7 +119,7 @@ sub process {
 	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {
 		next unless $session->user->isInGroup($tag->get("groupToUse"));
 		push(@tags, {
-			url=>$session->url->page("op=setWorkingVersionTag;backToSite=1;tagId=".$tag->getId),
+			url=>$session->url->page("op=" . ($tag->getId eq $workingId ? "editVersionTag" : "setWorkingVersionTag") . ";backToSite=1;tagId=".$tag->getId),
 			title=>($tag->getId eq $workingId) ?  '<span style="color: #000080;">* '.$tag->get("name").'</span>' : $tag->get("name"),
 			icon=>$session->url->extras('spacer.gif')
 			});
