@@ -163,7 +163,7 @@ See the information toward the bottom of this page to set up your merchant accou
 
 <p>
 <b>Step 3: Get An SSL Certificate</b><br />
-<a target="_blank" href="http://www.completessl.com/plainblack">Get an SSL Certificate from CompleteSSL.</a>
+<a target="_blank" href="http://www.completessl.com/plainblack.php">Get an SSL Certificate from CompleteSSL.</a>
 </p>
 
 <p>
@@ -251,7 +251,7 @@ Please note that some of these recipe's are only roughly correct. They don't 'fi
   <li><b>yearly</b> (differs 1 day each leap year)</li>
 </ul><br />
 Also set the 'RECURRING POST-BACK URL' field in the Account Settings part of the virtual terminal to:|,
-		lastUpdated => 1112200925,
+		lastUpdated => 1189004971,
 		context => q|An informational message that's shown in the configuration form of this plugin.|
 	},
 };
