@@ -215,13 +215,14 @@ sub definition {
             label           => $i18n->get('visitorCacheTimeout label'),
         },
         
-        subscriberNotifyOffset => {
-            fieldType       => "integer",
-            defaultValue    => "2",
-            tab             => "properties",
-            hoverHelp       => $i18n->get('subscriberNotifyOffset description'),
-            label           => $i18n->get('subscriberNotifyOffset label'),
-        },    
+        # This doesn't function currently
+        #subscriberNotifyOffset => {
+        #    fieldType       => "integer",
+        #    defaultValue    => "2",
+        #    tab             => "properties",
+        #    hoverHelp       => $i18n->get('subscriberNotifyOffset description'),
+        #    label           => $i18n->get('subscriberNotifyOffset label'),
+        #},    
     );
     
     push(@{$definition}, {
@@ -518,7 +519,7 @@ ENDJS
     
     $tab->raw(<<'ENDHTML');
     <label for="addFeed">Add a feed</label>
-    <input type="text" size="60" id="addFeed" name="addFeed" value="http://google.com" />
+    <input type="text" size="60" id="addFeed" name="addFeed" value="" />
     <input type="button" value="Add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
     
     <table id="feeds" style="width: 100%;">
