@@ -3,21 +3,19 @@ package WebGUI::Image;
 use strict;
 use WebGUI::Image::Palette;
 use Carp qw(croak);
-eval 'use Graphics::Magick';
-my $graphicsMagickAvailable = ($@) ? 0 : 1;
-eval 'use Image::Magick';
-my $imageMagickAvailable = ($@) ? 0 : 1;
-my $graphicsPackage = '';
-if ($imageMagickAvailable) {
-    $graphicsPackage = "Image::Magick";
-}
-elsif ($graphicsMagickAvailable) {
-    $graphicsPackage = "Graphics::Magick";
-}
-else {
-    croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
-}
 
+my $graphicsPackage;
+BEGIN {
+    if (eval { require Graphics::Magick; 1 }) {
+        $graphicsPackage = 'Graphics::Magick';
+    }
+    elsif (eval { require Graphics::Magick; 1 }) {
+        $graphicsPackage = 'Graphics::Magick';
+    }
+    else {
+        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
+    }
+}
 
 =head1 NAME
 

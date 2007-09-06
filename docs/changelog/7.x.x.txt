@@ -7,6 +7,7 @@
  - Profile fields and categories and have confirmation boxes when deleting using the side menu
  - Clicking active version tag in sidebar opens up version tag edit screen
  - fix: wrong ssl link in iTransact settings
+ - fix thumbnail script with Graphics::Magick
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
