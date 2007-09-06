@@ -608,7 +608,7 @@ our $I18N = {
 	},
 
 	'email recover password start message' => {
-		message => q|Enter either your email address or your login below to initiate the passwrod recovery process.|,
+		message => q|Enter either your email address or your login below to initiate the password recovery process.|,
 		lastUpdated => 177127324,
 	},
 
