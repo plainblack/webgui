@@ -31,6 +31,10 @@
  - fix: SQLReport templatable download doesn't run nested queries
  - fix: Edit branch copies hide from navigation setting from events and posts to rest of branch
  - Dashboard now shows default view if user hasn't configured their own view
+ - fix: Fixed a problem which would not allow certain user triggers to be saved in settings
+ - fix: Fixed LDAPLink API to allow anonymous binds
+ - fix: Fixed SyncProfileToLDAP workflow activity to allow anonymous snycs
+ - fix: Fixed SyncProfileToLDAP workflow activity to properly sync if RDN does not match DN
  - fix: SQL Report download link doesn't include form parameters
 
 7.4.5
