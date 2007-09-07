@@ -782,7 +782,7 @@ sub monthStartEnd {
 	my $epoch = shift || time();
 	my $time_zone = $self->getTimeZone();
 	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
-	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month);	
+	my $end = DateTime->last_day_of_month(year=>$dt->year, month=>$dt->month, time_zone=>$time_zone);	
 	$dt->set_day(1);
 	$dt->set_hour(0);
 	$dt->set_minute(0);
