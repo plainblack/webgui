@@ -97,8 +97,9 @@ Renders and input tag of type radio.
 =cut
 
 sub toHtml {
-	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value")))) || '';
+	my$self = shift;
+	my $value = $self->get('value');
+    $value = defined $value ? $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($value))) : '';
 	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
 	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';
 	return '<input type="radio" name="'.$self->get("name").'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';
