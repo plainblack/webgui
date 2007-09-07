@@ -19,6 +19,7 @@ use strict;
 use base 'WebGUI::Workflow::Activity';
 use Net::LDAP;
 use WebGUI::Auth;
+use WebGUI::LDAPLink;
 use WebGUI::User;
 
 =head1 NAME
@@ -109,49 +110,49 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
+	my $self       = shift;
 	my $userObject = shift; # Set to the current user by the instance
-	my ($userId, $userData, $uri, $port, %args, $fieldName, $ldap, $search, $sth);
-	
-	$userId = $userObject->userId;
-	my $auth = WebGUI::Auth->new($self->session, "LDAP",$userId);
-	$userData = $auth->getParams;
-	$uri = URI->new($userData->{ldapUrl});
-	if ($uri->port < 1) {
-		$port = 389;
-	} else {
-		$port = $uri->port;
-	}
-	
-	%args = (port => $port);
-	$ldap = Net::LDAP->new($uri->host, %args);
-	if ($ldap) {
-		my $result = $ldap->bind;
-		if ($result->code == 0) {
-			$search = $ldap->search( base=>$userData->{connectDN}, filter=>"&(objectClass=*)" );
-			if($search->code) {
-				$self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$userObject->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
-			}
+	my $userId   = $userObject->userId;
+	my $auth     = WebGUI::Auth->new($self->session, "LDAP",$userId);
+	my $userData = $auth->getParams;
+    
+    #Don't bother with this script if the user is not using the LDAP auth module.
+    return $self->COMPLETE if($userObject->authMethod ne "LDAP");
+    
+    my $ldapLink = WebGUI::LDAPLink->new($self->session,$userData->{ldapConnection});
+	# Just complete if can't setup ldapLink for the user
+    
+    if($ldapLink) {
+        my $ldap = $ldapLink->bind();
+        if($ldap) {
+            my $uri    = $ldapLink->getURI();
+            my $search = $ldap->search(
+                base   =>$ldapLink->getValue("ldapUserRDN"),
+                scope  =>"sub", 
+                filter =>$ldapLink->getValue("ldapIdentity").'='.$userObject->username
+            );
+		    if($search->code) {
+		        $self->session->errorHandler->warn("Couldn't search LDAP ".$uri->host." to find user ".$userObject->username." (".$userId.").\nError Message from LDAP: ".$ldapStatusCode{$search->code});
+			    return $self->COMPLETE;
+            }
 			elsif ($search->count == 0) {
-				$self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
-			}
-			else {
-				$sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
-				while (($fieldName) = $sth->array) {
-					if ($search->entry(0)->get_value($self->_alias($fieldName)) ne "") {
-						$userObject->profileField($fieldName,$search->entry(0)->get_value($self->_alias($fieldName)));
-					}
-				}
-				$sth->finish;
-			}
-			$ldap->unbind;
-		}
-		else {
-			$self->session->errorHandler->warn("Couldn't bind to LDAP host ".$uri->host."\nError Message from LDAP: ".$ldapStatusCode{$result->code});
-		}
- 
+                $self->session->errorHandler->warn("No results returned for user with dn ".$userData->{connectDN});
+                return $self->COMPLETE;
+            }
+            else {
+			    my $sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId<>4");
+                while (my ($fieldName) = $sth->array) {
+                    if ($search->entry(0)->get_value($self->_alias($fieldName)) ne "") {
+                        $userObject->profileField($fieldName,$search->entry(0)->get_value($self->_alias($fieldName)));
+                    }
+                }
+            }
+            $ldap->unbind;
+        } else {
+            $self->session->errorHandler->warn("Error connecting to LDAP: ".$ldapLink->getErrorMessage);
+            return $self->ERROR;
+        }
 	}
-	
 	return $self->COMPLETE;
 }
 
