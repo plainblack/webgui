@@ -477,16 +477,39 @@ sub view {
 	#use Data::Dumper; return '<pre>'.Dumper($var).'</pre>';
 	
 	# Add the "Download data" link if the user is allowed to download
-	$var->{'canDownload'} = 1 
-		if ($self->getValue("downloadType") ne "none" 
+	if ($self->getValue("downloadType") ne "none" 
 		&& $self->session->user->isInGroup($self->getValue("downloadUserGroup"))
-		);
+	) {
+	    $var->{'canDownload'} = 1;
+        $var->{'downloadLink'} = $self->_getDownloadLink($self);
+    }
 	
        	my $out = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
+}
+
+#-------------------------------------------------------------------
+# Create download link be adding all the passed in parameters and values to the url
+sub _getDownloadLink {
+	my $self = shift;
+    my %params;
+    for my $nr (1 .. 5) {
+        foreach my $row (split(/\n/,$self->{_query}{$nr}{placeholderParams})) {
+            $row =~ s/^\s+//;
+            $row =~ s/\s+$//;
+            if ($row =~ /^form:(.*)/) {
+                $params{$1} ||= $self->session->form->param($1);
+            }
+        }
+    }
+    my $url = "func=download";
+    for my $param (sort keys %params) {
+        $url .= ";$param=" . $self->session->url->escape($params{$param});
+    }
+    return $self->getUrl($url);
 }
 
 #-------------------------------------------------------------------
