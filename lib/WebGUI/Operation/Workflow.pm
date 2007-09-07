@@ -495,7 +495,7 @@ sub www_runWorkflow {
         my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets")) || canRunWorkflow($session)) {
+	unless (isInSubnet($session->env->getIp, $session->config->get("spectreSubnets")) || canRunWorkflow($session)) {
 		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
         	return "error";
 	}
