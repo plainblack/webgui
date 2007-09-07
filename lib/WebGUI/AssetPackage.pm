@@ -181,7 +181,10 @@ sub importPackage {
 	foreach my $file (sort(@{$decompressed->getFiles})) {
 		next unless ($decompressed->getFileExtension($file) eq "json");
 		$error->info("Found data file $file");
-		my $data = eval{JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))};
+		my $data = eval{
+            local $JSON::UnMapping = 1;
+            JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))
+        };
 		if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
 			$error->error("package corruption: ".$@) if ($@);
 			return "corrupt";
