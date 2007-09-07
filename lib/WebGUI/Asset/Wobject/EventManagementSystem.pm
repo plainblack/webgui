@@ -4227,8 +4227,8 @@ sub www_searchBadges {
                 left join EventManagementSystem_products d ON d.productId=b.productId
                 left join EventManagementSystem_purchases f ON b.purchaseId=f.purchaseId
                 left join transaction g ON f.transactionId=g.transactionId and g.status="Completed"
-                where b.returned='0' and b.badgeId=? and g.gateway IS NOT NULL
-                order by d.startDate,d.endDate,c.title|,[$badgeId]);
+                where b.assetId=? and b.returned='0' and b.badgeId=? and g.gateway IS NOT NULL
+                order by d.startDate,d.endDate,c.title|,[$self->getId, $badgeId]);
 
             # Make sure the transation is complete before we display this badge
             next unless $events->rows;
@@ -4546,8 +4546,9 @@ function resetToInitial() {
         from EventManagementSystem_registrations b left join products c on c.productId=b.productId
         left join EventManagementSystem_products d ON d.productId=b.productId
         left join EventManagementSystem_purchases f ON b.purchaseId=f.purchaseId
-        left join transaction g ON f.transactionId=g.transactionId where b.returned='0' and b.badgeId=?
-        order by d.startDate,d.endDate,c.title|,[$badgeId]);
+        left join transaction g ON f.transactionId=g.transactionId 
+        where b.assetId = ? and b.returned='0' and b.badgeId=?
+        order by d.startDate,d.endDate,c.title|,[$self->getId, $badgeId]);
     my $ticker = 1;
     while (my ($productId, $sku, $title, $price, $gateway, $start, $end, $prereq, $registrationId, $transactionId) = $events->array) {
         my $isMaster = ($prereq eq "");

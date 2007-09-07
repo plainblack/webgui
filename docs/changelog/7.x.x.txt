@@ -27,6 +27,7 @@
  - fix: Edit Branch doesn't follow auto commit settings
  - fix: Importing a package doesn't follow auto commit settings
  - add: DataForm template variable for the group to view entries
+ - fix: EMS Badge Reporting overlaps with other EMS on the system
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
