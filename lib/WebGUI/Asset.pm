@@ -1898,7 +1898,7 @@ sub processPropertiesFromFormPost {
 Returns the content generated from this template.  It adds the Asset control
 bar to the template variables, as well as all Asset properties and metadata.
 
-=head3 hashRef
+=head3 vars
 
 A hash reference containing variables and loops to pass to the template engine.
 
@@ -1917,6 +1917,13 @@ sub processTemplate {
 	my $var = shift;
 	my $templateId = shift;
 	my $template = shift;
+
+    # Sanity checks
+    if (ref $var ne "HASH") {
+        $self->session->errorHandler->error("First argument to processTemplate() should be a hash reference.");
+        return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
+    }
+
 	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
         	my $meta = {};

@@ -15,6 +15,7 @@ our $HELP = {
         ],
         variables => [
             { 'name' => 'canEdit' },
+            { 'name' => 'canViewEntries' },
             { 'name' => 'entryId' },
             {   'required' => 1,
                 'name'     => 'form.start'
@@ -137,6 +138,7 @@ our $HELP = {
             { 'name' => 'deleteAllEntries.label', },
             { 'name' => 'javascript.confirmation.deleteAll', },
             { 'name' => 'canEdit', },
+            { 'name' => 'canViewEntries' },
             { 'name' => 'hasEntries', },
             { 'name' => 'export.tab.url', },
             { 'name' => 'export.tab.label', },

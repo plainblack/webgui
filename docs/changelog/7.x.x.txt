@@ -26,6 +26,7 @@
  - Hide encryption settings for edit branch when SSL disabled
  - fix: Edit Branch doesn't follow auto commit settings
  - fix: Importing a package doesn't follow auto commit settings
+ - add: DataForm template variable for the group to view entries
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

@@ -933,6 +933,11 @@ below to see which template variables may be used inside this loop.|,
 		 lastUpdated => 1164910794,
         },
 
+        'canViewEntries' => {
+            message     => 'This template variable is true when the current user is allowed to view the list of submitted DataForm entries.',
+            lastUpdated => 0,
+        },
+
         'data form asset template variables title' => {
 		 message => q|DataForm Asset Template Variables|,
 		 lastUpdated => 1164910794,

@@ -350,20 +350,9 @@ sub getListTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	my @fieldLoop;
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
-	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
-	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
-	$var->{"deleteAllEntries.label"} = $i18n->get(91);
-	$var->{"hasEntries"} = $self->hasEntries;
-	$var->{canEdit} = ($self->canEdit);
-	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
-	$var->{"export.tab.label"} = $i18n->get(84);
-	$var->{"addField.url"} = $self->getUrl('func=editField');
-	$var->{"addField.label"} = $i18n->get(76);
-	$var->{"addTab.label"}=  $i18n->get(105);;
-	$var->{"addTab.url"}= $self->getUrl('func=editTab');
+	my @fieldLoop;
 	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
 			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
 	while (my $field = $fields->hashRef) {
@@ -450,27 +439,9 @@ sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	$var->{error_loop} = [] unless (exists $var->{error_loop});
-	$var->{canEdit} = ($self->canEdit);
-	$var->{"entryList.url"} = $self->getListUrl;
-	$var->{"entryList.label"} = $i18n->get(86);
-	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
-	$var->{"export.tab.label"} = $i18n->get(84);
-	$var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
-	$var->{"delete.label"} = $i18n->get(90);
 	$var->{"back.url"} = $self->getUrl;
 	$var->{"back.label"} = $i18n->get(18);
-	$var->{"addField.url"} = $self->getUrl('func=editField');
-	$var->{"addField.label"} = $i18n->get(76);
-	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
-	$var->{"deleteAllEntries.label"} = $i18n->get(91);
-	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
-	$var->{"javascript.confirmation.deleteOne"} = sprintf("return confirm('%s');",$i18n->get('confirm delete one'));
-	$var->{"hasEntries"} = $self->hasEntries;
-	# add Tab label, url, header and init
-	$var->{"addTab.label"}=  $i18n->get(105);;
-	$var->{"addTab.url"}= $self->getUrl('func=editTab');
-	$var->{"tab.init"}= $self->_createTabInit($self->getId);
+	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden($self->session,{name=>"func",value=>"process"});
 	my @tabs;
@@ -591,6 +562,42 @@ sub getRecordTemplateVars {
 	$var->{"form.save"} = WebGUI::Form::submit($self->session,);
 	$var->{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	return $var;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTemplateVars ( )
+
+Gets the default template vars for the asset. Includes the asset properties
+as well as shared template vars.
+
+=cut
+
+sub getTemplateVars {
+    my $self        = shift;
+    my $var         = $self->get;
+	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+
+	$var->{canEdit} = ($self->canEdit);
+    $var->{canViewEntries}  = ($self->session->user->isInGroup($self->get("groupToViewEntries")));
+	$var->{"hasEntries"} = $self->hasEntries;
+	$var->{"entryList.url"} = $self->getListUrl;
+	$var->{"entryList.label"} = $i18n->get(86);
+	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
+	$var->{"export.tab.label"} = $i18n->get(84);
+	$var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
+	$var->{"delete.label"} = $i18n->get(90);
+	$var->{"addField.url"} = $self->getUrl('func=editField');
+	$var->{"addField.label"} = $i18n->get(76);
+	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
+	$var->{"deleteAllEntries.label"} = $i18n->get(91);
+	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
+	$var->{"javascript.confirmation.deleteOne"} = sprintf("return confirm('%s');",$i18n->get('confirm delete one'));
+	$var->{"addTab.label"}=  $i18n->get(105);;
+	$var->{"addTab.url"}= $self->getUrl('func=editTab');
+	$var->{"tab.init"}= $self->_createTabInit($self->getId);
+
+    return $var;
 }
 
 #-------------------------------------------------------------------
@@ -795,17 +802,18 @@ sub view {
 #-------------------------------------------------------------------
 
 sub viewList {
-	my $self = shift;
+	my $self    = shift;
+    my $var     = $self->getTemplateVars;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup($self->get("groupToViewEntries")));
-	return $self->processTemplate($self->getListTemplateVars,$self->get("listTemplateId"));
+	return $self->processTemplate($self->getListTemplateVars($var),$self->get("listTemplateId"));
 }
 
 #-------------------------------------------------------------------
 
 sub viewForm {
-	my $self = shift;
-	my $passedVars = shift;
-	my $var;
+	my $self        = shift;
+	my $passedVars  = shift;
+	my $var         = $self->getTemplateVars;
 	$self->session->style->setLink($self->session->url->extras('tabs/tabs.css'), {"type"=>"text/css"});
 	$self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
 	$var->{entryId} = $self->session->form->process("entryId") if ($self->canEdit);
@@ -1190,6 +1198,7 @@ sub www_process {
                 submissionDate=>$self->session->datetime->time()
 		},0);
 	my ($var, %row, @errors, $updating, $hadErrors);
+    $var = $self->getTemplateVars;
 	$var->{entryId} = $entryId;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	tie %row, "Tie::CPHash";
