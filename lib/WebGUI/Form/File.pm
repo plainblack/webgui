@@ -165,7 +165,7 @@ sub getFilePreview {
     my $preview = "";
 	foreach my $file (@{$storage->getFiles}) {
 		if ($self->get("deleteFileUrl")) {
-			$preview = '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
+			$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$self->get("deleteFileUrl").$file.'">'
 			    .'<img src="'.$self->session->icon->getBaseURL().'delete.gif" style="vertical-align:middle;border: 0px;" alt="x" /></a></p> ';
 		}
 		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'

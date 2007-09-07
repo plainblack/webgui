@@ -27,6 +27,7 @@
  - fix: Edit Branch doesn't follow auto commit settings
  - fix: Importing a package doesn't follow auto commit settings
  - add: DataForm template variable for the group to view entries
+ - fix: File upload control now shows all files when deleteFileUrl exists
  - fix: EMS Badge Reporting overlaps with other EMS on the system
  - fix: SQLReport templatable download doesn't run nested queries
  - fix: Edit branch copies hide from navigation setting from events and posts to rest of branch
