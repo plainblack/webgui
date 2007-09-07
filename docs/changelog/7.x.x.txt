@@ -18,6 +18,7 @@
  - fix: can't turn off Is Group Admin setting
  - Check correct IP for spectre connections
  - Inbox messages sent by Data Forms add sent by user
+ - Hide encryption settings for edit branch when SSL disabled
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

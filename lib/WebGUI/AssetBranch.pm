@@ -159,7 +159,8 @@ sub www_editBranch {
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_printableStyleTemplateId"})
 		);
 	$tabform->addTab("security",$i18n->get(107),6);
-        $tabform->getTab("security")->yesNo(
+        if ($self->session->config->get("sslEnabled")) {
+            $tabform->getTab("security")->yesNo(
                 -name=>"encryptPage",
                 -value=>$self->get("encryptPage"),
                 -label=>$i18n->get('encrypt page'),
@@ -167,6 +168,7 @@ sub www_editBranch {
                 -uiLevel=>6,
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_encryptPage"})
                 );
+        }
 	my $subtext;
         if ($self->session->user->isInGroup(3)) {
                  $subtext = $self->session->icon->manage('op=listUsers');
@@ -304,6 +306,13 @@ sub www_editBranchSave {
 				}
                 	}
         	}
+	}
+	if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        }
 	}
 	delete $self->{_parent};
 	$self->session->asset($self->getParent);
