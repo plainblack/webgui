@@ -392,12 +392,9 @@ sub download {
 	# Store queries in class
 	$self->_storeQueries();
 	
-	# Call _processQuery
-	my $data	= $self->_processQuery(0,0);
-	
-	
 	# If we're downloading CSV
 	if ($self->getValue("downloadType") eq "csv") {
+        my $data	= $self->_processQuery(0,0);
 		my $out		= "";
 		
 		### Loop through the returned structure and put it through Text::CSV
@@ -407,21 +404,20 @@ sub download {
 				@{$data->{rows_loop}->[0]->{"row.field_loop"}}
 			);
 		
-		
 		# Data lines
 		for my $row (@{$data->{rows_loop}}) {
 			$out .= "\n".joinCSV(map { $_->{"field.value"} }
 					@{$row->{"row.field_loop"}}
 				);
-			
 		}
 		
 		return $out;
-		
-	} elsif ($self->getValue("downloadType") eq "template") { 
+	} 
+    elsif ($self->getValue("downloadType") eq "template") { 
+        my $data	= $self->_processQuery(1,0);
 		return $self->processTemplate($data,$self->get("downloadTemplateId"));
-		
-	} else {
+	} 
+    else {
 		# I don't know what to do
 		return;
 	}
