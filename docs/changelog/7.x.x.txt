@@ -11,6 +11,7 @@
  - fix thumbnail script with Graphics::Magick
  - fix ordering of statuses in In/Out board
  - fix package importing
+ - remove caching behavior, will always send content to the client if they ask
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

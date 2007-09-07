@@ -148,14 +148,16 @@ sub contentHandler {
 				}
 			}
 		} else {
-			if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") { #display from cache if page hasn't been modified.
-				$http->setStatus("304","Content Not Modified");
-				$http->sendHeader;
-				$session->close;
-    				return Apache2::Const::OK();
-			} else {					#return the page.
+            # This needs to be improved in some way in the future.
+            # The way this operates is very wrong, so disabled for now
+			#if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") { #display from cache if page hasn't been modified.
+			#	$http->setStatus("304","Content Not Modified");
+			#	$http->sendHeader;
+			#	$session->close;
+    		#		return Apache2::Const::OK();
+			#} else {					#return the page.
 				$out = page($session);
-			}
+			#}
 		}
 		my $filename = $http->getStreamedFile();
 		if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
