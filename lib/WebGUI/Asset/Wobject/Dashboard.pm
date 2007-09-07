@@ -100,7 +100,24 @@ sub getContentPositions {
 	my $self = shift;
 	my $dummy = $self->initialize unless $self->get("isInitialized");
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	return $u->profileField($self->getId.'contentPositions');
+	return $u->profileField($self->getId.'contentPositions') 
+        || $self->getContentPositionsDefault;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getContentPositionsDefault ( )
+
+Returns the default content positions for this Dashboard. 
+
+=cut
+
+sub getContentPositionsDefault {
+    my $self    = shift;
+    my $dummy   = $self->initialize unless $self->get("isInitialized");
+    # The default positions are saved under the "Visitor" user
+    my $u       = WebGUI::User->new($self->session, 1); 
+    return $u->profileField($self->getId.'contentPositions');
 }
 
 #-------------------------------------------------------------------

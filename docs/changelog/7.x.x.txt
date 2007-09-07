@@ -29,6 +29,7 @@
  - add: DataForm template variable for the group to view entries
  - fix: EMS Badge Reporting overlaps with other EMS on the system
  - fix: SQLReport templatable download doesn't run nested queries
+ - Dashboard now shows default view if user hasn't configured their own view
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
