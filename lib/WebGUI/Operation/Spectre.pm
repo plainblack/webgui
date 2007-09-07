@@ -55,7 +55,7 @@ sub www_spectreGetSiteData {
 	$session->http->setMimeType("text/json");
 	$session->http->setCacheControl("none");
 	my %siteData = ();
-	if (!isInSubnet($session->env->get("REMOTE_ADDR"), $session->config->get("spectreSubnets"))) {
+	if (!isInSubnet($session->env->getIp, $session->config->get("spectreSubnets"))) {
 		$session->errorHandler->security("make a Spectre workflow data load request, but we're only allowed to accept requests from "
 			.join(",",@{$session->config->get("spectreSubnets")}).".");
 	} 

@@ -14,6 +14,7 @@
  - fix package importing
  - remove caching behavior, will always send content to the client if they ask
  - fix: can't turn off Is Group Admin setting
+ - Check correct IP for spectre connections
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
