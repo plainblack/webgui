@@ -609,7 +609,7 @@ sub www_formUsers {
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
 	return $output unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);
 	$output .= '<ul>';
-	my $p = doUserSearch($session,"formUsers",1);
+	my $p = doUserSearch($session,"formUsers;formId=".$session->form->process("formId"),1);
 	foreach my $data (@{$p->getPageData}) {
 		$output .= '<li><a href="#" onclick="window.opener.document.getElementById(\''.$session->form->process("formId").'\').value=\''.$data->{userId}.'\';window.opener.document.getElementById(\''.$session->form->process("formId").'_display\').value=\''.$data->{username}.'\';window.close();">'.$data->{username}.'</a></li>';
 	}
