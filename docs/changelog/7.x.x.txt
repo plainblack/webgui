@@ -2,6 +2,7 @@
  - Prevent Help index from trying to link to non-existant documentation
  - fix: can't see the send private message link
  - fix: delete and become user links are shown for user list after deleting user
+ - fix: Cache & If-Modified-Since
  - fix: Threads and CollabSystem have new way to calculate ratings more
    accurately
  - fix: Inbox shows Next page link when is empty
@@ -14,7 +15,6 @@
  - fix thumbnail script with Graphics::Magick
  - fix ordering of statuses in In/Out board
  - fix package importing
- - remove caching behavior, will always send content to the client if they ask
  - fix: can't turn off Is Group Admin setting
  - Check correct IP for spectre connections
  - Inbox messages sent by Data Forms add sent by user

@@ -56,6 +56,38 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 getAsset ( session [, assetUrl ] )
+
+Returns an asset based upon the requested asset URL, or optionally pass one in.
+
+=cut
+
+sub getAsset {
+    my $session = shift;
+	my $assetUrl = shift;
+	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
+	if ($@) {
+		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
+	}
+    return $asset;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRequestedAssetUrl ( session [, assetUrl ] )
+
+Returns an asset based upon the requested asset URL, or optionally pass one in.
+
+=cut
+
+sub getRequestedAssetUrl {
+    my $session = shift;
+	my $assetUrl = shift || $session->url->getRequestedUrl;
+    return $assetUrl;
+}
+
+#-------------------------------------------------------------------
+
 =head2 handler ( requestObject )
 
 Primary http init/response handler for WebGUI.  This method decides whether to hand off the request to contentHandler() or uploadsHandler()
@@ -120,44 +152,57 @@ sub contentHandler {
 	if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
 		$http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
 		$http->sendHeader;
-	} elsif ($setting->get("specialState") eq "upgrading") {
+	} 
+    elsif ($setting->get("specialState") eq "upgrading") {
 		upgrading($session);
-	} else {
+	} 
+    else {
 		my $out = processOperations($session); #anything that has op=<whatever> will have it's thing done here
 		if ($out ne "") {
 			# do nothing because we have operation output to display
 			$out = undef if ($out eq "chunked");	#'chunked' is WebGUI's way of saying 'I took care of it'  The output was sent to the browser in pieces as quickly as it could be produced. 
-		} elsif ($setting->get("specialState") eq "init") { #if specialState is flagged and it's 'init' do initial setup
+		} 
+        elsif ($setting->get("specialState") eq "init") { #if specialState is flagged and it's 'init' do initial setup
 			$out = WebGUI::Setup::setup($session);
-		} elsif ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
+		} 
+        elsif ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
 			my $t = [Time::HiRes::gettimeofday()];
 			$out = page($session);
 			$t = Time::HiRes::tv_interval($t) ;
 			if ($out =~ /<\/title>/) {
 				$out =~ s/<\/title>/ : ${t} seconds<\/title>/i;
-			} else {
+			} 
+            else {
 				# Kludge.
 				my $mimeType = $http->getMimeType();
 				if ($mimeType eq 'text/css') {
 					$output->print("\n/* Page generated in $t seconds. */\n");
-				} elsif ($mimeType eq 'text/html') {
+				} 
+                elsif ($mimeType eq 'text/html') {
 					$output->print("\nPage generated in $t seconds.\n");
-				} else {
+				} 
+                else {
 					# Don't apply to content when we don't know how
 					# to modify it semi-safely.
 				}
 			}
-		} else {
-            # This needs to be improved in some way in the future.
-            # The way this operates is very wrong, so disabled for now
-			#if ($r->headers_in->{'If-Modified-Since'} ne "" && $session->var->get("userId") eq "1") { #display from cache if page hasn't been modified.
-			#	$http->setStatus("304","Content Not Modified");
-			#	$http->sendHeader;
-			#	$session->close;
-    		#		return Apache2::Const::OK();
-			#} else {					#return the page.
-				$out = page($session);
-			#}
+		} 
+        else {
+
+            my $asset = getAsset($session, getRequestedAssetUrl($session));
+
+            # display from cache if page hasn't been modified.
+			if ($session->var->get("userId") eq "1" && !$http->ifModifiedSince($asset->getContentLastModified)) { 
+				$http->setStatus("304","Content Not Modified");
+				$http->sendHeader;
+				$session->close;
+    			return Apache2::Const::OK();
+			} 
+
+            # return the page.
+            else {					
+				$out = page($session, undef, $asset);
+			}
 		}
 		my $filename = $http->getStreamedFile();
 		if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
@@ -227,11 +272,8 @@ Optionally pass in a URL to be loaded.
 
 sub page {
 	my $session = shift;
-	my $assetUrl = shift || $session->url->getRequestedUrl;
-	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
-	if ($@) {
-		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
-	}
+	my $assetUrl = getRequestedAssetUrl($session, shift);
+	my $asset = shift || getAsset($session, $assetUrl);
 	my $output = undef;
 	if (defined $asset) {
 		my $method = "view";

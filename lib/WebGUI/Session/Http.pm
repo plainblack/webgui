@@ -205,6 +205,24 @@ sub getStreamedFile {
 
 #-------------------------------------------------------------------
 
+=head2 ifModifiedSince ( epoch )
+
+Returns 1 if the epoch is greater than the modified date check.
+
+=cut
+
+sub ifModifiedSince {
+    my $self = shift;
+    my $epoch = shift;
+    require APR::Date;
+    my $modified = $self->session->request->headers_in->{'If-Modified-Since'};
+    return 1 if ($modified eq "");
+    $modified = APR::Date::parse_http($modified);
+    return ($epoch > $modified);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isRedirect ( )
 
 Returns a boolean value indicating whether the current page will redirect to some other location.
