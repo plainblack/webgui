@@ -176,7 +176,8 @@ sub view {
 	my $statusListString = $self->getValue("statusList");
 	my @statusListArray = split("\n",$statusListString);
 	my $statusListHashRef;
-	
+	tie %$statusListHashRef, 'Tie::IxHash';
+
 	foreach my $status (@statusListArray) {
 		chomp($status);
         next if $status eq "";
