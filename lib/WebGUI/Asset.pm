@@ -299,9 +299,13 @@ sub checkView {
 
 #-------------------------------------------------------------------
 
-=head2 definition ( [ definition ] )
+=head2 definition ( session, [ definition ] )
 
 Basic definition of an Asset. Properties, default values. Returns an array reference containing tableName,className,properties
+
+=head3 session
+
+The current session object.
 
 =head3 definition
 

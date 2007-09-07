@@ -7,6 +7,7 @@
    accurately
  - fix: Inbox shows Next page link when is empty
  - fix: Change Owner in Security Tab in Assets is not always Working
+ - fix: API error - definition
  - All toolbar icons now have a class called "toolbarIcon" so they can be
    styled by external CSS.
  - Profile fields and categories and have confirmation boxes when deleting using the side menu
