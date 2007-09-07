@@ -21,17 +21,18 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixUserTriggers($session);
 recalculateThreadRatings($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#---------------------------------------------------
+sub fixUserTriggers($session) {
+    my $session = shift;
+    $session->setting->add("runOnAdminCreateUser","");
+    $session->setting->add("runOnAdminUpdateUser","");
+}
 
 #----------------------------------------------------------------------------
 # Have Threads recalculate their own ratings
