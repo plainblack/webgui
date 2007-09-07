@@ -22,6 +22,7 @@
  - Inbox messages sent by Data Forms add sent by user
  - Hide encryption settings for edit branch when SSL disabled
  - fix: Edit Branch doesn't follow auto commit settings
+ - fix: Importing a package doesn't follow auto commit settings
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

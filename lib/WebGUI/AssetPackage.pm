@@ -198,7 +198,14 @@ sub importPackage {
 		my $newAsset = $asset->importAssetData($data);
 		$assets{$newAsset->getId} = $newAsset;
 	}
-	return undef;
+	if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        }
+	}
+    return undef;
 }
 
 #-------------------------------------------------------------------
