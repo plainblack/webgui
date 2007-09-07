@@ -4220,17 +4220,23 @@ sub www_searchBadges {
             order by lastName, firstName", [$self->getId, $wildQuery, $wildQuery, $wildQuery, $wildQuery]);
         $results .= q|<table id="badgeSearchResults">|;
         while (my ($badgeId, $last, $first, $city, $state, $email) = $badges->array) {
-            $results .= q|<tbody><tr><th>Name</th><th>Location</th><th>Email</th><th>Badge ID</th></tr>|; 
-            $results .= qq|<tr><td><b>$last, $first</b></td><td>$city, $state</td><td>$email</td>
-                <td><a href="|.$self->getUrl("func=editBadge;badgeId=".$badgeId).qq|">$badgeId</a></td></tr>|; 
-            $results .= q|<tr><td colspan="4"><hr></td></tr>|;
+            # Get the transaction that processed this badge
             my $events = $db->read(q|select b.productId, c.sku, c.title, c.price, g.gateway,
                 from_unixtime(d.startDate,"%a %M:%i"), from_unixtime(d.endDate,"%a %H:%i")
                 from EventManagementSystem_registrations b left join products c on c.productId=b.productId
                 left join EventManagementSystem_products d ON d.productId=b.productId
                 left join EventManagementSystem_purchases f ON b.purchaseId=f.purchaseId
-                left join transaction g ON f.transactionId=g.transactionId where b.returned='0' and b.badgeId=?
+                left join transaction g ON f.transactionId=g.transactionId and g.status="Completed"
+                where b.returned='0' and b.badgeId=? and g.gateway IS NOT NULL
                 order by d.startDate,d.endDate,c.title|,[$badgeId]);
+
+            # Make sure the transation is complete before we display this badge
+            next unless $events->rows;
+
+            $results .= q|<tbody><tr><th>Name</th><th>Location</th><th>Email</th><th>Badge ID</th></tr>|; 
+            $results .= qq|<tr><td><b>$last, $first</b></td><td>$city, $state</td><td>$email</td>
+                <td><a href="|.$self->getUrl("func=editBadge;badgeId=".$badgeId).qq|">$badgeId</a></td></tr>|; 
+            $results .= q|<tr><td colspan="4"><hr></td></tr>|;
             while (my ($productId, $sku, $title, $price, $gateway, $start, $end) = $events->array) {
                 $results .= qq|<tr><td colspan="2">$sku : $title</td>
                     <td>$start - $end</td><td style="text-align: right;">($gateway) $price</td></tr>|; 

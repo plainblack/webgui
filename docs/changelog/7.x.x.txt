@@ -18,6 +18,8 @@
  - fix ordering of statuses in In/Out board
  - fix package importing
  - fix: can't turn off Is Group Admin setting
+ - fix: Event Management System -> Manage Registrants (www_searchBadges) would
+   display badges not yet purchased
  - Check correct IP for spectre connections
  - Inbox messages sent by Data Forms add sent by user
  - Hide encryption settings for edit branch when SSL disabled
