@@ -69,13 +69,7 @@ sub bind {
 	if ($ldapUrl eq "") {
 		$self->{_error} = 100;
 		return 0;
-	} elsif ($connectDn eq "") {
-		$self->{_error} = 101;
-		return 0;
-	} elsif ($identifier eq "") {
-		$self->{_error} = 102;
-		return 0;
-	}
+	} 
 	
 	if ($uri = URI->new($ldapUrl)) {
 		unless ($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))) {
@@ -89,6 +83,7 @@ sub bind {
 		} elsif($auth->code > 0) {
 			$self->{_error} = $auth->code;
 		}
+        $self->{_uri       } = $uri;
 		$self->{_connection} = $ldap;
 	} else {
 		$self->{_error} = 105;
@@ -161,6 +156,33 @@ sub getList {
 
 #-------------------------------------------------------------------
 
+=head2 getURI ( )
+
+Returns the uri object for the ldap connection.
+
+=cut
+
+sub getURI {
+	my $self = shift;
+	return $self->{_uri};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( property )
+
+Returns the value of the property passed in.
+
+=cut
+
+sub getValue {
+	my $self = shift;
+    my $prop = shift;
+	return $self->get->{$prop};
+}
+
+#-------------------------------------------------------------------
+
 =head2 unbind ( )
 
 Disconnect cleanly from the current databaseLink.
@@ -198,7 +220,7 @@ sub new {
 	my $session = shift;
 	$ldapLinkId = shift;
 	return undef unless $ldapLinkId;
-	$ldapLink = $session->db->quickHashRef("select * from ldapLink where ldapLinkId=".$session->db->quote($ldapLinkId));
+	$ldapLink = $session->db->quickHashRef("select * from ldapLink where ldapLinkId=?",[$ldapLinkId]);
 	bless {_session=>$session, _ldapLinkId=>$ldapLinkId, _ldapLink=>$ldapLink }, $class;
 }
 
