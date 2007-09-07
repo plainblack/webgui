@@ -763,6 +763,7 @@ sub sendEmail {
 			WebGUI::Inbox->new($self->session)->addMessage({
 				userId=>$userId,
 				groupId=>$groupId,
+                sentBy => $self->session->user->userId,
 				subject=>$subject,
 				message=>$message,
 				status=>'complete'

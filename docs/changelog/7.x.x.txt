@@ -17,6 +17,7 @@
  - remove caching behavior, will always send content to the client if they ask
  - fix: can't turn off Is Group Admin setting
  - Check correct IP for spectre connections
+ - Inbox messages sent by Data Forms add sent by user
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
