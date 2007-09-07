@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+recalculateThreadRatings($session);
 
 finish($session); # this line required
 
@@ -32,6 +33,24 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+#----------------------------------------------------------------------------
+# Have Threads recalculate their own ratings
+sub recalculateThreadRatings {
+    my $session = shift;
+    print "\tRecalculating Thread ratings. This may take a while... " unless ($quiet);
+
+    my $root        = WebGUI::Asset->getRoot($session);
+    my $threadIds
+        = $root->getLineage(["descendants"], {
+            includeOnlyClasses => ["WebGUI::Asset::Post::Thread"]
+        });
+    
+    for my $threadId (@$threadIds) {
+        WebGUI::Asset->newByDynamicClass($session, $threadId)->updateThreadRating;
+    }
+    
+    print "OK!\n" unless $quiet;
+}
 
 
 # ---- DO NOT EDIT BELOW THIS LINE ----

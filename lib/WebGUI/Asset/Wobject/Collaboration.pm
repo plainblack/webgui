@@ -1166,14 +1166,34 @@ Calculates the rating of this forum from its threads and stores the new value in
 =cut
 
 sub recalculateRating {
-        my $self = shift;
-        my ($count) = $self->session->db->quickArray("select count(*) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=?",[$self->getId]);
-        $count = $count || 1;
-        my ($sum) = $self->session->db->quickArray("select sum(Post.rating) from Thread left join asset on Thread.assetId=asset.assetId 
-		left join Post on Thread.assetId=Post.assetId where asset.parentId=?",[$self->getId]);
-        my $average = round($sum/$count);
-        $self->update({rating=>$average});
+    my $self = shift;
+    
+    # Get the number of threads
+    my ($count) 
+        = $self->session->db->quickArray(
+            "select count(*) from Thread 
+                left join asset on Thread.assetId=asset.assetId 
+                left join Post on Thread.assetId=Post.assetId 
+                    AND Thread.revisionDate = (SELECT MAX(revisionDate) FROM Thread t WHERE t.assetId=asset.assetId)
+                where asset.parentId=?",
+            [$self->getId]
+        );  
+    $count = $count || 1;
+    
+    # Get the ratings of all the threads
+    my ($sum) 
+        = $self->session->db->quickArray(
+            "SELECT SUM(Thread.threadRating) 
+                FROM Thread 
+                LEFT JOIN asset ON Thread.assetId=asset.assetId 
+                LEFT JOIN Post ON Thread.assetId=Post.assetId
+                    AND Thread.revisionDate = (SELECT MAX(revisionDate) FROM Thread t WHERE t.assetId=asset.assetId)
+                WHERE asset.parentId=?",
+            [$self->getId]
+        );
+
+    my $average = round($sum/$count);
+    $self->update({rating=>$average});
 }
 
 

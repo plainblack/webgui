@@ -791,26 +791,28 @@ Update the cumulative ratings in this thread
 =cut
 
 sub updateThreadRating {
-	my $self = shift;
-	my $ratingSumSQL = <<EOSQL;
-select sum(Post.rating) from Post
-	left join assetData on
-		Post.assetId=assetData.assetId
-	left join asset on
-		asset.assetId=assetData.assetId
-		and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
-	where
-		Post.threadId=?
-	
-EOSQL
-	my ($sum) = $self->session->db->quickArray($ratingSumSQL, [$self->getId]);
-	$self->update({threadRating=>$sum});
-	my $parent = $self->getParent;
-	if (defined $parent) {
-		$parent->recalculateRating;
-	} else {
-		$self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
-	}
+    my $self        = shift;
+    my $session     = $self->session;
+
+    my $calcRating  = 0; 
+    my $postIds     = $self->getLineage(["descendants","self"], {
+        includeOnlyClasses => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
+    });  
+
+    $calcRating += $session->db->quickScalar(
+        "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
+    );     
+
+    $self->update({
+        threadRating    => $calcRating
+    });  
+
+    my $parent = $self->getParent;
+    if (defined $parent) {
+        $parent->recalculateRating;
+    } else {
+        $self->session->errorHandler->error("Couldn't get parent for thread ".$self->getId);
+    }    
 }
 
 
