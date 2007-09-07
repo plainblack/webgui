@@ -297,6 +297,21 @@ our $I18N = {
 
 #################### HELP PAGES View Calendar ####################
 
+	'add event' => {
+		message 	=> q|Add Event|,
+		lastUpdated 	=> 1171043337,
+	},
+
+	'print' => {
+		message 	=> q|Print|,
+		lastUpdated 	=> 1171043337,
+	},
+
+	'iCal' => {
+		message 	=> q|iCal|,
+		lastUpdated 	=> 1171043337,
+	},
+
 	'view calendar title' => {
 		message 	=> q|View Calendar Template Variables|,
 		lastUpdated 	=> 1171043337,

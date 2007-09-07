@@ -1,0 +1,101 @@
+<tmpl_if admin>
+    <p><tmpl_var adminControls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+    <h1><tmpl_var title></h1>
+</tmpl_if>
+
+<tmpl_if description>
+    <tmpl_var description>
+</tmpl_if>
+
+
+<table cellspacing="0" cellpadding="0" width="630" id="mCAL">
+<tr>
+    <td style="text-align:right">
+        <a class="tab" href="<tmpl_var urlDay>">^International(defaultView value day,Asset_Calendar);</a>
+        <a class="tab" href="<tmpl_var urlWeek>">^International(defaultView value wiki,Asset_Calendar);</a>
+        <a class="tab" href="<tmpl_var urlMonth>">^International(defaultView value month,Asset_Calendar);</a>
+        <a class="tab" href="<tmpl_var urlSearch>">^International(searchButtonLabel,Asset_Calendar);</a>
+    
+
+        <div class="controls"><tmpl_if editor><a href="<tmpl_var urlAdd>">^International(add event,Asset_Calendar);</a></tmpl_if> &bull; <a
+href="<tmpl_var urlPrint>">^International(print,Asset_Calendar);</a> &bull; <a href="<tmpl_var
+urlIcal>">^International(iCal,Asset_Calendar); </a>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td class="months">
+        <div style="padding:3px 0px;">
+            <a href="<tmpl_var pagePrevUrl>" style="font-weight:bold;margin-right:8px;">&laquo; <tmpl_var
+pagePrevYear></a>&bull;
+            <tmpl_loop months>
+            <a style="margin-right:4px;" href="<tmpl_var monthUrl>" class="monthLink<tmpl_if monthCurrent>
+current</tmpl_if>"><tmpl_var monthAbbr></a>
+            </tmpl_loop>
+            &bull;
+                <a href="<tmpl_var pageNextUrl>" style="font-weight:bold;padding-left:8px"><tmpl_var pageNextYear>
+&raquo;</a> 
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div  class="curMonth">
+            <tmpl_var monthName> <tmpl_var year>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td style="width:100%">
+    
+    <!-- the calendar table -->
+        <table id="month" width="100%" cellspacing="2" cellpadding="0">
+        <!-- day names -->
+        <tr><tmpl_loop dayNames>
+            <th><tmpl_var dayName></th>
+        </tmpl_loop></tr>
+        
+        <!-- the grid -->
+        <tmpl_loop weeks><tr>
+        <tmpl_loop days><td><div class="<tmpl_if dayMonth>active</tmpl_if><tmpl_if dayCurrent> current</tmpl_if>">
+            <tmpl_if dayMonth>
+               <a class="number" href="<tmpl_var dayUrl>"><tmpl_var dayMonth></a>
+            <tmpl_if events>
+            <ul class="events">
+               <tmpl_loop events>
+                <li><a href="<tmpl_var eventUrl>">
+        <tmpl_var eventMenuTitle>
+                </a>
+                </li>
+                </tmpl_loop>
+            </ul>
+            
+            <a href="#" id="event_<tmpl_var dayMonth>" class="moreButton" onmouseover="return
+showEvents('overlay<tmpl_var dayMonth>');">
+                <img src="<tmpl_var extrasUrl>/wobject/Calendar/images/more.gif" />
+            </a>
+            
+            </tmpl_if> <!--/events-->
+            </tmpl_if> <!--/day-->
+        </div></td></tmpl_loop> <!--/days-->
+        </tr></tmpl_loop>
+    </table>
+</tr>
+</table>
+<tmpl_loop weeks><tmpl_loop days><tmpl_if events>
+      <div id="overlay<tmpl_var dayMonth>" class="moreDisplay">
+         <div>
+            <ul>
+            <tmpl_loop events>
+            <li><a href="<tmpl_var eventUrl>"><tmpl_var eventTitle></a><br/></li>
+            </tmpl_loop>
+         </ul>            
+      </div>
+   </div>
+</tmpl_if></tmpl_loop></tmpl_loop>
+
+
+
