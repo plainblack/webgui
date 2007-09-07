@@ -821,7 +821,7 @@ sub www_editCommerceSettingsSave {
 
 		# Store the plugin configuration data in a special table for security and the general settings in the
 		# normal settings table for easy access.
-		if (/~([^~]*)~([^~]*)~([^~]*)/) {
+		if (/([^_]*)_([^_]*)_([^_]*)/) {
 			WebGUI::Commerce::setCommerceSetting($session,{
 				type		=> $1,
 				namespace	=> $2,

@@ -300,7 +300,7 @@ sub prepend {
 	$self = shift;
 	$name = shift;
 
-	return "~Shipping~".$self->namespace."~".$name;
+	return "Shipping_".$self->namespace."_".$name;
 }
 
 #-------------------------------------------------------------------

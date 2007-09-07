@@ -9,6 +9,7 @@
  - fix: Change Owner in Security Tab in Assets is not always Working
  - fix: API error - definition
  - fix: Calendar without i8n
+ - fix: Email field in Commerce Area small
  - All toolbar icons now have a class called "toolbarIcon" so they can be
    styled by external CSS.
  - Profile fields and categories and have confirmation boxes when deleting using the side menu
