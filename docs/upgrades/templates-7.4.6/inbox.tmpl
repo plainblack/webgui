@@ -1,0 +1,120 @@
+#PBtmpl0000000000000206
+<div class="PM_wrapper">
+    <table cellpadding="4" cellspacing="2" width="100%">
+    <tr>
+       <td colspan="4" class="PM_title"><tmpl_var title></td>
+    </tr>
+    <tr>
+        <th><a href="<tmpl_var subject_url>"><tmpl_var subject_label></a></th>
+        <th><a href="<tmpl_var from_url>"><tmpl_var from_label></a></th>
+        <th><a href="<tmpl_var dateStamp_url>"><tmpl_var dateStamp_label></a></th>
+        <th><a href="<tmpl_var status_url>"><tmpl_var status_label></a></th>
+    </tr>
+    <tmpl_if noresults>
+    <tr>
+       <td colspan="4"><tmpl_var noresults></td>   
+    </tr>
+    <tmpl_else>
+       <tmpl_loop messages>
+    <tr <tmpl_if __ODD__>class="alt"</tmpl_if>>
+        <td><a href="<tmpl_var message_url>"><tmpl_var subject></a></td>
+        <td><tmpl_var from></td>
+        <td><tmpl_var dateStamp></td>
+        <td><span class="<tmpl_var status_class>"><tmpl_var status></span></td>
+    </tr>   
+       </tmpl_loop>
+    </tmpl_if>
+</table>
+<table cellpadding="4" cellspacing="2" width="100%" style="border-style:none">
+    <tr>
+        <td style="text-align:left;width:50%"><tmpl_if prev_url><a href="<tmpl_var prev_url>"><strong>&laquo;
+<tmpl_var prev_label></strong></a></tmpl_if></td>
+        <td style="text-align:right;width:50%"><tmpl_if next_url><a href="<tmpl_var next_url>"><strong><tmpl_var
+next_label> &raquo;</strong></a></tmpl_if></td>
+    </tr>
+</table>
+</div>
+
+   <ul class="accountOptions">
+      <tmpl_loop accountOptions>
+         <li><tmpl_var options.display>
+      </tmpl_loop>
+   </ul>
+
+
+~~~
+
+<style>
+.PM_wrapper {
+    font-family:arial;
+    font-size:11px;
+    width:450px;
+}
+
+.PM_wrapper table {
+    background-color:#f9f9f9;
+    border:solid #BBBBBB 1px;
+}
+
+.PM_title {
+    font-size:15px;
+    font-weight:bold;
+    border-bottom:solid silver 2px;
+    background-color:#555555;
+    color:white;
+}
+.PM_label {
+    text-align:right;
+    font-weight:bold;
+    font-size:12px;
+    vertical-align:top;
+}
+.PM_text {
+    width:350px;
+    font-size:11px;
+    border: solid silver 1px;
+}
+.PM_button {
+    background-color:silver;
+    border:solid #555 1px;
+    color:#333;
+    font-weight:bold;
+}       
+.PM_detail {
+    background-color:#e9e9e9;
+}
+.PM_wrapper th {
+    background-color: #555;
+    text-align:left;
+    border-bottom:solid silver 2px;
+}
+.PM_wrapper a {
+    color:#003F9D;
+}
+.PM_wrapper th a {
+    color:#fff;
+    font-size:12px;
+}
+.PM_wrapper tr.alt td {
+    background-color:#E9E9E9;
+    border-bottom:solid #E1E1E1 1px;
+}
+
+.PM_wrapper .unread {
+    color:green;
+    font-weight:bold;
+}
+.PM_wrapper .replied {
+    color:blue;
+    font-weight:bold;
+}
+.PM_wrapper .pending {
+    color:orange;
+    font-weight:bold;
+}       
+.PM_wrapper .completed {
+    color:black;
+    font-weight:bold;
+}
+</style>
+

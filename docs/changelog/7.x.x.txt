@@ -2,6 +2,7 @@
  - Prevent Help index from trying to link to non-existant documentation
  - fix: can't see the send private message link
  - fix: delete and become user links are shown for user list after deleting user
+ - fix: Inbox shows Next page link when is empty
  - All toolbar icons now have a class called "toolbarIcon" so they can be
    styled by external CSS.
  - Profile fields and categories and have confirmation boxes when deleting using the side menu

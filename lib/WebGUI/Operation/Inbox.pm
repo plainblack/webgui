@@ -318,8 +318,10 @@ sub www_viewInbox {
        $vars->{'prev_url'    } = $inboxUrl.';pn='.($pn-1).$sort_url;
        $vars->{'prev_label'  } = $i18n->get("private message prev label");
     }
-    $vars->{'next_url'       } = $inboxUrl.';pn='.($pn+1).$sort_url;
-    $vars->{'next_label'     } = $i18n->get("private message next label");
+    if (scalar(@msg) >= $rpp) {
+       $vars->{'next_url'       } = $inboxUrl.';pn='.($pn+1).$sort_url;
+       $vars->{'next_label'     } = $i18n->get("private message next label");
+    }
     
    	$vars->{'messages'      } = \@msg;
    	$vars->{'noresults'     } = $i18n->get(353) unless ($msgCount > 0);
