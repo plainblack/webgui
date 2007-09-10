@@ -265,7 +265,9 @@ sub getNextThread {
 				group by assetData.assetId
 				order by ".$sortBy." ".$sortOrder." 
 				");
-		$self->{_next} = WebGUI::Asset->new($self->session, $id,$class,$version);
+		if ($id) {
+            $self->{_next} = WebGUI::Asset->new($self->session, $id, $class, $version);
+        }
 	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
 	};
 	return $self->{_next};
