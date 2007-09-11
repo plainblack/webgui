@@ -1186,7 +1186,7 @@ sub www_edit {
             my $subscribe = $form->process("subscribe");
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
-				value => defined $subscribe ? $subscribe : 1,;
+				value => defined $subscribe ? $subscribe : 1,
             });
 		}
         $content .= "\n\n".$user->profileField("signature") if ($user->profileField("signature") && !$form->process("content"));
