@@ -38,6 +38,7 @@
  - fix: Fixed SyncProfileToLDAP workflow activity to properly sync if RDN does not match DN
  - fix: SQL Report download link doesn't include form parameters
  - fix: Errors generated in webgui.log when viewing last thread
+ - Report errors on loading modules to Apache log during preload
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places

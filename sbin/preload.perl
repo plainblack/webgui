@@ -68,8 +68,10 @@ foreach my $lib (@{$customLibs}) {
 File::Find::find(\&getWebGUIModules, @folders);
 foreach my $package (@modules) {
 	next if (WebGUI::Utility::isIn($package,@excludes));
-	my $use = "use ".$package." ()";
-	eval($use);
+	(my $file = "$package.pm") =~ s{::|'}{/}g;
+    if (!eval { require $file; 1 }) {
+        warn "Error loading $package! - $@";
+    }
 }
 
 use Apache2::ServerUtil ();
