@@ -420,6 +420,17 @@ sub getFormUrl {
 }
 
 #-------------------------------------------------------------------
+=head2 getListUrl( params )
+
+Get url of list of entries
+
+=head3 params
+
+Name value pairs of URL paramters in the form of:
+
+ name1=value1;name2=value2;name3=value3
+
+=cut
 
 sub getListUrl {
         my $self = shift;
