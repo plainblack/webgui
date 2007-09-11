@@ -820,7 +820,12 @@ sub processPropertiesFromFormPost {
 	} elsif ($self->getThread->get("status") eq "archived") {
 		$self->getThread->unarchive;
 	}
-	$self->getThread->subscribe if ($self->session->form->process("subscribe"));
+    if ($self->session->form->process("subscribe")) {
+        $self->getThread->subscribe;
+    }
+    else {
+        $self->getThread->unsubscribe;
+    }
 	delete $self->{_storageLocation};
 	$self->postProcess;
 }
@@ -1158,9 +1163,10 @@ sub www_edit {
                 $title = $parent->get("title");
                 $title = "Re: ".$title unless ($title =~ /^Re:/i);
 			}
-			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
+			my $subscribe = $form->process("subscribe");
+            $var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
-				value=>$self->session->form->process("subscribe")
+				value => defined $subscribe ? $subscribe : $self->getThread->isSubscribed,
             });
 		}
         elsif ($className eq "WebGUI::Asset::Post::Thread") { # new thread
@@ -1177,9 +1183,10 @@ sub www_edit {
                     value=>$form->process('lock')
                 });
 			}
+            my $subscribe = $form->process("subscribe");
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
-				value=>$form->process("subscribe") || 1
+				value => defined $subscribe ? $subscribe : 1,;
             });
 		}
         $content .= "\n\n".$user->profileField("signature") if ($user->profileField("signature") && !$form->process("content"));
