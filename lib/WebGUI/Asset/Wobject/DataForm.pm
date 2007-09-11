@@ -1,14 +1,18 @@
 package WebGUI::Asset::Wobject::DataForm;
 
-#-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
-#-------------------------------------------------------------------
-# Please read the legal notices (docs/legal.txt) and the license
-# (docs/license.txt) that came with this distribution before using
-# this software.
-#-------------------------------------------------------------------
-# http://www.plainblack.com                     info@plainblack.com
-#-------------------------------------------------------------------
+=head1 LEGAL
+
+-------------------------------------------------------------------
+WebGUI is Copyright 2001-2007 Plain Black Corporation.
+-------------------------------------------------------------------
+Please read the legal notices (docs/legal.txt) and the license
+(docs/license.txt) that came with this distribution before using
+this software.
+-------------------------------------------------------------------
+http://www.plainblack.com                     info@plainblack.com
+-------------------------------------------------------------------
+
+=cut
 
 use strict qw(vars subs);
 use Tie::CPHash;
@@ -25,6 +29,21 @@ use WebGUI::Asset::Wobject;
 use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
+
+=head1 NAME
+
+Package WebGUI::Asset::Wobject::DataForm
+
+=head1 DESCRIPTION
+
+A subclass of lib/WebGUI/Wobject. DataForm creates custom forms to save data in the WebGUI database.
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
 
 #-------------------------------------------------------------------
 sub _createField {
@@ -130,6 +149,16 @@ sub defaultViewForm {
 }
 
 #-------------------------------------------------------------------
+=head2 definition ( session, [definition] )
+
+Returns an array reference of definitions. Adds tableName, className, properties to array definition.
+
+=head3 definition
+
+An array of hashes to prepend to the list
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
