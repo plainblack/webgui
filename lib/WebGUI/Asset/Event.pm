@@ -1217,7 +1217,7 @@ sub getTemplateVars {
     $var{ "endDateEpoch"        } = $dtEnd->epoch;
     
     $var{ "isAllDay"            } = $self->isAllDay;
-    $var{ "isOneDay"            } = $var{isAllDay} && $var{startDateDmy} eq $var{endDateDmy}
+    $var{ "isOneDay"            } = $var{startDateDmy} eq $var{endDateDmy}
                                   ? 1 : 0
                                   ;
     

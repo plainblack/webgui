@@ -42,6 +42,8 @@
  - fix: Use previous form value for Subscribe on CS preview
  - Use current subscription status on form for CS reply, unsubscribe if set to no
  - add: WebGUI::Form::CheckList now has optional "Select All" button
+ - fix: Event isOneDay template variable now works properly when Event isn't an
+   all-day event
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
