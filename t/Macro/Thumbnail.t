@@ -18,22 +18,21 @@ use WebGUI::Session;
 use WebGUI::Image;
 use WebGUI::Storage::Image;
 
-my $graphicsPackage;
-BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $graphicsPackage = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
-        $graphicsPackage = 'Image::Magick';
-    }
-    else {
-        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
-    }
-}
-
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 8;
+plan tests => 9;
+
+my $graphicsPackage;
+if (eval { require Graphics::Magick; 1 }) {
+    $graphicsPackage = 'Graphics::Magick';
+}
+elsif (eval { require Image::Magick; 1 }) {
+    $graphicsPackage = 'Image::Magick';
+}
+else {
+    die "Unable to load Graphics::Magick or Image::Magick!\n";
+}
+pass "Load $graphicsPackage";
 
 my $session = WebGUI::Test->session;
 

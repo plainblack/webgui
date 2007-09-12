@@ -149,6 +149,7 @@ sub defaultViewForm {
 }
 
 #-------------------------------------------------------------------
+
 =head2 definition ( session, [definition] )
 
 Returns an array reference of definitions. Adds tableName, className, properties to array definition.
@@ -449,6 +450,7 @@ sub getFormUrl {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getListUrl( params )
 
 Get url of list of entries
