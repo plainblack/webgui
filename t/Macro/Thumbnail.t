@@ -18,7 +18,18 @@ use WebGUI::Session;
 use WebGUI::Image;
 use WebGUI::Storage::Image;
 
-use Image::Magick;
+my $graphicsPackage;
+BEGIN {
+    if (eval { require Graphics::Magick; 1 }) {
+        $graphicsPackage = 'Graphics::Magick';
+    }
+    elsif (eval { require Image::Magick; 1 }) {
+        $graphicsPackage = 'Image::Magick';
+    }
+    else {
+        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
+    }
+}
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
@@ -88,7 +99,7 @@ SKIP: {
 
     ##Load the image into some parser and check a few pixels to see if they're blue-ish.
     ##->Get('pixel[x,y]') hopefully returns color in hex triplets
-    my $thumbImg = Image::Magick->new();
+    my $thumbImg = $graphicsPackage->new();
     $thumbImg->Read(filename => $thumbFile);
 
     cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>25, y=>25, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #1');
