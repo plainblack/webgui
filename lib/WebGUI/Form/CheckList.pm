@@ -17,6 +17,8 @@ package WebGUI::Form::CheckList;
 use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::Form::Checkbox;
+use WebGUI::Form::Button;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -54,25 +56,61 @@ Boolean representing whether the checklist should be represented vertically or h
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 showSelectAllButton
+
+Flag that toggles a "Select All" toggle button on or off.
+
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("941"),
-			},
-		vertical=>{
-			defaultValue=>0
-			},
-		profileEnabled=>{
-			defaultValue=>1
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
+    my $class       = shift;
+    my $session     = shift;
+    my $definition  = shift || [];
+    my $i18n        = WebGUI::International->new($session);
+    push @{$definition}, {
+        formName => {
+            defaultValue    => $i18n->get("941"),
+        },
+        vertical => {
+            defaultValue    => 0,
+        },
+        profileEnabled => {
+            defaultValue    => 1,
+        },
+        showSelectAll => {
+            defaultValue    => 0,
+        },
+    };
+    return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSelectAllButton ( )
+
+Returns the HTML / Script for the Select All button
+
+=cut
+
+sub getSelectAllButton {
+    my $self        = shift;
+    my $formName    = $self->get('name');
+    my $i18n        = WebGUI::International->new($self->session, "Form_CheckList");
+
+    $self->session->style->setScript(
+        $self->session->url->extras("yui-webgui/build/form/form.js")
+    );
+
+    return WebGUI::Form::Button->new($self->session, {
+        name        => $self->privateName('selectAllButton'),
+        value       => $i18n->get("selectAll label"),
+        extras      => q{onclick="WebGUI.Form.toggleAllCheckboxesInForm(this.form,'}
+                    . $formName
+                    . q{')"}
+                    . q{ class="selectAllButton" },
+        })->toHtml
+        . q{<br />}
+        ;   
 }
 
 #-------------------------------------------------------------------
@@ -84,28 +122,35 @@ Renders a series of checkboxes.
 =cut
 
 sub toHtml {
-	my $self = shift;
+	my $self        = shift;
 	my $output;
-	my $alignment = $self->alignmentSeparator;
-        my %options;
-        tie %options, 'Tie::IxHash';
-	%options = $self->orderedHash();
+	my $alignment   = $self->alignmentSeparator;
+
+    # Add the select all button
+    if ($self->get("showSelectAll")) {
+        $output .= $self->getSelectAllButton;
+    }
+
+    tie my %options, 'Tie::IxHash', $self->orderedHash();
 	foreach my $key (keys %options) {
-                my $checked = 0;
-                foreach my $item (@{ $self->get('value') }) {
-                        if ($item eq $key) {
-                                $checked = 1;
-                        }
-                }
-                $output .= WebGUI::Form::Checkbox->new($self->session,{
-                        name=>$self->get('name'),
-                        value=>$key,
-                        extras=>$self->get('extras'),
-                        checked=>$checked
-                        })->toHtml;
-                $output .= ${$self->get('options')}{$key} . $alignment;
-        }
-        return $output;
+        my $checked = (grep { $_ eq $key } @{ $self->get('value') })
+                    ? 1
+                    : 0
+                    ;
+
+        $output 
+            .= WebGUI::Form::Checkbox->new($self->session, {
+                name    => $self->get('name'),
+                value   => $key,
+                extras  => $self->get('extras'),
+                checked => $checked,
+            })->toHtml
+            . ${$self->get('options')}{$key} 
+            . $alignment
+            ;
+    }
+
+    return $output;
 }
 
 1;

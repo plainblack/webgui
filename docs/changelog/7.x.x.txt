@@ -41,6 +41,7 @@
  - Report errors on loading modules to Apache log during preload
  - fix: Use previous form value for Subscribe on CS preview
  - Use current subscription status on form for CS reply, unsubscribe if set to no
+ - add: WebGUI::Form::CheckList now has optional "Select All" button
 
 7.4.5
  - fix: Apostrophy incorrectly escaped as double quote in some places
