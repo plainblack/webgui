@@ -172,7 +172,8 @@ our $HELP = {
                             { 'name' => 'record.data.name' },
                             { 'name' => 'record.data.label' },
                             { 'name' => 'record.data.value' },
-                            { 'name' => 'record.data.isMailField' }
+                            { 'name' => 'record.data.isMailField' },
+                            { 'name' => 'record_data_type' },
                         ]
                     }
                 ]

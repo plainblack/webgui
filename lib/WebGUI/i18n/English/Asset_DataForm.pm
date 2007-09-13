@@ -726,6 +726,10 @@ below to see which template variables may be used inside this loop.|,
 		lastUpdated => 1149392138,
 	},
 
+	'record_data_type' => {
+		message => q|The data type associated with this field.|,
+		lastUpdated => 1189713018,
+	},
 	'24' => {
 		message => q|Possible Values|,
 		lastUpdated => 1031514049

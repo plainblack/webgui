@@ -1,4 +1,5 @@
 7.4.7
+ - add type variable to Data Form record loop
 
 
 7.4.6
