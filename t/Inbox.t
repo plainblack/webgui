@@ -16,7 +16,7 @@ use WebGUI::Session;
 
 use WebGUI::Inbox;
 
-use Test::More tests => 1; # increment this value for each test you create
+use Test::More tests => 2; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -24,3 +24,12 @@ my $session = WebGUI::Test->session;
 my $inbox = WebGUI::Inbox->new($session); 
 ok(defined ($inbox), 'new("new") -- object reference is defined');
 
+my $new_message = {
+    message => 'Test message',
+    groupId => 3,
+    userId => 1,
+    
+};
+
+my $message = $inbox->addMessage($new_message);
+ok(defined($message), 'addMessage returned a response');
