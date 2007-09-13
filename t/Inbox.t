@@ -20,6 +20,13 @@ use Test::More tests => 3; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
+# Do our work in the import node
+#my $node = WebGUI::Asset->getImportNode($session);
+
+#my $versionTag = WebGUI::VersionTag->getWorking($session);
+#$versionTag->set({name=>"Inbox Test"});
+#my $inbox = $node->addChild({className=>'WebGUI::Inbox'});
+
 # Begin tests...
 my $inbox = WebGUI::Inbox->new($session); 
 ok(defined ($inbox), 'new("new") -- object reference is defined');
@@ -36,3 +43,8 @@ my $new_message = {
 my $message = $inbox->addMessage($new_message);
 ok(defined($message), 'addMessage returned a response');
 ok($message->{_properties}{message} eq $message_body, 'Message body set');
+
+END {
+    # Clean up after thy self
+    #$versionTag->rollback();
+}
