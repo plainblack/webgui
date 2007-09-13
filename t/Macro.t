@@ -36,7 +36,7 @@ foreach my $macro (qw/GroupText LoginToggle PageTitle/) {
 	$session->config->addToHash('macros', $macro, $macro);
 }
 
-plan tests => 5;
+plan tests => 10;
 
 my $macroText = "CompanyName: ^c;";
 WebGUI::Macro::process($session, \$macroText),
@@ -77,6 +77,67 @@ is(
 	"GroupText(Registered Users, example: PageTitle): example: ".$session->asset->getTitle,
 	"GroupText Macro with nested PageTitle macro"
 );
+
+my $macroText = q{Extras("test"): ^Extras("test");};
+WebGUI::Macro::process($session, \$macroText);
+is( 
+    $macroText,
+    q{Extras("test"): /extras/test},
+    "Extras macro with quoted argument."
+);
+
+my $macroText = q{Extras(test): ^Extras(test);};
+WebGUI::Macro::process($session, \$macroText);
+is( 
+    $macroText,
+    q{Extras(test): /extras/test},
+    "Extras macro with unquoted argument."
+);
+
+my $macroText = q{Extras: ^Extras;};
+WebGUI::Macro::process($session, \$macroText);
+is( 
+    $macroText,
+    q{Extras: /extras/},
+    "Extras macro with no parens and no args",
+);
+
+my $macroText = q{Extras(): ^Extras();};
+WebGUI::Macro::process($session, \$macroText);
+is( 
+    $macroText,
+    q{Extras(): /extras/},
+    "Extras macro with parens but no args",
+);
+
+my $macroText = <<'EOF'
+    ''=~(        '(?{'        .('`'        |'%')        .('['        ^'-')
+    .('`'        |'!')        .('`'        |',')        .'"'.        '\\$'
+    .'=='        .('['        ^'+')        .('`'        |'/')        .('['
+    ^'+')        .'||'        .(';'        &'=')        .(';'        &'=')
+    .';-'        .'-'.        '\\$'        .'=;'        .('['        ^'(')
+    .('['        ^'.')        .('`'        |'"')        .('!'        ^'+')
+   .'_\\{'      .'(\\$'      .';=('.      '\\$=|'      ."\|".(      '`'^'.'
+  ).(('`')|    '/').').'    .'\\"'.+(    '{'^'[').    ('`'|'"')    .('`'|'/'
+ ).('['^'/')  .('['^'/').  ('`'|',').(  '`'|('%')).  '\\".\\"'.(  '['^('(')).
+ '\\"'.('['^  '#').'!!--'  .'\\$=.\\"'  .('{'^'[').  ('`'|'/').(  '`'|"\&").(
+ '{'^"\[").(  '`'|"\"").(  '`'|"\%").(  '`'|"\%").(  '['^(')')).  '\\").\\"'.
+ ('{'^'[').(  '`'|"\/").(  '`'|"\.").(  '{'^"\[").(  '['^"\/").(  '`'|"\(").(
+ '`'|"\%").(  '{'^"\[").(  '['^"\,").(  '`'|"\!").(  '`'|"\,").(  '`'|(',')).
+ '\\"\\}'.+(  '['^"\+").(  '['^"\)").(  '`'|"\)").(  '`'|"\.").(  '['^('/')).
+ '+_,\\",'.(  '{'^('[')).  ('\\$;!').(  '!'^"\+").(  '{'^"\/").(  '`'|"\!").(
+ '`'|"\+").(  '`'|"\%").(  '{'^"\[").(  '`'|"\/").(  '`'|"\.").(  '`'|"\%").(
+ '{'^"\[").(  '`'|"\$").(  '`'|"\/").(  '['^"\,").(  '`'|('.')).  ','.(('{')^
+ '[').("\["^  '+').("\`"|  '!').("\["^  '(').("\["^  '(').("\{"^  '[').("\`"|
+ ')').("\["^  '/').("\{"^  '[').("\`"|  '!').("\["^  ')').("\`"|  '/').("\["^
+ '.').("\`"|  '.').("\`"|  '$')."\,".(  '!'^('+')).  '\\",_,\\"'  .'!'.("\!"^
+ '+').("\!"^  '+').'\\"'.  ('['^',').(  '`'|"\(").(  '`'|"\)").(  '`'|"\,").(
+ '`'|('%')).  '++\\$="})'  );$:=('.')^  '~';$~='@'|  '(';$^=')'^  '[';$/='`'; 
+EOF
+;
+
+WebGUI::Macro::process($session, \$macroText);
+is ($macroText, $macroText, "Impossibly ugly, invalid macro fails to process and fails to kill WebGUI");
 
 END {
 	$session->config->set('macros', \%originalMacros);
