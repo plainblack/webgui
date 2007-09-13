@@ -1,3 +1,6 @@
+7.4.7
+
+
 7.4.6
  - Prevent Help index from trying to link to non-existant documentation
  - fix: can't see the send private message link
