@@ -578,17 +578,17 @@ our $I18N = {
 	},
 
 	'recover password email text1' => {
-		message => q|We have received your request the password for |,
-		lastUpdated => 177127324,
+		message => q|We have received your request to change the password for |,
+		lastUpdated => 1189780432,
 	},
 	
 	'recover password email text2' => {
-		message => q|Pleae use the link below to visit the site and change your password|,
-		lastUpdated => 177127324,
+		message => q|Please use the link below to visit the site and change your password.|,
+		lastUpdated => 1189780432,
 	},
 
 	'recover password email text3' => {
-		message => q|If you did not request your password to be recovered, please contact the system administrator by replying to this message|,
+		message => q|If you did not request your password to be recovered, please contact the system administrator.|,
 		lastUpdated => 177127324,
 	},
 

@@ -1,4 +1,5 @@
 7.4.7
+ - fix: misspelled i18n in webgui password recovery
  - add type variable to Data Form record loop
 
 

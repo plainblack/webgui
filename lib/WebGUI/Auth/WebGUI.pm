@@ -698,8 +698,6 @@ sub recoverPassword {
 
     my $type = $self->getPasswordRecoveryType;
 
-    #$self->session->errorHandler->warn("recovery type: $type");
-
     if ($type eq 'profile') {
         $self->profileRecoverPassword(@_);
     } 
