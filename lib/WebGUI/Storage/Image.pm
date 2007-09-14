@@ -91,11 +91,15 @@ sub addFileFromCaptcha {
 	if($error) {
         $self->session->errorHandler->warn("Error adding noise: $error");
     }
-    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'black', antialias=>'true', text=>$challenge);
+    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>'#666666', antialias=>'true', text=>$challenge);
 	if($error) {
         $self->session->errorHandler->warn("Error Annotating image: $error");
     }
-    $error = $image->Blur(geometry=>"1");
+    $error = $image->Draw(primitive=>"line", points=>"0,5 105,21", stroke=>'#666666', antialias=>'true', strokewidth=>2);
+	if($error) {
+        $self->session->errorHandler->warn("Error drawing line: $error");
+    }
+    $error = $image->Blur(geometry=>"9");
 	if($error) {
         $self->session->errorHandler->warn("Error blurring image: $error");
     }
