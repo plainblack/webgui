@@ -192,7 +192,7 @@ sub contentHandler {
             my $asset = getAsset($session, getRequestedAssetUrl($session));
 
             # display from cache if page hasn't been modified.
-			if ($session->var->get("userId") eq "1" && !$http->ifModifiedSince($asset->getContentLastModified)) { 
+			if ($session->var->get("userId") eq "1" && defined $asset && !$http->ifModifiedSince($asset->getContentLastModified)) { 
 				$http->setStatus("304","Content Not Modified");
 				$http->sendHeader;
 				$session->close;
