@@ -1,7 +1,7 @@
 7.4.7
  - fix: misspelled i18n in webgui password recovery
  - fix: crash bug in if modified cache checking
- - The default database setup no longer uses the popular "news" url.
+ - rfe: Change URL of "news" layout to be something else.
  - add type variable to Data Form record loop
 
 
