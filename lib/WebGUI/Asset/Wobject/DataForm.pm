@@ -412,7 +412,7 @@ sub getListTemplateVars {
 				"record.data.label"=>$data->{label},
 				"record.data.value"=>$value,
 				"record.data.isMailField"=>$data->{isMailField},
-                "record_data_type" => $field->{type},
+                "record_data_type" => $data->{type},
 				});
 		}
 		$dloop->finish;
