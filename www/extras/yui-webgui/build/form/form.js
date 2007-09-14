@@ -23,7 +23,7 @@ WebGUI.Form.toggleAllCheckboxesInForm
         var oldState    = WebGUI.Form.toggleAllCheckboxesState[formElement+checkboxesName]
         var state       = oldState ? "" : "checked";
 
-        for (var i in formElement.elements) {
+        for (var i = 0; i < formElement.elements.length; i++) {
             var input = formElement.elements[i];
             if (!/^check/.test(input.type))
                 continue;
