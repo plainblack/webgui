@@ -1,6 +1,7 @@
 7.4.7
  - fix: misspelled i18n in webgui password recovery
  - made captcha's harder to defeat by machine
+ - rfe: Make Layout Templates use separate namespace (News)
  - fix: crash bug in if modified cache checking
  - rfe: Change URL of "news" layout to be something else.
  - add type variable to Data Form record loop
