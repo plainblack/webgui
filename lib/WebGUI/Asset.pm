@@ -1572,7 +1572,7 @@ sub manageAssetsSearch {
 	$output .= WebGUI::Form::formFooter($self->session);
 	$self->session->output->print($output);
 	$output = '';
-	return undef unless ($self->session->form->get("doit") && $self->session->form->get("keywords") ne "");
+	return undef unless ($self->session->form->get("doit") && ($self->session->form->get("keywords") ne "" || $self->session->form->get("class") ne "any"));
 	my $class = $self->session->form->process("class","className") eq "any" ? undef : $self->session->form->process("class","className");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),
