@@ -1277,8 +1277,9 @@ sub viewWeek {
     $dt->subtract(days => $dt->day_of_week % 7 - $first_dow);
     
     my $start   = $dt->toMysql;
-    my $dtEnd   = $dt->clone->add(days => 7)->add(seconds => -1);
+    my $dtEnd   = $dt->clone->add(days => 7);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
+    $dtEnd->add(seconds => -1);
     
     my @events  = $self->getEventsIn($start,$end);
     

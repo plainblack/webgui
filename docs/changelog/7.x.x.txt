@@ -9,7 +9,7 @@
  - add type variable to Data Form record loop
  - fix: Select All button javascript would not work in IE
  - fix: Events were missing startDateMonth and endDateMonth template vars
-
+ - fix: Events don't display on last day of week on week view
 
 7.4.6
  - Prevent Help index from trying to link to non-existant documentation
