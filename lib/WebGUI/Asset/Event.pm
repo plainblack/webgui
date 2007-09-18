@@ -1188,6 +1188,7 @@ sub getTemplateVars {
     $var{ "startDateDayOfWeek"  } = $dtStart->day_of_week;
     $var{ "startDateMonthName"  } = $dtStart->month_name;
     $var{ "startDateMonthAbbr"  } = $dtStart->month_abbr;
+    $var{ "startDateMonth"      } = $dtStart->month;
     $var{ "startDateYear"       } = $dtStart->year;
     $var{ "startDateYmd"        } = $dtStart->ymd;
     $var{ "startDateMdy"        } = $dtStart->mdy;
@@ -1209,6 +1210,7 @@ sub getTemplateVars {
     $var{ "endDateDayOfWeek"    } = $dtEnd->day_of_week;
     $var{ "endDateMonthName"    } = $dtEnd->month_name;
     $var{ "endDateMonthAbbr"    } = $dtEnd->month_abbr;
+    $var{ "endDateMonth"        } = $dtEnd->month;
     $var{ "endDateYear"         } = $dtEnd->year;
     $var{ "endDateYmd"          } = $dtEnd->ymd;
     $var{ "endDateMdy"          } = $dtEnd->mdy;

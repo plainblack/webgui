@@ -7,6 +7,7 @@
  - rfe: Change URL of "news" layout to be something else.
  - add type variable to Data Form record loop
  - fix: Select All button javascript would not work in IE
+ - fix: Events were missing startDateMonth and endDateMonth template vars
 
 
 7.4.6
