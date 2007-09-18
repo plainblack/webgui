@@ -161,6 +161,22 @@ sub importAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 importAssetCollateralData ( data )
+
+Allows you to import collateral data that is exported with your asset. 
+
+=head3 data
+
+Hashref containing the assets exported data.
+
+=cut
+
+sub importAssetCollateralData {
+    # This is an interface method only. It is to be overloaded if needed.
+}
+
+#-------------------------------------------------------------------
+
 =head2 importPackage ( storageLocation )
 
 Imports the data from a webgui package file.
@@ -196,6 +212,7 @@ sub importPackage {
 		}
 		my $asset = $assets{$data->{properties}{parentId}} || $self;
 		my $newAsset = $asset->importAssetData($data);
+        $newAsset->importAssetCollateralData($data);
 		$assets{$newAsset->getId} = $newAsset;
 	}
 	if ($self->session->setting->get("autoRequestCommit")) {

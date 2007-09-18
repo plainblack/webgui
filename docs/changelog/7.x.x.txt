@@ -9,6 +9,8 @@
  - add type variable to Data Form record loop
  - fix: Select All button javascript would not work in IE
  - fix: Events were missing startDateMonth and endDateMonth template vars
+ - fix: Fixed a bug which caused assets to be uneditable if their edit group 
+   had been deleted. (Martin Kamerbeek / Oqapi)
  - fix: Events don't display on last day of week on week view
 
 7.4.6
