@@ -13,6 +13,7 @@
 # thumbnails. 
 #-----------------------------------------
 
+use Carp qw(croak);
 use File::stat;
 use File::Find ();
 use Getopt::Long;
