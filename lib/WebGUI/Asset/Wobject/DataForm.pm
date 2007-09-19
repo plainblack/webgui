@@ -1147,7 +1147,9 @@ sub www_exportTab {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
         $self->session->http->setFilename($self->get("url").".tab","text/plain");
-        my %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
+        my %fields;
+        tie %fields, 'Tie::IxHash';
+        %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
                 assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
         my @data;
         my $entries = $self->session->db->read("select * from DataForm_entry where assetId=".$self->session->db->quote($self->getId));

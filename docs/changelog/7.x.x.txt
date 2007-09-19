@@ -12,6 +12,7 @@
  - fix: Fixed a bug which caused assets to be uneditable if their edit group 
    had been deleted. (Martin Kamerbeek / Oqapi)
  - fix: Events don't display on last day of week on week view
+ - fix: Data Form tab delimited export doesn't obey field order
 
 7.4.6
  - Prevent Help index from trying to link to non-existant documentation
