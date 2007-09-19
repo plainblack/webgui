@@ -95,7 +95,6 @@ sub autolinkHtml {
     my $skipTitles = $opts{skipTitles} || [];
     # TODO: ignore caching for now, but maybe do it later.
 	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
-	return $html unless %mapping;
 	foreach my $key (keys %mapping) {
         if (grep {lc $_ eq $key} @$skipTitles) {
             delete $mapping{$key};
@@ -105,9 +104,10 @@ sub autolinkHtml {
         $key =~ s{\)}{\\\)}gxms; # escape parens
 		$mapping{$key} = $self->session->url->gateway($mapping{$key});
 	}
+	return $html unless %mapping;
     # sort by length so it prefers matching longer titles 
 	my $matchString = join('|', map{quotemeta} sort {length($b) <=> length($a)} keys %mapping);
-	my $regexp = qr/($matchString)/i;
+    my $regexp = qr/($matchString)/i;
 	my @acc = ();
 	my $in_a = 0;
 	my $p = HTML::Parser->new;

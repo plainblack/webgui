@@ -13,6 +13,7 @@
    had been deleted. (Martin Kamerbeek / Oqapi)
  - fix: Events don't display on last day of week on week view
  - fix: Data Form tab delimited export doesn't obey field order
+ - fix: Extra <a> tags inserted when viewing only Wiki page
 
 7.4.6
  - Prevent Help index from trying to link to non-existant documentation
