@@ -347,7 +347,7 @@ sub run {
 	if ($status eq "complete") {
 		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId, notifySpectre=>0});
 	} else {
-		$self->set({lastStatus=>"error", notifySpectre=>0});
+		$self->set({lastStatus=>$status, notifySpectre=>0});
 	}
 	return $status;
 }

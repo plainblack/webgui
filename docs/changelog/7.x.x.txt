@@ -4,6 +4,8 @@
  - rfe: Make Layout Templates use separate namespace (News)
  - rfe: search assets on class without keywords
  - fix: thumbnailer.pl is broken
+ - fix: workflow engine reporting "error" in status screen even when it's
+   "waiting"
  - fix: crash bug in if modified cache checking
  - rfe: Change URL of "news" layout to be something else.
  - add type variable to Data Form record loop
