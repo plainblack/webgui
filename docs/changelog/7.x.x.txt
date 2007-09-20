@@ -18,6 +18,7 @@
  - fix: Extra <a> tags inserted when viewing only Wiki page
  - fix: incorrect links generated for Event related links
  - fix: Sort Collaboration System threads correctly by rating
+ - fix: Newsletter contains trashed threads (Yung Han Khoe, United Knowledge)
 
 7.4.6
  - Prevent Help index from trying to link to non-existant documentation

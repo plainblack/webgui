@@ -106,8 +106,8 @@ sub execute {
             $eh->info("Searching for threads that match $subscription");
             my $matchingThreads = $db->read("select metaData_values.assetId from metaData_values
                 left join asset using (assetId) where fieldId=? and value like ? and creationDate > ?
-                and className like ?  and lineage like ?", 
-                [$fieldId, '%'.$value.'%', $lastTimeSent, 'WebGUI::Asset::Post::Thread%', $newsletter->get("lineage").'%']); 
+                and className like ?  and lineage like ? and state = ?", 
+                [$fieldId, '%'.$value.'%', $lastTimeSent, 'WebGUI::Asset::Post::Thread%', $newsletter->get("lineage").'%', 'published']); 
             while (my ($threadId) = $matchingThreads->array) {
                 my $thread = WebGUI::Asset->new($self->session, $threadId);
                 if (defined $thread) {

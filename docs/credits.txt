@@ -50,6 +50,7 @@ Contributing Developers..............Lucas Bartholemy
                                      Matt Wilson / Plain Black
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
+                                     Yung Han Khoe
 
 
 The following are people/companies who didn't directly contribute
