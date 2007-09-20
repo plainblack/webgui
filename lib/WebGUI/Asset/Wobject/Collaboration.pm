@@ -938,6 +938,10 @@ sub getThreadsPaginator {
 	}
 	$sortBy ||= "dateUpdated";
 	$sortOrder ||= "desc";
+    # Sort by the thread rating instead of the post rating.  other places don't care about threads.
+    if ($sortBy eq 'rating') {
+        $sortBy = 'threadRating';
+    } 
 
 	my $sql = "
 		select 
