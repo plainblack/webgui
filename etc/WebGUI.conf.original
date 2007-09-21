@@ -107,13 +107,6 @@
 
 # "fileCacheRoot" : "/path/to/cache",
 
-# Support for the memcached distributed caching system.
-# See http://www.danga.com/memcached/ for details on memcached.
-# Uncomment this and point it to your memcached server(s). Use a
-# comma separated list for multiple servers.
-
-# "memcached_servers" : "10.0.0.6:11211", 
-
 # Set this to 1 to disable WebGUI's caching subsystems. This is
 # mainly useful for developers.
 
