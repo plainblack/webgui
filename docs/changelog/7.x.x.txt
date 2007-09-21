@@ -1,3 +1,5 @@
+7.4.8
+
 7.4.7
  - fix: misspelled i18n in webgui password recovery
  - made captcha's harder to defeat by machine
