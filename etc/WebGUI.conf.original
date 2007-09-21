@@ -94,13 +94,11 @@
 #"webServerPort" : 80,
 
 # What kind of cache do you wish to use? Available types are 
-# WebGUI::Cache::FileCache, WebGUI::Cache::Database, and
-# WebGUI::Cache::Memcached. We highly recommend the file
-# cache if you're in a single server environment, and the
-# database cache if you have multiple web nodes. Memcached
-# is experimental and is slower and buggier than the other
-# two, so should only be used if you know what you're
-# doing.
+# WebGUI::Cache::FileCache and WebGUI::Cache::Database.
+# We highly recommend the database cache if you are running
+# sites with more than a few hundred pages, or if you're
+# running in a multi-server environment. The file cache is better
+# for very small sites.
 
 "cacheType" : "WebGUI::Cache::FileCache",
 
