@@ -243,7 +243,6 @@ sub www_editBranch {
                                 );
                 }
         }	
-	$ac->setHelp('edit branch', 'Asset');
 	return $ac->render($tabform->print, $i18n->get('edit branch','Asset'));
 }
 

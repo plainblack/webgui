@@ -307,7 +307,6 @@ Displays the export page administrative interface
 sub www_export {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-        $self->getAdminConsole->setHelp("page export", "Asset");
 	my $i18n = WebGUI::International->new($self->session, "Asset");
         my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
         $f->hidden(

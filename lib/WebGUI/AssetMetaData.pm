@@ -273,7 +273,6 @@ sub www_editMetaDataField {
 		-value=>$fieldInfo->{defaultValue}
 	);
 	$f->submit();
-	$ac->setHelp("metadata edit property","Asset");
 	return $ac->render($f->print, $i18n->get('Edit Metadata'));
 }
 
@@ -290,7 +289,6 @@ sub www_editMetaDataFieldSave {
 	my $ac = WebGUI::AdminConsole->new($self->session,"content profiling");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
 	my $i18n = WebGUI::International->new($self->session,"Asset");
-	$ac->setHelp("metadata edit property","Asset");
 	# Check for duplicate field names
     my $fid       = $self->session->form->process("fid");
     my $fieldName = $self->session->form->process("fieldName");
@@ -342,7 +340,6 @@ sub www_manageMetaData {
 		$output .= $self->session->icon->edit("func=editMetaDataField;fid=".$fieldId,$self->get("url"));
 		$output .= " <b>".$fields->{$fieldId}{fieldName}."</b><br />";
 	}	
-        $ac->setHelp("metadata manage","Asset");
 	return $ac->render($output);
 }
 

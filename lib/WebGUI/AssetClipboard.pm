@@ -364,7 +364,6 @@ sub www_manageClipboard {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my ($header,$limit);
-        $ac->setHelp("clipboard manage");
 	if ($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)) {
 		$header = $i18n->get(966);
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));

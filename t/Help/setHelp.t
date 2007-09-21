@@ -44,6 +44,10 @@ find(\&getHelpTopics, $lib);
 $numTests = scalar(@helpTopics)
 ;
 
+if (!$numTests) {
+    plan skip_all => 'No uses of setHelp to check';
+}
+
 plan tests => $numTests;
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);

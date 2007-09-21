@@ -525,7 +525,6 @@ sub www_manageRevisions {
         }
         $sth->finish;
         $output .= '</table>';
-	$ac->setHelp('manage versions','Asset');
         return $ac->render($output,$i18n->get("committed versions", "VersionTag").": ".$self->getTitle);
 }
 
