@@ -480,8 +480,8 @@ sub _create_interleaved_items {
     my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
     my $items_remain = 1;
     while((@$items < $maxHeadlines) && $items_remain){
+        $items_remain=0;
 	foreach my $rss(@$rss_feeds){
-	    $items_remain=0;
 	    if(defined $rss->{items}
 	       && @$items < $maxHeadlines
 	       && (my $item = shift @{$rss->{items}})
