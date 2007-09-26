@@ -2336,13 +2336,14 @@ A boolean indicating the value should be outputted in read only mode.
 =cut
 
 sub _getFieldValue {
-	my ($fieldValue);
 	my $self = shift;
 	my $field = shift;
 	my $recordValues = shift;
 	my $readOnly = shift;
 	
-	$fieldValue = $self->session->form->process($field->{fieldName}) || $recordValues->{$field->{fieldName}} || $field->{processedDefaultValue};
+	my $i18n = WebGUI::International->new($self->session, 'Asset_SQLForm');
+	
+    my $fieldValue = $self->session->form->process($field->{fieldName}) || $recordValues->{$field->{fieldName}} || $field->{processedDefaultValue};
 
 	if ($fieldValue && !$readOnly) {
 #		$fieldValue = $self->session->datetime->setToEpoch($fieldValue) if (isIn($field->{formFieldType}, qw(date dateTime)));
@@ -2369,7 +2370,7 @@ sub _getFieldValue {
 				$fieldValue .= '<img src="'.
 					$self->session->url->page('func=viewThumbnail;rid='.$self->session->form->process("rid").'&fid='.$_, $self->getUrl).'" />';
 			} else {
-				$fieldValue .= WebGUI::Internation::get('click here for file', 'Asset_SQLForm');
+				$fieldValue .= $i18n->get('click here for file');
 			}
 			$fieldValue .= '</a>';
 		}
@@ -2708,12 +2709,12 @@ my			@results = $self->session->db->quickArray($sql);
 			if ($self->session->form->process('_'.$fieldName.'_action') eq 'keep') {
 				push(@update, "$fieldName = ".$self->session->db->quote($previousRecord->{$fieldName}));
 				push(@update, "__".$fieldName."_mimeType=".$self->session->db->quote($previousRecord->{"__".$fieldName."_mimeType"}));
-			} elsif ($self->session->form->process('_'.$fieldName.'_action') eq 'overwrite' && $self->session->form->process($fieldName)) {
+			} elsif ($self->session->form->process('_'.$fieldName.'_action') eq 'overwrite' && $self->session->form->process($fieldName . '_file')) {
 				require Apache2::Request;
 				require Apache2::Upload;
 
 				# Get Apache2::Upload object
-				my $upload = $self->session->request->upload($fieldName);
+				my $upload = $self->session->request->upload($fieldName . '_file');
 
 				# Check file size
 				my $maxFileSize = ($self->get('maxFileSize') > $self->session->setting->get("maxAttachmentSize")) ? 
