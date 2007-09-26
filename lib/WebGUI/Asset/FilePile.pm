@@ -49,6 +49,12 @@ These methods are available from this class:
 sub edit {
 	my $self = shift;
 	my $tabform = WebGUI::TabForm->new($self->session,);
+	if ($self->session->config->get("enableSaveAndCommit")) {
+		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
+            name    => "saveAndCommit", 
+            value   => WebGUI::International->new($self->session, 'Asset')->get("save and commit"),
+            }));
+	}
 	my $i18n = WebGUI::International->new($self->session, 'Asset_FilePile');
 	$tabform->hidden({
 		name=>"func",
