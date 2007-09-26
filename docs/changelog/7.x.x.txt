@@ -2,6 +2,7 @@
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode
  - fix: SQLForm file upload broken
  - fix: Newsletter can contain duplicate threads
+ - fix: Captcha unreadable when using Image::Magick
 
 7.4.7
  - fix: misspelled i18n in webgui password recovery
