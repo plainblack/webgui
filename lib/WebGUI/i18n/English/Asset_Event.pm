@@ -53,6 +53,31 @@ our $I18N = {
         message     => q|HTML form for adding or removing files from this Event.|,
         lastUpdated => 1177383776,
     },
+    
+    'formUserDefinedN'   => {
+        message     => q|For each of the 5 User Defined fields, a form widget for a single line of text.|,
+        lastUpdated => 1190816264,
+    },
+
+    'formUserDefinedN_yesNo'   => {
+        message     => q|For each of the 5 User Defined fields, a form widget for a yes/no field.|,
+        lastUpdated => 1190816264,
+    },
+
+    'formUserDefinedN_textarea'   => {
+        message     => q|For each of the 5 User Defined fields, a form widget for a text area.|,
+        lastUpdated => 1190816264,
+    },
+
+    'formUserDefinedN_htmlarea'   => {
+        message     => q|For each of the 5 User Defined fields, a form widget for a WYSIWIG HTML area.|,
+        lastUpdated => 1190816264,
+    },
+
+    'formUserDefinedN_float'   => {
+        message     => q|For each of the 5 User Defined fields, a form widget for a float.|,
+        lastUpdated => 1190816264,
+    },
 
 	'formStartDate'	=> {
 		message		=> q|HTML form for entering or editing the Event's start date.|,

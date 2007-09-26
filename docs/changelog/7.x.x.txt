@@ -4,6 +4,7 @@
  - fix: Newsletter can contain duplicate threads
  - fix: Captcha unreadable when using Image::Magick
  - fix: WebGUI::Group->new doesn't check group validity
+ - add form element template variables for event user defined fields
 
 7.4.7
  - fix: misspelled i18n in webgui password recovery

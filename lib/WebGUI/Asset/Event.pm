@@ -1251,7 +1251,7 @@ sub getTemplateVars {
     $var{ "relatedLinks" } = [];
     push @{$var{"relatedLinks"}}, { "linkUrl" => $_ }
         for ($self->getRelatedLinks);
-    
+	
     # Attachments
 
     my $gotImage;
@@ -1806,6 +1806,31 @@ sub www_edit {
             name    => "description",
             value   => $form->process("description") || $self->get("description"),
         });
+    
+    # User defined
+    for my $x (1..5) {
+        my $userDefinedValue = $self->getValue("userDefined".$x);
+        $var->{'formUserDefined'.$x} = WebGUI::Form::text($session, {
+            name    => "userDefined" . $x,
+            value   => $userDefinedValue,
+        });
+        $var->{'formUserDefined'.$x.'_yesNo'} = WebGUI::Form::yesNo($session, {
+            name    => "userDefined".$x,
+            value   => $userDefinedValue,
+        });
+        $var->{'formUserDefined'.$x.'_textarea'} = WebGUI::Form::textarea($session, {
+            name    => "userDefined".$x,
+            value   => $userDefinedValue,
+        });
+        $var->{'formUserDefined'.$x.'_htmlarea'} = WebGUI::Form::HTMLArea($session, {
+            name    => "userDefined".$x,
+            value   => $userDefinedValue,
+        });
+		$var->{'formUserDefined'.$x.'_float'} = WebGUI::Form::Float($session, {
+            name    => "userDefined".$x,
+            value   => $userDefinedValue,
+        });
+    }
     
     # File attachments
     $var->{"formAttachments"}
