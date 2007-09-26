@@ -297,6 +297,8 @@ sub isInGroup {
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
    my $group = WebGUI::Group->new($self->session,$gid);
+   # Cope with non-existant groups. Default to the admin group if the groupId is invalid.
+   $group = WebGUI::Group->new($self->session, 3) unless $group;
    ### Check for groups of groups.
    my $users = $group->getAllUsers();
    foreach my $user (@{$users}) {

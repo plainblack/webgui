@@ -778,9 +778,11 @@ Negates the subscribe method.
 =cut
 
 sub unsubscribe {
-	my $self = shift;
-  my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-  $group->deleteUsers([$self->session->user->userId]);
+    my $self = shift;
+    my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
+    return
+        if !$group;
+    $group->deleteUsers([$self->session->user->userId]);
 }
 
 

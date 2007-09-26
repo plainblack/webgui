@@ -1138,7 +1138,9 @@ sub processPropertiesFromFormPost {
 sub purge {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
-	$group->delete;
+	if ($group) {
+        $group->delete;
+    }
 	if ($self->get("getMailCronId")) {
 		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
 		$cron->delete if defined $cron;
@@ -1262,8 +1264,16 @@ Subscribes a user to this collaboration system.
 
 sub subscribe {
 	my $self = shift;
-	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-	$group->addUsers([$self->session->user->userId]);
+    my $group;
+    my $subscriptionGroup = $self->get('subscriptionGroupId');
+    if ($subscriptionGroup) {
+	    $group = WebGUI::Group->new($self->session,$subscriptionGroup);
+    }
+    if (!$group) {
+        $self->createSubscriptionGroup;
+	    $group = WebGUI::Group->new($self->session,$self->get('subscriptionGroupId'));
+    }
+    $group->addUsers([$self->session->user->userId]);
 }
 
 #-------------------------------------------------------------------
@@ -1277,7 +1287,9 @@ Unsubscribes a user from this collaboration system
 sub unsubscribe {
 	my $self = shift;
 	my $group = WebGUI::Group->new($self->session,$self->get("subscriptionGroupId"));
-	$group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
+	return
+        unless $group;
+    $group->deleteUsers([$self->session->user->userId],[$self->get("subscriptionGroupId")]);
 }
 
 

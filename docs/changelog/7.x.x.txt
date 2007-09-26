@@ -3,6 +3,7 @@
  - fix: SQLForm file upload broken
  - fix: Newsletter can contain duplicate threads
  - fix: Captcha unreadable when using Image::Magick
+ - fix: WebGUI::Group->new doesn't check group validity
 
 7.4.7
  - fix: misspelled i18n in webgui password recovery

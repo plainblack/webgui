@@ -82,6 +82,8 @@ sub canEditGroup {
     return 1 if canEditAll($session, $user);
 
 	my $group = WebGUI::Group->new($session,$groupId);
+    return
+        unless $group;
     return $user->isInGroup( $session->setting->get("groupIdAdminGroupAdmin") )  
         && $group->userIsAdmin( $user->userId )
         ;
@@ -464,7 +466,7 @@ sub www_editGroupSave {
     return $session->privilege->adminOnly
         unless canEditGroup($session, $gid);
     my $g = WebGUI::Group->new($session, $gid);
-    # We don't want them to use an existing name.  If needed, we'll ad a number to the name to keep it unique.
+    # We don't want them to use an existing name.  If needed, we'll add a number to the name to keep it unique.
     my $groupName = $session->form->process("groupName");
     while (my $existingGroupId = WebGUI::Group->find($session, $groupName)->getId) {
         last
@@ -499,50 +501,52 @@ sub www_editGroupSave {
 
 #-------------------------------------------------------------------
 sub www_editGrouping {
-	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
-	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->submit;
-        $f->hidden(
-		-name => "op",
-		-value => "editGroupingSave"
-	);
-        $f->hidden(
-		-name => "uid",
-		-value => $session->form->process("uid")
-	);
-        $f->hidden(
-		-name => "gid",
-		-value => $session->form->process("gid")
-	);
-	my $u = WebGUI::User->new($session,$session->form->process("uid"));
-	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
-        $f->readOnly(
-		-value => $u->username,
-		-label => $i18n->get(50),
-		-hoverHelp => $i18n->get('50 description'),
-        );
-        $f->readOnly(
-		-value => $g->name,
-		-label => $i18n->get(84),
-		-hoverHelp => $i18n->get('84 description'),
-        );
-	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
-	$f->date(
-		-name => "expireDate",
-		-label => $i18n->get(369),
-		-hoverHelp => $i18n->get('369 description'),
-		-value => $group->userGroupExpireDate($session->form->process("uid")),
-	);
-	$f->yesNo(
-		-name=>"groupAdmin",
-		-label=>$i18n->get(977),
-		-hoverHelp=>$i18n->get('977 description'),
-		-value=>$group->userIsAdmin($session->form->process("uid"))
-		);
-	$f->submit;
-        return _submenu($session,$f->print,'370');
+    my $session = shift;
+    my $uid = $session->form->process('uid');
+    my $gid = $session->form->process('gid');
+    return $session->privilege->adminOnly()
+        unless canEditGroup($session, $gid);
+    my $i18n = WebGUI::International->new($session);
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->submit;
+    $f->hidden(
+        -name => "op",
+        -value => "editGroupingSave"
+    );
+    $f->hidden(
+        -name => "uid",
+        -value => $uid,
+    );
+    $f->hidden(
+        -name => "gid",
+        -value => $gid,
+    );
+    my $u = WebGUI::User->new($session,$uid);
+    my $g = WebGUI::Group->new($session,$gid);
+    $f->readOnly(
+        -value => $u->username,
+        -label => $i18n->get(50),
+        -hoverHelp => $i18n->get('50 description'),
+    );
+    $f->readOnly(
+        -value => $g && $g->name,
+        -label => $i18n->get(84),
+        -hoverHelp => $i18n->get('84 description'),
+    );
+    $f->date(
+        -name => "expireDate",
+        -label => $i18n->get(369),
+        -hoverHelp => $i18n->get('369 description'),
+        -value => $g && $g->userGroupExpireDate($uid),
+    );
+    $f->yesNo(
+        -name=>"groupAdmin",
+        -label=>$i18n->get(977),
+        -hoverHelp=>$i18n->get('977 description'),
+        -value=> $g && $g->userIsAdmin($uid),
+    );
+    $f->submit;
+    return _submenu($session,$f->print,'370');
 }
 
 #-------------------------------------------------------------------

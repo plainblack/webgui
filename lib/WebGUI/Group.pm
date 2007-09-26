@@ -981,15 +981,18 @@ If you specified "new" for groupId, you can use this property to specify an id y
 =cut
 
 sub new {
-        my ($class, %group);
-        tie %group, 'Tie::CPHash';
-        $class = shift;
-	my $self = {};
-	$self->{_session} = shift;
-	$self->{_groupId} = shift;
-	my $override = shift;
-	my $cached = $self->{_session}->stow->get("groupObj");
+    my ($class, %group);
+    tie %group, 'Tie::CPHash';
+   	my $self = {};
+    
+    $class              = shift;
+    $self->{_session}   = shift;
+	$self->{_groupId}   = shift;
+	my $override        = shift;
+
+    my $cached = $self->{_session}->stow->get("groupObj");
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
+
 	bless $self, $class;
         if ($self->{_groupId} eq "new") {
 		$self->_create($override);
@@ -997,6 +1000,18 @@ sub new {
 	elsif ($self->{_groupId} eq "") {
 		$self->{_group} = $self->_defaults();
 	}
+    else {
+        # Check if the groupId is valid. If not return undef
+        my ($groupExists) = $self->{_session}->db->quickArray('select groupId from groups where groupId=?', [
+            $self->{_groupId},
+        ]);
+        unless ($groupExists) {
+            $self->{_session}->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
+                .'['.$self->{_groupId}.']');
+            return undef;
+        }
+    }
+
 	$cached->{$self->{_groupId}} = $self;
 	$self->{_session}->stow->set("groupObj", $cached);
 	return $self;
