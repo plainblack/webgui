@@ -150,11 +150,15 @@ warning if it is a duplicate.
 
 sub validateProfileData {
 	my $session = shift;
-	my %data = ();
+	my $opts = shift || {};
+    my $regOnly = $opts->{regOnly};
+    my %data = ();
 	my $error = "";
 	my $warning = "";
 	my $i18n = WebGUI::International->new($session);
-	foreach my $field (@{WebGUI::ProfileField->getEditableFields($session)}) {
+    my $fields = $regOnly ? WebGUI::ProfileField->getRegistrationFields($session)
+                          : WebGUI::ProfileField->getEditableFields($session);
+	foreach my $field (@$fields) {
 		my $fieldValue = $field->formProcess;
 		if (ref $fieldValue eq "ARRAY") {
 			$data{$field->getId} = $$fieldValue[0];

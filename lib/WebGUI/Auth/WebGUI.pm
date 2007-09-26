@@ -208,7 +208,7 @@ sub createAccountSave {
             }
         }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
-    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
+    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session, {regOnly => 1});
     $error .= $temp;
      
     return $self->createAccount($error) unless ($error eq "");
