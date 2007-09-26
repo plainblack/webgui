@@ -99,6 +99,7 @@ sub execute {
 
         # find matching threads
         my @threads = ();
+        my %foundThreads;
         $eh->info("Find threads in $assetId matching $userId subscriptions.");
         foreach my $subscription (split("\n", $subscriptions)) {
             $eh->info("Found subscription $subscription");
@@ -109,10 +110,13 @@ sub execute {
                 and className like ?  and lineage like ? and state = ?", 
                 [$fieldId, '%'.$value.'%', $lastTimeSent, 'WebGUI::Asset::Post::Thread%', $newsletter->get("lineage").'%', 'published']); 
             while (my ($threadId) = $matchingThreads->array) {
+                next
+                    if $foundThreads{$threadId};
                 my $thread = WebGUI::Asset->new($self->session, $threadId);
                 if (defined $thread) {
                     $eh->info("Found thread $threadId");
                     push(@threads, $thread);
+                    $foundThreads{$threadId} = 1;
                 }
                 else {
                     $eh->error("Couldn't instanciate thread $threadId");
