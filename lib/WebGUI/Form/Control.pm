@@ -661,6 +661,8 @@ sub getHoverCode {
     $hoverHelp =~ s/\n/ /g;
     $hoverHelp =~ s/'/\\'/g;
     $hoverHelp =~ s/^\s+//;
+    return ''
+        unless $hoverHelp;
     my $hover = '<script type="text/javascript">var tooltip = new YAHOO.widget.Tooltip("' . $attachId . '_tooltip", { context: "' . $attachId . '", text: \'' . $hoverHelp . '\', autodismissdelay: 100000, width: "300px"});</script>';
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
