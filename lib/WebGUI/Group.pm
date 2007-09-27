@@ -513,8 +513,11 @@ sub getAllGroupsFor {
 	my $self = shift;
 	my $groups = $self->getGroupsFor();
 	foreach my $gid (@{ $groups }) {
-		push @{ $groups }, @{ WebGUI::Group->new($self->session, $gid)->getAllGroupsFor() };
-	}
+        my $group = WebGUI::Group->new($self->session, $gid);
+        if ($group) {
+		    push @{ $groups }, @{ $group->getAllGroupsFor() };
+        }
+    }
 	my %unique = map { $_ => 1 } @{ $groups };
 	$groups = [ keys %unique ];
 	return $groups;
