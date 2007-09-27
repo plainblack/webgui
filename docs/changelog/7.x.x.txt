@@ -1,3 +1,5 @@
+7.4.9
+
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode
  - fix: SQLForm file upload broken
