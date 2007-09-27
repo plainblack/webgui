@@ -7,6 +7,7 @@
  - add form element template variables for event user defined fields
  - fix: File Pile doesn't have save and commit button
  - fix: Anonymous user creation doesn't use default values for yes/no fields
+ - changed hover help to use YUI tooltips, fixes positioning issues
 
 7.4.7
  - fix: misspelled i18n in webgui password recovery

@@ -215,7 +215,7 @@ Returns the HTML for this form object.
 
 sub print {
 	my $self = shift;
-        return $self->{_header}.$self->{_data}.$self->{_footer}.'<script type="text/javascript" src="'.$self->session->url->extras('wz_tooltip.js').'"></script>';
+        return $self->{_header}.$self->{_data}.$self->{_footer};
 }
 
 #-------------------------------------------------------------------

@@ -248,7 +248,6 @@ sub print {
 	$output .= $form;
 	$output .= WebGUI::Form::formFooter($self->session,);
 	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
-	$output .= '<script type="text/javascript" src="'.$self->session->url->extras('wz_tooltip.js').'"></script>';
 	return $output;
 }
 
