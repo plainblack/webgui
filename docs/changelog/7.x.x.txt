@@ -10,6 +10,7 @@
  - changed hover help to use YUI tooltips, fixes positioning issues
  - remove duplicate header section in calendar event template
  - events now have a time zone.  fixes recurring events being generated on the wrong day.
+ - recurring events are included in iCal feeds
 
 7.4.7
  - fix: misspelled i18n in webgui password recovery

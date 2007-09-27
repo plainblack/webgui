@@ -218,7 +218,8 @@ sub generateRecurringEvents {
         $eventTime = WebGUI::DateTime->new($session, $properties->{startDate} . " " . $properties->{startTime});
         $eventTime = $eventTime->set_time_zone($properties->{timeZone})->toMysqlTime;
     }
-
+    $properties->{feedUid} = undef;
+    
     my @dates    = $self->getRecurrenceDates;
     
     for my $date (@dates) {
