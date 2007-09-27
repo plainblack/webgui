@@ -36,6 +36,7 @@ finish($session); # this line required
 #-------------------------------------------------
 sub addEventTimeZone {
 	my $session = shift;
+    print "\tAdding timeZone to Events.\n" unless $quiet;
     $session->db->write("alter table Event add column timeZone varchar(255) binary default 'UTC'");
 }
 
