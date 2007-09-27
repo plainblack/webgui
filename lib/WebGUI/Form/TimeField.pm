@@ -137,10 +137,11 @@ sub getValueFromPost {
 	}
 
     # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
+	if ($self->get('format') ne 'mysql' && (
+        !$self->get("defaultValue") 
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
+        || $self->get("value") =~ m/^\d+$/)) {
 		# epoch format
 		return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
 	} else {

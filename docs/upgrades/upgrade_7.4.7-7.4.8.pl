@@ -21,6 +21,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addEventTimeZone($session);
 
 finish($session); # this line required
 
@@ -31,6 +32,12 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub addEventTimeZone {
+	my $session = shift;
+    $session->db->write("alter table Event add column timeZone varchar(255) binary default 'UTC'");
+}
 
 
 

@@ -112,6 +112,9 @@ sub definition {
             fieldType       => "Text",
             defaultValue    => undef,
         },
+        'timeZone' => {
+            fieldType       => 'TimeZone',
+        },
     );
     
     
@@ -210,20 +213,32 @@ sub generateRecurringEvents {
     $duration_days      
         = $event_end->subtract_datetime($event_start)->days;
     
+    my $eventTime;
+    if ($properties->{startTime}) {
+        $eventTime = WebGUI::DateTime->new($session, $properties->{startDate} . " " . $properties->{startTime});
+        $eventTime = $eventTime->set_time_zone($properties->{timeZone})->toMysqlTime;
+    }
+
     my @dates    = $self->getRecurrenceDates;
     
     for my $date (@dates) {
+        my $dt;
+        if ($eventTime) {
+            $dt = WebGUI::DateTime->new($session, mysql => $date . " " . $eventTime, time_zone => $properties->{timeZone});
+        }
+        else {
+            $dt = WebGUI::DateTime->new($session, $date." ". "00:00:00");
+        }
+        my $startDate = $dt->toDatabaseDate;
         # Only generate if the recurId does not exist on this day
         my ($exists) 
             = $session->db->quickArray(
                 "select count(*) from Event where recurId=? and startDate=?",
-                [$properties->{recurId}, $date],
+                [$properties->{recurId}, $startDate],
             );
         
         if (!$exists) {
-            my $dt        = WebGUI::DateTime->new($self->session, $date." 00:00:00");
-            
-            $properties->{startDate} = $dt->toDatabaseDate;
+            $properties->{startDate} = $startDate;
             $properties->{endDate} 
                 = $dt->clone->add(days => $duration_days)->toDatabaseDate;
             
@@ -1244,8 +1259,9 @@ sub getTemplateVars {
     $var{ "urlWeek"     } = $self->getParent->getUrl("type=week;start=".$urlStartParam);
     $var{ "urlMonth"    } = $self->getParent->getUrl("type=month;start=".$urlStartParam);
     $var{ "urlParent"   } = $self->getParent->getUrl;        
-    $var{"urlSearch"}    = $self->getParent->getSearchUrl;        
+    $var{ "urlSearch"   } = $self->getParent->getSearchUrl;        
     
+    $var{"timeZone"}    = $self->get('timeZone');        
     
     # Related links
     $var{ "relatedLinks" } = [];
@@ -1436,7 +1452,7 @@ sub processPropertiesFromFormPost {
     }
     # Non-allday events need timezone conversion
     else {
-        my $tz    = $self->session->user->profileField("timeZone");
+        my $tz    = $self->get('timeZone');
        
         my $dtStart
             = WebGUI::DateTime->new($session, 
@@ -1728,7 +1744,7 @@ sub www_edit {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
-    my $tz          = $session->user->profileField("timeZone");
+    my $tz          = $form->param('timeZone') || $self->get('timeZone') || $session->user->profileField('timeZone');
     my $func        = lc $session->form->param("func");
     my $var         = {};
 
@@ -1849,7 +1865,7 @@ sub www_edit {
         $default_start 
             = WebGUI::DateTime->new($session, 
                 mysql       => $session->form->param("start"),
-                time_zone   => $session->user->profileField("timeZone"),
+                time_zone   => $tz,
             );
     }
     else {
@@ -1863,8 +1879,9 @@ sub www_edit {
             $startDate  = $dtStart->toDatabaseDate;
         }
         else {
-            $startDate  = $dtStart->toUserTimeZoneDate;
-            $startTime  = $dtStart->toUserTimeZoneTime;
+            my $start = $dtStart->clone->set_time_zone($tz);
+            $startDate  = $start->toMysqlDate;
+            $startTime  = $start->toMysqlTime;
         }
     }
 
@@ -1892,8 +1909,9 @@ sub www_edit {
             $endDate    = $dtEnd->toDatabaseDate;
         }
         else {
-            $endDate    = $dtEnd->toUserTimeZoneDate;
-            $endTime    = $dtEnd->toUserTimeZoneTime;
+            my $end = $dtEnd->clone->set_time_zone($tz);
+            $endDate    = $dtEnd->toMysqlDate;
+            $endTime    = $dtEnd->toMysqlTime;
         }
     }
     
@@ -1909,6 +1927,12 @@ sub www_edit {
             value           => $form->param("endTime") || $endTime,
             defaultValue    => $default_end->toUserTimeZoneTime,
         });
+    $var->{"formTimeZone"} 
+        = WebGUI::Form::TimeZone($session, {
+            name    => "timeZone",
+            value   => $tz,
+        });
+    
     
     # time
     my $allday  = defined $form->param("allday")
@@ -1930,6 +1954,7 @@ sub www_edit {
         <div id="times">|
         . q|Start: |.$var->{"formStartTime"}
         . q|<br/>End: |.$var->{"formEndTime"}
+        . q|<br/>Time Zone: |.$var->{formTimeZone}
         . q|</div>|;
     
     # related links
