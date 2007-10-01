@@ -20,9 +20,18 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+removeOrphanedGroupings($session); # upgrade functions go here
 
 finish($session); # this line required
+
+
+#-------------------------------------------------
+sub removeOrphanedGroupings {
+	my $session = shift;
+	print "\tCleaning up stale groupings.\n" unless ($quiet);
+	$session->db->write("delete from groupGroupings where inGroup not in (select distinct groupId from groups)");
+	$session->db->write("delete from groupings where groupId not in (select distinct groupId from groups)");
+}
 
 
 ##-------------------------------------------------

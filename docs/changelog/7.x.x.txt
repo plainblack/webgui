@@ -1,6 +1,7 @@
 7.4.9
  - fix: Bug that did not allow Calendar Update Feeds workflow activity to 
    complete
+ - Clean up orphaned grouping
  - fix: purging old asset revisions on large sites never completes
 
 7.4.8
