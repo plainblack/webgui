@@ -1,6 +1,7 @@
 7.4.9
  - fix: Bug that did not allow Calendar Update Feeds workflow activity to 
    complete
+ - fix: purging old asset revisions on large sites never completes
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode

@@ -84,8 +84,7 @@ sub execute {
 
     # figure out if we left off somewhere
     my $lastRunVersion = $instance->getScratch("purgeOldAssetsLastRevisionDate");
-    my $suspectDate = time() - $self->get("purgeAfter");
-    $suspectDate = ($suspectDate > $lastRunVersion) ? $suspectDate : $lastRunVersion;
+    my $suspectDate = ($lastRunVersion > 0) ? $lastRunVersion : (time() - $self->get("purgeAfter"));
 
     # the query to find old revisions
     my $sth = $session->db->read("select assetData.assetId,asset.className,assetData.revisionDate from asset
