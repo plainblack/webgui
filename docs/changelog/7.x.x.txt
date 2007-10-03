@@ -3,6 +3,7 @@
    complete
  - Clean up orphaned grouping
  - fix: purging old asset revisions on large sites never completes
+ - fix: graphing doesn't work with GraphicsMagick
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode

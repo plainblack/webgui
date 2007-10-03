@@ -4,7 +4,7 @@ use strict;
 use WebGUI::Image::Palette;
 use Carp qw(croak);
 
-my $graphicsPackage;
+our $graphicsPackage;
 BEGIN {
     if (eval { require Graphics::Magick; 1 }) {
         $graphicsPackage = 'Graphics::Magick';
@@ -264,8 +264,12 @@ sub setImageHeight {
 	my $self = shift;
 	my $height = shift;
 	
-	#$self->image->set(size => $self->getImageWidth.'x'.$height);
-	$self->image->Extent(height => $height);
+    if ($graphicsPackage eq 'Graphics::Magick') {
+        $self->image->set(size => $self->getImageWidth.'x'.$height);
+    }
+    else {
+	    $self->image->Extent(height => $height);
+    }
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{height} = $height;
 }
@@ -285,9 +289,12 @@ Teh width of the image in pixels.
 sub setImageWidth {
 	my $self = shift;
 	my $width = shift;
-	
-	#$self->image->set(size => $width.'x'.$self->getImageHeight);
-	$self->image->Extent(width => $width);
+    if ($graphicsPackage eq 'Graphics::Magick') {
+	    $self->image->set(size => $width.'x'.$self->getImageHeight);
+    }
+    else {
+	    $self->image->Extent(width => $width);
+    }
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{width} = $width;
 }
@@ -410,8 +417,13 @@ sub text {
 	my $anchorX = $properties{x};
 	my $anchorY = $properties{y};
 
-
-	my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryMultilineFontMetrics(%properties);
+    my %testProperties = %properties;
+    delete $testProperties{align};
+    delete $testProperties{style};
+    delete $testProperties{fill};
+    delete $testProperties{alignHorizontal};
+    delete $testProperties{alignVertical};
+    my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryFontMetrics(%testProperties);
 
 	# Process horizontal alignment
 	if ($properties{alignHorizontal} eq 'center') {

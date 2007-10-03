@@ -422,8 +422,8 @@ sub getLabelDimensions {
 	my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryFontMetrics(
 		font		=> $self->getLabelFont->getFile,
 #		stroke		=> $self->getLabelColor,
-		fill		=> $self->getLabelColor,
-		style		=> 'Normal',
+#		fill		=> $self->getLabelColor,
+#		style		=> 'Normal',
 		pointsize	=> $self->getLabelFontSize,
 		%$properties,
 		text		=> $text,
