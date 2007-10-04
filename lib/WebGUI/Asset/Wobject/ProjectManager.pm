@@ -1055,14 +1055,14 @@ sub www_editProject {
    
    my $hpdLabel = $i18n->get('hours per day label');
    my $hpdHoverHelp = $i18n->get('hours per day hoverhelp');
-   $hpdHoverHelp =~ s/'/\\'/g;
    my $hpdValue = $form->get("hoursPerDay") || $project->{hoursPerDay} || "8.0";
    my $hpdStyle = ($dunitValue eq "days"?"display:none":"");
    
    my $html = qq|
    <tr id="hoursper" style="$hpdStyle">
-      <td class="formDescription"  onmouseover="return escape('$hpdHoverHelp')" valign="top" style="width: 180px;">
-	     <label for="hoursPerDay_formId">$hpdLabel</label>
+      <td class="formDescription" valign="top" style="width: 180px;">
+	     <div class="wg-hoverhelp">$hpdHoverHelp</div>
+         <label for="hoursPerDay_formId">$hpdLabel</label>
 	  </td>
 	  <td valign="top" class="tableData"  style="width: *;">
 	     <input id="hoursPerDay_formId" type="text" name="hoursPerDay" value="$hpdValue" size="11" maxlength="14" />

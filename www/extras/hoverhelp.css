@@ -9,6 +9,7 @@
     font-weight: normal;
     padding: 3px;
     z-index: 1000;
+    width: 300px;
 }
 
 .wg-hoverhelp.yui-tt {

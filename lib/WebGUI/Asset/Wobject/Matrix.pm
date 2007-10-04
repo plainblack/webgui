@@ -326,10 +326,6 @@ sub www_compare {
 				if ($first) {
 					$desc = $row[1];
 					shift(@row);
-					$desc =~ s/\n//g;
-					$desc =~ s/\r//g;
-					$desc =~ s/'/\\\'/g;
-					$desc =~ s/"/\&quot;/g;
 					$first = 0;
 				}
 				my $class = lc($value);
@@ -972,10 +968,6 @@ sub www_search {
 		my $sth = $self->session->db->read("select name, fieldType, label, description from Matrix_field where category = ".$self->session->db->quote($category)." order by label");	
 		my @loop;
 		while (my $data = $sth->hashRef) {
-			$data->{description} =~ s/\n//g;
-			$data->{description} =~ s/\r//g;
-			$data->{description} =~ s/'/\\\'/g;
-			$data->{description} =~ s/"/\&quot;/g;
 			if ($data->{fieldType} ne "goodBad") {
 				$data->{form} = WebGUI::Form::text($self->session,{
 					name=>$data->{name},
@@ -1217,11 +1209,7 @@ sub www_viewDetail {
 	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category from Matrix_listingData a left join 
 		Matrix_field b on a.fieldId=b.fieldId and b.assetId=? where listingId=? order by b.label",[$self->getId, $listingId]);	
 	while (my $data = $sth->hashRef) {
-		$data->{description} =~ s/\n//g;
-		$data->{description} =~ s/\r//g;
-		$data->{description} =~ s/'/\\\'/g;
-		$data->{description} =~ s/"/\&quot;/g;
-		$data->{class} = lc($data->{value});
+        $data->{class} = lc($data->{value});
 		$data->{class} =~ s/\s/_/g;
 		$data->{class} =~ s/\W//g;
 		my $cat = $self->session->url->urlize($data->{category})."_loop";

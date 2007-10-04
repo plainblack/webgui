@@ -6,6 +6,7 @@
  - fix: Can't add assets when not using preload.perl.
  - fix: graphing doesn't work with GraphicsMagick
  - fix: Calendar generated iCal for last 30 days instead of next 30 days
+ - fix: hover help doesn't appear for matrix fields
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode
