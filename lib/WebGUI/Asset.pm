@@ -1335,14 +1335,13 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 =cut
 
 sub loadModule {
-    my ($session, $className) = @_;
-	my $cmd = "use ".$className;
-    eval ($cmd);
-	if ($@) {
-   	    $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-		return undef;
-	}
-    return $className;
+    my ($class, $session, $className) = @_;
+	(my $module = $className . '.pm') =~ s{::|'}{/}g;
+    if (eval { require $module; 1 }) {
+        return $className;
+    }
+   	$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+	return;
 }
 
 #-------------------------------------------------------------------
