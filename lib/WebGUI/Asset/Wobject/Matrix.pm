@@ -281,6 +281,14 @@ sub www_compare {
 	unless (scalar(@cmsList)) {
 		@cmsList = $self->session->form->checkList("listingId");
 	}
+    my ($style, $url) = ($self->session->style, $self->session->url);
+    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
 	my ( %var, @prodcol, @datecol);
 	my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
 	$var{isTooMany} = (scalar(@cmsList)>$max);
@@ -303,12 +311,20 @@ sub www_compare {
 			lastUpdated=>$self->session->datetime->epochToHuman($data->{lastUpdated},"%z")
 			});
 	}
+	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
+	my %goodBad = (
+		"No"          => $i18n->get("no"),
+		"Yes"         => $i18n->get("yes"),
+		"Free Add On" => $i18n->get("free"),
+		"Costs Extra" => $i18n->get("extra"),
+		"Limited"     => $i18n->get("limited"),
+	);
 	$var{product_loop} = \@prodcol;
 	$var{lastupdated_loop} = \@datecol;
 	my @categoryloop;
 	foreach my $category ($self->getCategories()) {
 		my @rowloop;
-		my $select = "select a.label, a.description";
+		my $select = "select a.fieldType, a.label, a.description";
 		my $from = "from Matrix_field a";
 		my $tableCount = "b";
 		foreach my $cms (@cmsList) {
@@ -321,6 +337,7 @@ sub www_compare {
 		while (my @row = $sth->array) {
 			my @columnloop;
 			my $first = 1;
+            my $type = shift @row;
 			foreach my $value (@row) {
 				my $desc = "";
 				if ($first) {
@@ -328,6 +345,9 @@ sub www_compare {
 					shift(@row);
 					$first = 0;
 				}
+                elsif ($type eq 'goodBad') {
+                    $value = $goodBad{$value};
+                }
 				my $class = lc($value);
 				$class =~ s/\s/_/g;
 				$class =~ s/\W//g;
@@ -1206,12 +1226,22 @@ sub www_viewDetail {
 	$var{views} = $listing->{views};
 	$var{compares} = $listing->{compares};
 	$var{clicks} = $listing->{clicks};
-	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category from Matrix_listingData a left join 
+	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category, fieldType from Matrix_listingData a left join 
 		Matrix_field b on a.fieldId=b.fieldId and b.assetId=? where listingId=? order by b.label",[$self->getId, $listingId]);	
-	while (my $data = $sth->hashRef) {
+	my %goodBad = (
+		"No"          => $i18n->get("no"),
+		"Yes"         => $i18n->get("yes"),
+		"Free Add On" => $i18n->get("free"),
+		"Costs Extra" => $i18n->get("extra"),
+		"Limited"     => $i18n->get("limited"),
+	);
+    while (my $data = $sth->hashRef) {
         $data->{class} = lc($data->{value});
 		$data->{class} =~ s/\s/_/g;
 		$data->{class} =~ s/\W//g;
+        if ($data->{fieldType} eq 'goodBad') {
+            $data->{value} = $goodBad{$data->{value}};
+        }
 		my $cat = $self->session->url->urlize($data->{category})."_loop";
 		push(@{$var{$cat}},$data);
 	}
