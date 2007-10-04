@@ -3,6 +3,7 @@
    complete
  - Clean up orphaned grouping
  - fix: purging old asset revisions on large sites never completes
+ - fix: Can't add assets when not using preload.perl.
  - fix: graphing doesn't work with GraphicsMagick
 
 7.4.8
