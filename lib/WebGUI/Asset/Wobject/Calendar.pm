@@ -1510,7 +1510,7 @@ sub www_ical {
         #}
         #else
         #{
-            $dt_start = WebGUI::DateTime->new($self->session, time-60*60*24*30)->set_time_zone($session->user->profileField("timeZone"));
+            $dt_start = WebGUI::DateTime->new($self->session, time)->set_time_zone($session->user->profileField("timeZone"));
         #}
     }
     else {
