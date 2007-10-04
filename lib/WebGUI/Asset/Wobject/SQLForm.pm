@@ -425,11 +425,6 @@ should be implemented in WebGUI::Form::myELement.
 		searchElement		=> 'selectList',
 		type			=> 'list',
 		},
-	selectBox 	=> {
-		name			=> 'Select box',
-		hasOptions		=> 1,
-        searchElement   => 'selectBox',
-    },
 	radioList 	=> {
 		name			=> 'Radio list',
 		hasOptions		=> 1,
