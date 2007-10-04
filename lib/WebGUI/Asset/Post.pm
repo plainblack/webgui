@@ -312,6 +312,12 @@ sub formatContent {
 }
 
 #-------------------------------------------------------------------
+# Too slow to try to find out children, just always assume new data
+sub getContentLastModified {
+    return time();
+}
+
+#-------------------------------------------------------------------
 sub getAutoCommitWorkflowId {
 	my $self = shift;
 	return $self->getThread->getParent->get("approvalWorkflow");

@@ -754,6 +754,12 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+# Too slow to try to find out children, just always assume new data
+sub getContentLastModified {
+    return time();
+}
+
+#-------------------------------------------------------------------
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
