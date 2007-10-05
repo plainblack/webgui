@@ -236,8 +236,10 @@ sub parseParts {
 	my $body = $message->bodyhandle;
 	if (defined $body) {
 		my $disposition = $message->head->get("Content-Disposition");
-		$disposition =~ m/filename=\"(.*)\"/;
-		my $filename = $1;
+		my $filename = "";
+        if($disposition =~ m/filename=\"(.*)\"/) {
+		    $filename = $1;
+        }
 		return [{content => $body->as_string, type=>$type, filename=>$filename}];
 	}
 	my @parts = ();

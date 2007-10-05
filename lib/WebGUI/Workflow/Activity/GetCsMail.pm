@@ -115,8 +115,8 @@ sub addPost {
 		content=>$content,
 		ownerUserId=>$user->userId,
 		username=>$user->profileField("alias") || $user->username,
-        originalEmail=>join("",@{$message->{rawMessage}})
-		});
+        originalEmail=>join("",@{$message->{rawMessage}}),
+        });
 	if (scalar(@attachments)) {
 		my $storage = $post->getStorageLocation;
 		foreach my $file (@attachments) {
@@ -176,13 +176,11 @@ sub execute {
 	return $self->COMPLETE unless (defined $mail);
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
 	my $postGroup = $cs->get("postGroupId"); #group that's allowed to post to the CS
-
+    
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
-		$from =~ /<(\S+\@\S+)>/;
-		$from = $1 || $from;
-		$from =~ /(\S+\@\S+)/;	
+		$from =~ s/<(\S+\@\S+)>/$1/;
 		my $user = WebGUI::User->newByEmail($self->session, $from); #instantiate the user by email
 		
 		unless (defined $user) { #if no user
@@ -209,9 +207,8 @@ sub execute {
 		}
 
 		my $post = undef;
-		if ($message->{inReplyTo}) {
-			$message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/;
-			my $id = $1;	
+		if ($message->{inReplyTo} && $message->{inReplyTo} =~ m/cs\-([\w_-]{22})\@/) {
+			my $id = $1;
 			$post = WebGUI::Asset->newByDynamicClass($self->session, $id);
 		}
 
