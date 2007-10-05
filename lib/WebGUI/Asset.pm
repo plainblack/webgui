@@ -1976,6 +1976,16 @@ sub publish {
                 $cache->deleteChunk(["asset",$id]);
         }
 	$self->{_properties}{state} = "published";
+
+    # Also publish any shortcuts to this asset that are in the trash
+    my $shortcuts 
+        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
+            returnObjects   => 1,
+            statesToInclude => ['trash','trash-limbo'],
+        });
+    for my $shortcut ( @$shortcuts ) {
+        $shortcut->publish;
+    }
 }
 
 

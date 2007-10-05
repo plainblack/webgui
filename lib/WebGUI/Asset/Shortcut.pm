@@ -11,6 +11,7 @@ package WebGUI::Asset::Shortcut;
 #-------------------------------------------------------------------
 
 use strict;
+use Carp;
 use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::International;
@@ -904,6 +905,44 @@ sub www_view {
         # Make sure the overrides are not cached by the original asset.
         $shortcut->purgeCache();
         return $output;
+}
+
+#----------------------------------------------------------------------------
+
+=head1 STATIC METHODS
+
+These methods are called using CLASS->method
+
+#----------------------------------------------------------------------------
+
+=head2 getShortcutsForAssetId ( session, assetId [, properties] )
+
+Get an arrayref of assetIds of all the shortcuts for the passed-in assetId.
+
+"properties" is a hash reference of properties to give to getLineage. 
+Probably the only useful key will be "returnObjects".
+
+=cut
+
+sub getShortcutsForAssetId {
+    my $class       = shift;
+    my $session     = shift;
+    my $assetId     = shift;
+    my $properties  = shift || {};
+    
+    croak "First argument to getShortcutsForAssetId must be WebGUI::Session"
+        unless $session && $session->isa("WebGUI::Session");
+    croak "Second argument to getShortcutsForAssetId must be assetId"
+        unless $assetId;
+    croak "Third argument to getShortcutsForAssetId must be hash reference"
+        if $properties && !ref $properties eq "HASH";
+
+    my $db      = $session->db;
+
+    $properties->{ joinClass            } = 'WebGUI::Asset::Shortcut';
+    $properties->{ whereClause          } = 'Shortcut.shortcutToAssetId = ' . $db->quote($assetId);
+
+    return WebGUI::Asset->getRoot($session)->getLineage(['descendants'], $properties); 
 }
 
 1;
