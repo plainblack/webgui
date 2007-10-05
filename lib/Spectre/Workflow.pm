@@ -585,17 +585,17 @@ sub workerResponse {
 			$self->debug("Got an error response for $instanceId.");
 			$kernel->yield("suspendInstance",$instance);
 		} else {
-			$self->error("Something bad happened on the return of $instanceId. ".$response->error_as_HTML);
+			$self->error("Something bad happened on the return of $instance->{sitename} - $instanceId. ".$response->error_as_HTML);
 			$kernel->yield("suspendInstance",$instance);
 		}
 	} elsif ($response->is_redirect) {
-		$self->error("Response for $instanceId was redirected. This should never happen if configured properly!!!");
+		$self->error("Response for $instance->{sitename} - $instanceId was redirected. This should never happen if configured properly!!!");
 		$instance->{lastState} = "redirect";
 		$instance->{lastRunTime} = localtime(time());
 	} elsif ($response->is_error) {	
 		$instance->{lastState} = "comm error";
 		$instance->{lastRunTime} = localtime(time());
-		$self->error("Response for $instanceId had a communications error. ".$response->error_as_HTML);
+		$self->error("Response for $instance->{sitename} - $instanceId had a communications error. ".$response->error_as_HTML);
 		$kernel->yield("suspendInstance",$instance)
 	}
 }
