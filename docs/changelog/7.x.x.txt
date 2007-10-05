@@ -13,6 +13,7 @@
  - fix: File user profile fields didn't link to the file
  - fix: SQL Reports only work on MySQL databases
  - More complete error messages from spectre
+ - fix: Wiki uploads didn't obey image and thumbnail size
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode

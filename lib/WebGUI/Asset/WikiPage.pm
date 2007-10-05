@@ -227,17 +227,21 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost(@_);
 	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
-
-	$self->update({ groupIdView => $self->getWiki->get('groupIdView'),
-			groupIdEdit => $self->getWiki->get('groupToAdminister'),
+    my $wiki = $self->getWiki;
+	$self->update({ groupIdView => $wiki->get('groupIdView'),
+			groupIdEdit => $wiki->get('groupToAdminister'),
 			actionTakenBy => $self->session->user->userId,
 			actionTaken => $actionTaken,
 	});
 
-	if ($self->getWiki->canAdminister) {
+	if ($wiki->canAdminister) {
 		$self->update({isProtected => $self->session->form("isProtected")});
 	}
 
+    my $options = {
+        maxImageSize    => $wiki->get('maxImageSize'),
+        thumbnailSize   => $wiki->get('thumbnailSize'),
+    };
     # deal with attachments from the attachments form control
     my @attachments = $self->session->form->param("attachments");
     my @tags = ();
@@ -252,6 +256,7 @@ sub processPropertiesFromFormPost {
                     groupIdView => $self->get("groupIdView"),
                     });
             }
+            $asset->applyConstraints($options);
             push(@tags, $asset->get("tagId"));
             $asset->setVersionTag($self->get("tagId"));
         }
