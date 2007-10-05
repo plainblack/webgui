@@ -266,6 +266,23 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getDriver ( )
+
+Returns the DBI driver used by this database link
+
+=cut
+
+sub getDriver {
+    my $self = shift;
+    my $dsn = $self->get->{DNS};
+    if ($dsn =~ /^dbi:(\w+):/i) {
+        return $1;
+    }
+    return;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the ID of this database link.

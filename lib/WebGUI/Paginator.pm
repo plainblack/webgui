@@ -680,12 +680,12 @@ sub setDataByQuery {
     my $pageNumber = $self->getPageNumber;
     my $rowsPerPage = $self->{_rpp};
     
-    #Handle dynamicPageNumber requests or custom limts the old way as it winds up being most efficient
-    if ((defined $dynamicPageNumberKey && $pageNumber == 1) || $sql =~ m/limit/i) {
+	$dbh ||= $self->session->dbSlave;
+    
+    #Handle dynamicPageNumber requests or custom limits, or non-mysql the old way as it winds up being most efficient
+    if ($dbh->getDriver ne 'mysql' || (defined $dynamicPageNumberKey && $pageNumber == 1) || $sql =~ m/limit/i) {
         return $self->_setDataByQuery(@_);
     }
-    
-	$dbh ||= $self->session->dbSlave;
 
     #Calculate where to start
     my $start = ( ($pageNumber - 1) * $rowsPerPage );
