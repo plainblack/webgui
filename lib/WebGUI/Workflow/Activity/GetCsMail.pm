@@ -180,8 +180,10 @@ sub execute {
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
-		$from =~ s/<(\S+\@\S+)>/$1/;
-		my $user = WebGUI::User->newByEmail($self->session, $from); #instantiate the user by email
+        if ($from =~ /<(\S+\@\S+)>/) {
+            $from = $1;
+        }
+        my $user = WebGUI::User->newByEmail($self->session, $from); #instantiate the user by email
 		
 		unless (defined $user) { #if no user
 			unless ($postGroup eq 1 || $postGroup eq 7) { #reject mail if no registered email, unless post group is Visitors (1) or Everyone (7)
