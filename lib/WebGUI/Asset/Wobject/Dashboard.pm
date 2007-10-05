@@ -96,12 +96,26 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+sub discernUserId {
+	my $self = shift;
+	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
+}
+
+#-------------------------------------------------------------------
 sub getContentPositions {
 	my $self = shift;
 	my $dummy = $self->initialize unless $self->get("isInitialized");
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	return $u->profileField($self->getId.'contentPositions') 
+	return $u->profileField($self->getContentPositionsId) 
         || $self->getContentPositionsDefault;
+}
+
+#-------------------------------------------------------------------
+sub getContentPositionsId {
+    my $self = shift;
+    my $id = "contentPositions".$self->getId;
+    $id =~ s/-/_/g;
+    return $id;
 }
 
 #-------------------------------------------------------------------
@@ -117,13 +131,7 @@ sub getContentPositionsDefault {
     my $dummy   = $self->initialize unless $self->get("isInitialized");
     # The default positions are saved under the "Visitor" user
     my $u       = WebGUI::User->new($self->session, 1); 
-    return $u->profileField($self->getId.'contentPositions');
-}
-
-#-------------------------------------------------------------------
-sub discernUserId {
-	my $self = shift;
-	return ($self->canManage && $self->session->var->isAdminOn) ? '1' : $self->session->user->userId;
+    return $u->profileField($self->getContentPositionsId);
 }
 
 #-------------------------------------------------------------------
@@ -154,13 +162,13 @@ sub getEditForm {
 #-------------------------------------------------------------------
 sub initialize {
 	my $self = shift;
-	my $userPrefField = WebGUI::ProfileField->create($self->session,$self->getId.'contentPositions',{
+	my $userPrefField = WebGUI::ProfileField->create($self->session,$self->getContentPositionsId,{
 		label=>'\'Dashboard User Preference - Content Positions\'',
 		visible=>0,
 		protected=>1,
 		editable=>0,
 		required=>0,
-		fieldType=>'text'
+		fieldType=>'textarea'
 	});
 	$self->update({isInitialized=>1});
 }
@@ -200,6 +208,17 @@ sub processPropertiesFromFormPost {
 		$self->update({styleTemplateId=>'PBtmplBlankStyle000001'});
 	}
 }
+
+#-------------------------------------------------------------------
+sub purge {
+    my $self = shift;
+    my $userPrefField = WebGUI::ProfileField->new($self->session,$self->getContentPositionsId);
+    if (defined $userPrefField) {
+        $userPrefField->delete;
+    }
+    $self->SUPER::purge(@_);
+}
+
 
 #-------------------------------------------------------------------
 sub view {
@@ -309,7 +328,7 @@ sub www_setContentPositions {
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");
 	my $u = WebGUI::User->new($self->session, $self->discernUserId);
-	my $success = $u->profileField($self->getId.'contentPositions',$self->session->form->process("map")) eq $self->session->form->process("map");
+	my $success = $u->profileField($self->getContentPositionsId,$self->session->form->process("map")) eq $self->session->form->process("map");
 	return "Map set: ".$self->session->form->process("map") if $success;
 	return "Map failed to set.";
 }

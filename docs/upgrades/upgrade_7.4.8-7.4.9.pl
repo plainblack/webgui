@@ -12,7 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-
+use WebGUI::ProfileField;
 
 my $toVersion = "7.4.9"; # make this match what version you're going to
 my $quiet; # this line required
@@ -21,8 +21,10 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 removeOrphanedGroupings($session); # upgrade functions go here
+fixDashboardContentPositions($session);
 
 finish($session); # this line required
+
 
 
 #-------------------------------------------------
@@ -34,12 +36,33 @@ sub removeOrphanedGroupings {
 }
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixDashboardContentPositions {
+	my $session = shift;
+    my $db = $session->db;
+	print "\tFixing broken dashboard content positions.\n" unless ($quiet);
+    foreach my $dashboardId ($db->quickArray("select assetId from asset where className='WebGUI::Asset::Wobject::Dashboard'")) {
+        my $newContentPositionId = "contentPositions".$dashboardId;
+        $newContentPositionId =~ s/-/_/g;
+        my $newField = WebGUI::ProfileField->create($session, $newContentPositionId, {
+		    label=>'\'Dashboard User Preference - Content Positions\'',
+		    visible=>0,
+		    protected=>1,
+		    editable=>0,
+		    required=>0,
+		    fieldType=>'textarea'
+            });
+        my $oldContentPositionId = $dashboardId."contentPositions";
+        my $userPositioning = $db->read("select userId, `".$oldContentPositionId."` from userProfileData");
+        while (my ($userId, $positions) = $userPositioning->array) {
+            $db->write("update userProfileData set $newContentPositionId = ? where userId=?", [$positions, $userId]); 
+        }
+        my $oldField = WebGUI::ProfileField->new($session, $oldContentPositionId);
+        if (defined $oldField) {
+            $oldField->delete;
+        }
+    }
+}
 
 
 
