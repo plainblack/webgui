@@ -40,12 +40,16 @@ sub appendRecentChanges {
 	my $self = shift;
 	my $var = shift;
 	my $limit = shift || $self->get("recentChangesCount") || 50;
-    foreach my $asset (@{$self->getLineage(["children"], {
-            returnObjects       => 1, 
-            limit               => $limit, 
-            includeOnlyClasses  =>["WebGUI::Asset::WikiPage"],
-            orderByClause       => "assetData.revisionDate desc"
-            })}) {
+	my $revisions = $self->session->db->read("select asset.assetId, assetData.revisionDate, asset.className 
+		from asset left join assetData using (assetId) where asset.parentId=? and asset.className
+		like ? order by assetData.revisionDate desc limit ?", [$self->getId, 
+		"WebGUI::Asset::WikiPage%", $limit]);
+	while (my ($id, $version, $class) = $revisions->array) {
+		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+		unless (defined $asset) {
+			$self->session->errorHandler->error("Asset $id $class $version could not be instanciated.");
+			next;
+		}
 		my $user = WebGUI::User->new($self->session, $asset->get("actionTakenBy"));
 		my $specialAction = '';
 		my $isAvailable = 1;
