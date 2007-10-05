@@ -72,16 +72,12 @@ sub addRevision {
 	my $now = time();
 	if ($threadId eq "") { # new post
 		if ($newSelf->getParent->isa("WebGUI::Asset::Wobject::Collaboration")) {
-			$newSelf->update({threadId=>$newSelf->getId, dateSubmitted=>$now});
+			$newSelf->update({threadId=>$newSelf->getId});
 		} else {
-			$newSelf->update({threadId=>$newSelf->getParent->get("threadId"), dateSubmitted=>$now});
+			$newSelf->update({threadId=>$newSelf->getParent->get("threadId")});
 		}
 		delete $newSelf->{_thread};
 	}
-	$newSelf->update({
-		dateUpdated=>$now,
-		});
-
 	$newSelf->getThread->unmarkRead;
 
         return $newSelf;
@@ -99,7 +95,7 @@ sub canEdit {
 	my $self = shift;
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
-		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("dateUpdated"))) ||
+		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("revisionDate"))) ||
 		$self->getThread->getParent->canEdit;
 
 }
@@ -150,7 +146,7 @@ sub commit {
 			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 			$u->karma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
-        	$self->getThread->incrementReplies($self->get("dateUpdated"),$self->getId) if ($self->isReply);
+        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId) if ($self->isReply);
 	}
 }
 
@@ -175,15 +171,6 @@ sub definition {
             noFormPost=>1,
             fieldType=>"hidden",
             defaultValue=>undef
-        },
-        dateSubmitted => {
-            noFormPost=>1,
-            fieldType=>"hidden",
-            defaultValue=>$session->datetime->time()
-        },
-        dateUpdated => {
-            fieldType=>"hidden",
-            defaultValue=>$session->datetime->time()
         },
         username => {
             fieldType=>"hidden",
@@ -517,8 +504,8 @@ sub getTemplateVars {
 	$var{"user.isPoster"} = $self->isPoster;
 	$var{"avatar.url"} = $self->getAvatarUrl;
 	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
-	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("dateSubmitted"));
-	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("dateUpdated"));
+	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("creationDate"));
+	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("revisionDate"));
 	$var{'title.short'} = $self->chopTitle;
 	$var{content} = $self->formatContent if ($self->getThread);
 	$var{'user.canEdit'} = $self->canEdit if ($self->getThread);
@@ -695,7 +682,7 @@ Returns a boolean indicating whether this post is new (not an edit).
 
 sub isNew {
 	my $self = shift;
-	return $self->get("dateSubmitted") eq $self->get("dateUpdated");
+	return $self->get("creationDate") == $self->get("revisionDate");
 }
 
 #-------------------------------------------------------------------
@@ -1027,19 +1014,23 @@ Moves post to the trash and updates reply counter on thread.
 =cut
 
 sub trash {
-        my $self = shift;
-        $self->SUPER::trash;
-        $self->getThread->sumReplies if ($self->isReply);
-        if ($self->getThread->get("lastPostId") eq $self->getId) {
-                my $threadLineage = $self->getThread->get("lineage");
-                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($threadLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
-                $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
-        }
-        if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
-                my $forumLineage = $self->getThread->getParent->get("lineage");
-                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($forumLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and asset.assetId=Post.assetId and asset.state='published' order by Post.dateSubmitted desc");
-                $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
-        }
+    my $self = shift;
+    $self->SUPER::trash;
+    $self->getThread->sumReplies if ($self->isReply);
+    if ($self->getThread->get("lastPostId") eq $self->getId) {
+        my $threadLineage = $self->getThread->get("lineage");
+        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
+            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
+            order by creationDate desc",[$threadLineage.'%', $self->getId]);
+        $self->getThread->update({lastPostId=>$id, lastPostDate=>$date});
+    }
+    if ($self->getThread->getParent->get("lastPostId") eq $self->getId) {
+        my $forumLineage = $self->getThread->getParent->get("lineage");
+        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
+            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
+            order by creationDate desc",[$forumLineage.'%', $self->getId]);
+        $self->getThread->getParent->update({lastPostId=>$id, lastPostDate=>$date});
+    }
 }
 
 #-------------------------------------------------------------------

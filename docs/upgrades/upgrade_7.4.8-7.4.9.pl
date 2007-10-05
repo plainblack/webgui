@@ -22,6 +22,7 @@ my $session = start(); # this line required
 
 removeOrphanedGroupings($session); # upgrade functions go here
 fixDashboardContentPositions($session);
+fixPosts($session);
 
 finish($session); # this line required
 
@@ -35,6 +36,17 @@ sub removeOrphanedGroupings {
 	$session->db->write("delete from groupings where groupId not in (select distinct groupId from groups)");
 }
 
+
+#-------------------------------------------------
+sub fixPosts {
+	my $session = shift;
+    my $db = $session->db;
+	print "\tRemoving unneeded fields from Posts.\n" unless ($quiet);
+    $db->write("alter table Post drop column dateSubmitted");
+    $db->write("alter table Post drop column dateUpdated");
+    $db->write("update Collaboration set sortBy='assetData.revisionDate' where sortBy='dateUpdated'");
+    $db->write("update Collaboration set sortBy='creationDate' where sortBy='dateSubmitted'");
+}
 
 #-------------------------------------------------
 sub fixDashboardContentPositions {

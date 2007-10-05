@@ -93,15 +93,17 @@ sub appendPostListTemplateVars {
 	my $p = shift;
 	my $page = $p->getPageData;
 	my $i = 0;
+    my ($icon, $datetime) = $self->session->quick(qw(icon datetime));
 	foreach my $row (@$page) {
 		my $post = WebGUI::Asset->new($self->session,$row->{assetId}, $row->{className}, $row->{revisionDate});
 		$post->{_parent} = $self; # caching parent for efficiency 
-		my $controls = $self->session->icon->delete('func=delete',$post->get("url"),"Delete").$self->session->icon->edit('func=edit',$post->get("url"));
+		my $controls = $icon->delete('func=delete',$post->get("url"),"Delete") . $icon->edit('func=edit',$post->get("url"));
 		if ($self->get("sortBy") eq "lineage") {
 			if ($self->get("sortOrder") eq "desc") {
-				$controls .= $self->session->icon->moveUp('func=demote',$post->get("url")).$self->session->icon->moveDown('func=promote',$post->get("url"));
-			} else {
-				$controls .= $self->session->icon->moveUp('func=promote',$post->get("url")).$self->session->icon->moveDown('func=demote',$post->get("url"));
+				$controls .= $icon->moveUp('func=demote',$post->get("url")).$icon->moveDown('func=promote',$post->get("url"));
+			} 
+            else {
+				$controls .= $icon->moveUp('func=promote',$post->get("url")).$icon->moveDown('func=demote',$post->get("url"));
 			}
 		}
 		my @rating_loop;
@@ -114,13 +116,13 @@ sub appendPostListTemplateVars {
 			if ($self->get("displayLastReply")) {
 				my $lastPost = $post->getLastPost();
 				%lastReply = (
-					"lastReply.url"=>$lastPost->getUrl.'#'.$lastPost->getId,
-                        		"lastReply.title"=>$lastPost->get("title"),
-                        		"lastReply.user.isVisitor"=>$lastPost->get("ownerUserId") eq "1",
-                        		"lastReply.username"=>$lastPost->get("username"),
-                       	 		"lastReply.userProfile.url"=>$lastPost->WebGUI::Asset::Post::getPosterProfileUrl(),
-                        		"lastReply.dateSubmitted.human"=>$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%z"),
-                        		"lastReply.timeSubmitted.human"=>$self->session->datetime->epochToHuman($lastPost->get("dateSubmitted"),"%Z")
+					"lastReply.url"                 => $lastPost->getUrl.'#'.$lastPost->getId,
+                    "lastReply.title"               => $lastPost->get("title"),
+                    "lastReply.user.isVisitor"      => $lastPost->get("ownerUserId") eq "1",
+                    "lastReply.username"            => $lastPost->get("username"),
+                    "lastReply.userProfile.url"     => $lastPost->getPosterProfileUrl(),
+                    "lastReply.dateSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%z"),
+                    "lastReply.timeSubmitted.human" => $datetime->epochToHuman($lastPost->get("creationDate"),"%Z"),
 					);
 			}
 			$hasRead = $post->isMarkedRead;
@@ -133,32 +135,32 @@ sub appendPostListTemplateVars {
 		}
 		my %postVars = (
 			%{$post->get},
-                        "id"=>$post->getId,
-                        "url"=>$url,
-			rating_loop=>\@rating_loop,
-			"content"=>$post->formatContent,
-                        "status"=>$post->getStatus,
-                        "thumbnail"=>$post->getThumbnailUrl,
-                        "image.url"=>$post->getImageUrl,
-                        "dateSubmitted.human"=>$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%z"),
-                        "dateUpdated.human"=>$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%z"),
-                        "timeSubmitted.human"=>$self->session->datetime->epochToHuman($post->get("dateSubmitted"),"%Z"),
-                        "timeUpdated.human"=>$self->session->datetime->epochToHuman($post->get("dateUpdated"),"%Z"),
-                        "userProfile.url"=>$post->getPosterProfileUrl,
-                        "user.isVisitor"=>$post->get("ownerUserId") eq "1",
-        		"edit.url"=>$post->getEditUrl,
-			'controls'=>$controls,
-                        "isSecond"=>(($i+1)%2==0),
-                        "isThird"=>(($i+1)%3==0),
-                        "isFourth"=>(($i+1)%4==0),
-                        "isFifth"=>(($i+1)%5==0),
-			"user.hasRead" => $hasRead,
-                	"user.isPoster"=>$post->isPoster,
-                	"avatar.url"=>$post->getAvatarUrl,
+            "id"                    => $post->getId,
+            "url"                   => $url,
+			rating_loop             => \@rating_loop,
+			"content"               => $post->formatContent,
+            "status"                => $post->getStatus,
+            "thumbnail"             => $post->getThumbnailUrl,
+            "image.url"             => $post->getImageUrl,
+            "dateSubmitted.human"   => $datetime->epochToHuman($post->get("creationDate"),"%z"),
+            "dateUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%z"),
+            "timeSubmitted.human"   => $datetime->epochToHuman($post->get("creationDate"),"%Z"),
+            "timeUpdated.human"     => $datetime->epochToHuman($post->get("revisionDate"),"%Z"),
+            "userProfile.url"       => $post->getPosterProfileUrl,
+            "user.isVisitor"        => $post->get("ownerUserId") eq "1",
+        	"edit.url"              => $post->getEditUrl,
+			'controls'              => $controls,
+            "isSecond"              => (($i+1)%2==0),
+            "isThird"               => (($i+1)%3==0),
+            "isFourth"              => (($i+1)%4==0),
+            "isFifth"               => (($i+1)%5==0),
+			"user.hasRead"          => $hasRead,
+            "user.isPoster"         => $post->isPoster,
+            "avatar.url"            => $post->getAvatarUrl,
 			%lastReply
 		);
         $post->getTemplateMetadataVars(\%postVars);
-		if ($row->{className} eq 'WebGUI::Asset::Post::Thread') {
+		if ($row->{className} =~ m/^WebGUI::Asset::Post::Thread/) {
 			$postVars{'rating'} = $post->get('threadRating');
 		}
                 push(@{$var->{post_loop}}, \%postVars );
@@ -363,8 +365,8 @@ sub definition {
 	my %sortByOptions;
 	tie %sortByOptions, 'Tie::IxHash';
 	%sortByOptions = (lineage=>$i18n->get('sequence'),
-			  dateUpdated=>$i18n->get('date updated'),
-			  dateSubmitted=>$i18n->get('date submitted'),
+			  "assetData.revisionDate"=>$i18n->get('date updated'),
+			  creationDate=>$i18n->get('date submitted'),
 			  title=>$i18n->get('title'),
 			  userDefined1=>$i18n->get('user defined 1'),
 			  userDefined2=>$i18n->get('user defined 2'),
@@ -611,7 +613,7 @@ sub definition {
 			},
 		sortBy =>{
 			fieldType=>"selectBox",
-			defaultValue=>'dateUpdated',
+			defaultValue=>'revisionDate',
 			tab=>'display',
 			options=>\%sortByOptions,
 			label=>$i18n->get('sort by'),
@@ -829,7 +831,7 @@ SQL
 		    'link'          => $postUrl, 
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
-		    pubDate         => $datetime->epochToMail($post->get('dateUpdated')),
+		    pubDate         => $datetime->epochToMail($post->get('revisionDate')),
 		    attachmentLoop  => $attachmentLoop, 
 			userDefined1 => $post->get("userDefined1"),
 			userDefined2 => $post->get("userDefined2"),
@@ -942,7 +944,7 @@ sub getThreadsPaginator {
                 }
                 $self->session->scratch->set($scratchSortOrder, $sortOrder);
 	}
-	$sortBy ||= "dateUpdated";
+	$sortBy ||= "revisionDate";
 	$sortOrder ||= "desc";
     # Sort by the thread rating instead of the post rating.  other places don't care about threads.
     if ($sortBy eq 'rating') {
@@ -1013,7 +1015,7 @@ sub getViewTemplateVars {
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
 	$var{'karmaIsEnabled'} = $self->session->setting->get("useKarma");
 	$var{'sortby.karmaRank.url'} = $self->getSortByUrl("karmaRank");
-	$var{'sortby.date.url'} = $self->getSortByUrl("dateSubmitted");
+	$var{'sortby.date.url'} = $self->getSortByUrl("creationDate");
 	$var{'sortby.lastreply.url'} = $self->getSortByUrl("lastPostDate");
 	$var{'sortby.views.url'} = $self->getSortByUrl("views");
 	$var{'sortby.replies.url'} = $self->getSortByUrl("replies");
