@@ -613,7 +613,7 @@ sub definition {
 			},
 		sortBy =>{
 			fieldType=>"selectBox",
-			defaultValue=>'revisionDate',
+			defaultValue=>'assetData.revisionDate',
 			tab=>'display',
 			options=>\%sortByOptions,
 			label=>$i18n->get('sort by'),
