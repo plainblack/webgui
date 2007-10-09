@@ -8,7 +8,7 @@ if (url != null) {
 }
 
 function init() {
-	tinyMCEPopup.resizeToInnerSize();
+	try { tinyMCEPopup.resizeToInnerSize(); } catch(e) {}
 
 	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','theme_advanced_link');
 
