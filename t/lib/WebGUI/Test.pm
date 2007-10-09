@@ -108,29 +108,123 @@ END {
     $SESSION->close if defined $SESSION;
 }
 
-sub file {
-    return $CONFIG_FILE;
-}
 
 sub config {
     return undef unless defined $SESSION;
     return $SESSION->config;
 }
 
-sub lib {
-    return $WEBGUI_LIB;
+sub file {
+    return $CONFIG_FILE;
 }
 
-sub session {
-    return $SESSION;
+#----------------------------------------------------------------------------
+
+=head2 getPage ( asset, pageName [, opts] )
+
+Get the entire response from a page request. asset is a WebGUI::Asset object.
+pageName is the name of the page subroutine to run. options is a hash reference
+of options with keys outlined below. 
+
+ args           => Array reference of arguments to the pageName sub
+ user           => A user object to set for this request
+ userId         => A userId to set for this request
+ formParams     => A hash reference of form parameters
+ uploads        => A hash reference of files to "upload"
+
+=cut
+
+sub getPage {
+    my $session     = shift;    # The session object
+    my $asset       = shift;    # The asset object
+    my $page        = shift;    # The page subroutine
+    my $optionsRef  = shift;    # A hashref of options
+                                # args      => Array ref of args to the page sub
+                                # user      => A user object to set
+                                # userId    => A user ID to set, "user" takes
+                                #              precedence
+
+    #!!! GETTING COOKIES WITH WebGUI::PseudoRequest DOESNT WORK, SO WE USE 
+    # THIS AS A WORKAROUND
+    $session->http->{_http}->{noHeader} = 1;
+    
+    # Open a buffer as a filehandle
+    my $buffer  = "";
+    open my $output, ">", \$buffer or die "Couldn't open memory buffer as filehandle: $@";
+    $session->output->setHandle($output);
+
+    # Set the appropriate user
+    my $oldUser     = $session->user;
+    if ($optionsRef->{user}) {
+        $session->user({ user => $optionsRef->{user} });
+    }
+    elsif ($optionsRef->{userId}) {
+        $session->user({ userId => $optionsRef->{userId} });
+    }
+    $session->user->uncache;
+
+    # Create a new request object
+    my $oldRequest  = $session->request;
+    my $request     = WebGUI::PseudoRequest->new;
+    $request->setup_param($optionsRef->{formParams});
+    $session->{_request} = $request;
+
+    # Fill the buffer
+    my $returnedContent = $asset->$page(@{$optionsRef->{args}});
+    if ($returnedContent && $returnedContent ne "chunked") {
+        print $output $returnedContent;
+    }
+
+    close $output;
+    
+    # Restore the former user and request
+    $session->user({ user => $oldUser });
+    $session->{_request} = $oldRequest;
+
+    #!!! RESTORE THE WORKAROUND
+    delete $session->http->{_http}->{noHeader};
+
+    # Return the page's output
+    return $buffer;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTestCollateralPath ( [filename] )
+
+Returns the full path to the directory containing the collateral files to be
+used for testing.
+
+Optionally adds a filename to the end.
+
+=cut
+
+sub getTestCollateralPath {
+    my $class           = shift;
+    my $filename        = shift;
+    return File::Spec->catfile($WEBGUI_TEST_COLLATERAL,$filename);
+}
+
+sub lib {
+    return $WEBGUI_LIB;
 }
 
 sub root {
     return $WEBGUI_ROOT;
 }
 
-sub getTestCollateralPath {
-    return $WEBGUI_TEST_COLLATERAL;
+sub session {
+    return $SESSION;
 }
+
+
+#----------------------------------------------------------------------------
+
+=head1 BUGS
+
+When trying to load the APR module, perl invariably throws an Out Of Memory
+error. For this reason, getPage disables header processing.
+
+=cut
 
 1;

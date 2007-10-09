@@ -15,6 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
+use WebGUI::Asset::Shortcut;
 
 =head1 NAME
 

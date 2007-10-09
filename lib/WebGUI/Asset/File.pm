@@ -16,6 +16,7 @@ package WebGUI::Asset::File;
 
 use strict;
 use base 'WebGUI::Asset';
+use Carp;
 use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
@@ -58,7 +59,7 @@ sub addRevision {
 	my $properties = shift;
 	
 	if ($self->get("storageId") ne "") {
-		my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+		my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
 		$properties->{storageId} = $newStorage->getId;
 	}
 	
@@ -221,20 +222,31 @@ sub getIcon {
 }
 
 
+#----------------------------------------------------------------------------
+
+=head2 getStorageClass
+
+Get the full classname of the WebGUI::Storage we should use for this asset.
+
+=cut
+
+sub getStorageClass {
+    return 'WebGUI::Storage';
+}
+
 #-------------------------------------------------------------------
 
 =head2 getStorageFromPost
 
-We have to wrap this operation because WebGUI::Asset::File::Image calls SUPER processPropertiesFormFormPost,
-which gives it the wrong type of Storage object.
+Get the storage location created by the form post.
 
 =cut
 
 sub getStorageFromPost {
-	my $self      = shift;
+    my $self      = shift;
     my $storageId = shift;
     my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
-    return WebGUI::Storage->get($self->session, $fileStorageId);
+    return $self->getStorageClass->get($self->session, $fileStorageId);
 }
 
 
@@ -300,23 +312,23 @@ sub processPropertiesFromFormPost {
 	   $storageLocation->clear();
     }
 
-    #Pass in the storage Id to prevent another one from being created.
+    # Pass in the storage Id to prevent another one from being created.
     my $storage = $self->getStorageFromPost($storageId);
+    if (defined $storage) {
+        my $filename = $storage->getFiles()->[0];
 
-	if (defined $storage) {
-		my $filename = $storage->getFiles()->[0];
-
-		if (defined $filename) {
-			my %data;
-			$data{filename} = $filename;
-			$data{storageId} = $storage->getId;
-			$data{title} = $filename unless ($session->form->process("title"));
-			$data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
-			$data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
+        if (defined $filename) {
+            my %data;
+            $data{filename} = $filename;
+            $data{storageId} = $storage->getId;
+            $data{title} = $filename unless ($session->form->process("title"));
+            $data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
+            $data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
             $self->setStorageLocation($storage);
-			$self->update(\%data);
-		}
-	}
+            $self->update(\%data);
+        }
+    }
+
     $self->applyConstraints;
 }
 
@@ -327,7 +339,7 @@ sub purge {
 	my $self = shift;
 	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
 	while (my ($storageId) = $sth->array) {
-		WebGUI::Storage->get($self->session,$storageId)->delete;
+		$self->getStorageClass->get($self->session,$storageId)->delete;
 	}
 	$sth->finish;
 	return $self->SUPER::purge;
@@ -355,6 +367,30 @@ sub purgeRevision {
 	return $self->SUPER::purgeRevision;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 setFile ( filename )
+
+Set the file being handled by this storage location with a file from the 
+system.
+
+=cut
+
+sub setFile {
+    my $self        = shift;
+    my $filename    = shift;
+    my $storage     = $self->getStorageLocation;
+
+    # Clear the old file if any
+    $storage->clear;
+
+    $storage->addFileFromFilesystem($filename) 
+        || croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
+        # NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+
+    $self->updatePropertiesFromStorage;
+}
+
 #-------------------------------------------------------------------
 sub setSize {
 	my $self = shift;
@@ -377,11 +413,11 @@ sub setStorageLocation {
         $self->{_storageLocation} = $storage;
 	}
 	elsif ($self->get("storageId") eq "") {
-		$self->{_storageLocation} = WebGUI::Storage->create($self->session);
+		$self->{_storageLocation} = $self->getStorageClass->create($self->session);
 		$self->update({storageId=>$self->{_storageLocation}->getId});
 	}
     else {
-		$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+		$self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->get("storageId"));
 	}
 }
 
@@ -409,6 +445,25 @@ sub update {
 	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
 		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
 	}
+}
+
+#----------------------------------------------------------------------------
+
+=head2 updatePropertiesFromStorage ( )
+
+Updates the asset properties from the file tracked by this asset. Should be
+called every time the file is changed to ensure the correct filename is
+in the asset properties.
+
+=cut
+
+sub updatePropertiesFromStorage {
+    my $self        = shift;
+    my $storage     = $self->getStorageLocation; 
+    my $filename    = $storage->getFiles->[0];
+    $self->update({
+        filename        => $filename,
+    });
 }
 
 #-------------------------------------------------------------------

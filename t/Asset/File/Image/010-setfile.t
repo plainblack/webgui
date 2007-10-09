@@ -40,9 +40,23 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan tests => 2;
 
 #----------------------------------------------------------------------------
+# setFile allows file path argument and adds the file
 # setFile also generates thumbnail
+# plan tests => 2
+$image->setFile( WebGUI::Test->getTestCollateralPath("page_title.jpg") );
+my $storage = $image->getStorageLocation;
 
+is_deeply(
+    $storage->getFiles, ['page_title.jpg'],
+    "Storage location contains only the file we added",
+);
+
+# We must do a filesystem test because getFiles doesn't include 'thumb-'
+ok(
+    -e $storage->getPath('thumb-page_title.jpg'),
+    "Thumbnail file exists on the filesystem",
+);
 

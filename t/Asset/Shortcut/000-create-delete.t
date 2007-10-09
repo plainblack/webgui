@@ -40,12 +40,12 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 2;
+plan tests => 3;
 
 #----------------------------------------------------------------------------
 # Test module compiles okay
-# plan tests => 0
-BEGIN { use_ok("WebGUI::Asset::Shortcut"); }
+# plan tests => 1
+use_ok("WebGUI::Asset::Shortcut"); 
 
 #----------------------------------------------------------------------------
 # Test creating a shortcut to snippet

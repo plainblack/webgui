@@ -10,7 +10,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../lib";
 
 ## The goal of this test is to test the creation and deletion of photo assets
 
@@ -39,15 +39,25 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan tests => 2;
 
 #----------------------------------------------------------------------------
 # setFile allows file path argument and fails if can't find file
+# plan tests => 1
+ok(
+    !eval { $file->setFile( WebGUI::Test->getTestCollateralPath("DOES_NOT_EXIST.NO") ); 1},
+    "setFile allows file path argument and croaks if can't find file"
+);
 
 #----------------------------------------------------------------------------
-# setFile allows filehandle argument, requires name argument and removes old
-# file
+# setFile allows file path argument and adds the file
+# plan tests => 1
+$file->setFile( WebGUI::Test->getTestCollateralPath("WebGUI.pm") );
+my $storage = $file->getStorageLocation;
 
-
+is_deeply(
+    $storage->getFiles, ['WebGUI.pm'],
+    "Storage location contains only the file we added",
+);
 
 
