@@ -8,7 +8,10 @@ if (url != null) {
 }
 
 function init() {
-	tinyMCEPopup.resizeToInnerSize();
+    // Nasty Hack
+    if (!tinyMCE.isSafari) {
+        tinyMCEPopup.resizeToInnerSize();
+    }
 
 	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','theme_advanced_link');
 
