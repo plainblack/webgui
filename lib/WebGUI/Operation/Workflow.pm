@@ -578,66 +578,87 @@ ENDCODE
         name=>rand(100000),
         timeout=>10
     );
-    if (! $remote) {
-        my $output = $i18n->get('spectre not running error');
-        return $ac->render($output, $i18n->get('show running workflows'));
-    }
-
     my $sitename = $session->config()->get('sitename')->[0];
-    my $workflowResult = $remote->post_respond('workflow/getJsonStatus',$sitename);
-    if (! defined $workflowResult) {
-        $remote->disconnect();
-        my $output = $i18n->get('spectre no info error');
-        return $ac->render($output, $i18n->get('show running workflows'));
+    my $workflowResult;
+    if ($remote) {
+        $workflowResult = $remote->post_respond('workflow/getJsonStatus',$sitename);
+        if (!defined $workflowResult) {
+            $remote->disconnect();
+            $output = $i18n->get('spectre no info error');
+        }
+    }
+    else {
+        $output = $i18n->get('spectre not running error')
     }
 
-    my $workflowsHref = jsonToObj($workflowResult);
+    if (defined $workflowResult) {
+        my $workflowsHref = jsonToObj($workflowResult);
 
-    my $workflowTitleFor = $session->db->buildHashRef(<<"");
-    SELECT wi.instanceId, w.title
-    FROM WorkflowInstance wi
-    JOIN Workflow w USING (workflowId)
+        my $workflowTitleFor = $session->db->buildHashRef(<<"");
+        SELECT wi.instanceId, w.title
+        FROM WorkflowInstance wi
+        JOIN Workflow w USING (workflowId)
 
-    my $lastActivityFor = $session->db->buildHashRef(<<"");
-    SELECT wi.instanceId, wa.title
-    FROM WorkflowInstance wi
-    JOIN WorkflowActivity wa ON wi.currentActivityId = wa.activityId
+        my $lastActivityFor = $session->db->buildHashRef(<<"");
+        SELECT wi.instanceId, wa.title
+        FROM WorkflowInstance wi
+        JOIN WorkflowActivity wa ON wi.currentActivityId = wa.activityId
 
-    for my $workflowType (qw( Suspended Waiting Running )) {
-        my $workflowsAref = $workflowsHref->{$workflowType};
-        my $workflowCount = @$workflowsAref;
+        for my $workflowType (qw( Suspended Waiting Running )) {
+            my $workflowsAref = $workflowsHref->{$workflowType};
+            my $workflowCount = @$workflowsAref;
 
-        my $titleHeader = $i18n->get('title header');
-        my $priorityHeader = $i18n->get('priority header');
-        my $activityHeader = $i18n->get('activity header');
-        my $lastStateHeader = $i18n->get('last state header');
-        my $lastRunTimeHeader = $i18n->get('last run time header');
-        $output .= sprintf $i18n->get('workflow type count'), $workflowCount, $workflowType;
-        $output .= '<table style="width: 100%;">';
-        $output .= "<tr><th>$titleHeader</th><th>$priorityHeader</th><th>$activityHeader</th>";
-        $output .= "<th>$lastStateHeader</th><th>$lastRunTimeHeader</th></tr>";
+            my $titleHeader = $i18n->get('title header');
+            my $priorityHeader = $i18n->get('priority header');
+            my $activityHeader = $i18n->get('activity header');
+            my $lastStateHeader = $i18n->get('last state header');
+            my $lastRunTimeHeader = $i18n->get('last run time header');
+            $output .= sprintf $i18n->get('workflow type count'), $workflowCount, $workflowType;
+            $output .= '<table style="width: 100%;">';
+            $output .= "<tr><th>$titleHeader</th><th>$priorityHeader</th><th>$activityHeader</th>";
+            $output .= "<th>$lastStateHeader</th><th>$lastRunTimeHeader</th></tr>";
 
-        for my $workflow (@$workflowsAref) {
-            my($priority, $id, $instance) = @$workflow;
+            for my $workflow (@$workflowsAref) {
+                my($priority, $id, $instance) = @$workflow;
 
-            my $originalPriority = ($instance->{priority} - 1) * 10;
-            my $instanceId       = $instance->{instanceId};
-            my $title            = $workflowTitleFor->{$instanceId} || '(no title)';
-            my $lastActivity     = $lastActivityFor->{$instanceId} || '(none)';
-            my $lastRunTime      = $instance->{lastRunTime} || '(never)';
+                my $originalPriority = ($instance->{priority} - 1) * 10;
+                my $instanceId       = $instance->{instanceId};
+                my $title            = $workflowTitleFor->{$instanceId} || '(no title)';
+                my $lastActivity     = $lastActivityFor->{$instanceId} || '(none)';
+                my $lastRunTime      = $instance->{lastRunTime} || '(never)';
 
-            $output .= '<tr>';
-            $output .= "<td>$title</td>";
-            $output .= qq[<td><a id="priority-$instanceId" href="javascript:void(0);" title="Edit Priority" onclick="showEditPriorityForm('$instanceId')">$priority</a>/$originalPriority</td>];
-            $output .= "<td>$lastActivity</td>";
-            $output .= "<td>$instance->{lastState}</td>";
-            $output .= "<td>$lastRunTime</td>";
+                $output .= '<tr>';
+                $output .= "<td>$title</td>";
+                $output .= qq[<td><a id="priority-$instanceId" href="javascript:void(0);" title="Edit Priority" onclick="showEditPriorityForm('$instanceId')">$priority</a>/$originalPriority</td>];
+                $output .= "<td>$lastActivity</td>";
+                $output .= "<td>$instance->{lastState}</td>";
+                $output .= "<td>$lastRunTime</td>";
 
-            if ($isAdmin) {
-                my $run = $i18n->get('run');
-                my $href = $session->url->page(qq[op=runWorkflow;instanceId=$instanceId]);
-                $output .= qq[<td><a href="$href">$run</a></td>];
+                if ($isAdmin) {
+                    my $run = $i18n->get('run');
+                    my $href = $session->url->page(qq[op=runWorkflow;instanceId=$instanceId]);
+                    $output .= qq[<td><a href="$href">$run</a></td>];
+                }
+                $output .= "</tr>\n";
             }
+            $output .= '</table>';
+        }
+    }
+    else {
+        $output .= '<table width="100%">';
+        my $rs = $session->db->read("select Workflow.title, WorkflowInstance.lastStatus, WorkflowInstance.runningSince, WorkflowInstance.lastUpdate, WorkflowInstance.instanceId from WorkflowInstance left join Workflow on WorkflowInstance.workflowId=Workflow.workflowId order by WorkflowInstance.runningSince desc");
+        while (my ($title, $status, $runningSince, $lastUpdate, $id) = $rs->array) {
+            my $class = $status || "complete";
+            $output .= '<tr class="'.$class.'">'
+                .'<td>'.$title.'</td>'
+                .'<td>'.$session->datetime->epochToHuman($runningSince).'</td>';
+            if ($status) {
+                $output .= '<td>'
+                    .$status.' / '.$session->datetime->epochToHuman($lastUpdate)
+                    .'</td>';
+            }
+            $output .= '<td><a href="'.$session->url->page("op=runWorkflow;instanceId=".$id).'">'.$i18n->get("run").'</a></td>'
+                if ($isAdmin);
             $output .= "</tr>\n";
         }
         $output .= '</table>';

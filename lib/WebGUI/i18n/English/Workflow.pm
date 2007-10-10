@@ -179,13 +179,13 @@ our $I18N = {
 	},
 
 	'spectre not running error' => {
-		message => q|Spectre <b>is not running</b>.<br/>Unable to get workflow information.|,
+		message => q|Spectre <b>is not running</b>.<br />Unable to get detailed workflow information.<br />|,
 		context => q||,
-		lastUpdated => 0,
+		lastUpdated => 1192031332,
 	},
 
 	'spectre no info error' => {
-		message => q|Spectre <b>is running</b>, but I was not able to get workflow information.|,
+		message => q|Spectre <b>is running</b>, but I was not able to get detailed workflow information.<br />|,
 		context => q||,
 		lastUpdated => 0,
 	},

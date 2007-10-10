@@ -17,6 +17,7 @@
  - More complete error messages from spectre
  - fix: Wiki uploads didn't obey image and thumbnail size
  - fix: Doesn't copy LDAP link to user on create, also wrong search base
+ - fix: Unable to view running workflows if spectre not running
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode
