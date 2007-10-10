@@ -23,6 +23,7 @@
  - fix: Unable to view running workflows if spectre not running
  - protect Wiki pages from malformed html content
  - work around broken linking function in tinyMCE on Safari
+ - fix: Searching in Calendars finds multiple of same event
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode

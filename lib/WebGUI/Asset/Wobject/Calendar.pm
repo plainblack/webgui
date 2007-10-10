@@ -1667,7 +1667,7 @@ sub www_search {
             keywords        => $keywords,
             classes         => ['WebGUI::Asset::Event'],
             lineage         => [$self->get("lineage")],
-            join            => "join Event on assetIndex.assetId=Event.assetId",
+            join            => "join Event on assetIndex.assetId=Event.assetId and assetIndex.revisionDate=Event.revisionDate",
             columns         => ['Event.startDate','Event.startTime'],
         );
         
