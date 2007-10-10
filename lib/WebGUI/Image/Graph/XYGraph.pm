@@ -172,33 +172,31 @@ sub drawLabels {
 	my $self = shift;
 	my $location = shift;
 
-	my %anchorPoint = %{$self->getFirstAnchorLocation};# %$location;
+	my %anchorPoint = %{$self->getFirstAnchorLocation}; 
 
 	# Draw x-axis labels
-	foreach (@{$self->getLabel}) {
-		my $text = $self->wrapLabelToWidth($_, $self->getAnchorSpacing->{x});
+	foreach my $text (@{$self->getLabel}) {
 		$self->drawLabel($text, (
-			alignHorizontal	=> 'center',
 			alignVertical	=> 'top',
-			align		=> 'Center',
+			align		=> 'left',
+            rotate      => 90,
 			x		=> $anchorPoint{x},
 			y		=> $anchorPoint{y},
 		));
 
-		$anchorPoint{x} += $self->getAnchorSpacing->{x}; #$groupWidth + $self->getGroupSpacing;
+		$anchorPoint{x} += $self->getAnchorSpacing->{x};
 		$anchorPoint{y} += $self->getAnchorSpacing->{y};
 	}
 
 	# Draw y-axis labels
 	$anchorPoint{x} = $self->getChartOffset->{x} - $self->getLabelOffset;
 	$anchorPoint{y} = $self->getChartOffset->{y} + $self->getChartHeight;
-#	for (1 .. $self->getYRange / $self->getYGranularity) {
 	foreach (@{$self->getYLabels}) {
 		$self->drawLabel($_, (
 			alignHorizontal	=> 'right',
 			alignVertical	=> 'center',
-			x		=> $anchorPoint{x}, #$self->getChartOffset->{x} - $self->getLabelOffset,
-			y		=> $anchorPoint{y}, #$self->getChartOffset->{y} + $self->getChartHeight - $self->getPixelsPerUnit * $_*$self->getYGranularity,
+			x		=> $anchorPoint{x}, 
+			y		=> $anchorPoint{y}, 
 		));
 		$anchorPoint{y} -= $self->getPixelsPerUnit * $self->getYGranularity
 	}
@@ -243,6 +241,19 @@ sub formNamespace {
 
 	return $self->SUPER::formNamespace.'_XYGraph';
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAnchorSpacing () 
+
+This method MUST be overridden by all sub classes.
+
+=cut
+
+sub getAnchorSpacing {
+    die "You were supposed to override this method in the sub class.";
+}
+
 
 #-------------------------------------------------------------------
 

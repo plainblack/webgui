@@ -4,6 +4,7 @@ use strict;
 use WebGUI::Image::Graph::XYGraph;
 use List::Util;
 use POSIX;
+use WebGUI::Utility;
 
 our @ISA = qw(WebGUI::Image::Graph::XYGraph);
 
@@ -250,7 +251,7 @@ sub getAnchorSpacing {
 
 	my $numberOfGroups = List::Util::max(map {scalar @$_} @{$self->getDataset});
 
-	my $spacing = ($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing;
+	my $spacing = round(($self->getChartWidth - ($numberOfGroups-1) * $self->getGroupSpacing) / $numberOfGroups + $self->getGroupSpacing);
 
 	return {
 		x	=> $spacing,
@@ -319,7 +320,7 @@ sub getFirstAnchorLocation {
 	my $self = shift;
 
 	return {
-		x	=> $self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2,
+		x	=> round($self->getChartOffset->{x} + ($self->getAnchorSpacing->{x} - $self->getGroupSpacing) / 2),
 		y	=> $self->getChartOffset->{y} + $self->getChartHeight
 	}
 }
@@ -344,10 +345,14 @@ sub processDataSet {
 	for my $currentElement (0 .. $maxElements-1) {
 		my @thisSet = ();
 		for my $currentDataset (0 .. $numberOfDatasets - 1) {
+            my $color = $palette->getColor($currentDataset);
+            if ($numberOfDatasets == 1) {
+                $color = $palette->getNextColor;
+            }
 			push(@thisSet, {
 				height => $self->{_datasets}->[$currentDataset]->[$currentElement] || 0,
-				fillColor => $palette->getColor($currentDataset)->getFillColor,
-				strokeColor => $palette->getColor($currentDataset)->getStrokeColor,
+				fillColor => $color->getFillColor,
+				strokeColor => $color->getStrokeColor,
 			});
 		}
 		push(@{$self->{_bars}}, [ @thisSet ]);

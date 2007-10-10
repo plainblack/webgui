@@ -4,6 +4,9 @@
  - Clean up orphaned grouping
  - fix: purging old asset revisions on large sites never completes
  - fix: Can't add assets when not using preload.perl.
+ - Colors in bar graph now cycle through the palette like pie chart.
+ - fix: Graphing with Graphics Magick Bungled ( fixed line and bar problems,
+   not pie problems)
  - fix: wiki recent
  - fix: Dashboard content positioning field problem
  - fix: graphing doesn't work with GraphicsMagick
