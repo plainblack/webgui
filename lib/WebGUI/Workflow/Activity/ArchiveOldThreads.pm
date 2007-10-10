@@ -77,14 +77,14 @@ sub execute {
                 my $archiveDate = $epoch - $cs->get("archiveAfter");
                 my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
                         left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
-                        where Post.dateUpdated<? and assetData.status='approved' and asset.state='published'
+                        where Post.revisionDate<? and assetData.status='approved' and asset.state='published'
 			and Post.threadId=Post.assetId and asset.lineage like ?";
                 my $b = $self->session->db->read($sql,[$archiveDate, $cs->get("lineage").'%']);
                 while (my ($id, $version) = $b->array) {
 			my $thread = WebGUI::Asset->new($self->session, $id, "WebGUI::Asset::Post::Thread", $version);
 			my $archiveIt = 1;
 			foreach my $post (@{$thread->getPosts}) {
-                        	$archiveIt = 0 if (defined $post && $post->get("dateUpdated") > $archiveDate);
+                        	$archiveIt = 0 if (defined $post && $post->get("revisionDate") > $archiveDate);
 			}
 			$thread->archive if ($archiveIt);
                 }
