@@ -19,6 +19,15 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+my $graphicsClass;
+BEGIN {
+    if (eval { require Graphics::Magick; 1 }) {
+        $graphicsClass = 'Graphics::Magick';
+    }
+    elsif (eval { require Image::Magick; 1 }) {
+        $graphicsClass = 'Image::Magick';
+    }
+}
 use WebGUI::Asset::File::Image::Photo;
 
 #----------------------------------------------------------------------------
