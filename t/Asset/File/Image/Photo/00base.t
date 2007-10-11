@@ -43,7 +43,6 @@ use_ok("WebGUI::Asset::File::Image::Photo");
 
 #----------------------------------------------------------------------------
 # Test creating a photo
-# plan tests => 2
 my $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
@@ -58,9 +57,13 @@ isa_ok(
     $photo, "WebGUI::Asset::File::Image",
 );
 
+is(
+    $photo->getGallery, undef,
+    "Photo->getGallery returns undef if photo not part of a Photo Gallery",
+);
+
 #----------------------------------------------------------------------------
 # Test deleting a photo
-# plan tests => 2
 my $properties  = $photo->get;
 $photo->purge;
 
@@ -74,3 +77,31 @@ is(
     "Photo no longer able to be instanciated",
 );
 
+#----------------------------------------------------------------------------
+# Test creating a photo as part of a photo album
+my $gallery
+    = $node->addChild({
+        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+    });
+my $album
+    = $gallery->addChild({
+        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+    });
+$photo
+    = $album->addChild({
+        className           => "WebGUI::Asset::File::Image::Photo",
+    });
+
+is(
+    blessed $photo, "WebGUI::Asset::File::Image::Photo",
+    "Photo is a WebGUI::Asset::File::Image::Photo object",
+);
+
+isa_ok( 
+    $photo, "WebGUI::Asset::File::Image",
+);
+
+is(
+    blessed $photo->getGallery, "WebGUI::Asset::Wobject::PhotoGallery",
+    "Photo->getGallery gets the gallery containing this photo",
+);

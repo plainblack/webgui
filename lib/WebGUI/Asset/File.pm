@@ -389,6 +389,7 @@ sub setFile {
         # NOTE: We should not croak here, the WebGUI::Storage should croak for us.
 
     $self->updatePropertiesFromStorage;
+    $self->applyConstraints;
 }
 
 #-------------------------------------------------------------------
