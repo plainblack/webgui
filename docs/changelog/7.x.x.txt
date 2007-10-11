@@ -1,3 +1,6 @@
+7.4.10
+ - fix: Graphs aren't sized properly using GraphicsMagick
+
 7.4.9
  - fix: Bug that did not allow Calendar Update Feeds workflow activity to 
    complete

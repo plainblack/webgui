@@ -265,7 +265,7 @@ sub setImageHeight {
 	my $height = shift;
 	
     if ($graphicsPackage eq 'Graphics::Magick') {
-        $self->image->set(size => $self->getImageWidth.'x'.$height);
+        $self->image->Resize(height => $height);
     }
     else {
 	    $self->image->Extent(height => $height);
@@ -290,7 +290,7 @@ sub setImageWidth {
 	my $self = shift;
 	my $width = shift;
     if ($graphicsPackage eq 'Graphics::Magick') {
-	    $self->image->set(size => $width.'x'.$self->getImageHeight);
+        $self->image->Resize(width => $width);
     }
     else {
 	    $self->image->Extent(width => $width);
