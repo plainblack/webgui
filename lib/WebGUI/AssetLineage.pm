@@ -362,17 +362,22 @@ sub getLineage {
 		push(@whereModifiers,"(asset.parentId=".$self->session->db->quote($self->getId).")");
 	}
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
-	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree} && substr($rules->{assetToPedigree}->get("lineage"),0,length($lineage)) eq $lineage) {
-		my @mods;
-		my $lineage = $rules->{assetToPedigree}->get("lineage");
-		my $length = $rules->{assetToPedigree}->getLineageLength;
-		for (my $i = $length; $i > 0; $i--) {
-			my $line = substr($lineage,0,$i*6);
-			push(@mods,"( asset.lineage like ".$self->session->db->quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
-			last if ($self->getLineageLength == $i);
-		}
-		push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
-	}
+	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
+        my $pedigreeLineage = $rules->{assetToPedigree}->get("lineage");
+        if (substr($pedigreeLineage,0,length($lineage)) ne $lineage) {
+		    push @whereModifiers, '0';
+        }
+        else {
+            my @mods;
+		    my $length = $rules->{assetToPedigree}->getLineageLength;
+            for (my $i = $length; $i > 0; $i--) {
+			    my $line = substr($pedigreeLineage,0,$i*6);
+			    push(@mods,"( asset.lineage like ".$self->session->db->quote($line.'%')." and  length(asset.lineage)=".(($i+1)*6).")");
+			    last if ($self->getLineageLength == $i);
+		    }
+		    push(@whereModifiers, "(".join(" or ",@mods).")") if (scalar(@mods));
+	    }
+    }
 	# deal with custom joined tables if we must
 	my $tables = "asset left join assetData on asset.assetId=assetData.assetId ";
 	if (exists $rules->{joinClass}) {
