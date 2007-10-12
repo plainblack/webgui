@@ -20,7 +20,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-exampleFunction($session);
+fixPost($session);
 
 finish($session); # this line required
 
