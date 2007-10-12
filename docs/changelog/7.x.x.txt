@@ -1,5 +1,6 @@
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
+ - fix: Navigation with pedigree on site with multiple roots (Yung Han Khoe, United Knowledge)
 
 7.4.9
  - fix: Bug that did not allow Calendar Update Feeds workflow activity to 
