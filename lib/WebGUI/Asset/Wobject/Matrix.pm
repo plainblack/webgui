@@ -745,7 +745,7 @@ sub www_editListingSave {
                         addEditStampToPosts => 0,
                         usePreview => 1,
                         sortOrder => 'desc',
-                        sortBy => 'dateUpdated',
+                        sortBy => 'assetData.revisionDate',
 			rssTemplateId=>'PBtmpl0000000000000142',
                      	notificationTemplateId=>'PBtmpl0000000000000027',
                         searchTemplateId=>'PBtmpl0000000000000031',

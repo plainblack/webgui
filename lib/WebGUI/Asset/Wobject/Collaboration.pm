@@ -789,7 +789,8 @@ sub getRssItems {
 	# XXX copied and reformatted this query from www_viewRSS, but why is it constructed like this?
 	# And it's duplicated inside view, too!  Eeeagh!  And it uses the versionTag scratch var...
 	my ($sortBy, $sortOrder) = ($self->getValue('sortBy'), $self->getValue('sortOrder'));
-	my @postIds = $self->session->db->buildArray(<<"SQL", [$self->getId, $self->session->scratch->get('versionTag')]);
+	
+    my @postIds = $self->session->db->buildArray(<<"SQL", [$self->getId, $self->session->scratch->get('versionTag')]);
   SELECT asset.assetId
     FROM Thread
          LEFT JOIN asset ON Thread.assetId = asset.assetId
@@ -933,7 +934,10 @@ sub getThreadsPaginator {
     my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
 	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
-	my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
+	if (!isIn($sortBy, qw(lineage assetData.revisionDate creationDate title userDefined1 userDefined2 userDefined3 userDefuned4 userDefined5 karmaRank))) {
+        $sortBy = '';
+    }
+    my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
 	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
@@ -944,7 +948,7 @@ sub getThreadsPaginator {
                 }
                 $self->session->scratch->set($scratchSortOrder, $sortOrder);
 	}
-	$sortBy ||= "revisionDate";
+	$sortBy ||= "assetData.revisionDate";
 	$sortOrder ||= "desc";
     # Sort by the thread rating instead of the post rating.  other places don't care about threads.
     if ($sortBy eq 'rating') {

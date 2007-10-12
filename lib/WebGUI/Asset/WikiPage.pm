@@ -44,7 +44,6 @@ sub addRevision {
 	my $now = time();
 	$newSelf->update({
 		isHidden => 1,
-		dateUpdated=>$now,
 		});
         return $newSelf;
 }
