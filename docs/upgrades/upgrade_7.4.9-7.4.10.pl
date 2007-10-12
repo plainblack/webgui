@@ -20,17 +20,20 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+exampleFunction($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub fixPost {
+	my $session = shift;
+    print "\tFixing post problems from previous release.\n" unless ($quiet);
+    my $db = $session->db;
+    $db->write("delete from userSessionScratch where value='dateSubmitted'");
+    $db->write("delete from userSessionScratch where value='dateUpdated'");
+    $db->write("alter table Collaboration change sortBy sortBy varchar(35) not null default 'assetData.revisionDate'");
+}
 
 
 
