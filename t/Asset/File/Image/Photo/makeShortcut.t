@@ -19,6 +19,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use WebGUI::Test::Maker::HTML;
 use WebGUI::Asset::File::Image::Photo;
 
 #----------------------------------------------------------------------------
@@ -27,6 +28,7 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
+my $maker           = WebGUI::Test::Maker::HTML->new;
 my $otherParent
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Layout",
@@ -109,14 +111,13 @@ is_deeply(
 
 #----------------------------------------------------------------------------
 # www_makeShortcut is only available to those who can edit the photo
-my $html = WebGUI::Test->getPage($photo, "www_makeShortcut", {
-            userId  => 1,
-        });
-
-like(
-    $html, qr/permission denied/i,
-    "www_makeShortcut is not allowed to those who can't edit the photo",
-);
+$maker->prepare({
+    object      => $photo,
+    method      => "www_makeShortcut",
+    userId      => 1,
+    test_privilege  => "insufficient",
+});
+$maker->run;
 
 #----------------------------------------------------------------------------
 # www_makeShortcut 
