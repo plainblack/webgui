@@ -3570,6 +3570,11 @@ LongTruncOk=1</p>
 		lastUpdated => 1181019679,
     },
 
+    'private message delete text' => {
+        message => q|delete|,
+		lastUpdated => 1181019679,
+    },
+
     'view inbox template' => {
 		message => q|Inbox Template|,
 		lastUpdated => 1181019679,
