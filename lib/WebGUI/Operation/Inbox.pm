@@ -270,7 +270,7 @@ sub www_viewInbox {
      
     #Cache the base url
     my $inboxUrl =  $session->url->page('op=viewInbox');
-     
+
     $vars->{ title           } = $i18n->get(159);
    	$vars->{'subject_label'  } = $i18n->get(351);
     $vars->{'subject_url'    } = $inboxUrl.$pn_url.";sortBy=subject";
@@ -287,6 +287,8 @@ sub www_viewInbox {
     my $adminUser = WebGUI::User->new($session,3)->username;
   	my $messages  = WebGUI::Inbox->new($session)->getMessagesForUser($session->user,$rpp,$pn,$sortBy); 
    	foreach my $message (@$messages) {   
+        next if($message->get('status') eq 'deleted');
+
         my $hash = {};
         $hash->{ message_url  } = $session->url->page('op=viewInboxMessage;messageId='.$message->getId);
         $hash->{ subject      } = $message->get("subject");
@@ -332,6 +334,31 @@ sub www_viewInbox {
 
 #-------------------------------------------------------------------
 
+=head2 www_deletePrivateMessage ( )
+
+Mark a private message in the inbox as deleted.
+
+=cut
+
+sub www_deletePrivateMessage {
+    my $session = shift;
+	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+
+    #Get the message
+    my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));
+    use Data::Dumper;
+    warn Dumper($message);
+    if(defined $message) {
+        # set the message status to 'deleted'
+        $message->setStatus("deleted");
+    }
+    warn 'status => ' . $message->get('status') . "\n";
+    #return WebGUI::Operation::Inbox->www_viewInbox($session); 
+    $session->http->setRedirect('?op=viewInbox');
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_viewInboxMessage ( )
 
 Templated display of a single message for the user.
@@ -367,6 +394,8 @@ sub www_viewInboxMessage {
 	   	$vars->{'dateStamp'} =$session->datetime->epochToHuman($message->get("dateStamp"));
    		$vars->{'status'   } = _status($session)->{$message->get("status")}; 
 		$vars->{ message   } = $message->get("message");
+        $vars->{ delete_text } = $i18n->get("private message delete text");
+        $vars->{ delete_url } = '?op=deletePrivateMessage;messageId=' . $message->getId;
    		unless ($vars->{message} =~ /\<a/ig) {
       			$vars->{message} =~ s/(http\S*)/\<a href=\"$1\"\>$1\<\/a\>/g;
    		}

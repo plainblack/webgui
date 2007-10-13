@@ -165,6 +165,7 @@ sub getOperations {
 		'viewInboxMessage' => 'WebGUI::Operation::Inbox',
         'sendPrivateMessage' => 'WebGUI::Operation::Inbox',
         'sendPrivateMessageSave' => 'WebGUI::Operation::Inbox',
+		'deletePrivateMessage' => 'WebGUI::Operation::Inbox',
 
 		'inviteUser'       => 'WebGUI::Operation::Invite',
 		'inviteUserSave'   => 'WebGUI::Operation::Invite',
