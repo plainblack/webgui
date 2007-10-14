@@ -1,5 +1,6 @@
 7.5.0
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
+ - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
 
 
 7.4.10
