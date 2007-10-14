@@ -346,8 +346,6 @@ sub www_deletePrivateMessage {
 
     #Get the message
     my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));
-    use Data::Dumper;
-    warn Dumper($message);
     if(defined $message) {
         # set the message status to 'deleted'
         $message->setStatus("deleted");
