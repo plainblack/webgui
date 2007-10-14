@@ -816,7 +816,7 @@ sub sendEmail {
                 sentBy => $self->session->user->userId,
 				subject=>$subject,
 				message=>$message,
-				status=>'complete'
+				status=>'unread'
 				});
 			if ($cc) {
                 my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, replyTo=>$from, subject=>$subject, from=>$from});
