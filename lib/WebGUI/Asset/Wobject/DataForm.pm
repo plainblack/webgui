@@ -503,6 +503,8 @@ sub getRecordTemplateVars {
 		$where .= " and b.DataForm_entryId=".$self->session->db->quote($var->{entryId});
 		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
 		$select .= ", b.value";
+	    $var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
+	    $var->{"delete.label"} = $i18n->get(90);
 	}
 	my %data;
 	tie %data, 'Tie::CPHash';
@@ -628,8 +630,6 @@ sub getTemplateVars {
 	$var->{"entryList.label"} = $i18n->get(86);
 	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
 	$var->{"export.tab.label"} = $i18n->get(84);
-	$var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
-	$var->{"delete.label"} = $i18n->get(90);
 	$var->{"addField.url"} = $self->getUrl('func=editField');
 	$var->{"addField.label"} = $i18n->get(76);
 	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");

@@ -1,4 +1,5 @@
 7.4.11
+  - fix: Delete this entry link in data form header broken
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
