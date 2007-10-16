@@ -2,6 +2,7 @@
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
  - fix: Delete this entry link in data form header broken
+ - fix: Image uploads fail when not using preload.perl
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
