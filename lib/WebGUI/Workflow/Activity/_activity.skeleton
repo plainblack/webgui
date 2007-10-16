@@ -75,8 +75,15 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	# do some work here, whatever this activity is supposed to do
-	return $self->COMPLETE;
+    my $object = shift;
+    my $instance = shift;
+    # do some work here, whatever this activity is supposed to do
+	# Workflow is finished
+    return $self->COMPLETE;
+	# Or needs to be run again to finish processing
+    #return $self->WAITING;
+    # Or encountered an error and cannot finish
+	#return $self->ERROR;
 }
 
 
