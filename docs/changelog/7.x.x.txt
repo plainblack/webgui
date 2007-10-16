@@ -3,6 +3,7 @@
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
  - fix: Delete this entry link in data form header broken
  - fix: Image uploads fail when not using preload.perl
+ - fix: Workflow activities don't pick up new default values
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick

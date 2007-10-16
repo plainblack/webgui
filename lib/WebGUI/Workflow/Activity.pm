@@ -297,15 +297,21 @@ sub new {
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
 	return undef unless $main->{activityId};
 	$class = $main->{className};
-        my $cmd = "use ".$class;
-        eval ($cmd);
-        if ($@) {
-                $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@);
-		return undef;
-	}
+    (my $module = "$class.pm") =~ s{'|::}{/}g;
+    unless (eval { require $module; 1 }) {
+        $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@);
+        return undef;
+    }
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
 	my %data = (%{$main}, %{$sub});
-	bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
+    for my $definition (reverse @{$class->definition($session)}) {
+        for my $property (keys %{$definition->{properties}}) {
+            if(!defined $data{$property} || $data{$property} eq '' && $definition->{properties}{$property}{defaultValue}) {
+                $data{$property} = $definition->{properties}{$property}{defaultValue};
+            }
+        }
+    }
+    bless {_session=>$session, _id=>$activityId, _data=>\%data}, $class;
 }
 
 #-------------------------------------------------------------------
