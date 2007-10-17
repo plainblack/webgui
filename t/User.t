@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 101; # increment this value for each test you create
+use Test::More tests => 102; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -175,6 +175,11 @@ $user = "";
 #Let's test new to retrieve default user visitor with no params passed in
 $user = WebGUI::User->new($session);
 is($user->userId, '1', 'new() -- returns visitor with no args');
+$user = "";
+
+#Let's test new to retrieve a non-existing user
+$user = WebGUI::User->new($session, 'xxYYxxYYxxYYxxYYxxYYxx');
+isa_ok($user, 'WebGUI::User', 'non-existant ID returns valid user object');
 $user = "";
 
 $user = WebGUI::User->new($session, "new", "ROYSUNIQUEUSERID000002");
