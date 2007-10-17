@@ -364,10 +364,7 @@ sub getLineage {
 	# now lets add in all of the siblings in every level between ourself and the asset we wish to pedigree
 	if (isIn("pedigree",@{$relatives}) && exists $rules->{assetToPedigree}) {
         my $pedigreeLineage = $rules->{assetToPedigree}->get("lineage");
-        if (substr($pedigreeLineage,0,length($lineage)) ne $lineage) {
-		    push @whereModifiers, '0';
-        }
-        else {
+        if (substr($pedigreeLineage,0,length($lineage)) eq $lineage) {
             my @mods;
 		    my $length = $rules->{assetToPedigree}->getLineageLength;
             for (my $i = $length; $i > 0; $i--) {
@@ -427,7 +424,10 @@ sub getLineage {
 		$where .= ' and (asset.className in ('.$self->session->db->quoteAndJoin($rules->{includeOnlyClasses}).'))';
 	}
 	## finish up our where clause
-	$where .= ' and ('.join(" or ",@whereModifiers).')' if (scalar(@whereModifiers));
+	if (!scalar(@whereModifiers)) {
+        return [];
+    }
+	$where .= ' and ('.join(" or ",@whereModifiers).')';
 	if (exists $rules->{whereClause} && $rules->{whereClause}) {
 		$where .= ' and ('.$rules->{whereClause}.')';
 	}
