@@ -3138,8 +3138,8 @@ and tracked by WebGUI.|,
         },
 
         'user function style description' => {
-                message => q|Defines which style to be used to style WebGUI operations (profile editing, message log, etc.) when they are available to a user.|,
-                lastUpdated => 1120239343,
+                message => q|Defines which style to be used to style WebGUI operations (profile editing, message log, etc.) when they are available to a user.  Only templates which have been committed are allowed.|,
+                lastUpdated => 1192735786,
         },
 
         'admin console template description' => {
