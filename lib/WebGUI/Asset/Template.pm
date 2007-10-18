@@ -191,7 +191,7 @@ sub getEditForm {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( session, namespace )
+=head2 getList ( session, namespace [,clause] )
 
 Returns a hash reference containing template ids and template names of all the templates in the specified namespace.
 
@@ -203,7 +203,12 @@ A reference to the current session.
 
 =head3 namespace
 
-Specify the namespace to build the list for.
+Specify the namespace to build the list for.  If no namespace is specified,
+then  an empty hash reference will be returned.
+
+=head3 clause
+
+An extra clause that can be used to further limit the list, such as "assetData.status='approved'
 
 =cut
 
@@ -211,8 +216,15 @@ sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $namespace = shift;
-	my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=".$session->db->quote($namespace)." and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=".$session->db->quote($session->scratch->get("versionTag")).")) order by assetData.title";
-	my $sth = $session->dbSlave->read($sql);
+    my $clause      = shift;
+    if ($clause) {
+        $clause = ' and ' . $clause;
+    }
+    else {
+        $clause = '';
+    }
+	my $sql = "select asset.assetId, assetData.revisionDate from template left join asset on asset.assetId=template.assetId left join assetData on assetData.revisionDate=template.revisionDate and assetData.assetId=template.assetId where template.namespace=? and template.showInForms=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and (assetData.status='approved' or assetData.tagId=?)) $clause order by assetData.title";
+	my $sth = $session->dbSlave->read($sql, [$namespace, $session->scratch->get("versionTag")]);
 	my %templates;
 	tie %templates, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
