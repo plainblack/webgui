@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 102; # increment this value for each test you create
+use Test::More tests => 103; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -277,6 +277,9 @@ is($result, 0, 'deleteFromGroups() -- Visitor removed from Everyone group');
 
 ok($visitor->isInGroup(1), "isInGroup: Visitor is in group Visitor, hardcoded");
 ok($visitor->isInGroup(7), "isInGroup: Everyone is in group Everyone, hardcoded");
+
+##Test for group membership in a non-existant group
+ok(! $visitor->isInGroup('nonExistantGroup'), 'isInGroup: Checking for membership in a non-existant group');
 
 ##Add Visitor back to those groups
 WebGUI::Group->new($session, '1')->addUsers([1]);
