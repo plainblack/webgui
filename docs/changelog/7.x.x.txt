@@ -5,6 +5,7 @@
  - fix: Image uploads fail when not using preload.perl
  - fix: Workflow activities don't pick up new default values
  - safely allow sorting by more fields in collaboration systems
+ - fix: iCal link on calendar doesn't work
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
