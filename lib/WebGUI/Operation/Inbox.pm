@@ -350,8 +350,7 @@ sub www_deletePrivateMessage {
         # set the message status to 'deleted'
         $message->setStatus("deleted");
     }
-    #return WebGUI::Operation::Inbox->www_viewInbox($session); 
-    $session->http->setRedirect('?op=viewInbox');
+    return www_viewInbox($session); 
 }
 
 #-------------------------------------------------------------------
