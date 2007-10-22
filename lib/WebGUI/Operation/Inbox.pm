@@ -153,7 +153,7 @@ sub www_sendPrivateMessage {
         return $style->userStyle(WebGUI::Asset::Template->new($session,$templateId)->process($vars));
     }
     
-    unless($userTo->profileField("allowPrivateMessages")) {
+    unless($userTo->acceptsPrivateMessages($user->userId)) {
         $vars->{'error_msg'} = $i18n->get('private message blocked error');
         return $style->userStyle(WebGUI::Asset::Template->new($session,$templateId)->process($vars));
     }
@@ -213,7 +213,15 @@ sub www_sendPrivateMessageSave {
         }
     }
     
-    unless($isReply || $userTo->profileField("allowPrivateMessages")) {
+    my $message = WebGUI::Inbox->new($session)->addPrivateMessage({
+	   message => $form->get("message"),
+       subject => $form->get("subject"),
+       userId  => $uid,
+       status  => 'unread',
+       sentBy  => $user->userId
+    },$isReply);
+    
+    unless(defined $message) {
         my $output = sprintf qq|<h1>%s</h1>\n<p>%s</p><a href="%s">%s</a>|,
             $i18n->get('private message error'),
             $i18n->get('private message blocked error'),
@@ -221,15 +229,6 @@ sub www_sendPrivateMessageSave {
             $i18n->get('493', 'WebGUI');
         return $style->userStyle($output);
     }
-    
-    
-    WebGUI::Inbox->new($session)->addMessage({
-	   message => $form->get("message"),
-       subject => $form->get("subject"),
-       userId  => $uid,
-       status  => 'unread',
-       sentBy  => $user->userId
-    });
     
 
     my $output = sprintf qq!<p>%s</p><a href="%s">%s</a>!,

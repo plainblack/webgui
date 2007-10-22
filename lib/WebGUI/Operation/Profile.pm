@@ -23,6 +23,7 @@ use WebGUI::Utility;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Operation::Shared;
+use WebGUI::Operation::Friends;
 
 =head1 NAME
 
@@ -280,39 +281,45 @@ A reference to the current session.
 =cut
 
 sub www_viewProfile {
-	my $session = shift;
-	my $u = WebGUI::User->new($session,$session->form->process("uid"));
-	my $i18n = WebGUI::International->new($session);
-	my $vars = {};
-	$vars->{displayTitle} = $i18n->get(347).' '.$u->username;
+    my $session = shift;
+    my $u       = WebGUI::User->new($session,$session->form->process("uid"));
+    my $i18n    = WebGUI::International->new($session);
+    my $vars    = {};
+    $vars->{displayTitle} = $i18n->get(347).' '.$u->username;
 
-	return $session->privilege->notMember() if($u->username eq "");
+    return $session->privilege->notMember() if($u->username eq "");
 
-	return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isInGroup(3)));
-	return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
+    return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isInGroup(3)));
+    return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
 
-	my @array = ();
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		next unless ($category->get("visible"));
-		push(@array, {'profile.category' => $category->getLabel});
-		foreach my $field (@{$category->getFields}) {
-			next unless ($field->get("visible"));
-			next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
-			push(@array, {
-				'profile.label' => $field->getLabel,
-				'profile.value' => $field->formField(undef,2,$u)
-				});
-		}
-	}
-	$vars->{'profile.elements'} = \@array;
-	if ($session->user->userId eq $session->form->process("uid")) {
-		$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
-	}
+    my @array = ();
+    foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
+        next unless ($category->get("visible"));
+        push(@array, {'profile.category' => $category->getLabel});
+        foreach my $field (@{$category->getFields}) {
+            next unless ($field->get("visible"));
+            next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
+            push @array, {
+                'profile.label' => $field->getLabel,
+                'profile.value' => $field->formField(undef,2,$u),
+            };
+        }
+    }
+    $vars->{'profile.elements'} = \@array;
+
+    if ($session->user->userId eq $session->form->process("uid")) {
+        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
+    }
     else {
-        push(@{$vars->{'profile.accountOptions'}}, {'options.display' => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$session->form->process("uid")).'">'.$i18n->get('send private message').'</a>'});
+        ## TODO: Make this more legible code, maybe refactor into a method
+        push @{$vars->{'profile.accountOptions'}}, {
+            'options.display'   => '<a href="'.$session->url->page("op=addFriend;userId=".$u->userId).'">'.$i18n->get('add to friends list', 'Friends').'</a>',
+        }, {
+            'options.display'   => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$session->form->process("uid")).'">'.$i18n->get('send private message').'</a>',
+        };
     }
 
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
+    return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
 }
 
 

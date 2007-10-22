@@ -74,6 +74,11 @@ TODO: DOCUMENT ME
             'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=inviteUser'), $i18n->get('invite a friend')),
         };
     }
+	unless ($op eq "manageFriends") {
+        push @array, {
+            'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=manageFriends'), $i18n->get('see my friends', 'Friends')),
+        };
+    }
 	my %logout;
 	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.$i18n->get(64).'</a>'; 
 	push(@array,\%logout);
