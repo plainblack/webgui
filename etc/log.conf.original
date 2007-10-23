@@ -4,7 +4,7 @@
 # system is capable of. To unleash the full power read the config file manual
 # http://log4perl.sourceforge.net/releases/Log-Log4perl/docs/html/Log/Log4perl/Config.html
 
-log4perl.logger = WARN, mainlog 
+log4perl.logger = ERROR, mainlog 
 log4perl.appender.mainlog = Log::Log4perl::Appender::File
 log4perl.appender.mainlog.filename = /var/log/webgui.log 
 log4perl.appender.mainlog.layout = PatternLayout

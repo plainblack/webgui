@@ -1,4 +1,5 @@
 7.5.0
+ - rfe: Default log level to ERROR
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
  - fix: Delete this entry link in data form header broken
