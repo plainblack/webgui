@@ -17,7 +17,6 @@ use WebGUI::Test;
 use WebGUI::Operation::Help;
 use WebGUI::International;
 use WebGUI::Session;
-use Text::Balanced qw(extract_codeblock);
 use File::Find;
 use Data::Dumper;
 
