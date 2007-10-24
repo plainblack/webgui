@@ -17,7 +17,6 @@ use WebGUI::Test;
 use WebGUI::Operation::Help;
 use WebGUI::International;
 use WebGUI::Session;
-use File::Find;
 use Data::Dumper;
 
 #The goal of this test is to verify all the i18n labels in
@@ -28,10 +27,6 @@ use Test::More; # increment this value for each test you create
 my $numTests = 0;
 
 my $session = WebGUI::Test->session;
-
-# put your tests here
-
-my %helpTable;
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
