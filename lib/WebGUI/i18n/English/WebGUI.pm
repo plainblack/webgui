@@ -3895,6 +3895,21 @@ LongTruncOk=1</p>
         lastUpdated => 1185856549,
     },
 
+    'account options template variables' => {
+        message     => q{Account Options Template Variables},
+        lastUpdated => 1193196209,
+    },
+
+    'account.options' => {
+        message     => q{A loop containing options for different user account access links.},
+        lastUpdated => 1193196211,
+    },
+
+    'options.display' => {
+        message     => q{A full HTML link, with internationalized label, for an individual account options, such as editing a profile, viewing a profile, accessing the user's inbox, and so on.},
+        lastUpdated => 1193196211,
+    },
+
 };
 
 1;

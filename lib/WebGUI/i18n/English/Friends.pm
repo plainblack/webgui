@@ -277,6 +277,11 @@ Thanks,
         lastUpdated => 1193194455,
     },
 
+	'topicName' => {
+		message => q|Friends Network.|,
+		lastUpdated => 1181493546,
+	},
+
 };
 
 1;

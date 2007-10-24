@@ -52,6 +52,19 @@ our $HELP = {
         ]
     },
 
+    'account options' => {
+        title     => 'account options template variables',
+        body      => '',
+        variables => [
+            {
+                'name' => 'account.options',
+                'variables' => [
+                    { 'name' => 'options.display' }
+                ],
+            },
+        ],
+    },
+
 };
 
 1;

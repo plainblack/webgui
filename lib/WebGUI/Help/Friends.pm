@@ -4,6 +4,12 @@ our $HELP = {
 	'manage friends template' => {
 		title => 'manage friends template title',
 		isa => [
+            {   namespace => "WebGUI",
+                tag       => "account options"
+            },
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
 		],
 		variables => [
 			{
