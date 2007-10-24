@@ -98,7 +98,7 @@ sub addToGroups {
 }
 
 #-------------------------------------------------------------------
-    
+
 =head2 acceptsPrivateMessages ( userId )
 
 Returns a boolean of whether or not the user can receive private messages from the user passed in
@@ -106,25 +106,25 @@ Returns a boolean of whether or not the user can receive private messages from t
 =head3 userId
 
 userId to determine if the user accepts private messages from
-       
+
 =cut
 
 sub acceptsPrivateMessages {
     my $self      = shift;
     my $userId    = shift;
-    
+
     my $pmSetting = $self->profileField('allowPrivateMessages');
-    
+
     return 0 if ($pmSetting eq "none");
     return 1 if ($pmSetting eq "all");
-    
+
     if($pmSetting eq "friends") {
         my $friendsGroup = $self->friends;
         my $sentBy       = WebGUI::User->new($self->session,$userId);
         #$self->session->errorHandler->warn($self->isInGroup($friendsGroup->getId));
         return $sentBy->isInGroup($friendsGroup->getId);
     }
-    
+
     return 1;
 }
 
@@ -285,18 +285,18 @@ sub friends {
 }
 
 #-------------------------------------------------------------------
-    
+
 =head2 getFirstName ( )
 
 Returns first name, or alias, or username depeneding upon what exists.
-    
+
 =cut
-    
+
 sub getFirstName {
     my $self = shift;
     return $self->profileField('firstName') || $self->profileField('alias') || $self->username;
 }   
-    
+
 #-------------------------------------------------------------------
 
 =head2 getGroups ( [ withoutExpired ] )
@@ -333,12 +333,12 @@ sub getGroups {
 }
 
 #-------------------------------------------------------------------
-    
+
 =head2 getWholeName ( )
 
 Attempts to build the user's whole name from profile fields, and ultimately their alias and username if all else
 fails.
-        
+
 =cut
 
 sub getWholeName {
