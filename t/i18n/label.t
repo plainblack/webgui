@@ -114,8 +114,8 @@ sub label_finder_pm {
 
 sub obj_finder_pm {
 	return unless /\.pm$/;
-	if ($File::Find::name =~ m#(?:Help|i18n)/?$#) {
-		warn "Pruned $File::Find::name\n";
+	if ($File::Find::name =~ m#/(?:Help|i18n)/?$#) {
+		diag "Pruned $File::Find::name\n";
 		$File::Find::prune=1;
 		return;
 	}
