@@ -136,7 +136,7 @@ sub getAddRequest {
 
 #-------------------------------------------------------------------
 
-=head getAllPendingAddRequests ( session )
+=head2 getAllPendingAddRequests ( session )
 
 Class method. Returns a WebGUI::SQL::ResultSet object with all the unanswered add requests.
 
