@@ -212,6 +212,71 @@ Thanks,
 		lastUpdated => 1187066104,
 	},
 
+    'manage friends template title' => {
+        message     => q{Manage Friends Template Variables},
+        lastUpdated => 1193193904,
+    },
+
+    'manage friends template title' => {
+        message     => q{Manage Friends Template Variables},
+        lastUpdated => 1193193904,
+    },
+
+    'formHeader' => {
+        message     => q{HTML required to begin the form},
+        lastUpdated => 1193193904,
+    },
+
+    'removeFriendButton' => {
+        message     => q{HTML code for a button that will remove all selected Friends.},
+        lastUpdated => 1193193904,
+    },
+
+    'subjectForm' => {
+        message     => q{HTML code for a text form for the subject of emails to send to your Friends.},
+        lastUpdated => 1193193904,
+    },
+
+    'messageForm' => {
+        message     => q{HTML code for a text form for the body of emails to send to your Friends.},
+        lastUpdated => 1193193904,
+    },
+
+    'sendMessageButton' => {
+        message     => q{HTML code for a button to send an email to selected Friends.},
+        lastUpdated => 1193193904,
+    },
+
+    'formFooter' => {
+        message     => q{HTML code for ending this form.},
+        lastUpdated => 1193193904,
+    },
+
+    'friends' => {
+        message     => q{A loop containing information about friends and form controls for selecting them for .},
+        lastUpdated => 1193193904,
+    },
+
+    'name' => {
+        message     => q{The name of this Friend},
+        lastUpdated => 1193193904,
+    },
+
+    'profileUrl' => {
+        message     => q{The URL to this friend's user profile},
+        lastUpdated => 1193193904,
+    },
+
+    'status' => {
+        message     => q{The user's status, either online (logged in) or offline (logged out)},
+        lastUpdated => 1193193904,
+    },
+
+    'checkboxForm' => {
+        message     => q{HTML code for a checkbox.  This checkbox is used to select the Friend to be deleted, or to send them an email.},
+        lastUpdated => 1193194455,
+    },
+
 };
 
 1;
