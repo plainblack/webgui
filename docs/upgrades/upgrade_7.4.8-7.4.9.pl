@@ -65,7 +65,7 @@ sub fixDashboardContentPositions {
 		    fieldType=>'textarea'
             });
         my $oldContentPositionId = $dashboardId."contentPositions";
-        my $userPositioning = $db->read("select userId, `".$oldContentPositionId."` from userProfileData");
+        my $userPositioning = $db->read("select userId, " . $db->dbh->quote_identifier($oldContentPositionId) . " from userProfileData");
         while (my ($userId, $positions) = $userPositioning->array) {
             $db->write("update userProfileData set $newContentPositionId = ? where userId=?", [$positions, $userId]); 
         }

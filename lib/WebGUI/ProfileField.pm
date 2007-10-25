@@ -149,7 +149,7 @@ sub delete {
     my $db      = $self->session->db;
     
     # Remove the column from the userProfileData table
-    $db->write("ALTER TABLE userProfileData DROP " . $self->getId);
+    $db->write("ALTER TABLE userProfileData DROP " . $db->dbh->quote_identifier($self->getId));
 
     # Remove the record
     $db->deleteRow("userProfileField","fieldName",$self->getId);

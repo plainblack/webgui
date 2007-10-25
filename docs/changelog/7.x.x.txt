@@ -7,6 +7,7 @@
  - fix: Workflow activities don't pick up new default values
  - safely allow sorting by more fields in collaboration systems
  - fix: iCal link on calendar doesn't work
+ - fix: error when deleting profile fields with non-alphanumeric names
  - add: Friends Network
 
 7.4.10
