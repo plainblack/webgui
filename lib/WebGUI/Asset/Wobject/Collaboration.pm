@@ -934,9 +934,6 @@ sub getThreadsPaginator {
     my $scratchSortBy = $self->getId."_sortBy";
 	my $scratchSortOrder = $self->getId."_sortDir";
 	my $sortBy = $self->session->form->process("sortBy") || $self->session->scratch->get($scratchSortBy) || $self->get("sortBy");
-	if (!isIn($sortBy, qw(lineage assetData.revisionDate creationDate title userDefined1 userDefined2 userDefined3 userDefuned4 userDefined5 karmaRank))) {
-        $sortBy = '';
-    }
     my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
@@ -954,7 +951,7 @@ sub getThreadsPaginator {
     if ($sortBy eq 'rating') {
         $sortBy = 'threadRating';
     } 
-
+    $sortBy = $self->session->db->dbh->quote_identifier($sortBy);
 	my $sql = "
 		select 
 			asset.assetId,

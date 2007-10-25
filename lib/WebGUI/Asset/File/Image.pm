@@ -19,7 +19,7 @@ use WebGUI::Asset::File;
 use WebGUI::Storage::Image;
 use WebGUI::HTMLForm;
 use WebGUI::Utility;
-
+use WebGUI::Form::Image;
 
 
 our @ISA = qw(WebGUI::Asset::File);
