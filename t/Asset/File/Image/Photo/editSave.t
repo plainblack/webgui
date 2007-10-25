@@ -8,8 +8,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# The goal of this test is to test the editSave and 
-# processPropertiesFromFormPost methods.
+# The goal of this test is to test the editSave, 
+# processPropertiesFromFormPost, and applyConstraints methods.
 
 use FindBin;
 use strict;
@@ -28,14 +28,15 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
+$session->user( { userId => 3 } ); # Admins can do everything
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+        className           => "WebGUI::Asset::Wobject::Gallery",
     });
 my $album
     = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 my $photo
     = $gallery->addChild({
@@ -50,7 +51,7 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan no_plan => 1;
 
 #----------------------------------------------------------------------------
 # Test permissions
@@ -76,11 +77,11 @@ $maker->prepare({
 # TODO: This test should use i18n.
 # TODO: This error / test should occur in File, not Photo
 $maker->prepare({
-    object      => $album
+    object      => $album,
     method      => "www_editSave",
     formParams  => {
-
-
+       assetId      => "new",
+       className    => "WebGUI::Asset::File::Image::Photo",
     },
     test_regex  => [ 
         qr/You must select a file/,
@@ -90,5 +91,17 @@ $maker->prepare({
 
 #----------------------------------------------------------------------------
 # Test editSave success result
+# TODO: This test should use i18n
+$maker->prepare({
+    object      => $album,
+    method      => "www_editSave",
+    formParams  => {
+       assetId      => "new",
+       className    => "WebGUI::Asset::File::Image::Photo",
+    },
+    test_regex  => [ 
+        qr/awaiting approval and commit/,
+    ],
+})->run;
 
 #----------------------------------------------------------------------------

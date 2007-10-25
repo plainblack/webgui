@@ -26,6 +26,22 @@ my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
 my ($photo);
+$session->user({ userId => 3 });
+my $gallery
+    = $node->addChild({
+        className       => "WebGUI::Asset::Wobject::Gallery",
+        groupIdView     => "7",
+        groupIdEdit     => "3",
+        ownerUserId     => $session->user->userId,
+    });
+my $album
+    = $gallery->addChild({
+        className       => "WebGUI::Asset::Wobject::GalleryAlbum",
+        groupIdView     => "",
+        groupIdEdit     => "",
+        ownerUserId     => $session->user->userId,
+    });
+
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -35,14 +51,14 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan no_plan => 1;
 
 #----------------------------------------------------------------------------
 # Photo assets outside of Gallery assets
 
 # Everyone can view, Admins can edit, Owned by current user
 $photo
-    = $node->addChild({
+    = $album->addChild({
         className       => "WebGUI::Asset::File::Image::Photo",
         groupIdView     => "7",
         groupIdEdit     => "3",
@@ -58,9 +74,9 @@ ok(  $photo->canEdit,           "Current user can edit"                 );
 
 # Admins can view, Admins can edit, Owned by Admin, current user is Visitor
 my $oldUser = $session->user;
-$session->user( WebGUI::User->new($session, "1") );
+$session->user( { user => WebGUI::User->new($session, "1") } );
 $photo
-    = $node->addChild({
+    = $album->addChild({
         className       => "WebGUI::Asset::File::Image::Photo",
         groupIdView     => "3",
         groupIdEdit     => "3",
@@ -73,24 +89,7 @@ ok( !$photo->canView(2),        "Registered Users cannot view"          );
 ok( !$photo->canEdit(2),        "Registered Users cannot edit"          );
 ok(  $photo->canView(3),        "Admins can view"                       );
 ok(  $photo->canEdit(3),        "Admins can edit"                       );
-$session->user($oldUser);
-
-#----------------------------------------------------------------------------
-# Photo assets inside of Gallery assets
-my $gallery
-    = $node->addChild({
-        className       => "WebGUI::Asset::Wobject::PhotoGallery",
-        groupIdView     => "7",
-        groupIdEdit     => "3",
-        ownerUserId     => $session->user->userId,
-    });
-my $album
-    = $gallery->addChild({
-        className       => "WebGUI::Asset::Wobject::PhotoAlbum",
-        groupIdView     => "",
-        groupIdEdit     => "",
-        ownerUserId     => $session->user->userId,
-    });
+$session->user( { user => $oldUser } );
 
 # Photo without specific view/edit inherits from gallery properties
 $photo

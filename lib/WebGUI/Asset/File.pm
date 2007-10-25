@@ -297,10 +297,14 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self    = shift;
 	my $session = $self->session;
-	$self->SUPER::processPropertiesFromFormPost;
+
+	my $errors  = $self->SUPER::processPropertiesFromFormPost;
+        return $errors if $errors;
 	
 	#Get the storage location out of memory.  If you call getStorageLocation you risk creating another one.
+        # How can this EVER be true?
 	my $storageLocation = $self->{_storageLocation};
+        $session->errorHandler->error("Storage Location set magically") if defined $storageLocation;
 	my $storageId       = undef;
 	$storageId          = $storageLocation->getId if(defined $storageLocation);
 	

@@ -12,7 +12,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../../lib";
 
-## The goal of this test is to test the creation and deletion of photo assets
+## The goal of this test is to test the creation and deletion of album assets
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
@@ -24,15 +24,10 @@ use Test::More;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
-print "hi";
+$versionTag->set({name=>"Album Test"});
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-    });
-my $album
-    = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 
 #----------------------------------------------------------------------------
@@ -48,36 +43,36 @@ plan tests => 5;
 #----------------------------------------------------------------------------
 # Test module compiles okay
 # plan tests => 1
-use_ok("WebGUI::Asset::File::Image::Photo");
+use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 
 #----------------------------------------------------------------------------
-# Test creating a photo
-my $photo
-    = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+# Test creating an album
+my $album
+    = $gallery->addChild({
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 
 is(
-    blessed $photo, "WebGUI::Asset::File::Image::Photo",
-    "Photo is a WebGUI::Asset::File::Image::Photo object",
+    blessed $album, "WebGUI::Asset::Wobject::GalleryAlbum",
+    "Album is a WebGUI::Asset::Wobject::GalleryAlbum object",
 );
 
 isa_ok( 
-    $photo, "WebGUI::Asset::File::Image",
-);
-
-is(
-    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
-    "Photo->getGallery gets the gallery containing this photo",
+    $album, "WebGUI::Asset::Wobject",
 );
 
 #----------------------------------------------------------------------------
-# Test deleting a photo
-my $properties  = $photo->get;
-$photo->purge;
+# Test deleting a album
+my $properties  = $album->get;
+$album->purge;
+
+is(
+    $album, undef,
+    "Album is undefined",
+);
 
 is(
     WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
-    "Photo no longer able to be instanciated",
+    "Album no longer able to be instanciated",
 );
 

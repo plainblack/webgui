@@ -9,6 +9,7 @@ use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
 use Test::MockObject::Extends;
+use WebGUI::PseudoRequest;
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -135,7 +136,8 @@ of options with keys outlined below.
 =cut
 
 sub getPage {
-    my $session     = shift;    # The session object
+    my $class       = shift;
+    my $session     = $SESSION; # The session object
     my $asset       = shift;    # The asset object
     my $page        = shift;    # The page subroutine
     my $optionsRef  = shift;    # A hashref of options
