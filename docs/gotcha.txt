@@ -7,7 +7,7 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-7.5.0
+7.4.11
 --------------------------------------------------------------------
  * The 7.4.8 upgrade script had an error for sites using Dashboards.
     This would prevent the script from completing successfully.  The
