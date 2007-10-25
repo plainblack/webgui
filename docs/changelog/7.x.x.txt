@@ -1,3 +1,5 @@
+7.4.12
+
 7.4.11
  - fix: Delete this entry link in data form header broken
  - fix: http://www.webgui.org/bugs/tracker/how-to-kill-a-webgui-website (perlDreamer Consulting, LLC.)
