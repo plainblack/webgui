@@ -951,7 +951,7 @@ sub getThreadsPaginator {
     if ($sortBy eq 'rating') {
         $sortBy = 'threadRating';
     } 
-    $sortBy = $self->session->db->dbh->quote_identifier($sortBy);
+    $sortBy = join('.', map { $self->session->dbh->quote_identifier($_) } split(/\./, $sortBy);
 	my $sql = "
 		select 
 			asset.assetId,
