@@ -2,13 +2,17 @@
  - rfe: Default log level to ERROR
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
- - fix: Delete this entry link in data form header broken
- - fix: Image uploads fail when not using preload.perl
  - fix: Workflow activities don't pick up new default values
+ - add: Friends Network
+ - fix: event end time not time zone adjusted properly
+
+7.4.11
+ - fix: Delete this entry link in data form header broken
+ - fix: http://www.webgui.org/bugs/tracker/how-to-kill-a-webgui-website (perlDreamer Consulting, LLC.)
+ - fix: Image uploads fail when not using preload.perl
  - safely allow sorting by more fields in collaboration systems
  - fix: iCal link on calendar doesn't work
  - fix: error when deleting profile fields with non-alphanumeric names
- - add: Friends Network
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
