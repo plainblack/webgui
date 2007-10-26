@@ -975,7 +975,7 @@ sub view {
     $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
     $var->{"urlIcal"}	    = $self->getUrl(
-                                    sprintf "func=ical;type=%s;start=%d",
+                                    sprintf "func=ical;type=%s;start=%s",
                                         $params->{type},
                                         $params->{start},
                               );
@@ -1510,7 +1510,7 @@ sub www_ical {
         #}
         #else
         #{
-            $dt_start = WebGUI::DateTime->new($self->session, time-60*60*24*30)->set_time_zone($session->user->profileField("timeZone"));
+            $dt_start = WebGUI::DateTime->new($self->session, time)->set_time_zone($session->user->profileField("timeZone"));
         #}
     }
     else {
@@ -1667,7 +1667,7 @@ sub www_search {
             keywords        => $keywords,
             classes         => ['WebGUI::Asset::Event'],
             lineage         => [$self->get("lineage")],
-            join            => "join Event on assetIndex.assetId=Event.assetId",
+            join            => "join Event on assetIndex.assetId=Event.assetId and assetIndex.revisionDate=Event.revisionDate",
             columns         => ['Event.startDate','Event.startTime'],
         );
         

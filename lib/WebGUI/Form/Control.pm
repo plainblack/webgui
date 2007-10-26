@@ -257,10 +257,10 @@ sub displayFormWithWrapper {
 	my $self = shift;
 	if ($self->passUiLevelCheck) {
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-		my $hoverCode = $self->getHoverCode($hoverHelp, $self->get('id') . '_wrapper');
+		$hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
         return '<tr'.$rowClass.'>
-				<td'.$labelClass.' valign="top" style="width: 25%;">'.$self->get("label").'</td>
-				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->displayForm().$subtext.$hoverCode."</td>
+				<td'.$labelClass.' valign="top" style="width: 25%;">'.$self->get("label") . $hoverHelp . '</td>
+				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->displayForm().$subtext."</td>
 			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
@@ -542,8 +542,9 @@ sub prepareWrapper {
 	$labelClass = qq| class="$labelClass" | if($self->get("labelClass"));
 	my $fieldClass = $self->get("fieldClass");
 	$fieldClass = qq| class="$fieldClass" | if($self->get("fieldClass"));
-	my $hoverHelp = $self->get("hoverHelp");
-	my $subtext = $self->get("subtext");
+	my $hoverHelp = $self->get("hoverHelp") || '';
+	$hoverHelp =~ s/^\s+//;
+    my $subtext = $self->get("subtext");
 	$subtext = qq| <span class="formSubtext">$subtext</span>| if ($subtext);
 	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
 }
@@ -625,51 +626,14 @@ sub toHtmlWithWrapper {
 	if ($self->passUiLevelCheck) {
 		my $rawField = $self->toHtml(); # has to be called before prepareWrapper for some controls, namely captcha.
 		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-        my $hoverCode = $self->getHoverCode($hoverHelp, $self->get('id') . '_description');
+        $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
         return '<tr'.$rowClass.' id="'.$self->get("id").'_row">
-				<td'.$labelClass.' id="' . $self->get('id') . '_description" valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
-				<td valign="top"'.$fieldClass.'>'.$rawField . $subtext . $hoverCode . "</td>
+				<td'.$labelClass.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label>' . $hoverHelp . '</td>
+				<td valign="top"'.$fieldClass.'>'.$rawField . $subtext . "</td>
 			</tr>\n";
 	} else {
 		return $self->toHtmlAsHidden;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 getHoverCode ( hoverHelp, attachId )
-
-Generated the code to add hover help to html elements.
-
-=head3 hoverHelp
-
-The text in include in the hover help.
-
-=head3 attachId
-
-The id of the HTML element to attach the hover help to.
-
-=cut
-
-sub getHoverCode {
-    my $self = shift;
-    my $style = $self->session->style;
-    my $url = $self->session->url;
-    my $hoverHelp = shift;
-    my $attachId = shift;
-    $hoverHelp =~ s/\r/ /g;
-    $hoverHelp =~ s/\n/ /g;
-    $hoverHelp =~ s/'/\\'/g;
-    $hoverHelp =~ s/^\s+//;
-    return ''
-        unless $hoverHelp;
-    my $hover = '<script type="text/javascript">var tooltip = new YAHOO.widget.Tooltip("' . $attachId . '_tooltip", { context: "' . $attachId . '", text: \'' . $hoverHelp . '\', autodismissdelay: 100000, width: "300px"});</script>';
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    return $hover;
 }
 
 #-------------------------------------------------------------------

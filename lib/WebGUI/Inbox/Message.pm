@@ -72,6 +72,10 @@ A userId of a user attached to this message.
 
 A groupId of a group attached to this message.
 
+=head4 sentBy
+
+A userId that created this message. Defaults to '3' (Admin).
+
 =cut
 
 sub create {

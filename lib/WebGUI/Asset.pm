@@ -1326,6 +1326,23 @@ sub indexContent {
 	return $indexer;
 }
 
+#-------------------------------------------------------------------
+
+=head2 loadModule ( $session, $className ) 
+
+Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.
+
+=cut
+
+sub loadModule {
+    my ($class, $session, $className) = @_;
+	(my $module = $className . '.pm') =~ s{::|'}{/}g;
+    if (eval { require $module; 1 }) {
+        return $className;
+    }
+   	$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+	return;
+}
 
 #-------------------------------------------------------------------
 
@@ -1687,14 +1704,9 @@ sub new {
 		}
 	}
 
-        if ($className) {
-		my $cmd = "use ".$className;
-        	eval ($cmd);
-		if ($@) {
-        		$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-			return undef;
-		}
-		$class = $className;
+    if ($className) {
+        $class = $class->loadModule($session, $className);        
+        return undef unless (defined $class);
 	}
 
 	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
@@ -1777,13 +1789,8 @@ sub newByPropertyHashRef {
 	my $properties = shift;
 	return undef unless defined $properties;
 	return undef unless exists $properties->{className};
-	my $className = $properties->{className};
-	my $cmd = "use ".$className;
-	eval ($cmd);
-	if ($@) {
-		$session->errorHandler->warn("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-		return undef;
-	}
+    my $className = $class->loadModule($session, $properties->{className});
+    return undef unless (defined $className);
 	bless {_session=>$session, _properties => $properties}, $className;
 }
 
@@ -2206,7 +2213,8 @@ Adds a new Asset based upon the class of the current form. Returns the Asset cal
 sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
-	my $class = $self->session->form->process("class","className");
+    my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
+    return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);

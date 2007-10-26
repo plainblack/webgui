@@ -98,6 +98,37 @@ sub addToGroups {
 }
 
 #-------------------------------------------------------------------
+    
+=head2 acceptsPrivateMessages ( userId )
+
+Returns a boolean of whether or not the user can receive private messages from the user passed in
+
+=head3 userId
+
+userId to determine if the user accepts private messages from
+       
+=cut
+
+sub acceptsPrivateMessages {
+    my $self      = shift;
+    my $userId    = shift;
+    
+    my $pmSetting = $self->profileField('allowPrivateMessages');
+    
+    return 0 if ($pmSetting eq "none");
+    return 1 if ($pmSetting eq "all");
+    
+    if($pmSetting eq "friends") {
+        my $friendsGroup = $self->friends;
+        my $sentBy       = WebGUI::User->new($self->session,$userId);
+        #$self->session->errorHandler->warn($self->isInGroup($friendsGroup->getId));
+        return $sentBy->isInGroup($friendsGroup->getId);
+    }
+    
+    return 1;
+}
+
+#-------------------------------------------------------------------
 
 =head2 authMethod ( [ value ] )
 
@@ -163,22 +194,24 @@ Deletes this user.
 =cut
 
 sub delete {
-        my $self = shift;
+    my $self = shift;
 	$self->uncache;
+    my $db = $self->session->db;
 	foreach my $groupId (@{$self->getGroups($self->userId)}) {
 		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
 	}
-	$self->session->db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$self->{_userId}]);
+    $self->friends->delete if ($self->{_user}{"friendsGroup"} ne "");
+	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$self->{_userId}]);
 	require WebGUI::Operation::Auth;
 	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
 	$authMethod->deleteParams($self->{_userId});
-	my $rs = $self->session->db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+	my $rs = $db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
 	while (my ($id) = $rs->array) {
-        	$self->session->db->write("delete from userSessionScratch where sessionId=?",[$id]);
+        	$db->write("delete from userSessionScratch where sessionId=?",[$id]);
 	}
-        $self->session->db->write("delete from userSession where userId=?",[$self->{_userId}]);
-        $self->session->db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
-        $self->session->db->write("delete from users where userId=?",[$self->{_userId}]);
+    $db->write("delete from userSession where userId=?",[$self->{_userId}]);
+    $db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
+    $db->write("delete from users where userId=?",[$self->{_userId}]);
 }
 
 #-------------------------------------------------------------------
@@ -213,10 +246,57 @@ Deconstructor.
 
 sub DESTROY {
         my $self = shift;
+        if (exists $self->{_friendsGroup}) {
+            $self->{_friendsGroup}->DESTROY;
+        }
         undef $self;
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 friends ( )
+
+Returns the WebGUI::Group for this user's Friend's Group.  
+
+=cut
+
+sub friends {
+    my $self = shift;
+    if ($self->{_user}{"friendsGroup"} eq "") {
+        my $myFriends = WebGUI::Group->new($self->session, "new");
+        $myFriends->name($self->username." Friends");
+        $myFriends->description("Friends of user ".$self->userId);
+        $myFriends->expireOffset(60*60*24*365*60);
+        $myFriends->showInForms(0);
+        $myFriends->isEditable(0);
+        $myFriends->deleteUsers(['3']);
+        $self->uncache;
+        $self->{_user}{"friendsGroup"} = $myFriends->getId;
+        $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
+        $self->session->db->write("update users set friendsGroup=?, lastUpdated=? where userId=?",
+            [$myFriends->getId, $self->session->datetime->time(), $self->userId]);
+        return $myFriends;
+    }
+    elsif (exists $self->{_friendsGroup}) {
+        return $self->{_friendsGroup};
+    }
+    return WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
+}
+
+#-------------------------------------------------------------------
+    
+=head2 getFirstName ( )
+
+Returns first name, or alias, or username depeneding upon what exists.
+    
+=cut
+    
+sub getFirstName {
+    my $self = shift;
+    return $self->profileField('firstName') || $self->profileField('alias') || $self->username;
+}   
+    
 #-------------------------------------------------------------------
 
 =head2 getGroups ( [ withoutExpired ] )
@@ -250,6 +330,23 @@ sub getGroups {
 		$self->session->stow->set("gotGroupsForUser",$gotGroupsForUser);
                 return \@groups;
         }
+}
+
+#-------------------------------------------------------------------
+    
+=head2 getWholeName ( )
+
+Attempts to build the user's whole name from profile fields, and ultimately their alias and username if all else
+fails.
+        
+=cut
+
+sub getWholeName {
+    my $self  = shift;
+    if ($self->profileField('firstName') and $self->profileField('lastName')) {
+        return join ' ', $self->profileField('firstName'), $self->profileField('lastName');
+    }
+    return $self->profileField("alias") || $self->username;
 }
 
 #-------------------------------------------------------------------
@@ -311,6 +408,22 @@ sub isInGroup {
    $isInGroup->{$uid}{$gid} = 0;
    $self->session->stow->set("isInGroup",$isInGroup);
    return 0;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isOnline ()
+
+Returns a boolean indicating whether this user is logged in and actively viewing pages in the site.
+
+=cut
+
+sub isOnline {
+    my $self = shift;
+    my ($flag) = $self->session->db->quickArray('select count(*) from userSession where userId=? and lastPageView=?',
+        [$self->userId, time() - 60*10]); 
+    return $flag;
 }
 
 

@@ -300,7 +300,8 @@ sub createAccountSave {
    my $properties;
    $properties->{connectDN} = $connectDN;
    $properties->{ldapUrl} = $connection->{ldapUrl};
-   
+   $properties->{ldapConnection} = $connection->{ldapLinkId};
+
    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
@@ -503,7 +504,8 @@ sub login {
          if ($self->validUsername($username)) {
             $self->SUPER::createAccountSave($username, {
                  connectDN => $self->getConnectDN,
-                 ldapUrl   => $self->getLDAPConnection->{ldapUrl}
+                 ldapUrl   => $self->getLDAPConnection->{ldapUrl},
+                 ldapConnection  => $self->getLDAPConnection->{ldapLinkId},
             },$identifier);
             $hasAuthenticated = 1;
                 

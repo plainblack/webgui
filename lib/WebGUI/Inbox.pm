@@ -55,6 +55,33 @@ sub addMessage {
 
 #-------------------------------------------------------------------
 
+=head2 addPrivateMessage ( properties[, userToSend] )
+
+Adds a new private message to the inbox if the user accepts private messages.
+
+=head3 properties
+
+See WebGUI::Inbox::Message::addMessage() for details.
+
+=cut 
+
+sub addPrivateMessage {
+	my $self        = shift;
+    my $messageData = shift;
+    my $isReply     = shift;
+    
+    my $userId      = $messageData->{userId};
+    my $sentBy      = $messageData->{sentBy} || $self->session->user->userId;
+    return undef unless $userId;
+    
+    my $u = WebGUI::User->new($self->session,$userId);
+    return undef unless ($isReply || $u->acceptsPrivateMessages($sentBy));
+	
+    return $self->addMessage($messageData);
+}
+
+#-------------------------------------------------------------------
+
 =head2 DESTROY ( )
 
 Deconstructor.

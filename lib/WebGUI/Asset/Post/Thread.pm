@@ -63,7 +63,7 @@ sub commit {
 	my $self = shift;
 	$self->SUPER::commit;
 	if ($self->isNew) {
-        	$self->getParent->incrementThreads($self->get("dateUpdated"),$self->getId);
+        	$self->getParent->incrementThreads($self->get("revisionDate"),$self->getId);
 	}
 }
 
@@ -623,6 +623,7 @@ sub setLastPost {
         $self->getParent->setLastPost($id,$date);
 }
 
+#-------------------------------------------------------------------
 sub normalizeLastPost {
 	my $self = shift;
 	# Hmm.  Is this right?
@@ -704,14 +705,21 @@ Moves thread to the trash and updates reply counter on thread.
 =cut
 
 sub trash {
-        my $self = shift;
-        $self->SUPER::trash;
-        $self->getParent->sumReplies;
-        if ($self->getParent->get("lastPostId") eq $self->getId) {
-                my $parentLineage = $self->getThread->get("lineage");
-                my ($id, $date) = $self->session->db->quickArray("select Post.assetId, Post.dateSubmitted from Post, asset where asset.lineage like ".$self->session->db->quote($parentLineage.'%')." and Post.assetId<>".$self->session->db->quote($self->getId)." and Post.assetId=asset.assetId and asset.state='published' order by Post.dateSubmitted desc");
-                $self->getParent->setLastPost('','') ? $self->getParent->setLastPost($id,$date) : $id;
+    my $self = shift;
+    $self->SUPER::trash;
+    $self->getParent->sumReplies;
+    if ($self->getParent->get("lastPostId") eq $self->getId) {
+        my $parentLineage = $self->getThread->get("lineage");
+        my ($id, $date) = $self->session->db->quickArray("select assetId, creationDate from asset where 
+            lineage like ? and assetId<>? and asset.state='published' and className like 'WebGUI::Asset::Post%' 
+            order by creationDate desc",[$parentLineage.'%', $self->getId]);
+        if (defined $id) {
+            $self->getParent->setLastPost($id,$date);
         }
+        else { 
+            $self->getParent->setLastPost('','');
+        }
+    }
 }
 
 
@@ -884,10 +892,9 @@ sub view {
     my $p = WebGUI::Paginator->new($self->session,$self->getUrl,$self->getParent->get("postsPerPage"));
 	my $sql = "select asset.assetId, asset.className, assetData.revisionDate as revisionDate, assetData.url as url from asset 
 		left join assetData on assetData.assetId=asset.assetId
-		left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
 		where asset.lineage like ".$self->session->db->quote($self->get("lineage").'%')
 		."	and asset.state='published'
-		and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId
+		and assetData.revisionDate=(SELECT max(assetData.revisionDate) from assetData where assetData.assetId=asset.assetId
 			and (
 				assetData.status in ('approved','archived')
 						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"));
@@ -898,7 +905,7 @@ sub view {
 		order by ";
 	
     if ($layout eq "flat") {
-		$sql .= "Post.dateSubmitted";
+		$sql .= "asset.creationDate";
 	} else {
 		$sql .= "asset.lineage";
 	}

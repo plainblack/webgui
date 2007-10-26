@@ -1,0 +1,94 @@
+#WikiPageTmpl0000000001
+<tmpl_if session.var.adminOn><p><tmpl_var controls></p></tmpl_if>
+<h2><tmpl_var title></h2>
+
+    <div id="wikipage" class="yui-navset">
+        <ul class="yui-nav">
+            <li class="selected"><a href="#wikipagecontent"><em><tmpl_var viewLabel></em></a></li>
+            <li><a href="#wikipageedit"><em><tmpl_var editLabel></em></a></li>
+        </ul>
+        <div class="yui-content">
+            <div id="wikipagecontent">
+                <tmpl_var content>
+                <p>^International("keywords","Asset");: <tmpl_loop keywordsLoop><a href="<tmpl_var url>"><tmpl_var
+keyword></a> </tmpl_loop></p>
+            </div><div id="wikipageedit">
+                <tmpl_var editContent>
+            </div></div>
+    </div>
+<script type="text/javascript">
+( function() {
+        var tabView = new YAHOO.widget.TabView('wikipage');
+        tabView.on('contentReady', function() {
+        tabView.addTab(new YAHOO.widget.Tab({
+                    label: '<tmpl_var historyLabel>',
+                    dataSrc: '<tmpl_var historyUrl>',
+                    cacheData: true
+            }));
+    });
+    
+
+})();
+</script>
+<div style="padding: 8px;"><a href="<tmpl_var searchUrl>"><tmpl_var searchLabel></a> | <a href="<tmpl_var
+mostPopularUrl>"><tmpl_var mostPopularLabel></a> | <a href="<tmpl_var recentChangesUrl>"><tmpl_var
+recentChangesLabel></a> | <a href="<tmpl_var wikiHomeUrl>"><tmpl_var wikiHomeLabel></a></div>
+~~~
+<link rel="stylesheet" type="text/css" href="^Extras(yui/build/tabview/assets/tabview.css);" />
+<script type="text/javascript" src="^Extras(yui/build/yahoo/yahoo-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/event/event-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/dom/dom-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/connection/connection-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/element/element-beta-min.js);"></script>
+<script type="text/javascript" src="^Extras(yui/build/tabview/tabview-min.js);"></script>
+
+<style type="text/css">
+#wikipage.yui-navset .yui-nav li a {
+    border:1px solid #000;  /* label and content borders */
+}
+
+#wikipage.yui-navset .yui-content {
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+}
+
+#wikipage.yui-navset .yui-nav .selected a, #wikipage.yui-navset .yui-nav a:hover {
+    background-color:#f6f7ee; /* active tab, tab hover, and content bgcolor */
+}
+
+#wikipage.yui-navset .yui-nav li em { padding:.5em; } /* tab padding */
+
+
+#wikipage.yui-navset .yui-nav .selected a {
+    background-color:black; /* active tab, tab hover, and content bgcolor */
+        color: white;
+    border-bottom-width:0; /* no bottom border for active tab */
+    padding-bottom:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-top .yui-nav .selected a {
+    border-bottom:0; /* no bottom border for active tab */
+    padding-bottom:1px; /* to match height of other tabs */
+}
+
+#wikipage.yui-navset-top .yui-content {
+    margin-top:-1px; /* for active tab overlap */
+}
+
+#wikipage .yui-content {
+    padding-top:1em; 
+    padding-bottom:1em; 
+}
+#wikipage .loading {
+    background-image:url(^Extras(yui/examples/tabview/img/loading.gif););
+    background-position:center center;
+    background-repeat:no-repeat;
+}
+
+#wikipage .loading * {
+    display:none;
+}
+
+
+</style>
+

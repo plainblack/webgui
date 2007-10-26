@@ -459,6 +459,19 @@ sub getNextId {
 
 #-------------------------------------------------------------------
 
+=head2 getDriver ( )
+
+Returns the DBI driver used by this database link
+
+=cut
+
+sub getDriver {
+    my $self = shift;
+    return  $self->{_dbh}->{Driver}->{Name};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRow ( table, key, keyValue )
 
 Returns a row of data as a hash reference from the specified table.

@@ -3138,8 +3138,8 @@ and tracked by WebGUI.|,
         },
 
         'user function style description' => {
-                message => q|Defines which style to be used to style WebGUI operations (profile editing, message log, etc.) when they are available to a user.|,
-                lastUpdated => 1120239343,
+                message => q|Defines which style to be used to style WebGUI operations (profile editing, message log, etc.) when they are available to a user.  Only templates which have been committed are allowed.|,
+                lastUpdated => 1192735786,
         },
 
         'admin console template description' => {
@@ -3546,7 +3546,22 @@ LongTruncOk=1</p>
     },
 
     'allow private messages label' => {
-        message => q|Allow Private Messages|,
+        message => q|Private Message Options|,
+		lastUpdated => 1181019679,
+    },
+    
+    'user profile field private message allow label' => {
+        message => q|Allow All|,
+		lastUpdated => 1181019679,
+    },
+    
+    'user profile field private message friends only label' => {
+        message => q|Allow From My Friends Only|,
+		lastUpdated => 1181019679,
+    },
+    
+    'user profile field private message allow none label' => {
+        message => q|Allow None|,
 		lastUpdated => 1181019679,
     },
 
@@ -3567,6 +3582,11 @@ LongTruncOk=1</p>
 
     'private message unread display message' => {
         message => q|%s unread messages|,
+		lastUpdated => 1181019679,
+    },
+
+    'private message delete text' => {
+        message => q|delete|,
 		lastUpdated => 1181019679,
     },
 
@@ -3868,6 +3888,11 @@ LongTruncOk=1</p>
     'wiki help target' => {
         message     => q{WebGUI Community Wiki},
         lastUpdated => 1185162267,
+    },
+
+    'user profile field friend availability' => {
+        message     => q{Are you available to be added as a Friend?},
+        lastUpdated => 1185856549,
     },
 
 };

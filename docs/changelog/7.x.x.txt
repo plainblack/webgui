@@ -1,8 +1,43 @@
+7.5.0
+ - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
+ - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
+ - fix: Delete this entry link in data form header broken
+ - fix: Image uploads fail when not using preload.perl
+ - fix: Workflow activities don't pick up new default values
+ - safely allow sorting by more fields in collaboration systems
+ - fix: iCal link on calendar doesn't work
+ - add: Friends Network
+
+7.4.10
+ - fix: Graphs aren't sized properly using GraphicsMagick
+ - fix: Navigation with pedigree on site with multiple roots (Yung Han Khoe, United Knowledge)
+ - fix: user selected CS sorting should be cleared after last update
+
 7.4.9
  - fix: Bug that did not allow Calendar Update Feeds workflow activity to 
    complete
  - Clean up orphaned grouping
  - fix: purging old asset revisions on large sites never completes
+ - fix: Can't add assets when not using preload.perl.
+ - Colors in bar graph now cycle through the palette like pie chart.
+ - fix: Graphing with Graphics Magick Bungled
+ - fix: wiki recent
+ - fix: Dashboard content positioning field problem
+ - fix: graphing doesn't work with GraphicsMagick
+ - fix: Last Reply and Replies columns not updating
+ - fix: Calendar generated iCal for last 30 days instead of next 30 days
+ - fix: hover help doesn't appear for matrix fields
+ - Collaboration systems should always tell browser there is new content
+ - fix: Good Bad fields not properly localized
+ - fix: File user profile fields didn't link to the file
+ - fix: SQL Reports only work on MySQL databases
+ - More complete error messages from spectre
+ - fix: Wiki uploads didn't obey image and thumbnail size
+ - fix: Doesn't copy LDAP link to user on create, also wrong search base
+ - fix: Unable to view running workflows if spectre not running
+ - protect Wiki pages from malformed html content
+ - work around broken linking function in tinyMCE on Safari
+ - fix: Searching in Calendars finds multiple of same event
 
 7.4.8
  - fix: Syndicated Content doesn't display all items with multiple feeds in interleaved mode

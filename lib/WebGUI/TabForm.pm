@@ -226,8 +226,17 @@ Returns an HTML string with all the necessary components to draw the tab form.
 
 sub print {
 	my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('tabs/tabs.js'),{type=>"text/javascript"});
-	$self->session->style->setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
+    my $style = $self->session->style;
+    my $url = $self->session->url;
+	$style->setScript($url->extras('tabs/tabs.js'),{type=>"text/javascript"});
+	$style->setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
+    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
 	my $output = $self->{_form};
 	$output .= $self->{_hidden};
 	my $i = 1;

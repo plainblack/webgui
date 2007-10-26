@@ -12,68 +12,27 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
-use WebGUI::ProfileField;
 
-my $toVersion = "7.4.9"; # make this match what version you're going to
+
+my $toVersion = "7.4.10"; # make this match what version you're going to
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
 
-removeOrphanedGroupings($session); # upgrade functions go here
-fixDashboardContentPositions($session);
-fixPosts($session);
+fixPost($session);
 
 finish($session); # this line required
 
 
-
 #-------------------------------------------------
-sub removeOrphanedGroupings {
+sub fixPost {
 	my $session = shift;
-	print "\tCleaning up stale groupings.\n" unless ($quiet);
-	$session->db->write("delete from groupGroupings where inGroup not in (select distinct groupId from groups)");
-	$session->db->write("delete from groupings where groupId not in (select distinct groupId from groups)");
-}
-
-
-#-------------------------------------------------
-sub fixPosts {
-	my $session = shift;
+    print "\tFixing post problems from previous release.\n" unless ($quiet);
     my $db = $session->db;
-	print "\tRemoving unneeded fields from Posts.\n" unless ($quiet);
-    $db->write("alter table Post drop column dateSubmitted");
-    $db->write("alter table Post drop column dateUpdated");
-    $db->write("update Collaboration set sortBy='assetData.revisionDate' where sortBy='dateUpdated'");
-    $db->write("update Collaboration set sortBy='creationDate' where sortBy='dateSubmitted'");
-}
-
-#-------------------------------------------------
-sub fixDashboardContentPositions {
-	my $session = shift;
-    my $db = $session->db;
-	print "\tFixing broken dashboard content positions.\n" unless ($quiet);
-    foreach my $dashboardId ($db->quickArray("select assetId from asset where className='WebGUI::Asset::Wobject::Dashboard'")) {
-        my $newContentPositionId = "contentPositions".$dashboardId;
-        $newContentPositionId =~ s/-/_/g;
-        my $newField = WebGUI::ProfileField->create($session, $newContentPositionId, {
-		    label=>'\'Dashboard User Preference - Content Positions\'',
-		    visible=>0,
-		    protected=>1,
-		    editable=>0,
-		    required=>0,
-		    fieldType=>'textarea'
-            });
-        my $oldContentPositionId = $dashboardId."contentPositions";
-        my $userPositioning = $db->read("select userId, `".$oldContentPositionId."` from userProfileData");
-        while (my ($userId, $positions) = $userPositioning->array) {
-            $db->write("update userProfileData set $newContentPositionId = ? where userId=?", [$positions, $userId]); 
-        }
-        my $oldField = WebGUI::ProfileField->new($session, $oldContentPositionId);
-        if (defined $oldField) {
-            $oldField->delete;
-        }
-    }
+    $db->write("delete from userSessionScratch where value='dateSubmitted'");
+    $db->write("delete from userSessionScratch where value='dateUpdated'");
+    $db->write("alter table Collaboration change sortBy sortBy varchar(35) not null default 'assetData.revisionDate'");
 }
 
 

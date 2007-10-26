@@ -19,7 +19,7 @@ use base 'WebGUI::Asset::File';
 use WebGUI::Storage::Image;
 use WebGUI::HTMLForm;
 use WebGUI::Utility;
-
+use WebGUI::Form::Image;
 
 
 =head1 NAME

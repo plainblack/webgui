@@ -127,7 +127,7 @@ sub execute {
         if($ldap) {
             my $uri    = $ldapLink->getURI();
             my $search = $ldap->search(
-                base   =>$ldapLink->getValue("ldapUserRDN"),
+                base   => $uri->dn,
                 scope  =>"sub", 
                 filter =>$ldapLink->getValue("ldapIdentity").'='.$userObject->username
             );

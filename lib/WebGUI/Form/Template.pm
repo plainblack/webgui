@@ -59,6 +59,10 @@ The namespace for the list of templates to return. If this is omitted, all templ
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
+=head4 onlyCommitted
+
+If true, this will limit the list of template to only include templates that are committed.
+
 =cut
 
 sub definition {
@@ -79,6 +83,9 @@ sub definition {
 		namespace=>{
 			defaultValue=>undef
 			},
+		onlyCommitted=>{
+			defaultValue=>''
+			},
         dbDataType  => {
             defaultValue    => "VARCHAR(22) BINARY",
         },
@@ -96,14 +103,15 @@ Renders a template picker control.
 
 sub toHtml {
 	my $self = shift;
-        my $templateList = WebGUI::Asset::Template->getList($self->session, $self->get("namespace"));
-        #Remove entries from template list that the user does not have permission to view.
-        for my $assetId ( keys %{$templateList} ) {
-          	my $asset = WebGUI::Asset::Template->new($self->session, $assetId);
-          	if (!$asset->canView($self->session->user->userId)) {
-            		delete $templateList->{$assetId};
-          	}
+    my $onlyCommitted = $self->get('onlyCommitted') ? "assetData.status='approved'" : $self->get('onlyCommitted');
+    my $templateList = WebGUI::Asset::Template->getList($self->session, $self->get("namespace"), $onlyCommitted);
+    #Remove entries from template list that the user does not have permission to view.
+    for my $assetId ( keys %{$templateList} ) {
+        my $asset = WebGUI::Asset::Template->new($self->session, $assetId);
+        if (!$asset->canView($self->session->user->userId)) {
+                delete $templateList->{$assetId};
         }
+    }
 	$self->set("options", $templateList);
 	return $self->SUPER::toHtml();
 }

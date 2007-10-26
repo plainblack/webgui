@@ -165,10 +165,19 @@ sub getOperations {
 		'viewInboxMessage' => 'WebGUI::Operation::Inbox',
         'sendPrivateMessage' => 'WebGUI::Operation::Inbox',
         'sendPrivateMessageSave' => 'WebGUI::Operation::Inbox',
+		'deletePrivateMessage' => 'WebGUI::Operation::Inbox',
 
 		'inviteUser'       => 'WebGUI::Operation::Invite',
 		'inviteUserSave'   => 'WebGUI::Operation::Invite',
 		'acceptInvite'     => 'WebGUI::Operation::Invite',
+
+		'addFriend'      => 'WebGUI::Operation::Friends',
+		'addFriendSave'  => 'WebGUI::Operation::Friends',
+		'friendRequest'     => 'WebGUI::Operation::Friends',
+		'friendRequestSave' => 'WebGUI::Operation::Friends',
+		'manageFriends'     => 'WebGUI::Operation::Friends',
+		'removeFriends'     => 'WebGUI::Operation::Friends',
+		'sendMessageToFriends'     => 'WebGUI::Operation::Friends',
 
 		'copyLDAPLink' => 'WebGUI::Operation::LDAPLink',
 		'deleteLDAPLink' => 'WebGUI::Operation::LDAPLink',

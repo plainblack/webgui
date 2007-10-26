@@ -91,7 +91,7 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
-=head2 appendTemplateVarsForCommentForm ( vars ) 
+=head2 appendTemplateVarsForCommentForm ( var ) 
 
 Add the template variables necessary for the comment form to the given hash
 reference. Returns the hash reference for convenience.
@@ -100,11 +100,11 @@ reference. Returns the hash reference for convenience.
 
 sub appendTemplateVarsForCommentForm {
     my $self        = shift;
-    my $vars        = shift;
+    my $var         = shift;
 
     # ...
 
-    return $vars;
+    return $var;
 }
 
 #----------------------------------------------------------------------------
@@ -151,9 +151,27 @@ sub canEdit {
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
 If no user is passed, checks the current user.
 
+Users can view this photo if they can view the parent asset. If this is a
+C<friendsOnly> photo, then they must also be in the owners friends list.
+
 =cut
 
-# Inherited from superclass
+sub canView {
+    my $self        = shift;
+    my $userId      = shift || $self->session->user->userId;
+
+    my $album       = $self->getParent;
+    return 0 unless $album->canView($userId);
+
+    if ($self->isFriendsOnly) {
+        
+        # ...
+
+    }
+
+    # Passed all checks
+    return 1;
+}
 
 #----------------------------------------------------------------------------
 
@@ -317,6 +335,19 @@ sub i18n {
     my $session = shift;
     
     return WebGUI::International->new($session, "Asset_Photo");
+}
+
+#----------------------------------------------------------------------------
+
+=head2 isFriendsOnly ( )
+
+Returns true if this Photo is friends only. Returns false otherwise.
+
+=cut
+
+sub isFriendsOnly {
+    my $self        = shift;
+    return $self->get("friendsOnly");
 }
 
 #----------------------------------------------------------------------------

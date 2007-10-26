@@ -441,6 +441,15 @@ sub definition {
 		namespace=>"userInvite/Email",
 		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
 		});    
+    push(@fields, {
+        tab             => "user",
+        fieldType       => "template",
+        defaultValue    => "managefriends_________",
+        namespace       => "friends/manage",
+        name            => "manageFriendsTemplateId",
+        label           => $i18n->get("manage friends template", "Friends"),
+        hoverHelp       => $i18n->get("manage friends template help", "Friends"),
+        });
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {

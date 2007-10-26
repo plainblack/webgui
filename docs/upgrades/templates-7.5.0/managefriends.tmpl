@@ -1,0 +1,61 @@
+#managefriends_________
+#url: managefriendstemplate 
+#title: Manage Friends (default)
+#menuTitle: Manage Friends
+#namespace:friends/manage
+#create
+<h1>^International("my friends","Friends");</h1>
+<tmpl_var formHeader>
+<table>
+    <tr style="background-color: #cccccc;">
+        <td><input type="checkbox" onclick="toggleUserSelectAll(this.form);" value="1" name="checkAllUserIds"></td>
+        <th>^International("name","Friends");</th>
+        <th>^International("status","Friends");</th>
+    </tr>
+<tmpl_loop friends>
+    <tr>
+        <td><tmpl_var checkboxForm></td>
+        <td><a href="<tmpl_var profileUrl>"><tmpl_var name></a></td>
+        <td><tmpl_var status></td>
+    </tr>
+</tmpl_loop>
+</table>
+<tmpl_var removeFriendButton>
+<p>^International("send friend email instructions","Friends");</p>
+<table>
+    <tr>
+        <td><label for="subject_formId">^International("subject","Friends");</label></td>
+        <td><tmpl_var subjectForm><tmpl_var sendMessageButton></td>
+    </tr>
+    <tr>
+        <td><label for="message_formId">^International("message","Friends");</label></td>
+        <td><tmpl_var messageForm></td>
+    </tr>
+</table>
+<tmpl_var formFooter>
+
+<div class="accountOptions">
+    <ul>
+    <tmpl_loop account.options>
+        <li><tmpl_var options.display></li>
+    </tmpl_loop>
+    </ul>
+</div>
+~~~
+<script type="text/javascript">
+//<![CDATA[
+var userSelectAllToggle = false;
+function toggleUserSelectAll(form){
+    userSelectAllToggle = userSelectAllToggle ? false : true;
+    for(var i = 0; i < form.userId.length; i++)
+        form.userId[i].checked = userSelectAllToggle;
+}
+function confirmRemovalOfFriends (form) {
+    if (confirm('^International("confirm remove friends","Friends");')) {
+        form.op.value = 'removeFriends';
+        form.submit();
+    }
+}
+//]]>
+</script>
+

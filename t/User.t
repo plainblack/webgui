@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 101; # increment this value for each test you create
+use Test::More tests => 103; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -177,6 +177,11 @@ $user = WebGUI::User->new($session);
 is($user->userId, '1', 'new() -- returns visitor with no args');
 $user = "";
 
+#Let's test new to retrieve a non-existing user
+$user = WebGUI::User->new($session, 'xxYYxxYYxxYYxxYYxxYYxx');
+isa_ok($user, 'WebGUI::User', 'non-existant ID returns valid user object');
+$user = "";
+
 $user = WebGUI::User->new($session, "new", "ROYSUNIQUEUSERID000002");
 is($user->userId, "ROYSUNIQUEUSERID000002", 'new() -- override user id');
 $user->authMethod("LDAP");
@@ -272,6 +277,9 @@ is($result, 0, 'deleteFromGroups() -- Visitor removed from Everyone group');
 
 ok($visitor->isInGroup(1), "isInGroup: Visitor is in group Visitor, hardcoded");
 ok($visitor->isInGroup(7), "isInGroup: Everyone is in group Everyone, hardcoded");
+
+##Test for group membership in a non-existant group
+ok(! $visitor->isInGroup('nonExistantGroup'), 'isInGroup: Checking for membership in a non-existant group');
 
 ##Add Visitor back to those groups
 WebGUI::Group->new($session, '1')->addUsers([1]);
