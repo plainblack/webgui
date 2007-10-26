@@ -54,6 +54,11 @@ my $helpmsg=<<STOP;
 
 STOP
 
+if ($help) {
+    print $helpmsg;
+    die "\n";
+}
+
 my $verboseFlag = "-v" if ($verbose);
 
 $perlBase .= '/bin/' if ($perlBase);
@@ -76,7 +81,7 @@ my $prefix = "WEBGUI_CONFIG=".$configFile;
 $prefix .= " CODE_COP=1" unless $noLongTests;
 
 # Add coverage tests
-$prefix .= " PERL5OPT='-MDevel::Cover=-db,/tmp/coverdb'" if $coverage;
+$prefix .= " HARNESS_PERL_SWITCHES='-MDevel::Cover=-db,/tmp/coverdb'" if $coverage;
 
 print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
 system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');

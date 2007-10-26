@@ -14,6 +14,7 @@
  - safely allow sorting by more fields in collaboration systems
  - fix: iCal link on calendar doesn't work
  - fix: error when deleting profile fields with non-alphanumeric names
+ - fix: Devel::Cover tests don't work (perlDreamer Consulting, LLC.)
 
 7.4.10
  - fix: Graphs aren't sized properly using GraphicsMagick
