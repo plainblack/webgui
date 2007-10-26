@@ -2,6 +2,18 @@ package WebGUI::i18n::English::Asset_Search;  ##Be sure to change the package na
 
 our $I18N = { ##hashref of hashes
 
+	'useContainers' => {
+		message => q|Use container URLs in results?|,
+		lastUpdated => 0,
+		context => q|an asset property|
+	},
+
+	'useContainers help' => {
+		message => q|Set this to "Yes" if you'd like the search results to return full pages instead of individual assets.|,
+		lastUpdated => 0,
+		context => q|an asset property help|
+	},
+
 	'search' => {
 		message => q|search|,
 		lastUpdated => 0,

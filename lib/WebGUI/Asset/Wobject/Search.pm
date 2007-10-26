@@ -72,30 +72,37 @@ sub definition {
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000200',	
-				tab=>"display",
-				namespace=>"Search",
-                		hoverHelp=>$i18n->get('search template description'),
-                		label=>$i18n->get('search template')
+			templateId => {
+				fieldType       => "template",
+				defaultValue    => 'PBtmpl0000000000000200',	
+				tab             => "display",
+				namespace       => "Search",
+                hoverHelp       => $i18n->get('search template description'),
+                label           => $i18n->get('search template')
 				},
 			searchRoot => {
-				fieldType=>"asset",
-				defaultValue=>$session->setting->get("defaultPage"),
-				tab=>"properties",
-				hoverHelp=>$i18n->get("search root description"),
-				label=>$i18n->get('search root')
+				fieldType       => "asset",
+				defaultValue    => $session->setting->get("defaultPage"),
+				tab             => "properties",
+				hoverHelp       => $i18n->get("search root description"),
+				label           => $i18n->get('search root')
 				},
 			classLimiter => {
-				fieldType => "checkList",
-				defaultValue => undef,
-				vertical=>1,
-				tab=>"properties",
-				hoverHelp=>$i18n->get("class limiter description"),
-				label=>$i18n->get("class limiter"),
-				options=>$session->db->buildHashRef("select distinct(className) from asset")
-				}
+				fieldType       => "checkList",
+				defaultValue    => undef,
+				vertical        => 1,
+				tab             => "properties",
+				hoverHelp       => $i18n->get("class limiter description"),
+				label           => $i18n->get("class limiter"),
+				options         => $session->db->buildHashRef("select distinct(className) from asset")
+				},
+            useContainers => {
+                tab             => "properties",
+                hoverHelp       => "useContainers help",
+                label           => "useContainers",
+                fieldType       => "yesNo",
+                defaultValue    => 0,
+                },
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -156,11 +163,18 @@ sub view {
 		my $rs = $search->getResultSet;
 		while (my $data = $rs->hashRef) {
 			if ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit})) {
-			 push(@results, {
-				url=>$data->{url},
-				title=>$data->{title},
-				synopsis=>$data->{synopsis},
-				assetId=>$data->{assetId},
+            my $url = $data->{url};
+            if ($self->get("useContainers")) {
+                my $asset = WebGUI::Asset->new($self->session, $data->{assetId}, $data->{className});
+                if (defined $asset) {
+                    $url = $asset->getContainer->get("url");
+                }
+            }
+			push(@results, {
+				url         => $url,
+				title       => $data->{title},
+				synopsis    => $data->{synopsis},
+				assetId     => $data->{assetId},
 				});
              $var{results_found} = 1;
 			}

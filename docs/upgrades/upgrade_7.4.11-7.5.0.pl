@@ -20,19 +20,19 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
 addFriendsNetwork($session);
+addSearchWithContainers($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#   my $session = shift;
-#   print "\tWe're doing some stuff here that you should know about..." unless $quiet;
-#   # and here's our code
-#   print "DONE!\n" unless $quiet;
-#}
+#-------------------------------------------------
+sub addSearchWithContainers {
+    my $session = shift;
+    print "\tMaking search capable of displaying containers in search results instead of individaul assets." unless $quiet;
+    $session->db->write("alter table Search add column useContainers int not null default 0");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addFriendsNetwork {
