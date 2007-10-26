@@ -20,13 +20,15 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 103; # increment this value for each test you create
+use Test::More tests => 120; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
+
+my $numberOfUsers = $session->db->quickScalar('select count(*) from users');
 
 my $user;
 my $lastUpdate;
@@ -368,7 +370,7 @@ is($useru, undef, 'newByUsername returns undef if username cannot be found');
 
 $dude->username('');
 
-$useru = WebGUI::User->newByUsername($session, 'dude@aftery2k.com');
+$useru = WebGUI::User->newByUsername($session, '');
 is($useru, undef, 'newByUsername returns undef if the user does not have a username');
 
 $dude->username('dude');
@@ -394,8 +396,6 @@ $copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
 $profileField->set(\%copiedFieldData);
 
 is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
-
-$session->errorHandler->warn('Making buster copy');
 
 my $busterCopy = WebGUI::User->new($session, $buster->userId);
 is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy received updated user profile because there is no username set in his cached user object');
@@ -453,8 +453,74 @@ $dude->deleteFromGroups([12]);
 $dudeGroups = $dude->getGroups(1);
 cmp_bag($dudeGroups, ['2', '7'], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
 
+################################################################
+#
+# acceptsPrivateMessages
+#
+################################################################
+
+my $friend = WebGUI::User->new($session, 'new');
+$friend->profileField('allowPrivateMessages', 'all');
+is ($friend->acceptsPrivateMessages(1), 1, 'when allowPrivateMessages=all, anyone can send messages');
+$friend->profileField('allowPrivateMessages', 'none');
+is ($friend->acceptsPrivateMessages($friend->userId), 0, 'when allowPrivateMessages=all, no one can send messages');
+
+TODO: {
+	local $TODO = "Tests that need to be written";
+    ok(0, 'Test allowPrivateMessages=friends, with various userIds');
+}
+
+################################################################
+#
+# getFirstName
+#
+################################################################
+
+is($friend->getFirstName, undef, 'with no profile settings, getFirstName returns undef');
+
+$friend->username('friend');
+is($friend->getFirstName, 'friend', 'username is the lower priority profile setting for getFirstName');
+$friend->profileField('alias', 'Friend');
+is($friend->getFirstName, 'Friend', 'alias is the middle priority profile setting for getFirstName');
+$friend->profileField('firstName', 'Mr');
+is($friend->getFirstName, 'Mr', 'firstName is the highest priority profile setting for getFirstName');
+
+################################################################
+#
+# getWholeName
+#
+################################################################
+
+my $neighbor = WebGUI::User->new($session, 'new');
+
+is($neighbor->getWholeName, undef, 'with no profile settings, getWholeName returns undef');
+$neighbor->username('neighbor');
+is($neighbor->getWholeName, 'neighbor', 'username is the lower priority profile setting for getWholeName');
+$neighbor->profileField('alias', 'neighbor-man');
+is($neighbor->getWholeName, 'neighbor-man', 'alias is the middle priority profile setting for getWholeName');
+
+$neighbor->profileField('firstName', 'Mr');
+is($neighbor->getWholeName, 'neighbor-man', 'must have firstName and lastName to override alias');
+$neighbor->profileField('lastName', 'Rogers');
+is($neighbor->getWholeName, 'Mr Rogers', 'If firstName and lastName are true, wholeName is the concatenation of the both');
+
+################################################################
+#
+# isOnline
+#
+################################################################
+
+is ($neighbor->isOnline, 0, 'neighbor is not onLine (no userSession entry)');
+$session->user({user => $neighbor});
+is ($neighbor->isOnline, 1, 'neighbor is onLine');
+$session->db->write('update userSession set lastPageView=?',[time-599]);
+is ($neighbor->isOnline, 1, 'neighbor is onLine (lastPageViews=599)');
+$session->db->write('update userSession set lastPageView=?',[time-601]);
+is ($neighbor->isOnline, 0, 'neighbor is not onLine (lastPageViews=601)');
+$session->user({userId => 1});
+
 END {
-    foreach my $account ($user, $dude, $buster) {
+    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
 
@@ -469,5 +535,8 @@ END {
     $visitor->profileField('email', $originalVisitorEmail);
 
 	$testCache->flush;
+    my $newNumberOfUsers = $session->db->quickScalar('select count(*) from users');
+    is ($newNumberOfUsers, $numberOfUsers, 'no new additional users were leaked by this test');
+
 }
 

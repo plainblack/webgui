@@ -421,7 +421,7 @@ Returns a boolean indicating whether this user is logged in and actively viewing
 
 sub isOnline {
     my $self = shift;
-    my ($flag) = $self->session->db->quickArray('select count(*) from userSession where userId=? and lastPageView=?',
+    my ($flag) = $self->session->db->quickArray('select count(*) from userSession where userId=? and lastPageView>=?',
         [$self->userId, time() - 60*10]); 
     return $flag;
 }
