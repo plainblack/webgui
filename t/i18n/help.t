@@ -30,6 +30,8 @@ my $session = WebGUI::Test->session;
 
 my @helpFileSet = WebGUI::Operation::Help::_getHelpFilesList($session);
 
+my %helpTable;
+
 foreach my $helpSet (@helpFileSet) {
 	my $helpName = $helpSet->[1];
 	my $help = WebGUI::Operation::Help::_load($session, $helpName);
