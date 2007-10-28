@@ -30,7 +30,7 @@ finish($session); # this line required
 sub addSearchWithContainers {
     my $session = shift;
     print "\tMaking search capable of displaying containers in search results instead of individaul assets." unless $quiet;
-    $session->db->write("alter table Search add column useContainers int not null default 0");
+    $session->db->write("alter table search add column useContainers int not null default 0");
     print "DONE!\n" unless $quiet;
 }
 
