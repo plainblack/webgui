@@ -6,6 +6,7 @@
  - fix: Workflow activities don't pick up new default values
  - add: Friends Network
  - fix: event end time not time zone adjusted properly
+ - fix: extra empty/grey area at the bottom of pages
 
 7.4.11
  - fix: Delete this entry link in data form header broken
