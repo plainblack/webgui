@@ -22,6 +22,9 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addFriendsNetwork($session);
+installGalleryAsset($session);
+installGalleryAlbumAsset($session);
+installPhotoAsset($session);
 
 finish($session); # this line required
 
@@ -97,6 +100,118 @@ EOSQL
  	print "\t\tAdd a new column to the users table to keep track of the groupId for friends." unless ($quiet);
     $db->write("alter table users add column friendsGroup varchar(22) binary not null default ''");
     print "OK\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Install the GalleryAlbum asset
+sub installGalleryAlbumAsset {
+    my $session     = shift;
+    print "\tInstalling GalleryAlbum asset..." unless $quiet;
+    
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS GalleryAlbum (
+    assetId VARCHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    othersCanAdd INT,
+    allowComments INT,
+    PRIMARY KEY (assetId, revisionDate)
+)
+ENDSQL
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Install the Gallery asset
+sub installGalleryAsset {
+    my $session     = shift;
+    print "\tInstalling Gallery asset..." unless $quiet;
+
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS Gallery (
+    assetId VARCHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    groupIdAddComment VARCHAR(22) BINARY,
+    groupIdAddFile VARCHAR(22) BINARY,
+    groupIdModerator VARCHAR(22) BINARY,
+    imageResolutions TEXT,
+    imageViewSize INT,
+    imageThumbnailSize INT,
+    maxSpacePerUser VARCHAR(20),
+    richEditIdFileComment VARCHAR(22) BINARY,
+    templateIdAddArchive VARCHAR(22) BINARY,
+    templateIdDeleteAlbum VARCHAR(22) BINARY,
+    templateIdDeleteFile VARCHAR(22) BINARY,
+    templateIdEditFile VARCHAR(22) BINARY,
+    templateIdListAlbums VARCHAR(22) BINARY,
+    templateIdListAlbumsRss VARCHAR(22) BINARY,
+    templateIdListUserFiles VARCHAR(22) BINARY,
+    templateIdListUserFilesRss VARCHAR(22) BINARY,
+    templateIdMakeShortcut VARCHAR(22) BINARY,
+    templateIdSearch VARCHAR(22) BINARY,
+    templateIdSlideshow VARCHAR(22) BINARY,
+    templateIdThumbnails VARCHAR(22) BINARY,
+    templateIdViewAlbum VARCHAR(22) BINARY,
+    templateIdViewAlbumRss VARCHAR(22) BINARY,
+    templateIdViewFile VARCHAR(22) BINARY,
+    workflowIdCommit VARCHAR(22) BINARY,
+    PRIMARY KEY (assetId, revisionDate)
+)
+ENDSQL
+    
+    
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Install the photo asset
+sub installPhotoAsset {
+    my $session     = shift;
+    print "\tInstalling Photo asset..." unless $quiet;
+
+    # Photo Asset
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS Photo (
+    assetId VARCHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    exifData LONGTEXT,
+    friendsOnly INT,
+    rating INT,
+    storageIdPhoto VARCHAR(22) BINARY,
+    userDefined1 TEXT,
+    userDefined2 TEXT,
+    userDefined3 TEXT,
+    userDefined4 TEXT,
+    userDefined5 TEXT,
+    PRIMARY KEY (assetId, revisionDate)
+)
+ENDSQL
+    
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS Photo_comment (
+    assetId VARCHAR(22) BINARY NOT NULL,
+    commentId VARCHAR(22) BINARY NOT NULL,
+    userId VARCHAR(22) BINARY,
+    visitorIp VARCHAR(255),
+    creationDate DATETIME,
+    bodyText LONGTEXT,
+    INDEX (commentId),
+    PRIMARY KEY (assetId, commentId)
+)
+ENDSQL
+   
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS Photo_rating (
+    assetId VARCHAR(22) BINARY NOT NULL,
+    userId VARCHAR(22) BINARY,
+    visitorIp VARCHAR(255),
+    rating INT,
+    INDEX (assetId)
+)
+ENDSQL
+    
+    print "DONE!\n" unless $quiet;
 }
 
 

@@ -15,9 +15,14 @@ package WebGUI::Asset::File::Image::Photo;
 =cut
 
 use strict;
-use Tie::IxHash;
-use Carp qw( croak );
 use base 'WebGUI::Asset::File::Image';
+
+use Carp qw( croak );
+use Image::ExifTool qw( :Public );
+use JSON;
+use Tie::IxHash;
+
+use WebGUI::Friends;
 use WebGUI::Utility;
 
 
@@ -109,18 +114,30 @@ sub appendTemplateVarsForCommentForm {
 
 #----------------------------------------------------------------------------
 
-=head2 applyConstraints ( )
+=head2 applyConstraints ( options )
 
 Apply the constraints to the original file. Called automatically by C<setFile>
 and C<processPropertiesFromFormPost>.
+
+This is a sort of catch-all method for applying things to the file after it's
+uploaded. This method simply calls other methods to do its work.
+
+C<options> is a hash reference of options and is currently not used. 
 
 =cut
 
 sub applyConstraints {
     my $self        = shift;
     my $gallery     = $self->getGallery;
+    
+    $self->makeResolutions();
+    $self->updateExifDataFromFile();
 
-    # ...
+    # Update the asset's size and make a thumbnail
+    $self->SUPER::applyConstraints({
+        maxImageSize        => $self->getGallery->get("imageViewSize"),
+        thumbnailSize       => $self->getGallery->get("imageThumbnailSize"),
+    });
 }
 
 #----------------------------------------------------------------------------
@@ -164,9 +181,8 @@ sub canView {
     return 0 unless $album->canView($userId);
 
     if ($self->isFriendsOnly) {
-        
-        # ...
-
+        return 0
+            unless WebGUI::Friends->new($self->session, $self->get("ownerUserId"))->isFriend($userId);
     }
 
     # Passed all checks
@@ -188,7 +204,7 @@ sub deleteComment {
     croak "Photo->deleteComment: No commentId specified."
         unless $commentId;
 
-    return $self->session->db->do(
+    return $self->session->db->write(
         "DELETE FROM Photo_comment WHERE assetId=? AND commentId=?",
         [$self->getId, $commentId],
     );
@@ -296,7 +312,8 @@ sub getResolutions {
     my $self        = shift;
     my $storage     = $self->getStorageLocation;
 
-    # ...
+    # Return a list not including the web view image.
+    return grep { $_ ne $self->get("filename") } @{ $storage->getFiles };
 }
 
 #----------------------------------------------------------------------------
@@ -310,8 +327,16 @@ Get a hash reference of template variables shared by all views of this asset.
 sub getTemplateVars {
     my $self        = shift;
     my $vars        = $self->get;
+    
+    ### Format exif vars
+    my $exif        = jsonToObj( delete $var->{exifData} );
+    for my $tag ( keys %$exif ) {
+        # Hash of exif_tag => value
+        $var->{ "exif_" . $tag } = $exif->{$tag};
 
-    # ...
+        # Loop of tag => "...", value => "..."
+        push @{ $var->{exifLoop} }, { tag => $tag, value => $exif->{$tag} };
+    }
 
     return $vars;
 }
@@ -407,9 +432,6 @@ sub makeShortcut {
 
 =head2 processPropertiesFromFormPost ( )
 
-Used to process properties from the form posted.  Do custom things with
-noFormPost fields here, or do whatever you want.  This method is called
-when /yourAssetUrl?func=editSave is requested/posted.
 
 =cut
 
@@ -440,6 +462,24 @@ sub setComment {
         unless $properties && ref $properties eq "HASH";
 
     # ...
+}
+
+#----------------------------------------------------------------------------
+
+=head2 updateExifDataFromFile ( )
+
+Gets the EXIF data from the uploaded image and store it in the database.
+
+=cut
+
+sub updateExifDataFromFile {
+    my $self        = shift;
+    my $storage     = $self->getStorageLocation;
+    
+    my $info        = ImageInfo( $storage->getFilePath( $self->get('filename') ) );
+    $self->update({
+        exifData    => objToJson( $info ),
+    });
 }
 
 #----------------------------------------------------------------------------
@@ -535,6 +575,9 @@ This page is only available to those who can edit this Photo.
 
 sub www_edit {
     my $self    = shift;
+    my $session = $self->session;
+    my $form    = $self->session->form;
+
     return $self->session->privilege->insufficient  unless $self->canEdit;
     return $self->session->privilege->locked        unless $self->canEditIfLocked;
 
@@ -619,7 +662,8 @@ sub www_makeShortcutSave {
 
     return $self->session->privilege->insufficient unless $self->canEdit;
 
-#...
+    #...
+
 }
 
 1;

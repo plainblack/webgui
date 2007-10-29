@@ -397,16 +397,25 @@ sub setFile {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setSize ( fileSize )
+
+Set the size of this asset by including all the files in its storage
+location. C<fileSize> is an integer of additional bytes to include in
+the asset size.
+
+=cut
+
 sub setSize {
-	my $self = shift;
-	my $fileSize = shift || 0;
-	my $storage = $self->getStorageLocation;
-	if (defined $storage) {	
-	    foreach my $file (@{$storage->getFiles}) {
-		    $fileSize += $storage->getFileSize($file);
-	    }
-	}
-	return $self->SUPER::setSize($fileSize);
+    my $self        = shift;
+    my $fileSize    = shift || 0;
+    my $storage     = $self->getStorageLocation;
+    if (defined $storage) {	
+        foreach my $file (@{$storage->getFiles}) {
+            $fileSize += $storage->getFileSize($file);
+        }
+    }
+    return $self->SUPER::setSize($fileSize);
 }
 
 #-------------------------------------------------------------------

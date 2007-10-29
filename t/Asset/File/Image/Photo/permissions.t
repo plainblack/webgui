@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../../../lib";
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Friends;
 use Test::More; 
 
 #----------------------------------------------------------------------------
@@ -27,6 +28,10 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
 my ($photo);
 $session->user({ userId => 3 });
+
+my $friend  = WebGUI::User->new($session, "new");
+WebGUI::Friends->new($session)->add( [ $friend->userId ] );
+
 my $gallery
     = $node->addChild({
         className       => "WebGUI::Asset::Wobject::Gallery",
@@ -46,7 +51,9 @@ my $album
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $versionTag->rollback();
+    WebGUI::Friends->new($session)->delete( [ $friend->userId ] );
+    $friend->delete;
+    $versionTag->rollback;
 }
 
 #----------------------------------------------------------------------------
@@ -54,8 +61,6 @@ END {
 plan no_plan => 1;
 
 #----------------------------------------------------------------------------
-# Photo assets outside of Gallery assets
-
 # Everyone can view, Admins can edit, Owned by current user
 $photo
     = $album->addChild({
@@ -72,6 +77,7 @@ ok( !$photo->canEdit(2),        "Registered users cannot edit"          );
 ok(  $photo->canView,           "Current user can view"                 );
 ok(  $photo->canEdit,           "Current user can edit"                 );
 
+#----------------------------------------------------------------------------
 # Admins can view, Admins can edit, Owned by Admin, current user is Visitor
 my $oldUser = $session->user;
 $session->user( { user => WebGUI::User->new($session, "1") } );
@@ -91,6 +97,7 @@ ok(  $photo->canView(3),        "Admins can view"                       );
 ok(  $photo->canEdit(3),        "Admins can edit"                       );
 $session->user( { user => $oldUser } );
 
+#----------------------------------------------------------------------------
 # Photo without specific view/edit inherits from gallery properties
 $photo
     = $album->addChild({
@@ -109,11 +116,11 @@ ok( $photo->canEdit,            "Owner can edit"                        );
 ok( $photo->canView(3),         "Admin can view"                        );
 ok( $photo->canEdit(3),         "Admin can edit"                        );
 
-# Photo with specific view uses that instead (friends lists)
+#----------------------------------------------------------------------------
+# Friends are allowed to view friendsOnly photos
 $photo
     = $album->addChild({
         className       => "WebGUI::Asset::File::Image::Photo",
-        groupIdView     => "3",
         groupIdEdit     => "",
         ownerUserId     => $session->user->userId,
     });
