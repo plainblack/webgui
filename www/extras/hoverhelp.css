@@ -10,6 +10,8 @@
     padding: 3px;
     z-index: 1000;
     width: 300px;
+    top: 0px;
+    left: 0px;
 }
 
 .wg-hoverhelp.yui-tt {
