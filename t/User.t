@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 120; # increment this value for each test you create
+use Test::More tests => 121; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -80,6 +80,10 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- profileFi
 
 #Fetching a non-existant profile field returns undef
 is($user->profileField('notAProfileField'), undef, 'getting non-existant profile fields returns undef');
+
+##Check for valid profileField access, even if it is not cached in the user object.
+my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
+is($user->profileField('testField'), undef, 'getting profile fields not cached in the user object returns undef');
 
 ################################################################
 #
@@ -533,6 +537,8 @@ END {
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
     $visitor->profileField('email', $originalVisitorEmail);
+
+    $newProfileField->delete();
 
 	$testCache->flush;
     my $newNumberOfUsers = $session->db->quickScalar('select count(*) from users');
