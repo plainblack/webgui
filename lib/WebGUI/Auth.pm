@@ -759,7 +759,7 @@ Sets or returns the Profile hash for a user.
 
 sub profile {
 	my $self = shift;
-	return $self->{profile} if ($_[0]);
+	return $self->{profile} if (!$_[0]);
 	$self->{profile} = $_[0];
 }
 
