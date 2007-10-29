@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 121; # increment this value for each test you create
+use Test::More tests => 124; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -522,6 +522,16 @@ is ($neighbor->isOnline, 1, 'neighbor is onLine (lastPageViews=599)');
 $session->db->write('update userSession set lastPageView=?',[time-601]);
 is ($neighbor->isOnline, 0, 'neighbor is not onLine (lastPageViews=601)');
 $session->user({userId => 1});
+
+################################################################
+#
+# identifier
+#
+################################################################
+
+is($neighbor->identifier, undef, 'identifier: by default, new users have an undefined password with created through the API');
+is($neighbor->identifier('neighborhood'), 'neighborhood', 'identifier: setting the identifier returns the new identifier');
+is($neighbor->identifier, 'neighborhood', 'identifier: testing fetch of newly set password');
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
