@@ -1911,8 +1911,8 @@ sub www_edit {
         }
         else {
             my $end = $dtEnd->clone->set_time_zone($tz);
-            $endDate    = $dtEnd->toMysqlDate;
-            $endTime    = $dtEnd->toMysqlTime;
+            $endDate    = $end->toMysqlDate;
+            $endTime    = $end->toMysqlTime;
         }
     }
     

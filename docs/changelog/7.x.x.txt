@@ -1,10 +1,10 @@
 7.4.12
  - fix: extra empty/grey area at the bottom of pages
+ - fix: event end time not time zone adjusted properly
 
 7.4.11
  - fix: Delete this entry link in data form header broken
  - fix: http://www.webgui.org/bugs/tracker/how-to-kill-a-webgui-website (perlDreamer Consulting, LLC.)
- - fix: Delete this entry link in data form header broken
  - fix: Image uploads fail when not using preload.perl
  - safely allow sorting by more fields in collaboration systems
  - fix: iCal link on calendar doesn't work
