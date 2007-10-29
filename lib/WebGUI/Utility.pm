@@ -40,6 +40,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  use WebGUI::Utility;
  $string = commify($integer);
  $size = formatBytes($integer);
+ $boolean = isBetween($value, $first, $second);
  $boolean = isIn($value, @array);
  $boolean = isInSubnet($ip, \@subnets);
  makeArrayCommaSafe(\@array); 
@@ -48,6 +49,7 @@ This package provides miscellaneous but useful utilities to the WebGUI programme
  $string = makeTabSafe($string);
  $integer = randint($low,$high);
  $hashRef = randomizeHash(\%hash);
+ $rounded = round($number, $digits);
  %hash = sortHash(%hash);
  %hash = sortHashDescending(%hash);
 
