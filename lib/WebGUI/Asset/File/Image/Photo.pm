@@ -223,9 +223,8 @@ sub getComment {
     my $self        = shift;
     my $commentId   = shift;
     
-    return $self->session->db->quickHashRef(
-        "SELECT * FROM Photo_comment WHERE assetId=? AND commentId=?",
-        [$self->getId, $commentId],
+    return $self->session->db->getRow(
+        "Photo_comment", "commentId", $commentId,
     );
 }
 
@@ -259,8 +258,14 @@ Get a WebGUI::Paginator for the comments for this Photo.
 sub getCommentPaginator {
     my $self        = shift;
     
-    # ...
-
+    my $p           = WebGUI::Paginator->new($session, $self->getUrl);
+    $p->setDataByQuery(
+        "SELECT * FROM Photo_comment WHERE assetId=? ORDER BY creationDate DESC",
+        undef, undef,
+        [$self->getId],
+    );
+    
+    return $p;
 }
 
 #----------------------------------------------------------------------------
@@ -281,7 +286,7 @@ sub getDownloadFileUrl {
     croak "Photo->getDownloadFileUrl: resolution doesn't exist for this Photo"
         unless grep /$resolution/, @{ $self->getResolutions };
 
-    # ...
+    return $self->getStorageLocation->getFileUrl( $resolution . ".jpg" );
 }
 
 #----------------------------------------------------------------------------
@@ -326,7 +331,7 @@ Get a hash reference of template variables shared by all views of this asset.
 
 sub getTemplateVars {
     my $self        = shift;
-    my $vars        = $self->get;
+    my $var         = $self->get;
     
     ### Format exif vars
     my $exif        = jsonToObj( delete $var->{exifData} );
@@ -338,7 +343,7 @@ sub getTemplateVars {
         push @{ $var->{exifLoop} }, { tag => $tag, value => $exif->{$tag} };
     }
 
-    return $vars;
+    return $var;
 }
 
 #----------------------------------------------------------------------------
@@ -406,7 +411,9 @@ sub makeResolutions {
 =head2 makeShortcut ( parentId [, overrides ] )
 
 Make a shortcut to this asset under the specified parent, optionally adding 
-the specified overrides.
+the specified hash reference of C<overrides>.
+
+Returns the created shortcut asset.
 
 =cut
 
@@ -418,14 +425,40 @@ sub makeShortcut {
 
     croak "Photo->makeShortcut: parentId must be defined"
         unless $parentId;
-    croak "Photo->makeShortcut: overrides must be hash reference"
-        if $overrides && ref $overrides ne "HASH";
 
     my $parent      = WebGUI::Asset->newByDynamicClass($session, $parentId)
                     || croak "Photo->makeShortcut: Could not instanciate asset '$parentId'";
 
-    # ...
+    my $shortcut
+        = $parent->addChild({ 
+            className           => "WebGUI::Asset::Shortcut",
+            shortcutToAssetId   => $self->getId,
+        });
+    
+    if ($overrides) {
+        $shortcut->setOverride( $overrides );
+    }
 
+    return $shortcut;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+Prepare the template to be used for the C<view> method.
+
+=cut
+
+sub prepareView {
+    my $self        = shift;
+    $self->SUPER::prepareView();
+
+    my $template    
+        = WebGUI::Asset::Template->new($self->session, $self->getGallery->get("templateIdViewFile"));
+    $template->prepare;
+
+    $self->{_viewTemplate}  = $template;
 }
 
 #----------------------------------------------------------------------------
@@ -440,6 +473,19 @@ sub processPropertiesFromFormPost {
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
     
      
+}
+
+#----------------------------------------------------------------------------
+
+=head2 processStyle ( html )
+
+Returns the HTML from the Gallery's style.
+
+=cut
+
+sub processStyle {
+    my $self        = shift;
+    return $self->getGallery->processStyle( @_ );
 }
 
 #----------------------------------------------------------------------------
@@ -461,7 +507,10 @@ sub setComment {
     croak "Photo->setComment: properties must be a hash reference"
         unless $properties && ref $properties eq "HASH";
 
-    # ...
+    $self->session->db->setRow( 
+        "Photo_comment", "commentId", 
+        { %$properties, commentId => $commentId }
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -499,9 +548,8 @@ sub view {
     $var->{ fileIcon    } = $self->getFileIconUrl;
 
 
-    return $self->processTemplate($var,undef, $self->{_viewTemplate});
+    return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
-
 
 #----------------------------------------------------------------------------
 
@@ -530,7 +578,15 @@ this Photo exists in.
 sub www_delete {
     my $self        = shift;
     
-    # ...
+    return $self->session->privilege->insufficient unless $self->canEdit;
+
+    my $var         = $self->getTemplateVar;
+    $var->{ url_yes     } = $self->getUrl("func=deleteConfirm");
+    $var->{ url_no      } = $self->getUrl();
+
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->getGallery->get("templateIdDeletePhoto") )
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -544,8 +600,16 @@ album.
 
 sub www_deleteConfirm {
     my $self        = shift;
-    
-    # ...
+
+    return $self->session->privilege->insufficient unless $self->canEdit;
+
+    my $i18n        = $self->i18n( $self->session );
+
+    $self->purge;
+
+    return $self->processStyle(
+        sprintf $i18n->get("delete message"), $self->getParent->getUrl,
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -559,8 +623,21 @@ download the original file.
 
 sub www_download {
     my $self        = shift;
+    
+    return $self->session->privilege->insufficient unless $self->canView;
+    
+    my $storage     = $self->getStorageLocation;
 
-# ...
+    $self->session->http->setMimeType( "image/jpeg" );
+    $self->session->http->setLastModified( $self->getContentLastModified );
+
+    my $resolution  = $self->session->form->get("resolution");
+    if ($resolution) {
+        return $storage->getFileContentsAsScalar( $resolution . ".jpg" ); 
+    }
+    else {
+        return $storage->getFileContentsAsScalar( $self->get("filename") );
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -625,6 +702,11 @@ sub www_edit {
             value           => ( $form->get("friendsOnly") || $self->get("friendsOnly") ),
             defaultValue    => undef,
         });
+
+
+    return $self->processStyle(
+        $self->processTemplate($var, $self->getGallery->get("templateIdEditFile"))
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -642,8 +724,32 @@ sub www_makeShortcut {
     
     return $self->session->privilege->insufficient  unless $self->canEdit;
 
-    # ...
+    # Create the form to make a shortcut
+    my $var         = $self->getTemplateVars;
+    
+    $var->{ form_header }
+        = WebGUI::Form::formHeader( $session )
+        . WebGUI::Form::hidden( $session, { name => "func", value => "makeShortcutSave" });
+    $var->{ form_footer } 
+        = WebGUI::Form::formFooter( $session );
 
+    # Albums under this Gallery
+    my $albums          = $self->getGallery->getAlbumIds;
+    my %albumOptions;
+    for my $assetId ( @$albums ) {
+        $albumOptions{ $assetId } 
+            = WebGUI::Asset->newByDynamicClass($session, $assetId)->get("title");
+    }
+    $var->{ form_parentId }
+        = WebGUI::Form::selectBox( $session, {
+            name        => "parentId",
+            value       => $self->getParent->getId,
+            options     => \%albumOptions,
+        });
+
+    return $self->processStyle(
+        $self->processTemplate($var, $self->getGallery->get("templateIdMakeShortcut"))
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -662,8 +768,35 @@ sub www_makeShortcutSave {
 
     return $self->session->privilege->insufficient unless $self->canEdit;
 
-    #...
+    my $shortcut    = $self->makeShortcut( $parentId );
+    
+    return $shortcut->www_view; 
+}
 
+#----------------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Shows the output of L<view> inside of the style provided by the gallery this
+photo is in.
+
+=cut
+
+sub www_view {
+    my $self    = shift;
+
+    return $self->session->privilege->insufficient unless $self->canView;
+
+    $self->session->http->setLastModified($self->getContentLastModified);
+    $self->session->http->sendHeader;
+    $self->prepareView;
+    my $style = $self->processStyle("~~~");
+    my ($head, $foot) = split("~~~",$style);
+    $self->session->output->print($head, 1);
+    $self->session->output->print($self->view);
+    $self->session->output->print($foot, 1);
+    return "chunked";
+}
 }
 
 1;

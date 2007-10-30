@@ -19,6 +19,8 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use JSON;
+use Image::ExifTool;
 
 #----------------------------------------------------------------------------
 # Init
@@ -52,5 +54,26 @@ $photo
     = $album->addChild({
         className               => "WebGUI::Asset::File::Image::Photo",
     });
-$photo->setFile( WebGUI::Test->getCollateralPath("lamp.jpg") );
-my $exif    = $photo->get("exifData");
+$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+my $exifData    = $photo->get("exifData");
+
+ok( defined $exifData, "exifData column is defined after setFile" );
+
+my $exif        = jsonToObj( $exifData );
+ok( ref $exif eq "HASH", "exifData is JSON hash" );
+
+#----------------------------------------------------------------------------
+# Test getTemplateVars exif data
+my $var         = $photo->getTemplateVars;
+
+is_deeply(
+    [ sort keys %$exif ],
+    [ sort map { s/exif_// } keys %$var ],
+    "getTemplateVars gets a hash of all exif tags",
+);
+
+is_deeply(
+    [ sort keys %$exif ],
+    [ sort map { $_->{tag} } @{ $var->{exifLoop} } ],
+    "getTemplateVars gets a loop over the tags",
+);

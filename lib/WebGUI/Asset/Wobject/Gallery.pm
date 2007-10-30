@@ -81,13 +81,6 @@ sub definition {
             label           => $i18n->get("imageViewSize label"),
             hoverHelp       => $i18n->get("imageViewSize description"),
         },
-        imageViewCompression => {
-            tab             => "properties",
-            fieldType       => "integer",
-            defaultValue    => 0,
-            label           => $i18n->get("imageViewCompression label"),
-            hoverHelp       => $i18n->get("imageViewCompression description"),
-        },
         imageThumbnailSize => {
             tab             => "properties",
             fieldType       => "integer",

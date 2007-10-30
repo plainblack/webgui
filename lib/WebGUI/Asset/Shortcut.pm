@@ -636,6 +636,34 @@ sub processPropertiesFromFormPost {
 	$self->uncacheOverrides;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 setOverride ( overrides )
+
+Set this shortcut's overrides. C<overrides> is a hash reference of overrides
+to set.
+
+=cut
+
+sub setOverride {
+    my $self        = shift;
+    my $override    = shift;
+
+    croak "Shortcut->setOverride - first argument must be hash reference" 
+        unless $override && ref $override eq "HASH";
+    
+    for my $key ( %$override ) {
+        $self->session->db->write(
+            "DELETE FROM Shortcut_overrides WHERE assetId=? AND fieldName=?",
+            [$self->getId, $key],
+        );
+        $self->session->db->write(
+            "INSERT INTO Shortcut_overrides VALUES (?,?,?)",
+            [$self->getId, $key, $override->{$key}],
+        );
+    }
+}
+
 #-------------------------------------------------------------------
 
 sub uncacheOverrides {
@@ -859,23 +887,23 @@ sub www_editOverride {
 
 #-------------------------------------------------------------------
 sub www_saveOverride {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $fieldName = $self->session->form->process("overrideFieldName");
-	my %overrides = $self->getOverrides;
-	my $output = '';
-	my %props;
-	foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
-		%props = (%props,%{$def->{properties}});
-	}
-	my $fieldType = $props{$fieldName}{fieldType};
-	my $value = $self->session->form->process($fieldName,$fieldType);
-	$value = $self->session->form->process("newOverrideValueText") || $value;
-	$self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
-	$self->session->db->write("insert into Shortcut_overrides values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($fieldName).",".$self->session->db->quote($value).")");
-	$self->uncacheOverrides;
-	$self->getShortcutOriginal->purgeCache();
-	return $self->www_manageOverrides;
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $fieldName = $self->session->form->process("overrideFieldName");
+    my %overrides = $self->getOverrides;
+    my $output = '';
+    my %props;
+    foreach my $def (@{$self->getShortcutOriginal->definition($self->session)}) {
+        %props = (%props,%{$def->{properties}});
+    }
+    my $fieldType = $props{$fieldName}{fieldType};
+    my $value = $self->session->form->process($fieldName,$fieldType);
+    $value = $self->session->form->process("newOverrideValueText") || $value;
+    $self->session->db->write("delete from Shortcut_overrides where assetId=".$self->session->db->quote($self->getId)." and fieldName=".$self->session->db->quote($fieldName));
+    $self->session->db->write("insert into Shortcut_overrides values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($fieldName).",".$self->session->db->quote($value).")");
+    $self->uncacheOverrides;
+    $self->getShortcutOriginal->purgeCache();
+    return $self->www_manageOverrides;
 }
 
 #-------------------------------------------------------------------
