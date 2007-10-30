@@ -16,7 +16,6 @@ package WebGUI::Group;
 
 use strict;
 use Tie::CPHash;
-use WebGUI::Auth;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;
@@ -984,11 +983,9 @@ If you specified "new" for groupId, you can use this property to specify an id y
 =cut
 
 sub new {
-    my ($class, %group);
-    tie %group, 'Tie::CPHash';
    	my $self = {};
     
-    $class              = shift;
+    my $class           = shift;
     $self->{_session}   = shift;
 	$self->{_groupId}   = shift;
 	my $override        = shift;
