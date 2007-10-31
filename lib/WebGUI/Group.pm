@@ -360,6 +360,20 @@ sub description {
 
 #-------------------------------------------------------------------
 
+=head2 DESTROY
+
+Desconstructor
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 expireNotify ( [ value ] )
 
 Returns a boolean value whether or not to notify the user of the group expiry.

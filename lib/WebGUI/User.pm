@@ -276,12 +276,12 @@ sub friends {
         $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
         $self->session->db->write("update users set friendsGroup=?, lastUpdated=? where userId=?",
             [$myFriends->getId, $self->session->datetime->time(), $self->userId]);
-        return $myFriends;
+        $self->{_friendsGroup} = $myFriends;
     }
-    elsif (exists $self->{_friendsGroup}) {
-        return $self->{_friendsGroup};
+    elsif (! exists $self->{_friendsGroup}) {
+        $self->{_friendsGroup} = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
     }
-    return WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
+    return $self->{_friendsGroup};
 }
 
 #-------------------------------------------------------------------

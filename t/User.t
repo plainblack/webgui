@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 124; # increment this value for each test you create
+use Test::More tests => 127; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -532,6 +532,25 @@ $session->user({userId => 1});
 is($neighbor->identifier, undef, 'identifier: by default, new users have an undefined password with created through the API');
 is($neighbor->identifier('neighborhood'), 'neighborhood', 'identifier: setting the identifier returns the new identifier');
 is($neighbor->identifier, 'neighborhood', 'identifier: testing fetch of newly set password');
+
+################################################################
+#
+# friends
+#
+################################################################
+
+my $friendsGroup  = $neighbor->friends();
+isa_ok($friendsGroup, 'WebGUI::Group', 'friends returns a Group object');
+my $friendsGroup2 = $neighbor->friends();
+cmp_deeply($friendsGroup, $friendsGroup2, 'second fetch returns the cached group object from the user object');
+
+my $neighborClone = WebGUI::User->new($session, $neighbor->userId);
+my $friendsGroup3 = $neighborClone->friends();
+is ($friendsGroup->getId, $friendsGroup3->getId, 'friends: fetching group object when group exists but is not cached');
+
+undef $friendsGroup2;
+undef $friendsGroup3;
+undef $neighborClone;
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
