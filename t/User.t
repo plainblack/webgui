@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 127; # increment this value for each test you create
+use Test::More tests => 129; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -459,27 +459,11 @@ cmp_bag($dudeGroups, ['2', '7'], 'Dude belongs to Registered Users, Everyone as 
 
 ################################################################
 #
-# acceptsPrivateMessages
-#
-################################################################
-
-my $friend = WebGUI::User->new($session, 'new');
-$friend->profileField('allowPrivateMessages', 'all');
-is ($friend->acceptsPrivateMessages(1), 1, 'when allowPrivateMessages=all, anyone can send messages');
-$friend->profileField('allowPrivateMessages', 'none');
-is ($friend->acceptsPrivateMessages($friend->userId), 0, 'when allowPrivateMessages=all, no one can send messages');
-
-TODO: {
-	local $TODO = "Tests that need to be written";
-    ok(0, 'Test allowPrivateMessages=friends, with various userIds');
-}
-
-################################################################
-#
 # getFirstName
 #
 ################################################################
 
+my $friend = WebGUI::User->new($session, 'new');
 is($friend->getFirstName, undef, 'with no profile settings, getFirstName returns undef');
 
 $friend->username('friend');
@@ -551,6 +535,26 @@ is ($friendsGroup->getId, $friendsGroup3->getId, 'friends: fetching group object
 undef $friendsGroup2;
 undef $friendsGroup3;
 undef $neighborClone;
+
+################################################################
+#
+# acceptsPrivateMessages
+#
+################################################################
+
+$friend->profileField('allowPrivateMessages', 'all');
+is ($friend->acceptsPrivateMessages(1), 1, 'acceptsPrivateMessages: when allowPrivateMessages=all, anyone can send messages');
+$friend->profileField('allowPrivateMessages', 'none');
+is ($friend->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=none, no one can send messages');
+
+$neighbor->profileField('allowPrivateMessages', 'friends');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=friends, only friends can send me messages');
+$friend->addToGroups([$neighbor->friends->getId]);
+is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: add $friend to $neighbor friendsGroup, now he can send me messages');
+
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+$neighbor->profileField('allowPrivateMessages', 'not a valid choice');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
