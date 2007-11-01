@@ -1,3 +1,6 @@
+7.4.13
+
+
 7.4.12
  - fix: extra empty/grey area at the bottom of pages
  - fix: event end time not time zone adjusted properly
