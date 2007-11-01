@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::ProfileField;
 
 
 my $toVersion = "7.5.0"; # make this match what version you're going to
