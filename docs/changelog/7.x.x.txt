@@ -5,8 +5,11 @@
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
  - fix: Workflow activities don't pick up new default values
  - add: Friends Network
- - fix: event end time not time zone adjusted properly
+
+7.4.12
  - fix: extra empty/grey area at the bottom of pages
+ - fix: event end time not time zone adjusted properly
+ - fix: Matrix search view doesn't display hover help properly
 
 7.4.11
  - fix: Delete this entry link in data form header broken

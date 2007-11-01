@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.4.12
+--------------------------------------------------------------------
+ * Any customizations made to the Matrix default Search, Compare or
+    Detailed listing templates will be lost.  Please back up your
+    custom templates before running the upgrade.
+
 7.4.11
 --------------------------------------------------------------------
  * The 7.4.8 upgrade script had an error for sites using Dashboards.
