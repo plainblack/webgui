@@ -25,7 +25,7 @@
 			<td valign="top" style="width:50%;">
 				<span class="category">Features</span>
 				<table class="content" width="180">
-				<tmpl_if features>
+				<tmpl_if features_loop>
 					<tmpl_loop features_loop>
 					<tr<tmpl_if __ODD__> class="odd"<tmpl_else> class="even"</tmpl_if>>
 						<td><tmpl_var label><div class="wg-hoverhelp"><tmpl_var description></div></td>
@@ -40,7 +40,7 @@
 			<td valign="top" style="width:50%;">
 				<span class="category">Benefits</span>
 				<table class="content">
-				<tmpl_if features>
+				<tmpl_if benefits_loop>
 					<tmpl_loop benefits_loop>
 					<tr<tmpl_if __ODD__> class="odd"<tmpl_else> class="even"</tmpl_if>>
 						<td><tmpl_var label><div class="wg-hoverhelp"><tmpl_var description></div></td>
