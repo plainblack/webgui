@@ -282,13 +282,6 @@ sub www_compare {
 		@cmsList = $self->session->form->checkList("listingId");
 	}
     my ($style, $url) = ($self->session->style, $self->session->url);
-    $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
 	my ( %var, @prodcol, @datecol);
 	my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
 	$var{isTooMany} = (scalar(@cmsList)>$max);
