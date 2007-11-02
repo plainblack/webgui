@@ -105,6 +105,8 @@ BEGIN {
 }
 
 END {
+    $SESSION->scratch->deleteAll;
+    $SESSION->var->end;
     $SESSION->close if defined $SESSION;
 }
 

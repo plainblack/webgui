@@ -16,6 +16,7 @@ package WebGUI::Session::Privilege;
 
 use strict;
 use WebGUI::International;
+use WebGUI::Operation::Auth;
 
 =head1 NAME
 
