@@ -274,7 +274,7 @@ sub getJsonStatus {
     my ($sitename, $rsvp) = @$request;
 
     # only return this site's info
-    return $kernel->call(IKC=>post=>$rsvp, '{}') unless $sitename;
+    #return $kernel->call(IKC=>post=>$rsvp, '{}') unless $sitename;
 
     my %queues = ();
     tie %queues, 'Tie::IxHash';
@@ -283,17 +283,26 @@ sub getJsonStatus {
         Waiting   => $self->getWaitingQueue,
         Running   => $self->getRunningQueue,
     );
+
     my %output = ();
-    foreach my $queueName (keys %queues) {
+    for my $queueName (keys %queues) {
         my $queue = $queues{$queueName};
         my $count = $queue->get_item_count;
-        my @instances;
         if ($count > 0) {
-            foreach my $itemAref ($queue->peek_items(sub { shift()->{sitename} eq $sitename })) {	
-                push @instances, $itemAref;
+			for my $queueItem ($queue->peek_items(sub {1})) {	
+                my($priority, $id, $instance) = @{$queueItem};
+                # it's not a hash ref, we haven't seen it yet
+                if(ref $output{$instance->{sitename}} ne 'HASH') {
+                    $output{$instance->{sitename}} = {};
+                }
+                # it's not an array ref, we haven't seen it yet
+                if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
+                    $output{$instance->{sitename}}{$queueName} = [];
+                }
+                $instance->{originalPriority} = ($instance->{priority} - 1) * 10;
+                push @{$output{$instance->{sitename}}{$queueName}}, $instance;
             }
         }
-        $output{$queueName} = \@instances;
     }
 
     $kernel->call(IKC=>post=>$rsvp, objToJson(\%output));
