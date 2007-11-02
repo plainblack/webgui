@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
+use WebGUI::Utility;
 use WebGUI::Workflow::Activity::DeleteExpiredSessions;
 
 use Test::More;
@@ -26,3 +27,18 @@ TODO: {
 	local $TODO = "Tests that need to be written";
     ok(0, 'Test allowPrivateMessages=friends, with various userIds');
 }
+
+my $sessionCount = $session->db->quickScalar('select count(*) from userSession');
+my $scratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
+
+##Add 4 sessions:
+##  1) Active session
+##  2) Active session with scratch
+##  3) Expired session
+##  4) Expired session with scratch
+##
+## run deleteExpiredSessions 
+## Make sure that the two session were kept and the other two deleted.
+## Make sure that one scratch session was deleted and the other kept.
+## Close and end all four sessions
+
