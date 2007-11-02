@@ -1,5 +1,6 @@
 7.4.13
-
+ - fix: Expired SessionScratch not deleted (thanks to Michelle Lamar)
+    http://www.plainblack.com/bugs/tracker/expired-sessionscratch-not-deleted
 
 7.4.12
  - fix: extra empty/grey area at the bottom of pages

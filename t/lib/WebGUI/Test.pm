@@ -105,6 +105,7 @@ BEGIN {
 }
 
 END {
+    $SESSION->var->end;
     $SESSION->close if defined $SESSION;
 }
 
