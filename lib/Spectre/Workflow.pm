@@ -273,9 +273,6 @@ sub getJsonStatus {
     my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
     my ($sitename, $rsvp) = @$request;
 
-    # only return this site's info
-    #return $kernel->call(IKC=>post=>$rsvp, '{}') unless $sitename;
-
     my %queues = ();
     tie %queues, 'Tie::IxHash';
     %queues = (
@@ -291,11 +288,13 @@ sub getJsonStatus {
         if ($count > 0) {
 			for my $queueItem ($queue->peek_items(sub {1})) {	
                 my($priority, $id, $instance) = @{$queueItem};
-                # it's not a hash ref, we haven't seen it yet
+                # The site's name in the list of %output keys isn't a hashref;
+                # we haven't seen it yet
                 if(ref $output{$instance->{sitename}} ne 'HASH') {
                     $output{$instance->{sitename}} = {};
                 }
-                # it's not an array ref, we haven't seen it yet
+                # The queue name in the $output{sitename} hashref isn't an
+                # arrayref; we haven't seen it yet
                 if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
                     $output{$instance->{sitename}}{$queueName} = [];
                 }
