@@ -161,7 +161,9 @@ The specific sessionId you want to instantiate.
 
 =head3 noFuss
 
-A boolean, that if true will not update the session, or check if it's expired. This is mainly for WebGUI session maintenance, and shouldn't normally be used by anyone.
+A boolean, that if true will not update the session, or check if it's
+expired. This is mainly for WebGUI session maintenance, and shouldn't
+normally be used by anyone.
 
 =cut
 
@@ -173,19 +175,28 @@ sub new {
 	my $noFuss = shift;
 	if ($sessionId eq "") { ##New session
 		$self->start(1);
-	} else { ##existing session requested
-		$self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
+	}
+    else { ##existing session requested
+        $self->{_var} = $session->db->quickHashRef("select * from userSession where sessionId=?",[$sessionId]);
+        ##We have to make sure that the session variable has a sessionId, otherwise downstream users of
+        ##the object will break
+        if ($noFuss && $self->{_var}{sessionId}) {
+            $self->session->{_sessionId} = $self->{_var}{sessionId};
+            return $self;
+        }
 		return $self if $noFuss && $self->{_var}{sessionId};
 		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) { ##Session expired, start a new one with the same Id
 			$self->end;
 			$self->start(1,$sessionId);
-		} elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
+		}
+        elsif ($self->{_var}{sessionId} ne "") { ##Fetched an existing session.  Update variables with recent data.
 			$self->{_var}{lastPageView} = $session->datetime->time();
 			$self->{_var}{lastIP} = $session->env->getIp;
 			$self->{_var}{expires} = $session->datetime->time() + $session->setting->get("sessionTimeout");
 			$self->session->{_sessionId} = $self->{_var}{sessionId};
 			$session->db->setRow("userSession","sessionId",$self->{_var});
-		} else {  ##Start a new default session with the requested, non-existant id.
+		}
+        else {  ##Start a new default session with the requested, non-existant id.
 			$self->start(1,$sessionId);
 		}
 	}
