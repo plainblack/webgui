@@ -13,6 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::PseudoRequest;
 use WebGUI::Session;
 use WebGUI::Asset;
 
@@ -20,7 +21,7 @@ my @getRefererUrlTests = (
 	{
 		input => undef,
 		output => undef,
-		comment => 'getRerererUrl returns undef unless there is a referrer',
+		comment => 'getRefererUrl returns undef unless there is a referrer',
 	},
 	{
 		input => 'http://www.domain.com/myUrl.html',
@@ -55,6 +56,9 @@ use Test::MockObject;
 plan tests => 46 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
+
+my $pseudoRequest = WebGUI::PseudoRequest->new();
+$session->{_request} = $pseudoRequest;
 
 #disable caching
 my $preventProxyCache = $session->setting->get('preventProxyCache');
@@ -193,26 +197,27 @@ my $originalRequest = $session->request;  ##Save the original request object
 
 is($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
 
-my $newRequest = Test::MockObject->new;
-my $requestedUrl = 'empty';
-$newRequest->set_bound('uri', \$requestedUrl);
-$session->{_request} = $newRequest;
+#my $newRequest = Test::MockObject->new;
+#my $requestedUrl = 'empty';
+#$newRequest->set_bound('uri', \$requestedUrl);
+#$session->{_request} = $newRequest;
 
 ##Validate new MockObject
 
+$pseudoRequest->uri('empty');
 is($session->request->uri, 'empty', 'Validate Mock Object operation');
 
-$requestedUrl = 'full';
+$pseudoRequest->uri('full');
 is($session->request->uri, 'full', 'Validate Mock Object operation #2');
 
-$requestedUrl = '/path1/file1';
+$pseudoRequest->uri('/path1/file1');
 is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, fetch');
 
-$requestedUrl = '/path2/file2';
+$pseudoRequest->uri('/path2/file2');
 is($session->url->getRequestedUrl, 'path1/file1', 'getRequestedUrl, check cache of previous result');
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$requestedUrl = '/path2/file2?param1=one;param2=two';
+$pseudoRequest->uri('/path2/file2?param1=one;param2=two');
 is($session->url->getRequestedUrl, 'path2/file2', 'getRequestedUrl, does not return params');
 
 #######################################
@@ -225,22 +230,22 @@ my $sessionAsset = $session->asset;
 $session->asset(undef);
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$requestedUrl = '/path1/file1';
-is($session->url->page, $requestedUrl, 'page with no args returns getRequestedUrl through gateway');
+$pseudoRequest->uri('/path1/file1');
+is($session->url->page, '/path1/file1', 'page with no args returns getRequestedUrl through gateway');
 
-is($session->url->page('op=viewHelpTOC;topic=Article'), $requestedUrl.'?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
+is($session->url->page('op=viewHelpTOC;topic=Article'), '/path1/file1?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
 
-$url2 = 'http://'.$session->config->get('sitename')->[0].$requestedUrl;
+$url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/file1';
 is($session->url->page('',1), $url2, 'page: withFullUrl includes method and sitename');
 
 $session->setting->set('preventProxyCache', 0);
 
-is($session->url->page('','',1), $requestedUrl, 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
+is($session->url->page('','',1), '/path1/file1', 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
 $session->setting->set('preventProxyCache', 1);
 my $cacheableUrl = $session->url->page('','',1);
-is($cacheableUrl, $requestedUrl, 'page: skipPreventProxyCache does not change url');
+is($cacheableUrl, '/path1/file1', 'page: skipPreventProxyCache does not change url');
 
-like($session->url->page('','',0), qr(^$requestedUrl\?noCache=\d{0,4}:\d+$), 'page: noCache added');
+like($session->url->page('','',0), qr(^/path1/file1\?noCache=\d{0,4}:\d+$), 'page: noCache added');
 
 ##Restore original setting
 $session->setting->set('preventProxyCache', $preventProxyCache);
@@ -311,6 +316,17 @@ is($unEscapedString, '10% is enough!', 'unescape method');
 is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower cased');
 is($session->url->urlize('home/'), 'home', 'urlize: trailing slashes removed');
 is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', 'urlize: makeCompliant translates spaces to dashes');
+
+#######################################
+#
+# getBackToSiteURL
+#
+#######################################
+$sessionAsset = $session->asset;
+$session->asset(undef);
+$session->url->{_requestedUrl} = undef;  ##Manually clear cached value
+
+$session->asset($sessionAsset);
 
 END {  ##Always clean-up
 	$session->asset($sessionAsset);
