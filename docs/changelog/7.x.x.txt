@@ -5,6 +5,8 @@
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
  - fix: Workflow activities don't pick up new default values
  - add: Friends Network
+ - rfe: Added message to user search operation when user count exceeds 250.
+   (Diona Kidd, Knowmad Technologies)
 
 7.4.13
  - fix: Expired SessionScratch not deleted (thanks to Michelle Lamar)
@@ -14,6 +16,8 @@
  - fix: extra empty/grey area at the bottom of pages
  - fix: event end time not time zone adjusted properly
  - fix: Matrix search view doesn't display hover help properly
+ - rfe: Added a message to the user search admin page to alert admin that user
+   count exceeds 250. (Diona Kidd, Knowmad Technologies)
 
 7.4.11
  - fix: Delete this entry link in data form header broken
