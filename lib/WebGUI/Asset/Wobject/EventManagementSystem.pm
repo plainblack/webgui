@@ -4587,9 +4587,9 @@ function resetToInitial() {
     $self->session->style->setRawHeadTags(q|
         <style type="text/css">
         #emsTickets { font-size: 11px; }
-        .masterEvent { background-color: black; color: white; }
-        .evenEvent { background-color: white; color: black; }
-        .oddEvent { background-color: #dddddd; color: black; }
+        .masterEvent, .masterEvent td { background-color: black; color: white; }
+        .evenEvent, .evenEvent td { background-color: white; color: black; }
+        .oddEvent, .oddEvent td { background-color: #dddddd; color: black; }
         </style>
         |);
 	return $self->processStyle("<h1>Edit Badge</h1>".$f->print.$tickets);
