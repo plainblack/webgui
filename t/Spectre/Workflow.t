@@ -27,9 +27,8 @@ use WRE::Spectre;
 use POE::Component::IKC::ClientLite;
 use JSON;
 use Config::JSON;
-use Data::Dumper;
 
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 
 $|++;
 
@@ -85,7 +84,6 @@ SKIP: {
     # then check it for the old style, single site result structure
     ok($oneSiteStructure = jsonToObj($oneSiteResult),  'workflow/getJsonStatus for one site returns a proper JSON data structure');
     isa_ok($oneSiteStructure, 'HASH', 'workflow/getJsonStatus for one site returns a JSON structure parseable into a Perl hashref');
-    ok(exists $oneSiteStructure->{$sitename}, "$sitename exists in one site result structure");
 }
 
 # Not sure how to handle these; the problem is that there may or may not be
@@ -98,7 +96,7 @@ TODO: {
         ok(exists $allSitesStructure->{$sitename}{$key}, "$key exists for $sitename in all sites structure");
         isa_ok($allSitesStructure->{$sitename}{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in all sites structure");
 
-        ok(exists $oneSiteStructure->{$sitename}{$key}, "$key exists for $sitename in one site structure");
-        isa_ok($oneSiteStructure->{$sitename}{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in one site structure");
+        ok(exists $oneSiteStructure->{$key}, "$key exists for $sitename in one site structure");
+        isa_ok($oneSiteStructure->{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in one site structure");
     }
 }

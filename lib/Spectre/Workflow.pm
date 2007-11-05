@@ -288,36 +288,52 @@ sub getJsonStatus {
         my $queue = $queues{$queueName};
         my $count = $queue->get_item_count;
 
+        # list of instances to be added to the %output structure in the event
+        # that a site name is provided
+        my @instances;
+
         # and if there are items in that queue, add them to our data structure
         if ($count > 0) {
 
-            QUEUEITEM:
-            foreach my $queueItem ($queue->peek_items(sub {1})) {	
-                my($priority, $id, $instance) = @{$queueItem};
-
-                # if we were provided a sitename, keep the original behavior of
-                # only returning the data for that site.
-                if($sitename) {
-                    next QUEUEITEM unless $instance->{sitename} eq $sitename;
+            # if a site name is provided, only process data for that site name,
+            # and only construct data for that site name
+            if($sitename ne '') {
+                foreach my $itemAref ($queue->peek_items(sub { shift()->{sitename} eq $sitename })) {   
+                    push @instances, $itemAref;
                 }
+                $output{$queueName} = \@instances;
+            }
 
-                # The site's name in the list of %output keys isn't a hashref;
-                # we haven't seen it yet
-                if(ref $output{$instance->{sitename}} ne 'HASH') {
-                    $output{$instance->{sitename}} = {};
+            # otherwise, process data for all sites.
+            else {
+                foreach my $queueItem ($queue->peek_items(sub {1})) {
+                    my($priority, $id, $instance) = @{$queueItem};
+
+                    # The site's name in the list of %output keys isn't a hashref;
+                    # we haven't seen it yet
+                    if(ref $output{$instance->{sitename}} ne 'HASH') {
+                        $output{$instance->{sitename}} = {};
+                    }
+
+                    # The queue name in the $output{sitename} hashref isn't an
+                    # arrayref; we haven't seen it yet
+                    if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
+                        $output{$instance->{sitename}}{$queueName} = [];
+                    }
+
+                    # calculate originalPriority separately
+                    $instance->{originalPriority} = ($instance->{priority} - 1) * 10;
+
+                    # finally, add the instance to the returned data structure
+                    push @{$output{$instance->{sitename}}{$queueName}}, $instance;
                 }
-
-                # The queue name in the $output{sitename} hashref isn't an
-                # arrayref; we haven't seen it yet
-                if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
-                    $output{$instance->{sitename}}{$queueName} = [];
-                }
-
-                # calculate originalPriority separately
-                $instance->{originalPriority} = ($instance->{priority} - 1) * 10;
-
-                # finally, add the instance to the returned data structure
-                push @{$output{$instance->{sitename}}{$queueName}}, $instance;
+            }
+        }
+        # there's no items in this queue, but the version of this call that
+        # accepts a sitename expects an empty array ref anyway. Give it one.
+        else {
+            if($sitename) {
+                $output{$queueName} = \@instances;
             }
         }
     }
