@@ -12,7 +12,7 @@
 use FindBin;
 use strict;
 use warnings;
-use lib "$FindBin::Bin/../lib", "../../wre/lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../wre/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use Spectre::Admin;
@@ -29,7 +29,7 @@ use JSON;
 use Config::JSON;
 use Data::Dumper;
 
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 
 $|++;
 
@@ -43,11 +43,13 @@ my $spectreConfig       = Config::JSON->new($spectreConfigFile);
 my $ip                  = $spectreConfig->get('ip');
 my $port                = $spectreConfig->get('port');
 
-# need to declare these before the skip block so that they're also visible in
-# the todo block
-my ($structure, $sitename);
+# need to declare these out here so that they're visible in the TODO: block as well
+my ($allSitesStructure, $oneSiteStructure, $sitename);
+$sitename = $session->config->get('sitename')->[0];
+
+# tests for retrieving more than one site, the default
 SKIP: {
-    skip "need modperl, modproxy, and spectre running to test", 10 unless ($isModPerlRunning && $isModProxyRunning && $isSpectreRunning);
+    skip "need modperl, modproxy, and spectre running to test", 8 unless ($isModPerlRunning && $isModProxyRunning && $isSpectreRunning);
     # XXX kinda evil kludge to put an activity in the scheduler so that the
     # below calls return data; suggestions on a better way to do this welcomed.
     my $taskId = 'pbcron0000000000000001'; # hopefully people don't delete daily maintenance
@@ -68,14 +70,22 @@ SKIP: {
         name    => rand(100000),
         timeout => 10
     );
-    my $result = $remote->post_respond('workflow/getJsonStatus');
-    ok(defined $result, 'can call getJsonStatus');
+    my $allSitesResult  = $remote->post_respond('workflow/getJsonStatus');
+    my $oneSiteResult   = $remote->post_respond('workflow/getJsonStatus', $sitename);
+    ok(defined $allSitesResult, 'can call getJsonStatus for all sites');
+    ok(defined $oneSiteResult,  "can call getJsonStatus for $sitename");
     $remote->disconnect;
     undef $remote;
-    ok($structure = jsonToObj($result), 'workflow/getJsonStatus returns a proper JSON data structure');
-    cmp_ok(ref $structure, 'eq', 'HASH', 'workflow/getJsonStatus returns a JSON structure parseable into a Perl hashref');
-    $sitename = $session->config->get('sitename')->[0];
-    ok(exists $structure->{$sitename}, "$sitename exists in returned structure");
+
+    # first test the data structure returned for all sites
+    ok($allSitesStructure = jsonToObj($allSitesResult), 'workflow/getJsonStatus for all sites returns a proper JSON data structure');
+    isa_ok($allSitesStructure, 'HASH', 'workflow/getJsonStatus for all sites returns a JSON structure parseable into a Perl hashref');
+    ok(exists $allSitesStructure->{$sitename}, "$sitename exists in all sites result structure");
+
+    # then check it for the old style, single site result structure
+    ok($oneSiteStructure = jsonToObj($oneSiteResult),  'workflow/getJsonStatus for one site returns a proper JSON data structure');
+    isa_ok($oneSiteStructure, 'HASH', 'workflow/getJsonStatus for one site returns a JSON structure parseable into a Perl hashref');
+    ok(exists $oneSiteStructure->{$sitename}, "$sitename exists in one site result structure");
 }
 
 # Not sure how to handle these; the problem is that there may or may not be
@@ -84,8 +94,11 @@ SKIP: {
 # contrived and kludgish.
 TODO: {
     local $TODO = "tests to make later.";
-    for my $key(qw/Suspended Waiting Running/) {
-    ok(exists $structure->{$sitename}{$key}, "$key exists for $sitename");
-    cmp_ok(ref $structure->{$sitename}{$key}, 'eq', 'ARRAY', "$key is an arrayref in the $sitename hash");
+    foreach my $key(qw/Suspended Waiting Running/) {
+        ok(exists $allSitesStructure->{$sitename}{$key}, "$key exists for $sitename in all sites structure");
+        isa_ok($allSitesStructure->{$sitename}{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in all sites structure");
+
+        ok(exists $oneSiteStructure->{$sitename}{$key}, "$key exists for $sitename in one site structure");
+        isa_ok($oneSiteStructure->{$sitename}{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in one site structure");
     }
 }

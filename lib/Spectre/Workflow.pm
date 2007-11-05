@@ -282,23 +282,41 @@ sub getJsonStatus {
     );
 
     my %output = ();
-    for my $queueName (keys %queues) {
+    foreach my $queueName (keys %queues) {
+
+        # get the queue name, and how many items it has
         my $queue = $queues{$queueName};
         my $count = $queue->get_item_count;
+
+        # and if there are items in that queue, add them to our data structure
         if ($count > 0) {
-			for my $queueItem ($queue->peek_items(sub {1})) {	
+
+            QUEUEITEM:
+            foreach my $queueItem ($queue->peek_items(sub {1})) {	
                 my($priority, $id, $instance) = @{$queueItem};
+
+                # if we were provided a sitename, keep the original behavior of
+                # only returning the data for that site.
+                if($sitename) {
+                    next QUEUEITEM unless $instance->{sitename} eq $sitename;
+                }
+
                 # The site's name in the list of %output keys isn't a hashref;
                 # we haven't seen it yet
                 if(ref $output{$instance->{sitename}} ne 'HASH') {
                     $output{$instance->{sitename}} = {};
                 }
+
                 # The queue name in the $output{sitename} hashref isn't an
                 # arrayref; we haven't seen it yet
                 if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
                     $output{$instance->{sitename}}{$queueName} = [];
                 }
+
+                # calculate originalPriority separately
                 $instance->{originalPriority} = ($instance->{priority} - 1) * 10;
+
+                # finally, add the instance to the returned data structure
                 push @{$output{$instance->{sitename}}{$queueName}}, $instance;
             }
         }
