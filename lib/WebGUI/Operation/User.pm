@@ -638,7 +638,7 @@ sub www_listUsers {
 	my $output = getUserSearchForm($session,"listUsers");
 	my ($userCount) = $session->db->quickArray("select count(*) from users");
     if($userCount > 250) {
-        $output .= "<p>There are over 250 users. Please use the search to find users.</p>\n";
+        $output .= $i18n->get('high user count');
     }
     
 	return _submenu($session,{workarea => $output}) unless ($session->form->process("doit") || $userCount<250 || $session->form->process("pn") > 1);

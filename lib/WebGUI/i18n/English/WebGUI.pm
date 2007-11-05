@@ -3910,6 +3910,11 @@ LongTruncOk=1</p>
         lastUpdated => 1193196211,
     },
 
+    'high user count' => {
+        message     => q{<p>There are over 250 users. Please use the search to find users.</p>},
+        lastUpdated => 1193196211,
+    },
+
 };
 
 1;
