@@ -35,6 +35,14 @@ sub addSearchWithContainers {
     print "DONE!\n" unless $quiet;
 }
 
+#-------------------------------------------------
+sub addGroupToEditPost {
+    my $session = shift;
+    print "\tAdding the Group to Edit Post field to the Collaboration system." unless $quiet;
+    $session->db->write("alter table Collaboration add column groupToEditPost varchar(22) not null");
+    print "DONE!\n" unless $quiet;
+}
+
 #----------------------------------------------------------------------------
 sub addFriendsNetwork {
     my $session = shift;

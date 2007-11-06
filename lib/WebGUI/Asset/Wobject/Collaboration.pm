@@ -729,11 +729,21 @@ sub definition {
         subscriptionGroupId =>{
 			fieldType=>"subscriptionGroup",
             tab=>'security',
-			label=>$i18n->get("subscription group label"),
-            hoverHelp=>$i18n->get("subscription group hoverHelp"),
+			label=>"subscription group label",
+            hoverHelp=>"subscription group hoverHelp",
             noFormPost=>1,
             defaultValue=>undef,
-			},
+        },
+        groupToEditPost=>{
+            tab=>"security",
+            label=>'Group to Edit Posts',
+            excludeGroups=>[1,7],
+            hoverHelp=>'Group to Edit Posts',
+            uiLevel=>6,
+            fieldType=>'group',
+            filter=>'fixId',
+            defaultValue=>'4'
+        },
         );
 
         push(@{$definition}, {
@@ -951,7 +961,7 @@ sub getThreadsPaginator {
     if ($sortBy eq 'rating') {
         $sortBy = 'threadRating';
     } 
-    $sortBy = $self->session->db->dbh->quote_identifier($sortBy);
+    #$sortBy = $self->session->db->dbh->quote_identifier($sortBy);
 	my $sql = "
 		select 
 			asset.assetId,

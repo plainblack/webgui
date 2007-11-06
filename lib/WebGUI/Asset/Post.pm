@@ -96,6 +96,7 @@ sub canEdit {
 	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
 
 		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("revisionDate"))) ||
+        $self->session->user->isInGroup($self->getThread->getParent->get('groupToEditPost')) ||
 		$self->getThread->getParent->canEdit;
 
 }
