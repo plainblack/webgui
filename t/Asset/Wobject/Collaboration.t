@@ -38,12 +38,7 @@ my $session = WebGUI::Test->session;
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
-# Grab a named version tag
-#my $versionTag = WebGUI::VersionTag->getWorking($session);
-#$versionTag->set({name => 'Collaboration Test'});
-
 my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'});
-#$versionTag->commit();
 
 # Test for a sane object type
 isa_ok($collab, 'WebGUI::Asset::Wobject::Collaboration');
@@ -62,6 +57,5 @@ TODO: {
 END {
     # Clean up after thyself
     $collab->purge();
-    #$versionTag->rollback();
 }
 # vim: syntax=perl filetype=perl

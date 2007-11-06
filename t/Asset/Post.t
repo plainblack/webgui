@@ -122,8 +122,6 @@ END {
     $postingUser->delete();
     $otherUser->delete();
     $groupIdEditUser->delete();
-    $groupToEditPost->delete();
-    $groupIdEditGroup->delete();
 }
 
 
