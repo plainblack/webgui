@@ -23,6 +23,7 @@ my $session = start(); # this line required
 
 addFriendsNetwork($session);
 addSearchWithContainers($session);
+addGroupToEditPost($session);
 
 finish($session); # this line required
 
