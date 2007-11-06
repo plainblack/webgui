@@ -22,6 +22,19 @@ use Image::ExifTool qw( :Public );
 use JSON;
 use Tie::IxHash;
 
+our $magick;
+BEGIN {
+    if (eval { require Graphics::Magick; 1 }) {
+        $magick = 'Graphics::Magick';
+    }
+    elsif (eval { require Image::Magick; 1 }) {
+        $magick = 'Image::Magick';
+    }
+    else {
+        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
+    }
+}
+
 use WebGUI::Friends;
 use WebGUI::Utility;
 
@@ -49,12 +62,6 @@ These methods are available from this class:
 =head2 definition ( session, definition )
 
 Define the properties of the Photo asset.
-
-=head3 session
-
-=head3 definition
-
-A hash reference passed in from a subclass definition.
 
 =cut
 
@@ -91,6 +98,7 @@ sub definition {
         i18n        => 'Asset_Photo',
         properties  => \%properties,
     };
+
     return $class->SUPER::definition($session, $definition);
 }
 
@@ -107,7 +115,12 @@ sub appendTemplateVarsForCommentForm {
     my $self        = shift;
     my $var         = shift;
 
-    # ...
+    $var->{commentForm_start}
+        = WebGUI::Form::formHeader( $session );
+        . WebGUI::Form::hidden( $session, { name => "func", value => "addCommentSave" } )
+        ;
+    $var->{commentForm_end}
+        = WebGUI::Form::formFooter( $session );
 
     return $var;
 }
@@ -138,6 +151,28 @@ sub applyConstraints {
         maxImageSize        => $self->getGallery->get("imageViewSize"),
         thumbnailSize       => $self->getGallery->get("imageThumbnailSize"),
     });
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canComment ( [userId] )
+
+Returns true if the user can comment on this asset. C<userId> is a WebGUI 
+user ID. If no userId is passed, check the current user.
+
+Users can comment on this Photo if they are allowed to view and the album 
+allows comments.
+
+=cut
+
+sub canComment {
+    my $self        = shift;
+    my $userId      = shift || $self->session->user->userId;
+    my $album       = $self->getParent;
+
+    return 0 if !$self->canView($userId);
+
+    return $album->canComment($userId);
 }
 
 #----------------------------------------------------------------------------
@@ -399,10 +434,16 @@ sub makeResolutions {
     
     # Get default if necessary
     $resolutions    ||= $self->getGallery->getImageResolutions;
+    
+    my $storage = $self->getStorageLocation;
+    my $photo   = $magick->new;
+    $photo->Read( $storage->get( $self->get("filename") ) );
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad
-        # ...
+        my $newPhoto    = $photo->Clone;
+        $newPhoto->Resize( geometry => $res );
+        $newPhoto->Write( $storage->getFilePath( "$res.jpg" ) );
     }
 }
 
@@ -546,7 +587,14 @@ sub view {
     $var->{ controls    } = $self->getToolbar;
     $var->{ fileUrl     } = $self->getFileUrl;
     $var->{ fileIcon    } = $self->getFileIconUrl;
+    
+    $self->appendTemplateVarsForCommentForm( $var ); 
 
+    my $p       = $self->getCommentPaginator;
+    $var->{ commentLoop             } = $p->getPageData;
+    $var->{ commentLoop_urlNext     } = [$p->getNextPageLink]->[0];
+    $var->{ commentLoop_urlPrev     } = [$p->getPrevPageLink]->[0];
+    $var->{ commentLoop_pageBar     } = $p->getBarAdvanced;
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -561,9 +609,22 @@ Save a new comment to the Photo.
 
 sub www_addCommentSave {
     my $self        = shift;
+    
+    return $self->session->privilege->insufficient unless $self->canComment;
+
     my $form        = $self->session;
     
-    # ...
+    my $properties  = {
+        assetId         => $self->getId,
+        creationDate    => time,
+        userId          => $session->user->userId,
+        visitorIp       => ( $session->user->userId eq "1" ? $session->env("REMOTE_ADDR") : undef ),
+        bodyText        => $form->get("bodyText"),
+    };
+
+    $self->setComment( "new", $properties );
+
+    return $self->www_view;
 }
 
 #----------------------------------------------------------------------------
@@ -582,7 +643,6 @@ sub www_delete {
 
     my $var         = $self->getTemplateVar;
     $var->{ url_yes     } = $self->getUrl("func=deleteConfirm");
-    $var->{ url_no      } = $self->getUrl();
 
     return $self->processStyle(
         $self->processTemplate( $var, $self->getGallery->get("templateIdDeletePhoto") )
@@ -705,7 +765,7 @@ sub www_edit {
 
 
     return $self->processStyle(
-        $self->processTemplate($var, $self->getGallery->get("templateIdEditFile"))
+        $self->processTemplate( $var, $self->getGallery->getTemplateIdEditFile )
     );
 }
 

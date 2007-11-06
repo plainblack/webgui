@@ -123,6 +123,7 @@ checkModule("Weather::Com::Finder","0.5.1");
 checkModule("Class::InsideOut","1.06");
 checkModule("HTML::TagCloud","0.34");
 checkModule("Image::ExifTool","7.00");
+checkModule("Archive::Any","0.093");
 
 
 ###################################

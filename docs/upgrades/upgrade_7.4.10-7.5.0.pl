@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS Gallery (
     imageViewSize INT,
     imageThumbnailSize INT,
     maxSpacePerUser VARCHAR(20),
-    richEditIdFileComment VARCHAR(22) BINARY,
+    richEditIdComment VARCHAR(22) BINARY,
     templateIdAddArchive VARCHAR(22) BINARY,
     templateIdDeleteAlbum VARCHAR(22) BINARY,
     templateIdDeleteFile VARCHAR(22) BINARY,
