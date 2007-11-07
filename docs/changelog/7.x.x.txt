@@ -9,6 +9,7 @@
    (Diona Kidd, Knowmad Technologies)
 
 7.4.13
+- fix: Calendar doubles backslashes on iCal import
 - fix: EMS edit badge event list can display incorrectly in IE
 - fix: Expired SessionScratch not deleted (thanks to Michelle Lamar)
     http://www.plainblack.com/bugs/tracker/expired-sessionscratch-not-deleted
