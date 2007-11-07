@@ -200,8 +200,8 @@ sub execute {
                 my $properties  = {
                     feedUid     => $id,
                     feedId      => $feed->{feedId},
-                    description => $events{$id}->{description}->[1],
-                    title       => $events{$id}->{summary}->[1],
+                    description => _unwrapIcalText($events{$id}->{description}->[1]),
+                    title       => _unwrapIcalText($events{$id}->{summary}->[1]),
                     menuTitle   => substr($events{$id}->{summary}->[1],0,15),
                     className   => 'WebGUI::Asset::Event',
                     isHidden    => 1,
@@ -507,6 +507,11 @@ sub _icalToMySQL {
     )->toMysql;
 }
 
+sub _unwrapIcalText {
+    my $text = shift;
+    $text =~ s/\\([.;\\])/$1/g;
+    return $text;
+}
 
 =head1 BUGS
 
