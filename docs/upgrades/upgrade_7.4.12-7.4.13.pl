@@ -12,6 +12,7 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::Asset;
 
 
 my $toVersion = '7.4.13';
@@ -21,7 +22,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+scrubOldEventsCalendarTemplates($session);
 finish($session); # this line required
 
 
@@ -31,6 +32,21 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub scrubOldEventsCalendarTemplates {
+	my $session = shift;
+	print "\tRemoving old Events Calendar Templates.\n" unless ($quiet);
+	# and here's our code
+    foreach my $templateId (qw/PBtmpl0000000000000086 PBtmpl0000000000000105/) {
+        my $asset = WebGUI::Asset->new($session, $templateId);
+        printf("\t\tFetching old EventsCalendar template ID:%s.\n", $templateId) unless ($quiet);
+        next unless defined $asset;
+        my $deleted = $asset->purge();
+        printf("\t\tDeleted old EventsCalendar template ID:%s.\n", $templateId) if ($deleted and not $quiet);
+    }
+    
+}
 
 
 
