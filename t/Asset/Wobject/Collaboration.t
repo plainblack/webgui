@@ -30,15 +30,27 @@ use WebGUI::User;
 use WebGUI::Group;
 use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
+use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 3; # increment this value for each test you create
+use Test::More tests => 4; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
 # Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'});
+# grab a named version tag
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->set({name => 'Collaboration => groupToEditPost test'});
+
+# place the collab system under a layout to ensure we're using the inherited groupIdEdit value
+my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout'});
+
+# set the layout as the current asset for the same reason
+$session->asset($layout);
+
+# finally, add the collab
+my $collab  = $layout->addChild({className => 'WebGUI::Asset::Wobject::Collaboration'});
 
 # Test for a sane object type
 isa_ok($collab, 'WebGUI::Asset::Wobject::Collaboration');
@@ -56,6 +68,5 @@ TODO: {
 
 END {
     # Clean up after thyself
-    $collab->purge();
+    $versionTag->rollback();
 }
-# vim: syntax=perl filetype=perl

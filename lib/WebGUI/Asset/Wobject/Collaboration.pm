@@ -742,7 +742,7 @@ sub definition {
             uiLevel=>6,
             fieldType=>'group',
             filter=>'fixId',
-            defaultValue=>'4'
+            defaultValue=>$session->asset->get('groupIdEdit') || '4',
         },
         );
 
