@@ -57,9 +57,33 @@ sub _loadHelp {
 
 #-------------------------------------------------------------------
 
+=head2 _processVariables ( $helpVar, $namespace )
+
+Recursively descend down any nested template variables and give
+them default namespaces.  Also, handle copying the variables
+entry.
+
+=cut
+
+sub _processVar {
+    my ($helpVar, $namespace) = @_;
+    my $processed = {};
+    $processed->{name}        = $helpVar->{name},
+    $processed->{description} = $helpVar->{description},
+    $processed->{namespace}   = $helpVar->{namespace} || $namespace;
+    if ($helpVar->{variables}) {
+        foreach my $helpVariable (@{ $helpVar->{variables} }) {
+            push @{ $processed->{variables} }, _processVar($helpVariable, $namespace);
+        }
+    }
+    return $processed;
+}
+
+#-------------------------------------------------------------------
+
 =head2 _process ( $session, $cmd, $key )
 
-Do all post processing for an entry in a freshly loaded help file.
+Do almost all the post processing for an entry in a freshly loaded help file.
 Resolve the related key, add a default isa key if it is missing,
 and set the __PROCESSED flag to prevent processing entries twice.
 
@@ -78,7 +102,7 @@ sub _process {
 		$helpEntry->{__PROCESSED} = 0;
 	}
 	foreach my $isa ( @{ $helpEntry->{isa} } ) {
-		my $oCmd = "WebGUI::Help::".$isa->{namespace};
+		my $oCmd  = "WebGUI::Help::".$isa->{namespace};
 		my $other = _loadHelp($session, $oCmd);
 		my $otherHelp = $other->{ $isa->{tag} };
 		_process($session, $otherHelp, $isa->{tag});
@@ -88,11 +112,7 @@ sub _process {
 		@{$helpEntry->{related}} = (@{ $helpEntry->{related} }, @{ $add });
 		$add = $otherHelp->{variables};
 		foreach my $row (@{$add}) {
-			push(@{$helpEntry->{variables}}, {
-				name=> $row->{name},
-				description => $row->{description},
-				namespace => $row->{namespace} || $isa->{namespace}
-				});
+			push(@{$helpEntry->{variables}}, _processVar($row, $isa->{namespace}));
 		}
 	}
 	$helpEntry->{__PROCESSED} = 1;
