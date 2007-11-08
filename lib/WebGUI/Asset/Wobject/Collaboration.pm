@@ -362,6 +362,18 @@ sub definition {
 	my $i18n = WebGUI::International->new($session,"Asset_Collaboration");
 	my $useKarma = $session->setting->get('useKarma');
 
+    # obtain the groupIdEdit default value. Try to get it from the parent asset
+    # if it exists. If not, default to the value specified in WebGUI::Asset's
+    # definition.
+    my $groupIdEdit;
+    if($session->asset) {
+        $groupIdEdit = $session->asset->get('groupIdEdit');
+    }
+    else {
+        $groupIdEdit = '4';
+    }
+
+
 	my %sortByOptions;
 	tie %sortByOptions, 'Tie::IxHash';
 	%sortByOptions = (lineage=>$i18n->get('sequence'),
@@ -742,7 +754,7 @@ sub definition {
             uiLevel=>6,
             fieldType=>'group',
             filter=>'fixId',
-            defaultValue=>$session->asset->get('groupIdEdit') || '4',
+            defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
         },
         );
 
