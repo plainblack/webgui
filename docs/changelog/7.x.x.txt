@@ -13,6 +13,7 @@
 - fix: EMS edit badge event list can display incorrectly in IE
 - fix: Expired SessionScratch not deleted (thanks to Michelle Lamar)
     http://www.plainblack.com/bugs/tracker/expired-sessionscratch-not-deleted
+- fix: Bad import of help template variables from other topics. (perlDreamer Consulting, LLC.)
 
 7.4.12
  - fix: extra empty/grey area at the bottom of pages
