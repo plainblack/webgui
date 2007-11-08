@@ -4359,7 +4359,6 @@ my		$sth = $dbLink->db->unconditionalRead($sql);
 	$var->{managementLinks} = $self->_getManagementLinks;	
 
 	# Only process style if search is called directly;
-	delete $var->{'searchForm.field_loop'};
 	return $self->processTemplate($var, $self->getValue('searchTemplateId')) unless ($self->session->form->process("func") eq 'superSearch');
 	return $self->processStyle($self->processTemplate($var, $self->getValue('searchTemplateId')));
 }
