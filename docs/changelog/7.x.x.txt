@@ -8,6 +8,9 @@
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
 
+7.4.14
+ - fix: CS posts won't allow new attachments after deleting an old one
+
 7.4.13
  - fix: field_loop missing from SQL Form template
  - fix: Calendar doubles backslashes on iCal import

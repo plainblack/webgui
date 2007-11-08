@@ -243,7 +243,7 @@ sub toHtml {
 	my $i18n = WebGUI::International->new($self->session);
 	my $uploadControl = undef;
 	my $storage = $self->getStorageLocation;
-	my @files = $storage->getFiles if (defined $storage);
+	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
         $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
