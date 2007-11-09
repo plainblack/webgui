@@ -262,3 +262,8 @@ $hrefHref = $session->db->buildHashRefOfHashRefs('select message, myIndex from t
 				'myIndex' => $_->[0] } }
 		grep { $_->[2] eq 'B' } @tableData;
 cmp_deeply($hrefHref, \%expected, 'buildHashRefOfHashRefs, 2 columns, 1 param');
+
+
+END: {
+    $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+}
