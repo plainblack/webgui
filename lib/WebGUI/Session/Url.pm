@@ -264,25 +264,25 @@ Returns a constructed site url. The returned value can be overridden using the s
 =cut
 
 sub getSiteURL {
-	my $self = shift;
-	unless ($self->{_siteUrl}) {
-		my $site = "";
-		my $sitenames = $self->session->config->get("sitename");
-                my ($http_host,$currentPort) = split(':', $self->session->env->get("HTTP_HOST"));
-                if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
-                        $site = $http_host;
-                } else {
-                        $site = $sitenames->[0];
-                }
-        	my $proto = "http://";
-        	if ($self->session->env->get("HTTPS") eq "on") {
-               	 	$proto = "https://";
-        	}
+    my $self = shift;
+    unless ($self->{_siteUrl}) {
+        my $site = "";
+        my $sitenames = $self->session->config->get("sitename");
+        my ($http_host,$currentPort) = split(':', $self->session->env->get("HTTP_HOST"));
+        if ($self->session->setting->get("hostToUse") eq "HTTP_HOST" and isIn($http_host,@{$sitenames})) {
+                $site = $http_host;
+        } else {
+                $site = $sitenames->[0];
+        }
+        my $proto = "http://";
+        if ($self->session->env->get("HTTPS") eq "on") {
+                $proto = "https://";
+        }
 		my $port = "";
-		$port = ":".$self->session->config->get("webServerPort") if ($self->session->config->get("webServerPort"));
-        	$self->{_siteUrl} = $proto.$site.$port;
-	}
-	return $self->{_siteUrl};
+        $port = ":".$self->session->config->get("webServerPort") if ($self->session->config->get("webServerPort"));
+        $self->{_siteUrl} = $proto.$site.$port;
+    }
+    return $self->{_siteUrl};
 }
 
 
@@ -373,18 +373,17 @@ then you'll understand the rest of wG just fine.
 =cut
 
 sub page {
-	my $self = shift;
-	my $pairs = shift;
-        my $useFullUrl = shift;
-	my $skipPreventProxyCache = shift;
-        my $url;
-        if ($useFullUrl) {
-                $url = $self->getSiteURL();
-        }
+    my $self = shift;
+    my $pairs = shift;
+    my $useFullUrl = shift;
+    my $skipPreventProxyCache = shift;
+    my $url;
+    if ($useFullUrl) {
+        $url = $self->getSiteURL();
+    }
 	my $path = $self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl;
 	$url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
-			
-        return $url;
+    return $url;
 }
 
 #-------------------------------------------------------------------

@@ -51,9 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-use Test::MockObject::Extends;
-use Test::MockObject;
-plan tests => 46 + scalar(@getRefererUrlTests);
+plan tests => 51 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -194,15 +192,10 @@ is( $session->url->makeCompliant($url), $url2, 'language specific URL compliance
 #######################################
 
 my $originalRequest = $session->request;  ##Save the original request object
+$session->{_request} = undef;
 
 is($session->url->getRequestedUrl, undef, 'getRequestedUrl returns undef unless it has a request object');
-
-#my $newRequest = Test::MockObject->new;
-#my $requestedUrl = 'empty';
-#$newRequest->set_bound('uri', \$requestedUrl);
-#$session->{_request} = $newRequest;
-
-##Validate new MockObject
+$session->{_request} = $originalRequest;
 
 $pseudoRequest->uri('empty');
 is($session->request->uri, 'empty', 'Validate Mock Object operation');
@@ -262,7 +255,7 @@ $session->asset($sessionAsset);
 
 $mockEnv{'HTTP_REFERER'} = 'test';
 
-is($session->env->get('HTTP_REFERER'), 'test', 'testing MockObject');
+is($session->env->get('HTTP_REFERER'), 'test', 'testing overridden ENV');
 
 foreach my $test (@getRefererUrlTests) {
 	$mockEnv{HTTP_REFERER} = $test->{input};
@@ -323,13 +316,43 @@ is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart
 #
 #######################################
 $sessionAsset = $session->asset;
-$session->asset(undef);
+$session->{_asset} = undef;
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
+$pseudoRequest->uri('/goBackToTheSite');
+
+is($session->url->getBackToSiteURL, '/goBackToTheSite', 'getBackToSiteURL: when session asset is undefined, the method falls back to using page');
 
 $session->asset($sessionAsset);
+is($session->url->getBackToSiteURL, $session->asset->getUrl, q!getBackToSiteURL: for most regular old assets, it takes you back to the asset's container!);
+
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+
+my $defaultAssetUrl = WebGUI::Asset->getDefault($session)->getUrl;
+
+$session->asset( WebGUI::Asset->getImportNode($session) );
+is(
+    $session->url->getBackToSiteURL, 
+    $defaultAssetUrl,
+    q!getBackToSiteURL: importNode asset returns you to the default Asset!
+);
+
+$session->asset( WebGUI::Asset->getMedia($session) );
+is(
+    $session->url->getBackToSiteURL, 
+    $defaultAssetUrl,
+    q!getBackToSiteURL: Media Folder asset returns you to the default Asset!
+);
+
+$session->asset( WebGUI::Asset->getRoot($session) );
+is(
+    $session->url->getBackToSiteURL, 
+    $defaultAssetUrl,
+    q!getBackToSiteURL: Root returns you to the default Asset!
+);
 
 END {  ##Always clean-up
 	$session->asset($sessionAsset);
+	$versionTag->rollback;
 	$session->config->set('sitename', \@config_sitename);
 	$session->setting->set('hostToUse', $setting_hostToUse);
 	$session->setting->set('preventProxyCache', $preventProxyCache);
