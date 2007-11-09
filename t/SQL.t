@@ -154,57 +154,64 @@ ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, transaction started.
 $session->db->rollback;
 ok( $session->db->dbh->{AutoCommit}, 'AutoCommits reenabled, aborted transaction finished');
 
-$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
-$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+my %mysqlVariables = $session->db->quickArray("SHOW GLOBAL VARIABLES where Variable_name='have_innodb'");
 
-my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
-my ($sth, $sth2, $rc);
+SKIP: {
 
-$sth  = $session->db->prepare('select myIndex from testTable');
-$sth2 = $dbh2->prepare('select myIndex from testTable');
+	skip("No InnoDB tables in this MySQL.  Skipping all transaction related tests.",7) if (lc $mysqlVariables{have_innodb} ne 'yes');
+    $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+    $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
 
-#rollback test
+    my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
+    my ($sth, $sth2, $rc);
 
-$rc = $session->db->beginTransaction();
-ok( $rc, 'beginTransaction returned successfully');
-ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, new transaction started');
+    $sth  = $session->db->prepare('select myIndex from testTable');
+    $sth2 = $dbh2->prepare('select myIndex from testTable');
 
-$session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
-$session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
-$session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
+    #rollback test
 
-$sth2->execute;
-is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
-$sth2->finish;
+    $rc = $session->db->beginTransaction();
+    ok( $rc, 'beginTransaction returned successfully');
+    ok( !$session->db->dbh->{AutoCommit}, 'AutoCommit disabled, new transaction started');
 
-$session->db->rollback;
+    $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
+    $session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
+    $session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
 
-$sth->execute;
-is( $sth->rows, 0, 'rollback called, no updates to table');
-$sth->finish;
+    $sth2->execute;
+    is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
+    $sth2->finish;
 
-$session->db->beginTransaction();
-$rc = $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
-$session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
-$session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
+    $session->db->rollback;
 
-$sth2->execute;
-is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
-$sth2->finish;
+    $sth->execute;
+    is( $sth->rows, 0, 'rollback called, no updates to table');
+    $sth->finish;
 
-$session->db->commit;
+    $session->db->beginTransaction();
+    $rc = $session->db->dbh->do("INSERT INTO testTable VALUES(0,'zero')");
+    $session->db->dbh->do("INSERT INTO testTable VALUES(1,'one')");
+    $session->db->dbh->do("INSERT INTO testTable VALUES(2,'two')");
 
-$sth->execute;
-is( $sth->rows, 3, 'rows inserted, committed');
-$sth->finish;
+    $sth2->execute;
+    is( $sth2->rows, 0, 'access from second dbh on uncommitted data');
+    $sth2->finish;
 
-$sth2->execute;
-is( $sth2->rows, 3, 'access from second dbh on committed data');
-$sth2->finish;
+    $session->db->commit;
 
-$session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+    $sth->execute;
+    is( $sth->rows, 3, 'rows inserted, committed');
+    $sth->finish;
 
-$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), myKey varchar(32), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+    $sth2->execute;
+    is( $sth2->rows, 3, 'access from second dbh on committed data');
+    $sth2->finish;
+
+    $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
+
+}
+
+$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), myKey varchar(32), PRIMARY KEY(myIndex))');
 
 my @tableData = (
 	[ 0, 'zero',  'A' ],
