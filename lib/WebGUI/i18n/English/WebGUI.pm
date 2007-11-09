@@ -3915,6 +3915,11 @@ LongTruncOk=1</p>
         lastUpdated => 1193196211,
     },
 
+    'high group count' => {
+        message     => q{<p>There are over 250 groups. Please use the search to find a group.</p>},
+        lastUpdated => 1193196211,
+    },
+
 };
 
 1;
