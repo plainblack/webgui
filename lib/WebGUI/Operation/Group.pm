@@ -614,6 +614,9 @@ sub www_listGroups {
 	if (canEditAll($session)) {
 		my $output = getGroupSearchForm($session, "listGroups");
 		my ($groupCount) = $session->db->quickArray("select count(*) from groups where isEditable=1");
+        if($groupCount > 250) {
+            $output .= "<p>There are over 250 groups. Please use the search to find a group.</p>\n"; 
+        }
         return _submenu($session,$output) unless ($session->form->process("doit") || $groupCount<250 || $session->form->process("pn") > 1);
 		$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 		$output .= '<tr><td class="tableHeader">'.$i18n->get(84).'</td><td class="tableHeader">'
