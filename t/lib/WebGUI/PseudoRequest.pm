@@ -145,6 +145,17 @@ sub status_line {
 	return $self->{status_line};
 }
 
+sub upload {
+	my $self = shift;
+    my $formName = shift;
+    my $uploadFileHandles = shift;
+    return unless $formName;
+	if (defined $uploadFileHandles) {
+		$self->{uploads}->{$formName} = $uploadFileHandles;
+	}
+	return @{ $self->{uploads}->{$formName} };
+}
+
 sub uri {
 	my $self = shift;
 	my $value = shift;

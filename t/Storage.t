@@ -16,10 +16,16 @@ our $todo;
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::PseudoRequest;
 
 use File::Spec;
 use Test::More;
 use Test::Deep;
+use Test::MockObject;
+
+my $mock = Test::MockObject->new();
+$mock->fake_module('Apache2::Request');
+$mock->fake_module('Apache2::Upload');
 
 my $extensionTests = [
 	{
@@ -49,7 +55,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 74 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 76 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -372,6 +378,22 @@ is ($hexStorage->{_part2}, $part2, 'Storage part2 uses hexId, too');
 like ($hexStorage->getPath, qr/$hexValue/, 'Storage path uses hexId');
 
 $session->config->set('caseInsensitiveOS', 0);
+
+####################################################
+#
+# addFileFromFormPost
+#
+####################################################
+
+my $pseudoRequest = WebGUI::PseudoRequest->new();
+$session->{_request} = $pseudoRequest;
+
+$session->http->setStatus(413);
+is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty string when HTTP status is 413');
+
+$session->http->setStatus(200);
+$pseudoRequest->upload('files', []);
+is($fileStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
 
 END {
 	foreach my $stor (
