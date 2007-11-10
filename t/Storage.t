@@ -11,7 +11,6 @@
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/lib";
-our $todo;
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -55,7 +54,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 76 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 77 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -394,6 +393,12 @@ is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty str
 $session->http->setStatus(200);
 $pseudoRequest->upload('files', []);
 is($fileStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
+
+$pseudoRequest->uploadFiles(
+    'oneFile',
+    [ File::Spec->catfile( WebGUI::Test->getTestCollateralPath, qw/WebGUI.pm/) ],
+);
+is($fileStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', 'Return the name of the uploaded file');
 
 END {
 	foreach my $stor (

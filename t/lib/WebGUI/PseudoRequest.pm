@@ -1,5 +1,7 @@
 package WebGUI::PseudoRequest;
 
+use strict;
+
 package WebGUI::PseudoRequest::Headers;
 
 sub new {
@@ -20,6 +22,55 @@ sub set {
 sub fetch {
 	my $self = shift;
 	return $self->{headers};
+}
+
+package WebGUI::PseudoRequest::Upload;
+
+sub new {
+	my $this = shift;
+	my $class = ref($this) || $this;
+	my $self = {
+        fh       => undef,
+        size     => 0,
+        filename => '',
+    };
+    my $file = shift;
+    if ($file and -e $file) {
+        $self->{filename} = $file;
+        $self->{size} = (stat $file)[7];
+        open my $fh, '<' . $file or
+            die "Unable to open $file for reading and creating a filehandle: $!\n";
+        $self->{fh} = $fh;
+    }
+	bless $self, $class;
+	return $self;
+}
+
+sub fh {
+	my $self = shift;
+	my $value = shift;
+	if (defined $value) {
+		$self->{fh} = $value;
+	}
+	return $self->{fh};
+}
+
+sub filename {
+	my $self = shift;
+	my $value = shift;
+	if (defined $value) {
+		$self->{filename} = $value;
+	}
+	return $self->{filename};
+}
+
+sub size {
+	my $self = shift;
+	my $value = shift;
+	if (defined $value) {
+		$self->{size} = $value;
+	}
+	return $self->{size};
 }
 
 package WebGUI::PseudoRequest;
@@ -154,6 +205,20 @@ sub upload {
 		$self->{uploads}->{$formName} = $uploadFileHandles;
 	}
 	return @{ $self->{uploads}->{$formName} };
+}
+
+sub uploadFiles {
+	my $self = shift;
+    my $formName = shift;
+    my $filesToUpload = shift;
+    return unless $formName;
+    return unless scalar $filesToUpload;
+    my @uploadObjects = ();
+    foreach my $file (@{ $filesToUpload }) {
+        my $upload = WebGUI::PseudoRequest::Upload->new($file);
+        push @uploadObjects, $upload;
+    }
+    $self->upload($formName, \@uploadObjects);
 }
 
 sub uri {
