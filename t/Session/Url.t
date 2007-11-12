@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 51 + scalar(@getRefererUrlTests);
+plan tests => 54 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -348,6 +348,31 @@ is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,
     q!getBackToSiteURL: Root returns you to the default Asset!
+);
+
+my $statefulAsset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+
+$statefulAsset->{_properties}{state} = 'archived';
+$session->asset( $statefulAsset );
+is(
+    $session->url->getBackToSiteURL, 
+    WebGUI::Asset->getRoot($session)->getUrl,
+    q!getBackToSiteURL: When asset state is archived, it returns you to the Asset's container!
+);
+
+$statefulAsset->{_properties}{state} = 'published';
+is(
+    $session->url->getBackToSiteURL, 
+    WebGUI::Asset->getRoot($session)->getUrl,
+    q!getBackToSiteURL: When asset state is published, it returns you to the Asset's container!
+);
+
+
+$statefulAsset->{_properties}{state} = 'trash';
+is(
+    $session->url->getBackToSiteURL, 
+    $defaultAssetUrl,
+    q!getBackToSiteURL: When asset state is not archived or published, it returns you to the default Asset!
 );
 
 END {  ##Always clean-up
