@@ -26,37 +26,12 @@ my $mock = Test::MockObject->new();
 $mock->fake_module('Apache2::Request');
 $mock->fake_module('Apache2::Upload');
 
-my $extensionTests = [
-	{
-		filename => 'filename',
-		extension => undef,
-		comment => 'no extension',
-	},
-	{
-		filename => 'filename.',
-		extension => '',
-		comment => 'dot, but no extension',
-	},
-	{
-		filename => 'filename.txt',
-		extension => 'txt',
-		comment => 'simple extension',
-	},
-	{
-		filename => 'filename.TXT',
-		extension => 'txt',
-		comment => 'extensions are all lowercase',
-	},
-	{
-		filename => 'filename.FOO.BAR',
-		extension => 'bar',
-		comment => 'multiple extensions return last extension',
-	},
-];
-
-plan tests => 77 + scalar @{ $extensionTests }; # increment this value for each test you create
-
 my $session = WebGUI::Test->session;
+
+my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
+
+my $numTests = 77; # increment this value for each test you create
+plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
 ok ($uploadDir, "uploadDir defined in config");
@@ -399,6 +374,85 @@ $pseudoRequest->uploadFiles(
     [ File::Spec->catfile( WebGUI::Test->getTestCollateralPath, qw/WebGUI.pm/) ],
 );
 is($fileStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', 'Return the name of the uploaded file');
+
+####################################################
+#
+# getFileIconUrl
+#
+####################################################
+
+foreach my $iconTest (@{ $fileIconTests }) {
+	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
+}
+
+####################################################
+#
+# Setup data driven tests here, to keep the top part of the
+# test clean.
+#
+####################################################
+
+sub setupDataDrivenTests {
+    my $session = shift;
+    my $extensionTests = [
+        {
+            filename => 'filename',
+            extension => undef,
+            comment => 'no extension',
+        },
+        {
+            filename => 'filename.',
+            extension => '',
+            comment => 'dot, but no extension',
+        },
+        {
+            filename => 'filename.txt',
+            extension => 'txt',
+            comment => 'simple extension',
+        },
+        {
+            filename => 'filename.TXT',
+            extension => 'txt',
+            comment => 'extensions are all lowercase',
+        },
+        {
+            filename => 'filename.FOO.BAR',
+            extension => 'bar',
+            comment => 'multiple extensions return last extension',
+        },
+    ];
+
+    my $fileIconTests = [
+        {
+            filename => 'filename',
+            iconUrl  => $session->url->extras("fileIcons/unknown.gif"),
+            comment  => 'no extension uses unknown icon',
+        },
+        {
+            filename => 'filename.txt',
+            iconUrl  => $session->url->extras("fileIcons/txt.gif"),
+            comment  => 'valid extension, lower case works',
+        },
+        {
+            filename => 'filename.TXT',
+            iconUrl  => $session->url->extras("fileIcons/txt.gif"),
+            comment  => 'valid extension, upper case works',
+        },
+        {
+            filename => 'filename.00TXT00',
+            iconUrl  => $session->url->extras("fileIcons/unknown.gif"),
+            comment  => 'unknown extension',
+        },
+    ];
+
+    return ($extensionTests, $fileIconTests)
+}
+
+####################################################
+#
+# END block, clean-up after yourself
+#
+####################################################
 
 END {
 	foreach my $stor (
