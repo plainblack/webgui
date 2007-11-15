@@ -275,8 +275,9 @@ sub checkView {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my ($conf, $env, $var, $http) = $self->session->quick(qw(config env var http));
-    if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
-        $http->setRedirect("https://".$conf->get("sitename")->[0].$self->getUrl);
+    if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
+        # getUrl already changes url to https if 'encryptPage'
+        $http->setRedirect($self->getUrl);
         return "redirect";
 	}
     elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
