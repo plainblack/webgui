@@ -183,25 +183,34 @@ Duplicates self, cuts duplicate, returns self->getContainer->www_view if canEdit
 =cut
 
 sub www_copy {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $self = shift;
+    return $self->session->privilege->insufficient
+        unless $self->canEdit;
 
-        # with: 'children' || 'descendants' || ''
-        my $with = $self->session->form->get('with') || '';
 
-        if ($with) {
-            my $childrenOnly = $with eq 'children';
-            my $newAsset = $self->duplicateBranch($childrenOnly);
-            $newAsset->update({ title=>$self->getTitle.' (copy)'});
-            $newAsset->cut;
-            return $self->session->asset($self->getContainer)->www_view;
+    # with: 'children' || 'descendants' || ''
+    my $with = $self->session->form->get('with') || '';
+    my $newAsset;
+    if ($with) {
+        my $childrenOnly = $with eq 'children';
+        $newAsset = $self->duplicateBranch($childrenOnly);
+    }
+    else {
+        $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
+    }
+    $newAsset->update({ title=>$self->getTitle.' (copy)'});
+    $newAsset->cut;
+    if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+            $self->session->http->setRedirect($self->getUrl(
+                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
+            ));
+            return 1;
         }
-        else {
-            my $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
-            $newAsset->update({ title=>$self->getTitle.' (copy)'});
-            $newAsset->cut;
-            return $self->session->asset($self->getContainer)->www_view;
-        }
+    }
+    return $self->session->asset($self->getContainer)->www_view;
 }
 
 #-------------------------------------------------------------------
