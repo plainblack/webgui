@@ -13,6 +13,7 @@
  - fix: SSL redirection broken
  - fix: Shortcut overrides not copied with asset or removed on purge
  - fix: Copy operations create version tags even with auto-commit turned on
+ - fix: Site starter style displays incorrectly in IE
 
 7.4.13
  - fix: field_loop missing from SQL Form template
