@@ -1,3 +1,5 @@
+7.4.15
+
 7.4.14
  - fix: CS posts won't allow new attachments after deleting an old one
  - fix: SSL redirection broken
