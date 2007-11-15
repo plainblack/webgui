@@ -208,6 +208,19 @@ sub discernUserId {
 }
 
 #-------------------------------------------------------------------
+sub duplicate {
+    my $self = shift;
+    my $newAsset = $self->SUPER::duplicate(@_);
+    $self->session->db->write(<<'END_SQL', [$newAsset->getId, $self->getId]);
+INSERT INTO Shortcut_overrides (assetId, fieldName, newValue)
+SELECT ?, fieldName, newValue
+FROM Shortcut_overrides 
+WHERE assetId = ?
+END_SQL
+    return $newAsset;
+}
+
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -636,7 +649,16 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+sub purge {
+    my $self = shift;
+    $self->session->db->write(<<'END_SQL', [$self->getId]);
+DELETE FROM Shortcut_overrides
+WHERE assetId = ?
+END_SQL
+    return $self->SUPER::purge(@_);
+}
 
+#-------------------------------------------------------------------
 sub uncacheOverrides {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,$self->_overridesCacheTag)->delete;

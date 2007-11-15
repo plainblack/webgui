@@ -11,6 +11,7 @@
 7.4.14
  - fix: CS posts won't allow new attachments after deleting an old one
  - fix: SSL redirection broken
+ - fix: Shortcut overrides not copied with asset or removed on purge
 
 7.4.13
  - fix: field_loop missing from SQL Form template
