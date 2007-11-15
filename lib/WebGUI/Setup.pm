@@ -227,7 +227,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 #mainBodyContentContainer { padding: 5px; margin-left: 200px; font-family: serif, times new roman; font-size: 12pt; }
 #pageFooterContainer { text-align: center; background-color: '.$form->get("footerBackgroundColor").'; color: '.$form->get("footerTextColor").'; }
 #copyrightContainer { font-size: 8pt; }
-#pageWidthContainer { margin-left: 10%; margin-right: 10%; font-family: sans-serif, helvetica, arial; border: 3px solid black; }
+#pageWidthContainer { width: 80%; margin-left: auto; margin-right: auto; font-family: sans-serif, helvetica, arial; border: 3px solid black; }
 ';
            my $css = addAsset($importNode, {
                 title       => "my-style.css",
