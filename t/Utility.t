@@ -17,7 +17,7 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 22; # increment this value for each test you create
+use Test::More tests => 43; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -36,6 +36,8 @@ ok(WebGUI::Utility::isBetween(0,-1,1), 'isBetween() - negative and positive rang
 ok(WebGUI::Utility::isBetween(0,1,-1), 'isBetween() - negative and positive range, reversed'); 
 ok(WebGUI::Utility::isBetween(11,1,15), 'isBetween() - positive range'); 
 ok(WebGUI::Utility::isBetween(-5,-10,-2), 'isBetween() - negative range'); 
+ok(!WebGUI::Utility::isBetween(+5,-10,-2), 'isBetween() - not in range on high side'); 
+ok(!WebGUI::Utility::isBetween(-15,-10,-2), 'isBetween() - not in range on low side'); 
 
 # isIn
 ok(WebGUI::Utility::isIn("webgui", qw(cars trucks webgui trains)), 'isIn()');
@@ -50,14 +52,38 @@ foreach my $row (@commaFilledArray) {
 ok($noCommaFound, 'makeArrayCommaSafe()');
 
 # makeCommaSafe
-ok(!(WebGUI::Utility::makeCommaSafe("this,that,foo,,bar") =~ m/,/), 'makeCommaSafe()');
+unlike(WebGUI::Utility::makeCommaSafe("this,that,foo,,bar"),  qr/,/, 'makeCommaSafe()');
+is(
+    WebGUI::Utility::makeCommaSafe("this,that,foo,,bar"),
+    'this;that;foo;;bar', 
+    'makeCommaSafe()'
+);
+is(
+    WebGUI::Utility::makeCommaSafe("this,that\nfoo\rbar\r\n"),
+    'this;that foo bar  ', 
+    'makeCommaSafe()'
+);
 
 # makeTabSafe
-ok(!(WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t") =~ m/\t/), 'makeTabSafe()');
+unlike(WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t"), qr/\t/, 'makeTabSafe()');
+is(
+    WebGUI::Utility::makeTabSafe("this\tthat\tfoo\tbar\t"),
+    "this    that    foo    bar    ", 
+    'makeCommaSafe(): clearing tabs'
+);
+is(
+    WebGUI::Utility::makeTabSafe("this\nthat\tfoo\rbar\r\n"),
+    "this that    foo bar  ", 
+    'makeCommaSafe(): clearing tabs, newlines and carriage returns'
+);
 
 # randint
 my $number = WebGUI::Utility::randint(50,75);
 ok($number >= 50 && $number <= 75, 'randint()');
+$number = WebGUI::Utility::randint();
+ok($number >= 0 && $number <= 1, 'randint() with default params');
+my $number = WebGUI::Utility::randint(10,5);
+ok($number >= 5 && $number <= 10, 'randint() auto reverses params if they are backwards');
 
 # randomizeArray
 SKIP: {
@@ -88,6 +114,21 @@ is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
 	is_deeply([keys %hash3], [qw/a d b c e/], 'sortHashDescending');
 }
+
+# isInSubnets
+is(WebGUI::Utility::isInSubnet('192.168.0.1', []), 0, 'isInSubnet: comparing against an empty array ref');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1/32']), 1, 'isInSubnet: comparing against an exact match');
+is(WebGUI::Utility::isInSubnet('192.168.0.2', ['192.168.0.1/32']), 0, 'isInSubnet: comparing against a mismatch');
+is(WebGUI::Utility::isInSubnet('192.168.0.2', ['192.168.0.1/30']), 1, 'isInSubnet: comparing against a match with mask');
+is(WebGUI::Utility::isInSubnet('256.168.0.2', ['192.168.0.1/30']), 0, 'isInSubnet: ip is out of range');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1/33']), undef, 'isInSubnet: mask is out of range');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.0.1/33']), undef, 'isInSubnet: ip has too many dots');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['0.0.1/33']), undef, 'isInSubnet: ip has too few dots');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.1']), undef, 'isInSubnet: ip is missing mask');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['256.168.0.1/32']), undef, 'isInSubnet: ip has an out of range quad');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.257.0.1/32']), undef, 'isInSubnet: ip has an out of range quad');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.258.1/32']), undef, 'isInSubnet: ip has an out of range quad');
+is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.259/32']), undef, 'isInSubnet: ip has an out of range quad');
 
 # Local variables:
 # mode: cperl
