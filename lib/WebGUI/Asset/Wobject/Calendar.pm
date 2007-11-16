@@ -489,7 +489,11 @@ sub getEditForm {
         for (var i = 0; i < cells.length; i++)
             row.appendChild(cells[i]);
         
-        table.appendChild(row);
+        var tbody = table.getElementsByTagName('tbody')[0];
+        if (tbody)
+            tbody.appendChild(row);
+        else
+            table.appendChild(row);
         FeedsManager.updateFeed(table.getAttribute("id"),rowId);
     }
     

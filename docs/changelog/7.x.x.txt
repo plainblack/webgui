@@ -8,6 +8,9 @@
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
 
+7.4.15
+ - fix: Calendar feed list doesn't display in IE
+
 7.4.14
  - fix: CS posts won't allow new attachments after deleting an old one
  - fix: SSL redirection broken
