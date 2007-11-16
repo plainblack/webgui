@@ -55,9 +55,13 @@ sub www_spectreGetSiteData {
 	$session->http->setMimeType("text/json");
 	$session->http->setCacheControl("none");
 	my %siteData = ();
-	if (!isInSubnet($session->env->getIp, $session->config->get("spectreSubnets"))) {
-		$session->errorHandler->security("make a Spectre workflow data load request, but we're only allowed to accept requests from "
-			.join(",",@{$session->config->get("spectreSubnets")}).".");
+    my $subnets = $session->config->get("spectreSubnets");
+    if (!defined $subnets) {
+        $subnets = [];
+    }
+	if (!isInSubnet($session->env->getIp, $subnets)) {
+		$session->errorHandler->security("Tried to make a Spectre workflow data load request, but we're only allowed to accept requests from "
+			.join(",",@{$subnets}).".");
 	} 
   	else {
 		my $sitename = $session->config->get("sitename")->[0];
@@ -168,9 +172,13 @@ sub www_spectreTest {
 	my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
-	unless (isInSubnet($session->env->getIp, $session->config->get("spectreSubnets"))) {
-		$session->errorHandler->security("make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$session->config->get("spectreSubnets")}).".");
-        	return "subnet";
+    my $subnets = $session->config->get("spectreSubnets");
+    if (!defined $subnets) {
+        $subnets = [];
+    }
+	unless (isInSubnet($session->env->getIp, $subnets)) {
+		$session->errorHandler->security("Tried to make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$subnets}).".");
+        return "subnet";
 	}
 	my $remote = create_ikc_client(
 		port=>$session->config->get("spectrePort"),
