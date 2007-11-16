@@ -225,7 +225,8 @@ Searches through an array looking for tabs and replaces them with four spaces. A
 
 =head3 array
 
- A reference to the array to look through.
+ A reference to the array to look through.  The array itself is modified, rather than
+ returning useful data.
 
 =cut
 
