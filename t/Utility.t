@@ -17,7 +17,8 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 43; # increment this value for each test you create
+use Test::More tests => 44; # increment this value for each test you create
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 
@@ -75,6 +76,15 @@ is(
     WebGUI::Utility::makeTabSafe("this\nthat\tfoo\rbar\r\n"),
     "this that    foo bar  ", 
     'makeCommaSafe(): clearing tabs, newlines and carriage returns'
+);
+
+# makeArrayTabSafe -- modifies an array in place
+my $tabbedArray = ["this\tthat", "these\nthose"];
+WebGUI::Utility::makeArrayTabSafe($tabbedArray);
+cmp_deeply(
+    $tabbedArray,
+    ["this    that", "these those"],
+    'makeArrayTabSafe'
 );
 
 # randint
