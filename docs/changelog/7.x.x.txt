@@ -1,5 +1,7 @@
 7.4.15
  - fix: Calendar feed list doesn't display in IE
+ - fix: Event: attachments link icon not rendering (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/event-attachments-link-icon-not-rendering
 
 7.4.14
  - fix: CS posts won't allow new attachments after deleting an old one
