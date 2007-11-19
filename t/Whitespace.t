@@ -48,6 +48,10 @@ if ($numFailedModules) {
 
 #----------------------------------------
 sub getWebGUIModules {
+	if ($File::Find::name =~ m#/(?:Help|i18n)/?$#) {
+		$File::Find::prune=1;
+		return;
+	}
 	push( @modules, $File::Find::name ) if /\.pm$/;
 }
 
