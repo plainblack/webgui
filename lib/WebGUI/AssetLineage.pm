@@ -168,9 +168,18 @@ sub formatRank {
 
 #-------------------------------------------------------------------
 
-=head2 getChildCount ( )
+=head2 getChildCount ( opts )
 
 Returns the number of children this asset has. This excludes assets in the trash or clipbaord.
+
+=head3 opts
+
+A hashref of options.  Currently only one option is supported.
+
+=head4 includeTrash
+
+If this value of this hash key is true, then assets in any state will be counted.  Normally,
+only those that are published or achived are counted.
 
 =cut
 
