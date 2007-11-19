@@ -85,7 +85,7 @@ sub updateTemplates {
 				$first = 0;
 			} elsif ($line =~ m/^\#create$/) {
 				$create = 1;
-			} elsif ($line =~ m/^\#(.*):(.*)$/) {
+			} elsif ($line =~ m/^\#(.*):\s*(.*)$/) {
 				$properties{$1} = $2;
 			} elsif ($line =~ m/^~~~$/) {
 				$head = 1;
