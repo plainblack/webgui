@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 78; # increment this value for each test you create
+use Test::More tests => 82; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -118,6 +118,16 @@ is(2,                $topFolder->getChildCount, 'getChildCount on top folder (2 
 $folder->update({status => 'pending'});
 is(1, $topFolder->getChildCount, 'getChildCount with one child pending');
 $folder->update({status => 'approved'});
+
+$folder2->trash();
+is(1, $topFolder->getChildCount, 'getChildCount with one child trashed');
+is(2, $topFolder->getChildCount({includeTrash => 1}), 'getChildCount with one child trash but includeTrash = 1');
+$folder2->publish();
+
+$folder2->cut();
+is(1, $topFolder->getChildCount, 'getChildCount with one child in the clipboard');
+$folder2->publish();
+is(2, $topFolder->getChildCount, 'getChildCount: restored original setup for next series of tests');
 
 ####################################################
 #
