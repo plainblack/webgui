@@ -170,7 +170,7 @@ sub formatRank {
 
 =head2 getChildCount ( opts )
 
-Returns the number of children this asset has. This excludes assets in the trash or clipbaord.
+Returns the number of children this asset has. This excludes assets in the trash or clipboard.
 
 =head3 opts
 
@@ -186,8 +186,8 @@ only those that are published or achived are counted.
 sub getChildCount {
 	my $self = shift;
     my $opts = shift || {};
-	my $stateWhere = $opts->{includeTrash} ? '' : "state in ('published','archived') and";
-	my ($count) = $self->session->db->quickArray("select count(*) from asset where $stateWhere parentId=?", [$self->getId]);
+	my $stateWhere = $opts->{includeTrash} ? '' : "asset.state='published' and";
+	my ($count) = $self->session->db->quickArray("select count(asset.state) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and assetData.status in ('approved', 'archived')", [$self->getId]);
 	return $count;
 }
 

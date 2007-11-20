@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 76; # increment this value for each test you create
+use Test::More tests => 78; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -111,8 +111,13 @@ is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild: cached loo
 #
 ####################################################
 
-is(scalar @snippets, $folder->getChildCount,  'getChildCount on folder with several children');
-is(1,                $folder2->getChildCount, 'getChildCount on folder with 1 child');
+is(scalar @snippets, $folder->getChildCount,    'getChildCount on folder with several children');
+is(1,                $folder2->getChildCount,   'getChildCount on folder with 1 child');
+is(2,                $topFolder->getChildCount, 'getChildCount on top folder (2 kids)');
+
+$folder->update({status => 'pending'});
+is(1, $topFolder->getChildCount, 'getChildCount with one child pending');
+$folder->update({status => 'approved'});
 
 ####################################################
 #
@@ -120,7 +125,7 @@ is(1,                $folder2->getChildCount, 'getChildCount on folder with 1 ch
 #
 ####################################################
 
-is(10, $topFolder->getDescendantCount,             'getDescendantCount on top folder');
+is(10,            $topFolder->getDescendantCount,  'getDescendantCount on top folder');
 is(scalar @snippets, $folder->getDescendantCount,  'getDescendantCount on folder with several children');
 is(1,                $folder2->getDescendantCount, 'getDescendantCount on folder with 1 child');
 
