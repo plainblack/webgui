@@ -195,13 +195,14 @@ sub getChildCount {
 
 =head2 getDescendantCount ( )
 
-Returns the number of descendants this asset has. This excludes assets in the trash or clipboard.
+Returns the number of descendants this asset has. This includes only assets that are published, and not
+in the clipboard or trash.
 
 =cut
 
 sub getDescendantCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from asset where state in ('published', 'archived') and lineage like ?", [$self->get("lineage")."%"]);
+	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
 	$count--; # have to subtract self
 	return $count;
 }
