@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 83; # increment this value for each test you create
+use Test::More tests => 87; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -111,23 +111,23 @@ is($snippets[-1]->getId, $folder->getLastChild->getId, 'getLastChild: cached loo
 #
 ####################################################
 
-is(scalar @snippets, $folder->getChildCount,    'getChildCount on folder with several children');
-is(1,                $folder2->getChildCount,   'getChildCount on folder with 1 child');
-is(2,                $topFolder->getChildCount, 'getChildCount on top folder (2 kids)');
+is($folder->getChildCount,    scalar @snippets, 'getChildCount on folder with several children');
+is($folder2->getChildCount,   1,                'getChildCount on folder with 1 child');
+is($topFolder->getChildCount, 2,                'getChildCount on top folder (2 kids)');
 
 $folder->update({status => 'pending'});
-is(1, $topFolder->getChildCount, 'getChildCount with one child pending');
+is($topFolder->getChildCount, 1, 'getChildCount with one child pending');
 $folder->update({status => 'approved'});
 
 $folder2->trash();
-is(1, $topFolder->getChildCount, 'getChildCount with one child trashed');
-is(2, $topFolder->getChildCount({includeTrash => 1}), 'getChildCount with one child trash but includeTrash = 1');
+is($topFolder->getChildCount, 1, 'getChildCount with one child trashed');
+is($topFolder->getChildCount({includeTrash => 1}), 2, 'getChildCount with one child trash but includeTrash = 1');
 $folder2->publish();
 
 $folder2->cut();
-is(1, $topFolder->getChildCount, 'getChildCount with one child in the clipboard');
+is($topFolder->getChildCount, 1, 'getChildCount with one child in the clipboard');
 $folder2->publish();
-is(2, $topFolder->getChildCount, 'getChildCount: restored original setup for next series of tests');
+is($topFolder->getChildCount, 2, 'getChildCount: restored original setup for next series of tests');
 
 ####################################################
 #
@@ -142,6 +142,16 @@ is($folder2->getDescendantCount,   1,                'getDescendantCount on fold
 $folder->update({status => 'pending'});
 is($topFolder->getDescendantCount, 9, 'getDescendantCount with one child pending');
 $folder->update({status => 'approved'});
+
+$folder2->trash();
+is($topFolder->getDescendantCount, 8, 'getDescendantCount with one child with family trashed');
+$folder2->publish();
+is($topFolder->getDescendantCount, 10, 'getDescendantCount: restored original setup for next series of tests');
+
+$folder2->cut();
+is($topFolder->getDescendantCount, 8, 'getDescendantCount with one child with family in the clipboard');
+$folder2->publish();
+is($topFolder->getDescendantCount, 10, 'getDescendantCount: restored original setup for next series of tests');
 
 ####################################################
 #
