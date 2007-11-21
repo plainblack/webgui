@@ -9,6 +9,7 @@
    (Diona Kidd, Knowmad Technologies)
 
 7.4.15
+ - fix: DataForm doesn't send mail if mail fields are in a tab
  - fix: Calendar feed list doesn't display in IE
 
 7.4.14

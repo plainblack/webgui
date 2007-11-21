@@ -782,7 +782,25 @@ sub sendEmail {
 			$row->{"field.value"} = WebGUI::HTML::format($row->{"field.value"},'mixed');
 		}
 	}
-	my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
+    my @rows = map { @{ $_->{'tab.field_loop'} } } @{$var->{tab_loop}};
+    foreach my $row (@rows) {
+        if ($row->{"tab.field.name"} eq "to") {
+            $to = $row->{"tab.field.value"};
+        } elsif ($row->{"tab.field.name"} eq "from") {
+            $from = $row->{"tab.field.value"};
+        } elsif ($row->{"tab.field.name"} eq "cc") {
+            $cc = $row->{"tab.field.value"};
+        } elsif ($row->{"tab.field.name"} eq "bcc") {
+            $bcc = $row->{"tab.field.value"};
+        } elsif ($row->{"tab.field.name"} eq "subject") {
+            $subject = $row->{"tab.field.value"};
+        } elsif ($row->{"tab.field.type"} eq "textArea") {
+            $row->{"tab.field.value"} =~ s/\n/<br\/>/;
+        } elsif ($row->{"tab.field.type"} eq "textarea") {
+            $row->{"tab.field.value"} = WebGUI::HTML::format($row->{"tab.field.value"},'mixed');
+        }
+    }
+    my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
 	WebGUI::Macro::process($self->session,\$message);
 	my @attachments = $self->get('mailAttachments')?
 	    @{$self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}})}
