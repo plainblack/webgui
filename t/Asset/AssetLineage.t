@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 82; # increment this value for each test you create
+use Test::More tests => 83; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -135,9 +135,13 @@ is(2, $topFolder->getChildCount, 'getChildCount: restored original setup for nex
 #
 ####################################################
 
-is(10,            $topFolder->getDescendantCount,  'getDescendantCount on top folder');
-is(scalar @snippets, $folder->getDescendantCount,  'getDescendantCount on folder with several children');
-is(1,                $folder2->getDescendantCount, 'getDescendantCount on folder with 1 child');
+is($topFolder->getDescendantCount, 10,               'getDescendantCount on top folder');
+is($folder->getDescendantCount,    scalar @snippets, 'getDescendantCount on folder with several children');
+is($folder2->getDescendantCount,   1,                'getDescendantCount on folder with 1 child');
+
+$folder->update({status => 'pending'});
+is($topFolder->getDescendantCount, 9, 'getDescendantCount with one child pending');
+$folder->update({status => 'approved'});
 
 ####################################################
 #
