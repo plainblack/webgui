@@ -1,4 +1,5 @@
 7.4.15
+ - fix: DataForm doesn't send mail if mail fields are in a tab
  - fix: Calendar feed list doesn't display in IE
  - fix: Event: attachments link icon not rendering (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/event-attachments-link-icon-not-rendering
