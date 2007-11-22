@@ -13,9 +13,12 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::MockObject;
-my $mocker = Test::MockObject->new();
-$mocker->fake_module('WebGUI::Form::Image');
-$mocker->fake_new('WebGUI::Form::Image');
+my $mocker;
+BEGIN {
+    $mocker = Test::MockObject->new();
+    $mocker->fake_module('WebGUI::Form::Image');
+    $mocker->fake_new('WebGUI::Form::Image');
+}
 
 use WebGUI::Test;
 use WebGUI::Session;

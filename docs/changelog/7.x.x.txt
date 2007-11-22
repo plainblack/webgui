@@ -1,4 +1,5 @@
 7.4.15
+ - fix: Image asset test fails
  - fix: Article attachments don't obey max image dimentions
  - fix: Article size doesn't include attachments
  - fix: Invalid group grouping entries can prevent admin admin mode and other operations
