@@ -20,10 +20,28 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+removeOrphanGroupings($session);
+changeDefaultTimeZone($session);
 # upgrade functions go here
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub changeDefaultTimeZone {
+    my $session = shift;
+    print "\tChanging Default Event Timezone.\n" unless ($quiet);
+    $session->db->write("alter table Event alter timeZone set default 'America/Chicago'");
+    my $visitor = WebGUI::User->new($session, 1);
+    my $defaultTimeZone = $visitor->profileField('timeZone');
+    $session->db->write("update Event set timeZone=? where timeZone='UTC'", [$defaultTimeZone]);
+}
+
+#-------------------------------------------------
+sub removeOrphanGroupings {
+    my $session = shift;
+    print "\tCleaning up stale groupings.\n" unless ($quiet);
+    $session->db->write("delete from groupGroupings where groupId not in (select distinct groupId from groups)");
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {
