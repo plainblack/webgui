@@ -288,7 +288,7 @@ sub checkView {
 		$http->setRedirect($self->getUrl("func=manageClipboard"));
 		return "redirect";
 	} 
-    elsif ($self->get("state") ne "published" && $self->get("state") ne "archived") { # tell em it doesn't exist anymore
+    elsif ($self->get("state") ne "published") { # tell em it doesn't exist anymore
 		$http->setStatus("410");
 		my $notFound = WebGUI::Asset->getNotFound($self->session);
 		$self->session->asset($notFound);

@@ -325,8 +325,6 @@ is($session->url->getBackToSiteURL, '/goBackToTheSite', 'getBackToSiteURL: when 
 $session->asset($sessionAsset);
 is($session->url->getBackToSiteURL, $session->asset->getUrl, q!getBackToSiteURL: for most regular old assets, it takes you back to the asset's container!);
 
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
 my $defaultAssetUrl = WebGUI::Asset->getDefault($session)->getUrl;
 
 $session->asset( WebGUI::Asset->getImportNode($session) );
@@ -356,15 +354,10 @@ TODO: {
     ok(0, 'test a child of the media folder');
 }
 
+my $versionTag = WebGUI::VersionTag->getWorking($session);
 my $statefulAsset = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
-
-$statefulAsset->{_properties}{state} = 'archived';
+$versionTag->commit;
 $session->asset( $statefulAsset );
-is(
-    $session->url->getBackToSiteURL, 
-    WebGUI::Asset->getRoot($session)->getUrl,
-    q!getBackToSiteURL: When asset state is archived, it returns you to the Asset's container!
-);
 
 $statefulAsset->{_properties}{state} = 'published';
 is(
@@ -373,12 +366,18 @@ is(
     q!getBackToSiteURL: When asset state is published, it returns you to the Asset's container!
 );
 
-
 $statefulAsset->{_properties}{state} = 'trash';
 is(
     $session->url->getBackToSiteURL, 
     $defaultAssetUrl,
-    q!getBackToSiteURL: When asset state is not archived or published, it returns you to the default Asset!
+    q!getBackToSiteURL: When asset state is trash, it returns you to the default Asset!
+);
+
+$statefulAsset->{_properties}{state} = 'clipboard';
+is(
+    $session->url->getBackToSiteURL, 
+    $defaultAssetUrl,
+    q!getBackToSiteURL: When asset state is clipboard, it returns you to the default Asset!
 );
 
 END {  ##Always clean-up
