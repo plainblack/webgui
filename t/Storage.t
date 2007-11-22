@@ -22,10 +22,6 @@ use Test::More;
 use Test::Deep;
 use Test::MockObject;
 
-my $mock = Test::MockObject->new();
-$mock->fake_module('Apache2::Request');
-$mock->fake_module('Apache2::Upload');
-
 my $session = WebGUI::Test->session;
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
