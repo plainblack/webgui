@@ -9,8 +9,16 @@
    (Diona Kidd, Knowmad Technologies)
 
 7.4.15
+ - fix: Image asset test fails
+ - fix: Article attachments don't obey max image dimentions
+ - fix: Article size doesn't include attachments
+ - fix: Invalid group grouping entries can prevent admin admin mode and other operations
+ - clean up invalid group groupings
+ - fix: Editing events after upgrade shows incorrect time zone
  - fix: DataForm doesn't send mail if mail fields are in a tab
  - fix: Calendar feed list doesn't display in IE
+ - fix: Event: attachments link icon not rendering (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/event-attachments-link-icon-not-rendering
 
 7.4.14
  - fix: CS posts won't allow new attachments after deleting an old one

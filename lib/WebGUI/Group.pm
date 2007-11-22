@@ -574,7 +574,9 @@ sub getAllUsers {
 	##Have to iterate twice due to the withoutExpired clause.
 	foreach my $groupId (@{ $groups }) {
 		my $subGroup = WebGUI::Group->new($self->session, $groupId);
-		push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
+        next
+            if !$subGroup;
+        push @users, @{ $subGroup->getAllUsers(1, $withoutExpired, $loopCount) };
 	}
 	my %users = map { $_ => 1 } @users;
 	@users = keys %users;

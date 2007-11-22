@@ -13,12 +13,12 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 
 use Test::MockObject;
-my $mocker = Test::MockObject->new();
-#$mocker->fake_module('WebGUI::Form::Image', fake_method => sub {return 1;});
-# XXX
-# Hack to make this test run.  This exact same code works fine for File.t above
-$mocker->fake_module('WebGUI::Form::Image', fake_method => sub {return 1;});
-$mocker->fake_new('WebGUI::Form::Image');
+my $mocker;
+BEGIN {
+    $mocker = Test::MockObject->new();
+    $mocker->fake_module('WebGUI::Form::Image');
+    $mocker->fake_new('WebGUI::Form::Image');
+}
 
 use WebGUI::Test;
 use WebGUI::Session;

@@ -221,6 +221,30 @@ sub prepareView {
 	$self->{_viewTemplate} = $template;
 }
 
+#-------------------------------------------------------------------
+
+sub processPropertiesFromFormPost {
+    my $self = shift;
+    $self->SUPER::processPropertiesFromFormPost(@_);
+    my $size = 0;
+    my $storage = $self->getStorageLocation;
+    foreach my $file (@{$storage->getFiles}) {
+        if ($storage->isImage($file)) {
+            my ($w, $h) = $storage->getSizeInPixels($file);
+            my $max_size = $self->session->setting->get("maxImageSize");
+            if($w > $max_size || $h > $max_size) {
+                if($w > $h) {
+                    $storage->resize($file, $max_size);
+                }
+                else {
+                    $storage->resize($file, 0, $max_size);
+                }
+            }
+        }
+        $size += $storage->getFileSize($file);
+    }
+    $self->setSize($size);
+}
 
 #-------------------------------------------------------------------
 
