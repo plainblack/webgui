@@ -118,6 +118,35 @@ sub addFileFromCaptcha {
     return ($filename, $challenge);
 }
 
+=head2 adjustMaxImageSize ( $file )
+
+Adjust the size of an image according to the C<maxImageSize> setting in the Admin
+Console.
+
+=head3 $file
+
+The name of the file to check for a maximum file size violation.
+
+=cut 
+
+sub adjustMaxImageSize {
+	my $self = shift;
+    my $file = shift;
+    my ($w, $h) = $self->getSizeInPixels($file);
+    my $max_size = $self->session->setting->get("maxImageSize");
+    my $resized = 0;
+    if($w > $max_size || $h > $max_size) {
+        if($w > $h) {
+            $self->resize($file, $max_size);
+        }
+        else {
+            $self->resize($file, 0, $max_size);
+        }
+        $resized = 1;
+    }
+    return $resized;
+}
+
 #-------------------------------------------------------------------
 
 =head2 copy ( [ storage ] )

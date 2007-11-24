@@ -78,15 +78,7 @@ sub applyConstraints {
 		$self->update({parameters=>$parameters.' alt="'.$self->get("title").'"'});
 	}
     my $file = $self->get("filename");
-    my ($w, $h) = $storage->getSizeInPixels($file);
-    if($w > $maxImageSize || $h > $maxImageSize) {
-        if($w > $h) {
-            $storage->resize($file, $maxImageSize);
-        }
-        else {
-            $storage->resize($file, 0, $maxImageSize);
-        }
-    }
+    $storage->adjustMaxImageSize($file);
 	$self->generateThumbnail($thumbnailSize);
     $self->setSize;
 }

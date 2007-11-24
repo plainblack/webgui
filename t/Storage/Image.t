@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 40 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 51 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -198,6 +198,45 @@ is($WebGUI::Test::logger_error, q/Can't make a thumbnail for a file that is not 
 
 is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square.png'), 'getThumbnailUrl returns the correct url');
 
+####################################################
+#
+# adjustMaxImageSize
+#
+####################################################
+
+my $origMaxImageSize = $session->setting->get('maxImageSize');
+
+my $sizeTest = WebGUI::Storage::Image->create($session);
+
+my @testImages = qw/tooWide.gif tooTall.gif/;
+
+foreach my $testImage (@testImages) {
+    $sizeTest->addFileFromFilesystem(
+        File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $testImage),
+    );
+}
+
+cmp_bag($sizeTest->getFiles(), ['tooWide.gif', 'tooTall.gif'], 'both files added to storage object for testing');
+
+
+$session->setting->set('maxImageSize', 200 );
+foreach my $testImage (@testImages) {
+    my $originalSize = [ $sizeTest->getSizeInPixels($testImage) ];
+    is($sizeTest->adjustMaxImageSize($testImage), 0, "$testImage does not need to be resized");
+    cmp_bag([$sizeTest->getSizeInPixels($testImage)], $originalSize, "$testImage was not resized");
+}
+
+$session->setting->set('maxImageSize', 75 );
+foreach my $testImage (@testImages) {
+    my @originalSize = $sizeTest->getSizeInPixels($testImage);
+    is($sizeTest->adjustMaxImageSize($testImage), 1, "$testImage needs to be resized");
+    my @newSize = $sizeTest->getSizeInPixels($testImage);
+    ok ($originalSize[0] != $newSize[0], "$testImage width changed");
+    ok ($originalSize[1] != $newSize[1], "$testImage height changed");
+}
+
+$session->setting->set('maxImageSize', $origMaxImageSize );
+
 TODO: {
 	local $TODO = "Methods that need to be tested";
 	ok(0, 'resize');
@@ -205,8 +244,9 @@ TODO: {
 
 END {
 	foreach my $stor (
-        $imageStore, $thumbStore, $imageCopy,
+        $imageStore, $thumbStore, $imageCopy, $sizeTest,
     ) {
 		ref $stor eq "WebGUI::Storage::Image" and $stor->delete;
 	}
+    $session->setting->set('maxImageSize', $origMaxImageSize );
 }
