@@ -124,15 +124,15 @@ sub addGroups {
 	my $self = shift;
 	my $groups = shift;
 	WebGUI::Cache->new($self->session, $self->getId)->delete;
-	foreach my $gid (@{$groups}) {
+	GROUP: foreach my $gid (@{$groups}) {
 		next if ($gid eq '1');
 		next if ($gid eq $self->getId);
 		my ($isIn) = $self->session->db->quickArray("select count(*) from groupGroupings where groupId=? and inGroup=?", [$gid, $self->getId]);
+        next GROUP if $isIn;
 		my $group = WebGUI::Group->new($self->session, $gid);
 		my $recursive = isIn($self->getId, @{$group->getGroupsIn(1)});
-		unless ($isIn || $recursive) {
-			$self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
-		}
+        next GROUP if $recursive;
+        $self->session->db->write("insert into groupGroupings (groupId,inGroup) values (?,?)",[$gid, $self->getId]);
 	}
 	$self->clearCaches();
 	return 1;

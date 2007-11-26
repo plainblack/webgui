@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (138 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (139 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -243,9 +243,9 @@ cmp_bag($gA->getGroupsIn(),  [3], 'Group C is not a member of Group A');
 cmp_bag($gB->getGroupsIn(1), [$gA->getId, 3], 'Group C is not in Group B, recursively');
 cmp_bag($gC->getGroupsFor(), [], 'No groups contain Group C');
 
-#	B		Z
-#      / \	       / \
-#     A   C	      Y   X
+#   B       Z
+#  / \     / \
+# A   C	  Y   X
 
 $gB->addGroups([$gC->getId]);
 
@@ -258,19 +258,22 @@ $gZ->name('Group Z');
 
 $gZ->addGroups([$gX->getId, $gY->getId]);
 
-#		B
-#	       / \
-#	      A   C
-#	      |
-#	      Z
-#            / \
-#           X   Y
+#      B
+#	  / \
+#	 A   C
+#    |
+#    Z
+#   / \
+#  X   Y
 
 $gA->addGroups([$gZ->getId]);
 cmp_bag($gB->getGroupsIn(1), [$gA->getId, $gC->getId, $gZ->getId, $gY->getId, $gX->getId, 3], 'Add Z tree to A under B');
 
 $gX->addGroups([$gA->getId]);
 cmp_bag($gX->getGroupsIn(), [3], 'Not able to add B tree under Z tree under X');
+
+$gZ->addGroups([$gX->getId]);
+cmp_bag($gZ->getGroupsIn(), [$gX->getId, $gY->getId, 3], 'Not able to add a group when it is already a member of a group');
 
 cmp_bag($gX->getAllGroupsFor(), [ map {$_->getId} ($gZ, $gA, $gB) ], 'getAllGroupsFor X');
 cmp_bag($gY->getAllGroupsFor(), [ map {$_->getId} ($gZ, $gA, $gB) ], 'getAllGroupsFor Y');
@@ -406,13 +409,13 @@ my $gK = WebGUI::Group->new($session, "new");
 $gK->name('Group K');
 $gC->addGroups([$gK->getId]);
 
-#		B
-#	       / \
-#	      A   C
-#	      |   |
-#	      Z   K
-#            / \
-#           X   Y
+#      B
+#     / \
+#    A   C
+#    |   |
+#    Z   K
+#   / \
+#  X   Y
 
 $gK->karmaThreshold(5);
 
@@ -465,13 +468,13 @@ my $gS = WebGUI::Group->new($session, "new");
 $gS->name('Group S');
 $gC->addGroups([$gS->getId]);
 
-#		B
-#	       / \
-#	      A   C
-#	      |   | \
-#	      Z   K  S
-#            / \
-#           X   Y
+#        B
+#    	/ \
+#      A   C
+#      |   | \
+#      Z   K  S
+#     / \
+#    X   Y
 
 
 $gS->scratchFilter('name=Tom;airport=PDX');
