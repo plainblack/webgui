@@ -184,7 +184,6 @@ sub new {
             $self->session->{_sessionId} = $self->{_var}{sessionId};
             return $self;
         }
-		return $self if $noFuss && $self->{_var}{sessionId};
 		if ($self->{_var}{expires} && $self->{_var}{expires} < $session->datetime->time()) { ##Session expired, start a new one with the same Id
 			$self->end;
 			$self->start(1,$sessionId);
