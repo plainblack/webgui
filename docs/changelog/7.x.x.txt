@@ -8,6 +8,10 @@
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
 
+
+7.4.16
+ - fix: EMS - Adding Prerequisite sets.
+
 7.4.15
  - fix: Image asset test fails
  - fix: Article attachments don't obey max image dimentions
