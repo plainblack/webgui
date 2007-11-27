@@ -1,4 +1,5 @@
 7.4.16
+ - fix: EMS - Adding Prerequisite sets.
 
 7.4.15
  - fix: Image asset test fails

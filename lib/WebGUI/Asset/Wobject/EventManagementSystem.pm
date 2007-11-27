@@ -1922,7 +1922,11 @@ sub www_editEvent {
 	);
 	my %prereqSets;
 	tie %prereqSets, 'Tie::IxHash';
-	%prereqSets = $self->session->db->buildHash("select prerequisiteId, name from EventManagementSystem_prerequisites order by name");
+    my $conditionalWhere = "";
+    if ($self->get("globalPrerequisites") == 0) {
+        $conditionalWhere = "where assetId=".$self->session->db->quote($self->getId);
+    }
+	%prereqSets = $self->session->db->buildHash("select prerequisiteId, name from EventManagementSystem_prerequisites $conditionalWhere order by name");
 	my %prereqMemberships = $self->session->db->buildHash("select prerequisiteId, requiredProductId from EventManagementSystem_prerequisiteEvents where requiredProductId=?",[$pid]);
 	if (scalar(keys(%prereqSets)) && (scalar(keys(%prereqMemberships)) == 0)) {
 		#there are some prereq sets entered into the system, and 
@@ -4330,6 +4334,10 @@ sub www_editPrereqSet {
 		},
 		-value=>$data->{operator}
 	);
+    my $conditionalWhere = "";
+    if ($self->get("globalPrerequisites") == 0) {
+        $conditionalWhere = "and e.assetId=".$self->session->db->quote($self->getId);
+    }
 	$f->checkList(
 		-name=>"requiredEvents",
 		-vertical=>1,
@@ -4339,6 +4347,7 @@ sub www_editPrereqSet {
 		   from products as p, EventManagementSystem_products as e
 		   where
 		   	p.productId = e.productId 
+            $conditionalWhere
 			and (e.prerequisiteId is NULL or e.prerequisiteId = '')"),
 		-value=>$self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents where prerequisiteId=?",[$psid])
 	);
