@@ -6,11 +6,11 @@ use Carp qw(croak);
 
 our $graphicsPackage;
 BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $graphicsPackage = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
+    if (eval { require Image::Magick; 1 }) {
         $graphicsPackage = 'Image::Magick';
+    }
+    elsif (eval { require Graphics::Magick; 1 }) {
+        $graphicsPackage = 'Graphics::Magick';
     }
     else {
         croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
