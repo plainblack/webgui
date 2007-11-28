@@ -7,6 +7,7 @@
  - add: Friends Network
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
+ - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
 
 7.4.16
  - fix: Event End Time Missing (perlDreamer Consulting, LLC.)

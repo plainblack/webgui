@@ -25,6 +25,9 @@ our $HELP = {
                     {   name        => "title",
                         description => "folder title"
                     },
+                    {   name        => "menuTitle",
+                        description => "folder menuTitle"
+                    },
                     {   name        => "icon.small",
                         description => "folder icon.small"
                     },
@@ -38,6 +41,7 @@ our $HELP = {
                     { name => "id", },
                     { name => "canView", },
                     { name => "title", },
+                    { name => "menuTitle", },
                     { name => "synopsis", },
                     { name => "size", },
                     { name => "date.epoch", },

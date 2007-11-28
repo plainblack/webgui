@@ -172,12 +172,13 @@ sub view {
 	foreach my $child (@{$children}) {
 		if (ref($child) eq "WebGUI::Asset::Wobject::Folder") {
 			push(@{$vars{"subfolder_loop"}}, {
-				id => $child->getId,
-				url => $child->getUrl,
-				title => $child->get("title"),
-				canView => $child->canView(),
-				"icon.small"=>$child->getIcon(1),
-				"icon.big"=>$child->getIcon
+				id           => $child->getId,
+				url          => $child->getUrl,
+				title        => $child->get("title"),
+				menuTitle    => $child->get("menuTitle"),
+				canView      => $child->canView(),
+				"icon.small" => $child->getIcon(1),
+				"icon.big"   => $child->getIcon,
 				});
 		} else {
 			my $isImage = (ref($child) =~ /^WebGUI::Asset::File::Image/);
@@ -188,6 +189,7 @@ sub view {
 				id=>$child->getId,
 				canView => $child->canView(),
 				title=>$child->get("title"),
+				title=>$child->get("menuTitle"),
 				synopsis=>$child->get("synopsis") || '',
 				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
 				"date.epoch"=>$child->get("revisionDate"),

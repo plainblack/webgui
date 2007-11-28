@@ -89,6 +89,12 @@ to do you want to go to the new Folder?</p>|,
 		context => q|Template variable description.|
 	},
 
+	'folder title' => {
+		message => q|The menu title of the Folder.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
 	'folder icon.small' => {
 		message => q|The URL to a small icon of the appropriate type for this Asset.|,
 		lastupdated => 0,
@@ -121,6 +127,12 @@ to do you want to go to the new Folder?</p>|,
 
 	'title' => {
 		message => q|The title of the Asset.|,
+		lastupdated => 0,
+		context => q|Template variable description.|
+	},
+
+	'menuTitle' => {
+		message => q|The menu title of the Asset.|,
 		lastupdated => 0,
 		context => q|Template variable description.|
 	},
