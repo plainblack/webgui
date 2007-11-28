@@ -8,11 +8,11 @@
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
 
-
 7.4.16
+ - fix: Event End Time Missing (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/event-end-time-missing
  - fix: EMS - Adding Prerequisite sets.
  - fix: Multiple Instances of EMS displaying on View Purchase
-
 
 7.4.15
  - fix: Image asset test fails
