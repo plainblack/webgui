@@ -200,9 +200,14 @@ sub getBackToSiteURL {
 		my $media = WebGUI::Asset->getMedia($self->session);
 		my $mediaLineage = $media->get("lineage");
 		my $assetLineage = $self->session->asset->get("lineage");
-		if ($assetLineage =~ /^$importNodeLineage/ || $assetLineage eq "000001" || $assetLineage =~ /^$mediaLineage/  || ($self->session->asset->get("state") ne "published" && $self->session->asset->get("state") ne "archived")) {
+		if ( $assetLineage =~ /^$importNodeLineage/
+          || $assetLineage eq "000001"
+          || $assetLineage =~ /^$mediaLineage/
+          || $self->session->asset->get("state") ne "published" ##Parent state is okay be definition
+        ) {
 			$url = WebGUI::Asset->getDefault($self->session)->getUrl;
-		} else {
+		}
+        else {
 			$url = $self->session->asset->getContainer->getUrl;
 		}
 	} else {
