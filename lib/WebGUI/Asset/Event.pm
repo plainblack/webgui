@@ -1239,19 +1239,28 @@ sub getTemplateVars {
                                   ? 1 : 0
                                   ;
     
-    # Make a Friendly date span
+    # Make a Friendly date span.
     $var{dateSpan}        
         = $var{startDateDayName}.", "
         . $var{startDateMonthName}." "
-        . $var{startDateDayOfMonth}." "
-        . ( !$var{isAllDay} ? $var{startDateHour}.":".$var{startDateMinute}." ".$var{startDateM} : "" )
-        . ( !$var{isOneDay} ? 
-            ' &bull; '
-            . $var{endDateDayName}.", "
-            .$var{endDateMonthName}." "
-            .$var{endDateDayOfMonth}." "
-            . ( !$var{isAllDay} ? $var{endDateHour}.":".$var{endDateMinute}." ".$var{endDateM} : "")
-            : "");
+        . $var{startDateDayOfMonth};
+    if (! $var{isAllDay}) {
+        $var{dateSpan} .= ' '.$var{startDateHour}.":".$var{startDateMinute}." ".$var{startDateM};
+    }
+    if (! $var{isOneDay}) {
+        $var{dateSpan}
+            .= ' &bull; '
+            .  $var{endDateDayName}.", "
+            .  $var{endDateMonthName}." "
+            .  $var{endDateDayOfMonth}." "
+    }
+    elsif (! $var{isAllDay}) {
+        $var{dateSpan}
+            .= ' &dash; '
+    }
+    if (! $var{isAllDay}) {
+        $var{dateSpan} .= ' '.$var{endDateHour}.":".$var{endDateMinute}." ".$var{endDateM};
+    }
     
     # Make some friendly URLs
     my $urlStartParam   = $dtStart->cloneToUserTimeZone->truncate(to => "day");
