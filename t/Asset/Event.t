@@ -35,10 +35,10 @@ my $properties = {
 	title     => 'Birthday of WebGUI',
 	className => 'WebGUI::Asset::Event',
 	url       => 'event-asset-test',
-    startDate => '2000-08-16',
-    startTime => '18:00:00',
-    endDate   => '2000-08-16',
-    endTime   => '23:00:00',
+    startDate => '2000-08-16', ##Times and dates have to be entered in UTC
+    startTime => '23:00:00',
+    endDate   => '2000-08-17',
+    endTime   => '03:00:00',
     timeZone  => 'America/Chicago',
     location  => 'Madison, Wisconsin',
 };
@@ -50,7 +50,7 @@ my $secondVersionTag = WebGUI::VersionTag->new($session, $event->get("tagId"));
 is($event->isAllDay, 0, 'isAllDay is zero since it has a start and end time');
 
 my %templateVars = $event->getTemplateVars();
-is($templateVars{dateSpan}, 'Wednesday, August 16 1:00 PM &dash;  6:00 PM', 'getTemplateVars: dateSpan bridges times on a single day');
+is($templateVars{dateSpan}, 'Wednesday, August 16 6:00 PM &dash;  10:00 PM', 'getTemplateVars: dateSpan bridges times on a single day');
 
 END {
 	# Clean up after thy self
