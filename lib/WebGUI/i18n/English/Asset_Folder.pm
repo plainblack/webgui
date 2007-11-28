@@ -89,7 +89,7 @@ to do you want to go to the new Folder?</p>|,
 		context => q|Template variable description.|
 	},
 
-	'folder title' => {
+	'folder menuTitle' => {
 		message => q|The menu title of the Folder.|,
 		lastupdated => 0,
 		context => q|Template variable description.|
