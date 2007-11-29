@@ -959,7 +959,7 @@ sub emailRecoverPasswordFinish {
        my $userId = $user->userId; #get the user guid
        $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
 
-       my $authsettings = $self->getParams;
+       my $authsettings = $self->getParams($userId);
        $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
 
        $self->saveParams($userId, 'WebGUI', $authsettings);
