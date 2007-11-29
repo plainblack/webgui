@@ -9,6 +9,9 @@
    (Diona Kidd, Knowmad Technologies)
  - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
 
+7.4.17
+ - fix: double width characters encoded incorrectly in Collaboration RSS feed
+
 7.4.16
  - fix: Event End Time Missing (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/event-end-time-missing
