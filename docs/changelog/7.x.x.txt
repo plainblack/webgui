@@ -1,3 +1,5 @@
+7.4.17
+
 7.4.16
  - fix: Event End Time Missing (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/event-end-time-missing
