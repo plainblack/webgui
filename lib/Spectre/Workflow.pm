@@ -273,9 +273,6 @@ sub getJsonStatus {
     my ($kernel, $request, $self) = @_[KERNEL,ARG0,OBJECT];
     my ($sitename, $rsvp) = @$request;
 
-    # only return this site's info
-    return $kernel->call(IKC=>post=>$rsvp, '{}') unless $sitename;
-
     my %queues = ();
     tie %queues, 'Tie::IxHash';
     %queues = (
@@ -283,17 +280,62 @@ sub getJsonStatus {
         Waiting   => $self->getWaitingQueue,
         Running   => $self->getRunningQueue,
     );
+
     my %output = ();
     foreach my $queueName (keys %queues) {
+
+        # get the queue name, and how many items it has
         my $queue = $queues{$queueName};
         my $count = $queue->get_item_count;
+
+        # list of instances to be added to the %output structure in the event
+        # that a site name is provided
         my @instances;
+
+        # and if there are items in that queue, add them to our data structure
         if ($count > 0) {
-            foreach my $itemAref ($queue->peek_items(sub { shift()->{sitename} eq $sitename })) {	
-                push @instances, $itemAref;
+
+            # if a site name is provided, only process data for that site name,
+            # and only construct data for that site name
+            if($sitename ne '') {
+                foreach my $itemAref ($queue->peek_items(sub { shift()->{sitename} eq $sitename })) {   
+                    push @instances, $itemAref;
+                }
+                $output{$queueName} = \@instances;
+            }
+
+            # otherwise, process data for all sites.
+            else {
+                foreach my $queueItem ($queue->peek_items(sub {1})) {
+                    my($priority, $id, $instance) = @{$queueItem};
+
+                    # The site's name in the list of %output keys isn't a hashref;
+                    # we haven't seen it yet
+                    if(ref $output{$instance->{sitename}} ne 'HASH') {
+                        $output{$instance->{sitename}} = {};
+                    }
+
+                    # The queue name in the $output{sitename} hashref isn't an
+                    # arrayref; we haven't seen it yet
+                    if(ref $output{$instance->{sitename}}{$queueName} ne 'ARRAY') {
+                        $output{$instance->{sitename}}{$queueName} = [];
+                    }
+
+                    # calculate originalPriority separately
+                    $instance->{originalPriority} = ($instance->{priority} - 1) * 10;
+
+                    # finally, add the instance to the returned data structure
+                    push @{$output{$instance->{sitename}}{$queueName}}, $instance;
+                }
             }
         }
-        $output{$queueName} = \@instances;
+        # there's no items in this queue, but the version of this call that
+        # accepts a sitename expects an empty array ref anyway. Give it one.
+        else {
+            if($sitename) {
+                $output{$queueName} = \@instances;
+            }
+        }
     }
 
     $kernel->call(IKC=>post=>$rsvp, objToJson(\%output));

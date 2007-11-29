@@ -1,6 +1,9 @@
 7.4.17
  - fix: double width characters encoded incorrectly in Collaboration RSS feed
  - fix: update method in various assets changes incoming parameters
+ - backport of the Spectre::Workflow::getJsonStatus improvements from
+   7.5. This method will now return information for all sites if not
+   provided a site name.
 
 7.4.16
  - fix: Event End Time Missing (perlDreamer Consulting, LLC.)
