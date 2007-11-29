@@ -447,7 +447,9 @@ sub send {
 	delete $self->{_toGroup};
 	if ($group) {
 		my $group = WebGUI::Group->new($self->session, $group);
-		$self->{_message}->head->replace("bcc", undef);
+        return $status
+            if !defined $group;
+        $self->{_message}->head->replace("bcc", undef);
 		$self->{_message}->head->replace("cc", undef);
 		foreach my $userId (@{$group->getAllUsers(1)}) {
 			my $user = WebGUI::User->new($self->session, $userId);

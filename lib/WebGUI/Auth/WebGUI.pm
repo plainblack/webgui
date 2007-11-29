@@ -733,15 +733,19 @@ sub emailRecoverPassword {
         name        => "username",
         label       => $i18n->get('password recovery login label', 'AuthWebGUI'),
         hoverHelp   => $i18n->get('password recovery login hoverHelp', 'AuthWebGUI'),
+        uiLevel     => 0,
     );
 
     $f->email(
         name        => "email",
         label       => $i18n->get('password recovery email label', 'AuthWebGUI'),
         hoverHelp   => $i18n->get('password recovery email hoverHelp', 'AuthWebGUI'),
+        uiLevel     => 0,
     );
     
-    $f->submit();
+    $f->submit(
+        uiLevel     => 0,
+    );
 
     $output .= $f->print;
     return  $output;
@@ -955,7 +959,7 @@ sub emailRecoverPasswordFinish {
        my $userId = $user->userId; #get the user guid
        $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
 
-       my $authsettings = $self->getParams;
+       my $authsettings = $self->getParams($userId);
        $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
 
        $self->saveParams($userId, 'WebGUI', $authsettings);

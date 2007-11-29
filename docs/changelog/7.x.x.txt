@@ -14,6 +14,9 @@
      http://www.plainblack.com/bugs/tracker/event-end-time-missing
  - fix: EMS - Adding Prerequisite sets.
  - fix: Multiple Instances of EMS displaying on View Purchase
+ - fix: invalid group ids will stall sending queued mail
+ - fix: Low UI level on Visitor prevents email password recovery form from working
+ - fix: requesting a password reset by email sets all user's auth settings to Visitor's
 
 7.4.15
  - fix: Image asset test fails
