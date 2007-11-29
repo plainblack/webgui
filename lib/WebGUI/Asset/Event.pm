@@ -1690,9 +1690,8 @@ Wrap update so that isHidden is always set to be a 1.
 
 sub update {
     my $self = shift;
-    my $properties = shift;    
-    $properties->{isHidden} = 1;
-    return $self->SUPER::update($properties);
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
 }
 
 

@@ -311,8 +311,7 @@ Wrap update to force isHidden to be on, all the time.
 sub update {
     my $self = shift;
     my $properties = shift;
-    $properties->{isHidden} = 1;
-    $self->SUPER::update($properties, @_);
+    return $self->SUPER::update({%$properties, isHidden => 1});
 }
 
 #-------------------------------------------------------------------
