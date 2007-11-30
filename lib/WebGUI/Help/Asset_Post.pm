@@ -99,6 +99,7 @@ our $HELP = {
             { 'name' => 'reply.url' },
             { 'name' => 'reply.withQuote.url' },
             { 'name' => 'url' },
+            { 'name' => 'url.raw', description => 'help url.raw' },
             { 'name' => 'rating.value' },
             { 'name' => 'rate.url.thumbsUp' },
             { 'name' => 'rate.url.thumbsDown' },

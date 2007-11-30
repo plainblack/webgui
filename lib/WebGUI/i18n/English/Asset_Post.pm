@@ -620,6 +620,11 @@ user subscribed to.|,
 		lastUpdated => 1184174365
 	},
 
+    'help url.raw' => {
+        message     => 'The URL to the post asset without the #id... at the end. Useful for performing other functions on the post like func=promote or func=demote',
+        lastUpdated => 0,
+        context     => "Help for the 'url.raw' template var.",
+    }
 };
 
 1;
