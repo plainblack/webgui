@@ -516,6 +516,7 @@ sub getTemplateVars {
 	$var{"reply.url"} = $self->getReplyUrl;
 	$var{'reply.withquote.url'} = $self->getReplyUrl(1);
 	$var{'url'} = $self->getUrl.'#id'.$self->getId;
+        $var{'url.raw'} = $self->getUrl;
 	$var{'rating.value'} = $self->get("rating")+0;
 	$var{'rate.url.thumbsUp'} = $self->getRateUrl(1);
 	$var{'rate.url.thumbsDown'} = $self->getRateUrl(-1);
