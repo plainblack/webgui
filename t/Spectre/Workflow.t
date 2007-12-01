@@ -12,23 +12,34 @@
 use FindBin;
 use strict;
 use warnings;
+
+use Test::More;
+
+if (!-e "$FindBin::Bin/../../../wre/lib") {
+    plan skip_all => 'No WRE libraries available';
+}
+else {
+    plan tests => 19;
+    eval <<'EOEVAL';  ##Delay compiling since it causes the test die
+    use WRE::Config;
+    use WRE::Modperl;
+    use WRE::Modproxy;
+    use WRE::Spectre;
+EOEVAL
+}
+
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../wre/lib";
+
 use WebGUI::Test;
 use WebGUI::Session;
 use Spectre::Admin;
 use WebGUI::Config;
 use WebGUI::Workflow::Cron;
 use WebGUI::Workflow::Instance;
-use WRE::Config;
-use WRE::Modperl;
-use WRE::Modproxy;
-use WRE::Spectre;
 
 use POE::Component::IKC::ClientLite;
 use JSON;
 use Config::JSON;
-
-use Test::More tests => 19; # increment this value for each test you create
 
 $|++;
 
