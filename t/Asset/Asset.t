@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 28; # increment this value for each test you create
+use Test::More tests => 31; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -96,6 +96,13 @@ my $importNode = WebGUI::Asset->getImportNode($session);
 isa_ok($importNode, 'WebGUI::Asset::Wobject::Folder');
 is($importNode->getId, 'PBasset000000000000002', 'Import Node Asset ID check');
 is($importNode->getParent->getId, $rootAsset->getId, 'Import Nodes parent is Root Asset');
+
+# tempspace Constructor
+
+my $tempNode = WebGUI::Asset->getTempspace($session);
+isa_ok($tempNode, 'WebGUI::Asset::Wobject::Folder');
+is($tempNode->getId, 'tempspace0000000000000', 'Tempspace Asset ID check');
+is($tempNode->getParent->getId, $rootAsset->getId, 'Tempspace parent is Root Asset');
 
 ################################################################
 #
