@@ -65,7 +65,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 51 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 49 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -216,31 +216,58 @@ my $origMaxImageSize = $session->setting->get('maxImageSize');
 
 my $sizeTest = WebGUI::Storage::Image->create($session);
 
-my @testImages = qw/tooWide.gif tooTall.gif/;
+my $resizeTarget = 80;
+$session->setting->set('maxImageSize', 200 );
+my @testImages = (
+    {
+        filename   => 'tooWide.gif',
+        origWidth  => 100,
+        origHeight => 50,
+        newWidth   => 80,
+        newHeight  => 40,
+    },
+    {
+        filename   => 'tooTall.gif',
+        origWidth  => 50,
+        origHeight => 100,
+        newWidth   => 40,
+        newHeight  => 80,
+    }
+);
 
 foreach my $testImage (@testImages) {
     $sizeTest->addFileFromFilesystem(
-        File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $testImage),
+        File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $testImage->{filename}),
     );
 }
 
-cmp_bag($sizeTest->getFiles(), ['tooWide.gif', 'tooTall.gif'], 'both files added to storage object for testing');
+cmp_bag(
+    $sizeTest->getFiles(),
+    [ map { $_->{filename} } @testImages ],
+    'all files added to storage object for testing adjustMaxImageSize'
+);
 
 
-$session->setting->set('maxImageSize', 200 );
 foreach my $testImage (@testImages) {
-    my $originalSize = [ $sizeTest->getSizeInPixels($testImage) ];
-    is($sizeTest->adjustMaxImageSize($testImage), 0, "$testImage does not need to be resized");
-    cmp_bag([$sizeTest->getSizeInPixels($testImage)], $originalSize, "$testImage was not resized");
+    my $filename = $testImage->{ filename };
+    is($sizeTest->adjustMaxImageSize($filename), 0, "$filename does not need to be resized");
+    cmp_bag(
+        [ $sizeTest->getSizeInPixels($filename)     ],
+        [ @{ $testImage }{qw/origHeight origWidth/} ],
+        "$testImage was not resized"
+    );
 }
 
-$session->setting->set('maxImageSize', 75 );
+$session->setting->set('maxImageSize', $resizeTarget );
 foreach my $testImage (@testImages) {
-    my @originalSize = $sizeTest->getSizeInPixels($testImage);
-    is($sizeTest->adjustMaxImageSize($testImage), 1, "$testImage needs to be resized");
-    my @newSize = $sizeTest->getSizeInPixels($testImage);
-    ok ($originalSize[0] != $newSize[0], "$testImage width changed");
-    ok ($originalSize[1] != $newSize[1], "$testImage height changed");
+    my $filename = $testImage->{ filename };
+    is($sizeTest->adjustMaxImageSize($filename), 1, "$filename needs to be resized");
+    my @newSize = $sizeTest->getSizeInPixels($filename);
+    cmp_bag(
+        [ $sizeTest->getSizeInPixels($filename)   ],
+        [ @{ $testImage }{qw/newHeight newWidth/} ],
+        "$testImage was resized properly"
+    );
 }
 
 $session->setting->set('maxImageSize', $origMaxImageSize );
