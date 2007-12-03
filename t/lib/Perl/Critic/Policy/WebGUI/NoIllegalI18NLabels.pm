@@ -3,10 +3,13 @@ package Perl::Critic::Policy::WebGUI::NoIllegalI18NLabels;
 use strict;
 use warnings;
 use Readonly;
+use FindBin;
 
 use Perl::Critic::Utils qw{ :all };
 use base 'Perl::Critic::Policy';
-use Data::Dumper;
+
+use WebGUI::International;
+use WebGUI::Test;
 
 =head1 Perl::Critic::Policy::WebGUI::NoIllegalI18NLabels
 
@@ -19,11 +22,11 @@ our $VERSION = '0.1';
 
 Readonly::Scalar my $DESC => q{i18n calls that do not have corresponding i18n table entries};
 
-sub supported_parameters { return ()                  }
+sub supported_parameters { return ()                   }
+ 
+sub default_severity     { return $SEVERITY_LOWEST     }
 
-sub default_severity     { return $SEVERITY_HIGH      }
-
-sub default_themes       { return 'WebGUI' }
+sub default_themes       { return 'WebGUI'             }
 
 sub applies_to           { return qw/PPI::Token::Word/ }
 
@@ -33,6 +36,8 @@ sub applies_to           { return qw/PPI::Token::Word/ }
 sub initialize_if_enabled {
     my ($self, $config) = @_;
     $self->{_i18n_objects} = {};
+    my $session = WebGUI::Test->session;
+    $self->{i18n} = WebGUI::International->new($session);
     return $TRUE;
 }
 
@@ -68,24 +73,27 @@ sub violates {
         my $namespace = $arguments[1]->[0];
         $namespace = $namespace->string;
         $self->{_i18n_objects}->{$symbol_name} = $namespace;
-        print join ':', $symbol_name, $namespace."\n";
         return;
     }
     elsif ($elem eq 'get') {  ##i18n fetch?  Check symbol
         my $symbol_name = _get_symbol_name($elem);
-        print $symbol_name."\n";
         my $arg_list = $elem->snext_sibling;
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
         ##Many assumptions being made here
         return unless $arguments[0]->[0]->isa('PPI::Token::Quote');
         my $label = $arguments[0]->[0]->string;
-        print $label."\n";
         my $namespace = $self->{_i18n_objects}->{$symbol_name};
         if ($arguments[1]) {
             $namespace = $arguments[1]->[0]->string;
         }
-        printf "Looking up %s in %s\n", $label, $namespace;
+        if (! $self->{i18n}->get($label, $namespace)) {
+            return $self->violation(
+                $DESC,
+                sprintf('label=%s, namespace=%s', $label, $namespace),
+                $elem
+            );
+        }
         return;
     }
     return;
