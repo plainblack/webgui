@@ -183,7 +183,7 @@ sub db {
 		}
 		else {
 			if ($skipFatal) {
-				return undef
+				return;
 			}
 			else { 	
 				$self->errorHandler->fatal("Couldn't connect to WebGUI database, and can't continue without it.");
@@ -580,7 +580,7 @@ sub url {
 	unless (exists $self->{_url}) {
 		$self->{_url} = WebGUI::Session::Url->new($self);
 	}
-	$self->{_url};
+	return $self->{_url};
 }
 
 #-------------------------------------------------------------------
@@ -619,7 +619,7 @@ sub user {
 		$self->{_user} = WebGUI::User->new($self, $self->var->get('userId'));
 		$self->request->user($self->{_user}->username) if $self->request;
 	} 
-    	return $self->{_user};
+    return $self->{_user};
 }
 
 
