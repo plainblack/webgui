@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 56 + scalar(@getRefererUrlTests);
+plan tests => 58 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -278,10 +278,21 @@ is($session->url->makeAbsolute('page1'), '/page1', 'makeAbsolute: default baseUr
 #
 #######################################
 
-is($session->url->extras, $session->config->get('extrasURL').'/', 'extras method returns URL to extras with a trailing slash');
-is($session->url->extras('foo.html'), join('/', $session->config->get('extrasURL'),'foo.html'), 'extras method appends to the extras url');
-is($session->url->extras('/foo.html'), join('/', $session->config->get('extrasURL'),'foo.html'), 'extras method removes extra slashes');
-is($session->url->extras('/dir1//foo.html'), join('/', $session->config->get('extrasURL'),'dir1/foo.html'), 'extras method removes extra slashes anywhere');
+my $origExtras = $session->config->get('extrasURL');
+my $extras  = $origExtras;
+
+is($session->url->extras, $extras.'/', 'extras method returns URL to extras with a trailing slash');
+is($session->url->extras('foo.html'), join('/', $extras,'foo.html'), 'extras method appends to the extras url');
+is($session->url->extras('/foo.html'), join('/', $extras,'foo.html'), 'extras method removes extra slashes');
+is($session->url->extras('/dir1//foo.html'), join('/', $extras,'dir1/foo.html'), 'extras method removes extra slashes anywhere');
+
+$extras = 'http://mydomain.com/';
+$session->config->set('extrasURL', $extras);
+
+is($session->url->extras('/foo.html'), join('', $extras,'foo.html'), 'extras method removes extra slashes');
+is($session->url->extras('/dir1//foo.html'), join('', $extras,'dir1/foo.html'), 'extras method removes extra slashes anywhere');
+
+$session->config->set('extrasURL', $origExtras);
 
 #######################################
 #
@@ -387,6 +398,7 @@ END {  ##Always clean-up
 	$session->setting->set('hostToUse', $setting_hostToUse);
 	$session->setting->set('preventProxyCache', $preventProxyCache);
     $session->config->set('gateway', $gateway);
+    $session->config->set('extrasURL', $origExtras);
 
 	if ($config_port) {
 		$session->config->set($config_port);

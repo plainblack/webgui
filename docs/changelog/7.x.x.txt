@@ -11,6 +11,8 @@
 
 7.4.17
  - fix: double width characters encoded incorrectly in Collaboration RSS feed
+ - fix: ExtrasUrl in conf http:// stripping / from URL (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/extrasurl-in-conf-http/-stripping-/-from-url
 
 7.4.16
  - fix: Event End Time Missing (perlDreamer Consulting, LLC.)
