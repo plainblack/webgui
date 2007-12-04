@@ -251,6 +251,7 @@ cmp_bag(
 foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
     is($sizeTest->adjustMaxImageSize($filename), 0, "$filename does not need to be resized");
+    diag sprintf("%s -> oldw size = %d x %d", $filename, $sizeTest->getSizeInPixels($filename));
     cmp_bag(
         [ $sizeTest->getSizeInPixels($filename)     ],
         [ @{ $testImage }{qw/origHeight origWidth/} ],
@@ -263,6 +264,7 @@ foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
     is($sizeTest->adjustMaxImageSize($filename), 1, "$filename needs to be resized");
     my @newSize = $sizeTest->getSizeInPixels($filename);
+    diag sprintf("%s -> new size = %d x %d", $filename, @newSize);
     cmp_bag(
         [ $sizeTest->getSizeInPixels($filename)   ],
         [ @{ $testImage }{qw/newHeight newWidth/} ],
