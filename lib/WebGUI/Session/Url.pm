@@ -130,16 +130,18 @@ Combinds the base extrasURL defined in the config file with a specfied path.
 
 =head3 path
 
-The path to the thing in the extras folder that you're referencing. Note that the leading / is not necessary.  Multiple consecutive slashes will be replaced with a single slash.
+The path to the thing in the extras folder that you're
+referencing. Note that the leading / is not necessary.  Multiple
+consecutive slashes in the path part of the URL will be replaced with a single slash.
 
 =cut
 
 sub extras {
-	my $self = shift;
-	my $path = shift;
-        my $url = $self->session->config->get("extrasURL").'/'.$path;
-	$url =~ s!/+!/!g;
-	return $url;
+    my $self = shift;
+    my $path = shift;
+    my $url = $self->session->config->get("extrasURL").'/'.$path;
+    $url =~ s$(?<!^http:)/{2,}$/$g;
+    return $url;
 }
 
 #-------------------------------------------------------------------
