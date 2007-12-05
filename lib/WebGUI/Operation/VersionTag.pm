@@ -530,7 +530,7 @@ A reference to the current session.
 
 =cut
 
-sub www_setWorkingVersionTag () {
+sub www_setWorkingVersionTag {
 	my $session = shift;
 	my $tag = WebGUI::VersionTag->new($session, $session->form->process("tagId"));
 	if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
