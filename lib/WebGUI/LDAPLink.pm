@@ -219,7 +219,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	$ldapLinkId = shift;
-	return undef unless $ldapLinkId;
+	return unless $ldapLinkId;
 	$ldapLink = $session->db->quickHashRef("select * from ldapLink where ldapLinkId=?",[$ldapLinkId]);
 	bless {_session=>$session, _ldapLinkId=>$ldapLinkId, _ldapLink=>$ldapLink }, $class;
 }

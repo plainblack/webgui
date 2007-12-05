@@ -74,7 +74,7 @@ sub AUTOLOAD {
 	eval ($cmd);
 	if ($@) {
 		$self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-		return undef;
+		return;
 	}
 	my $class = "WebGUI::Form::".$name;
 	return $class->new($self->session, $params)->getValueFromPost(@args);
@@ -177,7 +177,7 @@ sub process {
 			return $default;
 		}
 		if ($value =~ /^[\s]+$/) {
-			return undef;
+			return;
 		}
 		return $value;
 	}

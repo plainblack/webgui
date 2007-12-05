@@ -289,7 +289,7 @@ sub _find_record {
                 }
         }
         
-        return undef;
+        return;
 }
 
 #-------------------------------------------------------------------
@@ -348,7 +348,7 @@ sub _get_rss_data {
                 if (!$response->is_success()) {
                         $session->errorHandler->warn("Error retrieving url '$url': " . 
                              $response->status_line());
-                        return undef;
+                        return;
                 }
                 my $xml = $response->content();
 
@@ -380,7 +380,7 @@ sub _get_rss_data {
                         $session->errorHandler->warn("error parsing rss for url $url :".$@);
 			#Returning undef on a parse failure is a change from previous behaviour,
 			#but it SHOULDN'T have a major effect.
-			return undef;
+			return;
                 }
 
                 # make sure that the {channel} points to the channel 

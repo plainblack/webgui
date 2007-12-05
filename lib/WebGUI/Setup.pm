@@ -486,7 +486,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         # remove init state
 		$session->setting->remove('specialState');
 		$session->http->setRedirect($session->url->gateway("?setup=complete"));
-		return undef;
+		return;
 	} 
     else {
         $legend = "Admin Acccount";

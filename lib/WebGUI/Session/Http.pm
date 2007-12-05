@@ -264,11 +264,11 @@ Generates and sends HTTP headers for a response.
 
 sub sendHeader {
 	my $self = shift;
-	return undef if ($self->{_http}{noHeader});
+	return if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
 	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
-	return undef unless $request;
+	return unless $request;
 	my $userId = $var->get("userId");
 	
 	# send webgui session cookie
@@ -508,7 +508,7 @@ sub setRedirect {
 	my $self = shift;
 	my $url = shift;
 	my @params = $self->session->form->param;
-	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
+	return if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->errorHandler->info("Redirecting to $url");
 	$self->{_http}{location} = $url;
 	$self->setStatus("302", "Redirect");

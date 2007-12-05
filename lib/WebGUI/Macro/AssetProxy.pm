@@ -50,7 +50,7 @@ sub process {
 			$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if ($session->errorHandler->canShowPerformanceIndicators());
 			return $output;
 		}
-		return undef;
+		return;
 	} else {
 		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
 		return $i18n->get('invalid url');

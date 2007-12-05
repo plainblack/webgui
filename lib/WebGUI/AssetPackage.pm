@@ -222,7 +222,7 @@ sub importPackage {
 		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
         }
 	}
-    return undef;
+    return;
 }
 
 #-------------------------------------------------------------------

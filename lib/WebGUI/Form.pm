@@ -66,7 +66,7 @@ sub AUTOLOAD {
         eval ($cmd);
         if ($@) {
         	$session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-                return undef;
+                return;
         }
 	my $class = "WebGUI::Form::".$name;
 	return $class->new($session,@params)->toHtml;

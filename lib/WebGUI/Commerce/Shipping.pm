@@ -401,7 +401,7 @@ you'll have to overload this method. Defaults to undef.
 =cut
 
 sub trackingNumber {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -414,7 +414,7 @@ info of his package. Overload this method if your plugin supports tracking. Defa
 =cut
 
 sub  trackingUrl {
-	return undef;
+	return;
 }
 
 1;

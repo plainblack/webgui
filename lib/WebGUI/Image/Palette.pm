@@ -148,7 +148,7 @@ sub getColorIndex {
 		return $index if ($self->getColor($index)->getId eq $color->getId);
 	}
 
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -372,7 +372,7 @@ sub removeColor {
 	my $self = shift;
 	my $paletteIndex = shift;
 
-	return undef unless (defined $paletteIndex);
+	return unless (defined $paletteIndex);
 	
 	my $color = $self->getColor($paletteIndex);
 	
@@ -426,10 +426,10 @@ sub setColor {
 	my $index = shift;
 	my $color = shift;
 
-	return undef if ($index >= $self->getNumberOfColors);
-	return undef if ($index < 0);
-	return undef unless (defined $index);
-	return undef unless (defined $color);
+	return if ($index >= $self->getNumberOfColors);
+	return if ($index < 0);
+	return unless (defined $index);
+	return unless (defined $color);
 
 	$color->save;
 
@@ -484,7 +484,7 @@ sub setPaletteIndex {
 	my $self = shift;
 	my $index = shift;
 	
-	return undef unless (defined $index);
+	return unless (defined $index);
 	
 	$index = ($self->getNumberOfColors - 1) if ($index >= $self->getNumberOfColors);
 	$index = 0 if ($index < 0);

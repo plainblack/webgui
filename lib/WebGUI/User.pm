@@ -559,8 +559,8 @@ sub newByEmail {
 	my $email = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
-	return undef unless $user->username;
+	return if ($user->userId eq "1"); # visitor is never valid for this method
+	return unless $user->username;
 	return $user;
 }
 
@@ -588,8 +588,8 @@ sub newByUsername {
 	my $username = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from users where username=?",[$username]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
-	return undef unless $user->username;
+	return if ($user->userId eq "1"); # visitor is never valid for this method
+	return unless $user->username;
 	return $user;
 }
 
@@ -617,7 +617,7 @@ sub profileField {
     my $db          = $self->session->db;
     if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
         $self->session->errorHandler->warn("No such profile field: $fieldName");
-        return undef;
+        return;
     }
     if (defined $value) {
         $self->uncache;

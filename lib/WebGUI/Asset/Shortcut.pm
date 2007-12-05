@@ -364,7 +364,7 @@ sub getOverridesList {
 	$output .= '<table cellspacing="0" cellpadding="3" border="1">';
 	$output .= '<tr class="tableHeader"><td>'.$i18n->get('fieldName').'</td><td>'.$i18n->get('edit delete fieldname').'</td><td>'.$i18n->get('Original Value').'</td><td>'.$i18n->get('New value').'</td><td>'.$i18n->get('Replacement value').'</td></tr>';
 	my $shortcut = $self->getShortcutOriginal;
-	return undef unless defined $shortcut;
+	return unless defined $shortcut;
 	foreach my $definition (@{$shortcut->definition($self->session)}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';

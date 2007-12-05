@@ -72,10 +72,10 @@ sub addPrivateMessage {
     
     my $userId      = $messageData->{userId};
     my $sentBy      = $messageData->{sentBy} || $self->session->user->userId;
-    return undef unless $userId;
+    return unless $userId;
     
     my $u = WebGUI::User->new($self->session,$userId);
-    return undef unless ($isReply || $u->acceptsPrivateMessages($sentBy));
+    return unless ($isReply || $u->acceptsPrivateMessages($sentBy));
 	
     return $self->addMessage($messageData);
 }

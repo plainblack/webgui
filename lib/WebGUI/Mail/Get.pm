@@ -77,11 +77,11 @@ sub connect {
 	my $pop = Net::POP3->new($params->{server}, Timeout => 60);
 	unless (defined $pop) {
 		$session->errorHandler->error("Couldn't connect to POP3 server ". $params->{server});
-		return undef;
+		return;
 	}
 	unless ($pop->login($params->{account}, $params->{password})) {
 		$session->errorHandler->error("Couldn't log in to POP3 server ".$params->{server}." as ".$params->{account});
-		return undef;
+		return;
 	}
 	my $messageNumbers = $pop->list;
 	my @ids = ();
@@ -150,7 +150,7 @@ Retrieves the next available message from the server. Returns undef if there are
 sub getNextMessage {
 	my $self = shift;
 	my $id = pop(@{$self->{_ids}});
-	return undef unless $id;
+	return unless $id;
 	my $rawMessage = $self->{_pop}->get($id);
 	my $parser = MIME::Parser->new;
 	$parser->output_to_core(1);
@@ -159,7 +159,7 @@ sub getNextMessage {
 		$self->{_pop}->delete($id);
 	} else {
 		$self->session->errorHandler->error("Could not parse POP3 message $id");
-		return undef;
+		return;
 	}
 	my $head = $parsedMessage->head;
         my $type = $head->get("Content-Type");

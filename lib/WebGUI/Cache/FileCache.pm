@@ -105,12 +105,12 @@ Retrieve content from the filesystem cache.
 
 sub get {
 	my $self = shift;
-	return undef if ($self->session->config->get("disableCache"));
+	return if ($self->session->config->get("disableCache"));
 	my $folder = $self->getFolder;
 	if (-e $folder."/expires" && -e $folder."/cache" && open(my $FILE,"<",$folder."/expires")) {
 		my $expires = <$FILE>;
 		close($FILE);
-		return undef if ($expires < $self->session->datetime->time());
+		return if ($expires < $self->session->datetime->time());
 		my $value;
 		eval {$value = retrieve($folder."/cache")};
 		if (ref $value eq "SCALAR") {
@@ -119,7 +119,7 @@ sub get {
 			return $value;
 		}
 	}
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

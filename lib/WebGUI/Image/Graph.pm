@@ -602,12 +602,12 @@ sub processConfigurationForm {
 	my $class = shift;
 	my $session = shift;
 
-	return undef unless ($class->getPluginList($session));
+	return unless ($class->getPluginList($session));
 	
 	my $namespace = "WebGUI::Image::".$session->form->process('graphingPlugin');
 	$namespace =~ s/_/::/g;
 
-	return undef unless (isIn($namespace, @{$class->getPluginList($session)}));
+	return unless (isIn($namespace, @{$class->getPluginList($session)}));
 
 my	$graph = $class->load($session, $namespace);
 	

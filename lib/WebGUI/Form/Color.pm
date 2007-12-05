@@ -75,7 +75,7 @@ An optional value to use instead of POST input.
 sub getValueFromPost {
 	my $self = shift;
 	my $color = @_ ? shift : $self->session->form->param($self->get("name"));
-	return undef unless $color =~ /\#\w{6}/;
+	return unless $color =~ /\#\w{6}/;
 	return $color;
 }
 

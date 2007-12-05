@@ -131,7 +131,7 @@ sub getValueFromPost {
 		$self->session->errorHandler->warn("Date value: $value");
 		
 		# Verify format
-		return undef
+		return
 			unless ($value =~ m/(?:\d{2}|\d{4})\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/);
 		
 		# Fix time zone

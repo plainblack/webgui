@@ -704,7 +704,7 @@ sub getRecurrenceDates {
     
     my %date;
     my $recur       = {$self->getRecurrence};
-    return undef unless $recur->{recurType};
+    return unless $recur->{recurType};
     
     my %dayNames = (
         monday      => "m",

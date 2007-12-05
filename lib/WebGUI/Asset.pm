@@ -88,7 +88,7 @@ The missing URL.
 sub addMissing {
 	my $self = shift;
 	my $assetUrl = shift;
-	return undef unless ($self->session->var->isAdminOn);
+	return unless ($self->session->var->isAdminOn);
 	my $ac = $self->getAdminConsole;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $output = $i18n->get("missing page query");
@@ -295,7 +295,7 @@ sub checkView {
 		return $notFound->www_view;
 	}
 	$self->logView();
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -1150,7 +1150,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	return undef unless $self->canEdit;
+	return unless $self->canEdit;
 	return $self->{_toolbar} if (exists $self->{_toolbar});
 	my $userUiLevel = $self->session->user->profileField("uiLevel");
 	my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
@@ -1308,7 +1308,7 @@ sub getValue {
 		}
 		return $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
-	return undef;
+	return;
 }
 
 
@@ -1563,7 +1563,7 @@ sub manageAssets {
         </div>
 		';
 	$self->session->output->print($output);
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -1590,7 +1590,7 @@ sub manageAssetsSearch {
 	$output .= WebGUI::Form::formFooter($self->session);
 	$self->session->output->print($output);
 	$output = '';
-	return undef unless ($self->session->form->get("doit") && ($self->session->form->get("keywords") ne "" || $self->session->form->get("class") ne "any"));
+	return unless ($self->session->form->get("doit") && ($self->session->form->get("keywords") ne "" || $self->session->form->get("class") ne "any"));
 	my $class = $self->session->form->process("class","className") eq "any" ? undef : $self->session->form->process("class","className");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),
@@ -1655,7 +1655,7 @@ sub manageAssetsSearch {
                  //]]>
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	$self->session->output->print($output);
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -1691,23 +1691,23 @@ sub new {
 
 	unless (defined $assetId) {
 		$session->errorHandler->error("Asset constructor new() requires an assetId.");
-		return undef;
+		return;
 	}
 
 	my $revisionDate = shift || $class->getCurrentRevisionDate($session, $assetId);
-	return undef unless ($revisionDate);
+	return unless ($revisionDate);
 
 	unless ($class ne 'WebGUI::Asset' or defined $className) {
 		($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
 		unless ($className) {
 			$session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
-			return undef;
+			return;
 		}
 	}
 
     if ($className) {
         $class = $class->loadModule($session, $className);        
-        return undef unless (defined $class);
+        return unless (defined $class);
 	}
 
 	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
@@ -1718,7 +1718,7 @@ sub new {
 		$properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
 		unless (exists $properties->{assetId}) {
 			$session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
-			return undef;
+			return;
 		}
 		$cache->set($properties,60*60*24);
 	}
@@ -1727,7 +1727,7 @@ sub new {
 		bless $object, $class;
 		return $object;
 	}	
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -1755,7 +1755,7 @@ sub newByDynamicClass {
 	my $session = shift;
 	my $assetId = shift;
 	my $revisionDate = shift;
-	return undef unless defined $assetId;
+	return unless defined $assetId;
 	my $assetClass = $session->stow->get("assetClass");
 	my $className = $assetClass->{$assetId};
 	unless ($className) {
@@ -1763,7 +1763,7 @@ sub newByDynamicClass {
 		$assetClass->{$assetId} = $className;
 		$session->stow->set("assetClass",$assetClass);
 	}
-	return undef unless ($className);
+	return unless ($className);
 	return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
 }
 
@@ -1788,10 +1788,10 @@ sub newByPropertyHashRef {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	return undef unless defined $properties;
-	return undef unless exists $properties->{className};
+	return unless defined $properties;
+	return unless exists $properties->{className};
     my $className = $class->loadModule($session, $properties->{className});
-    return undef unless (defined $className);
+    return unless (defined $className);
 	bless {_session=>$session, _properties => $properties}, $className;
 }
 
@@ -1832,7 +1832,7 @@ sub newByUrl {
 			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
 		} else {
 			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
-			return undef;
+			return;
 		}
 	}
 	return WebGUI::Asset->getDefault($session);
@@ -2205,7 +2205,7 @@ sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
     my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
-    return undef unless (defined $class);
+    return unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
@@ -2303,7 +2303,7 @@ sub www_changeUrlConfirm {
 		return 'redirect';
 	}
 
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -2468,7 +2468,7 @@ sub www_view {
 	return $check if (defined $check);
 	$self->prepareView;
 	$self->session->output->print($self->view);
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

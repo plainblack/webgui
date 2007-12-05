@@ -280,7 +280,7 @@ sub setLink {
 	my $url = shift;
 	my $params = shift;
 	$params = {} unless (defined $params and ref $params eq 'HASH');
-	return undef if ($self->{_link}{$url});
+	return if ($self->{_link}{$url});
 	my $tag = '<link href="'.$url.'"';
 	foreach my $name (keys %{$params}) {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
@@ -390,7 +390,7 @@ sub setScript {
 	my $self = shift;
 	my $url = shift;
 	my $params = shift;
-	return undef if ($self->{_javascript}{$url});
+	return if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';
 	foreach my $name (keys %{$params}) {
 		$tag .= ' '.$name.'="'.$params->{$name}.'"';
@@ -438,7 +438,7 @@ sub userStyle {
         if (defined $output) {
                 return $self->process($output,$self->session->setting->get("userFunctionStyleId"));
         } else {
-                return undef;
+                return;
         }       
 }  
 

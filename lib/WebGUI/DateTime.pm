@@ -548,7 +548,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 sub webguiDate {
    my $self = shift;
    my $session = $self->session;
-   return undef unless ($session);
+   return unless ($session);
    my $format = shift || "%z %Z";
    my $temp;
    

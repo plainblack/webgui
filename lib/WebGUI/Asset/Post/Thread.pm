@@ -584,8 +584,8 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 sub rate {
 	my $self = shift;
 	my $rating = shift;
-	return undef unless ($rating == -1 || $rating == 1);
-	return undef if $self->hasRated;
+	return unless ($rating == -1 || $rating == 1);
+	return if $self->hasRated;
 	$self->SUPER::rate($rating);
 
 	##Thread specific karma adjustment for CS

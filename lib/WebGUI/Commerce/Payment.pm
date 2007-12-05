@@ -134,7 +134,7 @@ You only need to override this method if your gateway uses a webbased contacting
 =cut
 
 sub confirmRecurringTransaction {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -277,7 +277,7 @@ The term number you want the status of.
 =cut
 
 sub getRecurringPaymentStatus {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -383,7 +383,7 @@ A hashref containing:
 =cut
 
 sub normalTransaction {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -408,7 +408,7 @@ A hashref containing:
 =cut
 
 sub recurringTransaction {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

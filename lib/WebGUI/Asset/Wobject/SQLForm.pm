@@ -824,8 +824,8 @@ recent revision will be fetched.
 sub _getFileFromDatabase {
 	my ($constraint, $dbLink);
 	my $self = shift;
-	my $recordId = shift || return undef;
-	my $fieldName = shift || return undef;
+	my $recordId = shift || return;
+	my $fieldName = shift || return;
 	my $revision = shift;
 
 	$dbLink = $self->_getDbLink;
@@ -4088,7 +4088,7 @@ sub _constructSearchQuery {
 
     my $searchType = ($self->session->form->process("searchType") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchType')) eq 'and' ? 'and' : 'or';
 
-    return undef if (!@constraints);
+    return if (!@constraints);
 
     # Construct the search query
     my $sortField = @sortClauses ? ('('.join('+', @sortClauses).') AS sqlform_orderby') : '1 AS sqlform_orderby';

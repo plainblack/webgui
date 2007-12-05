@@ -119,7 +119,7 @@ sub connectionError {
 	$self = shift;
 
 	return $self->resultMessage if ($self->{_connectionError});
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -325,7 +325,7 @@ sub getRecurringPaymentStatus {
 	my $transactionData = $self->session->db->quickHashRef("select * from ITransact_recurringStatus where gatewayId=".$self->session->db->quote($recurringId));
 	unless ($transactionData->{recipe}) { # if for some reason there's no transaction data, we shouldn't calc anything
 		$self->session->errorHandler->error("For some reason recurring transaction $recurringId doesn't have any recurring status transaction data. This is most likely because you don't have the Recurring Postback URL set in your ITransact virtual terminal.");
-		return undef;
+		return;
 	}
         my $lastTerm = int(($transactionData->{lastTransaction} - $transactionData->{initDate}) / $resolve{$transactionData->{recipe}}) + 1;
 		
@@ -337,7 +337,7 @@ sub getRecurringPaymentStatus {
 		$paymentHistory{resultCode} = $transactionData->{status}.' '.$transactionData->{errorMessage};
 		$paymentHistory{resultCode} = 0 if $transactionData->{status} eq 'OK';
 	} else {
-		return undef;
+		return;
 	}
 		
 	return \%paymentHistory;
@@ -350,7 +350,7 @@ sub errorCode {
 
 	$resultCode = $self->{_response}->{Status};
 	return $resultCode unless ($resultCode eq 'OK');
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -607,7 +607,7 @@ sub transactionError {
 
 	$resultCode = $self->resultCode;
 	return $self->resultMessage if ($resultCode ne 'OK');
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

@@ -118,7 +118,7 @@ sub new {
 	eval ($load);
 	if ($@) {
                 $session->errorHandler->error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
-                return undef;
+                return;
         }
 	my $formObj = $cmd->new($session, $param);
 	if ($formObj->isa('WebGUI::Form::List')) {

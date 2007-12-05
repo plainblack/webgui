@@ -54,7 +54,7 @@ Handles a click on an advertisement.
 sub www_clickAd {
 	my $session = shift;
 	my $id = $session->form->param("id");
-	return undef unless $id;
+	return unless $id;
 	my $url = WebGUI::AdSpace->countClick($session, $id);
 	$session->http->setRedirect($url);
 	return "Redirecting to $url";

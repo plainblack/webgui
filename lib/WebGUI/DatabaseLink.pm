@@ -248,7 +248,7 @@ sub db {
 	} else {
 		$self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	}
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -344,7 +344,7 @@ sub new {
 	unless (defined($databaseLink{databaseLinkId}))
 	{
 		$session->errorHandler->warn("Could not find database link '".$databaseLinkId."'");
-		return undef;
+		return;
 	}
 	
 	bless {_session=>$session, _databaseLink => \%databaseLink }, $class;

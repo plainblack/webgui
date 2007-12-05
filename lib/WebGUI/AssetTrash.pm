@@ -184,7 +184,7 @@ Removes asset from lineage, places it in trash state. The "gap" in the lineage i
 
 sub trash {
 	my $self = shift;
-	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+	return if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
 	foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
 		$asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
 	}

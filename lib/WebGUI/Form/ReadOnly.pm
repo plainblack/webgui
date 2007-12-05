@@ -78,7 +78,7 @@ Returns undef.
 =cut
 
 sub getValueFromPost {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -103,7 +103,7 @@ Outputs nothing.
 =cut
 
 sub toHtmlAsHidden {
-	return undef;
+	return;
 }	
 
 

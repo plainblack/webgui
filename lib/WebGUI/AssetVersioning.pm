@@ -173,7 +173,7 @@ Override this method in your asset if you want your asset to automatically run i
 =cut
 
 sub getAutoCommitWorkflowId {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -536,9 +536,9 @@ sub www_purgeRevision {
 	my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit;
 	my $revisionDate = $session->form->process("revisionDate");
-	return undef unless $revisionDate;
+	return unless $revisionDate;
 	my $asset = WebGUI::Asset->new($session,$self->getId,$self->get("className"),$revisionDate);
-	return undef if ($asset->get('revisionDate') != $revisionDate);
+	return if ($asset->get('revisionDate') != $revisionDate);
 	my $parent = $asset->getParent;
 	$asset->purgeRevision;
 	if ($session->form->process("proceed") eq "manageRevisionsInTag") {

@@ -173,7 +173,7 @@ sub getSliderValue {
 		return $i if $keys[$i] eq $self->get('value')->[0];
 	}
 
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

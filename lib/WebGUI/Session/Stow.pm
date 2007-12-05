@@ -58,7 +58,7 @@ The name of the stow variable.
 sub delete {
 	my $self = shift;
 	my $name = shift;
-	return undef unless ($name);
+	return unless ($name);
 	delete $self->{_data}{$name};
 }
 
@@ -108,7 +108,7 @@ The name of the variable.
 sub get {
 	my $self = shift;
 	my $var = shift;
-	return undef if $self->session->config->get("disableCache");
+	return if $self->session->config->get("disableCache");
 	return $self->{_data}{$var};
 }
 
@@ -167,7 +167,7 @@ sub set {
 		if $self->session->config->get("disableCache");
 	my $name = shift;
 	my $value = shift;
-	return undef unless ($name);
+	return unless ($name);
 	$self->{_data}{$name} = $value;
 }
 

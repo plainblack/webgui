@@ -76,9 +76,9 @@ sub create {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift || {};
-	return undef unless $properties->{name};
+	return unless $properties->{name};
 	my $test = $class->newByName($session, $properties->{name});
-	return undef if defined $test;
+	return if defined $test;
 	my $id = $session->db->setRow("adSpace","adSpaceId",{adSpaceId=>"new"});
 	my $self = $class->new($session, $id);
 	$self->set($properties);
@@ -236,7 +236,7 @@ sub new {
 	my $session = shift;
 	my $id = shift;
 	my $properties = $session->db->getRow("adSpace","adSpaceId",$id);
-	return undef unless $properties->{adSpaceId};
+	return unless $properties->{adSpaceId};
 	bless {_session=>$session, _properties=>$properties}, $class;
 }
 
@@ -261,7 +261,7 @@ sub newByName {
 	my $session = shift;
 	my $name = shift;
 	my $properties = $session->db->getRow("adSpace","name",$name);
-	return undef unless $properties->{adSpaceId};
+	return unless $properties->{adSpaceId};
 	bless {_session=>$session, _properties=>$properties}, $class;
 }
 

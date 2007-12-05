@@ -537,7 +537,7 @@ sub www_setWorkingVersionTag () {
 		$tag->setWorking();
 	}
 	if ($session->form->param("backToSite")) {
-		return undef;
+		return;
 	}
 	return www_manageVersions($session);
 }

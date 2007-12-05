@@ -278,7 +278,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $id = shift;
-	return undef unless ($id);
+	return unless ($id);
 	my $properties = $session->db->getRow("userProfileCategory","profileCategoryId",$id);
 	bless {_session=>$session, _properties=>$properties}, $class;
 }

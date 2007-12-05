@@ -157,7 +157,7 @@ sub _get {
 	}
 	else {
 		$session->errorHandler->warn("Unable to load help for $namespace -> $id");
-		return undef;
+		return;
 	}
 }
 

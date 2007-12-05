@@ -323,7 +323,7 @@ sub connect {
 
 	unless (defined $dbh) {
 		$session->errorHandler->error("Couldn't connect to database: $dsn");
-		return undef;
+		return;
 	}
 
     ##Set specific attributes for this database.

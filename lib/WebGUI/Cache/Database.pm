@@ -94,7 +94,7 @@ Retrieve content from the filesystem cache.
 
 sub get {
 	my $self = shift;
-	return undef if ($self->session->config->get("disableCache"));
+	return if ($self->session->config->get("disableCache"));
 	# getting better performance using native dbi than webgui sql
 	my $dbh = $self->session->db->dbh;	
 	my $sth = $dbh->prepare("select content from cache where namespace=? and cachekey=? and expires>?");
@@ -102,7 +102,7 @@ sub get {
 	my $data = $sth->fetchrow_arrayref;
 	$sth->finish;
 	my $content = $data->[0];
-	return undef unless ($content);
+	return unless ($content);
 	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
 	return ${thaw($content)};
 }

@@ -264,11 +264,11 @@ sub addToScratchCart {
 	my $scratchCart = $self->session->scratch->get('EMS_scratch_cart');
 	my @eventsInCart = split("\n",$scratchCart);
 	my ($isApproved) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId = ?",[$event]);
-	return undef unless $isApproved;
+	return unless $isApproved;
 	unless (scalar(@eventsInCart) || $scratchCart) {
 		# the cart is empty, so check if this is a master event or not.
 		my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$event]);
-		return undef if $isChild;
+		return if $isChild;
 		$self->session->scratch->set('currentMainEvent',$event);
 		$self->session->scratch->set('EMS_scratch_cart', $event);
 		return $event;
@@ -276,7 +276,7 @@ sub addToScratchCart {
 	# check if event is actually available.
 	my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and r.returned=0 and r.productId=?",[$event]);
 	my ($maxAttendees) = $self->session->db->quickArray("select maximumAttendees from EventManagementSystem_products where productId=?",[$event]);
-	return undef unless ($self->canApproveEvents || ($maxAttendees > $numberRegistered));
+	return unless ($self->canApproveEvents || ($maxAttendees > $numberRegistered));
 
 	my $bid = $self->session->scratch->get('currentBadgeId');
 	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();

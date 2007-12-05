@@ -394,9 +394,9 @@ sub retrieve {
 	my $class = shift;
 	my $session = shift;
 	my $messageId = shift;
-	return undef unless $messageId;
+	return unless $messageId;
 	my $data = $session->db->getRow("mailQueue","messageId", $messageId);
-	return undef unless $data->{messageId};
+	return unless $data->{messageId};
 	$session->db->deleteRow("mailQueue","messageId", $messageId);
 	my $parser = MIME::Parser->new;
 	$parser->output_to_core(1);

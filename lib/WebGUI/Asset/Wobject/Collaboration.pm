@@ -80,7 +80,7 @@ sub addChild {
 	if ($properties->{className} ne "WebGUI::Asset::Post::Thread"
 	    and $properties->{className} ne 'WebGUI::Asset::RSSFromParent') {
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
-		return undef;
+		return;
 	}
 	return $self->SUPER::addChild($properties, @other);
 }

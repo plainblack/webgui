@@ -200,7 +200,7 @@ sub getValueFromPost {
 				@files = @images;
 			}
 
-			return undef unless @files;
+			return unless @files;
 			$storage->generateThumbnail($_) for @images; # Make a thumbnail for each filename in @images
 		}
 	}

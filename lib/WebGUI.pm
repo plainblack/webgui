@@ -349,7 +349,7 @@ sub tryAssetMethod {
 	my $asset = shift;
 	my $method = shift;
 	my $state = $asset->get("state");
-	return undef if ($state ne "published" && $state ne "archived" && !$session->var->isAdminOn); # can't interact with an asset if it's not published
+	return if ($state ne "published" && $state ne "archived" && !$session->var->isAdminOn); # can't interact with an asset if it's not published
 	$session->asset($asset);
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};

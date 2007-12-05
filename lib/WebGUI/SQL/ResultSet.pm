@@ -313,7 +313,7 @@ sub unconditionalRead {
         	$sth->execute(@$placeholders) or $errorHandler->warn("Unconditional read failed: ".$sql." : ".$sth->errstr);
 		bless {_sql=>$sql, _db=>$db, _sth=>$sth}, $class;
         }  else {
-		return undef;
+		return;
 	}
 }
 

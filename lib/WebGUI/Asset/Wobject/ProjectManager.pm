@@ -444,12 +444,12 @@ sub getProjectInstance {
    my $session = shift;
    my $db = $session->db;
    my $projectId = $_[0];
-   return undef unless $projectId;
+   return unless $projectId;
    my ($assetId) = $db->quickArray("select assetId from PM_project where projectId=?",[$projectId]);
    if($assetId) {
       return WebGUI::Asset->newByDynamicClass($session,$assetId);
    }
-   return undef;
+   return;
 }
 
 #-------------------------------------------------------------------

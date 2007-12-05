@@ -82,7 +82,7 @@ undef if it's not recurring.
 =cut
 
 sub duration {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------
@@ -95,7 +95,7 @@ your item you don't have to override this method or if you do, you can just retu
 =cut
 
 sub handler {
-	return undef;
+	return;
 }
 
 #-------------------------------------------------------------------

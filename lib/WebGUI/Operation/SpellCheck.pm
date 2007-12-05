@@ -41,12 +41,12 @@ An instanciated session object.
 sub _getSpeller {
 	my ($baseDir, $userDir, $homeDir);
 	my $session = shift;
-	return undef unless Text::Aspell->can('new');
+	return unless Text::Aspell->can('new');
 	my $speller = Text::Aspell->new;
 
 	# Get language
 	my $lang = $session->form->process('lang');
-	return undef unless (isIn($lang, map {m/^.*?:([^:]*):.*?$/} $speller->list_dictionaries));
+	return unless (isIn($lang, map {m/^.*?:([^:]*):.*?$/} $speller->list_dictionaries));
 
 	# User homedir
 	my $userId = $session->user->userId;

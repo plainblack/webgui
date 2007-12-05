@@ -159,7 +159,7 @@ if there is no such feed.
 sub getRssUrl {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
-	return undef unless defined $rssFromParentId;
+	return unless defined $rssFromParentId;
 	WebGUI::Asset->newByDynamicClass($self->session, $rssFromParentId)->getUrl;
 }
 
