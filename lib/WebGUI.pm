@@ -1,5 +1,7 @@
 package WebGUI;
 
+use strict qw(vars subs);
+
 our $VERSION = "7.5.0";
 our $STATUS = "beta";
 
@@ -18,7 +20,6 @@ our $STATUS = "beta";
 
 =cut
 
-use strict qw(vars subs);
 use Time::HiRes;
 use WebGUI::Affiliate;
 use WebGUI::Asset;
