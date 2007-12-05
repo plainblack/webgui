@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_MessageBoard;
+use strict
 
 our $HELP = {
     'message board template' => {

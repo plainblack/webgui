@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_DataForm;
+use strict
 
 our $HELP = {
     'data form template' => {

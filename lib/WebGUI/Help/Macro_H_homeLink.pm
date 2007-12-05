@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_H_homeLink;
+use strict
 
 our $HELP = {
 

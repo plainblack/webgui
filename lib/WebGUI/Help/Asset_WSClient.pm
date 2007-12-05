@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_WSClient;
+use strict
 
 our $HELP = {
     'ws client template' => {

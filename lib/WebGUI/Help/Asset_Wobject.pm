@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Wobject;
+use strict
 
 our $HELP = {
 

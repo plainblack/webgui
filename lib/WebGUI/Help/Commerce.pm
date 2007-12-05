@@ -1,4 +1,5 @@
 package WebGUI::Help::Commerce;
+use strict
 
 our $HELP = {
 

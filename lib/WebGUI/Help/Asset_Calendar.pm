@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Calendar;
+use strict
 
 use strict;
 use warnings;

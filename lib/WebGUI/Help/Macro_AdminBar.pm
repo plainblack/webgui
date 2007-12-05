@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_AdminBar;
+use strict
 
 our $HELP = {
 

@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_a_account;
+use strict
 
 our $HELP = {
 

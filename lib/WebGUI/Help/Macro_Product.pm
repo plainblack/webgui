@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_Product;
+use strict
 
 our $HELP = {
 

@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_WeatherData;
+use strict
 
 our $HELP = {
     'weatherdata template' => {

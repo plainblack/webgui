@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_EditableToggle;
+use strict
 
 our $HELP = {
 

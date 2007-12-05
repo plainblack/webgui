@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Product;
+use strict
 
 our $HELP = {
     'product template' => {

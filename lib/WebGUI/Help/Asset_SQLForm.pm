@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_SQLForm;
+use strict
 
 our $HELP = {
     'search record template' => {

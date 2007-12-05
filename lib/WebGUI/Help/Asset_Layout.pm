@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Layout;
+use strict
 
 our $HELP = {
 

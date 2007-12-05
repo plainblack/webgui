@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Survey;
+use strict
 
 our $HELP = {
     'survey template' => {

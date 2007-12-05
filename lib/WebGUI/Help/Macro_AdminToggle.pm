@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_AdminToggle;
+use strict
 
 our $HELP = {
 

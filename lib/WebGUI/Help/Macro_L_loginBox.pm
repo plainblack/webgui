@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_L_loginBox;
+use strict
 
 our $HELP = {
 

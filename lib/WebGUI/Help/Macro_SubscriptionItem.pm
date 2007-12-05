@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_SubscriptionItem;
+use strict
 
 our $HELP = {
 

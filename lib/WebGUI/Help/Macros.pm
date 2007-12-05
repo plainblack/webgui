@@ -1,4 +1,5 @@
 package WebGUI::Help::Macros;
+use strict
 
 our $HELP = {
 

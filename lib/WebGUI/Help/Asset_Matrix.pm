@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Matrix;
+use strict
 
 our $HELP = {
 

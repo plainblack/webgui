@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_WikiPage;
+use strict
 
 our $HELP = {
     'wiki page add/edit' => {

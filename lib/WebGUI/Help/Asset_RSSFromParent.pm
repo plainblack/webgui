@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_RSSFromParent;
+use strict
 
 our $HELP = {
     'rss from parent' => {

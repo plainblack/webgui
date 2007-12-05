@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Collaboration;
+use strict
 
 our $HELP = {
 

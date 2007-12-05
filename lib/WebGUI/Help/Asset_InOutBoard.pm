@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_InOutBoard;
+use strict
 
 our $HELP = {
     'in out board template' => {

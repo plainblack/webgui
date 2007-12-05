@@ -1,5 +1,7 @@
 package WebGUI::Help::_Help; ## Be sure to change the package name to match your filename.
 
+use strict; ##Required for good Perl::Critic code
+
 ##Stub document for creating help documents.
 
 our $HELP = {  ##hashref of hashes

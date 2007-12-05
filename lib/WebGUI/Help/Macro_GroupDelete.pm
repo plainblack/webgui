@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_GroupDelete;
+use strict
 
 our $HELP = {
 

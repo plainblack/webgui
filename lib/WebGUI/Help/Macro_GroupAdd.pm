@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_GroupAdd;
+use strict
 
 our $HELP = {
 

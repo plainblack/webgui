@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_WikiMaster;
+use strict
 
 our $HELP = {
     'wiki master search box variables' => {

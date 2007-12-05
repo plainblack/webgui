@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset;
+use strict
 
 our $HELP = {
 

@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Image;
+use strict
 
 our $HELP = {
 

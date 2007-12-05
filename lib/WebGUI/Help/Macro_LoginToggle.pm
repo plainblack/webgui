@@ -1,4 +1,5 @@
 package WebGUI::Help::Macro_LoginToggle;
+use strict
 
 our $HELP = {
 

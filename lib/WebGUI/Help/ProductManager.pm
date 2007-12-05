@@ -1,4 +1,5 @@
 package WebGUI::Help::ProductManager;
+use strict
 
 our $HELP = {
 

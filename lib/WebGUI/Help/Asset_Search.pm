@@ -1,4 +1,5 @@
 package WebGUI::Help::Asset_Search;
+use strict
 
 our $HELP = {
     'search template' => {

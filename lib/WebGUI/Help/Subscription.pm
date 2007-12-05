@@ -1,4 +1,5 @@
 package WebGUI::Help::Subscription;
+use strict
 
 our $HELP = {
 
