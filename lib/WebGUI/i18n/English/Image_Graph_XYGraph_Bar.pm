@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Image_Graph_XYGraph_Bar;
+use strict;
 
 our $I18N = {
 	'bar spacing' => {

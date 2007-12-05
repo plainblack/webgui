@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Graphics;
+use strict;
 
 our $I18N = {
 	'manage graphics' => { 

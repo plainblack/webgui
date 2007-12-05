@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
+use strict;
 
 our $I18N = { ##hashref of hashes
 	'cancel registration' => {

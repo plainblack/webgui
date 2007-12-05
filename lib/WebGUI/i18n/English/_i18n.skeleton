@@ -1,5 +1,7 @@
 package WebGUI::i18n::English::_i18n;  ##Be sure to change the package name to match the filename
 
+use strict; ##Required for all good Perl::Critic compliant code
+
 our $I18N = { ##hashref of hashes
 	'key1' => { ##key that will be used to reference this entry.  Do not translate this.
 		message => q|Internationalized message.  WebGUI Macros work in here.  Please use XHTML format for markup|,

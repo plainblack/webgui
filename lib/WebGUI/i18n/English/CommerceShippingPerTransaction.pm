@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::CommerceShippingPerTransaction;
+use strict;
 
 our $I18N = {
 	'title' => {

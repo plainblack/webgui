@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Macro_Include;
+use strict;
 
 our $I18N = {
 

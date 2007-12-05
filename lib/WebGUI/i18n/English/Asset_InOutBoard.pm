@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_InOutBoard;
+use strict;
 
 our $I18N = {
 	'In Out Template' => {

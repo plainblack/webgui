@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow;
+use strict;
 
 our $I18N = { 
 	'run' => {

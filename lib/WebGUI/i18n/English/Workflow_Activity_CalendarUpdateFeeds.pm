@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity_CalendarUpdateFeeds;
+use strict;
 
 our $I18N = {
 

@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Operation_FormHelpers;
+use strict;
 
 our $I18N = {
 	'Cancel' => {

@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::WebGUI;
+use strict;
 
 our $I18N = {
 	'run on admin create user' => {

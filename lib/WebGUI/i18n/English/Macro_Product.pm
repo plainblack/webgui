@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Macro_Product;
+use strict;
 
 our $I18N = {
 	'add to cart' => {

@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity_CleanTempStorage;
+use strict;
 
 our $I18N = {
 	'storage timeout help' => {

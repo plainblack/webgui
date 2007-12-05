@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Form_Captcha; 
+use strict;
 
 our $I18N = { 
 	'verify your humanity' => {

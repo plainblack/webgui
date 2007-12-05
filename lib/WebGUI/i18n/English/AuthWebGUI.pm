@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::AuthWebGUI;
+use strict;
 
 our $I18N = {
 	'no registration hack' => {

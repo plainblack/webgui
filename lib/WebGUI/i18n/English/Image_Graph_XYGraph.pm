@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Image_Graph_XYGraph;
+use strict;
 
 our $I18N = {
 	'chart width' => {

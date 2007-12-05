@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Subscription;
+use strict;
 
 our $I18N = {
 	'expire subscription codes' => {

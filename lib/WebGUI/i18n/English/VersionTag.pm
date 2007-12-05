@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::VersionTag;
+use strict;
 
 our $I18N = {
 	'export version tag to html' => {

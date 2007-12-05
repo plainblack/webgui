@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Commerce;
+use strict;
 
 our $I18N = {
         'purchase history template' => {

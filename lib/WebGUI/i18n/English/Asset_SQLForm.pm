@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_SQLForm;
+use strict;
 
 our $I18N = {
 	'change field warning' => {

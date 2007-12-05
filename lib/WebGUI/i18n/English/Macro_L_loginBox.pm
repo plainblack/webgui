@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Macro_L_loginBox;
+use strict;
 
 our $I18N = {
 

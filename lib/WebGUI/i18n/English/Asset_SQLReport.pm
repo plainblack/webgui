@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_SQLReport;
+use strict;
 
 our $I18N = {
 	'cache timeout description' => {

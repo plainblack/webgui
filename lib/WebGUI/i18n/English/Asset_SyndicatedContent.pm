@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_SyndicatedContent;
+use strict;
 
 our $I18N = {
 	'process macros in rss url' => {

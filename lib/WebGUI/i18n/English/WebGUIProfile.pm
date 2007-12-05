@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::WebGUIProfile;
+use strict;
 
 our $I18N = {
 	'787' => {

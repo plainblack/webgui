@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Collaboration;
+use strict;
 
 our $I18N = {
 

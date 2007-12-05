@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Image_Graph_Pie;
+use strict;
 
 our $I18N = {
 	'radius' => {

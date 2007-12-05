@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Thread;
+use strict;
 
 our $I18N = {
 

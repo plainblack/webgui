@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Post;
+use strict;
 
 our $I18N = {
 	'add/edit post template title' => {

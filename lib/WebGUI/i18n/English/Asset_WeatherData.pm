@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_WeatherData;
+use strict;
 
 our $I18N = {
 	'you need a weather.com key' => {

@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Matrix;
+use strict;
 
 our $I18N = {
 	'delete field confirm' => {

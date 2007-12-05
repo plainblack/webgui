@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Macro_H_homeLink;
+use strict;
 
 our $I18N = {
 

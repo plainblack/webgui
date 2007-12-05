@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_WSClient;
+use strict;
 
 our $I18N = {
 	'35' => {

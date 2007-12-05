@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity;
+use strict;
 
 our $I18N = {
 	'description help' => {

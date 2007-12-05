@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::TransactionLog;
+use strict;
 
 our $I18N = {
 	'cancel error' => {

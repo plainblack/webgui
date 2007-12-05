@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::ProductManager;
+use strict;
 
 our $I18N = {
 	'confirm delete product' => {

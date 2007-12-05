@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity_TrashClipboard;
+use strict;
 
 our $I18N = {
 	'trash after help' => {

@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::CommercePaymentITransact;
+use strict;
 
 our $I18N = {
 	'label' => {

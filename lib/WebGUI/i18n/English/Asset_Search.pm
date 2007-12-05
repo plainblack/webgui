@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Search;  ##Be sure to change the package name to match the filename
+use strict;
 
 our $I18N = { ##hashref of hashes
 

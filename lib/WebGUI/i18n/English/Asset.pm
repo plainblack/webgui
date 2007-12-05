@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset;
+use strict;
 
 our $I18N = {
 	'save and commit' => {

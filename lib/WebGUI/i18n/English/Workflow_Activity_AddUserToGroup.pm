@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity_AddUserToGroup;
+use strict;
 
 our $I18N = {
 	'expire offset help' => {

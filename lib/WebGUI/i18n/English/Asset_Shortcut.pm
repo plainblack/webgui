@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Shortcut;
+use strict;
 
 our $I18N = {
 

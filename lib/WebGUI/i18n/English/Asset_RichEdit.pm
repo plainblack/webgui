@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_RichEdit;
+use strict;
 
 our $I18N = {
 

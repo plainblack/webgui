@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Form_CheckList;
+use strict;
 
 our $I18N = { 
     'selectAll label' => {

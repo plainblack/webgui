@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Asset_Dashboard;
+use strict;
 
 our $I18N = {
 	'dashboard template field label' => {

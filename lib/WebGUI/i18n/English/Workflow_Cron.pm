@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Cron;
+use strict;
 
 our $I18N = { 
 	'day of week help' => {

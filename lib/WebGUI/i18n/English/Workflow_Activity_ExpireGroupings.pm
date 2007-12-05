@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Workflow_Activity_ExpireGroupings;
+use strict;
 
 our $I18N = {
 	'activityName' => {

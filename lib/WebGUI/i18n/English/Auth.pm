@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Auth;
+use strict;
 
 our $I18N = {
 

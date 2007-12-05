@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::CommerceShippingByPrice;
+use strict;
 
 our $I18N = {
 	'percentage of price' => {

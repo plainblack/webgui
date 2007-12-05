@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::AdminConsole;
+use strict;
 
 our $I18N = {
 	'admin console' => {

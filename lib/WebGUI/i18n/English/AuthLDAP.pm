@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::AuthLDAP;
+use strict;
 
 our $I18N = {
         'global recursive filter label' => {

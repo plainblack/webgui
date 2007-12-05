@@ -1,4 +1,5 @@
 package WebGUI::i18n::English::Friends;
+use strict;
 
 our $I18N = {
 
