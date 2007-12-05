@@ -9,8 +9,12 @@ our $HELP = {
             my $session = shift;
             my $dir = join '/', $session->config->getWebguiRoot, "lib", "WebGUI", "Macro";
             opendir( DIR, $dir ) or $session->errorHandler->fatal("Can't open Macro directory: $dir!");
-            my @macros = map { s/\.pm//; $_; }
-                grep {/\.pm$/} readdir(DIR);    ##list of namespaces
+            my @macros = ();
+            foreach my $dir (readdir(DIR)) {
+                next unless $dir =~ /\.pm$/;
+                $dir =~ s/\.pm//;
+                push @macros, $dir;
+            }
             closedir(DIR);
 
             ##Build list of enabled macros, by namespace, by reversing session hash:
