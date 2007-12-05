@@ -1,6 +1,8 @@
 package WebGUI::Asset::Wobject::Calendar;
 
-$VERSION = "0.0.0";
+use strict;
+
+our $VERSION = "0.0.0";
 
 ####################################################################
 # WebGUI is Copyright 2001-2007 Plain Black Corporation.
@@ -11,8 +13,6 @@ $VERSION = "0.0.0";
 ####################################################################
 # http://www.plainblack.com                     info@plainblack.com
 ####################################################################
-
-use strict;
 
 use Tie::IxHash;
 

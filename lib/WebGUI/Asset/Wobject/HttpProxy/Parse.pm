@@ -1,5 +1,7 @@
 package WebGUI::Asset::Wobject::HttpProxy::Parse;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -70,7 +72,7 @@ sub new {
 	$self->{assetUrl} = shift;
     
     my $pfilter = shift;
-    $pfiler =~ s/\r//g;
+    $pfilter =~ s/\r//g;
     my @patterns = split(/\n/,$pfilter); 
     $self->{patternFilter} = \@patterns;
    
@@ -166,7 +168,7 @@ sub start {
 						    $val =~ s/\n//g;	# Bugfix 757068
                             
                             #Determine if pattern should not be rewritten
-                            $rewritePattern = 0;
+                            my $rewritePattern = 0;
                             foreach my $pattern (@{$self->{patternFilter}}) {
                                 if($val =~ m/$pattern/i) {
                                     $rewritePattern = 1;

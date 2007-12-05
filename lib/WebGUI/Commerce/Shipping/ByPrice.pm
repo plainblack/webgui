@@ -1,5 +1,7 @@
 package WebGUI::Commerce::Shipping::ByPrice;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -23,8 +25,6 @@ Shipping plugin for determining shipping cost by a percentage of total price.
 =cut
 
 our @ISA = qw(WebGUI::Commerce::Shipping);
-
-use strict;
 
 #-------------------------------------------------------------------
 

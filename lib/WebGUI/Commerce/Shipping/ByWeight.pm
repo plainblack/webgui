@@ -1,5 +1,7 @@
 package WebGUI::Commerce::Shipping::ByWeight;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -24,8 +26,6 @@ or products being purchased.
 =cut
 
 our @ISA = qw(WebGUI::Commerce::Shipping);
-
-use strict;
 
 #-------------------------------------------------------------------
 

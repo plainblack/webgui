@@ -1,5 +1,7 @@
 package WebGUI::Commerce::Item;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -170,20 +172,16 @@ The type (namespace) of the item you want.
 =cut
 
 sub new {
-	my ($class, $session, $namespace, $load, $cmd, $plugin);
-    	$class = shift;
-    	$session = shift;
-	$id = shift;
-	$namespace = shift;
+    my ($class, $session, $id, $namespace) = @_;
 	
 	$session->errorHandler->fatal('No namespace') unless ($namespace);
 	$session->errorHandler->fatal('No ID') unless ($id);
 	
-    	$cmd = "WebGUI::Commerce::Item::$namespace";
-	$load = "use $cmd";
+    my $cmd = "WebGUI::Commerce::Item::$namespace";
+	my $load = "use $cmd";
 	eval($load);
 	$session->errorHandler->warn("Item plugin failed to compile: $cmd.".$@) if($@);
-	$plugin = eval($cmd.'->new($session, "$id", "$namespace")');
+	my $plugin = eval($cmd.'->new($session, "$id", "$namespace")');
 	$session->errorHandler->warn("Couldn't instantiate Item plugin: $cmd.".$@) if($@);
 	return $plugin;
 }

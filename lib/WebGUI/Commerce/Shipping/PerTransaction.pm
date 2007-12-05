@@ -1,5 +1,7 @@
 package WebGUI::Commerce::Shipping::PerTransaction;
 
+use strict;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -23,8 +25,6 @@ Shipping plugin for a fixed shipping costs per transaction.
 =cut
 
 our @ISA = qw(WebGUI::Commerce::Shipping);
-
-use strict;
 
 #-------------------------------------------------------------------
 
