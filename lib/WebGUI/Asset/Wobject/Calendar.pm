@@ -857,8 +857,10 @@ sub processPropertiesFromFormPost {
     # Workaround WebGUI::Session::Form->param bug that returns duplicate
     # names.
     my %feeds;
-    $feeds{$_}++ 
-        for map { s/^feeds-//; $_; } grep /^feeds-/,($form->param());
+    for my $feedId ( grep /^feeds-/, ($form->param()) ) {
+        $feedId =~ s/^feeds-//;
+        $feeds{$feedId}++;
+    }
     my @feedsFromForm = keys %feeds;
     
     # Delete old feeds that are not in @feeds
