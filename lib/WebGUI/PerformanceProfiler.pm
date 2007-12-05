@@ -501,10 +501,9 @@ sub is_constant {
 }
 
 sub sum {
-	my ($sum, $elem);
-	$sum = 0;
+	my $sum = 0;
 	my $arrRef = shift;
-	foreach $elem (@{$arrRef}) { $sum += $elem; }
+	foreach my $elem (@{$arrRef}) { $sum += $elem; }
 	return($sum);
 }
 

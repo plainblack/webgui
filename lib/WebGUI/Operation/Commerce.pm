@@ -404,7 +404,7 @@ C<viewPurchaseHistory> operation.
 sub www_checkoutSubmit {
 	my $session = shift;
 	my ($plugin, $shoppingCart, $transaction, $var, $amount, @cartItems, $i18n, @transactions, 
-		@normal, $currentPurchase, $checkoutError, @resultLoop, %param, $normal, $recurring, 
+		@normal, $checkoutError, @resultLoop, %param, $normal, $recurring, 
 		$formError, $shipping, $shippingCost, $shippingDescription);
 	
 	$i18n = WebGUI::International->new($session, 'Commerce');
@@ -449,7 +449,7 @@ sub www_checkoutSubmit {
 	map {push(@transactions, {recurring => 1, items => [$_]})} @$recurring;
 	push(@transactions, {recurring => 0, items => [@$normal]}) if (@$normal);
 	
-	foreach $currentPurchase (@transactions) {
+	foreach my $currentPurchase (@transactions) {
 		$amount = 0;
 		$var = {};
 
@@ -634,7 +634,7 @@ Calls C<www_editCommerceSettingsSave> on form submission.
 
 sub www_editCommerceSettings {
 	my $session = shift;
-	my (%tabs, $tabform, $currentPlugin, $ac, $jscript, $i18n, 
+	my (%tabs, $tabform, $ac, $jscript, $i18n, 
 		$paymentPlugin, @paymentPlugins, %paymentPlugins, @failedPaymentPlugins, $plugin,
 		$shippingPlugin, @shippingPlugins, %shippingPlugins, @failedShippingPlugins);
 	return $session->privilege->adminOnly unless canView($session);
@@ -741,7 +741,7 @@ sub www_editCommerceSettings {
 			-extras		=> 'onchange="activePayment=operateHidden(this.options[this.selectedIndex].value,activePayment)"'
 			);
 			
-		foreach $currentPlugin (@paymentPlugins) {
+		foreach my $currentPlugin (@paymentPlugins) {
 			my $style = '" style="display: none;' unless ($currentPlugin->namespace eq $paymentPlugin);
 			$tabform->getTab('payment')->raw('<tr id="'.$currentPlugin->namespace.$style.'"><td colspan="2" width="100%">'.
 				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
@@ -780,7 +780,7 @@ sub www_editCommerceSettings {
 			-extras	=> 'onchange="activeShipping=operateHidden(this.options[this.selectedIndex].value,activeShipping)"'
 			);
 		
-		foreach $currentPlugin (@shippingPlugins) {
+		foreach my $currentPlugin (@shippingPlugins) {
 			my $style = '" style="display: none;' unless ($currentPlugin->namespace eq $shippingPlugin);
 			$tabform->getTab('shipping')->raw('<tr id="'.$currentPlugin->namespace.$style.'"><td colspan="2" width="100%">'.
 				'<table border="0" cellspacing="0" cellpadding="0" width="100%">'.
@@ -897,7 +897,7 @@ The screen is not templated.
 
 sub www_listTransactions {
 	my $session = shift;
-	my ($output, %criteria, $transaction, @transactions);
+	my ($output, %criteria, @transactions);
 
 	return $session->privilege->insufficient unless canView($session);
 
@@ -968,7 +968,7 @@ sub www_listTransactions {
 		'<th>'. $i18n->get('shipping cost'). '</th>'.
 		'<th>'. $i18n->get('status'). '</th>'.
 		'<th>'. $i18n->get('shipping status'). '</th></tr>';
-	foreach $transaction (@transactions) {
+	foreach my $transaction (@transactions) {
 		$output .= '<tr bgcolor="#ddd">';
 		$output .= '<td>'.$session->icon->delete('op=deleteTransaction;tid='.$transaction->get('transactionId')).'</td>';
 		my $userId = $transaction->get('userId');

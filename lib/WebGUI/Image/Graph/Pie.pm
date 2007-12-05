@@ -398,7 +398,7 @@ Draws the pie chart.
 =cut
 
 sub draw {
-	my ($currentSlice, $coordinates, $sliceData, $leftPlaneVisible, $rightPlaneVisible);
+	my ($currentSlice, $coordinates, $leftPlaneVisible, $rightPlaneVisible);
 	my $self = shift;
 	
 	$self->processDataset;
@@ -407,7 +407,7 @@ sub draw {
 	my @slices = sort sortSlices @{$self->{_slices}};
 	
 	# First draw the bottom planes and the labels behind the chart.
-	foreach $sliceData (@slices) {
+	foreach my $sliceData (@slices) {
 		# Draw bottom
 		$self->drawBottom($sliceData);
 
@@ -419,7 +419,7 @@ sub draw {
 	# Second draw the sides
 	# If angle == 0 do a 2d pie
 	if ($self->getTiltAngle != 0) {
-		foreach $sliceData (@slices) {  #(sort sortSlices @{$self->{_slices}}) {
+		foreach my $sliceData (@slices) {  #(sort sortSlices @{$self->{_slices}}) {
 			$leftPlaneVisible = (_mod2pi($sliceData->{startAngle}) <= 0.5*pi || _mod2pi($sliceData->{startAngle} >= 1.5*pi));
 			$rightPlaneVisible = (_mod2pi($sliceData->{stopAngle}) >= 0.5*pi && _mod2pi($sliceData->{stopAngle} <= 1.5*pi));
 
@@ -446,7 +446,7 @@ sub draw {
 	}
 
 	# Finally draw the top planes of each slice and the labels that are in front of the chart.
-	foreach $sliceData (@slices) {
+	foreach my $sliceData (@slices) {
 		$self->drawTop($sliceData) if ($self->getTiltAngle != 0);
 
 		if (_mod2pi($sliceData->{avgAngle}) > pi) {

@@ -254,12 +254,12 @@ A reference to the current session.
 
 sub www_editProfileSave {
 	my $session = shift;
-	my ($profile, $fieldName, $error, $u, $warning);
+	my ($profile, $error, $warning);
 	return WebGUI::Operation::Auth::www_auth($session, "init") if ($session->user->userId eq '1');
 	($profile, $error, $warning) = validateProfileData($session);
 	$error .= $warning;
 	return www_editProfile($session, '<ul>'.$error.'</ul>') if($error ne "");
-	foreach $fieldName (keys %{$profile}) {
+	foreach my $fieldName (keys %{$profile}) {
 		$session->user->profileField($fieldName,$profile->{$fieldName});
 	}
 	return WebGUI::Operation::Auth::www_auth($session);

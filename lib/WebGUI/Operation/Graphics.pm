@@ -289,7 +289,7 @@ sub www_editFontSave {
 
 #-------------------------------------------------------------------
 sub www_editPalette {
-	my ($name, $palette, $output, $color);
+	my ($name, $palette, $output);
 	my $session = shift;
 	my $paletteId = shift || $session->form->process('pid');
 
@@ -324,7 +324,7 @@ sub www_editPalette {
 
 		$output .= '<table>';
 		$output .= '<tr><th></th><th>'.$i18n->get('fill color').'</th><th>'.$i18n->get('stroke color').'</th></tr>';
-		foreach $color (@{$palette->getColorsInPalette}) {
+		foreach my $color (@{$palette->getColorsInPalette}) {
 			$output .= '<tr>';
 			$output .= '<td>';
 			$output .= $session->icon->delete('op=removeColorFromPalette;pid='.$palette->getId.';index='.$palette->getColorIndex($color));

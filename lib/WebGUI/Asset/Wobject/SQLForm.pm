@@ -772,13 +772,13 @@ resides.
 =cut
 
 sub _getDatabaseInfo {
-	my (@tables, $tableName, $sth, $columnDefinition, $currentColumn, $databaseDefinition);
+	my (@tables, $sth, $columnDefinition, $currentColumn, $databaseDefinition);
 	my $self = shift;
 
 	my $dbLink = $self->_getDbLink;
 	@tables = $dbLink->db->buildArray("show tables");
 
-	foreach $tableName (@tables) {
+	foreach my $tableName (@tables) {
 		$sth = $dbLink->db->read("describe ".$tableName);
 		
 		while ($columnDefinition = $sth->hashRef) {
@@ -1940,7 +1940,7 @@ Processes and stores the field properties, and will alter the table according to
 =cut
 
 sub www_editFieldSave {
-	my ($databaseDef, $key, $joinNumber, @tables, $processed, $tableName,
+	my ($databaseDef, $joinNumber, @tables, $processed, $tableName,
 		$joinAColumnName, $joinATableName, $joinBColumnName, $joinBTableName,
 		@joinConstraints, @differenceConstraints, $maxAllowedLength, $fieldId, 
 		@error, $properties, $i18n);
@@ -2028,7 +2028,7 @@ my	@columnConstraints;
 my 	%fingerprint;
 my 	$dbLink = $self->_getDbLink;
 
-	foreach $key (sort(keys(%{$self->session->form->paramsHashRef}))) {
+	foreach my $key (sort(keys(%{$self->session->form->paramsHashRef}))) {
 		if ($key =~ m/^database(\d+)/ && $self->session->form->process($key)) {
 			$joinNumber = $1;
 my			$databaseName = $self->session->form->process("database$joinNumber");
@@ -3332,7 +3332,6 @@ revision number in form param 'rev'; otherwise the latest revision is used.
 =cut
 
 sub www_viewFile {
-	my ($field, $revision);
 	my $self = shift;
 
 	return $self->session->privilege->insufficient() unless ($self->canView);
@@ -3341,7 +3340,7 @@ sub www_viewFile {
 	my $recordId = $self->session->form->process('rid');
 	my $revision = $self->session->form->process('rev');
 
-	$field = $self->_getFieldProperties($fieldId);
+	my $field = $self->_getFieldProperties($fieldId);
 
 	if ($field->{formFieldType} eq 'file') {
 		my ($mimeType, $data) = $self->_getFileFromDatabase($recordId, $field->{fieldName}, $revision); 
@@ -3364,7 +3363,6 @@ This particular caching scheme is used in stead of storage, since privileges sho
 =cut
 
 sub www_viewThumbnail {
-	my ($field, $revision, $thumbnailData);
 	my $self = shift;
 
 	return $self->session->privilege->insufficient() unless ($self->canView);
@@ -3372,12 +3370,12 @@ sub www_viewThumbnail {
 	my $fieldId = $self->session->form->process('fid');
 	my $recordId = $self->session->form->process('rid');
 	my $revision = $self->session->form->process('rev');
-	$field = $self->_getFieldProperties($self->session->form->process("fid"));
+	my $field = $self->_getFieldProperties($self->session->form->process("fid"));
 
 	if ($field->{formFieldType} eq 'file') {
 		my $cache = WebGUI::Cache->new($self->session, ["sqlform",$recordId,$fieldId,$revision], 24*60*60);
 
-		$thumbnailData = $cache->get;
+		my $thumbnailData = $cache->get;
 		
 		unless ($thumbnailData) {	
 			my ($mimeType, $data) = $self->_getFileFromDatabase($recordId, $field->{fieldName}, $revision);
@@ -3923,7 +3921,7 @@ my %sortWeights = (
 );
 
 sub _constructSearchQuery {
-    my (@tables, @joinConstraints, $tableCounter, @constraints, $currentField, $conditional, @joinSequence);
+    my (@tables, @joinConstraints, $tableCounter, @constraints, $conditional, @joinSequence);
     my $self = shift;
     my $searchInFields = shift;
     my $showFields = shift;
@@ -3946,7 +3944,7 @@ sub _constructSearchQuery {
     $tableCounter = 2;
 
     # Process search fields.
-    foreach $currentField (@$searchInFields) {
+    foreach my $currentField (@$searchInFields) {
 	# Set conditional given for this field or to like or regexp mode if in normal search
 	my $searchMode = $self->session->form->process("searchMode") || $self->session->scratch->get('SQLForm_'.$self->getId.'searchMode');
 	if ($searchMode) {

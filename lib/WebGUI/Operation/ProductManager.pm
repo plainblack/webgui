@@ -852,7 +852,7 @@ The current WebGUI session object.
 
 sub www_manageProduct {
 	my $session = shift;
-	my ($product, $output, $parameter, $option, $optionId, $i18n);
+	my ($product, $output, $option, $i18n);
 
 	return $session->privilege->insufficient unless canView($session);
 
@@ -882,14 +882,14 @@ sub www_manageProduct {
 	$output .= "<h2>Parameters</h2>";
 	$output .= '<a href="'.$session->url->page('op=editProductParameter;parameterId=new;productId='.$product->get('productId')).'">'.
 		$i18n->get('add parameter').'</a><br />';
-	foreach $parameter (@{$product->getParameter}) {
+	foreach my $parameter (@{$product->getParameter}) {
 		$output .= $session->icon->delete('op=deleteProductParameter;parameterId='.$parameter->{parameterId}).
 			$session->icon->edit('op=editProductParameter;parameterId='.$parameter->{parameterId});
 		$output .= '<span style="margin-left: 10px"><b>'.$parameter->{name}.'</b></span><br />';
 		$output .= '<a style="margin-left: 20px" href="'.
 			$session->url->page('op=editProductParameterOption;optionId=new;parameterId='.$parameter->{parameterId}).'">'.
 			$i18n->get('add option').'</a><br />';
-		foreach $optionId (@{$parameter->{options}}) {
+		foreach my $optionId (@{$parameter->{options}}) {
 			$option = $product->getOption($optionId);
 			$output .= '<span style="margin-left: 20px">'.
 				$session->icon->delete('op=deleteProductParameterOption;optionId='.$option->{optionId}).

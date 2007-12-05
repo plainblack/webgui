@@ -123,7 +123,7 @@ Draws all the bars.
 =cut
 
 sub drawGraph {
-	my ($currentBar, %location);
+	my %location;
 	my $self = shift;
 
 	$self->processDataSet;
@@ -137,7 +137,7 @@ sub drawGraph {
 
 	$location{x} = $self->getChartOffset->{x} ;
 	$location{y} = $self->getChartOffset->{y} + $self->getChartHeight;
-	foreach $currentBar (@{$self->{_bars}}) {
+	foreach my $currentBar (@{$self->{_bars}}) {
 		if ($self->getDrawMode eq 'stacked') {
 			$self->drawStackedBar($currentBar, \%location, $barWidth);
 		} else {
