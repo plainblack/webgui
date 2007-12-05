@@ -143,11 +143,10 @@ sub recurseFileSystem {
 	my $self = shift;
     my $start = shift;
 	my $path = shift;
-    my (@filelist, $file);
     if (opendir(DIR,$path)) {
-        @filelist = readdir(DIR);
+        my @filelist = readdir(DIR);
         closedir(DIR);
-        foreach $file (@filelist) {
+        foreach my $file (@filelist) {
             unless ($file eq "." || $file eq "..") {
                 # taking too long, time to abort
                 return $self->WAITING if (time() - $start > 50);             
