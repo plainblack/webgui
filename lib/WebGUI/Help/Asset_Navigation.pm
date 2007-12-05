@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Navigation;
-use strict
+use strict;
 
 our $HELP = {
     'navigation template' => {

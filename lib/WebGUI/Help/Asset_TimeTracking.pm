@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_TimeTracking;
-use strict
+use strict;
 
 our $HELP = {
     'user view template variables' => {

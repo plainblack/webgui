@@ -1,5 +1,5 @@
 package WebGUI::Help::Macro_r_printable;
-use strict
+use strict;
 
 our $HELP = {
 

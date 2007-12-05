@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_SyndicatedContent;
-use strict
+use strict;
 
 our $HELP = {
     'syndicated content template' => {

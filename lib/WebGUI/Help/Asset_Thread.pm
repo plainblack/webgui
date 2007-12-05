@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Thread;
-use strict
+use strict;
 
 our $HELP = {
     'thread template variables' => {

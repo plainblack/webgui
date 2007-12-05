@@ -1,5 +1,5 @@
 package WebGUI::Help::Invite;
-use strict
+use strict;
 
 our $HELP = {
 

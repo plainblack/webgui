@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_MultiSearch;
-use strict
+use strict;
 
 our $HELP = {
     'multisearch template' => {

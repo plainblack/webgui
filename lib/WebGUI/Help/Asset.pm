@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset;
-use strict
+use strict;
 
 our $HELP = {
 

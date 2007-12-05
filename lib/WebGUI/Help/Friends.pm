@@ -1,5 +1,5 @@
 package WebGUI::Help::Friends;
-use strict
+use strict;
 
 our $HELP = {
 	'manage friends template' => {

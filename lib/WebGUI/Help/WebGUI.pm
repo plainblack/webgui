@@ -1,5 +1,5 @@
 package WebGUI::Help::WebGUI;
-use strict
+use strict;
 
 our $HELP = {
 

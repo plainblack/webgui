@@ -1,5 +1,5 @@
 package WebGUI::Help::AuthWebGUI;
-use strict
+use strict;
 
 our $HELP = {
     'webgui authentication display account template' => {

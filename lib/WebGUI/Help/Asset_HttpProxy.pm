@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_HttpProxy;
-use strict
+use strict;
 
 our $HELP = {
     'http proxy template' => {

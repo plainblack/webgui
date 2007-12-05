@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_StockData;
-use strict
+use strict;
 
 our $HELP = {
     'stock list template' => {

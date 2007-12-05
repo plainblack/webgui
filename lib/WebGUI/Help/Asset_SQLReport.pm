@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_SQLReport;
-use strict
+use strict;
 
 our $HELP = {
     'sql report template' => {

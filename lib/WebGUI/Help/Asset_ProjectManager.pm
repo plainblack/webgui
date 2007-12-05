@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_ProjectManager;
-use strict
+use strict;
 
 ##Stub document for creating help documents.
 

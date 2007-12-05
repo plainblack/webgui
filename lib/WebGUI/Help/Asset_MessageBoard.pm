@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_MessageBoard;
-use strict
+use strict;
 
 our $HELP = {
     'message board template' => {

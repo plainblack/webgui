@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Newsletter;    ## Be sure to change the package name to match your filename.
-use strict
+use strict;
 
 ##Stub document for creating help documents.
 

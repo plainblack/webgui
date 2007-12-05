@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Post;
-use strict
+use strict;
 
 our $HELP = {
     'post add/edit template' => {    ##Asset/Post/www_edit

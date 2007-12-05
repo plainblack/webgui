@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Event;
-use strict
+use strict;
 
 our $HELP = {
     'event add/edit' => {

@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_ZipArchive;
-use strict
+use strict;
 
 our $HELP = {
 

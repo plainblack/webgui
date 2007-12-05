@@ -1,5 +1,5 @@
 package WebGUI::Help::Asset_Poll;
-use strict
+use strict;
 
 our $HELP = {
     'poll template' => {

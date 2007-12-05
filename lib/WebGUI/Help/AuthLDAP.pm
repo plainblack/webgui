@@ -1,5 +1,5 @@
 package WebGUI::Help::AuthLDAP;
-use strict
+use strict;
 
 our $HELP = {
     'ldap authentication display account template' => {
