@@ -5,16 +5,22 @@ use warnings;
 use Readonly;
 use FindBin;
 
+use WebGUI::Test;
+use WebGUI::International;
+
 use Perl::Critic::Utils qw{ :all };
 use base 'Perl::Critic::Policy';
-
-use WebGUI::International;
-use WebGUI::Test;
 
 =head1 Perl::Critic::Policy::WebGUI::NoIllegalI18NLabels
 
 Scan WebGUI modules for i18n calls and make sure that each
-call has a corresponding i18n table entry
+call has a corresponding i18n table entry.
+
+Running this policy requires setting up some environmental
+variables to that it can get a proper WebGUI session, and access
+the test library.
+
+env WEBGUI_CONFIG=/data/WebGUI/etc/my.conf PERL5LIB=/data/WebGUI/t/lib perlcritic -single-policy NoIllegalI18N
 
 =cut
 
@@ -71,12 +77,13 @@ sub violates {
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
         my $namespace = $arguments[1]->[0];
-        $namespace = $namespace->string;
+        $namespace = $namespace->string || 'WebGUI';
         $self->{_i18n_objects}->{$symbol_name} = $namespace;
         return;
     }
     elsif ($elem eq 'get') {  ##i18n fetch?  Check symbol
         my $symbol_name = _get_symbol_name($elem);
+        return unless $symbol_name && exists $self->{_i18n_objects}->{$symbol_name};
         my $arg_list = $elem->snext_sibling;
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
