@@ -9,6 +9,10 @@
    (Diona Kidd, Knowmad Technologies)
  - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
 
+7.4.18
+ - fix: Auto Request Commit setting creates extra version tag if asset uses
+   requestAutoCommit
+
 7.4.17
  - fix: double width characters encoded incorrectly in Collaboration RSS feed
  - fix: ExtrasUrl in conf http:// stripping / from URL (perlDreamer Consulting, LLC.)

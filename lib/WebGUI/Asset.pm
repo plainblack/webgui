@@ -2332,72 +2332,91 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 =cut
 
 sub www_editSave {
-	my $self = shift;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	if ($self->session->config("maximumAssets")) {
-		my ($count) = $self->session->db->quickArray("select count(*) from asset");
-		my $i18n = WebGUI::International->new($self->session, "Asset");
-		return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
-	}
-	my $object;
-	if ($self->session->form->process("assetId") eq "new") {
-		$object = $self->addChild({className=>$self->session->form->process("class","className")});	
-		return $self->www_view unless defined $object;
-		$object->{_parent} = $self;
-	} else {
-		if ($self->canEditIfLocked) {
-                        $object = $self->addRevision;
-                } else {
-                        return $self->session->asset($self->getContainer)->www_view;
-                }
-	}
-
-	my $error = $object->processPropertiesFromFormPost;
-	if (ref $error eq 'ARRAY') {
-		$self->session->stow->set('editFormErrors', $error);
-		if ($self->session->form->process('assetId') eq 'new') {
-			$object->purge;
-			return $self->www_add();
-		} else {
-			$object->purgeRevision;
-			return $self->www_edit();
-		}
-	}
-
-	$object->updateHistory("edited");
-
-	if ($self->session->form->process("saveAndCommit") ne "") {
-        if ($self->session->setting->get("skipCommitComments")) {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-        } else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+    my $self = shift;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    if ($self->session->config("maximumAssets")) {
+        my ($count) = $self->session->db->quickArray("select count(*) from asset");
+        my $i18n = WebGUI::International->new($self->session, "Asset");
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+    }
+    my $object;
+    if ($self->session->form->process("assetId") eq "new") {
+        $object = $self->addChild({className=>$self->session->form->process("class","className")});	
+        return $self->www_view unless defined $object;
+        $object->{_parent} = $self;
+    } 
+    else {
+        if ($self->canEditIfLocked) {
+            $object = $self->addRevision;
+        } 
+        else {
+            return $self->session->asset($self->getContainer)->www_view;
         }
-		return "1";
-	}
-	if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+    }
+
+    # Process properties from form post
+    my $errors = $object->processPropertiesFromFormPost;
+    if (ref $errors eq 'ARRAY') {
+        $self->session->stow->set('editFormErrors', $errors);
+        if ($self->session->form->process('assetId') eq 'new') {
+            $object->purge;
+            return $self->www_add();
         } else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+            $object->purgeRevision;
+            return $self->www_edit();
         }
-	}
-	if ($self->session->form->process("proceed") eq "manageAssets") {
-		$self->session->asset($object->getParent);
-		return $self->session->asset->www_manageAssets;
-	}
-	if ($self->session->form->process("proceed") eq "viewParent") {
-		$self->session->asset($object->getParent);
-		return $self->session->asset->www_view;
-	}
-	if ($self->session->form->process("proceed") ne "") {
-		my $method = "www_".$self->session->form->process("proceed");
-		$self->session->asset($object);
-		return $self->session->asset->$method();
-	}
-		
-	$self->session->asset($object->getContainer);
-	return $self->session->asset->www_view;
+    }
+    
+    $object->updateHistory("edited");
+
+    # Handle Save & Commit button
+    if ($self->session->form->process("saveAndCommit") ne "") {
+        if ($self->session->setting->get("skipCommitComments")) {
+            $self->session->http->setRedirect(
+                $self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
+            );
+        } 
+        else {
+            $self->session->http->setRedirect(
+                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
+            );
+        }
+        return "1";
+    }
+
+    # Handle Auto Request Commit setting
+    if ($self->session->setting->get("autoRequestCommit")) {
+        # Make sure version tag hasn't already been committed by another process
+        my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");
+
+        if ($versionTag && $self->session->setting->get("skipCommitComments")) {
+            $versionTag->requestCommit;
+        }
+        elsif ($versionTag) {
+            $self->session->http->setRedirect(  
+                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
+            );
+        }
+    }
+
+    # Handle "proceed" form parameter
+    if ($self->session->form->process("proceed") eq "manageAssets") {
+        $self->session->asset($object->getParent);
+        return $self->session->asset->www_manageAssets;
+    }
+    elsif ($self->session->form->process("proceed") eq "viewParent") {
+        $self->session->asset($object->getParent);
+        return $self->session->asset->www_view;
+    }
+    elsif ($self->session->form->process("proceed") ne "") {
+        my $method = "www_".$self->session->form->process("proceed");
+        $self->session->asset($object);
+        return $self->session->asset->$method();
+    }
+            
+    $self->session->asset($object->getContainer);
+    return $self->session->asset->www_view;
 }
 
                 
