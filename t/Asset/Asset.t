@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 31; # increment this value for each test you create
+use Test::More tests => 32; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -140,3 +140,11 @@ $session->{_request} = $newRequest;
 $func = 'add';
 is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
 $session->{_request} = $origRequest;
+
+################################################################
+#
+# fixUrl
+#
+################################################################
+
+is($importNode->fixUrl('1234'.'-'x250 . 'abcdefghijkl'), '1234'.'-'x216, 'fixUrl truncates to 220 characters');
