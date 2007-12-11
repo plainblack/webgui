@@ -528,7 +528,17 @@ sub fixTitle {
 
 =head2 fixUrl ( string )
 
-Returns a URL, removing invalid characters and making it unique.
+Returns a URL, removing invalid characters and making it unique by
+adding a digit to the end if necessary.  URLs are not allowed to be
+children of the extrasURL, the uploadsURL, or any defined passthruURL.
+If not URL is passed, a URL will be constructed from the Asset's
+parent and the menuTitle.
+
+Assets have a maximum length of 250 characters.  Any URL longer than
+250 characters will be truncated to the initial 220 characters.
+
+URLs will be passed through $session->url->urlize to make them WebGUI compliant.
+That includes any languages specific constraints set up in the default language pack.
 
 =head3 string
 
@@ -550,12 +560,20 @@ sub fixUrl {
 
 	# fix urls used by uploads and extras
 	# and those beginning with http
-	my @badUrls = ($self->session->config->get("extrasURL"), $self->session->config->get("uploadsURL"));
-	foreach my $badUrl (@badUrls) {
+	my @badUrls = (
+        $self->session->config->get("extrasURL"),
+        $self->session->config->get("uploadsURL"),
+    );
+    if (defined $self->session->config->get('passthruUrls')) {
+        push @badUrls, @{ $self->session->config->get('passthruUrls') };
+    }
+    foreach my $badUrl (@badUrls) {
+        $badUrl =~ s{ / $ }{}x; # Remove trailing slashes from the end of the URL
 		if ($badUrl =~ /^http/) {
-			$badUrl =~ s/^http.*\/(.*)$/$1/;
-		} else {
-			$badUrl =~ s/^\/(.*)/$1/;
+			$badUrl =~ s{ ^ http .* / } {}x; #Remove everything but the final path fragment from the badUrl
+		}
+        else {
+			$badUrl =~ s{ ^ / }{}x; #Remove leading slashes from bare URLs
 		}
 		if ($url =~ /^$badUrl/) {
 			$url = "_".$url;
@@ -581,17 +599,18 @@ sub fixUrl {
 	}
 
 	# check to see if the url already exists or not, and increment it if it does
-        if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
-                my @parts = split(/\./,$url);
-                if ($parts[0] =~ /(.*)(\d+$)/) {
-                        $parts[0] = $1.($2+1);
-                } else {
-                        $parts[0] .= "2";
-                }
-                $url = join(".",@parts);
-                $url = $self->fixUrl($url);
+    if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
+        my @parts = split(/\./,$url);
+        if ($parts[0] =~ /(.*)(\d+$)/) {
+            $parts[0] = $1.($2+1);
         }
-	return $url;
+        else {
+            $parts[0] .= "2";
+        }
+        $url = join(".",@parts);
+        $url = $self->fixUrl($url);
+    }
+    return $url;
 }
 
 
