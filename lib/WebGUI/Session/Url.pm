@@ -140,7 +140,7 @@ sub extras {
     my $self = shift;
     my $path = shift;
     my $url = $self->session->config->get("extrasURL").'/'.$path;
-    $url =~ s$(?<!^http:)/{2,}$/$g;
+    $url =~ s$(?<!^http:)/{2,}$/$g;  ##Remove //, unless it's part of http://
     return $url;
 }
 
