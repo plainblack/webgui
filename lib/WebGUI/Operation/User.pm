@@ -404,12 +404,18 @@ sub www_editUser {
 		$tabform->getTab("profile")->fieldSetEnd($category->getLabel);
 	}
 	my @groupsToAdd = $session->form->group("groupsToAdd");
-	my @exclude = $session->db->buildArray("select groupId from groupings where userId=".$session->db->quote($u->userId));
+	my @exclude = $session->db->buildArray("select groupId from groupings where userId=?",[$u->userId]);
 	@exclude = (@exclude,"1","2","7");
+    my $secondaryAdmin = $session->user->isInGroup('11');
+    my @extraExclude = ();
+    if ($secondaryAdmin && !$session->user->isInGroup(3)) {
+        @extraExclude = $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
+    }
+    push @extraExclude, @exclude;
 	$tabform->getTab("groups")->group(
 		-name=>"groupsToAdd",
 		-label=>$i18n->get("groups to add"),
-		-excludeGroups=>\@exclude,
+		-excludeGroups=>\@extraExclude,
 		-size=>15,
 		-multiple=>1,
 		-value=>\@groupsToAdd
