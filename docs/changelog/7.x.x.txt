@@ -14,6 +14,8 @@
    requestAutoCommit
  - fix: Some urls cause an asset to be inaccessible after creation/editing (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/some-urls-cause-an-asset-to-be-inaccessible-after-creation/editing
+ - fix: Secondary Admin can create user with Admin Privilege (IRC:blacksilver)
+     http://www.plainblack.com/bugs/tracker/secondary-admin-can-create-user-with-admin-privilege
 
 7.4.17
  - fix: double width characters encoded incorrectly in Collaboration RSS feed
