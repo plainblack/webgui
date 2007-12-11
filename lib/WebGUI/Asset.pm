@@ -564,7 +564,7 @@ sub fixUrl {
 
 	# urls can't be longer than 250 characters
 	if (length($url) > 250) {
-		$url = substr($url,220);
+		$url = substr($url,0,220);
 	}
 
 	# remove multiple extensions from the url if there are some

@@ -63,7 +63,8 @@ sub violates {
     my ($self, $elem, undef) = @_;
     ##$elem has stringification overloaded by default.
     return unless $elem eq 'new'
-               or $elem eq 'get';
+               or $elem eq 'get'
+               or $elem eq 'setNamespace';
     return if !is_method_call($elem);
     if ($elem eq 'new') {  ##Object creation,  check for class.
         my $operator = $elem->sprevious_sibling     or return;
@@ -94,6 +95,9 @@ sub violates {
         if ($arguments[1]) {
             $namespace = $arguments[1]->[0]->string;
         }
+#        print "object    : $symbol_name\n";
+#        print "label     : $label\n";
+#        print "namespace : $namespace\n";
         if (! $self->{i18n}->get($label, $namespace)) {
             return $self->violation(
                 $DESC,
@@ -101,6 +105,18 @@ sub violates {
                 $elem
             );
         }
+        return;
+    }
+    elsif ($elem eq 'setNamespace') {  ##Set the object's default namespace
+        my $symbol_name = _get_symbol_name($elem);
+        return unless $symbol_name && exists $self->{_i18n_objects}->{$symbol_name};
+        my $arg_list = $elem->snext_sibling;
+        return unless ref $arg_list eq 'PPI::Structure::List'; 
+        my @arguments = _get_args($arg_list);
+        ##Many assumptions being made here
+        return unless $arguments[0]->[0]->isa('PPI::Token::Quote');
+        my $new_namespace = $arguments[0]->[0]->string;
+        $self->{_i18n_objects}->{$symbol_name} = $new_namespace;
         return;
     }
     return;
