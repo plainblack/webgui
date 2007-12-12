@@ -12,6 +12,8 @@
 7.4.18
  - fix: Auto Request Commit setting creates extra version tag if asset uses
    requestAutoCommit
+ - fix: URL extensions (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/url-extensions
  - fix: Some urls cause an asset to be inaccessible after creation/editing (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/some-urls-cause-an-asset-to-be-inaccessible-after-creation/editing
  - fix: Secondary Admin can create user with Admin Privilege (IRC:blacksilver)
