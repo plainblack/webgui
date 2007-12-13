@@ -130,9 +130,10 @@ sub toHtml {
     if ($self->get("showSelectAll")) {
         $output .= $self->getSelectAllButton;
     }
-
+    my $i=0;
     tie my %options, 'Tie::IxHash', $self->orderedHash();
 	foreach my $key (keys %options) {
+	$i++;
         my $checked = (grep { $_ eq $key } @{ $self->get('value') })
                     ? 1
                     : 0
@@ -144,8 +145,9 @@ sub toHtml {
                 value   => $key,
                 extras  => $self->get('extras'),
                 checked => $checked,
+                id => $self->get('name').$i,
             })->toHtml
-            . ${$self->get('options')}{$key} 
+            . '<label for="'.$self->get('name').$i.'">'.$self->get('options')->{$key}."</label>" 
             . $alignment
             ;
     }

@@ -106,7 +106,9 @@ sub toHtml {
         my %options;
         tie %options, 'Tie::IxHash';
         %options = $self->orderedHash;
+	my $i=0;
 	foreach my $key (keys %options) {
+		$i++;
                 my $checked = 0;
                 if ($self->get('value') eq $key) {
                         $checked = 1;
@@ -115,9 +117,10 @@ sub toHtml {
                         name=>$self->get('name'),
                         value=>$key,
                         extras=>$self->get('extras'),
-                        checked=>$checked
+                        checked=>$checked,
+                        id=>$self->get('name').$i
                         })->toHtml;
-                $output .= $self->get('options')->{$key} . $alignment;
+                $output .= '<label for="'.$self->get('name').$i.'">'.$self->get('options')->{$key}."</label>" . $alignment;
         }
         return $output;
 }
