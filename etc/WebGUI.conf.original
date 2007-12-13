@@ -80,7 +80,7 @@
 # see short clean WebGUI controlled URLs. However, this is 
 # slower than the default.
 
-"richEditorsUseAssetUrls" : 0,
+"richEditorsUseAssetUrls" : 1,
 
 # An array of URLs that WebGUI should leave alone for normal
 # processing by Apache. Anything that begins with these URLs

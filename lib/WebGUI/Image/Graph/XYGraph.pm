@@ -156,7 +156,8 @@ sub drawAxis {
 		points		=> 
 			" M ".$chartOffset->{x}.",".$chartOffset->{y}.
 			" L ".$chartOffset->{x}.",".($self->getChartHeight + $chartOffset->{y}).
-			" L ".($self->getChartWidth + $chartOffset->{x}).",".($self->getChartHeight + $chartOffset->{y})
+			" L ".($self->getChartWidth + $chartOffset->{x}).",".($self->getChartHeight + $chartOffset->{y}),
+        fill        => 'none',
 	);
 }
 
