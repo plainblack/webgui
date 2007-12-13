@@ -127,7 +127,7 @@ is($WebGUI::Test::logger_warns, q/Can't generate a thumbnail for something that'
 chmod 0, $thumbStore->getPath('square.png');
 
 SKIP: {
-	skip "Root will cause this test to fail since it does not obey file permissions", 1
+	skip "Root will cause this test to fail since it does not obey file permissions", 3
 		if $< == 0;
     ok(! -r $thumbStore->getPath('square.png'), 'Made square.png not readable');
     is($thumbStore->generateThumbnail('square.png'), 0,
