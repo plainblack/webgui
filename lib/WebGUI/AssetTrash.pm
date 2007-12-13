@@ -90,6 +90,18 @@ sub getAssetsInTrash {
 	return \@assets;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 isInTrash ( )
+
+Returns true if the asset is in the trash.
+
+=cut
+
+sub isInTrash {
+    my $self        = shift;
+    return $self->get("state") eq "trash";
+}
 
 #-------------------------------------------------------------------
 
