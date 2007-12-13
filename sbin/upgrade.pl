@@ -324,31 +324,28 @@ STOP
 #-----------------------------------------
 # checkVersion($versionNumber)
 #-----------------------------------------
-# Version number must be 7.3.18 or greater
+# Version number must be 7.3.22 or greater
 # in order to be upgraded by this utility.
 #-----------------------------------------
 sub checkVersion {
-	$_[0] =~ /(\d+)\.(\d+)\.(\d+)/; 
-	my $goal = 7;
-	my $feature = 3;
-	my $fix = 18;
-        if ($1 > $goal) {
-        	return 1;
-        } elsif ($1 == $goal) {
-        	if ($2 > $feature) {
-                	return 1;
-                } elsif ($2 == $feature) {
-                	if ($3 >= $fix) {
-                        	return 1;
-                        } else {
-				return 0;
-			}
-                } else {
-			return 0;
-		}
-        } else {
-		return 0;
-	}
+    $_[0] =~ /(\d+)\.(\d+)\.(\d+)/;
+    my $goal = 7;
+    my $feature = 3;
+    my $fix = 22;
+    if ($1 > $goal) {
+        return 1;
+    }
+    elsif ($1 == $goal) {
+        if ($2 > $feature) {
+            return 1;
+        }
+        elsif ($2 == $feature) {
+            if ($3 >= $fix) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 #-----------------------------------------
