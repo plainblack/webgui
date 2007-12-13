@@ -290,6 +290,7 @@ foreach my $filename (keys %config) {
 		}
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
+                sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
 	my $session = WebGUI::Session->open("../..",$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);

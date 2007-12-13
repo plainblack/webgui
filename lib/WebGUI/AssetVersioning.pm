@@ -44,15 +44,19 @@ These methods are available from this class:
 =cut
 
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
 =head2 addRevision ( properties [ , revisionDate, options ] )
 
 Creates a new revision of an existing asset. Returns the new revision of
 the asset.
 
-Note that programmers should almost never call this method directly, but 
+Programmers should almost never call this method directly, but 
 rather use the update() method instead.
+
+When using this method, take care that an asset doesn't try to add two
+revisions of the same asset within the same second. It will cause things to 
+fail. This is not a bug
 
 =head3 properties
 
@@ -60,7 +64,8 @@ A hash reference containing a list of properties to associate with the child.
 
 =head3 revisionDate
 
-An epoch date representing the date/time stamp that this revision was created. Defaults to$self->session->datetime->time().
+An epoch date representing the date/time stamp that this revision was 
+created. Defaults to $self->session->datetime->time().
 
 =head3 options
 
@@ -68,11 +73,14 @@ A hash reference of options that change the behavior of this method.
 
 =head4 skipAutoCommitWorkflows
 
-If this is set to 1 then assets that would normally autocommit their workflow (like CS Posts) will instead add themselves to the normal working version tag.
+If this is set to 1 then assets that would normally autocommit their 
+workflow (like CS Posts) will instead add themselves to the normal working 
+version tag.
 
 =head4 skipNotification
 
-If this is set to 1 then assets that normally send notifications will (like CS Posts) will know not to send them under certain conditions.
+If this is set to 1 then assets that normally send notifications will (like CS
+Posts) will know not to send them under certain conditions.
 
 =cut
 
