@@ -1,4 +1,5 @@
 7.4.19
+ - fix: Import Package does nothing when re-importing trashed package
 
 7.4.18
  - fix: Graph draws black triangle covering half the image

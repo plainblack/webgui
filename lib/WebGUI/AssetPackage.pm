@@ -125,18 +125,18 @@ A hash reference containing the exported data.
 =cut
 
 sub importAssetData {
-	my $self = shift;
-	my $data = shift;
-	my $error = $self->session->errorHandler;
-	my $id = $data->{properties}{assetId};
-	my $class = $data->{properties}{className};
-	my $version = $data->{properties}{revisionDate};
+    my $self = shift;
+    my $data = shift;
+    my $error = $self->session->errorHandler;
+    my $id = $data->{properties}{assetId};
+    my $class = $data->{properties}{className};
+    my $version = $data->{properties}{revisionDate};
     my $asset;
-	my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
-	if ($assetExists) { # update an existing revision
+    my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    if ($assetExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
-		$error->info("Updating an existing revision of asset $id");	
-		$asset->update($data->{properties});
+        $error->info("Updating an existing revision of asset $id");	
+        $asset->update($data->{properties});
         ##Pending assets are assigned a new version tag
         if ($data->{properties}->{status} eq 'pending') {
             $self->session->db->write(
@@ -144,19 +144,25 @@ sub importAssetData {
                 [WebGUI::VersionTag->getWorking($self->session)->getId, $data->{properties}->{assetId}]
             );
         }
-	}
+    }
     else {
-		$asset = WebGUI::Asset->new($self->session, $id, $class);
-		if (defined $asset) { # create a new revision of an existing asset
-			$error->info("Creating a new revision of asset $id");	
-			$asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
-		}
+        $asset = WebGUI::Asset->new($self->session, $id, $class);
+        if (defined $asset) { # create a new revision of an existing asset
+            $error->info("Creating a new revision of asset $id");	
+            $asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
+        }
         else { # add an entirely new asset
-			$error->info("Adding $id that didn't previously exist.");	
-			$asset = $self->addChild($data->{properties}, $id, $version, {skipAutoCommitWorkflows => 1});
-		}
-	}
-	return $asset;
+            $error->info("Adding $id that didn't previously exist.");	
+            $asset = $self->addChild($data->{properties}, $id, $version, {skipAutoCommitWorkflows => 1});
+        }
+    }
+
+    # If the asset is in the trash, re-publish it
+    if ( $asset->isInTrash ) {
+        $asset->publish;
+    }
+
+    return $asset;
 }
 
 #-------------------------------------------------------------------
