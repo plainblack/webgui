@@ -76,14 +76,21 @@ Assets that normally autocommit their workflows (like CS Posts, and Wiki Pages) 
 =cut
 
 sub duplicate {
-        my $self = shift;
-	my $options = shift;
-        my $newAsset = $self->getParent->addChild($self->get, undef, undef, {skipAutoCommitWorkflows=>$options->{skipAutoCommitWorkflows}});
-        my $sth = $self->session->db->read("select * from metaData_values where assetId = ?", [$self->getId]);
-        while (my $h = $sth->hashRef) {
-                $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
-        }
-        return $newAsset;
+    my $self        = shift;
+    my $options     = shift;
+    my $newAsset    
+        = $self->getParent->addChild( $self->get, undef, $self->get("revisionDate"), { skipAutoCommitWorkflows => $options->{skipAutoCommitWorkflows} } );
+
+    # Duplicate metadata fields
+    my $sth = $self->session->db->read(
+        "select * from metaData_values where assetId = ?", 
+        [$self->getId]
+    );
+    while (my $h = $sth->hashRef) {
+        $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
+    }
+
+    return $newAsset;
 }
 
 

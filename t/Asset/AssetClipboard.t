@@ -22,7 +22,7 @@ use WebGUI::Asset;
 use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
-plan tests => 5;
+plan tests => 6;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -38,7 +38,8 @@ my $snippet = $root->addChild({
     snippet   => 'A snippet of text',
 });
 
-my $snippetAssetId = $snippet->getId;
+my $snippetAssetId      = $snippet->getId;
+my $snippetRevisionDate = $snippet->get("revisionDate");
 
 $versionTag->commit;
 
@@ -48,6 +49,11 @@ my $duplicatedSnippet = $snippet->duplicate;
 
 is($duplicatedSnippet->get('title'), 'snippet',        'duplicated snippet has correct title');
 isnt($duplicatedSnippet->getId,      $snippetAssetId,  'duplicated snippet does not have same assetId as original');
+is( 
+    $duplicatedSnippet->get("revisionDate"),
+    $snippetRevisionDate,
+    'duplicated snippet has the same revision date',
+);
 is($snippet->getId,                  $snippetAssetId,  'original snippet has correct id');
 
 is($snippet->getParent->getId,           $root->getId, 'original snippet is a child of root');
