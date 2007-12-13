@@ -147,6 +147,9 @@ $session->{_request} = $origRequest;
 #
 ################################################################
 
+my $origUrlExtension = $session->setting->get('urlExtension');
+$session->setting->set('urlExtension', undef);
+
 is($importNode->fixUrl('1234'.'-'x235 . 'abcdefghij'), '1234'.'-'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
 is($importNode->fixUrl('1234'.'-'x250 . 'abcdefghij'), '1234'.'-'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
 
@@ -170,6 +173,8 @@ is($importNode->fixUrl('/extras1'), '_extras1', 'trailing underscore in extrasUR
 $session->config->set('extrasURL',  'http://mysite.com/extras2');
 is($importNode->fixUrl('/extras2'), '_extras2', 'underscore prepended to URLs that match the extrasURL, even with http://');
 
+$session->setting->set('urlExtension', 'html');
+
 END: {
 
     $session->config->set('extrasURL',    $origExtras);
@@ -180,4 +185,6 @@ END: {
     else {
         $session->config->delete('passthruUrls');
     }
+    $session->setting->set('urlExtension', $origUrlExtension);
+
 }
