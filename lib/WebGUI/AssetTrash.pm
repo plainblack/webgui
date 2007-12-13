@@ -325,12 +325,14 @@ sub www_manageTrash {
             var assetListSelectAllToggle = false;
             function toggleAssetListSelectAll(form) {
                 assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
-                if (typeof form.assetId.length == "undefined") {
-                    form.assetId.checked = assetListSelectAllToggle;
-                }
-                else {
-                    for (var i = 0; i < form.assetId.length; i++)
-                        form.assetId[i].checked = assetListSelectAllToggle;
+                if (form.assetId) {
+                    if (typeof form.assetId.length == "undefined") {
+                        form.assetId.checked = assetListSelectAllToggle;
+                    }
+                    else {
+                        for (var i = 0; i < form.assetId.length; i++)
+                            form.assetId[i].checked = assetListSelectAllToggle;
+                    }
                 }
             }
 		 //]]>
