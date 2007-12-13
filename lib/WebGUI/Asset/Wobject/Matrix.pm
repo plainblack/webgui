@@ -1050,7 +1050,7 @@ sub view {
 			where 
 				Matrix_listing.assetId=".$self->session->db->quote($self->getId)." and 
 				Matrix_listing.status='approved' and
-				Matrix_ratingSummary.countValue > 0
+				Matrix_ratingSummary.countValue >= 10
 			order by 
 				Matrix_ratingSummary.meanValue
 			";
