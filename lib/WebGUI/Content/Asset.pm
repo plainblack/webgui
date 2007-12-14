@@ -135,9 +135,6 @@ sub handler {
 		$http->sendHeader();	#http object will only send the header once per request, so if the above sent a header as part of it's operation, this will do nothing.
 		unless ($http->isRedirect()) {
 			$session->output->print($output);
-			if ($errorHandler->canShowDebug()) {
-				$session->output->print($errorHandler->showDebug(),1);
-			}
 		}
     # ...
     return $output;
@@ -180,16 +177,6 @@ sub page {
 		if ($session->var->isAdminOn) { # they're expecting it to be there, so let's help them add it
 			my $asset = WebGUI::Asset->newByUrl($session, $session->url->getRefererUrl) || WebGUI::Asset->getDefault($session);
 			$output = $asset->addMissing($assetUrl);
-		} else { # not in admin mode, so can't create it,  so display not found
-			$session->http->setStatus("404","Page Not Found");
-			my $notFound = WebGUI::Asset->getNotFound($session);
-			if (defined $notFound) {
-				$output = tryAssetMethod($session,$notFound,'view');
-			} else {
-				$session->errorHandler->error("The notFound page could not be instanciated!");
-				$output = "An error was encountered while processing your request.";
-			}
-			$output = "An error was encountered while processing your request." if $output eq '';
 		}
 	}
 	if ($output eq "chunked") {
