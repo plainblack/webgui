@@ -4,6 +4,7 @@
  - fix: CS Posts get re-ordered when copy/paste
  - fix: Matrix best/worst now must have 10 or more votes
  - fix: When upgrading, two revisions of same asset added in same second.
+ - fix: Uncommetted Snippets get cached when not in admin mode
 
 7.4.18
  - fix: Graph draws black triangle covering half the image
