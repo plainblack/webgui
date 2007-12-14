@@ -1,4 +1,4 @@
-package WebGUI::Setup;
+package WebGUI::Content::Setup;
 
 =head1 LEGAL
 
@@ -34,7 +34,7 @@ Initializes a new WebGUI install.
 =head1 SYNOPSIS
 
  use WebGUI::Setup;
- WebGUI::Setup::setup();
+ WebGUI::Content::Setup::handler();
 
 =head1 SUBROUTINES
 
@@ -99,9 +99,9 @@ sub addPage {
 
 #-------------------------------------------------------------------
 
-=head2 setup ( session )
+=head2 handler ( session )
 
-Handles a specialState: "setup"
+Handles a specialState: "init"
 
 =head3 session
 
@@ -109,8 +109,11 @@ The current WebGUI::Session object.
 
 =cut
 
-sub setup {
+sub handler {
 	my $session = shift;
+    unless ($session->setting->get("specialState") eq "init") {
+        return;
+    }
 	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
     my ($output,$legend) = "";
@@ -227,7 +230,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 #mainBodyContentContainer { padding: 5px; margin-left: 200px; font-family: serif, times new roman; font-size: 12pt; }
 #pageFooterContainer { text-align: center; background-color: '.$form->get("footerBackgroundColor").'; color: '.$form->get("footerTextColor").'; }
 #copyrightContainer { font-size: 8pt; }
-#pageWidthContainer { width: 80%; margin-left: auto; margin-right: auto; font-family: sans-serif, helvetica, arial; border: 3px solid black; }
+#pageWidthContainer { margin-left: 10%; margin-right: 10%; font-family: sans-serif, helvetica, arial; border: 3px solid black; }
 ';
            my $css = addAsset($importNode, {
                 title       => "my-style.css",
@@ -557,6 +560,7 @@ return props[propName];
          <img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 1000px; z-index: 1;" />
 	</body> </html>';
 	$session->http->setMimeType("text/html");
+    $session->http->sendHeader;
     return $page;
 }
 

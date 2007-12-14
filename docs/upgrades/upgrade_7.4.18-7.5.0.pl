@@ -21,12 +21,45 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+addUrlAndContentHandlers($session);
 addFriendsNetwork($session);
 addSearchWithContainers($session);
 addGroupToEditPost($session);
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addUrlAndContentHandlers {
+    my $session = shift;
+    print "\tAdding pluggable URL and content handlers." unless $quiet;
+    my $config = $session->config;
+    my @urlHandlers = (
+    { "^/extras" => "WebGUI::URL::PassThru" },
+    { "^/uploads/dictionaries" => "WebGUI::URL::Unauthorized" },
+    { "^/uploads" => "WebGUI::URL::Uploads" },
+    { '^/\*give-credit-where-credit-is-due\*$' => "WebGUI::URL::Credits" },
+    { '^/abcdefghijklmnopqrstuvwxyz$' => "WebGUI::URL::Snoop" },
+    { ".*" => "WebGUI::URL::Content" }
+        );
+    my $passthrus = $config->get("passthruUrls");
+    if (defined $passthrus) {
+        foreach my $url (@{$passthrus}) {
+            unshift @urlHandlers, { "^".$url => "WebGUI::URL::PassThru" };
+        }
+    }
+    $config->set("urlHandlers", \@urlHandlers);
+    $config->set("contentHandlers" , [
+    "WebGUI::Content::Prefetch",
+    "WebGUI::Content::Maintenance",
+    "WebGUI::Content::Operation",
+    "WebGUI::Content::Setup",
+    "WebGUI::Content::Asset",
+    "WebGUI::Content::NotFound"
+    ]);
+    $config->delete("passthruUrls");
+    print "DONE!\n" unless $quiet;
+}
 
 #-------------------------------------------------
 sub addSearchWithContainers {

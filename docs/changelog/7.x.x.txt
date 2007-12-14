@@ -8,6 +8,7 @@
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
  - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
+ - Added pluggable URL and content handlers.
 
 7.4.19
  - fix: Import Package does nothing when re-importing trashed package

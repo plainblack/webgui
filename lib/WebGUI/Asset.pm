@@ -564,9 +564,6 @@ sub fixUrl {
         $self->session->config->get("extrasURL"),
         $self->session->config->get("uploadsURL"),
     );
-    if (defined $self->session->config->get('passthruUrls')) {
-        push @badUrls, @{ $self->session->config->get('passthruUrls') };
-    }
     foreach my $badUrl (@badUrls) {
         $badUrl =~ s{ / $ }{}x; # Remove trailing slashes from the end of the URL
 		if ($badUrl =~ /^http/) {
@@ -1083,25 +1080,7 @@ A reference to the current session.
 sub getNotFound {
 	my $class = shift;
 	my $session = shift;
-	if ($session->url->getRequestedUrl eq "*give-credit-where-credit-is-due*") {
-		my $content = "";
-		open(my $FILE,"<",$session->config->getWebguiRoot."/docs/credits.txt");
-		while (<$FILE>) {
-			$content .= $_;
-		}
-		close($FILE);
-		return WebGUI::Asset->newByPropertyHashRef($session,{
-			className=>"WebGUI::Asset::Snippet",
-			snippet=> '<pre>'.$content.'</pre>'
-			});
-	} elsif ($session->url->getRequestedUrl eq "abcdefghijklmnopqrstuvwxyz") {
-		return WebGUI::Asset->newByPropertyHashRef($session,{
-			className=>"WebGUI::Asset::Snippet",
-			snippet=>q|<div style="width: 600px; padding: 200px;">&#87;&#104;&#121;&#32;&#119;&#111;&#117;&#108;&#100;&#32;&#121;&#111;&#117;&#32;&#116;&#121;&#112;&#101;&#32;&#105;&#110;&#32;&#116;&#104;&#105;&#115;&#32;&#85;&#82;&#76;&#63;&#32;&#82;&#101;&#97;&#108;&#108;&#121;&#46;&#32;&#87;&#104;&#97;&#116;&#32;&#119;&#101;&#114;&#101;&#32;&#121;&#111;&#117;&#32;&#101;&#120;&#112;&#101;&#99;&#116;&#105;&#110;&#103;&#32;&#116;&#111;&#32;&#115;&#101;&#101;&#32;&#104;&#101;&#114;&#101;&#63;&#32;&#89;&#111;&#117;&#32;&#114;&#101;&#97;&#108;&#108;&#121;&#32;&#110;&#101;&#101;&#100;&#32;&#116;&#111;&#32;&#103;&#101;&#116;&#32;&#97;&#32;&#108;&#105;&#102;&#101;&#46;&#32;&#65;&#114;&#101;&#32;&#121;&#111;&#117;&#32;&#115;&#116;&#105;&#108;&#108;&#32;&#104;&#101;&#114;&#101;&#63;&#32;&#83;&#101;&#114;&#105;&#111;&#117;&#115;&#108;&#121;&#44;&#32;&#121;&#111;&#117;&#32;&#110;&#101;&#101;&#100;&#32;&#116;&#111;&#32;&#103;&#111;&#32;&#100;&#111;&#32;&#115;&#111;&#109;&#101;&#116;&#104;&#105;&#110;&#103;&#32;&#101;&#108;&#115;&#101;&#46;&#32;&#73;&#32;&#116;&#104;&#105;&#110;&#107;&#32;&#121;&#111;&#117;&#114;&#32;&#98;&#111;&#115;&#115;&#32;&#105;&#115;&#32;&#99;&#97;&#108;&#108;&#105;&#110;&#103;&#46;</div>|
-			});
-	} else {
-		return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
-	}
+	return WebGUI::Asset->newByDynamicClass($session, $session->setting->get("notFoundPage"));
 }
 
 
