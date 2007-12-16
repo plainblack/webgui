@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 37; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -159,12 +159,9 @@ my $origPassthru = $session->config->get('passthruUrls');
 
 $session->config->set('extrasURL',    '/extras');
 $session->config->set('uploadsURL',   '/uploads');
-$session->config->set('passthruUrls', [qw/pass1 pass2/]);
 
 is($importNode->fixUrl('/extras'),  '_extras',  'underscore prepended to URLs that match the extrasURL');
 is($importNode->fixUrl('/uploads'), '_uploads', 'underscore prepended to URLs that match the uploadsURL');
-is($importNode->fixUrl('/pass1'),   '_pass1',   'underscore prepended to URLs that match any passthruUrl 1');
-is($importNode->fixUrl('/pass2'),   '_pass2',   'underscore prepended to URLs that match any passthruUrl 2');
 
 #Now that we have verified that extrasURL and uploadsURL both work, just test one.
 $session->config->set('extrasURL',  '/extras1/');
@@ -179,12 +176,6 @@ END: {
 
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
-    if (defined $origPassthru) {
-        $session->config->set('passthruUrls', $origPassthru);
-    }
-    else {
-        $session->config->delete('passthruUrls');
-    }
     $session->setting->set('urlExtension', $origUrlExtension);
 
 }
