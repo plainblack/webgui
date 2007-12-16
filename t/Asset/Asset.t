@@ -16,8 +16,11 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
+use WebGUI::Asset::Wobject::Folder;
+use WebGUI::AssetVersioning;
+use WebGUI::VersionTag;
 
-use Test::More tests => 40; # increment this value for each test you create
+use Test::More tests => 47; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -25,6 +28,39 @@ my $session = WebGUI::Test->session;
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 is(ref $defaultAsset, 'WebGUI::Asset::Wobject::Layout','default constructor');
+
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->set({name=>"Asset tests"});
+
+my $properties = {
+	#            '1234567890123456789012'
+	id        => 'fixUrlAsset00000000012',
+	title     => 'fixUrl Asset Test',
+	className => 'WebGUI::Asset::Wobject::Folder',
+	url       => 'fixUrlFolderURL2',
+};
+
+my $fixUrlAsset = $defaultAsset->addChild($properties, $properties->{id});
+
+	  #              '1234567890123456789012'
+$properties->{id}  = 'fixUrlAsset00000000013';
+$properties->{url} = 'fixUrlFolderURL9';
+
+my $fixUrlAsset2 = $defaultAsset->addChild($properties, $properties->{id});
+
+	  #              '1234567890123456789012'
+$properties->{id}  = 'fixUrlAsset00000000014';
+$properties->{url} = 'fixUrlFolderURL00';
+
+my $fixUrlAsset3 = $defaultAsset->addChild($properties, $properties->{id});
+
+	  #              '1234567890123456789012'
+$properties->{id}  = 'fixUrlAsset00000000015';
+$properties->{url} = 'fixUrlFolderURL100';
+
+my $fixUrlAsset4 = $defaultAsset->addChild($properties, $properties->{id});
+
+$versionTag->commit;
 
 # Test the new constructor
 my $assetId = "PBnav00000000000000001"; # one of the default nav assets
@@ -176,6 +212,19 @@ is($importNode->fixUrl('one.html/two.html'), 'one/two.html', 'extensions are not
 is($importNode->fixUrl('one.html/two.html/three.html'), 'one/two/three.html', 'extensions are not allowed anywhere in the path');
 is($importNode->fixUrl('one.one.html/two.html/three.html'), 'one/two/three.html', 'multiple dot extensions are removed in any path element');
 
+##Now, check duplicate URLs
+
+is($importNode->fixUrl('/rootyRootRoot'), 'rootyrootroot', 'URLs are lowercased');
+is($importNode->fixUrl('/root'), 'root2', 'If a node exists, appends a "2" to it');
+my $importNodeURL = $importNode->getUrl;
+$importNodeURL =~ s{ ^ / }{}x;
+is($importNode->fixUrl($importNodeURL), $importNodeURL, q{fixing an asset's own URL returns it unchanged});
+
+is($importNode->fixUrl('fixUrlFolderURL2'),   'fixurlfolderurl3',   'if a URL exists, fix it by incrementing any ending digits 2 -> 3');
+is($importNode->fixUrl('fixUrlFolderURL9'),   'fixurlfolderurl10',  'increments past single digits 9 -> 10');
+is($importNode->fixUrl('fixUrlFolderURL00'),  'fixurlfolderurl01',  'initial zeroes preserved 00 -> 01');
+is($importNode->fixUrl('fixUrlFolderURL100'), 'fixurlfolderurl101', '100->101');
+
 $session->setting->set('urlExtension', 'html');
 
 END: {
@@ -183,5 +232,5 @@ END: {
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);
-
+    $versionTag->rollback;
 }
