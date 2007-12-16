@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 37; # increment this value for each test you create
+use Test::More tests => 40; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -169,6 +169,12 @@ is($importNode->fixUrl('/extras1'), '_extras1', 'trailing underscore in extrasUR
 
 $session->config->set('extrasURL',  'http://mysite.com/extras2');
 is($importNode->fixUrl('/extras2'), '_extras2', 'underscore prepended to URLs that match the extrasURL, even with http://');
+
+##Now, check extension removal
+
+is($importNode->fixUrl('one.html/two.html'), 'one/two.html', 'extensions are not allowed higher up in the path');
+is($importNode->fixUrl('one.html/two.html/three.html'), 'one/two/three.html', 'extensions are not allowed anywhere in the path');
+is($importNode->fixUrl('one.one.html/two.html/three.html'), 'one/two/three.html', 'multiple dot extensions are removed in any path element');
 
 $session->setting->set('urlExtension', 'html');
 

@@ -583,9 +583,10 @@ sub fixUrl {
 	}
 
 	# remove multiple extensions from the url if there are some
-	while ($url =~ m{^(.*)\.\w+(/.*)$}) {
- 		$url =~ s{^(.*)\.\w+(/.*)$}{$1$2}ig;
-	}
+    $url =~ s{
+                (\.\w+)* # Strip off any number of extensions
+                (?=/)    # Followed by a slash
+            }{}xg;       # And delete all of them in the string
 
 	# add automatic extension if we're supposed to
 	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
