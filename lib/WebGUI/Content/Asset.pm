@@ -181,9 +181,6 @@ sub page {
 			$output = $asset->addMissing($assetUrl);
 		}
 	}
-	if ($output eq "chunked") {
-		$output = undef;
-	}
 	return $output;
 }
 

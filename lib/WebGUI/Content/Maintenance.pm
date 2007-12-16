@@ -23,7 +23,7 @@ Package WebGUI::Content::Maintenance;
 
 =head1 DESCRIPTION
 
-A content handler that does whatever I tell it to do.
+A content handler that displays a maintenance page while upgrading.
 
 =head1 SYNOPSIS
 

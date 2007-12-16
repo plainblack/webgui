@@ -64,7 +64,10 @@ sub handler {
                 use strict;
                 if ($output) {
                     unless ($output eq "none" || $output eq "redirect") {
-                        $session->output->print($output) unless ($output eq "chunked");
+                        unless ($output eq "chunked") {
+                            $session->http->sendHeader();
+                            $session->output->print($output) 
+                        }
 			            if ($session->errorHandler->canShowDebug()) {
 				            $session->output->print($session->errorHandler->showDebug(),1);
 			            }
