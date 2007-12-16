@@ -17,7 +17,7 @@ use WebGUI::Content::Maintenance;
 
 # load your modules here
 
-use Test::More tests => 2; # increment this value for each test you create
+use Test::More tests => 3; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -25,6 +25,8 @@ my $session = WebGUI::Test->session;
 
 $session->setting->set("specialState", "upgrading");
 isnt(WebGUI::Content::Maintenance::handler($session), undef, "Maintenance should return some output when in upgrade special state");
+$session->setting->set("specialState", "degrading");
+is(WebGUI::Content::Maintenance::handler($session), undef, "Maintenance returns undef if specialState is not 'upgrading'");
 $session->setting->remove("specialState");
 is(WebGUI::Content::Maintenance::handler($session), undef, "Maintenance shouldn't return anything when no special state is present");
 
