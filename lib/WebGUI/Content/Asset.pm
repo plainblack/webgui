@@ -19,6 +19,8 @@ use LWP::MediaTypes qw(guess_media_type);
 use Time::HiRes;
 use WebGUI::Asset;
 
+use Apache2::Const -compile => qw(OK);
+
 =head1 NAME
 
 Package WebGUI::Content::MyHandler
