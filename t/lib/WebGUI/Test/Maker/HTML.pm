@@ -73,6 +73,8 @@ Create a new WebGUI::Test::Maker::HTML object.
 
 Get a setting. Set L<set> for a list of settings.
 
+=cut
+
 #----------------------------------------------------------------------------
 
 =head2 plan

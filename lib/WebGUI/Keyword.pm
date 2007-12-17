@@ -27,6 +27,9 @@ Package WebGUI::Keyword
 
 This package provides an API to create and modify keywords used by the asset sysetm.
 
+Assets can use the C<keywords> property to set keywords automatically. See 
+WebGUI::Asset::update() for more details.
+
 =head1 SYNOPSIS
 
  use WebGUI::Keyword;

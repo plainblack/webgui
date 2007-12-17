@@ -14,6 +14,8 @@ package WebGUI::Asset;
 
 =cut
 
+use Carp qw( croak confess );
+
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
 use WebGUI::AssetExportHtml;
@@ -1336,12 +1338,12 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 
 sub loadModule {
     my ($class, $session, $className) = @_;
-	(my $module = $className . '.pm') =~ s{::|'}{/}g;
+    (my $module = $className . '.pm') =~ s{::|'}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
     }
-   	$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-	return;
+    $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+    return;
 }
 
 #-------------------------------------------------------------------
@@ -1752,6 +1754,7 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 sub newByDynamicClass {
 	my $class = shift;
 	my $session = shift;
+        confess "newByDynamicClass requires WebGUI::Session" unless $session;
 	my $assetId = shift;
 	my $revisionDate = shift;
 	return undef unless defined $assetId;
@@ -1895,6 +1898,7 @@ sub processPropertiesFromFormPost {
 	$self->session->db->beginTransaction;
 	$self->update(\%data);
 	$self->session->db->commit;
+    return;
 }
 
 
@@ -2081,6 +2085,9 @@ Updates the properties of an existing revision. If you want to create a new revi
 =head3 properties
 
 Hash reference of properties and values to set.
+
+NOTE: C<keywords> is a special property that uses the WebGUI::Keyword API
+to set the keywords for this asset.
 
 =cut
 

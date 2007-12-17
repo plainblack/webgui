@@ -24,15 +24,13 @@ use base 'WebGUI::Asset::Wobject';
 
 =head1 SYNOPSIS
 
+=head1 DIAGNOSTICS
+
 =head1 METHODS
 
 #-------------------------------------------------------------------
 
 =head2 definition ( )
-
-defines wobject properties for New Wobject instances.  You absolutely need 
-this method in your new Wobjects.  If you choose to "autoGenerateForms", the
-getEditForm method is unnecessary/redundant/useless.  
 
 =cut
 
@@ -50,6 +48,23 @@ sub definition {
         '1440'      => '1440',
         '1600'      => '1600',
         '2880'      => '2880',
+    );
+    
+    tie my %viewDefaultOptions, 'Tie::IxHash', (
+        list        => $i18n->get("viewDefault option list"),
+        album       => $i18n->get("viewDefault option album"),
+    );
+
+    tie my %viewListOrderByOptions, 'Tie::IxHash', (
+        creationDate    => $i18n->get("viewListOrderBy option creationDate"),
+        lineage         => $i18n->get("viewListOrderBy option lineage"),
+        revisionDate    => $i18n->get("viewListOrderBy option revisionDate"),
+        title           => $i18n->get("viewListOrderBy option title"),
+    );
+    
+    tie my %viewListOrderDirectionOptions, 'Tie::IxHash', (
+        ASC             => $i18n->get("viewListOrderDirection option asc"),
+        DESC            => $i18n->get("viewListOrderDirection option desc"),
     );
 
     tie my %properties, 'Tie::IxHash', (
@@ -77,7 +92,7 @@ sub definition {
         imageResolutions => {
             tab             => "properties",
             fieldType       => "checkList",
-            defaultValue    => ['800', '1024', '1200', '1600', '2880'],
+            defaultValue    => join("\n", '800', '1024', '1200', '1600', '2880'),
             options         => \%imageResolutionOptions,
             label           => $i18n->get("imageResolutions label"),
             hoverHelp       => $i18n->get("imageResolutions description"),
@@ -85,14 +100,14 @@ sub definition {
         imageViewSize => {
             tab             => "properties",
             fieldType       => "integer",
-            defaultValue    => 0,
+            defaultValue    => 700,
             label           => $i18n->get("imageViewSize label"),
             hoverHelp       => $i18n->get("imageViewSize description"),
         },
         imageThumbnailSize => {
             tab             => "properties",
             fieldType       => "integer",
-            defaultValue    => 0,
+            defaultValue    => 300,
             label           => $i18n->get("imageThumbnailSize label"),
             hoverHelp       => $i18n->get("imageThumbnailSize description"),
         },
@@ -106,7 +121,7 @@ sub definition {
         richEditIdComment => {
             tab             => "properties",
             fieldType       => "selectRichEditor",
-            defaultValue    => undef, # Rich Editor for Posts
+            defaultValue    => "PBrichedit000000000002", # Forum Rich Editor
             label           => $i18n->get("richEditIdFileComment label"),
             hoverHelp       => $i18n->get("richEditIdFileComment description"),
         },
@@ -134,6 +149,14 @@ sub definition {
             label           => $i18n->get("templateIdDeleteFile label"),
             hoverHelp       => $i18n->get("templateIdDeleteFile description"),
         },
+        templateIdEditAlbum => {
+            tab             => "display",
+            fieldType       => "template",
+            defaultValue    => "",
+            namespace       => "GalleryAlbum/Edit",
+            label           => $i18n->get("templateIdEditAlbum label"),
+            hoverHelp       => $i18n->get("templateIdEditAlbum description"),
+        },
         templateIdEditFile => {
             tab             => "display",
             fieldType       => "template",
@@ -158,21 +181,21 @@ sub definition {
             label           => $i18n->get("templateIdListAlbumsRss label"),
             hoverHelp       => $i18n->get("templateIdListAlbumsRss description"),
         },
-        templateIdListUserFiles => {
+        templateIdListFilesForUser => {
             tab             => "display",
             fieldType       => "template",
             defaultValue    => "",
-            namespace       => "Gallery/ListUserFiles",
-            label           => $i18n->get("templateIdListUserFiles label"),
-            hoverHelp       => $i18n->get("templateIdListUserFiles description"),
+            namespace       => "Gallery/ListFilesForUser",
+            label           => $i18n->get("templateIdListFilesForUser label"),
+            hoverHelp       => $i18n->get("templateIdListFilesForUser description"),
         },
-        templateIdListUserFilesRss => {
+        templateIdListFilesForUserRss => {
             tab             => "display",
             fieldType       => "template",
             defaultValue    => "",
-            namespace       => "Gallery/ListUserFilesRss",
-            label           => $i18n->get("templateIdListUserFilesRss label"),
-            hoverHelp       => $i18n->get("templateIdListUserFilesRss description"),
+            namespace       => "Gallery/ListFilesForUserRss",
+            label           => $i18n->get("templateIdListFilesForUserRss label"),
+            hoverHelp       => $i18n->get("templateIdListFilesForUserRss description"),
         },
         templateIdMakeShortcut => {
             tab             => "display",
@@ -190,21 +213,21 @@ sub definition {
             label           => $i18n->get("templateIdSearch label"),
             hoverHelp       => $i18n->get("templateIdSearch description"),
         },
-        templateIdSlideshow => {
+        templateIdViewSlideshow => {
             tab             => "display",
             fieldType       => "template",
             defaultValue    => "",
-            namespace       => "GalleryAlbum/Slideshow",
-            label           => $i18n->get("templateIdSlideshow label"),
-            hoverHelp       => $i18n->get("templateIdSlideshow description"),
+            namespace       => "GalleryAlbum/ViewSlideshow",
+            label           => $i18n->get("templateIdViewSlideshow label"),
+            hoverHelp       => $i18n->get("templateIdViewSlideshow description"),
         },
-        templateIdThumbnails => {
+        templateIdViewThumbnails => {
             tab             => "display",
             fieldType       => "template",
             defaultValue    => "",
-            namespace       => "GalleryAlbum/Thumbnails",
-            label           => $i18n->get("templateIdThumbnails label"),
-            hoverHelp       => $i18n->get("templateIdThumbnails description"),
+            namespace       => "GalleryAlbum/ViewThumbnails",
+            label           => $i18n->get("templateIdViewThumbnails label"),
+            hoverHelp       => $i18n->get("templateIdViewThumbnails description"),
         },
         templateIdViewAlbum => {
             tab             => "display",
@@ -230,6 +253,37 @@ sub definition {
             label           => $i18n->get("templateIdViewFile label"),
             hoverHelp       => $i18n->get("templateIdViewFile description"),
         },
+        viewDefault     => {
+            tab             => "display",
+            fieldType       => "selectBox",
+            defaultValue    => "list",
+            options         => \%viewDefaultOptions,
+            label           => $i18n->get("viewDefault label"),
+            hoverHelp       => $i18n->get("viewDefault description"),
+        },
+        viewAlbumAssetId => {
+            tab             => "display",
+            fieldType       => "asset",
+            class           => "WebGUI::Asset::Wobject::GalleryAlbum",
+            label           => $i18n->get("viewAlbumAssetId label"),
+            hoverHelp       => $i18n->get("viewAlbumAssetId description"),
+        },
+        viewListOrderBy => {
+            tab             => "display",
+            fieldType       => "selectBox",
+            defaultValue    => "lineage", # "Sequence Number"
+            options         => \%viewListOrderByOptions,
+            label           => $i18n->get("viewListOrderBy label"),
+            hoverHelp       => $i18n->get("viewListOrderBy description"),
+        },
+        viewListOrderDirection => {
+            tab             => "display",
+            fieldType       => "selectBox",
+            defaultValue    => "ASC",
+            options         => \%viewListOrderDirectionOptions,
+            label           => $i18n->get("viewListOrderDirection label"),
+            hoverHelp       => $i18n->get("viewListOrderDirection description"),
+        },
         workflowIdCommit => {
             tab             => "security",
             fieldType       => "workflow",
@@ -250,6 +304,91 @@ sub definition {
     };
 
     return $class->SUPER::definition($session, $definition);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 appendTemplateVarsSearchForm ( var )
+
+Appends the template vars for the search form to the hash reference C<var>.
+Returns the hash reference for convenience.
+
+=cut
+
+sub appendTemplateVarsSearchForm {
+    my $self        = shift;
+    my $var         = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    my $i18n        = WebGUI::International->new($session, 'Asset_Gallery');
+
+    $var->{ searchForm_start    } 
+        = WebGUI::Form::formHeader( $session, {
+            action      => $self->getUrl('func=search'),
+            method      => "GET",
+        });
+
+    $var->{ searchForm_end      } 
+        = WebGUI::Form::formFooter( $session );
+
+    $var->{ searchForm_basicSearch }
+        = WebGUI::Form::text( $session, {
+            name        => "basicSearch",
+            value       => $form->get("basicSearch"),
+        });
+
+    $var->{ searchForm_title    }
+        = WebGUI::Form::text( $session, {
+            name        => "title",
+            value       => $form->get("title"),
+        });
+
+    $var->{ searchForm_description }
+        = WebGUI::Form::text( $session, {
+            name        => "description",
+            value       => $form->get("description"),
+        });
+
+    $var->{ searchForm_keywords }
+        = WebGUI::Form::text( $session, {
+            name        => "keywords",
+            value       => $form->get("keywords"),
+        });
+
+    # Search classes
+    tie my %searchClassOptions, 'Tie::IxHash', (
+        'WebGUI::Asset::File::Image::Photo'     => $i18n->get("search class photo"),
+        'WebGUI::Asset::Wobject::GalleryAlbum'  => $i18n->get("search class galleryalbum"),
+        ''                                      => $i18n->get("search class any"),
+    );
+    $var->{ searchForm_className }
+        = WebGUI::Form::radioList( $session, {
+            name        => "className",
+            value       => $form->get("className"),
+            options     => \%searchClassOptions,
+        });
+
+    # Search creationDate
+    my $oneYearAgo      = WebGUI::DateTime->new( $session, time )->add( years => -1 )->epoch;
+    $var->{ searchForm_creationDate_after }
+        = WebGUI::Form::dateTime( $session, {
+            name        => "creationDate_after",
+            value       => $form->get("creationDate_after","dateTime") || $oneYearAgo,
+        });
+    $var->{ searchForm_creationDate_before }
+        = WebGUI::Form::dateTime( $session, {
+            name        => "creationDate_before",
+            value       => $form->get("creationDate_before","dateTime"),
+        });
+
+    # Buttons
+    $var->{ searchForm_submit }
+        = WebGUI::Form::submit( $session, {
+            name        => "submit",
+            value       => $i18n->get("search submit"),
+        });
+
+    return $var;
 }
 
 #----------------------------------------------------------------------------
@@ -356,23 +495,33 @@ Gets an array reference of all the album IDs under this Gallery.
 sub getAlbumIds {
     my $self        = shift;
     
-    return $self->getLineage(['descendants'], {
-        includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
-    });
+    my $assets 
+        = $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
+        });
+
+    return $assets;
 }
 
 #----------------------------------------------------------------------------
 
-=head2 getAlbumPaginator ( )
+=head2 getAlbumPaginator ( options )
 
-Gets a WebGUI::Paginator for all the albums in this Gallery.
+Gets a WebGUI::Paginator for all the albums in this Gallery. C<options> is a
+hash reference with the following keys.
+
+ perpage            => The number of results to show per page. Default: 20
 
 =cut
 
 sub getAlbumPaginator {
     my $self        = shift;
+    my $options     = shift;
+    
+    my $perpage     = $options->{ perpage }     || 20;
 
-    my $p           = WebGUI::Paginator->new( $self->session, $self->getUrl );
+    my $p
+        = WebGUI::Paginator->new( $self->session, $self->getUrl, $perpage );
     $p->setDataByArrayRef( $self->getAlbumIds );
 
     return $p;
@@ -392,7 +541,7 @@ sub getAssetClassForFile {
     my $filepath    = shift;
 
     # Checks for Photo assets
-    if ( $filepath =~ /\.(jpe?g|gif|png)/i ) {
+    if ( $filepath =~ /\.(jpe?g|gif|png)$/i ) {
         return "WebGUI::Asset::File::Image::Photo";
     }
 
@@ -416,9 +565,9 @@ sub getImageResolutions {
 
 #----------------------------------------------------------------------------
 
-=head2 getSearchPaginator ( options )
+=head2 getSearchPaginator ( rules )
 
-Gets a WebGUI::Paginator for a search. C<options> is a hash reference of 
+Gets a WebGUI::Paginator for a search. C<rules> is a hash reference of 
 options with the following keys:
 
     keywords       => Keywords to search on 
@@ -431,11 +580,11 @@ sub getSearchPaginator {
     my $self        = shift;
     my $rules       = shift;
 
-    $rules->{ lineage       } = $self->get("lineage");
+    $rules->{ lineage       } = [ $self->get("lineage") ];
 
     my $search      = WebGUI::Search->new( $self->session );
     $search->search( $rules );
-    my $paginator   = $search->getPaginatorResultSet( $self->getUrl('func=search') );
+    my $paginator   = $search->getPaginatorResultSet( $rules->{url} );
 
     return $paginator;
 }
@@ -451,7 +600,7 @@ classes of files inside of a Gallery.
 
 =cut
 
-sub getTemplateEditFile {
+sub getTemplateIdEditFile {
     my $self        = shift;
     return $self->get("templateIdEditFile");
 }
@@ -467,33 +616,21 @@ Gets a hash reference of vars common to all templates.
 sub getTemplateVars {
     my $self        = shift;
     my $var         = $self->get;
+    
+    # Add the search form variables
+    $self->appendTemplateVarsSearchForm( $var );
+
+    $var->{ url                         } = $self->getUrl;
+    $var->{ url_addAlbum                } = $self->getUrl('func=add;class=WebGUI::Asset::Wobject::GalleryAlbum');
+    $var->{ url_listAlbums              } = $self->getUrl('func=listAlbums');
+    $var->{ url_listAlbumsRss           } = $self->getUrl('func=listAlbumsRss');
+    $var->{ url_listFilesForCurrentUser } = $self->getUrl('func=listFilesForUser');
+    $var->{ url_search                  } = $self->getUrl('func=search');
+
+    $var->{ canEdit             } = $self->canEdit;
+    $var->{ canAddFile          } = $self->canAddFile;
 
     return $var;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 getUserFileIds ( [userId] )
-
-Gets an array reference of assetIds for the files in this Gallery owned by 
-the specified C<userId>. If userId is not defined, will use the current user.
-
-=cut
-
-sub getUserFileIds {
-    my $self        = shift;
-    my $userId      = shift || $self->session->user->userId;
-
-    my $db          = $self->session->db;
-
-    # Note: We use excludeClasses to avoid getting GalleryAlbum assets
-    my $assetIds
-        = $self->getLineage( ['descendants'], {
-            excludeClasses      => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
-            whereClause         => "ownerUserId = " . $db->quote($userId),
-        });
-
-    return $assetIds;
 }
 
 #----------------------------------------------------------------------------
@@ -523,6 +660,55 @@ sub getUserAlbumIds {
 
 #----------------------------------------------------------------------------
 
+=head2 getUserFileIds ( [userId] )
+
+Gets an array reference of assetIds for the files in this Gallery owned by 
+the specified C<userId>. If userId is not defined, will use the current user.
+
+=cut
+
+sub getUserFileIds {
+    my $self        = shift;
+    my $userId      = shift || $self->session->user->userId;
+
+    my $db          = $self->session->db;
+
+    # Note: We use excludeClasses to avoid getting GalleryAlbum assets
+    my $assetIds
+        = $self->getLineage( ['descendants'], {
+            excludeClasses      => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
+            whereClause         => "ownerUserId = " . $db->quote($userId),
+        });
+
+    return $assetIds;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getUserFilePaginator ( options )
+
+Gets a WebGUI::Paginator for the files owned by a specific C<userId>. 
+C<options> is a hash reference of options with the following keys:
+
+ userId         => The user who owns the asset. Defaults to the current user.
+ url            => The URL to give to the paginator
+
+=cut
+
+sub getUserFilePaginator {
+    my $self        = shift;
+    my $options     = shift;
+    my $userId      = delete $options->{userId};
+    my $url         = delete $options->{url};
+
+    my $p           = WebGUI::Paginator->new( $self->session, $url );
+    $p->setDataByArrayRef( $self->getUserFileIds( $userId ) );
+
+    return $p;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -532,7 +718,30 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
-    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+
+    if ( $self->get("viewDefault") eq "album" ) {
+        my $asset
+            = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("viewAlbumAssetId") );
+        $asset->prepareView;
+        $self->{_viewAsset} = $asset;
+    }
+    else {
+        $self->prepareViewListAlbums;
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 prepareViewListAlbums ( )
+
+Prepare the template for listing multiple albums.
+
+=cut
+
+sub prepareViewListAlbums {
+    my $self        = shift;
+    my $template 
+        = WebGUI::Asset::Template->new($self->session, $self->get("templateIdListAlbums"));
     $template->prepare;
     $self->{_viewTemplate} = $template;
 }
@@ -541,8 +750,7 @@ sub prepareView {
 
 =head2 view ( )
 
-method called by the www_view method.  Returns a processed template
-to be displayed within the page style.  
+Show the default view based on the Gallery settings.
 
 =cut
 
@@ -551,7 +759,41 @@ sub view {
     my $session = $self->session;	
     my $var     = $self->get;
 
-    return $self->processTemplate($var, undef, $self->{_viewTemplate});
+    if ( $self->get("viewDefault") eq "album" ) {
+        return $self->{_viewAsset}->view;
+    }
+    else {
+        return $self->view_listAlbums;
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 view_listAlbums ( )
+
+Show a paginated list of the albums in this gallery. This method does the 
+actual work.
+
+=cut
+
+sub view_listAlbums {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $var         = $self->getTemplateVars;
+    my $form        = $self->session->form;
+
+    my $p
+        = $self->getAlbumPaginator( { 
+            perpage     => $form->get('perpage'),
+        } );
+    $p->appendTemplateVars( $var );
+
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        push @{ $var->{albums} }, $asset->getTemplateVars;
+    }
+    
+    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 #----------------------------------------------------------------------------
@@ -565,30 +807,218 @@ Show a paginated list of the albums in this gallery.
 sub www_listAlbums {
     my $self        = shift;
     
+    # Perform the prepareView ourselves
+    $self->prepareViewListAlbums;
+
+    return $self->processStyle(
+        $self->view_listAlbums
+    );
 }
 
 #----------------------------------------------------------------------------
 
 =head2 www_listAlbumsRss ( )
 
+Show an RSS feed for the albums in this gallery.
+
 =cut
+
+sub www_listAlbumsRss {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $var         = $self->getTemplateVars;
+
+    for my $assetId ( @{ $self->getAlbumIds } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $assetVar    = $asset->getTemplateVars;
+
+        # Fix URLs
+        for my $key ( qw( url ) ) {
+            $assetVar->{ $key } = $self->session->url->getSiteURL . $assetVar->{ $key };
+        }
+        
+        # Additional vars for RSS
+        $assetVar->{ rssDate  } 
+            = $session->datetime->epochToMail( $assetVar->{ creationDate } );
+
+        push @{ $var->{albums} }, $assetVar;
+    }
+
+    $self->session->http->setMimeType('text/xml');
+    return $self->processTemplate( $var, $self->get("templateIdListAlbumsRss") );
+}
 
 #----------------------------------------------------------------------------
 
 =head2 www_search ( )
 
+Search through the GalleryAlbums and files in this gallery. Show the form to
+search and display the results if necessary.
+
 =cut
+
+sub www_search {
+    my $self        = shift;
+    my $form        = $self->session->form;
+    my $db          = $self->session->db;
+
+    my $var         = $self->getTemplateVars;
+    # NOTE: Search form is added as part of getTemplateVars()
+
+    # Get search results, if necessary.
+    if ($form->get("submit")) {
+        # Keywords to search on
+        my $keywords        = join " ", $form->get('basicSearch'),
+                                        $form->get('keywords'),
+                                        $form->get('title'),
+                                        $form->get('description')
+                                        ;
+
+        # Build a where clause from the advanced options
+        # Lineage search can capture gallery
+        my $where       = q{assetIndex.assetId <> '} . $self->getId . q{'};
+        if ( $form->get("title") ) {
+            $where      .= q{ AND assetData.title LIKE } 
+                        . $db->quote( '%' . $form->get("title") . '%' ) 
+                        ;
+        }
+        if ( $form->get("description") ) {
+            $where      .= q{ AND assetData.synopsis LIKE } 
+                        . $db->quote( '%' . $form->get("description") . '%' ) 
+                        ;
+        }
+        if ( $form->get("className") ) {
+            $where      .= q{ AND asset.className IN ('} 
+                        . $db->quoteAndJoin( [$form->get('className','checkList')] ) 
+                        . q{)}
+                        ;
+        }
+
+        # Build a URL for the pagination
+        my $url     
+            = $self->getUrl( 
+                'func=search;submit=1;'
+                . 'basicSearch=' . $form->get('basicSearch') . ';'
+                . 'keywords=' . $form->get('keywords') . ';'
+                . 'title=' . $form->get('title') . ';'
+                . 'description=' . $form->get('description') . ';'
+                . 'className=' . $form->get('className') . ';'
+                . 'creationDate_after=' . $form->get('creationDate_after') . ';'
+                . 'creationDate_before=' . $form->get('creationDate_before') . ';'
+            );
+
+        my $p
+            = $self->getSearchPaginator( { 
+                url             => $url,
+                keywords        => $keywords,
+                where           => $where,
+                joinClass       => ['WebGUI::Asset::Wobject::GalleryAlbum', 'WebGUI::Asset::File::Image::Photo'],
+            } );
+        
+        $var->{ keywords }  = $keywords;
+
+        $p->appendTemplateVars( $var );
+        for my $result ( @{ $p->getPageData } ) {
+            my $asset   = WebGUI::Asset->newByDynamicClass( $self->session, $result->{assetId} );
+            push @{ $var->{search_results} }, $asset->getTemplateVars;
+        }
+    }
+
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->get("templateIdSearch") )
+    );
+}
 
 #----------------------------------------------------------------------------
 
-=head2 www_userGallery ( )
+=head2 www_listFilesForUser ( )
+
+Show all the GalleryAlbums and files owned by a given userId. If no userId is
+given, will use the current user.
 
 =cut
+
+sub www_listFilesForUser {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $var         = $self->getTemplateVars;
+    my $userId      = $self->session->form->get("userId") || $self->session->user->userId;
+    my $user        = WebGUI::User->new( $session, $userId );
+
+    $var->{ url_rss         } = $self->getUrl('func=listFilesForUserRss;userId=' . $userId);
+    $var->{ userId          } = $userId;
+    $var->{ username        } = $user->username;
+
+    # Get all the albums
+    my $albumIds    = $self->getUserAlbumIds( $userId );
+    for my $albumId ( @$albumIds ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        push @{ $var->{user_albums} }, $asset->getTemplateVars;
+    }
+
+    # Get a page of files
+    my $p
+        = $self->getUserFilePaginator({ 
+            userId          => $userId, 
+            url             => $self->getUrl("func=listFilesForUser") 
+        });
+    $p->appendTemplateVars( $var );
+
+    for my $fileId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        push @{ $var->{user_files} }, $asset->getTemplateVars;
+    }
+
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->get("templateIdListFilesForUser") )
+    );
+}
 
 #----------------------------------------------------------------------------
 
-=head2 www_userGalleryRss ( )
+=head2 www_listFilesForUserRss ( )
 
 =cut
+
+sub www_listFilesForUserRss {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $var         = $self->getTemplateVars;
+    my $userId      = $self->session->form("userId") || $self->session->user->userId;
+
+    # Fix URLs for template vars
+    for my $key ( qw( url ) ) {
+        $var->{ $key } = $self->session->url->getSiteURL . $var->{ $key };
+    }
+
+    # Get all the albums
+    my $albumIds    = $self->getUserAlbumIds( $userId );
+    for my $albumId ( @$albumIds ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $albumId );
+        my $assetVar    = $asset->getTemplateVars;
+
+        for my $key ( qw( url ) ) {
+            $assetVar->{ $key } = $self->session->url->getSiteURL . $assetVar->{ $key };
+        }
+
+        push @{ $var->{user_albums} }, $assetVar;
+    }
+
+    # Get all the files
+    my $fileIds     = $self->getUserFileIds( $userId );
+    for my $fileId ( @$fileIds ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $assetVar    = $asset->getTemplateVars;
+
+        for my $key ( qw( url ) ) {
+            $assetVar->{ $key } = $self->session->url->getSiteURL . $assetVar->{ $key };
+        }
+
+        push @{ $var->{user_files} }, $assetVar;
+    }
+
+    $self->session->http->setMimeType('text/xml');
+    return $self->processTemplate( $var, $self->get("templateIdListFilesForUserRss") );
+}
 
 1;

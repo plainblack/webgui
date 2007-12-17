@@ -15,6 +15,7 @@ package WebGUI::Search;
 =cut
 
 use strict;
+use Carp qw( croak );
 use WebGUI::Asset;
 
 =head1 NAME
@@ -329,6 +330,9 @@ This rule allows for an array reference of table join clauses.
 
  join => 'join assetData on assetId = assetData.assetId'
 
+NOTE: This rule is deprecated and will be removed in a future release. Use 
+joinClass instead.
+
 =head4 columns
 
 This rule allows for additional columns to be returned by getResultSet().
@@ -344,6 +348,11 @@ placeholders and parameters.
 sub search {
 	my $self = shift;
 	my $rules = shift;
+
+        # Send the rules through some sanity checks
+        croak "'lineage' rule must be array reference"
+            if ( $rules->{lineage} && ref $rules->{lineage} ne "ARRAY" );
+
 	my @params = ();
 	my $query = "";
 	my @clauses = ();
@@ -410,10 +419,31 @@ sub search {
 	if ($rules->{where}) {
 		push(@clauses, $rules->{where});
 	}
-	if ($rules->{join}) {	# This join happens in _getQuery
-		$rules->{join} = [$rules->{join}]
-			unless (ref $rules->{join} eq "ARRAY");
-		$self->{_join} = $rules->{join};
+	# deal with custom joined tables if we must
+	if (exists $rules->{joinClass}) {
+            my $join        = [ "left join assetData on assetIndex.assetId=assetData.assetId" ];
+            for my $className ( @{ $rules->{ joinClass } } ) {
+                my $cmd         = "use " . $className;
+                eval { $cmd };
+                $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
+                foreach my $definition (@{$className->definition($self->session)}) {
+                    unless ($definition->{tableName} eq "asset") {
+                        my $tableName = $definition->{tableName};
+                        push @$join, 
+                            "left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
+                    }
+                    last;
+                }
+            }
+            # Get only the latest revision
+            push @clauses, "assetData.revisionDate = (SELECT MAX(revisionDate) FROM assetData ad WHERE ad.assetId = assetData.assetId)";
+            # Join happens in _getQuery
+            $self->{_join} = $join;
+	}
+        elsif ($rules->{join}) {	# This join happens in _getQuery
+            $rules->{join} = [$rules->{join}]
+                unless (ref $rules->{join} eq "ARRAY");
+            $self->{_join} = $rules->{join};
 	}
 	if ($rules->{columns}) {
 		$rules->{columns} = [$rules->{columns}]

@@ -22,19 +22,7 @@ use Image::ExifTool qw( :Public );
 use JSON;
 use Tie::IxHash;
 
-our $magick;
-BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $magick = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
-        $magick = 'Image::Magick';
-    }
-    else {
-        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
-    }
-}
-
+use WebGUI::DateTime;
 use WebGUI::Friends;
 use WebGUI::Utility;
 
@@ -49,7 +37,6 @@ WebGUI::Asset::File::Image::Photo
 =head1 SYNOPSIS
 
 use WebGUI::Asset::File::Image::Photo
-
 
 =head1 METHODS
 
@@ -72,14 +59,17 @@ sub definition {
     my $i18n        = __PACKAGE__->i18n($session);
 
     tie my %properties, 'Tie::IxHash', (
+        exifData => {
+            defaultValue        => undef,
+        },
         friendsOnly => {
             defaultValue        => 0,
         },
+        location    => {
+            defaultValue        => undef,
+        },
         rating  => {
             defaultValue        => 0,
-        },
-        storageIdPhoto  => {
-            defaultValue        => undef,
         },
     );
 
@@ -91,12 +81,13 @@ sub definition {
     }
 
     push @{$definition}, {
-        assetName   => $i18n->get('assetName'),
-        icon        => 'Image.gif',
-        tableName   => 'Photo',
-        className   => 'WebGUI::Asset::File::Image::Photo',
-        i18n        => 'Asset_Photo',
-        properties  => \%properties,
+        assetName           => $i18n->get('assetName'),
+        autoGenerateForms   => 0,
+        icon                => 'Image.gif',
+        tableName           => 'Photo',
+        className           => 'WebGUI::Asset::File::Image::Photo',
+        i18n                => 'Asset_Photo',
+        properties          => \%properties,
     };
 
     return $class->SUPER::definition($session, $definition);
@@ -114,13 +105,26 @@ reference. Returns the hash reference for convenience.
 sub appendTemplateVarsForCommentForm {
     my $self        = shift;
     my $var         = shift;
+    my $session     = $self->session;
 
-    $var->{commentForm_start}
-        = WebGUI::Form::formHeader( $session );
+    $var->{ commentForm_start }
+        = WebGUI::Form::formHeader( $session )
         . WebGUI::Form::hidden( $session, { name => "func", value => "addCommentSave" } )
         ;
-    $var->{commentForm_end}
+    $var->{ commentForm_end }
         = WebGUI::Form::formFooter( $session );
+
+    $var->{ commentForm_bodyText }
+        = WebGUI::Form::HTMLArea( $session, {
+            name        => "bodyText",
+            richEditId  => $self->getGallery->get("richEditIdComment"),
+        });
+
+    $var->{ commentForm_submit } 
+        = WebGUI::Form::submit( $session, {
+            name        => "submit",
+            value       => "Save Comment",
+        });
 
     return $var;
 }
@@ -143,14 +147,14 @@ sub applyConstraints {
     my $self        = shift;
     my $gallery     = $self->getGallery;
     
-    $self->makeResolutions();
-    $self->updateExifDataFromFile();
-
     # Update the asset's size and make a thumbnail
     $self->SUPER::applyConstraints({
         maxImageSize        => $self->getGallery->get("imageViewSize"),
         thumbnailSize       => $self->getGallery->get("imageThumbnailSize"),
     });
+
+    $self->makeResolutions();
+    $self->updateExifDataFromFile();
 }
 
 #----------------------------------------------------------------------------
@@ -247,6 +251,19 @@ sub deleteComment {
 
 #----------------------------------------------------------------------------
 
+=head2 getAutoCommitWorkflowId ( )
+
+Returns the workflowId of the Gallery's approval workflow.
+
+=cut
+
+sub getAutoCommitWorkflowId {
+    my $self        = shift;
+    return $self->getGallery->get("workflowIdCommit");
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getComment ( commentId )
 
 Get a comment from this asset. C<id> is the ID of the comment to get. Returns
@@ -292,6 +309,7 @@ Get a WebGUI::Paginator for the comments for this Photo.
 
 sub getCommentPaginator {
     my $self        = shift;
+    my $session     = $self->session;
     
     my $p           = WebGUI::Paginator->new($session, $self->getUrl);
     $p->setDataByQuery(
@@ -366,10 +384,37 @@ Get a hash reference of template variables shared by all views of this asset.
 
 sub getTemplateVars {
     my $self        = shift;
+    my $session     = $self->session;
     my $var         = $self->get;
+    my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
     
+    $var->{ canComment          } = $self->canComment;
+    $var->{ canEdit             } = $self->canEdit;
+    $var->{ numberOfComments    } = scalar @{ $self->getCommentIds };
+    $var->{ ownerUsername       } = $owner->username;
+    $var->{ url                 } = $self->getUrl;
+    $var->{ url_delete          } = $self->getUrl('func=delete');
+    $var->{ url_demote          } = $self->getUrl('func=demote');
+    $var->{ url_edit            } = $self->getUrl('func=edit');
+    $var->{ url_gallery         } = $self->getGallery->getUrl;
+    $var->{ url_makeShortcut    } = $self->getUrl('func=makeShortcut');
+    $var->{ url_listFilesForOwner } 
+        = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->get("ownerUserId"));
+    $var->{ url_promote         } = $self->getUrl('func=promote');
+
+    $var->{ fileUrl             } = $self->getFileUrl;
+    $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
+
+    ### Download resolutions
+    for my $resolution ( $self->getResolutions ) {
+        push @{ $var->{ resolutions_loop } }, { 
+            url_download => $self->getStorageLocation->getPathFrag($resolution) 
+        };
+    }
+
     ### Format exif vars
     my $exif        = jsonToObj( delete $var->{exifData} );
+    $exif           = ImageInfo( $self->getStorageLocation->getPath( $self->get("filename") ) );
     for my $tag ( keys %$exif ) {
         # Hash of exif_tag => value
         $var->{ "exif_" . $tag } = $exif->{$tag};
@@ -428,6 +473,7 @@ contained in.
 sub makeResolutions {
     my $self        = shift;
     my $resolutions = shift;
+    my $error;
 
     croak "Photo->makeResolutions: resolutions must be an array reference"
         if $resolutions && ref $resolutions ne "ARRAY";
@@ -435,15 +481,14 @@ sub makeResolutions {
     # Get default if necessary
     $resolutions    ||= $self->getGallery->getImageResolutions;
     
-    my $storage = $self->getStorageLocation;
-    my $photo   = $magick->new;
-    $photo->Read( $storage->get( $self->get("filename") ) );
+    my $storage     = $self->getStorageLocation;
+    $self->session->errorHandler->info(" Making resolutions for '" . $self->get("filename") . q{'});
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad
-        my $newPhoto    = $photo->Clone;
-        $newPhoto->Resize( geometry => $res );
-        $newPhoto->Write( $storage->getFilePath( "$res.jpg" ) );
+        my $newFilename     = $res . ".jpg";
+        $storage->copyFile( $self->get("filename"), $newFilename );
+        $storage->resize( $newFilename, $res );
     }
 }
 
@@ -512,8 +557,12 @@ sub prepareView {
 sub processPropertiesFromFormPost {
     my $self    = shift;
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+
+    # Return if errors
+    return $errors if @$errors;
     
-     
+    # Passes all checks
+    $self->requestAutoCommit;
 }
 
 #----------------------------------------------------------------------------
@@ -566,7 +615,9 @@ sub updateExifDataFromFile {
     my $self        = shift;
     my $storage     = $self->getStorageLocation;
     
-    my $info        = ImageInfo( $storage->getFilePath( $self->get('filename') ) );
+    return;
+    my $info        = ImageInfo( $storage->getPath( $self->get('filename') ) );
+    use Data::Dumper; $self->session->errorHandler->info( Dumper $info );
     $self->update({
         exifData    => objToJson( $info ),
     });
@@ -584,16 +635,19 @@ sub view {
     my $self    = shift;
     my $session = $self->session;
     my $var     = $self->getTemplateVars;
-    $var->{ controls    } = $self->getToolbar;
-    $var->{ fileUrl     } = $self->getFileUrl;
-    $var->{ fileIcon    } = $self->getFileIconUrl;
     
     $self->appendTemplateVarsForCommentForm( $var ); 
 
     my $p       = $self->getCommentPaginator;
-    $var->{ commentLoop             } = $p->getPageData;
-    $var->{ commentLoop_urlNext     } = [$p->getNextPageLink]->[0];
-    $var->{ commentLoop_urlPrev     } = [$p->getPrevPageLink]->[0];
+    for my $comment ( @{ $p->getPageData } ) {
+        my $user        = WebGUI::User->new( $session, $comment->{userId} );
+        $comment->{ username } = $user->username;
+        
+        my $dt          = WebGUI::DateTime->new( $session, $comment->{ creationDate } );
+        $comment->{ creationDate } = $dt->toUserTimeZone;
+
+        push @{ $var->{commentLoop} }, $comment;
+    }
     $var->{ commentLoop_pageBar     } = $p->getBarAdvanced;
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
@@ -609,14 +663,15 @@ Save a new comment to the Photo.
 
 sub www_addCommentSave {
     my $self        = shift;
+    my $session     = $self->session;
     
-    return $self->session->privilege->insufficient unless $self->canComment;
+    return $session->privilege->insufficient unless $self->canComment;
 
-    my $form        = $self->session;
+    my $form        = $self->session->form;
     
     my $properties  = {
         assetId         => $self->getId,
-        creationDate    => time,
+        creationDate    => WebGUI::DateTime->new( $session, time )->toDatabase,
         userId          => $session->user->userId,
         visitorIp       => ( $session->user->userId eq "1" ? $session->env("REMOTE_ADDR") : undef ),
         bodyText        => $form->get("bodyText"),
@@ -638,14 +693,17 @@ this Photo exists in.
 
 sub www_delete {
     my $self        = shift;
+    my $session     = $self->session;
     
     return $self->session->privilege->insufficient unless $self->canEdit;
 
-    my $var         = $self->getTemplateVar;
+    my $var         = $self->getTemplateVars;
     $var->{ url_yes     } = $self->getUrl("func=deleteConfirm");
 
+    # TODO Get albums with shortcuts to this asset
+
     return $self->processStyle(
-        $self->processTemplate( $var, $self->getGallery->get("templateIdDeletePhoto") )
+        $self->processTemplate( $var, $self->getGallery->get("templateIdDeleteFile") )
     );
 }
 
@@ -663,13 +721,32 @@ sub www_deleteConfirm {
 
     return $self->session->privilege->insufficient unless $self->canEdit;
 
-    my $i18n        = $self->i18n( $self->session );
+    my $i18n        = __PACKAGE__->i18n( $self->session );
 
     $self->purge;
 
     return $self->processStyle(
         sprintf $i18n->get("delete message"), $self->getParent->getUrl,
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_demote
+
+Override the default demote page to send the user back to the GalleryAlbum 
+edit screen.
+
+=cut
+
+sub www_demote {
+    my $self        = shift;
+
+    return $self->session->privilege->insufficient unless $self->canEdit;
+
+    $self->demote;
+    
+    return $self->session->asset( $self->getParent )->www_edit;
 }
 
 #----------------------------------------------------------------------------
@@ -719,10 +796,36 @@ sub www_edit {
     return $self->session->privilege->locked        unless $self->canEditIfLocked;
 
     # Prepare the template variables
-    my $var     = $self->getTemplateVars;
+    my $var     = {
+        url_addArchive          => $self->getParent->getUrl('func=addArchive'),    
+    };
     
-    $var->{ form_header } = WebGUI::Form::formHeader( $session );
-    $var->{ form_footer } = WebGUI::Form::formFooter( $session );
+    # Generate the form
+    if ($form->get("func") eq "add") {
+        $var->{ form_start  } 
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
+            });
+    }
+    else {
+        $var->{ form_start  } 
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getUrl('func=editSave'),
+            });
+    }
+    $var->{ form_start } 
+        .= WebGUI::Form::hidden( $session, {
+            name        => "proceed",
+            value       => "showConfirmation",
+        });
+
+    $var->{ form_end } = WebGUI::Form::formFooter( $session );
+    
+    $var->{ form_submit }
+        = WebGUI::Form::submit( $session, {
+            name        => "submit",
+            value       => "Save",
+        });
 
     $var->{ form_title  }
         = WebGUI::Form::Text( $session, {
@@ -737,12 +840,7 @@ sub www_edit {
             richEditId  => $self->getGallery->get("assetIdRichEditFile"),
         });
 
-    $var->{ form_storageIdPhoto }
-        = WebGUI::Form::Image( $session, {
-            name        => "storageIdPhoto",
-            value       => ( $form->get("storageIdPhoto") || $self->get("storageIdPhoto") ),
-            maxAttachments  => 1,
-        });
+    $var->{ form_photo } = $self->getEditFormUploadControl;
     
     $var->{ form_keywords }
         = WebGUI::Form::Text( $session, {
@@ -771,6 +869,23 @@ sub www_edit {
 
 #----------------------------------------------------------------------------
 
+=head2 www_editSave ( )
+
+Save the edit form. Overridden to display a confirm message to the user.
+
+=cut
+
+sub www_editSave {
+    my $self        = shift;
+    $self->SUPER::www_editSave;
+
+    my $i18n        = __PACKAGE__->i18n( $self->session );
+
+    sprintf $i18n->get("save message"), $self->getUrl,
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_makeShortcut ( )
 
 Display the form to make a shortcut.
@@ -781,24 +896,27 @@ This page is only available to those who can edit this Photo.
 
 sub www_makeShortcut {
     my $self        = shift;
+    my $session     = $self->session;
     
     return $self->session->privilege->insufficient  unless $self->canEdit;
 
     # Create the form to make a shortcut
     my $var         = $self->getTemplateVars;
     
-    $var->{ form_header }
+    $var->{ form_start }
         = WebGUI::Form::formHeader( $session )
         . WebGUI::Form::hidden( $session, { name => "func", value => "makeShortcutSave" });
-    $var->{ form_footer } 
+    $var->{ form_end } 
         = WebGUI::Form::formFooter( $session );
 
     # Albums under this Gallery
     my $albums          = $self->getGallery->getAlbumIds;
     my %albumOptions;
     for my $assetId ( @$albums ) {
-        $albumOptions{ $assetId } 
-            = WebGUI::Asset->newByDynamicClass($session, $assetId)->get("title");
+        my $asset   = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        if ($asset->canAddFile) {
+            $albumOptions{ $assetId } = $asset->get("title");
+        }
     }
     $var->{ form_parentId }
         = WebGUI::Form::selectBox( $session, {
@@ -827,10 +945,51 @@ sub www_makeShortcutSave {
     my $form        = $self->session->form;
 
     return $self->session->privilege->insufficient unless $self->canEdit;
-
+    
+    my $parentId    = $form->get('parentId');
     my $shortcut    = $self->makeShortcut( $parentId );
     
     return $shortcut->www_view; 
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_promote
+
+Override the default promote page to send the user back to the GalleryAlbum 
+edit screen.
+
+=cut
+
+sub www_promote {
+    my $self        = shift;
+
+    return $self->session->privilege->insufficient unless $self->canEdit;
+
+    $self->promote;
+    
+    return $self->session->asset( $self->getParent )->www_edit;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_showConfirmation ( ) 
+
+Shows the confirmation message after adding / editing a gallery album. 
+Provides links to view the photo and add more photos.
+
+=cut
+
+sub www_showConfirmation {
+    my $self        = shift;
+    my $i18n        = __PACKAGE__->i18n( $self->session );
+
+    return $self->processStyle(
+        sprintf( $i18n->get('save message'), 
+            $self->getUrl, 
+            $self->getParent->getUrl('func=add;className='.__PACKAGE__),
+        )
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -856,7 +1015,6 @@ sub www_view {
     $self->session->output->print($self->view);
     $self->session->output->print($foot, 1);
     return "chunked";
-}
 }
 
 1;

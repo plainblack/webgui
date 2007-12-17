@@ -14,6 +14,10 @@ $VERSION = "1.0.0";
 
 use strict;
 use base 'WebGUI::Asset::Wobject';
+use Carp qw( croak );
+use File::Find;
+use File::Spec;
+use File::Temp qw{ tempdir };
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -47,22 +51,22 @@ sub definition {
     tie my %properties, 'Tie::IxHash', (
         allowComments   => {
             fieldType       => "yesNo",
-            defaultValue    => 0,
-            label           => $i18n->get("allowComments label"),
-            hoverHelp       => $i18n->get("allowComments description"),
+            defaultValue    => 1,
         },
         othersCanAdd    => {
             fieldType       => "yesNo",
             defaultValue    => 0,
-            label           => $i18n->get("othersCanAdd label"),
-            hoverHelp       => $i18n->get("othersCanAdd description"),
+        },
+        assetIdThumbnail => {
+            fieldType       => "asset",
+            defaultValue    => undef,
         },
     );
 
     push @{$definition}, {
         assetName           => $i18n->get('assetName'),
+        autoGenerateForms   => 0,
         icon                => 'newWobject.gif',
-        autoGenerateForms   => 1,
         tableName           => 'GalleryAlbum',
         className           => __PACKAGE__,
         properties          => \%properties,
@@ -90,43 +94,56 @@ sub addArchive {
     my $self        = shift;
     my $filename    = shift;
     my $properties  = shift;
+    my $gallery     = $self->getParent;
     
     my $archive     = Archive::Any->new( $filename );
 
     croak "Archive will extract to directory outside of storage location!"
         if $archive->is_naughty;
 
-    use File::Temp qw{ tempdir };
     my $tempdirName = tempdir( "WebGUI-Gallery-XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
-    $archive->extract( $tempdir );
+    $archive->extract( $tempdirName );
 
-    opendir my $dh, $tempdirName or die "Could not open temp dir $tempdirName: $!";
-    for my $file (readdir $dh) {
-        my $class       = $gallery->getAssetClassForFile( $file );
+    # Get all the files in the archive
+    my @files;
+    my $wanted      = sub { push @files, $File::Find::name };
+    find( {
+        wanted      => $wanted,
+    }, $tempdirName );
+
+    for my $filePath (@files) {
+        my ($volume, $directory, $filename) = File::Spec->splitpath( $filePath );
+        $self->session->errorHandler->info( "trying $filename" );
+        next if $filename =~ m{^[.]};
+        my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
-        $self->addChild({
-            className       => $class,
-            title           => $properties->{title},
-            menuTitle       => $properties->{menuTitle} || $properties->{title},
-            synopsis        => $properties->{synopsis},
-        });
+        $self->session->errorHandler->info( "Adding $filename to album!" );
+        $properties->{ className        } = $class;
+        $properties->{ menuTitle        } = $filename;
+        $properties->{ title            } = $filename;
+        $properties->{ url              } = $self->getUrl . "/" . $filename;
+
+        my $asset   = $self->addChild( $properties, undef, undef, { skipAutoCommitWorkflows => 1 } );
+        $asset->setFile( $filePath );
     }
-    closedir $dh;
+
+    my $versionTag      = WebGUI::VersionTag->getWorking( $self->session );
+    $versionTag->set({ 
+        "workflowId" => $self->getParent->get("workflowIdCommit"),
+    });
+    $versionTag->requestCommit;
+
+    return;
 }
 
 #----------------------------------------------------------------------------
 
-=head2 appendTemplateVarsFileLoop ( vars, options )
+=head2 appendTemplateVarsFileLoop ( vars, assetIds )
 
-Append template vars for a file loop with the specified options. C<vars> is
-a hash reference to add the file loop to. C<options> is a hash reference of
-options with the following keys:
-
- perpage        => number | "all"
-                If "all", no pagination will be done.
- url            => url
-                The URL to the current page
+Append template vars for a file loop for the specified assetIds. C<vars> is
+a hash reference to add the file loop to. C<assetIds> is an array reference
+of assetIds for the loop.
 
 Returns the hash reference for convenience.
 
@@ -135,17 +152,10 @@ Returns the hash reference for convenience.
 sub appendTemplateVarsFileLoop {
     my $self        = shift;
     my $var         = shift;
-    my $options     = shift;
+    my $assetIds    = shift;
+    my $session     = $self->session;
 
-    my @assetIds;
-    if ($options->{perpage} eq "all") {
-        @assetIds   = @{ $self->getFileIds };
-    }
-    else {
-        @assetIds   = @{ $self->getFilePaginator($options->{url})->getPageData };
-    }
-
-    for my $assetId (@assetIds) {
+    for my $assetId (@$assetIds) {
         push @{$var->{file_loop}}, 
             WebGUI::Asset->newByDynamicClass($session, $assetId)->getTemplateVars;
     }
@@ -168,6 +178,7 @@ C<othersCanAdd> is true and the Gallery allows them to add files.
 sub canAddFile {
     my $self        = shift;
     my $userId      = shift || $self->session->user->userId;
+    my $gallery     = $self->getParent;
 
     return 1 if $userId eq $self->get("ownerUserId");
     return 1 if $self->get("othersCanAdd") && $gallery->canAddFile( $userId );
@@ -214,9 +225,13 @@ sub canEdit {
     my $self        = shift;
     my $userId      = shift || $self->session->user->userId;
     my $gallery     = $self->getParent;
+    my $form        = $self->session->form;
 
     # Handle adding a photo
     if ( $form->get("func") eq "add" ) {
+        return $self->canAddFile;
+    }
+    elsif ( $form->get("func") eq "editSave" && $form->get("className") eq __PACKAGE__ ) {
         return $self->canAddFile;
     }
     else {
@@ -233,13 +248,23 @@ sub canEdit {
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
 If no userId is given, checks the current user.
 
+Users can view this album if they can view the containing Gallery.
+
+NOTE: It may be possible to view a GalleryAlbum that has no public files. In
+such cases, the GalleryAlbum will appear empty to unprivileged users. This is 
+not a bug.
+
 =cut
 
-# Inherited from superclass
+sub canView {
+    my $self        = shift;
+    my $userId      = shift || $self->session->user->userId;
+    return $self->getParent->canView($userId);
+}
 
 #----------------------------------------------------------------------------
 
-=head2 i18n ( [ session ] )
+=head2 i18n ( session )
 
 Get a WebGUI::International object for this class. 
 
@@ -260,6 +285,19 @@ sub i18n {
 
 #----------------------------------------------------------------------------
 
+=head2 getAutoCommitWorkflowId ( )
+
+Returns the workflowId of the Gallery's approval workflow.
+
+=cut
+
+sub getAutoCommitWorkflowId {
+    my $self        = shift;
+    return $self->getParent->get("workflowIdCommit");
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getFileIds ( )
 
 Gets an array reference of asset IDs for all the files in this album.
@@ -270,9 +308,7 @@ sub getFileIds {
     my $self        = shift;
     my $gallery     = $self->getParent;
 
-    return $self->assetLineage( ['descendants'], {
-        includeOnlyClasses      => $gallery->getAllAssetClassesForFile,
-    });
+    return $self->getLineage( ['descendants'], { } );
 }
 
 #----------------------------------------------------------------------------
@@ -286,7 +322,7 @@ url to the current page that will be given to the paginator.
 
 sub getFilePaginator {
     my $self        = shift;
-    my $url         = shift;
+    my $url         = shift     || $self->getUrl;
 
     my $p           = WebGUI::Paginator->new( $self->session, $url );
     $p->setDataByArrayRef( $self->getFileIds );
@@ -304,11 +340,73 @@ Gets template vars common to all views.
 
 sub getTemplateVars {
     my $self        = shift;
+    my $session     = $self->session;
+    my $gallery     = $self->getParent;
     my $var         = $self->get;
+    my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
+    
+    # Permissions
+    $var->{ canAddFile              } = $self->canAddFile;
+    $var->{ canEdit                 } = $self->canEdit;
+    
+    # Add some common template vars from Gallery
+    $gallery->appendTemplateVarsSearchForm( $var );
+    $var->{ url_listAlbums              } = $gallery->getUrl('func=listAlbums');
+    $var->{ url_listAlbumsRss           } = $gallery->getUrl('func=listAlbumsRss');
+    $var->{ url_listFilesForCurrentUser } = $gallery->getUrl('func=listFilesForUser');
+    $var->{ url_search                  } = $gallery->getUrl('func=search');
 
-    $var->{ url         } = $self->getUrl;
+    # Friendly URLs
+    $var->{ url                     } = $self->getUrl;
+    $var->{ url_addArchive          } = $self->getUrl('func=addArchive');
+    $var->{ url_addPhoto            } = $self->getUrl("func=add;class=WebGUI::Asset::File::Image::Photo");
+    $var->{ url_addNoClass          } = $self->getUrl("func=add");
+    $var->{ url_delete              } = $self->getUrl("func=delete");
+    $var->{ url_edit                } = $self->getUrl("func=edit");
+    $var->{ url_listFilesForOwner   } = $gallery->getUrl("func=listFilesForUser;userId=".$var->{ownerUserId});
+    $var->{ url_viewRss             } = $self->getUrl("func=viewRss");
+    $var->{ url_slideshow           } = $self->getUrl("func=slideshow");
+    $var->{ url_thumbnails          } = $self->getUrl("func=thumbnails");
+
+    $var->{ fileCount               } = $self->getChildCount;
+    $var->{ ownerUsername           } = $owner->username;
+    $var->{ thumbnailUrl            } = $self->getThumbnailUrl;
 
     return $var;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getThumbnailUrl ( )
+
+Gets the URL for the thumbnail for this asset. If no asset is set, gets the 
+first child.
+
+NOTE: If the asset does not have a getThumbnailUrl method, this method will
+return undef.
+
+=cut
+
+sub getThumbnailUrl {
+    my $self        = shift;
+    my $asset       = undef;
+
+    if ( $self->get("assetIdThumbnail") ) {
+        $asset      = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("assetIdThumbnail") );
+    }
+    elsif ( $self->getFirstChild ) {
+        $asset      = $self->getFirstChild;
+    }
+    else {
+        return undef;
+    }
+
+    if ( $asset->can("getThumbnailUrl") ) {
+        return $asset->getThumbnailUrl;
+    }
+    else {
+        return undef;
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -360,6 +458,26 @@ sub processStyle {
 
 #----------------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost ( )
+
+Process the form to save the asset. Request approval from the Gallery's 
+approval workflow.
+
+=cut
+
+sub processPropertiesFromFormPost {
+    my $self        = shift;
+    my $errors      = $self->SUPER::processPropertiesFromFormPost || [];
+
+    # Return if error
+    return $errors  if @$errors;
+
+    # Passes all checks
+    $self->requestAutoCommit;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -371,8 +489,10 @@ sub view {
     my $self        = shift;
     my $session     = $self->session;	
     my $var         = $self->getTemplateVars;
-
-    $self->appendTemplateVarsFileLoop( $var );
+    
+    my $p           = $self->getFilePaginator;
+    $p->appendTemplateVars( $var );
+    $self->appendTemplateVarsFileLoop( $var, $p->getPageData );
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -384,6 +504,8 @@ sub view {
 method called by the www_slideshow method. Returns a processed template to be
 displayed within the page style.
 
+Show a slideshow of the GalleryAlbum's files.
+
 =cut
 
 sub view_slideshow {
@@ -391,9 +513,9 @@ sub view_slideshow {
     my $session     = $self->session;	
     my $var         = $self->getTemplateVars;
 
-    $self->appendTemplateVarsFileLoop( $var, { perpage => "all" } );
+    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
     
-    return $self->processTemplate($var, $self->getParent->get("templateIdSlideshow"));
+    return $self->processTemplate($var, $self->getParent->get("templateIdViewSlideshow"));
 }
 
 #----------------------------------------------------------------------------
@@ -403,6 +525,9 @@ sub view_slideshow {
 method called by the www_thumbnails method. Returns a processed template to be
 displayed within the page style.
 
+Shows all the thumbnails for this GalleryAlbum. In addition, shows details 
+about a specific thumbnail.
+
 =cut
 
 sub view_thumbnails {
@@ -410,9 +535,31 @@ sub view_thumbnails {
     my $session     = $self->session;	
     my $var         = $self->getTemplateVars;
 
-    $self->appendTemplateVarsFileLoop( $var, { perpage => "all" } );
+    my $fileId      = $session->form->get("fileId");
 
-    return $self->processTemplate($var, $self->getParent->get("templateIdThumbnails"));
+    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
+
+    # Process the file loop to add an additional URL
+    for my $file ( @{ $var->{file_loop} } ) {
+        $file->{ url_albumViewThumbnails }
+            = $self->getUrl('func=thumbnails;fileId=' . $file->{assetId});
+    }
+
+    # Add direct vars for the requested file
+    my $asset;
+    if ($fileId) {
+        $asset  = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+    }
+    # If no fileId given or fileId does not exist
+    if (!$asset) {
+        $asset  = $self->getFirstChild;
+    }
+    my %assetVars   = %{ $asset->getTemplateVars };
+    for my $key ( keys %assetVars ) {
+        $var->{ 'file_' . $key } = $assetVars{ $key };
+    }
+
+    return $self->processTemplate($var, $self->getParent->get("templateIdViewThumbnails"));
 }
 
 #----------------------------------------------------------------------------
@@ -428,7 +575,41 @@ sub www_addArchive {
     
     return $self->session->privilege->insufficient unless $self->canAddFile;
 
+    my $session     = $self->session;
+    my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
+
+    $var->{ form_start      } 
+        = WebGUI::Form::formHeader( $session, {
+            action          => $self->getUrl('func=addArchiveSave'),
+        });
+    $var->{ form_end        }
+        = WebGUI::Form::formFooter( $session );
+
+    $var->{ form_submit     } 
+        = WebGUI::Form::submit( $session, {
+            name            => "submit",
+            value           => "Submit",
+        });
+
+    $var->{ form_archive    } 
+        = WebGUI::Form::File( $session, {
+            name            => "archive",
+            maxAttachments  => 1,
+            value           => ( $form->get("archive") ),
+        });
+
+    $var->{ form_keywords   } 
+        = WebGUI::Form::text( $session, {
+            name            => "keywords",
+            value           => ( $form->get("keywords") ),
+        });
+
+    $var->{ form_friendsOnly }
+        = WebGUI::Form::yesNo( $session, {
+            name            => "friendsOnly",
+            value           => ( $form->get("friendsOnly") ),
+        });
 
     return $self->processStyle(
         $self->processTemplate($var, $self->getParent->get("templateIdAddArchive"))
@@ -446,20 +627,27 @@ Process the form for adding an archive.
 sub www_addArchiveSave {
     my $self        = shift;
 
-    return $self->session->privilege->insufficient unless $self->canAddfile;
+    return $self->session->privilege->insufficient unless $self->canAddFile;
 
+    my $session     = $self->session;
     my $form        = $self->session->form;
+    my $i18n        = __PACKAGE__->i18n( $session );
     my $properties  = {
         keywords        => $form->get("keywords"),
         friendsOnly     => $form->get("friendsOnly"),
     };
     
-    my $storage     = $form->get("archive", "File");
-    my $filename    = $storage->getFilePath( $storage->getFiles->[0] );
+    my $storageId   = $form->get("archive", "File");
+    my $storage     = WebGUI::Storage->get( $session, $storageId );
+    my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
     $self->addArchive( $filename, $properties );
 
-    return $self->www_view;
+    $storage->delete;
+
+    return $self->processStyle(
+        sprintf $i18n->get('addArchive message'), $self->getUrl,
+    );
 }
 
 #-----------------------------------------------------------------------------
@@ -476,7 +664,7 @@ sub www_delete {
     return $self->session->privilege->insufficient unless $self->canEdit;
 
     my $var         = $self->getTemplateVars;
-    $var->{ url_yes     } = $self->getUrl("?func=deleteConfirm");
+    $var->{ url_yes     } = $self->getUrl("func=deleteConfirm");
 
     return $self->processStyle(
         $self->processTemplate( $var, $self->getParent->get("templateIdDeleteAlbum") )
@@ -496,9 +684,130 @@ sub www_deleteConfirm {
 
     return $self->session->privilege->insufficient unless $self->canEdit;
 
+    my $gallery     = $self->getParent;
+
     $self->purge;
     
-    return $self->getParent->www_view;
+    return $gallery->www_view;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Show the form to add / edit a GalleryAlbum asset.
+
+=cut
+
+sub www_edit {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    my $var         = $self->getTemplateVars;
+    my $i18n        = __PACKAGE__->i18n($session);
+
+    # Generate the form
+    if ($form->get("func") eq "add") {
+        $var->{ form_start  } 
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
+            });
+    }
+    else {
+        $var->{ form_start  } 
+            = WebGUI::Form::formHeader( $session, {
+                action      => $self->getUrl('func=editSave'),
+            });
+    }
+    $var->{ form_start } 
+        .= WebGUI::Form::hidden( $session, {
+            name        => "proceed",
+            value       => "showConfirmation",
+        });
+    
+    $var->{ form_end    }
+        = WebGUI::Form::formFooter( $session );
+
+    $var->{ form_cancel }
+        = WebGUI::Form::button( $session, {
+            name        => "cancel",
+            value       => $i18n->get("cancel"),
+            extras      => 'onclick="history.go(-1)"',
+        });
+    
+    $var->{ form_submit }
+        = WebGUI::Form::submit( $session, {
+            name        => "save",
+            value       => $i18n->get("save"),
+        });
+    
+    $var->{ form_title  }
+        = WebGUI::Form::text( $session, {
+            name        => "title",
+            value       => $form->get("title") || $self->get("title"),
+        });
+
+    $var->{ form_description }
+        = WebGUI::Form::HTMLArea( $session, {
+            name        => "description",
+            value       => $form->get("description") || $self->get("description"),
+        });
+
+    # Generate the file loop
+    my $thumbnailUrl        = $self->getThumbnailUrl;
+    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
+    for my $file ( @{ $var->{file_loop} } ) {
+        if ( $thumbnailUrl eq $file->{thumbnailUrl} ) {
+            $file->{ isAlbumThumbnail } = 1;
+        }
+    }
+
+    return $self->processStyle( 
+        $self->processTemplate( $var, $self->getParent->get("templateIdEditAlbum") )
+    );
+}
+
+#-----------------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+Save the asset edit form. Overridden to give a nice message when a photo or 
+album is added
+
+=cut
+
+sub www_editSave {
+    my $self        = shift;
+    my $form        = $self->session->form;
+    my $i18n        = __PACKAGE__->i18n($self->session);
+    $self->SUPER::www_editSave;
+
+    if ( $form->get("assetId") eq "new" ) {
+        return sprintf $i18n->get("addFile message"), $self->getUrl,
+    }
+    else {
+        return sprintf $i18n->get("save message"), $self->getUrl,
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_showConfirmation ( ) 
+
+Shows the confirmation message after adding / editing a gallery album. 
+Provides links to view the album.
+
+=cut
+
+sub www_showConfirmation {
+    my $self        = shift;
+    my $i18n        = __PACKAGE__->i18n( $self->session );
+
+    my $output      = sprintf $i18n->get('save message'), $self->getUrl;
+
+    return $self->processStyle(
+        $output
+    );
 }
 
 #-----------------------------------------------------------------------------
@@ -547,7 +856,27 @@ sub www_viewRss {
 
     return $self->session->privilege->insufficient unless $self->canView;
 
+    my $var         = $self->getTemplateVars;
+    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
     
+    # Fix URLs to be full URLs
+    for my $key ( qw( url url_viewRss ) ) {
+        $var->{ $key } = $self->session->url->getSiteURL . $var->{ $key };
+    }
+
+    # Process the file loop to add additional params
+    for my $file ( @{ $var->{file_loop} } ) {
+        # Fix URLs to be full URLs
+        for my $key ( qw( url ) ) { 
+            $file->{ $key }  = $self->session->url->getSiteURL . $file->{$key}; 
+        }
+
+        $file->{ rssDate } 
+            = $self->session->datetime->epochToMail( $file->{creationDate} );
+    }
+
+    $self->session->http->setMimeType('text/xml');
+    return $self->processTemplate( $var, $self->getParent->get('templateIdViewAlbumRss') );
 }
 
 1;

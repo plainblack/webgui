@@ -112,8 +112,9 @@ sub installGalleryAlbumAsset {
 CREATE TABLE IF NOT EXISTS GalleryAlbum (
     assetId VARCHAR(22) BINARY NOT NULL,
     revisionDate BIGINT NOT NULL,
-    othersCanAdd INT,
     allowComments INT,
+    assetIdThumbnail VARCHAR(22) BINARY,
+    othersCanAdd INT,
     PRIMARY KEY (assetId, revisionDate)
 )
 ENDSQL
@@ -142,24 +143,29 @@ CREATE TABLE IF NOT EXISTS Gallery (
     templateIdAddArchive VARCHAR(22) BINARY,
     templateIdDeleteAlbum VARCHAR(22) BINARY,
     templateIdDeleteFile VARCHAR(22) BINARY,
+    templateIdEditAlbum VARCHAR(22) BINARY,
     templateIdEditFile VARCHAR(22) BINARY,
     templateIdListAlbums VARCHAR(22) BINARY,
     templateIdListAlbumsRss VARCHAR(22) BINARY,
-    templateIdListUserFiles VARCHAR(22) BINARY,
-    templateIdListUserFilesRss VARCHAR(22) BINARY,
+    templateIdListFilesForUser VARCHAR(22) BINARY,
+    templateIdListFilesForUserRss VARCHAR(22) BINARY,
     templateIdMakeShortcut VARCHAR(22) BINARY,
     templateIdSearch VARCHAR(22) BINARY,
-    templateIdSlideshow VARCHAR(22) BINARY,
-    templateIdThumbnails VARCHAR(22) BINARY,
+    templateIdViewSlideshow VARCHAR(22) BINARY,
+    templateIdViewThumbnails VARCHAR(22) BINARY,
     templateIdViewAlbum VARCHAR(22) BINARY,
     templateIdViewAlbumRss VARCHAR(22) BINARY,
     templateIdViewFile VARCHAR(22) BINARY,
+    viewAlbumAssetId VARCHAR(22),
+    viewDefault ENUM('album','list'),
+    viewListOrderBy VARCHAR(40),
+    viewListOrderDirection ENUM('ASC','DESC'),
     workflowIdCommit VARCHAR(22) BINARY,
     PRIMARY KEY (assetId, revisionDate)
 )
 ENDSQL
     
-    
+    $session->config->addToArray("assets","WebGUI::Asset::Wobject::Gallery");
 
     print "DONE!\n" unless $quiet;
 }
@@ -177,8 +183,8 @@ CREATE TABLE IF NOT EXISTS Photo (
     revisionDate BIGINT NOT NULL,
     exifData LONGTEXT,
     friendsOnly INT,
+    location VARCHAR(255),
     rating INT,
-    storageIdPhoto VARCHAR(22) BINARY,
     userDefined1 TEXT,
     userDefined2 TEXT,
     userDefined3 TEXT,
@@ -215,7 +221,71 @@ ENDSQL
 }
 
 
-# ---- DO NOT EDIT BELOW THIS LINE ----
+# --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
+
+#----------------------------------------------------------------------------
+# Add a package to the import node
+sub addPackage {
+    my $session     = shift;
+    my $file        = shift;
+
+    # Make a storage location for the package
+    my $storage     = WebGUI::Storage->createTemp( $session );
+    $storage->addFileFromFilesystem( $file );
+
+    # Import the package into the import node
+    WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+
+    # Make the package not a package anymore
+}
+
+#----------------------------------------------------------------------------
+# Add a template from a file
+sub addTemplate {
+    my $session     = shift;
+    my $file        = shift;
+    my $newFolder   = shift;
+
+    open(FILE,"<",$file);
+    my $first = 1;
+    my $create = 0;
+    my $head = 0;
+    my %properties = (className=>"WebGUI::Asset::Template");
+    while (my $line = <FILE>) {
+        if ($first) {
+            $line =~ m/^\#(.*)$/;
+            $properties{id} = $1;
+            $first = 0;
+        } 
+        elsif ($line =~ m/^\#create$/) {
+            $create = 1;
+        } 
+        elsif ($line =~ m/^\#(.*):(.*)$/) {
+            $properties{$1} = $2;
+        } 
+        elsif ($line =~ m/^~~~$/) {
+            $head = 1;
+        } 
+        elsif ($head) {
+            $properties{headBlock} .= $line;
+        } 
+        else {
+            $properties{template} .= $line;	
+        }
+    }
+    close(FILE);
+    if ($create) {
+        $$newFolder = createNewTemplatesFolder(WebGUI::Asset->getImportNode($session)) 
+            unless (defined $$newFolder);
+        my $template = $$newFolder->addChild(\%properties, $properties{id});
+    } 
+    else {
+        my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
+        if (defined $template) {
+            my $newRevision = $template->addRevision(\%properties);
+        }
+    }
+}
 
 #-------------------------------------------------
 sub start {
@@ -244,49 +314,24 @@ sub finish {
 
 #-------------------------------------------------
 sub updateTemplates {
-	my $session = shift;
-	return undef unless (-d "templates-".$toVersion);
-        print "\tUpdating templates.\n" unless ($quiet);
-	opendir(DIR,"templates-".$toVersion);
-	my @files = readdir(DIR);
-	closedir(DIR);
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $newFolder = undef;
-	foreach my $file (@files) {
-		next unless ($file =~ /\.tmpl$/);
-		open(FILE,"<templates-".$toVersion."/".$file);
-		my $first = 1;
-		my $create = 0;
-		my $head = 0;
-		my %properties = (className=>"WebGUI::Asset::Template");
-		while (my $line = <FILE>) {
-			if ($first) {
-				$line =~ m/^\#(.*)$/;
-				$properties{id} = $1;
-				$first = 0;
-			} elsif ($line =~ m/^\#create$/) {
-				$create = 1;
-			} elsif ($line =~ m/^\#(.*):(.*)$/) {
-				$properties{$1} = $2;
-			} elsif ($line =~ m/^~~~$/) {
-				$head = 1;
-			} elsif ($head) {
-				$properties{headBlock} .= $line;
-			} else {
-				$properties{template} .= $line;	
-			}
-		}
-		close(FILE);
-		if ($create) {
-			$newFolder = createNewTemplatesFolder($importNode) unless (defined $newFolder);
-			my $template = $newFolder->addChild(\%properties, $properties{id});
-		} else {
-			my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
-			if (defined $template) {
-				my $newRevision = $template->addRevision(\%properties);
-			}
-		}
-	}
+    my $session = shift;
+    return undef unless (-d "templates-".$toVersion);
+    print "\tUpdating templates.\n" unless ($quiet);
+    opendir(DIR,"templates-".$toVersion);
+    my @files = readdir(DIR);
+    closedir(DIR);
+    my $newFolder = undef;
+    foreach my $file (@files) {
+        next unless ($file =~ /\.(tmpl|wgpkg)$/);
+        my $type    = $1;
+        $file       = "templates-" . $toVersion . "/" . $file;
+        if ($type eq "tmpl") {
+            addTemplate( $session, $file, \$newFolder );
+        }
+        elsif ($type eq "wgpkg") {
+            addPackage( $session, $file );
+        }
+    }
 }
 
 #-------------------------------------------------

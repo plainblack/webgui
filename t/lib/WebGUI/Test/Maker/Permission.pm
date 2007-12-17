@@ -55,9 +55,13 @@ Test::More
 
 Create a new WebGUI::Test::Maker::Permission object.
 
+=cut
+
 =head2 get
 
-Get a setting. Set L<set> for a list of settings.
+Get a setting. See C<set> for a list of settings.
+
+=cut
 
 #----------------------------------------------------------------------------
 
@@ -116,11 +120,13 @@ The permissions method to test
 
 =item pass
 
-An array reference of userIds that should pass the permissions test.
+An array reference of userIds or WebGUI::User objects that should pass the 
+permissions test.
 
 =item fail
 
-An array reference of userIds that should fail the permissions test.
+An array reference of userIds or WebGUI::User objects that should fail the 
+permissions test.
 
 =back
 
@@ -145,6 +151,16 @@ sub prepare {
             if $test->{pass} && ref $test->{pass} ne "ARRAY";
         croak("Couldn't prepare: Test $test_num, fail is not an array reference")
             if $test->{fail} && ref $test->{fail} ne "ARRAY";
+
+        # Make sure pass and fail arrayrefs are userIds
+        for my $array ( $test->{pass, fail} ) {
+            for ( my $i = 0; $i < @$array; $i++ ) {
+                # If is a User object, replace with userId
+                if ( blessed $array->[$i] && $array->[$i]->isa("WebGUI::User") ) {
+                    $array->[$i] = $array->[$i]->userId;
+                }
+            }
+        }
 
         push @{$self->{_tests}}, $test;
     }

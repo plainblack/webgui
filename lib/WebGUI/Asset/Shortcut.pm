@@ -593,6 +593,26 @@ sub getPrefFieldsToImport {
 	return split("\n",$self->getValue("prefFieldsToImport"));
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getTemplateVars
+
+Gets the template vars for this shortcut.
+
+=cut
+
+sub getTemplateVars {
+    my $self            = shift;
+
+    my $shortcut        = $self->getShortcut;
+    if ( $shortcut->can('getTemplateVars') ) {
+        return $shortcut->getTemplateVars;
+    }
+    else {
+        return $shortcut->get;
+    }
+}
+
 #-------------------------------------------------------------------
 sub isDashlet {
 	my $self = shift;
