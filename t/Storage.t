@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 77; # increment this value for each test you create
+my $numTests = 80; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -262,8 +262,9 @@ cmp_bag($s3copy->getFiles(), [ @filesToCopy ], 'copy: passing explicit variable 
 #
 ####################################################
 
-is(scalar @{ $storage1->getFiles}, 3, 'storage1 has 2 files');
+is(scalar @{ $storage1->getFiles }, 4, 'storage1 has 4 files');
 is($storage1->deleteFile("testfile-hash-renamed.file"), 1, 'deleteFile: deleted 1 file');
+is($storage1->deleteFile("testfile-hash-copied.file"), 1, 'deleteFile: deleted 1 file');
 is($storage1->deleteFile("WebGUI.pm"), 1, 'deleteFile: deleted another file');
 cmp_bag($storage1->getFiles, [$filename], 'deleteFile: storage1 has only 1 file');
 

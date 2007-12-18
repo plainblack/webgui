@@ -119,6 +119,7 @@ our $HELP = {
                 namespace   => 'Asset_GalleryAlbum',
             },
         ],
+        variables   => [ ],
     },
     
     'help slideshow' => {
@@ -134,6 +135,7 @@ our $HELP = {
                 namespace   => 'Asset_GalleryAlbum',
             },
         ],
+        variables   => [ ],
     },
 
     'help thumbnails' => {

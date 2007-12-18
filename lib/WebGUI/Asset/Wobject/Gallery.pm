@@ -447,18 +447,31 @@ check. If no userId is passed, will check the current user.
 
 Users can edit this gallery if they are part of the C<groupIdEdit> group.
 
+Also checks if a user is adding a GalleryAlbum and allows them to if they are
+part of the C<groupIdAddFile> group.
+
 =cut
 
 sub canEdit {
     my $self        = shift;
     my $userId      = shift;
 
-    my $user        = $userId
-                    ? WebGUI::User->new( $self->session, $userId )
-                    : $self->session->user
-                    ;
+    my $form        = $self->session->form;
 
-    return $user->isInGroup( $self->get("groupIdEdit") );
+    if ( $form->get('func') eq "add" ) {
+        return $self->canAddFile( $userId );
+    }
+    elsif ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" ) {
+        return $self->canAddFile( $userId );
+    }
+    else {
+        my $user        = $userId
+                        ? WebGUI::User->new( $self->session, $userId )
+                        : $self->session->user
+                        ;
+        
+        return $user->isInGroup( $self->get("groupIdEdit") );
+    }
 }
 
 #----------------------------------------------------------------------------

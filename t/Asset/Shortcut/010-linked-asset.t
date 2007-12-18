@@ -50,11 +50,10 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 10;
+plan tests => 9;
 
 #----------------------------------------------------------------------------
 # Test shortcut's link to original asset
-# plan => 3
 my $original = $shortcut->getShortcut;
 
 ok(
@@ -74,7 +73,6 @@ is(
 
 #----------------------------------------------------------------------------
 # Test trashing snippet trashes shortcut also
-# plan tests => 3
 $snippet->trash;
 $shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
 
@@ -95,7 +93,6 @@ ok(
 
 #----------------------------------------------------------------------------
 # Test restoring snippet restores shortcut also
-# plan tests => 3
 $snippet->publish;
 $shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
 
@@ -111,7 +108,6 @@ ok(
 
 #----------------------------------------------------------------------------
 # Test purging snippet purges shortcut also
-# plan tests => 2
 $snippet->purge;
 $shortcut   = WebGUI::Asset->newByDynamicClass($session, $shortcut->getId);
 
@@ -120,7 +116,3 @@ ok(
     "Purge Linked Asset: Shortcut is not defined",
 );
 
-ok(
-    !grep({ $_->getId eq $shortcut->getId } @{ $snippet->getAssetsInTrash }),
-    "Purge Linked Asset: Shortcut is not in trash",
-);

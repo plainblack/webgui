@@ -165,6 +165,19 @@ sub appendTemplateVarsFileLoop {
 
 #----------------------------------------------------------------------------
 
+=head2 canAdd ( )
+
+Override canAdd to ignore its permissions check. Permissions are handled
+by the parent Gallery and other permissions methods.
+
+=cut
+
+sub canAdd {
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canAddFile ( [userId] )
 
 Returns true if the user can add a file to this album. C<userId> is a WebGUI
@@ -467,12 +480,20 @@ approval workflow.
 
 sub processPropertiesFromFormPost {
     my $self        = shift;
+    my $form        = $self->session->form;
     my $errors      = $self->SUPER::processPropertiesFromFormPost || [];
 
     # Return if error
     return $errors  if @$errors;
 
-    # Passes all checks
+    ### Passes all checks
+    # Fix if adding a new GalleryAlbum
+    if ( $form->get('assetId') eq "new" ) {
+        $self->update({
+            ownerUserId         => $self->session->user->userId,
+        });
+    }
+
     $self->requestAutoCommit;
 }
 

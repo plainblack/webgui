@@ -25,10 +25,11 @@ use WebGUI::Session;
 use WebGUI::Image;
 use WebGUI::Storage::Image;
 use WebGUI::Asset::File::Image;
+use WebGUI::Form::File;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 8;
+plan tests => 7;
 
 my $session = WebGUI::Test->session;
 
@@ -75,15 +76,8 @@ is($storage->getId, $asset->getStorageLocation->getId, 'Cached Asset storage loc
 
 $versionTag->commit;
 
-my $imageStorage = WebGUI::Storage::Image->create($session);
-$mocker->set_always('getValueFromPost', $imageStorage->getId);
-my $imageFormStorage = $asset->getStorageFromPost();
-isa_ok($imageFormStorage, 'WebGUI::Storage::Image', 'Asset::Image::getStorageFromPost');
-
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
-	##Storage is cleaned up by rolling back the version tag
-    $imageStorage->delete;
 }

@@ -159,6 +159,19 @@ sub applyConstraints {
 
 #----------------------------------------------------------------------------
 
+=head2 canAdd ( )
+
+Override canAdd to ignore its permissions check. Permissions are handled
+by the parent Gallery and other permissions methods.
+
+=cut
+
+sub canAdd {
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canComment ( [userId] )
 
 Returns true if the user can comment on this asset. C<userId> is a WebGUI 
@@ -556,12 +569,21 @@ sub prepareView {
 
 sub processPropertiesFromFormPost {
     my $self    = shift;
+    my $form    = $self->session->form;
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
 
     # Return if errors
     return $errors if @$errors;
     
-    # Passes all checks
+    ### Passes all checks
+    # Fix if adding a new photo
+    if ( $form->get("assetId") eq "new" ) {
+        $self->update({
+            ownerUserId         => $self->session->user->userId,
+        });
+    }
+
+
     $self->requestAutoCommit;
 }
 
