@@ -15,6 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
+use Carp qw( croak );
 
 =head1 NAME
 
@@ -82,9 +83,9 @@ sub addChild {
 	$self->session->db->commit;
 	$properties->{assetId} = $id;
 	$properties->{parentId} = $self->getId;
-	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties);
+	my $temp = WebGUI::Asset->newByPropertyHashRef($self->session,$properties) || croak "Couldn't create a new $properties->{className} asset!";
 	$temp->{_parent} = $self;
-	my $newAsset = $temp->addRevision($properties,$now, {skipAutoCommitWorkflows=>$options->{skipAutoCommitWorkflows}});
+	my $newAsset = $temp->addRevision($properties, $now, $options); 
 	$self->updateHistory("added child ".$id);
 	$self->session->http->setStatus(201,"Asset Creation Successful");
 	return $newAsset;

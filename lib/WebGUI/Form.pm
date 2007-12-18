@@ -15,6 +15,8 @@ package WebGUI::Form;
 =cut
 
 use strict;
+use Carp qw( croak );
+use Scalar::Util qw( blessed );
 use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::RichEdit;
@@ -92,7 +94,7 @@ sub formFooter {
 
 #-------------------------------------------------------------------
 
-=head2 formHeader ( session, hashRef )
+=head2 formHeader ( session, options )
 
 Returns a form header.
 
@@ -100,13 +102,16 @@ Returns a form header.
 
 A reference to the current session.
 
-=head3 hashRef
+=head3 options
 
 A hash reference that contains one or more of the following parameters.
 
 =head4 action
 
 The form action. Defaults to the current page.
+
+NOTE: If the C<action> contains a query string (?param=value), C<formHeader> 
+will  translate the parameters into hidden form elements automatically.
 
 =head4 method
 
@@ -118,28 +123,36 @@ The form enctype. Defaults to "multipart/form-data".
 
 =head4 extras
 
-If you want to add anything special to the form header like javascript actions or stylesheet info, then use this.
+If you want to add anything special to the form header like javascript 
+actions or stylesheet info, then use this.
 
 =cut
 
 sub formHeader {
-	my $session = shift;
-	my $params = shift;
-        my $action = $params->{action} || $session->url->page();
-	my $hidden;
-	if ($action =~ /\?/) {
-		my ($path,$query) = split(/\?/,$action);
-		$action = $path;
-		my @params = split(/\;/,$query);
-		foreach my $param (@params) {
-			$param =~ s/amp;(.*)/$1/;
-			my ($name,$value) = split(/\=/,$param);
-			$hidden .= hidden($session,{name=>$name,value=>$value});
-		}
-	}
-        my $method = $params->{method} || "post";
-        my $enctype = $params->{enctype} || "multipart/form-data";
-	return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$params->{extras}.'><div class="formContents">'.$hidden;
+    my $session     = shift;
+    my $params      = shift     || {};
+
+    croak "First parameter must be WebGUI::Session object"
+        unless blessed $session && $session->isa( "WebGUI::Session" );
+    croak "Second parameter must be hash reference"
+        if ref $params ne "HASH";
+    
+    my $action      = exists $params->{ action  } ? $params->{ action   } : $session->url->page();
+    my $method      = exists $params->{ method  } ? $params->{ method   } : "post";
+    my $enctype     = exists $params->{ enctype } ? $params->{ enctype  } : "multipart/form-data";
+
+    # Fix a query string in the action URL
+    my $hidden;
+    if ($action =~ /\?/) {
+        ($action, my $query) = split /\?/, $action, 2;
+        my @params = split /[&;]/, $query;
+        foreach my $param ( @params ) {
+            my ($name, $value) = split /=/, $param;
+            $hidden .= hidden( $session, { name => $name, value => $value } );
+        }
+    }
+
+    return '<form action="'.$action.'" enctype="'.$enctype.'" method="'.$method.'" '.$params->{extras}.'><div class="formContents">'.$hidden;
 }
 
 

@@ -15,6 +15,8 @@ package WebGUI::Storage;
 =cut
 
 use Archive::Tar;
+use Carp qw( croak );
+use Cwd;
 use File::Copy qw(cp);
 use FileHandle;
 use File::Find;
@@ -24,7 +26,6 @@ use Storable qw(nstore retrieve);
 use strict;
 use warnings;
 use WebGUI::Utility;
-use Carp;
 
 =head1 NAME
 
@@ -64,6 +65,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $newstore = $store->untar($filename);
 
 
+ $store->copyFile($filename, $newFilename);
  $store->delete;
  $store->deleteFile($filename);
  $store->rename($filename, $newFilename);
@@ -202,6 +204,7 @@ sub addFileFromFormPost {
 	my $filename;
 	my $attachmentCount = 1;
 	foreach my $upload ($self->session->request->upload($formVariableName)) {
+            $self->session->errorHandler->info("Trying to get " . $upload->filename);
 		return $filename if $attachmentCount > $attachmentLimit;
 		my $tempFilename = $upload->filename();
 		next unless $tempFilename;
@@ -225,6 +228,7 @@ sub addFileFromFormPost {
 				print $file $buffer;
 			}
 			close($file);
+                        $self->session->errorHandler->info("Got ".$upload->filename);
 		} else {
 			$self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
 			return;
@@ -343,6 +347,31 @@ sub copy {
 
 #-------------------------------------------------------------------
 
+=head2 copyFile ( filename, newFilename )
+
+Copy a file in this storage location. C<filename> is the file to copy. 
+C<newFilename> is the new file to create.
+
+=cut
+
+sub copyFile {
+    my $self        = shift;
+    my $filename    = shift;
+    my $newFilename = shift;
+
+    croak "Can't find '$filename' in storage location " . $self->getId
+        unless -e $self->getPath($filename);
+    croak "Second argument must be a filename"
+        unless $newFilename;
+
+    cp( $self->getPath($filename), $self->getPath($newFilename) )
+        || croak "Couldn't copy '$filename' to '$newFilename': $!";
+
+    return;
+}
+
+#-------------------------------------------------------------------
+
 =head2 create ( session )
 
 Creates a new storage location on the file system.
@@ -354,9 +383,9 @@ A reference to the current session;
 =cut
 
 sub create {
-	my $class   = shift;
-	my $session = shift;
-	my $id      = $session->id->generate();
+    my $class   = shift;
+    my $session = shift;
+    my $id      = $session->id->generate();
 	
     #Determine whether or not to use case insensitive files
     my $config          = $session->config;
@@ -365,14 +394,16 @@ sub create {
     
     #$session->errorHandler->warn($caseInsensitive.": $id\n".Carp::longmess()."\n");
     #For case insensitive operating systems, convert guid to hex
-    if($caseInsensitive) {
+    if ($caseInsensitive) {
         my $hexId = $session->id->toHex($id);
         $db->write("insert into storageTranslation (guidValue,hexValue) values (?,?)",[$id,$hexId]);
     }
     
     my $self = $class->get($session,$id);
-	$self->_makePath;
-	return $self;
+    $self->_makePath;
+
+    $session->errorHandler->info("Created storage location $id as a $class");
+    return $self;
 }
 
 
@@ -446,6 +477,7 @@ sub delete {
 		    $db->write("delete from storageTranslation where guidValue=?",[$self->getId]);
 	    }
 	}
+        $self->session->errorHandler->info("Deleted storage ".$self->getId);
 	return;
 }
 
@@ -753,6 +785,8 @@ Returns a full path to this storage location.
 
 If specified, we'll return a path to the file rather than the storage location.
 
+NOTE: Does not check if the file exists. This is a feature.
+
 =cut
 
 sub getPath {
@@ -898,21 +932,22 @@ Pass in a storage location object to create the tar file in, instead of having a
 =cut
 
 sub tar {
-	my $self = shift;
-	my $filename = shift;
-	my $temp = shift || WebGUI::Storage->createTemp($self->session);
+    my $self = shift;
+    my $filename = shift;
+    my $temp = shift || WebGUI::Storage->createTemp($self->session);
     chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
-	my @files = ();
-	find(sub { push(@files, $File::Find::name)}, ".");
-	if ($Archive::Tar::VERSION eq '0.072') {
-		my $tar = Archive::Tar->new();
-		$tar->add_files(@files);
-		$tar->write($temp->getPath($filename),1);
-		
-	} else {
-		Archive::Tar->create_archive($temp->getPath($filename),1,@files);
-	}
-	return $temp;
+    my @files = ();
+    find(sub { push(@files, $File::Find::name)}, ".");
+    if ($Archive::Tar::VERSION eq '0.072') {
+        my $tar = Archive::Tar->new();
+        $tar->add_files(@files);
+        $tar->write($temp->getPath($filename),1);
+            
+    } 
+    else {
+        Archive::Tar->create_archive($temp->getPath($filename),1,@files);
+    }
+    return $temp;
 }
 
 #-------------------------------------------------------------------
@@ -932,12 +967,17 @@ Pass in a storage location object to extract the contents to, instead of having 
 =cut
 
 sub untar {
-    my $self = shift;
-    my $filename = shift;
-    my $temp = shift || WebGUI::Storage->createTemp($self->session);
+    my $self        = shift;
+    my $filename    = shift;
+    my $temp        = shift || WebGUI::Storage->createTemp($self->session);
+
+    my $originalDir = cwd;
     chdir $temp->getPath;
+    
     Archive::Tar->extract_archive($self->getPath($filename),1);
     $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+    
+    chdir $originalDir;
     return $temp;
 }
 

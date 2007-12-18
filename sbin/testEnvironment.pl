@@ -122,6 +122,8 @@ checkModule("Locale::US");
 checkModule("Weather::Com::Finder","0.5.1");
 checkModule("Class::InsideOut","1.06");
 checkModule("HTML::TagCloud","0.34");
+checkModule("Image::ExifTool","7.00");
+checkModule("Archive::Any","0.093");
 
 
 ###################################
@@ -200,8 +202,8 @@ print "\nTesting complete!\n\n";
 #----------------------------------------
 sub checkModule {
     my $module = shift;
-	my $version = shift || 0;
-	my $skipInstall = shift;
+    my $version = shift || 0;
+    my $skipInstall = shift;
     my $afterinstall = shift;	
     unless (defined $afterinstall) { $afterinstall = 0; }
     printTest("Checking for module $module");

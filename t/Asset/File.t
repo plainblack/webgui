@@ -26,6 +26,8 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 plan tests => 9;
 
+#TODO: This script tests certain aspects of WebGUI::Storage and it should not
+
 my $session = WebGUI::Test->session;
 
 ##Create a storage location

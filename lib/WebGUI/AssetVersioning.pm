@@ -87,12 +87,12 @@ Posts) will know not to send them under certain conditions.
 sub addRevision {
     my $self             = shift;
     my $properties       = shift;
-	my $now              = shift     || $self->session->datetime->time();
-	my $options          = shift;
-	
+    my $now              = shift     || $self->session->datetime->time();
+    my $options          = shift;
+
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
-    
-	my $workingTag      
+
+    my $workingTag      
         = ($autoCommitId) 
             ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) 
             : WebGUI::VersionTag->getWorking($self->session)
@@ -112,8 +112,7 @@ sub addRevision {
         $self->session->user->userId, 
         $workingTag->getId, 
         $self->getId,
-        ]
-    );
+    ]);
     
     foreach my $definition (@{$self->definition($self->session)}) {
         unless ($definition->{tableName} eq "assetData") {

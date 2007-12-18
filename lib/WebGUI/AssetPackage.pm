@@ -125,12 +125,16 @@ A hash reference containing the exported data.
 =cut
 
 sub importAssetData {
-    my $self = shift;
-    my $data = shift;
-    my $error = $self->session->errorHandler;
-    my $id = $data->{properties}{assetId};
-    my $class = $data->{properties}{className};
-    my $version = $data->{properties}{revisionDate};
+    my $self        = shift;
+    my $data        = shift;
+    my $error       = $self->session->errorHandler;
+    my $id          = $data->{properties}{assetId};
+    my $class       = $data->{properties}{className};
+    my $version     = $data->{properties}{revisionDate};
+
+    # Load the class
+    WebGUI::Asset->loadModule( $self->session, $class );
+
     my $asset;
     my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
     if ($assetExists) { # update an existing revision
@@ -194,40 +198,40 @@ A reference to a WebGUI::Storage object that contains a webgui package file.
 =cut
 
 sub importPackage {
-	my $self = shift;
-	my $storage = shift;
-	my $decompressed = $storage->untar($storage->getFiles->[0]);
-	my %assets = ();
-	my $error = $self->session->errorHandler;
-	$error->info("Importing package.");
-	foreach my $file (sort(@{$decompressed->getFiles})) {
-		next unless ($decompressed->getFileExtension($file) eq "json");
-		$error->info("Found data file $file");
-		my $data = eval{
+    my $self = shift;
+    my $storage = shift;
+    my $decompressed = $storage->untar($storage->getFiles->[0]);
+    my %assets = ();
+    my $error = $self->session->errorHandler;
+    $error->info("Importing package.");
+    foreach my $file (sort(@{$decompressed->getFiles})) {
+        next unless ($decompressed->getFileExtension($file) eq "json");
+        $error->info("Found data file $file");
+        my $data = eval{
             local $JSON::UnMapping = 1;
             JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))
         };
-		if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
-			$error->error("package corruption: ".$@) if ($@);
-			return "corrupt";
-		}
-		$error->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
-		foreach my $storageId (@{$data->{storage}}) {
-			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
-			$decompressed->untar($storageId.".storage", $assetStorage);
-		}
-		my $asset = $assets{$data->{properties}{parentId}} || $self;
-		my $newAsset = $asset->importAssetData($data);
+        if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
+            $error->error("package corruption: ".$@) if ($@);
+            return "corrupt";
+        }
+        $error->info("Data file $file is valid and represents asset ".$data->{properties}{assetId});
+        foreach my $storageId (@{$data->{storage}}) {
+            my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
+            $decompressed->untar($storageId.".storage", $assetStorage);
+        }
+        my $asset = $assets{$data->{properties}{parentId}} || $self;
+        my $newAsset = $asset->importAssetData($data);
         $newAsset->importAssetCollateralData($data);
-		$assets{$newAsset->getId} = $newAsset;
-	}
-	if ($self->session->setting->get("autoRequestCommit")) {
+        $assets{$newAsset->getId} = $newAsset;
+    }
+    if ($self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {
             WebGUI::VersionTag->getWorking($self->session)->requestCommit;
         } else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+            $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
         }
-	}
+    }
     return;
 }
 

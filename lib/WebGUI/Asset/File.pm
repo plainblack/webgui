@@ -16,6 +16,7 @@ package WebGUI::Asset::File;
 
 use strict;
 use base 'WebGUI::Asset';
+use Carp;
 use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
@@ -54,17 +55,17 @@ Override the default method in order to deal with attachments.
 =cut
 
 sub addRevision {
-	my $self = shift;
-	my $properties = shift;
-	
-	if ($self->get("storageId") ne "") {
-		my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
-		$properties->{storageId} = $newStorage->getId;
-	}
-	
-	my $newSelf = $self->SUPER::addRevision($properties);
-	
-	return $newSelf;
+    my $self        = shift;
+    my $properties  = shift;
+    
+    if ($self->get("storageId") ne "") {
+        my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
+        $properties->{storageId} = $newStorage->getId;
+    }
+    
+    my $newSelf = $self->SUPER::addRevision($properties, @_);
+    
+    return $newSelf;
 }
 
 #-------------------------------------------------------------------
@@ -172,23 +173,50 @@ Returns the TabForm object that will be used in generating the edit page for thi
 =cut
 
 sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session, 'Asset_File');
-	if ($self->get("filename") ne "") {
-		$tabform->getTab("properties")->readOnly(
-			-label=>$i18n->get('current file'),
-			-hoverHelp=>$i18n->get('current file description', 'Asset_File'),
-			-value=>'<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
-		);
+    my $self        = shift;
+    my $tabform     = $self->SUPER::getEditForm();
+    my $i18n        = WebGUI::International->new($self->session, 'Asset_File');
 
-	}
-	$tabform->getTab("properties")->file(
-        -name           => 'newFile',
-        -label          => $i18n->get('new file'),
-        -hoverHelp      => $i18n->get('new file description'),
-	);
-	return $tabform;
+    $tabform->getTab("properties")->raw( 
+        '<tr><td>'.$i18n->get('new file').'<td colspan="2">'
+        . $self->getEditFormUploadControl 
+        . '</td></tr>'
+    );
+
+    return $tabform;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getEditFormUploadControl
+
+Returns the HTML to render the upload box and link to delete the existing 
+file, if necessary.
+
+=cut
+
+sub getEditFormUploadControl {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session, 'Asset_File');
+    my $html        = '';
+
+    if ($self->get("filename") ne "") {
+        $html .= WebGUI::Form::readOnly( $session, {
+            label       => $i18n->get('current file'),
+            hoverHelp   => $i18n->get('current file description', 'Asset_File'),
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+        });
+    }
+
+    # Control to upload a new file
+    $html .= WebGUI::Form::file( $session, {
+        name        => 'newFile',
+        label       => $i18n->get('new file'),
+        hoverHelp   => $i18n->get('new file description'),
+    });
+
+    return $html;
 }
 
 
@@ -199,10 +227,10 @@ sub getFileUrl {
 	return $self->getStorageLocation->getUrl($self->get("filename"));
 }
 
-
 #-------------------------------------------------------------------
 sub getFileIconUrl {
 	my $self = shift;
+        return unless $self->get("filename"); ## Why do I have to do this when creating new Files?
 	return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
 }
 
@@ -221,20 +249,32 @@ sub getIcon {
 }
 
 
+#----------------------------------------------------------------------------
+
+=head2 getStorageClass
+
+Get the full classname of the WebGUI::Storage we should use for this asset.
+
+=cut
+
+sub getStorageClass {
+    return 'WebGUI::Storage';
+}
+
 #-------------------------------------------------------------------
 
 =head2 getStorageFromPost
 
-We have to wrap this operation because WebGUI::Asset::File::Image calls SUPER processPropertiesFormFormPost,
-which gives it the wrong type of Storage object.
+Get the storage location created by the form post.
 
 =cut
 
 sub getStorageFromPost {
-	my $self      = shift;
+    my $self      = shift;
     my $storageId = shift;
     my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
-    return WebGUI::Storage->get($self->session, $fileStorageId);
+    $self->session->errorHandler->info( "File Storage Id: $fileStorageId" );
+    return $self->getStorageClass->get($self->session, $fileStorageId);
 }
 
 
@@ -283,41 +323,21 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
-	my $self    = shift;
-	my $session = $self->session;
-	$self->SUPER::processPropertiesFromFormPost;
-	
-	#Get the storage location out of memory.  If you call getStorageLocation you risk creating another one.
-	my $storageLocation = $self->{_storageLocation};
-	my $storageId       = undef;
-	$storageId          = $storageLocation->getId if(defined $storageLocation);
-	
-	#Now remove the storage location to prevent wierd caching stuff.
-	delete $self->{_storageLocation};
-    
-    #Clear the storage location if a file was uploaded.
-    if($session->form->get("newFile_file") ne "") {
-	   $storageLocation->clear();
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $errors  = $self->SUPER::processPropertiesFromFormPost;
+    return $errors if $errors;
+
+    if (my $storageId = $session->form->get('newFile','File')) {
+        $session->errorHandler->info("Got a new file for asset " . $self->getId);
+        my $storage     = $self->getStorageClass->get( $session, $storageId);
+        my $filePath    = $storage->getPath( $storage->getFiles->[0] );
+        $self->setFile( $filePath );
+        $storage->delete;
     }
 
-    #Pass in the storage Id to prevent another one from being created.
-    my $storage = $self->getStorageFromPost($storageId);
-
-	if (defined $storage) {
-		my $filename = $storage->getFiles()->[0];
-
-		if (defined $filename) {
-			my %data;
-			$data{filename} = $filename;
-			$data{storageId} = $storage->getId;
-			$data{title} = $filename unless ($session->form->process("title"));
-			$data{menuTitle} = $filename unless ($session->form->process("menuTitle"));
-			$data{url} = $self->getParent->get('url').'/'.$filename unless ($session->form->process("url"));
-            $self->setStorageLocation($storage);
-			$self->update(\%data);
-		}
-	}
-    $self->applyConstraints;
+    return;
 }
 
 
@@ -327,7 +347,7 @@ sub purge {
 	my $self = shift;
 	my $sth = $self->session->db->read("select storageId from FileAsset where assetId=".$self->session->db->quote($self->getId));
 	while (my ($storageId) = $sth->array) {
-		WebGUI::Storage->get($self->session,$storageId)->delete;
+		$self->getStorageClass->get($self->session,$storageId)->delete;
 	}
 	$sth->finish;
 	return $self->SUPER::purge;
@@ -355,34 +375,68 @@ sub purgeRevision {
 	return $self->SUPER::purgeRevision;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 setFile ( filename )
+
+Set the file being handled by this storage location with a file from the 
+system.
+
+=cut
+
+sub setFile {
+    my $self        = shift;
+    my $filename    = shift;
+    my $storage     = $self->getStorageLocation;
+
+    # Clear the old file if any
+    $storage->clear;
+
+    $storage->addFileFromFilesystem($filename) 
+        || croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
+        # NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+
+    $self->updatePropertiesFromStorage;
+    $self->applyConstraints;
+}
+
 #-------------------------------------------------------------------
+
+=head2 setSize ( fileSize )
+
+Set the size of this asset by including all the files in its storage
+location. C<fileSize> is an integer of additional bytes to include in
+the asset size.
+
+=cut
+
 sub setSize {
-	my $self = shift;
-	my $fileSize = shift || 0;
-	my $storage = $self->getStorageLocation;
-	if (defined $storage) {	
-	    foreach my $file (@{$storage->getFiles}) {
-		    $fileSize += $storage->getFileSize($file);
-	    }
-	}
-	return $self->SUPER::setSize($fileSize);
+    my $self        = shift;
+    my $fileSize    = shift || 0;
+    my $storage     = $self->getStorageLocation;
+    if (defined $storage) {	
+        foreach my $file (@{$storage->getFiles}) {
+            $fileSize += $storage->getFileSize($file);
+        }
+    }
+    return $self->SUPER::setSize($fileSize);
 }
 
 #-------------------------------------------------------------------
 
 sub setStorageLocation {
-	my $self    = shift;
+    my $self    = shift;
     my $storage = shift;
-	if (defined $storage) {
+    if (defined $storage) {
         $self->{_storageLocation} = $storage;
-	}
-	elsif ($self->get("storageId") eq "") {
-		$self->{_storageLocation} = WebGUI::Storage->create($self->session);
-		$self->update({storageId=>$self->{_storageLocation}->getId});
-	}
+    }
+    elsif ($self->get("storageId") eq "") {
+        $self->{_storageLocation} = $self->getStorageClass->create($self->session);
+        $self->update({storageId=>$self->{_storageLocation}->getId});
+    }
     else {
-		$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
-	}
+        $self->{_storageLocation} = $self->getStorageClass->get($self->session,$self->get("storageId"));
+    }
 }
 
 #-------------------------------------------------------------------
@@ -409,6 +463,27 @@ sub update {
 	if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
 		$self->getStorageLocation->setPrivileges($self->get("ownerUserId"),$self->get("groupIdView"),$self->get("groupIdEdit"));
 	}
+}
+
+#----------------------------------------------------------------------------
+
+=head2 updatePropertiesFromStorage ( )
+
+Updates the asset properties from the file tracked by this asset. Should be
+called every time the file is changed to ensure the correct filename is
+in the asset properties.
+
+=cut
+
+sub updatePropertiesFromStorage {
+    my $self        = shift;
+    my $storage     = $self->getStorageLocation; 
+    my $filename    = $storage->getFiles->[0];
+    $self->session->errorHandler->info("Updating file asset filename to $filename");
+    $self->update({
+        filename        => $filename,
+    });
+    return;
 }
 
 #-------------------------------------------------------------------

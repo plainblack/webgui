@@ -52,11 +52,11 @@ use WebGUI::Storage::Image;
 
 These methods are available from this class:
 
-my $boolean = $self->generateThumbnail($filename);
-my $url = $self->getThumbnailUrl($filename);
-my $boolean = $self->isImage($filename);
-my ($captchaFile, $challenge) = $self->addFileFromCaptcha;
-$self->resize($imageFile, $width, $height);
+ my $boolean = $self->generateThumbnail($filename);
+ my $url = $self->getThumbnailUrl($filename);
+ my $boolean = $self->isImage($filename);
+ my ($captchaFile, $challenge) = $self->addFileFromCaptcha;
+ $self->resize($imageFile, $width, $height);
 
 =cut
 
@@ -313,7 +313,7 @@ sub getThumbnailUrl {
 		return '';
 	}
     if (! isIn($filename, @{ $self->getFiles() })) {
-        $self->session->errorHandler->error("Can't make a thumbnail for a file that is not in my storage location.");
+        $self->session->errorHandler->error("Can't make a thumbnail for a file named '$filename' that is not in my storage location.");
         return '';
     }
 	return $self->getUrl("thumb-".$filename);
@@ -360,41 +360,42 @@ The new height of the image in pixels.
 =cut
 
 sub resize { 
-	my $self = shift;
-	my $filename = shift;
-	my $width = shift;
-	my $height = shift;
-	unless (defined $filename) {
-		$self->session->errorHandler->error("Can't resize when you haven't specified a file.");
-		return 0;
-	}
-	unless ($self->isImage($filename)) {
-		$self->session->errorHandler->error("Can't resize something that's not an image.");
-		return 0;
-	}
-	unless ($width || $height) {
-		$self->session->errorHandler->error("Can't resize with no resizing parameters.");
-		return 0;
-	}
-        my $image = $graphicsPackage->new;
-        my $error = $image->Read($self->getPath($filename));
-	if ($error) {
-		$self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
-		return 0;
-	}
-        my ($x, $y) = $image->Get('width','height');
-	if ($width && !$height) { # proportional scale by width
-		$height = $width / $x * $y;
-	} elsif (!$width && $height) { # proportional scale by height
-		$width = $height * $x / $y;
-	}
-        $image->Scale(width=>$width, height=>$height);
-        $error = $image->Write($self->getPath($filename));
-	if ($error) {
-		$self->session->errorHandler->error("Couldn't create thumbnail: ".$error);
-		return 0;
-	}
-	return 1;
+    my $self = shift;
+    my $filename = shift;
+    my $width = shift;
+    my $height = shift;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't resize something that's not an image.");
+        return 0;
+    }
+    unless ($width || $height) {
+        $self->session->errorHandler->error("Can't resize with no resizing parameters.");
+        return 0;
+    }
+    my $image = $graphicsPackage->new;
+    my $error = $image->Read($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        return 0;
+    }
+    my $geometry;
+    if (!$width || !$height) { 
+        $geometry   = $width || $height; 
+    } 
+    else {
+        $geometry   = $width . "x" . $height;
+    }
+    $image->Resize( geometry => $geometry, filter => "lanczos" );
+    $error = $image->Write($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        return 0;
+    }
+    return 1;
 }
 
 
