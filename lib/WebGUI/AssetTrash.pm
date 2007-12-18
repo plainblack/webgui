@@ -15,6 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
+use WebGUI::Asset::Shortcut;
 
 =head1 NAME
 
@@ -146,6 +147,16 @@ sub purge {
         }
 	}
 
+    # Delete shortcuts to this asset
+    # Also publish any shortcuts to this asset that are in the trash
+    my $shortcuts 
+        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { 
+            returnObjects   => 1,
+        });
+    for my $shortcut ( @$shortcuts ) {
+        $shortcut->purge;
+    }
+
     # gotta delete stuff we've exported
 	unless ($options->{skipExported}) {
 		$self->_invokeWorkflowOnExportedFiles($self->session->setting->get('purgeWorkflow'), 1);
@@ -190,29 +201,40 @@ sub purge {
 
 =head2 trash ( )
 
-Removes asset from lineage, places it in trash state. The "gap" in the lineage is changed in state to trash-limbo.
+Removes asset from lineage, places it in trash state. The "gap" in the 
+lineage is changed in state to trash-limbo.
 
 =cut
 
 sub trash {
-	my $self = shift;
-	return if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
-	foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
-		$asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
-	}
+    my $self = shift;
+    return if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+    foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
+        $asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
+    }
 
-	my $db = $self->session->db;
-	$db->beginTransaction;
-	my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
-	while (my ($id) = $sth->array) {
-		$db->write("delete from assetIndex where assetId=?",[$id]);
-	}
-	$db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
-	$db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
-	$db->commit;
-	$self->{_properties}{state} = "trash";
-	$self->updateHistory("trashed");
-	$self->purgeCache;
+    # Trash any shortcuts to this asset
+    my $shortcuts 
+        = WebGUI::Asset::Shortcut->getShortcutsForAssetId($self->session, $self->getId, { returnObjects => 1});
+    for my $shortcut ( @$shortcuts ) {
+        $shortcut->trash;
+    }
+
+    # Raw database work is more efficient than $asset->update
+    my $db = $self->session->db;
+    $db->beginTransaction;
+    my $sth = $db->read("select assetId from asset where lineage like ?",[$self->get("lineage").'%']);
+    while (my ($id) = $sth->array) {
+        $db->write("delete from assetIndex where assetId=?",[$id]);
+    }
+    $db->write("update asset set state='trash-limbo' where lineage like ?",[$self->get("lineage").'%']);
+    $db->write("update asset set state='trash', stateChangedBy=?, stateChanged=? where assetId=?",[$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
+    $db->commit;
+
+    # Update ourselves since we didn't use update()
+    $self->{_properties}{state} = "trash";
+    $self->updateHistory("trashed");
+    $self->purgeCache;
 }
 
 require WebGUI::Workflow::Activity::DeleteExportedFiles;

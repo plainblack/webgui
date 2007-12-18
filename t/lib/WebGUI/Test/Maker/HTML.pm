@@ -2,6 +2,7 @@ package WebGUI::Test::Maker::HTML;
 
 use base 'WebGUI::Test::Maker';
 use Scalar::Util qw( blessed );
+use Carp qw( croak );
 use Test::More;
 
 
@@ -71,6 +72,8 @@ Create a new WebGUI::Test::Maker::HTML object.
 =head2 get
 
 Get a setting. Set L<set> for a list of settings.
+
+=cut
 
 #----------------------------------------------------------------------------
 
@@ -187,7 +190,7 @@ sub prepare {
         croak("Couldn't prepare: Test $test_num, test_regex is not an array reference")
             if $test->{test_regex} && ref $test->{test_regex} ne "ARRAY";
         croak("Couldn't prepare: Test $test_num, $test->{test_privilege} is not a valid test_privilege value (adminOnly, insufficient, noAccess, notMember, vitalComponent)")
-            if $test->{test_privilege} && $test->{test_privilege} =~ m/adminOnly|insufficient|noAccess|notMember|vitalComponent/;
+            if $test->{test_privilege} && $test->{test_privilege} !~ m/adminOnly|insufficient|noAccess|notMember|vitalComponent/;
 
         push @{$self->{_tests}}, $test;
     }

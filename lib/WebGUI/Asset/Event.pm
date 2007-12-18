@@ -1140,21 +1140,23 @@ sub getRecurrenceFromForm {
 
 =head2 getRelatedLinks
 
-Gets the related links.
+Gets an array of hashrefs of related links.
 
 =cut
 
 sub getRelatedLinks {
     my $self    = shift;
-    return () unless $self->get("relatedLinks");
-    return split /\n+/, $self->get("relatedLinks");
+
 }
 
-
-
-
-
 #-------------------------------------------------------------------
+
+=head2 getStorageLocation ( )
+
+Get the storage location associated with this Event.
+
+=cut
+
 sub getStorageLocation {
     my $self = shift;
     unless (exists $self->{_storageLocation}) {
@@ -1189,6 +1191,7 @@ sub getTemplateVars {
     $var{"isPublic"} = 1
         if $self->get("groupIdView") eq "7";
     $var{"groupToView"} = $self->get("groupIdView");
+    $var{"timeZone"}    = $self->get('timeZone');        
     
     # Start date/time
     my $dtStart    = $self->getDateTimeStart;
@@ -1271,39 +1274,39 @@ sub getTemplateVars {
     $var{ "urlParent"   } = $self->getParent->getUrl;        
     $var{ "urlSearch"   } = $self->getParent->getSearchUrl;        
     
-    $var{"timeZone"}    = $self->get('timeZone');        
-    
     # Related links
     $var{ "relatedLinks" } = [];
     push @{$var{"relatedLinks"}}, { "linkUrl" => $_ }
         for ($self->getRelatedLinks);
 	
     # Attachments
-
     my $gotImage;
     my $gotAttachment;
-    @{$var{'attachment_loop'}} = ();
+    $var{'attachment_loop'} = [];
     unless ($self->get("storageId") eq "") {
         my $storage = $self->getStorageLocation;
         foreach my $filename (@{$storage->getFiles}) {
+            # Set top-level template vars for the first image and first non-image
             if (!$gotImage && $storage->isImage($filename)) {
-                $var{"image.url"} = $storage->getUrl($filename);
-                $var{"image.thumbnail"} = $storage->getThumbnailUrl($filename);
+                $var{ "image.url"       } = $storage->getUrl($filename);
+                $var{ "image.thumbnail" } = $storage->getThumbnailUrl($filename);
                 $gotImage = 1;
             }
             if (!$gotAttachment && !$storage->isImage($filename)) {
-                $var{"attachment.url"} = $storage->getUrl($filename);
-                $var{"attachment.icon"} = $storage->getFileIconUrl($filename);
-                $var{"attachment.name"} = $filename;
+                $var{ "attachment.url"  } = $storage->getUrl($filename);
+                $var{ "attachment.icon" } = $storage->getFileIconUrl($filename);
+                $var{ "attachment.name" } = $filename;
                 $gotAttachment = 1;
-                }   
-            push(@{$var{"attachment_loop"}}, {
-                url=>$storage->getUrl($filename),
-                icon=>$storage->getFileIconUrl($filename),
-                filename=>$filename,
-                thumbnail=>$storage->getThumbnailUrl($filename),
-                isImage=>$storage->isImage($filename)
-                });
+            }   
+
+            # All attachments get added to the loop
+            push @{$var{"attachment_loop"}}, {
+                url         => $storage->getUrl($filename),
+                icon        => $storage->getFileIconUrl($filename),
+                filename    => $filename,
+                thumbnail   => $storage->getThumbnailUrl($filename),
+                isImage     => $storage->isImage($filename),
+            };
         }
     }
     
@@ -1456,8 +1459,8 @@ sub processPropertiesFromFormPost {
     # All day events have no time
     if ($form->param("allday")) {
         $self->update({
-            startTime   => '',
-            endTime     => '',
+            startTime   => undef,
+            endTime     => undef,
         });
     }
     # Non-allday events need timezone conversion
@@ -1563,24 +1566,25 @@ sub processPropertiesFromFormPost {
     return;
 }
 
+#-------------------------------------------------------------------
 
 sub purge {
-        my $self = shift;
-        my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
-        while (my ($storageId) = $sth->array) {
+    my $self = shift;
+    my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
+    while (my ($storageId) = $sth->array) {
         my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
-                $storage->delete if defined $storage;
-        }
-        $sth->finish;
-        return $self->SUPER::purge;
+        $storage->delete if defined $storage;
+    }
+    $sth->finish;
+    return $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------
 
 sub purgeRevision {
-        my $self = shift;
-        $self->getStorageLocation->delete;
-        return $self->SUPER::purgeRevision;
+    my $self = shift;
+    $self->getStorageLocation->delete;
+    return $self->SUPER::purgeRevision;
 }
 
 ####################################################################
@@ -1677,7 +1681,7 @@ sub setRelatedLinks {
     
     $self->update({
         relatedLinks    => join("\n", @links),
-        });
+    });
 }
 
 ####################################################################

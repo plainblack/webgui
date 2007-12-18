@@ -1,5 +1,4 @@
 7.5.0
- - rfe: Default log level to ERROR
  - rfe: Search Asset returns URLs
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
@@ -9,6 +8,10 @@
    (Diona Kidd, Knowmad Technologies)
  - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
  - Added pluggable URL and content handlers.
+ - Added Gallery asset 
+ - Fixed inheritence problems with File/Image assets
+ - Added ability for upgrade scripts to contain packages to deploy
+ - Fixed chdir problem in Storage -- more remain though
 
 7.4.19
  - fix: Import Package does nothing when re-importing trashed package

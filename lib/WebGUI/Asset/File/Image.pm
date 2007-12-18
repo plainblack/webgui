@@ -15,15 +15,11 @@ package WebGUI::Asset::File::Image;
 =cut
 
 use strict;
-use WebGUI::Asset::File;
+use base 'WebGUI::Asset::File';
 use WebGUI::Storage::Image;
 use WebGUI::HTMLForm;
 use WebGUI::Utility;
 use WebGUI::Form::Image;
-
-
-our @ISA = qw(WebGUI::Asset::File);
-
 
 =head1 NAME
 
@@ -98,27 +94,27 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Image");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-                tableName=>'ImageAsset',
-                className=>'WebGUI::Asset::File::Image',
-		icon=>'image.gif',
-                properties=>{
-                                thumbnailSize=>{
-                                        fieldType=>'integer',
-                                        defaultValue=>$session->setting->get("thumbnailSize")
-                                        },
-				parameters=>{
-					fieldType=>'textarea',
-					defaultValue=>'style="border-style:none;"'
-					}
-                        }
-                });
-        return $class->SUPER::definition($session,$definition);
+    my $class       = shift;
+    my $session     = shift;
+    my $definition  = shift;
+    my $i18n        = WebGUI::International->new($session,"Asset_Image");
+    push @{$definition}, {
+        assetName       => $i18n->get('assetName'),
+        tableName       => 'ImageAsset',
+        className       => 'WebGUI::Asset::File::Image',
+        icon            => 'image.gif',
+        properties => {
+            thumbnailSize => {
+                fieldType       => 'integer',
+                defaultValue    => $session->setting->get("thumbnailSize"),
+            },
+            parameters => {
+                fieldType       => 'textarea',
+                defaultValue    => 'style="border-style:none;"',
+            },
+        },
+    };
+    return $class->SUPER::definition($session,$definition);
 }
 
 
@@ -184,37 +180,16 @@ sub getEditForm {
 	return $tabform;
 }
 
+#----------------------------------------------------------------------------
 
+=head2 getStorageClass
 
-#-------------------------------------------------------------------
-
-=head2 getStorageFromPost
-
-Sub class this method from WebGUI::Asset::File so the storage object is the correct type.
+Returns the class name of the WebGUI::Storage we should use for this asset.
 
 =cut
 
-sub getStorageFromPost {
-	my $self      = shift;
-    my $storageId = shift;
-    my $fileStorageId = WebGUI::Form::Image->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
-    return WebGUI::Storage::Image->get($self->session, $fileStorageId);
-}
-
-
-#-------------------------------------------------------------------
-
-sub getStorageLocation {
-	my $self = shift;
-	unless (exists $self->{_storageLocation}) {
-		if ($self->get("storageId") eq "") {
-			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
-			$self->update({storageId=>$self->{_storageLocation}->getId});
-		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
-		}
-	}
-	return $self->{_storageLocation};
+sub getStorageClass {
+    return 'WebGUI::Storage::Image';
 }
 
 #-------------------------------------------------------------------
@@ -253,31 +228,6 @@ sub prepareView {
 	$self->{_viewTemplate} = $template;
 }
 
-
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-    $self->applyConstraints;
-}
-
-#-------------------------------------------------------------------
-
-sub setStorageLocation {
-	my $self    = shift;
-    my $storage = shift;
-	if (defined $storage) {
-        $self->{_storageLocation} = $storage;
-	}
-	elsif ($self->get("storageId") eq "") {
-		$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
-		$self->update({storageId=>$self->{_storageLocation}->getId});
-	}
-    else {
-		$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
-	}
-}
-
 #-------------------------------------------------------------------
 sub view {
 	my $self = shift;
@@ -295,6 +245,20 @@ sub view {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 setFile ( filename )
+
+Extend the superclass setFile to automatically generate thumbnails.
+
+=cut
+
+sub setFile {
+    my $self    = shift;
+    $self->SUPER::setFile(@_);
+    $self->generateThumbnail;
 }
 
 #-------------------------------------------------------------------

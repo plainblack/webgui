@@ -205,6 +205,16 @@ cmp_deeply($storageHash, $thawedHash, 'getFileContentsAsHashref: thawed hash cor
 
 ####################################################
 #
+# copyFile
+#
+####################################################
+
+$storage1->copyFile("testfile-hash.file", "testfile-hash-copied.file");
+ok (-e $storage1->getPath("testfile-hash-copied.file"),'copyFile created file with new name');
+ok (-e $storage1->getPath("testfile-hash.file"), "copyFile original file still exists");
+
+####################################################
+#
 # renameFile
 #
 ####################################################

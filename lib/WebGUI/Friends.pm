@@ -311,7 +311,7 @@ sub sendMessage {
             userId  => $userId,
             sentBy  => $myId,
             status  => 'unread',
-            });
+        });
     }
 }
 

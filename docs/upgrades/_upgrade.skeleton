@@ -12,6 +12,8 @@ use lib "../../lib";
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
+use WebGUI::Storage;
+use WebGUI::Asset;
 
 
 my $toVersion = "0.0.0"; # make this match what version you're going to
@@ -33,8 +35,71 @@ finish($session); # this line required
 #}
 
 
+# --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
-# ---- DO NOT EDIT BELOW THIS LINE ----
+#----------------------------------------------------------------------------
+# Add a package to the import node
+sub addPackage {
+    my $session     = shift;
+    my $file        = shift;
+
+    # Make a storage location for the package
+    my $storage     = WebGUI::Storage->createTemp( $session );
+    $storage->addFileFromFilesystem( $file );
+
+    # Import the package into the import node
+    WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+
+    # Make the package not a package anymore
+}
+
+#----------------------------------------------------------------------------
+# Add a template from a file
+sub addTemplate {
+    my $session     = shift;
+    my $file        = shift;
+    my $newFolder   = shift;
+
+    open(FILE,"<",$file);
+    my $first = 1;
+    my $create = 0;
+    my $head = 0;
+    my %properties = (className=>"WebGUI::Asset::Template");
+    while (my $line = <FILE>) {
+        if ($first) {
+            $line =~ m/^\#(.*)$/;
+            $properties{id} = $1;
+            $first = 0;
+        } 
+        elsif ($line =~ m/^\#create$/) {
+            $create = 1;
+        } 
+        elsif ($line =~ m/^\#(.*):(.*)$/) {
+            $properties{$1} = $2;
+        } 
+        elsif ($line =~ m/^~~~$/) {
+            $head = 1;
+        } 
+        elsif ($head) {
+            $properties{headBlock} .= $line;
+        } 
+        else {
+            $properties{template} .= $line;	
+        }
+    }
+    close(FILE);
+    if ($create) {
+        $$newFolder = createNewTemplatesFolder(WebGUI::Asset->getImportNode($session)) 
+            unless (defined $$newFolder);
+        my $template = $$newFolder->addChild(\%properties, $properties{id});
+    } 
+    else {
+        my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
+        if (defined $template) {
+            my $newRevision = $template->addRevision(\%properties);
+        }
+    }
+}
 
 #-------------------------------------------------
 sub start {
@@ -63,49 +128,24 @@ sub finish {
 
 #-------------------------------------------------
 sub updateTemplates {
-	my $session = shift;
-	return undef unless (-d "templates-".$toVersion);
-        print "\tUpdating templates.\n" unless ($quiet);
-	opendir(DIR,"templates-".$toVersion);
-	my @files = readdir(DIR);
-	closedir(DIR);
-	my $importNode = WebGUI::Asset->getImportNode($session);
-	my $newFolder = undef;
-	foreach my $file (@files) {
-		next unless ($file =~ /\.tmpl$/);
-		open(FILE,"<templates-".$toVersion."/".$file);
-		my $first = 1;
-		my $create = 0;
-		my $head = 0;
-		my %properties = (className=>"WebGUI::Asset::Template");
-		while (my $line = <FILE>) {
-			if ($first) {
-				$line =~ m/^\#(.*)$/;
-				$properties{id} = $1;
-				$first = 0;
-			} elsif ($line =~ m/^\#create$/) {
-				$create = 1;
-			} elsif ($line =~ m/^\#(.*):\s*(.*)$/) {
-				$properties{$1} = $2;
-			} elsif ($line =~ m/^~~~$/) {
-				$head = 1;
-			} elsif ($head) {
-				$properties{headBlock} .= $line;
-			} else {
-				$properties{template} .= $line;	
-			}
-		}
-		close(FILE);
-		if ($create) {
-			$newFolder = createNewTemplatesFolder($importNode) unless (defined $newFolder);
-			my $template = $newFolder->addChild(\%properties, $properties{id});
-		} else {
-			my $template = WebGUI::Asset->new($session,$properties{id}, "WebGUI::Asset::Template");
-			if (defined $template) {
-				my $newRevision = $template->addRevision(\%properties);
-			}
-		}
-	}
+    my $session = shift;
+    return undef unless (-d "templates-".$toVersion);
+    print "\tUpdating templates.\n" unless ($quiet);
+    opendir(DIR,"templates-".$toVersion);
+    my @files = readdir(DIR);
+    closedir(DIR);
+    my $newFolder = undef;
+    foreach my $file (@files) {
+        next unless ($file =~ /\.(tmpl|wgpkg)$/);
+        my $type    = $1;
+        $file       = "templates-" . $toVersion . "/" . $file;
+        if ($type eq "tmpl") {
+            addTemplate( $session, $file, \$newFolder );
+        }
+        elsif ($type eq "wgpkg") {
+            addPackage( $session, $file );
+        }
+    }
 }
 
 #-------------------------------------------------
