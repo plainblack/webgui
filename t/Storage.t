@@ -392,6 +392,18 @@ foreach my $iconTest (@{ $fileIconTests }) {
 	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
 }
 
+
+####################################################
+#
+# Make sure after all this that our CWD is still the same
+#
+####################################################
+
+TODO: {
+    local $TODO = 'Write a test to ensure our CWD remains the same after all these calls to storage';
+    ok(0,'CWD must remain the same after addFileFromFilesystem, tar, untar, etc...');
+};
+
 ####################################################
 #
 # Setup data driven tests here, to keep the top part of the
