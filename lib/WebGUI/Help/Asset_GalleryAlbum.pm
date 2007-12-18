@@ -175,7 +175,7 @@ our $HELP = {
                 namespace   => 'Asset_GalleryAlbum',
             },
         ],
-        variables   => {
+        variables   => [
             {
                 name        => 'error',
                 description => 'helpvar error',
@@ -208,7 +208,7 @@ our $HELP = {
                 name        => 'form_friendsOnly',
                 description => 'helpvar form_friendsOnly',
             },
-        },
+        ],
     },
 
     'help delete' => {
