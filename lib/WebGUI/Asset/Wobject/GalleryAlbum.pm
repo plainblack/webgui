@@ -564,20 +564,26 @@ sub view_thumbnails {
 
 #----------------------------------------------------------------------------
 
-=head2 www_addArchive ( )
+=head2 www_addArchive ( params )
 
-Show the form to add an archive of files to this gallery. 
+Show the form to add an archive of files to this gallery. C<params> is a hash
+reference of parameters with the following keys:
+
+ error          => An error message to show to the user.
 
 =cut
 
 sub www_addArchive {
     my $self        = shift;
+    my $params      = shift;
     
     return $self->session->privilege->insufficient unless $self->canAddFile;
 
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
+
+    $var->{ error           } = $params->{ error };
 
     $var->{ form_start      } 
         = WebGUI::Form::formHeader( $session, {
@@ -639,6 +645,11 @@ sub www_addArchiveSave {
     
     my $storageId   = $form->get("archive", "File");
     my $storage     = WebGUI::Storage->get( $session, $storageId );
+    if (!$storage) {
+        return $self->www_addArchive({
+            error       => sprintf $i18n->get('addArchive error too big'),
+        });
+    }
     my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
     $self->addArchive( $filename, $properties );

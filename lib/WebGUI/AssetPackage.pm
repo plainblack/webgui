@@ -276,12 +276,12 @@ Returns a tarball file for the user to download containing the package data.
 =cut
 
 sub www_exportPackage {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->get("isPackage") && $self->canEdit && $self->session->user->isInGroup(4));
-	my $storage = $self->exportPackage;
-	my $filename = $storage->getFiles->[0];
-	$self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
-	return "redirect";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->get("isPackage") && $self->canEdit && $self->session->user->isInGroup(4));
+    my $storage = $self->exportPackage;
+    my $filename = $storage->getFiles->[0];
+    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    return "redirect";
 }
 
 #-------------------------------------------------------------------

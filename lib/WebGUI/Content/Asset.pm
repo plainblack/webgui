@@ -84,60 +84,65 @@ sub handler {
     my ($session) = @_;
     my ($errorHandler, $http, $var, $asset, $request, $config) = $session->quick(qw(errorHandler http var asset request config));
     my $output = "";
-        if ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
-			my $t = [Time::HiRes::gettimeofday()];
-			$output = page($session);
-			$t = Time::HiRes::tv_interval($t) ;
-			if ($output =~ /<\/title>/) {
-				$output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
-			} 
-            else {
-				# Kludge.
-				my $mimeType = $http->getMimeType();
-				if ($mimeType eq 'text/css') {
-					$session->output->print("\n/* Page generated in $t seconds. */\n");
-				} 
-                elsif ($mimeType eq 'text/html') {
-					$session->output->print("\nPage generated in $t seconds.\n");
-				} 
-                else {
-					# Don't apply to content when we don't know how
-					# to modify it semi-safely.
-				}
-			}
-		} 
+    if ($errorHandler->canShowPerformanceIndicators) { #show performance indicators if required
+        my $t = [Time::HiRes::gettimeofday()];
+        $output = page($session);
+        $t = Time::HiRes::tv_interval($t) ;
+        if ($output =~ /<\/title>/) {
+            $output =~ s/<\/title>/ : ${t} seconds<\/title>/i;
+        } 
         else {
+            # Kludge.
+            my $mimeType = $http->getMimeType();
+            if ($mimeType eq 'text/css') {
+                $session->output->print("\n/* Page generated in $t seconds. */\n");
+            } 
+            elsif ($mimeType eq 'text/html') {
+                $session->output->print("\nPage generated in $t seconds.\n");
+            } 
+            else {
+                # Don't apply to content when we don't know how
+                # to modify it semi-safely.
+            }
+        }
+    } 
+    else {
 
-            my $asset = getAsset($session, getRequestedAssetUrl($session));
+        my $asset = getAsset($session, getRequestedAssetUrl($session));
 
-            # display from cache if page hasn't been modified.
-			if ($var->get("userId") eq "1" && defined $asset && !$http->ifModifiedSince($asset->getContentLastModified)) { 
-				$http->setStatus("304","Content Not Modified");
-				$http->sendHeader;
-				$session->close;
-    			return Apache2::Const::OK;
-			} 
+        # display from cache if page hasn't been modified.
+        if ($var->get("userId") eq "1" && defined $asset && !$http->ifModifiedSince($asset->getContentLastModified)) { 
+            $http->setStatus("304","Content Not Modified");
+            $http->sendHeader;
+            $session->close;
+            return Apache2::Const::OK;
+        } 
 
-            # return the page.
-            else {					
-				$output = page($session, undef, $asset);
-			}
-		}
-		my $filename = $http->getStreamedFile();
-		if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
-			my $ct = guess_media_type($filename);
-            		my $oldContentType = $request->content_type($ct);
-            		if ($request->sendfile($filename) ) {
-				$session->close;
-    				return Apache2::Const::OK;
-			} else {
-                		$request->content_type($oldContentType);
-			}
-		}
-		$http->sendHeader();	#http object will only send the header once per request, so if the above sent a header as part of it's operation, this will do nothing.
-		unless ($http->isRedirect()) {
-			$session->output->print($output);
-		}
+        # return the page.
+        else {					
+            $output = page($session, undef, $asset);
+        }
+    }
+
+    my $filename = $http->getStreamedFile();
+    if ((defined $filename) && ($config->get("enableStreamingUploads") eq "1")) {
+        my $ct = guess_media_type($filename);
+        my $oldContentType = $request->content_type($ct);
+        if ($request->sendfile($filename) ) {
+            $session->close;
+            return Apache2::Const::OK;
+        } 
+        else {
+            $request->content_type($oldContentType);
+        }
+    }
+
+    # Uhm... why here and not somewhere else? Do content handlers manage their own content
+    # or should the URL handlers do it for them?
+    if ($output eq "redirect") {
+        $http->sendHeader;
+    }
+
     # ...
     return $output;
 }

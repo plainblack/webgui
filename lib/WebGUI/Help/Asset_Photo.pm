@@ -207,7 +207,8 @@ our $HELP = {
                 required    => 1,
             },
         ],
-    }
+    },
+
     'help view' => {
         title       => 'help view title',
         body        => 'help view body',

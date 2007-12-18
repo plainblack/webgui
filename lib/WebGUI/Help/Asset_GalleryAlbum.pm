@@ -177,6 +177,11 @@ our $HELP = {
         ],
         variables   => {
             {
+                name        => 'error',
+                description => 'helpvar error',
+                required    => 1,
+            },
+            {
                 name        => 'form_start',
                 description => 'helpvar form_start',
                 required    => 1,

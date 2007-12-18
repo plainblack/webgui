@@ -68,15 +68,15 @@ sub handler {
                             $session->http->sendHeader();
                             $session->output->print($output) 
                         }
-			            if ($session->errorHandler->canShowDebug()) {
-				            $session->output->print($session->errorHandler->showDebug(),1);
-			            }
+                        if ($session->errorHandler->canShowDebug()) {
+                            $session->output->print($session->errorHandler->showDebug(),1);
+                        }
                     }
                     last;
                 }
             }
-	    }
-		WebGUI::Affiliate::grabReferral($session);	# process affiliate tracking request
+        }
+        WebGUI::Affiliate::grabReferral($session);	# process affiliate tracking request
         $session->close;
         return Apache2::Const::OK;
     });

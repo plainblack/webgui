@@ -294,6 +294,16 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'helpvar error' => {
+        message     => 'An error message to show the user. Only defined when something went wrong.',
+        lastUpdated => 0,
+    },
+
+    'addArchive error too big' => {
+        message     => 'The archive you are trying to upload is too big. Please try again.',
+        lastUpdated => 0,
+    },
+
 };
 
 1;

@@ -390,6 +390,3 @@ sub createNewTemplatesFolder {
 	return $newFolder;
 }
 
-
-
->>>>>>> .merge-right.r5144
