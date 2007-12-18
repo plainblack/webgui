@@ -135,12 +135,12 @@ $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollater
 # makeResolutions gets default resolutions from a parent Photo Gallery asset
 $gallery
     = $node->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+        className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
     });
 $album
     = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 $photo
     = $album->addChild({
@@ -168,12 +168,12 @@ TODO: {
 # parent asset
 $gallery
     = $node->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+        className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "1600x1200\n1024x768\n800x600\n640x480",
     });
 $album
     = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 $photo
     = $album->addChild({

@@ -29,12 +29,12 @@ my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
 my $gallery
     = $node->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+        className           => "WebGUI::Asset::Wobject::Gallery",
         groupIdAddComment   => "2",
     });
 my $album
     = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 my $photo
     = $album->addChild({
@@ -49,7 +49,7 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan tests => 1;
 
 #----------------------------------------------------------------------------
 # Test with no comments
@@ -248,3 +248,4 @@ is(
     scalar @$ids, 1, 
     "www_addCommentSave -- Comment was added",
 );
+

@@ -31,11 +31,11 @@ $versionTag->set({name=>"Photo Test"});
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoGallery",
+        className           => "WebGUI::Asset::Wobject::Gallery",
     });
 my $album
     = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::PhotoAlbum",
+        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     });
 my $photo
     = $gallery->addChild({
@@ -50,4 +50,4 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan tests => 1;
