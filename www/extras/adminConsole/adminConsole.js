@@ -45,6 +45,9 @@ function switchToAdminConsole () {
         document.getElementById("console_workarea").className = "adminConsoleWorkArea";
         document.getElementById("console_toggle_off").className = "adminConsoleToggle";
         document.getElementById("console_toggle_on").className = "adminConsoleHidden";
+        
+        // force reflow to fix IE7
+        document.body.style.border = document.body.style.border;
 }
  
 function toggleAdminConsole () {
