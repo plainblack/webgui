@@ -382,14 +382,14 @@ sub resize {
         $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
         return 0;
     }
-    my $geometry;
-    if (!$width || !$height) { 
-        $geometry   = $width || $height; 
-    } 
-    else {
-        $geometry   = $width . "x" . $height;
+    my ($x, $y) = $image->Get('width','height');
+    if (!$height) { # proportional scale by width
+        $height = $width / $x * $y;
     }
-    $image->Resize( geometry => $geometry, filter => "lanczos" );
+    elsif (!$width) { # proportional scale by height
+        $width = $height * $x / $y;
+    }
+    $image->Resize( height => $height, width => $width, filter => "lanczos" );
     $error = $image->Write($self->getPath($filename));
     if ($error) {
         $self->session->errorHandler->error("Couldn't resize image: ".$error);
