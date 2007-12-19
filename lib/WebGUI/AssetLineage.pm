@@ -537,10 +537,16 @@ Returns an asset hash of the parent of current Asset.
 =cut
 
 sub getParent {
-	my $self = shift;
-	return $self if ($self->getId eq "PBasset000000000000001");
-	$self->{_parent} = WebGUI::Asset->newByDynamicClass($self->session,$self->get("parentId")) unless (defined $self->{_parent});
-	return $self->{_parent};
+    my $self        = shift;
+    
+    # Root asset is its own parent
+    return $self if ($self->getId eq "PBasset000000000000001");
+
+    unless ( $self->{_parent} ) {
+        $self->{_parent} = WebGUI::Asset->newByDynamicClass($self->session,$self->get("parentId"));
+    }
+
+    return $self->{_parent};
 }
 
 #-------------------------------------------------------------------

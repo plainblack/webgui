@@ -602,6 +602,24 @@ sub processStyle {
 
 #----------------------------------------------------------------------------
 
+=head2 purge ( )
+
+Purge the asset. Remove all comments on the photo.
+
+=cut
+
+sub purge {
+    my $self        = shift;
+    
+    for my $commentId ( @{ $self->getCommentIds } ) {
+        $self->deleteComment( $commentId );
+    }
+
+    return $self->SUPER::purge;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 setComment ( commentId, properties )
 
 Set a comment. If C<commentId> is C<"new">, create a new comment. C<properties>
@@ -618,6 +636,11 @@ sub setComment {
         unless $commentId;
     croak "Photo->setComment: properties must be a hash reference"
         unless $properties && ref $properties eq "HASH";
+    croak "Photo->setComment: properties must contain a bodyText key"
+        unless $properties->{ bodyText };
+
+    $properties->{ creationDate     } ||= WebGUI::DateTime->new($self->session, time)->toDatabase;
+    $properties->{ assetId          } = $self->getId;
 
     $self->session->db->setRow( 
         "Photo_comment", "commentId", 

@@ -8,7 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# The goal of this test is to get sthe getDownloadFileUrl and www_download()
+# The goal of this test is to test the getDownloadFileUrl and www_download()
 # methods
 
 use FindBin;
@@ -31,6 +31,7 @@ my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
+        imageResolutions    => "100\n200\n300",
     });
 my $album
     = $gallery->addChild({
@@ -44,9 +45,14 @@ my $photo
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    $photo->purge;
+    $album->purge
+    $gallery->purge;
     $versionTag->rollback();
 }
 
 #----------------------------------------------------------------------------
 # Tests
 plan tests => 1;
+
+

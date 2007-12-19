@@ -15,6 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use Carp qw( croak confess );
+use Scalar::Util qw( blessed );
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -1686,50 +1687,52 @@ no revision date is available it will return undef.
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
-	my $assetId = shift;
-	my $className = shift;
+    my $class           = shift;
+    my $session         = shift;
+    my $assetId         = shift;
+    my $className       = shift;
+    my $revisionDate    = shift || $class->getCurrentRevisionDate($session, $assetId);
 
-	unless (defined $assetId) {
-		$session->errorHandler->error("Asset constructor new() requires an assetId.");
-		return;
-	}
+    unless (defined $assetId) {
+        $session->errorHandler->error("Asset constructor new() requires an assetId.");
+        return;
+    }
 
-	my $revisionDate = shift || $class->getCurrentRevisionDate($session, $assetId);
-	return unless ($revisionDate);
+    return unless ($revisionDate);
 
-	unless ($class ne 'WebGUI::Asset' or defined $className) {
-		($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
-		unless ($className) {
-			$session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
-			return;
-		}
-	}
+    unless ($class ne 'WebGUI::Asset' or defined $className) {
+        ($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
+        unless ($className) {
+            $session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
+            return;
+        }
+    }
 
     if ($className) {
         $class = $class->loadModule($session, $className);        
         return unless (defined $class);
-	}
+    }
 
-	my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
-	my $properties = $cache->get;
-	if (exists $properties->{assetId}) {
-		# got properties from cache
-	} else {
-		$properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
-		unless (exists $properties->{assetId}) {
-			$session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
-			return;
-		}
-		$cache->set($properties,60*60*24);
-	}
-	if (defined $properties) {
-		my $object = { _session=>$session, _properties => $properties };
-		bless $object, $class;
-		return $object;
-	}	
-	return;
+    my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
+    my $properties = $cache->get;
+    if (exists $properties->{assetId}) {
+        # got properties from cache
+    } 
+    else {
+        $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
+        unless (exists $properties->{assetId}) {
+            $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
+            return;
+        }
+        $cache->set($properties,60*60*24);
+    }
+    if (defined $properties) {
+        my $object = { _session=>$session, _properties => $properties };
+        bless $object, $class;
+        return $object;
+    }	
+    $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
+    return;
 }
 
 #-------------------------------------------------------------------
@@ -1753,21 +1756,36 @@ A specific revision date for the asset to retrieve. If not specified, the most r
 =cut
 
 sub newByDynamicClass {
-	my $class = shift;
-	my $session = shift;
-        confess "newByDynamicClass requires WebGUI::Session" unless $session;
-	my $assetId = shift;
-	my $revisionDate = shift;
-	return unless defined $assetId;
-	my $assetClass = $session->stow->get("assetClass");
-	my $className = $assetClass->{$assetId};
-	unless ($className) {
-       		($className) = $session->db->quickArray("select className from asset where assetId=".$session->db->quote($assetId));
-		$assetClass->{$assetId} = $className;
-		$session->stow->set("assetClass",$assetClass);
-	}
-	return unless ($className);
-	return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
+    my $class           = shift;
+    my $session         = shift;
+    my $assetId         = shift;
+    my $revisionDate    = shift;
+    
+    confess "newByDynamicClass requires WebGUI::Session" 
+        unless $session && blessed $session eq 'WebGUI::Session';
+    confess "newByDynamicClass requires assetId"
+        unless $assetId;
+    
+    # Cache the className lookup
+    my $assetClass  = $session->stow->get("assetClass");
+    my $className   = $assetClass->{$assetId};
+
+    unless ($className) {
+        $className 
+            = $session->db->quickScalar(
+                "select className from asset where assetId=?",
+                [$assetId]
+            );
+        $assetClass->{ $assetId } = $className;
+        $session->stow->set("assetClass", $assetClass);
+    }
+        
+    unless ( $className ) {
+        $session->errorHandler->error("Couldn't find className for asset '$assetId'");
+        return;
+    }
+
+    return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
 }
 
 
