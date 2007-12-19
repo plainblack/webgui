@@ -26,7 +26,7 @@ my $session = WebGUI::Test->session;
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 80; # increment this value for each test you create
+my $numTests = 81; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -286,6 +286,8 @@ my $tempStor = WebGUI::Storage->createTemp($session);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
 is ($tempStor->{_part1}, 'temp', 'createTemp puts stuff in the temp directory');
+use Data::Dumper;
+diag Dumper $tempStor->getErrors();
 ok (-e $tempStor->getPath(), 'createTemp: directory was created');
 
 ####################################################
