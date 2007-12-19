@@ -230,24 +230,30 @@ sub definition {
 # prevent cross site scripting attacks
 
 sub _strip_html {
-    unless (ref $_[0]) {
-        return $_[0] = WebGUI::HTML::Filter($_[0], 'all');
+    my $ref = ref $_[0] ? shift : \( shift );
+    my $filtered = shift || [];
+    for my $found (@$filtered) {
+        return
+            if $ref eq $found;
     }
-    my $ref = shift;
-    if (ref $ref eq 'HASH') {
+    push @$filtered, $ref;
+    
+    if (ref $ref eq 'SCALAR') {
+        $$ref = WebGUI::HTML::filter($$ref, 'all');
+    }
+    elsif (ref $ref eq 'HASH') {
         if (exists $ref->{description}) {
             $ref->{description} = HTML::Entities::decode_entities($ref->{description});
         }
         foreach my $value (values %$ref) {
-            _strip_html($value);
+            _strip_html($value, $filtered);
         }
     }
     elsif (ref $ref eq 'ARRAY') {
         foreach my $value (@$ref) {
-            _strip_html($value);
+            _strip_html($value, $filtered);
         }
     }
-    return $ref;
 }
 
 #-------------------------------------------------------------------
@@ -314,8 +320,8 @@ sub _normalize_items {
                 }
 
                 # IE doesn't recognize &apos;
-                $item->{title} =~ s/&apos;/\'/g;
-                $item->{description} =~ s/&apos;/\'/g;
+                $item->{title} =~ s/&apos;/&#39;/g;
+                $item->{description} =~ s/&apos;/&#39;/g;
                 $item->{category} = [$item->{category}]
                     if ref $item->{category} ne 'ARRAY';  
 		appendChoppedDescriptionTemplateVars($item);
