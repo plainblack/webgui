@@ -26,8 +26,11 @@ use WebGUI::Asset::File::Image::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
+
+my @versionTags = ();
+push @versionTags, WebGUI::VersionTag->getWorking($session);
+$versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -36,24 +39,27 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $photo->purge;
-    $album->purge;
-    $gallery->purge;
-    $versionTag->rollback();
-};
+$versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 28;
+plan tests => 29;
 
 #----------------------------------------------------------------------------
 # Test with no comments
@@ -192,67 +198,88 @@ ok(
 # Test appendTemplateVarsForCommentForm
 TODO: {
     local $TODO = "Test appendTemplateVarsForCommentForm";
+    ok(0, "Test template variable generation");
 }
 
 #----------------------------------------------------------------------------
 # Test www_addCommentSave page sanity checks
 my $html;
-SKIP: {
-    skip "getParent isn't working in tests, so these tests fail...", 2;
-    $photo 
-        = $album->addChild({
-            className       => "WebGUI::Asset::File::Image::Photo",
-        });
+$photo 
+    = $album->addChild({
+        className       => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
 
 # Permissions
-    $html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
-                userId      => 1,
-                formParams  => { bodyText => "yes?" },
-            });
+$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
+            userId      => 1,
+            formParams  => { bodyText => "yes?" },
+        });
 
-    like(
-        $html, qr/permission denied/i,
-        "www_addCommentSave -- Permission denied if not Gallery->canAddComment",
-    );
+like(
+    $html, qr/permission denied/i,
+    "www_addCommentSave -- Permission denied if not Gallery->canAddComment",
+);
+
+my $i18n = $photo->i18n($session);
+
+SKIP: {
+    skip "www_addCommentSave needs to check for bodyText", 1;
 
 # Required fields
-    $html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
-                userId      => 2,
-                formParams  => { },
-            });
+$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
+            userId      => 1,
+            formParams  => { },
+        });
 
-    like(
-        $html, WebGUI::International->get($session, "Asset_Photo", "www_addCommentSave error missing required"),
-        "www_addCommentSave -- Must have bodyText defined",
-    );
+like(
+    $html, $i18n->get("www_addCommentSave error missing required"),
+    "www_addCommentSave -- Must have bodyText defined",
+);
+
 }
 
 #----------------------------------------------------------------------------
 # Test www_addCommentSave functionality
-SKIP: {
-    skip "getParent isn't working in tests, so these tests fail...", 4;
-    $html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
-                userId      => 2,
-                formParams  => { bodyText => "YES!", },
-            });
+$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
+            userId      => 1,
+            formParams  => { bodyText => "YES!", },
+        });
 
-    like(
-        $html, WebGUI::International->get($session, "Asset_Photo", "www_addCommentSave success"),
-        "www_addCommentSave -- page shows success message",
-    );
+like(
+    $html, $i18n->get("www_addCommentSave success"),
+    "www_addCommentSave -- page shows success message",
+);
 
-    my $ids = $photo->getCommentIds;
-    is(
-        scalar @$ids, 1, 
-        "www_addCommentSave -- Comment was added",
-    );
+my $ids = $photo->getCommentIds;
+is(
+    scalar @$ids, 1, 
+    "www_addCommentSave -- Comment was added",
+);
 
-    
-    is( 
-        $photo->getComment( $ids->[0] )->{visitorIp}, undef, 
-        "Non-visitor does not have their IP logged"
-    );
+
+is( 
+    $photo->getComment( $ids->[0] )->{visitorIp}, undef, 
+    "Non-visitor does not have their IP logged"
+);
+
+TODO: {
+    local $TODO = "Not programmed yet";
     
     # TODO
     ok( 0, "Visitor has their IP logged in visitorIp field" );
 }
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    foreach my $versionTag (@versionTags) {
+        $versionTag->rollback;
+    }
+};
+
+
