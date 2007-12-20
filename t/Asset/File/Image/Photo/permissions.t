@@ -24,14 +24,11 @@ use Test::More;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my @versionTags     = ();
 
-$session->errorHandler->warn('GOOD STUFF HERE');
 $session->user({ userId => 3 });
+my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
-
-diag $versionTags[-1]->getId;
 
 my $friend  = WebGUI::User->new($session, "new");
 WebGUI::Friends->new($session)->add( [ $friend->userId ] );
@@ -51,8 +48,8 @@ my $album
         groupIdEdit     => "",
         ownerUserId     => $session->user->userId,
     },
-    '',
-    0,
+    undef,
+    undef,
     {
         skipAutoCommitWorkflows => 1,
     });
@@ -71,13 +68,11 @@ my $photo
         groupIdEdit     => "3",
         ownerUserId     => $session->user->userId,
     },
-    '',
-    0,
+    undef,
+    undef,
     {
         skipAutoCommitWorkflows => 1,
     });
-
-diag $photo->get('tagId');
 
 $versionTags[-1]->commit;
 
@@ -101,8 +96,8 @@ $photo
         groupIdEdit     => "3",
         ownerUserId     => "3",
     },
-    '',
-    0,
+    undef,
+    undef,
     {
         skipAutoCommitWorkflows => 1,
     });
@@ -127,8 +122,8 @@ $photo
         groupIdEdit     => "",
         ownerUserId     => $session->user->userId,
     },
-    '',
-    0,
+    undef,
+    undef,
     {
         skipAutoCommitWorkflows => 1,
     });
@@ -153,8 +148,8 @@ $photo
         groupIdEdit     => "",
         ownerUserId     => $session->user->userId,
     },
-    '',
-    0,
+    undef,
+    undef,
     {
         skipAutoCommitWorkflows => 1,
     });

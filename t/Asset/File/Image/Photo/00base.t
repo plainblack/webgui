@@ -21,31 +21,31 @@ use Test::More;
 
 #----------------------------------------------------------------------------
 # Init
-my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
+my $session    = WebGUI::Test->session;
+my $node       = WebGUI::Asset->getImportNode($session);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+
 $versionTag->set({name=>"Photo Test"});
-print "hi";
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $photo;
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $gallery->purge;
-    $album->purge;
-    if ($photo) {
-        $photo->purge;
-    }
-    $versionTag->rollback;
-}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -61,7 +61,14 @@ use_ok("WebGUI::Asset::File::Image::Photo");
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+
+$versionTag->commit;
 
 is(
     blessed $photo, "WebGUI::Asset::File::Image::Photo",
@@ -72,14 +79,11 @@ isa_ok(
     $photo, "WebGUI::Asset::File::Image",
 );
 
-TODO: {
-    local $TODO = 'This test dies, but the subroutine works. Why!?';
-    ok(0, "Photo->getGallery dies here, but not in WebGUI.");
-    #is(
-    #    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
-    #    "Photo->getGallery gets the gallery containing this photo",
-    #);
-}
+
+is(
+    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
+    "Photo->getGallery gets the gallery containing this photo",
+);
 
 #----------------------------------------------------------------------------
 # Test deleting a photo
@@ -90,4 +94,11 @@ is(
     WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
     "Photo no longer able to be instanciated",
 );
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback;
+}
+
 
