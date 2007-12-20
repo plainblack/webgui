@@ -25,9 +25,12 @@ use WebGUI::Asset::File::Image::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
+
+my @versionTags = ();
+push @versionTags, WebGUI::VersionTag->getWorking($session);
+$versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
-my $maker           = WebGUI::Test::Maker::HTML->new;
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -36,23 +39,39 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $photo
     = $gallery->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $photo->purge;
-    $album->purge
-    $gallery->purge;
-    $versionTag->rollback();
-}
+$versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
 plan tests => 1;
+
+TODO: {
+    local $TODO = 'Write some tests for download testing';
+    ok(0, 'No tests yet');
+}
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    foreach my $versionTag (@versionTags) {
+        $versionTag->rollback;
+    }
+}
 
 
