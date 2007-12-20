@@ -128,7 +128,7 @@ sub definition {
         templateIdAddArchive => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "i0X4Q3tBWUb_thsVbsYz9xQ",
             namespace       => "GalleryAlbum/AddArchive",
             label           => $i18n->get("templateIdAddArchive label"),
             hoverHelp       => $i18n->get("templateIdAddArchive description"),
@@ -136,7 +136,7 @@ sub definition {
         templateIdDeleteAlbum => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "UTNFeV7B_aSCRmmaFCq4Vw",
             namespace       => "GalleryAlbum/Delete",
             label           => $i18n->get("templateIdDeleteAlbum label"),
             hoverHelp       => $i18n->get("templateIdDeleteAlbum description"),
@@ -144,7 +144,7 @@ sub definition {
         templateIdDeleteFile => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "zcX-wIUct0S_np14xxOA-A",
             namespace       => "GalleryFile/Delete",
             label           => $i18n->get("templateIdDeleteFile label"),
             hoverHelp       => $i18n->get("templateIdDeleteFile description"),
@@ -152,7 +152,7 @@ sub definition {
         templateIdEditAlbum => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "6X-7Twabn5KKO_AbgK3PEw",
             namespace       => "GalleryAlbum/Edit",
             label           => $i18n->get("templateIdEditAlbum label"),
             hoverHelp       => $i18n->get("templateIdEditAlbum description"),
@@ -160,7 +160,7 @@ sub definition {
         templateIdEditFile => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "7JCTAiu1U_bT9ldr655Blw",
             namespace       => "GalleryFile/Edit",
             label           => $i18n->get("templateIdEditFile label"),
             hoverHelp       => $i18n->get("templateIdEditFile description"),
@@ -168,7 +168,7 @@ sub definition {
         templateIdListAlbums => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "azCqD0IjdQSlM3ar29k5Sg",
             namespace       => "Gallery/ListAlbums",
             label           => $i18n->get("templateIdListAlbums label"),
             hoverHelp       => $i18n->get("templateIdListAlbums description"),
@@ -176,7 +176,7 @@ sub definition {
         templateIdListAlbumsRss => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "ilu5BrM-VGaOsec9Lm7M6Q",
             namespace       => "Gallery/ListAlbumsRss",
             label           => $i18n->get("templateIdListAlbumsRss label"),
             hoverHelp       => $i18n->get("templateIdListAlbumsRss description"),
@@ -184,7 +184,7 @@ sub definition {
         templateIdListFilesForUser => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "OkphOEdaSGTXnFGhK4GT5A",
             namespace       => "Gallery/ListFilesForUser",
             label           => $i18n->get("templateIdListFilesForUser label"),
             hoverHelp       => $i18n->get("templateIdListFilesForUser description"),
@@ -192,7 +192,7 @@ sub definition {
         templateIdListFilesForUserRss => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "-ANLpoTEP-n4POAdRxCzRw",
             namespace       => "Gallery/ListFilesForUserRss",
             label           => $i18n->get("templateIdListFilesForUserRss label"),
             hoverHelp       => $i18n->get("templateIdListFilesForUserRss description"),
@@ -200,7 +200,7 @@ sub definition {
         templateIdMakeShortcut => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "m3IbBavqzuKDd2PGGhKPlA",
             namespace       => "GalleryFile/MakeShortcut",
             label           => $i18n->get("templateIdMakeShortcut label"),
             hoverHelp       => $i18n->get("templateIdMakeShortcut description"),
@@ -208,7 +208,7 @@ sub definition {
         templateIdSearch => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "jME5BEDYVDlBZ8jIQA9-jQ",
             namespace       => "Gallery/Search",
             label           => $i18n->get("templateIdSearch label"),
             hoverHelp       => $i18n->get("templateIdSearch description"),
@@ -216,7 +216,7 @@ sub definition {
         templateIdViewSlideshow => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "KAMdiUdJykjN02CPHpyZOw",
             namespace       => "GalleryAlbum/ViewSlideshow",
             label           => $i18n->get("templateIdViewSlideshow label"),
             hoverHelp       => $i18n->get("templateIdViewSlideshow description"),
@@ -224,7 +224,7 @@ sub definition {
         templateIdViewThumbnails => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "q5O62aH4pjUXsrQR3Pq4lw",
             namespace       => "GalleryAlbum/ViewThumbnails",
             label           => $i18n->get("templateIdViewThumbnails label"),
             hoverHelp       => $i18n->get("templateIdViewThumbnails description"),
@@ -232,7 +232,7 @@ sub definition {
         templateIdViewAlbum => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "05FpjceLYhq4csF1Kww1KQ",
             namespace       => "GalleryAlbum/View",
             label           => $i18n->get("templateIdViewAlbum label"),
             hoverHelp       => $i18n->get("templateIdViewAlbum description"),
@@ -240,7 +240,7 @@ sub definition {
         templateIdViewAlbumRss => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "mM3bjP_iG9sv5nQb4S17tQ",
             namespace       => "GalleryAlbum/ViewRss",
             label           => $i18n->get("templateIdViewAlbumRss label"),
             hoverHelp       => $i18n->get("templateIdViewAlbumRss description"),
@@ -248,7 +248,7 @@ sub definition {
         templateIdViewFile  => {
             tab             => "display",
             fieldType       => "template",
-            defaultValue    => "",
+            defaultValue    => "TEId5V-jEvUULsZA0wuRuA",
             namespace       => "GalleryFile/View",
             label           => $i18n->get("templateIdViewFile label"),
             hoverHelp       => $i18n->get("templateIdViewFile description"),
