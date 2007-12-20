@@ -26,9 +26,13 @@ use WebGUI::Asset::File::Image::Photo;
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
+
+my @versionTags = ();
+push @versionTags, WebGUI::VersionTag->getWorking($session);
+$versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
+
 $session->user( { userId => 3 } ); # Admins can do everything
+
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
@@ -37,17 +41,23 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $photo
-    = $gallery->addChild({
+    = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+$versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -104,4 +114,13 @@ $maker->prepare({
     ],
 })->run;
 
+
 #----------------------------------------------------------------------------
+# Cleanup
+END {
+    foreach my $versionTag (@versionTags) {
+        $versionTag->rollback;
+    }
+}
+
+
