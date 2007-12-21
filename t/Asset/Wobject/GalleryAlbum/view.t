@@ -42,6 +42,11 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my @photos;
 for my $i ( 0 .. 5 ) {
@@ -49,18 +54,19 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::Image::Photo",
             filename            => "$i.jpg",
+        },
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
         });
 }
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan no_plan => 1;
+plan tests => 7;
 
 #----------------------------------------------------------------------------
 # Test getFileIds and getFilePaginator
@@ -117,7 +123,7 @@ $expected   = {
     "file_loop"     => bag( map { $_->getTemplateVars } @photos ),
 };
 cmp_deeply( 
-    $album->appendTemplateVarsFileLoop({},$self->getFilePaginator->getPageData), 
+    $album->appendTemplateVarsFileLoop({},$album->getFilePaginator->getPageData), 
     $expected 
 );
 
@@ -130,3 +136,8 @@ $maker->prepare({
 });
 $maker->run;
 
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
