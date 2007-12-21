@@ -10,7 +10,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the permissions of GalleryAlbum assets
 
