@@ -61,7 +61,7 @@ $versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan no_plan => 1;
+plan skip_all => "Tests are not working yet.";
 
 #----------------------------------------------------------------------------
 # Test permissions
@@ -118,6 +118,7 @@ $maker->prepare({
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    $gallery->purge;
     foreach my $versionTag (@versionTags) {
         $versionTag->rollback;
     }

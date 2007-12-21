@@ -21,29 +21,27 @@ use WebGUI::Session;
 use Test::More; 
 my $graphicsClass;
 BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $graphicsClass = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
+    if (eval { require Image::Magick; 1 }) {
         $graphicsClass = 'Image::Magick';
+    }
+    elsif (eval { require Graphics::Magick; 1 }) {
+        $graphicsClass = 'Graphics::Magick';
     }
 }
 use WebGUI::Asset::File::Image::Photo;
 
 #----------------------------------------------------------------------------
 # Init
+
+plan tests => 15;
+
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Photo Test"});
+my @versionTags = ();
+push @versionTags, WebGUI::VersionTag->getWorking($session);
+$versionTags[-1]->set({name=>"Photo Test"});
 
 my ($gallery, $album, $photo);
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
 
 #----------------------------------------------------------------------------
 # Photo not added under a Photo Gallery asset does NOT generate any 
@@ -51,7 +49,15 @@ END {
 $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+
+$versionTags[-1]->commit;
+
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 ok(
@@ -67,10 +73,18 @@ is_deeply(
 #----------------------------------------------------------------------------
 # makeResolutions allows API to specify resolutions to make as array reference
 # argument
+push @versionTags, WebGUI::VersionTag->getWorking($session);
 $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+$versionTags[-1]->commit;
+
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 ok(
@@ -95,10 +109,17 @@ TODO: {
 
 #----------------------------------------------------------------------------
 # makeResolutions throws a warning on an invalid resolution but keeps going
+push @versionTags, WebGUI::VersionTag->getWorking($session);
 $photo
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+$versionTags[-1]->commit;
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 { # localize our signal handler
     my @warnings;
@@ -133,6 +154,7 @@ $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollater
 
 #----------------------------------------------------------------------------
 # makeResolutions gets default resolutions from a parent Photo Gallery asset
+push @versionTags, WebGUI::VersionTag->getWorking($session);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -141,11 +163,22 @@ $gallery
 $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+$versionTags[-1]->commit;
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 ok(
@@ -166,6 +199,7 @@ TODO: {
 #----------------------------------------------------------------------------
 # Array of resolutions passed to makeResolutions overrides defaults from 
 # parent asset
+push @versionTags, WebGUI::VersionTag->getWorking($session);
 $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -174,11 +208,22 @@ $gallery
 $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+$versionTags[-1]->commit;
 $photo->getStorageLocation->addFileFromFilesystem( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 ok(
@@ -200,4 +245,13 @@ is_deeply(
 TODO: {
     local $TODO = 'Test to ensure the files are created with correct resolution and density';
 }
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    foreach my $versionTag (@versionTags) {
+        $versionTag->rollback;
+    }
+}
+
 
