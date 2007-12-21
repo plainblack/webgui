@@ -30,12 +30,7 @@ my $file
     = $node->addChild({
         className           => "WebGUI::Asset::File",
     });
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -60,4 +55,10 @@ is_deeply(
     "Storage location contains only the file we added",
 );
 
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
 
