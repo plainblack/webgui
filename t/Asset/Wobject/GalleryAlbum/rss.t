@@ -41,6 +41,11 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my @photos;
 for my $i ( 0 .. 5 ) {
@@ -48,7 +53,26 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::Image::Photo",
             filename            => "$i.jpg",
+        },
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
         });
+}
+
+$versionTag->commit;
+
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 1;
+
+#----------------------------------------------------------------------------
+# Test www_viewRss
+
+TODO: {
+    local $TODO = "Write some tests";
+    ok(0, "No tests here");
 }
 
 #----------------------------------------------------------------------------
@@ -56,11 +80,3 @@ for my $i ( 0 .. 5 ) {
 END {
     $versionTag->rollback();
 }
-
-#----------------------------------------------------------------------------
-# Tests
-plan no_plan => 1;
-
-#----------------------------------------------------------------------------
-# Test www_viewRss
-
