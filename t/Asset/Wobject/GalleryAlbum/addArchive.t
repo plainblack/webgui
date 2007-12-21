@@ -47,6 +47,7 @@ my $album
         skipAutoCommitWorkflows => 1,
     });
 
+$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip') );
 $versionTag->commit;
 
 #----------------------------------------------------------------------------
@@ -56,7 +57,6 @@ plan tests => 2;
 #----------------------------------------------------------------------------
 # Test the addArchive sub
 # elephant_images.zip contains three jpgs: Aana1.jpg, Aana2.jpg, Aana3.jpg
-$album->addArchive( WebGUI::Test->getTestCollateralPath('elephant_images.zip') );
 my $images  = $album->getLineage(['descendants'], { returnObjects => 1 });
 
 is( scalar @$images, 3, "addArchive() adds one asset per image" );
