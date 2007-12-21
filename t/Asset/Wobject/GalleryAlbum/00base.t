@@ -10,7 +10,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the creation and deletion of album assets
 
@@ -31,18 +31,11 @@ my $gallery
     });
 
 #----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
-#----------------------------------------------------------------------------
 # Tests
-plan tests => 5;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # Test module compiles okay
-# plan tests => 1
 use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 
 #----------------------------------------------------------------------------
@@ -50,7 +43,14 @@ use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
+
+$versionTag->commit;
 
 is(
     blessed $album, "WebGUI::Asset::Wobject::GalleryAlbum",
@@ -67,12 +67,13 @@ my $properties  = $album->get;
 $album->purge;
 
 is(
-    $album, undef,
-    "Album is undefined",
-);
-
-is(
     WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
     "Album no longer able to be instanciated",
 );
 
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
