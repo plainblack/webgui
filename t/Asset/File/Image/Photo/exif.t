@@ -19,8 +19,8 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use JSON;
-use Image::ExifTool;
+use Test::Deep;
+use Image::ExifTool qw(:Public);
 
 #----------------------------------------------------------------------------
 # Init
@@ -35,8 +35,20 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    });
-my ( $photo );
+    },
+    undef, undef,
+    { skipAutoCommitWorkflows => 1 },
+    );
+my $photo
+    = $album->addChild({
+        className               => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef, undef,
+    { skipAutoCommitWorkflows => 1 },
+    );
+$versionTag->commit;
+my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -46,30 +58,15 @@ END {
 
 #----------------------------------------------------------------------------
 # Tests
-plan no_plan => 1;
-
-#----------------------------------------------------------------------------
-# Test that exif data gets parsed from the file
-$photo
-    = $album->addChild({
-        className               => "WebGUI::Asset::File::Image::Photo",
-    });
-$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
-my $exifData    = $photo->get("exifData");
-
-ok( defined $exifData, "exifData column is defined after setFile" );
-
-my $exif        = jsonToObj( $exifData );
-ok( ref $exif eq "HASH", "exifData is JSON hash" );
+plan tests => 2;
 
 #----------------------------------------------------------------------------
 # Test getTemplateVars exif data
 my $var         = $photo->getTemplateVars;
 
-is_deeply(
-    [ sort keys %$exif ],
-    [ sort map { s/exif_// } keys %$var ],
-    "getTemplateVars gets a hash of all exif tags",
+cmp_deeply(
+    [ keys %$var ], superbagof( map { 'exif_' . $_ } keys %$exif ),
+    'getTemplateVars gets a hash of all exif tags',
 );
 
 is_deeply(
