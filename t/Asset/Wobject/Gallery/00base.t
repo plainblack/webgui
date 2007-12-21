@@ -25,54 +25,44 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Album Test"});
+
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 4;
+
+#----------------------------------------------------------------------------
+# Test module compiles okay
+use_ok("WebGUI::Asset::Wobject::Gallery");
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
-
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 5;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-# plan tests => 1
-use_ok("WebGUI::Asset::Wobject::GalleryAlbum");
-
-#----------------------------------------------------------------------------
-# Test creating an album
-my $album
-    = $gallery->addChild({
-        className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    });
+$versionTag->commit;
 
 is(
-    blessed $album, "WebGUI::Asset::Wobject::GalleryAlbum",
-    "Album is a WebGUI::Asset::Wobject::GalleryAlbum object",
+    blessed $gallery, "WebGUI::Asset::Wobject::Gallery",
+    "Gallery is a WebGUI::Asset::Wobject::Gallery object",
 );
 
 isa_ok( 
-    $album, "WebGUI::Asset::Wobject",
+    $gallery, "WebGUI::Asset::Wobject",
 );
 
 #----------------------------------------------------------------------------
 # Test deleting a album
-my $properties  = $album->get;
-$album->purge;
-
-is(
-    $album, undef,
-    "Album is undefined",
-);
+my $properties  = $gallery->get;
+$gallery->purge;
 
 is(
     WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
     "Album no longer able to be instanciated",
 );
 
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
