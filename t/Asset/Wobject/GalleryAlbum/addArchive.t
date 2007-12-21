@@ -11,7 +11,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the permissions of GalleryAlbum assets
 
@@ -19,11 +19,10 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Test::Maker::Permission;
+use Test::Deep;
 
 #----------------------------------------------------------------------------
 # Init
-my $maker           = WebGUI::Test::Maker::Permission->new;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
@@ -41,13 +40,14 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -67,3 +67,9 @@ cmp_deeply(
 
 #----------------------------------------------------------------------------
 # Test the www_addArchive page
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
