@@ -35,19 +35,35 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $photo
-    = $gallery->addChild({
+    = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
-$photo->setFile( WebGUI::Test->getCollateralPath('page_title.jpg') );
+$versionTag->commit;
+$photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
+
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 1;
+
+TODO: {
+    local $TODO = "Write some tests";
+    ok(0, 'No tests here, move on');
+}
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $versionTag->rollback();
 }
-
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 1;
