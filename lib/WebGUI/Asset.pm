@@ -498,7 +498,7 @@ sub fixId {
 	my $self = shift;
     my $id = shift;
     my $field = shift;
-    if ($id =~ m/\A \d+ \z/xms || $id =~ m/\A [A-Za-z0-9\-\_]{22} \z/xms) {
+    if ($id =~ m/\A \d{1,22} \z/xms || $id =~ m/\A [A-Za-z0-9\-\_]{22} \z/xms) {
         return $id;
     }
 	return $self->getValue($field);
@@ -513,7 +513,9 @@ Fixes a title by eliminating HTML from it.
 
 =head3 string
 
-Any text string. Most likely will have been the Asset's name or title.
+Any text string. Most likely will have been the Asset's name or title.  If
+no string is supplied, then it will fetch the default title for the asset,
+or the word Untitled.
 
 =cut
 
@@ -1288,7 +1290,7 @@ sub getUrl {
 
 =head2 getValue ( key )
 
-Returns the value of anything it can find with an index of key, or else it returns undefined.
+Returns the value of anything it can find with an index of key in the asset's properties, or else it returns undefined.
 
 =head3 key
 
