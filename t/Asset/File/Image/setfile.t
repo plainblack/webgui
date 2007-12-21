@@ -31,12 +31,7 @@ my $image
     = $node->addChild({
         className           => "WebGUI::Asset::File::Image",
     });
-
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-}
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -60,3 +55,9 @@ ok(
     "Thumbnail file exists on the filesystem",
 );
 
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+}
