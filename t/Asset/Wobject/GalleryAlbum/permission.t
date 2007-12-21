@@ -10,7 +10,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the permissions of GalleryAlbum assets
 
@@ -45,18 +45,18 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 
-#----------------------------------------------------------------------------
-# Cleanup
-END {
-    $versionTag->rollback();
-    $user{"2"}->delete;
-}
+$versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan no_plan => 1;
+plan skip_all => 1;
 
 #----------------------------------------------------------------------------
 # By default, GalleryAlbum inherits its permissions from the Gallery, but 
@@ -104,4 +104,11 @@ $maker->prepare({
     fail        => [ 1, ],
 });
 $maker->run;
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    $versionTag->rollback();
+    $user{"2"}->delete;
+}
 
