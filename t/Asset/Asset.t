@@ -117,7 +117,7 @@ my @fixTitleTests = (
     },
 );
 
-plan tests => 50 + scalar(@fixIdTests) + scalar(@fixTitleTests);
+plan tests => 56 + scalar(@fixIdTests) + scalar(@fixTitleTests);
 
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
@@ -350,6 +350,8 @@ TODO: {
     $session->setting->set('urlExtension', $origUrlExtension);
 }
 
+$session->config->set('extrasURL', $origExtras);
+
 ################################################################
 #
 # fixId
@@ -381,6 +383,26 @@ foreach my $test (@fixTitleTests) {
 $fixTitleAsset->update({'title' => 0});
 
 is($fixTitleAsset->fixTitle(''), 'Untitled', q{fixTitle: title is false, fixTitle returns 'Untitled'});
+
+################################################################
+#
+# getIcon
+#
+################################################################
+
+like($importNode->getIcon,    qr{folder.gif$},       'getIcon gets correct icon for importNode');
+like($importNode->getIcon(1), qr{small/folder.gif$}, 'getIcon gets small icon for importNode');
+
+like($importNode->getIcon(),  qr{$origExtras}, 'getIcon returns an icon from the extras URL');
+
+like($defaultAsset->getIcon,  qr{layout.gif$},       'getIcon gets icon for a layout');
+like($fixTitleAsset->getIcon, qr{snippet.gif$},      'getIcon gets icon for a snippet');
+
+
+TODO: {
+    local $TODO = "Coverage test";
+    ok(0, "Test the default name for the icon, if not given in the definition sub");
+}
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
