@@ -2,6 +2,7 @@ package WebGUI::Test::Maker::Permission;
 
 use base 'WebGUI::Test::Maker';
 use Scalar::Util qw( blessed );
+use Carp qw( croak );
 use Test::More;
 
 
@@ -141,8 +142,10 @@ sub prepare {
     for my $test (@tests) {
         $test_num++;
 
-        croak("Couldn't prepare: Test $test_num has no object")
-            unless $test->{object};
+        croak("Couldn't prepare: Test $test_num has no object or className")
+            unless $test->{object} || exists($test->{className});
+        croak("Couldn't prepare: Test $test_num has needs a session object")
+            if exists($test->{className}) && !$test->{session};
         croak("Couldn't prepare: Test $test_num has no method")
             unless $test->{method};
         croak("Couldn't prepare: Test $test_num has no pass/fail")
@@ -153,8 +156,8 @@ sub prepare {
             if $test->{fail} && ref $test->{fail} ne "ARRAY";
 
         # Make sure pass and fail arrayrefs are userIds
-        for my $array ( $test->{pass, fail} ) {
-            for ( my $i = 0; $i < @$array; $i++ ) {
+        for my $array ( $test->{'pass'}, $test->{'fail'} ) {
+            for ( my $i = 0; $i < @{ $array }; $i++ ) {
                 # If is a User object, replace with userId
                 if ( blessed $array->[$i] && $array->[$i]->isa("WebGUI::User") ) {
                     $array->[$i] = $array->[$i]->userId;
@@ -180,31 +183,57 @@ sub run {
     my $self        = shift;
      
     while (my $test = shift @{ $self->{_tests} }) {
-        my $o       = $test->{object};
-        my $m       = $test->{method};
+        my $session;
+        my @methodArguments = ();
+        my ($o, $m, $comment);
 
+        if (exists $test->{className}) {
+            $o = $test->{className};
+            $m = $test->{method};
+            $session = $test->{session};
+            push @methodArguments, $session;
+            $comment = $test->{className};
+        }
+        else {
+            $o = $test->{object};
+            $m = $test->{method};
+            $session = $o->session;
+            $comment = blessed $o;
+        }
+
+        ##This needs to be refactored into a sub/method, instead of copy/paste
+        ##duplicated in fail, below.
         if ($test->{pass}) {
             for my $userId (@{$test->{pass}}) {
-                # Test the userId parameter
-                ok( $o->$m($userId), "$userId passes $m check for " . blessed $o );
+                my @args    = @methodArguments;
 
                 # Test the default session user
-                my $oldUser = $o->session->user;
-                $o->session->user( WebGUI::User->new($o->session, $userId) );
-                ok( $o->$m(), "$userId passes $m check using default user for " . blessed $o );
-                $o->session->user($oldUser);
+                my $oldUser = $session->user;
+                $session->user( { userId => $userId } );
+                ok( $o->$m(@args), "userId $userId passes $m check using default user for " . $comment );
+                $session->user( { user => $oldUser });
+
+                # Test the specified userId
+                push @args, $userId;
+                # Test the userId parameter
+                ok( $o->$m(@args), "userId $userId passes $m check for " . $comment );
+
             }
         }
         if ($test->{fail}) {
             for my $userId (@{$test->{fail}}) {
-                # Test the userId parameter
-                ok( !($o->$m($userId)), "$userId fails $m check for " . blessed $o );
+                my @args = @methodArguments;
 
                 # Test the default session user
-                my $oldUser = $o->session->user;
-                $o->session->user( WebGUI::User->new($o->session, $userId) );
-                ok( !($o->$m()), "$userId fails $m check using default user for " . blessed $o );
-                $o->session->user($oldUser);
+                my $oldUser = $session->user;
+                $session->user( { userId => $userId } );
+                ok( !($o->$m(@args)), "userId $userId fails $m check using default user for " . $comment );
+                $session->user( { user => $oldUser });
+
+                # Test the userId parameter
+                push @args, $userId;
+                ok( !($o->$m(@args)), "userId $userId fails $m check for " . $comment );
+
             }
         }
     }

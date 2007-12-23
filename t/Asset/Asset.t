@@ -13,6 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
@@ -25,99 +26,49 @@ use Test::MockObject;
 
 my $session = WebGUI::Test->session;
 
-my @fixIdTests = (
-    {
-        id      => '0',
-        pass    => 1,
-        comment => 'digit zero',
-    },
-    {
-        id      => '1',
-        pass    => 1,
-        comment => 'digit one',
-    },
-    {
-        id      => '123',
-        pass    => 1,
-        comment => '3 digit integer',
-    },
-    {
-        id      => '12345678901'x2,
-        pass    => 1,
-        comment => '22 digit integer',
-    },
-    {
-        id      => '12345678901'x4,
-        pass    => 0,
-        comment => '44 digit integer',
-    },
-    {
-        id      => '',
-        pass    => 0,
-        comment => 'null string is rejected',
-    },
-    {
-        id      => 'a',
-        pass    => 0,
-        comment => 'single lower case character rejected',
-    },
-    {
-	  #            '1234567890123456789012'
-        id      => 'abc123ZYX098deadbeef()',
-        pass    => 0,
-        comment => 'illegal characters in length 22 string rejected',
-    },
-    {
-        id      => $session->id->generate,
-        pass    => 1,
-        comment => 'valid id accepted',
-    },
-);
+my @fixIdTests    = getFixIdTests($session);
+my @fixTitleTests = getFixTitleTests($session);
 
-my @fixTitleTests = (
-    {
-        title   => undef,
-        fixed   => 0,
-        comment => "undef returns the Asset's title",
-    },
-    {
-        title   => '',
-        fixed    => 0,
-        comment => "null string returns the Asset's title",
-    },
-    {
-        title   => 'untitled',
-        fixed    => 0,
-        comment => "'untitled' returns the Asset's title",
-    },
-    {
-        title   => 'UnTiTlEd',
-        fixed    => 0,
-        comment => "'untitled' in any case returns the Asset's title",
-    },
-    {
-        title   => 'Username: ^@;',
-        fixed    => 'Username: &#94;@;',
-        comment => "Macros are negated",
-    },
-    {
-        title   => '<b>A bold title</b>',
-        fixed    => 'A bold title',
-        comment => "Markup is stripped out",
-    },
-    {
-        title   => 'Javascript: <script>Evil code goes in here</script>',
-        fixed    => 'Javascript: ',
-        comment => "javascript removed",
-    },
-    {
-        title   => 'This is a good Title',
-        fixed    => 'This is a good Title',
-        comment => "Good titles are passed",
-    },
-);
+my $rootAsset = WebGUI::Asset->getRoot($session);
 
-plan tests => 56 + scalar(@fixIdTests) + scalar(@fixTitleTests);
+my $canAddMaker = WebGUI::Test::Maker::Permission->new();
+$canAddMaker->prepare({
+    'className' => 'WebGUI::Asset',
+    'session'   => $session,
+    'method'    => 'canAdd',
+    'pass'      => [3],
+    'fail'      => [1],
+});
+
+my $properties;
+$properties = {
+	#            '1234567890123456789012'
+	id        => 'canEditAsset0000000010',
+	title     => 'canEdit Asset Test',
+	url       => 'canEditAsset1',
+	className => 'WebGUI::Asset',
+};
+
+my $versionTag2 = WebGUI::VersionTag->getWorking($session);
+
+my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
+
+$versionTag2->commit;
+
+my $canEditMaker = WebGUI::Test::Maker::Permission->new();
+$canEditMaker->prepare({
+    'object' => $canEditAsset,
+    'method' => 'canEdit',
+    'pass'   => [3],
+    'fail'   => [1],
+});
+
+plan tests => 56
+            + scalar(@fixIdTests)
+            + scalar(@fixTitleTests)
+            + $canAddMaker->plan
+            + $canEditMaker->plan
+            ;
 
 # Test the default constructor
 my $defaultAsset = WebGUI::Asset->getDefault($session);
@@ -180,7 +131,6 @@ is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId return
 }
 
 # Root Asset
-my $rootAsset = WebGUI::Asset->getRoot($session);
 isa_ok($rootAsset, 'WebGUI::Asset');
 is($rootAsset->getId, 'PBasset000000000000001', 'Root Asset ID check');
 
@@ -250,7 +200,7 @@ $session->{_request} = $origRequest;
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Asset tests"});
 
-my $properties = {
+$properties = {
 	#            '1234567890123456789012'
 	id        => 'fixUrlAsset00000000012',
 	title     => 'fixUrl Asset Test',
@@ -404,9 +354,131 @@ TODO: {
     ok(0, "Test the default name for the icon, if not given in the definition sub");
 }
 
+################################################################
+#
+# canAdd
+#
+################################################################
+
+$canAddMaker->run;
+
+################################################################
+#
+# canEdit
+#
+################################################################
+
+$canEditMaker->run;
+
 END: {
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);
-    $versionTag->rollback;
+    foreach my $vTag ($versionTag, $versionTag2) {
+        $vTag->rollback;
+    }
+}
+
+##Return an array of hashrefs.  Each hashref describes a test
+##for the fixId method.
+
+sub getFixIdTests {
+    my $session = shift;
+    return (
+    {
+        id      => '0',
+        pass    => 1,
+        comment => 'digit zero',
+    },
+    {
+        id      => '1',
+        pass    => 1,
+        comment => 'digit one',
+    },
+    {
+        id      => '123',
+        pass    => 1,
+        comment => '3 digit integer',
+    },
+    {
+        id      => '12345678901'x2,
+        pass    => 1,
+        comment => '22 digit integer',
+    },
+    {
+        id      => '12345678901'x4,
+        pass    => 0,
+        comment => '44 digit integer',
+    },
+    {
+        id      => '',
+        pass    => 0,
+        comment => 'null string is rejected',
+    },
+    {
+        id      => 'a',
+        pass    => 0,
+        comment => 'single lower case character rejected',
+    },
+    {
+	  #            '1234567890123456789012'
+        id      => 'abc123ZYX098deadbeef()',
+        pass    => 0,
+        comment => 'illegal characters in length 22 string rejected',
+    },
+    {
+        id      => $session->id->generate,
+        pass    => 1,
+        comment => 'valid id accepted',
+    },
+    );
+}
+
+##Return an array of hashrefs.  Each hashref describes a test
+##for the fixTitle method.  If "fixed" != 0, it should
+##contain what the fixTitle method will return.
+
+sub getFixTitleTests {
+    my $session = shift;
+    return ({
+        title   => undef,
+        fixed   => 0,
+        comment => "undef returns the Asset's title",
+    },
+    {
+        title   => '',
+        fixed    => 0,
+        comment => "null string returns the Asset's title",
+    },
+    {
+        title   => 'untitled',
+        fixed    => 0,
+        comment => "'untitled' returns the Asset's title",
+    },
+    {
+        title   => 'UnTiTlEd',
+        fixed    => 0,
+        comment => "'untitled' in any case returns the Asset's title",
+    },
+    {
+        title   => 'Username: ^@;',
+        fixed    => 'Username: &#94;@;',
+        comment => "Macros are negated",
+    },
+    {
+        title   => '<b>A bold title</b>',
+        fixed    => 'A bold title',
+        comment => "Markup is stripped out",
+    },
+    {
+        title   => 'Javascript: <script>Evil code goes in here</script>',
+        fixed    => 'Javascript: ',
+        comment => "javascript removed",
+    },
+    {
+        title   => 'This is a good Title',
+        fixed    => 'This is a good Title',
+        comment => "Good titles are passed",
+    },
+    );
 }
