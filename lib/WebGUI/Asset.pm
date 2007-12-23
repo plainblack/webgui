@@ -191,19 +191,35 @@ Unique hash identifier for a user. If not supplied, current user.
 
 =head3 groupId
 
-Only developers extending this method should use this parameter. By default WebGUI will check groups in this order, whichever is defined: Group id assigned in the config file for each asset. Group assigned by the developer in the asset itself if s/he extended this method to do so. The "turn admin on" group which is group id 12.
+Only developers extending this method should use this parameter. By default WebGUI will check groups in this order, whichever is defined:
+
+=over 4
+
+=item *
+
+Group id assigned in the config file for each asset.
+
+=item *
+
+Group assigned by the developer in the asset itself if s/he extended this method to do so.
+
+=item *
+
+The "turn admin on" group which is group id 12.
+
+=back
 
 =cut
 
 sub canAdd {
-	my $className = shift;
-	my $session = shift;
-	my $userId = shift || $session->user->userId;
-	my $user = WebGUI::User->new($session, $userId);
-	my $subclassGroupId = shift;
-	my $addPrivs = $session->config->get("assetAddPrivilege");
-	my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
-        return $user->isInGroup($groupId);
+    my $className = shift;
+    my $session = shift;
+    my $userId = shift || $session->user->userId;
+    my $user = WebGUI::User->new($session, $userId);
+    my $subclassGroupId = shift;
+    my $addPrivs = $session->config->get("assetAddPrivilege");
+    my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
+    return $user->isInGroup($groupId);
 }
 
 
@@ -220,13 +236,13 @@ Unique hash identifier for a user. If not supplied, current user.
 =cut
 
 sub canEdit {
-	my $self = shift;
-	my $userId = shift || $self->session->user->userId;
-	my $user = WebGUI::User->new($self->session, $userId);
- 	if ($userId eq $self->get("ownerUserId")) {
-                return 1;
-	}
-        return $user->isInGroup($self->get("groupIdEdit"));
+    my $self = shift;
+    my $userId = shift || $self->session->user->userId;
+    my $user = WebGUI::User->new($self->session, $userId);
+    if ($userId eq $self->get("ownerUserId")) {
+        return 1;
+    }
+    return $user->isInGroup($self->get("groupIdEdit"));
 }
 
 
