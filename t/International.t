@@ -19,9 +19,9 @@ use File::Spec;
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 1; ##For conditional load check
+my $numTests  = 1; ##For conditional load check
 my $langTests = 2; ##For language look-up tests
-$numTests += 9 + $langTests;
+$numTests    += 10 + $langTests;
 
 plan tests => $numTests;
 
@@ -66,6 +66,8 @@ SKIP: {
 		'ebGUIWay',
 		'Language check: existing key returns native language key'
 	);
+
+    is($i18n->getLanguage('English', 'label'), 'English', 'getLanguage, specific property');
 
 }
 

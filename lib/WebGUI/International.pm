@@ -101,10 +101,12 @@ sub get {
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
 	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
+    my $file = $cmd;
+    $file =~ s{::}{/}g;
+    $file .= '.pm';
 
-	if (!defined *{"$cmd\::I18N"}) {  ##Symbol table lookup
-		my $load = "use ".$cmd;
-		eval($load);
+	if (!exists $INC{ $file }) {  ##Alread loaded?
+		eval{ require $file };
 		$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	}
 	our $table;
@@ -135,11 +137,13 @@ sub getLanguage {
 	my ($self, $language, $property) = @_;
 	$language = $language || $self->{_language} || "English";
 	my $cmd = "WebGUI::i18n::".$language;
-	my $load = "use ".$cmd;
-	eval($load);
+    my $file = $cmd;
+    $file =~ s{::}{/}g;
+    $file .= '.pm';
+	eval{require $file};
 	unless ($@) {
-		$cmd = "\$".$cmd."::LANGUAGE";
-		my $hashRef = eval($cmd);	
+		#$cmd = "\$".$cmd."::LANGUAGE";
+		my $hashRef = eval{ $cmd::LANGUAGE };	
 		$self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
 		if ($property) {
 			return $hashRef->{$property};
@@ -210,8 +214,10 @@ sub makeUrlCompliant {
 	my ($self, $url, $language) = @_;
 	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
 	my $cmd = "WebGUI::i18n::".$language;
-	my $load = "use ".$cmd;
-	eval($load);
+    my $file = $cmd;
+    $file =~ s{::}{/}g;
+    $file .= '.pm';
+	eval { require $file };
 	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	$cmd = $cmd."::makeUrlCompliant";
 	my $output = eval{&$cmd($url)};	
