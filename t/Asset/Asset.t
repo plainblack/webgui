@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Asset;
+use WebGUI::User;
 use WebGUI::Asset::Wobject::Navigation;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::AssetVersioning;
@@ -31,13 +32,20 @@ my @fixTitleTests = getFixTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
 
+my %testUsers = ();
+##Just a regular user
+$testUsers{'regular user'} = WebGUI::User->new($session, 'new');
+##Users in group 12 can add Assets
+$testUsers{'canAdd turnOnAdmin'} = WebGUI::User->new($session, 'new');
+$testUsers{'canAdd turnOnAdmin'}->addToGroups(['12']);
+
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
     'className' => 'WebGUI::Asset',
     'session'   => $session,
     'method'    => 'canAdd',
-    'pass'      => [3],
-    'fail'      => [1],
+    'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, ],
+    'fail'      => [1, $testUsers{'regular user'}, ],
 });
 
 my $properties;
@@ -54,13 +62,14 @@ my $versionTag2 = WebGUI::VersionTag->getWorking($session);
 my $canEditAsset = $rootAsset->addChild($properties, $properties->{id});
 
 $versionTag2->commit;
+$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
 
 my $canEditMaker = WebGUI::Test::Maker::Permission->new();
 $canEditMaker->prepare({
     'object' => $canEditAsset,
     'method' => 'canEdit',
-    'pass'   => [3],
-    'fail'   => [1],
+    'pass'   => [3, ],
+    'fail'   => [1, $testUsers{'regular user'}, ],
 });
 
 plan tests => 56
@@ -376,6 +385,9 @@ END: {
     $session->setting->set('urlExtension', $origUrlExtension);
     foreach my $vTag ($versionTag, $versionTag2) {
         $vTag->rollback;
+    }
+    foreach my $user (values %testUsers) {
+        $user->delete;
     }
 }
 
