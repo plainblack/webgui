@@ -518,7 +518,7 @@ sub new {
             if ($profile{$key} eq "" && $default{$key}) {
                 $value = eval($default{$key});
                 if (ref $value eq "ARRAY") {
-                    $profile{$key} = $$value[0];
+                    $profile{$key} = $value->[0];
                 } else {
                     $profile{$key} = $value;
                 }
