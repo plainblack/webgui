@@ -39,6 +39,16 @@ $testUsers{'regular user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd turnOnAdmin'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd turnOnAdmin'}->addToGroups(['12']);
 
+##Just a user for owning assets
+$testUsers{'owner'} = WebGUI::User->new($session, 'new');
+
+##Test Groups
+my %testGroups = ();
+$testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
+
+$testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
+$testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
+
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
     'className' => 'WebGUI::Asset',
@@ -51,10 +61,12 @@ $canAddMaker->prepare({
 my $properties;
 $properties = {
 	#            '1234567890123456789012'
-	id        => 'canEditAsset0000000010',
-	title     => 'canEdit Asset Test',
-	url       => 'canEditAsset1',
-	className => 'WebGUI::Asset',
+	id          => 'canEditAsset0000000010',
+	title       => 'canEdit Asset Test',
+	url         => 'canEditAsset1',
+	className   => 'WebGUI::Asset',
+    ownerUserId => $testUsers{'owner'}->userId,
+    groupIdEdit => $testGroups{'canEdit asset'}->getId,
 };
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
@@ -68,8 +80,8 @@ my $canEditMaker = WebGUI::Test::Maker::Permission->new();
 $canEditMaker->prepare({
     'object' => $canEditAsset,
     'method' => 'canEdit',
-    'pass'   => [3, ],
-    'fail'   => [1, $testUsers{'regular user'}, ],
+    'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
+    'fail'   => [1, $testUsers{'regular user'},                                   ],
 });
 
 plan tests => 56
@@ -388,6 +400,9 @@ END: {
     }
     foreach my $user (values %testUsers) {
         $user->delete;
+    }
+    foreach my $group (values %testUsers) {
+        $group->delete;
     }
 }
 
