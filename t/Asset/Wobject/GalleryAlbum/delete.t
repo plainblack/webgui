@@ -25,13 +25,14 @@ use Test::More;
 # Init
 my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
+$session->user({ userId => 3 });
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Album Test"});
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        groupIdAddComment   => 2,   # Registered Users
+        groupIdComment      => 2,   # Registered Users
         groupIdAddFile      => 2,   # Registered Users
         groupIdView         => 7,   # Everyone
         groupIdEdit         => 3,   # Admins

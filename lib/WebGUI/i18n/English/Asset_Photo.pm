@@ -16,6 +16,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'comment message' => {
+        message     => q{Your comment has been added. <a href="%s">Back to Photo</a>.},
+        lastUpdated => 0,
+    },
+
     'help commentForm title' => {
         message     => 'Photo -- Comment Form',
         lastUpdated => 0,

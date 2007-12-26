@@ -18,6 +18,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use Test::Deep;
 use WebGUI::Asset::File::Image::Photo;
 
 #----------------------------------------------------------------------------
@@ -60,9 +61,9 @@ plan tests => 2;
 $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 my $storage = $photo->getStorageLocation;
 
-is_deeply(
-    $storage->getFiles, ['page_title.jpg'],
-    "Storage location contains only the file we added",
+cmp_deeply(
+    $storage->getFiles, bag('page_title.jpg','1024x768.jpg'),
+    "Storage location contains the resolution file",
 );
 
 ok(

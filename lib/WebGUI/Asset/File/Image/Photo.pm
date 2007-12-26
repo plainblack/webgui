@@ -17,7 +17,7 @@ package WebGUI::Asset::File::Image::Photo;
 use strict;
 use base 'WebGUI::Asset::File::Image';
 
-use Carp qw( croak );
+use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
 use JSON;
 use Tie::IxHash;
@@ -37,6 +37,18 @@ WebGUI::Asset::File::Image::Photo
 =head1 SYNOPSIS
 
 use WebGUI::Asset::File::Image::Photo
+
+=head1 DIAGNOSTICS
+
+=head2 Geometry '...' is invalid. Skipping.
+
+makeResolutions will not pass invalid geometries to WebGUI::Storage::Image::resize().
+Valid geometries are one of the following forms:
+
+ ^\d+$
+ ^\d*x\d*$
+
+These geometries are exactly as understood by ImageMagick.
 
 =head1 METHODS
 
@@ -232,9 +244,10 @@ sub canView {
     my $album       = $self->getParent;
     return 0 unless $album->canView($userId);
 
-    if ($self->isFriendsOnly) {
+    if ($self->isFriendsOnly && $userId != $self->get("ownerUserId") ) {
+        my $owner       = WebGUI::User->new( $self->session, $self->get("ownerUserId") );
         return 0
-            unless WebGUI::Friends->new($self->session, $self->get("ownerUserId"))->isFriend($userId);
+            unless WebGUI::Friends->new($self->session, $owner)->isFriend($userId);
     }
 
     # Passed all checks
@@ -499,6 +512,10 @@ sub makeResolutions {
 
     for my $res ( @$resolutions ) {
         # carp if resolution is bad
+        if ( $res !~ /^\d+$/ && $res !~ /^\d*x\d*/ ) {
+            carp "Geometry '$res' is invalid. Skipping.";
+            next;
+        }
         my $newFilename     = $res . ".jpg";
         $storage->copyFile( $self->get("filename"), $newFilename );
         $storage->resize( $newFilename, $res );
@@ -712,6 +729,7 @@ sub www_addCommentSave {
     
     return $session->privilege->insufficient unless $self->canComment;
 
+    my $i18n        = __PACKAGE__->i18n( $session );
     my $form        = $self->session->form;
     
     my $properties  = {
@@ -724,7 +742,9 @@ sub www_addCommentSave {
 
     $self->setComment( "new", $properties );
 
-    return $self->www_view;
+    return $self->processStyle(
+        sprintf $i18n->get('comment message'), $self->getUrl,
+    );
 }
 
 #----------------------------------------------------------------------------

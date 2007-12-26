@@ -255,7 +255,7 @@ foreach my $testImage (@testImages) {
     cmp_bag(
         [ $sizeTest->getSizeInPixels($filename)     ],
         [ @{ $testImage }{qw/origHeight origWidth/} ],
-        "$testImage was not resized"
+        "$filename was not resized"
     );
 }
 

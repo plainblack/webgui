@@ -717,10 +717,13 @@ sub www_deleteConfirm {
     return $self->session->privilege->insufficient unless $self->canEdit;
 
     my $gallery     = $self->getParent;
+    my $i18n        = __PACKAGE__->i18n( $self->session );
 
     $self->purge;
     
-    return $gallery->www_view;
+    return $self->processStyle(
+        sprintf $i18n->get('delete message'), $self->getParent->getUrl,
+    );
 }
 
 #----------------------------------------------------------------------------

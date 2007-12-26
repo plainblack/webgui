@@ -185,10 +185,10 @@ attached to the session.
 =cut
 
 sub new {
-    my $class = shift;
-    my $session = shift;
-    my $user = shift || $session->user;
-    my $self = register($class);
+    my $class       = shift;
+    my $session     = shift;
+    my $user        = shift || $session->user;
+    my $self        = register($class);
     $session{id $self} = $session;
     $user{id $self} = $user;
     return $self;

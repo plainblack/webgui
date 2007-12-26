@@ -12,7 +12,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../lib";
 
-## The goal of this test is to test the creation and deletion of album assets
+## The goal of this test is to test the creation and deletion of gallery assets
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
@@ -24,7 +24,7 @@ use Test::More;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
-$versionTag->set({name=>"Album Test"});
+$versionTag->set({name=>"Gallery Test"});
 
 #----------------------------------------------------------------------------
 # Tests
@@ -57,7 +57,7 @@ $gallery->purge;
 
 is(
     WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
-    "Album no longer able to be instanciated",
+    "Gallery no longer able to be instanciated",
 );
 
 

@@ -23,6 +23,10 @@ our $I18N = {
         message     => 'Album settings saved. <a href="%s">Return to Album</a>',
         lastUpdated => 0,
     },
+    'delete message' => {
+        message     => 'Album has been deleted. <a href="%s">Return to Gallery</a>',
+        lastUpdated => 0,
+    },
 
     'help common title' => {
         message     => '',

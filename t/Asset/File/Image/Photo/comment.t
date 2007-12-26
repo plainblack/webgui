@@ -246,12 +246,12 @@ like(
 #----------------------------------------------------------------------------
 # Test www_addCommentSave functionality
 $html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
-            userId      => 1,
+            userId      => 3,
             formParams  => { bodyText => "YES!", },
         });
-
+my $successMessage = sprintf($i18n->get("comment message"), $photo->getUrl);
 like(
-    $html, $i18n->get("www_addCommentSave success"),
+    $html, qr/$successMessage/,
     "www_addCommentSave -- page shows success message",
 );
 

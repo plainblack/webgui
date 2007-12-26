@@ -19,33 +19,40 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Friends;
 use Test::More; 
+use WebGUI::Test::Maker::Permission;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
+my $maker           = WebGUI::Test::Maker::Permission->new;
 
 $session->user({ userId => 3 });
 my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 
+# Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
 WebGUI::Friends->new($session)->add( [ $friend->userId ] );
+
+# Add a new registered user
+my $notFriend   = WebGUI::User->new( $session, "new" );
 
 my $gallery
     = $node->addChild({
         className       => "WebGUI::Asset::Wobject::Gallery",
-        groupIdView     => "7",
-        groupIdEdit     => "3",
+        groupIdView     => "2",     # Registered Users
+        groupIdEdit     => "3",     # Admins
+        groupIdComment  => "2",     # Registered Users
         ownerUserId     => $session->user->userId,
     });
 
 my $album
     = $gallery->addChild({
         className       => "WebGUI::Asset::Wobject::GalleryAlbum",
-        groupIdView     => "",
-        groupIdEdit     => "",
+        groupIdView     => "2",     # Registered Users
+        groupIdEdit     => "3",     # Admins
         ownerUserId     => $session->user->userId,
     },
     undef,
@@ -53,126 +60,79 @@ my $album
     {
         skipAutoCommitWorkflows => 1,
     });
-
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 28;
-
-#----------------------------------------------------------------------------
-# Everyone can view, Admins can edit, Owned by current user
 
 my $photo
     = $album->addChild({
         className       => "WebGUI::Asset::File::Image::Photo",
-        groupIdView     => "7",
-        groupIdEdit     => "3",
-        ownerUserId     => $session->user->userId,
+        friendsOnly     => 0,
     },
     undef,
     undef,
     {
         skipAutoCommitWorkflows => 1,
     });
-
 $versionTags[-1]->commit;
-
-ok(  $photo->canView(1),        "Visitor can view"                      );
-ok( !$photo->canEdit(1),        "Visitor cannot edit"                   );
-ok(  $photo->canView(2),        "Registered users can view"             );
-ok( !$photo->canEdit(2),        "Registered users cannot edit"          );
-ok(  $photo->canView,           "Current user can view"                 );
-ok(  $photo->canEdit,           "Current user can edit"                 );
 
 #----------------------------------------------------------------------------
-# Admins can view, Admins can edit, Owned by Admin, current user is Visitor
-my $oldUser = $session->user;
-$session->user( { user => WebGUI::User->new($session, "1") } );
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-$versionTags[-1]->set({name=>"Adding new photo"});
-$photo
-    = $album->addChild({
-        className       => "WebGUI::Asset::File::Image::Photo",
-        groupIdView     => "3",
-        groupIdEdit     => "3",
-        ownerUserId     => "3",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
-$versionTags[-1]->commit;
-
-ok( !$photo->canView,           "Visitors cannot view"                  );
-ok( !$photo->canEdit,           "Visitors cannot edit"                  );
-ok( !$photo->canView(2),        "Registered Users cannot view"          );
-ok( !$photo->canEdit(2),        "Registered Users cannot edit"          );
-ok(  $photo->canView(3),        "Admins can view"                       );
-ok(  $photo->canEdit(3),        "Admins can edit"                       );
-$session->user( { user => $oldUser } );
+# Tests
+plan tests => 40;
 
 #----------------------------------------------------------------------------
-# Photo without specific view/edit inherits from gallery properties
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-$versionTags[-1]->set({name=>"Adding new photo #2"});
-$photo
-    = $album->addChild({
-        className       => "WebGUI::Asset::File::Image::Photo",
-        groupIdView     => "",
-        groupIdEdit     => "",
-        ownerUserId     => $session->user->userId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
-$versionTags[-1]->commit;
-
-ok( $photo->canView(1),         "Visitors can view"                     );
-ok( !$photo->canEdit(1),        "Visitors cannot edit"                  );
-ok( $photo->canView(2),         "Registered Users can view"             );
-ok( !$photo->canEdit(2),        "Registered Users cannot edit"          );
-ok( $photo->canView,            "Owner can view"                        );
-ok( $photo->canEdit,            "Owner can edit"                        );
-ok( $photo->canView(3),         "Admin can view"                        );
-ok( $photo->canEdit(3),         "Admin can edit"                        );
+# Photo inherits view from parent Album
+$maker->prepare({
+    object      => $photo,
+    method      => 'canView',
+    pass        => [ '3', $friend, $notFriend ],
+    fail        => [ '1', ],
+})->run;
 
 #----------------------------------------------------------------------------
-# Friends are allowed to view friendsOnly photos
-push @versionTags, WebGUI::VersionTag->getWorking($session);
-$versionTags[-1]->set({name=>"Adding new photo #3"});
-$photo
-    = $album->addChild({
-        className       => "WebGUI::Asset::File::Image::Photo",
-        groupIdEdit     => "",
-        ownerUserId     => $session->user->userId,
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
-$versionTags[-1]->commit;
+# Photo can only be edited by owner or those who can edit the parent album
+$maker->prepare({
+    object      => $photo,
+    method      => 'canEdit',
+    pass        => [ '3', ],
+    fail        => [ '1', $notFriend, $friend, ],
+})->run;
 
-ok( !$photo->canView(1),        "Visitors cannot view"                  );
-ok( !$photo->canEdit(1),        "Visitors cannot edit"                  );
-ok( !$photo->canView(2),        "Registered Users cannot view"          );
-ok( !$photo->canEdit(2),        "Registered Users cannot edit"          );
-ok( $photo->canView,            "Owner can view"                        );
-ok( $photo->canEdit,            "Owner can edit"                        );
-ok( $photo->canView(3),         "Admin can view"                        );
-ok( $photo->canEdit(3),         "Admin can edit"                        );
+#----------------------------------------------------------------------------
+# Photo can be commented on by those who can view and can comment on the 
+# parent album and gallery.
+$maker->prepare({
+    object      => $photo,
+    method      => 'canComment',
+    pass        => [ '3', $friend, $notFriend ],
+    fail        => [ '1', ],
+})->run;
 
+#----------------------------------------------------------------------------
+# Photo set as friends only can only be viewed by owner's friends
+$photo->update({ friendsOnly => 1, });
+$maker->prepare({
+    object      => $photo,
+    method      => 'canView',
+    pass        => [ '3', $friend ],
+    fail        => [ '1', $notFriend ],
+})->run;
+
+#----------------------------------------------------------------------------
+# Photo can be commented on by those who can view and can comment on the 
+# parent album and gallery.
+$maker->prepare({
+    object      => $photo,
+    method      => 'canComment',
+    pass        => [ '3', $friend ],
+    fail        => [ '1', $notFriend ],
+})->run;
+
+$photo->update({ friendsOnly => 0, });
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    WebGUI::Friends->new($session)->delete( [ $friend->userId ] );
-    $friend->delete;
-    foreach my $versionTag (@versionTags) {
+    for my $versionTag ( @versionTags ) {
         $versionTag->rollback;
     }
+    $friend->delete;
+    $notFriend->delete;
 }
-
-
