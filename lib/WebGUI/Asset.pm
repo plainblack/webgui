@@ -262,23 +262,23 @@ Unique hash identifier for a user. If not specified, uses current userId.
 
 
 sub canView {
-	my $self = shift;
-	my $eh = $self->session->errorHandler;
-	my $userId = shift;
-	my $user;
-	if (defined $userId) {
-		$user = WebGUI::User->new($self->session, $userId);
-	}
-	else {
-		$user =  $self->session->user;
-		$userId = $user->userId();
-	}
-	if ($userId eq $self->get("ownerUserId")) {
-                return 1;
-        } elsif ($user->isInGroup($self->get("groupIdView"))) {
-                return 1;
-        }
-        return $self->canEdit($userId);
+    my $self = shift;
+    my $userId = shift;
+    my $user;
+    if (defined $userId) {
+        $user = WebGUI::User->new($self->session, $userId);
+    }
+    else {
+        $user =  $self->session->user;
+        $userId = $user->userId();
+    }
+    if ($userId eq $self->get("ownerUserId")) {
+        return 1;
+    }
+    elsif ($user->isInGroup($self->get("groupIdView"))) {
+        return 1;
+    }
+    return $self->canEdit($userId);
 }
 
 

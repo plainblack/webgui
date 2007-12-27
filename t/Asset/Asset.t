@@ -77,6 +77,7 @@ $properties = {
 	className   => 'WebGUI::Asset',
     ownerUserId => $testUsers{'owner'}->userId,
     groupIdEdit => $testGroups{'canEdit asset'}->getId,
+    groupIdView => 7,
 };
 
 my $versionTag2 = WebGUI::VersionTag->getWorking($session);
@@ -94,11 +95,45 @@ $canEditMaker->prepare({
     'fail'   => [1, $testUsers{'regular user'},                                   ],
 });
 
+my $versionTag3 = WebGUI::VersionTag->getWorking($session);
+$properties = {
+	#            '1234567890123456789012'
+	id          => 'canViewAsset0000000010',
+	title       => 'canView Asset Test',
+	url         => 'canViewAsset1',
+	className   => 'WebGUI::Asset',
+    ownerUserId => $testUsers{'owner'}->userId,
+    groupIdEdit => $testGroups{'canEdit asset'}->getId,
+    groupIdView => $testGroups{'canEdit asset'}->getId,
+};
+
+
+my $canViewAsset = $rootAsset->addChild($properties, $properties->{id});
+
+$versionTag3->commit;
+$properties = {};  ##Clear out the hash so that it doesn't leak later by accident.
+
+my $canViewMaker = WebGUI::Test::Maker::Permission->new();
+$canViewMaker->prepare(
+    {
+        'object' => $canEditAsset,
+        'method' => 'canView',
+        'pass'   => [1, 3, $testUsers{'owner'}, $testUsers{'canEdit group user'}, $testUsers{'regular user'},],
+    },
+    {
+        'object' => $canViewAsset,
+        'method' => 'canView',
+        'pass'   => [3, $testUsers{'owner'},        $testUsers{'canEdit group user'}, ],
+        'fail'   => [1, $testUsers{'regular user'},                                   ],
+    },
+);
+
 plan tests => 56
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + $canAddMaker->plan
             + $canEditMaker->plan
+            + $canViewMaker->plan
             ;
 
 # Test the default constructor
@@ -406,12 +441,20 @@ $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
 
 $canEditMaker->run;
 
+################################################################
+#
+# canView
+#
+################################################################
+
+$canViewMaker->run;
+
 END: {
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);
     $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
-    foreach my $vTag ($versionTag, $versionTag2) {
+    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, ) {
         $vTag->rollback;
     }
     foreach my $user (values %testUsers) {
