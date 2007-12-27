@@ -32,6 +32,9 @@ my @fixTitleTests = getFixTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
 
+##Test users.
+##All users in here will be deleted at the end of the test.  DO NOT PUT
+##Visitor or Admin in here!
 my %testUsers = ();
 ##Just a regular user
 $testUsers{'regular user'} = WebGUI::User->new($session, 'new');
@@ -46,6 +49,7 @@ $testUsers{'owner'} = WebGUI::User->new($session, 'new');
 $testUsers{'owner'}->username('Asset Owner');
 
 ##Test Groups
+##All groups in here will be deleted at the end of the test
 my %testGroups = ();
 ##A group and user for groupIdEdit
 $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
