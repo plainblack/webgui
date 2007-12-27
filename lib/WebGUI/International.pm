@@ -105,7 +105,7 @@ sub get {
     $file =~ s{::}{/}g;
     $file .= '.pm';
 
-	if (!exists $INC{ $file }) {  ##Alread loaded?
+	if (!exists $INC{ $file }) {  ##Already loaded?
 		eval{ require $file };
 		$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
 	}
@@ -142,15 +142,17 @@ sub getLanguage {
     $file .= '.pm';
 	eval{require $file};
 	unless ($@) {
-		#$cmd = "\$".$cmd."::LANGUAGE";
-		my $hashRef = eval{ $cmd::LANGUAGE };	
+		$cmd = "\$".$cmd."::LANGUAGE";
+		my $hashRef = eval($cmd);	
 		$self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
 		if ($property) {
 			return $hashRef->{$property};
-		} else {
+		}
+        else {
 			return $hashRef;
 		}
-	} else {
+	}
+    else {
 		$self->session->errorHandler->warn("Language failed to compile: $language. ".$@);
 	}
 }
