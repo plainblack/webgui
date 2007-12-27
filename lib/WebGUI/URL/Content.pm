@@ -63,6 +63,9 @@ sub handler {
                 my $output = &$command($session);
                 use strict;
                 if ($output) {
+                    if ($output eq "cached") {
+                        return Apache2::Const::OK;
+                    }
                     unless ($output eq "none" || $output eq "redirect") {
                         unless ($output eq "chunked") {
                             $session->http->sendHeader();

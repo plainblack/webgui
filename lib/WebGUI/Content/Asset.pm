@@ -115,7 +115,7 @@ sub handler {
             $http->setStatus("304","Content Not Modified");
             $http->sendHeader;
             $session->close;
-            return Apache2::Const::OK;
+            return "cached";
         } 
 
         # return the page.
