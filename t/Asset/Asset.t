@@ -35,27 +35,37 @@ my $rootAsset = WebGUI::Asset->getRoot($session);
 my %testUsers = ();
 ##Just a regular user
 $testUsers{'regular user'} = WebGUI::User->new($session, 'new');
+$testUsers{'regular user'}->username('regular user');
 ##Users in group 12 can add Assets
 $testUsers{'canAdd turnOnAdmin'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd turnOnAdmin'}->addToGroups(['12']);
+$testUsers{'canAdd turnOnAdmin'}->username('Turn On Admin user');
 
 ##Just a user for owning assets
 $testUsers{'owner'} = WebGUI::User->new($session, 'new');
+$testUsers{'owner'}->username('Asset Owner');
 
 ##Test Groups
 my %testGroups = ();
+##A group and user for groupIdEdit
 $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
-
 $testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
+$testUsers{'canEdit group user'}->username('Edit Group User');
+
+##A group and user for groupIdEdit
+$testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
+$testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
+$testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
+$testUsers{'canEdit group user'}->username('Can Add Group User');
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
     'className' => 'WebGUI::Asset',
     'session'   => $session,
     'method'    => 'canAdd',
-    'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, ],
-    'fail'      => [1, $testUsers{'regular user'}, ],
+    'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, $testUsers{'canAdd group user'} ],
+    'fail'      => [1, $testUsers{'regular user'},                                       ],
 });
 
 my $properties;
@@ -381,7 +391,12 @@ TODO: {
 #
 ################################################################
 
+my $origAssetAddPrivileges = $session->config->get('assetAddPrivilege');
+$session->config->set('assetAddPrivilege', { 'WebGUI::Asset' => $testGroups{'canAdd asset'}->getId } );
+
 $canAddMaker->run;
+
+$session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
 
 ################################################################
 #
@@ -395,6 +410,7 @@ END: {
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);
+    $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
     foreach my $vTag ($versionTag, $versionTag2) {
         $vTag->rollback;
     }

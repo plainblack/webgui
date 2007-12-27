@@ -67,9 +67,9 @@ SKIP: {
 		'Language check: existing key returns native language key'
 	);
 
-    is($i18n->getLanguage('English', 'label'), 'English', 'getLanguage, specific property');
-
 }
+
+is($i18n->getLanguage('English', 'label'), 'English', 'getLanguage, specific property');
 
 }
 

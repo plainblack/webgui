@@ -122,12 +122,15 @@ The permissions method to test
 =item pass
 
 An array reference of userIds or WebGUI::User objects that should pass the 
-permissions test.
+permissions test.  If each user has a username, it will be used in the
+test comment output instead of the userId.
 
 =item fail
 
 An array reference of userIds or WebGUI::User objects that should fail the 
-permissions test.
+permissions test.  If each user has a username, it will be used in the
+test comment output instead of the userId.
+
 
 =back
 
@@ -209,14 +212,17 @@ sub run {
 
                 # Test the default session user
                 my $oldUser = $session->user;
-                $session->user( { userId => $userId } );
-                ok( $o->$m(@args), "userId $userId passes $m check using default user for " . $comment );
-                $session->user( { user => $oldUser });
+                $session->user( { userId => $userId  } );
+                my $role = $session->user->username
+                         ? "user ".$session->user->username
+                         : "userId ".$userId;
+                ok( $o->$m(@args), "$role passes $m check using default user for " . $comment );
+                $session->user( { user   => $oldUser } );
 
                 # Test the specified userId
                 push @args, $userId;
                 # Test the userId parameter
-                ok( $o->$m(@args), "userId $userId passes $m check for " . $comment );
+                ok( $o->$m(@args), "$role passes $m check for " . $comment );
 
             }
         }
@@ -227,12 +233,15 @@ sub run {
                 # Test the default session user
                 my $oldUser = $session->user;
                 $session->user( { userId => $userId } );
-                ok( !($o->$m(@args)), "userId $userId fails $m check using default user for " . $comment );
+                my $role = $session->user->username
+                         ? "user ".$session->user->username
+                         : "userId ".$userId;
+                ok( !($o->$m(@args)), "$role fails $m check using default user for " . $comment );
                 $session->user( { user => $oldUser });
 
                 # Test the userId parameter
                 push @args, $userId;
-                ok( !($o->$m(@args)), "userId $userId fails $m check for " . $comment );
+                ok( !($o->$m(@args)), "$role fails $m check for " . $comment );
 
             }
         }
