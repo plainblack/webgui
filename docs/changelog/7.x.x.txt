@@ -6,6 +6,7 @@
  - add: Friends Network
  - rfe: Added message to user search operation when user count exceeds 250.
    (Diona Kidd, Knowmad Technologies)
+ - rfe: Label for RadioList.pm and CheckList.pm
  - rfe: Add menuTitle to folder template (perlDreamer Consulting, LLC)
  - Added pluggable URL and content handlers.
  - Added Gallery asset 
