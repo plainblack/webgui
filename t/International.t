@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
 my $langTests = 2; ##For language look-up tests
-$numTests    += 10 + $langTests;
+$numTests    += 11 + $langTests;
 
 plan tests => $numTests;
 
@@ -70,6 +70,8 @@ SKIP: {
 }
 
 is($i18n->getLanguage('English', 'label'), 'English', 'getLanguage, specific property');
+
+isa_ok($i18n->getLanguage('English'), 'HASH', 'getLanguage, without a specific property returns a hashref');
 
 }
 

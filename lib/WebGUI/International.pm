@@ -141,20 +141,21 @@ sub getLanguage {
     $file =~ s{::}{/}g;
     $file .= '.pm';
 	eval{require $file};
-	unless ($@) {
-		$cmd = "\$".$cmd."::LANGUAGE";
-		my $hashRef = eval($cmd);	
-		$self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
-		if ($property) {
-			return $hashRef->{$property};
-		}
-        else {
-			return $hashRef;
-		}
-	}
-    else {
+    if ($@) {
 		$self->session->errorHandler->warn("Language failed to compile: $language. ".$@);
-	}
+        return;
+    }
+    $cmd = '$'.$cmd.'::LANGUAGE';
+    ## no critic ProhibitStringyEval
+    my $hashRef = eval($cmd);
+    ## use critic;
+    $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
+    if ($property) {
+        return $hashRef->{$property};
+    }
+    else {
+        return $hashRef;
+    }
 }
 
 
