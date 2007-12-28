@@ -13,6 +13,7 @@
  - Fixed inheritence problems with File/Image assets
  - Added ability for upgrade scripts to contain packages to deploy
  - Fixed chdir problem in Storage -- more remain though
+ - Added a new plugin handler system that is both faster and more secure.
 
 7.4.19
  - fix: Import Package does nothing when re-importing trashed package

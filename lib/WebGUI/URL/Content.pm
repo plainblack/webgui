@@ -17,6 +17,7 @@ package WebGUI::URL::Content;
 use strict;
 use Apache2::Const -compile => qw(OK DECLINED);
 use WebGUI::Affiliate;
+use WebGUI::Pluggable;
 use WebGUI::Session;
 
 =head1 NAME
@@ -51,17 +52,11 @@ sub handler {
     $request->push_handlers(PerlResponseHandler => sub {
         my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
         foreach my $handler (@{$config->get("contentHandlers")}) {
-            my $handlerPath = $handler.".pm";
-            $handlerPath =~ s{::}{/}g;
-            eval { require $handlerPath };
+            my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] ) };
             if ( $@ ) {
-                $session->errorHandler->error("Couldn't load content handler $handler.");
+                $session->errorHandler->error($@);
             }
             else {
-                my $command = $handler."::handler";
-                no strict qw(refs);
-                my $output = &$command($session);
-                use strict;
                 if ($output) {
                     if ($output eq "cached") {
                         return Apache2::Const::OK;

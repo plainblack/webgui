@@ -16,6 +16,7 @@ package WebGUI::Operation::Auth;
 use strict qw(vars subs);
 use URI;
 use WebGUI::Operation::Shared;
+use WebGUI::Pluggable;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Utility;
@@ -37,13 +38,13 @@ sub getInstance {
 	$authMethod = $_[0] if($_[0] && isIn($_[0], @{$session->config->get("authMethods")}));
 	my $userId = $_[1];
 	#Create Auth Object
-	my $cmd = "WebGUI::Auth::".$authMethod;
-	my $load = "use ".$cmd;
-	eval($load);
-	$session->errorHandler->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
-	my $auth = eval{$cmd->new($session, $authMethod,$userId)};
-	$session->errorHandler->fatal("Couldn't instantiate authentication module: $authMethod. Root cause: ".$@) if($@);
-	return $auth;
+    my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod, $userId ] ) };
+    if ($@) {
+        $session->errorHandler->fatal($@);
+    }
+    else {
+        return $auth;
+    };
 }
 
 #-------------------------------------------------------------------

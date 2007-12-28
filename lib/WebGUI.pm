@@ -1,6 +1,5 @@
 package WebGUI;
 
-use strict;# qw(vars subs);
 
 our $VERSION = "7.5.0";
 our $STATUS = "beta";
@@ -20,10 +19,12 @@ our $STATUS = "beta";
 
 =cut
 
+use strict;
 use Apache2::Const -compile => qw(OK DECLINED);
 use Apache2::Request;
 use Apache2::ServerUtil ();
 use WebGUI::Config;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -65,20 +66,14 @@ sub handler {
     foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
         if ($request->uri =~ m{$regex}i) {
-            my $module = $handler->{$regex};
-            my $modulePath = $module.".pm";
-            $modulePath =~ s{::}{/}g;
-            eval { require $modulePath };
+            my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
             if ($@) {
-                $error .= $@;
+                # bad
+                return Apache2::Const::DECLINED;
             }
             else {
-                my $command = $module."::handler";
-                no strict qw(refs);
-                my $out = &$command($request, $server, $config);
-                use strict;
-                return $out;
-            }
+                return $output;
+            }                
         }
 	}
     $request->push_handlers(PerlResponseHandler => sub { 
