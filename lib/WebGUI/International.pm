@@ -16,6 +16,8 @@ package WebGUI::International;
 
 
 use strict qw(vars subs);
+use WebGUI::Session;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -100,20 +102,13 @@ sub get {
 	$id =~ s/$safeRe//g;
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
-	my $cmd = "WebGUI::i18n::".$language."::".$namespace;
-    my $file = $cmd;
-    $file =~ s{::}{/}g;
-    $file .= '.pm';
-
-	if (!exists $INC{ $file }) {  ##Already loaded?
-		eval{ require $file };
-		$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
-	}
-	our $table;
-	*table = *{"$cmd\::I18N"};  ##Create alias into symbol table
+    my $cmd = "WebGUI::i18n::".$language."::".$namespace;
+    WebGUI::Pluggable::load($cmd);
+    our $table;
+    *table = *{"$cmd\::I18N"};  ##Create alias into symbol table
 	my $output = $table->{$id}->{message};
 	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
-	return $output;
+    return $output;
 }
 
 
@@ -137,18 +132,9 @@ sub getLanguage {
 	my ($self, $language, $property) = @_;
 	$language = $language || $self->{_language} || "English";
 	my $cmd = "WebGUI::i18n::".$language;
-    my $file = $cmd;
-    $file =~ s{::}{/}g;
-    $file .= '.pm';
-	eval{require $file};
-    if ($@) {
-		$self->session->errorHandler->warn("Language failed to compile: $language. ".$@);
-        return;
-    }
+    WebGUI::Pluggable::load($cmd);
     $cmd = '$'.$cmd.'::LANGUAGE';
-    ## no critic ProhibitStringyEval
     my $hashRef = eval($cmd);
-    ## use critic;
     $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
     if ($property) {
         return $hashRef->{$property};
@@ -217,14 +203,8 @@ sub makeUrlCompliant {
 	my ($self, $url, $language) = @_;
 	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
 	my $cmd = "WebGUI::i18n::".$language;
-    my $file = $cmd;
-    $file =~ s{::}{/}g;
-    $file .= '.pm';
-	eval { require $file };
-	$self->session->errorHandler->warn($cmd." failed to compile because ".$@) if ($@);
-	$cmd = $cmd."::makeUrlCompliant";
-	my $output = eval{&$cmd($url)};	
-	$self->session->errorHandler->fatal("Couldn't execute ".$cmd." because ".$@.". Maybe your languagepack misses the makeUrlCompliant method?") if ($@);
+    WebGUI::Pluggable::load($cmd);
+	my $output = WebGUI::Pluggable::run($cmd, 'makeUrlCompliant', [$url]);
 	return $output;
 }
 
@@ -270,7 +250,12 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
-	my $self = bless { _session   => $session, _namespace => $namespace, _language  => ($language || $session->user->profileField('language')) }, $class;
+	my $self =
+        bless {
+            _session   => $session,
+            _namespace => $namespace,
+            _language  => ($language || $session->user->profileField('language')),
+        }, $class;
 	return $self;
 }
 
