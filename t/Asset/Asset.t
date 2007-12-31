@@ -134,7 +134,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 61
+plan tests => 64
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + $canAddMaker->plan
@@ -486,6 +486,16 @@ ok($addMissing, 'addMissing returns some output when in Admin Mode');
 
 is($rootAsset->getContainer->getId, $rootAsset->getId, 'getContainer: A folder is a container, its container is itself');
 is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A snippet is not a container, its container is its parent');
+
+################################################################
+#
+# getName
+#
+################################################################
+
+is($fixTitleAsset->getName, $i18n->get('assetName', 'Asset_Snippet'), 'getName: Returns the internationalized name of the Asset, Snippet');
+is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, Folder');
+is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
