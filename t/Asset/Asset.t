@@ -24,6 +24,7 @@ use WebGUI::VersionTag;
 
 use Test::More;
 use Test::MockObject;
+use HTML::TokeParser;
 
 my $session = WebGUI::Test->session;
 
@@ -133,7 +134,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 56
+plan tests => 59
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + $canAddMaker->plan
@@ -453,6 +454,29 @@ $canEditMaker->run;
 ################################################################
 
 $canViewMaker->run;
+
+################################################################
+#
+# addMissing
+#
+################################################################
+
+$session->user({ userId => 3 });
+$session->var->switchAdminOff;
+is($canEditAsset->addMissing('/nowhereMan'), undef, q{addMissing doesn't return anything unless use is in Admin Mode});
+
+$session->var->switchAdminOn;
+my $addMissing = $canEditAsset->addMissing('/nowhereMan');
+ok($addMissing, 'addMissing returns some output when in Admin Mode');
+
+{
+
+    my $parser = HTML::TokeParser->new(\$addMissing);
+    my $link = $parser->get_tag('a');
+    my $url = $link->[1]{'href'} || '-';
+    like($url, qr{func=add;class=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
+
+}
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
