@@ -623,6 +623,7 @@ END {
 	foreach my $subSession (@sessionBank) {
 		$subSession->db->write("DELETE FROM userSession WHERE sessionId=?",[ $subSession->getId]);
 		$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
+        $subSession->scratch->deleteAll;
 		$subSession->close() if (defined $subSession and ref $subSession eq 'WebGUI::Session');
 	}
 	$testCache->flush;

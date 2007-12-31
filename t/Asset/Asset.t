@@ -68,7 +68,8 @@ $canAddMaker->prepare({
     'className' => 'WebGUI::Asset',
     'session'   => $session,
     'method'    => 'canAdd',
-    'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, $testUsers{'canAdd group user'} ],
+    #'pass'      => [3, $testUsers{'canAdd turnOnAdmin'}, $testUsers{'canAdd group user'} ],
+    'pass'      => [3, $testUsers{'canAdd group user'} ],
     'fail'      => [1, $testUsers{'regular user'},                                       ],
 });
 

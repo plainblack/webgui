@@ -68,6 +68,7 @@ my ($changedValue) = $session->db->quickArray("select value from userSessionScra
 is($changedValue, 15, "changing stored scratch value");
 is($scratch->get("dBase5"), 15, "checking cached scratch value");
 
+$newSession->scratch->deleteAll;
 $newSession->close;
 
 is($scratch->set('retVal',2), 1, 'set returns number of rows affected');
