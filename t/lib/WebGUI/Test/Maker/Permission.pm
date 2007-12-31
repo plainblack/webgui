@@ -207,43 +207,10 @@ sub run {
         ##This needs to be refactored into a sub/method, instead of copy/paste
         ##duplicated in fail, below.
         if ($test->{pass}) {
-            for my $userId (@{$test->{pass}}) {
-                my @args    = @methodArguments;
-
-                # Test the default session user
-                my $oldUser = $session->user;
-                $session->user( { userId => $userId  } );
-                my $role = $session->user->username
-                         ? "user ".$session->user->username
-                         : "userId ".$userId;
-                ok( $o->$m(@args), "$role passes $m check using default user for " . $comment );
-                $session->user( { user   => $oldUser } );
-
-                # Test the specified userId
-                push @args, $userId;
-                # Test the userId parameter
-                ok( $o->$m(@args), "$role passes $m check for " . $comment );
-
-            }
+            runUsers($session, $o, $m, \@methodArguments, $test->{pass}, 1, $comment);
         }
         if ($test->{fail}) {
-            for my $userId (@{$test->{fail}}) {
-                my @args = @methodArguments;
-
-                # Test the default session user
-                my $oldUser = $session->user;
-                $session->user( { userId => $userId } );
-                my $role = $session->user->username
-                         ? "user ".$session->user->username
-                         : "userId ".$userId;
-                ok( !($o->$m(@args)), "$role fails $m check using default user for " . $comment );
-                $session->user( { user => $oldUser });
-
-                # Test the userId parameter
-                push @args, $userId;
-                ok( !($o->$m(@args)), "$role fails $m check for " . $comment );
-
-            }
+            runUsers($session, $o, $m, \@methodArguments, $test->{fail}, 0, $comment);
         }
     }
 }
@@ -257,5 +224,72 @@ Set a setting.
 Currently this module has no settings
 
 =cut
+
+#----------------------------------------------------------------------------
+
+=head2 runUsers
+
+Process an array of users for tests.
+
+=head3 session
+
+A WebGUI session object, used to access and/or alter the default session
+user for the tests.
+
+=head3 object
+
+A WebGUI object or class, used for testing.
+
+=head3 method
+
+The method on the object or class to call for each test.
+
+=head3 precedingArguments
+
+Any arguments that should be pushed onto the argument list before a userId.
+
+=head3 users
+
+An array ref of users.
+
+=head3 passing
+
+A boolean, which if true, says that the users are expected to pass each test.
+If false, the users will be expected to fail, which means that if they do
+fail that the test itself will pass.
+
+=head3 comment
+
+A specific comment to add to the test's comment.  Usually this would
+be something like the username or userId.
+
+=cut
+
+sub runUsers {
+    my ($session, $object,  $method, $precedingArguments,
+        $users,   $passing, $comment ) = @_;
+    my $failing = !$passing;
+    foreach my $userId (@{ $users }) {
+        my @args = @{ $precedingArguments };
+        my $oldUser = $session->user;
+        $session->user( { userId => $userId  } );
+        my $role = $session->user->username
+                 ? "user ".$session->user->username
+                 : "userId ".$userId;
+        ok(
+            ( $object->$method(@args) xor $failing ),
+            "$role passes $method check using default user for " . $comment
+        );
+        $session->user( { user   => $oldUser } );
+
+        # Test the specified userId
+        push @args, $userId;
+        # Test the userId parameter
+        ok(
+            ( $object->$method(@args) xor $failing ),
+            "$role passes $method check for " . $comment
+        );
+    }
+}
 
 1;
