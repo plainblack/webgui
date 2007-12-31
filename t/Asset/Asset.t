@@ -134,7 +134,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 59
+plan tests => 61
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + $canAddMaker->plan
@@ -477,6 +477,15 @@ ok($addMissing, 'addMissing returns some output when in Admin Mode');
     like($url, qr{func=add;class=WebGUI::Asset::Wobject::Layout;url=/nowhereMan$}, 'addMissing: Link will add a new page asset with correct URL');
 
 }
+
+################################################################
+#
+# getContainer
+#
+################################################################
+
+is($rootAsset->getContainer->getId, $rootAsset->getId, 'getContainer: A folder is a container, its container is itself');
+is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A snippet is not a container, its container is its parent');
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
