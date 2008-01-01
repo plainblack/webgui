@@ -75,6 +75,14 @@ $canAddMaker->prepare({
     'fail'      => [1, $testUsers{'regular user'},                                       ],
 });
 
+my $canAddMaker2 = WebGUI::Test::Maker::Permission->new();
+$canAddMaker2->prepare({
+    'className' => 'WebGUI::Asset',
+    'session'   => $session,
+    'method'    => 'canAdd',
+    'pass'      => [$testUsers{'canAdd turnOnAdmin'},],
+});
+
 my $properties;
 $properties = {
 	#            '1234567890123456789012'
@@ -135,11 +143,12 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 70
+plan tests => 71
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             + $canAddMaker->plan
+            #+ $canAddMaker2->plan
             + $canEditMaker->plan
             + $canViewMaker->plan
             ;
@@ -468,7 +477,17 @@ $session->config->set('assetAddPrivilege', { 'WebGUI::Asset' => $testGroups{'can
 
 $canAddMaker->run;
 
-$session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
+TODO: {
+    local $TODO = 'assetAddPrivilege overrides group Turn On Admin?';
+    #$canAddMaker2->run;
+}
+
+if (defined $origAssetAddPrivileges) {
+    $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
+}
+else {
+    $session->config->delete('assetUiLevel');
+}
 
 ################################################################
 #
@@ -550,16 +569,39 @@ is($getTitleAsset->getToolbarState, 0, 'getToolbarState: toggleToolbarState togg
 is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
 is($fixTitleAsset->getUiLevel, 5, 'getUiLevel: Snippet has an uiLevel of 5');
 
-TODO: {
-    local $TODO = 'more getUiLevel tests';
-    ok(0, 'set assetUiLevel and retest several assets');
+my $origAssetUiLevel = $session->config->get('assetUiLevel');
+$session->config->set('assetUiLevel',
+                      {
+                        'WebGUI::Asset'          => 8,
+                        'WebGUI::Asset::Snippet' => 9,
+                      } );
+
+is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
+is($fixTitleAsset->getUiLevel, 9, 'getUiLevel: Snippet has a configured uiLevel of 9');
+
+if (defined $origAssetUiLevel) {
+    $session->config->set('assetUiLevel', $origAssetUiLevel);
+}
+else {
+    $session->config->delete('assetUiLevel');
 }
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
     $session->config->set('uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);
-    $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
+    if (defined $origAssetAddPrivileges) {
+        $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
+    }
+    else {
+        $session->config->delete('assetUiLevel');
+    }
+    if (defined $origAssetUiLevel) {
+        $session->config->set('assetUiLevel', $origAssetUiLevel);
+    }
+    else {
+        $session->config->delete('assetUiLevel');
+    }
     foreach my $vTag ($versionTag, $versionTag2, $versionTag3, ) {
         $vTag->rollback;
     }
