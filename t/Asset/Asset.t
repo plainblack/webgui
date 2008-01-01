@@ -135,10 +135,10 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 64
+plan tests => 70
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
-            + 2*scalar(@getTitleTests)
+            + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             + $canAddMaker->plan
             + $canEditMaker->plan
             + $canViewMaker->plan
@@ -527,6 +527,33 @@ is($fixTitleAsset->getContainer->getId, $defaultAsset->getId, 'getContainer: A s
 is($fixTitleAsset->getName, $i18n->get('assetName', 'Asset_Snippet'), 'getName: Returns the internationalized name of the Asset, Snippet');
 is($importNode->getName,    $i18n->get('assetName', 'Asset_Folder'),  'getName: Returns the internationalized name of the Asset, Folder');
 is($canEditAsset->getName,  $i18n->get('asset', 'Asset'),             'getName: Returns the internationalized name of the Asset, core Asset');
+
+################################################################
+#
+# getToolbarState
+# toggleToolbar
+#
+################################################################
+
+is($getTitleAsset->getToolbarState, undef, 'getToolbarState: default toolbar state is undef');
+$getTitleAsset->toggleToolbar();
+is($getTitleAsset->getToolbarState, 1, 'getToolbarState: toggleToolbarState toggled the state to 1');
+$getTitleAsset->toggleToolbar();
+is($getTitleAsset->getToolbarState, 0, 'getToolbarState: toggleToolbarState toggled the state to 0');
+
+################################################################
+#
+# getUiLevel
+#
+################################################################
+
+is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default uiLevel of 1');
+is($fixTitleAsset->getUiLevel, 5, 'getUiLevel: Snippet has an uiLevel of 5');
+
+TODO: {
+    local $TODO = 'more getUiLevel tests';
+    ok(0, 'set assetUiLevel and retest several assets');
+}
 
 END: {
     $session->config->set('extrasURL',    $origExtras);
