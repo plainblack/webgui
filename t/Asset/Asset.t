@@ -30,6 +30,7 @@ my $session = WebGUI::Test->session;
 
 my @fixIdTests    = getFixIdTests($session);
 my @fixTitleTests = getFixTitleTests($session);
+my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
 
@@ -137,6 +138,7 @@ $canViewMaker->prepare(
 plan tests => 64
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
+            + 2*scalar(@getTitleTests)
             + $canAddMaker->plan
             + $canEditMaker->plan
             + $canViewMaker->plan
@@ -317,6 +319,16 @@ my $properties2 = {
 
 my $fixTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
 
+$properties2 = {
+	#            '1234567890123456789012'
+	id        => 'getTitleAsset000000010',
+	title     => '',
+	className => 'WebGUI::Asset::Snippet',
+	url       => 'getTitleAsset1',
+};
+
+my $getTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
+
 $versionTag->commit;
 
 
@@ -405,6 +417,25 @@ foreach my $test (@fixTitleTests) {
 $fixTitleAsset->update({'title' => 0});
 
 is($fixTitleAsset->fixTitle(''), 'Untitled', q{fixTitle: title is false, fixTitle returns 'Untitled'});
+
+################################################################
+#
+# getTitle
+# getMenuTitle
+#
+################################################################
+
+my $getTitleAssetName = $getTitleAsset->getName();
+
+foreach my $test (@getTitleTests) {
+    my $expectedTitle = $test->{assetName} ? $getTitleAssetName : $test->{title};
+    $getTitleAsset->update({
+                            title     => $test->{title},
+                            menuTitle => $test->{title},
+                           });
+    is($getTitleAsset->getTitle,     $expectedTitle, $test->{comment});
+    is($getTitleAsset->getMenuTitle, $expectedTitle, $test->{comment});
+}
 
 ################################################################
 #
@@ -613,6 +644,40 @@ sub getFixTitleTests {
         title   => 'This is a good Title',
         fixed    => 'This is a good Title',
         comment => "Good titles are passed",
+    },
+    );
+}
+
+##Return an array of hashrefs.  Each hashref describes a test
+##for the getTitle and getMenuTitle tests.  If "assetName"  != 0, they
+##will return the Asset's internationalized name.
+
+sub getTitleTests {
+    my $session = shift;
+    return ({
+        title     => undef,
+        assetName => 1,
+        comment   => "getTitle: undef returns the Asset's name",
+    },
+    {
+        title     => '',
+        assetName => 1,
+        comment   => "getTitle: null string returns the Asset's name",
+    },
+    {
+        title     => 'untitled',
+        assetName => 1,
+        comment   => "getTitle: 'untitled' returns the Asset's name",
+    },
+    {
+        title     => 'UnTiTlEd',
+        assetName => 1,
+        comment   => "getTitle: 'untitled' in any case returns the Asset's title",
+    },
+    {
+        title     => 'This is a good Title',
+        assetName => 0,
+        comment   => "getTitle: Good titles are passed",
     },
     );
 }
