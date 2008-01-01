@@ -143,7 +143,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 71
+plan tests => 75
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -584,6 +584,27 @@ if (defined $origAssetUiLevel) {
 }
 else {
     $session->config->delete('assetUiLevel');
+}
+
+################################################################
+#
+# assetExists
+#
+################################################################
+
+{
+
+    my $id    = $canViewAsset->getId;
+    my $class = 'WebGUI::Asset';
+    my $date  = $canViewAsset->get('revisionDate');
+
+    ok ( WebGUI::Asset->assetExists($session, $id, $class, $date), 'assetExists with proper class, id and revisionDate');
+    ok (!WebGUI::Asset->assetExists($session, $id, 'WebGUI::Asset::Snippet', $date), 'assetExists with wrong class does not exist');
+    my $id2 = $id;
+    ++$id2;
+    ok (!WebGUI::Asset->assetExists($session, $id2, $class, $date), 'assetExists with wrong id does not exist');
+    ok (!WebGUI::Asset->assetExists($session, $id,  $class, $date+1), 'assetExists with wrong revisionDate does not exist');
+
 }
 
 END: {
