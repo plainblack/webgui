@@ -457,7 +457,7 @@ sub definition {
                         hoverHelp=>$i18n->get('make asset exportable description'),
                         uiLevel=>9,
                         fieldType=>'yesNo',
-                        defaultValue=>0,
+                        defaultValue=>1,
                     },
 				    status=>{
 					    noFormPost=>1,
