@@ -133,7 +133,11 @@ sub purge {
     }
 
     # assassinate the offspring
-	my $kids = $self->getLineage(["children"],{returnObjects=>1, statesToInclude=>['published', 'clipboard', 'clipboard-limbo','trash','trash-limbo']});
+	my $kids = $self->getLineage(["children"],{
+        returnObjects   => 1,
+        statesToInclude => [qw(published clipboard clipboard-limbo trash trash-limbo)],
+        statusToInclude => [qw(approved archived pending)],
+    });
 	foreach my $kid (@{$kids}) {
 		# Technically get lineage should never return an undefined object from getLineage when called like this, but it did so this saves the world from destruction.
         if (defined $kid) {
