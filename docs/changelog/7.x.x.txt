@@ -1,4 +1,5 @@
 7.4.20
+ - fix: Assets with no committed versions may be left as orphans when parent is purged
 
 7.4.19
  - fix: Select all doesn't work in trash in IE or with a single item
