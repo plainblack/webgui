@@ -451,6 +451,14 @@ sub definition {
 					    fieldType=>'yesNo',
 					    defaultValue=>0
 					},
+                    isExportable=>{
+                        tab=>'meta',
+                        label=>$i18n->get('make asset exportable'),
+                        hoverHelp=>$i18n->get('make asset exportable description'),
+                        uiLevel=>9,
+                        fieldType=>'yesNo',
+                        defaultValue=>0,
+                    },
 				    status=>{
 					    noFormPost=>1,
 					    fieldType=>'hidden',

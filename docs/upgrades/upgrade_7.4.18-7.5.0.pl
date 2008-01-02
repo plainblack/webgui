@@ -28,6 +28,7 @@ addGroupToEditPost($session);
 installGalleryAsset($session);
 installGalleryAlbumAsset($session);
 installPhotoAsset($session);
+addIsExportable($session);
 
 finish($session); # this line required
 
@@ -261,6 +262,15 @@ CREATE TABLE IF NOT EXISTS Photo_rating (
 )
 ENDSQL
     
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the isExportable property for all assets
+sub addIsExportable {
+    my $session = shift;
+    print "Adding isExportable flag for all assets (fine-grained export control)..." unless $quiet;
+    $session->db->write('alter table assetData add column isExportable int(11) not null default 0');
     print "DONE!\n" unless $quiet;
 }
 

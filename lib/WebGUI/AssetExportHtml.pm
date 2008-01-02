@@ -109,7 +109,8 @@ sub _exportAsHtml {
     	$tempSession->close;
     
     	# We're going to walk up the URL branch, making the deepest paths first
-	foreach my $assetId (@{$assetIds}) {
+        my $exportedCount = 0;
+        ASSET: foreach my $assetId (@{$assetIds}) {
         	my $assetSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
         	$assetSession->user({userId=>$userId});
 		my $asset = WebGUI::Asset->newByDynamicClass($assetSession, $assetId);
@@ -128,6 +129,19 @@ sub _exportAsHtml {
 		}
 		my $path        = $exportPath . '/'. $pathData->{'path'};
 		my $filename    = $pathData->{'filename'};
+		my $pathWithFilename = $path.'/'.$filename;
+		$pathWithFilename =~ s{//}{/}g;
+
+        # if this asset isn't exportable, skip it.
+        my $parentAssets = $asset->getLineage(['ancestors'], { returnObjects => 1} );
+        for my $exportCheck(@{$parentAssets}, $asset) {
+            # don't count the root asset
+            next if $exportCheck->getUrl eq '/root';
+            unless ($exportCheck->get('isExportable')) {
+                $self->session->output->print("$pathWithFilename skipped, not exportable<br />") unless $quiet;
+                next ASSET;
+            }
+        }
 
 		# this is needed for symlinking
 		if ($asset->getId eq $defaultAssetId) {
@@ -143,8 +157,6 @@ sub _exportAsHtml {
 		}
 
 		# output which page we're exporting
-		my $pathWithFilename = $path.'/'.$filename;
-		$pathWithFilename =~ s{//}{/}g;
 		unless ($quiet) {
 			$self->session->output->print(sprintf($i18n->get('exporting page'), $pathWithFilename));
 		}
@@ -169,6 +181,7 @@ sub _exportAsHtml {
 		$assetSession->close;
 		$self->session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$pathWithFilename, $asset->getId]);
 		$self->session->output->print($i18n->get('done')) unless $quiet;
+        $exportedCount++;
 	}
     
     	# symlink?
@@ -212,7 +225,7 @@ sub _exportAsHtml {
 		# Nothing.  This is the default.
 	}
 
-	return (1, sprintf($i18n->get('export information'), scalar(@{$assetIds}), ($self->session->datetime->time()-$startTime)));
+	return (1, sprintf($i18n->get('export information'), $exportedCount, ($self->session->datetime->time()-$startTime)));
 }
 
 #-------------------------------------------------------------------

@@ -652,6 +652,13 @@ isa_ok(WebGUI::Asset->getNotFound($session), 'WebGUI::Asset', 'getNotFound: Retu
 
 $session->setting->set('notFoundPage', $origNotFoundPage);
 
+################################################################
+#
+# isExportable
+#
+################################################################
+is($rootAsset->get('isExportable'), 0, 'isExportable exists, defaults to 0');
+
 END: {
     $session->config->set( 'extrasURL',    $origExtras);
     $session->config->set( 'uploadsURL',   $origUploads);

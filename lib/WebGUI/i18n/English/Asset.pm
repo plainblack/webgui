@@ -1027,6 +1027,16 @@ Couldn't open %-s because %-s <br />
 		lastUpdated => 1160773957,
 	},
 
+    'make asset exportable' => {
+        message => q|Make this asset exportable?|,
+        lastUpdated => 0,
+    },
+
+    'make asset exportable description' => {
+        message => q|<p>Will this asset be exportable? This asset, and all of its parent assets, must be exportable for this asset to be exported.</p>|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
