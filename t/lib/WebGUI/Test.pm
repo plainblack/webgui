@@ -106,6 +106,9 @@ BEGIN {
 }
 
 END {
+    my $Test = Test::Builder->new;
+    $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
+    $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
 }
