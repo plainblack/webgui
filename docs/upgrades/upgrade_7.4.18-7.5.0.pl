@@ -21,6 +21,8 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+addIsExportable($session);
+updateTemplates($session);
 addUrlAndContentHandlers($session);
 addFriendsNetwork($session);
 addSearchWithContainers($session);
@@ -28,7 +30,6 @@ addGroupToEditPost($session);
 installGalleryAsset($session);
 installGalleryAlbumAsset($session);
 installPhotoAsset($session);
-addIsExportable($session);
 
 finish($session); # this line required
 
@@ -353,7 +354,6 @@ sub start {
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"Upgrade to ".$toVersion});
 	$session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
-	updateTemplates($session);
 	return $session;
 }
 
