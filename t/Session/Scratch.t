@@ -119,9 +119,11 @@ is($sessionBank[2]->scratch->deleteNameByValue('falseValue',''), 1, "deleteNameB
 
 END {
 	$session->scratch->deleteAll;
-	foreach my $wgSess ($newSession, @sessionBank, $session) {
+	foreach my $wgSess ($newSession, @sessionBank) {
 		if (defined $wgSess and ref $wgSess eq 'WebGUI::Session') {
+            diag "Closing session";
 			$wgSess->scratch->deleteAll;
+            $wgSess->var->end;
 			$wgSess->close;
 		}
 	}
