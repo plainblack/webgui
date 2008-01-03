@@ -144,7 +144,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 80
+plan tests => 81
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -657,7 +657,7 @@ $session->setting->set('notFoundPage', $origNotFoundPage);
 # isExportable
 #
 ################################################################
-is($rootAsset->get('isExportable'), 0, 'isExportable exists, defaults to 0');
+is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
 
 END: {
     $session->config->set( 'extrasURL',    $origExtras);
