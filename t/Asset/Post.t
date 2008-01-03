@@ -116,8 +116,6 @@ TODO: {
 
 END {
     # Clean up after thyself
-    $collab->purge();
-    $post->purge();
     $versionTag->rollback();
     $postingUser->delete();
     $otherUser->delete();
