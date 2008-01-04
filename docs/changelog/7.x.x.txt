@@ -16,6 +16,8 @@
  - Added a new plugin handler system that is both faster and more secure.
  - Added switch for assets to determine whether they are exportable.
  - Added migration utility for Gallery
+ - Removed old .tmpl files from upgrades. ALL templates in upgrades must now 
+   be in Packages!
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged

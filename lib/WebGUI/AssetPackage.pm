@@ -198,11 +198,12 @@ A reference to a WebGUI::Storage object that contains a webgui package file.
 =cut
 
 sub importPackage {
-    my $self = shift;
-    my $storage = shift;
-    my $decompressed = $storage->untar($storage->getFiles->[0]);
-    my %assets = ();
-    my $error = $self->session->errorHandler;
+    my $self            = shift;
+    my $storage         = shift;
+    my $decompressed    = $storage->untar($storage->getFiles->[0]);
+    my %assets          = ();               # All the assets we've imported
+    my $package         = undef;            # The asset package
+    my $error           = $self->session->errorHandler;
     $error->info("Importing package.");
     foreach my $file (sort(@{$decompressed->getFiles})) {
         next unless ($decompressed->getFileExtension($file) eq "json");
@@ -224,15 +225,24 @@ sub importPackage {
         my $newAsset = $asset->importAssetData($data);
         $newAsset->importAssetCollateralData($data);
         $assets{$newAsset->getId} = $newAsset;
+        
+        # First imported asset must be the "package"
+        unless ($package) {
+            $package            = $newAsset;
+        }
     }
+
+    # Handle autocommit workflows
     if ($self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {
             WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
+        } 
+        else {
             $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
         }
     }
-    return;
+
+    return $package;
 }
 
 #-------------------------------------------------------------------
