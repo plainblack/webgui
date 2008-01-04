@@ -22,6 +22,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::RichEdit;
 use WebGUI::Asset::Template;
 use WebGUI::International;
+use WebGUI::Pluggable;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -64,14 +65,12 @@ sub AUTOLOAD {
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);	
 	my $session = shift;
 	my @params = @_;
-	my $cmd = "use WebGUI::Form::".$name;
-        eval ($cmd);
-        if ($@) {
-        	$session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-                return;
-        }
-	my $class = "WebGUI::Form::".$name;
-	return $class->new($session,@params)->toHtml;
+    my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $session, @params ]) };
+    if ($@) {
+        $session->errorHandler->error($@);
+        return;
+    }
+	return $control->toHtml;
 }
 
 

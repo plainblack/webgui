@@ -16,6 +16,7 @@ package WebGUI::FormValidator;
 
 use strict qw(vars subs);
 use WebGUI::HTML;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -70,14 +71,12 @@ sub AUTOLOAD {
 
 	my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
 	$params = {name=>$params} if ref ($params) ne "HASH";
-	my $cmd = "use WebGUI::Form::".$name;
-	eval ($cmd);
-	if ($@) {
-		$self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-		return;
-	}
-	my $class = "WebGUI::Form::".$name;
-	return $class->new($self->session, $params)->getValueFromPost(@args);
+    my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, $params ]) };
+    if ($@) {
+        $self->session->errorHandler->error($@);
+        return;
+    }
+	return $control->getValueFromPost(@args);
 }
 
 #-------------------------------------------------------------------

@@ -18,6 +18,7 @@ use CGI::Util qw(rearrange);
 use strict qw(vars refs);
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Pluggable;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -63,7 +64,8 @@ sub _uiLevelChecksOut {
 	my $self = shift;
 	if ($_[0] <= $self->session->user->profileField("uiLevel")) {
 		return 1;
-	} else {
+	} 
+    else {
 		return 0;
 	}
 }
@@ -77,20 +79,18 @@ Dynamically creates functions on the fly for all the different form control type
 =cut    
         
 sub AUTOLOAD {  
-        our $AUTOLOAD;
+    our $AUTOLOAD;
 	my $self = shift;
-        my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
-        my %params = @_;
+    my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
+    my %params = @_;
 	$params{uiLevelOverride} ||= $self->{_uiLevelOverride};
 	$params{rowClass} ||= $self->{_class};
-        my $cmd = "use WebGUI::Form::".$name;
-        eval ($cmd);    
-        if ($@) {
-                $self->session->errorHandler->error("Couldn't compile form control: ".$name.". Root cause: ".$@);
-                return;
-        }       
-        my $class = "WebGUI::Form::".$name;
-        $self->{_data} .= $class->new($self->session,%params)->toHtmlWithWrapper;
+    my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, %params ]) };
+    if ($@) {
+        $self->session->errorHandler->error($@);
+        return;
+    }
+	$self->{_data} .= $control->toHtmlWithWrapper;
 }       
         
 #-------------------------------------------------------------------

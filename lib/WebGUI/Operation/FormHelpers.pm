@@ -16,6 +16,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
+use WebGUI::Pluggable;
 use WebGUI::Storage::Image;
 use WebGUI::Utility;
 
@@ -47,26 +48,9 @@ sub www_formHelper {
     my $class       = "WebGUI::Form::".$form->get("class");
     my $sub         = $form->get("sub");
     return "ERROR" unless (defined $sub && defined $class);
-    
-    # Load the form helper class
-    my $load = "use ".$class;
-    eval($load);
+    my $output = eval { WebGUI::Pluggable::instanciate($class, "www_".$sub, [$session]) }; 
     if ($@) {
-        $session->errorHandler->error("Couldn't load form helper class $class because $@"); 
-        return "ERROR";
-    }
-   
-    # Make sure the subroutine exists
-    my $command = $class->can('www_'.$sub);
-    if (!$command) {
-        $session->errorHandler->error("Could not execute form helper: Couldn't find subroutine www_$sub via class $class");
-        return "ERROR";
-    }
-
-    # Run the subroutine
-    my $output = eval { $command->($session) };
-    if ($@) {
-        $session->errorHandler->error("Couldn't execute form helper ${class}::www_${sub} because $@"); 
+        $session->errorHandler->error($@); 
         return "ERROR";
     }
     return $output;
