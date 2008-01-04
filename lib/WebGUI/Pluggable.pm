@@ -29,11 +29,11 @@ This package provides a standard way of quickly and safely dynamically loading p
 
  use WebGUI::Pluggable;
 
- WebGUI::Pluggable::load($module);
+ eval { WebGUI::Pluggable::load($module) };
 
- my $object = WebGUI::Pluggable::instanciate($module, $method, \@params);
+ my $object = eval { WebGUI::Pluggable::instanciate($module, $method, \@params) };
 
- my $output = WebGUI::Pluggable::run($module, $function, \@params);
+ my $output = eval { WebGUI::Pluggable::run($module, $function, \@params) };
 
 =head1 FUNCTIONS
 
@@ -60,11 +60,17 @@ sub instanciate {
         croak "Could not instanciate object using $sub on $module because $module could not be loaded.";
     }
     else {
+        unless ($module->can($sub)) {
+            croak "Could not instanciate object using $sub on $module because $sub is not a valid method.";
+        }
         my $object = eval{$module->$sub(@{$params})};
         if ($@) {
             croak "Could not instanciate object using $sub on $module because $@";
         }
         else {
+            unless (defined $object) {
+                croak "Could not instanciate object using $sub on $module. The result is undefined.";
+            }
             return $object;
         }
     }

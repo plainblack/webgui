@@ -17,6 +17,7 @@ package WebGUI::Workflow::Instance;
 
 use strict;
 use JSON;
+use WebGUI::Pluggable;
 use WebGUI::Workflow::Spectre;
 use WebGUI::Workflow;
 
@@ -311,42 +312,25 @@ sub run {
 	my $method = $self->get("methodName");
 	my $params = $self->get("parameters");
 	my $status = "";
+    my $object = undef;
 	if ($class && $method) {
-		my $cmd = "use $class";
-		eval($cmd);
-		if ($@) {
-			$self->session->errorHandler->error("Error loading activity class $class: ".$@);
+        $object = eval { WebGUI::Pluggable::instanciate($class, $method, [$self->session, $params]) };
+        if ($@) {
+			$self->session->errorHandler->error($@);
 			$self->set({lastStatus=>"error", notifySpectre=>0});
 			return "error";
-		}
-		my $object = eval{ $class->$method($self->session, $params) };
-		if ($@) {
-			$self->session->errorHandler->error("Error instanciating activity (".$activity->getId.") pass-in object: ".$@);
-			$self->set({lastStatus=>"error", notifySpectre=>0});
-			return "error";
-		}
-		unless (defined $object) {
-			$self->session->errorHandler->error("Pass in object came back undefined for activity (".$activity->getId.") using ".$class.", ".$method.", ".$params.".");
-			$self->set({lastStatus=>"error", notifySpectre=>0});
-			return "error";
-		}
-		$status = eval{$activity->execute($object, $self)};
-		if ($@) {
-			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
-			$self->set({lastStatus=>"error", notifySpectre=>0});
-			return "error";
-		}
-	} else {
-		$status = $activity->execute(undef, $self);
-		if ($@) {
-			$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
-			$self->set({lastStatus=>"error", notifySpectre=>0});
-			return "error";
-		}
+        } 
+	} 
+	$status = eval { $activity->execute($object, $self) };
+	if ($@) {
+		$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
+		$self->set({lastStatus=>"error", notifySpectre=>0});
+		return "error";
 	}
 	if ($status eq "complete") {
 		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId, notifySpectre=>0});
-	} else {
+	} 
+    else {
 		$self->set({lastStatus=>$status, notifySpectre=>0});
 	}
 	return $status;

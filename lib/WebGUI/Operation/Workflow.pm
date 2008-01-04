@@ -15,6 +15,7 @@ use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
+use WebGUI::Pluggable;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Activity;
 use WebGUI::Workflow::Instance;
@@ -80,25 +81,9 @@ sub www_activityHelper {
     my $sub         = $form->get("sub");
     return "ERROR" unless (defined $sub && defined $class);
 
-    # Load the modules
-    my $load = "use ".$class;
-    eval($load);
+    my $output = eval {WebGUI::Pluggable::instanciate($class, "www_".$sub, [$session])};
     if ($@) {
-        $session->errorHandler->error("Couldn't load activity helper class $class because $@"); 
-        return "ERROR";
-    }
-
-    # Make sure the subroutine exists
-    my $command = $class->can('www_'.$sub);
-    if (!$command) {
-        $session->errorHandler->error("Couldn't execute activity helper ${class}::www_${sub} because subroutine does not exist");
-        return "ERROR";
-    }
-
-    # Execute
-    my $output = eval { $command->($session) };
-    if ($@) {
-        $session->errorHandler->error("Couldn't execute activity helper ${class}::www_${sub} because $@"); 
+        $session->errorHandler->error($@); 
         return "ERROR";
     }
     return $output;

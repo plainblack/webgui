@@ -17,6 +17,7 @@ package WebGUI::Workflow::Activity;
 
 use strict;
 use WebGUI::HTMLForm;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -297,11 +298,11 @@ sub new {
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
 	return unless $main->{activityId};
 	$class = $main->{className};
-    (my $module = "$class.pm") =~ s{'|::}{/}g;
-    unless (eval { require $module; 1 }) {
-        $session->errorHandler->error("Couldn't compile workflow activity package: ".$class.". Root cause: ".$@);
+    eval { WebGUI::Pluggable::load($class) };
+    if ($@) {
+        $session->errorHandler->error($@);
         return;
-    }
+    }  
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
 	my %data = (%{$main}, %{$sub});
     for my $definition (reverse @{$class->definition($session)}) {
@@ -331,19 +332,18 @@ A properties hash reference. The className of the properties hash must be valid.
 =cut
 
 sub newByPropertyHashRef {
-        my $class = shift;
-        my $session = shift;
-        my $properties = shift;
-        return unless defined $properties;
-        return unless exists $properties->{className};
-        my $className = $properties->{className};
-        my $cmd = "use ".$className;
-        eval ($cmd);
-        if ($@) {
-                $session->errorHandler->warn("Couldn't compile activity package: ".$className.". Root cause: ".$@);
-                return;
-        }
-        bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;
+    my $class = shift;
+    my $session = shift;
+    my $properties = shift;
+    return unless defined $properties;
+    return unless exists $properties->{className};
+    my $className = $properties->{className};
+    eval { WebGUI::Pluggable::load($class) };
+    if ($@) {
+        $session->errorHandler->error($@);
+        return;
+    }  
+    bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;
 }
 
 #-------------------------------------------------------------------
