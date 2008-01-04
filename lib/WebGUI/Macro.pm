@@ -15,8 +15,8 @@ package WebGUI::Macro;
 =cut
 
 
-use strict qw(vars subs);
-
+use strict;
+use WebGUI::Pluggable;
 
 =head1 NAME
 
@@ -118,38 +118,34 @@ A scalar reference of HTML to be processed.
 =cut
 
 sub process {
-	my $session = shift;
+    my $session = shift;
    	my $content = shift;
    	while ($$content =~ /$nestedMacro/gs) {
-      		my ($macro, $searchString, $params) = ($1, $2, $3);
-      		next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
-      		next if ($searchString =~ /^\-$/); # don't process ^-;
+        my ($macro, $searchString, $params) = ($1, $2, $3);
+      	next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
+      	next if ($searchString =~ /^\-$/); # don't process ^-;
 		if ($params ne "") {
-      			$params =~ s/(^\(|\)$)//g; # remove parenthesis
-      			&process($session,\$params); # recursive process params
+      		$params =~ s/(^\(|\)$)//g; # remove parenthesis
+      		&process($session,\$params); # recursive process params
 		}
 		my $macros = $session->config->get("macros");
 		if ($macros->{$searchString} ne "") {
-      			my $cmd = "WebGUI::Macro::".$macros->{$searchString};
-			my $load = "use ".$cmd;
-			eval($load);
-			$session->errorHandler->error("Macro failed to compile: $cmd.".$@) if($@);
-			my @param;
-        		push(@param, $+) while $params =~ m {
-                		"([^\"\\]*(?:\\.[^\"\\]*)*)",?
-                		|       ([^,]+),?
-                		|       ,
-        			}gx;
-        		push(@param, undef) if substr($params,-1,1) eq ',';
-      			$cmd = $cmd."::process";
-			my $result = eval{&$cmd($session,@param)};
-			if ($@) {
-				$session->errorHandler->error("Processing failed on macro: $macro: ".$@);
-			} else {
+		    my @param;
+        	push(@param, $+) while $params =~ m {
+               		"([^\"\\]*(?:\\.[^\"\\]*)*)",?
+               		|       ([^,]+),?
+               		|       ,
+        		}gx;
+        	push(@param, undef) if substr($params,-1,1) eq ',';
+            my $result = eval { WebGUI::Pluggable::run("WebGUI::Macro::".$macros->{$searchString}, "process", [ $session, @param ] ) };
+            if ( $@ ) {
+                $session->errorHandler->error($@);
+            }
+            else {
 				if ($result =~ /\Q$macro/) {
-                                        $result = "Endless macro loop detected. Stopping recursion.";
-					$session->errorHandler->warn($macro." : ".$result)
-                                }
+                    $result = "Endless macro loop detected. Stopping recursion.";
+					$session->errorHandler->error($macro." : ".$result);
+                }
 				$$content =~ s/\Q$macro/$result/ges;
 			}
 		}
