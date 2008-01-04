@@ -16,6 +16,7 @@ use WebGUI::AdminConsole;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Form::FieldType;
+use WebGUI::Pluggable;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 
@@ -304,12 +305,10 @@ sub www_editProfileField {
 	my @profileForms = ();
 	foreach my $form ( sort @{ $fieldType->get("types") }) {
 		next if $form eq 'DynamicField';
-		my $cmd = join '::', 'WebGUI::Form', $form;
-		eval "use $cmd";
-        my $w = eval {"$cmd"->new($session)};
-		unless(defined $w) {
-           $session->errorHandler->warn("Could not load $cmd.  Please check the syntax of this module to make sure it works properly");
-           next;
+        my $w = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$form, "new", [$session]) };
+        if ($@) {
+            $session->errorHandler->error($@);
+            next;
         }
         push @profileForms, $form if $w->get("profileEnabled");
 	}
