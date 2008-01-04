@@ -15,6 +15,7 @@
  - Fixed chdir problem in Storage -- more remain though
  - Added a new plugin handler system that is both faster and more secure.
  - Added switch for assets to determine whether they are exportable.
+ - Added migration utility for Gallery
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
