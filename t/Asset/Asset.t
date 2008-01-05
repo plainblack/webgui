@@ -144,7 +144,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 85
+plan tests => 86
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -651,6 +651,7 @@ TODO: {
 my $newFixTitleAsset = WebGUI::Asset->newByDynamicClass($session, $fixTitleAsset->getId);
 isnt($newFixTitleAsset, undef, 'newByDynamicClass did not fail');
 isa_ok($newFixTitleAsset, 'WebGUI::Asset', 'newByDynamicClass: able to look up an existing asset by id');
+cmp_deeply($newFixTitleAsset->{_properties}, $fixTitleAsset->{_properties}, 'newByDynamicClass created a duplicate asset');
 
 ################################################################
 #
