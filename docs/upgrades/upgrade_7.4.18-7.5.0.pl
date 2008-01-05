@@ -270,7 +270,7 @@ ENDSQL
 # Add the isExportable property for all assets
 sub addIsExportable {
     my $session = shift;
-    print "Adding isExportable flag for all assets (fine-grained export control)..." unless $quiet;
+    print "\tAdding isExportable flag for all assets (fine-grained export control)..." unless $quiet;
     $session->db->write('alter table assetData add column isExportable int(11) not null default 1');
     print "DONE!\n" unless $quiet;
 }
