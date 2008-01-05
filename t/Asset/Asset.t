@@ -149,7 +149,7 @@ plan tests => 85
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
             + $canAddMaker->plan
-            #+ $canAddMaker2->plan
+            + $canAddMaker2->plan
             + $canEditMaker->plan
             + $canViewMaker->plan
             ;
@@ -482,7 +482,7 @@ $canAddMaker->run;
 
 TODO: {
     local $TODO = 'assetAddPrivilege overrides group Turn On Admin?';
-    #$canAddMaker2->run;
+    $canAddMaker2->run;
 }
 
 if (defined $origAssetAddPrivileges) {
