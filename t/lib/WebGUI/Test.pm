@@ -107,8 +107,12 @@ BEGIN {
 
 END {
     my $Test = Test::Builder->new;
-    $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
-    $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
+    if ($ENV{WEBGUI_TEST_DEBUG}) {
+        $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
+        $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
+        $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
+        $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+    }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
 }
