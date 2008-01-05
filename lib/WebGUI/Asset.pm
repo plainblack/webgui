@@ -2159,6 +2159,17 @@ sub update {
             # skip a property if it has the display only flag set
             next if ($definition->{properties}{$property}{displayOnly});
 
+            # if this is the new-to-7.5 isExportable field, check if the
+            # database field for it exists. if not, setting it will break, so
+            # skip it. this facilitates updating from previous versions.
+            if($property eq 'isExportable') {
+                my $db = $self->session->db;
+                my $assetDataDescription = $db->buildHashRef('describe assetData');
+                unless(grep { $_ =~ /^isExportable/ } keys %{$assetDataDescription}) {
+                    next;
+                }
+            }
+
             # use the update value
 			my $value = $properties->{$property};
 
