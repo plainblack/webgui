@@ -5,6 +5,7 @@ use Scalar::Util qw( blessed );
 use Carp qw( croak );
 use Test::More;
 
+my $CLASS = __PACKAGE__;
 
 =head1 NAME
 
@@ -269,6 +270,7 @@ sub runUsers {
     my ($session, $object,  $method, $precedingArguments,
         $users,   $passing, $comment ) = @_;
     my $failing = !$passing;
+    my $tb = $CLASS->builder;
     foreach my $userId (@{ $users }) {
         my @args = @{ $precedingArguments };
         my $oldUser = $session->user;
@@ -276,7 +278,7 @@ sub runUsers {
         my $role = $session->user->username
                  ? "user ".$session->user->username
                  : "userId ".$userId;
-        ok(
+        $tb->ok(
             ( $object->$method(@args) xor $failing ),
             "$role passes $method check using default user for " . $comment
         );
@@ -285,7 +287,7 @@ sub runUsers {
         # Test the specified userId
         push @args, $userId;
         # Test the userId parameter
-        ok(
+        $tb->ok(
             ( $object->$method(@args) xor $failing ),
             "$role passes $method check for " . $comment
         );

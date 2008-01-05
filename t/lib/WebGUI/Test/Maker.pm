@@ -1,7 +1,8 @@
 package WebGUI::Test::Maker;
 
-use Test::More;
+use base 'Test::Builder::Module';
 
+my $CLASS = __PACKAGE__;
 
 =head1 NAME
 
