@@ -271,6 +271,7 @@ sub runUsers {
         $users,   $passing, $comment ) = @_;
     my $failing = !$passing;
     my $tb = $CLASS->builder;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     foreach my $userId (@{ $users }) {
         my @args = @{ $precedingArguments };
         my $oldUser = $session->user;

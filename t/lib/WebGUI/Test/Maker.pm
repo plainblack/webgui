@@ -145,6 +145,9 @@ Run the tests we've prepared and delete them as we run them.
 
 sub run {
     my $self        = shift;
+
+    my $tb = $CLASS->builder;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
      
     while (my $test = shift @{ $self->{_tests} }) {
         my $sub     = $self->get("test");
