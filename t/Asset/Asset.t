@@ -144,7 +144,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 81
+plan tests => 85
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -328,6 +328,8 @@ my $properties2 = {
 };
 
 my $fixTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
+##Commit this asset right away
+$fixTitleAsset->commit;
 
 $properties2 = {
 	#            '1234567890123456789012'
@@ -338,9 +340,9 @@ $properties2 = {
 };
 
 my $getTitleAsset = $defaultAsset->addChild($properties2, $properties2->{id});
+$getTitleAsset->commit;
 
 $versionTag->commit;
-
 
 my $origUrlExtension = $session->setting->get('urlExtension');
 $session->setting->set('urlExtension', undef);
@@ -642,13 +644,29 @@ TODO: {
 
 ################################################################
 #
+# newByDynamicClass
+#
+################################################################
+
+my $newFixTitleAsset = WebGUI::Asset->newByDynamicClass($session, $fixTitleAsset->getId);
+isnt($newFixTitleAsset, undef, 'newByDynamicClass did not fail');
+isa_ok($newFixTitleAsset, 'WebGUI::Asset', 'newByDynamicClass: able to look up an existing asset by id');
+
+################################################################
+#
 # getNotFound
 #
 ################################################################
 
 my $origNotFoundPage =  $session->setting->get('notFoundPage');
 
+$session->setting->set('notFoundPage', WebGUI::Asset->getDefault($session)->getId);
+
 isa_ok(WebGUI::Asset->getNotFound($session), 'WebGUI::Asset', 'getNotFound: Returns an asset');
+is(WebGUI::Asset->getNotFound($session)->getId, WebGUI::Asset->getDefault($session)->getId, 'getNotFound: Returns the correct asset');
+
+$session->setting->set('notFoundPage', $fixTitleAsset->getId);
+is(WebGUI::Asset->getNotFound($session)->getId, $fixTitleAsset->getId, 'getNotFound: Returns the correct asset on a different asset');
 
 $session->setting->set('notFoundPage', $origNotFoundPage);
 
