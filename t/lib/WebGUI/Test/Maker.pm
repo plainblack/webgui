@@ -147,6 +147,7 @@ sub run {
     my $self        = shift;
 
     my $tb = $CLASS->builder;
+    # This is to fix SKIP and TODO detection
     local $Test::Builder::Level = $Test::Builder::Level + 1;
      
     while (my $test = shift @{ $self->{_tests} }) {

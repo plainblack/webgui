@@ -185,7 +185,7 @@ Run the tests we've prepared and delete them as we run them.
 
 sub run {
     my $self        = shift;
-     
+
     while (my $test = shift @{ $self->{_tests} }) {
         my $session;
         my @methodArguments = ();
@@ -271,6 +271,7 @@ sub runUsers {
         $users,   $passing, $comment ) = @_;
     my $failing = !$passing;
     my $tb = $CLASS->builder;
+    # This is to fix detection of SKIP and TODO
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     foreach my $userId (@{ $users }) {
         my @args = @{ $precedingArguments };

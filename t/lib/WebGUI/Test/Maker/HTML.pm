@@ -208,6 +208,9 @@ Run the tests we've prepared and delete them as we run them.
 
 sub run {
     my $self        = shift;
+
+    # This is to fix detection of SKIP and TODO
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
      
     while (my $test = shift @{ $self->{_tests} }) {
         my $o       = $test->{object};
