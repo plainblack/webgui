@@ -45,9 +45,18 @@ my $collab
     });
 
 my @threads;
-for (1..3) { 
+for (0..2) { 
     push @threads, $collab->addChild({
         className       => 'WebGUI::Asset::Post::Thread',
+        title           => "title$_",
+        menuTitle       => "menuTitle$_",
+        bodyText        => "bodyText$_",
+        synopsis        => "synopsis$_",
+        userDefined1    => "userDefined1$_",
+        userDefined2    => "userDefined2$_",
+        userDefined3    => "userDefined3$_",
+        userDefined4    => "userDefined4$_",
+        userDefined5    => "userDefined5$_",
     }, @addArgs);
     $threads[-1]->getStorageLocation->addFileFromFilesystem(
         WebGUI::Test->getTestCollateralPath('lamp.jpg')
@@ -57,19 +66,44 @@ for (1..3) {
 # Add a post to one of the threads, with an image
 my @posts;
 push @{$posts[0]}, $threads[0]->addChild({
-    className           => 'WebGUI::Asset::Post',
+    className       => 'WebGUI::Asset::Post',
+    title           => "title",
+    menuTitle       => "menuTitle00",
+    bodyText        => "bodyText00",
+    synopsis        => "synopsis00",
+    userDefined1    => "userDefined100",
+    userDefined2    => "userDefined200",
+    userDefined3    => "userDefined300",
+    userDefined4    => "userDefined400",
+    userDefined5    => "userDefined500",
 }, @addArgs);
 $posts[0][0]->getStorageLocation->addFileFromFilesystem(
     WebGUI::Test->getTestCollateralPath('lamp.jpg')
+);
+
+# Thread fields mapped to album fields that should be migrated
+my %threadFields = (
+    title           => "title",
+    menuTitle       => "menuTitle",
+    bodyText        => "description",
+    synopsis        => "synopsis",
+    userDefined1    => "userDefined1",
+    userDefined2    => "userDefined2",
+    userDefined3    => "userDefined3",
+    userDefined4    => "userDefined4",
+    userDefined5    => "userDefined5",
 );
 
 #----------------------------------------------------------------------------
 # Tests
 
 # addAlbumFromThread tests $thread[0] and @{$posts[0]}
-my $threadTests     = 4 * ( 1 + scalar @{ $posts[0] } );
+my $threadPostTests     = 4 * ( 1 + scalar @{ $posts[0] } );
 
-plan tests => 9 + $threadTests;
+# addAlbumFromThread adds 1 test for each field in %threadFields
+my $threadFieldTests    = 1 * scalar keys %threadFields;
+
+plan tests => 9 + $threadPostTests + $threadFieldTests;
 
 #----------------------------------------------------------------------------
 # Test use
@@ -104,12 +138,20 @@ is(
     "addAlbumFromThread creates album with same revisionDate as thread",
 );
 
+# 1 test for each field in %threadFields
+for my $oldField ( sort keys %threadFields ) {
+    is( $album->get( $threadFields{ $oldField } ), $threads[0]->get( $oldField ),
+        "addAlbumFromThread migrates Thread $oldField to GalleryAlbum $threadFields{$oldField}",
+    );
+}
+
 is(
     scalar @{ $album->getFileIds }, 2,
     "addAlbumFromThread adds one file for each attachment to the thread or posts of the thread",
 );
 
 # 4 tests for each post/file
+# TODO: Test that post-to-file fields are migrated properly, but how?
 for my $fileId ( @{$album->getFileIds} ) {
     my $file = WebGUI::Asset->newByDynamicClass( $session, $fileId );
     is(

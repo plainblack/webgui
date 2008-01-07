@@ -167,6 +167,11 @@ sub addAlbumFromThread {
         menuTitle           => $thread->get('menuTitle'),
         description         => $thread->get('bodyText'),
         synopsis            => $thread->get('synopsis'),
+        userDefined1        => $thread->get('userDefined1'),
+        userDefined2        => $thread->get('userDefined2'),
+        userDefined3        => $thread->get('userDefined3'),
+        userDefined4        => $thread->get('userDefined4'),
+        userDefined5        => $thread->get('userDefined5'),
     }, undef, $thread->get('revisionDate'), $addOptions );
 
     # Add a new Photo asset for each photo in the storage locations

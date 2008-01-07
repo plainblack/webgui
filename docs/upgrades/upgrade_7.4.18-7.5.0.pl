@@ -160,6 +160,11 @@ CREATE TABLE IF NOT EXISTS GalleryAlbum (
     revisionDate BIGINT NOT NULL,
     allowComments INT,
     assetIdThumbnail VARCHAR(22) BINARY,
+    userDefined1 TEXT,
+    userDefined2 TEXT,
+    userDefined3 TEXT,
+    userDefined4 TEXT,
+    userDefined5 TEXT,
     othersCanAdd INT,
     PRIMARY KEY (assetId, revisionDate)
 )

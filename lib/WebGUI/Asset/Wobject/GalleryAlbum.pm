@@ -63,6 +63,13 @@ sub definition {
         },
     );
 
+    # UserDefined Fields
+    for my $i (1 .. 5) {
+        $properties{"userDefined".$i} = {
+            defaultValue        => undef,
+        };
+    }
+
     push @{$definition}, {
         assetName           => $i18n->get('assetName'),
         autoGenerateForms   => 0,
