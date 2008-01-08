@@ -53,7 +53,7 @@ my @testSets = (
 
 my $session = WebGUI::Test->session;
 
-plan tests => scalar(@testSets) + 4;
+plan tests => scalar(@testSets) + 5;
 
 # generate
 my $generateId = $session->id->generate();
@@ -79,3 +79,6 @@ foreach my $testSet (@testSets) {
 # 
 
 is($session->id->toHex('wjabZsKOb7kBBSiO3bQwzA'), 'c2369b66c28e6fb90105288eddb430cc', 'toHex works');
+
+my $re = $session->id->getValidator;
+is( ref $re, 'Regexp', 'getValidator returns a regexp object');

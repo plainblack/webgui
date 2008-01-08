@@ -20,6 +20,7 @@ use Digest::MD5;
 use Time::HiRes qw( gettimeofday usleep );
 use MIME::Base64;
 
+my $idValidator = qr/^[A-Za-z0-9_-]{22}$/;
 
 =head1 NAME
 
@@ -54,6 +55,19 @@ sub DESTROY {
         undef $self;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getValidator
+
+Get the regular expression used to validate generated GUIDs.  This is just to prevent
+regular expressions from being duplicated all over the place.
+
+=cut
+
+sub getValidator {
+	return $idValidator;
+}
 
 #-------------------------------------------------------------------
 
@@ -137,7 +151,7 @@ Returns true if $idString is a valid WebGUI guid.
 
 sub valid {
 	my ($self, $idString) = @_;
-	return $idString =~ m/^[A-Za-z0-9_-]{22}$/;
+	return $idString =~ m/$idValidator/;
 }
 
 
