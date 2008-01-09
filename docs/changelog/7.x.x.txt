@@ -23,6 +23,7 @@
  - fix: Assets with no committed versions may be left as orphans when parent is purged
  - fix: Tag cloud limited was to 50 least commonly used tags
  - Use UTF8 for database connection when connecting to MySQL
+ - fix: Calendar Edit template refers to non-existant and other unneeded javascript files
 
 7.4.19
  - fix: Import Package does nothing when re-importing trashed package
