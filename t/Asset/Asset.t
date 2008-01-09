@@ -81,7 +81,7 @@ $canAddMaker2->prepare({
     'className' => 'WebGUI::Asset',
     'session'   => $session,
     'method'    => 'canAdd',
-    'pass'      => [$testUsers{'canAdd turnOnAdmin'},],
+    'fail'      => [$testUsers{'canAdd turnOnAdmin'},],
 });
 
 my $properties;
@@ -480,10 +480,9 @@ $session->config->set('assetAddPrivilege', { 'WebGUI::Asset' => $testGroups{'can
 
 $canAddMaker->run;
 
-TODO: {
-    local $TODO = 'assetAddPrivilege overrides group Turn On Admin?';
-    $canAddMaker2->run;
-}
+diag 'Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege';
+
+$canAddMaker2->run;
 
 if (defined $origAssetAddPrivileges) {
     $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
