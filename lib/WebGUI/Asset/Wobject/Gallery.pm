@@ -499,18 +499,26 @@ sub canView {
 
 #----------------------------------------------------------------------------
 
-=head2 getAlbumIds ( )
+=head2 getAlbumIds ( options )
 
-Gets an array reference of all the album IDs under this Gallery.
+Gets an array reference of all the album IDs under this Gallery. C<options> 
+is a hash reference with the following keys.
+
+ orderBy            => An SQL ORDER BY clause to sort the albums
 
 =cut
 
 sub getAlbumIds {
     my $self        = shift;
+    my $options     = shift;
     
+    my $orderBy     = $options->{ orderBy }      || "lineage ASC";
+    $self->session->errorHandler->warn("ORDER BY: $orderBy");
+
     my $assets 
         = $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
+            orderByClause       => $orderBy,
         });
 
     return $assets;
@@ -525,17 +533,20 @@ hash reference with the following keys.
 
  perpage            => The number of results to show per page. Default: 20
 
+For more C<options>, see L</getAlbumIds>.
+
 =cut
 
 sub getAlbumPaginator {
     my $self        = shift;
     my $options     = shift;
     
-    my $perpage     = $options->{ perpage }     || 20;
+    my $perpage     = $options->{ perpage }      || 20;
+    delete $options->{ perpage };
 
     my $p
         = WebGUI::Paginator->new( $self->session, $self->getUrl, $perpage );
-    $p->setDataByArrayRef( $self->getAlbumIds );
+    $p->setDataByArrayRef( $self->getAlbumIds( $options ) );
 
     return $p;
 }
@@ -795,9 +806,12 @@ sub view_listAlbums {
     my $var         = $self->getTemplateVars;
     my $form        = $self->session->form;
 
+    my $orderBy     = $self->get('viewListOrderBy') 
+                    . q{ } . $self->get('viewListOrderDirection');
     my $p
         = $self->getAlbumPaginator( { 
-            perpage     => $form->get('perpage'),
+            perpage     => ( $form->get('perpage') || 20 ),
+            orderBy     => $orderBy,
         } );
     $p->appendTemplateVars( $var );
 

@@ -60,7 +60,7 @@ This module is B<NOT> to be used by the Gallery asset itself!
         multiple    => 1,  
     } 
  );
-
+ 
 =head1 METHODS
 
 These methods are available from this class:
@@ -152,21 +152,15 @@ sub addAlbumFromThread {
     my $session         = $gallery->session;
     my $addOptions      = { skipAutoCommitWorkflows => 1 };
 
-    # Get all the storage locations
-    my @storageIds      = ();
-    for my $post ( @{ $thread->getPosts } ) {
-        if ( $post->get('storageId') ) {
-            push @storageIds, $post->get('storageId');
-        }
-    }
-
     # Create the new album
     my $album = $gallery->addChild({
         className           => 'WebGUI::Asset::Wobject::GalleryAlbum',
-        title               => $thread->get('title'),
+        description         => $thread->get('content'),
         menuTitle           => $thread->get('menuTitle'),
-        description         => $thread->get('bodyText'),
+        ownerUserId         => $thread->get('ownerUserId'),
         synopsis            => $thread->get('synopsis'),
+        title               => $thread->get('title'),
+        url                 => $session->url->urlize( $gallery->get('url') . "/" . $thread->get('title') ),
         userDefined1        => $thread->get('userDefined1'),
         userDefined2        => $thread->get('userDefined2'),
         userDefined3        => $thread->get('userDefined3'),
@@ -174,23 +168,33 @@ sub addAlbumFromThread {
         userDefined5        => $thread->get('userDefined5'),
     }, undef, $thread->get('revisionDate'), $addOptions );
 
-    # Add a new Photo asset for each photo in the storage locations
-    for my $storageId ( @storageIds ) {
-        # Use WebGUI::Storage::Image to avoid thumbnails if there
-        my $storage     = WebGUI::Storage::Image->get( $session, $storageId );
-        
-        for my $filename ( @{$storage->getFiles} ) {
-            my $className       = $gallery->getAssetClassForFile( $filename );
-            if ( !$className ) {
-                warn "Skipping $filename because Gallery doesn't handle this file type";
-                next;
+    for my $post ( @{ $thread->getPosts } ) {
+        if ( my $storageId = $post->get('storageId') ) {
+            # Use WebGUI::Storage::Image to avoid thumbnails if there
+            my $storage     = WebGUI::Storage::Image->get( $session, $storageId );
+            
+            for my $filename ( @{$storage->getFiles} ) {
+                my $className       = $gallery->getAssetClassForFile( $filename );
+                if ( !$className ) {
+                    warn "Skipping $filename because Gallery doesn't handle this file type";
+                    next;
+                }
+
+                my $file = $album->addChild({
+                    className           => $className,
+                    menuTitle           => $filename,
+                    ownerUserId         => $post->get('ownerUserId'),
+                    title               => $filename,
+                    url                 => $session->url->urlize( $album->get('url') . "/" . $filename ),
+                    userDefined1        => $post->get('userDefined1'),
+                    userDefined2        => $post->get('userDefined2'),
+                    userDefined3        => $post->get('userDefined3'),
+                    userDefined4        => $post->get('userDefined4'),
+                    userDefined5        => $post->get('userDefined5'),
+                }, undef, $post->get('revisionDate'), $addOptions );
+
+                $file->setFile( $storage->getPath( $filename ) );
             }
-
-            my $file = $album->addChild({
-                className           => $className,
-            }, undef, $thread->get('revisionDate'), $addOptions );
-
-            $file->setFile( $storage->getPath( $filename ) );
         }
     }
 
