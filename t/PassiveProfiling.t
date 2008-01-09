@@ -25,7 +25,7 @@ use Test::Deep;
 
 my $startingTime = $session->datetime->time();
 
-my $numTests = 3; # increment this value for each test you create
+my $numTests = 5; # increment this value for each test you create
 plan tests => 1 + $numTests;
 
 my $origPassiveProfiling = $session->setting->get('passiveProfilingEnabled');
@@ -33,6 +33,35 @@ my $loaded = use_ok('WebGUI::PassiveProfiling');
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 my $home = WebGUI::Asset->getDefault($session);
+
+my $pageProperties = {
+	#            '1234567890123456789012'
+	id        => 'layoutAsset01010101010',
+	title     => 'mylayout',
+	url       => 'mylayout',
+	className => 'WebGUI::Asset::Wobject::Layout',
+};
+
+my $page = $home->addChild($pageProperties, $pageProperties->{id});
+
+my $snippetProperties = {
+	#            '1234567890123456789012'
+	id        => 'snippetAsset0101010101',
+	title     => 'mysnippet1',
+	url       => 'mysnippet1',
+	className => 'WebGUI::Asset::Snippet',
+};
+
+my $snippet1 = $page->addChild($snippetProperties, $snippetProperties->{id});
+
+##Yes, this is just lazy and evil
+$snippetProperties->{id}++;
+$snippetProperties->{title}++;
+$snippetProperties->{url}++;
+
+my $snippet2 = $page->addChild($snippetProperties, $snippetProperties->{id});
+
+$versionTag->commit;
 
 SKIP: {
 
@@ -50,13 +79,13 @@ $session->setting->set('passiveProfilingEnabled', 1);
 
 my $timeLogged;
 $timeLogged = $session->datetime->time();
-WebGUI::PassiveProfiling::add( $session, $home->getId );
+WebGUI::PassiveProfiling::add( $session, $page->getId );
 
-my $count = $session->db->quickScalar('select count(*) from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$home->getId, $startingTime]);
+my $count = $session->db->quickScalar('select count(*) from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$page->getId, $startingTime]);
 
 is($count, 1, 'add: Enabling passiveProfiling in the settings allows it to work, only 1 log entry added');
 
-my $logEntry = $session->db->quickHashRef('select * from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$home->getId, $startingTime]);
+my $logEntry = $session->db->quickHashRef('select * from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$page->getId, $startingTime]);
 
 cmp_deeply(
     $logEntry,
@@ -64,10 +93,30 @@ cmp_deeply(
         passiveProfileLogId => re($session->id->getValidator),
         userId              => 1,
         sessionId           => $session->getId,
-        assetId             => $home->getId,
+        assetId             => $page->getId,
         dateOfEntry         => num($timeLogged, 2),
     },
     'add: Correct information added for logged asset',
+);
+
+$session->setting->set('passiveProfilingEnabled', 0);
+
+WebGUI::PassiveProfiling::addPage( $session, $page->getId );
+
+$count = $session->db->quickScalar('select count(*) from passiveProfileLog where assetId=? and dateOfEntry >= ?',[$page->getId, $startingTime]);
+
+is($count, 1, 'addPage: Nothing added if passive profiling is not enabled');
+
+$session->setting->set('passiveProfilingEnabled', 1);
+
+WebGUI::PassiveProfiling::addPage( $session, $page->getId );
+
+my $loggedAssets = $session->db->buildArrayRef("select assetId from passiveProfileLog where dateOfEntry >= ?",[$startingTime]);
+
+cmp_bag(
+    $loggedAssets,
+    [ $page->getId, $snippet1->getId, $snippet2->getId ],
+    'addPage: All children assets added, but the originating page was not',
 );
 
 }
