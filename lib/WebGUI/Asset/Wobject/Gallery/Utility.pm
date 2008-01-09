@@ -60,7 +60,7 @@ This module is B<NOT> to be used by the Gallery asset itself!
         multiple    => 1,  
     } 
  );
- 
+
 =head1 METHODS
 
 These methods are available from this class:
