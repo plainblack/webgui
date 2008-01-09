@@ -2575,6 +2575,65 @@ true.
 
 sub isValidRssItem { 1 }
 
+#-------------------------------------------------------------------
+=head2 www_widgetView ( )
+
+Returns the view() method of the asset object suitable for widgetizing.
+
+=cut
+
+sub www_widgetView {
+    my $self    = shift;
+    my $session = $self->session;
+    my $style   = $session->style;
+
+    return $session->privilege->noAccess() unless $self->canView;
+
+    my $templateId = $session->form->process('templateId');
+
+    if($templateId eq 'none') {
+        $self->prepareView;
+    }
+    else {
+        $self->prepareWidgetView($templateId);
+    }
+        $self->_outputWidgetJs;
+        return $self->view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareWidgetView ( )
+
+Prepares the widget view for this asset. Specifically, sets up some JS to
+ensure that links selected / forms submitted in the widgetized form of the
+asset open in a new window.
+
+=cut
+
+sub prepareWidgetView {
+    my $self            = shift;
+    my $templateId      = shift;
+    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $session         = $self->session;
+    my $extras          = $session->config->get('extrasURL');
+    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
+    my $widgetJs        = $extras . '/widgetLinkTargets.js';
+
+    $template->prepare;
+
+    $self->{_viewTemplate} = $template;
+}
+
+sub _outputWidgetJs {
+    my $self            = shift;
+    my $session         = $self->session;
+    my $extras          = $session->config->get('extrasURL');
+    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
+    my $widgetJs        = $extras . '/widgetLinkTargets.js';
+    $session->output->print("<script type='text/javascript' src='" . $yahooDomJs . "'></script>");
+    $session->output->print("<script type='text/javascript' src='" . $widgetJs   . "'></script>");
+}
 
 1;
 

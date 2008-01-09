@@ -18,6 +18,10 @@
  - Added migration utility for Gallery
  - Removed old .tmpl files from upgrades. ALL templates in upgrades must now 
    be in Packages!
+ - add: widgetize asset macro. called like so: ^Widget(assetId, width,
+   height, templateId); where assetId is the asset of the widget to
+   templatize and templateId is the template for the widget itself. If
+   templateId isn't specified, uses ajaxInlineView.
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
