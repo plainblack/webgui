@@ -124,7 +124,7 @@ sub generateCloud {
     my $options = shift;
     my $display = $options->{displayAsset} || $options->{startAsset};
     my $sth = $self->session->db->read("select count(*) as keywordTotal, keyword from assetKeyword 
-        left join asset using (assetId) where lineage like ? group by keyword order by keywordTotal limit 50", 
+        left join asset using (assetId) where lineage like ? group by keyword order by keywordTotal desc limit 50", 
         [ $options->{startAsset}->get("lineage").'%' ]);
     my $cloud = HTML::TagCloud->new(levels=>$options->{cloudLevels} || 24);
     while (my ($count, $keyword) = $sth->array) {
