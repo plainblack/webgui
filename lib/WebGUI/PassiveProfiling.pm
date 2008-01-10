@@ -54,17 +54,16 @@ The assetId to add.
 =cut
 
 sub add {
-	my $session = shift;
-	return unless ($session->setting->get("passiveProfilingEnabled"));
-	my $assetId = shift;
-	my $sql = "insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry)
-		     values (".$session->db->quote($session->id->generate()).",".
-				$session->db->quote($session->user->userId).",".
-				$session->db->quote($session->var->get("sessionId")).",".
-				$session->db->quote($assetId).",".
-				$session->db->quote($session->datetime->time()).")";
-	$session->db->write($sql);
-	return;
+    my $session = shift;
+    return unless ($session->setting->get("passiveProfilingEnabled"));
+    my $assetId = shift;
+	$session->db->write("insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry) values (?,?,?,?,?)",
+                       [
+                        $session->id->generate(),        $session->user->userId,
+                        $session->var->get("sessionId"), $assetId,
+                        $session->datetime->time(),
+                       ]);
+    return;
 }
 
 #-------------------------------------------------------------------
