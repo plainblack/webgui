@@ -26,7 +26,7 @@
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
    RFC asks, to fix problems with some SMTP servers when lines exceed 
-   998 characters.
+   998 characters. (The Next Phase / MedIntellibase)
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
