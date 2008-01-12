@@ -23,6 +23,11 @@
    widgetize and templateId is the template for the widget itself. If
    templateId isn't specified, uses ajaxInlineView.
 
+7.4.21
+ - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
+   RFC asks, to fix problems with some SMTP servers when lines exceed 
+   998 characters.
+
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
  - fix: Tag cloud limited was to 50 least commonly used tags

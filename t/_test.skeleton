@@ -17,14 +17,13 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/lib";
 use Test::More;
+use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
-use WebGUI::Test;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 
-}
 
 #----------------------------------------------------------------------------
 # Tests
@@ -38,3 +37,5 @@ plan tests => 1;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+
+}
