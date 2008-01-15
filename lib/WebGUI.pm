@@ -66,7 +66,9 @@ sub getAsset {
     my $session = shift;
 	my $assetUrl = shift;
 	my $asset = eval{WebGUI::Asset->newByUrl($session,$assetUrl,$session->form->process("revision"))};
-	if ($@) {
+    # Propogate out fatal errors, anything else we have fallbacks
+    die $@ if ($@ =~ "^fatal:");
+    if ($@) {
 		$session->errorHandler->warn("Couldn't instantiate asset for url: ".$assetUrl." Root cause: ".$@);
 	}
     return $asset;
@@ -353,7 +355,9 @@ sub tryAssetMethod {
 	$session->asset($asset);
 	my $methodToTry = "www_".$method;
 	my $output = eval{$asset->$methodToTry()};
-	if ($@) {
+    # Propogate out fatal errors, anything else we have fallbacks
+    die $@ if ($@ =~ "^fatal:");
+    if ($@) {
 		$session->errorHandler->warn("Couldn't call method ".$method." on asset for url: ".$session->url->getRequestedUrl." Root cause: ".$@);
 		if ($method ne "view") {
 			$output = tryAssetMethod($session,$asset,'view');

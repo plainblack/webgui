@@ -60,7 +60,9 @@ sub execute {
 		# Call the method
 		$cmd = $operation->{$op} . '::www_'.$op;
 		$output = eval{&{$cmd}($session)};
-		$session->errorHandler->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
+        # Propogate fatal errors, anything else output error and move on
+        die $@ if ($@ =~ "^fatal:");
+        $session->errorHandler->error("Couldn't execute operation : ".$cmd.". Root cause: ".$@) if ($@);
 	} else {
 		$session->errorHandler->security("execute an invalid operation: ".$op);
 	}
