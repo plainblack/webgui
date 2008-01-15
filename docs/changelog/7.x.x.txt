@@ -3,6 +3,7 @@
    RFC asks, to fix problems with some SMTP servers when lines exceed 
    998 characters. (The Next Phase / MedIntellibase)
  - fix: Fatal Errors Kill Login Session
+ - fix: Calendar Event recurrence stretching over daylight savings time changes use wrong times
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
