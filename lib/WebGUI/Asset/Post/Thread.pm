@@ -257,7 +257,7 @@ sub getNextThread {
                 left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
                 left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
             where
-                asset.parentId=?,
+                asset.parentId=?
                 and asset.assetId <> ?
                 and asset.state='published'
                 and asset.className='WebGUI::Asset::Post::Thread'
@@ -317,8 +317,8 @@ sub getPreviousThread {
                 left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
                 left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
             where
-                asset.parentId=?,
-                asset.assetId <> ?
+                asset.parentId=?
+                and asset.assetId <> ?
                 and asset.state='published'
                 and asset.className='WebGUI::Asset::Post::Thread'
                 and $sortBy $sortCompare ?
