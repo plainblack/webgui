@@ -242,35 +242,40 @@ Returns a thread object for the next (newer) thread in the same forum.
 =cut
 
 sub getNextThread {
-	my $self = shift;
-        unless (defined $self->{_next}) {
+    my $self = shift;
+    unless (defined $self->{_next}) {
         my $parent = $self->getParent;
         my $sortBy = $parent->getSortBy;
+        my $sortByCompare = $sortBy eq 'assetData.revisionDate' ? $self->get('revisionDate') : $self->get($sortBy);
+        $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
         my $sortOrder = $parent->getSortOrder;
-		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
-				select asset.assetId,asset.className,max(assetData.revisionDate)
-				from Thread
-				left join asset on asset.assetId=Thread.assetId 
-				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
-				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
-				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
-					and asset.state='published' 
-					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy.($sortOrder eq 'asc' ? '>' : '<').$self->session->db->quote($self->get($sortBy))." 
-					and (
-						assetData.status in ('approved','archived')
-						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
-						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
-						)
-				group by assetData.assetId
-				order by ".$sortBy." ".$sortOrder." 
-				");
-		if ($id) {
+        my $sortCompare = lc $sortOrder eq 'asc' ? '>=' : '<=';
+        my ($id, $class, $version) = $self->session->dbSlave->quickArray(<<END_SQL, [$self->get("parentId"), $self->getId, $sortByCompare, $self->session->scratch->get("versionTag"), $self->session->user->userId]);
+            select asset.assetId, asset.className, max(assetData.revisionDate)
+            from Thread
+                left join asset on asset.assetId=Thread.assetId 
+                left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
+                left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
+            where
+                asset.parentId=?,
+                and asset.assetId <> ?
+                and asset.state='published'
+                and asset.className='WebGUI::Asset::Post::Thread'
+                and $sortBy $sortCompare ?
+                and (
+                    assetData.status in ('approved','archived')
+                    or assetData.tagId=?
+                    or (assetData.ownerUserId=? and assetData.ownerUserId<>'1')
+                )
+            group by assetData.assetId
+            order by $sortBy $sortOrder, assetData.revisionDate asc
+            limit 1
+END_SQL
+        if ($id) {
             $self->{_next} = WebGUI::Asset->new($self->session, $id, $class, $version);
         }
-	#	delete $self->{_next} unless ($self->{_next}->{_properties}{className} =~ /Thread/);
-	};
-	return $self->{_next};
+    };
+    return $self->{_next};
 }
 
 
@@ -297,36 +302,41 @@ Returns a thread object for the previous (older) thread in the same forum.
 =cut
 
 sub getPreviousThread {
-	my $self = shift;
+    my $self = shift;
     unless (defined $self->{_previous}) {
         my $parent = $self->getParent;
         my $sortBy = $parent->getSortBy;
+        my $sortByCompare = $sortBy eq 'assetData.revisionDate' ? $self->get('revisionDate') : $self->get($sortBy);
+        $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
         my $sortOrder = lc($parent->getSortOrder) eq 'asc' ? 'desc' : 'asc';
-		my ($id, $class, $version) = $self->session->dbSlave->quickArray("
-				select asset.assetId,asset.className,max(assetData.revisionDate)
-				from Thread
-				left join asset on asset.assetId=Thread.assetId 
-				left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
-				left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
-				where asset.parentId=".$self->session->db->quote($self->get("parentId"))." 
-					and asset.state='published' 
-					and asset.className='WebGUI::Asset::Post::Thread'
-					and ".$sortBy.($sortOrder eq 'asc' ? '>' : '<').$self->session->db->quote($self->get($sortBy))." 
-					and (
-						assetData.status in ('approved','archived')
-						 or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag"))."
-						or (assetData.ownerUserId=".$self->session->db->quote($self->session->user->userId)." and assetData.ownerUserId<>'1')
-						)
-				group by assetData.assetId
-				order by ".$sortBy." ".$sortOrder.", assetData.revisionDate desc ");
-		if($id) {
-            $self->{_previous} = WebGUI::Asset::Post::Thread->new($self->session, $id,$class,$version);
-	    }
-    #	delete $self->{_previous} unless ($self->{_previous}->{_properties}{className} =~ /Thread/);
-	}
-	return $self->{_previous};
+        my $sortCompare = lc $sortOrder eq 'asc' ? '>=' : '<=';
+        my ($id, $class, $version) = $self->session->dbSlave->quickArray(<<END_SQL, [$self->get("parentId"), $self->getId, $sortByCompare, $self->session->scratch->get("versionTag"), $self->session->user->userId]);
+            select asset.assetId, asset.className, max(assetData.revisionDate)
+            from Thread
+                left join asset on asset.assetId=Thread.assetId 
+                left join assetData on assetData.assetId=Thread.assetId and assetData.revisionDate=Thread.revisionDate
+                left join Post on Post.assetId=assetData.assetId and assetData.revisionDate=Post.revisionDate
+            where
+                asset.parentId=?,
+                asset.assetId <> ?
+                and asset.state='published'
+                and asset.className='WebGUI::Asset::Post::Thread'
+                and $sortBy $sortCompare ?
+                and (
+                    assetData.status in ('approved','archived')
+                    or assetData.tagId=?
+                    or (assetData.ownerUserId=? and assetData.ownerUserId<>'1')
+                )
+            group by assetData.assetId
+            order by $sortBy $sortOrder, assetData.revisionDate desc
+            limit 1
+END_SQL
+        if ($id) {
+            $self->{_previous} = WebGUI::Asset->new($self->session, $id, $class, $version);
+        }
+    };
+    return $self->{_previous};
 }
-
 
 #-------------------------------------------------------------------
 
