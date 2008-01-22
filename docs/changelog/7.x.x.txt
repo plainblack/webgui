@@ -2,6 +2,8 @@
  - rfe: Search Asset returns URLs
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)
  - fix: Cannot delete private message (Diona Kidd, Knowmad Technologies)
+ - Versioning and workflow are hidden by default to make WebGUI easier to use
+   for first timers.
  - fix: Workflow activities don't pick up new default values
  - add: Friends Network
  - rfe: Added message to user search operation when user count exceeds 250.
