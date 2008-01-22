@@ -359,197 +359,206 @@ our $I18N = {
     },
 
     'helpvar searchForm_start' => {
-        message     => '',
+        message     => 'Begin the form to search the Gallery.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_end' => {
-        message     => '',
+        message     => 'End the form to search the Gallery.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_basicSearch' => {
-        message     => '',
+        message     => 'The basic search input box. Will search the title, 
+                        description, keywords, and user defined fields.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_title' => {
-        message     => '',
+        message     => 'Search by title.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_description' => {
-        message     => '',
+        message     => 'Search by description.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_keywords' => {
-        message     => '',
+        message     => 'Search by keyword.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_className' => {
-        message     => '',
+        message     => 'Search by class name.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_creationDate_after' => {
-        message     => '',
+        message     => 'Limit search to assets created after this date-time.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_creationDate_before' => {
-        message     => '',
+        message     => 'Limit search to assets created before this date-time.',
         lastUpdated => 0,
     },
 
     'helpvar searchForm_submit' => {
-        message     => '',
+        message     => 'Submit the search form.',
         lastUpdated => 0,
     },
 
     'helpvar url_addAlbum' => {
-        message     => '',
+        message     => 'URL to add an album to the gallery.',
         lastUpdated => 0,
     },
 
     'helpvar url_listAlbums' => {
-        message     => '',
+        message     => 'URL to list the albums in the gallery.',
         lastUpdated => 0,
     },
 
     'helpvar url_listAlbumsRss' => {
-        message     => '',
+        message     => 'URL to the RSS feed for the list of albums.',
         lastUpdated => 0,
     },
 
     'helpvar url_listFilesForCurrentUser' => {
-        message     => '',
+        message     => 'URL to list albums and files for the current user.',
         lastUpdated => 0,
     },
 
     'helpvar url_search' => {
-        message     => '',
+        message     => 'URL to the search page.',
         lastUpdated => 0,
     },
 
     'helpvar canEdit' => {
-        message     => '',
+        message     => 'This var is true if the user can edit the gallery.',
         lastUpdated => 0,
     },
 
     'helpvar canAddFile' => {
-        message     => '',
+        message     => 'This var is true if the user can add albums and files to the gallery.',
         lastUpdated => 0,
     },
 
     'helpvar albums' => {
-        message     => '',
+        message     => 'This is the loop over the albums being currently displayed.',
         lastUpdated => 0,
     },
 
     'helpvar albums rss' => {
-        message     => '',
+        message     => 'This is the loop over the albums being currently displayed.',
         lastUpdated => 0,
     },
 
     'helpvar rssDate' => {
-        message     => '',
+        message     => 'This is the RFC2822-compatible date that RSS feeds need for the pubDate field',
         lastUpdated => 0,
     },
 
     'helpvar search_results' => {
-        message     => '',
+        message     => 'This is the loop over the search results.',
         lastUpdated => 0,
     },
 
     'helpvar user_albums' => {
-        message     => '',
+        message     => q{This is the loop over the user's albums. All the user's albums will be
+                    in this loop.},
         lastUpdated => 0,
     },
 
     'helpvar user_files' => {
-        message     => '',
+        message     => q{This is the loop over the user's files. Only the files on this page of 
+                    the results will be shown.},
         lastUpdated => 0,
     },
 
     'helpvar userId' => {
-        message     => '',
+        message     => 'The ID of the user currently being shown in the listFilesForUser page',
         lastUpdated => 0,
     },
 
     'helpvar url_rss' => {
-        message     => '',
+        message     => q{The URL to the RSS feed for this user's files and albums},
         lastUpdated => 0,
     },
 
     'helpvar username' => {
-        message     => '',
+        message     => 'The username of the user currently shown on the listFilesForUser page',
         lastUpdated => 0,
     },
     
     'help searchForm title' => {
-        message     => '',
+        message     => 'Gallery Search Form Variables',
         lastUpdated => 0,
     },
 
     'help searchForm body' => {
-        message     => '',
+        message     => 'These variables are available from all Gallery views and allow you to
+                        create a form to search the Gallery.',
         lastUpdated => 0,
     },
 
     'help common title' => {
-        message     => '',
+        message     => 'Gallery Variables (Common)',
         lastUpdated => 0,
     },
 
     'help common body' => {
-        message     => '',
+        message     => 'These variables are common to all Gallery views.',
         lastUpdated => 0,
     },
 
     'help listAlbums title' => {
-        message     => '',
+        message     => 'Gallery List Albums Variables',
         lastUpdated => 0,
     },
 
     'help listAlbums body' => {
-        message     => '',
+        message     => 'These variables are available on the listAlbums view of the Gallery',
         lastUpdated => 0,
     },
 
     'help listAlbumsRss title' => {
-        message     => '',
+        message     => 'Gallery List Albums RSS Variables',
         lastUpdated => 0,
     },
-
-    'help search body' => {
-        message     => '',
+    
+    'help listAlbumsRss body' => {
+        message     => 'These variables are available on the listAlbums RSS feed.',
         lastUpdated => 0,
     },
 
     'help search title' => {
-        message     => '',
+        message     => 'Gallery Search Results Variables',
+        lastUpdated => 0,
+    },
+
+    'help search body' => {
+        message     => 'These variables are available from the search results screen of the gallery.',
         lastUpdated => 0,
     },
 
     'help listFilesForUser title' => {
-        message     => '',
+        message     => 'Gallery List Files For User Variables',
         lastUpdated => 0,
     },
 
     'help listFilesForUser body' => {
-        message     => '',
+        message     => 'These variables are available from the listFilesForUser screen of the Gallery.',
         lastUpdated => 0,
     },
 
     'help listFilesForUserRss title' => {
-        message     => '',
+        message     => 'Gallery List Files For User RSS Variables',
         lastUpdated => 0,
     },
 
     'help listFilesForUserRss body' => {
-        message     => '',
+        message     => 'These variables are available for the listFilesForUser RSS feed.',
         lastUpdated => 0,
     },
 

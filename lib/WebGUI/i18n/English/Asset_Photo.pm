@@ -51,6 +51,16 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'help delete title' => {
+        message     => 'Photo -- Delete Form',
+        lastUpdated => 0,
+    },
+
+    'help delete body' => {
+        message     => 'Confirm the delete of a Photo asset.',
+        lastUpdated => 0,
+    },
+
     'help makeShortcut title' => {
         message     => 'Photo -- Make Shortcut Form',
         lastUpdated => 0,
@@ -166,7 +176,7 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'helpvar exif_*' => {
+    'helpvar exif_' => {
         message     => 'Each EXIF tag can be referenced by name.',
         lastUpdated => 0,
     },
@@ -187,107 +197,97 @@ our $I18N = {
     },
 
     'helpvar url_addArchive' => {
-        message     => '',
+        message     => 'The URL to add an archive to the parent Album',
         lastUpdated => 0,
     },
 
     'helpvar form_start' => {
-        message     => '',
+        message     => 'Start the form.',
         lastUpdated => 0,
     },
 
     'helpvar form_end' => {
-        message     => '',
+        message     => 'End the form.',
         lastUpdated => 0,
     },
 
     'helpvar form_submit' => {
-        message     => '',
+        message     => 'Submit the form.',
         lastUpdated => 0,
     },
 
     'helpvar form_title' => {
-        message     => '',
+        message     => 'The title of the Photo.',
         lastUpdated => 0,
     },
 
     'helpvar form_synopsis' => {
-        message     => '',
+        message     => 'The caption for the Photo.',
         lastUpdated => 0,
     },
 
     'helpvar form_photo' => {
-        message     => '',
+        message     => 'The photo to upload.',
         lastUpdated => 0,
     },
 
     'helpvar form_keywords' => {
-        message     => '',
+        message     => 'The keywords for the Photo.',
         lastUpdated => 0,
     },
 
     'helpvar form_location' => {
-        message     => '',
+        message     => 'The location the photo was taken.',
         lastUpdated => 0,
     },
 
     'helpvar form_friendsOnly' => {
-        message     => '',
-        lastUpdated => 0,
-    },
-
-    'helpvar form_start' => {
-        message     => '',
-        lastUpdated => 0,
-    },
-
-    'helpvar form_end' => {
-        message     => '',
+        message     => 'Make this photo friends only?',
         lastUpdated => 0,
     },
 
     'helpvar form_parentId' => {
-        message     => '',
+        message     => 'Select which Album the shortcut should be made in.',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop' => {
-        message     => '',
+        message     => 'Loop over a page of comments to this photo',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop userId' => {
-        message     => '',
+        message     => 'The userId of the user who made the comment.',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop visitorIp' => {
-        message     => '',
+        message     => 'If the user is a visitor, the IP address of the user.',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop creationDate' => {
-        message     => '',
+        message     => 'The creation date of the comment',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop bodyText' => {
-        message     => '',
+        message     => 'The body of the comment',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop username' => {
-        message     => '',
+        message     => 'The username of the user who made the comment.',
         lastUpdated => 0,
     },
 
     'helpvar commentLoop_pageBar' => {
-        message     => '',
+        message     => 'The bar to navigate through pages of comments',
         lastUpdated => 0,
     },
 
     'helpvar url_yes' => {
-        message     => '',
+        message     => 'Confirm the deleting of this Photo.',
         lastUpdated => 0,
     },
 

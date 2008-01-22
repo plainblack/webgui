@@ -101,8 +101,8 @@ our $HELP = {
                 ],
             },
             {
-                name        => 'exif_*',
-                description => 'helpvar exif_*',
+                name        => 'exif_',
+                description => 'helpvar exif_',
             },
             {
                 name        => 'exifLoop',
@@ -140,7 +140,7 @@ our $HELP = {
     
     'help edit' => {
         title       => 'help edit title',
-        body        => 'htlp edit body',
+        body        => 'help edit body',
         variables => [
             {
                 name        => 'url_addArchive',
@@ -189,7 +189,7 @@ our $HELP = {
     
     'help makeShortcut' => {
         title       => 'help makeShortcut title',
-        body        => 'htlp makeShortcut body',
+        body        => 'help makeShortcut body',
         variables => [
             {
                 name        => 'form_start',
