@@ -156,7 +156,12 @@ sub purgeCache {
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    my $versionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+    my $noCache =
+        $self->session->var->isAdminOn
+        || $self->get("cacheTimeout") <= 10
+        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+    unless ($noCache) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -166,7 +171,7 @@ sub view {
 	if ($self->getValue("processAsTemplate")) {
 		$output = WebGUI::Asset::Template->processRaw($self->session, $output, $self->get);
 	}
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    unless ($noCache) {
 		WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
 	}
        	return $output;

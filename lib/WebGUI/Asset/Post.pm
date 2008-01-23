@@ -1041,8 +1041,7 @@ sub update {
         view => $self->get("groupIdView"),
         edit => $self->get("groupIdEdit")
     );
-    $properties->{isHidden} = 1;
-    $self->SUPER::update($properties, @_);
+    $self->SUPER::update({%$properties, isHidden => 1});
     if ($self->get("ownerUserId") ne $before{owner} || $self->get("groupIdEdit") ne $before{edit} || $self->get("groupIdView") ne $before{view}) {
     my $storage = $self->getStorageLocation;
         if (-d $storage->getPath) {

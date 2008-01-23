@@ -322,7 +322,7 @@ sub www_manageTrash {
    <script type=\"text/javascript\">
    //<![CDATA[
      var assetManager = new AssetManager();
-         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{name=>"checkAllAssetIds", extras=>'onchange="toggleAssetListSelectAll(this.form);"'})."','','center','form');
+         assetManager.AddColumn('".WebGUI::Form::checkbox($self->session,{name=>"checkAllAssetIds", extras=>'onclick="toggleAssetListSelectAll(this.form);"'})."','','center','form');
          assetManager.AddColumn('".$i18n->get("99")."','','left','');
          assetManager.AddColumn('".$i18n->get("type")."','','left','');
          assetManager.AddColumn('".$i18n->get("last updated")."','','center','');
@@ -345,15 +345,20 @@ sub www_manageTrash {
 			."','".$child->get("revisionDate")."','".$child->get("assetSize")."');\n";
 	}
 	$output .= '
-assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
-assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
-		assetManager.Write();        
-                var assetListSelectAllToggle = false;
-                function toggleAssetListSelectAll(form){
-                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
-                        for(var i = 0; i < form.assetId.length; i++)
+            assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageTrash");
+            assetManager.AddButton("'.$i18n->get("purge").'","purgeList","manageTrash");
+            assetManager.Write();        
+            var assetListSelectAllToggle = false;
+            function toggleAssetListSelectAll(form) {
+                assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                if (typeof form.assetId.length == "undefined") {
+                    form.assetId.checked = assetListSelectAllToggle;
+                }
+                else {
+                    for (var i = 0; i < form.assetId.length; i++)
                         form.assetId[i].checked = assetListSelectAllToggle;
-                 }
+                }
+            }
 		 //]]>
 		</script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);

@@ -200,48 +200,53 @@ sub generateRecurringEvents {
     }
 
     # Get the distance between the event startDate and endDate
-    # Only days, since event recurrence only changes the Date the event occurs, not
-    # the time.
+    # Include the time, as recurrence can change it when crossing a daylight
+    # savings time border.
     # TODO: Allow recurrence patterns of less than a single day.
-    my $duration_days = 0;
+
+    my $initialStart
+        = WebGUI::DateTime->new($session, $properties->{startDate} . " "
+        . ($properties->{startTime} || "00:00:00"));
+    my $initialEnd
+        = WebGUI::DateTime->new($session, $properties->{endDate} . " "
+        . ($properties->{endTime} || "00:00:00"));
+    my $duration = $initialEnd->subtract_datetime($initialStart);
     
-    my $event_start     
-        = WebGUI::DateTime->new($session, $properties->{startDate}." 00:00:00");
-    my $event_end       
-        = WebGUI::DateTime->new($session, $properties->{endDate}." 00:00:00");
-    $duration_days      
-        = $event_end->subtract_datetime($event_start)->days;
-    
-    my $eventTime;
+    my $localTime;
     if ($properties->{startTime}) {
-        $eventTime = WebGUI::DateTime->new($session, $properties->{startDate} . " " . $properties->{startTime});
-        $eventTime = $eventTime->set_time_zone($properties->{timeZone})->toMysqlTime;
+        $localTime = $initialStart->clone->set_time_zone($properties->{timeZone})->toMysqlTime;
     }
     $properties->{feedUid} = undef;
     
     my @dates    = $self->getRecurrenceDates;
     
     for my $date (@dates) {
-        my $dt;
-        if ($eventTime) {
-            $dt = WebGUI::DateTime->new($session, mysql => $date . " " . $eventTime, time_zone => $properties->{timeZone});
+        my $startDate;
+        if ($localTime) {
+            $startDate = WebGUI::DateTime->new($session,
+                mysql       => $date . " " . $localTime,
+                time_zone   => $properties->{timeZone},
+            );
         }
         else {
-            $dt = WebGUI::DateTime->new($session, $date." ". "00:00:00");
+            $startDate = WebGUI::DateTime->new($session, $date." 00:00:00");
         }
-        my $startDate = $dt->toDatabaseDate;
+        my $endDate = $startDate->clone->add($duration);
+        my $dbDate = $startDate->toDatabaseDate;
         # Only generate if the recurId does not exist on this day
         my ($exists) 
             = $session->db->quickArray(
                 "select count(*) from Event where recurId=? and startDate=?",
-                [$properties->{recurId}, $startDate],
+                [$properties->{recurId}, $dbDate],
             );
         
         if (!$exists) {
-            $properties->{startDate} = $startDate;
-            $properties->{endDate} 
-                = $dt->clone->add(days => $duration_days)->toDatabaseDate;
-            
+            $properties->{startDate} = $dbDate;
+            $properties->{endDate} = $endDate->toDatabaseDate;
+            if ($localTime) {
+                $properties->{startTime} = $startDate->toDatabaseTime;
+                $properties->{endTime} = $endDate->toDatabaseTime;
+            }
             my $newEvent = $parent->addChild($properties);
             $newEvent->requestAutoCommit;
         }
@@ -1802,9 +1807,8 @@ Wrap update so that isHidden is always set to be a 1.
 
 sub update {
     my $self = shift;
-    my $properties = shift;    
-    $properties->{isHidden} = 1;
-    return $self->SUPER::update($properties);
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
 }
 
 

@@ -33,6 +33,10 @@
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
    RFC asks, to fix problems with some SMTP servers when lines exceed 
    998 characters. (The Next Phase / MedIntellibase)
+ - fix: Fatal Errors Kill Login Session
+ - fix: Calendar Event recurrence stretching over daylight savings time changes use wrong times
+ - fix: In IE, 'Insert WebGUI Image' loses some attributes
+ - fix: Collaboration System threads sometimes unable to find next/previous thread
 
 7.4.20
  - fix: Assets with no committed versions may be left as orphans when parent is purged
@@ -40,10 +44,14 @@
  - fix: Calendar Edit template refers to non-existant and other unneeded javascript files
 
 7.4.19
+ - fix: Select all doesn't work in trash in IE or with a single item
  - fix: Import Package does nothing when re-importing trashed package
  - fix: CS Posts get re-ordered when copy/paste
  - fix: Matrix best/worst now must have 10 or more votes
  - fix: When upgrading, two revisions of same asset added in same second.
+ - fix: Uncommitted Snippets get cached when not in admin mode and are then served to visitors
+ - fix: Admin Console icons sometimes not shown in IE7
+ - fix: Syndicated Content asset not decoding with entities properly
 
 7.4.18
  - fix: Graph draws black triangle covering half the image
@@ -60,6 +68,7 @@
 
 7.4.17
  - fix: double width characters encoded incorrectly in Collaboration RSS feed
+ - fix: update method in various assets changes incoming parameters
  - fix: ExtrasUrl in conf http:// stripping / from URL (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/extrasurl-in-conf-http/-stripping-/-from-url
 
@@ -97,8 +106,8 @@
  - fix: EMS edit badge event list can display incorrectly in IE
  - fix: Expired SessionScratch not deleted (thanks to Michelle Lamar)
      http://www.plainblack.com/bugs/tracker/expired-sessionscratch-not-deleted
- - fix: Bad import of help template variables from other topics. (perlDreamer Consulting, LLC.)
  - fix: Remove old templates that used to belong to the Events Calendar (perlDreamer Consulting, LLC.)
+ - fix: Bad import of help template variables from other topics. (perlDreamer Consulting, LLC.)
 
 7.4.12
  - fix: extra empty/grey area at the bottom of pages

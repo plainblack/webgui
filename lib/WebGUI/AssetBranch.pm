@@ -296,8 +296,7 @@ sub www_editBranchSave {
 				$data{url} .= $descendant->get("url");
 			}
 		}
-		# copy of %data instead of reference so modifications don't propagate to the next asset
-        my $newRevision = $descendant->addRevision({%data}, undef, {skipAutoCommitWorkflows=>1});
+        my $newRevision = $descendant->addRevision(\%data, undef, {skipAutoCommitWorkflows=>1});
 		foreach my $form ($self->session->form->param) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;

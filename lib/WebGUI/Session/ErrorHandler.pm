@@ -19,6 +19,7 @@ use strict;
 use Log::Log4perl;
 use Apache2::RequestUtil;
 use JSON;
+use HTML::Entities;
 
 =head1 NAME 
 
@@ -215,7 +216,7 @@ sub fatal {
 	elsif ($self->canShowDebug()) {
 		$self->session->output->print("<h1>WebGUI Fatal Error</h1><p>Something unexpected happened that caused this system to fault.</p>\n",1);
 		$self->session->output->print("<p>".$message."</p>\n",1);
-		$self->session->output->print($self->getStackTrace(), 1);
+		$self->session->output->print("<pre>" . encode_entities($self->getStackTrace) . "</pre>", 1);
 		$self->session->output->print($self->showDebug(),1);
 	} 
 	else {
@@ -228,7 +229,7 @@ sub fatal {
 		$self->session->output->print('<br />'.$self->session->setting->get("companyURL"),1);
 	}
 	$self->session->close();
-	exit;
+	die "fatal: " . $message;
 }
 
 

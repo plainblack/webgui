@@ -68,6 +68,7 @@ sub handler {
         if ($request->uri =~ m{$regex}i) {
             my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
             if ($@) {
+                die $@ if ($@ =~ "^fatal:");
                 # bad
                 return Apache2::Const::DECLINED;
             }

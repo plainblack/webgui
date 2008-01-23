@@ -225,39 +225,29 @@ sub definition {
         return $class->SUPER::definition($session, $definition);
 }
 
-
-
-
-
 #-------------------------------------------------------------------
 # strip all html tags from the given data structure.  This is important to
 # prevent cross site scripting attacks
-#my $_stripped_html = {};
 
 sub _strip_html {
-        #my ($data) = @_;
-
-        if (ref($_[0]) eq 'HASH') {
-                keys(%{$_[0]});
-                while (my ($name, $val) = each (%{$_[0]})) {
-                        $_[0]->{$name} = _strip_html($val);
-                }
-        } elsif (ref($_[0]) eq 'ARRAY') {
-                for (my $i = 0; $i < @{$_[0]}; $i++) {
-                        $_[0]->[$i] = _strip_html($_[0]->[$i]);
-                }
-        } else {
-                if ($_[0]) {
-                        $_[0] =~ s/\&lt;/</g;
-                        $_[0] =~ s/\&gt;/>/g;
-                        $_[0] = WebGUI::HTML::filter($_[0], 'all');
-			##Unencode double encoded entities.  This is usually done
-			##by passing XML::RSSLite an already encoded entity.
-			$_[0] =~ s/\&amp;(?=(#[0-9]+|#x[0-9a-fA-F]+|\w+);)/&/g;
-                }
+    unless (ref $_[0]) {
+        return $_[0] = WebGUI::HTML::Filter($_[0], 'all');
+    }
+    my $ref = shift;
+    if (ref $ref eq 'HASH') {
+        if (exists $ref->{description}) {
+            $ref->{description} = HTML::Entities::decode_entities($ref->{description});
         }
-
-        return $_[0];
+        foreach my $value (values %$ref) {
+            _strip_html($value);
+        }
+    }
+    elsif (ref $ref eq 'ARRAY') {
+        foreach my $value (@$ref) {
+            _strip_html($value);
+        }
+    }
+    return $ref;
 }
 
 #-------------------------------------------------------------------
@@ -399,7 +389,7 @@ sub _get_rss_data {
                         $rss->{items} = [];
 		}
 
-                _strip_html($rss);
+                 _strip_html($rss);
                  $rss->{items} = [ $rss->{items} ] unless (ref $rss->{items} eq 'ARRAY');
 
                 _normalize_items($rss->{items});

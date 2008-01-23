@@ -17,6 +17,9 @@ package WebGUI::Pluggable;
 use strict;
 use Carp qw(croak);
 
+# Carps should always bypass this package in error reporting
+$Carp::Internal{ __PACKAGE__ }++;
+
 =head1 NAME
 
 Package WebGUI::Pluggable
@@ -55,25 +58,21 @@ The name of the module you'd like to load like "WebGUI::Asset::Snippet";
 
 sub instanciate {
     my ($module, $sub, $params) = @_;
-    eval { load($module) };
-    if ($@) {
-        croak "Could not instanciate object using $sub on $module because $module could not be loaded.";
+    if ( ! eval { load($module); 1 } ) {
+        croak "Could not instanciate object using $sub on $module: $@";
     }
-    else {
-        unless ($module->can($sub)) {
-            croak "Could not instanciate object using $sub on $module because $sub is not a valid method.";
-        }
-        my $object = eval{$module->$sub(@{$params})};
-        if ($@) {
-            croak "Could not instanciate object using $sub on $module because $@";
-        }
-        else {
-            unless (defined $object) {
-                croak "Could not instanciate object using $sub on $module. The result is undefined.";
-            }
-            return $object;
-        }
+    # Module loaded properly
+    unless ($module->can($sub)) {
+        croak "Could not instanciate object using $sub on $module because $sub is not a valid method.";
     }
+    my $object;
+    if (! eval{$object = $module->$sub(@{$params}); 1}) {
+        croak "Could not instanciate object using $sub on $module because $@";
+    }
+    if (defined $object) {
+        return $object;
+    }
+    croak "Could not instanciate object using $sub on $module. The result is undefined.";
 }
 
 #-------------------------------------------------------------------
@@ -88,12 +87,20 @@ The name of the module you'd like to load like "WebGUI::Asset::Snippet";
 
 =cut
 
+# Cache results of failures.  Modules with compile errors will pass a require check if done a second time.
+my %moduleError;
 sub load {
     my $module = shift;
-    my $modulePath = $module.".pm";
-    $modulePath =~ s{::}{/}g;
-    eval { require $modulePath };
-    if ($@) {
+    if ($moduleError{$module}) {
+        croak "Could not load $module because $moduleError{$module}";
+    }
+    my $modulePath = $module . ".pm";
+    $modulePath =~ s{::|'}{/}g;
+    if (eval { require $modulePath; 1 }) {
+        return 1;
+    }
+    else {
+        $moduleError{$module} = $@;
         croak "Could not load $module because $@";
     }
 }
@@ -120,21 +127,15 @@ An array reference of parameters to pass in to the sub routine.
 
 sub run {
     my ($module, $sub, $params) = @_;
-    eval { load($module) };
-    if ($@) {
-        croak "Could not run $sub on $module because $module could not be loaded.";
+    if (! eval { load($module); 1 }) {
+        croak "Unable to run $sub on $module: $@";
+    }
+    elsif (my $sub = $module->can($sub)) {
+        # Let any other errors propagate
+        return $sub->(@$params);
     }
     else {
-        my $command = $module."::".$sub;
-        no strict qw(refs);
-        my $out = eval { &$command(@{$params}) };
-        use strict;
-        if ($@) {
-            croak "Could not run $sub on $module because $@";
-        }
-        else {
-            return $out;
-        }
+        croak "Could not run $sub on $module because it does not exist";
     }
 }
 

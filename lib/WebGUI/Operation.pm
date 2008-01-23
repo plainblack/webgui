@@ -56,11 +56,11 @@ sub execute {
 	if ($operation->{$op}) {
         $output = eval { WebGUI::Pluggable::run("WebGUI::Operation::".$operation->{$op}, 'www_'.$op, [ $session ] ) };
         if ( $@ ) {
+            die $@ if ($@ =~ "^fatal:");
             $session->errorHandler->error($@);
             return;
         }
-	} 
-    else {
+	} else {
 		$session->errorHandler->security("execute an invalid operation: ".$op);
 	}
 	return $output;
