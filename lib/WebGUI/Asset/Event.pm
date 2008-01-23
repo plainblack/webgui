@@ -91,10 +91,6 @@ sub definition {
             defaultValue    => undef,
         },
         
-        'relatedLinks' => {
-            fieldType       => "HTMLArea",
-            defaultValue    => undef,
-        },
         'location' => {
             fieldType       => "Text",
             defaultValue    => undef,
@@ -114,6 +110,9 @@ sub definition {
         },
         'timeZone' => {
             fieldType       => 'TimeZone',
+        },
+        sequenceNumber => {
+            fieldType       => 'hidden',
         },
     );
     
@@ -400,6 +399,8 @@ sub getEventNext {
         limit               => 1,
     });
     
+    
+    return unless $events->[0]; 
     return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
 }
 
@@ -455,6 +456,7 @@ sub getEventPrev {
                 limit               => 1,
             });
     
+    return unless $events->[0];
     return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
 }
 
@@ -1140,13 +1142,26 @@ sub getRecurrenceFromForm {
 
 =head2 getRelatedLinks
 
-Gets an array of hashrefs of related links.
+Gets an arrayref of hashrefs of related links.
 
 =cut
 
 sub getRelatedLinks {
     my $self    = shift;
+    
+    my $sth
+        = $self->session->db->prepare( 
+            "SELECT * FROM Event_relatedlink WHERE assetId=? ORDER BY sequenceNumber",
+        );
+    $sth->execute([ $self->getId ]);
 
+    my @links;
+    while ( my $link = $sth->hashRef ) {
+        next unless $self->session->user->isInGroup( $link->{ groupIdView } );
+        push @links, $link;
+    }
+    
+    return \@links;
 }
 
 #-------------------------------------------------------------------
@@ -1275,10 +1290,8 @@ sub getTemplateVars {
     $var{ "urlSearch"   } = $self->getParent->getSearchUrl;        
     
     # Related links
-    $var{ "relatedLinks" } = [];
-    push @{$var{"relatedLinks"}}, { "linkUrl" => $_ }
-        for ($self->getRelatedLinks);
-	
+    $var{ relatedLinks } = $self->getRelatedLinks;    
+
     # Attachments
     my $gotImage;
     my $gotAttachment;
@@ -1487,6 +1500,74 @@ sub processPropertiesFromFormPost {
         });
     }
     
+    my $top_val = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event ORDER BY sequenceNumber desc LIMIT 1")->[0];
+    $top_val += 16384;
+    my $assetId = $self->get('assetId');
+    my $revisionDate = $self->get('revisionDate');
+    
+    $session->db->write("UPDATE Event SET sequenceNumber =? WHERE assetId = ? AND revisionDate =?",[($form->param('sequenceNumber') || $top_val), $assetId, $revisionDate]);
+
+
+    # Pre-process Related Links and manage changes
+    # These parameters are the important ones
+    #
+    my @rel_keys = grep {/^rel_(?:delconfirm|url|text|group|seq)_/} $form->param;
+
+    # Organize results
+    my %rel_link_for;
+    for (@rel_keys) {
+       if (/^rel_group_id_(.+)$/) {  # Group assignment
+           $rel_link_for{$1}{groupIdView} = $form->param($_);
+       }
+       elsif (/^rel_url_(.+)$/) {
+           my $eventlinkId = $1;
+           my $url = $form->param($_);
+           $url =~ s/^\s+//;
+           $url =~ s/\s+$//;
+           if (0 && $url && $url !~ /^http:\/\//) {
+               $url =~ s/ht+p[^\w]+//i;
+               $url = "http://$url";
+           }
+           $rel_link_for{$eventlinkId}{linkurl} = $url || '';
+       }
+       elsif (/^rel_seq_(.+)$/) {
+           $rel_link_for{$1}{sequenceNumber} = $form->param($_);
+       }
+       elsif (/^rel_text_(.+)$/) {
+           my $eventlinkId = $1;
+           my $text = $form->param($_);
+           $text =~ s/^\s+//;
+           $text =~ s/\s+$//;
+           $rel_link_for{$eventlinkId}{linktext} = $text;
+       }
+       elsif (/^rel_delconfirm_(.+)$/) {
+           $rel_link_for{$1}{delete} = $form->param($_);
+       }
+    }
+
+    # The database entries for this assetId are compared and
+    # then replaced by these (possibly new) values.  Deletions
+    # are marked and passed on.
+    #
+    my @rel_link_saves;
+
+    for (keys %rel_link_for) {
+       if (!$rel_link_for{$_}{linkurl}) {
+           $rel_link_for{$_}{delete}++;
+           next;
+       }
+       if (/^new_/) {
+           $rel_link_for{$_}{eventlinkId} = $self->session->id->generate();
+           $rel_link_for{$_}{new_event}++;
+       }
+       else {
+           $rel_link_for{$_}{eventlinkId} = $_;
+       }
+       push @rel_link_saves, \%{$rel_link_for{$_}};
+    }
+
+    $self->setRelatedLinks(\@rel_link_saves);
+
 
     # Determine if the pattern has changed
     if ($form->param("recurType")) {
@@ -1497,7 +1578,8 @@ sub processPropertiesFromFormPost {
         
         
         # Set storable to canonical so that we can compare data structures
-        $Storable::canonical = 1;
+        local $Storable::canonical = 1;
+        
         
         # Pattern keys
         if (nfreeze(\%recurrence_new) ne nfreeze(\%recurrence_old)) {
@@ -1669,19 +1751,45 @@ sub setRecurrence {
 
 ####################################################################
 
-=head2 setRelatedLinks ( @links )
+=head2 setRelatedLinks ( links )
 
-Sets the event's related links.
+Sets the event's related links. C<links> is an array reference of
+hash reference of links.
 
 =cut
 
 sub setRelatedLinks {
     my $self    = shift;
-    my @links   = @_;
+    my $links   = shift;
     
-    $self->update({
-        relatedLinks    => join("\n", @links),
-    });
+    my $assetId = $self->getId;
+
+    # Don't make any changes unless asked, and then only change the known records
+    #
+    if (@$links) {
+       for my $hr (@{$links}) {
+           if ($hr->{new_event} && !$hr->{delete}) {
+               $self->session->db->write(
+                    q{INSERT INTO Event_relatedlink (assetId,sequenceNumber,linkurl,linktext,groupIdView,eventlinkId) VALUES (?,?,?,?,?,?)},
+                    [ $assetId, @{$hr}{('sequenceNumber','linkurl','linktext','groupIdView','eventlinkId')} ]
+                );
+           }
+           elsif ($hr->{delete}) {
+                $self->session->db->write(
+                    q{DELETE FROM Event_relatedlink WHERE assetId = ? AND eventlinkId = ?},
+                    [ $assetId, $hr->{eventlinkId} ],
+                );
+           }
+           else {
+                $self->session->db->write(
+                    q{UPDATE Event_relatedlink set sequenceNumber=?,linkurl=?,linktext=?,groupIdView=? where eventlinkId = ?},
+                    [ @{$hr}{('sequenceNumber','linkurl','linktext','groupIdView','eventlinkId')} ],
+                );
+           }
+       }
+    }
+
+    return;
 }
 
 ####################################################################
@@ -1782,6 +1890,10 @@ sub www_edit {
         $var->{"formHeader"} 
             = WebGUI::Form::formHeader($session, {
                 action      => $self->getUrl,
+            })
+            . WebGUI::Form::hidden($self->session, {
+                name    => "sequenceNumber",
+                value   => $self->get("sequenceNumber"),
             });
     }
     
@@ -1971,13 +2083,34 @@ sub www_edit {
         . q|<br/>Time Zone: |.$var->{formTimeZone}
         . q|</div>|;
     
-    # related links
-    $var->{"formRelatedLinks"} 
-        = WebGUI::Form::HTMLArea($session, {
-            name    => "relatedLinks",
-            value   => $form->process("relatedLinks") || $self->get("relatedLinks"),
-        });
+    ###### related links
+    my $relatedLinks = $self->getRelatedLinks();
     
+    my $seqNum = 1;
+    for (@$relatedLinks) {
+    
+        $_->{row_id} = "rel_row_".$_->{eventlinkId};
+        $_->{div_id} = "rel_div_".$_->{eventlinkId};
+        $_->{delete_name} = "rel_del_".$_->{eventlinkId};
+        $_->{delete_id} = "rel_del_id_".$_->{eventlinkId};
+        $_->{group_id} = WebGUI::Form::Group($session, {
+            name         => "rel_group_id_".$_->{eventlinkId},
+            value        => $form->process("rel_group_id_".$_->{eventlinkId}) || $_->{groupIdView} || $self->getParent->get("groupIdView"),
+            defaultValue => $self->getParent->get("groupIdView"),
+        });
+       $_->{seq_num_name} = "rel_seq_".$_->{eventlinkId};
+       $_->{seq_num_id} = "rel_seq_id_".$_->{eventlinkId};
+       $_->{seq_num_value} = $seqNum++;
+    }
+    $var->{"relatedLinks"} = $relatedLinks;
+
+    $var->{"genericGroup"} = WebGUI::Form::Group($session, {
+            name         => "rel_group_id_ZZZZZZZZZZ",
+            value        => $self->getParent->get("groupIdView"),
+            defaultValue => $self->getParent->get("groupIdView"),
+        });
+    chomp $var->{"genericGroup"};
+ 
     
     
     ###### Recurrence tab
@@ -2142,11 +2275,11 @@ sub www_edit {
         </div>
     |;
     
-    
     # Include
+    # TODO!
     
     # Exclude
-    
+    # TODO!
     
     
     

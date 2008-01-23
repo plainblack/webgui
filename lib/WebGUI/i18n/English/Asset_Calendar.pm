@@ -104,6 +104,29 @@ our $I18N = {
 	},
 	
 	
+	##### Default Daily Event Sort Order #####
+	'sortEventsBy label' => {
+		message		=> q{Daily Events Sort Order},
+		lastUpdated	=> 0,
+		context		=> q{A specification for determining daily Event display order.},
+	},
+	'sortEventsBy description' => {
+		message		=> q{The order in which daily Events are displayed.},
+		lastUpdated	=> 0,
+		context		=> q{Hover Help for the Daily Events Sort Order field.},
+	},
+	'sortEventsBy value time' => {
+		message		=> q{Order by Start Date/End Date.},
+		lastUpdated	=> 0,
+		context		=> q{A value for the Daily Event Sort Order field.},
+	},
+	'sortEventsBy value sequencenumber' => {
+		message		=> q{Order by Sequence Number.},
+		lastUpdated	=> 0,
+		context		=> q{A value for the Daily Events Sort Order field.},
+	},
+	
+	
 	
 	
 	

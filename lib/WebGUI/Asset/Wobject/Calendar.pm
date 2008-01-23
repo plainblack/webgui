@@ -62,8 +62,10 @@ sub definition {
         first   => $i18n->get("defaultDate value first"),
         last    => $i18n->get("defaultDate value last"),
     );
-    
-    
+    tie (my %optionsEventSort, 'Tie::IxHash', 
+        time            => $i18n->get("sortEventsBy value time"),
+        sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
+    );
     
     ### Build properties hash ###
     tie my %properties, 'Tie::IxHash';
@@ -214,7 +216,15 @@ sub definition {
             hoverHelp       => $i18n->get('visitorCacheTimeout description'),
             label           => $i18n->get('visitorCacheTimeout label'),
         },
-        
+        sortEventsBy => {
+            fieldType       => "SelectBox",
+            defaultValue    => "time",
+            options         => \%optionsEventSort,
+            tab             => "display",
+            label           => $i18n->get("sortEventsBy label"),
+            hoverHelp       => $i18n->get("sortEventsBy description"),
+        },
+ 
         # This doesn't function currently
         #subscriberNotifyOffset => {
         #    fieldType       => "integer",
@@ -589,7 +599,7 @@ sub getEvent {
 
 ####################################################################
 
-=head2 getEventsIn ( startDate, endDate )
+=head2 getEventsIn ( startDate, endDate, options )
 
 Returns a list of Event objects that fall between two dates, ordered by their
 start date/time.
@@ -601,10 +611,13 @@ user's time zone.
 
 TODO: Allow WebGUI::DateTime objects to be passed as the parameters.
 
-TODO: Allow for a hashref of options as the third parameter to specify such 
-things as a limit clause, or additional where clause, or something.
-
 This is the main API method to get events from a calendar, so it must be flexible.
+
+C<options> is a hash reference with the following keys:
+
+ order                  - The order to return the events. Will default to the
+                        sortEventsBy asset property. Valid values are:
+                        'time', 'sequenceNumber'
 
 =cut
 
@@ -612,6 +625,11 @@ sub getEventsIn {
     my $self    = shift;
     my $start   = shift;
     my $end     = shift;
+    my $params  = shift;
+
+    $params->{order} = '' if $params->{order} !~ /^(?:time|sequencenumber)/i;
+    my $order_by_type = $params->{order} ? lc($params->{order}) : $self->get('sortEventsBy');
+
     my $tz      = $self->session->user->profileField("timeZone");
     
     # Warn and return if no startDate or endDate
@@ -647,15 +665,20 @@ sub getEventsIn {
                 )
         };
 
-    my $orderby    
-        = join ',',
-            'Event.startDate', 
+    my @order_priority 
+       = ( 'Event.startDate', 
             'Event.startTime', 
             'Event.endDate', 
             'Event.endTime', 
             'assetData.title', 
             'assetData.assetId',
-            ;
+    );
+    if ($order_by_type eq 'sequencenumber') {
+       unshift @order_priority, 'Event.sequenceNumber';
+    }
+
+    my $orderby = join ',', @order_priority;
+
     
     my $events 
         = $self->getLineage(["descendants"], {
@@ -933,12 +956,25 @@ sub view {
     
     # Get the form parameters
     my $params        = {};    
-    $params->{type}   = $form->param("type");
+    $params->{type}   = $form->param("type") || $self->get( 'defaultView' );
     $params->{start}  = $form->param("start");
    
-    ### TODO: Parse user input for sanity.
-    # {start} must be of the form: YYYY-MM-DD%20HH:MM:SS
-    # {type} must be "month", "week", or "day"
+    # Validate type passed, or recover from session scratchpad
+    if ($params->{type} =~ /^(?:month|week|day)$/) {
+       $session->scratch->set('cal_view_type', $params->{'type'});
+    }
+    else {
+       $params->{type} = $session->scratch->get('cal_view_type') || $self->get( 'defaultView' ) || 'month';
+       $session->scratch->set('cal_view_type', $params->{'type'});
+    }
+
+    # Validate start passed or recover from session scratchpad
+    if ($params->{ start } =~ /^\d\d\d\d\-\d\d\-\d\d.+?\d\d\:\d\d\:\d\d$/) {
+       $session->scratch->set('cal_view_start', $params->{ start });
+    }
+    else {
+       $params->{ start } = $session->scratch->get('cal_view_start') || 0;
+    }
 
     # Set defaults if necessary
     if (!$params->{start}) {
@@ -949,9 +985,8 @@ sub view {
                 ? $self->getLastEvent->getDateTimeStart
             :   WebGUI::DateTime->new($session, time)->toUserTimeZone
             ;
-    }
-    if (!$params->{type}) {
-        $params->{type} = $self->get("defaultView") || "Month";
+
+        $session->scratch->set('cal_view_start', $params->{'start'});
     }
     
     # Get the template from the appropriate view* method
@@ -971,7 +1006,7 @@ sub view {
     # Event editor
     if ($self->canAddEvent) {
         $var->{'editor'}    = 1;
-        $var->{"urlAdd"}    = $self->getUrl("func=add;class=WebGUI::Asset::Event;start=$params->{start}");
+        $var->{"urlAdd"}    = $self->getUrl("func=add;class=WebGUI::Asset::Event;type=".$params->{type}.";start=$params->{start}");
     }
     
     # URLs
@@ -1283,12 +1318,165 @@ sub viewWeek {
     $dt->subtract(days => $dt->day_of_week % 7 - $first_dow);
     
     my $start   = $dt->toMysql;
-    my $dtEnd   = $dt->clone->add(days => 7);
+    my $dtEnd   = $dt->clone->add(days => 7)->add( seconds => -1);
     my $end     = $dtEnd->toMysql; # Clone to prevent saving change
-    $dtEnd->add(seconds => -1);
     
-    my @events  = $self->getEventsIn($start,$end);
-    
+    my $sort_by_sequence++ if $self->get('sortEventsBy') eq 'sequencenumber';
+    my $can_edit_order++ if $self->canEdit && $sort_by_sequence;
+
+    my $reorder_request++ if $can_edit_order && $session->form->param( 'eventMove' ) =~ /^(?:UP|DOWN)$/;
+    if ($reorder_request) {
+
+       # Someone clicked an UP or DOWN request
+       #
+       my @events  = $self->getEventsIn( $start, $end );
+
+       my (%event_asset_of, %seq_key_of, %week_day_of, @event_days);
+       
+       # The events
+       for my $event ( @events ) {
+           next unless $event->canView();
+           
+           my $event_asset_id = $event->get( 'assetId' );
+
+           # Add Event object use by assetId
+           $event_asset_of{ $event_asset_id }{ object } = $event;
+
+           # Get the week this event is in, and add it to that week in
+           # the template variables
+           my $dt_event_start = $event->getDateTimeStart;
+           my $dt_event_end   = $event->getDateTimeEnd;
+           
+           #Handle events that start before this week or end after this week.
+           if ($dt_event_start < $dt) {
+               $dt_event_start = $dt;
+           }
+           
+           if ($dt_event_end > $dtEnd) {
+               $dt_event_end = $dtEnd;
+           }
+           
+           my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
+           my $end_dow = ($dt_event_end->day_of_week - $first_dow) % 7;
+
+           my $sequence_number = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId 
+= ? ORDER BY revisionDate desc LIMIT 1",{},$event_asset_id)->[0];
+
+           foreach my $weekDay ($start_dow .. $end_dow) {
+     
+               push @{ $event_days[ $weekDay ] }, $event;
+               my $event_day_pos = $#{ $event_days[ $weekDay ]};
+
+               # Monitor duplicates in sequence list;
+               push @{ $seq_key_of{ $sequence_number } }, $event_asset_id;
+               
+               # Add find assetId by day/order pos
+               $week_day_of{ $weekDay }{ $event_day_pos } = $event_asset_id;
+
+               # Add find order pos by assetId and day
+               $event_asset_of{ $event_asset_id }{ $weekDay } = $event_day_pos;
+           }
+       }
+       
+       # Process the event sequence change request
+       #
+       #   Based upon binary values beginning at 16384 sequence
+       #   number separtion.  Collisions are expected, in fact,
+       #   designed for, with the move increment divided by two
+       #   repeatedly until a non-collision situation is detected and
+       #   then used.  In worst case behavior, this practice will
+       #   fail at 16 repositions, but to cause this someone would
+       #   have to be applying extremely abusive reorder behavior.
+       #
+       #   Abusive consists of applying move-up or move-down between
+       #   two select events, in a leap frog fashion, towards yet another
+       #   event in the same time frame.  This causes the increment to 
+       #   progressively be divided by two until it hits the value '1'.
+       #   At that point, duplication of sequence number is inevitable,
+       #   and the order list may behave in unexpected ways.
+       #
+       #   CAVEAT: This service functions on a week view.  This
+       #   behavior could move the reprioritized event ahead or
+       #   behind interventing events listed on other days.  The
+       #   logic to compensate for calendar events spanning to
+       #   non-target weeks is ignored.
+
+       #
+       my $direction      = $session->form->param( 'eventMove' );
+       my $event_asset_id = $session->form->param( 'assetId' );
+       my $event_day      = $session->form->param( 'day' );
+       my $event_day_pos  = $event_asset_of{ $event_asset_id }{ $event_day };
+       my $event_object   = $event_asset_of{ $event_asset_id }{ object };
+       my $event_seq_num  = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",{},$event_asset_id)->[0];
+
+       my @seq_list = sort keys %seq_key_of;
+       my $incr = 8192;
+       my $day_entries = \@{ $event_days[ $event_day ] };
+#      warn "@seq_list\n";
+#      warn "Moving assetId: $event_asset_id, seqNum: $event_seq_num, day: $event_day.$event_day_pos\n";
+
+       if ($direction eq 'UP' && $event_day_pos > 0) {
+           my $prev_asset_id     = $week_day_of{ $event_day }{ $event_day_pos - 1 };
+           my $prev_day_pos      = $event_asset_of{ $prev_asset_id }{ $event_day };
+           my $prev_event_object = $event_asset_of{ $prev_asset_id }{ object };
+           my $prev_seq_num      = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",{},$prev_asset_id)->[0];
+
+#          warn "Before Asset: $prev_asset_id, seqNum: $prev_seq_num, day: $event_day.$prev_day_pos\n";
+
+           my $seq_idx;
+           for my $i (0..$#seq_list) {
+               next if $seq_list[ $i ] < $prev_seq_num;
+               $seq_idx = $i - 1;
+               last;
+           }
+#          warn "\tmove between: $seq_list[ $seq_idx] and $prev_seq_num\n";
+
+           if ($seq_idx >= 0) {
+
+               while ($prev_seq_num - $incr <= $seq_list[ $seq_idx ] && $incr > 1) {
+                   $incr /= 2;
+               }
+
+           }
+           
+
+           $session->db->dbh->do
+               ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
+                $prev_seq_num-$incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                );
+#          warn "Moved Asset New Seq Num: ".($prev_seq_num - $incr)." by $incr\n";
+
+       }
+       elsif ($direction eq 'DOWN' && $event_day_pos < $#{ $day_entries }) {
+           my $next_asset_id     = $week_day_of{ $event_day }{ $event_day_pos + 1 };
+           my $next_day_pos      = $event_asset_of{ $next_asset_id }{ $event_day };
+           my $next_event_object = $event_asset_of{ $next_asset_id }{ object };
+           my $next_seq_num      = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",{},$next_asset_id)->[0];
+           
+#          warn "After Asset: $next_asset_id, seqNum: $next_seq_num, day: $event_day.$next_day_pos\n";
+
+           my $seq_idx;
+           for my $i (0..$#seq_list) {
+               next if $seq_list[ $i ] < $next_seq_num;
+               $seq_idx = $i;
+               last;
+           }
+#          warn "\tmove between: $next_seq_num and $seq_list[ $seq_idx]\n";
+
+           if ($seq_idx <= $#seq_list) {
+               while ($next_seq_num + $incr >= $seq_list[ $seq_idx + 1 ] && $incr > 1) {
+                   $incr /= 2;
+               }
+           }
+
+           $session->db->dbh->do
+               ("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},
+                $next_seq_num + $incr, $event_asset_id, $event_object->get( 'revisionDate' )
+                );
+#          warn "Moved Asset New Seq Num: ".($next_seq_num + $incr)." by $incr\n";
+       }
+    }
+  
     
     #### Create the template parameters
     # Some friendly dates
@@ -1316,9 +1504,9 @@ sub viewWeek {
     }
     
     # The events
-
-    EVENT: for my $event (@events) {
-        next EVENT unless $event->canView();
+    my @events  = $self->getEventsIn( $start, $end );
+    for my $event ( @events ) {
+        next unless $event->canView();
         # Get the week this event is in, and add it to that week in
         # the template variables
         my $dt_event_start = $event->getDateTimeStart;
@@ -1339,7 +1527,24 @@ sub viewWeek {
         my %eventTemplateVariables = $self->getEventVars($event);
 
         foreach my $weekDay ($start_dow .. $end_dow) {
-            push @{$var->{days}->[$weekDay]->{events}}, \%eventTemplateVariables;
+            my $eventAssetId = $event->get( 'assetId' );
+
+           my %hash = %eventTemplateVariables;
+
+            if ($sort_by_sequence && $can_edit_order) {
+               if (1) {
+                    $hash{ iconCallbackUP } 
+                      = $session->icon->moveUp( qq|eventMove=UP;day=$weekDay;assetId=$eventAssetId;type=week;start=|.$params->{start} );
+                    $hash{ iconCallbackDOWN } 
+                       = $session->icon->moveDown( qq|eventMove=DOWN;day=$weekDay;assetId=$eventAssetId;type=week;start=|.$params->{start} );
+               }
+               else {
+                    $hash{ callbackUP } = "day=$weekDay;eventMove=UP;assetId=$eventAssetId;type=week;start=".$params->{start};
+                    $hash{ callbackDOWN } = "day=$weekDay;eventMove=DOWN;assetId=$eventAssetId;type=week;start=".$params->{start};
+               }
+           }
+            push @{ $var->{ days }->[ $weekDay ]->{ events }}, \%hash;
+
         }
     }
     

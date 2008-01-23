@@ -31,6 +31,11 @@ installGalleryAsset($session);
 installGalleryAlbumAsset($session);
 installPhotoAsset($session);
 
+createEvent_relatedlinkTable($session);
+updateRelatedLinkData($session);
+alterEventTableForSequence($session);
+populateSequenceNumbers($session);
+
 finish($session); # this line required
 
 
@@ -279,6 +284,244 @@ sub addIsExportable {
     $session->db->write('alter table assetData add column isExportable int(11) not null default 1');
     print "DONE!\n" unless $quiet;
 }
+
+#--------------------------------------------------------------------------
+# Populate the initial sequence numbers
+sub populateSequenceNumbers {
+    my $session = shift;
+
+    my $dbh = $session->db->dbh;
+
+    my $seed = 16384;
+    my $curr_seed = 32768;
+
+    my $sql =<<SQL_END;
+SELECT DISTINCT Event.assetId 
+ FROM Event
+ ORDER BY Event.startDate, Event.startTime, Event.endDate, Event.endTime, Event.assetId
+SQL_END
+    my $ar_assetIds = $dbh->selectcol_arrayref($sql);
+
+    for my $assetId (@$ar_assetIds) {
+	my ($event) = $dbh->selectrow_hashref("SELECT revisionDate FROM Event WHERE assetId = ? ORDER BY revisionDate DESC LIMIT 1",undef,$assetId);
+
+	$dbh->do("UPDATE Event SET sequenceNumber = ? WHERE assetId = ? AND revisionDate = ?",{},$curr_seed,$assetId,$event->{revisionDate});
+
+	$curr_seed += $seed;
+    }
+    $dbh->do("UPDATE Calendar SET sortEventsBy = 'sequenceNumber'");
+}
+
+#--------------------------------------------------------------------------
+# Create event relatedlink table
+sub createEvent_relatedlinkTable {
+    my $session = shift;
+    print "\tCreate Event_relatedlink table.\n" unless $quiet;
+
+    my $sql =<<SQL_END;
+CREATE TABLE Event_relatedlink (
+  eventlinkId VARCHAR(22) NOT NULL,
+  assetId VARCHAR(22) NOT NULL,
+  linkURL TINYTEXT,
+  linktext VARCHAR(80),
+  groupIdView VARCHAR(22) NOT NULL,
+  sequenceNumber BIGINT(20) DEFAULT NULL
+)
+SQL_END
+
+    $session->db->write($sql) or die "Failed to create Event_relatedlink table\n";
+}
+
+#-----------------------------------------------------------------------------
+# Update the related links from the Event table to Event_relatedlink
+sub updateRelatedLinkData {
+    my $session = shift;
+    use HTML::Parser;
+
+    my $p = HTML::Parser->new(api_version =>3);
+
+    print "\tConverting Related Links from Event table to Event_relatedlink table\n" unless $quiet;
+
+    my $sth = $session->db->read("SELECT Event.assetId,relatedLinks,groupIdView FROM Event,assetData WHERE Event.assetId = assetData.assetId order by Event.revisionDate desc");
+    $sth->execute;
+    my (%asset_used, %event_asset_of, %snippet_asset_of);
+
+    while (my ($assetId, $relatedLinks, $groupIdView) = $sth->array) {
+
+        if (defined $asset_used{$assetId}) {
+#	    print "\tAlready defined\n";
+#	    print "$assetId, $relatedLinks\n";
+	    next;
+        }
+#	print "\n\tUsing\n";
+#	print "$assetId, $relatedLinks\n";
+
+	$asset_used{$assetId} = $groupIdView;
+
+	$event_asset_of{$assetId} = parse_html_to_link($p, $relatedLinks);
+#	print Dumper ( $event_asset_of{ $assetId } )."\n";
+	$p->eof;
+    }
+
+    # Scan all records for active AssetProxy macros and convert them to a
+    #   Real url / display text pair.
+    #
+    for my $assetId (keys %event_asset_of) {
+	for my $hr (@{$event_asset_of{$assetId}}) {
+	    next unless ($hr->{url} =~ /AssetProxy/);
+
+	    $hr->{text} =~ s/^\///;
+#	    print "*** NEW ***\n".$hr->{text}."\n";
+	    my ($assetId_snippet, $groupIdView) = $session->db->quickArray("SELECT assetId, groupIdView FROM assetData WHERE url = ? ORDER BY revisionDate DESC LIMIT 1",[$hr->{text}]);
+	    
+	    unless ($assetId_snippet) {
+		delete $event_asset_of{$assetId};
+		next;
+	    }
+	    $asset_used{$assetId_snippet} = $groupIdView;
+
+	    my ($snippet) = $session->db->quickArray("SELECT snippet FROM snippet WHERE assetId = ? ORDER BY revisionDate DESC LIMIT 1",[$assetId_snippet]);
+#	    print "\tsnippetId: ($assetId_snippet), assetId($assetId):\n$snippet\n";
+	    my $links = parse_html_to_link($p, $snippet);
+#	    print $assetId.":\n".Dumper ($links)."\n";
+	    for (@$links) {
+		push @{$snippet_asset_of{$assetId}{$assetId_snippet}}, $_;
+	    }
+	    $hr = undef;
+	}
+    }
+
+    # Extracted data now stored as Event_relatedlink rows
+    my $sql =<<SQL_END;
+INSERT INTO Event_relatedlink 
+(assetId,groupIdView,linkurl,linktext,sequenceNumber,eventlinkId)
+VALUES (?,?,?,?,?,?)
+SQL_END
+    for my $assetId (keys %event_asset_of) {
+	for my $a_idx (0..@{$event_asset_of{$assetId}}) {
+	    my $eventlinkId = $session->id->generate();
+	    next unless (defined (my $hr_link = $event_asset_of{$assetId}[$a_idx]));
+	    my $groupToView = $asset_used{$assetId};
+
+#	  printf "'%s', '%s', '%s',  '%s', '%s', '%s'\n",$assetId,$groupToView,$hr_link->{url},$hr_link->{text},$a_idx+1,$eventlinkId; 
+	    $session->db->write($sql,[$assetId,$groupToView,$hr_link->{url},$hr_link->{text},$a_idx+1,$eventlinkId]);
+        }
+    }
+#    print "Snippets\n";
+    for my $assetId (keys %snippet_asset_of) {
+	my $hrs_asset_of = \%{$snippet_asset_of{$assetId}};
+#	print "\tEvent: $assetId\n";
+#	print Dumper ($hrs_asset_of)."\n";
+	for my $s_assetId (keys %$hrs_asset_of) {
+#	    print "\t\tSnippet: $s_assetId\n";
+	    for my $a_idx (0..@{$hrs_asset_of->{$s_assetId}}) {
+#	      print "\t\t\tIDX: $a_idx\n";
+		my $eventlinkId = $session->id->generate();
+		next unless (defined (my $hr_link = $hrs_asset_of->{$s_assetId}[$a_idx]));
+		my $groupToView = $asset_used{$s_assetId};
+		
+#	    printf "'%s', '%s', '%s',  '%s', '%s', '%s'\n",$assetId,$groupToView,$hr_link->{url},$hr_link->{text},$a_idx+1,$eventlinkId; 
+		$session->db->write($sql,[$assetId,$groupToView,$hr_link->{url},$hr_link->{text},$a_idx+1,$eventlinkId]);
+	    }
+	}
+    }
+    return;
+}
+
+#-----------------------------------------------------------------------------
+# Alter the Event table to add the Sequence Number field
+sub alterEventTableForSequence {
+    my $session = shift;
+
+    print "\tAdding sequenceNumber to Event table.\n" unless $quiet;
+    my $sql =<<SQL_END;
+ALTER TABLE Event ADD sequenceNumber BIGINT(20) DEFAULT NULL
+SQL_END
+
+    $session->db->write($sql) or die "Failed to modify Event table\n";
+
+    $sql =<<SQL_END;
+ALTER TABLE Calendar ADD sortEventsBy ENUM('time','sequencenumber') DEFAULT 'time'
+SQL_END
+    $session->db->write($sql) or die "Failed to modify Calendar table\n";
+}
+
+########
+# Convert HTML::Parser output to something useful
+#  Results in a array of hashrefs with keys 'url' and 'text'
+# 
+sub parse_html_to_link {
+    my ($p, $rl, $verbose) = @_;
+
+    $rl =~ s/<\/a\>\s*<a\s/<\/a\><br \/><a/gm;
+
+    my @result;
+    $p->handler( start => \@result, 'attr' );
+    $p->handler( text => \@result, 'text' );
+    $p->parse($rl."<br />");
+    if ($verbose) { 
+        print "=========================================\n";
+        print Dumper (@result)."\n";
+        print "------\n";
+    }
+
+    my (@text, @links, $key);
+    for (@result) {
+	if (ref ($_->[0]) ne "HASH") {
+	    if ($_->[0] =~ /^\^AssetProxy/) {
+		push @text, $_->[0];
+		push @links, link_to_hashref('', \@text);
+	    }
+	    elsif ($_->[0] =~ /\w/) {
+		push @text, $_->[0]; 
+	    }
+	}
+	else {
+	    if ($_->[0]->{href}) {
+		$key = $_->[0]->{href};
+	    }
+	    else {
+		push @links, link_to_hashref($key, \@text);
+	    }
+	}
+    }
+    return \@links;
+}
+
+########
+# Given a key (URL) and an array_ref containing strings
+#   build a hash value according to certain rules
+# 
+sub link_to_hashref {
+    my ($key, $ar_text) = @_;
+
+    return unless $ar_text->[0];
+    my %h;
+    if ($key) {
+        # Both hash key and values provided
+	$h{url} = $key;
+	$h{text} = (join "&nbsp;",@$ar_text) || $key;
+	$key = '';
+    }
+    elsif ($ar_text->[0] =~ /^\//) {
+        # Only a file reference is provided
+	$h{url} = join "&nbsp;",@$ar_text;
+	$h{text} = join "&nbsp;",@$ar_text;
+    }
+    elsif ($ar_text->[0] =~ /^\^AssetProxy\(([^\)]+)\)/) {
+        # Snippet macro provided
+	$h{text} = $1;
+	$h{url} = 'AssetProxy';
+    }
+    
+    # prevent surprise array expansion
+    @$ar_text = ();
+
+    return \%h;
+}
+
+
+
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
