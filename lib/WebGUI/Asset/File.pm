@@ -553,6 +553,7 @@ sub www_view {
 
     $self->session->http->setRedirect($self->getFileUrl);
     $self->session->http->setStreamedFile($self->getStorageLocation->getPath($self->get("filename")));
+    $self->session->http->sendHeader;
     return 'chunked';
 }
 
