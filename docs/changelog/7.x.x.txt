@@ -1,3 +1,7 @@
+7.5.1
+ - fix: Friends language error (perlDreamer Consulting, LLC.)
+     http://www.plainblack.com/bugs/tracker/friends-language-error
+
 7.5.0
  - rfe: Search Asset returns URLs
  - Added link to return to inbox from message in inbox message template  (Diona Kidd, Knowmad Technologies)

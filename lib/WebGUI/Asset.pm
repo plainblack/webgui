@@ -1378,7 +1378,8 @@ sub loadModule {
 
 =head2 logView ( )
 
-Logs the view of this asset to the passive profiling mechanism.
+Logs the view of this asset to the passive profiling mechanism.   If the asset is a Layout, it will also index
+all of the children (not descendents) of the Layout.
 
 =cut
 

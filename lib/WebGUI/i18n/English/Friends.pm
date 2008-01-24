@@ -254,7 +254,7 @@ Thanks,
     },
 
     'friends' => {
-        message     => q{A loop containing information about friends and form controls for selecting them for .},
+        message     => q{A loop containing information about friends and form controls for deleting them, or sending a message to them.},
         lastUpdated => 1193193904,
     },
 
