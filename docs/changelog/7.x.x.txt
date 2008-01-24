@@ -5,6 +5,7 @@
  - fix: AssetPackage.pm would give an error on importing a package through
     the web interface, but the package would be imported successfully.
  - fix: 7.5.0 upgrade template for time tracker was corrupt.
+ - fix: Gallery is now part of the default set of assets
  - fix: replaced return; with return undef; and changed WGBP.
  - removed old CS based photo gallery prototype in favor of the new gallery
    asset

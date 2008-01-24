@@ -217,6 +217,7 @@
 	"WebGUI::Asset::Wobject::DataForm", 
 	"WebGUI::Asset::Wobject::Calendar", 
 	"WebGUI::Asset::Wobject::EventManagementSystem", 
+        "WebGUI::Asset::Wobject::Gallery",
 	"WebGUI::Asset::Wobject::HttpProxy", 
 	"WebGUI::Asset::Wobject::Navigation", 
 	"WebGUI::Asset::Wobject::Matrix", 
