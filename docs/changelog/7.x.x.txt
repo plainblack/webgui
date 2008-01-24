@@ -7,6 +7,7 @@
  - fix: 7.5.0 upgrade template for time tracker was corrupt.
  - fix: Gallery is now part of the default set of assets
  - fix: replaced return; with return undef; and changed WGBP.
+ - Default maximum attachment size is now 100kB
  - removed old CS based photo gallery prototype in favor of the new gallery
    asset
 
