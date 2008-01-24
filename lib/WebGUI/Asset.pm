@@ -1787,12 +1787,16 @@ sub newByDynamicClass {
     my $session         = shift;
     my $assetId         = shift;
     my $revisionDate    = shift;
-    
-    confess "newByDynamicClass requires WebGUI::Session" 
-        unless $session && blessed $session eq 'WebGUI::Session';
-    confess "newByDynamicClass requires assetId"
-        unless $assetId;
-    
+ 
+# Some code requires that these situations not die.
+#    confess "newByDynamicClass requires WebGUI::Session" 
+#        unless $session && blessed $session eq 'WebGUI::Session';
+#    confess "newByDynamicClass requires assetId"
+#        unless $assetId;
+# So just return instead
+    return unless ( $session && blessed $session eq 'WebGUI::Session' ) 
+        && $assetId;
+
     # Cache the className lookup
     my $assetClass  = $session->stow->get("assetClass");
     my $className   = $assetClass->{$assetId};
