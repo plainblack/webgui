@@ -231,7 +231,7 @@ sub definition {
 
 sub _strip_html {
     unless (ref $_[0]) {
-        return $_[0] = WebGUI::HTML::Filter($_[0], 'all');
+        return $_[0] = WebGUI::HTML::filter($_[0], 'all');
     }
     my $ref = shift;
     if (ref $ref eq 'HASH') {
