@@ -6,6 +6,8 @@
     the web interface, but the package would be imported successfully.
  - fix: 7.5.0 upgrade template for time tracker was corrupt.
  - fix: replaced return; with return undef; and changed WGBP.
+ - removed old CS based photo gallery prototype in favor of the new gallery
+   asset
 
 7.5.0
  - rfe: Search Asset returns URLs

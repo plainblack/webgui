@@ -21,6 +21,10 @@ save you many hours of grief.
    details.
    Your custom Event Edit and Event View templates may need fixing.
 
+ * If you want to use the beta, you must first upgrade to 7.4.21 then
+   upgrade to the beta. If you upgrade past 7.4.21 then you cannot
+   use the beta.
+
 7.4.12
 --------------------------------------------------------------------
  * Any customizations made to the Matrix default Search, Compare or

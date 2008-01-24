@@ -16,23 +16,24 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 
 
-my $toVersion = "0.0.0"; # make this match what version you're going to
+my $toVersion = "7.5.1"; # make this match what version you're going to
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+removeOldPhotoGallery($session);
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub removeOldPhotoGallery {
+	my $session = shift;
+    print "\tRemoving CS Photo Gallery prototype.\n" unless ($quiet);
+    my $gallery = WebGUI::Asset->newByDynamicClass($session, "pbproto000000000000001");
+    if (defined $gallery) {
+        $gallery->purge;
+    }
+}
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
