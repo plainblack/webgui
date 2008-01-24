@@ -28,6 +28,7 @@
    arbitrarily.
  - fix: Event Related Links are now proper collateral in their own table
    instead of a silly HTML area
+ - fix: rating archived posts causes error
 
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP

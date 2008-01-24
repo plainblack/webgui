@@ -818,8 +818,9 @@ sub updateThreadRating {
 
     my $calcRating  = 0; 
     my $postIds     = $self->getLineage(["descendants","self"], {
-        includeOnlyClasses => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
-    });  
+        includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
+        includeArchived     => 1,
+    });
 
     $calcRating += $session->db->quickScalar(
         "SELECT SUM(rating) FROM Post_rating WHERE assetId IN (".$session->db->quoteAndJoin($postIds).")"
