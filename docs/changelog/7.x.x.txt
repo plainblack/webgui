@@ -1,6 +1,10 @@
 7.5.1
  - fix: Friends language error (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/friends-language-error
+ - fix: newByDynamicClass would die if given bad parameters, must return undef
+ - fix: AssetPackage.pm would give an error on importing a package through
+    the web interface, but the package would be imported successfully.
+ - fix: 7.5.0 upgrade template for time tracker was corrupt.
 
 7.5.0
  - rfe: Search Asset returns URLs

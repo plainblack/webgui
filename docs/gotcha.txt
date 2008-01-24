@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.1
+--------------------------------------------------------------------
+ * There was a corrupt template in a package for the 7.5.0 upgrade.
+   If you already upgraded to 7.5.0, please import the package 
+   located at: 
+   WebGUI/docs/upgrades/packages-7.5.0/root_import_timetracking_user.wgpkg
+
 7.5.0
 --------------------------------------------------------------------
  * Event related links are now displayed using a template loop 

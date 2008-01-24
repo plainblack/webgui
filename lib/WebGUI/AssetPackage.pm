@@ -313,7 +313,7 @@ sub www_importPackage {
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
 		$error = $self->importPackage($storage);
 	}
-	if ($error) {
+	if (!blessed $error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return $self->session->style->userStyle($i18n->get("package corrupt"));
 	}
