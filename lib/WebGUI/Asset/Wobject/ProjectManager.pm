@@ -57,7 +57,7 @@ sub _clobberImproperDependants {
 	my $self = shift;
 	my $projectId = shift;
 	my @nondependTaskIds = $self->session->db->buildArray("SELECT sequenceNumber FROM PM_task WHERE projectId = ? AND taskType <> 'timed'", [$projectId]);
-	return unless @nondependTaskIds;
+	return undef unless @nondependTaskIds;
 	$self->session->db->write("UPDATE PM_task SET dependants = NULL WHERE projectId = ? AND dependants IN (".join(', ', ('?') x @nondependTaskIds).")", [$projectId, @nondependTaskIds]);
 }
 
@@ -444,12 +444,12 @@ sub getProjectInstance {
    my $session = shift;
    my $db = $session->db;
    my $projectId = $_[0];
-   return unless $projectId;
+   return undef unless $projectId;
    my ($assetId) = $db->quickArray("select assetId from PM_project where projectId=?",[$projectId]);
    if($assetId) {
       return WebGUI::Asset->newByDynamicClass($session,$assetId);
    }
-   return;
+   return undef;
 }
 
 #-------------------------------------------------------------------

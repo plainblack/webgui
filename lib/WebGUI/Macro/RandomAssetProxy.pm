@@ -50,7 +50,7 @@ sub process {
 				$randomAsset->prepareView;
 				return $randomAsset->view;
 			}
-			return;
+			return undef;
 		} else {
 			return $i18n->get('childless');
 		}

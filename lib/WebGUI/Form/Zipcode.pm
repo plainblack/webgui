@@ -94,7 +94,7 @@ sub getValueFromPost {
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
 		return $value;
 	}
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

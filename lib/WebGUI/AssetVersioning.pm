@@ -180,7 +180,7 @@ Override this method in your asset if you want your asset to automatically run i
 =cut
 
 sub getAutoCommitWorkflowId {
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -306,7 +306,7 @@ Returns the user who locked this asset, or undef if the asset is unlocked.
 sub lockedBy {
 	my $self = shift;
 	my $userId = $self->get("isLockedBy");
-	return unless defined $userId;
+	return undef unless defined $userId;
 	return WebGUI::User->new($self->session, $userId);
 }
 
@@ -543,9 +543,9 @@ sub www_purgeRevision {
 	my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit;
 	my $revisionDate = $session->form->process("revisionDate");
-	return unless $revisionDate;
+	return undef unless $revisionDate;
 	my $asset = WebGUI::Asset->new($session,$self->getId,$self->get("className"),$revisionDate);
-	return if ($asset->get('revisionDate') != $revisionDate);
+	return undef if ($asset->get('revisionDate') != $revisionDate);
 	my $parent = $asset->getParent;
 	$asset->purgeRevision;
 	if ($session->form->process("proceed") eq "manageRevisionsInTag") {

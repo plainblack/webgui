@@ -182,13 +182,13 @@ sub isInSubnet {
 	for my $cidr ( @{ $subnets } ) {
     		my @parts = $cidr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/;
     		unless ( 5 == @parts ) { # cidr has 5 parts
-			return;
+			return undef;
     		}
     		unless ( 4 == grep { $_ <= 255 } @parts[0..3] ) { # each octet needs to be between 0 and 255
-			return;
+			return undef;
     		}
     		unless ( $parts[4] <= 32 ) { # the subnet needs to be less than or equal to 32, as 32 represents only 1 ip address
-			return;
+			return undef;
     		}
 	}
 	my $net = Net::Subnets->new;

@@ -110,7 +110,7 @@ sub param {
 			@data = $self->session->request->param($field);
 			return wantarray ? @data : $data[0];
 		} else {
-			return;
+			return undef;
 		}
 	} else {
 		if ($self->session->request) {
@@ -123,7 +123,7 @@ sub param {
 			}
 			return keys %params;
 		} else {
-			return;
+			return undef;
 		}
 	}
 }

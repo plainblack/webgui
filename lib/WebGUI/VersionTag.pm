@@ -328,7 +328,7 @@ sub getWorking {
 			$session->stow->set("versionTag",$tag);
 			return $tag;
 		} elsif ($noCreate) {
-			return;
+			return undef;
 		} else {
 			my $tag = $class->create($session);
 			$tag->setWorking;
@@ -375,7 +375,7 @@ sub new {
         my $session = shift;
         my $tagId = shift;
         my $data = $session->db->getRow("assetVersionTag","tagId", $tagId);
-        return unless $data->{tagId};
+        return undef unless $data->{tagId};
         bless {_session=>$session, _id=>$tagId, _data=>$data}, $class;
 }
 

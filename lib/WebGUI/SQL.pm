@@ -323,7 +323,7 @@ sub connect {
 
 	unless (defined $dbh) {
 		$session->errorHandler->error("Couldn't connect to database: $dsn");
-		return;
+		return undef;
 	}
 
     ##Set specific attributes for this database.
@@ -571,11 +571,11 @@ sub quickCSV {
 	$sth = $self->prepare($sql);
 	$sth->execute($params);
 
-	return unless $csv->combine($sth->getColumnNames);
+	return undef unless $csv->combine($sth->getColumnNames);
 	$output = $csv->string();
 
 	while (@data = $sth->array) {
-		return unless $csv->combine(@data);
+		return undef unless $csv->combine(@data);
 		$output .= $csv->string();
 	}
 

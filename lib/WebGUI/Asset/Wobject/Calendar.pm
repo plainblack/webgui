@@ -267,7 +267,7 @@ sub addChild {
     
     if ($properties->{className} ne "WebGUI::Asset::Event") {
         $self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
-        return;
+        return undef;
     }
 
     return $self->SUPER::addChild($properties, @other);
@@ -360,7 +360,7 @@ sub createSubscriptionGroup {
         groupIdSubscription => $group->getId
     });
 
-    return;
+    return undef;
 }
 
 
@@ -579,7 +579,7 @@ this Calendar.
 sub getEvent {
     my $self    = shift;
     my $assetId = shift;
-    # Warn and return if no assetId
+    # Warn and return undef if no assetId
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: No asset ID."), return
         unless $assetId;
     
@@ -632,10 +632,10 @@ sub getEventsIn {
 
     my $tz      = $self->session->user->profileField("timeZone");
     
-    # Warn and return if no startDate or endDate
+    # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
         $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEventsIn() called with not enough arguments at ".join('::',(caller)[1,2]));
-        return;
+        return undef;
     }
     
     # Create objects and adjust for timezone

@@ -265,7 +265,7 @@ sub www_deployPackage {
 		my $packageMasterAsset = WebGUI::Asset->newByDynamicClass($self->session, $packageMasterAssetId);
 		unless ($packageMasterAsset->getValue('isPackage')) { #only deploy packages
 		 	$self->session->errorHandler->security('deploy an asset as a package which was not set as a package.');
-		 	return;
+		 	return undef;
 		}
 		my $masterLineage = $packageMasterAsset->get("lineage");
                 if (defined $packageMasterAsset && $packageMasterAsset->canView && $self->get("lineage") !~ /^$masterLineage/) {

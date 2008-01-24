@@ -102,7 +102,7 @@ sub addAlbumFromCollaboration {
         $class->addAlbumFromThread( $gallery, $thread );
     }
 
-    return;
+    return undef;
 }
 
 #----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ sub addAlbumFromFilesystem {
 
     # TODO!!!
 
-    return;
+    return undef;
 }
 
 #----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ sub addAlbumFromThread {
         }
     }
 
-    return;
+    return undef;
 }
 
 1;

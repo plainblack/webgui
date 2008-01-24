@@ -167,20 +167,20 @@ sub processPropertiesFromFormPost {
 	
 	my $file = $self->get("filename");
 	
-	#return unless $file;
+	#return undef unless $file;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_ZipArchive');
 	unless ($self->session->form->process("showPage")) {
 		$storage->delete;
 		$self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
 		$self->session->scratch->set("za_error",$i18n->get("za_show_error"));
-		return;
+		return undef;
 	}
 	
 	unless ($file =~ m/\.tar/i || $file =~ m/\.zip/i) {
 		$storage->delete;
 		$self->session->db->write("update FileAsset set filename=NULL where assetId=".$self->session->db->quote($self->getId));
 		$self->session->scratch->set("za_error",$i18n->get("za_error"));
-		return;
+		return undef;
 	}
 	
 	unless ($self->unzip($storage,$self->get("filename"))) {

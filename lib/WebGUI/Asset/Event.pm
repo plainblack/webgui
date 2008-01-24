@@ -298,7 +298,7 @@ sub getDateTimeStart {
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
         $self->session->errorHandler->warn("Event::getDateTimeStart -- This event (".$self->get("assetId").") has no start date.");
-        return;
+        return undef;
     }
     
     if ($time) {
@@ -337,7 +337,7 @@ sub getDateTimeEnd {
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
         $self->session->errorHandler->warn("Event::getDateTimeEnd -- This event (".$self->get("assetId").") has no end date.");
-        return;
+        return undef;
     }
     
     if ($time) {
@@ -405,7 +405,7 @@ sub getEventNext {
     });
     
     
-    return unless $events->[0]; 
+    return undef unless $events->[0]; 
     return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
 }
 
@@ -461,7 +461,7 @@ sub getEventPrev {
                 limit               => 1,
             });
     
-    return unless $events->[0];
+    return undef unless $events->[0];
     return WebGUI::Asset->newByDynamicClass($self->session,$events->[0]);
 }
 
@@ -711,7 +711,7 @@ sub getRecurrenceDates {
     
     my %date;
     my $recur       = {$self->getRecurrence};
-    return unless $recur->{recurType};
+    return undef unless $recur->{recurType};
     
     my %dayNames = (
         monday      => "m",
@@ -1650,7 +1650,7 @@ sub processPropertiesFromFormPost {
     delete $self->{_storageLocation};
     $self->requestAutoCommit;
 
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1691,7 +1691,7 @@ sub setRecurrence {
     my $self    = shift;
     my $vars    = shift;
     
-    my $type    = $vars->{recurType} || return;
+    my $type    = $vars->{recurType} || return undef;
     my $pattern;
     
     if ($type eq "daily" || $type eq "weekday") {
@@ -1794,7 +1794,7 @@ sub setRelatedLinks {
        }
     }
 
-    return;
+    return undef;
 }
 
 ####################################################################

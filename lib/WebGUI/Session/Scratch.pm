@@ -60,7 +60,7 @@ The name of the scratch variable.
 sub delete {
 	my $self = shift;
 	my $name = shift;
-	return unless ($name);
+	return undef unless ($name);
 	my $value = delete $self->{_data}{$name};
 	$self->session->db->write("delete from userSessionScratch where name=? and sessionId=?", [$name, $self->session->getId]);
 	return $value;
@@ -97,7 +97,7 @@ The name of the scratch variable.
 sub deleteName {
 	my $self = shift;
 	my $name = shift;
-	return unless ($name);	
+	return undef unless ($name);	
 	delete $self->{_data}{$name};
 	$self->session->db->write("delete from userSessionScratch where name=?", [$name]);
 }
@@ -122,7 +122,7 @@ sub deleteNameByValue {
 	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	return unless ($name and defined $value);
+	return undef unless ($name and defined $value);
 	delete $self->{_data}{$name} if ($self->{_data}{$name} eq $value);
 	$self->session->db->write("delete from userSessionScratch where name=? and value=?", [$name,$value]);
 }
@@ -215,7 +215,7 @@ sub set {
 	my $self = shift;
 	my $name = shift;
 	my $value = shift;
-	return unless ($name);
+	return undef unless ($name);
 	$self->{_data}{$name} = $value;
 	$self->session->db->write("insert into userSessionScratch (sessionId, name, value) values (?,?,?) on duplicate key update value=VALUES(value)", [$self->session->getId, $name, $value]);
 }

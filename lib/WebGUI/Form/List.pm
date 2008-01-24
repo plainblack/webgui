@@ -93,7 +93,7 @@ method.
 
 sub correctValues {
 	my ($self, $value) = @_;
-	return unless defined $value;
+	return undef unless defined $value;
 	my @defaultValues;
 	if (ref $value eq "ARRAY") {
 		@defaultValues = @{ $value };

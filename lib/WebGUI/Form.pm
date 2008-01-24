@@ -68,7 +68,7 @@ sub AUTOLOAD {
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $session, @params ]) };
     if ($@) {
         $session->errorHandler->error($@);
-        return;
+        return undef;
     }
 	return $control->toHtml;
 }

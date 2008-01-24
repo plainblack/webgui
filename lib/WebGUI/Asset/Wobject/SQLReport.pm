@@ -286,7 +286,7 @@ sub getEditForm {
 		function toggleQuery(Id) {
 			queryClass = "query" + Id;
 			var tr = document.getElementsByTagName("tr");
-			if (tr == null) return;
+			if (tr == null) return undef;
 			for (i=0; i < tr.length; i++) {
 			   if(tr[i].className == queryClass) {
 				if(tr[i].style.display == 'none') {
@@ -384,7 +384,7 @@ sub download {
 	my $self	= shift;
 	
 	# Instead of going through some costly exercises...
-	return if ($self->getValue("downloadType") eq "none");
+	return undef if ($self->getValue("downloadType") eq "none");
 	
         # Initiate an empty debug loop
         $self->{_debug_loop} = [] ;
@@ -419,7 +419,7 @@ sub download {
 	} 
     else {
 		# I don't know what to do
-		return;
+		return undef;
 	}
 }
 
@@ -705,7 +705,7 @@ sub www_download {
 	my $self	= shift;
 	
 	# Only allow if download type is not "none"
-	return if $self->getValue("downloadType") eq "none";
+	return undef if $self->getValue("downloadType") eq "none";
 	
 	# Only allow users in appropriate group
 	return $self->session->privilege->noAccess() 

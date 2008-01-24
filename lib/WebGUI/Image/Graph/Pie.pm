@@ -493,7 +493,7 @@ sub drawLabel {
 	my $slice = shift;
 
 	# Draw labels only once
-	return unless ($slice->{mainSlice});
+	return undef unless ($slice->{mainSlice});
 
 	$startRadius = $self->getRadius * $slice->{scaleFactor}+ $self->getStickOffset;
 	$stopRadius = $startRadius + $self->getStickLength;

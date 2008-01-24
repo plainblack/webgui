@@ -106,7 +106,7 @@ sub splitCSV {
 		#  shift, add to previous, and try again
 		if ($array[$i] =~ /^"/s && length(($array[$i] =~ m/("*)$/s)[0]) % 2 == 0 ) {
 			# If there are no more elements, this line is erroneous
-			if ($i+1 > @array) { warn "Error parsing CSV line."; return; }
+			if ($i+1 > @array) { warn "Error parsing CSV line."; return undef; }
 			$array[$i] .= ",".splice(@array,$i+1,1);
 			redo;
 		}

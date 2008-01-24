@@ -299,7 +299,7 @@ sub getGraphConfig {
     my $self    = shift;
     my $config  = $self->get("graphConfiguration");
 
-    return unless $config;
+    return undef unless $config;
     return $self->thawGraphConfig($config);
 }
 

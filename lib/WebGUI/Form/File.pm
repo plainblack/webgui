@@ -220,14 +220,14 @@ sub getValueFromPost {
 		my @files = @{ $storage->getFiles };
 		if (scalar(@files) < 1) {
 			$storage->delete;
-			return;
+			return undef;
 		} else {
 			my $id = $storage->getId;
 			$self->set("value", $id);
 			return $id;
 		}
 	}
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

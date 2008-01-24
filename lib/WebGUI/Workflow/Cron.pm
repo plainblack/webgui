@@ -176,7 +176,7 @@ sub new {
 	my $session = shift;
 	my $taskId = shift;
 	my $data = $session->db->getRow("WorkflowSchedule","taskId", $taskId);
-	return unless $data->{taskId};
+	return undef unless $data->{taskId};
 	bless {_session=>$session, _id=>$taskId, _data=>$data}, $class;
 }
 

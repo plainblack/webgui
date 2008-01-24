@@ -91,7 +91,7 @@ and set the __PROCESSED flag to prevent processing entries twice.
 
 sub _process {
 	my ($session, $helpEntry, $key) = @_;
-	return if exists($helpEntry->{__PROCESSED}) and $helpEntry->{__PROCESSED};
+	return undef if exists($helpEntry->{__PROCESSED}) and $helpEntry->{__PROCESSED};
 	$helpEntry->{related} = [ _related($session, $helpEntry->{related}) ];
 	##Add an ISA link unless it already exists.
 	##This simplifies handling later.
@@ -157,7 +157,7 @@ sub _get {
 	}
 	else {
 		$session->errorHandler->warn("Unable to load help for $namespace -> $id");
-		return;
+		return undef;
 	}
 }
 

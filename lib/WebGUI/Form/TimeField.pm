@@ -132,7 +132,7 @@ sub getValueFromPost {
 			return $value
 		}
 		else {
-			return;
+			return undef;
 		}
 	}
 
@@ -147,7 +147,7 @@ sub getValueFromPost {
 	} else {
 		# Mysql format
 		my $value = $self->session->form->param($self->get("name"));
-		return unless $value =~ /^\d{2}\D\d{2}(\D\d{2})?$/;
+		return undef unless $value =~ /^\d{2}\D\d{2}(\D\d{2})?$/;
 		return $value;
 	}
 }

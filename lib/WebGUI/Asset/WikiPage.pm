@@ -27,7 +27,7 @@ You can't add children to a wiki page.
 =cut
 
 sub addChild {
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -185,7 +185,7 @@ sub getEditForm {
 sub getWiki {
 	my $self = shift;
 	my $parent = $self->getParent;
-	return unless defined $parent and $parent->isa('WebGUI::Asset::Wobject::WikiMaster');
+	return undef unless defined $parent and $parent->isa('WebGUI::Asset::Wobject::WikiMaster');
 	return $parent;
 }
 

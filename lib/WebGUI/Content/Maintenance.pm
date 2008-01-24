@@ -56,7 +56,7 @@ sub handler {
         close($FILE);
         return $output;
     }
-    return;
+    return undef;
 }
 
 

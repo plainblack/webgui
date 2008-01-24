@@ -1024,7 +1024,7 @@ sub new {
         unless ($groupExists) {
             $self->{_session}->errorHandler->warn('WebGUI::Group->new called with a non-existant groupId:'
                 .'['.$self->{_groupId}.']');
-            return;
+            return undef;
         }
     }
 

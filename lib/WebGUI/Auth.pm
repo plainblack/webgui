@@ -304,7 +304,7 @@ sub createAccountSave {
         );
     }
 	
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -364,7 +364,7 @@ sub deactivateAccountConfirm {
     #});
 
     $self->logout;
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -680,7 +680,7 @@ sub login {
 		$self->session->errorHandler->warn($error) if $error;
 	}
 	
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -705,7 +705,7 @@ sub logout {
        $self->session->errorHandler->warn($error) if $error;
     }
    
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

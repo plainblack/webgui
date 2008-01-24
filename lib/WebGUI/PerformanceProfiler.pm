@@ -429,7 +429,7 @@ function addSTClassName(el, sClassName) {
 	var l = p.length;
 	for (var i = 0; i < l; i++) {
 		if (p[i] == sClassName)
-			return;
+			return undef;
 	}
 	p[p.length] = sClassName;
 	el.className = p.join(" ").replace( /(^\s+)|(\s+$)/g, "" );

@@ -112,7 +112,7 @@ The current WebGUI::Session object.
 sub handler {
 	my $session = shift;
     unless ($session->setting->get("specialState") eq "init") {
-        return;
+        return undef;
     }
 	$session->http->setCacheControl("none");
 	my $i18n = WebGUI::International->new($session, "WebGUI");
@@ -489,7 +489,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         # remove init state
 		$session->setting->remove('specialState');
 		$session->http->setRedirect($session->url->gateway("?setup=complete"));
-		return;
+		return undef;
 	} 
     else {
         $legend = "Admin Acccount";

@@ -141,7 +141,7 @@ sub addArchive {
     });
     $versionTag->requestCommit;
 
-    return;
+    return undef;
 }
 
 #----------------------------------------------------------------------------

@@ -37,7 +37,7 @@ sub process {
 		return "[AD:".$name."]";
 	}
 	my $adSpace = WebGUI::AdSpace->newByName($session, $name);
-	return unless defined $adSpace;
+	return undef unless defined $adSpace;
 	return $adSpace->displayImpression;
 }
 

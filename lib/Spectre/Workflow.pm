@@ -374,7 +374,7 @@ sub getNextInstance {
 		return $instance;
 	}
 	$self->debug("Didn't see any workflow instances to run.");
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

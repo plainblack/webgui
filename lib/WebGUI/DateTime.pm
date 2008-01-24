@@ -171,7 +171,7 @@ sub new
 	# If no DateTime object created yet, I don't know how
 	unless ($self)
 	{
-		return;
+		return undef;
 	}
     
 	
@@ -548,7 +548,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
 sub webguiDate {
    my $self = shift;
    my $session = $self->session;
-   return unless ($session);
+   return undef unless ($session);
    my $format = shift || "%z %Z";
    my $temp;
    

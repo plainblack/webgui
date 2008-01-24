@@ -231,11 +231,11 @@ sub addFileFromFormPost {
                         $self->session->errorHandler->info("Got ".$upload->filename);
 		} else {
 			$self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
-			return;
+			return undef;
 		}
 	}
 	return $filename if $filename;
-	return;
+	return undef;
 }
 
 
@@ -367,7 +367,7 @@ sub copyFile {
     cp( $self->getPath($filename), $self->getPath($newFilename) )
         || croak "Couldn't copy '$filename' to '$newFilename': $!";
 
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -478,7 +478,7 @@ sub delete {
 	    }
 	}
         $self->session->errorHandler->info("Deleted storage ".$self->getId);
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -497,7 +497,7 @@ it doesn't.
 sub deleteFile {
     my $self = shift;
     my $filename = shift;
-    return if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
+    return undef if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
     unlink($self->getPath($filename));
 }
 
@@ -522,7 +522,7 @@ sub get {
 	my $class   = shift;
 	my $session = shift;
 	my $id      = shift;
-	return unless $id;
+	return undef unless $id;
 	my $guid    = $id;
 	my $self;
     
@@ -796,7 +796,7 @@ sub getPath {
 	
 	unless ($self->session->config->get("uploadsPath") && $self->{_part1} && $self->{_part2} && $id) {
 		$self->_addError("storage object malformed");
-		return;
+		return undef;
 	}
     my $path = $self->session->config->get("uploadsPath")
              . '/'

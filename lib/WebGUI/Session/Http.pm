@@ -264,11 +264,11 @@ Generates and sends HTTP headers for a response.
 
 sub sendHeader {
 	my $self = shift;
-	return if ($self->{_http}{noHeader});
+	return undef if ($self->{_http}{noHeader});
 	return $self->_sendMinimalHeader unless defined $self->session->db(1);
 
 	my ($request, $datetime, $config, $var) = $self->session->quick(qw(request datetime config var));
-	return unless $request;
+	return undef unless $request;
 	my $userId = $var->get("userId");
 	
 	# send webgui session cookie
@@ -305,7 +305,7 @@ sub sendHeader {
 		$request->status($self->getStatus());
 		$request->status_line($self->getStatus().' '.$self->getStatusDescription());
 	}
-	return;
+	return undef;
 }
 
 sub _sendMinimalHeader {
@@ -316,7 +316,7 @@ sub _sendMinimalHeader {
 	$request->no_cache(1);
 	$request->status($self->getStatus());
 	$request->status_line($self->getStatus().' '.$self->getStatusDescription());
-	return;
+	return undef;
 }
 
 
@@ -508,7 +508,7 @@ sub setRedirect {
 	my $self = shift;
 	my $url = shift;
 	my @params = $self->session->form->param;
-	return if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
+	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->errorHandler->info("Redirecting to $url");
 	$self->{_http}{location} = $url;
 	$self->setStatus("302", "Redirect");

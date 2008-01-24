@@ -86,7 +86,7 @@ sub duplicateBranch {
 #-------------------------------------------------------------------
 sub createSubscriptionGroup {
 	my $self = shift;
-	return if ($self->get("subscriptionGroupId"));
+	return undef if ($self->get("subscriptionGroupId"));
 	my $group = WebGUI::Group->new($self->session, "new");
 	$group->name($self->getId);
 	$group->description("The group to store subscriptions for the thread ".$self->getId);
@@ -167,7 +167,7 @@ sub definition {
 
 sub DESTROY {
 	my $self = shift;
-	return unless defined $self;
+	return undef unless defined $self;
 	$self->{_next}->DESTROY if (defined $self->{_next});
 	$self->{_previous}->DESTROY if (defined $self->{_previous});
 	$self->SUPER::DESTROY;
@@ -594,8 +594,8 @@ An integer between 1 and 5 (5 being best) to rate this post with.
 sub rate {
 	my $self = shift;
 	my $rating = shift;
-	return unless ($rating == -1 || $rating == 1);
-	return if $self->hasRated;
+	return undef unless ($rating == -1 || $rating == 1);
+	return undef if $self->hasRated;
 	$self->SUPER::rate($rating);
 
 	##Thread specific karma adjustment for CS

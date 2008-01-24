@@ -45,7 +45,7 @@ sub www_ssoViaSessionId {
 			}
 		}
 	}
-	return;
+	return undef;
 }
 
 

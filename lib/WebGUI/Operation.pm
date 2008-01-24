@@ -58,7 +58,7 @@ sub execute {
         if ( $@ ) {
             die $@ if ($@ =~ "^fatal:");
             $session->errorHandler->error($@);
-            return;
+            return undef;
         }
 	} else {
 		$session->errorHandler->security("execute an invalid operation: ".$op);

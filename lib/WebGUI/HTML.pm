@@ -121,7 +121,7 @@ sub filter {
 		} ;
 		#HTML::Parser event handler called with non-tag text (no tags)
 		my $html_parser_text_sub = sub {
-			return if $html_parser_inside_tag{script} || $html_parser_inside_tag{style}; # do not output text
+			return undef if $html_parser_inside_tag{script} || $html_parser_inside_tag{style}; # do not output text
 			$html_parser_text .= $_[0] ;
 		} ;
 		my $parser = HTML::Parser->new(api_version => 3,
@@ -236,7 +236,7 @@ sub html2text {
 		}
 	};
 	my $textHandler = sub {
-		return if $inside->{script} || $inside->{style};
+		return undef if $inside->{script} || $inside->{style};
 		if ($_[0] =~ /\S+/) {
 			$text .= $_[0];
 		}
@@ -303,7 +303,7 @@ sub makeAbsolute {
 
 		if(not exists $linkElements{$tagname}) {	# no need to touch this tag
 			$absolute .= $text;
-			return;
+			return undef;
 		}
 		
 		# Build a hash with tag attributes
@@ -356,7 +356,7 @@ sub makeParameterSafe {
 	my $text = shift;
 	${ $text } =~ s/,/&#44;/g;
 	${ $text } =~ s/'/&#39;/g;
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

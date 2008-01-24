@@ -109,8 +109,8 @@ sub create {
             "select count(*) from userProfileField where fieldName=?", 
             [$fieldName]
         );
-    return if $fieldNameExists;
-    return if $class->isReservedFieldName($fieldName);
+    return undef if $fieldNameExists;
+    return undef if $class->isReservedFieldName($fieldName);
 
     ### Data okay, create the field
     # Add the record
@@ -553,11 +553,11 @@ sub new {
     my $class = shift;
     my $session = shift;
     my $id = shift;
-    return unless ($id);
-    return if $class->isReservedFieldName($id);
+    return undef unless ($id);
+    return undef if $class->isReservedFieldName($id);
     my $properties = $session->db->getRow("userProfileField","fieldName",$id);
     # Reject properties that don't exist.
-    return unless scalar keys %$properties;
+    return undef unless scalar keys %$properties;
     bless {_session=>$session, _properties=>$properties}, $class;
 }
 
@@ -731,10 +731,10 @@ The unique ID of a category to assign this field to.
 sub setCategory {
 	my $self = shift;
 	my $categoryId = shift;
-	return unless ($categoryId);
+	return undef unless ($categoryId);
 	my $currentCategoryId = $self->get("profileCategoryId");
 
-	return if ($categoryId eq $currentCategoryId);
+	return undef if ($categoryId eq $currentCategoryId);
 
         my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=".$self->session->db->quote($categoryId));
 	$self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});

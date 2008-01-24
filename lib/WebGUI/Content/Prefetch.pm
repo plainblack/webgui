@@ -52,7 +52,7 @@ sub handler {
         $http->sendHeader;
         return "none";
     }
-    return;
+    return undef;
 }
 
 1;

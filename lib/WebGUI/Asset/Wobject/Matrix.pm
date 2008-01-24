@@ -97,7 +97,7 @@ sub definition {
 #-------------------------------------------------------------------
 sub duplicate {
 	# Buggo: how do we duplicate these?
-	return;
+	return undef;
 }
 
 

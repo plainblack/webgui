@@ -55,7 +55,7 @@ The assetId to add.
 
 sub add {
     my $session = shift;
-    return unless ($session->setting->get("passiveProfilingEnabled"));
+    return undef unless ($session->setting->get("passiveProfilingEnabled"));
     my $assetId = shift;
 	$session->db->write("insert into passiveProfileLog (passiveProfileLogId, userId, sessionId, assetId, dateOfEntry) values (?,?,?,?,?)",
                        [
@@ -63,7 +63,7 @@ sub add {
                         $session->var->get("sessionId"), $assetId,
                         $session->datetime->time(),
                        ]);
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -84,13 +84,13 @@ The assetId of the page you want to log.
 
 sub addPage {
 	my $session = shift;
-	return unless ($session->setting->get("passiveProfilingEnabled"));
+	return undef unless ($session->setting->get("passiveProfilingEnabled"));
 	my $pageId = shift;
 	my @wids = $session->db->buildArray("select assetId from asset where parentId=".$session->db->quote($pageId));
 	foreach my $wid (@wids) {
 		add($session,$wid);
 	}
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

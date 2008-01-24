@@ -183,7 +183,7 @@ sub db {
 		}
 		else {
 			if ($skipFatal) {
-				return;
+				return undef;
 			}
 			else { 	
 				$self->errorHandler->fatal("Couldn't connect to WebGUI database, and can't continue without it.");

@@ -230,7 +230,7 @@ sub getFileUrl {
 #-------------------------------------------------------------------
 sub getFileIconUrl {
 	my $self = shift;
-        return unless $self->get("filename"); ## Why do I have to do this when creating new Files?
+        return undef unless $self->get("filename"); ## Why do I have to do this when creating new Files?
 	return $self->getStorageLocation->getFileIconUrl($self->get("filename"));
 }
 
@@ -337,7 +337,7 @@ sub processPropertiesFromFormPost {
         $storage->delete;
     }
 
-    return;
+    return undef;
 }
 
 
@@ -483,7 +483,7 @@ sub updatePropertiesFromStorage {
     $self->update({
         filename        => $filename,
     });
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------

@@ -73,7 +73,7 @@ sub delete {
 	$self->session->db->write("delete from productVariants where productId=".$self->session->db->quote($self->get('productId')));
 	$self->session->db->write("delete from products where productId=".$self->session->db->quote($self->get('productId')));
 
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -87,7 +87,7 @@ sub deleteParameter {
 
 	$self->updateVariants;
 
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -110,7 +110,7 @@ sub deleteOption {
 	
 	$self->updateVariants;
 	
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -136,7 +136,7 @@ sub getByOptionId {
 	($productId) = $session->db->quickArray("select productId from productParameters as t1, productParameterOptions as t2 ".
 		"where t1.parameterId=t2.parameterId and t2.optionId=".$session->db->quote($optionId));
 	
-	return unless ($productId);
+	return undef unless ($productId);
 
 	return WebGUI::Product->new($session,$productId);
 }

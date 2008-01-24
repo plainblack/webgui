@@ -37,7 +37,7 @@ sub process {
 	if (my $image = WebGUI::Asset::File::Image->newByUrl($session,$url)) {
 	        return $image->getThumbnailUrl;
         } else {
-                return;
+                return undef;
         }
 }
 

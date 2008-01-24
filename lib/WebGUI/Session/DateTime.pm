@@ -422,7 +422,7 @@ An integer ranging from 1-7 representing the day of the week (Sunday is 1 and Sa
 sub getDayName {
 	my $self = shift;
 	my $day = shift;
-	return unless ($day >= 1 && $day <= 7);
+	return undef unless ($day >= 1 && $day <= 7);
 
 	my $i18n = WebGUI::International->new($self->session,'DateTime');
 	return $i18n->get((qw/monday tuesday wednesday thursday friday saturday sunday/)[$day-1]);
@@ -552,7 +552,7 @@ An integer ranging from 1-12 representing the month.
 sub getMonthName {
 	my $self = shift;
 	my $month = shift;
-	return unless ($month >= 1 && $month <= 12);
+	return undef unless ($month >= 1 && $month <= 12);
 
 	my $i18n = WebGUI::International->new($self->session,'DateTime');
 	return $i18n->get((qw/january february march april may june
@@ -734,7 +734,7 @@ sub mailToEpoch {
 	my $dt = eval {$parser->parse_datetime($date)};
 	if ($@) {
 		$self->session->errorHandler->warn($date." is not a valid date for email, and is so poorly formatted, we can't even guess what it is.");
-		return;
+		return undef;
 	}
 	return $dt->epoch;
 }
@@ -909,7 +909,7 @@ A string in the format of YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
 sub setToEpoch {
 	my $self = shift;
 	my $set = shift;
-	return unless $set;
+	return undef unless $set;
 	my $time_zone = $self->getTimeZone();
 	my $parser = DateTime::Format::Strptime->new(pattern=>'%Y-%m-%d %H:%M:%S', time_zone=>$time_zone);
 	my $dt = $parser->parse_datetime($set);

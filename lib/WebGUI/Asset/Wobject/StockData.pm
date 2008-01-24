@@ -154,7 +154,7 @@ sub _convertToEpoch {
    my $time = $_[1];
 
    unless ($date =~ m{^\d+/\d+/\d+} and $time =~ m{^\d+:\d+}) {
-	   return;
+	   return undef;
    }
 
    my ($month,$day,$year) = split("/",$date);

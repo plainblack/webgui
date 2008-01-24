@@ -144,7 +144,7 @@ sub processPropertiesFromFormPost {
 		$self->_ensureRssFromParentAbsent;
 	}
 
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -159,7 +159,7 @@ if there is no such feed.
 sub getRssUrl {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
-	return unless defined $rssFromParentId;
+	return undef unless defined $rssFromParentId;
 	WebGUI::Asset->newByDynamicClass($self->session, $rssFromParentId)->getUrl;
 }
 

@@ -264,16 +264,16 @@ sub setStatus {
 	my $userId = shift || $self->session->user->userId;
 	unless ($status) {
         $self->session->errorHandler->warn("No status passed in for message.  Exit without update");
-        return;
+        return undef;
     }
     
     if($status eq "completed") {
         $self->setCompleted($userId);
-        return;
+        return undef;
     }
     $self->{_properties}{status} = $status;
 	$self->session->db->setRow("inbox","messageId",$self->{_properties});
-    return;
+    return undef;
 }
 
 1;

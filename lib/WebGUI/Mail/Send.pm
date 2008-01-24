@@ -178,7 +178,7 @@ sub addHtmlRaw {
         Type        => "text/html",
     );
 
-    return;
+    return undef;
 }
 
 
@@ -208,7 +208,7 @@ sub addText {
         Data        => wrap( '', '', $text ),
     );
 
-    return;
+    return undef;
 }
 
 
@@ -423,9 +423,9 @@ sub retrieve {
 	my $class = shift;
 	my $session = shift;
 	my $messageId = shift;
-	return unless $messageId;
+	return undef unless $messageId;
 	my $data = $session->db->getRow("mailQueue","messageId", $messageId);
-	return unless $data->{messageId};
+	return undef unless $data->{messageId};
 	$session->db->deleteRow("mailQueue","messageId", $messageId);
 	my $parser = MIME::Parser->new;
 	$parser->output_to_core(1);

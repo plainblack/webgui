@@ -48,7 +48,7 @@ sub addChild {
 	my @other = @_;
 	if ($properties->{className} ne "WebGUI::Asset::Post") {
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
-		return;
+		return undef;
 	}
 	return $self->SUPER::addChild($properties, @other);
 }
@@ -371,7 +371,7 @@ sub getEditUrl {
 #-------------------------------------------------------------------
 sub getImageUrl {
 	my $self = shift;
-	return if ($self->get("storageId") eq "");
+	return undef if ($self->get("storageId") eq "");
 	my $storage = $self->getStorageLocation;
 	my $url;
 	foreach my $filename (@{$storage->getFiles}) {
@@ -578,7 +578,7 @@ sub getThread {
 #-------------------------------------------------------------------
 sub getThumbnailUrl {
 	my $self = shift;
-	return if ($self->get("storageId") eq "");
+	return undef if ($self->get("storageId") eq "");
 	my $storage = $self->getStorageLocation;
 	my $url;
 	foreach my $filename (@{$storage->getFiles}) {
@@ -663,8 +663,8 @@ An integer indicating either thumbss up (+1) or thumbs down (-1)
 sub insertUserPostRating {
 	my $self = shift;
 	my $rating = shift;
-	return unless ($rating == -1 || $rating == 1);
-	return if $self->hasRated;
+	return undef unless ($rating == -1 || $rating == 1);
+	return undef if $self->hasRated;
 	$self->session->db->write("insert into Post_rating (assetId,userId,ipAddress,dateOfRating,rating) values (?,?,?,?,?)",
 		[$self->getId,
 		 $self->session->user->userId,
@@ -914,8 +914,8 @@ An integer indicating either thumbss up (+1) or thumbs down (-1)
 sub rate {
 	my $self = shift;
 	my $rating = shift;
-	return unless ($rating == -1 || $rating == 1);
-	return if $self->hasRated;
+	return undef unless ($rating == -1 || $rating == 1);
+	return undef if $self->hasRated;
 	$self->insertUserPostRating($rating);
 	$self->recalculatePostRating();
 	$self->getThread->updateThreadRating();

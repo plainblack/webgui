@@ -677,7 +677,7 @@ sub updateExifDataFromFile {
     my $self        = shift;
     my $storage     = $self->getStorageLocation;
     
-    return;
+    return undef;
     my $info        = ImageInfo( $storage->getPath( $self->get('filename') ) );
     use Data::Dumper; $self->session->errorHandler->info( Dumper $info );
     $self->update({

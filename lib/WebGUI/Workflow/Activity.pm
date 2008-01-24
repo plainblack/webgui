@@ -296,12 +296,12 @@ sub new {
 	my $session = shift;
 	my $activityId = shift;
 	my $main = $session->db->getRow("WorkflowActivity","activityId", $activityId);
-	return unless $main->{activityId};
+	return undef unless $main->{activityId};
 	$class = $main->{className};
     eval { WebGUI::Pluggable::load($class) };
     if ($@) {
         $session->errorHandler->error($@);
-        return;
+        return undef;
     }  
 	my $sub = $session->db->buildHashRef("select name,value from WorkflowActivityData where activityId=?",[$activityId]);
 	my %data = (%{$main}, %{$sub});
@@ -335,13 +335,13 @@ sub newByPropertyHashRef {
     my $class = shift;
     my $session = shift;
     my $properties = shift;
-    return unless defined $properties;
-    return unless exists $properties->{className};
+    return undef unless defined $properties;
+    return undef unless exists $properties->{className};
     my $className = $properties->{className};
     eval { WebGUI::Pluggable::load($class) };
     if ($@) {
         $session->errorHandler->error($@);
-        return;
+        return undef;
     }  
     bless {_session=>$session, _id=>$properties->{activityId}, _data => $properties}, $className;
 }

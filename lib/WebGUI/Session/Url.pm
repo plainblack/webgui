@@ -230,12 +230,12 @@ Returns the URL of the page this request was refered from (no gateway, no query 
 sub getRefererUrl {
 	my $self = shift;
 	my $referer = $self->session->env->get("HTTP_REFERER");
-	return unless ($referer);
+	return undef unless ($referer);
 	my $url = $referer;
 	my $gateway = $self->session->config->get("gateway");
 	$url =~ s{https?://[A-Za-z0-9\.-]+$gateway/*([^?]*)\??.*$}{$1};
 	if ($url eq $referer) { ##s/// failed
-		return;
+		return undef;
 	} else {
 		return $url;
 	}
@@ -252,7 +252,7 @@ Returns the URL of the page requested (no gateway, no query params, just the pag
 
 sub getRequestedUrl {
 	my $self = shift;
-	return unless ($self->session->request);
+	return undef unless ($self->session->request);
 	unless ($self->{_requestedUrl}) {
 		$self->{_requestedUrl} = $self->session->request->uri;
 		my $gateway = $self->session->config->get("gateway");

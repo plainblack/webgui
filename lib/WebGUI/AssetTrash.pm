@@ -212,7 +212,7 @@ lineage is changed in state to trash-limbo.
 
 sub trash {
     my $self = shift;
-    return if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+    return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
         $asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
     }

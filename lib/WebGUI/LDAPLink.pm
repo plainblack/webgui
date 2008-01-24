@@ -219,7 +219,7 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	$ldapLinkId = shift;
-	return unless $ldapLinkId;
+	return undef unless $ldapLinkId;
 	$ldapLink = $session->db->quickHashRef("select * from ldapLink where ldapLinkId=?",[$ldapLinkId]);
 	bless {_session=>$session, _ldapLinkId=>$ldapLinkId, _ldapLink=>$ldapLink }, $class;
 }
@@ -291,7 +291,7 @@ sub recurseProperty {
 	my $count = $_[4] || 0;
 	my $recurseFilter = $_[5] || $self->get->{ldapGlobalRecursiveFilter};
 	my $rfAlreadyTransformed = $_[6];
-	return unless($ldap && $base && $property);
+	return undef unless($ldap && $base && $property);
 
 	if (length $recurseFilter and not $rfAlreadyTransformed) {
 		$recurseFilter =~ tr/\r//d;
@@ -302,7 +302,7 @@ sub recurseProperty {
 
 	#Prevent infinite recursion
 	$count++;
-	return if $count == 99;
+	return undef if $count == 99;
 
 	#search the base
 	my $msg = $ldap->search( 
@@ -310,8 +310,8 @@ sub recurseProperty {
 			scope  => 'sub',
 			filter => "&(objectClass=*)"
 			);
-	#return if nothing found
-	return if($msg->code || $msg->count == 0);
+	#return undef if nothing found
+	return undef if($msg->code || $msg->count == 0);
 	#loop through the results
 	for (my $i = 0; $i < $msg->count; $i++) {
 		my $entry = $msg->entry($i);

@@ -91,7 +91,7 @@ The missing URL.
 sub addMissing {
 	my $self = shift;
 	my $assetUrl = shift;
-	return unless ($self->session->var->isAdminOn);
+	return undef unless ($self->session->var->isAdminOn);
 	my $ac = $self->getAdminConsole;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $output = $i18n->get("missing page query");
@@ -314,7 +314,7 @@ sub checkView {
 		return $notFound->www_view;
 	}
 	$self->logView();
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1179,7 +1179,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	return unless $self->canEdit;
+	return undef unless $self->canEdit;
 	return $self->{_toolbar} if (exists $self->{_toolbar});
 	my $userUiLevel = $self->session->user->profileField("uiLevel");
 	my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
@@ -1337,7 +1337,7 @@ sub getValue {
 		}
 		return $self->{_propertyDefinitions}{$key}{defaultValue};
 	}
-	return;
+	return undef;
 }
 
 
@@ -1371,7 +1371,7 @@ sub loadModule {
         return $className;
     }
     $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1389,7 +1389,7 @@ sub logView {
 		WebGUI::PassiveProfiling::add($self->session,$self->getId);
 		WebGUI::PassiveProfiling::addPage($self->session,$self->getId) if ($self->get("className") eq "WebGUI::Asset::Wobject::Layout");
 	}
-	return;
+	return undef;
 }
 
 
@@ -1593,7 +1593,7 @@ sub manageAssets {
         </div>
 		';
 	$self->session->output->print($output);
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1620,7 +1620,7 @@ sub manageAssetsSearch {
 	$output .= WebGUI::Form::formFooter($self->session);
 	$self->session->output->print($output);
 	$output = '';
-	return unless ($self->session->form->get("doit") && ($self->session->form->get("keywords") ne "" || $self->session->form->get("class") ne "any"));
+	return undef unless ($self->session->form->get("doit") && ($self->session->form->get("keywords") ne "" || $self->session->form->get("class") ne "any"));
 	my $class = $self->session->form->process("class","className") eq "any" ? undef : $self->session->form->process("class","className");
 	my $assets = WebGUI::Search->new($self->session,0)->search({
 		keywords=>$self->session->form->get("keywords"),
@@ -1685,7 +1685,7 @@ sub manageAssetsSearch {
                  //]]>
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	$self->session->output->print($output);
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1722,22 +1722,22 @@ sub new {
 
     unless (defined $assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");
-        return;
+        return undef;
     }
 
-    return unless ($revisionDate);
+    return undef unless ($revisionDate);
 
     unless ($class ne 'WebGUI::Asset' or defined $className) {
         ($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
         unless ($className) {
             $session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
-            return;
+            return undef;
         }
     }
 
     if ($className) {
         $class = $class->loadModule($session, $className);        
-        return unless (defined $class);
+        return undef unless (defined $class);
     }
 
     my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
@@ -1749,7 +1749,7 @@ sub new {
         $properties = WebGUI::Asset->assetDbProperties($session, $assetId, $class, $revisionDate);
         unless (exists $properties->{assetId}) {
             $session->errorHandler->error("Asset $assetId $class $revisionDate is missing properties. Consult your database tables for corruption. ");
-            return;
+            return undef;
         }
         $cache->set($properties,60*60*24);
     }
@@ -1759,7 +1759,7 @@ sub new {
         return $object;
     }	
     $session->errorHandler->error("Something went wrong trying to instanciate a '$className' with assetId '$assetId', but I don't know what!");
-    return;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -1794,7 +1794,7 @@ sub newByDynamicClass {
 #    confess "newByDynamicClass requires assetId"
 #        unless $assetId;
 # So just return instead
-    return unless ( $session && blessed $session eq 'WebGUI::Session' ) 
+    return undef unless ( $session && blessed $session eq 'WebGUI::Session' ) 
         && $assetId;
 
     # Cache the className lookup
@@ -1813,7 +1813,7 @@ sub newByDynamicClass {
         
     unless ( $className ) {
         $session->errorHandler->error("Couldn't find className for asset '$assetId'");
-        return;
+        return undef;
     }
 
     return WebGUI::Asset->new($session,$assetId,$className,$revisionDate);
@@ -1840,10 +1840,10 @@ sub newByPropertyHashRef {
 	my $class = shift;
 	my $session = shift;
 	my $properties = shift;
-	return unless defined $properties;
-	return unless exists $properties->{className};
+	return undef unless defined $properties;
+	return undef unless exists $properties->{className};
     my $className = $class->loadModule($session, $properties->{className});
-    return unless (defined $className);
+    return undef unless (defined $className);
 	bless {_session=>$session, _properties => $properties}, $className;
 }
 
@@ -1884,7 +1884,7 @@ sub newByUrl {
 			return WebGUI::Asset->new($session,$id, $class, $revisionDate);
 		} else {
 			$session->errorHandler->warn("The URL $url was requested, but does not exist in your asset tree.");
-			return;
+			return undef;
 		}
 	}
 	return WebGUI::Asset->getDefault($session);
@@ -1948,7 +1948,7 @@ sub processPropertiesFromFormPost {
 	$self->session->db->beginTransaction;
 	$self->update(\%data);
 	$self->session->db->commit;
-    return;
+    return undef;
 }
 
 
@@ -2282,7 +2282,7 @@ sub www_add {
 	my $self = shift;
 	my %prototypeProperties;
     my $class = $self->loadModule($self->session, $self->session->form->process("class","className"));
-    return unless (defined $class);
+    return undef unless (defined $class);
 	return $self->session->privilege->insufficient() unless ($class->canAdd($self->session));
 	if ($self->session->form->process('prototype')) {
 		my $prototype = WebGUI::Asset->new($self->session, $self->session->form->process("prototype"),$class);
@@ -2380,7 +2380,7 @@ sub www_changeUrlConfirm {
 		return 'redirect';
 	}
 
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -2564,7 +2564,7 @@ sub www_view {
 	return $check if (defined $check);
 	$self->prepareView;
 	$self->session->output->print($self->view);
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

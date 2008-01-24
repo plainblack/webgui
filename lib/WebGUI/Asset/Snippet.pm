@@ -117,7 +117,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	return if ($self->getToolbarState);
+	return undef if ($self->getToolbarState);
 	return '<p>'.$self->SUPER::getToolbar().'</p>';
 }
 

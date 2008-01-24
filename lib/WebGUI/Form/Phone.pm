@@ -86,7 +86,7 @@ sub getValueFromPost {
 	if ($value =~ /^[x\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
 		return $value;
 	}
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

@@ -417,7 +417,7 @@ sub new {
 	my $session = shift;
 	my $workflowId = shift;
 	my $data = $session->db->getRow("Workflow","workflowId", $workflowId);
-	return unless $data->{workflowId};
+	return undef unless $data->{workflowId};
 	bless {_session=>$session, _id=>$workflowId, _data=>$data}, $class;
 }
 

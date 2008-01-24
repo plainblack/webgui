@@ -74,7 +74,7 @@ sub AUTOLOAD {
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, $params ]) };
     if ($@) {
         $self->session->errorHandler->error($@);
-        return;
+        return undef;
     }
 	return $control->getValueFromPost(@args);
 }
@@ -176,7 +176,7 @@ sub process {
 			return $default;
 		}
 		if ($value =~ /^[\s]+$/) {
-			return;
+			return undef;
 		}
 		return $value;
 	}

@@ -295,7 +295,7 @@ Allows an administrator to assume another user.
 sub www_becomeUser {
 	my $session = shift;
 	return $session->privilege->adminOnly() unless canEdit($session);
-	return unless WebGUI::User->validUserId($session, $session->form->process("uid"));
+	return undef unless WebGUI::User->validUserId($session, $session->form->process("uid"));
 	$session->var->end($session->var->get("sessionId"));
 	$session->user({userId=>$session->form->process("uid")});
 	return "";

@@ -69,7 +69,7 @@ sub create {
         ? JSON::objToJson({parameters => $properties->{parameters}}, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}) 
         : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
-	return if ($isSingleton && $count);
+	return undef if ($isSingleton && $count);
 
     # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
@@ -204,7 +204,7 @@ Returns a reference to the next activity in this workflow from the current posit
 sub getNextActivity {
 	my $self = shift;
 	my $workflow = $self->getWorkflow;
-	return unless defined $workflow;
+	return undef unless defined $workflow;
 	return $workflow->getNextActivity($self->get("currentActivityId"));
 }
 
@@ -262,7 +262,7 @@ sub new {
 	my $session = shift;
 	my $instanceId = shift;
 	my $data = $session->db->getRow("WorkflowInstance","instanceId", $instanceId);
-	return unless $data->{instanceId};
+	return undef unless $data->{instanceId};
 	bless {_session=>$session, _id=>$instanceId, _data=>$data}, $class;
 }
 

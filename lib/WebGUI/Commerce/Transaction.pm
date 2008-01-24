@@ -95,7 +95,7 @@ sub cancelTransaction {
 
 	$self->status('Canceled');
 
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -293,7 +293,7 @@ sub getByGatewayId {
 		" and gateway=".$self->session->db->quote($paymentGateway));
 
 	return WebGUI::Commerce::Transaction->new($self->session, $transactionId) if $transactionId;
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------

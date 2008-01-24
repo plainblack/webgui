@@ -251,7 +251,7 @@ sub createAccountSave {
         $self->logout;
         return $self->displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
-	return;
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -577,7 +577,7 @@ sub editUserSettingsFormSave {
         return \@errors;
     }
     else {
-        return;
+        return undef;
     }
 }
 

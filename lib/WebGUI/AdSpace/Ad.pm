@@ -156,7 +156,7 @@ sub new {
 	my $session = shift;
 	my $id = shift;
 	my $properties = $session->db->getRow("advertisement","adId",$id);
-	return unless $properties->{adId};
+	return undef unless $properties->{adId};
 	bless {_session=>$session, _properties=>$properties}, $class;
 }
 

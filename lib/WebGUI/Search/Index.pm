@@ -55,14 +55,14 @@ sub addFile {
     if ($path =~ m/\.(\w+)$/) {
         my $type = lc($1);
         if ($filters->{$type}) {
-            open my $fh, "$filters->{$type} $path |" or return; # open pipe to filter
+            open my $fh, "$filters->{$type} $path |" or return undef; # open pipe to filter
             $content = do { local $/; <$fh> };  # slurp file
             close $fh;
         }
     }
     return $self->addKeywords($content)
         if $content =~ m/\S/; # only index if we fine non-whitespace
-    return;
+    return undef;
 }
 
 
