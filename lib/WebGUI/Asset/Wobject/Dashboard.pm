@@ -348,10 +348,10 @@ sub www_view {
                         return $self->session->privilege->noAccess();
                 } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
                         $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
-                        return "";
+                        return undef;
                 } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
                         $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
-                        return "";
+                        return undef;
                 } else { # tell em it doesn't exist anymore
                         $self->session->http->setStatus("410");
                         return WebGUI::Asset->getNotFound($self->session)->www_view;

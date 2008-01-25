@@ -267,10 +267,11 @@ sub www_click {
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
 	if ($self->session->form->process("m")) {
 		$self->session->http->setRedirect($listing->{manufacturerUrl});
-	} else {
+	} 
+    else {
 		$self->session->http->setRedirect($listing->{productUrl});
 	}
-	return "";
+	return undef;
 }
 
 

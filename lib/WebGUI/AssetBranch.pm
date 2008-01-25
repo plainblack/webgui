@@ -311,6 +311,7 @@ sub www_editBranchSave {
             WebGUI::VersionTag->getWorking($self->session)->requestCommit;
         } else {
 		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+            return undef;
         }
 	}
 	delete $self->{_parent};

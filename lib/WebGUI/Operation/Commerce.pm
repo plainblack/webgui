@@ -438,7 +438,7 @@ sub www_checkoutSubmit {
 	# Check if shoppingcart contains any items. If not the user probably clicked reload, so we redirect to the current page.
 	unless (@$normal || @$recurring) {
 		$session->http->setRedirect($session->url->page);
-		return '';
+		return undef;
 	}
 
 	# check submitted form params

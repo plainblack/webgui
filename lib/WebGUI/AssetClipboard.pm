@@ -214,7 +214,7 @@ sub www_copy {
             $self->session->http->setRedirect($self->getUrl(
                 "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
             ));
-            return 1;
+            return undef;
         }
     }
     return $self->session->asset($self->getContainer)->www_view;

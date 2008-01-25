@@ -286,6 +286,7 @@ sub createAccountSave {
 	if ($self->session->scratch->get("redirectAfterLogin")) {
 		my $url = $self->session->scratch->delete("redirectAfterLogin");
 		$self->session->http->setRedirect($url);
+        return undef;
 	} else {
 		$self->session->http->setStatus(201,"Account Registration Successful");
 	}

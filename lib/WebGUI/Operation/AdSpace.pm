@@ -57,7 +57,7 @@ sub www_clickAd {
 	return undef unless $id;
 	my $url = WebGUI::AdSpace->countClick($session, $id);
 	$session->http->setRedirect($url);
-	return "Redirecting to $url";
+	return undef;
 }
 
 #-------------------------------------------------------------------

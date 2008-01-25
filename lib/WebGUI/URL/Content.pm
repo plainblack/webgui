@@ -57,21 +57,21 @@ sub handler {
                 $session->errorHandler->error($@);
             }
             else {
-                if ($output) {
-                    if ($output eq "cached") {
-                        return Apache2::Const::OK;
-                    }
-                    unless ($output eq "none" || $output eq "redirect") {
-                        unless ($output eq "chunked") {
-                            $session->http->sendHeader();
-                            $session->output->print($output) 
-                        }
-                        if ($session->errorHandler->canShowDebug()) {
-                            $session->output->print($session->errorHandler->showDebug(),1);
-                        }
+                if ($output eq "chunked") {
+                    last;
+                }
+                elsif (defined $output && $output ne "") {
+                    $session->http->sendHeader;
+                    $session->output->print($output);
+                    if ($session->errorHandler->canShowDebug()) {
+                        $session->output->print($session->errorHandler->showDebug(),1);
                     }
                     last;
                 }
+                elsif ($session->http->getStatus ne "200") {
+                    $session->http->sendHeader;
+                    last;
+                } 
             }
         }
         WebGUI::Affiliate::grabReferral($session);	# process affiliate tracking request

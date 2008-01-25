@@ -375,7 +375,7 @@ sub www_edit {
 sub www_goBackToPage {
 	my $self = shift;
 	$self->session->http->setRedirect($self->session->form->get("returnUrl")) if ($self->session->form->get("returnUrl"));
-	return "";
+	return undef;
 }
 
 

@@ -115,7 +115,7 @@ sub handler {
             $http->setStatus("304","Content Not Modified");
             $http->sendHeader;
             $session->close;
-            return "cached";
+            return "chunked";
         } 
 
         # return the page.
@@ -137,13 +137,6 @@ sub handler {
         }
     }
 
-    # Uhm... why here and not somewhere else? Do content handlers manage their own content
-    # or should the URL handlers do it for them?
-    if ($output eq "redirect") {
-        $http->sendHeader;
-    }
-
-    # ...
     return $output;
 }
 

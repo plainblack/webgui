@@ -297,15 +297,18 @@ sub checkView {
     if ($conf->get("sslEnabled") && $self->get("encryptPage") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")) {
         # getUrl already changes url to https if 'encryptPage'
         $http->setRedirect($self->getUrl);
-        return "redirect";
+        $http->sendHeader;
+        return "chunked";
 	}
     elsif ($var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
 		$http->setRedirect($self->getUrl("func=manageTrash"));
-		return "redirect";
+        $http->sendHeader;
+		return "chunked";
 	} 
     elsif ($var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
 		$http->setRedirect($self->getUrl("func=manageClipboard"));
-		return "redirect";
+        $http->sendHeader;
+		return "chunked";
 	} 
     elsif ($self->get("state") ne "published") { # tell em it doesn't exist anymore
 		$http->setStatus("410");
@@ -2374,10 +2377,8 @@ sub www_changeUrlConfirm {
 
 	if ($self->session->form->param("proceed") eq "manageAssets") {
 		$self->session->http->setRedirect($self->getUrl('func=manageAssets'));
-		return 'redirect';
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
-		return 'redirect';
 	}
 
 	return undef;
@@ -2459,7 +2460,7 @@ sub www_editSave {
                 $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
             );
         }
-        return "1";
+        return undef;
     }
 
     # Handle Auto Request Commit setting
@@ -2474,6 +2475,7 @@ sub www_editSave {
             $self->session->http->setRedirect(  
                 $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
             );
+            return undef;
         }
     }
 
@@ -2556,12 +2558,18 @@ Returns the view() method of the asset object if the requestor canView.
 
 sub www_view {
 	my $self = shift;
+    
+    # don't allow viewing of the root asset
 	if ($self->getId eq "PBasset000000000000001") {
 		$self->session->http->setRedirect($self->getDefault($self->session)->getUrl);
-		return "1";
+		return undef;
 	}
+
+    # check view privs
 	my $check = $self->checkView;
 	return $check if (defined $check);
+
+    # if all else fails 
 	$self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;

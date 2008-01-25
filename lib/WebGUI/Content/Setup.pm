@@ -560,7 +560,6 @@ return props[propName];
          <img src="'.$session->url->extras('background.jpg').'" style="border-style:none;position: absolute; top: 0; left: 0; width: 100%; height: 1000px; z-index: 1;" />
 	</body> </html>';
 	$session->http->setMimeType("text/html");
-    $session->http->sendHeader;
     return $page;
 }
 

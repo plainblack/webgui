@@ -47,10 +47,7 @@ The content handler for this package.
 sub handler {
     my ($session) = @_;
     if ($session->env->get("HTTP_X_MOZ") eq "prefetch") { # browser prefetch is a bad thing
-        my $http = $session->http;
-        $http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
-        $http->sendHeader;
-        return "none";
+        $session->http->setStatus("403","We don't allow prefetch, because it increases bandwidth, hurts stats, and can break web sites.");
     }
     return undef;
 }

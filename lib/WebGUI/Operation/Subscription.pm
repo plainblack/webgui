@@ -604,8 +604,8 @@ The current WebGUI session object.
 sub www_purchaseSubscription {
 	my $session = shift;
 	WebGUI::Commerce::ShoppingCart->new($session)->add($session->form->process("sid"), 'Subscription');
-	
-	return $session->http->setRedirect($session->url->page('op=checkout'));
+	$session->http->setRedirect($session->url->page('op=checkout'));
+    return undef;
 }
 
 =head2 www_redeemSubscriptionCode ( $session )

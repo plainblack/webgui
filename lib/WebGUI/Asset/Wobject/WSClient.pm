@@ -509,6 +509,7 @@ sub view {
    # webgui flow.  This feature currently requires a patched WebGUI.pm file.
    if ($self->session->form->process('redirectURL')) {
     $self->session->http->setRedirect($self->session->form->process('redirectURL'));
+    return undef;
    }
 
    $var{'results'} = \@result;

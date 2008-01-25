@@ -115,24 +115,24 @@ A web executable method that redirects the user to the specified page, or displa
 =cut
 
 sub www_view {
-        my $self = shift;
-        return $self->session->privilege->noAccess() unless $self->canView;
+    my $self = shift;
+    return $self->session->privilege->noAccess() unless $self->canView;
 	my $i18n = WebGUI::International->new($self->session, "Asset_Redirect");
-        my $url = $self->get("redirectUrl");
-        WebGUI::Macro::process($self->session, \$url);
-        if ($self->session->var->isAdminOn() && $self->canEdit) {
-                return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
-                        <ul>
-                        <li><a href="'.$url.'">'.$i18n->get("go to the redirect url").'</a></li>
-                        <li><a href="'.$self->getUrl("func=edit").'">'.$i18n->get("edit the redirect properties").'</a></li>
-                        <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
-                        </ul>',$i18n->get("assetName"));
-        }
-        unless ($url eq $self->get("url")) {
-        	$self->session->http->setRedirect($url);
-		return 1;
+    my $url = $self->get("redirectUrl");
+    WebGUI::Macro::process($self->session, \$url);
+    if ($self->session->var->isAdminOn() && $self->canEdit) {
+        return $self->getAdminConsole->render($i18n->get("what do you want to do with this redirect").'
+            <ul>
+                <li><a href="'.$url.'">'.$i18n->get("go to the redirect url").'</a></li>
+                <li><a href="'.$self->getUrl("func=edit").'">'.$i18n->get("edit the redirect properties").'</a></li>
+                <li><a href="'.$self->getParent->getUrl.'">'.$i18n->get("go to the redirect parent page").'</a></li>
+             </ul>',$i18n->get("assetName"));
+    }
+    unless ($url eq $self->get("url")) {
+        $self->session->http->setRedirect($url);
+		return undef;
 	}
-        return $i18n->get('self_referential');
+    return $i18n->get('self_referential');
 }
 
 1;

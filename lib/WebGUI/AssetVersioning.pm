@@ -551,7 +551,7 @@ sub www_purgeRevision {
 	if ($session->form->process("proceed") eq "manageRevisionsInTag") {
 		my $working = (defined $self) ? $self : $parent;
 		$session->http->setRedirect($working->getUrl("op=manageRevisionsInTag"));
-		return "";
+		return undef;
 	}
 	unless (defined $self) {
 		return $parent->www_view;

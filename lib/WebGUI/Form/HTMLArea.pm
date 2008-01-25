@@ -459,7 +459,7 @@ sub www_addFolderSave {
 		#filename                 => $filename,
 		});
 	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLForm;sub=imageTree'));
-	return "";
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -544,7 +544,7 @@ sub www_addImageSave {
 	}
 	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
     $imageObj->delete;
-	return "";
+	return undef;
 }
 
 

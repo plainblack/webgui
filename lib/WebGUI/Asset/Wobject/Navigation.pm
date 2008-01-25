@@ -486,7 +486,7 @@ sub view {
 sub www_goBackToPage {
 	my $self = shift;
 	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
-	return "";
+	return undef;
 }
 
 

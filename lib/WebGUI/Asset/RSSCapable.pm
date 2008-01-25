@@ -196,7 +196,7 @@ sub www_viewRSS {
       $session->http->setRedirect($self->getRssUrl);
    }
    
-   return "";
+   return undef;
 }
 
 

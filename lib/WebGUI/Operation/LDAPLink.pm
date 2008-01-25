@@ -337,6 +337,7 @@ sub www_editLDAPLinkSave {
 	$session->db->setRow("ldapLink","ldapLinkId",$properties);
 	if($session->form->process("returnUrl")) {
 		$session->http->setRedirect($session->form->process("returnUrl"));
+        return undef;
 	}
 	return www_listLDAPLinks($session);
 }
