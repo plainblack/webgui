@@ -364,7 +364,7 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_className }
         = WebGUI::Form::radioList( $session, {
             name        => "className",
-            value       => $form->get("className"),
+            value       => ( $form->get("className") || '' ),
             options     => \%searchClassOptions,
         });
 
@@ -513,7 +513,6 @@ sub getAlbumIds {
     my $options     = shift;
     
     my $orderBy     = $options->{ orderBy }      || "lineage ASC";
-    $self->session->errorHandler->warn("ORDER BY: $orderBy");
 
     my $assets 
         = $self->getLineage(['descendants'], {
@@ -914,11 +913,13 @@ sub www_search {
                         . $db->quote( '%' . $form->get("description") . '%' ) 
                         ;
         }
+
+        my $joinClass   = [
+            'WebGUI::Asset::Wobject::GalleryAlbum',
+            'WebGUI::Asset::File::Image::Photo',
+        ];
         if ( $form->get("className") ) {
-            $where      .= q{ AND asset.className IN ('} 
-                        . $db->quoteAndJoin( [$form->get('className','checkList')] ) 
-                        . q{)}
-                        ;
+            $joinClass  = [ $form->get('className') ];
         }
 
         # Build a URL for the pagination
@@ -939,7 +940,7 @@ sub www_search {
                 url             => $url,
                 keywords        => $keywords,
                 where           => $where,
-                joinClass       => ['WebGUI::Asset::Wobject::GalleryAlbum', 'WebGUI::Asset::File::Image::Photo'],
+                joinClass       => $joinClass,
             } );
         
         $var->{ keywords }  = $keywords;

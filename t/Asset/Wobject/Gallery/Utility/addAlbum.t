@@ -49,11 +49,11 @@ for (0..2) {
     push @threads, $collab->addChild({
         className       => 'WebGUI::Asset::Post::Thread',
         content         => "content$_",
-        menuTitle       => "menuTitle$_",
+        menuTitle       => "menuTitle$_", 
         ownerUserId     => "3$_",
         synopsis        => "synopsis$_",
         title           => "title$_",
-        userDefined1    => "userDefined1$_",
+        userDefined1    => "$_", # This is important. Used to detect which File is from which Thread
         userDefined2    => "userDefined2$_",
         userDefined3    => "userDefined3$_",
         userDefined4    => "userDefined4$_",
@@ -69,10 +69,10 @@ my @posts;
 push @{$posts[0]}, $threads[0]->addChild({
     className       => 'WebGUI::Asset::Post',
     content         => "content00",
-    menuTitle       => "menuTitle00",
+    menuTitle       => "menuTitle00", 
     synopsis        => "synopsis00",
     title           => "title00",
-    userDefined1    => "userDefined100",
+    userDefined1    => "00", # This is important. Used to detect which File is from which Post
     userDefined2    => "userDefined200",
     userDefined3    => "userDefined300",
     userDefined4    => "userDefined400",
@@ -85,10 +85,25 @@ $posts[0][0]->getStorageLocation->addFileFromFilesystem(
 # Thread fields mapped to album fields that should be migrated
 my %threadFields = (
     content         => "description",
+    createdBy       => 'createdBy',
+    creationDate    => 'creationDate',
     menuTitle       => "menuTitle",
     ownerUserId     => "ownerUserId",
     synopsis        => "synopsis",
     title           => "title",
+    userDefined1    => "userDefined1",
+    userDefined2    => "userDefined2",
+    userDefined3    => "userDefined3",
+    userDefined4    => "userDefined4",
+    userDefined5    => "userDefined5",
+);
+
+# Post fields mapped to photo fields that should be migrated
+my %postFields = (
+    content         => "synopsis",
+    createdBy       => 'createdBy',
+    creationDate    => 'creationDate',
+    ownerUserId     => "ownerUserId",
     userDefined1    => "userDefined1",
     userDefined2    => "userDefined2",
     userDefined3    => "userDefined3",
@@ -105,7 +120,15 @@ my $threadPostTests     = 6 * ( 1 + scalar @{ $posts[0] } );
 # addAlbumFromThread adds 1 test for each field in %threadFields
 my $threadFieldTests    = 1 * scalar keys %threadFields;
 
-plan tests => 9 + $threadPostTests + $threadFieldTests;
+# addAlbumFromThread adds 1 test for each field in %postFields
+my $postFieldTests      = 1 * ( scalar keys %postFields )
+                        * ( 1 + scalar @{ $posts[0] } );
+
+plan tests => 10 
+            + $threadPostTests 
+            + $threadFieldTests
+            + $postFieldTests
+            ;
 
 #----------------------------------------------------------------------------
 # Test use
@@ -158,19 +181,28 @@ is(
     "addAlbumFromThread adds one file for each attachment to the thread or posts of the thread",
 );
 
-# 6 tests for each post/file
-# TODO: Test that post-to-file fields are migrated properly, but how?
+# 6 tests for each post/file + postFields tests
 my $albumUrl        = $album->get('url');
 for my $fileId ( @{$album->getFileIds} ) {
     my $file = WebGUI::Asset->newByDynamicClass( $session, $fileId );
-    is(
-        $file->get('revisionDate'), $threads[0]->get('revisionDate'),
-        "addAlbumFromThread adds files with same revisionDate as thread",
-    );
-    is(
-        $file->get('ownerUserId'), $threads[0]->get('ownerUserId'),
-        "addAlbumFromThread adds files with same ownerUserId as thread",
-    );
+
+    # Find which Thread or Post this file corresponds to
+    my $post;
+    if ( length $file->get('userDefined1') == 1 ) {
+        # Is a thread, get it
+        $post   = $threads[ $file->get('userDefined1') ];
+    }
+    else {
+        my @index   = split //, $file->get('userDefined1');
+        $post   = $posts[ $index[0] ][ $index[1] ];
+    }
+
+    for my $oldField ( sort keys %postFields ) {
+        is ( $file->get( $postFields{ $oldField } ), $post->get( $oldField ),
+            "addAlbumFromThread migrates Post $oldField to File $postFields{$oldField}",
+        );
+    }
+
     like(
         $file->get('url'), qr/^$albumUrl/,
         "addAlbumFromThread add files with urls that begin with GalleryAlbum url",
@@ -181,7 +213,16 @@ for my $fileId ( @{$album->getFileIds} ) {
         $file->getStorageLocation->getFiles, superbagof($file->get('filename')), 
         "Storage location contains the filename"
     );
+    # Test that title and menuTitle do not contain file extention
+    my ($title)   = $file->get('filename') =~ m{(.*)\.[^.]*$};
+    is( $file->get('title'), $title,
+        "Title doesn't contain the file extention"
+    );
+    is( $file->get('menuTitle'), $title,
+        "Menu title doesn't contain the file extention"
+    );
 }
+
 
 #----------------------------------------------------------------------------
 # Test addAlbumFromCollaboration

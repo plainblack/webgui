@@ -562,6 +562,61 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'template search title' => {
+        message     => "Advanced Search",
+        lastUpdated => 0,
+        context     => "Title for the www_search page. Used to show the Advanced search form",
+    },
+
+    'template search field title' => {
+        message     => "Title",
+        lastUpdated => 0,
+        context     => "Label for the 'Title' input for the search form",
+    },
+
+    'template search field description' => {
+        message     => "Description",
+        lastUpdated => 0,
+        context     => "Label for the 'Description' input for the search form",
+    },
+
+    'template search field keywords' => {
+        message     => "Tags",
+        lastUpdated => 0,
+        context     => "Label for the 'Keywords' input for the search form. 'Tags' is used because Keywords may be confused with the generic, all-inclusive search box.",
+    },
+
+    'template search field className' => {
+        message     => "Search Type",
+        lastUpdated => 0,
+        context     => "Label for the 'className' input for the search form. 'Type' is used because 'Class' has no meaning to a normal user.",
+    },
+
+    'template search field creationDate' => {
+        message     => "Date",
+        lastUpdated => 0,
+        context     => "Label for the 'creation date' input for the search form",
+    },
+
+    'template search to' => {
+        message     => "to",
+        lastUpdated => 0,
+        context     => "Joins the 'before' and 'after' parts of the Creation Date inputs.",
+    },
+
+    'template search results for' => {
+        message     => "Results for",
+        lastUpdated => 0,
+        context     => "Title for the results section. 'for' leads into the string that was searched for.",
+    },
+
+    'template by' => {
+        message     => "By",
+        lastUpdated => 0,
+        context     => "Lead-in for the user the album or photo was uploaded by",
+    },
+
+
 };
 
 1;

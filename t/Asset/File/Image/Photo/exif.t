@@ -48,6 +48,13 @@ my $photo
     );
 $versionTag->commit;
 my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+# Sanitize Exif data by removing keys with references as values
+for my $key ( keys %$exif ) {
+    if ( ref $exif->{$key} ) {
+        delete $exif->{$key};
+    }
+}
+
 $photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
 #----------------------------------------------------------------------------
@@ -65,8 +72,8 @@ plan tests => 2;
 my $var         = $photo->getTemplateVars;
 
 cmp_deeply(
-    [ keys %$var ], superbagof( map { 'exif_' . $_ } keys %$exif ),
-    'getTemplateVars gets a hash of all exif tags',
+    [ keys %$var ], superbagof( map { unless (ref $exif->{ $_ }) { 'exif_' . $_ } } keys %$exif ),
+    'getTemplateVars gets a hash of all valid exif tags',
 );
 
 is_deeply(

@@ -157,6 +157,8 @@ sub addAlbumFromThread {
         className           => 'WebGUI::Asset::Wobject::GalleryAlbum',
         description         => $thread->get('content'),
         menuTitle           => $thread->get('menuTitle'),
+        createdBy           => $thread->get('createdBy'),
+        creationDate        => $thread->get('creationDate'),
         ownerUserId         => $thread->get('ownerUserId'),
         synopsis            => $thread->get('synopsis'),
         title               => $thread->get('title'),
@@ -180,12 +182,18 @@ sub addAlbumFromThread {
                     next;
                 }
 
+                # Get rid of that file extention
+                my ($title)  = $filename =~ m{(.*)\.[^.]*$};
+
                 my $file = $album->addChild({
                     className           => $className,
-                    menuTitle           => $filename,
+                    createdBy           => $post->get('createdBy'),
+                    creationDate        => $post->get('creationDate'),
+                    menuTitle           => $title,
                     ownerUserId         => $post->get('ownerUserId'),
-                    title               => $filename,
-                    url                 => $session->url->urlize( $album->get('url') . "/" . $filename ),
+                    synopsis            => $post->get('content'),
+                    title               => $title,
+                    url                 => $session->url->urlize( $album->get('url') . "/" . $title ),
                     userDefined1        => $post->get('userDefined1'),
                     userDefined2        => $post->get('userDefined2'),
                     userDefined3        => $post->get('userDefined3'),

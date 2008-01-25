@@ -370,6 +370,21 @@ sub getDownloadFileUrl {
 
 #----------------------------------------------------------------------------
 
+=head2 getExifData ( )
+
+Gets a hash reference of Exif data about this Photo.
+
+=cut
+
+sub getExifData {
+    my $self        = shift;
+
+    return unless $self->get('exifData');    
+    return from_json( $self->get('exifData') );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getGallery ( )
 
 Gets the Gallery asset this Photo is a member of. 
@@ -413,12 +428,20 @@ sub getTemplateVars {
     my $session     = $self->session;
     my $var         = $self->get;
     my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
+
+    # Fix 'undef' vars since HTML::Template does inheritence on them
+    for my $key ( qw( synopsis ) ) {
+        unless ( defined $var->{$key} ) {
+            $var->{ $key } = '';
+        }
+    }
     
     $var->{ canComment          } = $self->canComment;
     $var->{ canEdit             } = $self->canEdit;
     $var->{ numberOfComments    } = scalar @{ $self->getCommentIds };
     $var->{ ownerUsername       } = $owner->username;
     $var->{ url                 } = $self->getUrl;
+    $var->{ url_addArchive      } = $self->getParent->getUrl('func=addArchive'),    
     $var->{ url_delete          } = $self->getUrl('func=delete');
     $var->{ url_demote          } = $self->getUrl('func=demote');
     $var->{ url_edit            } = $self->getUrl('func=edit');
@@ -439,8 +462,7 @@ sub getTemplateVars {
     }
 
     ### Format exif vars
-    my $exif        = from_json( delete $var->{exifData} );
-    $exif           = ImageInfo( $self->getStorageLocation->getPath( $self->get("filename") ) );
+    my $exif        = $self->getExifData;
     for my $tag ( keys %$exif ) {
         # Hash of exif_tag => value
         $var->{ "exif_" . $tag } = $exif->{$tag};
@@ -593,13 +615,6 @@ sub processPropertiesFromFormPost {
     return $errors if @$errors;
     
     ### Passes all checks
-    # Fix if adding a new photo
-    if ( $form->get("assetId") eq "new" ) {
-        $self->update({
-            ownerUserId         => $self->session->user->userId,
-        });
-    }
-
 
     $self->requestAutoCommit;
 }
@@ -677,8 +692,17 @@ sub updateExifDataFromFile {
     my $self        = shift;
     my $storage     = $self->getStorageLocation;
     
-    return undef;
-    my $info        = ImageInfo( $storage->getPath( $self->get('filename') ) );
+    my $exifTool    = Image::ExifTool->new;
+    $exifTool->Options( PrintConv => 1 );
+    my $info        = $exifTool->ImageInfo( $storage->getPath( $self->get('filename') ) );
+    
+    # Sanitize Exif data by removing keys with references as values
+    for my $key ( keys %$info ) {
+        if ( ref $info->{$key} ) {
+            delete $info->{$key};
+        }
+    }
+
     $self->update({
         exifData    => to_json( $info ),
     });
@@ -860,22 +884,30 @@ sub www_edit {
     return $self->session->privilege->locked        unless $self->canEditIfLocked;
 
     # Prepare the template variables
-    my $var     = {
-        url_addArchive          => $self->getParent->getUrl('func=addArchive'),    
-    };
+    my $var     = $self->getTemplateVars;
     
     # Generate the form
     if ($form->get("func") eq "add") {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),
-            });
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $session->user->userId,
+            })
+            ;
     }
     else {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getUrl('func=editSave'),
-            });
+            })
+            . WebGUI::Form::hidden( $session, {
+                name        => 'ownerUserId',
+                value       => $self->get('ownerUserId'),
+            })
+            ;
     }
     $var->{ form_start } 
         .= WebGUI::Form::hidden( $session, {

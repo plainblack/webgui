@@ -326,8 +326,8 @@ sub processPropertiesFromFormPost {
     my $self    = shift;
     my $session = $self->session;
 
-    my $errors  = $self->SUPER::processPropertiesFromFormPost;
-    return $errors if $errors;
+    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+    return $errors if @$errors;
 
     if (my $storageId = $session->form->get('newFile','File')) {
         $session->errorHandler->info("Got a new file for asset " . $self->getId);

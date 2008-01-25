@@ -14,6 +14,16 @@
  - Updated to work with the new JSON 2.04 module. See gotcha.txt for details.
  - removed old CS based photo gallery prototype in favor of the new gallery
    asset
+ - Added i18n for Gallery (Search) template
+ - fix: Album description showing up in Photos when photo has no synopsis
+ - fix: Photo now shows correct confirmation screen
+ - fix: Photo now gets auto-committed according to Gallery approval workflow
+ - fix: Formatting problems in Album view
+ - fix: Photo and Album assets now retain their Owner after other users edit them.
+ - fix: Gallery::Utility migration now retains createdBy, creationDate, and ownerUserId.
+ - Testing Gallery::Utility a bit more thoroughly.
+ - fix: Photo EXIF data now gets cached correctly and sanitized for 
+    references (since JSON won't store them and they're of no use to us anyway).
 
 7.5.0
  - rfe: Search Asset returns URLs
