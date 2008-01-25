@@ -376,7 +376,7 @@ sub view {
 
             # hashref
             } elsif (ref $return eq 'HASH') {
-               @result = $return undef;
+               @result = $return;
 
             # blessed object, to be stripped with Data::Structure::Util
             } elsif ( ref $return) {
