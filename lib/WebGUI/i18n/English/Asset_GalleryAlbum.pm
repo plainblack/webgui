@@ -139,8 +139,8 @@ our $I18N = {
     },
 
     'helpvar url_listAlbumsRss' => {
-        message     => 'The URL to the list albums view of the parent Gallery',
-        lastUpdated => 0,
+        message     => 'The URL to the list albums RSS of the parent Gallery',
+        lastUpdated => 1201280857,
     },
 
     'helpvar url_listFilesForCurrentUser' => {
