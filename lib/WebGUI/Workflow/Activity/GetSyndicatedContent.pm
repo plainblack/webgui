@@ -105,7 +105,7 @@ sub execute {
 
 	# See if we're done
 	if (scalar(@arrayCopy) > 0) {
-		$instance->setScratch("syndicatedUrls", objToJson(@arrayCopy));
+		$instance->setScratch("syndicatedUrls", JSON::to_json(@arrayCopy));
 		return $self->WAITING;
 	}
 
@@ -139,11 +139,11 @@ sub getSyndicatedUrls {
 								asset.state='published'"
 		);
 		
-		$instance->setScratch("syndicatedUrls", objToJson($urls));
+		$instance->setScratch("syndicatedUrls", JSON::to_json($urls));
 		return $urls;
 	}
 
-	return jsonToObj($syndicatedUrls);
+	return JSON::from_json($syndicatedUrls);
 }
 
 

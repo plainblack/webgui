@@ -9,6 +9,7 @@
  - fix: Gallery is now part of the default set of assets
  - fix: replaced return; with return undef; and changed WGBP.
  - Default maximum attachment size is now 100kB
+ - Updated to work with the new JSON 2.04 module. See gotcha.txt for details.
  - removed old CS based photo gallery prototype in favor of the new gallery
    asset
 

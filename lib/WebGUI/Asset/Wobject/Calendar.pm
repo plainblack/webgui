@@ -2,8 +2,6 @@ package WebGUI::Asset::Wobject::Calendar;
 
 use strict;
 
-our $VERSION = "0.0.0";
-
 ####################################################################
 # WebGUI is Copyright 2001-2007 Plain Black Corporation.
 ####################################################################
@@ -26,7 +24,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
-use JSON;
+use JSON qw/to_json/;
 
 =head1 Name
 
@@ -553,7 +551,7 @@ ENDHTML
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
     for my $feedId (keys %$feeds) {
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".objToJson($feeds->{$feedId}).");\n");
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".to_json($feeds->{$feedId}).");\n");
     }
     $tab->raw('</script>');
     

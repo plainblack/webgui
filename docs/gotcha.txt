@@ -14,6 +14,13 @@ save you many hours of grief.
    located at: 
    WebGUI/docs/upgrades/packages-7.5.0/root_import_timetracking_user.wgpkg
 
+ * WebGUI requires newer versions of some existing modules. Be sure to
+   install them BEFORE upgrading. They are:
+
+        JSON 2.04
+        Config::JSON 1.1.2
+
+
 7.5.0
 --------------------------------------------------------------------
  * Event related links are now displayed using a template loop 
@@ -25,11 +32,13 @@ save you many hours of grief.
    upgrade to the beta. If you upgrade past 7.4.21 then you cannot
    use the beta.
 
+
 7.4.12
 --------------------------------------------------------------------
  * Any customizations made to the Matrix default Search, Compare or
     Detailed listing templates will be lost.  Please back up your
     custom templates before running the upgrade.
+
 
 7.4.11
 --------------------------------------------------------------------

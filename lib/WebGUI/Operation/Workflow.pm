@@ -21,7 +21,7 @@ use WebGUI::Workflow::Activity;
 use WebGUI::Workflow::Instance;
 use WebGUI::Utility;
 use POE::Component::IKC::ClientLite;
-use JSON 'jsonToObj';
+use JSON qw/ from_json /;
 
 =head1 NAME
 
@@ -337,7 +337,7 @@ sub www_editWorkflowPriority {
 	return $ac->render($output, $i18n->get('show running workflows'));
     }
 
-    my $responseHref = jsonToObj($resultJson);
+    my $responseHref = from_json($resultJson);
 
     my $message = $i18n->get($responseHref->{message}) || $i18n->get('edit priority unknown error');
     return $ac->render($message, $i18n->get('show running workflows'));
@@ -577,7 +577,7 @@ ENDCODE
     }
 
     if (defined $workflowResult) {
-        my $workflowsHref = jsonToObj($workflowResult);
+        my $workflowsHref = from_json($workflowResult);
 
         my $workflowTitleFor = $session->db->buildHashRef(<<"");
         SELECT wi.instanceId, w.title

@@ -65,7 +65,7 @@ sub exportPackage {
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
 		my $data = $asset->exportAssetData;
-		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON::objToJson($data,{pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1}));
+		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON->new->pretty->encode($data));
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
 			$assetStorage->tar($storageId.".storage", $storage);
@@ -209,8 +209,7 @@ sub importPackage {
         next unless ($decompressed->getFileExtension($file) eq "json");
         $error->info("Found data file $file");
         my $data = eval{
-            local $JSON::UnMapping = 1;
-            JSON::jsonToObj($decompressed->getFileContentsAsScalar($file))
+            JSON->new->relaxed(1)->decode($decompressed->getFileContentsAsScalar($file))
         };
         if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
             $error->error("package corruption: ".$@) if ($@);

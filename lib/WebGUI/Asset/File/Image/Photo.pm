@@ -19,7 +19,7 @@ use base 'WebGUI::Asset::File::Image';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
-use JSON;
+use JSON qw/ to_json from_json /;
 use Tie::IxHash;
 
 use WebGUI::DateTime;
@@ -439,7 +439,7 @@ sub getTemplateVars {
     }
 
     ### Format exif vars
-    my $exif        = jsonToObj( delete $var->{exifData} );
+    my $exif        = from_json( delete $var->{exifData} );
     $exif           = ImageInfo( $self->getStorageLocation->getPath( $self->get("filename") ) );
     for my $tag ( keys %$exif ) {
         # Hash of exif_tag => value
@@ -679,9 +679,8 @@ sub updateExifDataFromFile {
     
     return undef;
     my $info        = ImageInfo( $storage->getPath( $self->get('filename') ) );
-    use Data::Dumper; $self->session->errorHandler->info( Dumper $info );
     $self->update({
-        exifData    => objToJson( $info ),
+        exifData    => to_json( $info ),
     });
 }
 

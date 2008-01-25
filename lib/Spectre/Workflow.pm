@@ -20,7 +20,7 @@ use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
 use POE::Queue::Array;
 use Tie::IxHash;
-use JSON 'objToJson';
+use JSON qw/ to_json /;
 
 #-------------------------------------------------------------------
 
@@ -223,7 +223,7 @@ sub editWorkflowPriority {
         if ($ackPriority != $newPriority) {
             # return an error
             my $error = 'edit priority setting error';
-            $kernel->call(IKC=>post=>$rsvp, objToJson({message => $error}));
+            $kernel->call(IKC=>post=>$rsvp, to_json({message => $error}));
         }
         $found = 1;
         last;
@@ -232,11 +232,11 @@ sub editWorkflowPriority {
     if (! $found) {
         # return an error message
         my $error = 'edit priority instance not found error';
-        $kernel->call(IKC=>post=>$rsvp, objToJson({message => $error}));
+        $kernel->call(IKC=>post=>$rsvp, to_json({message => $error}));
     }
     else {
         # return success message
-        $kernel->call(IKC=>post=>$rsvp, objToJson({message => 'edit priority success'}));
+        $kernel->call(IKC=>post=>$rsvp, to_json({message => 'edit priority success'}));
     }
 }
 
@@ -338,7 +338,7 @@ sub getJsonStatus {
         }
     }
 
-    $kernel->call(IKC=>post=>$rsvp, objToJson(\%output));
+    $kernel->call(IKC=>post=>$rsvp, to_json(\%output));
 }
 
 #-------------------------------------------------------------------
