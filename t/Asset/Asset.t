@@ -144,7 +144,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 86
+plan tests => 88 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -207,12 +207,23 @@ $deadAsset = WebGUI::Asset->newByDynamicClass($session, 'RoysNonExistantAssetId'
 is ($deadAsset, undef,'newByDynamicClass constructor with invalid assetId returns undef');
 
 # -- no assetId
-{
-    my $confession = '';
-    local $SIG{__DIE__} = sub { $confession = $_[0]; };
-    eval { WebGUI::Asset->newByDynamicClass($session); };
-    like($confession, qr/newByDynamicClass requires assetId/, 'newByDynamicClass constructor with no assetId confesses and dies');
-}
+is(
+    WebGUI::Asset->newByDynamicClass( $session ),
+    undef,
+    "newByDynamicClass constructor returns 'undef' with no assetId",
+);
+
+# -- no session
+is(
+    WebGUI::Asset->newByDynamicClass( ),
+    undef,
+    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
+);
+is(
+    WebGUI::Asset->newByDynamicClass( "nothing" ),
+    undef,
+    "newByDynamicClass constructor returns 'undef' with no valid WebGUI::Session",
+);
 
 # Root Asset
 isa_ok($rootAsset, 'WebGUI::Asset');
