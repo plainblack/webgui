@@ -398,7 +398,7 @@ sub showDebug {
 			$form->{$key} = "********";
 		}
 	}
-	$text = JSON::objToJson($form, {pretty => 1, indent => 4, autoconv=>0, skipinvalid=>1});
+	$text = JSON->new->pretty->encode($form);
 	$text =~ s/&/&amp;/sg;
 	$text =~ s/>/&gt;/sg;
 	$text =~ s/</&lt;/sg;

@@ -7,6 +7,16 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+7.4.22
+--------------------------------------------------------------------
+ * WebGUI requires newer versions of some existing modules. Be sure to
+   install them BEFORE upgrading. They are:
+
+        JSON 2.04
+        Config::JSON 1.1.2
+
+
 7.4.12
 --------------------------------------------------------------------
  * Any customizations made to the Matrix default Search, Compare or

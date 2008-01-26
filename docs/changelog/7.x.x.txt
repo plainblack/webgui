@@ -1,3 +1,6 @@
+7.4.22
+ - Updated to work with the new JSON 2.04 module. See gotcha.txt for details.
+
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
    RFC asks, to fix problems with some SMTP servers when lines exceed 

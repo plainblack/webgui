@@ -19,7 +19,6 @@ use strict;
 use DBI;
 use File::Path;
 use Getopt::Long;
-use JSON;
 use WebGUI::Config;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -331,8 +330,8 @@ STOP
 sub checkVersion {
     $_[0] =~ /(\d+)\.(\d+)\.(\d+)/;
     my $goal = 7;
-    my $feature = 3;
-    my $fix = 22;
+    my $feature = 4;
+    my $fix = 21;
     if ($1 > $goal) {
         return 1;
     }

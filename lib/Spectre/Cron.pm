@@ -19,7 +19,7 @@ use DateTime;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use POE qw(Component::Client::HTTP);
-use JSON 'objToJson';
+use JSON qw/ to_json /;
 
 #-------------------------------------------------------------------
 
@@ -337,7 +337,7 @@ sub getJsonStatus {
         next unless $self->{_jobs}->{$key}->{sitename} eq $sitename;
         $data{$key} = $self->{_jobs}->{$key};
     }
-    $kernel->call(IKC => post => $rsvp, objToJson(\%data));
+    $kernel->call(IKC => post => $rsvp, to_json(\%data));
 }
 
 
