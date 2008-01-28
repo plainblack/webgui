@@ -33,13 +33,15 @@ can be found, an internationalized error message will be returned instead.
 No editing controls (toolbar) will be displayed in the Asset output, even if
 Admin is turned on.
 
+The Not Found Page may not be Asset Proxied.
+
 =cut
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-        my $url = shift;
-	my $t = [Time::HiRes::gettimeofday()] if ($session->errorHandler->canShowPerformanceIndicators());
+    my $session = shift;
+    my $url = shift;
+	my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
 	my $asset = WebGUI::Asset->newByUrl($session,$url);
 	#Sorry, you cannot proxy the notfound page.
 	if (defined $asset && $asset->getId ne $session->setting->get("notFoundPage")) {
