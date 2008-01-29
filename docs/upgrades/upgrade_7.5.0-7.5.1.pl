@@ -22,8 +22,16 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 removeOldPhotoGallery($session);
+speedUp($session);
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub speedUp {
+	my $session = shift;
+    print "\tSlight asset performance increase.\n" unless ($quiet);
+    $session->db->write("alter table assetData add index assetId_status (assetId,status)");
+}
 
 #-------------------------------------------------
 sub removeOldPhotoGallery {
