@@ -1,4 +1,5 @@
 7.5.1
+ - rfe: maintenance - turn on/off maintenance mode from the command line
  - fix: RSS missing in message (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/bugs/tracker/rss-missing-in-message
  - fix: Friends language error (perlDreamer Consulting, LLC.)
