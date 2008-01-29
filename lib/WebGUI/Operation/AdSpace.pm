@@ -94,12 +94,13 @@ sub www_deleteAdSpace {
 
 =head2 www_editAd ( )
 
-Displays form for editing an ad.
+Displays form for editing an ad. 
 
 =cut
 
 sub www_editAd {
 	my $session = shift;
+        my $params  = shift;
 	return $session->privilege->insufficient unless canView($session);
 	my $id = $session->form->param("adId") || "new";
 	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
@@ -109,6 +110,7 @@ sub www_editAd {
 	$ac->addSubmenuItem($session->url->page("op=editAdSpace"), $i18n->get("add ad space"));
 	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
 	my $f = WebGUI::HTMLForm->new($session);
+
 	$f->submit;
 	$f->hidden(name=>"adId", value=>$id);
 	$f->hidden(name=>"adSpaceId", value=> $session->form->param("adSpaceId"));
@@ -240,6 +242,7 @@ The save method for www_editAd()
 sub www_editAdSave {
 	my $session = shift;
 	return $session->privilege->insufficient unless canView($session);
+	my $i18n = WebGUI::International->new($session,"AdSpace");
 	my %properties = (
 		type=>$session->form->process("type", "selectBox"),	
 		url=>$session->form->process("url", "url"),	
@@ -256,6 +259,7 @@ sub www_editAdSave {
 		);
 	my $storageId = $session->form->process("image","image");
 	$properties{storageId} = $storageId if (defined $storageId);
+
 	if ($session->form->param("adId") eq "new") {
 		WebGUI::AdSpace::Ad->create($session, $session->form->param("adSpaceId"), \%properties);
 	} else {
@@ -271,83 +275,108 @@ sub www_editAdSave {
 
 #-------------------------------------------------------------------
 
-=head2 www_editAdSpace ( )
+=head2 www_editAdSpace ( [ adSpace, params ] )
 
-Edit or add an ad space form.
+Edit or add an ad space form. C<adSpace> is an instantiated WebGUI::AdSpace
+object. C<params> is a hash reference of parameters with the following keys:
+
+ errors         -> An array reference of error messages to the user
 
 =cut
 
 sub www_editAdSpace {
-	my $session = shift;
-	my $adSpace = shift;
-	return $session->privilege->insufficient unless canView($session);
-	my $id;
-	my $i18n = WebGUI::International->new($session,"AdSpace");
-	my $ac = WebGUI::AdminConsole->new($session,"adSpace");
-	if (defined $adSpace) {
-		$id = $adSpace->getId;
-	} else {
-		$id = $session->form->param("adSpaceId") || "new";
-		$adSpace = WebGUI::AdSpace->new($session, $id);
-	}
-	$ac->addSubmenuItem($session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")) if defined $adSpace;
-	$ac->addSubmenuItem($session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces"));
-	my $f = WebGUI::HTMLForm->new($session);
-	$f->submit;
-	$f->hidden(name=>"adSpaceId", value=>$id);
-	$f->readOnly(label=>$i18n->get("ad space id"), value=>$id);
-	$f->hidden(name=>"op", value=>"editAdSpaceSave");
-	my $value = $adSpace->get("name") if defined $adSpace;
-	$f->text(
-		name=>"name",
-		value=>$value,
-		hoverHelp => $i18n->get("name help"),
-		label=>$i18n->get("name")
-		);
-	$value = $adSpace->get("title") if defined $adSpace;
-	$f->text(
-		name=>"title",
-		value=>$value,
-		hoverHelp => $i18n->get("title help"),
-		label=>$i18n->get("title")
-		);
-	$value = $adSpace->get("description") if defined $adSpace;
-	$f->textarea(
-		name=>"description",
-		value=>$value,
-		hoverHelp => $i18n->get("description help"),
-		label=>$i18n->get("description")
-		);
-	$value = $adSpace->get("width") if defined $adSpace;
-	$f->integer(
-		name=>"width",
-		value=>$value,
-		defaultValue=>468,
-		hoverHelp => $i18n->get("width help"),
-		label=>$i18n->get("width")
-		);
-	$value = $adSpace->get("height") if defined $adSpace;
-	$f->integer(
-		name=>"height",
-		value=>$value,
-		defaultValue=>60,
-		hoverHelp => $i18n->get("height help"),
-		label=>$i18n->get("height")
-		);
-	$f->submit;
-	my $ads = "";
-	my $code = "";
-	if (defined $adSpace) {
-		$code = '<p style="padding: 5px; line-height: 20px; text-align: center; border: 3px outset black; font-family: helvetica; font-size: 11px; width: 200px; float: right;">'.$i18n->get("macro code prompt").'<br /><b>&#94;AdSpace('.$adSpace->get("name").');</b></p>';
-		my $rs = $session->db->read("select adId, title, renderedAd from advertisement where adSpaceId=?",[$id]);
-		while (my ($adId, $title, $ad) = $rs->array) {
-			$ads .= '<div style="margin: 15px; float: left;">'.$session->icon->delete("op=deleteAd;adSpaceId=".$id.";adId=".$adId, undef, $i18n->get("confirm ad delete"))
-				.$session->icon->edit("op=editAd;adSpaceId=".$id.";adId=".$adId)
-				.' '.$title.'<br />'.$ad.'</div>';
-		}
-		$ads .= '<div style="clear: both;"></div>';
-	}
-	$ac->render($code.$f->print.$ads, $i18n->get("edit ad space"));
+    my $session = shift;
+    my $adSpace = shift;
+    my $params  = shift;
+
+    return $session->privilege->insufficient unless canView($session);
+    
+    my $i18n    = WebGUI::International->new( $session, "AdSpace" );
+    my $ac      = WebGUI::AdminConsole->new( $session, "adSpace" );
+    my $f       = WebGUI::HTMLForm->new($session);
+
+    # Get the adspace we're working with
+    my $id;
+    if ( $adSpace ) {
+        $id         = $adSpace->getId;
+    } else {
+        $id         = $session->form->param("adSpaceId") || "new";
+        $adSpace    = WebGUI::AdSpace->new($session, $id);
+    }
+    
+    if ( $adSpace ) {
+        $ac->addSubmenuItem(
+            $session->url->page("op=editAd;adSpaceId=".$id), $i18n->get("add an ad")
+        );
+    }
+    $ac->addSubmenuItem(
+        $session->url->page("op=manageAdSpaces"), $i18n->get("manage ad spaces")
+    );
+
+    # Give the errors to the user
+    if ( $params->{errors} ) {
+        $f->raw( '<p>' . $i18n->get('error heading') . '</p>'
+                . '<ul>' 
+                . join( "", map { '<li>' . $_ . '</li>' } @{ $params->{errors} } )
+                . '</ul>'
+        );
+    }
+
+    # Build the form
+    $f->submit;
+    $f->hidden( name => "adSpaceId", value => $id );
+    $f->readOnly( label => $i18n->get("ad space id"), value => $id );
+    $f->hidden( name => "op", value => "editAdSpaceSave" );
+    $f->text(
+        name        => "name",
+        value       => $session->form->get('name') || $adSpace->get("name"),
+        hoverHelp   => $i18n->get("name help"),
+        label       => $i18n->get("name"),
+    );
+    $f->text(
+        name        => "title",
+        value       => $session->form->get('title') || $adSpace->get('title'),
+        hoverHelp   => $i18n->get("title help"),
+        label       => $i18n->get("title"),
+    );
+    $f->textarea(
+        name        => "description",
+        value       => $session->form->get('description') || $adSpace->get('description'),
+        hoverHelp   => $i18n->get("description help"),
+        label       => $i18n->get("description"),
+    );
+    $f->integer(
+        name            => "width",
+        value           => $session->form->get('width') || $adSpace->get('width'),
+        defaultValue    => 468,
+        hoverHelp       => $i18n->get("width help"),
+        label           => $i18n->get("width"),
+    );
+    $f->integer(
+        name            => "height",
+        value           => $session->form->get('height') || $adSpace->get('height'),
+        defaultValue    => 60,
+        hoverHelp       => $i18n->get("height help"),
+        label           => $i18n->get("height"),
+    );
+    $f->submit;
+
+    # Show the ads in this adspace.
+    my $ads     = "";
+    my $code    = "";
+    if ( $adSpace ) {
+        $code = '<p style="padding: 5px; line-height: 20px; text-align: center; border: 3px outset black; font-family: helvetica; font-size: 11px; width: 200px; float: right;">'.$i18n->get("macro code prompt").'<br /><b>&#94;AdSpace('.$adSpace->get("name").');</b></p>';
+        my $rs = $session->db->read("select adId, title, renderedAd from advertisement where adSpaceId=?",[$id]);
+        while (my ($adId, $title, $ad) = $rs->array) {
+            $ads    .= '<div style="margin: 15px; float: left;">'.$session->icon->delete("op=deleteAd;adSpaceId=".$id.";adId=".$adId, undef, $i18n->get("confirm ad delete"))
+                    . $session->icon->edit( "op=editAd;adSpaceId=" . $id . ";adId=" . $adId )
+                    . ' ' . $title . '<br />' . $ad . '</div>'
+                    ;
+        }
+        $ads .= '<div style="clear: both;"></div>';
+    }
+
+    return $ac->render($code.$f->print.$ads, $i18n->get("edit ad space"));
 }
 
 
@@ -360,23 +389,43 @@ Save the www_editAdSpace method.
 =cut
 
 sub www_editAdSpaceSave {
-	my $session = shift;
-	return $session->privilege->insufficient unless canView($session);
-	my %properties = (
-		name=>$session->form->process("name", "text"),	
-		title=>$session->form->process("title", "text"),	
-		description=>$session->form->process("description", "textarea"),	
-		width=>$session->form->process("width", "integer"),	
-		height=>$session->form->process("height", "integer"),	
-		);
-	if ($session->form->param("adSpaceId") eq "new") {
-		my $adSpace = WebGUI::AdSpace->create($session, \%properties);
-		return www_editAdSpace($session, $adSpace);
-	} else {
-		my $adSpace = WebGUI::AdSpace->new($session, $session->form->param("adSpaceId"));
-		$adSpace->set(\%properties);
-	}
-	return www_manageAdSpaces($session);
+    my $session = shift;
+
+    return $session->privilege->insufficient unless canView($session);
+
+    my $i18n    = WebGUI::International->new( $session, "AdSpace" );
+    
+    my %properties = (
+        name        => $session->form->process("name", "text"),	
+        title       => $session->form->process("title", "text"),	
+        description => $session->form->process("description", "textarea"),	
+        width       => $session->form->process("width", "integer"),	
+        height      => $session->form->process("height", "integer"),	
+    );
+
+    ### Validate form entry
+    my @errors;
+    # Adspace titles cannot contain ] characters because of caching in the Layout asset
+    if ( $properties{name} =~ /[\]]/ ) {
+        push @errors, $i18n->get('error invalid characters');            
+    }
+
+    if ( @errors ) {
+        return www_editAdSpace( $session, undef, { errors => \@errors } );
+    }
+
+    # Create the new Ad Space
+    if ($session->form->param("adSpaceId") eq "new") {
+        my $adSpace = WebGUI::AdSpace->create($session, \%properties);
+        return www_editAdSpace($session, $adSpace);
+    } 
+    # Edit the existing Ad Space
+    else {
+        my $adSpace = WebGUI::AdSpace->new($session, $session->form->param("adSpaceId"));
+        $adSpace->set(\%properties);
+    }
+
+    return www_manageAdSpaces($session);
 }
 
 #-------------------------------------------------------------------
