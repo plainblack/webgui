@@ -25,6 +25,7 @@
  - Testing Gallery::Utility a bit more thoroughly.
  - fix: Photo EXIF data now gets cached correctly and sanitized for 
     references (since JSON won't store them and they're of no use to us anyway).
+ - fix: No current asset when ending up on Not Found page
 
 7.5.0
  - rfe: Search Asset returns URLs

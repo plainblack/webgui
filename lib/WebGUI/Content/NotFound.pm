@@ -50,7 +50,8 @@ sub handler {
     my $output = "";
 	my $notFound = WebGUI::Asset->getNotFound($session);
 	if (defined $notFound) {
-		$output = eval { $notFound->www_view };
+        $session->asset($notFound);
+        $output = eval { $notFound->www_view };
 	} 
     else {
         $session->errorHandler->error("The notFound page could not be instanciated!");

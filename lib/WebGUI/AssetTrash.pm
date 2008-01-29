@@ -194,7 +194,7 @@ sub purge {
 
     # clean up version tag if empty
     my $versionTag = WebGUI::VersionTag->new($session, $tagId);
-    if ($versionTag->getAssetCount == 0) {
+    if ($versionTag && $versionTag->getAssetCount == 0) {
         $versionTag->rollback;
     }
     return 1;
