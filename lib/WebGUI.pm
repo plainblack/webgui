@@ -63,9 +63,14 @@ sub handler {
 	my $server = Apache2::ServerUtil->server;	#instantiate the server api
 	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'), $configFile); #instantiate the config object
     my $error = "";
+    my $matchUri = $request->uri;
+    my $gateway = $config->get("gateway");
+warn $matchUri;
+    $matchUri =~ s{^$gateway(.*)}{/$1};
+warn $matchUri;
     foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
-        if ($request->uri =~ m{$regex}i) {
+        if ($matchUri =~ m{$regex}i) {
             my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
             if ($@) {
                 die $@ if ($@ =~ "^fatal:");

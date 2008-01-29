@@ -458,7 +458,7 @@
 #    { "^/perl-status$" : "WebGUI::URL::PassThru" },
     { "^/uploads/dictionaries" : "WebGUI::URL::Unauthorized" },
     { "^/uploads" : "WebGUI::URL::Uploads" },
-    { "^/\*give-credit-where-credit-is-due\*$" : "WebGUI::URL::Credits" },
+    { "^/\\*give-credit-where-credit-is-due\\*$" : "WebGUI::URL::Credits" },
     { "^/abcdefghijklmnopqrstuvwxyz$" : "WebGUI::URL::Snoop" },
     { ".*" : "WebGUI::URL::Content" }
     ],
