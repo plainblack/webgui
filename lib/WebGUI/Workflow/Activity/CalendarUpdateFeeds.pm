@@ -168,7 +168,7 @@ sub execute {
                     # Flush old entry
                     # KEY;ATTRIBUTE=VALUE;ATTRIBUTE=VALUE:KEYVALUE
                     my ($key_attrs,$value) = split /:/,$current_entry,2;
-                    my @attrs   = split /;/, $key_attrs;
+                    my @attrs   = $key_attrs ? (split /;/, $key_attrs) : ();
                     my $key     = shift @attrs;
                     my %attrs;
                     while (my $attribute = shift @attrs) {
