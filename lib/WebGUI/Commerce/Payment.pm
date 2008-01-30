@@ -618,5 +618,20 @@ sub validateFormData {
 	return $self->session->errorHandler->fatal("You must override the validateFormData method in the payment plugin.");
 }
 
+=head2 logExtraTransactionData ( $transaction )
+
+This method puts extra, Payment plugin specific data into the transaction log.  This
+needs to be be overridden to actually do the logging.
+
+=head3 $transaction
+
+A WebGUI::Commerce::Transaction object to do the logging.
+
+=cut
+
+sub logExtraTransactionData {
+    return 1;
+}
+
 1;
 

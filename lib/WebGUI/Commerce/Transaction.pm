@@ -70,6 +70,30 @@ sub addItem {
 
 #-------------------------------------------------------------------
 
+=head2 authcode ( authcode )
+
+Returns the authcode connected to the transaction. If authcode is given the authcode property is set to that.
+Presently, this is only used by the ITransact module.
+
+=head3 authcode
+
+The authcode of the current transaction.
+
+=cut
+
+sub authcode {
+    my ($self, $authcode) = @_;
+
+    if ($authcode) {
+        $self->{_properties}{authcode} = $authcode;
+        $self->session->db->write("update transaction set authcode=? where transactionId=?",[$authcode, $self->{_transactionId}]);
+    }
+
+    return $self->{_properties}{authcode};
+}
+
+#-------------------------------------------------------------------
+
 =head2 cancelTransaction ( )
 
 Cancels a recurring transaction. This is done by trying to cancel the subscription at the gateway
@@ -419,6 +443,30 @@ sub lastPayedTerm {
 
 #-------------------------------------------------------------------
 
+=head2 message ( message )
+
+Returns the message connected to the transaction. If message is given the message property is set to that.
+Presently, this is only used by the ITransact module.
+
+=head3 message
+
+The message of the current transaction.
+
+=cut
+
+sub message {
+    my ($self, $message) = @_;
+
+    if ($message) {
+        $self->{_properties}{message} = $message;
+        $self->session->db->write("update transaction set message=? where transactionId=?",[$message, $self->{_transactionId}]);
+    }
+
+    return $self->{_properties}{message};
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( transactionId, [ gateway, [ userId ] ] )
 
 Constructor. Returns a transaction object. If transactionId is set to 'new' a new transaction is created.
@@ -687,6 +735,30 @@ sub transactionsByUser {
 
 	return \@transactions;
 }
-	
+
+#-------------------------------------------------------------------
+
+=head2 xid ( xid )
+
+Returns the xid connected to the transaction. If xid is given the xid property is set to that.
+Presently, this is only used by the ITransact module.
+
+=head3 xid
+
+The xid of the current transaction.
+
+=cut
+
+sub xid {
+    my ($self, $xid) = @_;
+
+    if ($xid) {
+        $self->{_properties}{xid} = $xid;
+        $self->session->db->write("update transaction set xid=? where transactionId=?",[$xid, $self->{_transactionId}]);
+    }
+
+    return $self->{_properties}{xid};
+}
+
 1;
 

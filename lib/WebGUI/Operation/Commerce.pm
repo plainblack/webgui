@@ -503,6 +503,10 @@ sub www_checkoutSubmit {
 
 		$transaction->gatewayId($plugin->gatewayId);
 		$transaction->gateway($plugin->namespace);
+
+        ##New transaction logging code for ITransact module
+        ##goes here.
+        $plugin->logExtraTransactionData($transaction);
 	
 		# check transaction result
 		unless ($plugin->connectionError) {
@@ -519,14 +523,16 @@ sub www_checkoutSubmit {
 				$var->{status} = $i18n->get('transaction error');
 				$var->{error} = $plugin->transactionError;
 				$var->{errorCode} = $plugin->errorCode;
-				$transaction->delete;
+				$transaction->status('Canceled');
+				#$transaction->delete;
 			}
 		} else {
 			$checkoutError = 1;
 			$var->{status} = $i18n->get('connection error');
 			$var->{error} = $plugin->connectionError;
 			$var->{errorCode} = $plugin->errorCode;
-			$transaction->delete;
+            $transaction->status('Canceled');
+			#$transaction->delete;
 		}
 		
 		push(@resultLoop, $var);

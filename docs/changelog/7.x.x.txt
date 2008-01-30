@@ -51,6 +51,8 @@
  - Added migration utility for Gallery
  - Removed old .tmpl files from upgrades. ALL templates in upgrades must now 
    be in Packages!
+ - Changed transaction logging in the Commerce system, so that all connection and transaction errors
+   are now logged automatically, but listed as Canceled with the error message as to why.
  - add: widgetize asset macro. called like so: ^Widget(assetId, width,
    height, templateId); where assetId is the asset of the widget to
    widgetize and templateId is the template for the widget itself. If

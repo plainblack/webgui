@@ -23,6 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 removeOldPhotoGallery($session);
 speedUp($session);
+enhanceITransactLogging($session);
 finish($session); # this line required
 
 
@@ -31,6 +32,17 @@ sub speedUp {
 	my $session = shift;
     print "\tSlight asset performance increase.\n" unless ($quiet);
     $session->db->write("alter table assetData add index assetId_status (assetId,status)");
+}
+
+#----------------------------------------------------------------------------
+# Add more data to the transaction table
+sub enhanceITransactLogging {
+    my $session = shift;
+    print "\tAdd additional ITransact data to the transaction table..." unless $quiet;
+    $session->db->write('alter table transaction add column XID varchar(100) default null');
+    $session->db->write('alter table transaction add column authcode varchar(100) default null');
+    $session->db->write('alter table transaction add column message text default null');
+    print "DONE!\n" unless $quiet;
 }
 
 #-------------------------------------------------

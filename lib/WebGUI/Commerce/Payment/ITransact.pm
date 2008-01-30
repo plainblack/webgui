@@ -668,5 +668,35 @@ sub validateFormData {
 	return \@error;
 }
 
+sub logExtraTransactionData {
+    my ($self, $transaction) = @_;
+    $self->session->errorHandler->warn('transaction: '.$transaction->{_transactionId});
+    if (   exists($self->{_connectionError})  && $self->{_connectionError}) {  ##Bad connection
+        $self->session->errorHandler->warn('Connection error');
+        $transaction->message($self->connectionError);
+        return;
+    }
+    elsif (exists($self->{_transactionError}) && $self->{_transactionError}) {  ##Bad transaction
+        $self->session->errorHandler->warn('Transaction error');
+        $transaction->message($self->resultMessage);
+        $transaction->xid($self->{_response}->{XID});
+        return;
+    }
+    else { ##Everything went well
+        $self->session->errorHandler->warn('OK transaction');
+        if ($self->{_response}->{Status} eq 'OK') {
+            $transaction->message($self->{_response}->{Status});
+        }
+        else {
+            $transaction->message($self->resultMessage);
+        }
+        $transaction->xid($self->{_response}->{XID});
+        if (! ref $self->{_response}->{AuthCode} ) {
+            $transaction->authcode($self->{_response}->{AuthCode});
+        }
+        return;
+    }
+}
+
 1;
 
