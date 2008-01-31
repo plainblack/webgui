@@ -3,6 +3,28 @@ package WebGUI::Test;
 use strict;
 use warnings;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2005 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=head1 NAME
+
+Package WebGUI::Test
+
+=head1 DESCRIPTION
+
+Utility module for making testing in WebGUI easier.
+
+=cut
+
 our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
 
 use Config     qw[];
@@ -117,12 +139,26 @@ END {
     $SESSION->close if defined $SESSION;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 config
+
+Returns the config object from the session.
+
+=cut
 
 sub config {
     return undef unless defined $SESSION;
     return $SESSION->config;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 file
+
+Returns the full path to the WebGUI config file used for this test.
+
+=cut
 
 sub file {
     return $CONFIG_FILE;
@@ -216,13 +252,44 @@ sub getTestCollateralPath {
     return File::Spec->catfile($WEBGUI_TEST_COLLATERAL,$filename);
 }
 
+#----------------------------------------------------------------------------
+
+=head2 lib ( )
+
+Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
+
+=cut
+
 sub lib {
     return $WEBGUI_LIB;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 root ( )
+
+Returns the full path to the WebGUI root directory, usually /data/WebGUI.
+
+=cut
+
 sub root {
     return $WEBGUI_ROOT;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns the WebGUI::Session object that was created by the test.  This session object
+will automatically be destroyed if the test finishes without dying.
+
+The errorHandler/logger for this session has been overridden so that you can test
+that WebGUI is logging errors.  That means that errors will not be put into
+your webgui.log file (or whereever log.conf says to put it).  This will probably
+be moved into a utility sub so that the interception can be enabled, and then
+disabled.
+
+=cut
 
 sub session {
     return $SESSION;
