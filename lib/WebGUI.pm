@@ -65,9 +65,7 @@ sub handler {
     my $error = "";
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
-warn $matchUri;
     $matchUri =~ s{^$gateway(.*)}{/$1};
-warn $matchUri;
     foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
         if ($matchUri =~ m{$regex}i) {
