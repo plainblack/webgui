@@ -121,7 +121,7 @@ sub get {
             return $parameters->{parameters};
         }
         else {
-            return undef;
+            return {};
         }
     }
     return $self->{_data}{$name};
