@@ -66,8 +66,8 @@ sub create {
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
     mode='singleton'",[$properties->{workflowId}]);
 	my $params = (exists $properties->{parameters}) 
-        ? JSON->new->pretty->encode({parameters => $properties->{parameters}}) 
-        : undef;
+            ? JSON->new->pretty->encode({parameters => $properties->{parameters}}) 
+            : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
 	return undef if ($isSingleton && $count);
 
@@ -147,7 +147,7 @@ sub get {
     my $self = shift;
     my $name = shift;
     if ($name eq "parameters") {
-        if (exists $self->{_data}{parameters} and ref($self->{_data}{parameters}) eq 'HASH' ) {
+        if (exists $self->{_data}{parameters}) {
             my $parameters = JSON::from_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
