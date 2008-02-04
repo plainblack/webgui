@@ -1,4 +1,5 @@
 7.5.1
+ - improve rebuildLineage.pl behavior.  protect against assets that are too deep and don't destroy search index.
  - fix: CalendarUpdateFeeds workflow causes errors in log
  - rfe: maintenance - turn on/off maintenance mode from the command line
  - Slight performance increase in asset queries.

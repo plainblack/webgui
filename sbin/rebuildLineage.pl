@@ -89,9 +89,8 @@ if ($orphansFound) {
 } else {
 	print "No orphans found.\n" unless ($quiet);
 }
-print "\nRewriting existing lineage...\n" unless ($quiet);
-$session->db->write("update asset set lineage=concat('old___',lineage)");
-my ($lineage) = $session->db->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
+print "\nDisabling constraints on lineage...\n" unless ($quiet);
+$session->db->write("drop index `lineage` on `asset`");
 
 print "Rebuilding lineage...\n" unless ($quiet);
 my ($oldRootLineage) = $session->db->quickArray("select lineage from asset where assetId='PBasset000000000000001'");
@@ -99,6 +98,10 @@ printChange("Asset ID","Old Lineage","New Lineage");
 printChange('PBasset000000000000001',$oldRootLineage,'000001');
 $session->db->write("update asset set lineage='000001' where assetId='PBasset000000000000001'");
 recurseAndFixTree("PBasset000000000000001","000001");
+print "\nRe-enabling constraints on lineage...\n" unless ($quiet);
+$session->db->write("create unique index `lineage` on `asset` (`lineage`)");
+print "\nRepairing search index...\n" unless ($quiet);
+$session->db->write("update assetIndex inner join asset on asset.assetId=assetIndex.assetId set assetIndex.lineage=asset.lineage");
 
 print "Cleaning up..." unless ($quiet);
 $session->var->end;
@@ -110,15 +113,20 @@ print "\nDon't forget to clear your cache.\n" unless ($quiet);
 
 sub getDescendants {
 	my $parentId = shift;
-	if (isIn($parentId, @found)) {
+    my $depth = shift || 0;
+    if (isIn($parentId, @found)) {
 		print "\nFound circular relationships involving $parentId. This requires manual intervention.\n" unless ($quiet);
 		exit;
 	}
+    if (++$depth > 42) {
+		print "\nFound asset greater than 42 levels deep: $parentId. This requires manual intervention.\n" unless ($quiet);
+		exit;
+    }
 	push(@found, $parentId);
 	my $getChildren = $session->db->prepare("select assetId, lineage from asset where parentId=? order by lineage");
 	$getChildren->execute([$parentId]);
 	while (my ($assetId) = $getChildren->array) {
-		getDescendants($assetId);
+		getDescendants($assetId, $depth);
 	}
 }
 
@@ -142,6 +150,6 @@ sub printChange {
 	my $assetId = shift;
 	my $oldLineage = shift;
 	my $newLineage = shift;
-	print sprintf("%-25s",$assetId).sprintf("%-51s",$oldLineage).sprintf("%-51s",$newLineage)."\n" unless ($quiet);
+	print sprintf("%-25s",$assetId).sprintf("%-51s",$oldLineage).$newLineage."\n" unless ($quiet);
 }
 
