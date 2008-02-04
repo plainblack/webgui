@@ -884,7 +884,12 @@ sub www_edit {
     return $self->session->privilege->locked        unless $self->canEditIfLocked;
 
     # Prepare the template variables
-    my $var     = $self->getTemplateVars;
+    # Cannot get all template vars since they require a storage location, doesn't work for
+    # creating new assets.
+    #my $var     = $self->getTemplateVars; 
+    my $var     = {
+        url_addArchive      => $self->getParent->getUrl('func=addArchive'),
+    };
     
     # Generate the form
     if ($form->get("func") eq "add") {

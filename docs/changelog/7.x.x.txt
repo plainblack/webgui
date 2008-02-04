@@ -29,6 +29,7 @@
  - fix: Photo EXIF data now gets cached correctly and sanitized for 
     references (since JSON won't store them and they're of no use to us anyway).
  - fix: No current asset when ending up on Not Found page
+ - fix: Couldn't add single photos to gallery.
 
 7.5.0
  - rfe: Search Asset returns URLs
