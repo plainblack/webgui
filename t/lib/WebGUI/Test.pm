@@ -157,7 +157,7 @@ sub config {
 
 =head2 file
 
-Returns the full path to the WebGUI config file used for this test.
+Returns the name of the WebGUI config file used for this test.
 
 =cut
 
