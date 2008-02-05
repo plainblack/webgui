@@ -152,7 +152,9 @@ SKIP: {
     
     my $received = sendToServer( $mail );
     
-    skip "Cannot test emailOverride: No response received from smtpd", $numtests;
+    if (!$received) {
+        skip "Cannot test emailOverride: No response received from smtpd", $numtests;
+    }
 
     # Test the mail
     like( $received->{to}->[0], qr/dufresne\@localhost/,
