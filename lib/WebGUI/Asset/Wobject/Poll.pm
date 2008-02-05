@@ -403,6 +403,7 @@ sub thawGraphConfig {
     my $self        = shift;
     my $string      = shift;
     
+    return unless $string;
     return JSON::from_json($string);
 }
 

@@ -294,6 +294,16 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+        'error heading'  => {
+            message     => q{There was an error with your Ad Space:},
+            lastUpdated => 0,
+        },
+
+        'error invalid characters' => {
+            message     => q{There are invalid characters in the title field. Please use only letters, numbers, and spaces.},
+            lastUpdated => 0,
+        },
+
 };
 
 1;

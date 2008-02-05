@@ -32,6 +32,7 @@ use IO::Handle qw[];
 use File::Spec qw[];
 use Test::MockObject::Extends;
 use WebGUI::PseudoRequest;
+use Scalar::Util qw( blessed );
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -166,11 +167,13 @@ sub file {
 
 #----------------------------------------------------------------------------
 
-=head2 getPage ( asset, pageName [, opts] )
+=head2 getPage ( asset | sub, pageName [, opts] )
 
-Get the entire response from a page request. asset is a WebGUI::Asset object.
-pageName is the name of the page subroutine to run. options is a hash reference
-of options with keys outlined below. 
+Get the entire response from a page request. C<asset> is a WebGUI::Asset 
+object. C<sub> is a string containing a fully-qualified subroutine name. 
+C<pageName> is the name of the page subroutine to run (may be C<undef> for 
+sub strings. C<options> is a hash reference of options with keys outlined 
+below. 
 
  args           => Array reference of arguments to the pageName sub
  user           => A user object to set for this request
@@ -183,7 +186,7 @@ of options with keys outlined below.
 sub getPage {
     my $class       = shift;
     my $session     = $SESSION; # The session object
-    my $asset       = shift;    # The asset object
+    my $actor       = shift;    # The actor to work on
     my $page        = shift;    # The page subroutine
     my $optionsRef  = shift;    # A hashref of options
                                 # args      => Array ref of args to the page sub
@@ -217,7 +220,20 @@ sub getPage {
     $session->{_request} = $request;
 
     # Fill the buffer
-    my $returnedContent = $asset->$page(@{$optionsRef->{args}});
+    my $returnedContent;
+    if (blessed $actor) {
+        $returnedContent = $actor->$page(@{$optionsRef->{args}});
+    }
+    elsif ( ref $actor eq "CODE" ) {
+        $returnedContent = $actor->(@{$optionsRef->{args}});
+    }
+    else {
+        # Try using it as a subroutine
+        no strict 'refs';
+        $returnedContent = $actor->(@{$optionsRef->{args}});    
+        use strict 'refs';
+    }
+
     if ($returnedContent && $returnedContent ne "chunked") {
         print $output $returnedContent;
     }
