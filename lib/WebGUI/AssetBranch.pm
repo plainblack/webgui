@@ -169,30 +169,13 @@ sub www_editBranch {
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_encryptPage"})
                 );
         }
-	my $subtext;
-        if ($self->session->user->isInGroup(3)) {
-                 $subtext = $self->session->icon->manage('op=listUsers');
-        } else {
-                 $subtext = "";
-        }
-        my $clause;
-        if ($self->session->user->isInGroup(3)) {
-                my $contentManagers = WebGUI::Group->new($self->session,4)->getAllUsers();
-                push (@$contentManagers, $self->session->user->userId);
-                $clause = "userId in (".$self->session->db->quoteAndJoin($contentManagers).")";
-        } else {
-                $clause = "userId=".$self->session->db->quote($self->get("ownerUserId"));
-        }
-        my $users = $self->session->db->buildHashRef("select userId,username from users where $clause order by username");
-        $tabform->getTab("security")->selectBox(
+        $tabform->getTab("security")->user(
                -name=>"ownerUserId",
-               -options=>$users,
                -label=>$i18n->get(108),
-		-hoverHelp=>$i18n->get('108 description',"Asset"),
-               -value=>[$self->get("ownerUserId")],
-               -subtext=>$subtext,
+               -hoverHelp=>$i18n->get('108 description',"Asset"),
+               -value=>$self->get("ownerUserId"),
                -uiLevel=>6,
-		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_ownerUserId"})
+               -subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_ownerUserId"})
                );
         $tabform->getTab("security")->group(
                -name=>"groupIdView",

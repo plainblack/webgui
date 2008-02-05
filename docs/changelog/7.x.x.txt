@@ -5,6 +5,8 @@
    error message to the user.
  - Added tests for AdSpace Operation and fixed WebGUI::Test->getPage to allow
    testing Operations.
+ - fix: Make the Owner in editBranch to be the same as addEdit, allowing
+   any user to be selected (perlDreamer Consulting, LLC.)
 
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
