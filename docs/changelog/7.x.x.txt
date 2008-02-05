@@ -32,6 +32,8 @@
     references (since JSON won't store them and they're of no use to us anyway).
  - fix: No current asset when ending up on Not Found page
  - fix: Couldn't add single photos to gallery.
+ - fix: Make the Owner in editBranch to be the same as addEdit, allowing
+   any user to be selected (perlDreamer Consulting, LLC.)
 
 7.5.0
  - rfe: Search Asset returns URLs

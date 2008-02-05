@@ -64,8 +64,8 @@ $newEnvHash{REMOTE_ADDR} = '10.0.5.5';
 
 #Grab a more recent version of our user session object
 $varTime = time();
-$varExpires = $varTime + $session->setting->get('sessionTimeout');
 my $var2 = WebGUI::Session::Var->new($session, $session->getId);
+$varExpires = $varTime + $session->setting->get('sessionTimeout');
 
 cmp_deeply(
 	$var2,
