@@ -18,7 +18,7 @@ use WebGUI::Config;
 
 # FIX JSON PROBLEM
 use JSON;
-*JSON::autoconv = sub { return shift; };
+sub JSON::autoconv { return shift; };
 
 $|=1; # disable output buffering
 my $help;
