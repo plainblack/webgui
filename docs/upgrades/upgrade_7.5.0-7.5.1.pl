@@ -69,7 +69,7 @@ sub addPackage {
     $storage->addFileFromFilesystem( $file );
 
     # Import the package into the import node
-    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage, { skipAutoCommit => 0 } );
 
     # Make the package not a package anymore
     $package->update({ isPackage => 0 });

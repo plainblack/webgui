@@ -116,9 +116,13 @@ sub getPackageList {
 
 =head2 importAssetData ( hashRef )
 
-Imports the data exported by the exportAssetData method. If the asset already exists, a new revision will be created with these properties. If it doesn't exist then a child will be added to the current asset. Returns a reference to the created asset.
+Imports the data exported by the exportAssetData method. If the asset 
+already exists, a new revision will be created with these properties. If it 
+doesn't exist then a child will be added to the current asset. 
 
-=head3 hashRef
+Returns a reference to the created asset.
+
+=head3 assetData
 
 A hash reference containing the exported data.
 
@@ -187,7 +191,7 @@ sub importAssetCollateralData {
 
 #-------------------------------------------------------------------
 
-=head2 importPackage ( storageLocation )
+=head2 importPackage ( storageLocation [, options] )
 
 Imports the data from a webgui package file.
 
@@ -195,11 +199,19 @@ Imports the data from a webgui package file.
 
 A reference to a WebGUI::Storage object that contains a webgui package file.
 
+=head3 options
+
+An optional hashref of options with the following possible keys:
+
+ skipAutoCommit             : If true, will skip any automatic commit in
+                              the site's settings.
+
 =cut
 
 sub importPackage {
     my $self            = shift;
     my $storage         = shift;
+    my $options         = shift;
     my $decompressed    = $storage->untar($storage->getFiles->[0]);
     my %assets          = ();               # All the assets we've imported
     my $package         = undef;            # The asset package
@@ -232,7 +244,7 @@ sub importPackage {
     }
 
     # Handle autocommit workflows
-    if ($self->session->setting->get("autoRequestCommit")) {
+    if (!$options->{skipAutoCommit} && $self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {
             WebGUI::VersionTag->getWorking($self->session)->requestCommit;
         } 
