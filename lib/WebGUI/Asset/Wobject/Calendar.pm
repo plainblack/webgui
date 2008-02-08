@@ -1357,8 +1357,9 @@ sub viewWeek {
            my $start_dow = ($dt_event_start->day_of_week - $first_dow) % 7;
            my $end_dow = ($dt_event_end->day_of_week - $first_dow) % 7;
 
-           my $sequence_number = $session->db->dbh->selectcol_arrayref("SELECT sequenceNumber FROM Event WHERE assetId 
-= ? ORDER BY revisionDate desc LIMIT 1",{},$event_asset_id)->[0];
+           my $sequence_number = $session->db->dbh->selectcol_arrayref(
+               "SELECT sequenceNumber FROM Event WHERE assetId = ? ORDER BY revisionDate desc LIMIT 1",
+               {},$event_asset_id)->[0];
 
            foreach my $weekDay ($start_dow .. $end_dow) {
      

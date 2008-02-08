@@ -38,6 +38,7 @@
  - autocommit for packages is handled by web method, not API method
  - fix: importing packages generates orphaned duplicates of all attached storage locations
  - show fields in tabs on DataForm default email template
+ - fix: error rolling back version tags if a parent has a later revision date than its child
 
 7.5.0
  - rfe: Search Asset returns URLs
