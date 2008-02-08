@@ -37,6 +37,7 @@
  - Added a simple SMTPD for use in testing (t/smtpd.pl)
  - autocommit for packages is handled by web method, not API method
  - fix: importing packages generates orphaned duplicates of all attached storage locations
+ - show fields in tabs on DataForm default email template
 
 7.5.0
  - rfe: Search Asset returns URLs
