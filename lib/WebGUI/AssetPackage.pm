@@ -116,13 +116,9 @@ sub getPackageList {
 
 =head2 importAssetData ( hashRef )
 
-Imports the data exported by the exportAssetData method. If the asset 
-already exists, a new revision will be created with these properties. If it 
-doesn't exist then a child will be added to the current asset. 
+Imports the data exported by the exportAssetData method. If the asset already exists, a new revision will be created with these properties. If it doesn't exist then a child will be added to the current asset. Returns a reference to the created asset.
 
-Returns a reference to the created asset.
-
-=head3 assetData
+=head3 hashRef
 
 A hash reference containing the exported data.
 
@@ -191,7 +187,7 @@ sub importAssetCollateralData {
 
 #-------------------------------------------------------------------
 
-=head2 importPackage ( storageLocation [, options] )
+=head2 importPackage ( storageLocation )
 
 Imports the data from a webgui package file.
 
@@ -199,19 +195,11 @@ Imports the data from a webgui package file.
 
 A reference to a WebGUI::Storage object that contains a webgui package file.
 
-=head3 options
-
-An optional hashref of options with the following possible keys:
-
- skipAutoCommit             : If true, will skip any automatic commit in
-                              the site's settings.
-
 =cut
 
 sub importPackage {
     my $self            = shift;
     my $storage         = shift;
-    my $options         = shift;
     my $decompressed    = $storage->untar($storage->getFiles->[0]);
     my %assets          = ();               # All the assets we've imported
     my $package         = undef;            # The asset package
@@ -243,16 +231,6 @@ sub importPackage {
         }
     }
 
-    # Handle autocommit workflows
-    if (!$options->{skipAutoCommit} && $self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } 
-        else {
-            $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-            return undef;
-        }
-    }
 
     return $package;
 }
@@ -329,7 +307,18 @@ sub www_importPackage {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return $self->session->style->userStyle($i18n->get("package corrupt"));
 	}
-	return $self->www_manageAssets();	
+    # Handle autocommit workflows
+    if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } 
+        else {
+            $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+            return undef;
+        }
+    }
+
+    return $self->www_manageAssets();
 }
 
 1;

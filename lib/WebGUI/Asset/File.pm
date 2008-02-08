@@ -56,15 +56,13 @@ Override the default method in order to deal with attachments.
 
 sub addRevision {
     my $self        = shift;
-    my $properties  = shift;
-    
-    if ($self->get("storageId") ne "") {
+    my $newSelf = $self->SUPER::addRevision(@_);
+
+    if ($self->getRevisionCount > 1 && $self->get("storageId")) {
         my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
-        $properties->{storageId} = $newStorage->getId;
+        $newSelf->update({storageId => $newStorage->getId});
     }
-    
-    my $newSelf = $self->SUPER::addRevision($properties, @_);
-    
+
     return $newSelf;
 }
 

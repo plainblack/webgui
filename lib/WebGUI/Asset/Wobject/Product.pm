@@ -46,13 +46,15 @@ Override the default method in order to deal with attachments.
 sub addRevision {
 	my $self = shift;
 	my $newSelf = $self->SUPER::addRevision(@_);
-	foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
-		if ($self->get($field)) {
-			my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
-			$newSelf->update({$field=>$newStorage->getId});
-		}
-	}
-	return $newSelf;
+    if ($newSelf->getRevisionCount > 1) {
+        foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
+            if ($self->get($field)) {
+                my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
+                $newSelf->update({$field=>$newStorage->getId});
+            }
+        }
+    }
+    return $newSelf;
 }
 
 #-------------------------------------------------------------------
