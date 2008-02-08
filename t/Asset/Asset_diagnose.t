@@ -45,16 +45,30 @@ SKIP: {
 }
 
 foreach my $asset ( @assets ) {
-	eval "use $asset";
-	my $def = $asset->definition($session);
-	my $tableName = $def->[0]->{tableName};
-	my $classIds = $session->db->buildArrayRef("select distinct(assetId) from asset where className LIKE ? order by assetId", [$asset.'%']);
-	my $tableIds = $session->db->buildArrayRef(sprintf("select distinct(assetId) from %s order by assetId", $tableName));
-	my $skipDetails = is_deeply($classIds, $tableIds,
-			sprintf("Comparing assetIds for %s",$asset)
-			);
-	SKIP: {
-		skip("No details needed for $asset", 1) if $skipDetails;
-		cmp_bag($classIds, $tableIds, "Checking asset vs table for $asset");
-	}
+    eval "use $asset";
+    my $def = $asset->definition($session);
+    my $tableName = $def->[0]->{tableName};
+    my $classIds 
+        = $session->db->buildArrayRef(
+            q{
+                select distinct(assetId)
+                from asset 
+                where className = ? OR className LIKE ? 
+                order by assetId
+            }, 
+            [$asset, $asset.'::%']
+        );
+
+    my $tableIds 
+        = $session->db->buildArrayRef(
+            sprintf("select distinct(assetId) from %s order by assetId", $tableName)
+        );
+    
+    my $skipDetails = is_deeply($classIds, $tableIds,
+                    sprintf("Comparing assetIds for %s",$asset)
+                    );
+    SKIP: {
+            skip("No details needed for $asset", 1) if $skipDetails;
+            cmp_bag($classIds, $tableIds, "Checking asset vs table for $asset");
+    }
 }
