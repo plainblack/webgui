@@ -281,6 +281,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'helpvar commentLoop url_deleteComment' => {
+        message     => 'The URL to delete this comment.',
+        lastUpdated => 0,
+    },
+
     'helpvar commentLoop_pageBar' => {
         message     => 'The bar to navigate through pages of comments',
         lastUpdated => 0,
