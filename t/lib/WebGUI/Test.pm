@@ -117,7 +117,10 @@ BEGIN {
         exit(1);
     }
 
+    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    #$SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE, $pseudoRequest );
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
+    $SESSION->{_request} = $pseudoRequest;
 
     my $logger = $SESSION->errorHandler->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );

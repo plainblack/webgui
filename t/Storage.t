@@ -368,17 +368,14 @@ $session->config->set('caseInsensitiveOS', 0);
 #
 ####################################################
 
-my $pseudoRequest = WebGUI::PseudoRequest->new();
-$session->{_request} = $pseudoRequest;
-
 $session->http->setStatus(413);
 is($fileStore->addFileFromFormPost(), '', 'addFileFromFormPost returns empty string when HTTP status is 413');
 
 $session->http->setStatus(200);
-$pseudoRequest->upload('files', []);
+$session->request->upload('files', []);
 is($fileStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns empty string when asking for a form variable with no files attached');
 
-$pseudoRequest->uploadFiles(
+$session->request->uploadFiles(
     'oneFile',
     [ File::Spec->catfile( WebGUI::Test->getTestCollateralPath, qw/WebGUI.pm/) ],
 );
