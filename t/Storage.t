@@ -377,7 +377,7 @@ is($fileStore->addFileFromFormPost('files'), undef, 'addFileFromFormPost returns
 
 $session->request->uploadFiles(
     'oneFile',
-    [ File::Spec->catfile( WebGUI::Test->getTestCollateralPath, qw/WebGUI.pm/) ],
+    [ WebGUI::Test->getTestCollateralPath('WebGUI.pm') ],
 );
 is($fileStore->addFileFromFormPost('oneFile'), 'WebGUI.pm', 'Return the name of the uploaded file');
 
