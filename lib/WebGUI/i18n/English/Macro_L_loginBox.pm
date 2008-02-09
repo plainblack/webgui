@@ -92,6 +92,12 @@ our $I18N = {
 		message => q|Click here to log out.|,
 		lastUpdated => 1031514049,
 	},
+        
+        'helpvar form.returnUrl' => {
+            message     => 'When this hidden form element is present, the user will be
+                            returned to the current page after they login',
+            lastUpdated => 0,
+        },
 };
 
 1;

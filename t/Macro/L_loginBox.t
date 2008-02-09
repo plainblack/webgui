@@ -29,13 +29,16 @@ $session->user({userId=>1});
 ##known user agent.  Since it usually contains a reference to %ENV,
 ##you can't just modify that hash since it's protected
 my $origEnv = $session->{_env};
-my %newEnvHash = ('HTTP_USER_AGENT', 'mozilla');
+my %newEnvHash = (
+    'HTTP_USER_AGENT'   => 'mozilla',
+    'QUERY_STRING'      => 'func=search',
+);
 $session->{_env}->{_env} = \%newEnvHash;
 
 my $i18n = WebGUI::International->new($session,'Macro_L_loginBox');
 
 my $numTests = 1; #Module loading test
-$numTests += 29; #Static tests
+$numTests += 30; #Static tests
 
 plan tests => $numTests;
 
@@ -109,6 +112,14 @@ is(
 );
 
 is($vars{'form.footer'}, WebGUI::Form::formFooter($session), 'form.footer');
+
+is( $vars{'form.returnUrl'}, 
+    WebGUI::Form::hidden( $session, {
+        name    => 'returnUrl',
+        value   => $session->url->page($session->env->get("QUERY_STRING")), 
+    }),
+    'form.returnUrl' 
+);
 
 ##Now, test variations on user input, browser type and config settings
 
@@ -223,7 +234,7 @@ sub setupTest {
 		qw/user.isVisitor customText hello.label logout.url account.display.url
 		logout.label form.header username.label username.form
 		password.label password.form form.login account.create.url
-		account.create.label form.footer/;
+		account.create.label form.footer form.returnUrl/;
 	#$properties->{template} .= "\n";
 	my $template = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;

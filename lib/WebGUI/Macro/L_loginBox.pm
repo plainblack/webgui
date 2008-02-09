@@ -75,6 +75,14 @@ sub process {
 	$var{'logout.url'} = $session->url->page("op=auth;method=logout");
 	$var{'account.display.url'} = $session->url->page('op=auth;method=displayAccount');
         $var{'logout.label'} = $i18n->get(49);
+        
+        # A hidden field with the current URL
+        $var{'form.returnUrl'} 
+            = WebGUI::Form::hidden( $session, {
+                name        => 'returnUrl',
+                value       => $session->url->page($session->env->get("QUERY_STRING")),
+            });
+        
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
         if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {

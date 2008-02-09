@@ -3,7 +3,7 @@ package WebGUI::Auth;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2007 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -283,7 +283,11 @@ sub createAccountSave {
 	
 	
 	# If we have a redirectAfterLogin, redirect the user
-	if ($self->session->scratch->get("redirectAfterLogin")) {
+        if ($self->session->form->get('returnUrl')) {
+		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+	  	$self->session->scratch->delete("redirectAfterLogin");
+        }
+	elsif ($self->session->scratch->get("redirectAfterLogin")) {
 		my $url = $self->session->scratch->delete("redirectAfterLogin");
 		$self->session->http->setRedirect($url);
         return undef;
@@ -459,9 +463,15 @@ sub displayLogin {
     my $vars = $_[1];
     # Automatically set redirectAfterLogin unless we've linked here directly
     # or it's already been set to perform another operation
-    unless ($self->session->form->process("op") eq "auth" 
-        || ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) ) {
-        $self->session->scratch->set("redirectAfterLogin",$self->session->url->page($self->session->env->get("QUERY_STRING")));
+    unless (
+        $self->session->form->process("op") eq "auth" 
+            || ($self->session->scratch->get("redirectAfterLogin") =~ /op=\w+/) 
+        ) {
+        my $returnUrl
+            = $self->session->form->get('returnUrl')
+            || $self->session->url->page( $self->session->env->get('QUERY_STRING') )
+            ;
+        $self->session->scratch->set("redirectAfterLogin", $returnUrl);
     }
     my $i18n = WebGUI::International->new($self->session);
     $vars->{title} = $i18n->get(66);
@@ -669,7 +679,13 @@ sub login {
 		$currentUrl =~ s/^https:/http:/;
 		$self->session->http->setRedirect($currentUrl);
 	}
-	if ($self->session->scratch->get("redirectAfterLogin")) {
+
+        # Set the proper redirect
+        if ($self->session->form->get('returnUrl')) {
+		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+	  	$self->session->scratch->delete("redirectAfterLogin");
+        }
+	elsif ($self->session->scratch->get("redirectAfterLogin")) {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");
 	}

@@ -34,6 +34,7 @@ our $HELP = {
             },
             { 'name' => 'account.create.url' },
             { 'name' => 'account.create.label' },
+            { 'name' => 'helpvar form.returnUrl' },
             {   'required' => 1,
                 'name'     => 'form.footer'
             }

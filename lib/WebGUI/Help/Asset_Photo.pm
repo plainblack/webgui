@@ -243,6 +243,10 @@ our $HELP = {
                         name        => 'username',
                         description => 'helpvar commentLoop username',
                     },
+                    {
+                        name        => 'url_deleteComment',
+                        description => 'helpvar commentLoop url_deleteComment',
+                    },
                 ],
             },
             {
