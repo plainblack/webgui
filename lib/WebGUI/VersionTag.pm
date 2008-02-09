@@ -413,6 +413,7 @@ sub requestCommit {
             return $errorMessage;
         }
     }
+    return '';
 }
 
 

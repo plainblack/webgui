@@ -3921,6 +3921,16 @@ LongTruncOk=1</p>
         lastUpdated => 1193196211,
     },
 
+    'broken spectre title' => {
+        message     => q{Cannot connect to Spectre},
+        lastUpdated => 1202274234,
+    },
+
+    'broken spectre body' => {
+        message     => q{Your commit is canceled because WebGUI cannot connect to Spectre.  Please fix your Spectre problem and attempt to commit again.},
+        lastUpdated => 1202274246,
+    },
+
 };
 
 1;

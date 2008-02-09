@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
+use WebGUI::Operation::Spectre;
 
 =head1 NAME
 
@@ -206,7 +207,18 @@ sub www_commitVersionTag {
 	if ($tagId) {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
+            my $remote = WebGUI::Operation::Spectre::getASpectre($session);
 			my $i18n = WebGUI::International->new($session, "VersionTag");
+            if (!defined $remote) {
+               $session->errorHandler->warn('Unable to connect to spectre.  Canceling the commit');
+               my $output = sprintf qq{<h1>%s</h1>\n<p>%s</p><p><a href="%s">%s</a>},
+                   $i18n->get('broken spectre title', 'WebGUI'),
+                   $i18n->get('broken spectre body',  'WebGUI'),
+                   $session->url->getBackToSiteURL(),
+                   $i18n->get('493', 'WebGUI');
+               return $session->style->userStyle($output);
+            }
+            $remote->disconnect;
 			my $f = WebGUI::HTMLForm->new($session);
 			$f->submit;
 			$f->readOnly(
@@ -228,7 +240,7 @@ sub www_commitVersionTag {
 				hoverHelp=>$i18n->get("comments description commit")
 				);
 			$f->submit;
-        		my $ac = WebGUI::AdminConsole->new($session,"versions");
+            my $ac = WebGUI::AdminConsole->new($session,"versions");
 			return $ac->render($f->print);
 		}
 	}

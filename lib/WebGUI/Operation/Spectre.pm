@@ -42,6 +42,31 @@ sub canView {
     return $user->isInGroup( $session->setting->get("groupIdAdminSpectre") );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getASpectre ( [$session] )
+
+Get a connection to spectre.  Encapsulated here so outside code can call
+something that's carefully encapsulated.
+
+=head3 $session
+
+A WebGUI session variable so getASpectre can access information in
+the config file.
+
+=cut
+
+sub getASpectre {
+	my $session = shift;
+    my $remote = create_ikc_client(
+		port=>$session->config->get("spectrePort"),
+		ip=>$session->config->get("spectreIp"),
+		name=>rand(100000),
+	        timeout=>10
+    );
+    return $remote;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_spectreGetSiteData ( )

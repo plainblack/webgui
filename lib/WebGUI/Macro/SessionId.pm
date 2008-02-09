@@ -18,7 +18,11 @@ Package WebGUI::Macro::SessionId
 
 =head1 DESCRIPTION
 
-Returns the current user's session Id.
+A macro to return the ID of the user's current session.
+
+=head2 process( )
+
+Really just a wrapper around $session->getId;
 
 =cut
 
