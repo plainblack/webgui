@@ -11,7 +11,16 @@ package WebGUI::Macro::SessionId;
 #-------------------------------------------------------------------
 
 use strict;
-use strict;
+
+=head1 NAME
+
+Package WebGUI::Macro::SessionId
+
+=head1 DESCRIPTION
+
+Returns the current user's session Id.
+
+=cut
 
 sub process {
 	my $session = shift;
