@@ -78,11 +78,11 @@ isa_ok($i18n->getLanguage('English'), 'HASH', 'getLanguage, without a specific p
 sub installPigLatin {
 	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin');
 	copy( 
-		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'WebGUI.pm'),
+		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/)
 	);
 	copy(
-		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'PigLatin.pm'),
+		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/)
 	);
 }

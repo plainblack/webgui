@@ -275,7 +275,7 @@ $session->user({userId => 1});
 
 sub installBadLocale {
 	copy(
-		File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'BadLocale.pm'),
+		WebGUI::Test->getTestCollateralPath('BadLocale.pm'),
 		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/)
 	);
 }

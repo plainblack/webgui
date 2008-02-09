@@ -66,7 +66,7 @@ foreach my $newSetting (keys %{$newArticleSettings}) {
 
 # Test the duplicate method... not for assets, just the extended duplicate functionality of the article wobject
 my $filename = "page_title.jpg";
-my $pathedFile = File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $filename);
+my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage::Image->create($session);

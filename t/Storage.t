@@ -230,7 +230,7 @@ ok (!(-e $storage1->getPath("testfile-hash.file")), "rename file original file i
 ####################################################
 
 $storage1->addFileFromFilesystem(
-    File::Spec->catfile(WebGUI::Test->getTestCollateralPath, 'WebGUI.pm'),
+    WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
 );
 
 ok(
