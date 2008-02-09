@@ -237,7 +237,7 @@ my @testImages = (
 
 foreach my $testImage (@testImages) {
     $sizeTest->addFileFromFilesystem(
-        File::Spec->catfile(WebGUI::Test->getTestCollateralPath, $testImage->{filename}),
+        WebGUI::Test->getTestCollateralPath($testImage->{filename})
     );
 }
 
@@ -251,7 +251,6 @@ cmp_bag(
 foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
     is($sizeTest->adjustMaxImageSize($filename), 0, "$filename does not need to be resized");
-    diag sprintf("%s -> oldw size = %d x %d", $filename, $sizeTest->getSizeInPixels($filename));
     cmp_bag(
         [ $sizeTest->getSizeInPixels($filename)     ],
         [ @{ $testImage }{qw/origHeight origWidth/} ],
@@ -264,13 +263,8 @@ use Data::Dumper;
 $session->setting->set('maxImageSize', $resizeTarget );
 foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
-    #diag $filename;
-    #diag "orig size: ". Dumper([ $sizeTest->getSizeInPixels($filename) ]);
     is($sizeTest->adjustMaxImageSize($filename), 1, "$filename needs to be resized");
     my @newSize = $sizeTest->getSizeInPixels($filename);
-    #diag sprintf("%s -> new size = %d x %d", $filename, @newSize);
-    #diag $WebGUI::Test::logger_warns;
-    #diag $WebGUI::Test::logger_error;
     cmp_bag(
         [ $sizeTest->getSizeInPixels($filename)   ],
         [ @{ $testImage }{qw/newHeight newWidth/} ],
