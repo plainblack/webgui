@@ -23,6 +23,8 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
+$session->{_request} = undef;
+
 $session->setting->set("specialState", "upgrading");
 isnt(WebGUI::Content::Maintenance::handler($session), undef, "Maintenance should return some output when in upgrade special state");
 $session->setting->set("specialState", "degrading");
