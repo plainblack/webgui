@@ -12,6 +12,34 @@ package WebGUI::Macro::MacroSkeleton; # edit this line to match your own macro n
 
 use strict;
 
+=head1 NAME
+
+Package WebGUI::Macro::MacroSkeleton
+
+=head1 DESCRIPTION
+
+Handy example code for starting a new Macro when you have to start from scratch.
+
+=head2 process( $session, [@other_options] )
+
+The main macro class, Macro.pm, will call this subroutine and pass it
+
+=over 4
+
+=item *
+
+A session variable
+
+=item *
+
+Any other options that were sent to the macro by the user.  It is up to you to set defaults and
+to validate user input.
+
+=back
+
+=cut
+
+
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
