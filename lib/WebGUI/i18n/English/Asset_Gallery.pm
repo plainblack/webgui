@@ -611,11 +611,46 @@ our $I18N = {
     },
 
     'template by' => {
-        message     => "By",
+        message     => 'By',
         lastUpdated => 0,
-        context     => "Lead-in for the user the album or photo was uploaded by",
+        context     => q{Lead-in for the author of an Album or Photo},
     },
 
+    'template galleryalbum url' => {
+        message     => 'View Album',
+        lastUpdated => 0,
+        context     => 'Label for link from List Albums view to GalleryAlbum view',
+    },
+
+    'template url_search'   => {
+        message     => 'Advanced Search',
+        lastUpdated => 0,
+        context     => 'Label for link to the Gallery search page.',
+    },
+
+    'template url_listFilesForCurrentUser' => {
+        message     => 'My Gallery',
+        lastUpdated => 0,
+        context     => q{Label for link to view the current user's files and albums.},
+    },
+
+    'template listFilesForUser title' => {
+        message     => q{%s's Gallery},
+        lastUpdated => 0,
+        context     => q{Label for List Files For User view. '%s' will be replaced with the username},
+    },
+
+    'template listFilesForUser albums title' => {
+        message     => q{Albums},
+        lastUpdated => 0,
+        context     => q{Title for list of user's Albums},
+    },
+
+    'template listFilesForUser albums files' => {
+        message     => q{files},
+        lastUpdated => 0,
+        context     => q{Label for number of files in the Album},
+    },
 
 };
 

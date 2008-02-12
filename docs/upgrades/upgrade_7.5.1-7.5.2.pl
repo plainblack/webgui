@@ -23,6 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addViewsColumnToPhoto( $session );
 
 finish($session); # this line required
 
@@ -34,6 +35,16 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+#----------------------------------------------------------------------------
+# Add the views column to the Photo asset
+sub addViewsColumnToPhoto {
+    my $session     = shift;
+    print "\tAdding 'views' column to Photo asset... " unless $quiet;
+    $session->db->write(
+        "ALTER TABLE Photo ADD COLUMN views BIGINT"
+    );
+    print "DONE!\n" unless $quiet;
+}
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

@@ -306,6 +306,53 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'template url_addPhoto' => {
+        message     => 'Add a Photo',
+        lastUpdated => 0,
+        context     => 'Label for URL to add a new Photo asset.',
+    },
+
+    'template url_delete' => {
+        message     => 'Delete Album',
+        lastUpdated => 0,
+        context     => 'Label for URL to delete this Album',
+    },
+
+    'template url_edit' => {
+        message     => 'Edit Album',
+        lastUpdated => 0,
+        context     => 'Label for URL to edit this Album',
+    },
+
+    'template url_thumbnails' => {
+        message     => 'Thumbnails',
+        lastUpdated => 0,
+        context     => 'Label for URL to the Thumbnails view of the Album',
+    },
+
+    'template url_slideshow' => {
+        message     => 'Slideshow',
+        lastUpdated => 0,
+        context     => 'Label for URL to the Slideshow view of the album',
+    },
+
+    'template url' => {
+        message     => 'Album',
+        lastUpdated => 0,
+        context     => 'Label for URL to the default view of the album',
+    },
+
+    'template file creationDate' => {
+        message     => 'Uploaded on',
+        lastUpdated => 0,
+        context     => 'Label for the creation date of the file',
+    },
+
+    'template file numberOfComments' => {
+        message     => 'Comments',
+        lastUpdated => 0,
+        context     => 'Label for the number of comments on the file',
+    },
 };
 
 1;

@@ -296,6 +296,108 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'template view title' => {
+        message     => 'Photo Details',
+        lastUpdated => 0,
+        context     => 'The title of the default view of Photo assets',
+    },
+    
+    'template url_edit'  => {
+        message     => 'Edit Photo',
+        lastUpdated => 0,
+        context     => 'The label for the Edit Photo button',
+    },
+
+    'template url_delete' => {
+        message     => 'Delete Photo',
+        lastUpdated => 0,
+        context     => 'The label for the delete photo button',
+    },
+
+    'template url_makeShortcut' => {
+        message     => 'Cross Publish',
+        lastUpdated => 0,
+        context     => 'The label for the button to make a shortcut in another album',
+    },
+
+    'template url_album' => {
+        message     => 'Back to Album',
+        lastUpdated => 0,
+        context     => 'Label for the link to go back to the album',
+    },
+
+    'template fileUrl' => {
+        message     => 'View Full Size Image',
+        lastUpdated => 0,
+        context     => 'Link to the full size image',
+    },
+
+    'template comments title' => {
+        message     => 'Comments',
+        lastUpdated => 0,
+        context     => 'Title for the comments section of the photo page.',
+    },
+
+    'template comment creationDate' => {
+        message     => 'Posted On',
+        lastUpdated => 0,
+        context     => 'Label for creation date of comment',
+    },
+
+    'template comment delete confirm' => {
+        message     => 'Are you sure you want to delete this comment?',
+        lastUpdated => 0,
+        context     => 'Confirmation message for deleting a comment.',
+    },
+
+    'template url_deleteComment' => {
+        message     => 'delete',
+        lastUpdated => 0,
+        context     => 'Label for delete link for comments.',
+    },
+
+    'template creationDate' => {
+        message     => 'Uploaded on',
+        lastUpdated => 0,
+        context     => 'Label for creation date of photo',
+    },
+
+    'template views' => {
+        message     => 'Views',
+        lastUpdated => 0,
+        context     => 'Label for number of views of photo',
+    },
+
+    'template keywords' => {
+        message     => 'Tags',
+        lastUpdated => 0,
+        context     => 'Label for the keywords of the photo',
+    },
+
+    'template location' => {
+        message     => 'Location',
+        lastUpdated => 0,
+        context     => 'Label for the location of the photo',
+    },
+
+    'template friendsOnly label' => {
+        message     => 'Privacy',
+        lastUpdated => 0,
+        context     => 'Label for the friends only setting.',
+    },
+
+    'template friendsOnly yes' => {
+        message     => 'Friends Only',
+        lastUpdated => 0,
+        context     => 'Label for photos that are friends only',
+    },
+
+    'template friendsOnly no' => {
+        message     => 'Public',
+        lastUpdated => 0,
+        context     => 'Label for photos that are not friends only',
+    },
+
 };
 
 1;

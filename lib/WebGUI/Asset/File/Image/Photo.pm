@@ -20,6 +20,7 @@ use base 'WebGUI::Asset::File::Image';
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
 use JSON qw/ to_json from_json /;
+use URI::Escape;
 use Tie::IxHash;
 
 use WebGUI::DateTime;
@@ -71,6 +72,9 @@ sub definition {
     my $i18n        = __PACKAGE__->i18n($session);
 
     tie my %properties, 'Tie::IxHash', (
+        views   => {
+            defaultValue        => 0,
+        },
         exifData => {
             defaultValue        => undef,
         },
@@ -723,8 +727,23 @@ sub view {
     
     $self->appendTemplateVarsForCommentForm( $var ); 
 
+    # Keywords
+    my $k           = WebGUI::Keyword->new( $session );
+    my $keywords    = $k->getKeywordsForAsset( { asArrayRef => 1, asset => $self } ); 
+    for my $keyword ( @{ $keywords } ) {
+        push @{ $var->{keywords} }, {
+            url_searchKeyword   
+                => $self->getGallery->getUrl("func=search;submit=1;keywords=" . uri_escape($keyword) ),
+            keyword             => $keyword,
+        };
+    }
+
+    # Comments
     my $p       = $self->getCommentPaginator;
     for my $comment ( @{ $p->getPageData } ) {
+        $comment->{ url_deleteComment } 
+            = $self->getUrl('func=deleteComment;commentId=' . $comment->{commentId} );
+
         my $user        = WebGUI::User->new( $session, $comment->{userId} );
         $comment->{ username } = $user->username;
         
@@ -793,6 +812,29 @@ sub www_delete {
     return $self->processStyle(
         $self->processTemplate( $var, $self->getGallery->get("templateIdDeleteFile") )
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_deleteComment ( )
+
+Delete a comment immediately. Only those who can edit this Photo can delete
+comments on it.
+
+=cut
+
+sub www_deleteComment {
+    my $self        = shift;
+    my $session     = $self->session;
+
+    return $session->privilege->insufficient unless $self->canEdit;
+    
+    my $i18n        = __PACKAGE__->i18n( $session );
+    my $commentId   = $session->form->get('commentId');
+    
+    $self->deleteComment( $commentId );
+
+    return $self->www_view;
 }
 
 #----------------------------------------------------------------------------
@@ -1106,6 +1148,9 @@ sub www_view {
     my $self    = shift;
 
     return $self->session->privilege->insufficient unless $self->canView;
+
+    # Add to views
+    $self->update({ views => $self->get('views') + 1 });
 
     $self->session->http->setLastModified($self->getContentLastModified);
     $self->session->http->sendHeader;

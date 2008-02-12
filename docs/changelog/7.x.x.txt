@@ -4,6 +4,12 @@
    redirected to after the login / createAccount is done.
  - RFE: Spectre diagnostics on version tag commit (perlDreamer Consulting, LLC.)
      http://www.plainblack.com/rfe/request-for-enhancement/spectre-diagnostics-on-version-tag-commit
+ - add: i18n for more Gallery templates
+ - add: International macro now takes sprintf arguments as third and subsequent 
+   parameters
+ - add: Keywords are now processed and given to the photo template, along with
+   a url to search the gallery for the keyword. 
+ - add: Photos now track views
 
 7.5.1
  - fix: Extra head tags of unplaced assets included twice
