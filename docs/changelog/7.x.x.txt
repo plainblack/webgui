@@ -11,6 +11,7 @@
    a url to search the gallery for the keyword. 
  - add: Photos now track views
  - fix: Multiple Gallery template fixes.
+ - fix: don't show Admin mode toggle when not in adminModeSubnets
 
 7.5.1
  - fix: Extra head tags of unplaced assets included twice
