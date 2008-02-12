@@ -218,8 +218,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'currentPage.synopsis' => {
-		message => q|The synopsis of the current page.|,
-		lastUpdated => 1163720621,
+		message => q|The summary, or synopsis, of the current page.|,
+		lastUpdated => 1202861338,
 	},
 
 	'currentPage.newWindow' => {
@@ -293,8 +293,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page.synopsis' => {
-		message => q|The synopsis of this page.|,
-		lastUpdated => 1149394665,
+		message => q|The summary, or synopsis, of this page.|,
+		lastUpdated => 1202861328,
 	},
 
 	'page.newWindow' => {
@@ -501,8 +501,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page.parent.synopsis' => {
-		message => q|The synopsis of the mother of this page.|,
-		lastUpdated => 1149394665,
+		message => q|The summary, or synopsis,  of the mother of this page.|,
+		lastUpdated => 1202861334,
 	},
 
 	'page.parent.newWindow' => {
