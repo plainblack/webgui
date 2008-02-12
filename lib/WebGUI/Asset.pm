@@ -2277,7 +2277,8 @@ sub view {
 
 =head2 www_add ( )
 
-Adds a new Asset based upon the class of the current form. Returns the Asset calling method www_edit();
+Adds a new Asset based upon the class of the current form. Returns the Asset calling method www_edit();  The
+new Asset will inherit security and style properties from the current asset, the parent.
 
 =cut
 
