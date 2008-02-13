@@ -4,6 +4,7 @@
  - fix: importing packages generates orphaned duplicates of all attached storage locations
  - fix: error rolling back version tags if a parent has a later revision date than its child
  - show fields in tabs on DataForm default email template
+ - fix: don't show Admin mode toggle when not in adminModeSubnets
 
 7.4.22
  - fix: Extra head tags of unplaced assets included twice

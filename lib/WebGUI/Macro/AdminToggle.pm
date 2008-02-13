@@ -45,27 +45,23 @@ A template from the Macro/AdminToggle namespace to use for formatting the link.
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-         if ($session->user->isInGroup(12)) {
-        	my %var;
-                 my ($turnOn,$turnOff,$templateName) = @_;
-	my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
-              $turnOn ||= $i18n->get(516);
-              $turnOff ||= $i18n->get(517);
-                 if ($session->var->isAdminOn) {
-                      $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
-                      $var{'toggle.text'} = $turnOff;
-                 } else {
-                      $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
-                      $var{'toggle.text'} = $turnOn;
-                 }
-		if ($templateName) {
-         		return  WebGUI::Asset::Template->newByUrl($session,$templateName)->process(\%var);
-		} else {
-         		return  WebGUI::Asset::Template->new($session,"PBtmpl0000000000000036")->process(\%var);
-		}
-	}
-       return "";
+    my $session = shift;
+    return ""
+        unless $session->user->canUseAdminMode;
+    my ($turnOn, $turnOff, $templateName) = @_;
+    my $i18n = WebGUI::International->new($session,'Macro_AdminToggle');
+    my %var;
+    if ($session->var->isAdminOn) {
+        $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
+        $var{'toggle.text'} = $turnOff || $i18n->get(517);
+    }
+    else {
+        $var{'toggle.url'} = $session->url->page('op=switchOnAdmin');
+        $var{'toggle.text'} = $turnOn || $i18n->get(516);
+    }
+    my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
+                                    : WebGUI::Asset::Template->new($session, "PBtmpl0000000000000036");
+    return $template->process(\%var);
 }
 
 1;
