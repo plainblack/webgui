@@ -17,6 +17,7 @@ package WebGUI::Asset;
 use strict;
 use JSON;
 use WebGUI::Storage;
+use Scalar::Util qw(blessed);
 
 =head1 NAME
 
@@ -194,16 +195,17 @@ A reference to a WebGUI::Storage object that contains a webgui package file.
 =cut
 
 sub importPackage {
-	my $self = shift;
-	my $storage = shift;
-	my $decompressed = $storage->untar($storage->getFiles->[0]);
-	my %assets = ();
-	my $error = $self->session->errorHandler;
-	$error->info("Importing package.");
-	foreach my $file (sort(@{$decompressed->getFiles})) {
-		next unless ($decompressed->getFileExtension($file) eq "json");
-		$error->info("Found data file $file");
-		my $data = eval{
+    my $self            = shift;
+    my $storage         = shift;
+    my $decompressed    = $storage->untar($storage->getFiles->[0]);
+    my %assets          = ();               # All the assets we've imported
+    my $package         = undef;            # The asset package
+    my $error           = $self->session->errorHandler;
+    $error->info("Importing package.");
+    foreach my $file (sort(@{$decompressed->getFiles})) {
+        next unless ($decompressed->getFileExtension($file) eq "json");
+        $error->info("Found data file $file");
+        my $data = eval{
             JSON->new->relaxed(1)->decode($decompressed->getFileContentsAsScalar($file))
         };
 		if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
@@ -218,16 +220,16 @@ sub importPackage {
 		my $asset = $assets{$data->{properties}{parentId}} || $self;
 		my $newAsset = $asset->importAssetData($data);
         $newAsset->importAssetCollateralData($data);
-		$assets{$newAsset->getId} = $newAsset;
-	}
-	if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+        $assets{$newAsset->getId} = $newAsset;
+        
+        # First imported asset must be the "package"
+        unless ($package) {
+            $package            = $newAsset;
         }
-	}
-    return undef;
+    }
+
+
+    return $package;
 }
 
 #-------------------------------------------------------------------
@@ -298,11 +300,22 @@ sub www_importPackage {
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
 		$error = $self->importPackage($storage);
 	}
-	if ($error) {
+	if (!blessed $error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
 		return $self->session->style->userStyle($i18n->get("package corrupt"));
 	}
-	return $self->www_manageAssets();	
+    # Handle autocommit workflows
+    if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } 
+        else {
+            $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
+            return undef;
+        }
+    }
+
+    return $self->www_manageAssets();
 }
 
 1;
