@@ -2,6 +2,7 @@
  - fix: CalendarUpdateFeeds workflow causes errors in log
  - autocommit for packages is handled by web method, not API method
  - fix: importing packages generates orphaned duplicates of all attached storage locations
+ - fix: error rolling back version tags if a parent has a later revision date than its child
 
 7.4.22
  - fix: Extra head tags of unplaced assets included twice

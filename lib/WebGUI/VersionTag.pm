@@ -431,7 +431,7 @@ sub rollback {
 		$self->session->errorHandler->warn("You cannot rollback a tag that is required for the system to operate.");	
 		return 0;
 	}
-	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ? order by assetData.revisionDate desc, asset.lineage desc", [ $tagId ]);
+	my $sth = $self->session->db->read("select asset.className, asset.assetId, assetData.revisionDate from assetData left join asset on asset.assetId=assetData.assetId where assetData.tagId = ? order by asset.lineage desc, assetData.revisionDate desc", [ $tagId ]);
 	while (my ($class, $id, $revisionDate) = $sth->array) {
 		my $revision = WebGUI::Asset->new($self->session,$id, $class, $revisionDate);
 		$revision->purgeRevision;
