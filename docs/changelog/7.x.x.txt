@@ -1,3 +1,5 @@
+7.4.23
+
 7.4.22
  - fix: Extra head tags of unplaced assets included twice
  - Updated to work with the new JSON 2.04 module. See gotcha.txt for details.
