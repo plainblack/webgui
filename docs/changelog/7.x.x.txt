@@ -13,6 +13,17 @@
    a url to search the gallery for the keyword. 
  - add: Photos now track views
  - fix: Multiple Gallery template fixes.
+
+7.4.24
+ - fix: https and extra / in urls (perlDreamer Consulting, LLC.)
+    http://www.webgui.org/bugs/tracker/https-and-extra-/-in-urls
+
+7.4.23
+ - fix: CalendarUpdateFeeds workflow causes errors in log
+ - autocommit for packages is handled by web method, not API method
+ - fix: importing packages generates orphaned duplicates of all attached storage locations
+ - fix: error rolling back version tags if a parent has a later revision date than its child
+ - show fields in tabs on DataForm default email template
  - fix: don't show Admin mode toggle when not in adminModeSubnets
  - fix regression: Site starter style displays incorrectly in IE
  - really show fields in tabs on DataForm default email template

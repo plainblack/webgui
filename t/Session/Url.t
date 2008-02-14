@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 58 + scalar(@getRefererUrlTests);
+plan tests => 60 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -289,7 +289,13 @@ is($session->url->extras('/dir1//foo.html'), join('/', $extras,'dir1/foo.html'),
 $extras = 'http://mydomain.com/';
 $session->config->set('extrasURL', $extras);
 
-is($session->url->extras('/foo.html'), join('', $extras,'foo.html'), 'extras method removes extra slashes');
+is($session->url->extras('/foo.html'),       join('', $extras,'foo.html'),      'extras method removes extra slashes');
+is($session->url->extras('/dir1//foo.html'), join('', $extras,'dir1/foo.html'), 'extras method removes extra slashes anywhere');
+
+$extras = 'https://mydomain.com/';
+$session->config->set('extrasURL', $extras);
+
+is($session->url->extras('/foo.html'),       join('', $extras,'foo.html'),      'extras method removes extra slashes');
 is($session->url->extras('/dir1//foo.html'), join('', $extras,'dir1/foo.html'), 'extras method removes extra slashes anywhere');
 
 $session->config->set('extrasURL', $origExtras);
