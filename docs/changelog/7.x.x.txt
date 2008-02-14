@@ -1,3 +1,5 @@
+7.5.3
+
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in
    or creating a new account. This parameter is the URL the user is 
