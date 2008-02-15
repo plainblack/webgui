@@ -1,5 +1,7 @@
 7.5.3
  - prevent HTML and Macro injection in usernames
+ - Fixed a problem that caused all Cron job parameters to return an empty hash
+   ref.
 
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in
