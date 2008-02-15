@@ -30,6 +30,43 @@ readonly session => my %session;
 
 #-------------------------------------------------------------------
 
+=head2 add ( [$params] )
+
+Add tax information to the table.  Returns the taxId of the newly created tax information.  
+
+=head3 $params
+
+A hash ref of the geographic and rate information.  All parameters are required.
+
+=head4 field
+
+field denotes what kind of location the tax information is for.  This should
+be country, state, or code.  The combination of field and value is unique
+in the database.
+
+=head4 value
+
+value is the value of the field to be added.  For example, appropriate values
+for a field of country might be China, United States, Mexico.  If the field
+is state, it could be British Colombia, Oregon or Maine.
+
+=head4 taxRate
+
+This is the tax rate for the location, as specified by field and value.  The tax rate is stored
+as a percentage, like 5.5 .
+
+=cut
+
+sub add {
+    my $self   = shift;
+    my $params = shift;
+    my $id = $self->session->id->generate();
+    $self->session->db->write('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)', [$id, @{ $params }{qw[ field value taxRate ]}]);
+    return $id;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getItems ( )
 
 Returns a WebGUI::SQL::Result object for accessing all of the data in the tax table.  This

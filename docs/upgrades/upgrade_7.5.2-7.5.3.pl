@@ -62,8 +62,8 @@ sub insertCommerceTaxTable {
 CREATE TABLE tax (
     taxId    VARCHAR(22)  binary NOT NULL,
     field    VARCHAR(100) NOT NULL,
-    value    VARCHAR(100) DEFAULT 0.0,
-    taxRate  FLOAT        NOT NULL,
+    value    VARCHAR(100),
+    taxRate  FLOAT        NOT NULL DEFAULT 0.0,
     PRIMARY KEY (taxId),
     UNIQUE  KEY (field, value)
 )
