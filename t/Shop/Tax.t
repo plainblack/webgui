@@ -33,9 +33,10 @@ plan tests => 1 + $tests;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::Tax', 'Tax module loaded');
+my $loaded = use_ok('WebGUI::Shop::Tax');
 
 SKIP: {
+
 skip 'Unable to load module WebGUI::Shop::Tax', $tests unless $loaded;
 
 my $taxer = WebGUI::Shop::Tax->new($session);
