@@ -1,0 +1,2229 @@
+=head1 WebGUI 7.5+ Commerce System Needs and Wants
+
+We need a massive overhaul of the commerce system, not just for the
+sake of it, but because of the current system's inflexibility. The new
+system must support everything the current system supports, plus
+resolve these limitations.
+
+=head2 Must Haves
+
+The following items must be introduced to the commerce system in order
+to fix fundamental flaws:
+
+=over
+
+=item Flexible Prices
+
+Currently because price is attached to the base object every product
+must have a price and there is no way to override it. The problem with
+this is that some configurable products have a variable price, and
+other products (like donations and auctions) you want the user to be
+able to type in a price. Therefore the new system needs to allow for
+variable price. This is a limitation of the current shopping cart and
+the current base product.
+
+=item Item Callbacks
+
+There must be a callback system after checkout. Right now there's no
+way to trigger custom functionality in custom products after purchase.
+So if you want a workflow to kick off after someone has purchased
+something to give them a bunch of privileges, send an email, etc you
+couldn't do it. Or if your product needed to mark something as out of
+stock, that's not possible either.
+
+=item Web Based Payment Gateways
+
+There's currently no way to pass off the checkout process to a
+third-party web site such as PayPal, 2checkout, or Google Checkout. The
+system right now is designed to work with payment gateways that have
+behind the scenes APIs.
+
+=item Vendor Id
+
+If you want two different vendors to sell from the same site (like
+Amazon does) you have a problem because currently WebGUI treats
+everything as one site one store. Therefore we need a vendor id
+attached to each product so we can keep track of who sold what. This
+might even be used by a single vendor to keep track of sales by
+department.
+
+=item Independent Skus
+
+Not all products have SKUs, but the current system requires a sku. For
+example, does a donation have a SKU? It may or may not. Obviously every
+product has to have a unique id to track it behind the scenes, but
+whether or not a store owner cares about this number is largely
+dependent upon the type of thing being purchased or sold.
+
+=item Merge Ops And Assets
+
+Currently we have the product asset, the product macro, and the product
+manager in admin console. This needs to be brought down to a single
+item, and that item needs to be an asset which is easily placable on
+the site by people familiar with WebGUI. This is not to say that the
+base product class should be an asset. Maybe it should, maybe it
+shouldn't, but the three mechanisms we have now must be merged. This
+will go a long way toward ease of use.
+
+And since the current product system will become a product asset, the
+subscription system should become a subscription asset.
+
+=item Cart Macro
+
+We need a macro or other mechanism to display what's in the user's
+cart. This also means we need a good API for querying this information
+quickly and easily.
+
+=item Plugins as Drivers
+
+All plugins for shipping, payment, tax, etc should be built like
+drivers, so that the API remains consistent for all of them, and a
+driver is loaded behind the scenes for the appropriate plugin based
+upon rules or users choice.
+
+=item Pretty Checkout
+
+The checkout process must be streamlined, easy to use, and pretty.
+Right now it's none of those things.
+
+=item Unique Items
+
+We need to be able to handle unique items in the cart. For example,
+with the Event Manager, someone buys a badge to an event, that badge is
+unique to them and can't possibly have a quantity of anything greater
+than one. However, the current cart allows for more than one of it.
+
+=back
+
+=head2 Niceties
+
+The following items would make the commerce system better, but can be
+added at a later date if need be:
+
+=over
+
+=item Aisles
+
+An aisle is an asset container for products. It would display
+all of it's children as well as any product that fit within a
+particular keyword group using the WebGUI keywords system. Aisles
+should also have a nifty import/export mechanism to make uploading
+products to the system easier.
+
+=item Affiliates
+
+Affiliate tracking system. We need a way to track who's sending us
+sales, so that we can automatically commission them. Note that the
+automatic commissioning is a big part of this. Just tracking stuff
+isn't good enough as it creates a lot of manual labor for writing out
+checks at the end of the month. It may be that we just need to hook in
+with some third party affiliate programs rather than build our own.
+
+=item Discounts
+
+Discounts, coupons, sales, and gift certificates. These may all be
+separate items, but the goal is virtually the same, we need mechanisms
+to give discounts based upon the group a user is in, sale period,
+coupons, discount codes, gift certificates, etc.
+
+=item Ad Manager Tie In
+
+Tie the ad management system in with commerce so that people can buy
+ads on a site without human intervention.
+
+=item Saved Carts
+
+Allow for saved shopping carts, so that users can come back to a cart
+later. This will most likely mean that the user has to create an
+account to attach their cart to.
+
+=back
+
+=head2 Pipe Dream
+
+The following items are pie in the sky that we should build at some
+point, but definitely won't make it into WebGUI in the 7.5 or 7.6 time
+frames unless someone funds them:
+
+=over
+
+=item Auction System. 
+
+We're not talking ebay here, but a way to conduct
+simple auctions would still be nice.
+
+=item Product configurator. 
+
+If you're buying something complex, you're
+probably going to have lots of options to switch. Therefore we need a
+product configurator system. Dell's web site for buying computers is a
+great example of a configurator.
+
+=back
+
+=head1 Shopping Cart
+
+The shopping cart has to be flexible enough to hold any type of
+purchasable good (anything derived from WebGUI::Asset::Sku), user
+friendly, and also have speedy reporting options so that macros can be
+written to display the cart data.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>cartE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+cartId
+
+guid
+
+The unique id for this cart.
+
+sessionId
+
+guid
+
+The sessionId attached to this cart. Can't use userId because the user
+may not be logged in yet.
+
+shippingAddressId
+
+guid
+
+The id of the address to ship to.
+
+couponId
+
+guid
+
+A coupon that is applied to this cart.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Cart
+class.
+
+Method
+
+Description
+
+addItem
+
+Adds an item to the cart. Returns the number of items now in the cart.
+
+param: asset E<acirc>E<128>E<147> the asset object to be added already
+configured as needed
+
+param: quantity E<acirc>E<128>E<147> the number of this item that the
+user wants
+
+create
+
+Creates a new cart object if there's not one already attached to the
+current session object. Otherwise just instanciates the existing one.
+Returns a reference to the object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+delete
+
+Deletes this cart and all cartItems contained in it.
+
+empty
+
+Removes all items from this cart.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+getId
+
+Returns the cart id.
+
+getItems
+
+Returns an array reference of WebGUI::Asset::Sku objects that are in
+the cart. Calls WebGUI::Shop::CartItem-E<gt>getAllInCart
+
+new
+
+Instanciates a cart based upon a cartId.
+
+param: sessionId E<acirc>E<128>E<147> a reference to the current
+session
+
+param: cartId E<acirc>E<128>E<147> the unique id for this cart
+
+set
+
+Sets properties in the cart.
+
+param: hashref
+
+www_removeItem
+
+Checks privileges and displays appropriate message. Removes an item by
+itemId. Returns www_viewCart
+
+=head1 Shopping Cart Item
+
+This object represents an individual item in the cart.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>cartItemsE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+cartId
+
+guid
+
+The unique id for this cart.
+
+assetId
+
+guid
+
+The assetId for this item.
+
+options
+
+mediumText
+
+A json serialized hashref of any configuration data associated with
+this item so that it can be edited or whatnot.
+
+shippingAddressId
+
+guid
+
+Assign a special shipping address to this item beyond the one attached
+at the cart level.
+
+quantity
+
+integer
+
+The number of these items being purchased.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::CartItem
+class.
+
+Method
+
+Description
+
+create
+
+Creates a new cart item object. Returns a reference to the object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: cartId E<acirc>E<128>E<147> the unique id of the cart
+
+param: asset E<acirc>E<128>E<147> A reference to the asset you wish to
+create.
+
+param: quantity E<acirc>E<128>E<147> the quantity of sku to purchase
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+getAllInCart
+
+Returns an array reference of WebGUI::Shop::Cart::Item objects.
+
+param: session E<acirc>E<128>E<147> the session object
+
+param: cartId E<acirc>E<128>E<147> the unique id of the cart you'd like
+to retrieve the objects of
+
+getSku
+
+Returns an instanciated WebGUI::Asset::Sku object for this cart item.
+
+new
+
+Instanciates a cart item based upon a cartId and assetId.
+
+param: session E<acirc>E<128>E<147> the session object
+
+param: cartId E<acirc>E<128>E<147> the unique id for this cart
+
+param: assetId E<acirc>E<128>E<147> the unique id of an skue contained
+in the cart
+
+remove
+
+Removes an item from the cart.
+
+param: assetId E<acirc>E<128>E<147> the unique id of the asset to be
+removed
+
+update
+
+Updates an item in the cart.
+
+param: assetId E<acirc>E<128>E<147> the unique id of the sku to be
+updated
+
+param: hashRef E<acirc>E<128>E<147> a hash reference of the things that
+might be updated, including quanity, shippingAddressId, and options.
+
+=head1 Coupon
+
+Coupons (sometimes called promotional codes) are a way to apply
+discounts to a purchase. Only one coupon per purchase though because we
+don't want to have to deal with coupon magnification effects.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>couponE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+couponId
+
+guid
+
+The unique id for this coupon.
+
+code
+
+varchar(35), unique
+
+The coupon code the user has to type in to use this coupon.
+
+title
+
+varchar(100)
+
+A title for this coupon.
+
+options
+
+mediumtext
+
+A json serialized hash reference with the coupon rules.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Coupon
+class.
+
+Method
+
+Description
+
+create
+
+Creates a new WebGUI::Shop::Coupon object. Returns a reference to the
+object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in coupon table, except for couponId.
+
+delete
+
+Deletes this coupon.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference.
+
+getId
+
+Returns the coupon id.
+
+new
+
+Instantiates a coupon based upon couponId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: couponId E<acirc>E<128>E<147> the unique id to instantiate
+
+newByCode
+
+Instantiates a coupon based upon coupon code.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: code E<acirc>E<128>E<147> the coupon code.
+
+set
+
+Update a parameter for the coupon.
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in coupon table, except for couponId.
+
+=head1 Payment Gateway
+
+Payment gateways are the mechanism by which users can pay for the items
+in their shopping cart.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>paymentGatewayE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+paymentGatewayId
+
+guid
+
+the primary key
+
+label
+
+varchar(100)
+
+A title for this payment that will be displayed to the user. For
+example E<acirc>E<128>E<156>Pay PalE<acirc>E<128>E<157> or
+E<acirc>E<128>E<156>Credit CardE<acirc>E<128>E<157> or
+E<acirc>E<128>E<156>CheckE<acirc>E<128>E<157>
+
+className
+
+varchar(255)
+
+The plugin classname that will be used for this payment gateway.
+
+options
+
+mediumtext
+
+A json serialized hash reference with configuration data for this
+payment gateway.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Pay
+class.
+
+Method
+
+Description
+
+_loadDriver
+
+A method used load a payment gateway driver.
+
+create
+
+Creates a new WebGUI::Shop::Pay object. Returns a reference to the
+object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in coupon table, except for couponId.
+
+delete
+
+Deletes this payment gateway.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference.
+
+getId
+
+Returns the payment gateway id.
+
+getOptions
+
+Returns a hash reference of paymentGatewayIds as keys, with
+E<acirc>E<128>E<156>labelE<acirc>E<128>E<157> and
+E<acirc>E<128>E<156>formE<acirc>E<128>E<157> as subkeys. Label provides
+the human readable label for the object, and form provides the HTML
+form, that includes the button for the payment gateway option. This is
+required since some payment gateways take the user off site and have
+very complex forms that need to be created and posted to the remote
+site.
+
+param: cart E<acirc>E<128>E<147> a reference to the cart object to
+generate options for.
+
+new
+
+Instantiates a payment gateway based upon paymentGatewayId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: paymentGatewayId E<acirc>E<128>E<147> the unique id to
+instantiate
+
+set
+
+Update a parameter for the payment gateway.
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in paymentGateway table, except for paymentGatewayId.
+
+www_listPaymentGateways
+
+Returns a list of the payment gateways configured currently.
+
+www_editPaymentGateway
+
+The add/edit form for managing a payment gateway.
+
+www_editPaymentGatwaySave
+
+Saves the result of www_editPaymentGateway and then displays
+www_listPaymentGateways.
+
+=head1 Payment Gateway Driver
+
+Payment gateway drivers are used to collect payment. In Perl terms this
+is the DBD to DBI. All payment gateway drivers (itransact, paypal,
+google checkout, etc) will be derived from this base class.
+
+=head2 Data Dictionary
+
+Payment gateway drivers have no database tables, unless they need it on
+a one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Pay::Driver class.
+
+Method
+
+Description
+
+definition
+
+Returns an array reference of hash references of fields that are
+defined for this payment gateway driver similar to definition() in
+WebGUI::Asset.
+
+param: definition E<acirc>E<128>E<147> an array ref of hash refs
+
+field:
+
+[
+
+name =E<gt> E<acirc>E<128>E<156>Payment TypeE<acirc>E<128>E<157>,
+
+fields =E<gt> {
+
+label =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>LabelE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> E<acirc>E<128>E<156>Credit CardE<acirc>E<128>E<157>
+
+},
+
+enabled =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Enabled?E<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 1
+
+},
+
+groupToUse =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>groupE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Who can use?E<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 1
+
+},
+
+receiptMessage =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Receipt Email
+MessageE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> undef
+
+},
+
+}
+
+],
+
+getButton
+
+Returns the HTML postable form that will take the user to check out
+using this payment gateway.
+
+getName
+
+Return a human readable name for this driver. Never overridden in the
+subclass, instead specified in definition.
+
+new
+
+Instantiates a driver.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: options E<acirc>E<128>E<147> a hash reference of configurable
+parameters for this driver
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+We need the following payment gateways converted to the new API:
+
+=over
+
+=item 1.
+
+itransact
+
+=item 2.
+
+cash
+
+=item 3.
+
+check
+
+=back
+
+=back
+
+=head1 iTransact Driver
+
+This allows for credit card payments via the iTransact payment gateway.
+
+=head2 Data Dictionary
+
+Payment gateway drivers have no database tables, unless they need it on
+a one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Pay::Driver::Itransact class.
+
+Method
+
+Description
+
+definition
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition E<acirc>E<128>E<147> an array ref of hash refs of
+definitions
+
+[
+
+{
+
+name =E<gt> E<acirc>E<128>E<156>iTransactE<acirc>E<128>E<157>,
+
+fields =E<gt> {
+
+username =E<gt> {
+
+label =E<gt> E<acirc>E<128>E<156>Vendor IDE<acirc>E<128>E<157>,
+
+fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> undef
+
+},
+
+password =E<gt> {
+
+label =E<gt> E<acirc>E<128>E<156>PasswordE<acirc>E<128>E<157>,
+
+fieldType =E<gt> E<acirc>E<128>E<156>passwordE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> undef
+
+},
+
+useCvv2 =E<gt> {
+
+label =E<gt> E<acirc>E<128>E<156>Use CVV2?E<acirc>E<128>E<157>,
+
+fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 1
+
+},
+
+}
+
+]
+
+getEditForm
+
+Similar to the method of the same name in WebGUI asset, but uses the
+definition from this module.
+
+getButton
+
+Returns the HTML postable form that will take the user to check out
+using this payment gateway.
+
+new
+
+Instantiates a driver.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: options E<acirc>E<128>E<147> a hash reference of configurable
+parameters for this driver
+
+www_collectPaymentInfo
+
+Collects payment info from the user.
+
+www_displayStatus
+
+Displays a status message to the user after collecting payment info.
+The status may be a success message along with a printable receipt, or
+an error message like E<acirc>E<128>E<156>Credit card
+declined.E<acirc>E<128>E<157>
+
+=head1 Shipper
+
+This is the master class to manage shipper drivers. In Perl terms the
+DBI to DBD.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>shipperE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+shipperId
+
+guid
+
+The unique id for this shipper.
+
+label
+
+varchar(100)
+
+A title for this shipper that will be displayed to the user. For
+example E<acirc>E<128>E<156>Flat RateE<acirc>E<128>E<157> or
+E<acirc>E<128>E<156>FedEx OvernightE<acirc>E<128>E<157>
+
+className
+
+varchar(255)
+
+The plugin classname that will be used for this shipping module.
+
+options
+
+mediumtext
+
+A json serialized hash reference with configuration data for this
+shipper.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Ship
+class.
+
+Method
+
+Description
+
+_loadDriver
+
+A method used load a shipping driver.
+
+create
+
+Creates a new WebGUI::Shop::Ship object. Returns a reference to the
+object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in shipper table, except for shipperId.
+
+delete
+
+Deletes this object.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the shippingId. Automatically converts the options json
+into a hash reference.
+
+getId
+
+Returns the shipperId.
+
+getOptions
+
+Returns a hash reference of shipperIds as keys, with
+E<acirc>E<128>E<156>labelE<acirc>E<128>E<157> and
+E<acirc>E<128>E<156>priceE<acirc>E<128>E<157> as subkeys. Label
+provides the human readable label for the object, and price provides
+the calculated price for shipping.
+
+param: cart E<acirc>E<128>E<147> a reference to the cart object to
+calculate for.
+
+new
+
+Instantiates a coupon based upon shipperId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: shipperId E<acirc>E<128>E<147> the unique id to instantiate
+
+set
+
+Update a parameter for the coupon.
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in coupon table, except for shipperId. Automatically
+convert the options parameter into json.
+
+www_listShippers
+
+Returns a list of the shippers configured currently.
+
+www_editShipper
+
+The add/edit form for managing a shipper.
+
+www_editShipperSave
+
+Saves the result of www_editShipper and then displays www_listShippers.
+
+=head1 Shipper Driver
+
+Shipping modules are used to calculate shipping costs. Shipping modules
+are not allowed to have a user interface. Instead, they plug their data
+into the shopping cart screen if any items in the shopping cart have
+shipping. In Perl terms this is the DBD to DBI. All shipping drivers
+(flat rate, fedex, ups, dhl, usps, etc) will be derived from this base
+class.
+
+=head2 Data Dictionary
+
+Shipping drivers have no database tables, unless they need it on a
+one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Ship::Driver class.
+
+Method
+
+Description
+
+calculate
+
+Returns a shipping price.
+
+param: cart E<acirc>E<128>E<147> a reference to the cart object.
+
+definition
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition E<acirc>E<128>E<147> an array ref of hash refs
+
+field:
+
+[
+
+name =E<gt> E<acirc>E<128>E<156>Shipper TypeE<acirc>E<128>E<157>,
+
+fields =E<gt> {
+
+label =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>LabelE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> undef
+
+},
+
+enabled =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Enabled?E<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 1
+
+},
+
+}
+
+],
+
+getName
+
+Return a human readable name for this driver. Never overridden in the
+subclass, instead specified in definition.
+
+getEditForm
+
+Similar to the method of the same name in WebGUI asset, but uses the
+definition from this module.
+
+new
+
+Instantiates a driver.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: options E<acirc>E<128>E<147> a hash reference of configurable
+parameters for this driver
+
+=head1 Flat Rate Shipper
+
+This allows for basic shipping calculations without any tie-ins to
+external shippers.
+
+=head2 Data Dictionary
+
+Shipping drivers have no database tables, unless they need it on a
+one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Ship::Driver::Flat class.
+
+Method
+
+Description
+
+calculate
+
+Returns a shipping price. Calculates the shipping price using the
+following formula:
+
+total cart price * percentageOfPrice
+
++
+
+flatFee
+
++
+
+total weight of shippable items * pricePerWeight
+
++
+
+total quantity of shippable items * pricePerItem
+
+param: cart E<acirc>E<128>E<147> a reference to the cart object.
+
+definition
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition E<acirc>E<128>E<147> an array ref of hash refs of
+definitions
+
+[
+
+{
+
+name =E<gt> E<acirc>E<128>E<156>Flat RateE<acirc>E<128>E<157>,
+
+fields =E<gt> {
+
+percentageOfPrice =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Percentage Of
+PriceE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 0
+
+},
+
+flatFee =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Flat FeeE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 0
+
+},
+
+pricePerWeight =E<gt> {
+
+fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
+
+label =E<gt> E<acirc>E<128>E<156>Price Per WeightE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 0
+
+},
+
+pricePerItem =E<gt> {
+
+label =E<gt> E<acirc>E<128>E<156>Price Per ItemE<acirc>E<128>E<157>,
+
+fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
+
+defaultValue =E<gt> 0
+
+},
+
+}
+
+]
+
+new
+
+Instantiates a driver.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: options E<acirc>E<128>E<147> a hash reference of configurable
+parameters for this driver
+
+=head1 Taxes
+
+There are various taxes that need to be applied to an order based upon
+where an order is being shipped to. This class deals with that.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>taxE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+taxId
+
+guid
+
+The unique id for this tax.
+
+field
+
+varchar(100)
+
+The field to match against to calculate this tax.
+
+value
+
+varchar(100)
+
+The value of the field to match.
+
+taxRate
+
+float, default 0
+
+A percentage of the sale price to tax.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Tax
+class.
+
+Method
+
+Description
+
+add
+
+Adds an item to the tax table.
+
+param: field E<acirc>E<128>E<147> choose from
+E<acirc>E<128>E<156>countryE<acirc>E<128>E<157>,
+E<acirc>E<128>E<156>stateE<acirc>E<128>E<157>, or
+E<acirc>E<128>E<156>codeE<acirc>E<128>E<157>.
+
+param: value E<acirc>E<128>E<147> the value to match against field. For
+example, for state it might be
+E<acirc>E<128>E<156>WIE<acirc>E<128>E<157>.
+
+param: taxRate E<acirc>E<128>E<147> the rate to apply to this locale in
+percent.
+
+calculate
+
+Returns a tax price. Calculates the tax price using the following
+formula:
+
+total cart price * percentageOfPrice
+
++
+
+flatFee
+
++
+
+total weight of shippable items * pricePerWeight
+
++
+
+total quantity of shippable items * pricePerItem
+
+param: cart E<acirc>E<128>E<147> a reference to the cart object.
+
+delete
+
+Deletes an item from the tax table.
+
+param: taxId E<acirc>E<128>E<147> the id of the item to delete
+
+export
+
+Creates a tab delimited file from the tax table using the field, value,
+and taxRate in a temporary storage location, and returns a reference to
+the storage location.
+
+getItems
+
+Returns a WebGUI::SQL::Result object containing the information in the
+tax table.
+
+import
+
+Deletes all the existing records in the tax table, and replaces them
+with the values in the file.
+
+param: path E<acirc>E<128>E<147> the path to the tab delimited file to
+import. See the export() method for details.
+
+new
+
+Instanciates the tax object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+www_add
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, adds an item
+to the the tax table. Returns www_view.
+
+www_delete
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, deletes a
+tax item based upon taxId. Returns www_view.
+
+www_export
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, returns a
+tab delimited file generated via the export() method. Returns the
+www_view method.
+
+www_import
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, pull a tab
+delimited file off the POST, and puts it into a storage location. Then
+passes the path into the import() method. Then deletes the storage
+location. Returns the www_view method.
+
+www_view
+
+Draws an HTML fragment showing the tax options. See the diagram below
+for details.
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Convert existing state based tax tables to the new system.
+
+=back
+
+=head1 Address
+
+Addresses are used to store address information for users, for
+shipping, billing, and other uses. In the future the address object may
+be used by other subsystems, but it will first be used by commerce.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>addressE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+addressId
+
+guid
+
+The unique id for this address.
+
+label
+
+varchar(100)
+
+A label for this address like
+E<acirc>E<128>E<156>homeE<acirc>E<128>E<157>,
+E<acirc>E<128>E<156>workE<acirc>E<128>E<157>, etc.
+
+name
+
+varchar(100)
+
+The name of this shipping location be it a business name or a personal
+name.
+
+address
+
+varchar(100)
+
+The street address of this location.
+
+city
+
+varchar(100)
+
+The city of this location.
+
+state
+
+varchar(100)
+
+The state or province of this location.
+
+code
+
+varchar(35)
+
+The zip code or postal code of this location.
+
+country
+
+varchar(100)
+
+The country of this location.
+
+phoneNumber
+
+varchar(35)
+
+A phone number for this location, used for shipping.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Address
+class.
+
+Method
+
+Description
+
+create
+
+Creates a new WebGUI::Shop::Address object. Returns a reference to the
+object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in address table, except for addressId.
+
+delete
+
+Deletes this object.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+getId
+
+Returns the addressId.
+
+new
+
+Instantiates a address based upon addressId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: addressId E<acirc>E<128>E<147> the unique id to instantiate
+
+set
+
+Update a parameter for the address.
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+of the parameters in address table, except for addressId.
+
+=head1 Transaction History
+
+Transaction history keeps track of all orders attempted whether
+successful or not as well as the state of all objects involved at the
+time of sale, because things change over time.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>transactionE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+transactionId
+
+guid
+
+The unique id for this transaction.
+
+isSuccessful
+
+tinyint
+
+A boolean indicating whether the transaction succeeded or not.
+
+transactionCode
+
+varchar(100)
+
+The transaction id or code received from the payment gateway. In
+iTransact it is called E<acirc>E<128>E<156>xidE<acirc>E<128>E<157>.
+
+statusCode
+
+varchar(35)
+
+A string indicating the status code for the transaction.
+
+statusMessage
+
+varchar(100)
+
+If a longer message was given with the status code that is stored here.
+
+userId
+
+guid
+
+The userId that made the purchase.
+
+username
+
+varchar(35)
+
+The username of the user making the purchase.
+
+amount
+
+float
+
+The total purchase amount.
+
+shippingAddressId
+
+guid
+
+The unqiue id of the shipping address.
+
+shippingAddressName
+
+varchar(100)
+
+The name of the person/company to ship to.
+
+shippingAddress
+
+varchar(100)
+
+The street address to ship to.
+
+shippingState
+
+varchar(100)
+
+The state or province to ship to.
+
+shippingCity
+
+varchar(100)
+
+The city to ship to.
+
+shippingCode
+
+varchar(20)
+
+The postal code or zip code to ship to.
+
+shippingCountry
+
+varchar(100)
+
+The country to ship to.
+
+shippingPhone
+
+varchar(35)
+
+The phone number for this location.
+
+shippingMethodId
+
+guid
+
+The id of the shipping plugin used.
+
+shippingMethodTitle
+
+varchar(100)
+
+The name of the shipping method used.
+
+shippingTrackingNumber
+
+varchar(100)
+
+A tracking number received back from a shipping module, if any.
+
+shippingStatus
+
+varchar(35), default 'NotShipped'
+
+A flag indicating whether the order has shipped, is on back order, or
+whatever.
+
+billingAddressId
+
+guid
+
+The unique id of the billing address for this order.
+
+billingName
+
+varchar(100)
+
+The name this of person/company to bill to.
+
+billingAddress
+
+varchar(100)
+
+The street address to bill to.
+
+billingState
+
+varchar(100)
+
+The state or province to bill to.
+
+billingCity
+
+varchar(100)
+
+The city to bill to.
+
+billingCode
+
+varchar(20)
+
+The postal code or zip code to bill to.
+
+billingCountry
+
+varchar(100)
+
+The country to bill to.
+
+billingPhone
+
+varchar(35)
+
+The phone number for this location.
+
+billingMethodId
+
+guid
+
+The id of the billing method used.
+
+billingMethodTitle
+
+varchar(100)
+
+The name of the billing method used.
+
+couponId
+
+guid
+
+The unique id of the coupon applied to this order.
+
+couponTitle
+
+varchar(100)
+
+The title of the coupon applied to this order.
+
+totalPrice
+
+float
+
+The final sale price.
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>transactionItemsE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+transactionId
+
+guid
+
+The unique id for this transaction.
+
+assetId
+
+guid
+
+The assetId for this item.
+
+title
+
+varchar(100)
+
+The title of this item.
+
+options
+
+mediumText
+
+A json serialized hashref of any configuration data associated with
+this item so that it can be edited or whatnot.
+
+shippingAddressId
+
+guid
+
+Assign a special shipping address to this item beyond the one attached
+at the cart level.
+
+shippingAddressName
+
+varchar(100)
+
+The name of the person/company to ship to. Only used when a special
+shipping address has been attached to this item.
+
+shippingAddress
+
+varchar(100)
+
+The street address to ship to. Only used when a special shipping
+address has been attached to this item.
+
+shippingState
+
+varchar(100)
+
+The state or province to ship to. Only used when a special shipping
+address has been attached to this item.
+
+shippingCity
+
+varchar(100)
+
+The city to ship to. Only used when a special shipping address has been
+attached to this item.
+
+shippingCode
+
+varchar(20)
+
+The postal code or zip code to ship to. Only used when a special
+shipping address has been attached to this item.
+
+shippingCountry
+
+varchar(100)
+
+The country to ship to. Only used when a special shipping address has
+been attached to this item.
+
+shippingMethodId
+
+guid
+
+The id of the shipping plugin used. Only used when a special shipping
+address has been attached to this item.
+
+shippingMethodTitle
+
+varchar(100)
+
+The name of the shipping method used. Only used when a special shipping
+address has been attached to this item.
+
+shippingStatus
+
+varchar(35),default 'NotShipped'
+
+A flag indicating whether the item has shipped, is on back order, or
+whatever. Only used when a special shipping address has been attached
+to this item.
+
+quantity
+
+integer
+
+The number of this sku desired.
+
+price
+
+float
+
+The price paid for this item.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Transaction class.
+
+Method
+
+Description
+
+addItem
+
+Adds an item to the transactionItems table. Automatically serialize
+hashRefs like options into json. Make a callback to the original SKU to
+let it know that the item has been purchased. This enables things like
+tickets to be decremented, kick off a workflow, and subscriptions to
+give permissions, etc.
+
+create
+
+Creates a new transaction object. Returns a reference to the object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing any/all
+of the fields from the transaction table minus the
+E<acirc>E<128>E<156>transactionIdE<acirc>E<128>E<157> field.
+
+delete
+
+Deletes this transaction and all related transaction items.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+getId
+
+Returns the transaction id.
+
+getItems
+
+Returns an array reference of hash references for all the rows of data
+in the transactionItem table. Automatically convert serilized json into
+hash reference.
+
+new
+
+Instantiates a WebGUI::Shop::Transaction object using transactionId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: transactionId
+
+set
+
+Updates a transaction object.
+
+param: hashRef E<acirc>E<128>E<147> a hash reference containing any/all
+of the fields from the transaction table minus the
+E<acirc>E<128>E<156>transactionIdE<acirc>E<128>E<157> field.
+
+setStatus
+
+Default status is E<acirc>E<128>E<156>pendingE<acirc>E<128>E<157> as
+items are being added to it.
+
+param: status E<acirc>E<128>E<147> The status to set:
+
+pending E<acirc>E<128>E<147> default
+
+pending payment E<acirc>E<128>E<147> waiting on payment to complete
+
+pending shipment E<acirc>E<128>E<147> waiting on shipment to be marked
+
+complete E<acirc>E<128>E<147> order has been paid and shipped
+
+returned E<acirc>E<128>E<147> order has been cancelled
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Convert all existing transactions in the current transactions table
+into the new style transactions.
+
+=item 2.
+
+Convert recurring transactions back into their relevant subscription
+asset types so subscriptions are tracking their own subscribers.
+
+=item 3.
+
+As soon as a transaction object has been created a workflow should be
+kicked off. The workflow will go through various stages as the status
+of the order is updated. Various workflow activities will need to be
+completed for this.
+
+=item 4.
+
+We need to create screens for users to see their transaction history,
+and administrators to manage their transaction history.
+
+=back
+
+=head1 SKU (base product class)
+
+The SKU class is what all other products will be subclassed from. It
+needs to be simple so it can be extended to fit any need.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+E<acirc>E<128>E<156>SKUE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+assetId
+
+guid
+
+The unique id assigned to this sku that may never change. It's with all
+assets
+
+sku
+
+varchar(35) unique
+
+The unique id that the shop keeper assigns to this item. It may be
+changed by the shop keeper. By default this is set equal to assetId.
+
+vendorId
+
+guid
+
+The unique id of the vendor associated with this sku, if any
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Asset::Sku
+class.
+
+Method
+
+Description
+
+asset methods
+
+all the methods from the WebGUI::Asset superclass
+
+addToCart
+
+Adds this sku to the shopping cart.
+
+applyOptions
+
+Accepts a configuration data hash reference that can configure a sku a
+certain way. For example, E<acirc>E<128>E<156>a size XL red
+t-shirtE<acirc>E<128>E<157> instead of just E<acirc>E<128>E<156>a
+t-shirtE<acirc>E<128>E<157>.
+
+param: options E<acirc>E<128>E<147> a hash reference containing the
+configuration properties returned from getConfiguration()
+
+getOptions
+
+Returns a hash reference of configuration data that can return this sku
+to a configured state. See applyConfiguration() for details.
+
+getMaxAllowedInCart
+
+By default returns 99999999. Should be overridden by subclasses. For
+unique items should return 1. For items that have a count in stock,
+should return the number that are currently in stock.
+
+getPrice
+
+By default return 0.00. Should be overridden by subclasses.
+
+isShippingRequired
+
+By default return 0. Should be overridden by subclasses.
+
+newBySku
+
+Instanciates based on an existing sku, rather than an assetId.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: sku E<acirc>E<128>E<147> the sku to instanciate
+
+processStyle
+
+Looks up the style from the container and and wrappers the product in
+it.
+
+param: html E<acirc>E<128>E<147> the HTML output to be wrapped by the
+style
+
+=head1 Donation Asset
+
+This asset will be used by sites that want to accept variable amount
+funds from it's users. But the reason it will be built as part of this
+project is to prove variable pricing.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+E<acirc>E<128>E<156>DonationE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+assetId
+
+guid
+
+revisionDate
+
+bigint
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Donation class.
+
+Method
+
+Description
+
+view
+
+Displays the donation amount form.
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Subscription Asset
+
+This will be an asset in the form of the subscription manager.
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Write a subscription asset.
+
+=over
+
+=item 1.
+
+Move the E<acirc>E<128>E<156>redeem a subscription
+codeE<acirc>E<128>E<157> functionality from the user account to the
+subscription asset.
+
+=back
+
+=item 2.
+
+Convert all subscriptions into subscription assets.
+
+=over
+
+=item 1.
+
+Create subscription assets in the import node under a folder called
+E<acirc>E<128>E<156>SubscriptionsE<acirc>E<128>E<157>.
+
+=item 2.
+
+Write an upgrade migration to convert all ^SubscriptionItem(); macros
+into ^AssetProxy macros.
+
+=item 3.
+
+Write an upgrade migration to convert all ^SubscriptionItemPurchaseUrl
+macros into ^AssetProxy macros. I know this isn't a 1:1 translation,
+which is why we also need to add something to the gotchas to warn
+people about the change.
+
+=item 4.
+
+Convert subscription recurring urls to new subscription urls or provide
+instructions for doing it.
+
+=back
+
+=item 3.
+
+Delete the SubscriptionItem macro code and its reference from the
+config file.
+
+=item 4.
+
+Delete the SubscriptionItemPurchaseUrl code and its reference from the
+config file.
+
+=item 5.
+
+Make new templates that look good, and throw out the old ones.
+
+=back
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+E<acirc>E<128>E<156>SubscriptionE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Subscription class.
+
+Method
+
+Description
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Product Asset
+
+This asset will be the mix of the current product asset and the
+products that are in the product manager in the admin console.
+
+=head2 Todo
+
+=over
+
+=item *
+
+Merge the products in the product manager into the product asset.
+
+=over
+
+=item *
+
+Make the URL of the new products the skew.
+
+=item *
+
+Place all the new products in the import node under a
+E<acirc>E<128>E<156>ProductsE<acirc>E<128>E<157> folder.
+
+=item *
+
+Write an upgrade migration to get rid of the ^Product(); macro and
+replace it with the ^AssetProxy; macro.
+
+=back
+
+=item *
+
+Convert all products to use the base product class.
+
+=item *
+
+Eliminate all product manager code from the admin console.
+
+=item *
+
+Delete the Product macro code and it's reference from the config file.
+
+=item *
+
+Make new templates that look good, and throw out the old ones.
+
+=back
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+E<acirc>E<128>E<156>ProductE<acirc>E<128>E<157>.
+
+Field
+
+Schema
+
+Description
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Product class.
+
+Method
+
+Description
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Event Manager Asset
+
+The event manager asset needs to be updated to use the new commerce
+subsystem.
+
+TODO:
+
+=over
+
+=item *
+
+Make use of the new base product class.
+
+=item *
+
+Set all cart items to unique so that quantity cannot be incremented.
+
+=item *
+
+Set a callback workflow to mark tickets out of stock, associate a
+transaction id with the badge, etc.
+
+=item *
+
+Update the templates to reflect changes
+
+=item *
+
+Update the templates to reflect suggestions from GAMA
+
+=back
+
+=cut
+
+#Pod::HTML2Pod conversion notes:
+#From file commerce.html
+# 91169 bytes of input
+#Fri Feb 15 15:16:43 2008 jtsmith
+# No a_name switch not specified, so will not try to render <a name='...'>
+# Will try to render <a href='...'>
