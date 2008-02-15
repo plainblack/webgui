@@ -911,6 +911,11 @@ to add or remove users from their groups.
 		lastUpdated => 1129431859
 	},
 
+    'username no html' => {
+        message => q|Your username cannot contain HTML or WebGUI Macros.|,
+        lastUpdated => 1203059016,
+    },
+
 	'432' => {
 		message => q|Expires|,
 		lastUpdated => 1031514049
