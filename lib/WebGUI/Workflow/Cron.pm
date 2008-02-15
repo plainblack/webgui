@@ -116,7 +116,7 @@ sub get {
     my $self = shift;
     my $name = shift;
     if ($name eq "parameters") {
-        if (exists $self->{_data}{parameters}) {
+        if (exists $self->{_data}{parameters} && $self->{_data}{parameters} eq "") {
             my $parameters = JSON::from_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
