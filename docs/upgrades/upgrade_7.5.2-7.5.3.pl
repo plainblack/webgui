@@ -24,6 +24,8 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+insertCommerceTaxTable($session);
+
 finish($session); # this line required
 
 
@@ -33,6 +35,25 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub insertCommerceTaxTable {
+	my $session = shift;
+	print "\tInstall the Commerce Tax Table.\n" unless ($quiet);
+	# and here's our code
+    $session->db->write(<<EOSQL);
+
+CREATE TABLE tax (
+    taxId    VARCHAR(22)  NOT NULL,
+    field    VARCHAR(100) NOT NULL,
+    value    VARCHAR(100) DEFAULT 0.0,
+    taxRate  FLOAT        NOT NULL,
+    PRIMARY KEY (taxId),
+    UNIQUE  KEY (field, value)
+)
+EOSQL
+
+}
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------

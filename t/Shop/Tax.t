@@ -27,7 +27,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 3;
+my $tests = 5;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -46,6 +46,12 @@ isa_ok($taxer, 'WebGUI::Shop::Tax');
 isa_ok($taxer->session, 'WebGUI::Session', 'session method returns a session object');
 
 is($session->getId, $taxer->session->getId, 'session method returns OUR session object');
+
+my $taxIterator = $taxer->getItems;
+
+isa_ok($taxIterator, 'WebGUI::SQL::ResultSet');
+
+is($taxIterator->rows, 0, 'WebGUI ships with no predefined tax data');
 
 }
 
