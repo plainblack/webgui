@@ -1,4 +1,5 @@
 7.5.3
+ - prevent HTML and Macro injection in usernames
 
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in

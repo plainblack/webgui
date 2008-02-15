@@ -78,7 +78,12 @@ sub _isValidUsername {
 
 	return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
 
-	my $i18n = WebGUI::International->new($self->session);
+    my $i18n = WebGUI::International->new($self->session);
+
+    my $filteredUsername = WebGUI::HTML::filter($username, 'all');
+    if ($username ne $filteredUsername) {
+        $error .= '<li>' . $i18n->get('username no html') . '</li>';
+    }
 
 	if ($username =~ /^\s/ || $username =~ /\s$/) {
 		$error .= '<li>'.$i18n->get(724).'</li>';
@@ -889,7 +894,6 @@ Validates the a username.
 sub validUsername {
 	my $self = shift;
 	my $username = shift;
-	WebGUI::Macro::negate(\$username);
 	my $error = "";
 
 	if ($self->_isDuplicateUsername($username)) {
