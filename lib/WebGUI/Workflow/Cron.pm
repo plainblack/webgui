@@ -113,18 +113,18 @@ Returns the value for a given property. See the set() method for details.
 =cut
 
 sub get {
-    my $self = shift;
-    my $name = shift;
+	my $self = shift;
+	my $name = shift;
     if ($name eq "parameters") {
-        if (exists $self->{_data}{parameters} and ref($self->{_data}{parameters}) eq 'HASH' ) {
+        if (exists $self->{_data}{parameters} && $self->{_data}{parameters} eq "") {
             my $parameters = JSON::from_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
         else {
-            return undef;
+            return {};
         }
     }
-    return $self->{_data}{$name};
+	return $self->{_data}{$name};
 }
 
 #-------------------------------------------------------------------
