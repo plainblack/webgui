@@ -1,0 +1,167 @@
+=head1 Shopping Cart
+
+The shopping cart has to be flexible enough to hold any type of
+purchasable good (anything derived from WebGUI::Asset::Sku), user
+friendly, and also have speedy reporting options so that macros can be
+written to display the cart data.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>cartE<acirc>E<128>E<157>.
+
+ Field               Schema          Description
+ cartId              guid            The unique id for this cart.
+ sessionId           guid            The sessionId attached to this cart. Can't use userId because the user may not be logged in yet.
+ shippingAddressId   guid            The id of the address to ship to.
+ couponId            guid            A coupon that is applied to this cart.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Cart
+class.
+
+=head3 addItem
+
+Adds an item to the cart. Returns the number of items now in the cart.
+
+param: asset E<acirc>E<128>E<147> the asset object to be added already
+configured as needed
+
+param: quantity E<acirc>E<128>E<147> the number of this item that the
+user wants
+
+=head3 create
+
+Creates a new cart object if there's not one already attached to the
+current session object. Otherwise just instanciates the existing one.
+Returns a reference to the object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+=head3 delete
+
+Deletes this cart and all cartItems contained in it.
+
+=head3 empty
+
+Removes all items from this cart.
+
+=head3 get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+=head3 getId
+
+Returns the cart id.
+
+=head3 getItems
+
+Returns an array reference of WebGUI::Asset::Sku objects that are in
+the cart. Calls WebGUI::Shop::CartItem-E<gt>getAllInCart
+
+=head3 new
+
+Instanciates a cart based upon a cartId.
+
+param: sessionId E<acirc>E<128>E<147> a reference to the current
+session
+
+param: cartId E<acirc>E<128>E<147> the unique id for this cart
+
+=head3 set
+
+Sets properties in the cart.
+
+param: hashref
+
+=head3 www_removeItem
+
+Checks privileges and displays appropriate message. Removes an item by
+itemId. Returns www_viewCart
+
+=head1 Shopping Cart Item
+
+This object represents an individual item in the cart.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+E<acirc>E<128>E<156>cartItemsE<acirc>E<128>E<157>.
+
+ Field               Schema          Description
+ cartId              guid            The unique id for this cart.
+ assetId             guid            The assetId for this item.
+ options             medium          Text A json serialized hashref of any configuration data associated with this item so that it can be edited or whatnot.
+ shippingAddressId   guid            Assign a special shipping address to this item beyond the one attached at the cart level.
+ quantity            integer         The number of these items being purchased.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::CartItem
+class.
+
+=head3 create
+
+Creates a new cart item object. Returns a reference to the object.
+
+param: session E<acirc>E<128>E<147> a reference to the current session
+
+param: cartId E<acirc>E<128>E<147> the unique id of the cart
+
+param: asset E<acirc>E<128>E<147> A reference to the asset you wish to
+create.
+
+param: quantity E<acirc>E<128>E<147> the quantity of sku to purchase
+
+=head3 get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field E<acirc>E<128>E<147> returns the value of a field
+rather than the hash reference
+
+=head3 getAllInCart
+
+Returns an array reference of WebGUI::Shop::Cart::Item objects.
+
+param: session E<acirc>E<128>E<147> the session object
+
+param: cartId E<acirc>E<128>E<147> the unique id of the cart you'd like
+to retrieve the objects of
+
+=head3 getSku
+
+Returns an instanciated WebGUI::Asset::Sku object for this cart item.
+
+=head3 new
+
+Instanciates a cart item based upon a cartId and assetId.
+
+param: session E<acirc>E<128>E<147> the session object
+
+param: cartId E<acirc>E<128>E<147> the unique id for this cart
+
+param: assetId E<acirc>E<128>E<147> the unique id of an skue contained
+in the cart
+
+=head3 remove
+
+Removes an item from the cart.
+
+param: assetId E<acirc>E<128>E<147> the unique id of the asset to be
+removed
+
+=head3 update
+
+Updates an item in the cart.
+
+param: assetId E<acirc>E<128>E<147> the unique id of the sku to be
+updated
+
+param: hashRef E<acirc>E<128>E<147> a hash reference of the things that
+might be updated, including quanity, shippingAddressId, and options.
+
