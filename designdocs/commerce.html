@@ -1,0 +1,4088 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="NeoOffice 2.2  (Unix)">
+	<META NAME="CREATED" CONTENT="20071221;8532900">
+	<META NAME="CHANGED" CONTENT="20080215;13565300">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 8.5in 11in; margin: 0.79in }
+		P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Arial", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "MS Mincho"; font-size: 16pt }
+		H1.ctl { font-family: "Tahoma"; font-size: 16pt }
+		H2 { margin-bottom: 0.08in }
+		H2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "MS Mincho"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-size: 14pt; font-style: italic }
+		TD P { margin-bottom: 0in }
+		TH P { margin-bottom: 0in }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1 CLASS="western">WebGUI 7.5+ Commerce System Needs and Wants</H1>
+<P>We need a massive overhaul of the commerce system, not just for
+the sake of it, but because of the current system's inflexibility.
+The new system must support everything the current system supports,
+plus resolve these limitations.</P>
+<H2 CLASS="western">Must Haves</H2>
+<P>The following items must be introduced to the commerce system in
+order to fix fundamental flaws:</P>
+<OL>
+	<LI><P>Currently because price is attached to the base object every
+	product must have a price and there is no way to override it. The
+	problem with this is that some configurable products have a variable
+	price, and other products (like donations and auctions) you want the
+	user to be able to type in a price. Therefore the new system needs
+	to allow for variable price. This is a limitation of the current
+	shopping cart and the current base product.</P>
+	<LI><P>There must be a callback system after checkout. Right now
+	there's no way to trigger custom functionality in custom products
+	after purchase. So if you want a workflow to kick off after someone
+	has purchased something to give them a bunch of privileges, send an
+	email, etc you couldn't do it. Or if your product needed to mark
+	something as out of stock, that's not possible either. 
+	</P>
+	<LI><P>There's currently no way to pass off the checkout process to
+	a third-party web site such as PayPal, 2checkout, or Google
+	Checkout. The system right now is designed to work with payment
+	gateways that have behind the scenes APIs. 
+	</P>
+	<LI><P>If you want two different vendors to sell from the same site
+	(like Amazon does) you have a problem because currently WebGUI
+	treats everything as one site one store. Therefore we need a vendor
+	id attached to each product so we can keep track of who sold what.
+	This might even be used by a single vendor to keep track of sales by
+	department.</P>
+	<LI><P>Not all products have SKUs, but the current system requires a
+	sku. For example, does a donation have a SKU? It may or may not.
+	Obviously every product has to have a unique id to track it behind
+	the scenes, but whether or not a store owner cares about this number
+	is largely dependent upon the type of thing being purchased or sold.</P>
+	<LI><P>Currently we have the product asset, the product macro, and
+	the product manager in admin console. This needs to be brought down
+	to a single item, and that item needs to be an asset which is easily
+	placable on the site by people familiar with WebGUI. This is not to
+	say that the base product class should be an asset. Maybe it should,
+	maybe it shouldn't, but the three mechanisms we have now must be
+	merged. This will go a long way toward ease of use.</P>
+	<LI><P>And since the current product system will become a product
+	asset, the subscription system should become a subscription asset.</P>
+	<LI><P>We need a macro or other mechanism to display what's in the
+	user's cart. This also means we need a good API for querying this
+	information quickly and easily.</P>
+	<LI><P>All plugins for shipping, payment, tax, etc should be built
+	like drivers, so that the API remains consistent for all of them,
+	and a driver is loaded behind the scenes for the appropriate plugin
+	based upon rules or users choice.</P>
+	<LI><P>The checkout process must be streamlined, easy to use, and
+	pretty. Right now it's none of those things.</P>
+	<LI><P>We need to be able to handle unique items in the cart. For
+	example, with the Event Manager, someone buys a badge to an event,
+	that badge is unique to them and can't possibly have a quantity of
+	anything greater than one. However, the current cart allows for more
+	than one of it.</P>
+</OL>
+<P><BR><BR>
+</P>
+<H2 CLASS="western">Niceties 
+</H2>
+<P>The following items would make the commerce system better, but can
+be added at a later date if need be:</P>
+<OL>
+	<LI><P>Aisles. An aisle is an asset container for products. It would
+	display all of it's children as well as any product that fit within
+	a particular keyword group using the WebGUI keywords system. Aisles
+	should also have a nifty import/export mechanism to make uploading
+	products to the system easier.</P>
+	<LI><P>Affiliate tracking system. We need a way to track who's
+	sending us sales, so that we can automatically commission them. Note
+	that the automatic commissioning is a big part of this. Just
+	tracking stuff isn't good enough as it creates a lot of manual labor
+	for writing out checks at the end of the month. It may be that we
+	just need to hook in with some third party affiliate programs rather
+	than build our own.</P>
+	<LI><P>Discounts, coupons, sales, and gift certificates. These may
+	all be separate items, but the goal is virtually the same, we need
+	mechanisms to give discounts based upon the group a user is in, sale
+	period, coupons, discount codes, gift certificates, etc.</P>
+	<LI><P>Tie the ad management system in with commerce so that people
+	can buy ads on a site without human intervention.</P>
+	<LI><P>Allow for saved shopping carts, so that users can come back
+	to a cart later. This will most likely mean that the user has to
+	create an account to attach their cart to.</P>
+</OL>
+<H2 CLASS="western">Pipe Dream</H2>
+<P>The following items are pie in the sky that we should build at
+some point, but definitely won't make it into WebGUI in the 7.5 or
+7.6 time frames unless someone funds them:</P>
+<OL>
+	<LI><P>Auction System. We're not talking ebay here, but a way to
+	conduct simple auctions would still be nice.</P>
+	<LI><P>Product configurator. If you're buying something complex,
+	you're probably going to have lots of options to switch. Therefore
+	we need a product configurator system. Dell's web site for buying
+	computers is a great example of a configurator.</P>
+</OL>
+<P><BR><BR>
+</P>
+<P><BR><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">The User
+Experience</H1>
+<P STYLE="margin-bottom: 0in">The following diagrams and screen mock
+ups show the user experience of the new commerce system.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Shopping Cart and Check Out</H2>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_m108d2926.png" NAME="graphics1" ALIGN=LEFT WIDTH=665 HEIGHT=614 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">When the
+user views the cart, this is what they will initially see:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_m65561de9.png" NAME="graphics2" ALIGN=LEFT WIDTH=665 HEIGHT=663 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">Then the
+user will choose a shipping address. 
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_4f993cbe.png" NAME="graphics6" ALIGN=LEFT WIDTH=527 HEIGHT=481 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">After
+choosing a shipping address the user will be redirected back to the
+shopping cart.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_2794d8e0.png" NAME="graphics4" ALIGN=LEFT WIDTH=665 HEIGHT=593 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">The user can
+also optionally assign shipping addresses to individual items in the
+cart.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_m1b8119cc.png" NAME="graphics5" ALIGN=LEFT WIDTH=665 HEIGHT=640 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">At this
+point the user is ready to check out, so when they click on checkout
+they're brought to a screen that looks like:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_4578c787.png" NAME="graphics7" ALIGN=LEFT WIDTH=236 HEIGHT=241 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">Let's say
+the user chooses credit card to pay. They'll then see:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_ma0fd3c8.png" NAME="graphics8" ALIGN=LEFT WIDTH=453 HEIGHT=403 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0in; page-break-before: always">For admins
+configuring the commerce system, under Admin Console &gt; Commerce
+they'll have a screen similar to:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><IMG SRC="commerce_html_1e32196.png" NAME="graphics9" ALIGN=LEFT WIDTH=577 HEIGHT=652 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Shopping Cart</H1>
+<P STYLE="margin-bottom: 0in">The shopping cart has to be flexible
+enough to hold any type of purchasable good (anything derived from
+WebGUI::Asset::Sku), user friendly, and also have speedy reporting
+options so that macros can be written to display the cart data. 
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “cart”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>cartId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this cart.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>sessionId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The sessionId attached to this cart. Can't use userId because
+			the user may not be logged in yet.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingAddressId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The id of the address to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>couponId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A coupon that is applied to this cart.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Cart class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>addItem</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds an item to the cart. Returns the number of items now in
+			the cart.</P>
+			<P><BR>
+			</P>
+			<P>param: asset – the asset object to be added already
+			configured as needed</P>
+			<P><BR>
+			</P>
+			<P>param: quantity – the number of this item that the user wants</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new cart object if there's not one already attached
+			to the current session object. Otherwise just instanciates the
+			existing one. Returns a reference to the object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this cart and all cartItems contained in it.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>empty</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Removes all items from this cart.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the cart id.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getItems</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of WebGUI::Asset::Sku objects that
+			are in the cart. Calls WebGUI::Shop::CartItem-&gt;getAllInCart</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instanciates a cart based upon a cartId.</P>
+			<P><BR>
+			</P>
+			<P>param: sessionId – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: cartId – the unique id for this cart</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Sets properties in the cart.</P>
+			<P><BR>
+			</P>
+			<P>param: hashref</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_removeItem</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Checks privileges and displays appropriate message. Removes an
+			item by itemId. Returns www_viewCart</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Shopping Cart
+Item</H1>
+<P STYLE="margin-bottom: 0in">This object represents an individual
+item in the cart.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “cartItems”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>cartId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this cart.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>assetId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The assetId for this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>options</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>mediumText</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A json serialized hashref of any configuration data associated
+			with this item so that it can be edited or whatnot.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingAddressId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>Assign a special shipping address to this item beyond the one
+			attached at the cart level.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>quantity</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>integer</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The number of these items being purchased.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::CartItem class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new cart item object. Returns a reference to the
+			object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: cartId – the unique id of the cart</P>
+			<P><BR>
+			</P>
+			<P>param: asset – A reference to the asset you wish to create.</P>
+			<P><BR>
+			</P>
+			<P>param: quantity – the quantity of sku to purchase</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getAllInCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of WebGUI::Shop::Cart::Item objects.</P>
+			<P><BR>
+			</P>
+			<P>param: session – the session object</P>
+			<P><BR>
+			</P>
+			<P>param: cartId – the unique id of the cart you'd like to
+			retrieve the objects of</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getSku</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an instanciated WebGUI::Asset::Sku object for this cart
+			item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instanciates a cart item based upon a cartId and assetId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – the session object</P>
+			<P><BR>
+			</P>
+			<P>param: cartId – the unique id for this cart</P>
+			<P><BR>
+			</P>
+			<P>param: assetId – the unique id of an skue contained in the
+			cart</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>remove</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Removes an item from the cart.</P>
+			<P><BR>
+			</P>
+			<P>param: assetId – the unique id of the asset to be removed</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>update</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Updates an item in the cart.</P>
+			<P><BR>
+			</P>
+			<P>param: assetId – the unique id of the sku to be updated</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference of the things that might be
+			updated, including quanity, shippingAddressId, and options.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Coupon</H1>
+<P STYLE="margin-bottom: 0in">Coupons (sometimes called promotional
+codes) are a way to apply discounts to a purchase. Only one coupon
+per purchase though because we don't want to have to deal with coupon
+magnification effects.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “coupon”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>couponId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this coupon.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>code</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(35), unique</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The coupon code the user has to type in to use this coupon.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>title</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A title for this coupon.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>options</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>mediumtext</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A json serialized hash reference with the coupon rules.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Coupon class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new WebGUI::Shop::Coupon object. Returns a reference
+			to the object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in coupon table, except for couponId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this coupon.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the coupon id.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a coupon based upon couponId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: couponId – the unique id to instantiate</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>newByCode</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a coupon based upon coupon code.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: code – the coupon code.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Update a parameter for the coupon.</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in coupon table, except for couponId.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Payment Gateway</H1>
+<P STYLE="margin-bottom: 0in">Payment gateways are the mechanism by
+which users can pay for the items in their shopping cart. 
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “paymentGateway”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>paymentGatewayId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>the primary key</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>label</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A title for this payment that will be displayed to the user.
+			For example “Pay Pal” or “Credit Card” or “Check”</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>className</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(255)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The plugin classname that will be used for this payment
+			gateway.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>options</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>mediumtext</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A json serialized hash reference with configuration data for
+			this payment gateway.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Pay class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>_loadDriver</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>A method used load a payment gateway driver.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new WebGUI::Shop::Pay object. Returns a reference to
+			the object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in coupon table, except for couponId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this payment gateway.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the payment gateway id.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getOptions</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a hash reference of paymentGatewayIds as keys, with
+			“label” and “form” as subkeys. Label provides the human
+			readable label for the object, and form provides the HTML form,
+			that includes the button for the payment gateway option. This is
+			required since some payment gateways take the user off site and
+			have very complex forms that need to be created and posted to the
+			remote site. 
+			</P>
+			<P><BR>
+			</P>
+			<P>param: cart – a reference to the cart object to generate
+			options for.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a payment gateway based upon paymentGatewayId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: paymentGatewayId – the unique id to instantiate</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Update a parameter for the payment gateway.</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in paymentGateway table, except for paymentGatewayId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_listPaymentGateways</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a list of the payment gateways configured currently.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_editPaymentGateway</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>The add/edit form for managing a payment gateway.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_editPaymentGatwaySave</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Saves the result of www_editPaymentGateway and then displays
+			www_listPaymentGateways.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Payment Gateway
+Driver</H1>
+<P STYLE="margin-bottom: 0in">Payment gateway drivers are used to
+collect payment. In Perl terms this is the DBD to DBI. All payment
+gateway drivers (itransact, paypal, google checkout, etc) will be
+derived from this base class.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>Payment gateway drivers have no database tables, unless they need
+it on a one-off basis.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Pay::Driver class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>definition</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of hash references of fields that
+			are defined for this payment gateway driver similar to
+			definition() in WebGUI::Asset.</P>
+			<P><BR>
+			</P>
+			<P>param: definition – an array ref of hash refs</P>
+			<P><BR>
+			</P>
+			<P>field: 
+			</P>
+			<P>[</P>
+			<P>  name =&gt; “Payment Type”,</P>
+			<P>  fields =&gt; {</P>
+			<P>        label =&gt; { 
+			</P>
+			<P>            fieldType =&gt; “text”,</P>
+			<P>            label =&gt; “Label”,</P>
+			<P>            defaultValue =&gt; “Credit Card”</P>
+			<P>        },</P>
+			<P>        enabled =&gt; {</P>
+			<P>            fieldType =&gt; “yesNo”,</P>
+			<P>            label =&gt; “Enabled?”,</P>
+			<P>            defaultValue =&gt; 1</P>
+			<P>        },</P>
+			<P>        groupToUse =&gt; {</P>
+			<P>            fieldType =&gt; “group”,</P>
+			<P>            label =&gt; “Who can use?”,</P>
+			<P>            defaultValue =&gt; 1</P>
+			<P>        },</P>
+			<P>        receiptMessage =&gt; {</P>
+			<P>            fieldType =&gt; “text”,</P>
+			<P>            label =&gt; “Receipt Email Message”,</P>
+			<P>            defaultValue =&gt; undef</P>
+			<P>        },</P>
+			<P>    }</P>
+			<P>],</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getButton</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the HTML postable form that will take the user to check
+			out using this payment gateway.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getName</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Return a human readable name for this driver. Never overridden
+			in the subclass, instead specified in definition.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a driver.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: options – a hash reference of configurable parameters
+			for this driver</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Todo</H2>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">We need the following payment
+	gateways converted to the new API:</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">itransact</P>
+		<LI><P STYLE="margin-bottom: 0in">cash</P>
+		<LI><P STYLE="margin-bottom: 0in">check</P>
+	</OL>
+</OL>
+<H1 CLASS="western" STYLE="page-break-before: always">iTransact
+Driver</H1>
+<P STYLE="margin-bottom: 0in">This allows for credit card payments
+via the iTransact payment gateway.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>Payment gateway drivers have no database tables, unless they need
+it on a one-off basis.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Pay::Driver::Itransact class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>definition</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of hash references of fields that
+			are defined for this ship driver similar to definition() in
+			WebGUI::Asset.</P>
+			<P><BR>
+			</P>
+			<P>param: definition – an array ref of hash refs of definitions</P>
+			<P><BR>
+			</P>
+			<P>[</P>
+			<P> {</P>
+			<P>   name =&gt; “iTransact”,</P>
+			<P>   fields =&gt; {</P>
+			<P>     username =&gt; {</P>
+			<P>        label =&gt; “Vendor ID”,</P>
+			<P>        fieldType =&gt; “text”,</P>
+			<P>        defaultValue =&gt; undef</P>
+			<P>     },</P>
+			<P>     password =&gt; {</P>
+			<P>        label =&gt; “Password”,</P>
+			<P>        fieldType =&gt; “password”,</P>
+			<P>        defaultValue =&gt; undef</P>
+			<P>     },</P>
+			<P>     useCvv2 =&gt; {</P>
+			<P>        label =&gt; “Use CVV2?”,</P>
+			<P>        fieldType =&gt; “yesNo”,</P>
+			<P>        defaultValue =&gt; 1</P>
+			<P>     },</P>
+			<P> }</P>
+			<P>]</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getEditForm</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Similar to the method of the same name in WebGUI asset, but
+			uses the definition from this module.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getButton</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the HTML postable form that will take the user to check
+			out using this payment gateway.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a driver.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: options – a hash reference of configurable parameters
+			for this driver</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_collectPaymentInfo</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Collects payment info from the user.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_displayStatus</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Displays a status message to the user after collecting payment
+			info. The status may be a success message along with a printable
+			receipt, or an error message like “Credit card declined.”</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Shipper</H1>
+<P STYLE="margin-bottom: 0in">This is the master class to manage
+shipper drivers. In Perl terms the DBI to DBD.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “shipper”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shipperId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this shipper.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>label</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A title for this shipper that will be displayed to the user.
+			For example “Flat Rate” or “FedEx Overnight”</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>className</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(255)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The plugin classname that will be used for this shipping
+			module.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>options</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>mediumtext</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A json serialized hash reference with configuration data for
+			this shipper.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Ship class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>_loadDriver</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>A method used load a shipping driver.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new WebGUI::Shop::Ship object. Returns a reference to
+			the object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in shipper table, except for shipperId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this object.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the shippingId. Automatically converts the options json into a
+			hash reference.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the shipperId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getOptions</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a hash reference of shipperIds as keys, with “label”
+			and “price” as subkeys. Label provides the human readable
+			label for the object, and price provides the calculated price for
+			shipping.</P>
+			<P><BR>
+			</P>
+			<P>param: cart – a reference to the cart object to calculate
+			for.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a coupon based upon shipperId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: shipperId – the unique id to instantiate</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Update a parameter for the coupon.</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in coupon table, except for shipperId. Automatically
+			convert the options parameter into json.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_listShippers</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a list of the shippers configured currently.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_editShipper</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>The add/edit form for managing a shipper.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_editShipperSave</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Saves the result of www_editShipper and then displays
+			www_listShippers.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Shipper Driver</H1>
+<P STYLE="margin-bottom: 0in">Shipping modules are used to calculate
+shipping costs. Shipping modules are not allowed to have a user
+interface. Instead, they plug their data into the shopping cart
+screen if any items in the shopping cart have shipping. In Perl terms
+this is the DBD to DBI. All shipping drivers (flat rate, fedex, ups,
+dhl, usps, etc) will be derived from this base class.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>Shipping drivers have no database tables, unless they need it on a
+one-off basis.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Ship::Driver class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>calculate</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a shipping price.</P>
+			<P><BR>
+			</P>
+			<P>param: cart – a reference to the cart object.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>definition</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of hash references of fields that
+			are defined for this ship driver similar to definition() in
+			WebGUI::Asset.</P>
+			<P><BR>
+			</P>
+			<P>param: definition – an array ref of hash refs</P>
+			<P><BR>
+			</P>
+			<P>field: 
+			</P>
+			<P><BR>
+			</P>
+			<P>[</P>
+			<P>  name =&gt; “Shipper Type”,</P>
+			<P>  fields =&gt; {</P>
+			<P>        label =&gt; { 
+			</P>
+			<P>            fieldType =&gt; “text”,</P>
+			<P>            label =&gt; “Label”,</P>
+			<P>            defaultValue =&gt; undef</P>
+			<P>        },</P>
+			<P>        enabled =&gt; {</P>
+			<P>            fieldType =&gt; “yesNo”,</P>
+			<P>            label =&gt; “Enabled?”,</P>
+			<P>            defaultValue =&gt; 1</P>
+			<P>        },</P>
+			<P>    }</P>
+			<P>],</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getName</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Return a human readable name for this driver. Never overridden
+			in the subclass, instead specified in definition.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getEditForm</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Similar to the method of the same name in WebGUI asset, but
+			uses the definition from this module.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a driver.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: options – a hash reference of configurable parameters
+			for this driver</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Flat Rate
+Shipper</H1>
+<P STYLE="margin-bottom: 0in">This allows for basic shipping
+calculations without any tie-ins to external shippers.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>Shipping drivers have no database tables, unless they need it on a
+one-off basis.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Ship::Driver::Flat class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>calculate</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a shipping price. Calculates the shipping price using
+			the following formula:</P>
+			<P><BR>
+			</P>
+			<P>total cart price * percentageOfPrice</P>
+			<P> +</P>
+			<P>flatFee</P>
+			<P> +</P>
+			<P>total weight of shippable items * pricePerWeight</P>
+			<P> +</P>
+			<P>total quantity of shippable items * pricePerItem</P>
+			<P><BR>
+			</P>
+			<P>param: cart – a reference to the cart object.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>definition</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of hash references of fields that
+			are defined for this ship driver similar to definition() in
+			WebGUI::Asset.</P>
+			<P><BR>
+			</P>
+			<P>param: definition – an array ref of hash refs of definitions</P>
+			<P><BR>
+			</P>
+			<P>[</P>
+			<P> {</P>
+			<P>   name =&gt; “Flat Rate”,</P>
+			<P>   fields =&gt; {</P>
+			<P>     percentageOfPrice =&gt; {</P>
+			<P>        fieldType =&gt; “float”,</P>
+			<P>        label =&gt; “Percentage Of Price”,</P>
+			<P>        defaultValue =&gt; 0</P>
+			<P>     },</P>
+			<P>     flatFee =&gt; {</P>
+			<P>        fieldType =&gt; “float”,</P>
+			<P>        label =&gt; “Flat Fee”,</P>
+			<P>        defaultValue =&gt; 0</P>
+			<P>     },</P>
+			<P>     pricePerWeight =&gt; {</P>
+			<P>        fieldType =&gt; “float”,</P>
+			<P>        label =&gt; “Price Per Weight”,</P>
+			<P>        defaultValue =&gt; 0</P>
+			<P>     },</P>
+			<P>     pricePerItem =&gt; {</P>
+			<P>        label =&gt; “Price Per Item”,</P>
+			<P>        fieldType =&gt; “float”,</P>
+			<P>        defaultValue =&gt; 0</P>
+			<P>     },</P>
+			<P> }</P>
+			<P>]</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a driver.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: options – a hash reference of configurable parameters
+			for this driver</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Taxes</H1>
+<P STYLE="margin-bottom: 0in">There are various taxes that need to be
+applied to an order based upon where an order is being shipped to. 
+This class deals with that.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “tax”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>taxId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this tax.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>field</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The field to match against to calculate this tax.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>value</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The value of the field to match.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>taxRate</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>float, default 0</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A percentage of the sale price to tax.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Tax class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>add</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds an item to the tax table.</P>
+			<P><BR>
+			</P>
+			<P>param: field – choose from “country”, “state”, or
+			“code”.</P>
+			<P><BR>
+			</P>
+			<P>param: value – the value to match against field. For example,
+			for state it might be “WI”.</P>
+			<P><BR>
+			</P>
+			<P>param: taxRate – the rate to apply to this locale in percent.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>calculate</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a tax price. Calculates the tax price using the
+			following formula:</P>
+			<P><BR>
+			</P>
+			<P>total cart price * percentageOfPrice</P>
+			<P> +</P>
+			<P>flatFee</P>
+			<P> +</P>
+			<P>total weight of shippable items * pricePerWeight</P>
+			<P> +</P>
+			<P>total quantity of shippable items * pricePerItem</P>
+			<P><BR>
+			</P>
+			<P>param: cart – a reference to the cart object.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes an item from the tax table.</P>
+			<P><BR>
+			</P>
+			<P>param: taxId – the id of the item to delete</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>export</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a tab delimited file from the tax table using the
+			field, value, and taxRate in a temporary storage location, and
+			returns a reference to the storage location. 
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getItems</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a WebGUI::SQL::Result object containing the information
+			in the tax table.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>import</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes all the existing records in the tax table, and replaces
+			them with the values in the file.</P>
+			<P><BR>
+			</P>
+			<P>param: path – the path to the tab delimited file to import.
+			See the export() method for details.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instanciates the tax object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_add</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Checks to see if the user has privileges to access commerce
+			functions. If not, returns an insufficient privileges message. If
+			so, adds an item to the the tax table. Returns www_view.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Checks to see if the user has privileges to access commerce
+			functions. If not, returns an insufficient privileges message. If
+			so, deletes a tax item based upon taxId. Returns www_view.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_export</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Checks to see if the user has privileges to access commerce
+			functions. If not, returns an insufficient privileges message. If
+			so, returns a tab delimited file generated via the export()
+			method. Returns the www_view method.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_import</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Checks to see if the user has privileges to access commerce
+			functions. If not, returns an insufficient privileges message. If
+			so, pull a tab delimited file off the POST, and puts it into a
+			storage location. Then passes the path into the import() method.
+			Then deletes the storage location. Returns the www_view method.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_view</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Draws an HTML fragment showing the tax options. See the diagram
+			below for details.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Todo</H2>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">Convert existing state based tax
+	tables to the new system.</P>
+</OL>
+<H1 CLASS="western" STYLE="page-break-before: always">Address</H1>
+<P STYLE="margin-bottom: 0in">Addresses are used to store address
+information for users, for shipping, billing, and other uses. In the
+future the address object may be used by other subsystems, but it
+will first be used by commerce.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “address”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>addressId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this address.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>label</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A label for this address like “home”, “work”, etc.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>name</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of this shipping location be it a business name or a
+			personal name.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>address</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The street address of this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>city</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The city of this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>state</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The state or province of this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>code</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The zip code or postal code of this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>country</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The country of this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>phoneNumber</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A phone number for this location, used for shipping.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Address class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new WebGUI::Shop::Address object. Returns a reference
+			to the object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in address table, except for addressId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this object.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the addressId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a address based upon addressId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: addressId – the unique id to instantiate</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Update a parameter for the address.</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing a list of the
+			parameters in address table, except for addressId.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Transaction
+History</H1>
+<P STYLE="margin-bottom: 0in">Transaction history keeps track of all
+orders attempted whether successful or not as well as the state of
+all objects involved at the time of sale, because things change over
+time.</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this object's table
+called “transaction”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=155>
+	<COL WIDTH=168>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=155>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=168>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>transactionId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this transaction.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>isSuccessful</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>tinyint</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A boolean indicating whether the transaction succeeded or not.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>transactionCode</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The transaction id or code received from the payment gateway.
+			In iTransact it is called “xid”.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>statusCode</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A string indicating the status code for the transaction.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>statusMessage</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>If a longer message was given with the status code that is
+			stored here.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>userId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The userId that made the purchase.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>username</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The username of the user making the purchase.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>amount</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>float</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The total purchase amount.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingAddressId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unqiue id of the shipping address.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingAddressName</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of the person/company to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingAddress</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The street address to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingState</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The state or province to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingCity</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The city to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingCode</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(20)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The postal code or zip code to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingCountry</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The country to ship to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingPhone</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The phone number for this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingMethodId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The id of the shipping plugin used.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingMethodTitle</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of the shipping method used.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingTrackingNumber</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A tracking number received back from a shipping module, if any.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>shippingStatus</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(35), default 'NotShipped'</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A flag indicating whether the order has shipped, is on back
+			order, or whatever.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingAddressId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id of the billing address for this order.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingName</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name this of person/company to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingAddress</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The street address to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingState</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The state or province to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingCity</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The city to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingCode</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(20)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The postal code or zip code to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingCountry</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The country to bill to.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingPhone</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(35)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The phone number for this location.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingMethodId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The id of the billing method used.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>billingMethodTitle</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of the billing method used.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>couponId</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id of the coupon applied to this order.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>couponTitle</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The title of the coupon applied to this order.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=155>
+			<P>totalPrice</P>
+		</TD>
+		<TD WIDTH=168>
+			<P>float</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The final sale price.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P>The following fields are needed to construct this object's table
+called “transactionItems”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>transactionId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id for this transaction.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>assetId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The assetId for this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>title</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The title of this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>options</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>mediumText</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A json serialized hashref of any configuration data associated
+			with this item so that it can be edited or whatnot. 
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingAddressId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>Assign a special shipping address to this item beyond the one
+			attached at the cart level.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingAddressName</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of the person/company to ship to. Only used when a
+			special shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingAddress</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The street address to ship to. Only used when a special
+			shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingState</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The state or province to ship to. Only used when a special
+			shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingCity</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The city to ship to. Only used when a special shipping address
+			has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingCode</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(20)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The postal code or zip code to ship to. Only used when a
+			special shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingCountry</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The country to ship to. Only used when a special shipping
+			address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingMethodId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The id of the shipping plugin used. Only used when a special
+			shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingMethodTitle</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(100)</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The name of the shipping method used. Only used when a special
+			shipping address has been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>shippingStatus</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(35),default 'NotShipped'</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>A flag indicating whether the item has shipped, is on back
+			order, or whatever. Only used when a special shipping address has
+			been attached to this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>quantity</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>integer</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The number of this sku desired.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>price</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>float</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The price paid for this item.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Shop::Transaction class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>addItem</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds an item to the transactionItems table. Automatically
+			serialize hashRefs like options into json. Make a callback to the
+			original SKU to let it know that the item has been purchased. This
+			enables things like tickets to be decremented, kick off a
+			workflow, and subscriptions to give permissions, etc.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>create</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Creates a new transaction object. Returns a reference to the
+			object.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing any/all of the
+			fields from the transaction table minus the “transactionId”
+			field.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>delete</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Deletes this transaction and all related transaction items.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>get</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a duplicated hash reference of this object's data.</P>
+			<P><BR>
+			</P>
+			<P>param: any field – returns the value of a field rather than
+			the hash reference</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getId</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns the transaction id.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getItems</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns an array reference of hash references for all the rows
+			of data in the transactionItem table. Automatically convert
+			serilized json into hash reference.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>new</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instantiates a WebGUI::Shop::Transaction object using
+			transactionId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: transactionId</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>set</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Updates a transaction object.</P>
+			<P><BR>
+			</P>
+			<P>param: hashRef – a hash reference containing any/all of the
+			fields from the transaction table minus the “transactionId”
+			field.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>setStatus</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Default status is “pending” as items are being added to it.
+						</P>
+			<P><BR>
+			</P>
+			<P>param: status – The status to set:</P>
+			<P><BR>
+			</P>
+			<P>pending – default</P>
+			<P>pending payment – waiting on payment to complete</P>
+			<P>pending shipment – waiting on shipment to be marked</P>
+			<P>complete – order has been paid and shipped</P>
+			<P>returned – order has been cancelled 
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Todo</H2>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">Convert all existing transactions
+	in the current transactions table into the new style transactions.</P>
+	<LI><P STYLE="margin-bottom: 0in">Convert recurring transactions
+	back into their relevant subscription asset types so subscriptions
+	are tracking their own subscribers.</P>
+	<LI><P STYLE="margin-bottom: 0in">As soon as a transaction object
+	has been created a workflow should be kicked off. The workflow will
+	go through various stages as the status of the order is updated.
+	Various workflow activities will need to be completed for this.</P>
+	<LI><P STYLE="margin-bottom: 0in">We need to create screens for
+	users to see their transaction history, and administrators to manage
+	their transaction history.</P>
+</OL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">SKU (base
+product class)</H1>
+<P STYLE="margin-bottom: 0in">The SKU class is what all other
+products will be subclassed from. It needs to be simple so it can be
+extended to fit any need.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this assets table
+called “SKU”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>assetId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id assigned to this sku that may never change. It's
+			with all assets</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>sku</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>varchar(35) unique</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id that the shop keeper assigns to this item. It may
+			be changed by the shop keeper. By default this is set equal to
+			assetId.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>vendorId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P>The unique id of the vendor associated with this sku, if any</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Asset::Sku class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>asset methods</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>all the methods from the WebGUI::Asset superclass</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>addToCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds this sku to the shopping cart.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>applyOptions</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Accepts a configuration data hash reference that can configure
+			a sku a certain way. For example, “a size XL red t-shirt”
+			instead of just “a t-shirt”.</P>
+			<P><BR>
+			</P>
+			<P>param: options – a hash reference containing the
+			configuration properties returned from getConfiguration()</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getOptions</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Returns a hash reference of configuration data that can return
+			this sku to a configured state. See applyConfiguration() for
+			details.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getMaxAllowedInCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>By default returns 99999999. Should be overridden by
+			subclasses. For unique items should return 1. For items that have
+			a count in stock, should return the number that are currently in
+			stock.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>getPrice</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>By default return 0.00. Should be overridden by subclasses.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>isShippingRequired</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>By default return 0. Should be overridden by subclasses.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>newBySku</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Instanciates based on an existing sku, rather than an assetId.</P>
+			<P><BR>
+			</P>
+			<P>param: session – a reference to the current session</P>
+			<P><BR>
+			</P>
+			<P>param: sku – the sku to instanciate</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>processStyle</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Looks up the style from the container and and wrappers the
+			product in it.</P>
+			<P><BR>
+			</P>
+			<P>param: html – the HTML output to be wrapped by the style</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=467>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Donation Asset</H1>
+<P STYLE="margin-bottom: 0in">This asset will be used by sites that
+want to accept variable amount funds from it's users. But the reason
+it will be built as part of this project is to prove variable
+pricing.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this assets table
+called “Donation”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>assetId</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>guid</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P>revisionDate</P>
+		</TD>
+		<TD WIDTH=182>
+			<P>bigint</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Asset::Wobject::Donation class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>view</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Displays the donation amount form.</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_addToCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds this item to the cart.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Subscription
+Asset</H1>
+<P STYLE="margin-bottom: 0in">This will be an asset in the form of
+the subscription manager.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Todo</H2>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">Write a subscription asset.</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">Move the “redeem a subscription
+		code” functionality from the user account to the subscription
+		asset.</P>
+	</OL>
+	<LI><P STYLE="margin-bottom: 0in">Convert all subscriptions into
+	subscription assets.</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">Create subscription assets in the
+		import node under a folder called “Subscriptions”.</P>
+		<LI><P STYLE="margin-bottom: 0in">Write an upgrade migration to
+		convert all ^SubscriptionItem(); macros into ^AssetProxy macros.</P>
+		<LI><P STYLE="margin-bottom: 0in">Write an upgrade migration to
+		convert all ^SubscriptionItemPurchaseUrl macros into ^AssetProxy
+		macros. I know this isn't a 1:1 translation, which is why we also
+		need to add something to the gotchas to warn people about the
+		change.</P>
+		<LI><P STYLE="margin-bottom: 0in">Convert subscription recurring
+		urls to new subscription urls or provide instructions for doing it.</P>
+	</OL>
+	<LI><P STYLE="margin-bottom: 0in">Delete the SubscriptionItem macro
+	code and its reference from the config file.</P>
+	<LI><P STYLE="margin-bottom: 0in">Delete the
+	SubscriptionItemPurchaseUrl code and its reference from the config
+	file.</P>
+	<LI><P STYLE="margin-bottom: 0in">Make new templates that look good,
+	and throw out the old ones.</P>
+</OL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this assets table
+called “Subscription”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Asset::Wobject::Subscription class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_addToCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds this item to the cart.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Product Asset</H1>
+<P STYLE="margin-bottom: 0in">This asset will be the mix of the
+current product asset and the products that are in the product
+manager in the admin console.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Todo</H2>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">Merge the products in the product
+	manager into the product asset.</P>
+	<UL>
+		<LI><P STYLE="margin-bottom: 0in">Make the URL of the new products
+		the skew.</P>
+		<LI><P STYLE="margin-bottom: 0in">Place all the new products in the
+		import node under a “Products” folder.</P>
+		<LI><P STYLE="margin-bottom: 0in">Write an upgrade migration to get
+		rid of the ^Product(); macro and replace it with the ^AssetProxy;
+		macro.</P>
+	</UL>
+	<LI><P STYLE="margin-bottom: 0in">Convert all products to use the
+	base product class.</P>
+	<LI><P STYLE="margin-bottom: 0in">Eliminate all product manager code
+	from the admin console.</P>
+	<LI><P STYLE="margin-bottom: 0in">Delete the Product macro code and
+	it's reference from the config file.</P>
+	<LI><P STYLE="margin-bottom: 0in">Make new templates that look good,
+	and throw out the old ones.</P>
+</UL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Data Dictionary</H2>
+<P>The following fields are needed to construct this assets table
+called “Product”.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=141>
+	<COL WIDTH=182>
+	<COL WIDTH=316>
+	<TR VALIGN=TOP>
+		<TH WIDTH=141>
+			<P>Field</P>
+		</TH>
+		<TH WIDTH=182>
+			<P>Schema</P>
+		</TH>
+		<TH WIDTH=316>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=141>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=182>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=316>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H2 CLASS="western">Method Dictionary</H2>
+<P STYLE="margin-bottom: 0in">The following methods will be available
+from the WebGUI::Asset::Wobject::Product class.</P>
+<TABLE WIDTH=665 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+	<COL WIDTH=180>
+	<COL WIDTH=467>
+	<TR VALIGN=TOP>
+		<TH WIDTH=180>
+			<P>Method</P>
+		</TH>
+		<TH WIDTH=467>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=180>
+			<P>www_addToCart</P>
+		</TD>
+		<TD WIDTH=467>
+			<P>Adds this item to the cart.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western" STYLE="page-break-before: always">Event Manager
+Asset</H1>
+<P STYLE="margin-bottom: 0in">The event manager asset needs to be
+updated to use the new commerce subsystem. 
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">TODO:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">Make use of the new base product
+	class.</P>
+	<LI><P STYLE="margin-bottom: 0in">Set all cart items to unique so
+	that quantity cannot be incremented.</P>
+	<LI><P STYLE="margin-bottom: 0in">Set a callback workflow to mark
+	tickets out of stock, associate a transaction id with the badge,
+	etc.</P>
+	<LI><P STYLE="margin-bottom: 0in">Update the templates to reflect
+	changes</P>
+	<LI><P STYLE="margin-bottom: 0in">Update the templates to reflect
+	suggestions from GAMA</P>
+</UL>
+</BODY>
+</HTML>
