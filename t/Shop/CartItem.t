@@ -20,7 +20,7 @@ use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
-use WebGUI::Shop::Cart;
+use WebGUI::Shop::CartItem;
 
 #----------------------------------------------------------------------------
 # Init
@@ -30,15 +30,10 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 5;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
-
-my $cart = WebGUI::Shop::Cart->create($session);
-
-isa_ok($cart, "WebGUI::Shop::Cart");
-isa_ok($cart->session, "WebGUI::Session");
 
 my $root = WebGUI::Asset->getRoot($session);
 my $product = $root->addChild($session, {
@@ -47,20 +42,14 @@ my $product = $root->addChild($session, {
     price=>4.99
     });
 
-$cart->addItem($product, 1);
-is(scalar(@{$cart->getItems}), 1, "Added an item to the cart.");
-like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
+my $item = WebGUI::Shop::CartItem->create($session, "XXX", $product, 2);
+isa_ok($item, "WebGUI::Shop::CartItem");
+isa_ok($item->session, "WebGUI::Session", "did we get a session");
 
-is(ref($cart->get), "HASH", "Cart properties are a hash reference.");
-is($cart->get("sessionId"), $session->getId, "Can retrieve a value from the cart properties.");
-$cart->set({shippingAddressId => "XXXX"});
-is($cart->get("shippingAddressId"), "XXXX", "Can set values to the cart properties.");
+is(ref($item->get), "HASH", "Do we have a hash of properties?");
+is($item->get("quantity"), 2, "Should have 2 of these in the cart.");
+is($item->delete, undef, "actually deletes the item");
 
-$cart->empty;
-is($session->db->quickScalar("select count(*) from cartItems where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
-
-$cart->delete;
-is($cart, undef, "Can destroy cart.");
 
 $product->purge;
 

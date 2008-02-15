@@ -25,16 +25,32 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 insertCommerceTaxTable($session);
+migrateToNewCart($session);
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+#-------------------------------------------------
+sub migrateToNewCart {
+	my $session = shift;
+	print "\tInstall new shopping cart.\n" unless ($quiet);
+    $session->db->write("create table cart (
+        cartId varchar(22) binary not null primary key,
+        sessionId varchar(22) binary not null,
+        shippingAddressId varchar(22) binary,
+        couponId varchar(22) binary,
+        index sessionId (sessionId)
+    )");
+    $session->db->write("create table cartItems (
+        cartId varchar(22) binary not null,
+        assetId varchar(22) binary not null,
+        options mediumtext,
+        shippingAddressId varchar(22) binary,
+        quantity integer not null default 1,
+        index cartId_assetId (cartId,assetId)
+    )");
+    $session->db->write("drop table shoppingCart");
+}
 
 #-------------------------------------------------
 sub insertCommerceTaxTable {
@@ -44,7 +60,7 @@ sub insertCommerceTaxTable {
     $session->db->write(<<EOSQL);
 
 CREATE TABLE tax (
-    taxId    VARCHAR(22)  NOT NULL,
+    taxId    VARCHAR(22)  binary NOT NULL,
     field    VARCHAR(100) NOT NULL,
     value    VARCHAR(100) DEFAULT 0.0,
     taxRate  FLOAT        NOT NULL,
