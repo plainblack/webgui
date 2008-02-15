@@ -872,8 +872,12 @@ Validates the a username.
 sub validUsername {
 	my $self = shift;
 	my $username = shift;
-	WebGUI::Macro::negate(\$username);
 	my $error = "";
+
+    my $filteredUsername = WebGUI::HTML::filter($username, 'all');
+    if ($username ne $filteredUsername) {
+        $error .= $self->error;
+    }
 
 	if ($self->_isDuplicateUsername($username)) {
 		$error .= $self->error;
