@@ -37,7 +37,8 @@ Add tax information to the table.  Returns the taxId of the newly created tax in
 
 =head3 $params
 
-A hash ref of the geographic and rate information.  All parameters are required.
+A hash ref of the geographic and rate information.  All parameters are required and
+must have defined values.
 
 =head4 field
 
@@ -62,6 +63,12 @@ sub add {
     my $self   = shift;
     my $params = shift;
     my $id = $self->session->id->generate();
+    croak "Must pass in a hashref"
+        unless ref($params) eq 'HASH';
+    foreach my $key (qw/field value taxRate/) {
+        croak "Hash ref must contain a $key key with a defined value"
+            unless exists($params->{$key}) and defined $params->{$key};
+    }
     $self->session->db->write('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)', [$id, @{ $params }{qw[ field value taxRate ]}]);
     return $id;
 }

@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 17;
+my $tests = 24;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -71,6 +71,46 @@ is($taxIterator->rows, 0, 'WebGUI ships with no predefined tax data');
 # add
 #
 #######################################################################
+
+eval{$taxer->add()};
+like($@, qr{Must pass in a hashref},
+    'add: error handling for missing hashref');
+
+eval{$taxer->add({})};
+like($@, qr{Hash ref must contain a field key with a defined value},
+    'add: error handling for missing field hashref key');
+
+my $taxData = {
+    field   => undef,
+};
+
+eval{$taxer->add($taxData)};
+like($@, qr{Hash ref must contain a field key with a defined value},
+    'add: error handling for undefined field key');
+
+$taxData->{field} = 'state';
+
+eval{$taxer->add($taxData)};
+like($@, qr{Hash ref must contain a value key with a defined value},
+    'add: error handling for missing value key');
+
+$taxData->{value} = undef;
+
+eval{$taxer->add($taxData)};
+like($@, qr{Hash ref must contain a value key with a defined value},
+    'add: error handling for undefined value key');
+
+$taxData->{value} = 'Oregon';
+
+eval{$taxer->add($taxData)};
+like($@, qr{Hash ref must contain a taxRate key with a defined value},
+    'add: error handling for missing taxRate key');
+
+$taxData->{taxRate} = undef;
+
+eval{$taxer->add($taxData)};
+like($@, qr{Hash ref must contain a taxRate key with a defined value},
+    'add: error handling for undefined taxRate key');
 
 my $taxData = {
     field   => 'state',
