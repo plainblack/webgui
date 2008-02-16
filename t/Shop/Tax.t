@@ -28,13 +28,15 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 24;
+my $tests = 27;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $loaded = use_ok('WebGUI::Shop::Tax');
+
+my $storage;
 
 SKIP: {
 
@@ -188,6 +190,17 @@ $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 1, 'No rows were deleted from the table since the requested id does not exist');
 is($taxIterator->hashRef->{taxId}, $wisconsinTaxId, 'The correct tax information was deleted');
 
+#######################################################################
+#
+# export
+#
+#######################################################################
+
+$storage = $taxer->export();
+isa_ok($storage, 'WebGUI::Storage', 'export returns a WebGUI::Storage object');
+is($storage->{_part1}, 'temp', 'The storage object is in the temporary area');
+ok(-e $storage->getPath('siteTaxData.csv'), 'siteTaxData.csv file exists in the storage object');
+
 }
 
 
@@ -195,4 +208,5 @@ is($taxIterator->hashRef->{taxId}, $wisconsinTaxId, 'The correct tax information
 # Cleanup
 END {
     $session->db->write('delete from tax');
+    $storage->delete;
 }

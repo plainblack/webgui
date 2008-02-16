@@ -4,6 +4,8 @@ use strict;
 
 use Class::InsideOut qw{ :std };
 use Carp qw(croak);
+use WebGUI::Text;
+use WebGUI::Storage;
 
 =head1 NAME
 
@@ -98,6 +100,30 @@ sub delete {
         unless exists($params->{taxId}) and defined $params->{taxId};
     $self->session->db->write('delete from tax where taxId=?', [$params->{taxId}]);
     return;
+}
+
+#-------------------------------------------------------------------
+
+=head2 export ( )
+
+Creates a tab deliniated file containing all the information from
+the tax table.  Returns a temporary WebGUI::Storage object containing
+the file.  The file will be named "siteTaxData.csv".
+
+=cut
+
+sub export {
+    my $self = shift;
+    my $taxIterator = $self->getItems;
+    my @columns = qw{ field value taxRate };
+    my $taxData = WebGUI::Text::joinCSV(@columns) . "\n";
+    while (my $taxRow = $taxIterator->hashRef() ) {
+        my @taxData = @{ $taxRow }{@columns};
+        $taxData .= WebGUI::Text::joinCSV(@taxData) . "\n";
+    }
+    my $storage = WebGUI::Storage->createTemp($self->session);
+    $storage->addFileFromScalar('siteTaxData.csv', $taxData);
+    return $storage;
 }
 
 #-------------------------------------------------------------------
