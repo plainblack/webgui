@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 11;
+my $tests = 17;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -118,6 +118,35 @@ is($taxIterator->rows, 2, 'add did not add another row since it would be a dupli
 ##53701-53709
 ##city rate: 0.5%
 ##Wisconsin rate 5.0%
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
+
+eval{$taxer->delete()};
+like($@, qr{Must pass in a hashref},
+    'delete: error handling for missing hashref');
+
+eval{$taxer->delete({})};
+like($@, qr{Hash ref must contain a taxId key with a defined value},
+    'delete: error handling for missing key in hashref');
+
+eval{$taxer->delete({ taxId => undef })};
+like($@, qr{Hash ref must contain a taxId key with a defined value},
+    'delete: error handling for an undefined taxId value');
+
+$taxer->delete({ taxId => $oregonTaxId });
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 1, 'One row was deleted from the tax table');
+
+$taxer->delete({ taxId => $session->id->generate });
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 1, 'No rows were deleted from the table since the requested id does not exist');
+is($taxIterator->hashRef->{taxId}, $wisconsinTaxId, 'The correct tax information was deleted');
 
 }
 

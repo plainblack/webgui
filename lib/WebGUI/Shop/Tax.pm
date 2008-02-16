@@ -3,6 +3,7 @@ package WebGUI::Shop::Tax;
 use strict;
 
 use Class::InsideOut qw{ :std };
+use Carp qw(croak);
 
 =head1 NAME
 
@@ -63,6 +64,33 @@ sub add {
     my $id = $self->session->id->generate();
     $self->session->db->write('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)', [$id, @{ $params }{qw[ field value taxRate ]}]);
     return $id;
+}
+
+#-------------------------------------------------------------------
+
+=head2 delete ( [$params] )
+
+Deletes data from the tax table by taxId.
+
+=head3 $params
+
+A hashref containing the taxId of the data to delete from the table.
+
+=head4 taxId
+
+The taxId of the data to delete from the table.
+
+=cut
+
+sub delete {
+    my $self   = shift;
+    my $params = shift;
+    croak "Must pass in a hashref"
+        unless ref($params) eq 'HASH';
+    croak "Hash ref must contain a taxId key with a defined value"
+        unless exists($params->{taxId}) and defined $params->{taxId};
+    $self->session->db->write('delete from tax where taxId=?', [$params->{taxId}]);
+    return;
 }
 
 #-------------------------------------------------------------------
