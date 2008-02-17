@@ -20,6 +20,7 @@ use Test::More;
 use Test::Deep;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Text;
 
 #----------------------------------------------------------------------------
 # Init
@@ -28,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 27;
+my $tests = 30;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -200,7 +201,16 @@ $storage = $taxer->export();
 isa_ok($storage, 'WebGUI::Storage', 'export returns a WebGUI::Storage object');
 is($storage->{_part1}, 'temp', 'The storage object is in the temporary area');
 ok(-e $storage->getPath('siteTaxData.csv'), 'siteTaxData.csv file exists in the storage object');
-
+cmp_ok($storage->getFileSize('siteTaxData.csv'), '!=', 0, 'CSV file is not empty');
+my @fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');
+my @header = WebGUI::Text::splitCSV($fileLines[0]);
+my @expectedHeader = qw/field value taxRate/;
+cmp_deeply(\@header, \@expectedHeader, 'export: header line is correct');
+my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
+use Data::Dumper;
+my $wiData = $taxer->getItems->hashRef;
+##Need to ignore the taxId from the database
+cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'export: first line of data is correct');
 }
 
 
