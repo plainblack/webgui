@@ -49,7 +49,7 @@ my $extensionTests = [
 	},
 ];
 
-plan tests => 74 + scalar @{ $extensionTests }; # increment this value for each test you create
+plan tests => 75 + scalar @{ $extensionTests }; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -89,7 +89,7 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 #
 ####################################################
 
-is( $storage1->getPathFrag, 'fo/ob/foobar');
+is( $storage1->getPathFrag, 'fo/ob/foobar', 'pathFrag returns correct value');
 
 ####################################################
 #
@@ -195,7 +195,7 @@ open my $fcon, "< ".$filePath or
 	die "Unable to open $filePath for reading: $!\n";
 my $fileContents;
 {
-	local undef $/;
+	local $/;
 	$fileContents = <$fcon>;
 }
 close $fcon;
@@ -203,6 +203,8 @@ close $fcon;
 is ($fileContents, $content, 'file contents match');
 
 is ($storage1->getFileContentsAsScalar($filename), $content, 'getFileContentsAsScalar matches');
+
+isnt($/, undef, 'getFileContentsAsScalar did not change $/');
 
 foreach my $extTest (@{ $extensionTests }) {
 	is( $storage1->getFileExtension($extTest->{filename}), $extTest->{extension}, $extTest->{comment} );
