@@ -104,7 +104,7 @@ sub delete {
 
 #-------------------------------------------------------------------
 
-=head2 export ( )
+=head2 exportTaxData ( )
 
 Creates a tab deliniated file containing all the information from
 the tax table.  Returns a temporary WebGUI::Storage object containing
@@ -112,7 +112,7 @@ the file.  The file will be named "siteTaxData.csv".
 
 =cut
 
-sub export {
+sub exportTaxData {
     my $self = shift;
     my $taxIterator = $self->getItems;
     my @columns = qw{ field value taxRate };
@@ -139,6 +139,56 @@ sub getItems {
     my $self = shift;
     my $result = $self->session->db->read('select * from tax');
     return $result;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importTaxData ( $filePath )
+
+Import tax information from the specified file in CSV format.  The
+first line of the file should contain the name of the columns, in
+any order.  The following lines will contain tax information.  Blank
+lines and anything following a '#' sign will be ignored.
+
+=cut
+
+sub importTaxData {
+    my $self     = shift;
+    my $filePath = shift;
+    croak q{Must provide the path to a file}
+        unless $filePath;
+    croak qq{$filePath could not be found}
+        unless -e $filePath;
+    croak qq{$filePath is not readable}
+        unless -r $filePath;
+    open my $table, '<', $filePath or
+        croak "Unable to open $filePath for reading: $!\n";
+    my $headers;
+    $headers = <$table>;
+    chomp $headers;
+    my @headers = WebGUI::Text::splitCSV($headers);
+    croak qq{Bad header found in the CSV file}
+        unless (join(q{-}, sort @headers) eq 'field-taxRate-value')
+           and (scalar @headers == 3);
+    my @taxData = ();
+    my $line = 1;
+    while (my $taxRow = <$table>) {
+        chomp $taxRow;
+        my @taxRow = WebGUI::Text::splitCSV($taxRow);
+        croak qq{Error on line $line in file $filePath}
+            unless scalar @taxRow == 3;
+        push @taxData, [ @taxRow ];
+    }
+    ##Okay, if we got this far, then the data looks fine.
+    $self->session->db->beginTransaction;
+    $self->session->db->write('delete from tax');
+    foreach my $taxRow (@taxData) {
+        my %taxRow;
+        @taxRow{ @headers } = @{ $taxRow }; ##Must correspond 1:1, or else...
+        $self->add(\%taxRow);
+    }
+    $self->session->db->commit;
+    return;
 }
 
 #-------------------------------------------------------------------

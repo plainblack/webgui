@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 30;
+my $tests = 34;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -193,24 +193,62 @@ is($taxIterator->hashRef->{taxId}, $wisconsinTaxId, 'The correct tax information
 
 #######################################################################
 #
-# export
+# exportTaxData
 #
 #######################################################################
 
-$storage = $taxer->export();
-isa_ok($storage, 'WebGUI::Storage', 'export returns a WebGUI::Storage object');
+$storage = $taxer->exportTaxData();
+isa_ok($storage, 'WebGUI::Storage', 'exportTaxData returns a WebGUI::Storage object');
 is($storage->{_part1}, 'temp', 'The storage object is in the temporary area');
 ok(-e $storage->getPath('siteTaxData.csv'), 'siteTaxData.csv file exists in the storage object');
 cmp_ok($storage->getFileSize('siteTaxData.csv'), '!=', 0, 'CSV file is not empty');
 my @fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');
+#my @fileLines = ();
 my @header = WebGUI::Text::splitCSV($fileLines[0]);
 my @expectedHeader = qw/field value taxRate/;
-cmp_deeply(\@header, \@expectedHeader, 'export: header line is correct');
+cmp_deeply(\@header, \@expectedHeader, 'exportTaxData: header line is correct');
 my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
 use Data::Dumper;
 my $wiData = $taxer->getItems->hashRef;
 ##Need to ignore the taxId from the database
-cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'export: first line of data is correct');
+cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'exportTaxData: first line of data is correct');
+
+#######################################################################
+#
+# import
+#
+#######################################################################
+
+eval { $taxer->importTaxData(); };
+like($@, qr{Must provide the path to a file},
+    'importTaxData: error handling for an undefined taxId value');
+
+eval { $taxer->importTaxData('/path/to/nowhere'); };
+like($@, qr{/path/to/nowhere could not be found},
+    'importTaxData: error handling for file that does not exist in the filesystem');
+
+my $taxFile = WebGUI::Test->getTestCollateralPath('taxTable.csv');
+
+SKIP: {
+    skip 'Root will cause this test to fail since it does not obey file permissions', 1
+        if $< == 0;
+
+    my $originalChmod = (stat $taxFile)[2];
+    chmod oct(0000), $taxFile;
+
+    eval { $taxer->importTaxData($taxFile); };
+    like($@, qr{is not readable},
+        'importTaxData: error handling for file that cannot be read');
+
+    chmod $originalChmod, $taxFile;
+
+}
+
+$taxer->importTaxData($taxFile);
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 4, 'import: Old data deleted, new data imported');
+
 }
 
 
