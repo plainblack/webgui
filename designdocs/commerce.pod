@@ -1018,7 +1018,7 @@ Deletes an item from the tax table.
 
 param: taxId E<acirc>E<128>E<147> the id of the item to delete
 
-export
+exportTaxData
 
 Creates a tab delimited file from the tax table using the field, value,
 and taxRate in a temporary storage location, and returns a reference to
@@ -1029,7 +1029,7 @@ getItems
 Returns a WebGUI::SQL::Result object containing the information in the
 tax table.
 
-import
+importTaxData
 
 Deletes all the existing records in the tax table, and replaces them
 with the values in the file.
