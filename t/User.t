@@ -220,19 +220,19 @@ is($admin->profileField('uiLevel'), 9, 'Admin default uiLevel = 9');
 my $visitor = WebGUI::User->new($session, 1);
 is($visitor->profileField('uiLevel'), 5, 'Visitor gets the default uiLevel of 5');
 
-$session->db->write('update userSession set lastIP=? where sessionId=?',['192.168.0.101', $session->getId]);
+$session->db->write('update userSession set lastIP=? where sessionId=?',['194.168.0.101', $session->getId]);
 
 my ($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
-is ($result, '192.168.0.101', "userSession setup correctly");
+is ($result, '194.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
 ok ($admin->isInGroup($cm->getId), "Admin is member of group");
 
 my $origFilter = $cm->ipFilter;
 
-$cm->ipFilter('192.168.0.0/24');
+$cm->ipFilter('194.168.0.0/24');
 
-is( $cm->ipFilter, "192.168.0.0/24", "ipFilter assignment to local net, 192.168.0.0/24");
+is( $cm->ipFilter, "194.168.0.0/24", "ipFilter assignment to local net, 194.168.0.0/24");
 
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
 
@@ -314,9 +314,9 @@ $dude->deleteFromGroups([12]);
 
 ##Spoof the IP address to test subnet level access control to adminMode
 my $origEnvHash = $session->env->{_env};
-my %newEnv = ( REMOTE_ADDR => '192.168.0.2' );
+my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
 $session->env->{_env} = \%newEnv;
-$session->config->set('adminModeSubnets', ['192.168.0.0/24']);
+$session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: just being in the subnet does not allow adminMode access');

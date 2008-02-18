@@ -53,7 +53,7 @@ my @scratchTests = (
 
 my @ipTests = (
 			{
-				ip => '192.168.0.2',
+				ip => '194.168.0.2',
 				comment => 'good IP address',
 				expect  => 1,
 			},
@@ -63,7 +63,7 @@ my @ipTests = (
 				expect  => 0,
 			},
 			{
-				ip => '192.168.0.128',
+				ip => '194.168.0.128',
 				comment => 'another good IP address',
 				expect  => 1,
 			},
@@ -532,6 +532,7 @@ foreach my $idx (0..$#ipTests) {
 	##Set the ip to be used by the session for this user
 	my $ip = $ipTests[$idx]->{ip};
 	$ENV{REMOTE_ADDR} = $ip;
+
 	##Create a new session
 	$sessionBank[$idx] = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
 
@@ -548,7 +549,7 @@ foreach my $idx (0..$#ipTests) {
 
 my $gI = WebGUI::Group->new($session, "new");
 $gI->name('Group I');
-$gI->ipFilter('192.168.0.0/24');
+$gI->ipFilter('194.168.0.0/24');
 
 cmp_bag(
 	$gI->getIpUsers,
