@@ -65,7 +65,7 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 #
 ####################################################
 
-is( $storage1->getPathFrag, 'fo/ob/foobar');
+is( $storage1->getPathFrag, 'fo/ob/foobar', 'pathFrag returns correct value');
 
 ####################################################
 #
