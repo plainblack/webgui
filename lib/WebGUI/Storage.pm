@@ -619,7 +619,7 @@ sub getFileContentsAsScalar {
 	my $filename = shift;
 	my $content;
 	open (my $FILE,"<",$self->getPath($filename));
-    local undef $/;
+    local $/;
     $content = <$FILE>;
 	close($FILE);
 	return $content;
