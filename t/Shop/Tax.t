@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 34;
+my $tests = 45;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -244,13 +244,95 @@ SKIP: {
 
 }
 
-$taxer->importTaxData($taxFile);
+my $expectedTaxData = [
+        {
+            field   => 'state',
+            value   => 'Wisconsin',
+            taxRate => 5.0,
+        },
+        {
+            field   => 'code',
+            value   => 53701,
+            taxRate => 0.5,
+        },
+];
+
+ok(
+    $taxer->importTaxData(
+        $taxFile
+    ),
+    'Good tax data inserted',
+);
 
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 4, 'import: Old data deleted, new data imported');
+is($taxIterator->rows, 2, 'import: Old data deleted, new data imported');
+my @goodTaxData = _grabTaxData($taxIterator);
+cmp_bag(
+    \@goodTaxData,
+    $expectedTaxData,
+    'Correct data inserted.',
+);
+
+ok(
+    $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/orderedTaxTable.csv')
+    ),
+    'Reordered tax data inserted',
+);
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 2, 'import: Old data deleted, new data imported again');
+my @orderedTaxData = _grabTaxData($taxIterator);
+cmp_bag(
+    \@orderedTaxData,
+    $expectedTaxData,
+    'Correct data inserted, with CSV in different columnar order.',
+);
+
+ok(
+    $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/commentedTaxTable.csv')
+    ),
+    'Commented tax data inserted',
+);
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 2, 'import: Old data deleted, new data imported the third time');
+my @orderedTaxData = _grabTaxData($taxIterator);
+cmp_bag(
+    \@orderedTaxData,
+    $expectedTaxData,
+    'Correct data inserted, with comments in the CSV file',
+);
+
+ok(
+    ! $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/emptyTaxTable.csv')
+    ),
+    'Empty tax data not inserted',
+);
+
+my $failure;
+eval {
+    $failure = $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/badTaxTable.csv')
+    );
+};
+ok (!$failure, 'Tax data not imported');
+like($@, qr{Error on line \d+ in file},
+    'importTaxData: error handling when the CSV data is missing an entry on 1 line');
 
 }
 
+sub _grabTaxData {
+    my $tax = shift;
+    my @taxData = ();
+    while (my $taxRow = $tax->hashRef) {
+        delete $taxRow->{'taxId'};
+        push @taxData, $taxRow;
+    }
+    return @taxData;
+}
 
 #----------------------------------------------------------------------------
 # Cleanup

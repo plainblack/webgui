@@ -147,8 +147,15 @@ sub getItems {
 
 Import tax information from the specified file in CSV format.  The
 first line of the file should contain the name of the columns, in
-any order.  The following lines will contain tax information.  Blank
-lines and anything following a '#' sign will be ignored.
+any order.  The first line may not contain comments in it, or
+before it.
+
+The following lines will contain tax information.  Blank
+lines and anything following a '#' sign will be ignored from
+the second line of the file, on to the end.
+
+Returns 1 if the import has taken place.  This is to help you know
+if old data has been deleted and new has been inserted.
 
 =cut
 
@@ -174,12 +181,15 @@ sub importTaxData {
     my $line = 1;
     while (my $taxRow = <$table>) {
         chomp $taxRow;
+        $taxRow =~ s/\s*#.+$//;
+        next unless $taxRow;
         my @taxRow = WebGUI::Text::splitCSV($taxRow);
         croak qq{Error on line $line in file $filePath}
             unless scalar @taxRow == 3;
         push @taxData, [ @taxRow ];
     }
     ##Okay, if we got this far, then the data looks fine.
+    return unless scalar @taxData;
     $self->session->db->beginTransaction;
     $self->session->db->write('delete from tax');
     foreach my $taxRow (@taxData) {
@@ -188,7 +198,7 @@ sub importTaxData {
         $self->add(\%taxRow);
     }
     $self->session->db->commit;
-    return;
+    return 1;
 }
 
 #-------------------------------------------------------------------

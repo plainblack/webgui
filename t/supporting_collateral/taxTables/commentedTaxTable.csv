@@ -1,0 +1,8 @@
+taxRate,value,field
+#header lines above
+
+#This is just a zip code.
+0.5,53701,code
+
+
+5.0,Wisconsin,state #Wisconsin is expensive!
