@@ -227,7 +227,7 @@ eval { $taxer->importTaxData('/path/to/nowhere'); };
 like($@, qr{/path/to/nowhere could not be found},
     'importTaxData: error handling for file that does not exist in the filesystem');
 
-my $taxFile = WebGUI::Test->getTestCollateralPath('taxTable.csv');
+my $taxFile = WebGUI::Test->getTestCollateralPath('taxTables/goodTaxTable.csv');
 
 SKIP: {
     skip 'Root will cause this test to fail since it does not obey file permissions', 1
