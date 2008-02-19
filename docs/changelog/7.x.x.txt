@@ -1,3 +1,5 @@
+7.4.25
+
 7.4.24
  - prevent HTML and Macro injection in usernames
  - fix: https and extra / in urls (perlDreamer Consulting, LLC.)
