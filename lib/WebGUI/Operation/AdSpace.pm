@@ -329,32 +329,32 @@ sub www_editAdSpace {
     $f->hidden( name => "op", value => "editAdSpaceSave" );
     $f->text(
         name        => "name",
-        value       => $session->form->get('name') || $adSpace->get("name"),
+        value       => $session->form->get('name') || ($adSpace && $adSpace->get("name")),
         hoverHelp   => $i18n->get("name help"),
         label       => $i18n->get("name"),
     );
     $f->text(
         name        => "title",
-        value       => $session->form->get('title') || $adSpace->get('title'),
+        value       => $session->form->get('title') || ($adSpace && $adSpace->get('title')),
         hoverHelp   => $i18n->get("title help"),
         label       => $i18n->get("title"),
     );
     $f->textarea(
         name        => "description",
-        value       => $session->form->get('description') || $adSpace->get('description'),
+        value       => $session->form->get('description') || ($adSpace && $adSpace->get('description')),
         hoverHelp   => $i18n->get("description help"),
         label       => $i18n->get("description"),
     );
     $f->integer(
         name            => "width",
-        value           => $session->form->get('width') || $adSpace->get('width'),
+        value           => $session->form->get('width') || ($adSpace && $adSpace->get('width')),
         defaultValue    => 468,
         hoverHelp       => $i18n->get("width help"),
         label           => $i18n->get("width"),
     );
     $f->integer(
         name            => "height",
-        value           => $session->form->get('height') || $adSpace->get('height'),
+        value           => $session->form->get('height') || ($adSpace && $adSpace->get('height')),
         defaultValue    => 60,
         hoverHelp       => $i18n->get("height help"),
         label           => $i18n->get("height"),
