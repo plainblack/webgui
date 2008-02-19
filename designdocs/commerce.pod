@@ -662,7 +662,7 @@ Description
 
 _loadDriver
 
-A method used load a shipping driver.
+A method used to load a shipping driver.
 
 create
 
@@ -703,7 +703,7 @@ calculate for.
 
 new
 
-Instantiates a coupon based upon shipperId.
+Instantiates a Shipper object based upon shipperId.
 
 param: session E<acirc>E<128>E<147> a reference to the current session
 
@@ -711,7 +711,7 @@ param: shipperId E<acirc>E<128>E<147> the unique id to instantiate
 
 set
 
-Update a parameter for the coupon.
+Update a parameter for the ship object.
 
 param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
 of the parameters in coupon table, except for shipperId. Automatically
