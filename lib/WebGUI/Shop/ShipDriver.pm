@@ -1,4 +1,4 @@
-package WebGUI::Shop::ShipperDriver;
+package WebGUI::Shop::ShipDriver;
 
 use strict;
 
@@ -7,7 +7,7 @@ use Carp qw(croak);
 
 =head1 NAME
 
-Package WebGUI::Shop::ShipperDriver
+Package WebGUI::Shop::ShipDriver
 
 =head1 DESCRIPTION
 
@@ -17,9 +17,9 @@ handling the information in the tax tables.
 
 =head1 SYNOPSIS
 
- use WebGUI::Shop::ShipperDriver;
+ use WebGUI::Shop::ShipDriver;
 
- my $tax = WebGUI::Shop::ShipperDriver->new($session);
+ my $tax = WebGUI::Shop::ShipDriver->new($session);
 
 =head1 METHODS
 

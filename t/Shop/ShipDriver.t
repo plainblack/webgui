@@ -34,13 +34,13 @@ plan tests => 1 + $tests;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::ShipperDriver');
+my $loaded = use_ok('WebGUI::Shop::ShipDriver');
 
 my $storage;
 
 SKIP: {
 
-skip 'Unable to load module WebGUI::Shop::ShipperDriver', $tests unless $loaded;
+skip 'Unable to load module WebGUI::Shop::ShipDriver', $tests unless $loaded;
 
 #######################################################################
 #
@@ -48,9 +48,9 @@ skip 'Unable to load module WebGUI::Shop::ShipperDriver', $tests unless $loaded;
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipperDriver->new($session);
+my $driver = WebGUI::Shop::ShipDriver->new($session);
 
-isa_ok($driver, 'WebGUI::Shop::ShipperDriver');
+isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
 isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');
 

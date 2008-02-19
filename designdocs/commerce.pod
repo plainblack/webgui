@@ -746,7 +746,7 @@ one-off basis.
 =head2 Method Dictionary
 
 The following methods will be available from the
-WebGUI::Shop::Ship::Driver class.
+WebGUI::Shop::ShipDriver class.
 
 Method
 
@@ -829,7 +829,7 @@ one-off basis.
 =head2 Method Dictionary
 
 The following methods will be available from the
-WebGUI::Shop::Ship::Driver::Flat class.
+WebGUI::Shop::ShipDriver::Flat class.
 
 Method
 
