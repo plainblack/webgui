@@ -3,6 +3,7 @@
  - Fixed a problem that caused all Cron job parameters to return an empty hash
    ref.
  - fixed: creating new ad spaces is broken
+ - don't write .wgaccess files for public uploads, allowing WRE optimizations
 
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in
