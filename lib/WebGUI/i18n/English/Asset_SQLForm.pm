@@ -1249,11 +1249,6 @@ You can use this if you want to create a custom Advanced search form that comple
 		lastUpdated => 1149822982,
 	},
 
-	'' => {
-		message => q||,
-		lastUpdated => 1149822982,
-	},
-
 	'headerLoop' => {
 		message => q|A loop containing the display names of each field, including sort controls. The
 following variables are provided within this loop:|,
