@@ -119,17 +119,17 @@ param: definition - an array ref of hash refs
 field:
 
  [
-    name =E<gt> "Shipper Type",
-    fields =E<gt> {
-        label =E<gt> {
-            fieldType =E<gt> "text",
-            label =E<gt> "Label",
-            defaultValue =E<gt> undef
+    name => "Shipper Type",
+    fields => {
+        label => {
+            fieldType => "text",
+            label => "Label",
+            defaultValue => undef
         },
-        enabled =E<gt> {
-            fieldType =E<gt> "yesNo",
-            label =E<gt> "Enabled?",
-            defaultValue =E<gt> 1
+        enabled => {
+            fieldType => "yesNo",
+            label => "Enabled?",
+            defaultValue => 1
         },
     }
  ],
