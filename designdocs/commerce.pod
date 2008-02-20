@@ -996,7 +996,9 @@ calculate
 Returns a tax price. Calculates the tax price using the following
 formula:
 
-total cart price * percentageOfPrice
+sum(
+    sku price * ( $sku->getTaxRate? $sku->getTaxRate : percentageOfPrice)
+)
 
 +
 
