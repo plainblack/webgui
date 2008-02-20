@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Navigation;
 
-use Test::More tests => 39; # increment this value for each test you create
+use Test::More tests => 40; # increment this value for each test you create
 use Test::MockObject;
 
 my $session = WebGUI::Test->session;
@@ -169,6 +169,19 @@ is($importNode->fixUrl('/extras1'), '_extras1', 'trailing underscore in extrasUR
 
 $session->config->set('extrasURL',  'http://mysite.com/extras2');
 is($importNode->fixUrl('/extras2'), '_extras2', 'underscore prepended to URLs that match the extrasURL, even with http://');
+
+################################################################
+#
+# get
+#
+################################################################
+my $assetProps = $rootAsset->get();
+my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
+diag $assetProps->{title};
+$assetProps->{title} = $funkyTitle;
+diag $assetProps->{title};
+
+isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
 END: {
 
