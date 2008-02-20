@@ -26,6 +26,18 @@ param: class - the classname of the driver for the gateway you want to configure
 
 param: hashRef - a hash reference containing a list of the parameters in coupon table, except for couponId.
 
+=head3 getDrivers
+
+A class method.
+
+Returns an array reference of the driver classes enabled in the config file.
+
+=head3 getPaymentGateways
+
+A class method.
+
+Returns an array reference of the configured payment objects.
+
 =head3 getOptions
 
 A class method.
