@@ -1,5 +1,6 @@
 7.4.25
  - fixed: creating new ad spaces is broken
+ - fixed: editing file assets is broken
 
 7.4.24
  - prevent HTML and Macro injection in usernames

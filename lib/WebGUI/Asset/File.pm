@@ -58,7 +58,7 @@ sub addRevision {
     my $newSelf = $self->SUPER::addRevision(@_);
 
     if ($self->getRevisionCount > 1 && $self->get("storageId")) {
-        my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
+        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }
 
