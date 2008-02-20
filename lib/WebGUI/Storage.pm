@@ -910,7 +910,13 @@ sub setPrivileges {
 	my $owner = shift;
 	my $viewGroup = shift;
 	my $editGroup = shift;
-	$self->addFileFromScalar(".wgaccess",$owner."\n".$viewGroup."\n".$editGroup);
+	
+    if ($owner eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
+        $self->deleteFile('.wgaccess');
+    }
+    else {
+        $self->addFileFromScalar(".wgaccess",$owner."\n".$viewGroup."\n".$editGroup);
+    }
 }
 
 
