@@ -816,6 +816,11 @@ param: session E<acirc>E<128>E<147> a reference to the current session
 param: options E<acirc>E<128>E<147> a hash reference of configurable
 parameters for this driver
 
+properties
+
+Accessor for the internally stored configurable parameters.  Returns
+a safe copy of the hash.
+
 =head1 Flat Rate Shipper
 
 This allows for basic shipping calculations without any tie-ins to
