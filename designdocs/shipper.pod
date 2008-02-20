@@ -194,7 +194,7 @@ The following methods will be available from the WebGUI::Shop::ShipDriver::Flat 
 
 Returns a shipping price. Calculates the shipping price using the following formula:
 
- total cart price * percentageOfPrice 
+ total price of shippable items * percentageOfPrice 
  + flatFee
  + total weight of shippable items * pricePerWeight
  + total quantity of shippable items * pricePerItem
