@@ -170,7 +170,7 @@ don't want to have to deal with coupon magnification effects.
 =head2 Data Dictionary
 
 The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>couponE<acirc>E<128>E<157>.
+"coupon".
 
 Field
 
@@ -216,9 +216,9 @@ create
 Creates a new WebGUI::Shop::Coupon object. Returns a reference to the
 object.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+param: hashRef - a hash reference containing a list
 of the parameters in coupon table, except for couponId.
 
 delete
@@ -229,7 +229,7 @@ get
 
 Returns a duplicated hash reference of this object's data.
 
-param: any field E<acirc>E<128>E<147> returns the value of a field
+param: any field - returns the value of a field
 rather than the hash reference.
 
 getId
@@ -240,696 +240,25 @@ new
 
 Instantiates a coupon based upon couponId.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: couponId E<acirc>E<128>E<147> the unique id to instantiate
+param: couponId - the unique id to instantiate
 
 newByCode
 
 Instantiates a coupon based upon coupon code.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: code E<acirc>E<128>E<147> the coupon code.
+param: code - the coupon code.
 
 set
 
 Update a parameter for the coupon.
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+param: hashRef - a hash reference containing a list
 of the parameters in coupon table, except for couponId.
 
-=head1 Payment Gateway
-
-Payment gateways are the mechanism by which users can pay for the items
-in their shopping cart.
-
-=head2 Data Dictionary
-
-The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>paymentGatewayE<acirc>E<128>E<157>.
-
-Field
-
-Schema
-
-Description
-
-paymentGatewayId
-
-guid
-
-the primary key
-
-label
-
-varchar(100)
-
-A title for this payment that will be displayed to the user. For
-example E<acirc>E<128>E<156>Pay PalE<acirc>E<128>E<157> or
-E<acirc>E<128>E<156>Credit CardE<acirc>E<128>E<157> or
-E<acirc>E<128>E<156>CheckE<acirc>E<128>E<157>
-
-className
-
-varchar(255)
-
-The plugin classname that will be used for this payment gateway.
-
-options
-
-mediumtext
-
-A json serialized hash reference with configuration data for this
-payment gateway.
-
-=head2 Method Dictionary
-
-The following methods will be available from the WebGUI::Shop::Pay
-class.
-
-Method
-
-Description
-
-_loadDriver
-
-A method used load a payment gateway driver.
-
-create
-
-Creates a new WebGUI::Shop::Pay object. Returns a reference to the
-object.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
-of the parameters in coupon table, except for couponId.
-
-delete
-
-Deletes this payment gateway.
-
-get
-
-Returns a duplicated hash reference of this object's data.
-
-param: any field E<acirc>E<128>E<147> returns the value of a field
-rather than the hash reference.
-
-getId
-
-Returns the payment gateway id.
-
-getOptions
-
-Returns a hash reference of paymentGatewayIds as keys, with
-E<acirc>E<128>E<156>labelE<acirc>E<128>E<157> and
-E<acirc>E<128>E<156>formE<acirc>E<128>E<157> as subkeys. Label provides
-the human readable label for the object, and form provides the HTML
-form, that includes the button for the payment gateway option. This is
-required since some payment gateways take the user off site and have
-very complex forms that need to be created and posted to the remote
-site.
-
-param: cart E<acirc>E<128>E<147> a reference to the cart object to
-generate options for.
-
-new
-
-Instantiates a payment gateway based upon paymentGatewayId.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: paymentGatewayId E<acirc>E<128>E<147> the unique id to
-instantiate
-
-set
-
-Update a parameter for the payment gateway.
-
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
-of the parameters in paymentGateway table, except for paymentGatewayId.
-
-www_listPaymentGateways
-
-Returns a list of the payment gateways configured currently.
-
-www_editPaymentGateway
-
-The add/edit form for managing a payment gateway.
-
-www_editPaymentGatwaySave
-
-Saves the result of www_editPaymentGateway and then displays
-www_listPaymentGateways.
-
-=head1 Payment Gateway Driver
-
-Payment gateway drivers are used to collect payment. In Perl terms this
-is the DBD to DBI. All payment gateway drivers (itransact, paypal,
-google checkout, etc) will be derived from this base class.
-
-=head2 Data Dictionary
-
-Payment gateway drivers have no database tables, unless they need it on
-a one-off basis.
-
-=head2 Method Dictionary
-
-The following methods will be available from the
-WebGUI::Shop::Pay::Driver class.
-
-Method
-
-Description
-
-definition
-
-Returns an array reference of hash references of fields that are
-defined for this payment gateway driver similar to definition() in
-WebGUI::Asset.
-
-param: definition E<acirc>E<128>E<147> an array ref of hash refs
-
-field:
-
-[
-
-name =E<gt> E<acirc>E<128>E<156>Payment TypeE<acirc>E<128>E<157>,
-
-fields =E<gt> {
-
-label =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>LabelE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> E<acirc>E<128>E<156>Credit CardE<acirc>E<128>E<157>
-
-},
-
-enabled =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Enabled?E<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 1
-
-},
-
-groupToUse =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>groupE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Who can use?E<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 1
-
-},
-
-receiptMessage =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Receipt Email
-MessageE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> undef
-
-},
-
-}
-
-],
-
-getButton
-
-Returns the HTML postable form that will take the user to check out
-using this payment gateway.
-
-getName
-
-Return a human readable name for this driver. Never overridden in the
-subclass, instead specified in definition.
-
-new
-
-Instantiates a driver.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: options E<acirc>E<128>E<147> a hash reference of configurable
-parameters for this driver
-
-=head2 Todo
-
-=over
-
-=item 1.
-
-We need the following payment gateways converted to the new API:
-
-=over
-
-=item 1.
-
-itransact
-
-=item 2.
-
-cash
-
-=item 3.
-
-check
-
-=back
-
-=back
-
-=head1 iTransact Driver
-
-This allows for credit card payments via the iTransact payment gateway.
-
-=head2 Data Dictionary
-
-Payment gateway drivers have no database tables, unless they need it on
-a one-off basis.
-
-=head2 Method Dictionary
-
-The following methods will be available from the
-WebGUI::Shop::Pay::Driver::Itransact class.
-
-Method
-
-Description
-
-definition
-
-Returns an array reference of hash references of fields that are
-defined for this ship driver similar to definition() in WebGUI::Asset.
-
-param: definition E<acirc>E<128>E<147> an array ref of hash refs of
-definitions
-
-[
-
-{
-
-name =E<gt> E<acirc>E<128>E<156>iTransactE<acirc>E<128>E<157>,
-
-fields =E<gt> {
-
-username =E<gt> {
-
-label =E<gt> E<acirc>E<128>E<156>Vendor IDE<acirc>E<128>E<157>,
-
-fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> undef
-
-},
-
-password =E<gt> {
-
-label =E<gt> E<acirc>E<128>E<156>PasswordE<acirc>E<128>E<157>,
-
-fieldType =E<gt> E<acirc>E<128>E<156>passwordE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> undef
-
-},
-
-useCvv2 =E<gt> {
-
-label =E<gt> E<acirc>E<128>E<156>Use CVV2?E<acirc>E<128>E<157>,
-
-fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 1
-
-},
-
-}
-
-]
-
-getEditForm
-
-Similar to the method of the same name in WebGUI asset, but uses the
-definition from this module.
-
-getButton
-
-Returns the HTML postable form that will take the user to check out
-using this payment gateway.
-
-new
-
-Instantiates a driver.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: options E<acirc>E<128>E<147> a hash reference of configurable
-parameters for this driver
-
-www_collectPaymentInfo
-
-Collects payment info from the user.
-
-www_displayStatus
-
-Displays a status message to the user after collecting payment info.
-The status may be a success message along with a printable receipt, or
-an error message like E<acirc>E<128>E<156>Credit card
-declined.E<acirc>E<128>E<157>
-
-=head1 Shipper
-
-This is the master class to manage shipper drivers. In Perl terms the
-DBI to DBD.
-
-=head2 Data Dictionary
-
-The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>shipperE<acirc>E<128>E<157>.
-
-Field
-
-Schema
-
-Description
-
-shipperId
-
-guid
-
-The unique id for this shipper.
-
-label
-
-varchar(100)
-
-A title for this shipper that will be displayed to the user. For
-example E<acirc>E<128>E<156>Flat RateE<acirc>E<128>E<157> or
-E<acirc>E<128>E<156>FedEx OvernightE<acirc>E<128>E<157>
-
-className
-
-varchar(255)
-
-The plugin classname that will be used for this shipping module.
-
-options
-
-mediumtext
-
-A json serialized hash reference with configuration data for this
-shipper.
-
-=head2 Method Dictionary
-
-The following methods will be available from the WebGUI::Shop::Ship
-class.
-
-Method
-
-Description
-
-_loadDriver
-
-A method used to load a shipping driver.
-
-create
-
-Creates a new WebGUI::Shop::Ship object. Returns a reference to the
-object.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
-of the parameters in shipper table, except for shipperId.
-
-delete
-
-Deletes this object.
-
-get
-
-Returns a duplicated hash reference of this object's data.
-
-param: any field E<acirc>E<128>E<147> returns the value of a field
-rather than the shippingId. Automatically converts the options json
-into a hash reference.
-
-getId
-
-Returns the shipperId.
-
-getOptions
-
-Returns a hash reference of shipperIds as keys, with
-E<acirc>E<128>E<156>labelE<acirc>E<128>E<157> and
-E<acirc>E<128>E<156>priceE<acirc>E<128>E<157> as subkeys. Label
-provides the human readable label for the object, and price provides
-the calculated price for shipping.
-
-param: cart E<acirc>E<128>E<147> a reference to the cart object to
-calculate for.
-
-new
-
-Instantiates a Shipper object based upon shipperId.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: shipperId E<acirc>E<128>E<147> the unique id to instantiate
-
-set
-
-Update a parameter for the ship object.
-
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
-of the parameters in coupon table, except for shipperId. Automatically
-convert the options parameter into json.
-
-www_listShippers
-
-Returns a list of the shippers configured currently.
-
-www_editShipper
-
-The add/edit form for managing a shipper.
-
-www_editShipperSave
-
-Saves the result of www_editShipper and then displays www_listShippers.
-
-=head1 Shipper Driver
-
-Shipping modules are used to calculate shipping costs. Shipping modules
-are not allowed to have a user interface. Instead, they plug their data
-into the shopping cart screen if any items in the shopping cart have
-shipping. In Perl terms this is the DBD to DBI. All shipping drivers
-(flat rate, fedex, ups, dhl, usps, etc) will be derived from this base
-class.
-
-=head2 Data Dictionary
-
-Shipping drivers have no database tables, unless they need it on a
-one-off basis.
-
-=head2 Method Dictionary
-
-The following methods will be available from the
-WebGUI::Shop::ShipDriver class.
-
-Method
-
-Description
-
-calculate
-
-Returns a shipping price.
-
-param: cart E<acirc>E<128>E<147> a reference to the cart object.
-
-definition
-
-Returns an array reference of hash references of fields that are
-defined for this ship driver similar to definition() in WebGUI::Asset.
-
-param: definition E<acirc>E<128>E<147> an array ref of hash refs
-
-field:
-
-[
-
-name =E<gt> E<acirc>E<128>E<156>Shipper TypeE<acirc>E<128>E<157>,
-
-fields =E<gt> {
-
-label =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>textE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>LabelE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> undef
-
-},
-
-enabled =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>yesNoE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Enabled?E<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 1
-
-},
-
-}
-
-],
-
-getName
-
-Return a human readable name for this driver. Never overridden in the
-subclass, instead specified in definition.
-
-getEditForm
-
-Similar to the method of the same name in WebGUI asset, but uses the
-definition from this module.
-
-new
-
-Instantiates a driver.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: options E<acirc>E<128>E<147> a hash reference of configurable
-parameters for this driver
-
-properties
-
-Accessor for the internally stored configurable parameters.  Returns
-a safe copy of the hash.
-
-=head1 Flat Rate Shipper
-
-This allows for basic shipping calculations without any tie-ins to
-external shippers.
-
-=head2 Data Dictionary
-
-Shipping drivers have no database tables, unless they need it on a
-one-off basis.
-
-=head2 Method Dictionary
-
-The following methods will be available from the
-WebGUI::Shop::ShipDriver::Flat class.
-
-Method
-
-Description
-
-calculate
-
-Returns a shipping price. Calculates the shipping price using the
-following formula:
-
-total cart price * percentageOfPrice
-
-+
-
-flatFee
-
-+
-
-total weight of shippable items * pricePerWeight
-
-+
-
-total quantity of shippable items * pricePerItem
-
-param: cart E<acirc>E<128>E<147> a reference to the cart object.
-
-definition
-
-Returns an array reference of hash references of fields that are
-defined for this ship driver similar to definition() in WebGUI::Asset.
-
-param: definition E<acirc>E<128>E<147> an array ref of hash refs of
-definitions
-
-[
-
-{
-
-name =E<gt> E<acirc>E<128>E<156>Flat RateE<acirc>E<128>E<157>,
-
-fields =E<gt> {
-
-percentageOfPrice =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Percentage Of
-PriceE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 0
-
-},
-
-flatFee =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Flat FeeE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 0
-
-},
-
-pricePerWeight =E<gt> {
-
-fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
-
-label =E<gt> E<acirc>E<128>E<156>Price Per WeightE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 0
-
-},
-
-pricePerItem =E<gt> {
-
-label =E<gt> E<acirc>E<128>E<156>Price Per ItemE<acirc>E<128>E<157>,
-
-fieldType =E<gt> E<acirc>E<128>E<156>floatE<acirc>E<128>E<157>,
-
-defaultValue =E<gt> 0
-
-},
-
-}
-
-]
-
-new
-
-Instantiates a driver.
-
-param: session E<acirc>E<128>E<147> a reference to the current session
-
-param: options E<acirc>E<128>E<147> a hash reference of configurable
-parameters for this driver
 
 =head1 Taxes
 
@@ -939,7 +268,7 @@ where an order is being shipped to. This class deals with that.
 =head2 Data Dictionary
 
 The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>taxE<acirc>E<128>E<157>.
+"tax".
 
 Field
 
@@ -984,16 +313,16 @@ add
 
 Adds an item to the tax table.
 
-param: field E<acirc>E<128>E<147> choose from
-E<acirc>E<128>E<156>countryE<acirc>E<128>E<157>,
-E<acirc>E<128>E<156>stateE<acirc>E<128>E<157>, or
-E<acirc>E<128>E<156>codeE<acirc>E<128>E<157>.
+param: field - choose from
+"country",
+"state", or
+"code".
 
-param: value E<acirc>E<128>E<147> the value to match against field. For
+param: value - the value to match against field. For
 example, for state it might be
-E<acirc>E<128>E<156>WIE<acirc>E<128>E<157>.
+"WI".
 
-param: taxRate E<acirc>E<128>E<147> the rate to apply to this locale in
+param: taxRate - the rate to apply to this locale in
 percent.
 
 calculate
@@ -1017,13 +346,13 @@ total weight of shippable items * pricePerWeight
 
 total quantity of shippable items * pricePerItem
 
-param: cart E<acirc>E<128>E<147> a reference to the cart object.
+param: cart - a reference to the cart object.
 
 delete
 
 Deletes an item from the tax table.
 
-param: taxId E<acirc>E<128>E<147> the id of the item to delete
+param: taxId - the id of the item to delete
 
 exportTaxData
 
@@ -1041,14 +370,14 @@ importTaxData
 Deletes all the existing records in the tax table, and replaces them
 with the values in the file.
 
-param: path E<acirc>E<128>E<147> the path to the tab delimited file to
+param: path - the path to the tab delimited file to
 import. See the export() method for details.
 
 new
 
 Instanciates the tax object.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
 www_add
 
@@ -1101,7 +430,7 @@ be used by other subsystems, but it will first be used by commerce.
 =head2 Data Dictionary
 
 The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>addressE<acirc>E<128>E<157>.
+"address".
 
 Field
 
@@ -1120,8 +449,8 @@ label
 varchar(100)
 
 A label for this address like
-E<acirc>E<128>E<156>homeE<acirc>E<128>E<157>,
-E<acirc>E<128>E<156>workE<acirc>E<128>E<157>, etc.
+"home",
+"work", etc.
 
 name
 
@@ -1180,9 +509,9 @@ create
 Creates a new WebGUI::Shop::Address object. Returns a reference to the
 object.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+param: hashRef - a hash reference containing a list
 of the parameters in address table, except for addressId.
 
 delete
@@ -1193,7 +522,7 @@ get
 
 Returns a duplicated hash reference of this object's data.
 
-param: any field E<acirc>E<128>E<147> returns the value of a field
+param: any field - returns the value of a field
 rather than the hash reference
 
 getId
@@ -1204,15 +533,15 @@ new
 
 Instantiates a address based upon addressId.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: addressId E<acirc>E<128>E<147> the unique id to instantiate
+param: addressId - the unique id to instantiate
 
 set
 
 Update a parameter for the address.
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing a list
+param: hashRef - a hash reference containing a list
 of the parameters in address table, except for addressId.
 
 =head1 Transaction History
@@ -1224,7 +553,7 @@ time of sale, because things change over time.
 =head2 Data Dictionary
 
 The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>transactionE<acirc>E<128>E<157>.
+"transaction".
 
 Field
 
@@ -1249,7 +578,7 @@ transactionCode
 varchar(100)
 
 The transaction id or code received from the payment gateway. In
-iTransact it is called E<acirc>E<128>E<156>xidE<acirc>E<128>E<157>.
+iTransact it is called "xid".
 
 statusCode
 
@@ -1433,7 +762,7 @@ float
 The final sale price.
 
 The following fields are needed to construct this object's table called
-E<acirc>E<128>E<156>transactionItemsE<acirc>E<128>E<157>.
+"transactionItems".
 
 Field
 
@@ -1570,11 +899,11 @@ create
 
 Creates a new transaction object. Returns a reference to the object.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing any/all
+param: hashRef - a hash reference containing any/all
 of the fields from the transaction table minus the
-E<acirc>E<128>E<156>transactionIdE<acirc>E<128>E<157> field.
+"transactionId" field.
 
 delete
 
@@ -1584,7 +913,7 @@ get
 
 Returns a duplicated hash reference of this object's data.
 
-param: any field E<acirc>E<128>E<147> returns the value of a field
+param: any field - returns the value of a field
 rather than the hash reference
 
 getId
@@ -1601,7 +930,7 @@ new
 
 Instantiates a WebGUI::Shop::Transaction object using transactionId.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
 param: transactionId
 
@@ -1609,26 +938,26 @@ set
 
 Updates a transaction object.
 
-param: hashRef E<acirc>E<128>E<147> a hash reference containing any/all
+param: hashRef - a hash reference containing any/all
 of the fields from the transaction table minus the
-E<acirc>E<128>E<156>transactionIdE<acirc>E<128>E<157> field.
+"transactionId" field.
 
 setStatus
 
-Default status is E<acirc>E<128>E<156>pendingE<acirc>E<128>E<157> as
+Default status is "pending" as
 items are being added to it.
 
-param: status E<acirc>E<128>E<147> The status to set:
+param: status - The status to set:
 
-pending E<acirc>E<128>E<147> default
+pending - default
 
-pending payment E<acirc>E<128>E<147> waiting on payment to complete
+pending payment - waiting on payment to complete
 
-pending shipment E<acirc>E<128>E<147> waiting on shipment to be marked
+pending shipment - waiting on shipment to be marked
 
-complete E<acirc>E<128>E<147> order has been paid and shipped
+complete - order has been paid and shipped
 
-returned E<acirc>E<128>E<147> order has been cancelled
+returned - order has been cancelled
 
 =head2 Todo
 
@@ -1668,7 +997,7 @@ project is to prove variable pricing.
 =head2 Data Dictionary
 
 The following fields are needed to construct this assets table called
-E<acirc>E<128>E<156>DonationE<acirc>E<128>E<157>.
+"Donation".
 
 Field
 
@@ -1717,8 +1046,8 @@ Write a subscription asset.
 
 =item 1.
 
-Move the E<acirc>E<128>E<156>redeem a subscription
-codeE<acirc>E<128>E<157> functionality from the user account to the
+Move the "redeem a subscription
+code" functionality from the user account to the
 subscription asset.
 
 =back
@@ -1732,7 +1061,7 @@ Convert all subscriptions into subscription assets.
 =item 1.
 
 Create subscription assets in the import node under a folder called
-E<acirc>E<128>E<156>SubscriptionsE<acirc>E<128>E<157>.
+"Subscriptions".
 
 =item 2.
 
@@ -1772,7 +1101,7 @@ Make new templates that look good, and throw out the old ones.
 =head2 Data Dictionary
 
 The following fields are needed to construct this assets table called
-E<acirc>E<128>E<156>SubscriptionE<acirc>E<128>E<157>.
+"Subscription".
 
 Field
 
@@ -1815,7 +1144,7 @@ Make the URL of the new products the skew.
 =item *
 
 Place all the new products in the import node under a
-E<acirc>E<128>E<156>ProductsE<acirc>E<128>E<157> folder.
+"Products" folder.
 
 =item *
 
@@ -1845,7 +1174,7 @@ Make new templates that look good, and throw out the old ones.
 =head2 Data Dictionary
 
 The following fields are needed to construct this assets table called
-E<acirc>E<128>E<156>ProductE<acirc>E<128>E<157>.
+"Product".
 
 Field
 

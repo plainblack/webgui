@@ -6,7 +6,7 @@ needs to be simple so it can be extended to fit any need.
 =head2 Data Dictionary
 
 The following fields are needed to construct this assets table called
-E<acirc>E<128>E<156>SKUE<acirc>E<128>E<157>.
+"SKU".
 
  Field              Schema              Description
  assetId            guid                The unique id assigned to this sku that may never change. It's with all assets 
@@ -26,11 +26,11 @@ Adds this sku to the shopping cart.
 =head3 applyOptions
 
 Accepts a configuration data hash reference that can configure a sku a
-certain way. For example, E<acirc>E<128>E<156>a size XL red
-t-shirtE<acirc>E<128>E<157> instead of just E<acirc>E<128>E<156>a
-t-shirtE<acirc>E<128>E<157>.
+certain way. For example, "a size XL red
+t-shirt" instead of just "a
+t-shirt".
 
-param: options E<acirc>E<128>E<147> a hash reference containing the
+param: options - a hash reference containing the
 configuration properties returned from getConfiguration()
 
 =head3 getOptions
@@ -60,15 +60,15 @@ By default return 0. Should be overridden by subclasses.
 
 Instanciates based on an existing sku, rather than an assetId.
 
-param: session E<acirc>E<128>E<147> a reference to the current session
+param: session - a reference to the current session
 
-param: sku E<acirc>E<128>E<147> the sku to instanciate
+param: sku - the sku to instanciate
 
 =head3 processStyle
 
 Looks up the style from the container and and wrappers the product in
 it.
 
-param: html E<acirc>E<128>E<147> the HTML output to be wrapped by the
+param: html - the HTML output to be wrapped by the
 style
 
