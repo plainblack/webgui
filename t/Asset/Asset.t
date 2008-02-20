@@ -144,7 +144,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 88 
+plan tests => 89 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -687,6 +687,19 @@ $session->setting->set('notFoundPage', $origNotFoundPage);
 #
 ################################################################
 is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
+
+################################################################
+#
+# get
+#
+################################################################
+my $assetProps = $rootAsset->get();
+my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
+diag $assetProps->{title};
+$assetProps->{title} = $funkyTitle;
+diag $assetProps->{title};
+
+isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
 END: {
     $session->config->set( 'extrasURL',    $origExtras);
