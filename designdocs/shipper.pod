@@ -175,7 +175,7 @@ parameters for this driver
 
 Update a parameter for the ship object.
 
-param: hashRef - a hash reference containing a list of the parameters in coupon table, except for shipperId. Automatically convert the options parameter into json.
+param: hashRef - a hash reference containing a list of the parameters in shipper table, except for shipperId. Automatically convert the options parameter into json.
 
 
 =head1 Flat Rate Shipper
