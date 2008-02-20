@@ -24,7 +24,7 @@ param: session - a reference to the current session
 
 param: class - the classname of the driver for the gateway you want to configure
 
-param: hashRef - a hash reference containing a list of the parameters in coupon table, except for couponId.
+param: hashRef - a hash reference containing a list of the parameters in paymentGateway table, except for paymentGatewayId.
 
 =head3 getDrivers
 
@@ -101,7 +101,7 @@ Creates a new WebGUI::Shop::PayDriver object. Returns a reference to the object.
 
 param: session - a reference to the current session
 
-param: hashRef - a hash reference containing a list of the parameters in coupon table, except for couponId.
+param: hashRef - a hash reference containing a list of the parameters in paymentGateway table, except for paymentGatewayId.
 
 =head definition
 
