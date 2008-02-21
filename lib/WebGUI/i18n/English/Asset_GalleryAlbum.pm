@@ -123,6 +123,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'helpvar isNewAlbum' => {
+        message     => 'This variable is true if the user is adding a new Album to the Gallery',
+        lastUpdated => 0,
+    },
+
     'helpvar canAddFile' => {
         message     => 'This variable is true if the user can add files to this Album.',
         lastUpdated => 0,
@@ -353,6 +358,90 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Label for the number of comments on the file',
     },
+    
+    'template add' => {
+        message     => "Add",
+        lastUpdated => 0,
+        context     => 'Verb shown in title when adding a new Album',
+    },
+
+    'template edit' => {
+        message     => "Edit",
+        lastUpdated => 0,
+        context     => 'Verb shown in title when editing an existing Album',
+    },
+
+    'template assetName' => {
+        message     => "Album",
+        lastUpdated => 0,
+        context     => "The asset's name shown in templates",
+    },
+
+    'editForm title label' =>  {
+        message     => 'Title',
+        lastUpdated => 0,
+        context     => 'Label for the "Title" property of the Album asset',
+    },
+
+    'editForm description label' => {
+        message     => 'Description',
+        lastUpdated => 0,
+        context     => 'Label for the "Description" property of the Album asset',
+    },
+
+    'editForm assetIdThumbnail label' => {
+        message     => 'Please select a thumbnail to represent your album.',
+        lastUpdated => 0,
+    },
+
+    'template upload type' => {
+        message     => 'Upload Type',
+        lastUpdated => 0,
+        context     => 'Label for different methods of uploading',
+    },
+
+    'template upload single' => {
+        message     => 'Single File',
+        lastUpdated => 0,
+        context     => 'Label for uploading a single file',
+    },
+
+    'template upload archive' => {
+        message     => 'Zip Archive',
+        lastUpdated => 0,
+        context     => 'Label for uploading an archive of files',
+    },
+    
+    'addArchive file' => {
+        message     => 'Archive',
+        lastUpdated => 0,
+        context     => 'Label for the file upload control of the Add Archive page',
+    },
+
+    'addArchive keywords' => {
+        message     => 'Tags',
+        lastUpdated => 0,
+        context     => 'Label for the "keywords" field of the Add Archive page',
+    },
+
+    'addArchive friendsOnly' => {
+        message     => 'Friends Only',
+        lastUpdated => 0,
+        context     => 'Label for the "friends only" field of the Add Archive page',
+    },
+
+    'template addArchive title' => {
+        message     => "Add Zip Archive",
+        lastUpdated => 0,
+        context     => 'Title for the Add Archive page',
+    },
+
+    'template addArchive body' => {
+        message     => 'This form accepts both "zip" and "tar/gzipped" archives',
+        lastUpdated => 0,
+        context     => 'Body text explaining what kinds of archives can be submitted',
+    },
+
 };
 
 1;

@@ -142,6 +142,10 @@ our $HELP = {
         title       => 'help edit title',
         body        => 'help edit body',
         variables => [
+            { 
+                name        => 'isNewPhoto',
+                description => 'helpvar isNewPhoto',
+            },
             {
                 name        => 'url_addArchive',
                 description => 'helpvar url_addArchive',

@@ -652,6 +652,11 @@ our $I18N = {
         context     => q{Label for number of files in the Album},
     },
 
+    'template url_addAlbum' => {
+        message     => q{Add an Album},
+        lastUpdated => 0,
+        context     => q{Label for the link to add an Album},
+    },
 };
 
 1;

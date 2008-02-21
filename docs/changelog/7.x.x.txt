@@ -4,6 +4,9 @@
    ref.
  - fixed: creating new ad spaces is broken
  - don't write .wgaccess files for public uploads, allowing WRE optimizations
+ - More i18n for Gallery templates
+ - fix: Add an Album button now appears on Gallery List Albums view for those
+   authorized.
 
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in

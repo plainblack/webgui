@@ -73,7 +73,7 @@ sub definition {
     push @{$definition}, {
         assetName           => $i18n->get('assetName'),
         autoGenerateForms   => 0,
-        icon                => 'newWobject.gif',
+        icon                => 'photoAlbum.gif',
         tableName           => 'GalleryAlbum',
         className           => __PACKAGE__,
         properties          => \%properties,
@@ -190,8 +190,9 @@ sub canAdd {
 Returns true if the user can add a file to this album. C<userId> is a WebGUI
 user ID. If no userId is passed, will check the current user.
 
-Users can add files to this album if they are the owner, or if 
-C<othersCanAdd> is true and the Gallery allows them to add files.
+Users can add files to this album if they are the owner, if 
+C<othersCanAdd> is true and the Gallery allows them to add files, or if
+they are allowed to edit the parent Gallery.
 
 =cut
 
@@ -202,6 +203,7 @@ sub canAddFile {
 
     return 1 if $userId eq $self->get("ownerUserId");
     return 1 if $self->get("othersCanAdd") && $gallery->canAddFile( $userId );
+    return $gallery->canEdit( $userId );
 }
 
 #----------------------------------------------------------------------------
@@ -744,6 +746,7 @@ sub www_edit {
 
     # Generate the form
     if ($form->get("func") eq "add") {
+        $var->{ isNewAlbum  } = 1;
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
                 action      => $self->getParent->getUrl('func=editSave;assetId=new;class='.__PACKAGE__),

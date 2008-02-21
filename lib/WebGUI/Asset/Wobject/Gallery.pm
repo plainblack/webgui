@@ -296,7 +296,7 @@ sub definition {
 
     push @{$definition}, {
         assetName           => $i18n->get('assetName'),
-        icon                => 'newWobject.gif',
+        icon                => 'photoGallery.gif',
         autoGenerateForms   => 1,
         tableName           => 'Gallery',
         className           => __PACKAGE__,

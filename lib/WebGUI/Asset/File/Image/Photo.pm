@@ -99,7 +99,7 @@ sub definition {
     push @{$definition}, {
         assetName           => $i18n->get('assetName'),
         autoGenerateForms   => 0,
-        icon                => 'Image.gif',
+        icon                => 'photo.gif',
         tableName           => 'Photo',
         className           => 'WebGUI::Asset::File::Image::Photo',
         i18n                => 'Asset_Photo',
@@ -932,6 +932,10 @@ sub www_edit {
     my $var     = {
         url_addArchive      => $self->getParent->getUrl('func=addArchive'),
     };
+
+    if ( $form->get('assetId') eq "new" ) {
+        $var->{ isNewPhoto }    = 1;
+    }
     
     # Generate the form
     if ($form->get("func") eq "add") {

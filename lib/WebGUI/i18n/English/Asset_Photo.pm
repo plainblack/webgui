@@ -81,6 +81,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'helpvar isNewPhoto' => {
+        message     => 'This variable is true if the user is adding a new Photo',
+        lastUpdated => 0,
+    },
+
     'helpvar commentForm_start' => {
         message     => 'Begin the comment form',
         lastUpdated => 0,
@@ -396,6 +401,66 @@ our $I18N = {
         message     => 'Public',
         lastUpdated => 0,
         context     => 'Label for photos that are not friends only',
+    },
+
+    'template assetName' => {
+        message     => 'Photo',
+        lastUpdated => 0,
+        context     => 'Asset name for templates.',
+    },
+
+    'editForm title label' => {
+        message     => 'Title',
+        lastUpdated => 0,
+        context     => 'Label for "title" property',
+    },
+
+    'editForm synopsis label' => {
+        message     => 'Description',
+        lastUpdated => 0,
+        context     => 'Label for "synopsis" property',
+    },
+
+    'editForm photo new' => {
+        message     => 'New Photo',
+        lastUpdated => 0,
+        context     => 'Label for upload field when adding a new photo',
+    },
+
+    'editForm photo replace' => {
+        message     => 'Replace Photo',
+        lastUpdated => 0,
+        context     => 'Label for upload field when replacing an existing photo',
+    },
+
+    'editForm keywords' => {
+        message     => 'Tags',
+        lastUpdated => 0,
+        context     => 'Label for "keywords" field',
+    },
+
+    'editForm location' => {
+        message     => 'Location',
+        lastUpdated => 0,
+        context     => 'Label for "location" field',
+    },
+
+    'editForm friendsOnly' => {
+        message     => 'Friends Only',
+        lastUpdated => 0,
+        context     => 'Label for "friends only" field',
+    },
+
+    'editForm cancel' => {
+        message     => 'Cancel',
+        lastUpdated => 0,
+        context     => 'Label for "cancel" button',
+    },
+
+    'editForm save' => {
+        message     => 'Save',
+        lastUpdated => 0,
+        context     => 'Label for "save" button',
     },
 
 };
