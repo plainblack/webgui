@@ -27,7 +27,7 @@ function TinyMCE_pagetree_execCommand(editor_id, element, command, user_interfac
 			var template = new Array();
 			//Check for proper get delimiter
  	                var separator = getWebguiProperty("pageURL").match(/\?/)? ';' : '?';
- 	                template['file'] = "../../../../../.." + getWebguiProperty("pageURL") + separator + 'op=richEditPageTree';
+ 	                template['file'] = "../../../../../.." + getWebguiProperty("pageURL") + separator + 'op=formHelper;class=HTMLArea;sub=pageTree';
 			template['width'] = 500;
 			template['height'] = 500;
 			tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : "yes"} );

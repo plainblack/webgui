@@ -7,6 +7,7 @@
  - More i18n for Gallery templates
  - fix: Add an Album button now appears on Gallery List Albums view for those
    authorized.
+ - fixed: Rich editor page and image pickers are broken
 
 7.5.2
  - add: Auth modules now accept a "returnUrl" form parameter when logging in

@@ -36,8 +36,8 @@ function Init() {
     var seperator = '';
     if (pageURL.match(/\?/)) { seperator = ';' } else { seperator = '?'}
     
-    document.getElementById("lister").src = pageURL + seperator + 'op=richEditImageTree&DPI=' + dpi;
-    document.getElementById("viewer").src = pageURL + seperator + 'op=richEditViewThumbnail&DPI=' + dpi;
+    document.getElementById("lister").src = pageURL + seperator + 'op=formHelper;class=HTMLArea;sub=imageTree&DPI=' + dpi;
+    document.getElementById("viewer").src = pageURL + seperator + 'op=formHelper;class=HTMLArea;sub=viewThumbnail&DPI=' + dpi;
 
     var txtFileName = document.getElementById("txtFileName");
 		
@@ -146,7 +146,7 @@ function resetForm() {
            document.getElementById("thumbnailSize").value = '';         
            document.getElementById("description").value = '';         
            document.getElementById("folder").value = '';
-           document.getElementById("viewer").src=window.opener.getWebguiProperty("pageURL") + "?op=richEditImageTree";
+           document.getElementById("viewer").src=window.opener.getWebguiProperty("pageURL") + "?op=formHelper;class=HTMLArea;sub=imageTree";
        }else {
        	   initialLoad=false;
        }

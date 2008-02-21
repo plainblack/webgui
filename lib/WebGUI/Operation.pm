@@ -130,15 +130,7 @@ sub getOperations {
 		'editDatabaseLinkSave' => 'DatabaseLink',
 		'listDatabaseLinks' => 'DatabaseLink',
 
-		'formAssetTree' => 'FormHelpers',
 		'formHelper' => 'FormHelpers',
-		'richEditAddFolder' => 'FormHelpers',
-		'richEditAddFolderSave' => 'FormHelpers',
-		'richEditAddImage' => 'FormHelpers',
-		'richEditAddImageSave' => 'FormHelpers',
-		'richEditImageTree' => 'FormHelpers',
-		'richEditPageTree' => 'FormHelpers',
-		'richEditViewThumbnail' => 'FormHelpers',
 
 		'addGroupsToGroupSave' => 'Group',
 		'addUsersToGroupSave' => 'Group',
