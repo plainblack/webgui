@@ -27,17 +27,31 @@ These subroutines are available from this package:
 
 =cut
 
-readonly session => my %session;
+readonly session   => my %session;
+readonly className => my %className;
+readonly shipperId => my %shipperId;
+readonly label     => my %label;
+readonly options   => my %options;
 
 #-------------------------------------------------------------------
 
-=head2 new ( $session )
+=head2 className (  )
 
-Constructor for the WebGUI::Shop::Tax.  Returns a WebGUI::Shop::Tax object.
+Accessor for the className of the object.  This is the name of the driver that is used
+to do calculations.
 
 =cut
 
-sub new {
+#-------------------------------------------------------------------
+
+=head2 create ( $session )
+
+Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
+To access driver objects that have already been configured, use C<new>.
+
+=cut
+
+sub create {
     my $class   = shift;
     my $session = shift;
     my $self    = {};
@@ -49,9 +63,36 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 label (  )
+
+Accessor for the label property.  This is the name assigned to this
+driver, something like "Slow and dangerous".
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 options (  )
+
+Accessor for the driver properties.  This returns a JSON string of
+any driver specific properties.  Driver properties have a
+
+=cut
+
+#-------------------------------------------------------------------
+
 =head2 session (  )
 
 Accessor for the session object.  Returns the session object.
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 shipperId (  )
+
+Accessor for the unique identifier for this shipperDriver.  The shipperId is 
+a GUID.
 
 =cut
 
