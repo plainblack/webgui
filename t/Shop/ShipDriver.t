@@ -44,23 +44,65 @@ skip 'Unable to load module WebGUI::Shop::ShipDriver', $tests unless $loaded;
 
 #######################################################################
 #
+# definition
+#
+#######################################################################
+
+my $definition = WebGUI::Shop::ShipDriver->definition($session);
+
+cmp_deeply(
+    $definition,
+    [ {
+        name => 'Shipper Driver',
+        fields => {
+            label => {
+                fieldType => 'text',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => undef,
+            },
+            enabled => {
+                fieldType => 'yesNo',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 1,
+            }
+        }
+    } ],
+    ,
+    'Definition returns an array of hashrefs',
+);
+
+$definition = WebGUI::Shop::ShipDriver->definition($session, [ { name => 'Red' }]);
+
+cmp_deeply(
+    $definition,
+    [
+        {
+            name => 'Red',
+        },
+        {
+            name => 'Shipper Driver',
+            fields => ignore(),
+        }
+    ],
+    ,
+    'New data is appended correctly',
+);
+
+#######################################################################
+#
 # new
 #
 #######################################################################
 
-my $driver = WebGUI::Shop::ShipDriver->new($session);
-
-isa_ok($driver, 'WebGUI::Shop::ShipDriver');
-
-isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');
-
-is($session->getId, $driver->session->getId, 'session method returns OUR session object');
-
-#######################################################################
+#my $driver = WebGUI::Shop::ShipDriver->create($session);
 #
-# definition
+#isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 #
-#######################################################################
+#isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');
+#
+#is($session->getId, $driver->session->getId, 'session method returns OUR session object');
 
 #######################################################################
 #

@@ -4,6 +4,8 @@ use strict;
 
 use Class::InsideOut qw{ :std };
 use Carp qw(croak);
+use Tie::IxHash;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -59,6 +61,42 @@ sub create {
     register $self;
     $session{ id $self } = $session;
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 definition ( $session )
+
+Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
+To access driver objects that have already been configured, use C<new>.
+
+=cut
+
+sub definition {
+    my $class      = shift;
+    my $session    = shift;
+    my $definition = shift || [];
+    my $i18n = WebGUI::International->new($session, 'ShipDriver');
+    tie my %properties, 'Tie::IxHash';
+    %properties = (
+        name => 'Shipper Driver',
+        fields => {
+            label => {
+                fieldType    => 'text',
+                label        => $i18n->get('label'),
+                hoverHelp    => $i18n->get('label help'),
+                defaultValue => undef,
+            },
+            enabled => {
+                fieldType    => 'yesNo',
+                label        => $i18n->get('enabled'),
+                hoverHelp    => $i18n->get('enabled help'),
+                defaultValue => 1,
+            },
+        },
+    );
+    push @{ $definition }, \%properties;
+    return $definition;
 }
 
 #-------------------------------------------------------------------
