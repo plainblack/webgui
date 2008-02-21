@@ -535,15 +535,13 @@ sub www_addImageSave {
 			title       => $filename,
 			menuTitle   => $filename,
 			templateId  => 'PBtmpl0000000000000088',
-			url         => $base->get("url").'/'.$filename,
 			groupIdEdit => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
 			groupIdView => $session->form->process('groupIdView') || $base->get('groupIdView'),
-			ownerUserId => $session->var->get('userId'),
+			ownerUserId => $session->user-userId,
 			isHidden    => 1,
 			});
 	}
 	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
-    $imageObj->delete;
 	return undef;
 }
 
