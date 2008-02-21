@@ -46,10 +46,18 @@ to do calculations.
 
 #-------------------------------------------------------------------
 
-=head2 create ( $session )
+=head2 create ( $session, $properties )
 
 Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
 To access driver objects that have already been configured, use C<new>.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=head4 $properties
+
+A list of properties to assign to this ShipperDriver.  See C<definition> for details.
 
 =cut
 
@@ -67,8 +75,9 @@ sub create {
 
 =head2 definition ( $session )
 
-Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
-To access driver objects that have already been configured, use C<new>.
+This subroutine returns an arrayref of hashrefs, used to validate data put into
+the object by the user, and to automatically generate the edit form to show
+the user.
 
 =cut
 
