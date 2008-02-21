@@ -527,7 +527,7 @@ sub www_addImageSave {
 	##us from future form name changes.
 	my $filename = $imageObj->getFiles->[0];
 	if ($filename) {
-		$base->addChild({
+		my $child = $base->addChild({
 			assetId     => 'new',
 			className   => 'WebGUI::Asset::File::Image',
 			storageId   => $imageObj->getId,
@@ -540,6 +540,7 @@ sub www_addImageSave {
 			ownerUserId => $session->user-userId,
 			isHidden    => 1,
 			});
+        $child->update({url => $child->fixUrl});
 	}
 	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
