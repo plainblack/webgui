@@ -537,7 +537,7 @@ sub www_addImageSave {
 			templateId  => 'PBtmpl0000000000000088',
 			groupIdEdit => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
 			groupIdView => $session->form->process('groupIdView') || $base->get('groupIdView'),
-			ownerUserId => $session->user-userId,
+			ownerUserId => $session->user->userId,
 			isHidden    => 1,
 			});
         $child->update({url => $child->fixUrl});
