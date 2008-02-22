@@ -1,3 +1,5 @@
+7.5.4
+
 7.5.3
  - prevent HTML and Macro injection in usernames
  - Fixed a problem that caused all Cron job parameters to return an empty hash
