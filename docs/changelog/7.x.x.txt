@@ -4,6 +4,12 @@
  - prevent HTML and Macro injection in usernames
  - Fixed a problem that caused all Cron job parameters to return an empty hash
    ref.
+
+7.4.26
+ - fixed: rich text editor image uploads deleted immediately
+ - fixed: Running WebGUI Tests on Windows (William McKee, Knowmad Technologies)
+
+7.4.25
  - fixed: creating new ad spaces is broken
  - don't write .wgaccess files for public uploads, allowing WRE optimizations
  - More i18n for Gallery templates
