@@ -89,7 +89,8 @@ BEGIN {
     $WEBGUI_ROOT = File::Spec->canonpath($WEBGUI_ROOT);
     $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
 
-    $WEBGUI_LIB  ||= File::Spec->catpath( (File::Spec->splitpath($WEBGUI_ROOT))[0], $WEBGUI_ROOT, 'lib' );
+    my ($volume,$directories) = File::Spec->splitpath( $WEBGUI_ROOT, 'no_file' );
+    $WEBGUI_LIB ||= File::Spec->catpath( $volume, $directories, 'lib' );
 
     push (@INC,$WEBGUI_LIB);
 
