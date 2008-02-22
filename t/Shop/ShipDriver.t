@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 3;
+my $tests = 4;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -96,8 +96,14 @@ cmp_deeply(
 #
 #######################################################################
 
-#my $driver = WebGUI::Shop::ShipDriver->create($session);
-#
+my $driver;
+
+eval { $driver = WebGUI::Shop::ShipDriver->create($session); };
+like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks without a hashref of options');
+
+eval { $driver = WebGUI::Shop::ShipDriver->create($session, {}); };
+like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks with an empty hashref of options');
+
 #isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 #
 #isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');

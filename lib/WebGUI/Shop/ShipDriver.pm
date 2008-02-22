@@ -32,7 +32,6 @@ These subroutines are available from this package:
 readonly session   => my %session;
 readonly className => my %className;
 readonly shipperId => my %shipperId;
-readonly label     => my %label;
 readonly options   => my %options;
 
 #-------------------------------------------------------------------
@@ -46,7 +45,7 @@ to do calculations.
 
 #-------------------------------------------------------------------
 
-=head2 create ( $session, $properties )
+=head2 create ( $session, $options )
 
 Constructor for new WebGUI::Shop::ShipperDriver objects.  Returns a WebGUI::Shop::ShipperDriver object.
 To access driver objects that have already been configured, use C<new>.
@@ -55,7 +54,7 @@ To access driver objects that have already been configured, use C<new>.
 
 A WebGUI::Session object.
 
-=head4 $properties
+=head4 $options
 
 A list of properties to assign to this ShipperDriver.  See C<definition> for details.
 
@@ -64,10 +63,21 @@ A list of properties to assign to this ShipperDriver.  See C<definition> for det
 sub create {
     my $class   = shift;
     my $session = shift;
+    my $options = shift;
+    croak "You must pass a hashref of options to create a new ShipDriver object"
+        unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
     my $self    = {};
     bless $self, $class;
     register $self;
-    $session{ id $self } = $session;
+
+    my $shipperId = $session->id->generate;
+    my $id        = id $self;
+
+    $session{ $id }   = $session;
+    $shipperId{ $id } = $shipperId;
+    $options{ $id }   = $options;
+    $className{ $id } = __PACKAGE__;
+
     return $self;
 }
 
