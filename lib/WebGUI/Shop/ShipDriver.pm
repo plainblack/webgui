@@ -78,6 +78,9 @@ sub create {
     $options{ $id }   = $options;
     $className{ $id } = __PACKAGE__;
 
+    $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $className{$id}]);
+    #$self->set($options);
+
     return $self;
 }
 

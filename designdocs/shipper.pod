@@ -83,7 +83,6 @@ The following fields are needed to construct this object's table called "shipper
 
  Field          Schema          Description
  shipperId      guid            The unique id for this shipper.
- label          varchar(100)    A title for this shipper that will be displayed to the user. For example "Flat Rate" or "FedEx Overnight"
  className      varchar(255)    The plugin classname that will be used for this shipping module.
  options        mediumtext      A json serialized hash reference with configuration data for this shipper.
 

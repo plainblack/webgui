@@ -25,6 +25,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 insertCommerceTaxTable($session);
+insertCommerceShipDriverTable($session);
 migrateToNewCart($session);
 
 finish($session); # this line required
@@ -66,6 +67,23 @@ CREATE TABLE tax (
     taxRate  FLOAT        NOT NULL DEFAULT 0.0,
     PRIMARY KEY (taxId),
     UNIQUE  KEY (field, value)
+)
+EOSQL
+
+}
+
+#-------------------------------------------------
+sub insertCommerceShipDriverTable {
+	my $session = shift;
+	print "\tInstall the Commerce ShipperDriver Table.\n" unless ($quiet);
+	# and here's our code
+    $session->db->write(<<EOSQL);
+
+CREATE TABLE shipper (
+    shipperId  VARCHAR(22)  binary NOT NULL,
+    className  VARCHAR(255),
+    options    mediumtext,
+    PRIMARY KEY (shipperId)
 )
 EOSQL
 
