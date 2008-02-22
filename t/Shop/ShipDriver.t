@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 4;
+my $tests = 9;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -104,11 +104,23 @@ like ($@, qr/You must pass a hashref of options to create a new ShipDriver objec
 eval { $driver = WebGUI::Shop::ShipDriver->create($session, {}); };
 like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks with an empty hashref of options');
 
-#isa_ok($driver, 'WebGUI::Shop::ShipDriver');
-#
-#isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');
-#
-#is($session->getId, $driver->session->getId, 'session method returns OUR session object');
+$driver = WebGUI::Shop::ShipDriver->create(
+                                        $session,
+                                        {
+                                            label   => 'Slow and dangerous',
+                                            enabled => 1,
+                                        }
+                                    );
+
+isa_ok($driver, 'WebGUI::Shop::ShipDriver');
+
+isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session object');
+
+is($session->getId, $driver->session->getId, 'session method returns OUR session object');
+
+like($driver->shipperId, $session->id->getValidator, 'got a valid GUID for shipperId');
+
+is($driver->className, ref $driver, 'className property set correctly');
 
 #######################################################################
 #
