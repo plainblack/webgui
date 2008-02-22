@@ -6,6 +6,7 @@ use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::International;
+use JSON;
 
 =head1 NAME
 
@@ -79,7 +80,7 @@ sub create {
     $className{ $id } = __PACKAGE__;
 
     $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $className{$id}]);
-    #$self->set($options);
+    $self->set($options);
 
     return $self;
 }
@@ -97,6 +98,8 @@ the user.
 sub definition {
     my $class      = shift;
     my $session    = shift;
+    croak "Definition requires a session object"
+        unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
     my $i18n = WebGUI::International->new($session, 'ShipDriver');
     tie my %properties, 'Tie::IxHash';
@@ -123,19 +126,53 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 label (  )
+=head2 delete ( )
 
-Accessor for the label property.  This is the name assigned to this
-driver, something like "Slow and dangerous".
+Removes this ShipDriver object from the db.
 
 =cut
+
+sub delete {
+    my $self = shift;
+    $self->session->db->write('delete from shipper');
+    return;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getID ( )
+
+Returns the shipperId.  This is an alias for shipperId provided
+since a lot of WebGUI classes have a getId method.
+
+=cut
+
+sub getId {
+    return shift->shipperId;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( )
+
+Return a human readable name for this driver. Never overridden in the
+subclass, instead specified in definition with the name "name".
+
+=cut
+
+sub getName {
+    my $self = shift;
+    my $definition = WebGUI::Shop::ShipDriver->definition($self->session);
+    return $definition->[0]->{name};
+}
 
 #-------------------------------------------------------------------
 
 =head2 options (  )
 
-Accessor for the driver properties.  This returns a JSON string of
-any driver specific properties.  Driver properties have a
+Accessor for the driver properties.  This returns a hashref
+any driver specific properties.  To set the properties, use
+the C<set> method.
 
 =cut
 
@@ -146,6 +183,28 @@ any driver specific properties.  Driver properties have a
 Accessor for the session object.  Returns the session object.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 set ( $options )
+
+Setter for user configurable options in the ship objects.
+
+=head4 $options
+
+A list of properties to assign to this ShipperDriver.  See C<definition> for details.
+
+=cut
+
+sub set {
+    my $self    = shift;
+    my $options = shift;
+    croak "set was not sent a hashref of options to store in the database"
+        unless ref($options) eq 'HASH' and scalar keys %{ $options };
+    my $jsonOptions = to_json($options);
+    $self->session->db->write('update shipper set options=? where shipperId=?', [$jsonOptions, $self->shipperId]);
+    return;
+}
 
 #-------------------------------------------------------------------
 

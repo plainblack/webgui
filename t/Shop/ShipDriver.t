@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use JSON;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
@@ -28,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 9;
+my $tests = 15;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -48,7 +49,12 @@ skip 'Unable to load module WebGUI::Shop::ShipDriver', $tests unless $loaded;
 #
 #######################################################################
 
-my $definition = WebGUI::Shop::ShipDriver->definition($session);
+my $definition;
+
+eval { $definition = WebGUI::Shop::ShipDriver->definition(); };
+like ($@, qr/^Definition requires a session object/, 'definition croaks without a session object');
+
+$definition = WebGUI::Shop::ShipDriver->definition($session);
 
 cmp_deeply(
     $definition,
@@ -92,7 +98,7 @@ cmp_deeply(
 
 #######################################################################
 #
-# new
+# create
 #
 #######################################################################
 
@@ -104,13 +110,11 @@ like ($@, qr/You must pass a hashref of options to create a new ShipDriver objec
 eval { $driver = WebGUI::Shop::ShipDriver->create($session, {}); };
 like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks with an empty hashref of options');
 
-$driver = WebGUI::Shop::ShipDriver->create(
-                                        $session,
-                                        {
-                                            label   => 'Slow and dangerous',
-                                            enabled => 1,
-                                        }
-                                    );
+my $options = {
+                label   => 'Slow and dangerous',
+                enabled => 1,
+              };
+$driver = WebGUI::Shop::ShipDriver->create( $session, $options);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
@@ -119,8 +123,22 @@ isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session ob
 is($session->getId, $driver->session->getId, 'session method returns OUR session object');
 
 like($driver->shipperId, $session->id->getValidator, 'got a valid GUID for shipperId');
+is($driver->getId,       $driver->shipperId,         'getId returns the same thing as shipperId');
 
 is($driver->className, ref $driver, 'className property set correctly');
+
+cmp_deeply($driver->options, $options, 'options accessor works');
+
+my $dbData = $session->db->quickHashRef('select * from shipper limit 1');
+cmp_deeply(
+    $dbData,
+    {
+        shipperId => $driver->shipperId,
+        className => ref($driver),
+        options   => q|{"label":"Slow and dangerous","enabled":1}|,
+    },
+    'Correct data written to the db',
+);
 
 #######################################################################
 #
@@ -128,11 +146,26 @@ is($driver->className, ref $driver, 'className property set correctly');
 #
 #######################################################################
 
+is ($driver->getName, 'Shipper Driver', 'getName returns the human readable name of this driver');
+
 #######################################################################
 #
 # getEditForm
 #
 #######################################################################
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
+
+$driver->delete;
+
+my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
+is($count, 0, 'delete deleted the object');
+
+undef $driver;
 
 #######################################################################
 #
@@ -145,4 +178,5 @@ is($driver->className, ref $driver, 'className property set correctly');
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    $session->db->write('delete from shipper');
 }
