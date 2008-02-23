@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 21;
+my $tests = 24;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -147,6 +147,16 @@ cmp_deeply(
 #######################################################################
 
 is ($driver->getName, 'Shipper Driver', 'getName returns the human readable name of this driver');
+
+#######################################################################
+#
+# get
+#
+#######################################################################
+
+cmp_deeply($driver->get, $driver->options, 'get works like the options method with no param passed');
+is($driver->get('enabled'), 1, 'get the enabled entry from the options');
+is($driver->get('label'),   'Slow and dangerous', 'get the label entry from the options');
 
 #######################################################################
 #

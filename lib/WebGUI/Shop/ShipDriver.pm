@@ -156,6 +156,34 @@ sub delete {
 
 #-------------------------------------------------------------------
 
+=head2 get ( [ $param ] )
+
+This is an enhanced accessor for the options property.  By default,
+it returns all the options as a hashref.  If the name of a key
+in the hash is passed, it will only return that value from the
+options hash.
+
+=head3 $param
+
+An optional parameter.  If it matches the key of a hash, it will
+return the value from the options hash.
+
+=cut
+
+sub get {
+    my $self  = shift;
+    my $param = shift;
+    my $options = $self->options;
+    if (defined $param) {
+        return $options->{$param};
+    }
+    else {
+        return $options;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getID ( )
 
 Returns the shipperId.  This is an alias for shipperId provided
