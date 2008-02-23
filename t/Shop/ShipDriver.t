@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 18;
+my $tests = 21;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -156,19 +156,6 @@ is ($driver->getName, 'Shipper Driver', 'getName returns the human readable name
 
 #######################################################################
 #
-# delete
-#
-#######################################################################
-
-$driver->delete;
-
-my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
-is($count, 0, 'delete deleted the object');
-
-undef $driver;
-
-#######################################################################
-#
 # new
 #
 #######################################################################
@@ -183,6 +170,25 @@ like ($@, qr/^new requires a shipperId/, 'new croaks without a shipperId');
 
 eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, 'notEverAnId'); };
 like ($@, qr/^The requested shipperId does not exist in the db/, 'new croaks unless the requested shipperId object exists in the db');
+
+my $driverCopy = WebGUI::Shop::ShipDriver->new($session, $driver->shipperId);
+
+is($driver->getId,           $driverCopy->getId,     'same id');
+is($driver->className,       $driverCopy->className, 'same className');
+cmp_deeply($driver->options, $driverCopy->options,   'same options');
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
+
+$driver->delete;
+
+my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
+is($count, 0, 'delete deleted the object');
+
+undef $driver;
 
 #######################################################################
 #

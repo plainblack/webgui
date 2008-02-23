@@ -49,7 +49,6 @@ sub _buildObj {
     bless $self, $class;
     register $self;
 
-    my $shipperId = $session->id->generate;
     my $id        = id $self;
 
     $session{ $id }   = $session;
@@ -207,7 +206,7 @@ sub new {
         unless exists $properties->{options} and $properties->{options};
     my $options = from_json($properties->{options});
     my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $shipperId, $options);
-    return;
+    return $self;
 }
 
 #-------------------------------------------------------------------
