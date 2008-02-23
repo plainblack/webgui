@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 15;
+my $tests = 18;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -166,6 +166,23 @@ my $count = $session->db->quickScalar('select count(*) from shipper where shippe
 is($count, 0, 'delete deleted the object');
 
 undef $driver;
+
+#######################################################################
+#
+# new
+#
+#######################################################################
+
+my $oldDriver;
+
+eval { $oldDriver = WebGUI::Shop::ShipDriver->new(); };
+like ($@, qr/^new requires a session object/, 'new croaks without a session object');
+
+eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session); };
+like ($@, qr/^new requires a shipperId/, 'new croaks without a shipperId');
+
+eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, 'notEverAnId'); };
+like ($@, qr/^The requested shipperId does not exist in the db/, 'new croaks unless the requested shipperId object exists in the db');
 
 #######################################################################
 #

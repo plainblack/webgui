@@ -37,6 +37,32 @@ readonly options   => my %options;
 
 #-------------------------------------------------------------------
 
+=head2 _buildObj (  )
+
+Private method used to build objects, shared by new and create.
+
+=cut
+
+sub _buildObj {
+    my ($class, $session, $shipperId, $options) = @_;
+    my $self    = {};
+    bless $self, $class;
+    register $self;
+
+    my $shipperId = $session->id->generate;
+    my $id        = id $self;
+
+    $session{ $id }   = $session;
+    $shipperId{ $id } = $shipperId;
+    $options{ $id }   = $options;
+    $className{ $id } = $class;
+
+    return $self;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 className (  )
 
 Accessor for the className of the object.  This is the name of the driver that is used
@@ -67,19 +93,10 @@ sub create {
     my $options = shift;
     croak "You must pass a hashref of options to create a new ShipDriver object"
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $self    = {};
-    bless $self, $class;
-    register $self;
-
     my $shipperId = $session->id->generate;
-    my $id        = id $self;
+    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $shipperId, $options);
 
-    $session{ $id }   = $session;
-    $shipperId{ $id } = $shipperId;
-    $options{ $id }   = $options;
-    $className{ $id } = __PACKAGE__;
-
-    $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $className{$id}]);
+    $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $class]);
     $self->set($options);
 
     return $self;
@@ -164,6 +181,33 @@ sub getName {
     my $self = shift;
     my $definition = WebGUI::Shop::ShipDriver->definition($self->session);
     return $definition->[0]->{name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 new ( $session, $shipperId )
+
+Looks up an existing ShipperDriver in the db by shipperId and returns
+that object.
+
+=cut
+
+sub new {
+    my $class     = shift;
+    my $session   = shift;
+    croak "new requires a session object"
+        unless ref $session eq 'WebGUI::Session';
+    my $shipperId = shift;
+    croak "new requires a shipperId"
+        unless defined $shipperId;
+    my $properties = $session->db->quickHashRef('select * from shipper where shipperId=?',[$shipperId]);
+    croak "The requested shipperId does not exist in the db"
+        unless scalar keys %{ $properties };
+    croak "Somehow, the options property of this object, $shipperId, got broken in the db"
+        unless exists $properties->{options} and $properties->{options};
+    my $options = from_json($properties->{options});
+    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $shipperId, $options);
+    return;
 }
 
 #-------------------------------------------------------------------
