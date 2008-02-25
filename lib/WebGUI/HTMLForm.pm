@@ -169,7 +169,6 @@ sub dynamicForm {
             $params{value} = $parent->get($fieldname);
             $params{name}  = $fieldname;
             $self->dynamicField(%params);
-            warn "name: ".$fieldname;
         }
     }
 }
