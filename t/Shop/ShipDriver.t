@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 28;
+my $tests = 29;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -240,6 +240,15 @@ cmp_deeply($driver->options, $driverCopy->options,   'same options');
 
 #######################################################################
 #
+# calculate
+#
+#######################################################################
+
+eval { $driver->calculate; };
+like ($@, qr/^You must override the calculate method/, 'calculate throws an exception to force overriding it in the child classes');
+
+#######################################################################
+#
 # delete
 #
 #######################################################################
@@ -250,12 +259,6 @@ my $count = $session->db->quickScalar('select count(*) from shipper where shippe
 is($count, 0, 'delete deleted the object');
 
 undef $driver;
-
-#######################################################################
-#
-# calculate
-#
-#######################################################################
 
 }
 

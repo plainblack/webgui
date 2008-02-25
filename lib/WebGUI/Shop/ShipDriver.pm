@@ -62,6 +62,19 @@ sub _buildObj {
 
 #-------------------------------------------------------------------
 
+=head2 calculate (  )
+
+This method calculates how much it costs to ship the contents of a cart.  This method
+MUST be overridden in all child classes.
+
+=cut
+
+sub calculate {
+    croak "You must override the calculate method";
+}
+
+#-------------------------------------------------------------------
+
 =head2 className (  )
 
 Accessor for the className of the object.  This is the name of the driver that is used
