@@ -61,7 +61,7 @@ Returns the cart id.
 =head3 getItems
 
 Returns an array reference of WebGUI::Asset::Sku objects that are in
-the cart. Calls WebGUI::Shop::CartItem-E<gt>getAllInCart
+the cart. 
 
 =head3 new
 
@@ -72,7 +72,7 @@ session
 
 param: cartId - the unique id for this cart
 
-=head3 set
+=head3 update
 
 Sets properties in the cart.
 
@@ -123,15 +123,6 @@ Returns a duplicated hash reference of this object's data.
 
 param: any field - returns the value of a field
 rather than the hash reference
-
-=head3 getAllInCart
-
-Returns an array reference of WebGUI::Shop::Cart::Item objects.
-
-param: session - the session object
-
-param: cartId - the unique id of the cart you'd like
-to retrieve the objects of
 
 =head3 getSku
 
