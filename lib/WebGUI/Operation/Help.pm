@@ -362,7 +362,7 @@ sub www_viewHelp {
 
 	WebGUI::Macro::process($session,\$body);
 
-    return $ac->render(wikiHelpLink($session).$body, $i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title}));
+    return $ac->render($i18n->get("external help", "WebGUI").$body, $i18n->get(93, 'WebGUI').': '.$i18n->get($help->{title}));
 }
 
 #-------------------------------------------------------------------
@@ -434,26 +434,7 @@ sub www_viewHelpIndex {
 	}
 	$output .= '</td></tr></table>';
     my $ac = WebGUI::AdminConsole->new($session,"help");
-    return $ac->render(wikiHelpLink($session).$output, join ': ',$i18n->get(93), $i18n->get('help index'));
-}
-
-#-------------------------------------------------------------------
-
-=head2 wikiHelpLink ( $session )
-
-Utility method that returns link to the WebGUI Community Wiki with i18n'ed text.
-
-=cut
-
-sub wikiHelpLink {
-	my $session = shift;
-	return $session->privilege->insufficient() unless canView($session);
-	my $i18n = WebGUI::International->new($session);
-    return sprintf q!<p>%s <a href="%s">%s</a></p>!, 
-        $i18n->get('wiki help label leadin'),
-        'http://www.webgui.org/community-wiki',
-        $i18n->get('wiki help target'),
-        ;
+    return $ac->render($i18n->get("external help", "WebGUI").$output, join ': ',$i18n->get(93), $i18n->get('help index'));
 }
 
 1;

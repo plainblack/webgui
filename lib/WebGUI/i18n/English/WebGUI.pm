@@ -3886,14 +3886,9 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
-    'wiki help label leadin' => {
-        message     => q{For more help, visit the},
-        lastUpdated => 1185162265,
-    },
-
-    'wiki help target' => {
-        message     => q{WebGUI Community Wiki},
-        lastUpdated => 1185162267,
+    'external help' => {
+        message     => q{<p>For more help, visit the <a href="http://wiki.webgui.org/">WebGUI Community Wiki</a>.</p>},
+        lastUpdated => 0,
     },
 
     'user profile field friend availability' => {
