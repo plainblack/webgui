@@ -15,9 +15,8 @@ Package WebGUI::Shop::ShipDriver
 
 =head1 DESCRIPTION
 
-This package manages tax information, and calculates taxes on a shopping cart.  It isn't a classic object
-in that the only data it contains is a WebGUI::Session object, but it does provide several methods for
-handling the information in the tax tables.
+This package is the base class for all modules which calculate shipping
+costs.
 
 =head1 SYNOPSIS
 
