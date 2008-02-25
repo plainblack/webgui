@@ -109,7 +109,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 dynamicForm ( $formDefinition, $who ) 
+=head2 dynamicForm ( $formDefinition, $listName, $who ) 
 
 Build a form dynamically from an array of hash refs.  The format is
 based on the definition sub from Asset, Workflow::Activity and
@@ -140,6 +140,12 @@ any WebGUI::Form plugin.
 The default value the form field should have if the caller has no value
 for this field.
 
+=head3 $listName
+
+The name of the key in the structure that contains the list of
+fields.  For example, in Workflow Activities, it is called "properties".
+Inside the Shop modules, it is called "fields".
+
 =head3 $who
 
 In order to populate the form with current information from an object,
@@ -149,9 +155,9 @@ a C<get> method to provide that information.
 =cut
 
 sub dynamicForm {
-	my ($self, $formDefinition, $parent) = @_;
+	my ($self, $formDefinition, $fieldList, $parent) = @_;
     foreach my $definition (reverse @{$formDefinition}) {
-        my $properties = $definition->{properties};
+        my $properties = $definition->{$fieldList};
         foreach my $fieldname (keys %{$properties}) {
             my %params;
             foreach my $key (keys %{$properties->{$fieldname}}) {
@@ -163,6 +169,7 @@ sub dynamicForm {
             $params{value} = $parent->get($fieldname);
             $params{name}  = $fieldname;
             $self->dynamicField(%params);
+            warn "name: ".$fieldname;
         }
     }
 }
