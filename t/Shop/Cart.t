@@ -42,9 +42,8 @@ isa_ok($cart->session, "WebGUI::Session");
 
 my $root = WebGUI::Asset->getRoot($session);
 my $product = $root->addChild($session, {
-    className=>"WebGUI::Asset::Sku::Product",
+    className=>"WebGUI::Asset::Sku",
     title=>"Test Product",
-    price=>4.99
     });
 
 $cart->addItem($product, 1);

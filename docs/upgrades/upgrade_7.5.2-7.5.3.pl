@@ -45,7 +45,7 @@ sub createSkuAsset {
         taxRateOverride float not null default 0.00,
         primary key (assetId, revisionDate),
         unique key sku (sku),
-        index vendorId (vendorId)
+        index salesAgentId (salesAgentId)
     )"); 
 }
 

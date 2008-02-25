@@ -67,3 +67,5 @@ is($loadSku->getId, $sku->getId, "newBySku() works.");
 END {
 
 }
+
+1;

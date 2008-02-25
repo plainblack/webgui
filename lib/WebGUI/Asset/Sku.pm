@@ -316,3 +316,4 @@ sub www_view {
 	return "chunked";
 }
 
+1;
