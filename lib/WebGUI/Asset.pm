@@ -621,6 +621,8 @@ sub fixUrl {
 
 Returns a reference to a list of properties (or specified property) of an Asset.
 
+If C<propertyName> is omitted, it will return a safe copy of the entire property hash.
+
 =head3 propertyName
 
 Any of the values associated with the properties of an Asset. Default choices are "title", "menutTitle",
@@ -1305,7 +1307,10 @@ sub getUrl {
 
 =head2 getValue ( key )
 
-Returns the value of anything it can find with an index of key, or else it returns undefined.
+Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it
+tries to look it up in the definition sub for the asset.
+
+Unlike get, it will not return the whole property hash if you omit the key.
 
 =head3 key
 
