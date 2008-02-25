@@ -211,27 +211,27 @@ param: definition - an array ref of hash refs of definitions
 
  [
     {
-        name =E<gt> "Flat Rate",
-        fields =E<gt> {
-            percentageOfPrice =E<gt> {
-                fieldType =E<gt> "float",
-                label =E<gt> "Percentage Of Price",
-                defaultValue =E<gt> 0
+        name => "Flat Rate",
+        fields => {
+            percentageOfPrice => {
+                fieldType => "float",
+                label => "Percentage Of Price",
+                defaultValue => 0
             },
-            flatFee =E<gt> {
-                fieldType =E<gt> "float",
-                label =E<gt> "Flat Fee",
-                defaultValue =E<gt> 0
+            flatFee => {
+                fieldType => "float",
+                label => "Flat Fee",
+                defaultValue => 0
             },
-            pricePerWeight =E<gt> {
-                fieldType =E<gt> "float",
-                label =E<gt> "Price Per Weight",
-                defaultValue =E<gt> 0
+            pricePerWeight => {
+                fieldType => "float",
+                label => "Price Per Weight",
+                defaultValue => 0
             },
-            pricePerItem =E<gt> {
-                label =E<gt> "Price Per Item",
-                fieldType =E<gt> "float",
-                defaultValue =E<gt> 0
+            pricePerItem => {
+                label => "Price Per Item",
+                fieldType => "float",
+                defaultValue => 0
             },
         }
     }
