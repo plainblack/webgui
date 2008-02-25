@@ -19,6 +19,8 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use JSON;
+use HTML::Form;
+
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
@@ -29,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 24;
+my $tests = 28;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -163,6 +165,55 @@ is($driver->get('label'),   'Slow and dangerous', 'get the label entry from the 
 # getEditForm
 #
 #######################################################################
+
+my $form = $driver->getEditForm;
+
+isa_ok($form, 'WebGUI::HTMLForm', 'getEditForm returns an HTMLForm object');
+
+my $html = $form->print;
+
+##Any URL is fine, really
+my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is (scalar @forms, 1, 'getEditForm generates just 1 form');
+
+my @inputs = $forms[0]->inputs;
+is (scalar @inputs, 5, 'getEditForm: the form has 5 controls');
+
+my @interestingFeatures;
+foreach my $input (@inputs) {
+    my $name = $input->name;
+    my $type = $input->type;
+    push @interestingFeatures, { name => $name, type => $type };
+}
+
+cmp_deeply(
+    \@interestingFeatures,
+    [
+        {
+            name => undef,
+            type => 'submit',
+        },
+        {
+            name => 'shipperId',
+            type => 'hidden',
+        },
+        {
+            name => 'className',
+            type => 'hidden',
+        },
+        {
+            name => 'label',
+            type => 'text',
+        },
+        {
+            name => 'enabled',
+            type => 'radio',
+        },
+    ],
+    'getEditForm made the correct form with all the elements'
+
+);
+
 
 #######################################################################
 #

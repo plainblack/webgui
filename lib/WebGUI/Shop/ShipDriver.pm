@@ -6,6 +6,7 @@ use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::International;
+use WebGUI::HTMLForm;
 use JSON;
 
 =head1 NAME
@@ -184,7 +185,32 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getID ( )
+=head2 getEditForm ( )
+
+Dynamically generate an HTMLForm based on the contents
+of the definition sub, and return the form.
+=cut
+
+sub getEditForm {
+    my $self  = shift;
+    my $definition = $self->definition($self->session);
+    my $form = WebGUI::HTMLForm->new($self->session);
+    $form->submit;
+    $form->hidden(
+        name  => 'shipperId',
+        value => $self->getId,
+    );
+    $form->hidden(
+        name  => 'className',
+        value => $self->className,
+    );
+    $form->dynamicForm($definition, 'fields', $self);
+    return $form;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getId ( )
 
 Returns the shipperId.  This is an alias for shipperId provided
 since a lot of WebGUI classes have a getId method.
