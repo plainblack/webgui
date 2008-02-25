@@ -2,6 +2,7 @@ package WebGUI::Shop::ShipDriver::FlatRate;
 
 use strict;
 use base qw/WebGUI::Shop::ShipDriver/;
+use Carp qw/croak/;
 
 =head1 NAME
 
@@ -60,36 +61,37 @@ sub definition {
     croak "Definition requires a session object"
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
-    my $i18n = WebGUI::International->new($session, 'ShipDriver');
-    tie my %properties, 'Tie::IxHash';
-    %properties = (
-        name => 'Flat Rate',
-        fields => {
-            flatFee => {
-                fieldType    => 'float',
-                label        => $i18n->get('flatFee'),
-                hoverHelp    => $i18n->get('flatFee help'),
-                defaultValue => 0,
-            },
-            percentageOfPrice => {
-                fieldType    => 'float',
-                label        => $i18n->get('percentageOfPrice'),
-                hoverHelp    => $i18n->get('percentageOfPrice help'),
-                defaultValue => 0,
-            },
-            pricePerWeight => {
-                fieldType    => 'float',
-                label        => $i18n->get('pricePerWeight'),
-                hoverHelp    => $i18n->get('pricePerWeight help'),
-                defaultValue => 0,
-            },
-            pricePerItem => {
-                fieldType    => 'float',
-                label        => $i18n->get('pricePerItem'),
-                hoverHelp    => $i18n->get('pricePerItem help'),
-                defaultValue => 0,
-            },
+    my $i18n = WebGUI::International->new($session, 'ShipDriver_FlatRate');
+    tie my %fields, 'Tie::IxHash';
+    %fields = (
+        flatFee => {
+            fieldType    => 'float',
+            label        => $i18n->get('flatFee'),
+            hoverHelp    => $i18n->get('flatFee help'),
+            defaultValue => 0,
         },
+        percentageOfPrice => {
+            fieldType    => 'float',
+            label        => $i18n->get('percentageOfPrice'),
+            hoverHelp    => $i18n->get('percentageOfPrice help'),
+            defaultValue => 0,
+        },
+        pricePerWeight => {
+            fieldType    => 'float',
+            label        => $i18n->get('pricePerWeight'),
+            hoverHelp    => $i18n->get('pricePerWeight help'),
+            defaultValue => 0,
+        },
+        pricePerItem => {
+            fieldType    => 'float',
+            label        => $i18n->get('pricePerItem'),
+            hoverHelp    => $i18n->get('pricePerItem help'),
+            defaultValue => 0,
+        },
+    );
+    my %properties = (
+        name   => 'Flat Rate',
+        fields => \%fields,
     );
     push @{ $definition }, \%properties;
     return $class->SUPER::definition($session, $definition);

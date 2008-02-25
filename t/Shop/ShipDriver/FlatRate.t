@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 28;
+my $tests = 11;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -56,11 +56,40 @@ my $definition;
 eval { $definition = WebGUI::Shop::ShipDriver::FlatRate->definition(); };
 like ($@, qr/^Definition requires a session object/, 'definition croaks without a session object');
 
-$definition = WebGUI::Shop::ShipDriver->definition($session);
+$definition = WebGUI::Shop::ShipDriver::FlatRate->definition($session);
 
 cmp_deeply(
     $definition,
     [ {
+        name => 'Flat Rate',
+        fields => {
+            flatFee => {
+                fieldType => 'float',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 0,
+            },
+            percentageOfPrice => {
+                fieldType => 'float',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 0,
+            },
+            pricePerWeight => {
+                fieldType => 'float',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 0,
+            },
+            pricePerItem => {
+                fieldType => 'float',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 0,
+            },
+        }
+    },
+    {
         name => 'Shipper Driver',
         fields => {
             label => {
@@ -74,10 +103,9 @@ cmp_deeply(
                 label => ignore(),
                 hoverHelp => ignore(),
                 defaultValue => 1,
-            }
+            },
         }
     } ],
-    ,
     'Definition returns an array of hashrefs',
 );
 
@@ -90,16 +118,21 @@ cmp_deeply(
 my $driver;
 
 my $options = {
-                label   => 'Slow and dangerous',
+                label   => 'flat rate, ship weight, items in the cart',
                 enabled => 1,
+                flatFee => 1.00,
+                percentageOfPrice => 5,
+                pricePerWeight    => 0.5,
+                pricePerItem      => 0.1,
               };
 
-$driver = WebGUI::Shop::ShipDriver->create( $session, $options);
+$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate');
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
+cmp_deeply($driver->options, $options, 'options accessor works');
 
 #######################################################################
 #
@@ -126,7 +159,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 5, 'getEditForm: the form has 5 controls');
+is (scalar @inputs, 9, 'getEditForm: the form has 9 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -157,6 +190,22 @@ cmp_deeply(
         {
             name => 'enabled',
             type => 'radio',
+        },
+        {
+            name => 'flatFee',
+            type => 'text',
+        },
+        {
+            name => 'percentageOfPrice',
+            type => 'text',
+        },
+        {
+            name => 'pricePerWeight',
+            type => 'text',
+        },
+        {
+            name => 'pricePerItem',
+            type => 'text',
         },
     ],
     'getEditForm made the correct form with all the elements'

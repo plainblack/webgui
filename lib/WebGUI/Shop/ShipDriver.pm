@@ -131,23 +131,24 @@ sub definition {
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
     my $i18n = WebGUI::International->new($session, 'ShipDriver');
-    tie my %properties, 'Tie::IxHash';
-    %properties = (
-        name => 'Shipper Driver',
-        fields => {
-            label => {
-                fieldType    => 'text',
-                label        => $i18n->get('label'),
-                hoverHelp    => $i18n->get('label help'),
-                defaultValue => undef,
-            },
-            enabled => {
-                fieldType    => 'yesNo',
-                label        => $i18n->get('enabled'),
-                hoverHelp    => $i18n->get('enabled help'),
-                defaultValue => 1,
-            },
+    tie my %fields, 'Tie::IxHash';
+    %fields = (
+        label => {
+            fieldType    => 'text',
+            label        => $i18n->get('label'),
+            hoverHelp    => $i18n->get('label help'),
+            defaultValue => undef,
         },
+        enabled => {
+            fieldType    => 'yesNo',
+            label        => $i18n->get('enabled'),
+            hoverHelp    => $i18n->get('enabled help'),
+            defaultValue => 1,
+        },
+    );
+    my %properties = (
+        name   => 'Shipper Driver',
+        fields => \%fields,
     );
     push @{ $definition }, \%properties;
     return $definition;
@@ -245,7 +246,7 @@ subclass, instead specified in definition with the name "name".
 
 sub getName {
     my $self = shift;
-    my $definition = WebGUI::Shop::ShipDriver->definition($self->session);
+    my $definition = $self->definition($self->session);
     return $definition->[0]->{name};
 }
 
@@ -302,7 +303,8 @@ Setter for user configurable options in the ship objects.
 
 =head4 $options
 
-A list of properties to assign to this ShipperDriver.  See C<definition> for details.
+A list of properties to assign to this ShipperDriver.  See C<definition> for details.  The options are
+flattened into JSON and stored in the database as text.  There is no content checking performed.
 
 =cut
 
