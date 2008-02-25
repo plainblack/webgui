@@ -44,9 +44,9 @@ Private method used to build objects, shared by new and create.
 =cut
 
 sub _buildObj {
-    my ($class, $session, $shipperId, $options) = @_;
+    my ($class, $session, $requestedClass, $shipperId, $options) = @_;
     my $self    = {};
-    bless $self, $class;
+    bless $self, $requestedClass;
     register $self;
 
     my $id        = id $self;
@@ -54,7 +54,7 @@ sub _buildObj {
     $session{ $id }   = $session;
     $shipperId{ $id } = $shipperId;
     $options{ $id }   = $options;
-    $className{ $id } = $class;
+    $className{ $id } = $requestedClass;
 
     return $self;
 }
@@ -106,7 +106,7 @@ sub create {
     croak "You must pass a hashref of options to create a new ShipDriver object"
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
     my $shipperId = $session->id->generate;
-    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $shipperId, $options);
+    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $class, $shipperId, $options);
 
     $session->db->write('insert into shipper (shipperId,className) VALUES (?,?)', [$shipperId, $class]);
     $self->set($options);
@@ -201,6 +201,7 @@ sub get {
 
 Dynamically generate an HTMLForm based on the contents
 of the definition sub, and return the form.
+
 =cut
 
 sub getEditForm {
@@ -271,7 +272,7 @@ sub new {
     croak "Somehow, the options property of this object, $shipperId, got broken in the db"
         unless exists $properties->{options} and $properties->{options};
     my $options = from_json($properties->{options});
-    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $shipperId, $options);
+    my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $class, $shipperId, $options);
     return $self;
 }
 
