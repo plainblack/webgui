@@ -1,6 +1,7 @@
 7.4.26
  - fixed: rich text editor image uploads deleted immediately
  - fixed: Running WebGUI Tests on Windows (William McKee, Knowmad Technologies)
+ - fixed: runCronJob operation fails
 
 7.4.25
  - fixed: creating new ad spaces is broken
