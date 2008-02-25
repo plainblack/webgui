@@ -27,9 +27,27 @@ my $session = start(); # this line required
 insertCommerceTaxTable($session);
 insertCommerceShipDriverTable($session);
 migrateToNewCart($session);
+createSkuAsset($session);
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub createSkuAsset {
+	my $session = shift;
+	print "\tCreate SKU asset.\n" unless ($quiet);
+    $session->db->write("create table sku (
+        assetId varchar(22) binary not null,
+        revisionDate bigint not null,
+        sku varchar(35) binary not null,
+        salesAgentId varchar(22) binary,
+        overrideTaxRate int not null default 0,
+        taxRateOverride float not null default 0.00,
+        primary key (assetId, revisionDate),
+        unique key sku (sku),
+        index vendorId (vendorId)
+    )"); 
+}
 
 #-------------------------------------------------
 sub migrateToNewCart {
