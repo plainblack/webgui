@@ -1,7 +1,6 @@
 package WebGUI::Shop::CartItem;
 
 use strict;
-
 use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use JSON;
@@ -81,13 +80,33 @@ sub get {
     my ($self, $name) = @_;
     if (defined $name) {
         if ($name eq "options") {
-            return JSON::from_json($properties{id $self}{$name});
+            my $options = $properties{id $self}{$name};
+            if ($options eq "") {
+                return {};
+            }
+            else {
+                return JSON::from_json($properties{id $self}{$name});
+            }
         }
         return $properties{id $self}{$name};
     }
     my %copyOfHashRef = $properties{id $self};
     return \%copyOfHashRef;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getId () 
+
+Returns the unique id of this item.
+
+=cut
+
+sub getId {
+    my $self = shift;
+    return $self->get("itemId");
+}
+
 
 #-------------------------------------------------------------------
 
@@ -99,7 +118,7 @@ Returns an instanciated WebGUI::Asset::Sku object for this cart item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->get("assetId"));
+    my $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
     $asset->applyOptions($self->get("options"));
     return $asset;
 }
@@ -109,11 +128,11 @@ sub getSku {
 
 =head2 incrementQuantity ( [ quantity ] )
 
-Increments quantity of item by one.
+Increments quantity of item by one. Returns the quantity of this item in the cart.
 
 =head3 quantity
 
-If specified may increment quantity by more than one.
+If specified may increment quantity by more than one. Specify a negative number to decrement quantity. If the quantity ever reaches 0 or lower, the item will be removed from the cart.
 
 =cut
 
@@ -124,8 +143,12 @@ sub incrementQuantity {
     if ($self->get("quantity") + $quantity > $self->getSku->getMaxAllowedInCart) {
         croak "Cannot have that many in cart.";
     }
+    if ($self->get("quantity") + $quantity <= 0) {
+        return $self->remove;
+    }
     $properties{$id}{quantity} += $quantity;
-    $self->session->db->setRow("cartItems","itemId", $properties{$id});
+    $self->cart->session->db->setRow("cartItems","itemId", $properties{$id});
+    return $properties{$id}{quantity};
 }
 
 
@@ -149,7 +172,7 @@ sub new {
     my ($class, $cart, $itemId) = @_;
     croak "Need a cart" unless (defined $cart && $cart->isa("WebGUI::Shop::Cart"));
     croak "Need an itemId" unless defined $itemId;
-    my $item = $cart->session->db->quickHashRef('select * from cart where itemId=?', [$itemId]);
+    my $item = $cart->session->db->quickHashRef('select * from cartItems where itemId=?', [$itemId]);
     croak "No item with id of $itemId" if ($item->{itemId} eq "");
     croak "Item $itemId is not in this cart." if ($item->{cartId} ne $cart->getId);
     my $self = register $class;
@@ -158,6 +181,22 @@ sub new {
     $properties{ $id } = $item;
     return $self;
 }
+
+#-------------------------------------------------------------------
+
+=head2 remove ( )
+
+Removes this item from the cart.
+
+=cut
+
+sub remove {
+    my $self = shift;
+    $self->cart->session->db->deleteRow("cartItems","itemId",$self->getId);
+    undef $self;
+    return undef;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -199,7 +238,7 @@ sub update {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }
     $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
-    $self->session->db->setRow("cart","cartId",$properties{$id});
+    $self->cart->session->db->setRow("cartItems","cartId",$properties{$id});
 }
 
 

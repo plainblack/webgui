@@ -82,6 +82,8 @@ sub delete {
     my ($self) = @_;
     $self->empty;
     $self->session->db->write("delete from cart where cartId=?",[$self->getId]);
+    undef $self;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -144,9 +146,9 @@ Returns an array reference of WebGUI::Asset::Sku objects that are in the cart.
 sub getItems {
     my ($self) = @_;
     my @itemsObjects = ();
-    my $items = $self->session->db->read("select assetId from cartItems where cartId=?",[$self->getId]);
-    while (my ($assetId) = $items->array) {
-        push(@itemsObjects, WebGUI::Shop::CartItems->new($self->session, $assetId));
+    my $items = $self->session->db->read("select itemId from cartItems where cartId=?",[$self->getId]);
+    while (my ($itemId) = $items->array) {
+        push(@itemsObjects, WebGUI::Shop::CartItem->new($self, $itemId));
     }
     return \@itemsObjects;
 }

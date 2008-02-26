@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 14;        # Increment this number for each test you create
+plan tests => 16;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -48,26 +48,30 @@ my $product = $root->addChild({
 
 my $item = $cart->addItem($product);
 isa_ok($item, "WebGUI::Shop::CartItem");
-isa_ok($item->cart, "WebGUI::Cart", "Does the item have a cart?");
+isa_ok($item->cart, "WebGUI::Shop::Cart", "Does the item have a cart?");
 is(ref($item->get), "HASH", "Do we have a hash of properties?");
 
-is($item->get("quantity"), 2, "Should have 1 of these in the cart.");
-$item->incrementQuantity(2);
+is($item->get("quantity"), 1, "Should have 1 of these in the cart.");
+is($item->incrementQuantity(2), 3, "incrementQuantity() should tell us how many items of this type are in the cart");
 is($item->get("quantity"), 3, "Should have 3 of these in the cart.");
-is(scalar(@{$cart->getItems}), 1, "Should have 3 of these in the cart.");
+is(scalar(@{$cart->getItems}), 1, "Should have 1 item type in cart regardless of quanity.");
+
+$item->update({shippingAddressId => "XXXX"});
+is($item->get("shippingAddressId"), "XXXX", "Can set values to the cart item properties.");
 
 like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
 
 is(ref($cart->get), "HASH", "Cart properties are a hash reference.");
 is($cart->get("sessionId"), $session->getId, "Can retrieve a value from the cart properties.");
-$cart->set({shippingAddressId => "XXXX"});
+
+$cart->update({shippingAddressId => "XXXX"});
 is($cart->get("shippingAddressId"), "XXXX", "Can set values to the cart properties.");
 
 $cart->empty;
 is($session->db->quickScalar("select count(*) from cartItems where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
 
 $cart->delete;
-is($cart, undef, "Can destroy cart.");
+is($cart->delete, undef, "Can destroy cart.");
 
 
 $product->purge;
