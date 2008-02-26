@@ -20,15 +20,19 @@ use Exception::Class (
     'WebGUI::Error' => {
         description     => "A general error occured.",
         },
+    'WebGUI::Error::InvalidObject' => {
+        isa             => 'WebGUI::Error::InvalidParam',
+        description     => "Expected to get a reference to an object type that wasn't gotten.",
+        fields          => ["expected","got"],
+        },
+    'WebGUI::Error::InvalidParam' => {
+        isa             => 'WebGUI::Error',
+        description     => "Expected to get a param we didn't get.",
+        },
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
         description     => "The object you were try to retrieve does not exist.",
         fields          => ["id"],
-        },
-    'WebGUI::Error::WrongObjectType' => {
-        isa             => 'WebGUI::Error',
-        description     => "Expected to get a reference to an object type that wasn't gotten.",
-        fields          => ["expected","got"],
         },
 );
 
@@ -95,19 +99,9 @@ A read only exception method that returns the line number where the exception wa
 
 A read only exception method that returns the package name where the exception was thrown.
 
-=head2 WebGUI::Error::ObjectNotFound
+=head2 WebGUI::Error::InvalidObject
 
-Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::Error.
-
-=head3 id
-
-The id of the object to be retrieved.
-
-=cut
-
-=head2 WebGUI::Error::WrongObjectType
-
-Used when looking to make sure objects are passed in that you expect. ISA WebGUI::Error.
+Used when looking to make sure objects are passed in that you expect. ISA WebGUI::Error::InvalidParam.
 
 =head3 expected
 
@@ -116,6 +110,18 @@ The type of object expected ("HASH", "ARRAY", "WebGUI::User", etc).
 =head3 got
 
 The object type we got.
+
+=head2 WebGUI::Error::InvalidParam
+
+Used when an invalid parameter is passed into a subroutine.
+
+=head2 WebGUI::Error::ObjectNotFound
+
+Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::Error.
+
+=head3 id
+
+The id of the object to be retrieved.
 
 =cut
 
