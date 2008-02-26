@@ -67,12 +67,7 @@ sub create {
     return $class->new($session, $cartId) if (defined $cartId);
     my $cartId = $session->id->generate;
     $session->db->write('insert into cart (cartId, sessionId) values (?,?)', [$cartId, $session->getId]);
-    bless my $self, $class;
-    register $self;
-    my $id        = id $self;
-    $session{ $id }   = $session;
-    $properties{ $id } = {cartId=>$cartId, sessionId=>$session->getId};
-    return $self;
+    return $class->new($session, $cartId);
 }
 
 #-------------------------------------------------------------------

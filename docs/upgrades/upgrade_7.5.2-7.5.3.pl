@@ -61,6 +61,7 @@ sub migrateToNewCart {
         index sessionId (sessionId)
     )");
     $session->db->write("create table cartItems (
+        itemId varchar(22) binary not null primary key,
         cartId varchar(22) binary not null,
         assetId varchar(22) binary not null,
         options mediumtext,

@@ -28,9 +28,6 @@ Adds an item to the cart. Returns the number of items now in the cart.
 param: asset - the asset object to be added already
 configured as needed
 
-param: quantity - the number of this item that the
-user wants
-
 =head3 create
 
 Creates a new cart object if there's not one already attached to the
@@ -93,6 +90,7 @@ The following fields are needed to construct this object's table called
 "cartItems".
 
  Field               Schema          Description
+ itemId              guid            primary key
  cartId              guid            The unique id for this cart.
  assetId             guid            The assetId for this item.
  options             medium          Text A json serialized hashref of any configuration data associated with this item so that it can be edited or whatnot.
@@ -108,14 +106,11 @@ class.
 
 Creates a new cart item object. Returns a reference to the object.
 
-param: session - a reference to the current session
-
-param: cartId - the unique id of the cart
+param: cart - a reference to a cart
 
 param: asset - A reference to the asset you wish to
 create.
 
-param: quantity - the quantity of sku to purchase
 
 =head3 get
 
@@ -127,6 +122,12 @@ rather than the hash reference
 =head3 getSku
 
 Returns an instanciated WebGUI::Asset::Sku object for this cart item.
+
+=head3 incrementQuantity
+
+Increment the amount in cart by one.
+
+param: quantity - up it by more than one
 
 =head3 new
 

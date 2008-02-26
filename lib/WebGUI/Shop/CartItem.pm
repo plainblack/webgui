@@ -121,21 +121,11 @@ sub incrementQuantity {
     my ($self, $quantity) = @_;
     $quantity ||= 1;
     my $id = $self;
+    if ($self->get("quantity") + $quantity > $self->getSku->getMaxAllowedInCart) {
+        croak "Cannot have that many in cart.";
+    }
     $properties{$id}{quantity} += $quantity;
     $cart->session->db->setRow("cartItems","itemId", $properties{$id});
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 isAtMaxQuantity ( ) 
-
-Returns a boolean indicating whether the item is already at max quantity in the cart.
-
-=cut
-
-sub isAtMaxQuantity {
-    my ($self) = @_;
 }
 
 
