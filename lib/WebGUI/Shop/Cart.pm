@@ -3,7 +3,7 @@ package WebGUI::Shop::Cart;
 use strict;
 
 use Class::InsideOut qw{ :std };
-use Carp qw(croak);
+use WebGUI::Exception::Shop;
 use WebGUI::Shop::CartItem;
 
 =head1 NAME
@@ -43,7 +43,9 @@ A reference to a subclass of WebGUI::Asset::Sku.
 
 sub addItem {
     my ($self, $sku) = @_;
-    croak "Need a SKU item." unless (defined $sku && $sku->isa("WebGUI::Asset::Sku"));
+    unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
+    }
     my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
@@ -62,7 +64,9 @@ A reference to the current session.
 
 sub create {
     my ($class, $session) = @_;
-    croak "Need a session." unless (defined $session && $session->isa("WebGUI::Session"));
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
     my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
     return $class->new($session, $cartId) if (defined $cartId);
     my $cartId = $session->id->generate;
@@ -171,10 +175,16 @@ The unique id of a cart to instanciate.
 
 sub new {
     my ($class, $session, $cartId) = @_;
-    croak "Need a session" unless (defined $session && $session->isa("WebGUI::Session"));
-    croak "Need a cartId" unless defined $cartId;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    unless (defined $cartId) {
+        WebGUI::Error::InvalidParam->throw(error=>"Need a cartId.");
+    }
     my $cart = $session->db->quickHashRef('select * from cart where cartId=?', [$cartId]);
-    croak "No cart with id of $cartId" if ($cart->{cartId} eq "");
+    if ($cart->{cartId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No such cart.", id=>$cartId);
+    }
     my $self = register $class;
     my $id        = id $self;
     $session{ $id }   = $session;

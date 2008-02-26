@@ -178,7 +178,7 @@ sub new {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
     }
     unless (defined $itemId) {
-        WebGUI::Error::InvalidObject->throw(error=>"Need an itemId.");
+        WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
     my $item = $cart->session->db->quickHashRef('select * from cartItems where itemId=?', [$itemId]);
     if ($item->{itemId} eq "") {
