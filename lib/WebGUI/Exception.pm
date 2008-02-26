@@ -1,0 +1,105 @@
+package WebGUI::Exception;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use Exception::Class (
+
+    'WebGUI::Error' => {
+        description     => "A general error occured.",
+        },
+    'WebGUI::Error::ObjectNotFound' => {
+        isa             => 'WebGUI::Error',
+        description     => "The object you were try to retrieve does not exist.",
+        fields          => ["id"],
+        },
+);
+
+
+=head1 NAME
+
+Package WebGUI::Exception;
+
+=head1 DESCRIPTION
+
+A base class for all exception handling. It creates a few base exception objects.
+
+=head1 SYNOPSIS
+
+ use WebGUI::Exception;
+
+ # throw
+ WebGUI::Error->throw(error=>"Something bad happened.");
+ WebGUI::Error::ObjectNotFound->throw(error=>"Couldn't instanciate object.", id=>$id);
+
+ # try
+ eval { someFunction() };
+ eval { my $obj = SomeClass->new($id) };
+
+ # catch
+ if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+    my $errorMessage = $e->error;
+    my $objectId = $e->id;
+    # do something
+ }
+
+B<NOTE>: Though the package name is WebGUI::Exception, the handler objects that are created are WebGUI::Error.
+
+=head1 EXCEPTION TYPES
+
+These exception classes are defined in this class:
+
+
+=head2 WebGUI::Error
+
+A basic do nothing exception. ISA Exception::Class.
+
+=head3 error
+
+The error message
+
+ WebGUI::Error->throw(error => "Something bad happened");
+
+ $message = $e->error;
+
+=head3 file
+
+A read only exception method that returns the file name of the file where the exception was thrown.
+
+ $filename = $e->file;
+
+=head3 line
+
+A read only exception method that returns the line number where the exception was thrown.
+
+ $lineNumber = $e->line;
+
+=head3 package
+
+A read only exception method that returns the package name where the exception was thrown.
+
+=head2 WebGUI::Error::ObjectNotFound
+
+Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::Error.
+
+=head3 id
+
+The id of the object to be retrieved.
+
+=cut
+
+
+1;
+
