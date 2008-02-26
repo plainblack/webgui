@@ -3,6 +3,7 @@
  - fixed: Running WebGUI Tests on Windows (William McKee, Knowmad Technologies)
  - fixed: runCronJob operation fails
  - fixed: unable to remove calendar feeds in IE6
+ - changed iTransact help to refer directly to iTransact website instead of reseller
 
 7.4.25
  - fixed: creating new ad spaces is broken
