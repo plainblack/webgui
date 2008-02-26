@@ -9,12 +9,6 @@ YAHOO.util.Event.onDOMReady(function () {
             autodismissdelay: 1000000,
             context: tips[i].parentNode
         });
-        myTip.beforeShowEvent.subscribe(function() {
-            YAHOO.util.Dom.addClass(this.element, 'wg-hoverhelp-visible');
-        });
-        myTip.beforeHideEvent.subscribe(function() {
-            YAHOO.util.Dom.removeClass(this.element, 'wg-hoverhelp-visible');
-        });
     }
 });
 

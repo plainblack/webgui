@@ -1,5 +1,4 @@
 .wg-hoverhelp {
-    display: none;
     background-color: #e6ecff;
     border: 1px solid #003399;
     color: #000066;
@@ -8,16 +7,10 @@
     font-weight: normal;
     padding: 3px;
     width: 300px;
-    top: 0px;
-    left: 0px;
-    z-index: -1;
+    z-index: 100 !important;
+    display: none;
 }
-
 .wg-hoverhelp.yui-tt {
     display: block;
-}
-
-.wg-hoverhelp-visible {
-    z-index: 100 !important;
 }
 
