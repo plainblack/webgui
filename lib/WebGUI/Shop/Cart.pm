@@ -4,7 +4,7 @@ use strict;
 
 use Class::InsideOut qw{ :std };
 use Carp qw(croak);
-use WebGUI::Shop::CartItems;
+use WebGUI::Shop::CartItem;
 
 =head1 NAME
 
@@ -27,35 +27,24 @@ These subroutines are available from this package:
 =cut
 
 readonly session => my %session;
-public properties => my %properties;
+private properties => my %properties;
 
 #-------------------------------------------------------------------
 
-=head2 addItem ( item, [ quantity ])
+=head2 addItem ( sku )
 
 Adds an item to the cart. Returns the number of items now in the cart.
 
-=head3 item
+=head3 sku
 
 A reference to a subclass of WebGUI::Asset::Sku.
-
-=head3 quantity
-
-The number of items configured this way. Defaults to 1. 
 
 =cut
 
 sub addItem {
-    my ($self, $item, $quantity) = @_;
+    my ($self, $sku) = @_;
     croak "Need a SKU item." unless (defined $item && $item->isa("WebGUI::Asset::Sku"));
-    $quantity ||= 1;
-    croak "Too many items of that type in cart." if ($quantity > $item->getMaxAlowedInCart);
-    my $item = WebGUI::Shop::CartItem->create(
-        $self->session, 
-        $self->getId,
-        $item,
-        $quantity,
-        );
+    my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
 
@@ -111,7 +100,7 @@ Removes all items from this cart.
 sub empty {
     my ($self) = @_;
     foreach my $item = (@{$self->getItems}) {
-        $item->delete;
+        $item->remove;
     } 
 }
 
@@ -128,9 +117,9 @@ Any field − returns the value of a field rather than the hash reference.
 =cut
 
 sub get {
-    my ($self, $property) = @_;
-    if (defined $property) {
-        return $self->{_properties}{$propertyName};
+    my ($self, $name) = @_;
+    if (defined $name) {
+        return $self->properties->{$name};
     }
     my %copyOfHashRef = $properties{id $self};
     return \%copyOfHashRef;
@@ -218,10 +207,10 @@ The unique id for a shipping address attached to this cart.
 =cut
 
 sub update {
-    my ($self, $properties) = @_;
+    my ($self, $newProperties) = @_;
     my $id = id $self;
-    $properties{$id}{couponId} = $properties->{couponId} || $self->properties->{couponId};
-    $properties{$id}{shippingAddressId} = $properties->{shippingAddressId} || $self->properties->{shippingAddressId};
+    $properties{$id}{couponId} = $newProperties->{couponId} || $self->properties->{couponId};
+    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $self->properties->{shippingAddressId};
     $self->session->db->setRow("cart","cartId",$self->properties);
 }
 
