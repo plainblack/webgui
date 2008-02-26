@@ -43,7 +43,7 @@ A reference to a subclass of WebGUI::Asset::Sku.
 
 sub addItem {
     my ($self, $sku) = @_;
-    croak "Need a SKU item." unless (defined $item && $item->isa("WebGUI::Asset::Sku"));
+    croak "Need a SKU item." unless (defined $sku && $sku->isa("WebGUI::Asset::Sku"));
     my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
@@ -94,7 +94,7 @@ Removes all items from this cart.
 
 sub empty {
     my ($self) = @_;
-    foreach my $item = (@{$self->getItems}) {
+    foreach my $item (@{$self->getItems}) {
         $item->remove;
     } 
 }
@@ -114,7 +114,7 @@ Any field − returns the value of a field rather than the hash reference.
 sub get {
     my ($self, $name) = @_;
     if (defined $name) {
-        return $self->properties->{$name};
+        return $properties{id $self}{$name};
     }
     my %copyOfHashRef = $properties{id $self};
     return \%copyOfHashRef;
@@ -169,12 +169,11 @@ The unique id of a cart to instanciate.
 
 sub new {
     my ($class, $session, $cartId) = @_;
-    croak "Need a session" unless (defined $session && $session->isa("WebGUI::Session");
+    croak "Need a session" unless (defined $session && $session->isa("WebGUI::Session"));
     croak "Need a cartId" unless defined $cartId;
     my $cart = $session->db->quickHashRef('select * from cart where cartId=?', [$cartId]);
     croak "No cart with id of $cartId" if ($cart->{cartId} eq "");
-    bless my $self, $class;
-    register $self;
+    my $self = register $class;
     my $id        = id $self;
     $session{ $id }   = $session;
     $properties{ $id } = $cart;
@@ -204,9 +203,9 @@ The unique id for a shipping address attached to this cart.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    $properties{$id}{couponId} = $newProperties->{couponId} || $self->properties->{couponId};
-    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $self->properties->{shippingAddressId};
-    $self->session->db->setRow("cart","cartId",$self->properties);
+    $properties{$id}{couponId} = $newProperties->{couponId} || $properties{$id}{couponId};
+    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
+    $self->session->db->setRow("cart","cartId",$properties{$id});
 }
 
 

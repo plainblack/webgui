@@ -81,9 +81,9 @@ sub get {
     my ($self, $name) = @_;
     if (defined $name) {
         if ($name eq "options") {
-            return JSON::from_json($self->properties->{$name});
+            return JSON::from_json($properties{id $self}{$name});
         }
-        return $self->properties->{$name};
+        return $properties{id $self}{$name};
     }
     my %copyOfHashRef = $properties{id $self};
     return \%copyOfHashRef;
@@ -125,7 +125,7 @@ sub incrementQuantity {
         croak "Cannot have that many in cart.";
     }
     $properties{$id}{quantity} += $quantity;
-    $cart->session->db->setRow("cartItems","itemId", $properties{$id});
+    $self->session->db->setRow("cartItems","itemId", $properties{$id});
 }
 
 
@@ -147,13 +147,12 @@ The unique id of the item to instanciate.
 
 sub new {
     my ($class, $cart, $itemId) = @_;
-    croak "Need a cart" unless (defined $cart && $session->isa("WebGUI::Shop::Cart");
+    croak "Need a cart" unless (defined $cart && $cart->isa("WebGUI::Shop::Cart"));
     croak "Need an itemId" unless defined $itemId;
     my $item = $cart->session->db->quickHashRef('select * from cart where itemId=?', [$itemId]);
     croak "No item with id of $itemId" if ($item->{itemId} eq "");
     croak "Item $itemId is not in this cart." if ($item->{cartId} ne $cart->getId);
-    bless my $self, $class;
-    register $self;
+    my $self = register $class;
     my $id        = id $self;
     $cart{ $id }   = $cart;
     $properties{ $id } = $item;
@@ -195,12 +194,12 @@ sub update {
         $newProperties->{options} = $newProperties->{asset}->getOptions;
         $newProperties->{assetId} = $newProperties->{asset}->getId;       
     }
-    $properties{$id}{assetId} = $newProperties->{assetId} || $self->properties->{assetId};
+    $properties{$id}{assetId} = $newProperties->{assetId} || $properties{$id}{assetId};
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }
-    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $self->properties->{shippingAddressId};
-    $self->session->db->setRow("cart","cartId",$self->properties);
+    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
+    $self->session->db->setRow("cart","cartId",$properties{$id});
 }
 
 

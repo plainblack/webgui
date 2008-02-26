@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 14;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -41,13 +41,21 @@ isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");
 
 my $root = WebGUI::Asset->getRoot($session);
-my $product = $root->addChild($session, {
+my $product = $root->addChild({
     className=>"WebGUI::Asset::Sku",
     title=>"Test Product",
     });
 
-$cart->addItem($product, 1);
-is(scalar(@{$cart->getItems}), 1, "Added an item to the cart.");
+my $item = $cart->addItem($product);
+isa_ok($item, "WebGUI::Shop::CartItem");
+isa_ok($item->cart, "WebGUI::Cart", "Does the item have a cart?");
+is(ref($item->get), "HASH", "Do we have a hash of properties?");
+
+is($item->get("quantity"), 2, "Should have 1 of these in the cart.");
+$item->incrementQuantity(2);
+is($item->get("quantity"), 3, "Should have 3 of these in the cart.");
+is(scalar(@{$cart->getItems}), 1, "Should have 3 of these in the cart.");
+
 like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
 
 is(ref($cart->get), "HASH", "Cart properties are a hash reference.");
@@ -60,6 +68,7 @@ is($session->db->quickScalar("select count(*) from cartItems where cartId=?",[$c
 
 $cart->delete;
 is($cart, undef, "Can destroy cart.");
+
 
 $product->purge;
 
