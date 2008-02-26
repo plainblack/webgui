@@ -28,6 +28,7 @@ insertCommerceTaxTable($session);
 insertCommerceShipDriverTable($session);
 migrateToNewCart($session);
 createSkuAsset($session);
+addShippingDrivers($session);
 
 finish($session); # this line required
 
@@ -106,6 +107,15 @@ CREATE TABLE shipper (
 )
 EOSQL
 
+}
+
+#-------------------------------------------------
+sub addShippingDrivers {
+	my $session = shift;
+	print "\tSet up the default shipping.\n" unless ($quiet);
+	# and here's our code
+    $session->config->delete('shippingPlugins');
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::FlatRate');
 }
 
 

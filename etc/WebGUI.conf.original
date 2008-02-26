@@ -173,10 +173,10 @@
 
 "paymentPlugins" : ["ITransact","Cash"],
 
-# List the shipping plugins you have installed and wish to be
+# List the shipping drivers you have installed and wish to be
 # available for configuration on the site.
 
-"shippingPlugins" : ["ByPrice", "ByWeight", "PerTransaction"],
+"shippingDrivers" : ["WebGUI::Shop::ShipDriver::FlatRate"],
 
 # Specify the list of template parsers available in the system.
 

@@ -5,6 +5,8 @@ use strict;
 use Carp qw(croak);
 use WebGUI::International;
 use WebGUI::Shop::ShipDriver;
+use WebGUI::Pluggable;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -58,29 +60,38 @@ A list of properties to assign to this ShipperDriver.  See C<definition> for det
 sub create {
     my $class   = shift;
     my $session = shift;
-    croak "Definition requires a session object"
+    croak "create requires a session object"
         unless ref $session eq 'WebGUI::Session';
     my $requestedClass = shift;
+    croak "create requires the name of a class to create an object"
+        unless defined $requestedClass;
+    croak "The requested class $class is not enabled in your WebGUI configuration file"
+        unless isIn($requestedClass, @{ WebGUI::Shop::Ship->getDrivers($session) } );
     my $options = shift;
     croak "You must pass a hashref of options to create a new ShipDriver object"
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
+
 }
 
 #-------------------------------------------------------------------
 
 =head2 getDrivers ( $session )
 
-This subroutine returns an arrayref of hashrefs, used to validate data put into
-the object by the user, and to automatically generate the edit form to show
-the user.
+This subroutine returns an arrayref of available shipping driver classes
+from the WebGUI config file.
+
+=head3 $session
+
+A WebGUI::Session object.
 
 =cut
 
 sub getDrivers {
     my $class      = shift;
     my $session    = shift;
-    croak "Definition requires a session object"
+    croak "getDrivers requires a session object"
         unless ref $session eq 'WebGUI::Session';
+    return $session->config->get('shippingDrivers');
 }
 
 #-------------------------------------------------------------------
@@ -89,6 +100,10 @@ sub getDrivers {
 
 Returns a list of options for the user to ship, along with the cost of using each one.  It is a hash of hashrefs,
 with the key of the primary hash being the shipperId of the driver, and sub keys of label and price.
+
+=head3 $session
+
+A WebGUI::Session object.
 
 =head3
 
@@ -107,6 +122,14 @@ sub getOptions {
 
 Looks up an existing ShipperDriver in the db by shipperId and returns
 that object.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=head3 $shipperId
+
+The ID of a shipper to look up and instanciate.
 
 =cut
 
