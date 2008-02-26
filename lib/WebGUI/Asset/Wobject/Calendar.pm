@@ -417,14 +417,12 @@ sub getEditForm {
     my $tab     = $form->addTab("feeds",$i18n->get("feeds"), 6);
     $tab->raw("<tr><td>");
     
-    
     $tab->raw(<<'ENDJS');
     <script type="text/javascript">
     var FeedsManager    = new Object();
     
     FeedsManager.addFeed = function (table,rowId,params) {
         // TODO: Verify that feed URL is valid
-        
         
         var table    = document.getElementById(table);
         
@@ -446,11 +444,13 @@ sub getEditForm {
         
         var deleteLink    = document.createElement("a");
         deleteLink.setAttribute("href","#");
-        deleteLink.setAttribute("onclick","FeedsManager.deleteFeed('feeds','"+rowId+"'); return false;");
+        YAHOO.util.Event.addListener(deleteLink, "click", function (e, rowId) {
+            FeedsManager.deleteFeed('feeds',rowId);
+            YAHOO.util.Event.preventDefault(e);
+        }, rowId);
         deleteLink.appendChild(button);
         
         cells[0].appendChild(deleteLink);
-        
         
         
         /*** [1] - Feed link for teh clicking and form element for teh saving */
@@ -468,7 +468,6 @@ sub getEditForm {
         cells[1].appendChild(formElement);
         
         
-        
         /*** [2] - Result (new) */
         if (params.lastResult == undefined)
             params.lastResult = "new";
@@ -477,14 +476,12 @@ sub getEditForm {
         cells[2].appendChild(lastResult);
         
         
-        
         /*** [3] - Last updated */
         if (params.lastUpdated == undefined)
             params.lastUpdated = "never";
         var lastUpdated    = document.createTextNode(params.lastUpdated);
         
         cells[3].appendChild(lastUpdated);
-        
         
         
         /*** [4] - Update now! */
