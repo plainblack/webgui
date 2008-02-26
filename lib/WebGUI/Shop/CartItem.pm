@@ -139,7 +139,7 @@ If specified may increment quantity by more than one. Specify a negative number 
 sub incrementQuantity {
     my ($self, $quantity) = @_;
     $quantity ||= 1;
-    my $id = $self;
+    my $id = id $self;
     if ($self->get("quantity") + $quantity > $self->getSku->getMaxAllowedInCart) {
         croak "Cannot have that many in cart.";
     }
