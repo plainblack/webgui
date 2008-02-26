@@ -9,6 +9,14 @@ save you many hours of grief.
 
 7.5.1
 --------------------------------------------------------------------
+ * The resizable textarea implementation in WebGUI has been reimplemented to use
+   the code present in YUI 2.5.0. As such, WebGUI's YUI implementation has been
+   updated to version 2.5.0, and the no-longer-needed extjs library has been
+   removed.
+
+
+7.5.1
+--------------------------------------------------------------------
  * There was a corrupt template in a package for the 7.5.0 upgrade.
    If you already upgraded to 7.5.0, please import the package 
    located at: 
