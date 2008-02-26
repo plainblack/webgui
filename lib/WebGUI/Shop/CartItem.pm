@@ -2,9 +2,9 @@ package WebGUI::Shop::CartItem;
 
 use strict;
 use Class::InsideOut qw{ :std };
-use Carp qw(croak);
 use JSON;
 use WebGUI::Asset;
+use WebGUI::Exception::Shop;
 
 =head1 NAME
 
@@ -55,8 +55,12 @@ A reference to a subclass of WebGUI::Asset::Sku.
 
 sub create {
     my ($class, $cart, $sku) = @_;
-    croak "Need a cart." unless (defined $cart && $cart->isa("WebGUI::Shop::Cart"));
-    croak "Need a SKU item." unless (defined $sku && $sku->isa("WebGUI::Asset::Sku"));
+    unless (defined $cart && $cart->isa("WebGUI::Shop::Cart")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
+    }
+    unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
+    }
     my $itemId = $cart->session->id->generate;
     $cart->session->db->write('insert into cartItems (quantity, cartId, assetId, itemId) values (1,?,?,?)', [$cart->getId, $sku->getId, $itemId]);
     my $self = $class->new($cart, $itemId);
@@ -141,7 +145,7 @@ sub incrementQuantity {
     $quantity ||= 1;
     my $id = id $self;
     if ($self->get("quantity") + $quantity > $self->getSku->getMaxAllowedInCart) {
-        croak "Cannot have that many in cart.";
+        WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
     }
     if ($self->get("quantity") + $quantity <= 0) {
         return $self->remove;
@@ -170,11 +174,19 @@ The unique id of the item to instanciate.
 
 sub new {
     my ($class, $cart, $itemId) = @_;
-    croak "Need a cart" unless (defined $cart && $cart->isa("WebGUI::Shop::Cart"));
-    croak "Need an itemId" unless defined $itemId;
+    unless (defined $cart && $cart->isa("WebGUI::Shop::Cart")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Shop::Cart", got=>(ref $cart), error=>"Need a cart.");
+    }
+    unless (defined $itemId) {
+        WebGUI::Error::InvalidObject->throw(error=>"Need an itemId.");
+    }
     my $item = $cart->session->db->quickHashRef('select * from cartItems where itemId=?', [$itemId]);
-    croak "No item with id of $itemId" if ($item->{itemId} eq "");
-    croak "Item $itemId is not in this cart." if ($item->{cartId} ne $cart->getId);
+    if ($item->{itemId} eq "") {
+        WebGUI::Error::ObjectNotFound->throw(error=>"Item not in cart.", id=>$itemId);
+    }
+    if ($item->{cartId} ne $cart->getId) {
+        WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this cart.", id=>$itemId);
+    }
     my $self = register $class;
     my $id        = id $self;
     $cart{ $id }   = $cart;
