@@ -23,30 +23,10 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-removePublicStorageAccessFiles($session);
 # upgrade functions go here
 
 finish($session); # this line required
 
-
-#-------------------------------------------------
-sub removePublicStorageAccessFiles {
-    my $session = shift;
-    print "\tRemoving unnecessary .wgaccess files.\n" unless ($quiet);
-    my $uploadsPath = $session->config->get('uploadsPath');
-    File::Find::find({no_chdir => 1, wanted => sub {
-        return if -d $File::Find::name;
-        my $filename = (File::Spec->splitpath($File::Find::name))[2];
-        return if $filename ne '.wgaccess';
-        open my $fh, '<', $File::Find::name or return;
-        local $/ = "\n";
-        chomp (my ($user, $viewGroup, $editGroup) = <$fh>);
-        close $fh;
-        if ($user eq '1' || $viewGroup eq '1' || $viewGroup eq '7' || $editGroup eq '1' || $editGroup eq '7') {
-            unlink $File::Find::name;
-        }
-    }}, $uploadsPath);
-}
 
 ##-------------------------------------------------
 #sub exampleFunction {

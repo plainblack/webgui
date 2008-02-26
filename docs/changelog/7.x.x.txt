@@ -4,8 +4,9 @@
  - The YUI library used in WebGUI has been upgraded to 2.5.0.
  - The resizable text area implementation used in WebGUI has been
    migrated to the code provided by YUI 2.5.0.
--  As a result of the above, we no longer need extjs, and it has been
+ - As a result of the above, we no longer need extjs, and it has been
    removed.
+ - added script to remove unneeded .wgaccess files instead of having it run during upgrade
 
 7.5.3
  - prevent HTML and Macro injection in usernames
