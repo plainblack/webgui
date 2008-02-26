@@ -25,6 +25,11 @@ use Exception::Class (
         description     => "The object you were try to retrieve does not exist.",
         fields          => ["id"],
         },
+    'WebGUI::Error::WrongObjectType' => {
+        isa             => 'WebGUI::Error',
+        description     => "Expected to get a reference to an object type that wasn't gotten.",
+        fields          => ["expected","got"],
+        },
 );
 
 
@@ -97,6 +102,20 @@ Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::E
 =head3 id
 
 The id of the object to be retrieved.
+
+=cut
+
+=head2 WebGUI::Error::WrongObjectType
+
+Used when looking to make sure objects are passed in that you expect. ISA WebGUI::Error.
+
+=head3 expected
+
+The type of object expected ("HASH", "ARRAY", "WebGUI::User", etc).
+
+=head3 got
+
+The object type we got.
 
 =cut
 
