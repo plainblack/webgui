@@ -313,10 +313,10 @@ sub www_view {
             onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
         shipppingAddress        => "todo",
         shippingOptions         => "todo",
-        changeShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("change shipping button"), 
+        shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
         hasShippingAddress      => "todo",
-        couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>""}),
+        couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         couponDiscount          => "todo",
         totalPrice              => "todo",
         tax                     => "todo",
@@ -324,7 +324,7 @@ sub www_view {
         );
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     $template->prepare;
-    return $template->process(\%var);
+    return $session->style->userStyle($template->process(\%var));
 }
 
 #-------------------------------------------------------------------
