@@ -30,9 +30,24 @@ migrateToNewCart($session);
 createSkuAsset($session);
 createDonationAsset($session);
 addShippingDrivers($session);
+addShoppingHandler($session);
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addShoppingHandler {
+	my $session = shift;
+	print "\tInstalling shopping handler.\n" unless ($quiet);
+    my @changed = ();
+    foreach my $handler (@{$session->config->get("contentHandlers")}) {
+        if ($handler eq "WebGUI::Content::Asset") {
+            push(@changed, "WebGUI::Content::Shop");
+        }
+        push(@changed, $handler);   
+    }
+    $session->config->set("contentHandlers", \@changed);
+}
 
 #-------------------------------------------------
 sub createDonationAsset {
