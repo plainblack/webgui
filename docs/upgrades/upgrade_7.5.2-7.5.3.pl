@@ -28,20 +28,38 @@ insertCommerceTaxTable($session);
 insertCommerceShipDriverTable($session);
 migrateToNewCart($session);
 createSkuAsset($session);
+createDonationAsset($session);
 addShippingDrivers($session);
 
 finish($session); # this line required
 
 
 #-------------------------------------------------
+sub createDonationAsset {
+	my $session = shift;
+	print "\tInstall Donation asset.\n" unless ($quiet);
+    $session->db->write("create table donation (
+        assetId varchar(22) binary not null,
+        revisionDate bigint not null,
+        defaultPrice float not null default 100.00,
+        thankYouMessage mediumtext,
+        templateId varchar(22) binary not null,
+        primary key (assetId, revisionDate)
+    )"); 
+    $session->config->addToArray("assets","WebGUI::Asset::Sku::Donation");
+}
+
+#-------------------------------------------------
 sub createSkuAsset {
 	my $session = shift;
-	print "\tCreate SKU asset.\n" unless ($quiet);
+	print "\tInstall SKU asset.\n" unless ($quiet);
     $session->db->write("create table sku (
         assetId varchar(22) binary not null,
         revisionDate bigint not null,
+        description mediumtext,
         sku varchar(35) binary not null,
         salesAgentId varchar(22) binary,
+        displayTitle int not null default 1,
         overrideTaxRate int not null default 0,
         taxRateOverride float not null default 0.00,
         primary key (assetId, revisionDate),
@@ -66,6 +84,7 @@ sub migrateToNewCart {
         cartId varchar(22) binary not null,
         assetId varchar(22) binary not null,
         options mediumtext,
+        configuredTitle varchar(255),
         shippingAddressId varchar(22) binary,
         quantity integer not null default 1,
         index cartId_assetId (cartId,assetId)

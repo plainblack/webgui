@@ -9,6 +9,18 @@ our $I18N = {
 		context => q|The name of a tab that all Sku based assets have to put their commerce related settings.|
 	},
 
+	'description' => {
+		message => q|Description|,
+		lastUpdated => 0,
+		context => q|The label for the description of the product.|
+	},
+
+	'description help' => {
+		message => q|Describe the product or service here.|,
+		lastUpdated => 0,
+		context => q|help for description field|
+	},
+
 	'sku' => {
 		message => q|SKU|,
 		lastUpdated => 0,

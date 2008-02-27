@@ -222,7 +222,7 @@ A hash reference that contains one of the following:
 
 =head4 asset
 
-This is a special meta property. It is a reference to a WebGUI::Asset::Sku subclass object. If you pass this reference it will acquire the assetId and options properties automatically.
+This is a special meta property. It is a reference to a WebGUI::Asset::Sku subclass object. If you pass this reference it will acquire the assetId, configuredTitle, and options properties automatically.
 
 =head4 assetId 
 
@@ -231,6 +231,10 @@ The assetId of the asset to add to the cart.
 =head4 options
 
 The configuration options for this asset.
+
+=head4 configuredTitle
+
+The title of this product as configured.
 
 =head4 shippingAddressId
 
@@ -244,8 +248,10 @@ sub update {
     if (exists $newProperties->{asset}) {
         $newProperties->{options} = $newProperties->{asset}->getOptions;
         $newProperties->{assetId} = $newProperties->{asset}->getId;       
+        $newProperties->{configuredTitle} = $newProperties->{asset}->getConfiguredTitle;       
     }
     $properties{$id}{assetId} = $newProperties->{assetId} || $properties{$id}{assetId};
+    $properties{$id}{configuredTitle} = $newProperties->{configuredTitle} || $properties{$id}{configuredTitle};
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }

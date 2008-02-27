@@ -17,7 +17,6 @@ package WebGUI::Asset::Sku;
 use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
-use WebGUI::Utility;
 
 
 
@@ -68,7 +67,7 @@ sub addToCart {
     my ($self, $options) = @_;
     $self->applyOptions($options);
     my $cart = WebGUI::Shop::Cart->create($self->session);
-    my $cart->addItem($self, 1);
+    my $cart->addItem($self);
 }
 
 #-------------------------------------------------------------------
@@ -104,6 +103,13 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, "Asset_Sku");
 	%properties = (
+		description => {
+			tab=>"properties",
+			fieldType=>"HTMLArea",
+			defaultValue=>undef,
+			label=>$i18n->get("description"),
+			hoverHelp=>$i18n->get("description help")
+			},
 		sku => {
 			tab=>"commerce",
 			fieldType=>"text",
@@ -111,10 +117,17 @@ sub definition {
 			label=>$i18n->get("sku"),
 			hoverHelp=>$i18n->get("sku help")
 			},
+		displayTitle => {
+			tab=>"display",
+			fieldType=>"yesNo",
+			defaultValue=>1,
+			label=>$i18n->get("display title"),
+			hoverHelp=>$i18n->get("display title")
+			},
 		overrideTaxRate => {
 			tab=>"commerce",
-			fieldType=>"text",
-			defaultValue=>$session->id->generate,
+			fieldType=>"yesNo",
+			defaultValue=>0,
 			label=>$i18n->get("override tax rate"),
 			hoverHelp=>$i18n->get("override tax rate help")
 			},
@@ -147,6 +160,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getConfiguredTitle ( )
+
+Returns a configured title like "Red XL T-Shirt" rather than just "T-Shirt". Needs to be overridden by subclasses to support this. Defaultly just returns getTitle().
+
+=cut
+
+sub getConfiguredTitle {
+    my $self = shift;
+    return $self->getTitle;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditTabs ( )
 
 Not to be modified, just defines a new tab.
@@ -169,7 +196,10 @@ Returns a hash reference of configuration data that can return this sku to a con
 
 sub getOptions {
     my $self = shift;
-    return $self->{_skuOptions};
+    if (ref $self->{_skuOptions} eq "HASH") {
+        return $self->{_skuOptions};
+    }
+    return {};
 }
 
 #-------------------------------------------------------------------
@@ -276,21 +306,6 @@ sub processStyle {
 	my $self = shift;
 	my $output = shift;
 	return $self->getParent->processStyle($output);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page
-
-=cut
-
-sub www_edit {
-   my $self = shift;
-   return $self->session->privilege->insufficient() unless $self->canEdit;
-   return $self->session->privilege->locked() unless $self->canEditIfLocked;
-   return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit asset',"Asset_NewAsset"));
 }
 
 #-------------------------------------------------------------------

@@ -2,6 +2,11 @@ Commerce merge
  - The getEditForm code was refactored out of WebGUI::Workflow::Activity and
    put into WebGUI::HTMLForm.  Now any WebGUI code can dynamically generate
    tabless forms.
+ - Rewrote the commerce system from the ground up.
+ - Added a new donation asset which allows visitors to donate arbitrary
+   amounts of money using the new commerce system.
+ - Merged all the old shipping plugins into one "Flat Rate" shipping plugin.
+   See gotchas.
 
 7.5.3
  - prevent HTML and Macro injection in usernames

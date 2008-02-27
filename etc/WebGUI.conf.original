@@ -209,6 +209,7 @@
 # Add Content menus.
 
 "assets" : [
+    "WebGUI::Asset::Sku::Donation",
 	"WebGUI::Asset::Snippet", 
 	"WebGUI::Asset::Redirect", 
 	"WebGUI::Asset::FilePile", 
