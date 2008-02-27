@@ -18,6 +18,8 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Exception::Class;
+
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
@@ -29,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 45;
+my $tests = 62;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -75,45 +77,57 @@ is($taxIterator->rows, 0, 'WebGUI ships with no predefined tax data');
 #
 #######################################################################
 
+my $e;
+
 eval{$taxer->add()};
-like($@, qr{Must pass in a hashref},
-    'add: error handling for missing hashref');
+
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hashref');
+is($e->error, 'Must pass in a hashref of params', 'add: correct message for a missing hashref');
 
 eval{$taxer->add({})};
-like($@, qr{Hash ref must contain a field key with a defined value},
-    'add: error handling for missing field hashref key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for empty hashref');
+is($e->error, 'Hash ref must contain a field key with a defined value', 'add: correct message for an empty hashref');
 
 my $taxData = {
     field   => undef,
 };
 
 eval{$taxer->add($taxData)};
-like($@, qr{Hash ref must contain a field key with a defined value},
+like($@, qr{},
     'add: error handling for undefined field key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for valueless hash key');
+is($e->error, 'Hash ref must contain a field key with a defined value', 'add: correct message for valueless hash key');
 
 $taxData->{field} = 'state';
 
 eval{$taxer->add($taxData)};
-like($@, qr{Hash ref must contain a value key with a defined value},
-    'add: error handling for missing value key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing field hash key');
+is($e->error, 'Hash ref must contain a value key with a defined value', 'add: correct message for missing field hash key');
 
 $taxData->{value} = undef;
 
 eval{$taxer->add($taxData)};
-like($@, qr{Hash ref must contain a value key with a defined value},
-    'add: error handling for undefined value key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash key');
+is($e->error, 'Hash ref must contain a value key with a defined value', 'add: correct message for missing field hash value');
 
 $taxData->{value} = 'Oregon';
 
 eval{$taxer->add($taxData)};
-like($@, qr{Hash ref must contain a taxRate key with a defined value},
-    'add: error handling for missing taxRate key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash key');
+is($e->error, 'Hash ref must contain a taxRate key with a defined value', 'add: correct message for missing taxRate hash key');
 
 $taxData->{taxRate} = undef;
 
 eval{$taxer->add($taxData)};
-like($@, qr{Hash ref must contain a taxRate key with a defined value},
-    'add: error handling for undefined taxRate key');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash value');
+is($e->error, 'Hash ref must contain a taxRate key with a defined value', 'add: correct message for missing taxRate hash value');
 
 my $taxData = {
     field   => 'state',
@@ -152,6 +166,7 @@ $taxData = {
 
 eval {$taxer->add($taxData)};
 
+##This error is thrown by DBI, not us.
 ok($@, 'add threw an exception to having taxes in Oregon when they were defined as 0 initially');
 
 $taxIterator = $taxer->getItems;
@@ -169,16 +184,19 @@ is($taxIterator->rows, 2, 'add did not add another row since it would be a dupli
 #######################################################################
 
 eval{$taxer->delete()};
-like($@, qr{Must pass in a hashref},
-    'delete: error handling for missing hashref');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'delete: error handling for missing hashref');
+is($e->error, 'Must pass in a hashref of params', 'delete: error message for missing hashref');
 
 eval{$taxer->delete({})};
-like($@, qr{Hash ref must contain a taxId key with a defined value},
-    'delete: error handling for missing key in hashref');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'delete: error handling for missing key in hashref');
+is($e->error, 'Hash ref must contain a taxId key with a defined value', 'delete: error message for missing key in hashref');
 
 eval{$taxer->delete({ taxId => undef })};
-like($@, qr{Hash ref must contain a taxId key with a defined value},
-    'delete: error handling for an undefined taxId value');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'delete: error handling for an undefined taxId value');
+is($e->error, 'Hash ref must contain a taxId key with a defined value', 'delete: error message for an undefined taxId value');
 
 $taxer->delete({ taxId => $oregonTaxId });
 
@@ -220,12 +238,21 @@ cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'exportTaxData: first line 
 #######################################################################
 
 eval { $taxer->importTaxData(); };
-like($@, qr{Must provide the path to a file},
-    'importTaxData: error handling for an undefined taxId value');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'importTaxData: error handling for an undefined taxId value');
+is($e->error, 'Must provide the path to a file', 'importTaxData: error handling for an undefined taxId value');
 
 eval { $taxer->importTaxData('/path/to/nowhere'); };
-like($@, qr{/path/to/nowhere could not be found},
-    'importTaxData: error handling for file that does not exist in the filesystem');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: error handling for file that does not exist in the filesystem');
+is($e->error, 'File could not be found', 'importTaxData: error handling for file that does not exist in the filesystem');
+cmp_deeply(
+    $e,
+    methods(
+        brokenFile => '/path/to/nowhere',
+    ),
+    'importTaxData: error handling for file that does not exist in the filesystem',
+);
 
 my $taxFile = WebGUI::Test->getTestCollateralPath('taxTables/goodTaxTable.csv');
 
@@ -237,8 +264,16 @@ SKIP: {
     chmod oct(0000), $taxFile;
 
     eval { $taxer->importTaxData($taxFile); };
-    like($@, qr{is not readable},
-        'importTaxData: error handling for file that cannot be read');
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: error handling for file that cannot be read');
+    is($e->error, 'File is not readable', 'importTaxData: error handling for file that that cannot be read');
+    cmp_deeply(
+        $e,
+        methods(
+            brokenFile => $taxFile,
+        ),
+        'importTaxData: error handling for file that that cannot be read',
+    );
 
     chmod $originalChmod, $taxFile;
 
@@ -319,8 +354,17 @@ eval {
     );
 };
 ok (!$failure, 'Tax data not imported');
-like($@, qr{Error on line \d+ in file},
-    'importTaxData: error handling when the CSV data is missing an entry on 1 line');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: a file with a ');
+cmp_deeply(
+    $e,
+    methods(
+        error      => 'Error found in the CSV file',
+        brokenFile => WebGUI::Test->getTestCollateralPath('taxTables/badTaxTable.csv'),
+        brokenLine => 1,
+    ),
+    'importTaxData: error handling for file that that cannot be read',
+);
 
 }
 

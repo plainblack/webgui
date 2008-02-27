@@ -165,9 +165,9 @@ sub importTaxData {
     my $filePath = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide the path to a file})
         unless $filePath;
-    WebGUI::Error::InvalidParam->throw(error => qq{$filePath could not be found})
+    WebGUI::Error::InvalidFile->throw(error => qq{File could not be found}, brokenFile => $filePath)
         unless -e $filePath;
-    WebGUI::Error::InvalidParam->throw(error => qq{$filePath is not readable})
+    WebGUI::Error::InvalidFile->throw(error => qq{File is not readable}, brokenFile => $filePath)
         unless -r $filePath;
     open my $table, '<', $filePath or
         WebGUI::Error->throw(error => qq{Unable to open $filePath for reading: $!\n});
