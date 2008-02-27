@@ -52,8 +52,8 @@ sub handler {
     my ($session) = @_;
     my $output = undef;
     my $function = "www_".$session->form->get("shop");
-    if ($function ne "www_" && __PACKAGE__->can($function)) {
-        $output = &$function($session);
+    if ($function ne "www_" && (my $sub = __PACKAGE__->can($function))) {
+        $output = $sub->($session);
     }
     return $output;
 }
@@ -69,9 +69,9 @@ Hand off to the cart.
 sub www_cart {
     my $session = shift;
     my $output = undef;
-    my $method = "www_".$session->form->get("method");
+    my $method = "www_". ( $session->form->get("method") || "view");
     my $cart = WebGUI::Shop::Cart->create($session);
-    if ($method ne "www_" && $cart->can($method)) {
+    if ($cart->can($method)) {
         $output = $cart->$method();
     }
     return $output;

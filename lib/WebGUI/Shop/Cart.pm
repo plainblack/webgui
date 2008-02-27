@@ -3,8 +3,13 @@ package WebGUI::Shop::Cart;
 use strict;
 
 use Class::InsideOut qw{ :std };
+use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
+use WebGUI::International;
 use WebGUI::Shop::CartItem;
+# use WebGUI::Shop::Coupon;
+use WebGUI::Shop::Ship;
+use WebGUI::Shop::Tax;
 
 =head1 NAME
 
@@ -218,6 +223,128 @@ sub update {
     $properties{$id}{couponId} = $newProperties->{couponId} || $properties{$id}{couponId};
     $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
     $self->session->db->setRow("cart","cartId",$properties{$id});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_continueShopping ( )
+
+Update the cart and the return the user back to the asset.
+
+=cut
+
+sub www_continueShopping {
+    my $self = shift;
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_removeItem ( )
+
+Remove an item from the cart and then display the cart again.
+
+=cut
+
+sub www_removeItem {
+    my $self = shift;
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_update ( )
+
+Updates the cart totals and then displays the cart again.
+
+=cut
+
+sub www_update {
+    my $self = shift;
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Displays the shopping cart.
+
+=cut
+
+sub www_view {
+    my $self = shift;
+    my $session = $self->session;
+    my $url = $session->url;
+    my $i18n = WebGUI::International->new($session, "Shop");
+    my @items = ();
+    foreach my $item (@{$self->getItems}) {
+        my $sku = $item->getSku;
+        my %properties = (
+            %{$item->get},
+            url                     => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
+            quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity")}),
+            isUnique                => ($sku->getMaxAllowedInCart == 1),
+            isShippable             => $sku->isShippable,
+            extendedPrice           => sprintf("%.2f", ($properties{price} * $properties{quantity})),
+            price                   => sprintf("%.2f", $properties{price}),
+            removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
+                onclick=>"this.form.method.value='removeItem';this.form.itemId.value='".$item->getId."';this.form.submit;"}),
+            shippingAddress         => "todo",
+            shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
+                onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.itemId.value='".$item->getId."';this.form.submit;"}),
+            );
+        push(@items, \%properties);
+    }
+    my %var = (
+        %{$self->get},
+        items                   => \@items,
+        formHeader              => WebGUI::Form::formHeader($session)
+            . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
+            . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
+            . WebGUI::Form::hidden($session, {name=>"itemId", value=>""}),
+        formFooter              => WebGUI::Form::formFooter($session),
+        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
+        checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
+            onclick=>"this.form.shop.value='pay';this.form.methodvalue='viewOptions';this.form.submit;"}),
+        continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
+            onclick=>"this.form.method.value='continueShopping';this.form.submit;"}),
+        chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
+            onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
+        shipppingAddress        => "todo",
+        shippingOptions         => "todo",
+        changeShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("change shipping button"), 
+            onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
+        hasShippingAddress      => "todo",
+        couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>""}),
+        couponDiscount          => "todo",
+        totalPrice              => "todo",
+        tax                     => "todo",
+        subtotalPrice           => "todo",
+        );
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
+    $template->prepare;
+    return $template->process(\%var);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewItem ( )
+
+Displays the configured item.
+
+=cut
+
+sub www_viewItem {
+    my $self = shift;
+    my $itemId = $self->session->form->get("itemId");
+    my $item = eval { WebGUI::Shop::CartItem->new($self, $itemId) };
+    if (WebGUI::Error->caught()) {
+        return $self->www_view;
+    }
+    my $sku = $item->getSku;
+    $sku->applyOptions($item->get("options"));
+    return $sku->www_view;
 }
 
 
