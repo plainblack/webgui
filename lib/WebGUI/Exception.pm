@@ -34,6 +34,11 @@ use Exception::Class (
         description     => "The object you were try to retrieve does not exist.",
         fields          => ["id"],
         },
+    'WebGUI::Error::InvalidFile' => {
+        isa             => 'WebGUI::Error',
+        description     => "The file you have provided has errors.",
+        fields          => [qw{ brokenFile brokenLine }],
+        },
 );
 
 

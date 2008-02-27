@@ -3,9 +3,9 @@ package WebGUI::Shop::Tax;
 use strict;
 
 use Class::InsideOut qw{ :std };
-use Carp qw(croak);
 use WebGUI::Text;
 use WebGUI::Storage;
+use WebGUI::Exception::Shop;
 
 =head1 NAME
 
@@ -65,10 +65,11 @@ sub add {
     my $self   = shift;
     my $params = shift;
     my $id = $self->session->id->generate();
-    croak "Must pass in a hashref"
+
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a hashref of params')
         unless ref($params) eq 'HASH';
     foreach my $key (qw/field value taxRate/) {
-        croak "Hash ref must contain a $key key with a defined value"
+        WebGUI::Error::InvalidParam->throw(error => "Hash ref must contain a $key key with a defined value")
             unless exists($params->{$key}) and defined $params->{$key};
     }
     $self->session->db->write('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)', [$id, @{ $params }{qw[ field value taxRate ]}]);
@@ -94,9 +95,9 @@ The taxId of the data to delete from the table.
 sub delete {
     my $self   = shift;
     my $params = shift;
-    croak "Must pass in a hashref"
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a hashref of params')
         unless ref($params) eq 'HASH';
-    croak "Hash ref must contain a taxId key with a defined value"
+    WebGUI::Error::InvalidParam->throw(error => "Hash ref must contain a taxId key with a defined value")
         unless exists($params->{taxId}) and defined $params->{taxId};
     $self->session->db->write('delete from tax where taxId=?', [$params->{taxId}]);
     return;
@@ -162,19 +163,19 @@ if old data has been deleted and new has been inserted.
 sub importTaxData {
     my $self     = shift;
     my $filePath = shift;
-    croak q{Must provide the path to a file}
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide the path to a file})
         unless $filePath;
-    croak qq{$filePath could not be found}
+    WebGUI::Error::InvalidParam->throw(error => qq{$filePath could not be found})
         unless -e $filePath;
-    croak qq{$filePath is not readable}
+    WebGUI::Error::InvalidParam->throw(error => qq{$filePath is not readable})
         unless -r $filePath;
     open my $table, '<', $filePath or
-        croak "Unable to open $filePath for reading: $!\n";
+        WebGUI::Error->throw(error => qq{Unable to open $filePath for reading: $!\n});
     my $headers;
     $headers = <$table>;
     chomp $headers;
     my @headers = WebGUI::Text::splitCSV($headers);
-    croak qq{Bad header found in the CSV file}
+    WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
         unless (join(q{-}, sort @headers) eq 'field-taxRate-value')
            and (scalar @headers == 3);
     my @taxData = ();
@@ -184,7 +185,7 @@ sub importTaxData {
         $taxRow =~ s/\s*#.+$//;
         next unless $taxRow;
         my @taxRow = WebGUI::Text::splitCSV($taxRow);
-        croak qq{Error on line $line in file $filePath}
+        WebGUI::Error::InvalidFile->throw(error => qq{Error found in the CSV file}, brokenFile => $filePath, brokenLine => $line)
             unless scalar @taxRow == 3;
         push @taxData, [ @taxRow ];
     }
