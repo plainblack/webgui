@@ -3,12 +3,36 @@ package WebGUI::Test;
 use strict;
 use warnings;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=head1 NAME
+
+Package WebGUI::Test
+
+=head1 DESCRIPTION
+
+Utility module for making testing in WebGUI easier.
+
+=cut
+
 our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL );
 
 use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
 use Test::MockObject::Extends;
+use WebGUI::PseudoRequest;
+use Scalar::Util qw( blessed );
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -94,7 +118,10 @@ BEGIN {
         exit(1);
     }
 
+    my $pseudoRequest = WebGUI::PseudoRequest->new;
+    #$SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE, $pseudoRequest );
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
+    $SESSION->{_request} = $pseudoRequest;
 
     my $logger = $SESSION->errorHandler->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
@@ -106,33 +133,196 @@ BEGIN {
 }
 
 END {
+    my $Test = Test::Builder->new;
+    if ($ENV{WEBGUI_TEST_DEBUG}) {
+        $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
+        $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
+        $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
+        $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+    }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
 }
 
-sub file {
-    return $CONFIG_FILE;
-}
+#----------------------------------------------------------------------------
+
+=head2 config
+
+Returns the config object from the session.
+
+=cut
 
 sub config {
     return undef unless defined $SESSION;
     return $SESSION->config;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 file
+
+Returns the name of the WebGUI config file used for this test.
+
+=cut
+
+sub file {
+    return $CONFIG_FILE;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPage ( asset | sub, pageName [, opts] )
+
+Get the entire response from a page request. C<asset> is a WebGUI::Asset 
+object. C<sub> is a string containing a fully-qualified subroutine name. 
+C<pageName> is the name of the page subroutine to run (may be C<undef> for 
+sub strings. C<options> is a hash reference of options with keys outlined 
+below. 
+
+ args           => Array reference of arguments to the pageName sub
+ user           => A user object to set for this request
+ userId         => A userId to set for this request
+ formParams     => A hash reference of form parameters
+ uploads        => A hash reference of files to "upload"
+
+=cut
+
+sub getPage {
+    my $class       = shift;
+    my $session     = $SESSION; # The session object
+    my $actor       = shift;    # The actor to work on
+    my $page        = shift;    # The page subroutine
+    my $optionsRef  = shift;    # A hashref of options
+                                # args      => Array ref of args to the page sub
+                                # user      => A user object to set
+                                # userId    => A user ID to set, "user" takes
+                                #              precedence
+
+    #!!! GETTING COOKIES WITH WebGUI::PseudoRequest DOESNT WORK, SO WE USE 
+    # THIS AS A WORKAROUND
+    $session->http->{_http}->{noHeader} = 1;
+    
+    # Open a buffer as a filehandle
+    my $buffer  = "";
+    open my $output, ">", \$buffer or die "Couldn't open memory buffer as filehandle: $@";
+    $session->output->setHandle($output);
+
+    # Set the appropriate user
+    my $oldUser     = $session->user;
+    if ($optionsRef->{user}) {
+        $session->user({ user => $optionsRef->{user} });
+    }
+    elsif ($optionsRef->{userId}) {
+        $session->user({ userId => $optionsRef->{userId} });
+    }
+    $session->user->uncache;
+
+    # Create a new request object
+    my $oldRequest  = $session->request;
+    my $request     = WebGUI::PseudoRequest->new;
+    $request->setup_param($optionsRef->{formParams});
+    $session->{_request} = $request;
+
+    # Fill the buffer
+    my $returnedContent;
+    if (blessed $actor) {
+        $returnedContent = $actor->$page(@{$optionsRef->{args}});
+    }
+    elsif ( ref $actor eq "CODE" ) {
+        $returnedContent = $actor->(@{$optionsRef->{args}});
+    }
+    else {
+        # Try using it as a subroutine
+        no strict 'refs';
+        $returnedContent = $actor->(@{$optionsRef->{args}});    
+        use strict 'refs';
+    }
+
+    if ($returnedContent && $returnedContent ne "chunked") {
+        print $output $returnedContent;
+    }
+
+    close $output;
+    
+    # Restore the former user and request
+    $session->user({ user => $oldUser });
+    $session->{_request} = $oldRequest;
+
+    #!!! RESTORE THE WORKAROUND
+    delete $session->http->{_http}->{noHeader};
+
+    # Return the page's output
+    return $buffer;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getTestCollateralPath ( [filename] )
+
+Returns the full path to the directory containing the collateral files to be
+used for testing.
+
+Optionally adds a filename to the end.
+
+=cut
+
+sub getTestCollateralPath {
+    my $class           = shift;
+    my $filename        = shift;
+    return File::Spec->catfile($WEBGUI_TEST_COLLATERAL,$filename);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 lib ( )
+
+Returns the full path to the WebGUI lib directory, usually /data/WebGUI/lib.
+
+=cut
+
 sub lib {
     return $WEBGUI_LIB;
 }
 
-sub session {
-    return $SESSION;
-}
+#----------------------------------------------------------------------------
+
+=head2 root ( )
+
+Returns the full path to the WebGUI root directory, usually /data/WebGUI.
+
+=cut
 
 sub root {
     return $WEBGUI_ROOT;
 }
 
-sub getTestCollateralPath {
-    return $WEBGUI_TEST_COLLATERAL;
+#----------------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns the WebGUI::Session object that was created by the test.  This session object
+will automatically be destroyed if the test finishes without dying.
+
+The errorHandler/logger for this session has been overridden so that you can test
+that WebGUI is logging errors.  That means that errors will not be put into
+your webgui.log file (or whereever log.conf says to put it).  This will probably
+be moved into a utility sub so that the interception can be enabled, and then
+disabled.
+
+=cut
+
+sub session {
+    return $SESSION;
 }
+
+
+#----------------------------------------------------------------------------
+
+=head1 BUGS
+
+When trying to load the APR module, perl invariably throws an Out Of Memory
+error. For this reason, getPage disables header processing.
+
+=cut
 
 1;
