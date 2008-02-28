@@ -31,11 +31,13 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 29;
+my $tests = 34;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
 # put your tests here
+
+my $e;
 
 my $loaded = use_ok('WebGUI::Shop::ShipDriver');
 
@@ -54,7 +56,15 @@ skip 'Unable to load module WebGUI::Shop::ShipDriver', $tests unless $loaded;
 my $definition;
 
 eval { $definition = WebGUI::Shop::ShipDriver->definition(); };
-like ($@, qr/^Definition requires a session object/, 'definition croaks without a session object');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'definition: requires a session variable',
+);
 
 $definition = WebGUI::Shop::ShipDriver->definition($session);
 
@@ -106,11 +116,39 @@ cmp_deeply(
 
 my $driver;
 
+eval { $driver = WebGUI::Shop::ShipDriver->create(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'create takes exception to not giving it a session object',
+);
+
 eval { $driver = WebGUI::Shop::ShipDriver->create($session); };
-like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks without a hashref of options');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a hashref of options');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must pass in a hashref of params to create a new ShipDriver object',
+    ),
+    'create takes exception to not giving it a hashref of options',
+);
+
 
 eval { $driver = WebGUI::Shop::ShipDriver->create($session, {}); };
-like ($@, qr/You must pass a hashref of options to create a new ShipDriver object/, 'create croaks with an empty hashref of options');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it an empty hashref of options');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must pass in a hashref of params to create a new ShipDriver object',
+    ),
+    'create takes exception to not giving it an empty hashref of options',
+);
 
 my $options = {
                 label   => 'Slow and dangerous',

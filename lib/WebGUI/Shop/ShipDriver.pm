@@ -7,6 +7,7 @@ use Carp qw(croak);
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::HTMLForm;
+use WebGUI::Exception::Shop;
 use JSON;
 
 =head1 NAME
@@ -102,8 +103,10 @@ A list of properties to assign to this ShipperDriver.  See C<definition> for det
 sub create {
     my $class   = shift;
     my $session = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+        unless ref $session eq 'WebGUI::Session';
     my $options = shift;
-    croak "You must pass a hashref of options to create a new ShipDriver object"
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a hashref of params to create a new ShipDriver object')
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
     my $shipperId = $session->id->generate;
     my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $class, $shipperId, $options);
@@ -127,7 +130,7 @@ the user.
 sub definition {
     my $class      = shift;
     my $session    = shift;
-    croak "Definition requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
     my $i18n = WebGUI::International->new($session, 'ShipDriver');
