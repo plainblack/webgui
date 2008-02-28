@@ -70,7 +70,8 @@ STOP
 	exit;
 }
 
-my $config = WebGUI::Config->new("..","spectre.conf",1);
+require File::Spec;
+my $config = WebGUI::Config->new(File::Spec->rel2abs(".."),"spectre.conf",1);
 unless (defined $config) {
 	print <<STOP;
 
@@ -106,12 +107,19 @@ if ($shutdown) {
 } elsif ($run) {
 	Spectre::Admin->new($config, $debug);
 } elsif ($daemon) {
-	my $res = ping();
-	print "Spectre is already running.\n" unless $res;
-	exit unless $res;
-	#fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));  #Can't have right now.
-	fork and exit;
-	Spectre::Admin->new($config, $debug);
+    if (!ping()) {
+        die "Spectre is already running.\n";
+    }
+    #fork and exit(sleep(1) and print((ping())?"Spectre failed to start!\n":"Spectre started successfully!\n"));  #Can't have right now.
+    require POSIX;
+    fork and exit;
+    POSIX::setsid();
+    chdir "/";
+    open STDIN, "+>", File::Spec->devnull;
+    open STDOUT, "+>STDIN";
+    open STDERR, "+>STDIN";
+    fork and exit;
+    Spectre::Admin->new($config, $debug);
 }
 
 sub ping {
