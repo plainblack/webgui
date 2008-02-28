@@ -106,8 +106,8 @@ sub create {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $options = shift;
-    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a hashref of params to create a new ShipDriver object')
-        unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
+        unless ref $options eq 'HASH' and scalar keys %{ $options };
     my $shipperId = $session->id->generate;
     my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $class, $shipperId, $options);
 
@@ -265,13 +265,13 @@ that object.
 sub new {
     my $class     = shift;
     my $session   = shift;
-    croak "new requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $shipperId = shift;
-    croak "new requires a shipperId"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a shipperId})
         unless defined $shipperId;
     my $properties = $session->db->quickHashRef('select * from shipper where shipperId=?',[$shipperId]);
-    croak "The requested shipperId does not exist in the db"
+    WebGUI::Error::ObjectNotFound->throw(error => q{shipperId not found in db}, id => $shipperId)
         unless scalar keys %{ $properties };
     croak "Somehow, the options property of this object, $shipperId, got broken in the db"
         unless exists $properties->{options} and $properties->{options};
@@ -314,8 +314,8 @@ flattened into JSON and stored in the database as text.  There is no content che
 sub set {
     my $self    = shift;
     my $options = shift;
-    croak "set was not sent a hashref of options to store in the database"
-        unless ref($options) eq 'HASH' and scalar keys %{ $options };
+    WebGUI::Error::InvalidParam->throw(error => 'set was not sent a hashref of options to store in the database')
+        unless ref $options eq 'HASH' and scalar keys %{ $options };
     my $jsonOptions = to_json($options);
     $self->session->db->write('update shipper set options=? where shipperId=?', [$jsonOptions, $self->shipperId]);
     return;

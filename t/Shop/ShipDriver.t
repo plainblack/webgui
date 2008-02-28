@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 34;
+my $tests = 39;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving 
 cmp_deeply(
     $e,
     methods(
-        error => 'Must pass in a hashref of params to create a new ShipDriver object',
+        error => 'Must provide a hashref of options',
     ),
     'create takes exception to not giving it a hashref of options',
 );
@@ -145,7 +145,7 @@ isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving 
 cmp_deeply(
     $e,
     methods(
-        error => 'Must pass in a hashref of params to create a new ShipDriver object',
+        error => 'Must provide a hashref of options',
     ),
     'create takes exception to not giving it an empty hashref of options',
 );
@@ -154,7 +154,7 @@ my $options = {
                 label   => 'Slow and dangerous',
                 enabled => 1,
               };
-$driver = WebGUI::Shop::ShipDriver->create( $session, $options);
+$driver = WebGUI::Shop::ShipDriver->create( $session, $options );
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
@@ -169,7 +169,8 @@ is($driver->className, ref $driver, 'className property set correctly');
 
 cmp_deeply($driver->options, $options, 'options accessor works');
 
-my $dbData = $session->db->quickHashRef('select * from shipper limit 1');
+my $dbData = $session->db->quickHashRef('select * from shipper where shipperId=?',[$driver->shipperId]);
+diag $driver->shipperId;
 cmp_deeply(
     $dbData,
     {
@@ -262,19 +263,49 @@ cmp_deeply(
 my $oldDriver;
 
 eval { $oldDriver = WebGUI::Shop::ShipDriver->new(); };
-like ($@, qr/^new requires a session object/, 'new croaks without a session object');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'new takes exception to not giving it a session object',
+);
 
 eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session); };
-like ($@, qr/^new requires a shipperId/, 'new croaks without a shipperId');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a shipperId');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a shipperId',
+    ),
+    'new takes exception to not giving it a shipperId',
+);
 
 eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, 'notEverAnId'); };
-like ($@, qr/^The requested shipperId does not exist in the db/, 'new croaks unless the requested shipperId object exists in the db');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::ObjectNotFound', 'new croaks unless the requested shipperId object exists in the db');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'shipperId not found in db',
+        id    => 'notEverAnId',
+    ),
+    'new croaks unless the requested shipperId object exists in the db',
+);
 
 my $driverCopy = WebGUI::Shop::ShipDriver->new($session, $driver->shipperId);
 
 is($driver->getId,           $driverCopy->getId,     'same id');
 is($driver->className,       $driverCopy->className, 'same className');
 cmp_deeply($driver->options, $driverCopy->options,   'same options');
+
+TODO: {
+    local $TODO = 'tests for new';
+    ok(0, 'Test broken options in the db');
+}
 
 #######################################################################
 #
@@ -283,7 +314,24 @@ cmp_deeply($driver->options, $driverCopy->options,   'same options');
 #######################################################################
 
 eval { $driver->calculate; };
-like ($@, qr/^You must override the calculate method/, 'calculate throws an exception to force overriding it in the child classes');
+like ($@, qr/^You must override the calculate method/, 'calculate croaks to force overriding it in the child classes');
+
+#######################################################################
+#
+# set
+#
+#######################################################################
+
+eval { $driver->set(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'set takes exception to not giving it a hashref of options');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'set was not sent a hashref of options to store in the database',
+    ),
+    'set takes exception to not giving it a hashref of options',
+);
 
 #######################################################################
 #
@@ -291,17 +339,18 @@ like ($@, qr/^You must override the calculate method/, 'calculate throws an exce
 #
 #######################################################################
 
-$driver->delete;
+#$driver->delete;
+#
+#my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
+#is($count, 0, 'delete deleted the object');
+#
+#undef $driver;
 
-my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
-is($count, 0, 'delete deleted the object');
-
-undef $driver;
 
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from shipper');
+    #$session->db->write('delete from shipper');
 }
