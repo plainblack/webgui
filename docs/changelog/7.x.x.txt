@@ -8,6 +8,7 @@
  - As a result of the above, we no longer need extjs, and it has been
    removed.
  - added script to remove unneeded .wgaccess files instead of having it run during upgrade
+ - fixed: wiki pages link to deleted pages (Arjan Widlak, United Knowledge)
 
 7.5.3
  - prevent HTML and Macro injection in usernames

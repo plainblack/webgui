@@ -42,7 +42,7 @@ sub appendRecentChanges {
 	my $limit = shift || $self->get("recentChangesCount") || 50;
 	my $revisions = $self->session->db->read("select asset.assetId, assetData.revisionDate, asset.className 
 		from asset left join assetData using (assetId) where asset.parentId=? and asset.className
-		like ? order by assetData.revisionDate desc limit ?", [$self->getId, 
+		like ? and status='approved' order by assetData.revisionDate desc limit ?", [$self->getId, 
 		"WebGUI::Asset::WikiPage%", $limit]);
 	while (my ($id, $version, $class) = $revisions->array) {
 		my $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
@@ -98,7 +98,7 @@ sub autolinkHtml {
     my %opts = ref $_[-1] eq 'HASH' ? %{pop @_} : ();
     my $skipTitles = $opts{skipTitles} || [];
     # TODO: ignore caching for now, but maybe do it later.
-	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
+	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage' and i.state='published' and d.status='approved'", [$self->getId]);
 	foreach my $key (keys %mapping) {
         if (grep {lc $_ eq $key} @$skipTitles) {
             delete $mapping{$key};
