@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 11;
+my $tests = 12;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -52,9 +52,19 @@ skip 'Unable to load module WebGUI::Shop::ShipDriver::FlatRate', $tests unless $
 #######################################################################
 
 my $definition;
+my $e; ##Exception variable, used throughout the file
 
 eval { $definition = WebGUI::Shop::ShipDriver::FlatRate->definition(); };
-like ($@, qr/^Definition requires a session object/, 'definition croaks without a session object');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'definition takes an exception to not giving it a session variable');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'definition: requires a session variable',
+);
+
 
 $definition = WebGUI::Shop::ShipDriver::FlatRate->definition($session);
 

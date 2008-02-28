@@ -2,7 +2,7 @@ package WebGUI::Shop::ShipDriver::FlatRate;
 
 use strict;
 use base qw/WebGUI::Shop::ShipDriver/;
-use Carp qw/croak/;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -58,7 +58,7 @@ the user.
 sub definition {
     my $class      = shift;
     my $session    = shift;
-    croak "Definition requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
     my $i18n = WebGUI::International->new($session, 'ShipDriver_FlatRate');
