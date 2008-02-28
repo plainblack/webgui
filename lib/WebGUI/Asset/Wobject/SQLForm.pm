@@ -1395,6 +1395,7 @@ my $hasPrimaryKey = 0;
 			}
 			
 			$dbLink->db->write("alter table $tableName add primary key (__recordId, __revision)");
+			$dbLink->db->write("alter table $tableName add key recordId_archived (__recordId, __archived)");
 		} 
 		else {
 			#new table
@@ -1409,7 +1410,8 @@ my $hasPrimaryKey = 0;
 				" __deletedBy varchar(22),".
 				" __archived tinyint(1) default 0,".
 				" __revision int(11) not null,".
-				" primary key (__recordId, __revision)".
+				" primary key (__recordId, __revision),".
+				" key recordId_archived (__recordId, __archived)".
 			")");
 		}
 	} 

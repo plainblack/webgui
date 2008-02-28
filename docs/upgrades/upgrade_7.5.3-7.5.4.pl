@@ -22,9 +22,32 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addIndexesToSQLForms($session);
 
 finish($session); # this line required
+
+
+#-------------------------------------------------
+sub addIndexesToSQLForms {
+    my $session = shift;
+    print "\tAdding extra indexes to SQL Forms.\n" unless ($quiet);
+    my $sqlForms = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {
+        statusToInclude => [qw(pending approved archived)],
+        statesToInclude => [qw(published trash trash-limbo clipboard clipboard-limbo)],
+        returnObjects => 1,
+        includeOnlyClasses => ['WebGUI::Asset::Wobject::SQLForm'],
+    });
+    for my $sqlForm (@$sqlForms) {
+        my $dbLink = WebGUI::DatabaseLink->new($session, $sqlForm->getValue('databaseLinkId'))->db;
+        my $dbh = $dbLink->dbh;
+        $dbh->{PrintError} = 0;
+        eval {
+            # We don't care about failure
+            $dbh->do('CREATE INDEX `recordId_archived` ON ' . $dbh->quote_identifier($sqlForm->get('tableName')) . ' (__recordId, __archived)');
+        };
+        $dbLink->disconnect;
+    }
+}
 
 
 ##-------------------------------------------------
