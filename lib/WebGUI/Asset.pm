@@ -1774,7 +1774,8 @@ sub new {
 
 =head2 newByDynamicClass ( session, assetId [ , revisionDate ] )
 
-Similar to new() except that it will look up the classname of an asset rather than making you specify it. Returns undef if it can't find the classname.
+Instances an existing Asset, by looking up the classname of the asset specified by the assetId, and then calling new.
+Returns undef if it can't find the classname.
 
 =head3 session
 
@@ -1832,7 +1833,7 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.
+Constructor.  This creates a standalone asset with no parent.
 
 =head3 session
 
@@ -1859,7 +1860,9 @@ sub newByPropertyHashRef {
 
 =head2 newByUrl ( session, [url, revisionDate] )
 
-Returns a new Asset object based upon current url, given url or defaultPage.
+Instances an existing Asset, by looking up the classname of the asset specified by the url, and then calling new.
+Returns undef if it can't find a classname with that url.  If no URL is specified, and the requested url cannot
+be found, it returns the default asset.
 
 =head3 session
 
@@ -1885,7 +1888,6 @@ sub newByUrl {
 	$url =~ s/^\///;
 	$url =~ s/\'//;
 	$url =~ s/\"//;
-	my $asset;
 	if ($url ne "") {
 		my ($id, $class) = $session->db->quickArray("select asset.assetId, asset.className from assetData join asset using (assetId) where assetData.url = ? limit 1", [ $url ]);
 		if ($id ne "" || $class ne "") {
