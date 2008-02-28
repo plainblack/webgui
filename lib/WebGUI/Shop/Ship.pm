@@ -7,6 +7,7 @@ use WebGUI::International;
 use WebGUI::Shop::ShipDriver;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -41,7 +42,8 @@ sub _loadDriver {
 
 =head2 create ( $session, $class, $options )
 
-The interface method for creating new, configured instances of ShipDriver.
+The interface method for creating new, configured instances of ShipDriver.  If the ShipperDriver throws an exception,  it is propagated
+back up to the top.
 
 =head3 $session
 
@@ -60,17 +62,18 @@ A list of properties to assign to this ShipperDriver.  See C<definition> for det
 sub create {
     my $class   = shift;
     my $session = shift;
-    croak "create requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $requestedClass = shift;
-    croak "create requires the name of a class to create an object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
-    croak "The requested class $class is not enabled in your WebGUI configuration file"
+    WebGUI::Error::InvalidParam->throw(error => qq{The requested class $requestedClass is not enabled in your WebGUI configuration file})
         unless isIn($requestedClass, @{ WebGUI::Shop::Ship->getDrivers($session) } );
     my $options = shift;
-    croak "You must pass a hashref of options to create a new ShipDriver object"
+    WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new ShipDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $session, $options ]) };
+    return $driver;
 }
 
 #-------------------------------------------------------------------
@@ -82,14 +85,14 @@ from the WebGUI config file.
 
 =head3 $session
 
-A WebGUI::Session object.
+A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
 
 =cut
 
 sub getDrivers {
     my $class      = shift;
     my $session    = shift;
-    croak "getDrivers requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     return $session->config->get('shippingDrivers');
 }
@@ -103,7 +106,7 @@ with the key of the primary hash being the shipperId of the driver, and sub keys
 
 =head3 $session
 
-A WebGUI::Session object.
+A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
 
 =head3
 
@@ -121,7 +124,8 @@ sub getOptions {
 =head2 new ( $session, $shipperId )
 
 Looks up an existing ShipperDriver in the db by shipperId and returns
-that object.
+that object.  If the ShipperDriver throws an exception,  it is propagated
+back up to the top.
 
 =head3 $session
 
@@ -136,11 +140,16 @@ The ID of a shipper to look up and instanciate.
 sub new {
     my $class     = shift;
     my $session   = shift;
-    croak "new requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $shipperId = shift;
-    croak "new requires a shipperId"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a shipperId})
         unless defined $shipperId;
+    my $requestedClass = $session->db->quickScalar('select className from shipper where shipperId=?',[$shipperId]);
+    WebGUI::Error::ObjectNotFound->throw(error => q{shipperId not found in db}, id => $shipperId)
+        unless $requestedClass;
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'new', [ $session, $shipperId ]) };
+    return $driver;
 }
 
 1;

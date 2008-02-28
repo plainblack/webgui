@@ -36,7 +36,8 @@ Returns a shipping price. Calculates the shipping price using the following form
 =head3 $cart
 
 A WebGUI::Shop::Cart object.  The contents of the cart are analyzed to calculate
-the shipping costs.
+the shipping costs.  If no items in the cart require shipping, then no shipping
+costs are assessed.
 
 =cut
 

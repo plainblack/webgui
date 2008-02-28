@@ -46,13 +46,22 @@ These functions are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 instanciate ( module, method, params )
+=head2 instanciate ( module, sub, params )
 
 Dynamically ensures that a plugin module is loaded into memory. Then instanciates a new object from the module. Croaks on failure.
 
 =head3 module
 
 The name of the module you'd like to load like "WebGUI::Asset::Snippet";
+
+=head3 sub
+
+The name of the constructor you would like to invoke from the module.  Usually "new", or sometimes "create".
+
+=head3 params
+
+An array ref of params to send to the constructor.  In WebGUI, the first param should be a WebGUI::Session
+object.
 
 =cut
 
