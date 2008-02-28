@@ -212,6 +212,23 @@ sub remove {
 
 #-------------------------------------------------------------------
 
+=head2 setQuantity ( quantity )
+
+Sets quantity of this item in the cart. 
+
+=head3 quantity
+
+The number to set the quantity to. Zero or less will remove the item from cart. 
+
+=cut
+
+sub setQuantity {
+    my ($self, $quantity) = @_;
+    return $self->incrementQuantity($quantity - $self->get("quantity"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 update ( properties )
 
 Sets properties of the cart item.

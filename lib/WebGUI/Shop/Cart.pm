@@ -33,6 +33,7 @@ These subroutines are available from this package:
 
 readonly session => my %session;
 private properties => my %properties;
+private error => my %error;
 
 #-------------------------------------------------------------------
 
@@ -261,6 +262,16 @@ Updates the cart totals and then displays the cart again.
 
 sub www_update {
     my $self = shift;
+    my $form = $self->session->form;
+    foreach my $item (@{$self->getItems}) {
+        if ($form->get("quantity-".$item->getId) ne "") {
+            eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
+            if (WebGUI::Error->caught("WebGUI::Error::Shop::MaxOfItemInCartReached")) {
+                my $i18n = WebGUI::International->new($self->session, "Shop");
+                $error{id $self} = sprint($i18n->get("too many of this item"), $item->get("configuredTitle"));
+            }
+        }
+    }
     return $self->www_view;
 }
 
@@ -285,7 +296,7 @@ sub www_view {
             url                     => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
             quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity")}),
             isUnique                => ($sku->getMaxAllowedInCart == 1),
-            isShippable             => $sku->isShippable,
+            isShippable             => $sku->isShippingRequired,
             extendedPrice           => sprintf("%.2f", ($properties{price} * $properties{quantity})),
             price                   => sprintf("%.2f", $properties{price}),
             removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
@@ -299,6 +310,7 @@ sub www_view {
     my %var = (
         %{$self->get},
         items                   => \@items,
+        error                   => $error{id $self},
         formHeader              => WebGUI::Form::formHeader($session)
             . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
             . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
