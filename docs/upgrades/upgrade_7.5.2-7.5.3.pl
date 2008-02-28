@@ -105,7 +105,7 @@ sub migrateToNewCart {
         index cartId_assetId (cartId,assetId)
     )");
     $session->db->write("drop table shoppingCart");
-    $session->db->write("insert into settings values ('shopCartTemplateId','HKwB9Y7jKKfpL4bkQEmX0w')");
+    $session->db->write("insert into settings values ('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw')");
 }
 
 #-------------------------------------------------

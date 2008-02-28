@@ -128,7 +128,7 @@ sub get {
     if (defined $name) {
         return $properties{id $self}{$name};
     }
-    my %copyOfHashRef = $properties{id $self};
+    my %copyOfHashRef = %{$properties{id $self}};
     return \%copyOfHashRef;
 }
 
@@ -249,6 +249,8 @@ Remove an item from the cart and then display the cart again.
 
 sub www_removeItem {
     my $self = shift;
+    my $item = WebGUI::Shop::CartItem->new($self, $self->session->form->get("itemId"));
+    $item->remove;
     return $self->www_view;
 }
 
@@ -291,19 +293,20 @@ sub www_view {
     my @items = ();
     foreach my $item (@{$self->getItems}) {
         my $sku = $item->getSku;
+        $sku->applyOptions($item->get("options"));
         my %properties = (
             %{$item->get},
             url                     => $sku->getUrl("shop=cart;method=viewItem;itemId=".$item->getId),
             quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity")}),
             isUnique                => ($sku->getMaxAllowedInCart == 1),
             isShippable             => $sku->isShippingRequired,
-            extendedPrice           => sprintf("%.2f", ($properties{price} * $properties{quantity})),
-            price                   => sprintf("%.2f", $properties{price}),
+            extendedPrice           => sprintf("%.2f", ($sku->getPrice * $item->get("quantity"))),
+            price                   => sprintf("%.2f", $sku->getPrice),
             removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
-                onclick=>"this.form.method.value='removeItem';this.form.itemId.value='".$item->getId."';this.form.submit;"}),
+               extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             shippingAddress         => "todo",
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-                onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.itemId.value='".$item->getId."';this.form.submit;"}),
+                extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             );
         push(@items, \%properties);
     }
@@ -318,15 +321,15 @@ sub www_view {
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
         checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
-            onclick=>"this.form.shop.value='pay';this.form.methodvalue='viewOptions';this.form.submit;"}),
+            extras=>q|onclick="this.form.shop.value='pay';this.form.methodvalue='viewOptions';this.form.submit;"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
-            onclick=>"this.form.method.value='continueShopping';this.form.submit;"}),
+            extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-            onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
+            extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"|}),
         shipppingAddress        => "todo",
         shippingOptions         => "todo",
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-            onclick=>"this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"}),
+            extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"|}),
         hasShippingAddress      => "todo",
         couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         couponDiscount          => "todo",

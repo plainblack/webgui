@@ -3,6 +3,12 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'too many of this item' => { 
+		message => q|Can't add that many %s to your cart.|,
+		lastUpdated => 0,
+		context => q|an error message|
+	},
+
 	'subtotal' => { 
 		message => q|Subtotal|,
 		lastUpdated => 0,

@@ -94,7 +94,7 @@ sub get {
         }
         return $properties{id $self}{$name};
     }
-    my %copyOfHashRef = $properties{id $self};
+    my %copyOfHashRef = %{$properties{id $self}};
     return \%copyOfHashRef;
 }
 
@@ -143,16 +143,8 @@ If specified may increment quantity by more than one. Specify a negative number 
 sub incrementQuantity {
     my ($self, $quantity) = @_;
     $quantity ||= 1;
-    my $id = id $self;
-    if ($self->get("quantity") + $quantity > $self->getSku->getMaxAllowedInCart) {
-        WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
-    }
-    if ($self->get("quantity") + $quantity <= 0) {
-        return $self->remove;
-    }
-    $properties{$id}{quantity} += $quantity;
-    $self->cart->session->db->setRow("cartItems","itemId", $properties{$id});
-    return $properties{$id}{quantity};
+    $self->setQuantity($quantity + $self->get("quantity"));
+    return $self->get("quantity");
 }
 
 
@@ -224,7 +216,15 @@ The number to set the quantity to. Zero or less will remove the item from cart.
 
 sub setQuantity {
     my ($self, $quantity) = @_;
-    return $self->incrementQuantity($quantity - $self->get("quantity"));
+    my $id = id $self;
+    if ($quantity > $self->getSku->getMaxAllowedInCart) {
+        WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
+    }
+    if ($quantity <= 0) {
+        return $self->remove;
+    }
+    $properties{$id}{quantity} = $quantity;
+    $self->cart->session->db->setRow("cartItems","itemId", $properties{$id});
 }
 
 #-------------------------------------------------------------------

@@ -67,7 +67,7 @@ sub addToCart {
     my ($self, $options) = @_;
     $self->applyOptions($options);
     my $cart = WebGUI::Shop::Cart->create($self->session);
-    my $cart->addItem($self);
+    $cart->addItem($self);
 }
 
 #-------------------------------------------------------------------
