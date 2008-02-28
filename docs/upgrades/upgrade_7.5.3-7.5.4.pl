@@ -23,6 +23,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addIndexesToSQLForms($session);
+addListViewToCalendar( $session );
+addIcalPageSize( $session );
 
 finish($session); # this line required
 
@@ -56,6 +58,43 @@ sub addIndexesToSQLForms {
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#----------------------------------------------------------------------------
+# Add the list view columns to the Calendar
+sub addListViewToCalendar {
+    my $session     = shift;
+    print "\tAdding list view to Calendar... " unless $quiet;
+
+    $session->db->write(
+        "ALTER TABLE Calendar ADD COLUMN listViewPageInterval BIGINT"  
+    );
+    $session->db->write(
+        "ALTER TABLE Calendar ADD COLUMN templateIdList VARCHAR(22)"  
+    );
+    $session->db->write(
+        "ALTER TABLE Calendar ADD COLUMN templateIdPrintList VARCHAR(22)"  
+    );
+    $session->db->write(
+        "ALTER TABLE Calendar MODIFY COLUMN defaultView ENUM('month','week','day','list') DEFAULT 'month'"
+    );
+
+    print "DONE!\n" unless $quiet;
+    return;
+}
+
+#----------------------------------------------------------------------------
+# Add the ability to set the iCalendar interval
+sub addIcalPageSize {
+    my $session     = shift;
+    print "\tAdding iCalendar interval to Calendar... " unless $quiet;
+
+    $session->db->write(
+        "ALTER TABLE Calendar ADD COLUMN icalInterval BIGINT"  
+    );
+
+    print "DONE!\n" unless $quiet;
+    return;
+}
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------

@@ -2,15 +2,15 @@ package WebGUI::Asset::Wobject::Calendar;
 
 use strict;
 
-####################################################################
+#----------------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
-####################################################################
+#----------------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
 # this software.
-####################################################################
+#----------------------------------------------------------------------------
 # http://www.plainblack.com                     info@plainblack.com
-####################################################################
+#----------------------------------------------------------------------------
 
 use Tie::IxHash;
 
@@ -26,21 +26,20 @@ use base 'WebGUI::Asset::Wobject';
 use DateTime;
 use JSON qw/to_json/;
 
-=head1 Name
+=head1 NAME
 
 
-=head1 Description
+=head1 DESCRIPTION
 
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
 
-=head1 Methods
-
+=head1 METHODS
 
 =cut
 
-####################################################################
+#----------------------------------------------------------------------------
 
 sub definition {
     my $class       = shift;
@@ -50,25 +49,27 @@ sub definition {
     my $i18n        = WebGUI::International->new($session, 'Asset_Calendar');
     
     ### Set up list options ###
-    tie (my %optionsDefaultView, 'Tie::IxHash',
+    tie my %optionsDefaultView, 'Tie::IxHash', (
         month   => $i18n->get("defaultView value month"),
         week    => $i18n->get("defaultView value week"),
         day     => $i18n->get("defaultView value day"),
+        list    => $i18n->get('defaultView value list'),
     );
-    tie (my %optionsDefaultDate, 'Tie::IxHash', 
+    
+    tie my %optionsDefaultDate, 'Tie::IxHash', (
         current => $i18n->get("defaultDate value current"),
         first   => $i18n->get("defaultDate value first"),
         last    => $i18n->get("defaultDate value last"),
     );
-    tie (my %optionsEventSort, 'Tie::IxHash', 
+    
+    tie my %optionsEventSort, 'Tie::IxHash', (
         time            => $i18n->get("sortEventsBy value time"),
         sequencenumber  => $i18n->get("sortEventsBy value sequencenumber"),
     );
+
     
     ### Build properties hash ###
-    tie my %properties, 'Tie::IxHash';
-    %properties = (
-        
+    tie my %properties, 'Tie::IxHash', (
         ##### DEFAULTS #####
         defaultView => {
             fieldType       => "SelectBox",
@@ -97,6 +98,7 @@ sub definition {
             label           => $i18n->get("groupIdEventEdit label"),
             hoverHelp       => $i18n->get("groupIdEventEdit description"),
         },
+
         groupIdSubscribed => {
             fieldType       => 'hidden',
         },
@@ -133,6 +135,16 @@ sub definition {
             label           => $i18n->get('templateIdDay label'),
         },
         
+        # List
+        templateIdList => {
+            fieldType       => "template",  
+            defaultValue    => '',
+            tab             => "display",
+            namespace       => "Calendar/List", 
+            hoverHelp       => $i18n->get('editForm templateIdList description'),
+            label           => $i18n->get('editForm templateIdList label'),
+        },
+
         # Event Details
         templateIdEvent => {
             fieldType       => "template",  
@@ -195,6 +207,16 @@ sub definition {
             label           => $i18n->get('templateIdPrintDay label'),
         },
         
+        # List
+        templateIdPrintList => {
+            fieldType       => "template",  
+            defaultValue    => '',
+            tab             => "display",
+            namespace       => "Calendar/Print/List", 
+            hoverHelp       => $i18n->get('editForm templateIdPrintList description'),
+            label           => $i18n->get('editForm templateIdPrintList label'),
+        },
+
         # Event Details
         templateIdPrintEvent => {
             fieldType       => "template",  
@@ -222,6 +244,24 @@ sub definition {
             label           => $i18n->get("sortEventsBy label"),
             hoverHelp       => $i18n->get("sortEventsBy description"),
         },
+
+        listViewPageInterval => {
+            fieldType       => "interval",
+            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
+            tab             => "display",
+            label           => $i18n->get('editForm listViewPageInterval label'),
+            hoverHelp       => $i18n->get('editForm listViewPageInterval description'),
+            unitsAvailable  => [ qw( days weeks months years ) ],
+        },
+
+        icalInterval    => {
+            fieldType       => "interval",
+            defaultValue    => $session->datetime->intervalToSeconds( 3, 'months' ),
+            tab             => "display",
+            label           => $i18n->get('editForm icalInterval label'),
+            hoverHelp       => $i18n->get('editForm icalInterval description'),
+            unitsAvailable  => [ qw( days weeks months years ) ],
+        },
  
         # This doesn't function currently
         #subscriberNotifyOffset => {
@@ -233,24 +273,19 @@ sub definition {
         #},    
     );
     
-    push(@{$definition}, {
+    push @{$definition}, {
         assetName           => $i18n->get('assetName'),
         icon                => 'calendar.gif',
         tableName           => 'Calendar',
         className           => 'WebGUI::Asset::Wobject::Calendar',
         properties          => \%properties,
         autoGenerateForms   => 1,
-    });
+    };
     
     return $class->SUPER::definition($session, $definition);
 }
 
-
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 addChild ( properties [, more ] )
 
@@ -271,11 +306,69 @@ sub addChild {
     return $self->SUPER::addChild($properties, @other);
 }
 
+#----------------------------------------------------------------------------
 
+=head2 appendTemplateVarsDateTime( var, datetime [, prefix ] )
 
+Append template vars from the given datetime. C<var> is a hash reference. 
+C<datetime> is a WebGUI::DateTime object. C<prefix> is an optional prefix for
+the template variables. 
 
+=cut
 
-####################################################################
+sub appendTemplateVarsDateTime {
+    my $self        = shift;
+    my $var         = shift;
+    my $dt          = shift;
+    my $prefix      = shift || '';
+
+    # Simple fields
+    my %fields  = (
+    #   label           => method
+        hour24          => 'hour',
+        hour            => 'hour_12',
+        dayName         => 'day_name',
+        dayAbbr         => 'day_abbr',
+        dayOfMonth      => 'day_of_month',
+        dayOfWeek       => 'day_of_week',
+        monthName       => 'month_name',
+        monthAbbr       => 'month_abbr',
+        month           => 'month',
+        year            => 'year',
+        ymd             => 'ymd',
+        mdy             => 'mdy',
+        dmy             => 'dmy',
+        hms             => 'hms',
+        epoch           => 'epoch',
+    );
+
+    for my $name ( keys %fields ) {
+        if ( $prefix ) {
+            $var->{ $prefix . ucfirst $name }
+                = $dt->can( $fields{ $name } )->( $dt );
+        }
+        else {
+            $var->{ $name } = $dt->can( $fields{ $name } )->( $dt );
+        }
+    }
+    
+    # Special fields
+    if ( $prefix ) {
+        $var->{ $prefix . "Second"      } = sprintf "%02d", $dt->second;
+        $var->{ $prefix . "Minute"      } = sprintf "%02d", $dt->minute;
+        $var->{ $prefix . "M"           } = ( $dt->hour < 12 ? "AM" : "PM" );
+        $var->{ $prefix . "Meridiem"    } = $var->{ $prefix . "M" };  
+    }
+    else {
+        $var->{ "second"      } = sprintf "%02d", $dt->second;
+        $var->{ "minute"      } = sprintf "%02d", $dt->minute;
+        $var->{ "meridiem"    } = ( $dt->hour < 12 ? "AM" : "PM" );
+    }
+    
+    return $var;
+}
+
+#----------------------------------------------------------------------------
 
 =head2 canEdit
 
@@ -303,10 +396,7 @@ sub canEdit {
     return $self->SUPER::canEdit()
 }
 
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 canAddEvent
 
@@ -332,10 +422,7 @@ sub canAddEvent {
     );
 }
 
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 createSubscriptionGroup ( )
 
@@ -361,11 +448,7 @@ sub createSubscriptionGroup {
     return undef;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 duplicate ( )
 
@@ -393,11 +476,7 @@ sub duplicate {
     return $newCalendar;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getEditForm
 
@@ -557,11 +636,7 @@ ENDHTML
     return $form;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getEvent ( assetId )
 
@@ -582,17 +657,18 @@ sub getEvent {
     
     my $event = WebGUI::Asset->newByDynamicClass($self->session, $assetId);
     
+    unless ( $event ) {
+        $self->session->errorHandler->warn("Event '$assetId' doesn't exist!");
+        return undef;
+    }
+
     $self->session->errorHandler->warn("WebGUI::Asset::Wobject::Calendar->getEvent :: Event '$assetId' not a child of calendar '".$self->getId."'"), return
         unless $event->get("parentId") eq $self->getId;
 
     return $event;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getEventsIn ( startDate, endDate, options )
 
@@ -638,6 +714,8 @@ sub getEventsIn {
     my ($startDate,$startTime)    = split / /, $start;
     my ($endDate,$endTime)        = split / /, $end;
     
+    #use Data::Dumper;
+    #$self->session->errorHandler->warn( Dumper [caller(1), caller(2), caller(3)] );
     my $startTz  = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $tz)
                     ->set_time_zone("UTC")->toMysql;
     my $endTz    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $tz)
@@ -689,7 +767,7 @@ sub getEventsIn {
     return @{$events};
 }
 
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getEventVars ( event )
 
@@ -710,11 +788,7 @@ sub getEventVars {
     return %eventVar, %eventDates;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getFeeds ( )
 
@@ -734,11 +808,7 @@ sub getFeeds {
         );
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getFirstEvent ( )
 
@@ -760,14 +830,11 @@ sub getFirstEvent {
         LIMIT 1
 ENDSQL
 
+    return unless $assetId;
     return $self->getEvent($assetId);
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 getLastEvent ( )
 
@@ -789,13 +856,27 @@ sub getLastEvent {
         LIMIT 1
 ENDSQL
     
+    return unless $assetId;
     return $self->getEvent($assetId);
 }
 
+#----------------------------------------------------------------------------
 
+=head2 getTemplateVars ( )
 
+Get template variables common to all views of the Calendar.
 
-####################################################################
+=cut
+
+sub getTemplateVars {
+    my $self        = shift;
+    my $var         = $self->get;
+
+    
+    return $var;
+}
+
+#----------------------------------------------------------------------------
 
 =head2 getSearchUrl ( )
 
@@ -808,10 +889,7 @@ sub getSearchUrl {
     return $self->getUrl('func=search');
 }
 
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 prepareView ( )
 
@@ -835,7 +913,7 @@ sub prepareView {
         $self->session->style->makePrintable(1);
     }
     
-    #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+    $self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
     
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
     $template->prepare;
@@ -843,12 +921,7 @@ sub prepareView {
     $self->{_viewTemplate} = $template;
 }
 
-
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 processPropertiesFromFormPost ( )
 
@@ -869,7 +942,8 @@ sub processPropertiesFromFormPost {
     unless ($self->get("groupIdSubscribed")) {
         $self->createSubscriptionGroup();
     }
-    
+        
+    $self->session->errorHandler->info( "DEFAULT VIEW:" . $self->get('defaultView') );
     
     ### Get feeds from the form
     # Workaround WebGUI::Session::Form->param bug that returns duplicate
@@ -906,10 +980,12 @@ sub processPropertiesFromFormPost {
             feedType    => "ical",
         });
     }
+
+    return;
 }
 
 
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 purge ( )
 
@@ -925,7 +1001,7 @@ sub purge {
     $self->SUPER::purge;
 }
 
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 view ( )
 
@@ -943,8 +1019,6 @@ sub view {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
-    my $var;
-    
     
     ## INTERRUPT: If user is only a Visitor and we have a cached version 
         # and is not expired, use it.
@@ -955,7 +1029,7 @@ sub view {
     $params->{start}  = $form->param("start");
    
     # Validate type passed, or recover from session scratchpad
-    if ($params->{type} =~ /^(?:month|week|day)$/) {
+    if ($params->{type} =~ /^(?:month|week|day|list)$/i) {
        $session->scratch->set('cal_view_type', $params->{'type'});
     }
     else {
@@ -985,13 +1059,16 @@ sub view {
     }
     
     # Get the template from the appropriate view* method
-    $var    = lc $params->{type} eq "month"     ? $self->viewMonth($params)
-            : lc $params->{type} eq "week"      ? $self->viewWeek($params)
-            : lc $params->{type} eq "day"       ? $self->viewDay($params)
+    # TODO: This should be abstracted
+    my $var = lc $params->{type} eq "month"     ? $self->viewMonth( $params )
+            : lc $params->{type} eq "week"      ? $self->viewWeek( $params )
+            : lc $params->{type} eq "day"       ? $self->viewDay( $params )
+            : lc $params->{type} eq "list"      ? $self->viewList( $params )
             : return $self->errorHandler->error("Calendar invalid 'type=' url parameter")
             ;
     
-    ##### Add any global variables
+    ##### Process the template
+    # Add any global variables
     # Admin
     if ($self->session->var->isAdminOn) {
         $var->{'admin'}         = 1;
@@ -1005,6 +1082,7 @@ sub view {
     }
     
     # URLs
+    $var->{ url }           = $self->getUrl;
     $var->{"urlDay"}        = $self->getUrl("type=day;start=".$params->{start});
     $var->{"urlWeek"}       = $self->getUrl("type=week;start=".$params->{start});
     $var->{"urlMonth"}      = $self->getUrl("type=month;start=".$params->{start});
@@ -1016,25 +1094,18 @@ sub view {
                                         $params->{start},
                               );
 
-    # Parameters
-    $var->{"paramStart"}    = $params->{start};
-    $var->{"paramType"}     = $params->{type};
-    
     
     $var->{"extrasUrl"}     = $self->session->url->extras();
-    
-    ##### Process the template
+    $var->{ paramStart      } = $params->{ start };
+    $var->{ paramType       } = $params->{ type };
+
     # TODO: If user is only a Visitor and we've gotten this far, update the cache
     
     # Return the processed template to be displayed for the user
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 viewDay ( \%params )
 
@@ -1057,7 +1128,7 @@ sub viewDay {
     my $session     = $self->session;
     my $params      = shift;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
-    my $var         = {};
+    my $var         = $self->getTemplateVars;
     
     ### Get all the events in this time period
     # Get the range of the epoch of this day
@@ -1120,12 +1191,85 @@ sub viewDay {
     return $var;
 }
 
+#----------------------------------------------------------------------------
 
+=head2 viewList ( \%params )
 
+Shows the list view. Returns the template parameters as a hash reference.
 
+%params keys:
 
+=over 4
 
-####################################################################
+=item start
+
+The start of the list page
+
+=back
+
+=cut
+
+sub viewList {
+    my $self        = shift;
+    my $params      = shift;
+    my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
+    my $var         = $self->getTemplateVars;
+    
+    ### Get the events
+    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
+    my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
+
+    my @events
+        = $self->getEventsIn(
+            $dtStart->toDatabase,
+            $dtEnd->toDatabase,
+        );
+
+    ### Build the event vars
+    my $dtLast = $dtStart; # The DateTime of the last event
+    for my $event (@events) {
+        my ( %eventVar, %eventDate )
+            = $self->getEventVars( $event );
+
+        # Add the change flags
+        my $dt  = $event->getDateTimeStart;
+        if ( $dt->year > $dtLast->year ) {
+            $eventVar{ new_year } = 1;
+        }
+        if ( $dt->month > $dtLast->month ) {
+            $eventVar{ new_month } = 1;
+        }
+        if ( $dt->day > $dtLast->day ) {
+            $eventVar{ new_day } = 1;
+        }
+        
+        push @{ $var->{events} }, { %eventVar, %eventDate };
+        $dtLast = $dt;
+    }
+
+    ### Additional variables
+    # Date span
+    $self->appendTemplateVarsDateTime( $var, $dtStart, "start" );
+    $self->appendTemplateVarsDateTime( $var, $dtEnd, "end" );
+    
+    # Previous and next pages
+    if ( $self->getFirstEvent && $self->getFirstEvent->getDateTimeStart < $dtStart ) {
+        my $dtPrevious
+            = $dtStart->clone->add( seconds => 0 - $self->get('listViewPageInterval') );
+        $var->{ url_previousPage }
+            = $self->getUrl( 'type=list;start=' . $dtPrevious->toDatabase );
+    }
+
+    if ( $self->getLastEvent && $self->getLastEvent->getDateTimeStart > $dtEnd ) {
+        $var->{ url_nextPage }
+            = $self->getUrl( 'type=list;start=' . $dtEnd->toDatabase );
+    }
+
+    return $var;
+}
+
+#----------------------------------------------------------------------------
 
 =head2 viewMonth ( \%params )
 
@@ -1148,7 +1292,7 @@ sub viewMonth {
     my $session     = $self->session;
     my $params      = shift;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
-    my $var         = {};
+    my $var         = $self->getTemplateVars;
     my $tz          = $session->user->profileField("timeZone");
     my $today       = WebGUI::DateTime->new($self->session, time)
                     ->set_time_zone($tz)->toMysqlDate;
@@ -1265,12 +1409,7 @@ sub viewMonth {
     return $var;
 }
 
-
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 viewWeek ( \%params )
 
@@ -1293,7 +1432,7 @@ sub viewWeek {
     my $session = $self->session;
     my $params  = shift;
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
-    my $var     = {};
+    my $var     = $self->getTemplateVars;
     my $tz      = $session->user->profileField("timeZone");
     my $today   = WebGUI::DateTime->new($self->session, time)->set_time_zone($tz)
                 ->toMysqlDate;
@@ -1571,11 +1710,7 @@ sub viewWeek {
     return $var;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 unwrapIcal ( text )
 
@@ -1594,11 +1729,7 @@ sub unwrapIcal
     
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 wrapIcal ( text )
 
@@ -1621,11 +1752,7 @@ sub wrapIcal {
     return join "\r\n ",@text;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 www_edit ( )
 
@@ -1647,12 +1774,7 @@ sub www_edit {
         );
 }
 
-
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 www_ical
 
@@ -1663,16 +1785,8 @@ Export an iCalendar feed of this Events Calendar's events.
 sub www_ical {
     my $self        = shift;
     my $session     = $self->session;
+    my $user        = $self->session->user;
     my $form        = $self->session->form;
-    
-    #!!! Events from what time period should we show? Default perpage?
-    # By default show the events for a month
-    my $type        = $form->param("type") || lc($self->get("defaultView")) || "month";
-    my $start       = $form->param("start");
-    my $end         = $form->param("end");
-    
-    
-    
     
     #!!! KLUDGE:
     # An "adminId" may be passed as a parameter in order to facilitate
@@ -1696,53 +1810,31 @@ sub www_ical {
     }
     #/KLUDGE
     
-    
     my $dt_start;
-    unless ($start) {
-        #if ($self->get("defaultDate") eq "first")
-        #{
-            #!! TODO: Get the first event's date
-                # select startDate from Events 
-                #    join assetLineage
-                #    order by startDate ASC, revisionDate DESC
-                #    limit 1
-        #}
-        #elsif ($self->get("defaultDate") eq "last")
-        #{
-            #!! TODO: Get the last event's date
-                # select startDate from Events 
-                #    join assetLineage
-                #    order by startDate DESC, revisionDate DESC
-                #    limit 1
-        #}
-        #else
-        #{
-            $dt_start = WebGUI::DateTime->new($self->session, time)->set_time_zone($session->user->profileField("timeZone"));
-        #}
+    my $start       = $form->param("start");
+    if ($start) {
+        $dt_start   
+            = WebGUI::DateTime->new($session, 
+                mysql       => $start, 
+                time_zone   => $user->profileField("timeZone")
+            );
     }
     else {
-        $dt_start    = WebGUI::DateTime->new($self->session, mysql => $start, time_zone => $session->user->profileField("timeZone"));
+        $dt_start = WebGUI::DateTime->new($self->session, time);
+        $dt_start->set_time_zone( $user->profileField("timeZone") );
     }
-    
-    
     
     my $dt_end;
-    unless ($end) {
-        #if ($type eq "month")
-        #{
-            $dt_end    = $dt_start->clone->add(months => 1);
-        #}
-        #elsif ($type eq "week")
-        #{
-        #    $dt_end = $dt_start->clone->add(weeks => 1);
-        #}
-        #elsif ($type eq "day")
-        #{
-        #    $dt_end = $dt_start->clone->add(days => 1);
-        #}
+    my $end         = $form->param("end");
+    if ($end) {
+        $dt_end 
+            = WebGUI::DateTime->new($self->session, 
+                mysql       => $end, 
+                time_zone   => $user->profileField("timeZone")
+            );
     }
     else {
-        $dt_end    = WebGUI::DateTime->new($self->session, mysql => $end, time_zone => $session->user->profileField("timeZone"));
+        $dt_end = $dt_start->clone->add( seconds => $self->get('icalInterval') );
     }
     
     
@@ -1820,11 +1912,7 @@ sub www_ical {
     return $ical;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 www_importIcal
 
@@ -1840,11 +1928,7 @@ sub www_importIcal {
     return $_[0]->session->privilege->noAccess;
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 www_search ( )
 
@@ -1864,7 +1948,7 @@ sub www_search {
     my $endDate     = $form->process("enddate");
     my $perpage     = $form->param("perpage");
     
-    my $var         = $self->get;
+    my $var         = $self->getTemplateVars;
     $var->{url}     = $self->getUrl;
     
     # If there is a search to perform
@@ -1988,11 +2072,7 @@ sub www_search {
     return "chunked";
 }
 
-
-
-
-
-####################################################################
+#----------------------------------------------------------------------------
 
 =head2 www_view ( )
 
@@ -2020,18 +2100,6 @@ If set to some true value (like "1"), will show the printable version of the
 page.
 
 =back
-
-
-
-
-=head1 Templates
-
-The templates provided by this Wobject and the parameters they contain
-
-!!! TODO !!!
-
-
-
 
 =head1 BUGS / RFE
 

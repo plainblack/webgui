@@ -8,18 +8,17 @@ our $I18N = {
 	#	context 	=> q{},
 	#},
 
+	'assetName' => {
+		message 	=> q{Calendar},
+		lastUpdated 	=> 1131394072,
+	},
 
-#################### DATETIME LOCALE ####################
 	'locale'	=> {
 		message		=> q{en_US},
 		lastUpdated	=> 0,
 		context		=> q{The ISO locale name for month and day labels.},
 	},
 	
-	
-#################### CALENDAR PROPERTIES FIELDS ####################
-	
-	##### Subscriber Notify Offset #####
 	'subscriberNotifyOffset label' => {
 		message 	=> q{Subscriber Notify Offset},
 		lastUpdated 	=> 0,
@@ -31,11 +30,6 @@ our $I18N = {
 		context 	=> q{The Hover Help for the Subscriber Notify Offset field},
 	},
 	
-	
-	
-#################### CALENDAR DISPLAY FIELDS ####################
-	
-	##### Default View #####
 	'defaultView label' => {
 		message 	=> q{Default View},
 		lastUpdated 	=> 0,
@@ -61,9 +55,13 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{A value for the Default View field.},
 	},
+	'defaultView value list' => {
+		message 	=> q{List},
+		lastUpdated 	=> 0,
+		context 	=> q{A value for the Default View field.},
+	},
 	
 	
-	##### Default Date #####
 	'defaultDate label' => {
 		message 	=> q{Default Date},
 		lastUpdated 	=> 0,
@@ -91,7 +89,6 @@ our $I18N = {
 	},
 	
 	
-	##### Visitor Cache Timeout #####
 	'visitorCacheTimeout label' => {
 		message		=> q{Visitor Cache Timeout},
 		lastUpdated	=> 0,
@@ -104,7 +101,6 @@ our $I18N = {
 	},
 	
 	
-	##### Default Daily Event Sort Order #####
 	'sortEventsBy label' => {
 		message		=> q{Daily Events Sort Order},
 		lastUpdated	=> 0,
@@ -126,14 +122,32 @@ our $I18N = {
 		context		=> q{A value for the Daily Events Sort Order field.},
 	},
 	
+        
+        'editForm listViewPageInterval label' => {
+            message     => "List View Page Interval",
+            lastUpdated => 0,
+            context     => 'Label for the asset property',
+        },
+        'editForm listViewPageInterval description' => {
+            message     => "Period of time displayed in a single page of the list view",
+            lastUpdated => 0,
+            context     => 'Description of the asset property',
+        },
+	
+        'editForm icalInterval label' => {
+            message     => "ICalendar Feed Interval",
+            lastUpdated => 0,
+            context     => 'Label for the asset property',
+        },
+        'editForm icalInterval description' => {
+            message     => "Period of time displayed in the iCalendar feed",
+            lastUpdated => 0,
+            context     => 'Description of the asset property',
+        },
 	
 	
 	
 	
-	
-#################### CALENDAR SECURITY FIELDS ####################
-	
-	##### Group to add/edit events #####
 	'groupIdEventEdit label' => {
 		message		=> q{Who can add Events?},
 		lastUpdated	=> 0,
@@ -148,9 +162,7 @@ our $I18N = {
 	
 	
 	
-#################### CALENDAR FEEDS FIELDS ####################
 	
-	##### Feeds tab #####
 	'feeds' => {
 		message		=> q{Feeds},
 		lastUpdated	=> 0,
@@ -159,11 +171,9 @@ our $I18N = {
 	
 	
 	
-#################### TEMPLATES ####################
 	
 	
 	
-	##### Template - Month #####
 	'templateIdMonth label' => {
 		message 	=> q{Month View Template},
 		lastUpdated 	=> 0,
@@ -175,7 +185,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default month template.},
 	},
 	
-	##### Template - Week #####
 	'templateIdWeek label' => {
 		message 	=> q{Week View Template},
 		lastUpdated 	=> 0,
@@ -187,7 +196,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Week template.},
 	},
 	
-	##### Template - Day #####
 	'templateIdDay label' => {
 		message 	=> q{Day View Template},
 		lastUpdated 	=> 0,
@@ -198,8 +206,18 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Day template.},
 	},
+
+	'editForm templateIdList label' => {
+		message 	=> q{List View Template},
+		lastUpdated 	=> 0,
+		context 	=> q{The label for the default List template.},
+	},
+	'editForm templateIdList description' => {
+		message 	=> q{This template shows the calendar in List form.},
+		lastUpdated 	=> 0,
+		context 	=> q{Hover Help for the default List template.},
+	},
 	
-	##### Template - Event #####
 	'templateIdEvent label' => {
 		message 	=> q{Event Details Template},
 		lastUpdated 	=> 0,
@@ -211,7 +229,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Event template.},
 	},
 	
-	##### Template - EventEdit #####
 	'templateIdEventEdit label' => {
 		message 	=> q{Event Edit Template},
 		lastUpdated 	=> 0,
@@ -223,7 +240,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Event Edit template.},
 	},
 	
-	##### Template - Search #####
 	'templateIdSearch label' => {
 		message 	=> q{Search View Template},
 		lastUpdated 	=> 0,
@@ -237,7 +253,6 @@ our $I18N = {
 	
 	
 	
-	##### Template - Print Month #####
 	'templateIdPrintMonth label' => {
 		message 	=> q{Print Month Template},
 		lastUpdated 	=> 0,
@@ -249,7 +264,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default month template.},
 	},
 	
-	##### Template - Print Week #####
 	'templateIdPrintWeek label' => {
 		message 	=> q{Print Week Template},
 		lastUpdated 	=> 0,
@@ -261,7 +275,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Week template.},
 	},
 	
-	##### Template - Print Day #####
 	'templateIdPrintDay label' => {
 		message 	=> q{Print Day Template},
 		lastUpdated 	=> 0,
@@ -273,7 +286,17 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Day template.},
 	},
 	
-	##### Template - Print Event #####
+	'editForm templateIdPrintList label' => {
+		message 	=> q{Print List View Template},
+		lastUpdated 	=> 0,
+		context 	=> q{The label for the default Print List template.},
+	},
+	'editForm templateIdPrintList description' => {
+		message 	=> q{This template print the calendar in List form.},
+		lastUpdated 	=> 0,
+		context 	=> q{Hover Help for the default Print List template.},
+	},
+	
 	'templateIdPrintEvent label' => {
 		message 	=> q{Print Event Details Template},
 		lastUpdated 	=> 0,
@@ -285,9 +308,6 @@ our $I18N = {
 		context 	=> q{Hover Help for the default Event template.},
 	},
 	
-	
-	
-#################### WORKFLOW ACTIVITIES ####################
 	'workflow updateFeeds' => {
 			message		=> q{Update Calendar Feeds},
 			lastUpdated	=> 0,
@@ -313,13 +333,10 @@ our $I18N = {
 			context		=> q{Description of what the CalendarGenerateRecurringEvents workflow activity does},
 	},	
 
-#################### HELP PAGES ####################
 	'searchButtonLabel' => {
 		message 	=> q|Search|,
 		lastUpdated 	=> 1170803504,
 	},
-
-#################### HELP PAGES View Calendar ####################
 
 	'add event' => {
 		message 	=> q|Add Event|,
@@ -624,11 +641,184 @@ our $I18N = {
 	},
 
 
-#################### ASSET NAME ####################
-	'assetName' => {
-		message 	=> q{Calendar},
-		lastUpdated 	=> 1131394072,
-	},
+        'help view list title' => {
+            message         => 'Calendar List View',
+            lastUpdated     => 0,
+            context         => 'Title for help page',
+        },
+
+        'help view list body' => {
+            message         => 'These variables are available to the Calendar List View',
+            lastUpdated     => 0,
+            context         => 'Body of help page',
+        },
+        
+        'helpvar newYear' => {
+            message         => 'This variable is true when the current event is in a different
+                                year than the previous event.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar newMonth'  => {
+            message         => 'This variable is true when the current event is in a different
+                                month than the previous event.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar newDay'    => {
+            message         => 'This variable is true when the current event is in a different
+                                day than the previous event.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar url_previousPage' => {
+            message         => 'The URL to the previous page. If there is no previous page, this
+                                variable will not exist.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar url_nextPage' => {
+            message         => 'The URL to the next page. If there is no previous page, this
+                                variable will not exist.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+
+        'help calendar dateTime title' => {
+            message         => 'Calendar Date/Time variables',
+            lastUpdated     => 0,
+            context         => 'Title for help page',
+        },
+
+        'help calendar dateTime body' => {
+            message         => 'These variables are available for most date/time in the Calendar. <br/><br/>
+                                NOTE: Sometimes these variables have a prefix, like "start" or "end". 
+                                In that case, the first letter of the variables below is capitalized, so
+                                "monthName" with a prefix of "start" becomes "startMonthName".',
+            lastUpdated     => 0,
+            context         => 'Body for help page',
+        },
+
+        'helpvar dateTime second' => {
+            message         => 'The seconds',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime minute' => {
+            message         => 'The minutes',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime meridiem' => {
+            message         => 'The meridiem (A.M. or P.M.)',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime month' => {
+            message         => 'The month number (01)',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime monthName' => {
+            message         => 'The month name ("January")',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },,
+
+        'helpvar dateTime monthAbbr' => {
+            message         => 'The abbreviated month name ("Jan")',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime dayOfMonth' => {
+            message         => 'The number of the day of the month',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime dayName' => {
+            message         => 'The day name (Sunday)',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime dayAbbr' => {
+            message         => 'The abbreviated day name (Sun)',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime year' => {
+            message         => 'The year',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime dayOfWeek' => {
+            message         => 'The number of the day of the week (1 is Monday, 7 is Sunday)',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime ymd' => {
+            message         => 'The year, month, and day in ISO format: YYYY-MM-DD',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime mdy' => {
+            message         => 'The month, day, and year in US format: MM/DD/YYYY',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime dmy' => {
+            message         => 'The day, month, and year in UK format: DD/MM/YYYY',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'helpvar dateTime epoch' => {
+            message         => 'The epoch date (number of seconds since 1970-01-01 00:00:00). Suitable to be used in the Date macro.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+    
+        'helpvar dateTime start' => {
+            message         => 'A set of date/time variables with the prefix "start". See "Calendar Date/Time Variables" for more information.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable.',
+        },
+
+        'helpvar dateTime end' => {
+            message         => 'A set of date/time variables with the prefix "end". See "Calendar Date/Time Variables for more information.',
+            lastUpdated     => 0,
+            context         => 'Description of template variable',
+        },
+
+        'help event variables title' => {
+            message         => "Calendar Event Variables",
+            lastUpdated     => 0,
+            context         => 'Title for help page',
+        },
+
+        'help event variables body' => {
+            message         => q{When the Calendar is displaying an Event, it gets the entire set of Event template variables and changes the name slightly. <br/><br/>
+                                The Event template variable "title" becomes "eventTitle". The Event template variable "startDate" becomes "eventStartDate" and so on.
+            },
+            lastUpdated     => 0,
+            context         => 'Body for help page',
+        },
 };
 
 1;

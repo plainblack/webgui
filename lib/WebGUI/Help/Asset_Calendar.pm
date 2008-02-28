@@ -6,8 +6,6 @@ use warnings;
 
 our $HELP = {
 
-#### View Calendar Page
-
     'view calendar template' => {
         title => 'view calendar title',
         body  => 'view calendar body',
@@ -38,13 +36,38 @@ our $HELP = {
         related => []
     },
 
-#### Search Calendar Page
+    'calendar dateTime' => {
+        title       => 'help calendar dateTime title',
+        body        => 'help calendar dateTime body',
+        variables   => [
+            { 'name' => 'second',       description => 'helpvar dateTime second', },
+            { 'name' => 'minute',       description => 'helpvar dateTime minute', },
+            { 'name' => 'meridiem',     description => 'helpvar dateTime meridiem', },
+            { 'name' => 'month',        description => 'helpvar dateTime month', },
+            { 'name' => 'monthName',    description => 'helpvar dateTime monthName', },
+            { 'name' => 'monthAbbr',    description => 'helpvar dateTime monthAbbr', },
+            { 'name' => 'dayOfMonth',   description => 'helpvar dateTime dayOfMonth', },
+            { 'name' => 'dayName',      description => 'helpvar dateTime dayName', },
+            { 'name' => 'dayAbbr',      description => 'helpvar dateTime dayAbbr', },
+            { 'name' => 'year',         description => 'helpvar dateTime year', },
+            { 'name' => 'dayOfWeek',    description => 'helpvar dateTime dayOfWeek', },
+            { 'name' => 'ymd',          description => 'helpvar dateTime ymd', },
+            { 'name' => 'mdy',          description => 'helpvar dateTime mdy', },
+            { 'name' => 'dmy',          description => 'helpvar dateTime dmy', },
+            { 'name' => 'epoch',        description => 'helpvar dateTime epoch', },
+        ],
+    },
 
-#### ICal Calendar Page
-
-#### View Month Template
-
-#### View Week Template
+    'event variables' => {
+        title       => 'help event variables title',
+        body        => 'help event variables body',
+        related     => [
+            {
+                namespace       => 'Asset_Event',
+                tag             => 'event common variables',
+            },
+        ],
+    },
 
     'view week template' => {
         title => 'view calendar week title',
@@ -143,9 +166,60 @@ our $HELP = {
         related => []
     },
 
+#### List view template
+    'view list template' => {
+        title   => 'help view list title',
+        body    => 'help view list body',
+        isa     => [
+            {
+                namespace   => "Asset_Calendar",
+                tag         => "view calendar template",
+            },
+            {
+                namespace   => "Asset_Calendar",
+                tag         => "event variables",
+            },
+        ],
+        related  => [
+            {
+                namespace   => "Asset_Calendar",
+                tag         => 'calendar dateTime',
+            },
+        ],
+        variables   => [
+            {
+                name        => 'newYear',
+                description => 'helpvar newYear',
+            },
+            {
+                name        => 'newMonth',
+                description => 'helpvar newMonth',
+            },
+            {
+                name        => 'newDay',
+                description => 'helpvar newDay',
+            },
+            {
+                name        => 'url_previousPage',
+                description => 'helpvar url_previousPage',
+            },
+            {
+                name        => 'url_nextPage',
+                description => 'helpvar url_nextPage',
+            },
+            {
+                name        => 'start',
+                description => 'helpvar dateTime start',
+            },
+            {
+                name        => 'end',
+                description => 'helpvar dateTime end',
+            },
+
+        ],
+    },
 };
 
-#### Search Template
 
 1;
 
