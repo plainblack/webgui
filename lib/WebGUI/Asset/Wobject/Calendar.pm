@@ -913,7 +913,7 @@ sub prepareView {
         $self->session->style->makePrintable(1);
     }
     
-    $self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
+    #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
     
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
     $template->prepare;
@@ -1217,7 +1217,7 @@ sub viewList {
     my $var         = $self->getTemplateVars;
     
     ### Get the events
-    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} );
+    my $dtStart     = WebGUI::DateTime->new( $session, $params->{start} )->truncate( to => "day" );
     my $dtEnd       = $dtStart->clone->add( seconds => $self->get('listViewPageInterval') );
 
     my @events
