@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 23;
+my $tests = 25;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -187,6 +187,27 @@ my $driverCopy = WebGUI::Shop::Ship->new($session, $driver->shipperId);
 is($driverCopy->getId,     $driver->getId,           'same id');
 is($driverCopy->className, $driver->className,       'same className');
 cmp_deeply($driverCopy->options,   $driver->options, 'same options');
+
+#######################################################################
+#
+# getShippers
+#
+#######################################################################
+
+my $shippers;
+
+eval { $shippers = WebGUI::Shop::Ship->getShippers(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'getShippers takes exception to not giving it a session object');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'getShippers takes exception to not giving it a session object',
+);
+
+$shippers = WebGUI::Shop::Ship->getShippers();
 
 }
 

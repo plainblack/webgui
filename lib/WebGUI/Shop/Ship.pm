@@ -29,17 +29,6 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 _loadDriver (  )
-
-The method used to safely load the Shipping drivers.
-
-=cut
-
-sub _loadDriver {
-}
-
-#-------------------------------------------------------------------
-
 =head2 create ( $session, $class, $options )
 
 The interface method for creating new, configured instances of ShipDriver.  If the ShipperDriver throws an exception,  it is propagated
@@ -116,6 +105,27 @@ sub getOptions {
     my $class      = shift;
     my $session    = shift;
     croak "Definition requires a session object"
+        unless ref $session eq 'WebGUI::Session';
+}
+
+#-------------------------------------------------------------------
+
+=head2 getShippers ( $session )
+
+Returns an array ref of all shipping objects in the db.
+
+=head3 $session
+
+A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
+
+=head3
+
+=cut
+
+sub getShippers {
+    my $class      = shift;
+    my $session    = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
 }
 
