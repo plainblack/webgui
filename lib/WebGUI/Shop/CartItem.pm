@@ -273,7 +273,7 @@ sub update {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }
     $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
-    $self->cart->session->db->setRow("cartItems","cartId",$properties{$id});
+    $self->cart->session->db->setRow("cartItems","itemId",$properties{$id});
 }
 
 
