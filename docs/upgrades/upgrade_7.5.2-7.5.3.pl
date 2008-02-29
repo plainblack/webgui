@@ -25,6 +25,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 insertCommerceTaxTable($session);
+migrateOldTaxTable($session);
 insertCommerceShipDriverTable($session);
 migrateToNewCart($session);
 createSkuAsset($session);
@@ -155,6 +156,22 @@ CREATE TABLE tax (
 )
 EOSQL
 
+}
+
+#-------------------------------------------------
+sub migrateOldTaxTable {
+	my $session = shift;
+	print "\tMigrate old tax data into the new tax table.\n" unless ($quiet);
+	# and here's our code
+    my $oldTax = $session->db->prepare('select * from commerceSalesTax');
+    my $newTax = $session->db->prepare('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)');
+    $oldTax->execute();
+    while (my $oldTaxData = $oldTax->hashRef()) {
+        $newTax->execute([$oldTaxData->{commerceSalesTaxId}, 'state', $oldTaxData->{regionIdentifier}, $oldTaxData->{salesTax}]);
+    }
+    $oldTax->finish;
+    $newTax->finish;
+    $session->db->write('drop table commerceSalesTax');
 }
 
 #-------------------------------------------------
