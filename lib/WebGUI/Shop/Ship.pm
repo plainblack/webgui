@@ -56,7 +56,7 @@ sub create {
     my $requestedClass = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
-    WebGUI::Error::InvalidParam->throw(error => qq{The requested class $requestedClass is not enabled in your WebGUI configuration file})
+    WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
         unless isIn($requestedClass, @{ WebGUI::Shop::Ship->getDrivers($session) } );
     my $options = shift;
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new ShipDriver object})

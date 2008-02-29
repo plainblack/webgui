@@ -28,6 +28,7 @@ use Exception::Class (
     'WebGUI::Error::InvalidParam' => {
         isa             => 'WebGUI::Error',
         description     => "Expected to get a param we didn't get.",
+        fields          => ["param"],
         },
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
@@ -119,6 +120,10 @@ The object type we got.
 =head2 WebGUI::Error::InvalidParam
 
 Used when an invalid parameter is passed into a subroutine.
+
+=head3 param
+
+Used to return the bad parameter, if present.
 
 =head2 WebGUI::Error::ObjectNotFound
 

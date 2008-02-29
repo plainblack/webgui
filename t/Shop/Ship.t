@@ -109,7 +109,8 @@ isa_ok($e, 'WebGUI::Error::InvalidParam', 'create croaks without a configured cl
 cmp_deeply(
     $e,
     methods(
-        error => 'The requested class WebGUI::Shop::ShipDriver::FreeShipping is not enabled in your WebGUI configuration file',
+        error => 'The requested class is not enabled in your WebGUI configuration file',
+        param => 'WebGUI::Shop::ShipDriver::FreeShipping',
     ),
     'create croaks without a configured class',
 );
