@@ -36,6 +36,8 @@ my ($eh) = $session->quick('errorHandler');
 #
 ####################################################
 
+WebGUI::Test->interceptLogging();
+
 my $accumulated_warn = "";
 $eh->warn("This is a warning");
 is($WebGUI::Test::logger_warns, "This is a warning", "warn: Log4perl called");

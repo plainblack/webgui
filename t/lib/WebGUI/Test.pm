@@ -123,13 +123,6 @@ BEGIN {
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
     $SESSION->{_request} = $pseudoRequest;
 
-    my $logger = $SESSION->errorHandler->getLogger;
-    $logger = Test::MockObject::Extends->new( $logger );
-
-    $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
-    $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
-    $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
-    $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
 }
 
 END {
@@ -142,6 +135,24 @@ END {
     }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 interceptLogging
+
+Intercept logging request and capture them in buffer variables for testing
+
+=cut
+
+sub interceptLogging {
+    my $logger = $SESSION->errorHandler->getLogger;
+    $logger = Test::MockObject::Extends->new( $logger );
+
+    $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
+    $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
+    $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
+    $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
 }
 
 #----------------------------------------------------------------------------

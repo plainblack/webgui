@@ -451,6 +451,8 @@ cmp_bag(
 my $vTag2 = WebGUI::VersionTag->getWorking($session);
 $vTag2->set({name=>"deep addChild test"});
 
+WebGUI::Test->interceptLogging();
+
 my @deepAsset = ($root);
 
 for (1..42) {

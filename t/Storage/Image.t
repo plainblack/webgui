@@ -116,6 +116,9 @@ foreach my $extTest ( @{ $extensionTests } ) {
 # generateThumbnail
 #
 ####################################################
+
+WebGUI::Test->interceptLogging();
+
 my $thumbStore = WebGUI::Storage::Image->create($session);
 my $square = WebGUI::Image->new($session, 500, 500);
 $square->setBackgroundColor('#FF0000');

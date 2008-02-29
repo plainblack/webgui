@@ -116,6 +116,8 @@ $session->user({userId => 1});  ##back to Visitor
 my $wgBdayMail = 'Thu, 16 Aug 2001 08:00:00 -0500';
 is ($dt->mailToEpoch($wgBdayMail), $wgbday, 'mailToEpoch');
 
+WebGUI::Test->interceptLogging();
+
 is ($dt->mailToEpoch(750), undef, 'mailToEpoch returns undef on failure to parse');
 like($WebGUI::Test::logger_warns, qr{750 is not a valid date for email}, "DateTime logs a warning on failure to parse");
 

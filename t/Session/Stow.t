@@ -50,6 +50,8 @@ is($stow->get("Test2"), undef, "deleteAll()");
 $session->config->set('disableCache', 1);
 is($stow->get('Test2'), undef, 'get: when config->disableCache is set get returns undef');
 
+WebGUI::Test->interceptLogging();
+
 $stow->set('unavailableVariable', 'too bad');
 is($WebGUI::Test::logger_debug, 'Stow->set() is being called but cache has been disabled', 'debug emitted by set when disableCache is true');
 
