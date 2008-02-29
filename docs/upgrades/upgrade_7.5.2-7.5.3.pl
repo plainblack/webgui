@@ -31,9 +31,39 @@ createSkuAsset($session);
 createDonationAsset($session);
 addShippingDrivers($session);
 addShoppingHandler($session);
+addAddressBook($session);
 
 finish($session); # this line required
 
+
+#-------------------------------------------------
+sub addAddressBook {
+	my $session = shift;
+	print "\tInstalling address book.\n" unless ($quiet);
+    $session->db->write("create table addressBook (
+        addressBookId varchar(22) binary not null primary key,
+        sessionId varchar(22) binary,
+        userId varchar(22) binary,
+        lastPayId varchar(22) binary,
+        lastShipId varchar(22) binary,
+        index userId (sessionId),
+        index sessionId (sessionId)
+    )");
+    $session->db->write("create table address (
+        addressId varchar(22) binary not null primary key,
+        addressBookId varchar(22) binary not null,
+        label varchar(35),
+        name varchar(35),
+        address1 varchar(35),
+        address2 varchar(35),
+        address3 varchar(35),
+        state varchar(35),
+        country varchar(35),
+        code varchar(35),
+        phoneNumber varchar(35),
+        index addressBookId_addressId (addressBookId,addressId)
+    )");
+}
 
 #-------------------------------------------------
 sub addShoppingHandler {

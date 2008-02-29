@@ -49,9 +49,6 @@ A reference to a subclass of WebGUI::Asset::Sku.
 
 sub addItem {
     my ($self, $sku) = @_;
-    unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
-    }
     my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
@@ -306,7 +303,7 @@ sub www_view {
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             shippingAddress         => "todo",
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-                extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
+                extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             );
         push(@items, \%properties);
     }
@@ -325,11 +322,11 @@ sub www_view {
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-            extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"|}),
+            extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
         shipppingAddress        => "todo",
         shippingOptions         => "todo",
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-            extras=>q|onclick="this.form.shop.value='ship';this.form.method.value='viewAddressbook';this.form.submit;"|}),
+            extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
         hasShippingAddress      => "todo",
         couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         couponDiscount          => "todo",

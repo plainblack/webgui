@@ -16,6 +16,7 @@ package WebGUI::Content::Shop;
 
 use strict;
 use WebGUI::AdminConsole;
+use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Cart;
 #use WebGUI::Shop::Pay;
 use WebGUI::Shop::Ship;
@@ -71,6 +72,25 @@ sub www_cart {
     my $output = undef;
     my $method = "www_". ( $session->form->get("method") || "view");
     my $cart = WebGUI::Shop::Cart->create($session);
+    if ($cart->can($method)) {
+        $output = $cart->$method();
+    }
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_address ()
+
+Hand off to the address book.
+
+=cut
+
+sub www_address {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_". ( $session->form->get("method") || "view");
+    my $cart = WebGUI::Shop::AddressBook->create($session);
     if ($cart->can($method)) {
         $output = $cart->$method();
     }

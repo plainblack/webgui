@@ -150,9 +150,9 @@ sub incrementQuantity {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, cart, itemId )
+=head2 new ( cart, itemId )
 
-Constructor.  Instanciates a cart based upon a cartId.
+Constructor.  Instanciates a cart item based upon itemId.
 
 =head3 cart
 
@@ -174,7 +174,7 @@ sub new {
     }
     my $item = $cart->session->db->quickHashRef('select * from cartItems where itemId=?', [$itemId]);
     if ($item->{itemId} eq "") {
-        WebGUI::Error::ObjectNotFound->throw(error=>"Item not in cart.", id=>$itemId);
+        WebGUI::Error::ObjectNotFound->throw(error=>"Item not found.", id=>$itemId);
     }
     if ($item->{cartId} ne $cart->getId) {
         WebGUI::Error::ObjectNotFound->throw(error=>"Item not in this cart.", id=>$itemId);
