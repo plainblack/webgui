@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 25;
+my $tests = 27;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -195,6 +195,7 @@ cmp_deeply($driverCopy->options,   $driver->options, 'same options');
 #######################################################################
 
 my $shippers;
+my $driver2 = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
 
 eval { $shippers = WebGUI::Shop::Ship->getShippers(); };
 $e = Exception::Class->caught();
@@ -207,7 +208,16 @@ cmp_deeply(
     'getShippers takes exception to not giving it a session object',
 );
 
-$shippers = WebGUI::Shop::Ship->getShippers();
+
+$shippers = WebGUI::Shop::Ship->getShippers($session);
+is(scalar @{$shippers}, 2, 'getShippers: got both shippers');
+
+my @shipperNames = map { $_->options()->{label} } @{ $shippers };
+cmp_bag(
+    \@shipperNames,
+    [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping}],
+    'Returned shippers have the right data'
+);
 
 }
 

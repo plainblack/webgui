@@ -127,6 +127,14 @@ sub getShippers {
     my $session    = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
+    my $drivers;
+    my $sth = $session->db->prepare('select shipperId from shipper');
+    $sth->execute();
+    while (my $driver = $sth->hashRef()) {
+        push @{ $drivers }, WebGUI::Shop::Ship->new($session, $driver->{shipperId});
+    }
+    $sth->finish;
+    return $drivers;
 }
 
 #-------------------------------------------------------------------
