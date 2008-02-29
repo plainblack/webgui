@@ -152,11 +152,14 @@ $mech->content_contains( $testContent, "We made it to the snippet through the lo
 
 $response = $mech->res->previous;
 ok( $response, 'There were at least two requests' );
-is(
-    $response->headers->header('location'),
-    $redirectToUrl . ';' . $extraParams,
-    "We were redirected to the right URL with forwarded query params",
-);
+TODO: {
+    local $TODO = 'Add forwarding of query parameters to Redirect asset';
+    is(
+        $response->headers->header('location'),
+        $redirectToUrl . ';' . $extraParams,
+        "We were redirected to the right URL with forwarded query params",
+    );
+};
 
 
 #----------------------------------------------------------------------------

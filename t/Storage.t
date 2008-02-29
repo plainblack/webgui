@@ -21,8 +21,11 @@ use File::Spec;
 use Test::More;
 use Test::Deep;
 use Test::MockObject;
+use Cwd;
 
 my $session = WebGUI::Test->session;
+
+my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
@@ -400,10 +403,7 @@ foreach my $iconTest (@{ $fileIconTests }) {
 #
 ####################################################
 
-TODO: {
-    local $TODO = 'Write a test to ensure our CWD remains the same after all these calls to storage';
-    ok(0,'CWD must remain the same after addFileFromFilesystem, tar, untar, etc...');
-};
+is($cwd, Cwd::cwd(), 'CWD must remain the same after addFileFromFilesystem, tar, untar, etc...');
 
 ####################################################
 #
