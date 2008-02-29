@@ -11,6 +11,7 @@
  - fixed: wiki pages link to deleted pages (Arjan Widlak, United Knowledge)
  - add: Calendar List View and associated Help
  - add: Test::WWW::Mechanize tests for Redirect and Auth
+ - change: maintenance Workflows are now singletons to prevent buildup
 
 7.5.3
  - prevent HTML and Macro injection in usernames
