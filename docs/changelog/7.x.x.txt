@@ -1,3 +1,5 @@
+7.5.5
+
 7.5.4
  - fixed: unable to remove calendar feeds in IE6
  - Moved the Wiki Help link into i18n so it can be pointed to other sites for
