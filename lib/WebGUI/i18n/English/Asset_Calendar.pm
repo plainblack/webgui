@@ -682,9 +682,9 @@ our $I18N = {
         },
 
         'helpvar url_nextPage' => {
-            message         => 'The URL to the next page. If there is no previous page, this
+            message         => 'The URL to the next page. If there is no next page, this
                                 variable will not exist.',
-            lastUpdated     => 0,
+            lastUpdated     => 1204303378,
             context         => 'Description of template variable',
         },
 
@@ -696,11 +696,11 @@ our $I18N = {
         },
 
         'help calendar dateTime body' => {
-            message         => 'These variables are available for most date/time in the Calendar. <br/><br/>
+            message         => 'These variables are available for most dates and times in the Calendar. <br/><br/>
                                 NOTE: Sometimes these variables have a prefix, like "start" or "end". 
                                 In that case, the first letter of the variables below is capitalized, so
                                 "monthName" with a prefix of "start" becomes "startMonthName".',
-            lastUpdated     => 0,
+            lastUpdated     => 1204303540,
             context         => 'Body for help page',
         },
 
@@ -801,8 +801,8 @@ our $I18N = {
         },
 
         'helpvar dateTime end' => {
-            message         => 'A set of date/time variables with the prefix "end". See "Calendar Date/Time Variables for more information.',
-            lastUpdated     => 0,
+            message         => 'A set of date/time variables with the prefix "end". See "Calendar Date/Time Variables" for more information.',
+            lastUpdated     => 1204303480,
             context         => 'Description of template variable',
         },
 
