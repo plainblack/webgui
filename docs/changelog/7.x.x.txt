@@ -1,4 +1,5 @@
 7.4.27
+ - fixed: wiki no longer links to pages in trash (Arjan Widlak, United Knowledge)
 
 7.4.26
  - fixed: rich text editor image uploads deleted immediately
