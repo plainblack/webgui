@@ -11,10 +11,6 @@ There is no table for this object.
 
 The following methods will be available from the WebGUI::Shop::Ship class.
 
-=head3 _loadDriver
-
-A method used to load a shipping driver. See WebGUI::Pluggable.
-
 =head3 create
 
 A class method.
