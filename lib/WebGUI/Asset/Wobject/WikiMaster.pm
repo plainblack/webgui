@@ -98,7 +98,7 @@ sub autolinkHtml {
     my %opts = ref $_[-1] eq 'HASH' ? %{pop @_} : ();
     my $skipTitles = $opts{skipTitles} || [];
     # TODO: ignore caching for now, but maybe do it later.
-	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage'", [$self->getId]);
+	my %mapping = $self->session->db->buildHash("SELECT LOWER(d.title), d.url FROM asset AS i INNER JOIN assetData AS d ON i.assetId = d.assetId WHERE i.parentId = ? and className='WebGUI::Asset::WikiPage' and i.state='published'", [$self->getId]);
 	foreach my $key (keys %mapping) {
         if (grep {lc $_ eq $key} @$skipTitles) {
             delete $mapping{$key};
