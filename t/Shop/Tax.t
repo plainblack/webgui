@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 62;
+my $tests = 64;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -366,6 +366,19 @@ cmp_deeply(
     'importTaxData: error handling for file that that cannot be read',
 );
 
+#######################################################################
+#
+# calculate
+#
+#######################################################################
+
+eval { $taxer->calculate(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate: error handling for not sending a cart');
+is($e->error, 'Must pass in a WebGUI::Shop::Cart object', 'calculate: error handling for not sending a cart');
+
+##Build a cart, add some Donation SKUs to it.  Set one to be taxable.
+
 }
 
 sub _grabTaxData {
@@ -377,12 +390,6 @@ sub _grabTaxData {
     }
     return @taxData;
 }
-
-#######################################################################
-#
-# calculate
-#
-#######################################################################
 
 #----------------------------------------------------------------------------
 # Cleanup

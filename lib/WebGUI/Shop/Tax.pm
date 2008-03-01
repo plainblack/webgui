@@ -87,10 +87,9 @@ Calculate the tax for the contents of the cart.
 sub calculate {
     my $self = shift;
     my $cart = shift;
-
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
         unless ref($cart) eq 'WebGUI::Shop::Cart';
-    return $id;
+    return;
 }
 
 #-------------------------------------------------------------------
