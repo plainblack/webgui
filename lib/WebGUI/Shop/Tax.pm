@@ -78,6 +78,23 @@ sub add {
 
 #-------------------------------------------------------------------
 
+=head2 calculate ( $cart )
+
+Calculate the tax for the contents of the cart.
+
+=cut
+
+sub calculate {
+    my $self = shift;
+    my $cart = shift;
+
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
+        unless ref($cart) eq 'WebGUI::Shop::Cart';
+    return $id;
+}
+
+#-------------------------------------------------------------------
+
 =head2 delete ( [$params] )
 
 Deletes data from the tax table by taxId.
