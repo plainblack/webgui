@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 8;
+my $tests = 10;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -98,11 +98,33 @@ cmp_deeply(
 $address = WebGUI::Shop::Address->create($book, {});
 isa_ok($address, 'WebGUI::Shop::Address', 'create returns an Address object with an empty hashref');
 
+#######################################################################
+#
+# addressBook
+#
+#######################################################################
+
 cmp_deeply(
     $address->addressBook,
     $book,
     'The address has a reference back to the book used to create it'
 );
+
+#######################################################################
+#
+# getId
+#
+#######################################################################
+
+ok( $session->id->valid($address->getId), 'Address has a valid GUID');
+
+#######################################################################
+#
+# get
+#
+#######################################################################
+
+ok( $session->id->valid($address->getId), 'Address has a valid GUID');
 
 #######################################################################
 #

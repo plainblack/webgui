@@ -119,7 +119,7 @@ sub getId {
 
 =head2 new ( addressBook, addressId )
 
-Constructor.  Instanciates an address based upon addressId.
+Constructor.  Instanciates an existing address from the database based upon addressId.
 
 =head3 addressBook
 
