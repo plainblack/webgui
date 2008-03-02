@@ -43,7 +43,7 @@ my $storage;
 
 SKIP: {
 
-skip 'Unable to load module WebGUI::Shop::Tax', $tests unless $loaded;
+skip 'Unable to load module WebGUI::Shop::AddressBook', $tests unless $loaded;
 my $e;
 my $book;
 

@@ -59,7 +59,7 @@ sub create {
     unless (defined $addressData && ref $addressData eq "HASH") {
         WebGUI::Error::InvalidParam->throw(param=>$addressData, error=>"Need a hash reference.");
     }
-    my $id = $book->session->db->setRow("addressBook","addressBookId", {addressId=>"new"});
+    my $id = $book->session->db->setRow("address","addressId", {addressId=>"new", addressBookId=>$book->getId});
     my $address = $class->new($book, $id);
     $address->update($addressData);
     return $address;

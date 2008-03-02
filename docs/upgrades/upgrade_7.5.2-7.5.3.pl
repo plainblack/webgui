@@ -58,6 +58,7 @@ sub addAddressBook {
         address1 varchar(35),
         address2 varchar(35),
         address3 varchar(35),
+        city varchar(35),
         state varchar(35),
         country varchar(35),
         code varchar(35),
