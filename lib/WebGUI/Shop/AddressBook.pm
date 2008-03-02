@@ -30,7 +30,6 @@ These subroutines are available from this package:
 
 readonly session => my %session;
 private properties => my %properties;
-private error => my %error;
 
 #-------------------------------------------------------------------
 
@@ -96,7 +95,6 @@ sub create {
     # check to see if we're dealing with a registered user or just a visitor
     if ($session->user->userId ne "1") {  
         # check to see if this user or his session already has an address book
-        my $addressBookId = "";
         my @ids = $session->db->buildArray("select addressBookId from addressBook where userId=? or sessionId=?",[$session->user->userId, $session->getId]);
         if (scalar(@ids) > 0) {
             # how are we looking
@@ -151,7 +149,8 @@ Returns a duplicated hash reference of this object’s data.
 
 =head3 property
 
-Any field − returns the value of a field rather than the hash reference.
+Any field − returns the value of a field rather than the hash reference.  See the 
+C<update> method.
 
 =cut
 

@@ -213,16 +213,16 @@ The address book that this address belongs to.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    $properties{$id}{address2} = (exists $newProperties->{address2}) ? $newProperties->{address2} : $properties{$id}{address2};
-    $properties{$id}{address3} = (exists $newProperties->{address3}) ? $newProperties->{address3} : $properties{$id}{address3};
-    $properties{$id}{state} = (exists $newProperties->{state}) ? $newProperties->{state} : $properties{$id}{state};
-    $properties{$id}{code} = $newProperties->{code} || $properties{$id}{code};
-    $properties{$id}{city} = $newProperties->{city} || $properties{$id}{city};
-    $properties{$id}{label} = $newProperties->{label} || $properties{$id}{label};
-    $properties{$id}{name} = $newProperties->{name} || $properties{$id}{name};
-    $properties{$id}{country} = $newProperties->{country} || $properties{$id}{country};
-    $properties{$id}{address1} = $newProperties->{address1} || $properties{$id}{address1};
-    $properties{$id}{phoneNumber} = $newProperties->{phoneNumber} || $properties{$id}{phoneNumber};
+    $properties{$id}{address2}      = (exists $newProperties->{address2}) ? $newProperties->{address2} : $properties{$id}{address2};
+    $properties{$id}{address3}      = (exists $newProperties->{address3}) ? $newProperties->{address3} : $properties{$id}{address3};
+    $properties{$id}{state}         = (exists $newProperties->{state})    ? $newProperties->{state}    : $properties{$id}{state};
+    $properties{$id}{code}          = $newProperties->{code}        || $properties{$id}{code};
+    $properties{$id}{city}          = $newProperties->{city}        || $properties{$id}{city};
+    $properties{$id}{label}         = $newProperties->{label}       || $properties{$id}{label};
+    $properties{$id}{name}          = $newProperties->{name}        || $properties{$id}{name};
+    $properties{$id}{country}       = $newProperties->{country}     || $properties{$id}{country};
+    $properties{$id}{address1}      = $newProperties->{address1}    || $properties{$id}{address1};
+    $properties{$id}{phoneNumber}   = $newProperties->{phoneNumber} || $properties{$id}{phoneNumber};
     $properties{$id}{addressBookId} = $self->addressBook->getId;
     $self->addressBook->session->db->setRow("address","addressId",$properties{$id});
 }
