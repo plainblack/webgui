@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 8;
+my $tests = 15;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -112,6 +112,21 @@ cmp_deeply(
 $session->user({userId => 1});
 
 $book = WebGUI::Shop::AddressBook->create($session);
+isa_ok($book, 'WebGUI::Shop::AddressBook', 'create returns the right kind of object');
+
+isa_ok($book->session, 'WebGUI::Session', 'session method returns a session object');
+
+is($session->getId, $book->session->getId, 'session method returns OUR session object');
+
+ok($session->id->valid($book->getId), 'create makes a valid GUID style addressBookId');
+
+is(undef, $book->get('userId'), 'create does not automatically set the userId');
+
+my $bookCount = $session->db->quickScalar('select count(*) from addressBook');
+is($bookCount, 1, 'only 1 address book was created');
+
+my $alreadyHaveBook = WebGUI::Shop::AddressBook->create($session);
+is($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, when you already have one, returns the one already created');
 
 }
 
