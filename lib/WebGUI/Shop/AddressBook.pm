@@ -35,7 +35,9 @@ private properties => my %properties;
 
 =head2 addAddress ( address )
 
-Adds an address to the address book.
+Adds an address to the address book.  Returns a reference to the WebGUI::Shop::Address
+object that was created.  It does not trap exceptions, so any problems with creating
+the object will be passed to the caller.
 
 =head2 address
 
@@ -133,7 +135,7 @@ Deletes this address book and all addresses contained in it.
 
 sub delete {
     my ($self) = @_;
-    foreach my $address (@{$self->addresses}) {
+    foreach my $address (@{$self->getAddresses}) {
         $address->delete;
     } 
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
@@ -187,7 +189,7 @@ Returns an array reference of address objects that are in this book.
 sub getAddresses {
     my ($self) = @_;
     my @addressObjects = ();
-    my $addresses = $self->session->db->read("select addressId from addresses where addressBookId=?",[$self->getId]);
+    my $addresses = $self->session->db->read("select addressId from address where addressBookId=?",[$self->getId]);
     while (my ($addressId) = $addresses->array) {
         push(@addressObjects, WebGUI::Shop::Address->new($self, $addressId));
     }
@@ -264,6 +266,7 @@ sub update {
     $properties{$id}{lastPayId} = $newProperties->{lastPayId} || $properties{$id}{lastPayId};
     $properties{$id}{userId} = (exists $newProperties->{userId}) ? $newProperties->{userId} : $properties{$id}{userId};
     $properties{$id}{sessionId} = (exists $newProperties->{sessionId}) ? $newProperties->{sessionId} : $properties{$id}{sessionId};
+    ##Having both a userId and sessionId will confuse create.
     if ($properties{$id}{userId} ne "") {
         $properties{$id}{sessionId} = "";
     }

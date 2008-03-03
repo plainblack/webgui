@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 15;
+my $tests = 20;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -127,6 +127,52 @@ is($bookCount, 1, 'only 1 address book was created');
 
 my $alreadyHaveBook = WebGUI::Shop::AddressBook->create($session);
 is($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, when you already have one, returns the one already created');
+
+#######################################################################
+#
+# getId
+#
+#######################################################################
+
+is($book->getId, $book->get('addressBookId'), 'getId is a shortcut for ->get');
+
+#######################################################################
+#
+# addAddress
+#
+#######################################################################
+
+my $address1 = $book->addAddress({ label => q{Red's cell} });
+isa_ok($address1, 'WebGUI::Shop::Address', 'addAddress returns an object');
+
+my $address2 = $book->addAddress({ label => q{Norton's office} });
+
+#######################################################################
+#
+# getAddresses
+#
+#######################################################################
+
+my @addresses = @{ $book->getAddresses() };
+
+cmp_deeply(
+    \@addresses,
+    [$address1, $address2],
+    'getAddresses returns all address objects for this book'
+);
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
+
+$book->delete();
+$bookCount = $session->db->quickScalar('select count(*) from addressBook');
+my $addrCount = $session->db->quickScalar('select count(*) from address');
+
+is($bookCount, 0, 'delete: book deleted');
+is($addrCount, 0, 'delete: also deletes addresses in the book');
 
 }
 
