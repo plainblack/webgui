@@ -23,17 +23,44 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addGalleryEditCommentTemplate( $session );
+addGalleryRichEditAlbum( $session );
 
 finish($session); # this line required
 
 
-##-------------------------------------------------
+##---------------------------------------------------------------------------
 #sub exampleFunction {
 #	my $session = shift;
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
 
+#----------------------------------------------------------------------------
+# Add a column to the Gallery
+sub addGalleryEditCommentTemplate {
+    my $session     = shift;
+    print "\tAdding Edit Comment Template... " unless $quiet;
+
+    $session->db->write( q{
+        ALTER TABLE Gallery ADD COLUMN templateIdEditComment VARCHAR(22) BINARY
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add a column to select rich editor for albums
+sub addGalleryRichEditAlbum {
+    my $session     = shift;
+    print "\tAdding Select Rich Editor for Gallery Albums..." unless $quiet;
+
+    $session->db->write( q{
+        ALTER TABLE Gallery ADD COLUMN richEditIdAlbum VARCHAR(22) BINARY
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

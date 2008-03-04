@@ -111,22 +111,53 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
-=head2 appendTemplateVarsForCommentForm ( var ) 
+=head2 appendTemplateVarsCommentForm ( var [, comment ] ) 
 
 Add the template variables necessary for the comment form to the given hash
-reference. Returns the hash reference for convenience.
+reference. Returns the hash reference for convenience. C<comment> is a hash
+reference of values to populate the form with.
 
 =cut
 
-sub appendTemplateVarsForCommentForm {
+sub appendTemplateVarsCommentForm {
     my $self        = shift;
     my $var         = shift;
+    my $comment     = shift     || {};
     my $session     = $self->session;
+
+    # Default comment
+    $comment->{ commentId        } ||= "new";
 
     $var->{ commentForm_start }
         = WebGUI::Form::formHeader( $session )
-        . WebGUI::Form::hidden( $session, { name => "func", value => "addCommentSave" } )
+        . WebGUI::Form::hidden( $session, { 
+            name    => "func", 
+            value   => "editCommentSave" 
+        } )
+        . WebGUI::Form::hidden( $session, { 
+            name    => "commentId", 
+            value   => $comment->{ commentId } 
+        } )
         ;
+
+    # Add hidden fields for editing a comment
+    if ( $comment->{ commentId } ne "new" ) {
+        $var->{ commentForm_start } 
+            .= WebGUI::Form::hidden( $session, {
+                name    => "userId",
+                value   => $comment->{ userId } 
+            } )
+            .  WebGUI::Form::hidden( $session, { 
+                name    => "visitorIp", 
+                value   => $comment->{ visitorIp } 
+            } )
+            .  WebGUI::Form::hidden( $session, { 
+                name    => "creationDate", 
+                value   => $comment->{ creationDate } 
+            } )
+            ;
+    }
+
     $var->{ commentForm_end }
         = WebGUI::Form::formFooter( $session );
 
@@ -134,6 +165,7 @@ sub appendTemplateVarsForCommentForm {
         = WebGUI::Form::HTMLArea( $session, {
             name        => "bodyText",
             richEditId  => $self->getGallery->get("richEditIdComment"),
+            value       => $comment->{ bodyText },
         });
 
     $var->{ commentForm_submit } 
@@ -605,6 +637,53 @@ sub prepareView {
 
 #----------------------------------------------------------------------------
 
+=head2 processCommentEditForm ( )
+
+Process the Comment Add / Edit Form. Returns a hash reference of properties
+that can be passed to C<setComment>.
+
+Will die with an i18n-friendly error message if something is missing or 
+wrong.
+
+=cut
+
+sub processCommentEditForm {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    my $now         = WebGUI::DateTime->new( $session, time );
+    my $i18n        = __PACKAGE__->i18n( $session );
+
+    # Using die here to suppress line number and file path info
+    die $i18n->get("commentForm error no commentId") . "\n"
+        unless $form->get("commentId");
+    die $i18n->get("commentForm error no bodyText") . "\n"
+        unless $form->get("bodyText");
+
+    my $new         = $form->get('commentId') eq "new" 
+                    ? 1 
+                    : 0
+                    ;
+
+    my $visitorIp   = $session->user->userId eq "1"
+                    ? $session->env->get("REMOTE_ADDR")
+                    : undef
+                    ;
+
+    my $properties  = {
+        commentId       => $form->get("commentId"),
+        assetId         => $self->getId,
+        bodyText        => $form->get("bodyText"),
+        creationDate    => ( $new ? $now->toDatabaseDate    : $form->get("creationDate") ), 
+        userId          => ( $new ? $session->user->userId  : $form->get("userId") ),
+        visitorIp       => ( $new ? $visitorIp              : $form->get("visitorIp") ),
+    };
+
+    return $properties;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 processPropertiesFromFormPost ( )
 
 
@@ -656,31 +735,37 @@ sub purge {
 
 #----------------------------------------------------------------------------
 
-=head2 setComment ( commentId, properties )
+=head2 setComment ( properties )
 
-Set a comment. If C<commentId> is C<"new">, create a new comment. C<properties>
-is a hash reference of comment information.
+Set a comment. C<properties> is a hash reference of comment information with
+the following keys:
+
+ assetId        - The assetId of the asset this comment is for
+ commentId      - The ID of the comment. If "new", will make a new comment.
+ bodyText       - The body of the comment
+ userId         - The userId of the user who made the comment
+ visitorIp      - If the user was a visitor, the IP address of the user
+ creationDate   - A MySQL-formatted date/time when the comment was posted
 
 =cut
 
 sub setComment {
     my $self        = shift;
-    my $commentId   = shift;
     my $properties  = shift;
 
-    croak "Photo->setComment: commentId must be defined"
-        unless $commentId;
     croak "Photo->setComment: properties must be a hash reference"
         unless $properties && ref $properties eq "HASH";
+    croak "Photo->setComment: commentId must be defined"
+        unless $properties->{ commentId };
     croak "Photo->setComment: properties must contain a bodyText key"
         unless $properties->{ bodyText };
 
     $properties->{ creationDate     } ||= WebGUI::DateTime->new($self->session, time)->toDatabase;
     $properties->{ assetId          } = $self->getId;
 
-    $self->session->db->setRow( 
+    return $self->session->db->setRow( 
         "Photo_comment", "commentId", 
-        { %$properties, commentId => $commentId }
+        $properties, 
     );
 }
 
@@ -725,7 +810,7 @@ sub view {
     my $session = $self->session;
     my $var     = $self->getTemplateVars;
     
-    $self->appendTemplateVarsForCommentForm( $var ); 
+    $self->appendTemplateVarsCommentForm( $var ); 
 
     # Keywords
     my $k           = WebGUI::Keyword->new( $session );
@@ -743,6 +828,8 @@ sub view {
     for my $comment ( @{ $p->getPageData } ) {
         $comment->{ url_deleteComment } 
             = $self->getUrl('func=deleteComment;commentId=' . $comment->{commentId} );
+        $comment->{ url_editComment }
+            = $self->getUrl('func=editComment;commentId=' . $comment->{commentId} );
 
         my $user        = WebGUI::User->new( $session, $comment->{userId} );
         $comment->{ username } = $user->username;
@@ -755,38 +842,6 @@ sub view {
     $var->{ commentLoop_pageBar     } = $p->getBarAdvanced;
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_addCommentSave ( )
-
-Save a new comment to the Photo.
-
-=cut
-
-sub www_addCommentSave {
-    my $self        = shift;
-    my $session     = $self->session;
-    
-    return $session->privilege->insufficient unless $self->canComment;
-
-    my $i18n        = __PACKAGE__->i18n( $session );
-    my $form        = $self->session->form;
-    
-    my $properties  = {
-        assetId         => $self->getId,
-        creationDate    => WebGUI::DateTime->new( $session, time )->toDatabase,
-        userId          => $session->user->userId,
-        visitorIp       => ( $session->user->userId eq "1" ? $session->env("REMOTE_ADDR") : undef ),
-        bodyText        => $form->get("bodyText"),
-    };
-
-    $self->setComment( "new", $properties );
-
-    return $self->processStyle(
-        sprintf $i18n->get('comment message'), $self->getUrl,
-    );
 }
 
 #----------------------------------------------------------------------------
@@ -1016,19 +1071,74 @@ sub www_edit {
 
 #----------------------------------------------------------------------------
 
-=head2 www_editSave ( )
+=head2 www_editComment ( params )
 
-Save the edit form. Overridden to display a confirm message to the user.
+Form to edit a comment. C<params> is a hash reference of parameters
+with the following keys:
+
+ errors     = An array reference of errors to show the user.
 
 =cut
 
-sub www_editSave {
+sub www_editComment {
     my $self        = shift;
-    $self->SUPER::www_editSave;
+    my $params      = shift;
+    my $session     = $self->session;
 
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    return $session->privilege->insufficient unless $self->canEdit;
 
-    sprintf $i18n->get("save message"), $self->getUrl,
+    my $var         = $self->getTemplateVars;
+    
+    if ( $params->{ errors } ) {
+        $var->{ errors } = [ map { { "error" => $_ } } @{ $params->{errors} } ];
+    }
+
+    my $commentId   = $session->form->get( "commentId" );
+    my $comment     = $self->getComment( $commentId );
+    $self->appendTemplateVarsCommentForm( $var, $comment );
+
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->getGallery->get("templateIdEditComment") )
+    );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_editCommentSave ( )
+
+Save a comment being edited
+
+=cut
+
+sub www_editCommentSave {
+    my $self        = shift;
+    my $session     = $self->session;
+
+    return $session->privilege->insufficient unless $self->canEdit;
+    
+    my $i18n        = __PACKAGE__->i18n( $session );
+
+    my $comment     = eval { $self->processCommentEditForm };
+    if ( $@ ) {
+        return $self->www_editComment( { errors => [ $@ ] } );
+    }
+    
+    # setComment changes commentId, so keep track if we're adding a new comment
+    my $isNew       = $comment->{commentId} eq "new";
+
+    $self->setComment( $comment );
+
+    # Return different message for adding and editing
+    if ( $isNew ) {
+        return $self->processStyle(
+            sprintf $i18n->get('comment message'), $self->getUrl
+        );
+    }
+    else {
+        return $self->processStyle(
+            sprintf $i18n->get('editCommentSave message'), $self->getUrl
+        );
+    }
 }
 
 #----------------------------------------------------------------------------

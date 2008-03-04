@@ -2,6 +2,8 @@
  - fixed: Several typos in the new Calendar help documentation.
  - fix: List View now starts at the beginning of the day passed in.
  - Removed some spurious warnings from the calendar.
+ - Added ability to edit comments. Entirely changed how comments work in prep
+   for turning it into a mixin.
 
 7.5.4
  - fixed: unable to remove calendar feeds in IE6

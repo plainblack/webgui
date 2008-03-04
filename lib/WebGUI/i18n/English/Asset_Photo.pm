@@ -21,6 +21,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'editCommentSave message' => {
+        message     => q{The comment has been updated. <a href="%s">Back to Photo</a>.},
+        lastUpdated => 0,
+        context     => q{Message after a comment is edited.},
+    },
+
     'help commentForm title' => {
         message     => 'Photo -- Comment Form',
         lastUpdated => 0,
@@ -461,6 +467,48 @@ our $I18N = {
         message     => 'Save',
         lastUpdated => 0,
         context     => 'Label for "save" button',
+    },
+
+    'help editComment title' => {
+        message     => 'Photo Edit Comment Template',
+        lastUpdated => 0,
+        context     => 'Help page title',
+    },
+
+    'help editComment body' => {
+        message     => 'These variables are available to the Photo Edit Comment page',
+        lastUpdated => 0,
+        context     => 'Help page body text',
+    },
+
+    'helpvar errors' => {
+        message     => 'A loop of error messages to show the user',
+        lastUpdated => 0,
+        context     => 'Description of template variable',
+    },
+
+    'helpvar error' => {
+        message     => 'The i18n error message',
+        lastUpdated => 0,
+        context     => 'Description of template variable',
+    },
+
+    'template error happened' => {
+        message     => q{An error occurred while processing your request.},
+        lastUpdated => 0,
+        context     => "Text shown when friendly error messages are being displayed",
+    },
+
+    'commentForm error no commentId' => {
+        message     => q{No comment ID was given. This indicates a problem with the template. Please notify an administrator.},
+        lastUpdated => 0,
+        context     => q{Error message when no comment ID was given. This should never happen unless the template is made wrong.},
+    },
+
+    'commentForm error no bodyText' => {
+        message     => q{No text was entered. Please enter some text to create a comment.},
+        lastUpdated => 0,
+        context     => q{Error message for Photo comments},
     },
 
 };

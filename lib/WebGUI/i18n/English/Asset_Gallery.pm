@@ -77,6 +77,16 @@ our $I18N = {
         lastUpdated => 0,
         context     => '',
     },
+    "richEditIdAlbum label" => {
+        message     => "Rich Editor for Albums",
+        lastUpdated => 0,
+        context     => 'Asset property label',
+    },
+    "richEditIdAlbum description" => {
+        message     => "The Rich Text Editor to use for Albums",
+        lastUpdated => 0,
+        context     => 'Asset property description',
+    },
     "richEditIdFileComment label" => {
         message     => "Rich Editor for Comments",
         lastUpdated => 0,
@@ -144,6 +154,16 @@ our $I18N = {
     },
     "templateIdEditAlbum description" => {
         message     => "The template to add / edit an album.",
+        lastUpdated => 0,
+        context     => '',
+    },
+    "templateIdEditComment label" => {
+        message     => "Template to Edit Comments",
+        lastUpdated => 0,
+        context     => '',
+    },
+    "templateIdEditComment description" => {
+        message     => "The template to edit a comment.",
         lastUpdated => 0,
         context     => '',
     },

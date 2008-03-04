@@ -260,6 +260,32 @@ our $HELP = {
         ],
     },
 
+    'help editComment' => {
+        title       => 'help editComment title',
+        body        => 'help editComment body',
+        isa         => [
+            { 
+                tag         => 'help common',
+                namespace   => 'Asset_Photo',
+            },
+            {
+                tag         => 'help commentForm',
+                namespace   => 'Asset_Photo',
+            },
+        ],
+        variables => [
+            {
+                name        => 'errors',
+                description => 'helpvar errors',
+                variables   => [
+                    { 
+                        name        => 'error',
+                        description => 'helpvar error',
+                    },
+                ],
+            },
+        ],
+    },
 
 };
 

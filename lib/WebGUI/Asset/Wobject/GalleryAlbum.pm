@@ -814,29 +814,6 @@ sub www_edit {
     );
 }
 
-#-----------------------------------------------------------------------------
-
-=head2 www_editSave ( )
-
-Save the asset edit form. Overridden to give a nice message when a photo or 
-album is added
-
-=cut
-
-sub www_editSave {
-    my $self        = shift;
-    my $form        = $self->session->form;
-    my $i18n        = __PACKAGE__->i18n($self->session);
-    $self->SUPER::www_editSave;
-
-    if ( $form->get("assetId") eq "new" ) {
-        return sprintf $i18n->get("addFile message"), $self->getUrl,
-    }
-    else {
-        return sprintf $i18n->get("save message"), $self->getUrl,
-    }
-}
-
 #----------------------------------------------------------------------------
 
 =head2 www_showConfirmation ( ) 

@@ -118,6 +118,13 @@ sub definition {
             label           => $i18n->get("maxSpacePerUser label"),
             hoverHelp       => $i18n->get("maxSpacePerUser description"),
         },
+        richEditIdAlbum => {
+            tab             => "properties",
+            fieldType       => "selectRichEditor",
+            defaultValue    => "PBrichedit000000000001", # Content Managers editor
+            label           => $i18n->get("richEditIdAlbum label"),
+            hoverHelp       => $i18n->get("richEditIdAlbum description"),
+        },
         richEditIdComment => {
             tab             => "properties",
             fieldType       => "selectRichEditor",
@@ -156,6 +163,14 @@ sub definition {
             namespace       => "GalleryAlbum/Edit",
             label           => $i18n->get("templateIdEditAlbum label"),
             hoverHelp       => $i18n->get("templateIdEditAlbum description"),
+        },
+        templateIdEditComment => {
+            tab             => "display",
+            fieldType       => "template",
+            defaultValue    => "OxJWQgnGsgyGohP2L3zJPQ",
+            namespace       => "GalleryFile/EditComment",
+            label           => $i18n->get("templateIdEditComment label"),
+            hoverHelp       => $i18n->get("templateIdEditComment description"),
         },
         templateIdEditFile => {
             tab             => "display",

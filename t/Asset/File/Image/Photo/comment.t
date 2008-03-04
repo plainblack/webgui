@@ -31,6 +31,7 @@ my @versionTags = ();
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 
+my @addArguments    = ( undef, undef, { skipAutoCommitWorkflows => 1 } );
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -39,21 +40,11 @@ my $gallery
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    }, @addArguments );
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::Image::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    }, @addArguments );
 
 $versionTags[-1]->commit;
 
@@ -81,17 +72,12 @@ ok(
 );
 
 ok(
-    !eval{ $photo->setComment("new"); 1 },
-    "Photo->setComment fails when no second argument given",
+    !eval{ $photo->setComment("lulz"); 1 },
+    "Photo->setComment fails when first argument is not a hashref",
 );
 
 ok(
-    !eval{ $photo->setComment("new", "lulz"); 1 },
-    "Photo->setComment fails when second argument is not a hashref",
-);
-
-ok(
-    !eval{ $photo->setComment("new", { lulz => "ohai" }); 1 },
+    !eval{ $photo->setComment({ lulz => "ohai" }); 1 },
     "Photo->setComment fails when hashref does not contain a bodyText key",
 );
 
@@ -101,9 +87,10 @@ ok(
 #   - All else is defaults
 my $commentId;
 ok(
-    eval{ $commentId = $photo->setComment("new", { userId => 1, assetId => $photo->getId, bodyText => "bodyText", }); 1 },
+    eval{ $commentId = $photo->setComment({ commentId => "new", userId => 1, bodyText => "bodyText", }); 1 },
     "Photo->setComment succeeds",
 );
+if ( $@ ) { diag $@; }
 
 is_deeply(
     $photo->getCommentIds, [$commentId],
@@ -142,9 +129,10 @@ like(
 #   - userId is visitor
 #   - all else is defaults
 ok(
-    eval{ $commentId = $photo->setComment("new", { userId => 1, bodyText => "bodyText", }); 1 },
+    eval{ $commentId = $photo->setComment({ commentId => "new", userId => 1, bodyText => "bodyText", }); 1 },
     "Photo->setComment succeeds",
 );
+if ( $@ ) { diag $@; }
 
 cmp_deeply(
     $photo->getCommentIds, superbagof( $commentId ),
@@ -156,6 +144,7 @@ ok(
     eval{ $comment = $photo->getComment($commentId); 1},
     "Photo->getComment does not croak.",
 );
+if ( $@ ) { diag $@; }
 
 is(
     ref $comment, "HASH",
@@ -202,63 +191,67 @@ TODO: {
 }
 
 #----------------------------------------------------------------------------
-# Test www_addCommentSave page sanity checks
+# Test www_editCommentSave page sanity checks
 my $html;
 $photo 
     = $album->addChild({
         className       => "WebGUI::Asset::File::Image::Photo",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    }, @addArguments );
 
 # Permissions
-$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
+$html   = WebGUI::Test->getPage($photo, "www_editCommentSave", {
             userId      => 1,
             formParams  => { bodyText => "yes?" },
         });
 
 like(
     $html, qr/permission denied/i,
-    "www_addCommentSave -- Permission denied if not Gallery->canAddComment",
+    "www_editCommentSave -- Permission denied if not Gallery->canAddComment",
 );
 
-my $i18n = $photo->i18n($session);
+my $i18n    = $photo->i18n($session);
+my $errorMessage;
 
-SKIP: {
-    skip "www_addCommentSave needs to check for bodyText", 1;
-
-# Required fields
-$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
-            userId      => 1,
-            formParams  => { },
+# Required: commentId
+$html   = WebGUI::Test->getPage($photo, "www_editCommentSave", {
+            userId      => 3,
+            formParams  => { bodyText => "bodyText" },
         });
 
+$errorMessage    = $i18n->get("commentForm error no commentId");
 like(
-    $html, $i18n->get("www_addCommentSave error missing required"),
-    "www_addCommentSave -- Must have bodyText defined",
+    $html, qr/$errorMessage/,
+    "www_editCommentSave -- Must have commentId defined",
 );
 
-}
+# Required: bodyText
+$html   = WebGUI::Test->getPage($photo, "www_editCommentSave", {
+            userId      => 3,
+            formParams  => { commentId => "new" },
+        });
+
+$errorMessage    = $i18n->get("commentForm error no bodyText");
+like(
+    $html, qr/$errorMessage/,
+    "www_editCommentSave -- Must have bodyText defined",
+);
 
 #----------------------------------------------------------------------------
-# Test www_addCommentSave functionality
-$html   = WebGUI::Test->getPage($photo, "www_addCommentSave", {
+# Test www_editCommentSave functionality
+$html   = WebGUI::Test->getPage($photo, "www_editCommentSave", {
             userId      => 3,
-            formParams  => { bodyText => "YES!", },
+            formParams  => { commentId => "new", bodyText => "YES!", },
         });
 my $successMessage = sprintf($i18n->get("comment message"), $photo->getUrl);
 like(
     $html, qr/$successMessage/,
-    "www_addCommentSave -- page shows success message",
+    "www_editCommentSave -- page shows success message",
 );
 
 my $ids = $photo->getCommentIds;
 is(
     scalar @$ids, 1, 
-    "www_addCommentSave -- Comment was added",
+    "www_editCommentSave -- Comment was added",
 );
 
 
