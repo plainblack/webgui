@@ -1,133 +1,82 @@
-WebguiColorPicker = function() {
-    var Slider=YAHOO.widget.Slider;
-    var Color=YAHOO.util.Color;
-    var Dom=YAHOO.util.Dom;
-
-    var pickerSize=180;
-    
-    var hue,picker,panel;
-
-    // hue, int[0,359]
-    var getH = function() {
-        var h = (pickerSize - hue.getValue()) / pickerSize;
-        h = Math.round(h*360);
-        return (h == 360) ? 0 : h;
-    }
-
-    // saturation, int[0,1], left to right
-    var getS = function() {
-        return picker.getXValue() / pickerSize;
-    }
-
-    // value, int[0,1], top to bottom
-    var getV = function() {
-        return (pickerSize - picker.getYValue()) / pickerSize;
-    }
-
-    // correctly handle PNG transparency in Win IE 5.5 or higher.
-    var correctPNG = function() {
-        if (YAHOO.util.Event.isIE) {
-            for(var i=0; i<document.images.length; i++) {
-                var img = document.images[i]
-                var imgName = img.src.toUpperCase()
-                if (imgName.substring(imgName.length-3, imgName.length) == "PNG") {
-                    var imgID = (img.id) ? "id='" + img.id + "' " : ""
-                    var imgClass = (img.className) ? "class='" + img.className + "' " : ""
-                    var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' "
-                    var imgStyle = "display:inline-block;" + img.style.cssText 
-                    if (img.align == "left") imgStyle = "float:left;" + imgStyle
-                    if (img.align == "right") imgStyle = "float:right;" + imgStyle
-                    if (img.parentElement.href) imgStyle = "cursor:hand;" + imgStyle       
-                    var strNewHTML = "<span " + imgID + imgClass + imgTitle
-                        + " style=\"" + "width:" + img.width + "px; height:" + img.height + "px;" + imgStyle + ";"
-                        + "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader"
-                        + "(src=\'" + img.src + "\', sizingMethod='scale');\"></span>" 
-                    img.outerHTML = strNewHTML
-                    i = i-1
-                }
+YAHOO.namespace('WebGUI.Form');
+YAHOO.WebGUI.Form.ColorPicker = {
+    init: function() {
+        // Instantiate the Dialog
+        var dg = this.dialogElement = document.createElement('div');
+        document.body.appendChild(dg);
+        YAHOO.util.Dom.generateId(dg);
+        YAHOO.util.Dom.addClass(dg, 'yui-picker-panel');
+        YAHOO.util.Dom.addClass(dg, 'wg-picker-panel');
+        var hd = document.createElement('div');
+        YAHOO.util.Dom.addClass(hd, 'hd');
+        dg.appendChild(hd);
+        var bd = document.createElement('div');
+        YAHOO.util.Dom.addClass(bd, 'bd');
+        dg.appendChild(bd);
+        var ft = document.createElement('div');
+        YAHOO.util.Dom.addClass(ft, 'ft');
+        dg.appendChild(ft);
+        this.dialog = new YAHOO.widget.Dialog(dg, {
+            width : "360px",
+            visible : false,
+            zIndex : 20,
+            draggable: false,
+            constraintoviewport : true,
+            buttons : [
+                { text:"Set", handler:function() { this.submit() }, isDefault:true },
+                { text:"Cancel", handler:function() { this.cancel() } }
+            ],
+            postmethod: 'manual'
+        });
+        this.dialog.renderEvent.subscribe(function() { 
+            if (!this.picker) { //make sure that we haven't already created our Color Picker 
+                var extras = getWebguiProperty("extrasURL");
+                var pickerdiv = document.createElement('div');
+                YAHOO.util.Dom.addClass(pickerdiv, 'yui-picker');
+                this.dialog.body.getElementsByTagName('form')[0].appendChild(pickerdiv);
+                this.picker = new YAHOO.widget.ColorPicker(pickerdiv, { 
+                    container: this.dialog,
+                    images: { 
+                        PICKER_THUMB: extras + '/yui/build/colorpicker/assets/picker_thumb.png',
+                        HUE_THUMB: extras + '/yui/build/colorpicker/assets/hue_thumb.png'
+                    },
+                    showhexsummary: false,
+                    showwebsafe: false,
+                    showhexcontrols: true, // default is false 
+                    showhsvcontrols: true  // default is false 
+                });
             }
+        }, this, true);
+        this.dialog.beforeShowEvent.subscribe(function() {
+            var hex = this.saveElement.value.substr(1);
+            this.picker.setValue(YAHOO.util.Color.hex2rgb(hex), false);
+        }, this, true);
+        this.dialog.manualSubmitEvent.subscribe(function() {
+            var hex = '#' + this.picker.get('hex');
+            this.saveElement.value = hex;
+            this.saveElement.onchange();
+        }, this, true);
+        this.dialog.render();
+    },
+    display: function(el, swatch) {
+        this.saveElement = YAHOO.util.Dom.get(el);
+        this.swatchElement = YAHOO.util.Dom.get(swatch);
+        if (this.dialog) {
+            this.dialog.cancel();
         }
+        this.dialog.cfg.setProperty('context', [this.swatchElement, 'tl', 'tr']);
+        this.dialog.align(YAHOO.widget.Overlay.TOP_LEFT, YAHOO.widget.Overlay.TOP_RIGHT);
+        this.dialog.show();
+    },
+    attach: function(el, swatch) {
+        YAHOO.util.Event.on(el, 'change', function(e, swatch) {
+            YAHOO.util.Dom.setStyle(swatch, 'background-color', this.value);
+        }, swatch);
+        YAHOO.util.Event.on(swatch, 'click', function(e, objs) {
+            YAHOO.util.Event.preventDefault(e);
+            this.display(objs[0], objs[1]);
+        }, [el, swatch], this);
     }
-
-    var swatchUpdate = function() {
-        var h=getH(), s=getS(), v=getV();
-
-        Dom.get("hval").value = h;
-        Dom.get("sval").value = Math.round(s*100);
-        Dom.get("vval").value = Math.round(v*100);
-
-        var rgb = Color.hsv2rgb(h, s, v);
-
-        var styleDef = "rgb(" + rgb.join(",") + ")";
-        Dom.setStyle("swatch", "background-color", styleDef);
-
-        Dom.get("rval").value = rgb[0];
-        Dom.get("gval").value = rgb[1];
-        Dom.get("bval").value = rgb[2];
-
-        Dom.get("hexval").value = Color.rgb2hex(rgb[0], rgb[1], rgb[2]);
-    };
-
-    var hueUpdate = function(newOffset) {
-        var rgb = Color.hsv2rgb(getH(), 1, 1);
-        var styleDef = "rgb(" + rgb.join(",") + ")";
-        Dom.setStyle("pickerDiv", "background-color", styleDef);
-
-        swatchUpdate();
-    };
-
-    pickerUpdate = function(newOffset) {
-        swatchUpdate();
-    };
-    var currentColorField = "";
-
-    return {
-        init: function () {
-            var thepicker = document.createElement('div');
-            thepicker.id = "ddPicker";
-            thepicker.style.display = "none";
-            document.body.appendChild(thepicker);
-        },
-
-        display: function (field) {
-            currentColorField = Dom.get(field); 
-            var extras = getWebguiProperty("extrasURL");
-            thepicker = Dom.get("ddPicker");
-            thepicker.style.top = YAHOO.util.Dom.getY(currentColorField) + "px";
-            thepicker.style.left = YAHOO.util.Dom.getX(currentColorField) + "px";
-            thepicker.style.display = "block";
-            thepicker.innerHTML = ' <div id="pickerHandle">&nbsp;</div> <div id="pickerDiv" tabindex="-1" hidefocus="true"> <img id="pickerbg" src="' + extras + 'colorpicker/pickerbg.png" alt="" /> <div id="selector"><img src="' + extras + 'colorpicker/select.gif" /></div> </div> <div id="hueBg" tabindex="-1" hidefocus="true"> <div id="hueThumb"><img src="' + extras + 'colorpicker/hline.png" /></div> </div> <div id="valdiv"> <form name="rgbform"> <br /> R <input autocomplete="off" name="rval" id="rval" type="text" value="0" size="3" maxlength="3" /> H <input autocomplete="off" name="hval" id="hval" type="text" value="0" size="3" maxlength="3" /> <br />G <input autocomplete="off" name="gval" id="gval" type="text" value="0" size="3" maxlength="3" /> S <input autocomplete="off" name="gsal" id="sval" type="text" value="0" size="3" maxlength="3" /> <br /> B <input autocomplete="off" name="bval" id="bval" type="text" value="0" size="3" maxlength="3" /> V <input autocomplete="off" name="vval" id="vval" type="text" value="0" size="3" maxlength="3" /> <br /> <br /> # <input autocomplete="off" name="hexval" id="hexval" type="text" value="0" size="6" maxlength="6" /> <br /> <input type="button" value="Set" onclick="WebguiColorPicker.setColor()" /> </form> </div> <div id="swatch">&nbsp;</div> ';
-            correctPNG();
-            hue = Slider.getVertSlider("hueBg", "hueThumb", 0, pickerSize);
-            hue.subscribe("change", hueUpdate);
-
-            picker = Slider.getSliderRegion("pickerDiv", "selector", 0, pickerSize, 0, pickerSize);
-            picker.subscribe("change", pickerUpdate);
-            hueUpdate(0);
-            panel = new YAHOO.util.DD("ddPicker");
-            panel.setHandleElId("pickerHandle");
-
-            // set field color
-            var color = currentColorField.value; 
-            color = color.substring(1,7);
-            var hsv = Color.hex2hsv(color);
-            hue.setValue(pickerSize -  Math.round((hsv["h"] * pickerSize)/360));
-            picker.setRegionValue(hsv["s"] * pickerSize, pickerSize - Math.round(hsv["v"]*128/pickerSize) +1);
-            Dom.get("hexval").value = color; 
-        },
-
-        setColor: function () {
-            var color = "#"+document.getElementById("hexval").value;
-            currentColorField.value = color;
-            currentColorField.onchange();
-            thepicker = Dom.get("ddPicker");
-            thepicker.innerHTML = "";
-            thepicker.style.display = "none";
-        }
-    }
-}();
-
-YAHOO.util.Event.on(window, "load", WebguiColorPicker.init);
-
-
+};
+YAHOO.util.Event.onDOMReady(YAHOO.WebGUI.Form.ColorPicker.init, YAHOO.WebGUI.Form.ColorPicker, true);
 

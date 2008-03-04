@@ -88,26 +88,31 @@ Renders a color picker control.
 =cut
 
 sub toHtml {
-	my $self = shift;
+    my $self = shift;
     my $url = $self->session->url;
     my $style = $self->session->style;
-	$style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/yui/build/dragdrop/dragdrop-min.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/yui/build/animation/animation-min.js'),{ type=>'text/javascript' });
-	$style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
-	$style->setScript($url->extras('/colorpicker/color.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/colorpicker/key.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/yui/build/slider/slider-min.js'),{ type=>'text/javascript' });
-	$style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
+    $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setLink($url->extras('/yui/build/colorpicker/assets/skins/sam/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/dragdrop/dragdrop-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/slider/slider-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/colorpicker/colorpicker-min.js'),{ type=>'text/javascript' });
+    $style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
     my $id = $self->get("id");
     my $value = $self->get("value");
-    return q| <a href="javascript:WebguiColorPicker.display('|. $id. q|');" id="|. $id.q|_swatch"
-    class="colorPickerFormSwatch" style="background-color: |.$value.q|;"></a>
-   <input onchange="document.getElementById('|.$id.q|_swatch').style.backgroundColor=this.value;" 
-   maxlength="7" name="|.$self->get("name").q|" type="text" size="8" value="|.$value.q|" id="|.$id.q|" />|;
+    my $name = $self->get("name");
+    return qq{<a href="javascript:YAHOO.WebGUI.ColorPicker.display('$id', '${id}_swatch');" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: $value"></a>
+<input onchange="YAHOO.util.Dom.setStyle('${id}_swatch', 'background-color', this.value)" 
+maxlength="7" name="$name" type="text" size="8" value="$value" id="$id" />};
 
+#        <a href="#" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: #008000;"></a>
+#        <input maxlength="7" name="$name" type="text" size="8" value="$value" id="$id" />
+#        <script type="text/javascript">YAHOO.WebGUI.Form.ColorPicker.attach('$id', '${id}_swatch')</script>
 }
 
 1;

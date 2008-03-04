@@ -129,7 +129,8 @@ WebguiStyleDesigner = function () {
                 swatch.style.backgroundColor = field.value;
                 swatch.onclick = function () {
                     var id = this.id.replace(/(\w+)_swatch/,"$1");
-                    WebguiColorPicker.display(id);
+                    YAHOO.WebGUI.Form.ColorPicker.display(id, this.id);
+                    return false;
                 }
                 field.onchange = function () {
                     Dom.get(this.id+"_swatch").style.backgroundColor = this.value;
