@@ -180,6 +180,23 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getAddress ( id )
+
+Returns an address object.
+
+=head3 id
+
+An address object's unique id.
+
+=cut
+
+sub getAddress {
+    my ($self, $addressId) = @_;
+    return WebGUI::Shop::Address->new($self, $addressId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAddresses ( )
 
 Returns an array reference of address objects that are in this book.
@@ -191,7 +208,7 @@ sub getAddresses {
     my @addressObjects = ();
     my $addresses = $self->session->db->read("select addressId from address where addressBookId=?",[$self->getId]);
     while (my ($addressId) = $addresses->array) {
-        push(@addressObjects, WebGUI::Shop::Address->new($self, $addressId));
+        push(@addressObjects, $self->getAddress($addressId));
     }
     return \@addressObjects;
 }
