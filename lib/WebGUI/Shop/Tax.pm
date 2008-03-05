@@ -6,6 +6,11 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
+use WebGUI::Shop::Cart;
+use WebGUI::Shop::CartItem;
+use WebGUI::Shop::AddressBook;
+use WebGUI::Shop::Address;
+use List::Util qw{sum};
 
 =head1 NAME
 
@@ -89,7 +94,23 @@ sub calculate {
     my $cart = shift;
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
         unless ref($cart) eq 'WebGUI::Shop::Cart';
-    return;
+    my $book = WebGUI::Shop::AddressBook->create($self->session);
+    my $address = WebGUI::Shop::Address->new($book, $cart->get('shippingAddressId'));
+    my $tax = 0;
+    foreach my $item (@{ $cart->getItems }) {
+        my $sku = $item->getSku;
+        my $unitPrice = $sku->getPrice;
+        my $quantity  = $item->get('quantity');
+        my $taxables  = $self->getTaxRates($address);
+        use Data::Dumper;
+        warn Dumper $taxables;
+        my $itemTax   = sum(@{$taxables}) / 100;  ##Form a percentage
+        warn "unitPrice: $unitPrice\n";
+        warn "quantity : $quantity\n";
+        warn "itemTax  : $itemTax\n";
+        $tax += $unitPrice * $quantity * $itemTax;
+    }
+    return $tax;
 }
 
 #-------------------------------------------------------------------
@@ -155,6 +176,30 @@ is a convenience method for listing and/or exporting tax data.
 sub getItems {
     my $self = shift;
     my $result = $self->session->db->read('select * from tax');
+    return $result;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTaxRates ( $address )
+
+Given a WebGUI::Shop::Address object, return all rates associated with the address as an arrayRef.
+
+=cut
+
+sub getTaxRates {
+    my $self = shift;
+    my $address = shift;
+    WebGUI::Error::InvalidObject->throw(error => 'Need an address.', expected=>'WebGUI::Shop::Address', got=>(ref $address))
+        unless ref($address) eq 'WebGUI::Shop::Address';
+    my $result = $self->session->db->buildArrayRef(
+    q{
+        select taxRate from tax where
+           (field='state'   and value=?)
+        OR (field='country' and value=?)
+        OR (field='code'    and value=?)
+    },
+    [$address->get('state'), $address->get('country'), $address->get('code')]);
     return $result;
 }
 

@@ -23,6 +23,8 @@ use Exception::Class;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::Shop::Cart;
+use WebGUI::Shop::AddressBook;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 64;
+my $tests = 68;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -368,6 +370,57 @@ cmp_deeply(
 
 #######################################################################
 #
+# getTaxRates
+#
+#######################################################################
+
+##Set up the tax information
+$taxer->importTaxData(
+    WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
+),
+my $book = WebGUI::Shop::AddressBook->create($session);
+my $taxingAddress = $book->addAddress({
+    label => 'taxing',
+    city  => 'Madison',
+    state => 'WI',
+    code  => '53701',
+    country => 'USA',
+});
+my $taxFreeAddress = $book->addAddress({
+    label => 'no tax',
+    city  => 'Portland',
+    state => 'OR',
+    code  => '97123',
+    country => 'USA',
+});
+
+eval { $taxer->getTaxRates(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidObject', 'calculate: error handling for not sending a cart');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Need an address.',
+        got   => '',
+        expected => 'WebGUI::Shop::Address',
+    ),
+    'importTaxData: error handling for file that does not exist in the filesystem',
+);
+
+cmp_deeply(
+    $taxer->getTaxRates($taxingAddress),
+    [5, 0.5],
+    'getTaxRates: return correct data for a state with tax data'
+);
+
+cmp_deeply(
+    $taxer->getTaxRates($taxFreeAddress),
+    [0.0],
+    'getTaxRates: return correct data for a state with no tax data'
+);
+
+#######################################################################
+#
 # calculate
 #
 #######################################################################
@@ -379,6 +432,32 @@ is($e->error, 'Must pass in a WebGUI::Shop::Cart object', 'calculate: error hand
 
 ##Build a cart, add some Donation SKUs to it.  Set one to be taxable.
 
+my $cart = WebGUI::Shop::Cart->create($session);
+$cart->update({ shippingAddressId => $taxingAddress->getId});
+
+##Set up the tax information
+$taxer->importTaxData(
+    WebGUI::Test->getTestCollateralPath('taxTables/goodTaxTable.csv')
+),
+
+my $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
+    className => 'WebGUI::Asset::Sku::Donation',
+    title     => 'Taxable donation',
+    defaultPrice => 100.00,
+});
+
+$cart->addItem($taxableDonation);
+
+foreach my $item (@{ $cart->getItems }) {
+    $item->setQuantity(1);
+}
+
+my $tax = $taxer->calculate($cart);
+is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
+
+$taxableDonation->purge;
+$cart->delete;
+$book->delete;
 }
 
 sub _grabTaxData {
@@ -395,5 +474,8 @@ sub _grabTaxData {
 # Cleanup
 END {
     $session->db->write('delete from tax');
+    $session->db->write('delete from cart');
+    $session->db->write('delete from addressBook');
+    $session->db->write('delete from address');
     $storage->delete;
 }

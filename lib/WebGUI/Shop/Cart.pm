@@ -72,7 +72,7 @@ sub create {
     }
     my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
     return $class->new($session, $cartId) if (defined $cartId);
-    my $cartId = $session->id->generate;
+    $cartId = $session->id->generate;
     $session->db->write('insert into cart (cartId, sessionId) values (?,?)', [$cartId, $session->getId]);
     return $class->new($session, $cartId);
 }
