@@ -8,8 +8,6 @@ use WebGUI::Storage;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::CartItem;
-use WebGUI::Shop::AddressBook;
-use WebGUI::Shop::Address;
 use List::Util qw{sum};
 
 =head1 NAME
@@ -97,7 +95,7 @@ sub calculate {
     my $cart = shift;
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
         unless ref($cart) eq 'WebGUI::Shop::Cart';
-    my $book = WebGUI::Shop::AddressBook->create($self->session);
+    my $book = $cart->getAddressBook;
     return 0 if $cart->get('shippingAddressId') eq "";
     my $address = $book->getAddress($cart->get('shippingAddressId'));
     my $tax = 0;
