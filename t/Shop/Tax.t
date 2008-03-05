@@ -34,7 +34,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 73;
+my $tests = 80;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -357,7 +357,7 @@ eval {
 };
 ok (!$failure, 'Tax data not imported');
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: a file with a ');
+isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: a file with an error on 1 line');
 cmp_deeply(
     $e,
     methods(
@@ -365,7 +365,41 @@ cmp_deeply(
         brokenFile => WebGUI::Test->getTestCollateralPath('taxTables/badTaxTable.csv'),
         brokenLine => 1,
     ),
-    'importTaxData: error handling for file that that cannot be read',
+    'importTaxData: error handling for file with errors in the CSV data',
+);
+
+eval {
+    $failure = $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/missingHeaders.csv')
+    );
+};
+ok (!$failure, 'Tax data not imported when headers are missing');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: a file with a missing header column');
+cmp_deeply(
+    $e,
+    methods(
+        error      => 'Bad header found in the CSV file',
+        brokenFile => WebGUI::Test->getTestCollateralPath('taxTables/missingHeaders.csv'),
+    ),
+    'importTaxData: error handling for a file with a missing header',
+);
+
+eval {
+    $failure = $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/badHeaders.csv')
+    );
+};
+ok (!$failure, 'Tax data not imported when headers are wrong');
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidFile', 'importTaxData: a file with a bad header column');
+cmp_deeply(
+    $e,
+    methods(
+        error      => 'Bad header found in the CSV file',
+        brokenFile => WebGUI::Test->getTestCollateralPath('taxTables/badHeaders.csv'),
+    ),
+    'importTaxData: error handling for a file with a bad header',
 );
 
 #######################################################################
@@ -433,6 +467,9 @@ is($e->error, 'Must pass in a WebGUI::Shop::Cart object', 'calculate: error hand
 ##Build a cart, add some Donation SKUs to it.  Set one to be taxable.
 
 my $cart = WebGUI::Shop::Cart->create($session);
+
+is($taxer->calculate($cart), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
+
 $cart->update({ shippingAddressId => $taxingAddress->getId});
 
 ##Set up the tax information
