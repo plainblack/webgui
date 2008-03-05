@@ -2,7 +2,6 @@ package WebGUI::Shop::Ship;
 
 use strict;
 
-use Carp qw(croak);
 use WebGUI::International;
 use WebGUI::Shop::ShipDriver;
 use WebGUI::Pluggable;
@@ -104,8 +103,9 @@ A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be throw
 sub getOptions {
     my $class      = shift;
     my $session    = shift;
-    croak "Definition requires a session object"
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
+    return;
 }
 
 #-------------------------------------------------------------------

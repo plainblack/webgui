@@ -273,8 +273,11 @@ sub new {
     my $properties = $session->db->quickHashRef('select * from shipper where shipperId=?',[$shipperId]);
     WebGUI::Error::ObjectNotFound->throw(error => q{shipperId not found in db}, id => $shipperId)
         unless scalar keys %{ $properties };
-    croak "Somehow, the options property of this object, $shipperId, got broken in the db"
-        unless exists $properties->{options} and $properties->{options};
+    ##This check is just to guardband the from_json call below.
+    WebGUI::Error::InvalidParam->throw(
+        error => qq{Options property for $shipperId was broken in the db},
+        param => $properties->{options},
+    ) unless $properties->{options};  ##Note, existence is controlled by the columns in the db
     my $options = from_json($properties->{options});
     my $self = WebGUI::Shop::ShipDriver->_buildObj($session, $class, $shipperId, $options);
     return $self;

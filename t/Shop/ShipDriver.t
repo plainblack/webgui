@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 39;
+my $tests = 42;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -302,10 +302,35 @@ is($driver->getId,           $driverCopy->getId,     'same id');
 is($driver->className,       $driverCopy->className, 'same className');
 cmp_deeply($driver->options, $driverCopy->options,   'same options');
 
-TODO: {
-    local $TODO = 'tests for new';
-    ok(0, 'Test broken options in the db');
-}
+my $brokenDriver = WebGUI::Shop::ShipDriver->create($session, {label=>'to be broken', enabled=>'0'});
+$session->db->write('update shipper set options=NULL where shipperId=?',[$brokenDriver->getId]);
+
+eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, $brokenDriver->getId); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new croaks if the options column in the db is null');
+cmp_deeply(
+    $e,
+    methods(
+        error => re('Options property for \S{22} was broken in the db'),
+        param => undef,
+    ),
+    'new croaks if the options column in the db is null',
+);
+
+$session->db->write(q{update shipper set options='' where shipperId=?},[$brokenDriver->getId]);
+
+eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, $brokenDriver->getId); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new croaks if the options column in the db is empty string');
+cmp_deeply(
+    $e,
+    methods(
+        error => re('Options property for \S{22} was broken in the db'),
+        param => '',
+    ),
+    'new croaks if the options column in the db is empty string',
+);
+
 
 #######################################################################
 #

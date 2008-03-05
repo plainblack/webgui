@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 27;
+my $tests = 29;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -218,6 +218,23 @@ cmp_bag(
     \@shipperNames,
     [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping}],
     'Returned shippers have the right data'
+);
+
+#######################################################################
+#
+# getOptions
+#
+#######################################################################
+
+eval { $shippers = WebGUI::Shop::Ship->getOptions(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giving it a session object');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'getOptions takes exception to not giving it a session object',
 );
 
 }
