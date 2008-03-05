@@ -1,3 +1,5 @@
+7.4.28
+
 7.4.27
  - fixed: wiki no longer links to pages in trash (Arjan Widlak, United Knowledge)
  - fixed: Child assets not indicated by plus sign in uncommited tags
