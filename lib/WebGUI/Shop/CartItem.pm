@@ -114,6 +114,19 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getShippingAddress ()
+
+Returns the WebGUI::Shop::Address object that is attached to this item for shipping.
+
+=cut
+
+sub getShippingAddress {
+    my $self = shift;
+    return $self->cart->getAddressBook->getAddress($self->get("shippingAddressId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getSku ( )
 
 Returns an instanciated WebGUI::Asset::Sku object for this cart item.

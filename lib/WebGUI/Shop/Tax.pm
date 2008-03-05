@@ -88,7 +88,7 @@ sub add {
 Calculate the tax for the contents of the cart.  The tax rate is calculated off
 of the shipping address stored in the cart.  If an item in the cart has an alternate
 address, that is used instead.  Finally, if the item in the cart has a Sku with a tax
-rate override, that rate overrides all.
+rate override, that rate overrides all. Returns 0 if no shipping address has been attached to the cart yet.
 
 =cut
 
@@ -98,6 +98,7 @@ sub calculate {
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
         unless ref($cart) eq 'WebGUI::Shop::Cart';
     my $book = WebGUI::Shop::AddressBook->create($self->session);
+    return 0 if $cart->get('shippingAddressId') eq "";
     my $address = $book->getAddress($cart->get('shippingAddressId'));
     my $tax = 0;
     foreach my $item (@{ $cart->getItems }) {

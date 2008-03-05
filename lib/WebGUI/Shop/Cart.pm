@@ -6,6 +6,7 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
+use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::CartItem;
 # use WebGUI::Shop::Coupon;
 use WebGUI::Shop::Ship;
@@ -52,6 +53,26 @@ sub addItem {
     my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
+
+#-------------------------------------------------------------------
+
+=head2 calculateSubtotal ()
+
+Returns the subtotal of the items in the cart.
+
+=cut
+
+sub calculateSubtotal {
+    my $self = shift;
+    my $subtotal = 0;
+    foreach my $item (@{$self->getItems}) {
+        my $sku = $item->getSku;
+        $subtotal += $sku->getPrice * $item->get("quantity");
+    }
+    return $subtotal;
+}   
+
+
 
 #-------------------------------------------------------------------
 
@@ -110,6 +131,23 @@ sub empty {
 
 #-------------------------------------------------------------------
 
+=head2 formatCurrency ( amount )
+
+Formats a number as a float with two digits after the decimal like 0.00.
+
+=head3 amount
+
+The number to format.
+
+=cut
+
+sub formatCurrency {
+    my ($self, $amount) = @_;
+    return sprintf("%.2f", $amount);
+}
+
+#-------------------------------------------------------------------
+
 =head2 get ( [ property ] )
 
 Returns a duplicated hash reference of this object’s data.
@@ -127,6 +165,19 @@ sub get {
     }
     my %copyOfHashRef = %{$properties{id $self}};
     return \%copyOfHashRef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAddressBook ()
+
+Returns a reference to the address book for the user who's cart this is.
+
+=cut
+
+sub getAddressBook {
+    my $self = shift;
+    return WebGUI::Shop::AddressBook->create($self->session);
 }
 
 #-------------------------------------------------------------------
@@ -158,6 +209,19 @@ sub getItems {
         push(@itemsObjects, WebGUI::Shop::CartItem->new($self, $itemId));
     }
     return \@itemsObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getShippingAddress ()
+
+Returns the WebGUI::Shop::Address object that is attached to this cart for shipping.
+
+=cut
+
+sub getShippingAddress {
+    my $self = shift;
+    return $self->getAddressBook->getAddress($self->get("shippingAddressId"));
 }
 
 #-------------------------------------------------------------------
@@ -297,16 +361,20 @@ sub www_view {
             quantityField           => WebGUI::Form::integer($session, {name=>"quantity-".$item->getId, value=>$item->get("quantity")}),
             isUnique                => ($sku->getMaxAllowedInCart == 1),
             isShippable             => $sku->isShippingRequired,
-            extendedPrice           => sprintf("%.2f", ($sku->getPrice * $item->get("quantity"))),
-            price                   => sprintf("%.2f", $sku->getPrice),
+            extendedPrice           => $self->formatCurrency($sku->getPrice * $item->get("quantity")),
+            price                   => $self->formatCurrency($sku->getPrice),
             removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
-            shippingAddress         => "todo",
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
                 extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             );
+        my $address = eval { $item->getShippingAddress };
+        unless (WebGUI::Error->caught) {
+            $properties{shippingAddress} = $address->getHtmlFormatted;
+        }
         push(@items, \%properties);
     }
+    my $tax = WebGUI::Shop::Tax->new($self->session);
     my %var = (
         %{$self->get},
         items                   => \@items,
@@ -323,17 +391,20 @@ sub www_view {
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
             extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
-        shipppingAddress        => "todo",
         shippingOptions         => "todo",
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
-        hasShippingAddress      => "todo",
+        hasShippingAddress      => ($self->get("shippingAddressId") ne ""),
         couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         couponDiscount          => "todo",
         totalPrice              => "todo",
-        tax                     => "todo",
-        subtotalPrice           => "todo",
+        tax                     => $self->formatCurrency($tax->calculate($self)),
+        subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         );
+        my $address = eval { $self->getShippingAddress };
+        unless (WebGUI::Error->caught) {
+            $var{shippingAddress} = $address->getHtmlFormatted;
+        }
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     $template->prepare;
     return $session->style->userStyle($template->process(\%var));
