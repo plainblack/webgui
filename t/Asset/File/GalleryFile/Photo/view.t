@@ -8,33 +8,29 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+# The goal of this test is to test the view and getTemplateVars methods
+
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../../lib";
-
-## The goal of this test is to test the creation and deletion of photo assets
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use WebGUI::Test::Maker::HTML;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
-my $session    = WebGUI::Test->session;
-my $node       = WebGUI::Asset->getImportNode($session);
-my $versionTag = WebGUI::VersionTag->getWorking($session);
-
+my $session         = WebGUI::Test->session;
+my $node            = WebGUI::Asset->getImportNode($session);
+my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
-
+my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-    },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
@@ -45,60 +41,29 @@ my $album
     {
         skipAutoCommitWorkflows => 1,
     });
-my $photo;
-
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 5;
-
-#----------------------------------------------------------------------------
-# Test module compiles okay
-# plan tests => 1
-use_ok("WebGUI::Asset::File::Image::Photo");
-
-#----------------------------------------------------------------------------
-# Test creating a photo
-$photo
+my $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
     {
         skipAutoCommitWorkflows => 1,
     });
-
 $versionTag->commit;
-
-is(
-    blessed $photo, "WebGUI::Asset::File::Image::Photo",
-    "Photo is a WebGUI::Asset::File::Image::Photo object",
-);
-
-isa_ok( 
-    $photo, "WebGUI::Asset::File::Image",
-);
-
-
-is(
-    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
-    "Photo->getGallery gets the gallery containing this photo",
-);
+$photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 
 #----------------------------------------------------------------------------
-# Test deleting a photo
-my $properties  = $photo->get;
-$photo->purge;
+# Tests
+plan tests => 1;
 
-is(
-    WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
-    "Photo no longer able to be instanciated",
-);
+TODO: {
+    local $TODO = "Write some tests";
+    ok(0, 'No tests here, move on');
+}
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $versionTag->rollback;
+    $versionTag->rollback();
 }
-
-

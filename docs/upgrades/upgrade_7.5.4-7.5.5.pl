@@ -25,6 +25,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addGalleryEditCommentTemplate( $session );
 addGalleryRichEditAlbum( $session );
+migrateToGalleryFile( $session );
 
 finish($session); # this line required
 
@@ -58,6 +59,29 @@ sub addGalleryRichEditAlbum {
     $session->db->write( q{
         ALTER TABLE Gallery ADD COLUMN richEditIdAlbum VARCHAR(22) BINARY
     } );
+    $session->db->write( q{
+        ALTER TABLE Gallery ADD COLUMN richEditIdFile VARCHAR(22) BINARY
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Move File::Image::Photos to File::GalleryFile::Photos
+sub migrateToGalleryFile {
+    my $session     = shift;
+    print "\tMigrating Image::Photos to GalleryFile::Photos (this may take time)..." unless $quiet;
+
+    # Change WebGUI::Asset::File::Image::Photo to WebGUI::Asset::File::GalleryFile::Photo
+    $session->db->write( q{
+        UPDATE asset SET className='WebGUI::Asset::File::GalleryFile::Photo' WHERE 
+        className='WebGUI::Asset::File::Image::Photo'
+    });
+
+    # Delete Photos from ImageAsset table
+    $session->db->write(
+        "DELETE FROM ImageAsset WHERE assetId IN ( SELECT assetId FROM Photo )"
+    );
 
     print "DONE!\n" unless $quiet;
 }

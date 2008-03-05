@@ -12,15 +12,14 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../../lib";
 
-## The goal of this test is to test the EXIF functionality of WebGUI's photo
-# asset
+## The goal of this test is to test the creation and deletion of photo assets
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
-use Image::ExifTool qw(:Public);
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,31 +30,47 @@ $versionTag->set({name=>"Photo Test"});
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
+        imageResolutions    => "1024x768",
     });
 my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     },
-    undef, undef,
-    { skipAutoCommitWorkflows => 1 },
-    );
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
 my $photo
     = $album->addChild({
-        className               => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
-    undef, undef,
-    { skipAutoCommitWorkflows => 1 },
-    );
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
+    });
 $versionTag->commit;
-my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
-# Sanitize Exif data by removing keys with references as values
-for my $key ( keys %$exif ) {
-    if ( ref $exif->{$key} ) {
-        delete $exif->{$key};
-    }
-}
 
-$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 2;
+
+#----------------------------------------------------------------------------
+# setFile also makes download versions
+$photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
+my $storage = $photo->getStorageLocation;
+
+cmp_deeply(
+    $storage->getFiles, bag('page_title.jpg','1024x768.jpg'),
+    "Storage location contains the resolution file",
+);
+
+ok(
+    -e $storage->getPath($gallery->get('imageResolutions') . '.jpg'),
+    "Generated resolution file exists on the filesystem",
+);
+
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -63,21 +78,3 @@ END {
     $versionTag->rollback();
 }
 
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 2;
-
-#----------------------------------------------------------------------------
-# Test getTemplateVars exif data
-my $var         = $photo->getTemplateVars;
-
-cmp_deeply(
-    [ keys %$var ], superbagof( map { unless (ref $exif->{ $_ }) { 'exif_' . $_ } } keys %$exif ),
-    'getTemplateVars gets a hash of all valid exif tags',
-);
-
-is_deeply(
-    [ sort keys %$exif ],
-    [ sort map { $_->{tag} } @{ $var->{exifLoop} } ],
-    "getTemplateVars gets a loop over the tags",
-);

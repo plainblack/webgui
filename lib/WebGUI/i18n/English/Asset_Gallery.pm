@@ -87,6 +87,16 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Asset property description',
     },
+    "richEditIdFile label" => {
+        message     => "Rich Editor for Files",
+        lastUpdated => 0,
+        context     => 'Asset property label',
+    },
+    "richEditIdFile description" => {
+        message     => "The Rich Text Editor to use for Files",
+        lastUpdated => 0,
+        context     => 'Asset property description',
+    },
     "richEditIdFileComment label" => {
         message     => "Rich Editor for Comments",
         lastUpdated => 0,

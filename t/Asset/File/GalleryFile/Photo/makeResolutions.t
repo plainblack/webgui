@@ -29,7 +29,7 @@ BEGIN {
         $graphicsClass = 'Graphics::Magick';
     }
 }
-use WebGUI::Asset::File::Image::Photo;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -63,7 +63,7 @@ plan tests => 13;
 # makeResolutions gets default resolutions from a parent Photo Gallery asset
 $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
@@ -110,7 +110,7 @@ $album
     });
 $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
@@ -148,7 +148,7 @@ TODO: {
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $photo
     = $node->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
@@ -185,7 +185,7 @@ TODO: {
 push @versionTags, WebGUI::VersionTag->getWorking($session);
 $photo
     = $node->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,

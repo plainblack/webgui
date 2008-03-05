@@ -19,7 +19,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Asset::File::Image::Photo;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -47,7 +47,7 @@ my $album
     });
 my $photo
     = $gallery->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,

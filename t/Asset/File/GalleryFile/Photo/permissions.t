@@ -63,7 +63,7 @@ my $album
 
 my $photo
     = $album->addChild({
-        className       => "WebGUI::Asset::File::Image::Photo",
+        className       => "WebGUI::Asset::File::GalleryFile::Photo",
         friendsOnly     => 0,
     },
     undef,

@@ -20,7 +20,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use WebGUI::Test::Maker::HTML;
-use WebGUI::Asset::File::Image::Photo;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -49,7 +49,7 @@ my $album
     });
 my $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
@@ -91,7 +91,7 @@ $maker->prepare({
     method      => "www_editSave",
     formParams  => {
        assetId      => "new",
-       className    => "WebGUI::Asset::File::Image::Photo",
+       className    => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     test_regex  => [ 
         qr/You must select a file/,
@@ -107,7 +107,7 @@ $maker->prepare({
     method      => "www_editSave",
     formParams  => {
        assetId      => "new",
-       className    => "WebGUI::Asset::File::Image::Photo",
+       className    => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     test_regex  => [ 
         qr/awaiting approval and commit/,

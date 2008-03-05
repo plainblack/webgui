@@ -79,7 +79,7 @@ our $I18N = {
     },
 
     'help thumbnails body' => {
-        message     => 'These variables are available from the slideshow view of the Album',
+        message     => 'These variables are available from the thumbnails view of the Album',
         lastUpdated => 0,
     },
 

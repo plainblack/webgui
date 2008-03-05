@@ -5,6 +5,9 @@
  - Added ability to edit comments. Entirely changed how comments work in prep
    for turning it into a mixin.
  - fixed: Child assets not indicated by plus sign in uncommited tags
+ - Added WebGUI::Asset::File::GalleryFile as a subclass for all files to be 
+   used inside the Gallery.
+ - Changed WebGUI::Asset::File::Image::Photo to subclass GalleryFile
 
 7.5.4
  - fixed: unable to remove calendar feeds in IE6

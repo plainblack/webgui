@@ -18,19 +18,23 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use Test::Deep;
-use WebGUI::Asset::File::Image::Photo;
 
 #----------------------------------------------------------------------------
 # Init
-my $session         = WebGUI::Test->session;
-my $node            = WebGUI::Asset->getImportNode($session);
-my $versionTag      = WebGUI::VersionTag->getWorking($session);
+my $session    = WebGUI::Test->session;
+my $node       = WebGUI::Asset->getImportNode($session);
+my $versionTag = WebGUI::VersionTag->getWorking($session);
+
 $versionTag->set({name=>"Photo Test"});
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
-        imageResolutions    => "1024x768",
+    },
+    undef,
+    undef,
+    {
+        skipAutoCommitWorkflows => 1,
     });
 my $album
     = $gallery->addChild({
@@ -41,40 +45,60 @@ my $album
     {
         skipAutoCommitWorkflows => 1,
     });
-my $photo
+my $photo;
+
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 5;
+
+#----------------------------------------------------------------------------
+# Test module compiles okay
+# plan tests => 1
+use_ok("WebGUI::Asset::File::GalleryFile::Photo");
+
+#----------------------------------------------------------------------------
+# Test creating a photo
+$photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
     undef,
     {
         skipAutoCommitWorkflows => 1,
     });
+
 $versionTag->commit;
 
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 2;
-
-#----------------------------------------------------------------------------
-# setFile also makes download versions
-$photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
-my $storage = $photo->getStorageLocation;
-
-cmp_deeply(
-    $storage->getFiles, bag('page_title.jpg','1024x768.jpg'),
-    "Storage location contains the resolution file",
+is(
+    blessed $photo, "WebGUI::Asset::File::GalleryFile::Photo",
+    "Photo is a WebGUI::Asset::File::GalleryFile::Photo object",
 );
 
-ok(
-    -e $storage->getPath($gallery->get('imageResolutions') . '.jpg'),
-    "Generated resolution file exists on the filesystem",
+isa_ok( 
+    $photo, "WebGUI::Asset::File::GalleryFile",
 );
 
+
+is(
+    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
+    "Photo->getGallery gets the gallery containing this photo",
+);
+
+#----------------------------------------------------------------------------
+# Test deleting a photo
+my $properties  = $photo->get;
+$photo->purge;
+
+is(
+    WebGUI::Asset->newByDynamicClass($session, $properties->{assetId}), undef,
+    "Photo no longer able to be instanciated",
+);
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $versionTag->rollback();
+    $versionTag->rollback;
 }
+
 

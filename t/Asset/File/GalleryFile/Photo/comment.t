@@ -20,7 +20,7 @@ use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
 use Scalar::Util qw( blessed );
-use WebGUI::Asset::File::Image::Photo;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -43,7 +43,7 @@ my $album
     }, @addArguments );
 my $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
     }, @addArguments );
 
 $versionTags[-1]->commit;
@@ -195,7 +195,7 @@ TODO: {
 my $html;
 $photo 
     = $album->addChild({
-        className       => "WebGUI::Asset::File::Image::Photo",
+        className       => "WebGUI::Asset::File::GalleryFile::Photo",
     }, @addArguments );
 
 # Permissions

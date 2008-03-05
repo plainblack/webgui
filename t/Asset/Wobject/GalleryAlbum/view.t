@@ -52,7 +52,7 @@ my @photos;
 for my $i ( 0 .. 5 ) {
     $photos[ $i ] 
         = $album->addChild({
-            className           => "WebGUI::Asset::File::Image::Photo",
+            className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
         },
         undef,
@@ -87,7 +87,7 @@ cmp_deeply( $album->getTemplateVars, superhashof( { %{$album->get}, url => $albu
 my $expected = {
     "url_addPhoto" 
         => all( 
-            re( qr/class=WebGUI::Asset::File::Image::Photo/ ), 
+            re( qr/class=WebGUI::Asset::File::GalleryFile::Photo/ ), 
             re( qr/func=add/ ),
             re( $album->getUrl ),
         ),

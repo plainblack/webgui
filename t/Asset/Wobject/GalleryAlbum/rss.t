@@ -51,7 +51,7 @@ my @photos;
 for my $i ( 0 .. 5 ) {
     $photos[ $i ] 
         = $album->addChild({
-            className           => "WebGUI::Asset::File::Image::Photo",
+            className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
         },
         undef,

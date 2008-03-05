@@ -146,6 +146,34 @@ sub addArchive {
 
 #----------------------------------------------------------------------------
 
+=head2 addChild ( properties [, ... ] )
+
+Add a child to this GalleryAlbum. See C<WebGUI::AssetLineage> for more info.
+
+Override to ensure only appropriate classes get added to GalleryAlbums.
+
+=cut
+
+sub addChild {
+    my $self        = shift;
+    my $properties  = shift;
+    my $fileClass   = 'WebGUI::Asset::File::GalleryFile';
+    
+    # Load the class
+    WebGUI::Pluggable::load( $properties->{className} );
+
+    if ( !$properties->{className}->isa( $fileClass ) ) {
+        $self->session->errorHandler->security(
+            "add a ".$properties->{className}." to a ".$self->get("className")
+        );
+        return undef;
+    }
+
+    return $self->SUPER::addChild( $properties, @_ );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 appendTemplateVarsFileLoop ( vars, assetIds )
 
 Append template vars for a file loop for the specified assetIds. C<vars> is
@@ -381,7 +409,7 @@ sub getTemplateVars {
     # Friendly URLs
     $var->{ url                     } = $self->getUrl;
     $var->{ url_addArchive          } = $self->getUrl('func=addArchive');
-    $var->{ url_addPhoto            } = $self->getUrl("func=add;class=WebGUI::Asset::File::Image::Photo");
+    $var->{ url_addPhoto            } = $self->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo");
     $var->{ url_addNoClass          } = $self->getUrl("func=add");
     $var->{ url_delete              } = $self->getUrl("func=delete");
     $var->{ url_edit                } = $self->getUrl("func=edit");

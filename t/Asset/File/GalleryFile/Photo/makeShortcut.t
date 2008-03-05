@@ -20,7 +20,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use WebGUI::Test::Maker::HTML;
-use WebGUI::Asset::File::Image::Photo;
+use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
 # Init
@@ -35,7 +35,7 @@ my $otherParent
     });
 my $photo
     = $node->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className           => "WebGUI::Asset::File::GalleryFile::Photo",
         userDefined1        => "ORIGINAL",
     },
     undef,

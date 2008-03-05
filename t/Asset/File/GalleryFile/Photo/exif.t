@@ -8,18 +8,19 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-# The goal of this test is to test the view and getTemplateVars methods
-
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../../lib";
+
+## The goal of this test is to test the EXIF functionality of WebGUI's photo
+# asset
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Test::Maker::HTML;
-use WebGUI::Asset::File::Image::Photo;
+use Test::Deep;
+use Image::ExifTool qw(:Public);
 
 #----------------------------------------------------------------------------
 # Init
@@ -27,7 +28,6 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
-my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
@@ -36,34 +36,48 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
     },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    undef, undef,
+    { skipAutoCommitWorkflows => 1 },
+    );
 my $photo
     = $album->addChild({
-        className           => "WebGUI::Asset::File::Image::Photo",
+        className               => "WebGUI::Asset::File::GalleryFile::Photo",
     },
-    undef,
-    undef,
-    {
-        skipAutoCommitWorkflows => 1,
-    });
+    undef, undef,
+    { skipAutoCommitWorkflows => 1 },
+    );
 $versionTag->commit;
-$photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
-
-#----------------------------------------------------------------------------
-# Tests
-plan tests => 1;
-
-TODO: {
-    local $TODO = "Write some tests";
-    ok(0, 'No tests here, move on');
+my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+# Sanitize Exif data by removing keys with references as values
+for my $key ( keys %$exif ) {
+    if ( ref $exif->{$key} ) {
+        delete $exif->{$key};
+    }
 }
+
+$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $versionTag->rollback();
 }
+
+#----------------------------------------------------------------------------
+# Tests
+plan tests => 2;
+
+#----------------------------------------------------------------------------
+# Test getTemplateVars exif data
+my $var         = $photo->getTemplateVars;
+
+cmp_deeply(
+    [ keys %$var ], superbagof( map { unless (ref $exif->{ $_ }) { 'exif_' . $_ } } keys %$exif ),
+    'getTemplateVars gets a hash of all valid exif tags',
+);
+
+is_deeply(
+    [ sort keys %$exif ],
+    [ sort map { $_->{tag} } @{ $var->{exifLoop} } ],
+    "getTemplateVars gets a loop over the tags",
+);

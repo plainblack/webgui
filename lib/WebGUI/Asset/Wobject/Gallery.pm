@@ -125,6 +125,13 @@ sub definition {
             label           => $i18n->get("richEditIdAlbum label"),
             hoverHelp       => $i18n->get("richEditIdAlbum description"),
         },
+        richEditIdFile => {
+            tab             => "properties",
+            fieldType       => "selectRichEditor",
+            defaultValue    => "PBrichedit000000000002", # Forum Rich editor
+            label           => $i18n->get("richEditIdFile label"),
+            hoverHelp       => $i18n->get("richEditIdFile description"),
+        },
         richEditIdComment => {
             tab             => "properties",
             fieldType       => "selectRichEditor",
@@ -323,6 +330,34 @@ sub definition {
 
 #----------------------------------------------------------------------------
 
+=head2 addChild ( properties, [...] )
+
+Add a child to this asset. See C<WebGUI::AssetLineage> for more info.
+
+Overridden to ensure that only GalleryAlbums are added to Galleries.
+
+=cut
+
+sub addChild {
+    my $self        = shift;
+    my $properties  = shift;
+    my $albumClass  = "WebGUI::Asset::Wobject::GalleryAlbum";
+
+    # Load the class
+    WebGUI::Pluggable::load( $properties->{className} );
+
+    if ( !$properties->{className}->isa( $albumClass ) ) {
+        $self->session->errorHandler->security(
+            "add a ".$properties->{className}." to a ".$self->get("className")
+        );
+        return undef;
+    }
+
+    return $self->SUPER::addChild( $properties, @_ );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 appendTemplateVarsSearchForm ( var )
 
 Appends the template vars for the search form to the hash reference C<var>.
@@ -372,9 +407,9 @@ sub appendTemplateVarsSearchForm {
 
     # Search classes
     tie my %searchClassOptions, 'Tie::IxHash', (
-        'WebGUI::Asset::File::Image::Photo'     => $i18n->get("search class photo"),
-        'WebGUI::Asset::Wobject::GalleryAlbum'  => $i18n->get("search class galleryalbum"),
-        ''                                      => $i18n->get("search class any"),
+        'WebGUI::Asset::File::GalleryFile::Photo'   => $i18n->get("search class photo"),
+        'WebGUI::Asset::Wobject::GalleryAlbum'      => $i18n->get("search class galleryalbum"),
+        ''                                          => $i18n->get("search class any"),
     );
     $var->{ searchForm_className }
         = WebGUI::Form::radioList( $session, {
@@ -580,7 +615,7 @@ sub getAssetClassForFile {
 
     # Checks for Photo assets
     if ( $filepath =~ /\.(jpe?g|gif|png)$/i ) {
-        return "WebGUI::Asset::File::Image::Photo";
+        return "WebGUI::Asset::File::GalleryFile::Photo";
     }
 
     # No class found
@@ -931,7 +966,7 @@ sub www_search {
 
         my $joinClass   = [
             'WebGUI::Asset::Wobject::GalleryAlbum',
-            'WebGUI::Asset::File::Image::Photo',
+            'WebGUI::Asset::File::GalleryFile::Photo',
         ];
         if ( $form->get("className") ) {
             $joinClass  = [ $form->get('className') ];

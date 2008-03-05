@@ -1,4 +1,4 @@
-package WebGUI::Asset::File::Image::Photo;
+package WebGUI::Asset::File::GalleryFile::Photo;
 
 =head1 LEGAL
 
@@ -15,7 +15,7 @@ package WebGUI::Asset::File::Image::Photo;
 =cut
 
 use strict;
-use base 'WebGUI::Asset::File::Image';
+use base 'WebGUI::Asset::File::GalleryFile';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
@@ -26,18 +26,19 @@ use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Friends;
 use WebGUI::Utility;
+use WebGUI::Storage::Image;
 
 
 =head1 NAME
 
-WebGUI::Asset::File::Image::Photo
+WebGUI::Asset::File::GalleryFile::Photo
 
 =head1 DESCRIPTION
 
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::File::Image::Photo
+use WebGUI::Asset::File::GalleryFile::Photo
 
 =head1 DIAGNOSTICS
 
@@ -101,7 +102,7 @@ sub definition {
         autoGenerateForms   => 0,
         icon                => 'photo.gif',
         tableName           => 'Photo',
-        className           => 'WebGUI::Asset::File::Image::Photo',
+        className           => 'WebGUI::Asset::File::GalleryFile::Photo',
         i18n                => 'Asset_Photo',
         properties          => \%properties,
     };
@@ -196,13 +197,18 @@ sub applyConstraints {
     my $gallery     = $self->getGallery;
     
     # Update the asset's size and make a thumbnail
-    $self->SUPER::applyConstraints({
-        maxImageSize        => $self->getGallery->get("imageViewSize"),
-        thumbnailSize       => $self->getGallery->get("imageThumbnailSize"),
-    });
-
-    $self->makeResolutions();
-    $self->updateExifDataFromFile();
+    my $maxImageSize    = $self->getGallery->get("imageViewSize") 
+                        || $self->session->setting->get("maxImageSize");
+    my $thumbnailSize   = $self->getGallery->get("imageThumbnailSize")
+                        || $self->session->setting->get("thumbnailSize");
+    my $parameters      = $self->get("parameters");
+    my $storage         = $self->getStorageLocation;
+    my $file            = $self->get("filename");
+    $storage->adjustMaxImageSize($file);
+    $self->generateThumbnail;
+    $self->setSize;
+    $self->makeResolutions;
+    $self->updateExifDataFromFile;
 }
 
 #----------------------------------------------------------------------------
@@ -309,6 +315,23 @@ sub deleteComment {
         "DELETE FROM Photo_comment WHERE assetId=? AND commentId=?",
         [$self->getId, $commentId],
     );
+}
+
+#-------------------------------------------------------------------
+
+=head2 generateThumbnail ( ) 
+
+Generates a thumbnail for this image.
+
+=cut
+
+sub generateThumbnail {
+    my $self        = shift;
+    $self->getStorageLocation->generateThumbnail(
+        $self->get("filename"),
+        $self->getGallery->get("imageThumbnailSize"),
+    );
+    return;
 }
 
 #----------------------------------------------------------------------------
@@ -453,6 +476,19 @@ sub getResolutions {
 
 #----------------------------------------------------------------------------
 
+=head2 getStorageClass ( )
+
+Get the WebGUI::Storage subclass name for this file. This file uses the
+Image class.
+
+=cut
+
+sub getStorageClass {
+    return 'WebGUI::Storage::Image';
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getTemplateVars ( )
 
 Get a hash reference of template variables shared by all views of this asset.
@@ -462,7 +498,7 @@ Get a hash reference of template variables shared by all views of this asset.
 sub getTemplateVars {
     my $self        = shift;
     my $session     = $self->session;
-    my $var         = $self->get;
+    my $var         = $self->SUPER::getTemplateVars;
     my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
@@ -487,9 +523,6 @@ sub getTemplateVars {
         = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->get("ownerUserId"));
     $var->{ url_promote         } = $self->getUrl('func=promote');
 
-    $var->{ fileUrl             } = $self->getFileUrl;
-    $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
-
     ### Download resolutions
     for my $resolution ( $self->getResolutions ) {
         push @{ $var->{ resolutions_loop } }, { 
@@ -508,6 +541,21 @@ sub getTemplateVars {
     }
 
     return $var;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getThumbnailUrl ( )
+
+Get the URL to the thumbnail for this Photo.
+
+=cut
+
+sub getThumbnailUrl {
+    my $self = shift;
+    return $self->getStorageLocation->getThumbnailUrl(
+        $self->get("filename")
+    );
 }
 
 #----------------------------------------------------------------------------
@@ -704,19 +752,6 @@ sub processPropertiesFromFormPost {
 
 #----------------------------------------------------------------------------
 
-=head2 processStyle ( html )
-
-Returns the HTML from the Gallery's style.
-
-=cut
-
-sub processStyle {
-    my $self        = shift;
-    return $self->getGallery->processStyle( @_ );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 purge ( )
 
 Purge the asset. Remove all comments on the photo.
@@ -767,6 +802,20 @@ sub setComment {
         "Photo_comment", "commentId", 
         $properties, 
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 setFile ( filename )
+
+Extend the superclass setFile to automatically generate thumbnails.
+
+=cut
+
+sub setFile {
+    my $self    = shift;
+    $self->SUPER::setFile(@_);
+    $self->generateThumbnail;
 }
 
 #----------------------------------------------------------------------------
@@ -913,25 +962,6 @@ sub www_deleteConfirm {
     return $self->processStyle(
         sprintf $i18n->get("delete message"), $self->getParent->getUrl,
     );
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_demote
-
-Override the default demote page to send the user back to the GalleryAlbum 
-edit screen.
-
-=cut
-
-sub www_demote {
-    my $self        = shift;
-
-    return $self->session->privilege->insufficient unless $self->canEdit;
-
-    $self->demote;
-    
-    return $self->session->asset( $self->getParent )->www_edit;
 }
 
 #----------------------------------------------------------------------------
@@ -1211,25 +1241,6 @@ sub www_makeShortcutSave {
 
 #----------------------------------------------------------------------------
 
-=head2 www_promote
-
-Override the default promote page to send the user back to the GalleryAlbum 
-edit screen.
-
-=cut
-
-sub www_promote {
-    my $self        = shift;
-
-    return $self->session->privilege->insufficient unless $self->canEdit;
-
-    $self->promote;
-    
-    return $self->session->asset( $self->getParent )->www_edit;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 www_showConfirmation ( ) 
 
 Shows the confirmation message after adding / editing a gallery album. 
@@ -1266,15 +1277,7 @@ sub www_view {
     # Add to views
     $self->update({ views => $self->get('views') + 1 });
 
-    $self->session->http->setLastModified($self->getContentLastModified);
-    $self->session->http->sendHeader;
-    $self->prepareView;
-    my $style = $self->processStyle("~~~");
-    my ($head, $foot) = split("~~~",$style);
-    $self->session->output->print($head, 1);
-    $self->session->output->print($self->view);
-    $self->session->output->print($foot, 1);
-    return "chunked";
+    return $self->SUPER::www_view;
 }
 
 1;
