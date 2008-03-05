@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
+use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -33,7 +34,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 68;
+my $tests = 73;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -228,7 +229,6 @@ my @header = WebGUI::Text::splitCSV($fileLines[0]);
 my @expectedHeader = qw/field value taxRate/;
 cmp_deeply(\@header, \@expectedHeader, 'exportTaxData: header line is correct');
 my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
-use Data::Dumper;
 my $wiData = $taxer->getItems->hashRef;
 ##Need to ignore the taxId from the database
 cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'exportTaxData: first line of data is correct');
@@ -437,7 +437,7 @@ $cart->update({ shippingAddressId => $taxingAddress->getId});
 
 ##Set up the tax information
 $taxer->importTaxData(
-    WebGUI::Test->getTestCollateralPath('taxTables/goodTaxTable.csv')
+    WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
 ),
 
 my $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
@@ -455,7 +455,41 @@ foreach my $item (@{ $cart->getItems }) {
 my $tax = $taxer->calculate($cart);
 is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
 
+$cart->update({ shippingAddressId => $taxFreeAddress->getId});
+is($taxer->calculate($cart), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
+
+foreach my $item (@{ $cart->getItems }) {
+    $item->setQuantity(2);
+}
+
+$cart->update({ shippingAddressId => $taxingAddress->getId});
+is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
+
+my $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
+    className => 'WebGUI::Asset::Sku::Donation',
+    title     => 'Tax Free Donation',
+    defaultPrice => 100.00,
+    overrideTaxRate => 1,
+    taxRateOverride => 0,
+});
+
+$cart->addItem($taxFreeDonation);
+
+foreach my $item (@{ $cart->getItems }) {
+    $item->setQuantity(1);
+}
+is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes');
+
+my $remoteItem = $cart->addItem($taxableDonation);
+$remoteItem->update({shippingAddressId => $taxFreeAddress->getId});
+
+foreach my $item (@{ $cart->getItems }) {
+    $item->setQuantity(1);
+}
+is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes, 1 shipped to a location with no taxes');
+
 $taxableDonation->purge;
+$taxFreeDonation->purge;
 $cart->delete;
 $book->delete;
 }

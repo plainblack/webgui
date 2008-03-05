@@ -85,7 +85,10 @@ sub add {
 
 =head2 calculate ( $cart )
 
-Calculate the tax for the contents of the cart.
+Calculate the tax for the contents of the cart.  The tax rate is calculated off
+of the shipping address stored in the cart.  If an item in the cart has an alternate
+address, that is used instead.  Finally, if the item in the cart has a Sku with a tax
+rate override, that rate overrides all.
 
 =cut
 
@@ -95,19 +98,31 @@ sub calculate {
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Cart object')
         unless ref($cart) eq 'WebGUI::Shop::Cart';
     my $book = WebGUI::Shop::AddressBook->create($self->session);
-    my $address = WebGUI::Shop::Address->new($book, $cart->get('shippingAddressId'));
+    my $address = $book->getAddress($cart->get('shippingAddressId'));
     my $tax = 0;
     foreach my $item (@{ $cart->getItems }) {
         my $sku = $item->getSku;
         my $unitPrice = $sku->getPrice;
         my $quantity  = $item->get('quantity');
-        my $taxables  = $self->getTaxRates($address);
-        use Data::Dumper;
-        warn Dumper $taxables;
-        my $itemTax   = sum(@{$taxables}) / 100;  ##Form a percentage
-        warn "unitPrice: $unitPrice\n";
-        warn "quantity : $quantity\n";
-        warn "itemTax  : $itemTax\n";
+        ##Check for an item specific shipping address
+        my $itemAddress;
+        if (defined $item->get('shippingAddressId')) {
+            $itemAddress = $book->getAddress($item->get('shippingAddressId'));
+        }
+        else {
+            $itemAddress = $address;
+        }
+        my $taxables  = $self->getTaxRates($itemAddress);
+        ##Check for a SKU specific tax override rate
+        my $skuTaxRate = $sku->getTaxRate();
+        my $itemTax;
+        if (defined $skuTaxRate) {
+            $itemTax = $skuTaxRate;
+        }
+        else {
+            $itemTax = sum(@{$taxables});
+        }
+        $itemTax /= 100;
         $tax += $unitPrice * $quantity * $itemTax;
     }
     return $tax;

@@ -39,7 +39,7 @@ private error => my %error;
 
 =head2 addItem ( sku )
 
-Adds an item to the cart. Returns the number of items now in the cart.
+Adds an item to the cart. Returns a reference to the newly added item.
 
 =head3 sku
 
