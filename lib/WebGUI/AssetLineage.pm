@@ -188,7 +188,7 @@ sub getChildCount {
 	my $self = shift;
     my $opts = shift || {};
 	my $stateWhere = $opts->{includeTrash} ? '' : "asset.state='published' and";
-	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and assetData.status in ('approved', 'archived')", [$self->getId]);
+	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
 	return $count;
 }
 

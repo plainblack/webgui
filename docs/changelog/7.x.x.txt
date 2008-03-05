@@ -4,6 +4,7 @@
  - Removed some spurious warnings from the calendar.
  - Added ability to edit comments. Entirely changed how comments work in prep
    for turning it into a mixin.
+ - fixed: Child assets not indicated by plus sign in uncommited tags
 
 7.5.4
  - fixed: unable to remove calendar feeds in IE6
