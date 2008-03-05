@@ -99,6 +99,12 @@ my @testSets = (
 		output => '1:0:1:2:3,2:100:101:102:103,',
 	},
 	{
+		comment => q!Multiline output test using rownum!,
+		sql => q!select zero from testTable order by one!,
+		template => "^rownum;\n",
+		output => "1\n2\n",
+	},
+	{
 		comment => q!SQL error!,
 		sql => q!select ** from testTable order by one!,
 		template => join(':', map { "^$_;" } 'rownum', 0..3).',',
