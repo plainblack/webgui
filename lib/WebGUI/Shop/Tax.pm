@@ -222,20 +222,12 @@ sub getTaxRates {
     my $code    = $address->get('code');
     my $result = $self->session->db->buildArrayRef(
     q{
-        select taxRate from tax where
-           (country=? and state='' and city='' and code='')
-        OR (country=? and state=?  and city='' and code='')
-        OR (country=? and state=?  and city=?  and code='')
-        OR (country=? and state=?  and city='' and code=? )
-        OR (country=? and state=?  and city=?  and code=? )
+        select taxRate from tax where country=?
+        and (state='' or state=?)
+        and (city=''  or city=?)
+        and (code=''  or code=?)
     },
-    [
-        $country,
-        $country, $state,
-        $country, $state, $city,
-        $country, $state, $code,
-        $country, $state, $city, $code,
-    ]);
+    [ $country, $state, $city, $code, ]);
     return $result;
 }
 

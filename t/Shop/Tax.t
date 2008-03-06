@@ -439,7 +439,7 @@ cmp_deeply(
 
 cmp_deeply(
     $taxer->getTaxRates($taxFreeAddress),
-    [0.0],
+    [0,0],
     'getTaxRates: return correct data for a state with no tax data'
 );
 
