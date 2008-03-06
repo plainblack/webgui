@@ -232,7 +232,7 @@ isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giv
 cmp_deeply(
     $e,
     methods(
-        error => 'Must provide a session variable',
+        error => 'Need a cart.',
     ),
     'getOptions takes exception to not giving it a session object',
 );

@@ -92,9 +92,9 @@ sub getDrivers {
 Returns a list of options for the user to ship, along with the cost of using each one.  It is a hash of hashrefs,
 with the key of the primary hash being the shipperId of the driver, and sub keys of label and price.
 
-=head3 $session
+=head3 $cart
 
-A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
+A WebGUI::Shop::Cart object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
 
 =head3
 
@@ -102,8 +102,8 @@ A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be throw
 
 sub getOptions {
     my ($class, $cart) = @_;
+    WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
     my $session = $cart->session; 
-    WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless $cart->isa("WebGUI::Shop::Cart");
     my %options = ();
     foreach my $shipper (@{$class->getShippers($session)}) {
         $options{$shipper->getId} = {
