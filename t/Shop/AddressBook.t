@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 20;
+my $tests = 22;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -163,16 +163,45 @@ cmp_deeply(
 
 #######################################################################
 #
+# update
+#
+#######################################################################
+
+$book->update({ lastShipId => $address1->getId, lastPayId => $address2->getId});
+
+cmp_deeply(
+    $book->get(),
+    {
+        userId     => ignore,
+        sessionId  => ignore,
+        addressBookId  => ignore,
+        lastShipId => $address1->getId,
+        lastPayId  => $address2->getId,
+    },
+    'update updates the object properties cache'
+);
+
+my $bookClone = WebGUI::Shop::AddressBook->new($session, $book->getId);
+
+cmp_deeply(
+    $bookClone,
+    $book,
+    'update updates the db, too'
+);
+
+#######################################################################
+#
 # delete
 #
 #######################################################################
 
-$book->delete();
+$bookClone->delete();
 $bookCount = $session->db->quickScalar('select count(*) from addressBook');
 my $addrCount = $session->db->quickScalar('select count(*) from address');
 
 is($bookCount, 0, 'delete: book deleted');
 is($addrCount, 0, 'delete: also deletes addresses in the book');
+undef $book;
 
 }
 
