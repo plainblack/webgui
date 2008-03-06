@@ -34,7 +34,9 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 80;
+my $addExceptions = getAddExceptions($session);
+
+my $tests = 68 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -88,53 +90,23 @@ $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hashref');
 is($e->error, 'Must pass in a hashref of params', 'add: correct message for a missing hashref');
 
-eval{$taxer->add({})};
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for empty hashref');
-is($e->error, 'Hash ref must contain a field key with a defined value', 'add: correct message for an empty hashref');
+foreach my $inputSet ( @{ $addExceptions } ){
+    eval{$taxer->add($inputSet->{args})};
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: '.$inputSet->{comment});
+    cmp_deeply(
+        $e,
+        methods(
+            error => $inputSet->{error},
+            param => $inputSet->{param},
+        ),
+        'add: '.$inputSet->{comment},
+    );
+}
 
 my $taxData = {
-    field   => undef,
-};
-
-eval{$taxer->add($taxData)};
-like($@, qr{},
-    'add: error handling for undefined field key');
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for valueless hash key');
-is($e->error, 'Hash ref must contain a field key with a defined value', 'add: correct message for valueless hash key');
-
-$taxData->{field} = 'state';
-
-eval{$taxer->add($taxData)};
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing field hash key');
-is($e->error, 'Hash ref must contain a value key with a defined value', 'add: correct message for missing field hash key');
-
-$taxData->{value} = undef;
-
-eval{$taxer->add($taxData)};
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash key');
-is($e->error, 'Hash ref must contain a value key with a defined value', 'add: correct message for missing field hash value');
-
-$taxData->{value} = 'Oregon';
-
-eval{$taxer->add($taxData)};
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash key');
-is($e->error, 'Hash ref must contain a taxRate key with a defined value', 'add: correct message for missing taxRate hash key');
-
-$taxData->{taxRate} = undef;
-
-eval{$taxer->add($taxData)};
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'add: correct type of exception thrown for missing hash value');
-is($e->error, 'Hash ref must contain a taxRate key with a defined value', 'add: correct message for missing taxRate hash value');
-
-my $taxData = {
-    field   => 'state',
-    value   => 'Oregon',
+    country => 'USA',
+    state   => 'OR',
     taxRate => '0',
 };
 
@@ -147,12 +119,16 @@ is($taxIterator->rows, 1, 'add added only 1 row to the tax table');
 
 my $addedData = $taxIterator->hashRef;
 $taxData->{taxId} = $oregonTaxId;
+$taxData->{city} = undef;
+$taxData->{code} = undef;
 
-cmp_deeply($taxData, $addedData, 'add put the right data into the database for Oregon');
+cmp_deeply($addedData, $taxData, 'add put the right data into the database for Oregon');
 
 $taxData = {
-    field   => 'state',
-    value   => 'Wisconsin',
+    country => 'USA',
+    state   => 'Wisconsin',
+    city    => 'Madcity',
+    code    => '53702',
     taxRate => '5',
 };
 
@@ -162,18 +138,15 @@ $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 2, 'add added another row to the tax table');
 
 $taxData = {
-    field   => 'state',
-    value   => 'Oregon',
+    country => 'state',
+    state   => 'Oregon',
     taxRate => '0.1',
 };
 
-eval {$taxer->add($taxData)};
-
-##This error is thrown by DBI, not us.
-ok($@, 'add threw an exception to having taxes in Oregon when they were defined as 0 initially');
+my $dupId = $taxer->add($taxData);
 
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 2, 'add did not add another row since it would be a duplicate');
+is($taxIterator->rows, 3, 'add permits adding duplicate information.');
 
 ##Madison zip codes:
 ##53701-53709
@@ -201,10 +174,13 @@ $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'delete: error handling for an undefined taxId value');
 is($e->error, 'Hash ref must contain a taxId key with a defined value', 'delete: error message for an undefined taxId value');
 
-$taxer->delete({ taxId => $oregonTaxId });
-
+$taxer->delete({ taxId => $dupId });
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 1, 'One row was deleted from the tax table');
+is($taxIterator->rows, 2, 'One row was deleted from the tax table, even though another row has duplicate information');
+
+$taxer->delete({ taxId => $oregonTaxId });
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 1, 'Another row was deleted from the tax table');
 
 $taxer->delete({ taxId => $session->id->generate });
 
@@ -212,11 +188,11 @@ $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 1, 'No rows were deleted from the table since the requested id does not exist');
 is($taxIterator->hashRef->{taxId}, $wisconsinTaxId, 'The correct tax information was deleted');
 
-#######################################################################
-#
-# exportTaxData
-#
-#######################################################################
+########################################################################
+##
+## exportTaxData
+##
+########################################################################
 
 $storage = $taxer->exportTaxData();
 isa_ok($storage, 'WebGUI::Storage', 'exportTaxData returns a WebGUI::Storage object');
@@ -226,7 +202,7 @@ cmp_ok($storage->getFileSize('siteTaxData.csv'), '!=', 0, 'CSV file is not empty
 my @fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');
 #my @fileLines = ();
 my @header = WebGUI::Text::splitCSV($fileLines[0]);
-my @expectedHeader = qw/field value taxRate/;
+my @expectedHeader = qw/country state city code taxRate/;
 cmp_deeply(\@header, \@expectedHeader, 'exportTaxData: header line is correct');
 my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
 my $wiData = $taxer->getItems->hashRef;
@@ -283,13 +259,24 @@ SKIP: {
 
 my $expectedTaxData = [
         {
-            field   => 'state',
-            value   => 'Wisconsin',
-            taxRate => 5.0,
+            country => 'USA',
+            state   => '',
+            city    => '',
+            code    => '',
+            taxRate => 0,
         },
         {
-            field   => 'code',
-            value   => 53701,
+            country => 'USA',
+            state   => 'Wisconsin',
+            city    => '',
+            code    => '',
+            taxRate => 5,
+        },
+        {
+            country => 'USA',
+            state   => 'Wisconsin',
+            city    => 'Madison',
+            code    => '53701',
             taxRate => 0.5,
         },
 ];
@@ -302,7 +289,7 @@ ok(
 );
 
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 2, 'import: Old data deleted, new data imported');
+is($taxIterator->rows, 3, 'import: Old data deleted, new data imported');
 my @goodTaxData = _grabTaxData($taxIterator);
 cmp_bag(
     \@goodTaxData,
@@ -318,7 +305,7 @@ ok(
 );
 
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 2, 'import: Old data deleted, new data imported again');
+is($taxIterator->rows, 3, 'import: Old data deleted, new data imported again');
 my @orderedTaxData = _grabTaxData($taxIterator);
 cmp_bag(
     \@orderedTaxData,
@@ -334,7 +321,7 @@ ok(
 );
 
 $taxIterator = $taxer->getItems;
-is($taxIterator->rows, 2, 'import: Old data deleted, new data imported the third time');
+is($taxIterator->rows, 3, 'import: Old data deleted, new data imported the third time');
 my @orderedTaxData = _grabTaxData($taxIterator);
 cmp_bag(
     \@orderedTaxData,
@@ -348,6 +335,9 @@ ok(
     ),
     'Empty tax data not inserted',
 );
+
+$taxIterator = $taxer->getItems;
+is($taxIterator->rows, 3, 'import: Old data still exists and was not deleted');
 
 my $failure;
 eval {
@@ -443,7 +433,7 @@ cmp_deeply(
 
 cmp_deeply(
     $taxer->getTaxRates($taxingAddress),
-    [5, 0.5],
+    [0, 5, 0.5],
     'getTaxRates: return correct data for a state with tax data'
 );
 
@@ -541,6 +531,42 @@ sub _grabTaxData {
     return @taxData;
 }
 
+sub getAddExceptions {
+    my $session = shift;
+    my $inputValidion = [
+        {
+            args  => {},
+            error => q{Missing required information.},
+            param => q{country},
+            comment => q{missing country},
+        },
+        {
+            args  => {country => undef},
+            error => q{Missing required information.},
+            param => q{country},
+            comment => q{undef country},
+        },
+        {
+            args  => {country => ''},
+            error => q{Missing required information.},
+            param => q{country},
+            comment => q{empty country},
+        },
+        {
+            args  => {country => 'USA'},
+            error => q{Missing required information.},
+            param => q{taxRate},
+            comment => q{missing taxRate},
+        },
+        {
+            args  => {country => 'USA', taxRate => undef},
+            error => q{Missing required information.},
+            param => q{taxRate},
+            comment => q{empty taxRate},
+        },
+    ];
+}
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
@@ -548,5 +574,5 @@ END {
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
-    $storage->delete;
+    #$storage->delete;
 }

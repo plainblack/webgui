@@ -20,6 +20,10 @@ This package manages tax information, and calculates taxes on a shopping cart.  
 in that the only data it contains is a WebGUI::Session object, but it does provide several methods for
 handling the information in the tax tables.
 
+Taxes are accumulated through increasingly specific geographic information.  For example, you can
+specify the sales tax for a whole country, then the additional sales tax for a state in the country,
+all the way down to a single code inside of a city.
+
 =head1 SYNOPSIS
 
  use WebGUI::Shop::Tax;
@@ -42,40 +46,46 @@ Add tax information to the table.  Returns the taxId of the newly created tax in
 
 =head3 $params
 
-A hash ref of the geographic and rate information.  All parameters are required and
+A hash ref of the geographic and rate information.  The country and taxRate parameters
 must have defined values.
 
-=head4 field
+=head4 country
 
-field denotes what kind of location the tax information is for.  This should
-be country, state, or code.  The combination of field and value is unique
-in the database.
+The country this tax information applies to.
 
-=head4 value
+=head4 state
 
-value is the value of the field to be added.  For example, appropriate values
-for a field of country might be China, United States, Mexico.  If the field
-is state, it could be British Colombia, Oregon or Maine.
+The state this tax information applies to.  state and country together are unique.
+
+=head4 city
+
+The ciy this tax information applies to.  Cities are unique with state and country information.
+
+=head4 code
+
+The postal code this tax information applies to.  codes are unique with state and country information.
 
 =head4 taxRate
 
-This is the tax rate for the location, as specified by field and value.  The tax rate is stored
-as a percentage, like 5.5 .
+This is the tax rate for the location, as specified by the geographical
+fields country, state, city and/or code.  The tax rate is stored as
+a percentage, like 5.5 .
 
 =cut
 
 sub add {
     my $self   = shift;
     my $params = shift;
-    my $id = $self->session->id->generate();
 
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a hashref of params')
         unless ref($params) eq 'HASH';
-    foreach my $key (qw/field value taxRate/) {
-        WebGUI::Error::InvalidParam->throw(error => "Hash ref must contain a $key key with a defined value")
-            unless exists($params->{$key}) and defined $params->{$key};
-    }
-    $self->session->db->write('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)', [$id, @{ $params }{qw[ field value taxRate ]}]);
+    WebGUI::Error::InvalidParam->throw(error => "Missing required information.", param => 'country')
+        unless exists($params->{country}) and $params->{country};
+    WebGUI::Error::InvalidParam->throw(error => "Missing required information.", param => 'taxRate')
+        unless exists($params->{taxRate}) and defined $params->{taxRate};
+
+    $params->{taxId} = 'new';
+    my $id = $self->session->db->setRow('tax', 'taxId', $params);
     return $id;
 }
 
@@ -167,7 +177,7 @@ the file.  The file will be named "siteTaxData.csv".
 sub exportTaxData {
     my $self = shift;
     my $taxIterator = $self->getItems;
-    my @columns = qw{ field value taxRate };
+    my @columns = grep { $_ ne 'taxId' } $taxIterator->getColumnNames;
     my $taxData = WebGUI::Text::joinCSV(@columns) . "\n";
     while (my $taxRow = $taxIterator->hashRef() ) {
         my @taxData = @{ $taxRow }{@columns};
@@ -206,14 +216,26 @@ sub getTaxRates {
     my $address = shift;
     WebGUI::Error::InvalidObject->throw(error => 'Need an address.', expected=>'WebGUI::Shop::Address', got=>(ref $address))
         unless ref($address) eq 'WebGUI::Shop::Address';
+    my $country = $address->get('country');
+    my $state   = $address->get('state');
+    my $city    = $address->get('city');
+    my $code    = $address->get('code');
     my $result = $self->session->db->buildArrayRef(
     q{
         select taxRate from tax where
-           (field='state'   and value=?)
-        OR (field='country' and value=?)
-        OR (field='code'    and value=?)
+           (country=? and state='' and city='' and code='')
+        OR (country=? and state=?  and city='' and code='')
+        OR (country=? and state=?  and city=?  and code='')
+        OR (country=? and state=?  and city='' and code=? )
+        OR (country=? and state=?  and city=?  and code=? )
     },
-    [$address->get('state'), $address->get('country'), $address->get('code')]);
+    [
+        $country,
+        $country, $state,
+        $country, $state, $city,
+        $country, $state, $code,
+        $country, $state, $city, $code,
+    ]);
     return $result;
 }
 
@@ -251,8 +273,8 @@ sub importTaxData {
     chomp $headers;
     my @headers = WebGUI::Text::splitCSV($headers);
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
-        unless (join(q{-}, sort @headers) eq 'field-taxRate-value')
-           and (scalar @headers == 3);
+        unless (join(q{-}, sort @headers) eq 'city-code-country-state-taxRate')
+           and (scalar @headers == 5);
     my @taxData = ();
     my $line = 1;
     while (my $taxRow = <$table>) {
@@ -261,7 +283,7 @@ sub importTaxData {
         next unless $taxRow;
         my @taxRow = WebGUI::Text::splitCSV($taxRow);
         WebGUI::Error::InvalidFile->throw(error => qq{Error found in the CSV file}, brokenFile => $filePath, brokenLine => $line)
-            unless scalar @taxRow == 3;
+            unless scalar @taxRow == 5;
         push @taxData, [ @taxRow ];
     }
     ##Okay, if we got this far, then the data looks fine.

@@ -1,8 +1,9 @@
-field,value,taxRate
-state,WI,5.0
-code,53701,0.5
-code,53702,0.5
-code,53703,0.5
-code,53704,0.5
-state,CA,7.25
-code,97123,0.0
+country,state,city,code,taxRate
+USA,,,,0.0
+USA,WI,,,5.0
+USA,WI,,53701,0.5
+USA,WI,,53702,0.5
+USA,WI,,53703,0.5
+USA,WI,,53704,0.5
+USA,CA,,,7.25
+USA,,,97123,0.0

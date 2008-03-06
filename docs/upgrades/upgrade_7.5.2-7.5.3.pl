@@ -152,11 +152,12 @@ sub insertCommerceTaxTable {
 
 CREATE TABLE tax (
     taxId    VARCHAR(22)  binary NOT NULL,
-    field    VARCHAR(100) NOT NULL,
-    value    VARCHAR(100),
+    country  VARCHAR(100) NOT NULL,
+    state    VARCHAR(100),
+    city     VARCHAR(100),
+    code     VARCHAR(100),
     taxRate  FLOAT        NOT NULL DEFAULT 0.0,
-    PRIMARY KEY (taxId),
-    UNIQUE  KEY (field, value)
+    PRIMARY KEY (taxId)
 )
 EOSQL
 
@@ -168,10 +169,10 @@ sub migrateOldTaxTable {
 	print "\tMigrate old tax data into the new tax table.\n" unless ($quiet);
 	# and here's our code
     my $oldTax = $session->db->prepare('select * from commerceSalesTax');
-    my $newTax = $session->db->prepare('insert into tax (taxId, field, value, taxRate) VALUES (?,?,?,?)');
+    my $newTax = $session->db->prepare('insert into tax (taxId, country, state, city, code, taxRate) VALUES (?,?,?,?,?,?)');
     $oldTax->execute();
     while (my $oldTaxData = $oldTax->hashRef()) {
-        $newTax->execute([$oldTaxData->{commerceSalesTaxId}, 'state', $oldTaxData->{regionIdentifier}, $oldTaxData->{salesTax}]);
+        $newTax->execute([$oldTaxData->{commerceSalesTaxId}, 'USA', $oldTaxData->{regionIdentifier}, '', '', $oldTaxData->{salesTax}]);
     }
     $oldTax->finish;
     $newTax->finish;
