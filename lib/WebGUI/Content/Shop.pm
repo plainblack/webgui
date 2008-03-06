@@ -61,25 +61,6 @@ sub handler {
 
 #-------------------------------------------------------------------
 
-=head2 www_cart ()
-
-Hand off to the cart.
-
-=cut
-
-sub www_cart {
-    my $session = shift;
-    my $output = undef;
-    my $method = "www_". ( $session->form->get("method") || "view");
-    my $cart = WebGUI::Shop::Cart->create($session);
-    if ($cart->can($method)) {
-        $output = $cart->$method();
-    }
-    return $output;
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_address ()
 
 Hand off to the address book.
@@ -99,14 +80,40 @@ sub www_address {
 
 #-------------------------------------------------------------------
 
-=head2 www_manageSettings ()
+=head2 www_admin ()
 
-Display the commerce settings page.
+Hand off to admin processor.
 
 =cut
 
-sub www_manageSettings {
+sub www_admin {
     my $session = shift;
+    my $output = undef;
+    my $method = "www_". ( $session->form->get("method") || "editSettings");
+    my $admin = WebGUI::Shop::Admin->new($session);
+    if ($admin->can($method)) {
+        $output = $admin->$method();
+    }
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_cart ()
+
+Hand off to the cart.
+
+=cut
+
+sub www_cart {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_". ( $session->form->get("method") || "view");
+    my $cart = WebGUI::Shop::Cart->create($session);
+    if ($cart->can($method)) {
+        $output = $cart->$method();
+    }
+    return $output;
 }
 
 #-------------------------------------------------------------------

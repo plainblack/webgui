@@ -63,9 +63,13 @@ sub _formatFunction {
 	my $self = shift;
 	my $function = shift;
 	my $url;
-	if (exists $function->{func}) {
+    if ($function->{url}) {
+        $url = $function->{url};
+	} 
+    elsif (exists $function->{func}) {
 		$url = $self->session->url->page("func=".$function->{func});
-	} else {
+	} 
+    else {
 		$url = $self->session->url->page("op=".$function->{op});
 	}
 	my $i18n = WebGUI::International->new($self->session);
@@ -390,12 +394,12 @@ sub getAdminFunction {
 		},
 		"commerce" => {
 			title => {
-				id          => "commerce settings",
-				namespace   => "Commerce",
+				id          => "shop",
+				namespace   => "Shop",
 			},
 			icon    => "commerce.gif",
-			op      => "editCommerceSettings",
-            class   => 'WebGUI::Operation::Commerce',
+			url      => $self->session->url->page("shop=admin"),
+            group   => "3",
 		},
 		"subscriptions" => {
 			title => {
@@ -437,7 +441,8 @@ sub getAdminFunction {
     return $functions if $testing;
 	if ($id) {
 		return $self->_formatFunction($functions->{$id});
-	} else {
+	} 
+    else {
 		my %names;
 		foreach my $id (keys %{$functions}) {
 			my $func = $self->_formatFunction($functions->{$id});

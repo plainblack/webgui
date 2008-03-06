@@ -3,6 +3,72 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'shopping cart template' => { 
+		message => q|Cart Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'shopping cart template help' => { 
+		message => q|Choose the template that you want used to render the shopping cart.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'address book template' => { 
+		message => q|Address Book Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'address book template help' => { 
+		message => q|Choose the template you want used to render the address book.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'edit address template' => { 
+		message => q|Edit Address Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'edit address template help' => { 
+		message => q|Choose the template you want used to render the address edit form.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'transactions' => { 
+		message => q|Transactions|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
+	'payment methods' => { 
+		message => q|Payment Methods|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
+	'shipping methods' => { 
+		message => q|Shipping Methods|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
+	'taxes' => { 
+		message => q|Taxes|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
+	'shop settings' => { 
+		message => q|Shop Settings|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
 	'is a required field' => { 
 		message => q|%s is a required field.|,
 		lastUpdated => 0,
@@ -187,6 +253,12 @@ our $I18N = {
 		message => q|Continue Shopping|,
 		lastUpdated => 0,
 		context => q|a button the user clicks on to go back to shopping after viewing the cart|
+	},
+
+	'shop' => { 
+		message => q|Shop|,
+		lastUpdated => 0,
+		context => q|the title of all commerce related stuff in the admin console|
 	},
 
 	'ship to button' => { 
