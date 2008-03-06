@@ -5,6 +5,7 @@ use strict;
 use Class::InsideOut qw{ :std };
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
+use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::CartItem;
@@ -195,6 +196,23 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getItem ( itemId )
+
+Returns a reference to a WebGUI::Cart::Item object.
+
+=head3 itemId
+
+The id of the item to retrieve.
+
+=cut
+
+sub getItem {
+    my ($self, $itemId) = @_;
+    return WebGUI::Shop::CartItem->new($self, $itemId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getItems ( )
 
 Returns an array reference of WebGUI::Asset::Sku objects that are in the cart.
@@ -206,7 +224,7 @@ sub getItems {
     my @itemsObjects = ();
     my $items = $self->session->db->read("select itemId from cartItems where cartId=?",[$self->getId]);
     while (my ($itemId) = $items->array) {
-        push(@itemsObjects, WebGUI::Shop::CartItem->new($self, $itemId));
+        push(@itemsObjects, $self->getItem($itemId));
     }
     return \@itemsObjects;
 }
@@ -310,10 +328,30 @@ Remove an item from the cart and then display the cart again.
 
 sub www_removeItem {
     my $self = shift;
-    my $item = WebGUI::Shop::CartItem->new($self, $self->session->form->get("itemId"));
-    $item->remove;
+    my $item = $self->getItem($self->session->form->get("itemId"))->remove;
     return $self->www_view;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_setShippingAddress ()
+
+Sets the shipping address for the cart or for a cart item if itemId is one of the form params.
+
+=cut
+
+sub www_setShippingAddress {
+    my $self = shift;
+    my $form = $self->session->form;
+    if ($form->get("itemId") ne "") {
+        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('shippingAddressId')}); 
+    }
+    else {
+        $self->update({shippingAddressId=>$form->get('shippingAddressId')}); 
+    }
+    return $self->www_view;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -421,7 +459,7 @@ Displays the configured item.
 sub www_viewItem {
     my $self = shift;
     my $itemId = $self->session->form->get("itemId");
-    my $item = eval { WebGUI::Shop::CartItem->new($self, $itemId) };
+    my $item = eval { $self->getItem($itemId) };
     if (WebGUI::Error->caught()) {
         return $self->www_view;
     }

@@ -73,7 +73,7 @@ sub definition {
 			defaultValue=>1
 			},
         dbDataType  => {
-            defaultValue    => "INT(1)",
+            defaultValue    => "bool",
         },
 		});
         return $class->SUPER::definition($session, $definition);

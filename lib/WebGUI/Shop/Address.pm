@@ -114,7 +114,7 @@ sub getHtmlFormatted {
     my $address = $self->get("name") . "<br />" . $self->get("address1") . "<br />";
     $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
     $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
-    $address .= $self->get("city") . ",";
+    $address .= $self->get("city") . ", ";
     $address .= $self->get("state") . " " if ($self->get("state") ne "");
     $address .= $self->get("code") if ($self->get("code") ne "");
     $address .= '<br />' . $self->get("country");

@@ -65,6 +65,8 @@ sub addAddressBook {
         phoneNumber varchar(35),
         index addressBookId_addressId (addressBookId,addressId)
     )");
+    $session->setting->add('shopAddressBookTemplateId','3womoo7Teyy2YKFa25-MZg');
+    $session->setting->add('shopAddressTemplateId','XNd7a_g_cTvJVYrVHcx2Mw');
 }
 
 #-------------------------------------------------
@@ -106,8 +108,8 @@ sub createSkuAsset {
         description mediumtext,
         sku varchar(35) binary not null,
         salesAgentId varchar(22) binary,
-        displayTitle int not null default 1,
-        overrideTaxRate int not null default 0,
+        displayTitle bool not null default 1,
+        overrideTaxRate bool not null default 0,
         taxRateOverride float not null default 0.00,
         primary key (assetId, revisionDate),
         unique key sku (sku),
@@ -137,7 +139,7 @@ sub migrateToNewCart {
         index cartId_assetId (cartId,assetId)
     )");
     $session->db->write("drop table shoppingCart");
-    $session->db->write("insert into settings values ('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw')");
+    $session->setting->add('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw');
 }
 
 #-------------------------------------------------

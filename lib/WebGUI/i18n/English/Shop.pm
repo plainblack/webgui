@@ -3,6 +3,90 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'is a required field' => { 
+		message => q|%s is a required field.|,
+		lastUpdated => 0,
+		context => q|an error message|
+	},
+
+	'label' => { 
+		message => q|Label|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'label help' => { 
+		message => q|eg: 'Home' or 'Work'|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'name' => { 
+		message => q|Name|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'address' => { 
+		message => q|Address|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'city' => { 
+		message => q|City|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'state' => { 
+		message => q|State / Province|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'code' => { 
+		message => q|Postal / Zip Code|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'country' => { 
+		message => q|Country|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'phone number' => { 
+		message => q|Phone Number|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'add a new address' => { 
+		message => q|Add A New Address|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
+	'delete' => { 
+		message => q|Delete|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
+	'edit' => { 
+		message => q|Edit|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
+	'use this address' => { 
+		message => q|Use This Address|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
 	'too many of this item' => { 
 		message => q|Can't add that many %s to your cart.|,
 		lastUpdated => 0,

@@ -5,6 +5,7 @@ use strict;
 use Class::InsideOut qw{ :std };
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
+use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Shop::Address;
 
@@ -290,6 +291,177 @@ sub update {
     $self->session->db->setRow("addressBook","addressBookId",$properties{$id});
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_deleteAddress ( )
+
+Deletes an address from the book.
+
+=cut
+
+sub www_deleteAddress {
+    my $self = shift;
+    $self->getAddress($self->session->form->get("addressId"))->delete;
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editAddress ()
+
+Allows a user to edit an address in their address book.
+
+=cut
+
+sub www_editAddress {
+    my ($self, $error) = @_;
+    my $session = $self->session;
+    my $form = $session->form;
+    my $address = eval{$self->getAddress($form->get("addressId"))};
+    if (WebGUI::Error->caught) {
+        $address = undef;
+    }
+    my %base = ();
+    if (defined $address) {
+        %base = %{$address->get};
+    }
+    my %var = (
+        %base,
+        error               => $error,
+        formHeader          => WebGUI::Form::formHeader($session)
+                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddressSave"})
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$form->get("addressId")})
+                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")}),
+        saveButton          => WebGUI::Form::submit($session),
+        formFooter          => WebGUI::Form::formFooter($session),
+        address1Field       => WebGUI::Form::text($session, {name=>"address1", maxlength=>35, defaultValue=>($form->get("address1") || ((defined $address) ? $address->get('address1') : undef))}),
+        address2Field       => WebGUI::Form::text($session, {name=>"address2", maxlength=>35, defaultValue=>($form->get("address2") || ((defined $address) ? $address->get('address2') : undef))}),
+        address3Field       => WebGUI::Form::text($session, {name=>"address3", maxlength=>35, defaultValue=>($form->get("address3") || ((defined $address) ? $address->get('address3') : undef))}),
+        labelField          => WebGUI::Form::text($session, {name=>"label", maxlength=>35, defaultValue=>($form->get("label") || ((defined $address) ? $address->get('label') : undef))}),
+        nameField           => WebGUI::Form::text($session, {name=>"name", maxlength=>35, defaultValue=>($form->get("name") || ((defined $address) ? $address->get('name') : undef))}),
+        cityField           => WebGUI::Form::text($session, {name=>"city", maxlength=>35, defaultValue=>($form->get("city") || ((defined $address) ? $address->get('city') : undef))}),
+        stateField          => WebGUI::Form::text($session, {name=>"state", maxlength=>35, defaultValue=>($form->get("state") || ((defined $address) ? $address->get('state') : undef))}),
+        countryField        => WebGUI::Form::country($session, {name=>"country", defaultValue=>($form->get("country") || ((defined $address) ? $address->get('country') : undef))}),
+        codeField           => WebGUI::Form::zipcode($session, {name=>"code", defaultValue=>($form->get("code") || ((defined $address) ? $address->get('code') : undef))}),
+        phoneNumberField    => WebGUI::Form::phone($session, {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $address) ? $address->get('phoneNumber') : undef))}),
+    );
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressTemplateId"));
+    $template->prepare;
+    return $session->style->userStyle($template->process(\%var));
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editAddressSave ()
+
+Saves the address. If there is a problem generates www_editAddress() with an error message. Otherwise returns www_view().
+
+=cut
+
+sub www_editAddressSave {
+    my $self = shift;
+    my $form = $self->session->form;
+    my $i18n = WebGUI::International->new($self->session,"Shop");
+    if ($form->get("label") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('label')));
+    }    
+    if ($form->get("name") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('name')));
+    }    
+    if ($form->get("address1") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('address')));
+    }    
+    if ($form->get("city") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('city')));
+    }    
+    if ($form->get("code") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('code')));
+    }    
+    if ($form->get("country") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('country')));
+    }    
+    if ($form->get("phoneNumber") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('phone number')));
+    }    
+    my %addressData = (
+        label           => $form->get("label"),
+        name            => $form->get("name"),
+        address1        => $form->get("address1"),
+        address2        => $form->get("address2"),
+        address3        => $form->get("address3"),
+        city            => $form->get("city"),
+        state           => $form->get("state"),
+        code            => $form->get("code","zipcode"),
+        country         => $form->get("country","country"),
+        phoneNumber     => $form->get("phoneNumber","phone"),
+        );
+    if ($form->get('addressId') eq '') {
+        $self->addAddress(\%addressData);
+    }
+    else {
+        $self->getAddress($form->get('addressId'))->update(\%addressData);
+    }
+    return $self->www_view;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_view
+
+Displays the current user's address book.
+
+=cut
+
+sub www_view {
+    my $self = shift;
+    my $session = $self->session;
+    my $form = $session->form;
+    my $i18n = WebGUI::International->new($session, "Shop");
+    my @addresses = ();
+    foreach my $address (@{$self->getAddresses}) {
+        push(@addresses, {
+            %{$address->get},
+            address         => $address->getHtmlFormatted,
+            deleteButton    => WebGUI::Form::formHeader($session)
+                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                                .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteAddress"})
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
+                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                                .WebGUI::Form::submit($session, {value=>$i18n->get("delete")})
+                                .WebGUI::Form::formFooter($session),
+            editButton      => WebGUI::Form::formHeader($session)
+                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddress"})
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
+                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                                .WebGUI::Form::submit($session, {value=>$i18n->get("edit")})
+                                .WebGUI::Form::formFooter($session),
+            useButton       => WebGUI::Form::formHeader($session)
+                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
+                                .WebGUI::Form::hidden($session, {name=>"method", value=>"setShippingAddress"})
+                                .WebGUI::Form::hidden($session, {name=>"shippingAddressId", value=>$address->getId})
+                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                                .WebGUI::Form::submit($session, {value=>$i18n->get("use this address")})
+                                .WebGUI::Form::formFooter($session),
+            });
+    }
+    my %var = (
+        addresses => \@addresses,
+        addButton => WebGUI::Form::formHeader($session)
+                    .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                    .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddress"})
+                    .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                    .WebGUI::Form::submit($session, {value=>$i18n->get("add a new address")})
+                    .WebGUI::Form::formFooter($session),
+        );
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressBookTemplateId"));
+    $template->prepare;
+    return $session->style->userStyle($template->process(\%var));
+}
 
 1;
 
