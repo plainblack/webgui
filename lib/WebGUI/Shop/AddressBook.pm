@@ -280,10 +280,9 @@ Assign the session that owns this adress book. Will automatically be set to "" i
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    $properties{$id}{lastShipId} = $newProperties->{lastShipId} || $properties{$id}{lastShipId};
-    $properties{$id}{lastPayId} = $newProperties->{lastPayId} || $properties{$id}{lastPayId};
-    $properties{$id}{userId} = (exists $newProperties->{userId}) ? $newProperties->{userId} : $properties{$id}{userId};
-    $properties{$id}{sessionId} = (exists $newProperties->{sessionId}) ? $newProperties->{sessionId} : $properties{$id}{sessionId};
+    foreach my $field (qw(lastPayId lastShipId userId sessionId)) {
+        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
+    }
     ##Having both a userId and sessionId will confuse create.
     if ($properties{$id}{userId} ne "") {
         $properties{$id}{sessionId} = "";

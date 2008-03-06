@@ -280,12 +280,12 @@ sub update {
         $newProperties->{assetId} = $newProperties->{asset}->getId;       
         $newProperties->{configuredTitle} = $newProperties->{asset}->getConfiguredTitle;       
     }
-    $properties{$id}{assetId} = $newProperties->{assetId} || $properties{$id}{assetId};
-    $properties{$id}{configuredTitle} = $newProperties->{configuredTitle} || $properties{$id}{configuredTitle};
+    foreach my $field (qw(assetId configuredTitle shippingAddressId)) {
+        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
+    }
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }
-    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
     $self->cart->session->db->setRow("cartItems","itemId",$properties{$id});
 }
 

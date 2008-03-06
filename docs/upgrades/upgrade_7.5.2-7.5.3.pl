@@ -125,6 +125,7 @@ sub migrateToNewCart {
         cartId varchar(22) binary not null primary key,
         sessionId varchar(22) binary not null,
         shippingAddressId varchar(22) binary,
+        shipperId varchar(22) binary,
         couponId varchar(22) binary,
         index sessionId (sessionId)
     )");

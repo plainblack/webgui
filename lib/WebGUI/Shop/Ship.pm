@@ -87,7 +87,7 @@ sub getDrivers {
 
 #-------------------------------------------------------------------
 
-=head2 getOptions ( $session, $cart )
+=head2 getOptions ( $cart )
 
 Returns a list of options for the user to ship, along with the cost of using each one.  It is a hash of hashrefs,
 with the key of the primary hash being the shipperId of the driver, and sub keys of label and price.
@@ -101,11 +101,17 @@ A WebGUI::Session object.  A WebGUI::Error::InvalidParam exception will be throw
 =cut
 
 sub getOptions {
-    my $class      = shift;
-    my $session    = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
-        unless ref $session eq 'WebGUI::Session';
-    return;
+    my ($class, $cart) = @_;
+    my $session = $cart->session; 
+    WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless $cart->isa("WebGUI::Shop::Cart");
+    my %options = ();
+    foreach my $shipper (@{$class->getShippers($session)}) {
+        $options{$shipper->getId} = {
+            label => $shipper->get("label"),
+            price => $shipper->calculate($cart),
+            };    
+    }
+    return \%options;
 }
 
 #-------------------------------------------------------------------
@@ -127,14 +133,14 @@ sub getShippers {
     my $session    = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
-    my $drivers;
+    my @drivers = ();
     my $sth = $session->db->prepare('select shipperId from shipper');
     $sth->execute();
     while (my $driver = $sth->hashRef()) {
-        push @{ $drivers }, WebGUI::Shop::Ship->new($session, $driver->{shipperId});
+        push @drivers, WebGUI::Shop::Ship->new($session, $driver->{shipperId});
     }
     $sth->finish;
-    return $drivers;
+    return \@drivers;
 }
 
 #-------------------------------------------------------------------

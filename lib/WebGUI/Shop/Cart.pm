@@ -295,13 +295,18 @@ The unique id for a coupon used in this cart.
 
 The unique id for a shipping address attached to this cart.
 
+=head4 shipperId
+
+The unique id of the configured shipping driver that will be used to ship these goods.
+
 =cut
 
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    $properties{$id}{couponId} = $newProperties->{couponId} || $properties{$id}{couponId};
-    $properties{$id}{shippingAddressId} = $newProperties->{shippingAddressId} || $properties{$id}{shippingAddressId};
+    foreach my $field (qw(couponId shippingAddressId shipperId)) {
+        $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
+    }
     $self->session->db->setRow("cart","cartId",$properties{$id});
 }
 
@@ -315,6 +320,10 @@ Update the cart and the return the user back to the asset.
 
 sub www_continueShopping {
     my $self = shift;
+    my $cartView = $self->www_update;
+    if ($error{id $self} ne "") {
+        return $cartView;
+    }
     return undef;
 }
 
@@ -429,20 +438,39 @@ sub www_view {
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
             extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
-        shippingOptions         => "todo",
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
-        hasShippingAddress      => ($self->get("shippingAddressId") ne ""),
         couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
-        couponDiscount          => "todo",
-        totalPrice              => "todo",
-        tax                     => $self->formatCurrency($tax->calculate($self)),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
+        couponDiscount          => $self->formatCurrency(0),
         );
         my $address = eval { $self->getShippingAddress };
-        unless (WebGUI::Error->caught) {
-            $var{shippingAddress} = $address->getHtmlFormatted;
+        if (WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+            # choose another address cuz we've got a problem
+            $self->update({shippingAddressId=>""});
         }
+        if (WebGUI::Error->caught) {
+           $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
+        }
+        else {
+            $var{hasShippingAddress} = 1;
+            $var{shippingAddress} = $address->getHtmlFormatted;
+            $var{tax} = $self->formatCurrency($tax->calculate($self));
+            my $options = WebGUI::Shop::Ship->getOptions($self);
+            my %formOptions = ();
+            my $defaultOption = "";
+            foreach my $option (keys %{$options}) {
+                $defaultOption = $option;
+                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
+            }
+            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
+            $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
+            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+        } 
+        if ($self->get("couponId")) {
+            $var{couponDiscount} = $self->formatCurrency(0);
+        }
+        $var{totalPrice} = $self->formatCurrency($var{subtotalPrice} + $var{couponDiscount} + $var{shippingPrice} + $var{tax}); 
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     $template->prepare;
     return $session->style->userStyle($template->process(\%var));
