@@ -5,6 +5,7 @@
  - new YUI based date picker
  - fixed: changing image thumbnail size doesn't resize image
  - fixed: loadAddConfigs loads hidden files
+ - ensure proper XML encoding for ITransact messages
 
 7.5.5
  - fixed: Several typos in the new Calendar help documentation.

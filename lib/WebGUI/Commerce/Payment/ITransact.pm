@@ -30,6 +30,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use LWP::UserAgent;
 use XML::Simple;
+use HTML::Entities qw(encode_entities_numeric);
 use HTTP::Cookies;
 use WebGUI::SQL;
 
@@ -466,50 +467,50 @@ my	%transactionData = %{$self->{_transactionParams}};
 
 	$xml = 
 '<?xml version="1.0"?>'.
-"<SaleRequest>
+'<SaleRequest>
   <CustomerData>
-    <Email>$userData{EMAIL}</Email>
+    <Email>'.encode_entities_numeric($userData{EMAIL}).'</Email>
     <BillingAddress>
-      <Address1>$userData{STREET}</Address1>
-      <FirstName>$userData{FIRSTNAME}</FirstName>
-      <LastName>$userData{LASTNAME}</LastName>
-      <City>$userData{CITY}</City>
-      <State>$userData{STATE}</State>
-      <Zip>$userData{ZIP}</Zip>
-      <Country>$userData{COUNTRY}</Country>
-      <Phone>$userData{PHONE}</Phone>
+      <Address1>'.encode_entities_numeric($userData{STREET}).'</Address1>
+      <FirstName>'.encode_entities_numeric($userData{FIRSTNAME}).'</FirstName>
+      <LastName>'.encode_entities_numeric($userData{LASTNAME}).'</LastName>
+      <City>'.encode_entities_numeric($userData{CITY}).'</City>
+      <State>'.encode_entities_numeric($userData{STATE}).'</State>
+      <Zip>'.encode_entities_numeric($userData{ZIP}).'</Zip>
+      <Country>'.encode_entities_numeric($userData{COUNTRY}).'</Country>
+      <Phone>'.encode_entities_numeric($userData{PHONE}).'</Phone>
     </BillingAddress>
     <AccountInfo>
       <CardInfo>
-  	<CCNum>$cardData{ACCT}</CCNum>
-   	<CCMo>$cardData{EXPMONTH}</CCMo>
-    	<CCYr>$cardData{EXPYEAR}</CCYr>\n";
+  	<CCNum>'.encode_entities_numeric($cardData{ACCT}).'</CCNum>
+   	<CCMo>'.encode_entities_numeric($cardData{EXPMONTH}).'</CCMo>
+    	<CCYr>'.encode_entities_numeric($cardData{EXPYEAR})."</CCYr>\n";
 	
-	$xml .= "<CVV2Number>$cardData{CVV2}</CVV2Number>\n" if $self->get('useCVV2');
+	$xml .= '<CVV2Number>'.encode_entities_numeric($cardData{CVV2})."</CVV2Number>\n" if $self->get('useCVV2');
 #      	  <CVV2Illegible>1</CVV2Illegible> <!-- .Submit only if CVV number is illegible. -->
 	$xml .=
 "      </CardInfo> 
     </AccountInfo>
   </CustomerData>
   <TransactionData>
-    <VendorId>".$self->get('vendorId')."</VendorId>
-    <VendorPassword>".$self->get('password')."</VendorPassword>
-    <HomePage>".$self->session->setting->get("companyURL")."</HomePage>\n";
+    <VendorId>".encode_entities_numeric($self->get('vendorId'))."</VendorId>
+    <VendorPassword>".encode_entities_numeric($self->get('password'))."</VendorPassword>
+    <HomePage>".encode_entities_numeric($self->session->setting->get("companyURL"))."</HomePage>\n";
 
 	if ($self->{_recurring}) {
 		$xml .=
-"    <RecurringData>
-      <RecurRecipe>$transactionData{RECIPE}</RecurRecipe>
-      <RecurReps>$transactionData{TERM}</RecurReps>
-      <RecurTotal>$transactionData{AMT}</RecurTotal>
-      <RecurDesc>$transactionData{DESCRIPTION}</RecurDesc>
+'    <RecurringData>
+      <RecurRecipe>'.encode_entities_numeric($transactionData{RECIPE}).'</RecurRecipe>
+      <RecurReps>'.encode_entities_numeric($transactionData{TERM}).'</RecurReps>
+      <RecurTotal>'.encode_entities_numeric($transactionData{AMT}).'</RecurTotal>
+      <RecurDesc>'.encode_entities_numeric($transactionData{DESCRIPTION})."</RecurDesc>
     </RecurringData>\n";
 	};
 
 	$xml .=
-"    <EmailText>
-      <EmailTextItem>".$self->get('emailMessage')."</EmailTextItem>
-      <EmailTextItem>ID: $transactionData{ORGID}</EmailTextItem>
+'    <EmailText>
+      <EmailTextItem>'.encode_entities_numeric($self->get('emailMessage')).'</EmailTextItem>
+      <EmailTextItem>ID: '.encode_entities_numeric($transactionData{ORGID})."</EmailTextItem>
     </EmailText>
     <OrderItems>\n";
 
@@ -523,18 +524,18 @@ my	%transactionData = %{$self->{_transactionParams}};
 		$data =~ tr/A-Za-z0-9 //dc;
 		my $itemPrice = $_->{amount} / $_->{quantity};
 		$xml .= 
-"   <Item>
-        <Description>".$data."</Description>
-	<Cost>".sprintf('%.2f', $itemPrice)."</Cost>
-	<Qty>".$_->{quantity}."</Qty>
+'   <Item>
+        <Description>'.encode_entities_numeric($data).'</Description>
+	<Cost>'.encode_entities_numeric(sprintf('%.2f', $itemPrice)).'</Cost>
+	<Qty>'.encode_entities_numeric($_->{quantity})."</Qty>
       </Item>\n";
 	}
 
 	if ($self->{_shipping}->{cost}) {
 		$xml .=
 "     <Item>
-        <Description>Shipping cost. ".$self->{_shipping}->{description}."</Description>
-	<Cost>".sprintf('%.2f', $self->{_shipping}->{cost})."</Cost>
+        <Description>Shipping cost. ".encode_entities_numeric($self->{_shipping}->{description})."</Description>
+	<Cost>".encode_entities_numeric(sprintf('%.2f', $self->{_shipping}->{cost}))."</Cost>
 	<Qty>1</Qty>
       </Item>\n";
 	};
