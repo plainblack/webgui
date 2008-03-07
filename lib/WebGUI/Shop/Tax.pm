@@ -226,9 +226,9 @@ sub getTaxRates {
     my $result = $self->session->db->buildArrayRef(
     q{
         select taxRate from tax where find_in_set(?, country)
-        and (state='' or find_in_set(?, lower(state)))
-        and (city=''  or find_in_set(?, lower(city)))
-        and (code=''  or find_in_set(?, lower(code)))
+        and (state='' or find_in_set(?, state))
+        and (city=''  or find_in_set(?, city))
+        and (code=''  or find_in_set(?, code))
     },
     [ $country, $state, $city, $code, ]);
     return $result;
