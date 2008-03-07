@@ -181,6 +181,9 @@ sub exportTaxData {
     my $taxData = WebGUI::Text::joinCSV(@columns) . "\n";
     while (my $taxRow = $taxIterator->hashRef() ) {
         my @taxData = @{ $taxRow }{@columns};
+        foreach my $column (@taxData) {
+            $column =~ tr/,/|/;  ##Convert to the alternation syntax for the text file
+        }
         $taxData .= WebGUI::Text::joinCSV(@taxData) . "\n";
     }
     my $storage = WebGUI::Storage->createTemp($self->session);
@@ -222,10 +225,10 @@ sub getTaxRates {
     my $code    = $address->get('code');
     my $result = $self->session->db->buildArrayRef(
     q{
-        select taxRate from tax where country=?
-        and (state='' or state=?)
-        and (city=''  or city=?)
-        and (code=''  or code=?)
+        select taxRate from tax where find_in_set(?, country)
+        and (state='' or find_in_set(?, lower(state)))
+        and (city=''  or find_in_set(?, lower(city)))
+        and (code=''  or find_in_set(?, lower(code)))
     },
     [ $country, $state, $city, $code, ]);
     return $result;
@@ -273,7 +276,8 @@ sub importTaxData {
         chomp $taxRow;
         $taxRow =~ s/\s*#.+$//;
         next unless $taxRow;
-        my @taxRow = WebGUI::Text::splitCSV($taxRow);
+        local $_;
+        my @taxRow = map { tr/|/,/; $_; } WebGUI::Text::splitCSV($taxRow);
         WebGUI::Error::InvalidFile->throw(error => qq{Error found in the CSV file}, brokenFile => $filePath, brokenLine => $line)
             unless scalar @taxRow == 5;
         push @taxData, [ @taxRow ];

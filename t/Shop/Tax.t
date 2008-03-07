@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 68 + 2*scalar(@{$addExceptions});
+my $tests = 72 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -208,6 +208,23 @@ my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
 my $wiData = $taxer->getItems->hashRef;
 ##Need to ignore the taxId from the database
 cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'exportTaxData: first line of data is correct');
+
+my $newTaxId = $taxer->add({
+    country => 'USA|U.S.A.',
+    state   => 'washington|WA',
+    taxRate => '7',
+    code    => '',
+    city    => '',
+});
+$taxer->delete({taxId => $wisconsinTaxId});
+$storage = $taxer->exportTaxData();
+@fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');
+my @row1 = WebGUI::Text::splitCSV($fileLines[1]);
+my $wiData = $taxer->getItems->hashRef;
+##Need to ignore the taxId from the database
+cmp_bag([ @{ $wiData }{ @expectedHeader } ], \@row1, 'exportTaxData: first line of data is correct');
+
+$taxer->delete({taxId => $newTaxId});
 
 #######################################################################
 #
@@ -392,6 +409,27 @@ cmp_deeply(
     'importTaxData: error handling for a file with a bad header',
 );
 
+ok(
+    $taxer->importTaxData(
+        WebGUI::Test->getTestCollateralPath('taxTables/alternations.csv')
+    ),
+    'Tax data with alternations inserted',
+);
+
+my $altData = $taxer->getItems->hashRef;  ##Just 1 row
+cmp_deeply(
+    $altData,
+    {
+        taxId => ignore,
+        country => q{U.S.A.,USA},
+        state   => q{WI,Wisconsin},
+        city    => q{Madison},
+        code    => 53701,
+        taxRate => 0.5,
+    },
+    'import: Data correctly loaded with alternations'
+);
+
 #######################################################################
 #
 # getTaxRates
@@ -417,6 +455,13 @@ my $taxFreeAddress = $book->addAddress({
     code  => '97123',
     country => 'USA',
 });
+my $alternateAddress = $book->addAddress({
+    label => 'using alternations',
+    city  => 'Los Angeles',
+    state => 'CalifornIA',
+    code  => '97123',
+    country => 'U.S.A.',
+});
 
 eval { $taxer->getTaxRates(); };
 $e = Exception::Class->caught();
@@ -441,6 +486,12 @@ cmp_deeply(
     $taxer->getTaxRates($taxFreeAddress),
     [0,0],
     'getTaxRates: return correct data for a state with no tax data'
+);
+
+cmp_deeply(
+    $taxer->getTaxRates($alternateAddress),
+    [7.25], #Only 7.25 because it uses the alternate address for USA
+    'getTaxRates: return correct data for a state when the address has alternations'
 );
 
 #######################################################################
