@@ -33,6 +33,7 @@ createDonationAsset($session);
 addShippingDrivers($session);
 addShoppingHandler($session);
 addAddressBook($session);
+addPaymentDrivers($session);
 
 finish($session); # this line required
 
@@ -194,6 +195,15 @@ CREATE TABLE shipper (
 )
 EOSQL
 
+}
+
+#-------------------------------------------------
+sub addPaymentDrivers {
+	my $session = shift;
+	print "\tSet up the default payment dirvers.\n" unless ($quiet);
+	# and here's our code
+    $session->config->delete('paymentPlugins');
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::Cash');
 }
 
 #-------------------------------------------------
