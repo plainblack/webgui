@@ -128,9 +128,8 @@ sub www_pay {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $pay = WebGUI::Shop::Pay->create($session);
-    if ($method ne "www_" && $pay->can($method)) {
-        $output = $pay->$method();
+    if ($method ne "www_" && WebGUI::Shop::Pay->can($method)) {
+        $output = WebGUI::Shop::Pay->$method($session);
     }
     return $output;
 }
@@ -147,9 +146,8 @@ sub www_ship {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $ship = WebGUI::Shop::Ship->create($session);
-    if ($method ne "www_" && $ship->can($method)) {
-        $output = $ship->$method();
+    if ($method ne "www_" && WebGUI::Shop::Ship->can($method)) {
+        $output = WebGUI::Shop::Ship->$method($session);
     }
     return $output;
 }

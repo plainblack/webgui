@@ -45,8 +45,8 @@ sub getAdminConsole {
     my $url = $self->session->url;
     $ac->addSubmenuItem($url->page("shop=admin"), $i18n->get("shop settings"));
     $ac->addSubmenuItem($url->page("shop=tax"), $i18n->get("taxes"));
-    $ac->addSubmenuItem($url->page("shop=pay"), $i18n->get("payment methods"));
-    $ac->addSubmenuItem($url->page("shop=ship"), $i18n->get("shipping methods"));
+    $ac->addSubmenuItem($url->page("shop=pay;method=manage"), $i18n->get("payment methods"));
+    $ac->addSubmenuItem($url->page("shop=ship;method=manage"), $i18n->get("shipping methods"));
     $ac->addSubmenuItem($url->page("shop=transactions"), $i18n->get("transactions"));
     return $ac;
 }

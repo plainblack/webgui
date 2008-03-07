@@ -2,11 +2,12 @@ package WebGUI::Shop::Ship;
 
 use strict;
 
-use WebGUI::International;
-use WebGUI::Shop::ShipDriver;
-use WebGUI::Pluggable;
-use WebGUI::Utility;
 use WebGUI::Exception;
+use WebGUI::International;
+use WebGUI::Pluggable;
+use WebGUI::Shop::Admin;
+use WebGUI::Shop::ShipDriver;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -174,6 +175,44 @@ sub new {
         unless $requestedClass;
     my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'new', [ $session, $shipperId ]) };
     return $driver;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_do ( )
+
+Let's ship drivers do method calls. Requires a driver param in the post form vars which contains the id of the driver to load.
+
+=cut
+
+sub www_do {
+    my ($class, $session) = @_;
+    my $form = $session->form;
+    my $driver = $class->new($session, $form->get("driver"));
+    my $output = undef;
+    my $method = "www_". ( $form->get("do"));
+    if ($driver->can($method)) {
+        $output = $driver->$method();
+    }
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manage ( )
+
+The main management screen for shippers.
+
+=cut
+
+sub www_manage {
+    my ($class, $session) = @_;
+    return $session->privilege->adminOnly() unless ($session->user->isInGroup("3"));
+    my $admin = WebGUI::Shop::Admin->new($session);
+    my $console = $admin->getAdminConsole;
+    my $output = "Test";
+    my $i18n = WebGUI::International->new($session, "Shop");
+    return $console->render($output, $i18n->get("shipping methods"));
 }
 
 1;
