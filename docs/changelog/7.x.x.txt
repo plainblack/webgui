@@ -1,5 +1,6 @@
 7.5.6
  - Internationalized Calendar templates
+ - fixed: exporting as HTML leaks sessions for inaccessible assets, 
 
 7.5.5
  - fixed: Several typos in the new Calendar help documentation.

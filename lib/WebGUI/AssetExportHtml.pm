@@ -119,6 +119,8 @@ sub _exportAsHtml {
 		# notify we can't output because user selected can't view the page
 		unless ($asset->canView($userId)) {
 			$self->session->output->print(sprintf($i18n->get('bad user privileges')."\n") . $asset->getUrl) unless $quiet;
+            $assetSession->var->end;
+            $assetSession->close;
 			next;
 		}
 
@@ -139,6 +141,8 @@ sub _exportAsHtml {
             next if $exportCheck->getUrl eq '/root';
             unless ($exportCheck->get('isExportable')) {
                 $self->session->output->print("$pathWithFilename skipped, not exportable<br />") unless $quiet;
+                $assetSession->var->end;
+                $assetSession->close;
                 next ASSET;
             }
         }
