@@ -152,7 +152,7 @@ this is not used, it uses the current session user object.
 
 sub canEdit {
     my $self   = shift;
-    my $user   = shift || $session->user;
+    my $user   = shift || $self->session->user;
     return $user->isInGroup( $self->session->get('groupIdAdminCommerce'));
 }
 

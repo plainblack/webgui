@@ -28,7 +28,7 @@ These subroutines are available from this package:
 
 =cut
 
-public session => my %session;
+readonly session => my %session;
 
 #-------------------------------------------------------------------
 

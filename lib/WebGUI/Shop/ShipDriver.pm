@@ -240,7 +240,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getName ( )
+=head2 getName ( $session )
 
 Return a human readable name for this driver. Never overridden in the
 subclass, instead specified in definition with the name "name".
@@ -248,8 +248,8 @@ subclass, instead specified in definition with the name "name".
 =cut
 
 sub getName {
-    my $self = shift;
-    my $definition = $self->definition($self->session);
+    my ($class, $session) = @_;
+    my $definition = $class->definition($session);
     return $definition->[0]->{name};
 }
 
