@@ -139,6 +139,25 @@ sub calculate {
 
 #-------------------------------------------------------------------
 
+=head2 canEdit ( [ $user ] )
+
+Determine whether or not the current user can perform commerce functions
+
+=head3 $user
+
+An optional WebGUI::User object to check for permission to do commerce functions.  If
+this is not used, it uses the current session user object.
+
+=cut
+
+sub canEdit {
+    my $self   = shift;
+    my $user   = shift || $session->user;
+    return $user->isInGroup( $self->session->get('groupIdAdminCommerce'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 delete ( [$params] )
 
 Deletes data from the tax table by taxId.
@@ -320,5 +339,21 @@ sub new {
 Accessor for the session object.  Returns the session object.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_view (  )
+
+User interface to manage taxes.  Provides a list of current taxes, and forms for adding
+new tax info, exporting and importing sets of taxes, and deleting individual tax data.
+
+=cut
+
+sub www_view {
+    my $self = shift;
+    return $self->session->privileges->insufficient
+        unless $self->canEdit;
+    return '';
+}
 
 1;
