@@ -66,8 +66,8 @@ sub applyConstraints {
     my $self = shift;
     my $options = shift;
     $self->SUPER::applyConstraints($options);
-    my $maxImageSize = $options->{maxImageSize} || $self->session->setting->get("maxImageSize");
-    my $thumbnailSize = $options->{thumbnailSize} || $self->session->setting->get("thumbnailSize");
+    my $maxImageSize = $options->{maxImageSize} || $self->get('maxImageSize') || $self->session->setting->get("maxImageSize");
+    my $thumbnailSize = $options->{thumbnailSize} || $self->get('thumbnailSize') || $self->session->setting->get("thumbnailSize");
 	my $parameters = $self->get("parameters");
     my $storage = $self->getStorageLocation;
 	unless ($parameters =~ /alt\=/) {

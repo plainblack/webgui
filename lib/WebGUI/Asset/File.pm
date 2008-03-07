@@ -334,6 +334,9 @@ sub processPropertiesFromFormPost {
         $self->setFile( $filePath );
         $storage->delete;
     }
+    else {
+        $self->applyConstraints;
+    }
 
     return undef;
 }
