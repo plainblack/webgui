@@ -104,7 +104,11 @@ sub get {
 	my $content = $data->[0];
 	return undef unless ($content);
 	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
-	return ${thaw($content)};
+    eval {
+        $content = thaw($content);
+    };
+    return undef unless $content;
+    return $$content;
 }
 
 #-------------------------------------------------------------------

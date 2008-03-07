@@ -319,7 +319,10 @@ sub connect {
 	my $pass    = shift;
     my $params  = shift;
 
-	my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError=>0,AutoCommit=>1 });
+    my (undef, $driver) = DBI->parse_dsn($dsn);
+    my $dbh = DBI->connect($dsn,$user,$pass,{RaiseError => 0, AutoCommit => 1,
+        $driver eq 'mysql' ? (mysql_enable_utf8 => 1) : (),
+    });
 
 	unless (defined $dbh) {
 		$session->errorHandler->error("Couldn't connect to database: $dsn");

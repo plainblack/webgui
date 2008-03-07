@@ -22,10 +22,17 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+convertCacheToBinary($session);
 
 finish($session); # this line required
 
+
+sub convertCacheToBinary {
+    my $session = shift;
+    print "\tConverting database cache to binary data.\n" unless ($quiet);
+    $session->db->write('ALTER TABLE `cache` MODIFY COLUMN `content` mediumblob');
+    $session->db->write('DELETE FROM `cache`');
+}
 
 ##-------------------------------------------------
 #sub exampleFunction {
