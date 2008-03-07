@@ -589,7 +589,8 @@ sub getAllUsers {
 
 =head2 getDatabaseUsers ( )
 
-Get the set of users allowed to be in this group via a database query.
+Get the set of users allowed to be in this group via a database query.  Returns an array ref
+of WebGUI userIds.
 
 =cut
 
