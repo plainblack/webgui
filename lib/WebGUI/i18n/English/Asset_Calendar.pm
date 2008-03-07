@@ -819,6 +819,76 @@ our $I18N = {
             lastUpdated     => 0,
             context         => 'Body for help page',
         },
+
+    'label day' => {
+        message     => q{Day},
+        lastUpdated => 1204668000,
+    },
+    'label week' => {
+        message     => q{Week},
+        lastUpdated => 1204668000,
+    },
+    'label month' => {
+        message     => q{Month},
+        lastUpdated => 1204668000,
+    },
+    'label search' => {
+        message     => q{Search},
+        lastUpdated => 1204668000,
+    },
+    'subscribe' => {
+        message     => q{Subscribe},
+        lastUpdated => 1204668000,
+    },
+    'current' => {
+        message     => q{current},
+        lastUpdated => 1204668000,
+    },
+    'previous week' => {
+        message     => q{Previous Week},
+        lastUpdated => 1204668000,
+    },
+    'next week' => {
+        message     => q{Next Week},
+        lastUpdated => 1204668000,
+    },
+    'previous day' => {
+        message     => q{Previous Day},
+        lastUpdated => 1204668000,
+    },
+    'next day' => {
+        message     => q{Next Day},
+        lastUpdated => 1204668000,
+    },
+    'previous page' => {
+        message     => q{Previous Page},
+        lastUpdated => 1204668000,
+    },
+    'next page' => {
+        message     => q{Next Page},
+        lastUpdated => 1204668000,
+    },
+    'start date' => {
+        message     => q{Start Date},
+        lastUpdated => 1204668000,
+    },
+    'end date' => {
+        message     => q{End Date},
+        lastUpdated => 1204668000,
+    },
+    'page x of x' => {
+        message     => q{Displaying page %s of %s},
+        lastUpdated => 1204668000,
+    },
+    'keyword' => {
+        message     => q{Keyword},
+        lastUpdated => 1204668000,
+    },
+    'search results' => {
+        message     => q{Search Results},
+        lastUpdated => 1204668000,
+    },
+
 };
 
 1;

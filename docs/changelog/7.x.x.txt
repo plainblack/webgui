@@ -1,4 +1,5 @@
 7.5.6
+ - Internationalized Calendar templates
 
 7.5.5
  - fixed: Several typos in the new Calendar help documentation.

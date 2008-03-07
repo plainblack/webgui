@@ -543,6 +543,128 @@ be useful, others may not.|,
 		message 	=> q{Event},
 		lastUpdated 	=> 1131394072,
 	},
+
+    'edit' => {
+        message     => q{Edit},
+        lastUpdated => 1204668000,
+    },
+    'delete' => {
+        message     => q{Delete},
+        lastUpdated => 1204668000,
+    },
+    'print' => {
+        message     => q{Print},
+        lastUpdated => 1204668000,
+    },
+    'previous event' => {
+        message     => q{Previous Event},
+        lastUpdated => 1204668000,
+    },
+    'next event' => {
+        message     => q{Next Event},
+        lastUpdated => 1204668000,
+    },
+    'event details' => {
+        message     => q{Event Details},
+        lastUpdated => 1204668000,
+    },
+    'event title' => {
+        message     => q{Event Title},
+        lastUpdated => 1204668000,
+    },
+    'location' => {
+        message     => q{Location},
+        lastUpdated => 1204668000,
+    },
+    'description' => {
+        message     => q{Description},
+        lastUpdated => 1204668000,
+    },
+    'scheduled' => {
+        message     => q{Scheduled},
+        lastUpdated => 1204668000,
+    },
+    'related material' => {
+        message     => q{Related Material},
+        lastUpdated => 1204668000,
+    },
+    'attachments' => {
+        message     => q{Attachments},
+        lastUpdated => 1204668000,
+    },
+    'start date' => {
+        message     => q{Start Date},
+        lastUpdated => 1204668000,
+    },
+    'end date' => {
+        message     => q{End Date},
+        lastUpdated => 1204668000,
+    },
+    'errors' => {
+        message     => q{Errors!},
+        lastUpdated => 1204668000,
+    },
+    'tab event' => {
+        message     => q{Event},
+        lastUpdated => 1204668000,
+    },
+    'recurrence' => {
+        message     => q{Recurrence},
+        lastUpdated => 1204668000,
+    },
+    'short title' => {
+        message     => q{Short Title},
+        lastUpdated => 1204668000,
+    },
+    'time' => {
+        message     => q{Time},
+        lastUpdated => 1204668000,
+    },
+    'add related link' => {
+        message     => q{Add New Related Link},
+        lastUpdated => 1204668000,
+    },
+    'link description' => {
+        message     => q{Link Desc},
+        lastUpdated => 1204668000,
+    },
+    'link view group' => {
+        message     => q{View Group},
+        lastUpdated => 1204668000,
+    },
+    'group to view' => {
+        message     => q{Group to View this Event},
+        lastUpdated => 1204668000,
+    },
+    'attachments for event' => {
+        message     => q{Attachments for this Event},
+        lastUpdated => 1204668000,
+    },
+    'recurrence pattern' => {
+        message     => q{Recurrence Pattern},
+        lastUpdated => 1204668000,
+    },
+    'recurrence range' => {
+        message     => q{Recurrence Range},
+        lastUpdated => 1204668000,
+    },
+    'start' => {
+        message     => q{Start},
+        lastUpdated => 1204668000,
+    },
+    'end' => {
+        message     => q{End},
+        lastUpdated => 1204668000,
+    },
+    'include dates' => {
+        message     => q{Include Dates},
+        lastUpdated => 1204668000,
+    },
+    'exclude dates' => {
+        message     => q{Exclude Dates},
+        lastUpdated => 1204668000,
+    },
+
 };
 
 1;
