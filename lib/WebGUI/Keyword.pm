@@ -268,18 +268,20 @@ sub setKeywordsForAsset {
     else {
         @{$keywords} = split(" ", $options->{keywords});
     }
+
     $self->deleteKeywordsForAsset($options->{asset});
     my $assetId = $options->{asset}->getId;
     if (scalar(@{$keywords})) {
         my $sth = $self->session->db->prepare("insert into assetKeyword (assetId, keyword) values (?,?)");
+        my %found_keywords;
         foreach my $keyword (@{$keywords}) {
             next if ($keyword eq "");
+            next
+                if $found_keywords{$keyword};
+            $found_keywords{$keyword}++;
             $sth->execute([$assetId, lc($keyword)]);
         }
     }
-    else {
-        $self->deleteKeywordsForAsset($options->{asset});
-    }   
 }
 
 
