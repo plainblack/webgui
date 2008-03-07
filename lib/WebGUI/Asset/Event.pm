@@ -1152,7 +1152,14 @@ Gets the related links.
 sub getRelatedLinks {
     my $self    = shift;
     return () unless $self->get("relatedLinks");
-    return split /\n+/, $self->get("relatedLinks");
+    my @links;
+    my %found_links;
+    for my $link ($self->get("relatedLinks") =~ m{\w+://[a-zA-Z0-9\\-_.!~*'():\@&=+\$,/?]+}g) {
+        push @links, $link
+            unless $found_links{$link};
+        $found_links{$link}++;
+    }
+    return @links;
 }
 
 
