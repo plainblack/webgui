@@ -193,32 +193,23 @@ sub toHtml {
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 	}
 
-	my $language  = WebGUI::International->new($self->session)->getLanguage($self->session->user->profileField("language"),"languageAbbreviation");
-	unless ($language) {
-		$language = WebGUI::International->new($self->session)->getLanguage("English","languageAbbreviation");
-	}
-        $self->session->style->setScript($self->session->url->extras('calendar/calendar.js'),{ type=>'text/javascript' });
-        $self->session->style->setScript($self->session->url->extras('calendar/lang/calendar-'.$language.'.js'),{ type=>'text/javascript' });
-        $self->session->style->setScript($self->session->url->extras('calendar/calendar-setup.js'),{ type=>'text/javascript' });
-        $self->session->style->setLink($self->session->url->extras('calendar/calendar-win2k-1.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
-        my $mondayFirst = $self->session->user->profileField("firstDayOfWeek") ? "1" : "0";
-	return WebGUI::Form::Text->new($self->session,
+        $self->session->style->setLink($self->session->url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
+        $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),{ type=>'text/javascript' });
+        $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'),{ type=>'text/javascript' });
+        my $firstDow = $self->session->user->profileField("firstDayOfWeek");
+        $self->session->style->setRawHeadTags("<script type=\"text/javascript\">var webguiFirstDayOfWeek = $firstDow</script>");
+        $self->session->style->setScript($self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type=>'text/javascript' });
+
+        return WebGUI::Form::Text->new($self->session,
                 name=>$self->get("name"),
                 value=>$value,
                 size=>$self->get("size"),
-                extras=>$self->get("extras"),
-		id=>$self->get('id'),
+                extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this);"',
+                id=>$self->get('id'),
                 maxlength=>$self->get("maxlength")
-                )->toHtml . '<script type="text/javascript"> 
-                        Calendar.setup({ 
-                                inputField : "'.$self->get('id').'", 
-                                ifFormat : "%Y-%m-%d", 
-                                showsTime : false, 
-                                step : 1,
-                                timeFormat : "12",
-                                firstDay : '.$mondayFirst.'
-                                }); 
-                        </script>';
+                )->toHtml;
 }
 
 #-------------------------------------------------------------------

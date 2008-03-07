@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>WebGUI Date picker control</title>
+<link rel="stylesheet" type="text/css" href="/extras/yui/build/calendar/assets/skins/sam/calendar.css"> 
+<script type="text/javascript" src="/extras/yui/build/yahoo/yahoo-min.js" ></script>
+<script type="text/javascript" src="/extras/yui/build/event/event-min.js" ></script>
+<script type="text/javascript" src="/extras/yui/build/dom/dom-min.js" ></script>
+<script type="text/javascript" src="/extras/yui/build/calendar/calendar-min.js"></script> 
+<script type="text/javascript">
+function getWebguiProperty (propName) {
+    var props = new Array();
+    props["extrasURL"] = "/extras/";
+    props["pageURL"] = "/home";
+    return props[propName];
+}
+</script>
+<link rel="stylesheet" type="text/css" href="datepicker.css" />
+<script type="text/javascript" src="datepicker.js"></script>
+</head>
+<body> 
+<form>
+    <input maxlength="10" name="date" type="text" size="10" id="date_formId" onfocus="YAHOO.WebGUI.Form.DatePicker.display(this)"/>
+    <input maxlength="19" name="datetime" type="text" size="19" id="date_formId" onfocus="YAHOO.WebGUI.Form.DatePicker.display(this, true)"/>
+</form>
+</body>
+</html>

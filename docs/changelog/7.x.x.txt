@@ -1,6 +1,7 @@
 7.5.6
  - Internationalized Calendar templates
  - fixed: exporting as HTML leaks sessions for inaccessible assets, 
+ - new YUI based date picker
 
 7.5.5
  - fixed: Several typos in the new Calendar help documentation.
