@@ -23,6 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 convertCacheToBinary($session);
+addLayoutOrderSetting( $session );
 
 finish($session); # this line required
 
@@ -40,6 +41,22 @@ sub convertCacheToBinary {
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#----------------------------------------------------------------------------
+# Add a column to the Gallery
+sub addLayoutOrderSetting {
+    my $session     = shift;
+    print "\tAdding Layout Order Setting... " unless $quiet;
+
+    $session->db->write( q{
+        ALTER TABLE Layout ADD COLUMN assetOrder varchar(20) default 'asc';
+    } );
+	$session->db->write( q{
+		UPDATE Layout SET assetOrder='asc';
+	});
+
+    print "DONE!\n" unless $quiet;
+}
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------

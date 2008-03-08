@@ -112,6 +112,26 @@ be useful, others may not.|,
 		message => q|The Id of the template used to display this Asset.|,
 		lastUpdated => 1164841027
 	},
+	
+	'asset order asc' => {
+		message     => q|To the Bottom|,
+		lastUpdated => 1164841027
+	},
+	
+	'asset order desc' => {
+		message     => q|To the Top|,
+		lastUpdated => 1164841027
+	},
+	
+	'asset order label' => {
+		message     => q|Add New Assets|,
+		lastUpdated => 1164841027
+	},
+	
+	'asset order hoverhelp' => {
+		message	    => q|Choose whether you'd like new or unpositioned assets added to the top or bottom of the first content position on the page.|,
+		lastUpdated => 1164841027
+	},
 
 };
 
