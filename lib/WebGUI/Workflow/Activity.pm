@@ -230,7 +230,7 @@ sub getEditForm {
     $form->hidden(name=>"activityId", value=>$self->getId);
     $form->hidden(name=>"className", value=>$self->get("className"));
     my $fullDefinition = $self->definition($self->session);
-    $form->dynamicForm($fullDefinition, $self);
+    $form->dynamicForm($fullDefinition, "properties", $self);
     return $form;
 }
 

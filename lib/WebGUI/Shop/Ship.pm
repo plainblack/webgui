@@ -50,16 +50,15 @@ A list of properties to assign to this ShipperDriver.  See C<definition> for det
 
 sub addShipper {
     my $self   = shift;
-    my $session = shift;
     my $requestedClass = shift;
+    my $options = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
-    WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
-        unless isIn($requestedClass, keys %{$self->getDrivers($session) } );
-    my $options = shift;
+    WebGUI::Error::InvalidParam->throw(error => qq{The requested class $requestedClass is not enabled in your WebGUI configuration file}, param => $requestedClass)
+        unless isIn($requestedClass, (keys %{$self->getDrivers}) );
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new ShipDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $session, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
     return $driver;
 }
 
@@ -189,6 +188,20 @@ Returns a reference to the current session.
 
 #-------------------------------------------------------------------
 
+=head2 www_addDriver ()
+
+=cut
+
+sub www_addDriver {
+    my $self = shift;
+    my $form = $self->session->form;
+    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called className with a driver class name }) if ($form->get("className") eq "");
+    my $shipper = $self->addShipper($form->get("className"), { $form->get("className")->getName($self->session), enabled=>0});
+    return $shipper->www_edit;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_do ( )
 
 Let's ship drivers do method calls. Requires a driver param in the post form vars which contains the id of the driver to load.
@@ -199,6 +212,7 @@ sub www_do {
     my ($self) = @_;
     my $form = $self->session->form;
     WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driver with a driver id }) if ($form->get("driver") eq "");
+    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called do with a method name in the driver }) if ($form->get("do") eq "");
     my $driver = $self->getShipper($form->get("driver"));
     my $output = undef;
     my $method = "www_". ( $form->get("do"));

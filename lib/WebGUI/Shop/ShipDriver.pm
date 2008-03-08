@@ -150,8 +150,8 @@ sub definition {
         },
     );
     my %properties = (
-        name   => 'Shipper Driver',
-        fields => \%fields,
+        name        => 'Shipper Driver',
+        properties  => \%fields,
     );
     push @{ $definition }, \%properties;
     return $definition;
@@ -221,7 +221,7 @@ sub getEditForm {
         name  => 'className',
         value => $self->className,
     );
-    $form->dynamicForm($definition, 'fields', $self);
+    $form->dynamicForm($definition, 'properties', $self);
     return $form;
 }
 
@@ -332,5 +332,22 @@ Accessor for the unique identifier for this shipperDriver.  The shipperId is
 a GUID.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Generates an edito form.
+
+=cut
+
+sub www_edit {
+    my $self = shift;
+    my $admin = WebGUI::Shop::Admin->new($self->session);
+    my $i18n = WebGUI::International->new($self->session, "Shop");
+    return $admin->getAdminConsole->render($self->getEditForm->print, $i18n->get("shipping methods"));
+}
+
+
 
 1;

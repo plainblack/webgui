@@ -91,8 +91,8 @@ sub definition {
         },
     );
     my %properties = (
-        name   => 'Flat Rate',
-        fields => \%fields,
+        name        => 'Flat Rate',
+        properties  => \%fields,
     );
     push @{ $definition }, \%properties;
     return $class->SUPER::definition($session, $definition);

@@ -50,16 +50,15 @@ A list of properties to assign to this PayDriver.  See C<definition> for details
 
 sub addPaymentGateway {
     my $self   = shift;
-    my $session = shift;
     my $requestedClass = shift;
+    my $options = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
     WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
-        unless isIn($requestedClass, keys %{$self->getDrivers($session) } );
-    my $options = shift;
+        unless isIn($requestedClass, (keys %{$self->getDrivers}) );
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $session, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
     return $driver;
 }
 
