@@ -72,7 +72,7 @@ cmp_deeply(
     $definition,
     [ {
         name => 'Flat Rate',
-        fields => {
+        properties => {
             flatFee => {
                 fieldType => 'float',
                 label => ignore(),
@@ -101,7 +101,7 @@ cmp_deeply(
     },
     {
         name => 'Shipper Driver',
-        fields => {
+        properties => {
             label => {
                 fieldType => 'text',
                 label => ignore(),
@@ -150,7 +150,7 @@ cmp_deeply($driver->options, $options, 'options accessor works');
 #
 #######################################################################
 
-is ($driver->getName, 'Flat Rate', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver::FlatRate->getName($session), 'Flat Rate', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
