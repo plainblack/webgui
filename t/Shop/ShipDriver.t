@@ -72,7 +72,7 @@ cmp_deeply(
     $definition,
     [ {
         name => 'Shipper Driver',
-        fields => {
+        properties => {
             label => {
                 fieldType => 'text',
                 label => ignore(),
@@ -101,7 +101,7 @@ cmp_deeply(
         },
         {
             name => 'Shipper Driver',
-            fields => ignore(),
+            properties => ignore(),
         }
     ],
     ,
@@ -170,7 +170,6 @@ is($driver->className, ref $driver, 'className property set correctly');
 cmp_deeply($driver->options, $options, 'options accessor works');
 
 my $dbData = $session->db->quickHashRef('select * from shipper where shipperId=?',[$driver->shipperId]);
-diag $driver->shipperId;
 cmp_deeply(
     $dbData,
     {
@@ -187,7 +186,7 @@ cmp_deeply(
 #
 #######################################################################
 
-is ($driver->getName, 'Shipper Driver', 'getName returns the human readable name of this driver');
+is (WebGUI::Shop::ShipDriver->getName($session), 'Shipper Driver', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
