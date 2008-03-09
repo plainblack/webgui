@@ -54,7 +54,7 @@ sub addShipper {
     my $options = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
-    WebGUI::Error::InvalidParam->throw(error => qq{The requested class $requestedClass is not enabled in your WebGUI configuration file}, param => $requestedClass)
+    WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
         unless isIn($requestedClass, (keys %{$self->getDrivers}) );
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new ShipDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
@@ -66,7 +66,7 @@ sub addShipper {
 
 =head2 getDrivers ( )
 
-This subroutine returns a hash reference of available shipping driver classes as keys with their human readable names as values, read from the WebGUI config file in the shippingDrivers directive.
+This method returns a hash reference of available shipping driver classes as keys with their human readable names as values, read from the WebGUI config file in the shippingDrivers directive.
 
 =cut
 

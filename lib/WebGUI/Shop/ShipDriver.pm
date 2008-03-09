@@ -245,6 +245,8 @@ sub getId {
 Return a human readable name for this driver. Never overridden in the
 subclass, instead specified in definition with the name "name".
 
+This is a class method.
+
 =cut
 
 sub getName {
