@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 29;
+my $tests = 19;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -47,26 +47,42 @@ skip 'Unable to load module WebGUI::Shop::Ship', $tests unless $loaded;
 
 #######################################################################
 #
+# new
+#
+#######################################################################
+
+my $e;
+my $ship;
+
+eval { $ship = WebGUI::Shop::Ship->new(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes an exception to not giving it a session variable');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+        got   => '',
+        expected => 'WebGUI::Session',
+    ),
+    'new: requires a session variable',
+);
+
+$ship = WebGUI::Shop::Ship->new($session);
+isa_ok($ship, 'WebGUI::Shop::Ship', 'new returned the right kind of object');
+
+isa_ok($ship->session, 'WebGUI::Session', 'session method returns a session object');
+
+is($session->getId, $ship->session->getId, 'session method returns OUR session object');
+
+#######################################################################
+#
 # getDrivers
 #
 #######################################################################
 
 my $drivers;
-my $e;
 
-eval { $drivers = WebGUI::Shop::Ship->getDrivers(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'getDrivers takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'getDrivers: requires a session variable',
-);
-
-
-$drivers = WebGUI::Shop::Ship->getDrivers($session);
+$drivers = $ship->getDrivers();
 
 cmp_deeply(
     $drivers,
@@ -76,118 +92,59 @@ cmp_deeply(
 
 #######################################################################
 #
-# create
+# addShipper
 #
 #######################################################################
 
-eval { $drivers = WebGUI::Shop::Ship->create(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'create: requires a session variable',
-);
+my $shipper;
 
-eval { $drivers = WebGUI::Shop::Ship->create($session); };
+eval { $shipper = $ship->addShipper(); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create croaks without a class');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without a class');
 cmp_deeply(
     $e,
     methods(
         error => 'Must provide a class to create an object',
     ),
-    'create croaks without a class',
+    'addShipper croaks without a class',
 );
 
-
-eval { $drivers = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FreeShipping'); };
+eval { $shipper = $ship->addShipper('WebGUI::Shop::ShipDriver::FreeShipping'); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create croaks without a configured class');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without a configured class');
 cmp_deeply(
     $e,
     methods(
         error => 'The requested class is not enabled in your WebGUI configuration file',
         param => 'WebGUI::Shop::ShipDriver::FreeShipping',
     ),
-    'create croaks without a configured class',
+    'addShipper croaks without a configured class',
 );
 
-eval { $drivers = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FlatRate'); };
+eval { $shipper = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate'); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create croaks without options to build a object with');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without options to build a object with');
 cmp_deeply(
     $e,
     methods(
         error => 'You must pass a hashref of options to create a new ShipDriver object',
     ),
-    'create croaks without options to build a object with',
+    'addShipper croaks without options to build a object with',
 );
 
-eval { $drivers = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FlatRate', {}); };
+eval { $shipper = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', {}); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'create croaks without options to build a object with');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addShipper croaks without options to build a object with');
 cmp_deeply(
     $e,
     methods(
         error => 'You must pass a hashref of options to create a new ShipDriver object',
     ),
-    'create croaks without options to build a object with',
+    'addShipper croaks without options to build a object with',
 );
 
-my $driver = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}});
-isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'created a new, configured FlatRate driver');
-
-
-#######################################################################
-#
-# new
-#
-#######################################################################
-
-my $oldDriver;
-
-eval { $oldDriver = WebGUI::Shop::Ship->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'new takes exception to not giving it a session object',
-);
-
-eval { $oldDriver = WebGUI::Shop::Ship->new($session); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a shipperId');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a shipperId',
-    ),
-    'new takes exception to not giving it a shipperId',
-);
-
-eval { $oldDriver = WebGUI::Shop::Ship->new($session, 'notEverAnId'); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::ObjectNotFound', 'new croaks unless the requested shipperId object exists in the db');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'shipperId not found in db',
-        id    => 'notEverAnId',
-    ),
-    'new croaks unless the requested shipperId object exists in the db',
-);
-
-my $driverCopy = WebGUI::Shop::Ship->new($session, $driver->shipperId);
-
-is($driverCopy->getId,     $driver->getId,           'same id');
-is($driverCopy->className, $driver->className,       'same className');
-cmp_deeply($driverCopy->options,   $driver->options, 'same options');
+my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}});
+isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured FlatRate driver');
 
 #######################################################################
 #
@@ -196,21 +153,9 @@ cmp_deeply($driverCopy->options,   $driver->options, 'same options');
 #######################################################################
 
 my $shippers;
-my $driver2 = WebGUI::Shop::Ship->create($session, 'WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
+my $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
 
-eval { $shippers = WebGUI::Shop::Ship->getShippers(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'getShippers takes exception to not giving it a session object');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-    ),
-    'getShippers takes exception to not giving it a session object',
-);
-
-
-$shippers = WebGUI::Shop::Ship->getShippers($session);
+$shippers = $ship->getShippers();
 is(scalar @{$shippers}, 2, 'getShippers: got both shippers');
 
 my @shipperNames = map { $_->options()->{label} } @{ $shippers };
@@ -226,15 +171,15 @@ cmp_bag(
 #
 #######################################################################
 
-eval { $shippers = WebGUI::Shop::Ship->getOptions(); };
+eval { $shippers = $ship->getOptions(); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giving it a session object');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giving it a cart');
 cmp_deeply(
     $e,
     methods(
         error => 'Need a cart.',
     ),
-    'getOptions takes exception to not giving it a session object',
+    'getOptions takes exception to not giving it a cart',
 );
 
 }
