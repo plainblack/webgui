@@ -1477,8 +1477,8 @@ sub processPropertiesFromFormPost {
     # All day events have no time
     if ($form->param("allday")) {
         $self->update({
-            startTime   => undef,
-            endTime     => undef,
+            startTime   => '',
+            endTime     => '',
         });
     }
     # Non-allday events need timezone conversion
