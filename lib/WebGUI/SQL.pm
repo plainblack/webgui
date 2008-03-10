@@ -755,7 +755,8 @@ sub quoteAndJoin {
 
 =head2 read ( sql [ , placeholders ] )
 
-This is a convenience method for WebGUI::SQL::ResultSet->read().
+This is a convenience method for WebGUI::SQL::ResultSet->read().  It returns the statement
+handler.
 
 =head3 sql
 
