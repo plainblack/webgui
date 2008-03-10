@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 72 + 2*scalar(@{$addExceptions});
+my $tests = 73 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 2, 'add added another row to the tax table');
 
 $taxData = {
-    country => 'state',
+    country => 'USA',
     state   => 'Oregon',
     taxRate => '0.1',
 };
@@ -152,6 +152,42 @@ is($taxIterator->rows, 3, 'add permits adding duplicate information.');
 ##53701-53709
 ##city rate: 0.5%
 ##Wisconsin rate 5.0%
+
+#######################################################################
+#
+# getAllItems
+#
+#######################################################################
+
+my $expectedTaxData = [
+        {
+            country => 'USA',
+            state   => 'OR',
+            city    => undef,
+            code    => undef,
+            taxRate => 0,
+        },
+        {
+            country => 'USA',
+            state   => 'Wisconsin',
+            city    => 'Madcity',
+            code    => '53702',
+            taxRate => 5,
+        },
+        {
+            country => 'USA',
+            state   => 'Oregon',
+            city    => undef,
+            code    => undef,
+            taxRate => 0.1,
+        },
+];
+
+cmp_bag(
+    $taxer->getAllItems,
+    $expectedTaxData,
+    'getAllItems returns the whole set of tax data',
+);
 
 #######################################################################
 #
@@ -307,9 +343,8 @@ ok(
 
 $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 3, 'import: Old data deleted, new data imported');
-my @goodTaxData = _grabTaxData($taxIterator);
 cmp_bag(
-    \@goodTaxData,
+    $taxer->getAllItems,
     $expectedTaxData,
     'Correct data inserted.',
 );
@@ -323,9 +358,8 @@ ok(
 
 $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 3, 'import: Old data deleted, new data imported again');
-my @orderedTaxData = _grabTaxData($taxIterator);
 cmp_bag(
-    \@orderedTaxData,
+    $taxer->getAllItems,
     $expectedTaxData,
     'Correct data inserted, with CSV in different columnar order.',
 );
@@ -339,9 +373,8 @@ ok(
 
 $taxIterator = $taxer->getItems;
 is($taxIterator->rows, 3, 'import: Old data deleted, new data imported the third time');
-my @orderedTaxData = _grabTaxData($taxIterator);
 cmp_bag(
-    \@orderedTaxData,
+    $taxer->getAllItems,
     $expectedTaxData,
     'Correct data inserted, with comments in the CSV file',
 );
@@ -570,16 +603,6 @@ $taxableDonation->purge;
 $taxFreeDonation->purge;
 $cart->delete;
 $book->delete;
-}
-
-sub _grabTaxData {
-    my $tax = shift;
-    my @taxData = ();
-    while (my $taxRow = $tax->hashRef) {
-        delete $taxRow->{'taxId'};
-        push @taxData, $taxRow;
-    }
-    return @taxData;
 }
 
 sub getAddExceptions {

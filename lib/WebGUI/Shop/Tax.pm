@@ -141,7 +141,7 @@ sub calculate {
 
 =head2 canEdit ( [ $user ] )
 
-Determine whether or not the current user can perform commerce functions
+Determine whether or not a user can perform commerce functions
 
 =head3 $user
 
@@ -212,6 +212,21 @@ sub exportTaxData {
 
 #-------------------------------------------------------------------
 
+=head2 getAllItems ( )
+
+Returns an arrayref of hashrefs, where each hashref is the data for one row of
+tax data.  taxId is dropped from the dataset.
+
+=cut
+
+sub getAllItems {
+    my $self = shift;
+    my $taxes = $self->session->db->buildArrayRefOfHashRefs('select country,state,city,code,taxRate from tax order by country, state');
+    return $taxes;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getItems ( )
 
 Returns a WebGUI::SQL::Result object for accessing all of the data in the tax table.  This
@@ -221,7 +236,7 @@ is a convenience method for listing and/or exporting tax data.
 
 sub getItems {
     my $self = shift;
-    my $result = $self->session->db->read('select * from tax');
+    my $result = $self->session->db->read('select * from tax order by country, state');
     return $result;
 }
 
@@ -353,6 +368,28 @@ sub www_view {
     my $self = shift;
     return $self->session->privileges->insufficient
         unless $self->canEdit;
+    my $session = $self->session;
+    ##YUI specific datatable CSS
+    $session->setLink($session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type => 'text/CSS'});
+    ##YUI basics
+    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/element/element-beta-min.js'), {type => 'text/javascript'});
+    $session->style->setScript($session->url->extras('yui/build/datasource/datasource-beta-min.js'), {type => 'text/javascript'});
+    ##YUI Datatable
+    $session->style->setScript($session->url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
+    ##YUI JSON handler
+    $session->style->setScript($session->url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
+    ##Build column headers. TODO: I18N
+    my $i18n=WebGUI::International->new($session, 'Tax');
+    $session->style->setRawHeadTags(sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'));
+var taxColumnDefs = [
+    {key:"country", label:"%s"},
+    {key:"state",   label:"%s"},
+    {key:"city",    label:"%s"},
+    {key:"code",    label:"%s"}
+];
+EOCHJS
+    $session->style->setRawHeadTags();
     return '';
 }
 
