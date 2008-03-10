@@ -227,7 +227,8 @@ sub prepare {
 
 =head2 read ( sql, db, placeholders )
 
-Constructor. Returns a result set statement handler.
+Constructor. Returns a result set statement handler after doing a prepare and execute on
+the supplied SQL query and the placeholders.
 
 =head3 sql
 
