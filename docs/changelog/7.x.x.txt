@@ -1,4 +1,5 @@
 7.5.6
+ - fixed: event related links may not work with some group names
  - Use UTF8 for database connection when connecting to MySQL
  - Internationalized Calendar templates
  - fixed: exporting as HTML leaks sessions for inaccessible assets, 
