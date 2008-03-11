@@ -4,6 +4,19 @@
  - fixed: exporting as HTML leaks sessions for inaccessible assets, 
  - fixed: changing image thumbnail size doesn't resize image
  - fixed: loadAddConfigs loads hidden files
+ - fixed: fatal error duplicate keywords added to a wiki page
+
+7.5.5
+ - fixed: Several typos in the new Calendar help documentation.
+ - fix: List View now starts at the beginning of the day passed in.
+ - Removed some spurious warnings from the calendar.
+ - Added ability to edit comments. Entirely changed how comments work in prep
+   for turning it into a mixin.
+ - fixed: Child assets not indicated by plus sign in uncommited tags
+ - Added WebGUI::Asset::File::GalleryFile as a subclass for all files to be 
+   used inside the Gallery.
+ - Changed WebGUI::Asset::File::Image::Photo to subclass GalleryFile
+>>>>>>> 38e9b50... fixed: fatal error duplicate keywords added to a wiki page:docs/changelog/7.x.x.txt
 
 7.4.27
  - fixed: wiki no longer links to pages in trash (Arjan Widlak, United Knowledge)
