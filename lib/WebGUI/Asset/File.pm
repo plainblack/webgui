@@ -297,6 +297,9 @@ sub processPropertiesFromFormPost {
     if($session->form->get("newFile_file") ne "") {
 	   $storageLocation->clear();
     }
+    else {
+        $self->applyConstraints;
+    }
 
     #Pass in the storage Id to prevent another one from being created.
     my $storage = $self->getStorageFromPost($storageId);
