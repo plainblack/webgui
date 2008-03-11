@@ -58,7 +58,7 @@ sub addPaymentGateway {
         unless isIn($requestedClass, (keys %{$self->getDrivers}) );
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, 'TEMPORARY_LABEL', $options ]) };
     return $driver;
 }
 
@@ -109,7 +109,7 @@ sub getOptions {
 
 #-------------------------------------------------------------------
 
-=head2 getPaymentGateway ( )
+=head2 getPaymentGateway ( $id )
 
 Looks up an existing PayDriver in the db by paymentGatewayId and returns
 that object.  If the PayDriver throws an exception,  it is propagated

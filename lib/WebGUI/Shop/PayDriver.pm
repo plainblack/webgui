@@ -111,7 +111,7 @@ sub create {
     my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $label, $options);
 
     # and persist this instance in the db
-    $session->db->write('insert into payment_Gateway (paymentGatewayId, label, className) VALUES (?,?,?)', [
+    $session->db->write('insert into paymentGateway (paymentGatewayId, label, className) VALUES (?,?,?)', [
         $paymentGatewayId, 
         $label,
         $class,
@@ -146,26 +146,26 @@ sub definition {
     %fields = (
         label           => {
             fieldType       => 'text',
-            label           => $i18n->echo('label'),
-            hoverHelp       => $i18n->echo('label help'),
+            label           => $i18n->get('label'),
+            hoverHelp       => $i18n->get('label help'),
             defaultValue    => "Credit Card",
         },
         enabled         => {
             fieldType       => 'yesNo',
-            label           => $i18n->echo('enabled'),
-            hoverHelp       => $i18n->echo('enabled help'),
+            label           => $i18n->get('enabled'),
+            hoverHelp       => $i18n->get('enabled help'),
             defaultValue    => 1,
         },
         groupToUse      => {
             fieldType       => 'group',
-            label           => $i18n->echo('who can use'),
-            hoverHelp       => $i18n->echo('who can use help'),
+            label           => $i18n->get('who can use'),
+            hoverHelp       => $i18n->get('who can use help'),
             defaultValue    => 1,
         },
         receiptMessage  => {
             fieldType       => 'text',
-            label           => $i18n->echo('receipt message'),
-            hoverHelp       => $i18n->echo('receipt message help'),
+            label           => $i18n->get('receipt message'),
+            hoverHelp       => $i18n->get('receipt message help'),
             defaultValue    => undef,
         },
     );
@@ -190,7 +190,7 @@ Removes this PayDriver object from the db.
 sub delete {
     my $self = shift;
 
-    $self->session->db->write('delete from payment_Gateway where paymentGatewayId=?', [
+    $self->session->db->write('delete from paymentGateway where paymentGatewayId=?', [
         $self->getId,
     ]);
 
@@ -285,11 +285,17 @@ sub getId {
 Return a human readable name for this driver. Never overridden in the
 subclass, instead specified in definition with the name "name".
 
+This is a class method.
 =cut
 
 sub getName {
-    my $self = shift;
-    my $definition = $self->definition($self->session);
+    my $class       = shift;
+    my $session     = shift;
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
+        unless ref $session eq 'WebGUI::Session';
+
+    my $definition  = $class->definition($session);
+
     return $definition->[0]->{name};
 }
 
@@ -312,7 +318,7 @@ sub new {
         unless defined $paymentGatewayId;
 
     # Fetch the instance data from the db
-    my $properties = $session->db->quickHashRef('select * from payment_Gateway where paymentGatewayId=?', [
+    my $properties = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [
         $paymentGatewayId,
     ]);
     WebGUI::Error::ObjectNotFound->throw(error => q{paymentGatewayId not found in db}, id => $paymentGatewayId)
@@ -368,7 +374,7 @@ sub set {
         unless ref $properties eq 'HASH' and scalar keys %{ $properties };
 
     my $jsonOptions = to_json($properties);
-    $self->session->db->write('update payment_Gateway set options=? where paymentGatewayId=?', [
+    $self->session->db->write('update paymentGateway set options=? where paymentGatewayId=?', [
         $jsonOptions,
         $self->paymentGatewayId
     ]);

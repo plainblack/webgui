@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 43;
+my $tests = 45;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ $driver = WebGUI::Shop::PayDriver->create( $session, $label, $options );
 
 isa_ok  ($driver, 'WebGUI::Shop::PayDriver', 'create creates WebGUI::Shop::PayDriver object');
 
-my $dbData = $session->db->quickHashRef('select * from payment_Gateway where paymentGatewayId=?', [ $driver->getId ]);
+my $dbData = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [ $driver->getId ]);
 
 #diag        ($driver->getId);
 cmp_deeply  (
@@ -245,7 +245,18 @@ cmp_deeply  ($driver->options, $options, 'options accessor works');
 #
 #######################################################################
 
-is          ($driver->getName, 'Payment Driver', 'getName returns the human readable name of this driver');
+eval { WebGUI::Shop::PayDriver->getName(); };
+$e = Exception::Class->caught();
+isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'getName requires a session object passed to it');
+cmp_deeply  (
+    $e,
+    methods(
+        error => 'Must provide a session variable',
+    ),
+    'getName requires a session object passed to it',
+);
+
+is          (WebGUI::Shop::PayDriver->getName($session), 'Payment Driver', 'getName returns the human readable name of this driver');
 
 #######################################################################
 #
@@ -403,7 +414,7 @@ my $newOptions = {
 };
 
 $driver->set($newOptions);
-my $storedOptions = $session->db->quickScalar('select options from payment_Gateway where paymentGatewayId=?', [
+my $storedOptions = $session->db->quickScalar('select options from paymentGateway where paymentGatewayId=?', [
     $driver->getId,
 ]);
 cmp_deeply(
@@ -422,7 +433,7 @@ cmp_deeply(
 
 $driver->delete;
 
-my $count = $session->db->quickScalar('select count(*) from payment_Gateway where paymentGatewayId=?', [
+my $count = $session->db->quickScalar('select count(*) from paymentGateway where paymentGatewayId=?', [
     $driver->paymentGatewayId
 ]);
 
@@ -436,5 +447,5 @@ undef $driver;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    #$session->db->write('delete from payment_Gateway');
+    $session->db->write('delete from paymentGateway');
 }

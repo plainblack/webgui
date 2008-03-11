@@ -222,7 +222,7 @@ sub insertCommercePayDriverTable {
 	print "\tInstall the Commerce PayDriver Table.\n" unless ($quiet);
 	# and here's our code
     $session->db->write(<<EOSQL);
-CREATE TABLE payment_Gateway (
+CREATE TABLE paymentGateway (
     paymentGatewayId    VARCHAR(22) binary NOT NULL primary key,
     label               VARCHAR(255),           
     className           VARCHAR(255),
