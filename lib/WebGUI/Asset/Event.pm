@@ -1269,7 +1269,7 @@ sub getTemplateVars {
     }
     elsif (! $var{isAllDay}) {
         $var{dateSpan}
-            .= ' &dash; '
+            .= ' &ndash; '
     }
     if (! $var{isAllDay}) {
         $var{dateSpan} .= ' '.$var{endDateHour}.":".$var{endDateMinute}." ".$var{endDateM};

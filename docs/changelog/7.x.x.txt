@@ -1,5 +1,6 @@
 7.4.28
  - related links are now parsed out of related links text area
+ - Internationalized Calendar templates
 
 7.4.27
  - fixed: wiki no longer links to pages in trash (Arjan Widlak, United Knowledge)
