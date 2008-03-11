@@ -3,6 +3,7 @@
  - Internationalized Calendar templates
  - fixed: exporting as HTML leaks sessions for inaccessible assets, 
  - fixed: changing image thumbnail size doesn't resize image
+ - fixed: loadAddConfigs loads hidden files
 
 7.4.27
  - fixed: wiki no longer links to pages in trash (Arjan Widlak, United Knowledge)

@@ -186,9 +186,12 @@ sub readAllConfigs {
 	closedir(DIR);
 	my %configs;
 	foreach my $file (@files) {
-		if ($file =~ /\.conf$/ && !($file =~ /^log\.conf$/) && !($file =~ /^spectre\.conf$/)) {
-			$configs{$file} = WebGUI::Config->new($webguiPath,$file);
-		}
+        next
+            if $file !~ /\.conf$/
+            || $file =~ /^\./
+            || $file eq 'log.conf'
+            || $file eq 'spectre.conf';
+        $configs{$file} = WebGUI::Config->new($webguiPath,$file);
 	}
 	return \%configs;
 }
