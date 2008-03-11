@@ -33,7 +33,7 @@ readonly session => my %session;
 
 #-------------------------------------------------------------------
 
-=head2 addPaymentGateway ( $class, $options )
+=head2 addPaymentGateway ( $class, $label, $options )
 
 The interface method for creating new, configured instances of PayDriver.  If the PayDriver throws an exception,  it is propagated
 back up to the top.
@@ -42,6 +42,10 @@ back up to the top.
 
 The class of the new PayDriver object to create.
 
+=head4 $label
+
+The label for this instance.
+
 =head4 $options
 
 A list of properties to assign to this PayDriver.  See C<definition> for details.
@@ -49,16 +53,19 @@ A list of properties to assign to this PayDriver.  See C<definition> for details
 =cut
 
 sub addPaymentGateway {
-    my $self   = shift;
-    my $requestedClass = shift;
-    my $options = shift;
+    my $self            = shift;
+    my $requestedClass  = shift;
+    my $label           = shift;
+    my $options         = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
     WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
         unless isIn($requestedClass, (keys %{$self->getDrivers}) );
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a label to create an object})
+        unless $label;
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, 'TEMPORARY_LABEL', $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $label, $options ]) };
     return $driver;
 }
 

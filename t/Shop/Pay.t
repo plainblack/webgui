@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 25;
+my $tests = 27;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -114,6 +114,18 @@ cmp_deeply(
 
 eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash'); };
 $e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without a label');
+cmp_deeply(
+    $e,
+    methods(
+        error => 'Must provide a label to create an object',
+    ),
+    'addPaymentGateway requires a label',
+);
+
+
+eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL'); };
+$e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without options to build a object with');
 cmp_deeply(
     $e,
@@ -123,7 +135,7 @@ cmp_deeply(
     'addPaymentGateway croaks without options to build a object with',
 );
 
-eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', {}); };
+eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', {}); };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without options to build a object with');
 cmp_deeply(
@@ -138,13 +150,13 @@ my $options = {
     enabled => 1,
     label   => 'Cold, stone hard cash',
 };
-my $newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $options);
+my $newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', $options);
 isa_ok($newDriver, 'WebGUI::Shop::PayDriver::Cash', 'added a new, configured Cash driver');
+is($newDriver->label, 'JAL', 'label passed correctly to paydriver');
 
-diag ('----> THE NEXT TEST IS SUPPOSED TO FAIL! REMOVE WHEN RESOLVED. <----');
-isnt ($newDriver->label, 'TEMPORARY_LABEL', 'fail test until the addPaymentGateway interface is resolved.');
 
 #TODO: check if options are stored.
+
 
 #######################################################################
 #
@@ -225,7 +237,7 @@ my $otherOptions = {
     enabled     => 1,
     label       => 'Even harder cash',
 };
-my $anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $otherOptions);
+my $anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'Pomade', $otherOptions);
 
 my $gateways = $pay->getPaymentGateways;
 my @returnedIds = map {$_->getId} @{ $gateways };
