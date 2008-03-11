@@ -33,6 +33,7 @@ createDonationAsset($session);
 addShippingDrivers($session);
 addShoppingHandler($session);
 addAddressBook($session);
+insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
 
 finish($session); # this line required
@@ -215,6 +216,20 @@ sub addShippingDrivers {
     $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::FlatRate');
 }
 
+#-------------------------------------------------
+sub insertCommercePayDriverTable {
+	my $session = shift;
+	print "\tInstall the Commerce PayDriver Table.\n" unless ($quiet);
+	# and here's our code
+    $session->db->write(<<EOSQL);
+CREATE TABLE payment_Gateway (
+    paymentGatewayId    VARCHAR(22) binary NOT NULL primary key,
+    label               VARCHAR(255),           
+    className           VARCHAR(255),
+    options             mediumtext
+)
+EOSQL
+}
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
