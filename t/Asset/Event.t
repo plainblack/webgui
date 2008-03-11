@@ -52,7 +52,7 @@ is($event->isAllDay, 0, 'isAllDay is zero since it has a start and end time');
 
 my %templateVars = $event->getTemplateVars();
 is($templateVars{isOneDay}, 1, 'getTemplateVars: isOneDay with start times');
-is($templateVars{dateSpan}, 'Wednesday, August 16 6:00 PM &dash;  10:00 PM', 'getTemplateVars: dateSpan bridges times on a single day');
+is($templateVars{dateSpan}, 'Wednesday, August 16 6:00 PM &ndash;  10:00 PM', 'getTemplateVars: dateSpan bridges times on a single day');
 
 $properties->{startDate} = '2000-08-16';
 $properties->{endDate}   = '2000-08-16';
