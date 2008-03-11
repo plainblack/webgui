@@ -18,11 +18,13 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use JSON;
 use HTML::Form;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::TestException;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 27;
+my $tests = 18;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -54,17 +56,15 @@ skip 'Unable to load module WebGUI::Shop::Pay', $tests unless $loaded;
 my $e;
 my $pay;
 
-eval { $pay = WebGUI::Shop::Pay->new(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new takes an exception to not giving it a session variable');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a session variable',
-        got   => '',
-        expected => 'WebGUI::Session',
-    ),
-    'new: requires a session variable',
+
+throws_deeply ( sub { $pay = WebGUI::Shop::Pay->new(); }, 
+    'WebGUI::Error::InvalidObject', 
+    {
+        error       => 'Must provide a session variable',
+        got         => '',
+        expected    => 'WebGUI::Session',
+    },
+    'new takes an exception to not giving it a session variable'
 );
 
 $pay = WebGUI::Shop::Pay->new($session);
@@ -79,8 +79,6 @@ isa_ok($pay, 'WebGUI::Shop::Pay', 'new returned the right kind of object');
 isa_ok($pay->session, 'WebGUI::Session', 'session method returns a session object');
 is($session->getId, $pay->session->getId, 'session method returns OUR session object');
 
-
-
 #######################################################################
 #
 # addPaymentGateway
@@ -89,60 +87,45 @@ is($session->getId, $pay->session->getId, 'session method returns OUR session ob
 
 my $gateway;
 
-eval { $gateway = $pay->addPaymentGateway(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without a class');
-cmp_deeply(
-    $e,
-    methods(
-        error => 'Must provide a class to create an object',
-    ),
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway(); },
+    'WebGUI::Error::InvalidParam',
+    { 
+        error => 'Must provide a class to create an object' 
+    },
     'addPaymentGateway croaks without a class',
 );
 
-eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::NoSuchDriver'); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without a configured class');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::NoSuchDriver'); },
+    'WebGUI::Error::InvalidParam',
+    {
         error => 'The requested class is not enabled in your WebGUI configuration file',
         param => 'WebGUI::Shop::PayDriver::NoSuchDriver',
-    ),
+    },
     'addPaymentGateway croaks without a configured class',
 );
 
-eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash'); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without a label');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash'); },
+    'WebGUI::Error::InvalidParam',
+    {
         error => 'Must provide a label to create an object',
-    ),
+    },
     'addPaymentGateway requires a label',
 );
 
 
-eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL'); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without options to build a object with');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL'); },
+    'WebGUI::Error::InvalidParam', 
+    {
         error => 'You must pass a hashref of options to create a new PayDriver object',
-    ),
+    },
     'addPaymentGateway croaks without options to build a object with',
 );
 
-eval { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', {}); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'addPaymentGateway croaks without options to build a object with');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', {}); },
+    'WebGUI::Error::InvalidParam',
+    {
         error => 'You must pass a hashref of options to create a new PayDriver object',
-    ),
+    },
     'addPaymentGateway croaks without options to build a object with',
 );
 
@@ -170,11 +153,7 @@ my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::Cash'     => 'Cash',
 };
 
-cmp_deeply(
-    $drivers,
-    $defaultPayDrivers,
-    'getDrivers returns the default PayDrivers',
-);
+cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
 
 #######################################################################
 #
@@ -182,14 +161,11 @@ cmp_deeply(
 #
 #######################################################################
 
-eval { $drivers = $pay->getOptions(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giving it a cart');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply( sub { $drivers = $pay->getOptions(); },
+    'WebGUI::Error::InvalidParam',
+    {
         error => 'Need a cart.',
-    ),
+    },
     'getOptions takes exception to not giving it a cart',
 );
 
@@ -199,26 +175,20 @@ cmp_deeply(
 #
 #######################################################################
 
-eval { $gateway = $pay->getPaymentGateway(); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'getPaymentDriver throws an exception when no paymentGatewayId is passed');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply( sub { $gateway = $pay->getPaymentGateway(); },
+    'WebGUI::Error::InvalidParam',
+    {
         error   => q{Must provide a paymentGatewayId},
-    ),
+    },
     'getPaymentGateway throws exception without paymentGatewayId',
 );
 
-eval { $gateway = $pay->getPaymentGateway('NoSuchThing'); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::ObjectNotFound', 'getPaymentGateway thows exception when a non-existant paymentGatewayId is passed');
-cmp_deeply(
-    $e,
-    methods(
+throws_deeply( sub { $gateway = $pay->getPaymentGateway('NoSuchThing'); },
+    'WebGUI::Error::ObjectNotFound',
+    {   
         error   => q{payment gateway not found in db},
         id      => 'NoSuchThing',
-    ),
+    },
     'getPaymentGateway throws exception when called with a non-existant paymentGatewayId',
 );
 
