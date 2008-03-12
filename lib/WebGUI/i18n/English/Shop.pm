@@ -3,6 +3,12 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'add shipper' => { 
+		message => q|Add Shipping Method|,
+		lastUpdated => 0,
+		context => q|button in shipping manager|
+	},
+
 	'shopping cart template' => { 
 		message => q|Cart Template|,
 		lastUpdated => 0,

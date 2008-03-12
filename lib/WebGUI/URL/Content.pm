@@ -58,6 +58,9 @@ sub handler {
             }
             else {
                 if ($output eq "chunked") {
+                    if ($session->errorHandler->canShowDebug()) {
+                        $session->output->print($session->errorHandler->showDebug(),1);
+                    }
                     last;
                 }
                 elsif (defined $output && $output ne "") {

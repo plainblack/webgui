@@ -190,6 +190,8 @@ Returns a reference to the current session.
 
 =head2 www_addDriver ()
 
+Adds a ship driver to the shop, then displays it's edit screen.
+
 =cut
 
 sub www_addDriver {
@@ -202,18 +204,34 @@ sub www_addDriver {
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteDriver ()
+
+Deletes a ship driver from the shop.
+
+=cut
+
+sub www_deleteDriver {
+    my $self = shift;
+    my $form = $self->session->form;
+    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driverId with guid }) if ($form->get("driverId") eq "");
+    $self->getShipper($form->get("driverId"))->delete;
+    return $self->www_manage;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_do ( )
 
-Let's ship drivers do method calls. Requires a driver param in the post form vars which contains the id of the driver to load.
+Let's ship drivers do method calls. Requires a driverId param in the post form vars which contains the id of the driver to load.
 
 =cut
 
 sub www_do {
     my ($self) = @_;
     my $form = $self->session->form;
-    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driver with a driver id }) if ($form->get("driver") eq "");
+    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driverId with a driver id }) if ($form->get("driverId") eq "");
     WebGUI::Error::InvalidParam->throw(error => q{must have a form var called do with a method name in the driver }) if ($form->get("do") eq "");
-    my $driver = $self->getShipper($form->get("driver"));
+    my $driver = $self->getShipper($form->get("driverId"));
     my $output = undef;
     my $method = "www_". ( $form->get("do"));
     if ($driver->can($method)) {
@@ -243,7 +261,23 @@ sub www_manage {
         .WebGUI::Form::submit($session, {value=>$i18n->get("add shipper")})
         .WebGUI::Form::formFooter($session);
     foreach my $shipper (@{$self->getShippers}) {
-        
+        $output .= '<div style="clear: both;">'
+			.WebGUI::Form::formHeader($session, {extras=>'style="float: left;"'})
+            .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
+            .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteDriver"})
+            .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
+            .WebGUI::Form::submit($session, {value=>$i18n->get("delete"), extras=>'class="backwardButton"'})
+            .WebGUI::Form::formFooter($session)
+            .WebGUI::Form::formHeader($session, {extras=>'style="float: left;"'})
+            .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})
+            .WebGUI::Form::hidden($session, {name=>"method", value=>"do"})
+            .WebGUI::Form::hidden($session, {name=>"do", value=>"edit"})
+            .WebGUI::Form::hidden($session, {name=>"driverId", value=>$shipper->getId})
+            .WebGUI::Form::submit($session, {value=>$i18n->get("edit"), extras=>'class="normalButton"'})
+            .WebGUI::Form::formFooter($session)
+            .' '
+            .$shipper->get("label")
+			.'</div>';        
     }
     my $console = $admin->getAdminConsole;
     return $console->render($output, $i18n->get("shipping methods"));

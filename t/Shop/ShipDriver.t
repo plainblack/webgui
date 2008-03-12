@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 42;
+my $tests = 35;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -154,6 +154,7 @@ my $options = {
                 label   => 'Slow and dangerous',
                 enabled => 1,
               };
+
 $driver = WebGUI::Shop::ShipDriver->create( $session, $options );
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
@@ -162,18 +163,16 @@ isa_ok($driver->session, 'WebGUI::Session', 'session method returns a session ob
 
 is($session->getId, $driver->session->getId, 'session method returns OUR session object');
 
-like($driver->shipperId, $session->id->getValidator, 'got a valid GUID for shipperId');
-is($driver->getId,       $driver->shipperId,         'getId returns the same thing as shipperId');
+like($driver->getId, $session->id->getValidator, 'got a valid GUID for shipperId');
 
-is($driver->className, ref $driver, 'className property set correctly');
 
-cmp_deeply($driver->options, $options, 'options accessor works');
+cmp_deeply($driver->get, $options, 'options accessor works');
 
-my $dbData = $session->db->quickHashRef('select * from shipper where shipperId=?',[$driver->shipperId]);
+my $dbData = $session->db->quickHashRef('select * from shipper where shipperId=?',[$driver->getId]);
 cmp_deeply(
     $dbData,
     {
-        shipperId => $driver->shipperId,
+        shipperId => $driver->getId,
         className => ref($driver),
         options   => q|{"label":"Slow and dangerous","enabled":1}|,
     },
@@ -194,7 +193,6 @@ is (WebGUI::Shop::ShipDriver->getName($session), 'Shipper Driver', 'getName retu
 #
 #######################################################################
 
-cmp_deeply($driver->get, $driver->options, 'get works like the options method with no param passed');
 is($driver->get('enabled'), 1, 'get the enabled entry from the options');
 is($driver->get('label'),   'Slow and dangerous', 'get the label entry from the options');
 
@@ -215,7 +213,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 5, 'getEditForm: the form has 5 controls');
+is (scalar @inputs, 7, 'getEditForm: the form has 7 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -232,11 +230,19 @@ cmp_deeply(
             type => 'submit',
         },
         {
-            name => 'shipperId',
+            name => 'driverId',
             type => 'hidden',
         },
         {
-            name => 'className',
+            name => 'shop',
+            type => 'hidden',
+        },
+        {
+            name => 'method',
+            type => 'hidden',
+        },
+        {
+            name => 'do',
             type => 'hidden',
         },
         {
@@ -295,40 +301,12 @@ cmp_deeply(
     'new croaks unless the requested shipperId object exists in the db',
 );
 
-my $driverCopy = WebGUI::Shop::ShipDriver->new($session, $driver->shipperId);
+my $driverCopy = WebGUI::Shop::ShipDriver->new($session, $driver->getId);
 
 is($driver->getId,           $driverCopy->getId,     'same id');
-is($driver->className,       $driverCopy->className, 'same className');
-cmp_deeply($driver->options, $driverCopy->options,   'same options');
+is(ref $driver,       ref $driverCopy, 'same className');
+cmp_deeply($driver->get, $driverCopy->get,   'same options');
 
-my $brokenDriver = WebGUI::Shop::ShipDriver->create($session, {label=>'to be broken', enabled=>'0'});
-$session->db->write('update shipper set options=NULL where shipperId=?',[$brokenDriver->getId]);
-
-eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, $brokenDriver->getId); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new croaks if the options column in the db is null');
-cmp_deeply(
-    $e,
-    methods(
-        error => re('Options property for \S{22} was broken in the db'),
-        param => undef,
-    ),
-    'new croaks if the options column in the db is null',
-);
-
-$session->db->write(q{update shipper set options='' where shipperId=?},[$brokenDriver->getId]);
-
-eval { $oldDriver = WebGUI::Shop::ShipDriver->new($session, $brokenDriver->getId); };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'new croaks if the options column in the db is empty string');
-cmp_deeply(
-    $e,
-    methods(
-        error => re('Options property for \S{22} was broken in the db'),
-        param => '',
-    ),
-    'new croaks if the options column in the db is empty string',
-);
 
 
 #######################################################################
@@ -346,15 +324,15 @@ like ($@, qr/^You must override the calculate method/, 'calculate croaks to forc
 #
 #######################################################################
 
-eval { $driver->set(); };
+eval { $driver->update(); };
 $e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error::InvalidParam', 'set takes exception to not giving it a hashref of options');
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'update takes exception to not giving it a hashref of options');
 cmp_deeply(
     $e,
     methods(
-        error => 'set was not sent a hashref of options to store in the database',
+        error => 'update was not sent a hashref of options to store in the database',
     ),
-    'set takes exception to not giving it a hashref of options',
+    'update takes exception to not giving it a hashref of options',
 );
 
 #######################################################################

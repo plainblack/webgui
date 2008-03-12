@@ -97,6 +97,7 @@ sub www_editSettings {
     my $ac = $self->getAdminConsole; 
     my $setting = $self->session->setting;
     my $form = WebGUI::HTMLForm->new($self->session);
+    $form->submit;
     $form->hidden(name=>"shop", value=>"admin");
     $form->hidden(name=>"method", value=>"editSettingsSave");
     $form->template(

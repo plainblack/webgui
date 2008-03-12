@@ -18,7 +18,7 @@ use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Cart;
-#use WebGUI::Shop::Pay;
+use WebGUI::Shop::Pay;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 

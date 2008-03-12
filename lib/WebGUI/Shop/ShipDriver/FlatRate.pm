@@ -79,8 +79,8 @@ sub definition {
         },
         pricePerWeight => {
             fieldType    => 'float',
-            label        => $i18n->get('pricePerWeight'),
-            hoverHelp    => $i18n->get('pricePerWeight help'),
+            label        => $i18n->get('percentageOfWeight'),
+            hoverHelp    => $i18n->get('percentageOfWeight help'),
             defaultValue => 0,
         },
         pricePerItem => {
