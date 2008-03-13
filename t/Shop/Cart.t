@@ -35,7 +35,7 @@ plan tests => 16;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $cart = WebGUI::Shop::Cart->create($session);
+my $cart = WebGUI::Shop::Cart->getCartBySession($session);
 
 isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");

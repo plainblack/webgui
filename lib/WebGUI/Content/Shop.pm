@@ -109,7 +109,7 @@ sub www_cart {
     my $session = shift;
     my $output = undef;
     my $method = "www_". ( $session->form->get("method") || "view");
-    my $cart = WebGUI::Shop::Cart->create($session);
+    my $cart = WebGUI::Shop::Cart->getCartBySession($session);
     if ($cart->can($method)) {
         $output = $cart->$method();
     }

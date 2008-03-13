@@ -540,7 +540,7 @@ is($e->error, 'Must pass in a WebGUI::Shop::Cart object', 'calculate: error hand
 
 ##Build a cart, add some Donation SKUs to it.  Set one to be taxable.
 
-my $cart = WebGUI::Shop::Cart->create($session);
+my $cart = WebGUI::Shop::Cart->getCartBySession($session);
 
 is($taxer->calculate($cart), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
 
