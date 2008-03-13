@@ -10,6 +10,7 @@
  - ensure proper XML encoding for ITransact messages
  - fixed: fatal error duplicate keywords added to a wiki page
  - rfe:  added the ability to choose whether assets should be added to the front or end of the first content position of the page (Dept of State)
+ - Added Thingy asset
 
 7.5.5
  - fixed: Several typos in the new Calendar help documentation.

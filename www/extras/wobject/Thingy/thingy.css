@@ -1,0 +1,36 @@
+/*div.workarea { padding:10px; float:left }*/
+
+ul.draglist { 
+    /*position: relative;*/
+    width: 600px; 
+    background: #f7f7f7;
+    /*border: 1px solid gray;*/
+    list-style: none;
+    margin:0;
+    padding:0;
+}
+
+ul.draglist li {
+    margin: 1px;
+    cursor: move; 
+}
+
+ul.draglist_alt li {
+    margin: 1px;
+    cursor: move; 
+}
+
+
+li.list1 {
+    /*background-color: #D1E6EC;*/
+    border:1px solid #7EA6B2;
+}
+
+#dialog1{
+    height: 400px; 
+}
+
+#dialog2{
+    height: 400px; 
+}
+

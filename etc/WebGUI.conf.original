@@ -235,8 +235,9 @@
 	"WebGUI::Asset::Wobject::InOutBoard",
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
-	"WebGUI::Asset::Wobject::SQLForm"
-	],
+	"WebGUI::Asset::Wobject::SQLForm",
+	"WebGUI::Asset::Wobject::Thingy"
+    ],
 
 # Specify the list assets that are used for utility purposes only
 # and are not typically used as a normal part of content

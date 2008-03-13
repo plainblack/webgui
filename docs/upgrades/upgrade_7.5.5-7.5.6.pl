@@ -24,6 +24,7 @@ my $session = start(); # this line required
 
 convertCacheToBinary($session);
 addLayoutOrderSetting( $session );
+installThingyAsset($session);
 
 finish($session); # this line required
 
@@ -58,7 +59,86 @@ sub addLayoutOrderSetting {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Install the Thingy asset
+sub installThingyAsset {
+    my $session     = shift;
+    print "\tInstalling Thingy asset..." unless $quiet;
 
+    $session->db->write(<<'ENDSQL');
+create table if not exists Thingy (
+        assetId varchar(22) binary not null,
+        revisionDate bigint not null,
+        templateId varchar(22) not null,
+        defaultThingId varchar(22),
+        primary key (assetId, revisionDate)
+        )
+ENDSQL
+
+    $session->db->write(<<'ENDSQL');
+create table if not exists Thingy_things (
+        assetId varchar(22) binary not null,
+        thingId varchar(22) binary  not null,
+        label varchar(255) not null,
+        editScreenTitle varchar(255) not null,
+        editInstructions text,
+        groupIdAdd varchar(22) not null,
+        groupIdEdit varchar(22) not null,
+        saveButtonLabel varchar(255) not null,
+        afterSave varchar(255) not null,
+        editTemplateId varchar(22) not null,
+        onAddWorkflowId varchar(22),
+        onEditWorkflowId varchar(22),
+        onDeleteWorkflowId varchar(22),
+        groupIdView varchar(22) not null,
+        viewTemplateId varchar(22) not null,
+        defaultView varchar(255) not null,
+        searchScreenTitle varchar(255) not null,
+        searchDescription text,
+        groupIdSearch varchar(22) not null,
+        groupIdImport varchar(22) not null,
+        groupIdExport varchar(22) not null,
+        searchTemplateId varchar(22) not null,
+        thingsPerPage int(11) not null default 25,
+        sortBy varchar(22),
+        display int(11),
+        primary key (thingId)
+        )
+ENDSQL
+
+    $session->db->write(<<'ENDSQL');
+create table if not exists Thingy_fields (
+        assetId varchar(22) binary not null,
+        thingId varchar(22) binary not null,
+        fieldId varchar(22) not null,
+        sequenceNumber int(11) not null,
+        dateCreated bigint(20) not null,
+        createdBy varchar(22) not null,
+        dateUpdated bigint(20) not null,
+        updatedBy varchar(22) not null,
+        label varchar(255) not null,
+        fieldType varchar(255) not null,
+        defaultValue varchar(255),
+        possibleValues varchar(255),
+        subText varchar(255),
+        status varchar(255) not null,
+        width int(11),
+        height int(11),
+        vertical smallint(1),
+        extras varchar(255),
+        display int(11),
+        viewScreenTitle int(11),
+        displayInSearch int(11),
+        searchIn int(11),
+        fieldInOtherThingId varchar(22),
+        primary key (fieldId, thingId, assetId)
+        )
+ENDSQL
+
+    $session->config->addToArray("assets","WebGUI::Asset::Wobject::Thingy");
+
+    print "DONE!\n" unless $quiet;
+}
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------
