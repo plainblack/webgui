@@ -116,8 +116,8 @@ if ($shutdown) {
     POSIX::setsid();
     chdir "/";
     open STDIN, "+>", File::Spec->devnull;
-    open STDOUT, "+>STDIN";
-    open STDERR, "+>STDIN";
+    open STDOUT, "+>&STDIN";
+    open STDERR, "+>&STDIN";
     fork and exit;
     Spectre::Admin->new($config, $debug);
 }
