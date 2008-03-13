@@ -1,3 +1,5 @@
+7.5.7
+
 7.5.6
  - fixed: events get start/end time even when none specified (also can offset start/end day)
  - fixed: event related links may not work with some group names
