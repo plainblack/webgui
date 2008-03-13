@@ -28,11 +28,11 @@ our $VERSION = "1.0.0";
 
 Adds a new field.
 
-=head3
+=head3 field
 
 A hashref containing the properties of the new field.
 
-=head3
+=head3 retainIds
 
 If retainIds is true the new field will keep the fieldId and assetId in the properties hashref. The thingId is
 always taken from the field hashref.
@@ -84,11 +84,11 @@ sub addField {
 
 Adds a new thing.
 
-=head3
+=head3 thing
 
 A hashref containing the properties of the new thing.
 
-=head3
+=head3 retainIds
 
 If retainIds is true the new thing will keep the thingId and assetId in the properties hashref.
 
@@ -529,6 +529,7 @@ sub getEditForm {
 	
 	return $tabform;
 }
+
 #-------------------------------------------------------------------
 
 =head2 getFieldValue ( value, field )
@@ -539,7 +540,7 @@ Processes the field value for date(Time) fields and Other Thing fields.
 
 The value as stored in the database.
 
-=head field
+=head3 field
 
 A reference to a hash containing the fields properties.
 
@@ -583,7 +584,7 @@ sub getFieldValue {
 
 Returns the form element tied to this field.
 
-=head3 data 
+=head3 data
 
 A hashref containing the properties of this field.
 
@@ -670,7 +671,7 @@ sub getFormElement {
 
 Returns a table row containing a form element in a yui module.
 
-=head3 id 
+=head3 id
 
 An id for the module div.
 
@@ -1573,7 +1574,9 @@ sub www_editFieldSave {
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";
 }
+
 #-------------------------------------------------------------------
+
 =head2 www_editThingData ( )
 
 Shows a form to edit a things data.
@@ -1668,7 +1671,9 @@ sequenceNumber');
         return $self->processTemplate($var,$thingProperties{editTemplateId});
     }
 }
+
 #-------------------------------------------------------------------
+
 =head2 www_editThingDataSave ( )
 
 Processes and saves data for a Thing.
@@ -1769,8 +1774,9 @@ thingId=".$session->db->quote($thingId));
         return $self->view();
     }
 }
-    
+
 #-------------------------------------------------------------------
+
 =head2 www_export ( )
 
 Exports search results as csv.
@@ -1825,7 +1831,9 @@ sub www_export {
     return $out;
 
 }
+
 #-------------------------------------------------------------------
+
 =head2 www_import ( )
 
 Imports data from a .csv file.
@@ -1948,7 +1956,9 @@ thingId=".$session->db->quote($thingId));
     return $self->www_search($thingId);
 }
 
+
 #-------------------------------------------------------------------
+
 =head2 www_importForm ( )
 
 Shows the import screen.
@@ -2025,8 +2035,8 @@ sub www_importForm {
     return $self->session->style->process($output,$self->get("styleTemplateId"));
 }
 
-
 #-------------------------------------------------------------------
+
 =head2 www_manage ( )
 
 Shows the screen to manage things in a Thingy.
@@ -2134,7 +2144,8 @@ sub www_moveFieldConfirm {
 }
 
 #-------------------------------------------------------------------
-=head2 www_search ( ) 
+
+=head2 www_search ( )
 
 Shows the search screen and performs the search.
 
@@ -2295,7 +2306,9 @@ sequenceNumber');
         return $self->processTemplate($var,$thingProperties{searchTemplateId});
     }
 }
+
 #-------------------------------------------------------------------
+
 =head2 www_selectDefaultFieldValue ( )
 
 Returns a form element to select a field in a thing.
@@ -2347,7 +2360,9 @@ sub www_selectDefaultFieldValue {
     return "chunked";
 }
 
+
 #-------------------------------------------------------------------
+
 =head2 www_selectFieldInThing ( )
 
 Returns a form element to select a field in a thing.
@@ -2394,6 +2409,7 @@ sub www_selectFieldInThing {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_viewThingData ( )
 
 Shows the view screen of a Thing
@@ -2449,8 +2465,7 @@ sequenceNumber');
         if ($field{fieldType} =~ m/^otherThing/x) {
             my $otherThingId = $field{fieldType};
             $otherThingId =~ s/^otherThing_//x;
-            my ($groupIdView) = $session->db->quickArray("select groupIdView from Thingy_things where thingId
-=?",[$otherThingId]);
+            my ($groupIdView) = $session->db->quickArray("select groupIdView from Thingy_things where thingId=?",[$otherThingId]);
             if($self->hasPrivileges($groupIdView)){ 
                 $otherThingUrl = $session->url->append($url,"func=viewThingData;thingId=$otherThingId;thingDataId=$originalValue");
             }
