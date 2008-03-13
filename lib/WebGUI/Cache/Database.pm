@@ -107,7 +107,7 @@ sub get {
     eval {
         $content = thaw($content);
     };
-    return undef unless $content;
+    return undef unless $content && ref $content;
     return $$content;
 }
 
