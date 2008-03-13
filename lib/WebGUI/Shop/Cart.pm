@@ -198,7 +198,7 @@ sub getId {
 
 =head2 getItem ( itemId )
 
-Returns a reference to a WebGUI::Cart::Item object.
+Returns a reference to a WebGUI::Shop::CartItem object.
 
 =head3 itemId
 
@@ -231,6 +231,19 @@ sub getItems {
 
 #-------------------------------------------------------------------
 
+=head2 getShipper ()
+
+Returns the WebGUI::Shop::ShipDriver object that is attached to this cart for shipping.
+
+=cut
+
+sub getShipper {
+    my $self = shift;
+    return WebGUI::Shop::Ship->new($self->session)->getShipper($self->get("shipperId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getShippingAddress ()
 
 Returns the WebGUI::Shop::Address object that is attached to this cart for shipping.
@@ -240,6 +253,20 @@ Returns the WebGUI::Shop::Address object that is attached to this cart for shipp
 sub getShippingAddress {
     my $self = shift;
     return $self->getAddressBook->getAddress($self->get("shippingAddressId"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTaxes ()
+
+Returns the tax amount on the items in the cart.
+
+=cut
+
+sub getTaxes {
+    my $self = shift;
+    my $tax = WebGUI::Shop::Tax->new($self->session);
+    return $self->formatCurrency($tax->calculate($self));
 }
 
 #-------------------------------------------------------------------
@@ -421,7 +448,6 @@ sub www_view {
         }
         push(@items, \%properties);
     }
-    my $tax = WebGUI::Shop::Tax->new($self->session);
     my %var = (
         %{$self->get},
         items                   => \@items,
@@ -455,7 +481,7 @@ sub www_view {
         else {
             $var{hasShippingAddress} = 1;
             $var{shippingAddress} = $address->getHtmlFormatted;
-            $var{tax} = $self->formatCurrency($tax->calculate($self));
+            $var{tax} = $self->getTaxes;
             my $options = WebGUI::Shop::Ship->getOptions($self);
             my %formOptions = ();
             my $defaultOption = "";
