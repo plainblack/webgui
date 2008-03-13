@@ -8,6 +8,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::HTMLForm;
 use WebGUI::Exception::Shop;
+use WebGUI::Shop::Cart;
 use JSON;
 
 =head1 NAME
@@ -239,6 +240,23 @@ sub getButton {
 
 #-------------------------------------------------------------------
 
+=head2 getCart ( )
+
+Returns the WebGUI::Shop::Cart object for the current session.
+
+=cut
+
+sub getCart {
+    my $self = shift;
+
+    my $cart = WebGUI::Shop::Cart->getCartBySession( $self->session );
+
+    return $cart;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 Returns the configuration form for the options of this plugin.
@@ -327,7 +345,6 @@ sub new {
     croak "Somehow, the options property of this object, $paymentGatewayId, got broken in the db"
         unless exists $properties->{options} and $properties->{options};
 
-    #### TODO: Fix deprecated json sub
     my $options = from_json($properties->{options});
 
     my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $properties->{ label }, $options);
@@ -366,7 +383,6 @@ flattened into JSON and stored in the database as text.  There is no content che
 
 =cut
 
-#### TODO: decide on what set() sets. Ie. does it only set options, or also label?
 sub set {
     my $self        = shift;
     my $properties  = shift;

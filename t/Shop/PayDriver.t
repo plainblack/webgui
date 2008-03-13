@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 45;
+my $tests = 46;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -272,6 +272,15 @@ my $optionsCopy = $driver->get;
 $optionsCopy->{label} = 'And now for something completely different';
 isnt        ($driver->get('label'),   'And now for something completely different', 
                 'hashref returned by get() is a copy of the internal hashref');
+
+#######################################################################
+#
+# getCart
+#
+#######################################################################
+
+my $cart = $driver->getCart;
+isa_ok      ($cart, 'WebGUI::Shop::Cart', 'getCart returns an instantiated WebGUI::Shop::Cart object');
 
 #######################################################################
 #
