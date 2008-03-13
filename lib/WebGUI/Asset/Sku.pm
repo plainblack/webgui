@@ -241,6 +241,19 @@ sub getTaxRate {
 
 #-------------------------------------------------------------------
 
+=head2 getWeight ( )
+
+Returns 0. Needs to be overriden by subclasses.
+
+=cut
+
+sub getWeight {
+    my $self = shift;
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 indexContent ( )
 
 Adding sku as a keyword. See WebGUI::Asset::indexContent() for additonal details. 

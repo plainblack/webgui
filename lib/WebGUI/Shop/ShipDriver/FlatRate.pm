@@ -42,8 +42,22 @@ costs are assessed.
 =cut
 
 sub calculate {
-    my $self = shift;
-    return;
+    my ($self, $cart) = @_;
+	my $cost = 0;
+	my $anyShippable = 0;
+	foreach my $item (@{$cart->getItems}) {
+		my $sku = $item->getSku;
+		if ($sku->isShippingRequired) {
+			$cost += ($item->get("quantity") * $sku->getPrice * $self->get("percentageOfPrice") / 100)  # cost by price
+				+ ($item->get("quantity") * $sku->getWeight * $self->get("percentageOfWeight") / 100)	# cost by weight
+				+ ($item->get("quantity") * $self->get("pricePerItem"));								# cost by item
+			$anyShippable = 1;
+		}
+	}
+	if ($anyShippable) {
+		$cost += $flatFee;
+	}
+    return $cost;
 }
 
 #-------------------------------------------------------------------

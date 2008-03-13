@@ -53,6 +53,7 @@ is($options{test1}, "YY", "Can set and get an option.");
 
 is($sku->getMaxAllowedInCart, 99999999, "Got a valid default max in cart.");
 is($sku->getPrice, 0.00, "Got a valid default price.");
+is($sku->getWeight, 0, "Got a valid default weight.");
 is($sku->getTaxRate, undef, "Tax rate is not overridden.");
 $sku->update({overrideTaxRate=>1, taxRateOverride=>5});
 is($sku->getTaxRate, 5, "Tax rate is overridden.");
