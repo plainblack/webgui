@@ -35,9 +35,82 @@ addShoppingHandler($session);
 addAddressBook($session);
 insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
+convertTransactionLog($session);
 
 finish($session); # this line required
 
+#-------------------------------------------------
+sub convertTransactionLog {
+	my $session = shift;
+	print "\tInstalling transaction log.\n" unless ($quiet);
+	$session->db->write("alter table transaction rename oldtransaction");
+	$session->db->write("alter table transactionItem rename oldtransactionitem");
+    $session->db->write("create table transaction (
+        transactionId varchar(22) binary not null primary key,
+        isSuccessful bool not null default 0,
+		transactionCode varchar(100),
+		statusCode varchar(35),
+		statusMessage varchar(100),
+		userId varchar(22) binary not null,
+		username varchar(35) not null,
+		amount float,
+		shippingAddressId varchar(22) binary,
+        shippingAddressName varchar(35),
+        shippingAddress1 varchar(35),
+        shippingAddress2 varchar(35),
+        shippingAddress3 varchar(35),
+        shippingCity varchar(35),
+        shippingState varchar(35),
+        shippingCountry varchar(35),
+        shippingCode varchar(35),
+        shippingPhoneNumber varchar(35),
+		shippingDriverId varchar(22) binary,
+		shippingDriverLabel varchar(35),
+		shippingPrice float,
+		paymentAddressId varchar(22) binary,
+        paymentAddressName varchar(35),
+        paymentAddress1 varchar(35),
+        paymentAddress2 varchar(35),
+        paymentAddress3 varchar(35),
+        paymentCity varchar(35),
+        paymentState varchar(35),
+        paymentCountry varchar(35),
+        paymentCode varchar(35),
+        paymentPhoneNumber varchar(35),
+		paymentDriverId varchar(22) binary,
+		paymentDriverLabel varchar(35),
+		couponId varchar(22),
+		couponTitle varchar(35),
+		couponDiscount float,
+		taxes float,
+		dateOfPurchase datetime
+    )");
+	$session->db->write("create table transactionItem (
+		itemId varchar(22) binary not null primary key,
+		transactionId varchar(22) binary not null,
+		assetId varchar(22),
+		configuredTitle varchar(255),
+		options mediumText,
+		shippingAddressId varchar(22) binary,
+        shippingName varchar(35),
+        shippingAddress1 varchar(35),
+        shippingAddress2 varchar(35),
+        shippingAddress3 varchar(35),
+        shippingCity varchar(35),
+        shippingState varchar(35),
+        shippingCountry varchar(35),
+        shippingCode varchar(35),
+        shippingPhoneNumber varchar(35),
+		shippingTrackingNumber varchar(255),
+		shippingStatus varchar(35) not null default 'NotShipped',
+		shippingDate datetime,
+		quantity int not null default 1,
+		price float,
+		index transactionId (transactionId)
+	)");
+    $session->setting->add('shopMyPurchasesTemplateId','');
+    $session->setting->add('shopMyPurchaseDetailTemplateId','');
+}
 
 #-------------------------------------------------
 sub addAddressBook {

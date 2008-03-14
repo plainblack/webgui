@@ -18,7 +18,7 @@ A cart item is a manager of a WebGUI::Asset::Sku class that is put into a user's
 
  use WebGUI::Shop::CartItem;
 
- my $item = WebGUI::Shop::CartItem->new($session, $cartId, $assetId);
+ my $item = WebGUI::Shop::CartItem->new($cart);
 
 =head1 METHODS
 
