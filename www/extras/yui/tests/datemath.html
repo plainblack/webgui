@@ -1,0 +1,375 @@
+<html>
+<head>
+	<title>YUI DateMath Tests</title>
+	<link type="text/css" rel="stylesheet" href="../build/logger/assets/logger.css" />
+	<link type="text/css" rel="stylesheet" href="../build/yuitest/assets/testlogger.css" />
+
+	<script type="text/javascript" src="../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="../build/logger/logger-min.js"></script>
+	<script type="text/javascript" src="../build/yuitest/yuitest.js"></script>
+	<script type="text/javascript" src="../build/calendar/calendar-min.js"></script>
+
+	<script type="text/javascript">
+	(function() {
+
+		var	Dom=YAHOO.util.Dom,
+			TestCase = YAHOO.tool.TestCase,
+			Assert=YAHOO.util.Assert,
+			ObjectAssert=YAHOO.util.ObjectAssert,
+			ArrayAssert=YAHOO.util.ArrayAssert,
+			UserAction=YAHOO.util.UserAction, 
+			DateAssert=YAHOO.util.DateAssert,
+			DateMath=YAHOO.widget.DateMath;
+			
+		var logger;
+
+		var dmTemplate = {
+			
+			name: "datemathtestcase",
+
+			testAdd : function() {
+
+				var dt = new Date(2007, 3, 12);
+				var resDt = DateMath.add(dt, DateMath.DAY, 4);
+				DateAssert.datesAreEqual(new Date(2007, 3, 16), resDt, "Incorrect results adding to DAY field");
+
+				dt = new Date(2008, 0, 1);
+				var resDt = DateMath.add(dt, DateMath.DAY, 127);
+				DateAssert.datesAreEqual(new Date(2008, 4, 7), resDt, "Incorrect results adding 127 to DAY field");
+
+				dt = new Date(2008, 0, 1);
+				var resDt = DateMath.add(dt, DateMath.DAY, 366); // 2008 Leap Year
+				DateAssert.datesAreEqual(new Date(2009, 0 , 1), resDt, "Incorrect results adding 366 to DAY field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.add(dt, DateMath.MONTH, 5);
+				DateAssert.datesAreEqual(new Date(2007, 8, 12), resDt, "Incorrect results adding to MONTH field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.add(dt, DateMath.YEAR, 4);
+				DateAssert.datesAreEqual(new Date(2011, 3, 12), resDt, "Incorrect results adding to YEAR field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.add(dt, DateMath.WEEK, 2);
+				DateAssert.datesAreEqual(new Date(2007, 3, 26), resDt, "Incorrect results adding to WEEK field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.add(dt, DateMath.WEEK, 52);
+				DateAssert.datesAreEqual(new Date(2008, 3, 10), resDt, "Incorrect results adding to 52 WEEKS to field");
+
+				// Rollover Tests
+				dt = new Date(2007, 3, 29);
+				resDt = DateMath.add(dt, DateMath.DAY, 5);
+				DateAssert.datesAreEqual(new Date(2007, 4, 4), resDt, "Incorrect results adding to DAYS field with rollover to valid date");
+
+				dt = new Date(2007, 0, 31);
+				resDt = DateMath.add(dt, DateMath.MONTH, 1);
+				// Feb 31st = March 3rd
+				DateAssert.datesAreEqual(new Date(2007, 2, 3), resDt, "Incorrect results adding rollover to MONTHS field with rollover to invalid date");
+
+				dt = new Date(2006, 10, 3);
+				resDt = DateMath.add(dt, DateMath.MONTH, 3);
+				DateAssert.datesAreEqual(new Date(2007, 1, 3), resDt, "Incorrect results adding rollover to MONTHS field with rollover year boundary");
+
+				dt = new Date(2006, 11, 31);
+				resDt = DateMath.add(dt, DateMath.MONTH, 2);
+				DateAssert.datesAreEqual(new Date(2007, 2, 3), resDt, "Incorrect results adding rollover to MONTHS field with rollover year boundary to invalid date");
+			},
+			
+			testSubtract : function() {
+				var dt = new Date(2007, 3, 12);
+				var resDt = DateMath.subtract(dt, DateMath.DAY, 4);
+				DateAssert.datesAreEqual(new Date(2007, 3, 8), resDt, "Incorrect results subtracting from DAY field");
+
+				dt = new Date(2008, 0, 1);
+				var resDt = DateMath.subtract(dt, DateMath.DAY, 130);
+				DateAssert.datesAreEqual(new Date(2007, 7, 24), resDt, "Incorrect results subtracting 129 from DAY field");
+
+				dt = new Date(2008, 0, 1);
+				var resDt = DateMath.subtract(dt, DateMath.DAY, 365);
+				DateAssert.datesAreEqual(new Date(2007, 0 , 1), resDt, "Incorrect results subtracting 366 from DAY field");
+
+				dt = new Date(2008, 0, 1);
+				var resDt = DateMath.subtract(dt, DateMath.DAY, 1);
+				DateAssert.datesAreEqual(new Date(2007, 11 , 31), resDt, "Incorrect results subtracting 1 from DAY field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.subtract(dt, DateMath.MONTH, 2);
+				DateAssert.datesAreEqual(new Date(2007, 1, 12), resDt, "Incorrect results subtracting from MONTH field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.subtract(dt, DateMath.YEAR, 4);
+				DateAssert.datesAreEqual(new Date(2003, 3, 12), resDt, "Incorrect results subtracting from YEAR field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.subtract(dt, DateMath.WEEK, 1);
+				DateAssert.datesAreEqual(new Date(2007, 3, 5), resDt, "Incorrect results subtracting from WEEK field");
+
+				dt = new Date(2007, 3, 12);
+				resDt = DateMath.subtract(dt, DateMath.WEEK, 52);
+				DateAssert.datesAreEqual(new Date(2006, 3, 13), resDt, "Incorrect results subtracting 52 WEEKS from field");
+
+				// Rollover Tests
+				dt = new Date(2007, 3, 3);
+				resDt = DateMath.subtract(dt, DateMath.DAY, 5);
+				DateAssert.datesAreEqual(new Date(2007, 2, 29), resDt, "Incorrect results subtracting to DAYS field with rollover to valid date");
+
+				dt = new Date(2007, 2, 31);
+				resDt = DateMath.subtract(dt, DateMath.MONTH, 1);
+				// Feb 31st = March 3rd
+				DateAssert.datesAreEqual(new Date(2007, 2, 3), resDt, "Incorrect results subtracting rollover to MONTHS field with rollover to invalid date");
+
+				dt = new Date(2007, 2, 3);
+				resDt = DateMath.subtract(dt, DateMath.MONTH, 3);
+				DateAssert.datesAreEqual(new Date(2006, 11, 3), resDt, "Incorrect results subtracting rollover to MONTHS field with rollover year boundary");
+
+				dt = new Date(2007, 0, 31);
+				resDt = DateMath.subtract(dt, DateMath.MONTH, 2);
+				// Nov 31st = Dec 1st
+				DateAssert.datesAreEqual(new Date(2006, 11, 1), resDt, "Incorrect results subtracting rollover to MONTHS field with rollover year boundary to invalid date");
+			},
+
+			testAfter : function() {
+				var dt = new Date(2007, 3, 12);
+
+				Assert.isTrue(DateMath.after(dt, new Date(2007, 3, 11)));
+				Assert.isTrue(DateMath.after(dt, new Date(2007, 2, 15)));
+				Assert.isTrue(DateMath.after(dt, new Date(2006, 5, 20)));
+
+				Assert.isFalse(DateMath.after(dt, new Date(2007, 3, 12)));
+				Assert.isFalse(DateMath.after(dt, new Date(2007, 4, 10)));
+				Assert.isFalse(DateMath.after(dt, new Date(2008, 1, 10)));
+			},
+
+			testBefore : function() {
+				var dt = new Date(2007, 3, 12);
+
+				Assert.isTrue(DateMath.before(dt, new Date(2007, 3, 13)));
+				Assert.isTrue(DateMath.before(dt, new Date(2007, 4, 10)));
+				Assert.isTrue(DateMath.before(dt, new Date(2008, 1, 10)));
+
+				Assert.isFalse(DateMath.before(dt, new Date(2007, 3, 12)));
+				Assert.isFalse(DateMath.before(dt, new Date(2007, 2, 15)));
+				Assert.isFalse(DateMath.before(dt, new Date(2006, 5, 20)));
+			},
+
+			testBetween : function() {
+				var dt = new Date(2007, 3, 12);
+
+				Assert.isTrue(DateMath.between(dt, new Date(2007, 3, 11), new Date(2007, 3, 13)));
+				Assert.isTrue(DateMath.between(dt, new Date(2006, 4, 13), new Date(2008, 2, 10)));
+				Assert.isTrue(DateMath.between(dt, new Date(2006, 1, 10), new Date(2008, 1, 10)));
+
+				Assert.isFalse(DateMath.between(dt, new Date(2007, 3, 10), new Date(2007, 3, 11)));
+				Assert.isFalse(DateMath.between(dt, new Date(2006, 4, 10), new Date(2006, 5, 10)));
+				Assert.isFalse(DateMath.between(dt, new Date(2007, 3, 13), new Date(2008, 2, 10)));
+			},
+
+			testClearTime : function() {
+				var dt = new Date(2007, 3, 12, 3, 45, 29, 300);
+				
+				var clearedDt = DateMath.clearTime(dt);
+				
+				DateAssert.datesAreEqual(new Date(2007, 3, 12), clearedDt);
+				DateAssert.timesAreEqual(new Date(2007, 3, 12, 12, 0, 0, 0), clearedDt);
+			},
+
+			testFindMonthEnd : function() {
+				var dt = new Date(2007, 3, 12);
+				var rstDt = DateMath.findMonthEnd(dt);
+				DateAssert.datesAreEqual(new Date(2007, 3, 30), rstDt);
+
+				dt = new Date(2007, 11, 15);
+				rstDt = DateMath.findMonthEnd(dt);
+				DateAssert.datesAreEqual(new Date(2007, 11, 31), rstDt);
+				
+				dt = new Date(2007, 1, 14);
+				rstDt = DateMath.findMonthEnd(dt);
+				DateAssert.datesAreEqual(new Date(2007, 1, 28), rstDt);
+
+				// Leap
+				dt = new Date(2008, 1, 14);
+				rstDt = DateMath.findMonthEnd(dt);
+				DateAssert.datesAreEqual(new Date(2008, 1, 29), rstDt);
+			},
+
+			testFindMonthStart : function() {
+				var dt = new Date(2007, 3, 12);
+				var rstDt = DateMath.findMonthStart(dt);
+				DateAssert.datesAreEqual(new Date(2007, 3, 1), rstDt);
+
+				dt = new Date(2007, 0, 15);
+				rstDt = DateMath.findMonthStart(dt);
+				DateAssert.datesAreEqual(new Date(2007, 0, 1), rstDt);
+				
+				dt = new Date(2007, 1, 14);
+				rstDt = DateMath.findMonthStart(dt);
+				DateAssert.datesAreEqual(new Date(2007, 1, 1), rstDt);
+				
+				// Leap
+				dt = new Date(2008, 2, 3);
+				rstDt = DateMath.findMonthStart(dt);
+				DateAssert.datesAreEqual(new Date(2008, 2, 1), rstDt);
+			},
+
+			testGetDayOffset : function() {
+				var dt = new Date(2007, 3, 12);
+				Assert.areEqual(101, DateMath.getDayOffset(dt, 2007));
+
+				dt = new Date(2007, 0, 1);
+				Assert.areEqual(0, DateMath.getDayOffset(dt, 2007));
+			},
+
+			testGetJan1 : function() {
+				DateAssert.datesAreEqual(new Date(2007, 0, 1), DateMath.getJan1(2007));
+				DateAssert.datesAreEqual(new Date(2008, 0, 1), DateMath.getJan1(2008));
+			},
+
+			testGetWeekNumber : function() {
+				// TODO - Need to understand week number algorithm to test properly. For now just boundary tests
+				var dt = new Date(2007, 0, 1);
+				Assert.areEqual(1, DateMath.getWeekNumber(dt, 2007));
+				
+				var dt = new Date(2007, 11, 29);
+				Assert.areEqual(52, DateMath.getWeekNumber(dt, 2007));
+			},
+
+			testIsMonthOverlapWeek : function() {
+				Assert.isTrue(DateMath.isMonthOverlapWeek(new Date(2007, 4, 30)));
+				Assert.isFalse(DateMath.isMonthOverlapWeek(new Date(2007, 4, 23)));
+			},
+
+			testIsYearOverlapWeek : function() {
+				Assert.isTrue(DateMath.isYearOverlapWeek(new Date(2007, 11, 30)));
+				Assert.isFalse(DateMath.isMonthOverlapWeek(new Date(2007, 11, 23)));
+			},
+
+			testGetDate: function() {
+				var dt = new Date(2007, 3, 12);
+				var getDt = DateMath.getDate(2007, 3, 12);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// Leap
+				dt = new Date(2007, 1, 29);
+				getDt = DateMath.getDate(2007, 1, 29);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// Before gregorian shift - 1582
+				dt = new Date(1500, 10, 25);
+				getDt = DateMath.getDate(1500, 10, 25);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// No date specified
+				dt = new Date(2007, 10);
+				getDt = DateMath.getDate(2007, 10);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// Rollover args
+				dt = new Date(2007, 1, 31);
+				getDt = DateMath.getDate(2007, 1, 31);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// Time cloning
+				dt = new Date(new Date(2007, 10, 25).getTime());
+				getDt = DateMath.getDate(2007, 10, 25);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				dt = new Date(); // new Date(99, 10, 25) returns 25th Nov, 1999
+				dt.setFullYear(99);
+				dt.setMonth(10);
+				dt.setDate(25);
+				dt.setHours(0,0,0,0);
+				getDt = DateMath.getDate(99, 10, 25);
+				DateAssert.datesAreEqual(dt, getDt);
+				DateAssert.timesAreEqual(dt, getDt);
+
+				// 25th December 0 was a Monday 
+				//
+				// * http://www.fourmilab.ch/documents/calendar/
+				getDt = DateMath.getDate(0, 11, 25);
+				Assert.areEqual(1, getDt.getDay());
+				Assert.areEqual(0, getDt.getFullYear());
+				Assert.areEqual(11, getDt.getMonth());
+				Assert.areEqual(25, getDt.getDate());
+
+				// 23rd April 0099 was a Thursday 
+				//
+				// * http://www.fourmilab.ch/documents/calendar/
+				getDt = DateMath.getDate(99, 3, 23);
+				Assert.areEqual(4, getDt.getDay());
+				Assert.areEqual(99, getDt.getFullYear());
+				Assert.areEqual(3, getDt.getMonth());
+				Assert.areEqual(23, getDt.getDate());
+
+				// 1st Jan 0100 was a Friday
+				//
+				// * http://www.fourmilab.ch/documents/calendar/
+				getDt = DateMath.getDate(100, 0, 1);
+				Assert.areEqual(5, getDt.getDay());
+				Assert.areEqual(100, getDt.getFullYear());
+				Assert.areEqual(0, getDt.getMonth());
+				Assert.areEqual(1, getDt.getDate());
+
+				// 15th Oct 1582 was a Friday
+				// 
+				// * http://www.fourmilab.ch/documents/calendar/
+				// * http://www.ddj.com/184405350 (Historical-Date Conversions)
+				getDt = DateMath.getDate(1582, 9, 15);
+				Assert.areEqual(5, getDt.getDay());
+				Assert.areEqual(1582, getDt.getFullYear());
+				Assert.areEqual(9, getDt.getMonth());
+				Assert.areEqual(15, getDt.getDate());
+
+				// 24th November 4714 B.C. was a Monday and OnohglDhootk didn't feel like going to work
+				//
+				// * http://www.fourmilab.ch/documents/calendar/
+				// * http://www.ddj.com/184405350 (Historical-Date Conversions)
+				getDt = DateMath.getDate(-4713, 10, 24);
+				Assert.areEqual(1, getDt.getDay());
+				Assert.areEqual(-4713, getDt.getFullYear());
+				Assert.areEqual(10, getDt.getMonth());
+				Assert.areEqual(24, getDt.getDate());
+			}
+		};
+		
+		var dmTestCase = new TestCase(dmTemplate);
+
+		function runTests(){
+
+			YAHOO.tool.TestRunner.run();
+		}
+
+		YAHOO.util.Event.addListener(window, "load", function() {
+			logger = new YAHOO.tool.TestLogger();
+
+			var testSuite=new YAHOO.tool.TestSuite("datemathsuite");
+			testSuite.add(dmTestCase);
+
+			logger.clearConsole();
+
+			YAHOO.tool.TestRunner.clear();
+			YAHOO.tool.TestRunner.add(testSuite);
+
+			YAHOO.util.Event.addListener("btnRun", "click", runTests);
+
+			if (parent && parent != window) {
+				YAHOO.tool.TestManager.load();
+			}
+		});
+	})();
+	</script>
+
+</head>
+<body>
+
+	<h1>YAHOO.widget.DateMath Tests</h1>
+	<p><input type="button" value="Run Tests" id="btnRun" /></p>
+
+</body>
+</html>
