@@ -67,7 +67,7 @@ our $HELP = {
                 'variables' => [
                     { 'name' => 'field_isHidden' },
                     { 'name' => 'field_isRequired' },
-                    { 'name' => 'field_isDisplayed' },
+                    { 'name' => 'field_isVisible' },
                     { 'name' => 'field_label' },
                     { 'name' => 'field_form' },
                     { 'name' => 'field_name' },
@@ -162,8 +162,10 @@ our $HELP = {
             {   'name'      => 'searchFields_loop',
                 'variables' => [
                     { 'name' => 'searchFields_fieldId' },
-                    { 'name' => 'searchFields_searchForm' },
+                    { 'name' => 'searchFields_form' },
+                    { 'name' => 'searchFields_textForm' },
                     { 'name' => 'searchFields_label' },
+                    { 'name' => 'searchFields_is__fieldType__' },
                 ]
             },
             {   'required' => 1,

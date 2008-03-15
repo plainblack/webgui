@@ -274,12 +274,12 @@ our $I18N = {
         lastUpdated => 1104630516,
     },
 
-    'search descrpiption label' => {
+    'search description label' => {
         message => q|Description|,
         lastUpdated => 1104630516,
     },
 
-    'search descrpiption description' => {
+    'search description description' => {
         message => q|Description of the search screen.|,
         lastUpdated => 1104630516,
     },
@@ -707,8 +707,8 @@ field.|,
         lastUpdated => 1104630516,
     },
 
-    'field_isDisplayed' => {
-        message => q|A conditional indicating whether this field is supposed to be displayed.|,
+    'field_isVisible' => {
+        message => q|A conditional indicating whether this field is supposed to be visible but not editable.|,
         lastUpdated => 1104630516,
     },
 
@@ -804,7 +804,17 @@ search has been done.|,
     },
 
     'searchFields_form' => {
-        message => q|The form element to search this field.|,
+        message => q|A form element corresponding to this fields fieldType to search this field.|,
+        lastUpdated => 1104630516,
+    },
+
+    'searchFields_textForm' => {
+        message => q|A text input to search this field.|,
+        lastUpdated => 1104630516,
+    },
+
+    'searchFields_is__fieldType__' => {
+        message => q|A boolean indicating wether this field is of type __fieldType__. The first letter of __fieldType__ is always uppercase. Example: for a select box the value of &lt;tmpl_var searchFields_isSelectBox&gt; is true.|,
         lastUpdated => 1104630516,
     },
 
