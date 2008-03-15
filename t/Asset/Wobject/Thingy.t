@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::PseudoRequest;
-use Test::More tests => 7; # increment this value for each test you create
+use Test::More tests => 8; # increment this value for each test you create
 use WebGUI::Asset::Wobject::Thingy;
 
 my $session = WebGUI::Test->session;
@@ -77,6 +77,10 @@ my $thingTableName = "Thingy_".$thingId;
 my ($thingTableNameCheck) = $session->db->quickArray("show tables like ".$session->db->quote($thingTableName));
 
 is($thingTableNameCheck,$thingTableName,"An empty table: ".$thingTableName." for the new thing exists.");
+
+is($thingy->get('defaultThingId'),$thingId,"The Thingy assets defaultThingId was set correctly.");
+
+# Test adding a field
 
 my %fieldProperties = (
     thingId=>$thingId,

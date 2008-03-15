@@ -24,7 +24,7 @@ our $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
 
-=head2 addField ( field, retainIds )
+=head2 addField ( field, isImport )
 
 Adds a new field.
 
@@ -32,9 +32,9 @@ Adds a new field.
 
 A hashref containing the properties of the new field.
 
-=head3 retainIds
+=head3 isImport
 
-If retainIds is true the new field will keep the fieldId and assetId in the properties hashref. The thingId is
+If isImport is true the new field will keep the fieldId and assetId in the properties hashref. The thingId is
 always taken from the field hashref.
 
 =cut
@@ -43,7 +43,7 @@ sub addField {
 
     my $self = shift;
     my $field = shift;
-    my $retainIds = shift;
+    my $isImport = shift;
     my $dbDataType = shift || $self->_getDbDataType($field->{fieldType});
     my $db = $self->session->db;
     my $error = $self->session->errorHandler;
@@ -51,7 +51,7 @@ sub addField {
 
     $error->info("Adding Field, label: ".$field->{label}.", fieldId: ".$field->{fieldId}.",thingId: ".$field->{thingId});
 
-    if ($retainIds){
+    if ($isImport){
         $oldFieldId = $field->{fieldId};
     }
     else {
@@ -62,7 +62,7 @@ sub addField {
     $field->{fieldId} = "new";
     $newFieldId = $self->setCollateral("Thingy_fields","fieldId",$field,1,$useAssetId);
 
-    if ($retainIds){
+    if ($isImport){
         $db->write("update Thingy_fields set fieldId = ".$db->quote($oldFieldId)
             ." where fieldId = ".$db->quote($newFieldId));
         $newFieldId = $oldFieldId;
@@ -80,7 +80,7 @@ sub addField {
 
 #-------------------------------------------------------------------
 
-=head2 addThing ( thing, retainIds )
+=head2 addThing ( thing, isImport )
 
 Adds a new thing.
 
@@ -88,9 +88,9 @@ Adds a new thing.
 
 A hashref containing the properties of the new thing.
 
-=head3 retainIds
+=head3 isImport
 
-If retainIds is true the new thing will keep the thingId and assetId in the properties hashref.
+If isImport is true the new thing will keep the thingId and assetId in the properties hashref.
 
 =cut
 
@@ -98,14 +98,14 @@ sub addThing {
     
     my $self = shift;
     my $thing = shift;
-    my $retainIds = shift;
+    my $isImport = shift;
     my $db = $self->session->db;
     my $error = $self->session->errorHandler;
     my ($oldThingId, $newThingId,$useAssetId);
 
     $error->info("Adding Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
     
-    if ($retainIds){
+    if ($isImport){
         $oldThingId = $thing->{thingId};
     }
     else{
@@ -115,10 +115,18 @@ sub addThing {
     $thing->{thingId} = "new";
     $newThingId = $self->setCollateral("Thingy_things","thingId",$thing,0,$useAssetId);
 
-    if ($retainIds){
+    if ($isImport){
         $db->write("update Thingy_things set thingId = ".$db->quote($oldThingId)
         ." where thingId = ".$db->quote($newThingId));
         $newThingId = $oldThingId;
+    }
+    else{
+        # Set this Thingy assets defaultThingId if this is its first Thing.
+        my ($numberOfThings) = $db->quickArray('select count(*) from Thingy_things where assetId=?'
+            ,[$self->getId]);
+        if ($numberOfThings == 1){
+            $self->update({defaultThingId => $newThingId});
+        }
     }
 
     $db->write("create table ".$db->dbh->quote_identifier("Thingy_".$newThingId)."(
