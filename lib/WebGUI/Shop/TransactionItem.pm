@@ -29,6 +29,7 @@ These subroutines are available from this package:
 readonly transaction => my %transaction;
 private properties => my %properties;
 
+
 #-------------------------------------------------------------------
 
 =head2 create ( transaction, properties)

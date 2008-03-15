@@ -21,6 +21,7 @@ use WebGUI::Shop::Cart;
 use WebGUI::Shop::Pay;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
+use WebGUI::Shop::Transaction;
 
 =head1 NAME
 
@@ -172,6 +173,26 @@ sub www_tax {
     }
     return $output;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_transaction ()
+
+Hand off to the transaction system.
+
+=cut
+
+sub www_transaction {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_".$session->form->get("method");
+    my $transaction = WebGUI::Shop::Transaction->create($session);
+    if ($method ne "www_" && $transaction->can($method)) {
+        $output = $transaction->$method();
+    }
+    return $output;
+}
+
 
 
 1;

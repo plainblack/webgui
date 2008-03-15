@@ -3,6 +3,42 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'username' => { 
+		message => q|User|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'date' => { 
+		message => q|Date|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'transaction id' => { 
+		message => q|Transaction Id|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'status code' => { 
+		message => q|Status Code|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'status message' => { 
+		message => q|Status Message|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'payment method' => { 
+		message => q|Payment Method|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
 	'add shipper' => { 
 		message => q|Add Shipping Method|,
 		lastUpdated => 0,

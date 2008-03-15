@@ -115,23 +115,36 @@ sub toHtml {
 	my ($style, $url) = $self->session->quick(qw(style url));
 	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
     $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
-	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#">'.$value.'</textarea>';
+	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>';
 	if ($self->get("resizable")) {
-		$out = '<div style="border: 0px; width: '.$width.'px; height: '.$height.'px;" class="yresizable-pinned" id="'.$self->get('id').'_wrapper">'.$out.'</div>';
-		$style->setScript($url->extras("yui/build/yahoo/yahoo-min.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/event/event-min.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/dom/dom-min.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("yui/build/dragdrop/dragdrop-min.js"), {type=>"text/javascript"});
-		$style->setLink($url->extras("extjs/resources/css/ext-all.css"), {type=>"text/css", rel=>"stylesheet"});
-		$style->setScript($url->extras("extjs/adapter/yui/ext-yui-adapter.js"), {type=>"text/javascript"});
-		$style->setScript($url->extras("extjs/ext-all.js"), {type=>"text/javascript"});
-		$out .= qq|
-		<script type="text/javascript">
-			YAHOO.util.Event.addListener(window, 'load', function () {
-                    var resizableTextarea = new Ext.Resizable('|.$self->get('id').qq|_wrapper', {minWidth:300, minHeight:150, wrap:false, resizeChild:true, disableTrackOver:true, multiDirectional:false, pinned:true, width:|.$width.qq|, height:|.$height.qq|, dynamic:false });
-				});
-		</script>
-		|;
+        $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
+        $style->setLink($url->extras("resize-skin.css"), {type=>"text/css", rel=>"stylesheet"});
+        $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/dragdrop/dragdrop.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/element/element-beta.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/resize/resize-beta.js"), {type=>"text/javascript"});
+        $out = qq|
+            <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 10) . qq|px; height: | . ($height + 10) . qq|px; overflow: hidden">
+            $out
+            </div>
+
+            <script type="text/javascript">
+
+            YAHOO.util.Event.onDOMReady(function() {
+                var Dom = YAHOO.util.Dom,
+                    Event = YAHOO.util.Event,
+                    textAreaElement = document.getElementById('| . $self->get('id') . qq|');
+
+                var resize = new YAHOO.util.Resize('resize_| . $self->get('id'). qq|');
+                resize.on('resize', function(ev) {
+                    var w = ev.width;
+                    var h = ev.height;
+                    textAreaElement.style.width = (w - 6) + "px";
+                    textAreaElement.style.height = (h - 6) + "px";
+                });
+            });
+            </script>
+        |;
 	}
 	return $out;
 }

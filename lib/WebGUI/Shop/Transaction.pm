@@ -3,10 +3,12 @@ package WebGUI::Shop::Transaction;
 use strict;
 
 use Class::InsideOut qw{ :std };
+use JSON;
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Paginator;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::TransactionItem;
 
@@ -328,7 +330,129 @@ sub update {
     $self->session->db->setRow("transaction","transactionId",$properties{$id});
 }
 
+#-------------------------------------------------------------------
 
+=head2 www_getTransactionsAsJson ()
+
+Retrieves a list of transactions for the www_manage() method.
+
+=cut
+
+sub www_getTransactionsAsJson {
+    my ($self) = @_;
+    my ($db, $form) = $self->session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
+    my $transactions = $db->read('select transactionId, transactionCode, paymentDriverLabel,
+        dateOfPurchase, username, amount, isSuccessful, statusCode, statusMessage
+        from transaction order by dateOfPurchase desc limit ?,?', [$startIndex, $numberOfResults]);
+    my $totalRecords = $db->quickScalar('select found_rows()');
+    my $tally = 0;
+    my @records = ();
+    while (my $row = $transactions->hashRef) {
+        push(@records, $row);
+        $tally++;
+    }
+    my %results = (
+        recordsReturned     => $tally,
+        totalRecords        => $totalRecords,
+        startIndex          => $startIndex,
+        sort                => undef,
+        dir                 => "desc",
+        records             => \@records,
+    );
+    $self->session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+#-------------------------------------------------------------------
+
+=head2 www_manage ()
+
+Displays a list of all transactions in the system along with management tools for them. 
+
+=cut
+
+sub www_manage {
+    my ($self) = @_;
+    my $admin = WebGUI::Shop::Admin->new($self->session);
+    return $self->session->privilege->insufficient() unless $admin->canManage;
+    my $i18n = WebGUI::International->new($self->session, 'Shop');
+    my ($style, $url) = $self->session->quick(qw(style url));
+    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/json/json.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-beta.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-beta.js'), {type=>'text/javascript'});
+    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } </style>');
+    my $output = q| 
+
+<div class=" yui-skin-sam"><div id="demo">
+    <div id="paging"></div>
+    <div id="dt"></div>
+</div></div>
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
+    |;
+    $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson')."');";
+    $output .= <<STOP;
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'transactionCode', 'paymentDriverLabel',
+            'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage']
+    };
+
+    var buildQueryString = function (state,dt) {
+        return ";startIndex=" + state.pagination.recordOffset +
+               ";results=" + state.pagination.rowsPerPage;
+    };
+
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
+
+    var myTableConfig = {
+        initialRequest         : ';startIndex=0;results=25',
+        generateRequest        : buildQueryString,
+        paginationEventHandler : DataTable.handleDataSourcePagination,
+        paginator              : myPaginator
+    };
+
+    YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, transactionId) {
+STOP
+	$output .= q{elCell.innerHTML = '<a href="}.$url->page('shop=transaction;method=viewTransaction')
+        .q{;transactionId=' + transactionId + '">' + transactionId + '</a>'; };
+    $output .= '
+        }; 
+        var myColumnDefs = [
+    ';
+    $output .= '{key:"transactionId", label:"'.$i18n->get('transaction id').'", formatter:YAHOO.widget.DataTable.formatViewTransaction},';
+    $output .= '{key:"dateOfPurchase", label:"'.$i18n->get('date').'",formatter:YAHOO.widget.DataTable.formatDate},';
+    $output .= '{key:"username", label:"'.$i18n->get('username').'"},';
+    $output .= '{key:"amount", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
+    $output .= '{key:"statusCode", label:"'.$i18n->get('status code').'"},';
+    $output .= '{key:"statusMessage", label:"'.$i18n->get('status message').'"},';
+    $output .= '{key:"paymentDriverLabel", label:"'.$i18n->get('payment method').'"},';
+    $output .= <<STOP;
+    ];
+
+    var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+});
+</script>
+STOP
+    
+    return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
+}
 
 
 1;

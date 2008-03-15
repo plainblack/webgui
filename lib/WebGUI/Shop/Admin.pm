@@ -32,6 +32,25 @@ readonly session => my %session;
 
 #-------------------------------------------------------------------
 
+=head2 canManage ( [ $user ] )
+
+Determine whether or not a user can manage commerce functions
+
+=head3 $user
+
+An optional WebGUI::User object to check for permission to do commerce functions.  If
+this is not used, it uses the current session user object.
+
+=cut
+
+sub canManage {
+    my $self   = shift;
+    my $user   = shift || $self->session->user;
+    return $user->isInGroup( $self->session->setting->get('groupIdAdminCommerce'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAdminConsole ()
 
 Returns a reference to the admin console with all submenu items already added.
@@ -47,7 +66,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($url->page("shop=tax"), $i18n->get("taxes"));
     $ac->addSubmenuItem($url->page("shop=pay;method=manage"), $i18n->get("payment methods"));
     $ac->addSubmenuItem($url->page("shop=ship;method=manage"), $i18n->get("shipping methods"));
-    $ac->addSubmenuItem($url->page("shop=transactions"), $i18n->get("transactions"));
+    $ac->addSubmenuItem($url->page("shop=transaction;method=manage"), $i18n->get("transactions"));
     return $ac;
 }
 
