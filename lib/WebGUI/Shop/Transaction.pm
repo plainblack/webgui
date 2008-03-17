@@ -339,13 +339,28 @@ Retrieves a list of transactions for the www_manage() method.
 =cut
 
 sub www_getTransactionsAsJson {
-    my ($self) = @_;
-    my ($db, $form) = $self->session->quick(qw(db form));
+    my ($class, $session) = @_;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient() unless $admin->canManage;
+    my ($db, $form) = $session->quick(qw(db form));
     my $startIndex = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results') || 25;
-    my $transactions = $db->read('select orderNumber, transactionId, transactionCode, paymentDriverLabel,
+    my @placeholders = ();
+    my $sql = 'select orderNumber, transactionId, transactionCode, paymentDriverLabel,
         dateOfPurchase, username, amount, isSuccessful, statusCode, statusMessage
-        from transaction order by dateOfPurchase desc limit ?,?', [$startIndex, $numberOfResults]);
+        from transaction';
+    my $keywords = $form->get("keywords");
+    if ($keywords ne "") {
+        $sql .= ' where';
+        foreach my $field (qw(amount username orderNumber shippingAddressName shippingAddress1 paymentAddressName paymentAddress1)) {
+            $sql .= ' or' if (scalar @placeholders > 0);
+            $sql .= qq{ $field like ?};
+            push(@placeholders, '%'.$keywords.'%');
+        }
+    }
+    push(@placeholders, $startIndex, $numberOfResults);
+    $sql .= ' order by dateOfPurchase desc limit ?,?';
+    my $transactions = $db->read($sql, \@placeholders);
     my $totalRecords = $db->quickScalar('select found_rows()');
     my $tally = 0;
     my @records = ();
@@ -354,14 +369,14 @@ sub www_getTransactionsAsJson {
         $tally++;
     }
     my %results = (
-        recordsReturned     => $tally,
         totalRecords        => $totalRecords,
+        recordsReturned     => $tally,
         startIndex          => $startIndex,
         sort                => undef,
         dir                 => "desc",
         records             => \@records,
     );
-    $self->session->http->setMimeType('text/json');
+    $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
 #-------------------------------------------------------------------
@@ -373,21 +388,22 @@ Displays a list of all transactions in the system along with management tools fo
 =cut
 
 sub www_manage {
-    my ($self) = @_;
-    my $admin = WebGUI::Shop::Admin->new($self->session);
-    return $self->session->privilege->insufficient() unless $admin->canManage;
-    my $i18n = WebGUI::International->new($self->session, 'Shop');
-    my ($style, $url) = $self->session->quick(qw(style url));
+    my ($class, $session) = @_;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient() unless $admin->canManage;
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    my ($style, $url) = $session->quick(qw(style url));
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/json/json.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/datasource/datasource-beta.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/datatable/datatable-beta.js'), {type=>'text/javascript'});
-    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } </style>');
+    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $output = q| 
 
 <div class=" yui-skin-sam"><div id="demo">
+    <div id="search"><form><input type="text" name="keywords" id="keywordsField" /><input type="button" id="searchButton" value="Search" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
 </div></div>
@@ -395,6 +411,7 @@ sub www_manage {
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady(function () {
     var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
         DataTable  = YAHOO.widget.DataTable,
         Paginator  = YAHOO.widget.Paginator;
     |;
@@ -410,6 +427,7 @@ YAHOO.util.Event.onDOMReady(function () {
 
     var buildQueryString = function (state,dt) {
         return ";startIndex=" + state.pagination.recordOffset +
+               ";keywords=" + Dom.get('keywordsField').value +
                ";results=" + state.pagination.rowsPerPage;
     };
 
@@ -447,6 +465,12 @@ STOP
     ];
 
     var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+
+    Dom.get('searchButton').onclick = function () {
+         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+            myTable.onDataReturnInitializeTable, myTable);    
+    };
+
 });
 </script>
 STOP

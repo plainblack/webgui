@@ -194,9 +194,8 @@ sub www_transaction {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $transaction = WebGUI::Shop::Transaction->new($session);
-    if ($method ne "www_" && $transaction->can($method)) {
-        $output = $transaction->$method();
+    if ($method ne "www_" && WebGUI::Shop::Transaction->can($method)) {
+        $output = WebGUI::Shop::Transaction->$method($session);
     }
     return $output;
 }
