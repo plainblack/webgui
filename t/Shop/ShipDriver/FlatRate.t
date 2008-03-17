@@ -142,8 +142,6 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate');
 
 isa_ok($driver, 'WebGUI::Shop::ShipDriver');
 
-cmp_deeply($driver->options, $options, 'options accessor works');
-
 #######################################################################
 #
 # getName
