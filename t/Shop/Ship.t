@@ -83,9 +83,9 @@ is($session->getId, $ship->session->getId, 'session method returns OUR session o
 my $drivers;
 
 $drivers = $ship->getDrivers();
-
+my @driverClasses = keys %{$drivers};
 cmp_deeply(
-    $drivers,
+    \@driverClasses,
     [ 'WebGUI::Shop::ShipDriver::FlatRate' ],
     'getDrivers: WebGUI only ships with 1 default shipping driver',
 );
@@ -158,7 +158,7 @@ my $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=
 $shippers = $ship->getShippers();
 is(scalar @{$shippers}, 2, 'getShippers: got both shippers');
 
-my @shipperNames = map { $_->options()->{label} } @{ $shippers };
+my @shipperNames = map { $_->get("label") } @{ $shippers };
 cmp_bag(
     \@shipperNames,
     [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping}],

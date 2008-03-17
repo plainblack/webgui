@@ -68,7 +68,7 @@ $cart->update({shippingAddressId => "XXXX"});
 is($cart->get("shippingAddressId"), "XXXX", "Can set values to the cart properties.");
 
 $cart->empty;
-is($session->db->quickScalar("select count(*) from cartItems where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
+is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
 
 $cart->delete;
 is($cart->delete, undef, "Can destroy cart.");
