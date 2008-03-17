@@ -205,15 +205,16 @@ sub migrateToNewCart {
         couponId varchar(22) binary,
         index sessionId (sessionId)
     )");
-    $session->db->write("create table cartItems (
+    $session->db->write("create table cartItem (
         itemId varchar(22) binary not null primary key,
         cartId varchar(22) binary not null,
         assetId varchar(22) binary not null,
+		dateAdded datetime not null,
         options mediumtext,
         configuredTitle varchar(255),
         shippingAddressId varchar(22) binary,
         quantity integer not null default 1,
-        index cartId_assetId (cartId,assetId)
+        index cartId_assetId_dateAdded (cartId,assetId,dateAdded)
     )");
     $session->db->write("drop table shoppingCart");
     $session->setting->add('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw');

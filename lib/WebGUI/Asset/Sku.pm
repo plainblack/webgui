@@ -72,6 +72,23 @@ sub addToCart {
 
 #-------------------------------------------------------------------
 
+=head2 adjustQuantityAvailable ( amount )
+
+Adjust the quantity of this product that is available. Send a negative number to decrease, or a positive number to increase. Returns getQuantityAvailable. 
+
+=head3 amount
+
+A signed integer that represents the amount to adjust
+
+=cut
+
+sub adjustQuantityAvailable {
+	my ($self, $amount) = @_;
+	return $self->setQuantityAvailable($self->getQuantityAvailable + $amount);
+}
+
+#-------------------------------------------------------------------
+
 =head2 applyOptions ( options )
 
 Accepts a configuration data hash reference that configures a sku a certain way. For example to turn "a t-shirt" into "an XL red t-shirt". See also getOptions().
@@ -206,12 +223,13 @@ sub getOptions {
 
 =head2 getMaxAllowedInCart ( )
 
-Returns 99999999. Should be overriden by subclasses that have a specific value. Subclasses that are unique should return 1. Subclasses that have an inventory count should return the amount in inventory.
+Returns getQuantityAvailable(). Should be overriden by subclasses that have a specific value. Subclasses that are unique should return 1. Subclasses that have an inventory count should return the amount in inventory.
 
 =cut
 
 sub getMaxAllowedInCart {
-    return 99999999;
+	my $self = shift;
+    return $self->getQuantityAvailable;
 }
 
 #-------------------------------------------------------------------
@@ -224,6 +242,18 @@ Returns 0.00. Needs to be overriden by subclasses.
 
 sub getPrice {
     return 0.00;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getQuantityAvailable ( )
+
+Returns 99999999. Needs to be overriden by subclasses. Tells the commerce system how many of this item is on hand.
+
+=cut
+
+sub getQuantityAvailable {
+    return 99999999;
 }
 
 #-------------------------------------------------------------------
@@ -264,6 +294,19 @@ sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
     $indexer->addKeywords($self->get('sku'));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isRecurring
+
+Returns a boolean indicating whether this sku is recurring. Defaultly returns 0. Needs to be overriden by subclasses that do recurring transactions, because not all payment gateways can process recurring transactions.
+
+=cut
+
+sub isRecurring {
+    return 0;
 }
 
 
@@ -319,6 +362,23 @@ sub processStyle {
 	my $self = shift;
 	my $output = shift;
 	return $self->getParent->processStyle($output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 setQuantityAvailable ( amount )
+
+Set the quantity of this product that is available. Returns getQuantityAvailable(). Should be overridden by skus that keep track of quantity.
+
+=head3 amount
+
+A signed integer that represents the quantity to set it to.
+
+=cut
+
+sub setQuantityAvailable {
+	my ($self, $amount) = @_;
+    return $self->getQuantityAvailable;
 }
 
 #-------------------------------------------------------------------

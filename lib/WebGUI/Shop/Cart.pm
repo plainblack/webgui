@@ -238,7 +238,7 @@ Returns an array reference of WebGUI::Asset::Sku objects that are in the cart.
 sub getItems {
     my ($self) = @_;
     my @itemsObjects = ();
-    my $items = $self->session->db->read("select itemId from cartItems where cartId=?",[$self->getId]);
+    my $items = $self->session->db->read("select itemId from cartItem where cartId=?",[$self->getId]);
     while (my ($itemId) = $items->array) {
         push(@itemsObjects, $self->getItem($itemId));
     }

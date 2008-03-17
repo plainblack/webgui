@@ -62,9 +62,10 @@ sub create {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a SKU item.");
     }
     my $itemId = $cart->session->id->generate;
-    $cart->session->db->write('insert into cartItems (quantity, cartId, assetId, itemId) values (1,?,?,?)', [$cart->getId, $sku->getId, $itemId]);
+    $cart->session->db->write('insert into cartItem (quantity, cartId, assetId, itemId, dateAdded) values (1,?,?,?,now())', [$cart->getId, $sku->getId, $itemId]);
     my $self = $class->new($cart, $itemId);
     $self->update({asset=>$sku});
+    $sku->adjustQuantityAvailable(-1);
     return $self;
 }
 
@@ -185,7 +186,7 @@ sub new {
     unless (defined $itemId) {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
-    my $item = $cart->session->db->quickHashRef('select * from cartItems where itemId=?', [$itemId]);
+    my $item = $cart->session->db->quickHashRef('select * from cartItem where itemId=?', [$itemId]);
     if ($item->{itemId} eq "") {
         WebGUI::Error::ObjectNotFound->throw(error=>"Item not found.", id=>$itemId);
     }
@@ -209,7 +210,7 @@ Removes this item from the cart.
 
 sub remove {
     my $self = shift;
-    $self->cart->session->db->deleteRow("cartItems","itemId",$self->getId);
+    $self->cart->session->db->deleteRow("cartItem","itemId",$self->getId);
     undef $self;
     return undef;
 }
@@ -230,6 +231,7 @@ The number to set the quantity to. Zero or less will remove the item from cart.
 sub setQuantity {
     my ($self, $quantity) = @_;
     my $id = id $self;
+    my $currentQuantity = $self->get("quantity");
     if ($quantity > $self->getSku->getMaxAllowedInCart) {
         WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
     }
@@ -237,7 +239,8 @@ sub setQuantity {
         return $self->remove;
     }
     $properties{$id}{quantity} = $quantity;
-    $self->cart->session->db->setRow("cartItems","itemId", $properties{$id});
+    $self->getSku->adjustQuantityAvailable($currentQuantity + $quantity);
+    $self->cart->session->db->setRow("cartItem","itemId", $properties{$id});
 }
 
 #-------------------------------------------------------------------
@@ -286,7 +289,7 @@ sub update {
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON::to_json($newProperties->{options});
     }
-    $self->cart->session->db->setRow("cartItems","itemId",$properties{$id});
+    $self->cart->session->db->setRow("cartItem","itemId",$properties{$id});
 }
 
 
