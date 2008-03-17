@@ -29,13 +29,15 @@ Package WebGUI::Content::Shop
 
 =head1 DESCRIPTION
 
-A content handler that opens up all the commerce functionality. The modules herein are accessed like this:
+A content handler that opens up all the commerce functionality. The shop modules are accessed via the url like this:
 
- pagename?shop=modulehandler;method=www_method
+ /pagename?shop=modulehandler;method=www_method
  
 For example:
 
- home?shop=transaction;method=manage
+ /home?shop=transaction;method=manage
+
+In the above we're accessing the WebGUI::Shop::Transaction module, which is configured with the www_transaction() sub in this package. And we're calling www_manage() on that object.
 
 =head1 SYNOPSIS
 
