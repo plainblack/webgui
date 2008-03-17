@@ -55,7 +55,7 @@ sub calculate {
 		}
 	}
 	if ($anyShippable) {
-		$cost += $flatFee;
+		$cost += $self->get('flatFee');
 	}
     return $cost;
 }
