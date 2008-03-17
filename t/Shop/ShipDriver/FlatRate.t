@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 12;
+my $tests = 11;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 9, 'getEditForm: the form has 9 controls');
+is (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -184,11 +184,19 @@ cmp_deeply(
             type => 'submit',
         },
         {
-            name => 'shipperId',
+            name => 'driverId',
             type => 'hidden',
         },
         {
-            name => 'className',
+            name => 'shop',
+            type => 'hidden',
+        },
+        {
+            name => 'method',
+            type => 'hidden',
+        },
+        {
+            name => 'do',
             type => 'hidden',
         },
         {
@@ -228,7 +236,7 @@ cmp_deeply(
 
 $driver->delete;
 
-my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
+my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->getId]);
 is($count, 0, 'delete deleted the object');
 
 undef $driver;
