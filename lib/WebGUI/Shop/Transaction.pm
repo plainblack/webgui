@@ -369,7 +369,7 @@ sub www_getTransactionsAsJson {
         $tally++;
     }
     my %results = (
-        totalRecords        => $totalRecords,
+        totalRecords        => $totalRecords + 0,
         recordsReturned     => $tally,
         startIndex          => $startIndex,
         sort                => undef,
