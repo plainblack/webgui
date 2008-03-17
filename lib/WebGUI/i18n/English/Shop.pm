@@ -15,8 +15,8 @@ our $I18N = {
 		context => q|field label|
 	},
 
-	'transaction id' => { 
-		message => q|Transaction Id|,
+	'order number' => { 
+		message => q|Order #|,
 		lastUpdated => 0,
 		context => q|field label|
 	},

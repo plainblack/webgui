@@ -48,6 +48,7 @@ sub convertTransactionLog {
     $session->db->write("create table transaction (
         transactionId varchar(22) binary not null primary key,
         isSuccessful bool not null default 0,
+		orderNumber int not null auto_increment unique,
 		transactionCode varchar(100),
 		statusCode varchar(35),
 		statusMessage varchar(100),

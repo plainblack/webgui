@@ -343,7 +343,7 @@ sub www_getTransactionsAsJson {
     my ($db, $form) = $self->session->quick(qw(db form));
     my $startIndex = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results') || 25;
-    my $transactions = $db->read('select transactionId, transactionCode, paymentDriverLabel,
+    my $transactions = $db->read('select orderNumber, transactionId, transactionCode, paymentDriverLabel,
         dateOfPurchase, username, amount, isSuccessful, statusCode, statusMessage
         from transaction order by dateOfPurchase desc limit ?,?', [$startIndex, $numberOfResults]);
     my $totalRecords = $db->quickScalar('select found_rows()');
@@ -404,7 +404,7 @@ YAHOO.util.Event.onDOMReady(function () {
     mySource.responseSchema = {
         resultsList : 'records',
         totalRecords: 'totalRecords',
-        fields      : [ 'transactionCode', 'paymentDriverLabel',
+        fields      : [ 'transactionCode', 'orderNumber', 'paymentDriverLabel',
             'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage']
     };
 
@@ -417,26 +417,26 @@ YAHOO.util.Event.onDOMReady(function () {
         containers         : ['paging'],
         pageLinks          : 5,
         rowsPerPage        : 25,
-        rowsPerPageOptions : [25,50,100],
+        rowsPerPageOptions : [10,25,50,100],
         template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
     });
 
     var myTableConfig = {
-        initialRequest         : ';startIndex=0;results=25',
+        initialRequest         : ';startIndex=0',
         generateRequest        : buildQueryString,
         paginationEventHandler : DataTable.handleDataSourcePagination,
         paginator              : myPaginator
     };
 
-    YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, transactionId) {
+    YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
 STOP
-	$output .= q{elCell.innerHTML = '<a href="}.$url->page('shop=transaction;method=viewTransaction')
-        .q{;transactionId=' + transactionId + '">' + transactionId + '</a>'; };
+	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=viewTransaction})
+        .q{;transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
     $output .= '
         }; 
         var myColumnDefs = [
     ';
-    $output .= '{key:"transactionId", label:"'.$i18n->get('transaction id').'", formatter:YAHOO.widget.DataTable.formatViewTransaction},';
+    $output .= '{key:"orderNumber", label:"'.$i18n->get('order number').'", formatter:YAHOO.widget.DataTable.formatViewTransaction},';
     $output .= '{key:"dateOfPurchase", label:"'.$i18n->get('date').'",formatter:YAHOO.widget.DataTable.formatDate},';
     $output .= '{key:"username", label:"'.$i18n->get('username').'"},';
     $output .= '{key:"amount", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';

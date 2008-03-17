@@ -167,7 +167,7 @@ sub www_tax {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $tax = WebGUI::Shop::Tax->create($session);
+    my $tax = WebGUI::Shop::Tax->new($session);
     if ($method ne "www_" && $tax->can($method)) {
         $output = $tax->$method();
     }
@@ -186,7 +186,7 @@ sub www_transaction {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
-    my $transaction = WebGUI::Shop::Transaction->create($session);
+    my $transaction = WebGUI::Shop::Transaction->new($session);
     if ($method ne "www_" && $transaction->can($method)) {
         $output = $transaction->$method();
     }
