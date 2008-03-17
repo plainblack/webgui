@@ -346,7 +346,7 @@ sub www_getTransactionsAsJson {
     my $startIndex = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results') || 25;
     my @placeholders = ();
-    my $sql = 'select orderNumber, transactionId, transactionCode, paymentDriverLabel,
+    my $sql = 'select SQL_CALC_FOUND_ROWS orderNumber, transactionId, transactionCode, paymentDriverLabel,
         dateOfPurchase, username, amount, isSuccessful, statusCode, statusMessage
         from transaction';
     my $keywords = $form->get("keywords");
@@ -379,6 +379,7 @@ sub www_getTransactionsAsJson {
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
+
 #-------------------------------------------------------------------
 
 =head2 www_manage ()
@@ -406,11 +407,11 @@ sub www_manage {
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $output = q| 
 
-<div class=" yui-skin-sam"><div id="demo">
+<div class=" yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
-</div></div>
+</div>
 
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady(function () {
@@ -492,5 +493,42 @@ STOP
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_viewTransaction ()
+
+Displays the admin view of an individual transaction.
+
+=cut
+
+sub www_viewTransaction {
+    my ($class, $session) = @_;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient() unless $admin->canManage;
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    my ($style, $url) = $session->quick(qw(style url));
+    my $transaction = $class->new($session, $session->form->get('transactionId'));
+    my $output = q{
+        <table>
+            <tr>
+                <th>}. $i18n->get("transaction id") .q{</th><td>}. $transaction->getId .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("order number") .q{</th><td>}. $transaction->get('orderNumber') .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("shipping address") .q{</th><td>}. join(" ",$transaction->get('shippingAddressName'),$transaction->get('shippingAddress1'),$transaction->get('shippingAddress2'),$transaction->get('shippingAddress3'),$transaction->get('shippingCity'),$transaction->get('shippingState'),$transaction->get('shippingCode'),$transaction->get('shippingCountry'),$transaction->get('shippingPhoneNumber')) .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("payment address") .q{</th><td>}. join(" ",$transaction->get('paymentAddressName'),$transaction->get('paymentAddress1'),$transaction->get('paymentAddress2'),$transaction->get('paymentAddress3'),$transaction->get('paymentCity'),$transaction->get('paymentState'),$transaction->get('paymentCode'),$transaction->get('paymentCountry'),$transaction->get('paymentPhoneNumber')) .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("price") .q{</th><td>}. $transaction->get('amount') .q{</td>
+            </tr>
+        </table>
+    };
+
+    return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
+}
 
 1;
