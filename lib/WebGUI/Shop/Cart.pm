@@ -498,7 +498,8 @@ sub www_view {
             $var{hasShippingAddress} = 1;
             $var{shippingAddress} = $address->getHtmlFormatted;
             $var{tax} = $self->getTaxes;
-            my $options = WebGUI::Shop::Ship->getOptions($self);
+            my $ship = WebGUI::Shop::Ship->new($self->session);
+            my $options = $ship->getOptions($self);
             my %formOptions = ();
             my $defaultOption = "";
             foreach my $option (keys %{$options}) {
