@@ -393,17 +393,21 @@ sub www_manage {
     return $session->privilege->insufficient() unless $admin->canManage;
     my $i18n = WebGUI::International->new($session, 'Shop');
     my ($style, $url) = $session->quick(qw(style url));
+    
+    # set up all the files that we need
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/json/json.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+
+    # draw the html markup that's needed
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $output = q| 
 
 <div class=" yui-skin-sam"><div id="demo">
-    <div id="search"><form><input type="text" name="keywords" id="keywordsField" /><input type="button" id="searchButton" value="Search" /></form></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
 </div></div>
@@ -415,6 +419,8 @@ YAHOO.util.Event.onDOMReady(function () {
         DataTable  = YAHOO.widget.DataTable,
         Paginator  = YAHOO.widget.Paginator;
     |;
+    
+    # the datasource deals with the stuff returned from www_getTransactionsAsJson
     $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson')."');";
     $output .= <<STOP;
     mySource.responseType   = DataSource.TYPE_JSON;
@@ -424,7 +430,10 @@ YAHOO.util.Event.onDOMReady(function () {
         fields      : [ 'transactionCode', 'orderNumber', 'paymentDriverLabel',
             'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage']
     };
+STOP
 
+    # paginator does the cool ajaxy pagination and makes the requests as needed
+    $output .= <<STOP;
     var buildQueryString = function (state,dt) {
         return ";startIndex=" + state.pagination.recordOffset +
                ";keywords=" + Dom.get('keywordsField').value +
@@ -438,14 +447,16 @@ YAHOO.util.Event.onDOMReady(function () {
         rowsPerPageOptions : [10,25,50,100],
         template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
     });
+STOP
 
+    # create the data table, and a special formatter for the view transaction urls
+    $output .= <<STOP;
     var myTableConfig = {
         initialRequest         : ';startIndex=0',
         generateRequest        : buildQueryString,
         paginationEventHandler : DataTable.handleDataSourcePagination,
         paginator              : myPaginator
     };
-
     YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
 STOP
 	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=viewTransaction})
@@ -463,18 +474,21 @@ STOP
     $output .= '{key:"paymentDriverLabel", label:"'.$i18n->get('payment method').'"},';
     $output .= <<STOP;
     ];
-
     var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+STOP
 
-    Dom.get('searchButton').onclick = function () {
+    # add the necessary event handler to the search button that sends the search request via ajax
+    $output .= <<STOP;
+    Dom.get('keywordSearchForm').onsubmit = function () {
          mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
-            myTable.onDataReturnInitializeTable, myTable);    
+            myTable.onDataReturnInitializeTable, myTable);
+        return false;
     };
 
 });
 </script>
 STOP
-    
+    # render everything to a web page
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
 }
 
