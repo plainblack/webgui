@@ -877,11 +877,6 @@ search has been done.|,
         message => q|Field does not have any values.|,
         lastUpdated => 1104630516,
     },
-
-    '' => {
-        message => q||,
-        lastUpdated => 1104630516,
-    },
 };
 
 1;
