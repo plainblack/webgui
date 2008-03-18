@@ -373,8 +373,8 @@ sub view {
 		}
 		
 		if($response->is_success) {
-			$var{content} = $response->content;
-			$var{header} = $response->content_type; 
+			$var{content} = $response->decoded_content || $response->content;
+			$var{header} = $response->content_type;
 			if($response->content_type eq "text/html"
 			    || ($response->content_type eq "" && $var{content}=~/<html/gis)) {
 				
