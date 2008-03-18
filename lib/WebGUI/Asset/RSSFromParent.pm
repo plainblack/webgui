@@ -15,7 +15,6 @@ package WebGUI::Asset::RSSFromParent;
 =cut
 
 use strict;
-use Encode;
 use HTML::Entities;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
@@ -70,7 +69,6 @@ sub update {
 sub _escapeXml {
 	my $text = shift;
     return $text unless (ref $text eq "");
-    $text = decode('utf8', $text);
     return HTML::Entities::encode_numeric($text)
 }
 
