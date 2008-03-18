@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 73 + 2*scalar(@{$addExceptions});
+my $tests = 75 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -492,8 +492,8 @@ my $alternateAddress = $book->addAddress({
     label => 'using alternations',
     city  => 'Los Angeles',
     state => 'CalifornIA',
-    code  => '97123',
-    country => 'U.S.A.',
+    code  => '92801',
+    country => 'USA',
 });
 
 eval { $taxer->getTaxRates(); };
@@ -523,7 +523,7 @@ cmp_deeply(
 
 cmp_deeply(
     $taxer->getTaxRates($alternateAddress),
-    [7.25], #Only 7.25 because it uses the alternate address for USA
+    [0.0, 8.25], #Hits USA and Los Angeles, California using the alternate spelling of the state
     'getTaxRates: return correct data for a state when the address has alternations'
 );
 
@@ -598,6 +598,30 @@ foreach my $item (@{ $cart->getItems }) {
     $item->setQuantity(1);
 }
 is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes, 1 shipped to a location with no taxes');
+
+#######################################################################
+#
+# www_getTaxesAsJson
+#
+#######################################################################
+
+$session->user({userId=>3});
+my $json = $taxer->www_getTaxesAsJson();
+diag $json;
+ok($json, 'www_getTaxesAsJson returned something');
+my $jsonTax = JSON::from_json($json);
+cmp_deeply(
+    $jsonTax,
+    {
+        sort            => undef,
+        startIndex      => 0,
+        totalRecords    => 1778,
+        recordsReturned => 25,
+        dir             => 'desc',
+        records         => array_each({taxId=>ignore, country => 'USA', state=>ignore, city=>ignore, code=>ignore, taxRate=>re('^\d+\.\d+$')}),
+    },
+    'Check major elements of JSON',
+);
 
 $taxableDonation->purge;
 $taxFreeDonation->purge;

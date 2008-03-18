@@ -6,6 +6,7 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
+use WebGUI::Shop::Admin;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::CartItem;
 use List::Util qw{sum};
@@ -135,25 +136,6 @@ sub calculate {
         $tax += $unitPrice * $quantity * $itemTax;
     }
     return $tax;
-}
-
-#-------------------------------------------------------------------
-
-=head2 canEdit ( [ $user ] )
-
-Determine whether or not a user can perform commerce functions
-
-=head3 $user
-
-An optional WebGUI::User object to check for permission to do commerce functions.  If
-this is not used, it uses the current session user object.
-
-=cut
-
-sub canEdit {
-    my $self   = shift;
-    my $user   = shift || $self->session->user;
-    return $user->isInGroup( $self->session->get('groupIdAdminCommerce'));
 }
 
 #-------------------------------------------------------------------
@@ -357,6 +339,56 @@ Accessor for the session object.  Returns the session object.
 
 #-------------------------------------------------------------------
 
+=head2 www_getTaxesAsJson (  )
+
+Servers side pagination for tax data that is sent as JSON back to the browser to be
+displayed in a YUI DataTable.
+
+=cut
+
+sub www_getTaxesAsJson {
+    my ($self) = @_;
+    my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient
+        unless $admin->canManage;
+    my ($db, $form) = $session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
+    my @placeholders = ();
+    my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
+    my $keywords = $form->get("keywords");
+    if ($keywords ne "") {
+        $sql .= ' where';
+        foreach my $field (qw(country state city code)) {
+            $sql .= ' or' if (scalar @placeholders > 0);
+            $sql .= qq{ $field like ?};
+            push(@placeholders, '%'.$keywords.'%');
+        }
+    }
+    push(@placeholders, $startIndex, $numberOfResults);
+    $sql .= ' order by country desc limit ?,?';
+    my $transactions = $db->read($sql, \@placeholders);
+    my $totalRecords = 0+$db->quickScalar('select found_rows()'); ##Must explicitly convert to numerics
+    my $tally = $transactions->rows();
+    my @records = ();
+    while (my $row = $transactions->hashRef) {
+        push(@records, $row);
+    }
+    my %results = (
+        totalRecords        => $totalRecords + 0,
+        recordsReturned     => $tally,
+        startIndex          => $startIndex,
+        sort                => undef,
+        dir                 => "desc",
+        records             => \@records,
+    );
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view (  )
 
 User interface to manage taxes.  Provides a list of current taxes, and forms for adding
@@ -366,22 +398,27 @@ new tax info, exporting and importing sets of taxes, and deleting individual tax
 
 sub www_view {
     my $self = shift;
-    return $self->session->privileges->insufficient
-        unless $self->canEdit;
     my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privileges->insufficient
+        unless $admin->canManage;
     ##YUI specific datatable CSS
-    $session->setLink($session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type => 'text/CSS'});
+    my ($style, $url) = $session->quick(qw(style url));
+    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
     ##YUI basics
-    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
-    $session->style->setScript($session->url->extras('yui/build/element/element-beta-min.js'), {type => 'text/javascript'});
-    $session->style->setScript($session->url->extras('yui/build/datasource/datasource-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource-beta-min.js'), {type => 'text/javascript'});
     ##YUI Datatable
-    $session->style->setScript($session->url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
     ##YUI JSON handler
-    $session->style->setScript($session->url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
-    ##Build column headers. TODO: I18N
+    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
+    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
-    $session->style->setRawHeadTags(sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'));
+    ##Build column headers.
+    my $output = sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code');
+<script type="text/javascript">
 var taxColumnDefs = [
     {key:"country", label:"%s"},
     {key:"state",   label:"%s"},
@@ -389,7 +426,6 @@ var taxColumnDefs = [
     {key:"code",    label:"%s"}
 ];
 EOCHJS
-    $session->style->setRawHeadTags();
     return '';
 }
 
