@@ -314,6 +314,46 @@ sub buildHashRefOfHashRefs {
                                                                               
 #-------------------------------------------------------------------
 
+=head2 buildSearchQuery ( $sql, $keywords, $columns )
+
+Append information to an existing SQL statement for implementing
+basic search functions.  The ammended SQL and an array of placeholder
+variables will be returned.
+
+=head3 $sql
+
+An SQL query.  The clauses to add search-like capabilities will be
+appended to the end of the query.
+
+=head3 $keywords
+
+This is the data that will be searched for in columns.  An SQL wildcard '%' will
+be added to the beginning and end of $keywords.
+
+=head3 $columns
+
+An arrayref of column names that should be searched for $keywords.
+
+=cut
+
+sub buildSearchQuery {
+    my $self = shift;
+    my $sql = shift;
+    my $keywords = shift;
+    my $columns = shift || [];
+    my @placeholders;
+    $sql .= ' where';
+    $keywords = '%'.$keywords.'%';
+    foreach my $field (@{ $columns }) {
+        $sql .= ' or' if (scalar @placeholders > 0);
+        $sql .= qq{ $field like ?};
+        push(@placeholders, $keywords);
+    }
+    return ($sql, @placeholders);
+}
+
+#-------------------------------------------------------------------
+
 =head2 commit ( )
 
 Ends a transaction sequence. To be used with beginTransaction. Applies all of the writes since beginTransaction to the database.

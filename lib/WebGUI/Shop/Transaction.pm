@@ -352,12 +352,7 @@ sub www_getTransactionsAsJson {
         from transaction';
     my $keywords = $form->get("keywords");
     if ($keywords ne "") {
-        $sql .= ' where';
-        foreach my $field (qw(amount username orderNumber shippingAddressName shippingAddress1 paymentAddressName paymentAddress1)) {
-            $sql .= ' or' if (scalar @placeholders > 0);
-            $sql .= qq{ $field like ?};
-            push(@placeholders, '%'.$keywords.'%');
-        }
+        ($sql, @placeholders) = $db->buildSearchQuery($sql, $keywords, [qw{amount username orderNumber shippingAddressName shippingAddress1 paymentAddressName paymentAddress1}])
     }
     push(@placeholders, $startIndex, $numberOfResults);
     $sql .= ' order by dateOfPurchase desc limit ?,?';

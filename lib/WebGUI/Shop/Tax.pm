@@ -359,12 +359,7 @@ sub www_getTaxesAsJson {
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
     if ($keywords ne "") {
-        $sql .= ' where';
-        foreach my $field (qw(country state city code)) {
-            $sql .= ' or' if (scalar @placeholders > 0);
-            $sql .= qq{ $field like ?};
-            push(@placeholders, '%'.$keywords.'%');
-        }
+        ($sql, @placeholders) = $db->buildSearchQuery($sql, $keywords, [qw{country state city code}])
     }
     push(@placeholders, $startIndex, $numberOfResults);
     $sql .= ' order by country desc limit ?,?';
