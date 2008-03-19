@@ -37,10 +37,10 @@ plan tests => 20;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->newBySession(); }, 
+throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->getCartBySession(); }, 
     'WebGUI::Error::InvalidObject', 
     {
-        error       => 'Needs a session.',
+        error       => 'Need a session.',
         got         => '',
         expected    => 'WebGUI::Session',
     },
