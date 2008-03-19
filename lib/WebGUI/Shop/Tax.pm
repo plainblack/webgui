@@ -110,19 +110,22 @@ sub calculate {
     return 0 if $cart->get('shippingAddressId') eq "";
     my $address = $book->getAddress($cart->get('shippingAddressId'));
     my $tax = 0;
+    ##Fetch the tax data for the cart address so it doesn't have to look it up for every item
+    ##in the cart with that address.
+    my $cartTaxables = $self->getTaxRates($address);
     foreach my $item (@{ $cart->getItems }) {
         my $sku = $item->getSku;
         my $unitPrice = $sku->getPrice;
         my $quantity  = $item->get('quantity');
         ##Check for an item specific shipping address
-        my $itemAddress;
+        my $taxables;
         if (defined $item->get('shippingAddressId')) {
-            $itemAddress = $book->getAddress($item->get('shippingAddressId'));
+            my $itemAddress = $book->getAddress($item->get('shippingAddressId'));
+            $taxables = $self->getTaxRates($itemAddress);
         }
         else {
-            $itemAddress = $address;
+            $taxables = $cartTaxables;
         }
-        my $taxables  = $self->getTaxRates($itemAddress);
         ##Check for a SKU specific tax override rate
         my $skuTaxRate = $sku->getTaxRate();
         my $itemTax;
@@ -398,11 +401,53 @@ sub www_view {
     $style->setScript($url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
     ##YUI JSON handler
     $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
+    ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
-    ##Build column headers.
-    my $output = sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code');
+
+    my $output =<<EODIV;
+<div class=" yui-skin-sam">
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
+    <div id="paging"></div>
+    <div id="dt"></div>
+</div>
+
 <script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
+        DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
+EODIV
+
+    ##Build datasource with URL.
+    $output .= sprintf <<'EODSURL', $url->page('shop=tax;method=getTaxesAsJson');
+    var mySource = new DataSource('%s');
+EODSURL
+    $output .= <<STOP;
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'taxId', 'country', 'state', 'city', 'code', 'taxRate']
+    };
+    var buildQueryString = function (state,dt) {
+        return ";startIndex=" + state.pagination.recordOffset +
+               ";keywords=" + Dom.get('keywordsField').value +
+               ";results=" + state.pagination.rowsPerPage;
+    };
+
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [10,25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
+STOP
+
+    ##Build column headers.
+    $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code');
 var taxColumnDefs = [
     {key:"country", label:"%s"},
     {key:"state",   label:"%s"},
