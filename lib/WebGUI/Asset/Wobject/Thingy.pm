@@ -178,7 +178,7 @@ sub definition {
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'Thingy.gif',
+		icon=>'thingy.gif',
 		autoGenerateForms=>1,
 		tableName=>'Thingy',
 		className=>'WebGUI::Asset::Wobject::Thingy',
