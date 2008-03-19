@@ -100,6 +100,11 @@ sub duplicate {
 	return undef;
 }
 
+#-------------------------------------------------------------------
+# Too much data to keep track of modification dates, always assume new data
+sub getContentLastModified {
+    return time();
+}
 
 #-------------------------------------------------------------------
 sub formatURL {
@@ -1140,7 +1145,7 @@ sub www_viewDetail {
 		$var{screenshot} = $storage->getUrl($listing->{filename});
 		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
 	}
-	$var{"discussion"} = $forum->view;
+	$var{"discussion"} = $forum && $forum->view;
 	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
 	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {
 		if ($self->session->form->process("body") ne "") {
