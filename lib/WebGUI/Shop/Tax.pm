@@ -368,21 +368,10 @@ sub www_getTaxesAsJson {
     }
     push(@placeholders, $startIndex, $numberOfResults);
     $sql .= ' order by country desc limit ?,?';
-    my $transactions = $db->read($sql, \@placeholders);
-    my $totalRecords = 0+$db->quickScalar('select found_rows()'); ##Must explicitly convert to numerics
-    my $tally = $transactions->rows();
-    my @records = ();
-    while (my $row = $transactions->hashRef) {
-        push(@records, $row);
-    }
-    my %results = (
-        totalRecords        => $totalRecords + 0,
-        recordsReturned     => $tally,
-        startIndex          => $startIndex,
-        sort                => undef,
-        dir                 => "desc",
-        records             => \@records,
-    );
+    my %results = $db->buildDataTableStructure($sql, \@placeholders);
+    $results{'startIndex'} = $startIndex;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "desc";
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }

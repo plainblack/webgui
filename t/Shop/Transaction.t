@@ -199,6 +199,7 @@ is(scalar @{$transaction->getItems}, 0, "can delete items");
 $session->user({userId=>3});
 my $json = WebGUI::Shop::Transaction->www_getTransactionsAsJson($session);
 ok($json, 'www_getTransactionsAsJson returned something');
+diag $json;
 my $jsonTransactions = JSON::from_json($json);
 cmp_deeply(
     $jsonTransactions,

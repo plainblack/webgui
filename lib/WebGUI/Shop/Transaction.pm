@@ -361,22 +361,10 @@ sub www_getTransactionsAsJson {
     }
     push(@placeholders, $startIndex, $numberOfResults);
     $sql .= ' order by dateOfPurchase desc limit ?,?';
-    my $transactions = $db->read($sql, \@placeholders);
-    my $totalRecords = $db->quickScalar('select found_rows()');
-    my $tally = 0;
-    my @records = ();
-    while (my $row = $transactions->hashRef) {
-        push(@records, $row);
-        $tally++;
-    }
-    my %results = (
-        totalRecords        => $totalRecords + 0,
-        recordsReturned     => $tally,
-        startIndex          => $startIndex,
-        sort                => undef,
-        dir                 => "desc",
-        records             => \@records,
-    );
+    my %results = $db->buildDataTableStructure($sql, \@placeholders);
+    $results{'startIndex'} = $startIndex;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "desc";
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }

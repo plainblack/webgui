@@ -241,7 +241,7 @@ Builds a data structure that can be converted to JSON and sent
 to a YUI Data Table.  This is basically a hash of information about
 the results, with one of the keys being an array ref of hashrefs.  It also
 calculates the total records that could have been matched without a limit
-statement, as well as how many were actually matched.
+statement, as well as how many were actually matched.  It returns a hash.
 
 =head3 sql
 
@@ -270,7 +270,7 @@ sub buildDataTableStructure {
     $hash{totalRecords}    = $self->quickScalar('select found_rows()') + 0; ##Convert to numeric
     $hash{recordsReturned} = $sth->rows();
 	$sth->finish;
-	return \%hash;
+	return %hash;
 }
 
 #-------------------------------------------------------------------
