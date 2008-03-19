@@ -2,6 +2,7 @@
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
  - fixed: Thingy i18n has an empty message
  - fixed: Thingy has no icon
+ - fixed: Wiki page history shows username instead of alias
 
 7.5.6
  - fixed: events get start/end time even when none specified (also can offset start/end day)
