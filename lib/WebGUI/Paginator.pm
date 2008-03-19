@@ -567,7 +567,7 @@ The number of rows to display per page. If left blank it defaults to 25.
 
 =head3 formVar
 
-Specify the form variable the paginator should use in it's links.  Defaults to "pn".
+Specify the form variable the paginator should use in its links.  Defaults to "pn".
 
 =head3 pageNumber 
 
