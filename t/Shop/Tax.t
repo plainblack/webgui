@@ -637,10 +637,10 @@ SKIP: {
         ok(0, 'test keywords');
     }
     
-    $taxableDonation->purge;
-    $taxFreeDonation->purge;
     $cart->delete;
     $book->delete;
+    $taxableDonation->purge;
+    $taxFreeDonation->purge;
 }
 
 sub getAddExceptions {
