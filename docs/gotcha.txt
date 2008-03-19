@@ -86,7 +86,9 @@ save you many hours of grief.
 
  * DatabaseLinks no longer automatically set LongReadLen and LongTruncOk
    for Oracle or ODBC databases.  These parameters, and others, can now
-   be set in the DatabaseLink.
+   be set in the DatabaseLink.  The old settings used were
+     LongReadLen: 512*1024
+     LongTruncOK: 1
 
  * WebGUI now requires the following additional perl modules to operate,
    and you should install them prior to upgrading:
