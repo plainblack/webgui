@@ -4,6 +4,7 @@
  - fixed: Thingy has no icon
  - fixed: Wiki page history shows username instead of alias
  - added: Uploads locations and files are set to the same uid/gid that owns the uploads root
+ - fixed: SQL Form fields with a regex are required even if not set to required
 
 7.5.6
  - fixed: events get start/end time even when none specified (also can offset start/end day)
