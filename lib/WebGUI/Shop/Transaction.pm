@@ -9,6 +9,7 @@ use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Paginator;
+use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::TransactionItem;
 

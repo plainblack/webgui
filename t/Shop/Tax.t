@@ -607,7 +607,6 @@ is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items 
 
 $session->user({userId=>3});
 my $json = $taxer->www_getTaxesAsJson();
-diag $json;
 ok($json, 'www_getTaxesAsJson returned something');
 my $jsonTax = JSON::from_json($json);
 cmp_deeply(
@@ -618,9 +617,16 @@ cmp_deeply(
         totalRecords    => 1778,
         recordsReturned => 25,
         dir             => 'desc',
-        records         => array_each({taxId=>ignore, country => 'USA', state=>ignore, city=>ignore, code=>ignore, taxRate=>re('^\d+\.\d+$')}),
+        records         => array_each({
+            taxId=>ignore,
+            country => 'USA',
+            state=>ignore,
+            city=>ignore,
+            code=>ignore,
+            taxRate=>re('^\d+\.\d+$')
+        }),
     },
-    'Check major elements of JSON',
+    'Check major elements of tax JSON',
 );
 
 $taxableDonation->purge;

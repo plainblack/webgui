@@ -225,8 +225,7 @@ sub buildArrayRefOfHashRefs {
 	my $sql = shift;
 	my $params = shift;
 	my $sth = $class->read($sql,$params);
-	my $data;
-	while ($data = $sth->hashRef) {
+	while (my $data = $sth->hashRef) {
 		push(@array,$data);
 	}
 	$sth->finish;
@@ -236,7 +235,47 @@ sub buildArrayRefOfHashRefs {
 
 #-------------------------------------------------------------------
 
-=head2 buildHashRefOfHashRefs ( sql )
+=head2 buildDataTableStructure ( sql, params )
+
+Builds a data structure that can be converted to JSON and sent
+to a YUI Data Table.  This is basically a hash of information about
+the results, with one of the keys being an array ref of hashrefs.  It also
+calculates the total records that could have been matched without a limit
+statement, as well as how many were actually matched.
+
+=head3 sql
+
+An SQL query. The query may select as many columns of data as you wish.  The query
+should contain a SQL_CALC_ROWS_FOUND entry so that the total number of available
+rows can be sent to the Data Table.
+
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
+=cut
+
+sub buildDataTableStructure {
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my %hash;
+    my @array;
+    ##Note, I need a valid statement handle for doing the rows method on.
+	my $sth = $self->read($sql,$params);
+	while (my $data = $sth->hashRef) {
+		push(@array,$data);
+	}
+    $hash{records}         = \@array;
+    $hash{totalRecords}    = $self->quickScalar('select found_rows()') + 0; ##Convert to numeric
+    $hash{recordsReturned} = $sth->rows();
+	$sth->finish;
+	return \%hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 buildHashRefOfHashRefs ( sql, params, key )
 
 Builds a hash reference of hash references of data 
 from a series of rows.  Useful for returning many rows at once.

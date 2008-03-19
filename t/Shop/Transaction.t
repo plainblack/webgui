@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 64;        # Increment this number for each test you create
+plan tests => 66;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -183,12 +183,47 @@ my $icopy = $transaction->getItem($item->getId);
 isa_ok($icopy, "WebGUI::Shop::TransactionItem");
 is($icopy->getId, $item->getId, "items are the same");
 
-# get itmes
+# get items
 is(scalar @{$transaction->getItems}, 1, "can retrieve items");
 
 # delete
 $item->delete;
 is(scalar @{$transaction->getItems}, 0, "can delete items");
+
+#######################################################################
+#
+# www_getTaxesAsJson
+#
+#######################################################################
+
+$session->user({userId=>3});
+my $json = WebGUI::Shop::Transaction->www_getTransactionsAsJson($session);
+ok($json, 'www_getTransactionsAsJson returned something');
+my $jsonTransactions = JSON::from_json($json);
+cmp_deeply(
+    $jsonTransactions,
+    {
+        sort            => undef,
+        startIndex      => 0,
+        totalRecords    => 1,
+        recordsReturned => 1,
+        dir             => 'desc',
+        records         => array_each({
+            orderNumber=>ignore,
+            transactionId=>ignore,
+            transactionCode=>ignore,
+            paymentDriverLabel=>ignore,
+            dateOfPurchase=>ignore,
+            username=>ignore,
+            amount=>ignore,
+            isSuccessful=>ignore,
+            statusCode=>ignore,
+            statusMessage=>ignore,
+        }),
+    },
+    'Check major elements of transaction JSON',
+);
+
 
 $transaction->delete;
 is($session->db->quickScalar("select transactionId from transaction where transactionId=?",[$transaction->getId]), undef, "can delete transactions");
@@ -198,5 +233,5 @@ is($session->db->quickScalar("select transactionId from transaction where transa
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
+    $session->db->write('delete from transaction');
 }
