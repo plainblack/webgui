@@ -26,6 +26,17 @@ This package keeps records of every puchase made.
  use WebGUI::Shop::Transaction;
 
  my $transaction = WebGUI::Shop::Transaction->new($session, $id);
+ 
+ # typical transaction goes like this:
+ my $transaction = WebGUI::Shop::Transaction->create({ cart=>$cart, paymentMethod=>$paymentMethod, paymentAddress=>$address});
+ my ($transactionNumber, $status, $message) = $paymentMethod->tryTransaction;
+ if ($status eq "somekindofsuccess") {
+    $transaction->completePurchase($cart, $transactionNumber, $status, $message);
+ }
+ else {
+    $transaction->denyPurchase($transactionNumber, $status, $message);
+ }
+
 
 =head1 METHODS
 
@@ -52,6 +63,41 @@ sub addItem {
     my ($self, $cartItem) = @_;
     my $item = WebGUI::Shop::TransactionItem->create( $self, $cartItem);
     return $item;
+}
+
+#-------------------------------------------------------------------
+
+=head2 completePurchase ( cart, transactionCode, statusCode, statusMessage )
+
+See also denyPurchase(). Completes a purchase by updating the transaction as a success, and clearing the cart of it's items.
+
+=head3 cart
+
+A reference to the current cart that's full of items just purchased.
+
+=head3 transactionCode
+
+The transaction id or code given by the payment gateway.
+
+=head3 statusCode
+
+The status code that came back from the payment gateway when trying to process the payment.
+
+=head3 statusMessage
+
+The extended status message that came back from the payment gateway when trying to process the payment.
+
+=cut
+
+sub completePurchase {
+    my ($self, $cart, $transactionCode, $statusCode, $statusMessage) = @_;
+    $cart->completePurchase;
+    $self->update({
+        transactionCode => $transactionCode,
+        isSuccessful    => 1,
+        statusCode      => $statusCode,
+        statusMessage   => $statusMessage,
+        });
 }
 
 #-------------------------------------------------------------------
@@ -99,6 +145,36 @@ sub delete {
     $self->session->db->write("delete from transaction where transactionId=?",[$self->getId]);
     undef $self;
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 denyPurchase ( transactionCode, statusCode, statusMessage )
+
+Completes a purchase as a failure. It could be that the user didn't enter their credit cart correctly, or they may have insufficient funds.
+
+=head3 transactionCode
+
+The transaction id or code given by the payment gateway.
+
+=head3 statusCode
+
+The status code that came back from the payment gateway when trying to process the payment.
+
+=head3 statusMessage
+
+The extended status message that came back from the payment gateway when trying to process the payment.
+
+=cut
+
+sub denyPurchase {
+    my ($self, $transactionCode, $statusCode, $statusMessage) = @_;
+    $self->update({
+        isSuccessful    => 0,
+        transactionCode => $transactionCode,
+        statusCode      => $statusCode,
+        statusMessage   => $statusMessage
+        });
 }
 
 #-------------------------------------------------------------------

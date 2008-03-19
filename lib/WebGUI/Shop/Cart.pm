@@ -101,7 +101,7 @@ sub create {
 
 =head2 delete ()
 
-Deletes this cart and all cartItems contained in it.
+Deletes this cart and removes all cartItems contained in it. Also see onCompletePurchase() and empty().
 
 =cut
 
@@ -117,7 +117,7 @@ sub delete {
 
 =head2 empty ()
 
-Removes all items from this cart.
+Removes all items from this cart. Also see onCompletePurchase() and delete().
 
 =cut
 
@@ -318,6 +318,23 @@ sub new {
     $session{ $id }   = $session;
     $properties{ $id } = $cart;
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onCompletePurchase ()
+
+Calls onCompletePurchase() on all the items in the cart. Then deletes all the items in the cart without calling $item->remove() on them which would affect inventory levels. See also delete() and empty().
+
+=cut
+
+sub onCompletePurchase {
+    my $self = shift;
+    foreach my $item (@{$self->getItems}) {
+        $item->getSku->completePurchase($item);
+        $item->delete;
+    }
+    $self->delete;
 }
 
 #-------------------------------------------------------------------

@@ -454,95 +454,88 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
 	%properties = (
-			displayTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'EventManagerTmpl000001',	
-				tab=>"display",
-				namespace=>"EventManagementSystem",
-                		hoverHelp=>$i18n->get('display template description'),
-                		label=>$i18n->get('display template')
-				},
-			checkoutTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'EventManagerTmpl000003',
-				tab=>"display",
-				namespace=>"EventManagementSystem_checkout",
-                		hoverHelp=>$i18n->get('checkout template description'),
-                		label=>$i18n->get('checkout template')
-				},
-			managePurchasesTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'EventManagerTmpl000004',
-				tab=>"display",
-				namespace=>"EventManagementSystem_managePurchas",
-                		hoverHelp=>$i18n->get('manage purchases template description'),
-                		label=>$i18n->get('manage purchases template')
-				},
-			viewPurchaseTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'EventManagerTmpl000005',
-				tab=>"display",
-				namespace=>"EventManagementSystem_viewPurchase",
-                		hoverHelp=>$i18n->get('view purchase template description'),
-                		label=>$i18n->get('view purchase template')
-				},
-			searchTemplateId =>{
-				fieldType=>"template",
-				defaultValue=>'EventManagerTmpl000006',
-				tab=>"display",
-				namespace=>"EventManagementSystem_search",
-                		hoverHelp=>$i18n->get('search template description'),
-                		label=>$i18n->get('search template')
-				},
-            badgePrinterTemplateId => {
-                fieldType       => "template",
-                defaultValue    => "emsbadgeprintout000000",
-                tab             => "display",
-                namespace       => "emsbadgeprint",
-                lable           => "Badge Printer Template",
-                },
-            ticketPrinterTemplateId => {
-                fieldType       => "template",
-                defaultValue    => "emsticketprintout00000",
-                tab             => "display",
-                namespace       => "emsticketprint",
-                lable           => "Ticket Printer Template",
-                },
-			paginateAfter =>{
-				fieldType=>"integer",
-				defaultValue=>10,
-				tab=>"display",
-				hoverHelp=>$i18n->get('paginate after description'),
-				label=>$i18n->get('paginate after')
-				},
-			groupToAddEvents =>{
-				fieldType=>"group",
-				defaultValue=>3,
-				tab=>"security",
-				hoverHelp=>$i18n->get('group to add events description'),
-				label=>$i18n->get('group to add events')
-				},
-			groupToApproveEvents =>{
-				fieldType=>"group",
-				defaultValue=>3,
-				tab=>"security",
-				hoverHelp=>$i18n->get('group to approve events description'),
-				label=>$i18n->get('group to approve events')
-				},
-			globalPrerequisites  =>{
-				fieldType=>"yesNo",
-				defaultValue=>1,
-				tab=>"properties",
-				label=>$i18n->get('global prerequisite'),
-				hoverHelp=>$i18n->get('global prerequisite description')
-				},
-			globalMetadata  =>{
-				fieldType=>"yesNo",
-				defaultValue=>1,
-				tab=>"properties",
-				label=>$i18n->get('global metadata'),
-				hoverHelp=>$i18n->get('global metadata description')
-				},
+		timezone => {
+			fieldType 		=> 'TimeZone',
+			defaultValue 	=> 'America/Chicago',
+			tab				=> 'properties',
+			label			=> $i18n->get('time zone'),
+			hoverHelp		=> $i18n->get('time zone help'),
+		},
+		displayTemplateId =>{
+			fieldType=>"template",
+			defaultValue=>'EventManagerTmpl000001',	
+			tab=>"display",
+			namespace=>"EventManagementSystem",
+			hoverHelp=>$i18n->get('display template description'),
+			label=>$i18n->get('display template')
+			},
+		checkoutTemplateId =>{
+			fieldType=>"template",
+			defaultValue=>'EventManagerTmpl000003',
+			tab=>"display",
+			namespace=>"EventManagementSystem_checkout",
+			hoverHelp=>$i18n->get('checkout template description'),
+			label=>$i18n->get('checkout template')
+			},
+		managePurchasesTemplateId =>{
+			fieldType=>"template",
+			defaultValue=>'EventManagerTmpl000004',
+			tab=>"display",
+			namespace=>"EventManagementSystem_managePurchas",
+			hoverHelp=>$i18n->get('manage purchases template description'),
+			label=>$i18n->get('manage purchases template')
+			},
+		viewPurchaseTemplateId =>{
+			fieldType=>"template",
+			defaultValue=>'EventManagerTmpl000005',
+			tab=>"display",
+			namespace=>"EventManagementSystem_viewPurchase",
+			hoverHelp=>$i18n->get('view purchase template description'),
+			label=>$i18n->get('view purchase template')
+			},
+		searchTemplateId =>{
+			fieldType=>"template",
+			defaultValue=>'EventManagerTmpl000006',
+			tab=>"display",
+			namespace=>"EventManagementSystem_search",
+			hoverHelp=>$i18n->get('search template description'),
+			label=>$i18n->get('search template')
+			},
+		badgePrinterTemplateId => {
+			fieldType       => "template",
+			defaultValue    => "emsbadgeprintout000000",
+			tab             => "display",
+			namespace       => "emsbadgeprint",
+			lable           => "Badge Printer Template",
+			},
+		ticketPrinterTemplateId => {
+			fieldType       => "template",
+			defaultValue    => "emsticketprintout00000",
+			tab             => "display",
+			namespace       => "emsticketprint",
+			lable           => "Ticket Printer Template",
+			},
+		paginateAfter =>{
+			fieldType=>"integer",
+			defaultValue=>10,
+			tab=>"display",
+			hoverHelp=>$i18n->get('paginate after description'),
+			label=>$i18n->get('paginate after')
+			},
+		groupToAddEvents =>{
+			fieldType=>"group",
+			defaultValue=>3,
+			tab=>"security",
+			hoverHelp=>$i18n->get('group to add events description'),
+			label=>$i18n->get('group to add events')
+			},
+		groupToApproveEvents =>{
+			fieldType=>"group",
+			defaultValue=>3,
+			tab=>"security",
+			hoverHelp=>$i18n->get('group to approve events description'),
+			label=>$i18n->get('group to approve events')
+			},
 		);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -4114,8 +4107,29 @@ $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$master
 	return $self->processStyle($self->processTemplate(\%var,$self->getValue("searchTemplateId")));
 }
 
+
 #-------------------------------------------------------------------
 sub view {
+	my ($self) = @_;
+	my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
+
+	# set up objects we'll need
+	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
+	my %var = ();
+	
+	# get our badges
+	foreach my $badge (@{$self->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::Sku::EMSBadge"]})}) {
+		push(@{$var{availableBadges}}, $self->get);
+		$var{availableBadges}[-1]{isFull} = $badge->getQuantityAvailable;
+		$var{availableBadges}[-1]{url} = $badge->getUrl;
+	}
+	
+	
+}
+
+#-------------------------------------------------------------------
+sub viewOLD {
 	my $self = shift;
 	my %var;
 	return $self->session->privilege->noAccess() unless $self->canView;

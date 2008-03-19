@@ -65,8 +65,23 @@ sub create {
     $cart->session->db->write('insert into cartItem (quantity, cartId, assetId, itemId, dateAdded) values (1,?,?,?,now())', [$cart->getId, $sku->getId, $itemId]);
     my $self = $class->new($cart, $itemId);
     $self->update({asset=>$sku});
-    $sku->adjustQuantityAvailable(-1);
+    $sku->onAdjustQuantityInCart($self, 1);
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 delete ( )
+
+Removes this item from the cart without calling $sku->onRemoveFromCart which would adjust inventory levels. See also remove().
+
+=cut
+
+sub delete {
+    my $self = shift;
+    $self->cart->session->db->deleteRow("cartItem","itemId",$self->getId);
+    undef $self;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -204,15 +219,14 @@ sub new {
 
 =head2 remove ( )
 
-Removes this item from the cart.
+Removes this item from the cart and calls $sku->onRemoveFromCart. See also delete().
 
 =cut
 
 sub remove {
     my $self = shift;
-    $self->cart->session->db->deleteRow("cartItem","itemId",$self->getId);
-    undef $self;
-    return undef;
+    $self->getSku->onRemoveFromCart($self);
+    return $self->delete;
 }
 
 
@@ -229,18 +243,18 @@ The number to set the quantity to. Zero or less will remove the item from cart.
 =cut
 
 sub setQuantity {
-    my ($self, $quantity) = @_;
+    my ($self, $newQuantity) = @_;
     my $id = id $self;
     my $currentQuantity = $self->get("quantity");
-    if ($quantity > $self->getSku->getMaxAllowedInCart) {
+    if ($newQuantity > $self->getSku->getMaxAllowedInCart) {
         WebGUI::Error::Shop::MaxOfItemInCartReached->throw(error=>"Cannot have that many of this item in cart.");
     }
-    if ($quantity <= 0) {
+    if ($newQuantity <= 0) {
         return $self->remove;
     }
-    $properties{$id}{quantity} = $quantity;
-    $self->getSku->adjustQuantityAvailable($currentQuantity + $quantity);
+    $properties{$id}{quantity} = $newQuantity;
     $self->cart->session->db->setRow("cartItem","itemId", $properties{$id});
+    $self->getSku->onAdjustQuantityInCart($self, $newQuantity - $currentQuantity);
 }
 
 #-------------------------------------------------------------------

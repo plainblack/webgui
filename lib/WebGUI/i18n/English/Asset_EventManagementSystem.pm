@@ -2,13 +2,86 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = { ##hashref of hashes
+			 
+	'is required' => {
+		message 	=> q|%s is required.|,
+		lastUpdated	=> 0,
+		context		=> q|used in an error message|,
+	},
+	
+	'email address' => {
+		message 	=> q|Email Address|,
+		lastUpdated	=> 0,
+		context		=> q|form label|,
+	},
+	
+	'organization' => {
+		message 	=> q|Organization|,
+		lastUpdated	=> 0,
+		context		=> q|form label for company/school/etc|,
+	},
+	
+	'badge holder information' => {
+		message 	=> q|Badge Holder Information|,
+		lastUpdated	=> 0,
+		context		=> q|heading on add badge to cart screen|,
+	},
+	
+	'add to cart' => {
+		message 	=> q|Add To Cart|,
+		lastUpdated	=> 0,
+		context		=> q|a button on the add badge to cart screen|,
+	},
+	
+	'populate from address book' => {
+		message 	=> q|Populate From Address Book|,
+		lastUpdated	=> 0,
+		context		=> q|a button on the add badge to cart screen|,
+	},
+
+	'related badges' => {
+		message 	=> q|Related Badges|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'related badges help' => {
+		message 	=> q|Check the badges that can act as a prerequisite to being able to attend this event.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'event number' => {
+		message 	=> q|Event Number|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'event number help' => {
+		message 	=> q|A number that represents the event, which is easily referenceable for things like event catalogs.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'time zone' => {
+		message 	=> q|Time Zone|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'time zone help' => {
+		message 	=> q|Select the time zone that this event will be taking place in.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
 	'cancel registration' => {
 		message => q|Cancel Registration|,
 		lastUpdated => 0,
 		context => q|Label for hyperlink asking user if they wish to cancel the registration process during checkout.|,
 	},
 
-        'search template' => { 
+    'search template' => { 
 		message => q|Search Template|,
 		lastUpdated => 1131394070,
 		context => q|Field label for template selector|
@@ -172,8 +245,15 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'price' => {
-		message => q|Price|,
+		message 	=> q|Price|,
 		lastUpdated => 1138312761,
+		context		=> q|field label|,
+	},
+	
+	'price help' => {
+		message		=> q|How much do you want to charge for this item?|,
+		lastUpdated	=> 0,
+		context		=> q|field label help|,
 	},
 
 	'add/edit event price description' => {
@@ -191,20 +271,10 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1160109886,
 	},
 
-	'add/edit event maximum attendees' => {
-		message => q|Maximum Attendees|,
-		lastUpdated => 1138312761,
-	},
-
 	'add/edit approve event' => {
 		message => q|Approve Event|,
 		lastUpdated => 1138312761,
 		context => q|URL to approve an event in the Add/Edit Event form|,
-	},
-
-	'add/edit event maximum attendees description' => {
-		message => q|Based on room size, chairs, staffing and other requirements, the number of people who can attend the event.|,
-		lastUpdated => 1138899055,
 	},
 
 	'add/edit event required events' => {
@@ -282,16 +352,6 @@ our $I18N = { ##hashref of hashes
 	'event' => {
 		message => q|Event|,
 		lastUpdated => 1138904660,
-	},
-
-	'global prerequisite' => {
-		message => q|Global Prerequisites|,
-		lastUpdated => 1138312761,
-	},
-
-	'global prerequisite description' => {
-		message => q|When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance of the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.|,
-		lastUpdated => 1165364300,
 	},
 
 	'price must be greater than zero' => {
@@ -510,7 +570,7 @@ our $I18N = { ##hashref of hashes
 		context => q|When a required field is empty/blank, then this message is used in sprintf to tell the user which field it is and that it cannot be blank|,
 	},
 
-	'add to cart' => {
+	'add to badge' => {
 		message => q|Add To Badge|,
 		lastUpdated => 1140466438,
 		context => q|Label to invite the user to purchase this event and add it to their shopping cart.|,
@@ -987,18 +1047,21 @@ by setting the "hide" form variable.|,
 	},
 
 	'assetName' => {
-		message => q|Event Manager (beta)|,
+		message 	=> q|Event Manager (beta)|,
 		lastUpdated => 1131394072,
+		context		=> q|name of asset|,
 	},
 
-	'global metadata' => {
-		message => q|Use Global Event Metadata|,
-		lastUpdated => 1140469381,
+	'ems badge' => {
+		message 	=> q|Event Manager Badge|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
 	},
 
-	'global metadata description' => {
-		message => q|Whether or not to use all other Event Management Systems Metadata Fields when assigning metadata to events and searching for events.<br /><br />The management screen list of metadata fields for this asset will still remain limited to those created by this EMS asset.<br />|,
-		lastUpdated => 1140469381,
+	'ems ticket' => {
+		message 	=> q|Event Manager Ticket|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
 	},
 
 	'type name here' => {
@@ -1017,8 +1080,8 @@ by setting the "hide" form variable.|,
 	},
 
 	'confirm delete event metadata' => {
-		message => q|Are you certain you want to delete this metadata field?  The metadata values for this field will be deleted from all events, including events in other EMS wobjects that are set to use global metadata.|,
-		lastUpdated => 1140469381,
+		message => q|Are you certain you want to delete this metadata field?  The metadata values for this field will be deleted from all events.|,
+		lastUpdated => 1205860492,
 	},
 
 	'manage purchases' => {
@@ -1105,8 +1168,15 @@ by setting the "hide" form variable.|,
 	},
 
 	'seats available' => {
-		message => q|Seats Available|,
+		message 	=> q|Seats Available|,
 		lastUpdated => 1145400186,
+		context		=> q|field label|,
+	},
+
+	'seats available help' => {
+		message 	=> q|How many people may purchase this item before you run out of room?|,
+		lastUpdated => 0,
+		context		=> q|field label help|,
 	},
 
 	'missing prerequisites message' => {

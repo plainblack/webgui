@@ -36,8 +36,64 @@ addAddressBook($session);
 insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
 convertTransactionLog($session);
+upgradeEMS($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub upgradeEMS {
+	my $session = shift;
+	print "\tUpgrading Event Manager\n" unless ($quiet);
+	my $db = $session->db;
+	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default value 'America/Chicago'");
+	$db->write("alter table EventManagementSystem drop column globalMetadata");
+	$db->write("alter table EventManagementSystem drop column globalPrerequisites");
+	$db->write("create table EMSRegistrant (
+		badgeId varchar(22) binary not null primary key,
+		userId varchar(22) binary,
+		badgeNumber int not null auto_increment unique,
+		badgeAssetId varchar(22) binary not null,
+		emsAssetId varchar(22) binary not null,
+		name varchar(35) binary not null,
+		address1 varchar(35),
+		address2 varchar(35),
+		address3 varchar(35),
+		city varchar(35),
+		state varchar(35),
+		zipcode varchar(35),
+		country varchar(35),
+		phoneNumber varchar(35),
+		organization varchar(35),
+		email varchar(255),
+		purchaseComplete boolean,
+		index badgeAssetId_purchaseComplete (badgeAssetId,purcahseComplete)
+		)");
+	$db->write("create table EMSRegistrantTicket (
+		badgeId varchar(22) binary not null primary key,
+		ticketAssetId varchar(22) binary not null,
+		purchaseComplete boolean,
+		index ticketAssetId_purchaseComplete (ticketAssetId,purchaseComplete)
+		)");
+	$db->write("create table EMSBadge (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		price float not null default 0.00,
+		seatsAvailable int not null default 100,
+		primary key (assetId, revisionDate)
+		)");
+	$db->write("insert into incrementer values ('EMSBadgeNumber', 1)");
+	$db->write("create table EMSTicket (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		price float not null default 0.00,
+		seatsAvailable int not null default 100,
+		startDate datetime,
+		endDate datetTime,
+		eventNumber int,
+		relatedBadges mediumtext,
+		primary key (assetId, revisionDate)
+		)");
+}
 
 #-------------------------------------------------
 sub convertTransactionLog {
