@@ -2016,6 +2016,22 @@ sub processTemplate {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 processStyle ( html )
+
+Returns some HTML wrappered in a style. Should be overridden by subclasses, because this one actually doesn't do anything other than return the html back to you.
+
+=head3 html
+
+The content to wrap up.
+
+=cut
+
+sub processStyle {
+	my ($self, $output) = @_;
+	return $output;
+}
 
 #-------------------------------------------------------------------
 

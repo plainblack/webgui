@@ -17,7 +17,7 @@ package WebGUI::Asset::Sku;
 use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
-
+use WebGUI::Shop::Cart;
 
 
 =head1 NAME
@@ -159,7 +159,13 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getCart ( ) {
+=head2 getCart ( )
+
+Returns a reference to the current session's cart.
+
+=cut
+
+sub getCart {
 	my $self = shift;
 	return WebGUI::Shop::Cart->getCartBySession($self->session);
 }

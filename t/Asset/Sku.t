@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 19;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -47,17 +47,30 @@ $sku->applyOptions({
         test1   => "YY"
         });
 
-my %options = $sku->getOptions;
-is($options{test1}, "YY", "Can set and get an option.");
+my $options = $sku->getOptions;
+is($options->{test1}, "YY", "Can set and get an option.");
 
 
 is($sku->getMaxAllowedInCart, 99999999, "Got a valid default max in cart.");
+is($sku->getQuantityAvailable, 99999999, "skus should have an unlimited quantity by default");
+is($sku->getQuantityAvailable, $sku->getMaxAllowedInCart, "quantity available and max allowed in cart should be the same");
 is($sku->getPrice, 0.00, "Got a valid default price.");
 is($sku->getWeight, 0, "Got a valid default weight.");
 is($sku->getTaxRate, undef, "Tax rate is not overridden.");
 $sku->update({overrideTaxRate=>1, taxRateOverride=>5});
 is($sku->getTaxRate, 5, "Tax rate is overridden.");
 isnt($sku->processStyle, "", "Got some style information.");
+is($sku->onAdjustQuantityInCart, undef, "onAdjustQuantityInCart should exist and return undef");
+is($sku->onCompletePurchase, undef, "onCompletePurchase should exist and return undef");
+is($sku->onRemoveFromCart, undef, "onRemoveFromCart should exist and return undef");
+is($sku->isRecurring, 0, "skus are not recurring by default");
+is($sku->isShippingRequired, 0, "skus are not shippable by default");
+is($sku->getConfiguredTitle, $sku->getTitle, "configured title and title should be the same by default");
+
+isa_ok($sku->getCart, "WebGUI::Shop::Cart", "can get a cart object");
+my $item = $sku->addToCart;
+isa_ok($item, "WebGUI::Shop::CartItem", "can add to cart");
+$item->cart->delete;
 
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
