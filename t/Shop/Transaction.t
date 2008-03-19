@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 66;        # Increment this number for each test you create
+plan tests => 70;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -224,6 +224,14 @@ cmp_deeply(
     },
     'Check major elements of transaction JSON',
 );
+
+TODO: {
+    local $TODO = 'More getTaxesAsJson tests';
+    ok(0, 'test group privileges to this method');
+    ok(0, 'test startIndex variable');
+    ok(0, 'test results form variable');
+    ok(0, 'test keywords');
+}
 
 
 $transaction->delete;

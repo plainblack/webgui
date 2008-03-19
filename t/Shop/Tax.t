@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 75 + 2*scalar(@{$addExceptions});
+my $tests = 79 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -628,6 +628,14 @@ cmp_deeply(
     },
     'Check major elements of tax JSON',
 );
+
+TODO: {
+    local $TODO = 'More getTaxesAsJson tests';
+    ok(0, 'test group privileges to this method');
+    ok(0, 'test startIndex variable');
+    ok(0, 'test results form variable');
+    ok(0, 'test keywords');
+}
 
 $taxableDonation->purge;
 $taxFreeDonation->purge;
