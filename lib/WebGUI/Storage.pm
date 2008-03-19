@@ -116,11 +116,34 @@ sub _makePath {
 	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->getFileId) {
 		$node .= '/'.$folder;
 		unless (-e $node) { # check to see if it already exists
-			unless (mkdir($node)) { # check to see if there was an error during creation
+			if (mkdir($node)) { # check to see if there was an error during creation
+                $self->_changeOwner($node);
+            }
+            else {
 				$self->_addError("Couldn't create storage location: $node : $!");
 			}
 		}
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 _changeOwner ( )
+
+Changes the owner to be the same as that of the uploads directory
+
+NOTE: This is a private method and should never be called except internally to this package.
+
+=cut
+
+sub _changeOwner {
+    my $self = shift;
+    # Don't change owner if we're on windows or not the superuser
+    return
+        if ($^O eq 'MSWin32' || $> != 0);
+    my $uploads = $self->session->config->get("uploadsPath");
+    my ($uid, $gid) = (stat($uploads))[4,5];
+    chown $uid, $gid, @_;
 }
 
 #-------------------------------------------------------------------
@@ -161,6 +184,7 @@ sub addFileFromFilesystem {
                                         binmode($dest);
                                         cp($source,$dest) or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
                                         $dest->close;
+                                        $self->_changeOwner($self->getPath($filename));
                                 } else {
                                         $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
                                         $filename = undef;
@@ -228,6 +252,7 @@ sub addFileFromFormPost {
 				print $file $buffer;
 			}
 			close($file);
+            $self->_changeOwner($self->getPath($filename));
                         $self->session->errorHandler->info("Got ".$upload->filename);
 		} else {
 			$self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
@@ -259,7 +284,8 @@ sub addFileFromHashref {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
 	my $hashref = shift;
-        nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
+    nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
+    $self->_changeOwner($self->getPath($filename));
 	return $filename;
 }
 
@@ -286,6 +312,7 @@ sub addFileFromScalar {
 	if (open(my $FILE,">",$self->getPath($filename))) {
 		print $FILE $content;
 		close($FILE);
+        $self->_changeOwner($self->getPath($filename));
 	} else {
         	$self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
 	}
@@ -338,6 +365,7 @@ sub copy {
                         	binmode($dest);
                         	cp($source,$dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
                         	$dest->close;
+                        $newStorage->_changeOwner($newStorage->getPath($file));
                 	}
                 	$source->close;
         	}
@@ -366,6 +394,7 @@ sub copyFile {
 
     cp( $self->getPath($filename), $self->getPath($newFilename) )
         || croak "Couldn't copy '$filename' to '$newFilename': $!";
+    $self->_changeOwner($self->getPath($filename));
 
     return undef;
 }
