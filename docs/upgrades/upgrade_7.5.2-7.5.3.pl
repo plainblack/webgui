@@ -45,7 +45,7 @@ sub upgradeEMS {
 	my $session = shift;
 	print "\tUpgrading Event Manager\n" unless ($quiet);
 	my $db = $session->db;
-	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default value 'America/Chicago'");
+	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem drop column globalMetadata");
 	$db->write("alter table EventManagementSystem drop column globalPrerequisites");
 	$db->write("create table EMSRegistrant (
@@ -66,7 +66,7 @@ sub upgradeEMS {
 		organization varchar(35),
 		email varchar(255),
 		purchaseComplete boolean,
-		index badgeAssetId_purchaseComplete (badgeAssetId,purcahseComplete)
+		index badgeAssetId_purchaseComplete (badgeAssetId,purchaseComplete)
 		)");
 	$db->write("create table EMSRegistrantTicket (
 		badgeId varchar(22) binary not null primary key,
@@ -88,7 +88,7 @@ sub upgradeEMS {
 		price float not null default 0.00,
 		seatsAvailable int not null default 100,
 		startDate datetime,
-		endDate datetTime,
+		endDate datetime,
 		eventNumber int,
 		relatedBadges mediumtext,
 		primary key (assetId, revisionDate)
