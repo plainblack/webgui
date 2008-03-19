@@ -21,6 +21,8 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Shop::Cart;
+use WebGUI::TestException;
+
 
 #----------------------------------------------------------------------------
 # Init
@@ -30,10 +32,20 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 19;        # Increment this number for each test you create
+plan tests => 20;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
+
+throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->newBySession(); }, 
+    'WebGUI::Error::InvalidObject', 
+    {
+        error       => 'Needs a session.',
+        got         => '',
+        expected    => 'WebGUI::Session',
+    },
+    'newBySession takes an exception to not giving it a session variable'
+);
 
 my $cart = WebGUI::Shop::Cart->getCartBySession($session);
 

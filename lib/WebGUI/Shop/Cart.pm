@@ -51,6 +51,9 @@ A reference to a subclass of WebGUI::Asset::Sku.
 
 sub addItem {
     my ($self, $sku) = @_;
+    unless (defined $sku && $sku->isa("WebGUI::Asset::Sku")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Asset::Sku", got=>(ref $sku), error=>"Need a sku.");
+    }
     my $item = WebGUI::Shop::CartItem->create( $self, $sku);
     return $item;
 }
@@ -142,6 +145,9 @@ The number to format.
 
 sub formatCurrency {
     my ($self, $amount) = @_;
+    unless (defined $amount) {
+        WebGUI::Error::InvalidParam->throw(error=>"Need an amount.");
+    }
     return sprintf("%.2f", $amount);
 }
 
@@ -181,9 +187,13 @@ sub getAddressBook {
 
 #-------------------------------------------------------------------
 
-=head2 getCartBySession ()
+=head2 getCartBySession ( session )
 
 Class method that figures out if the user has a cart in their session. If they do it returns it. If they don't it creates it and returns it.
+
+=head3 session
+
+A reference to the current session.
 
 =cut
 
@@ -224,6 +234,9 @@ The id of the item to retrieve.
 
 sub getItem {
     my ($self, $itemId) = @_;
+    unless (defined $itemId && $itemId =~ m/^[A-Za-z0-9_-]{22}$/) {
+        WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
+    }
     return WebGUI::Shop::CartItem->new($self, $itemId);
 }
 
@@ -306,7 +319,7 @@ sub new {
     unless (defined $session && $session->isa("WebGUI::Session")) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
-    unless (defined $cartId) {
+    unless (defined $cartId && $cartId =~ m/^[A-Za-z0-9_-]{22}$/) {
         WebGUI::Error::InvalidParam->throw(error=>"Need a cartId.");
     }
     my $cart = $session->db->quickHashRef('select * from cart where cartId=?', [$cartId]);
@@ -363,6 +376,9 @@ The unique id of the configured shipping driver that will be used to ship these 
 
 sub update {
     my ($self, $newProperties) = @_;
+    unless (defined $newProperties && ref $newProperties eq 'HASH') {
+        WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
+    }
     my $id = id $self;
     foreach my $field (qw(couponId shippingAddressId shipperId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
