@@ -29,6 +29,27 @@ These subroutines are available from this package:
 readonly cart => my %cart;
 private properties => my %properties;
 
+
+#-------------------------------------------------------------------
+
+=head2 adjustQuantity ( [ quantity ] )
+
+Increments quantity of item by one. Returns the quantity of this item in the cart.
+
+=head3 quantity
+
+If specified may increment quantity by more than one. Specify a negative number to decrement quantity. If the quantity ever reaches 0 or lower, the item will be removed from the cart.
+
+=cut
+
+sub adjustQuantity {
+    my ($self, $quantity) = @_;
+    $quantity ||= 1;
+    $self->setQuantity($quantity + $self->get("quantity"));
+    return $self->get("quantity");
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 cart ( )
@@ -156,25 +177,6 @@ sub getSku {
     return $asset;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 incrementQuantity ( [ quantity ] )
-
-Increments quantity of item by one. Returns the quantity of this item in the cart.
-
-=head3 quantity
-
-If specified may increment quantity by more than one. Specify a negative number to decrement quantity. If the quantity ever reaches 0 or lower, the item will be removed from the cart.
-
-=cut
-
-sub incrementQuantity {
-    my ($self, $quantity) = @_;
-    $quantity ||= 1;
-    $self->setQuantity($quantity + $self->get("quantity"));
-    return $self->get("quantity");
-}
 
 
 #-------------------------------------------------------------------
