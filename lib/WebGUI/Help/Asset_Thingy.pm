@@ -7,10 +7,10 @@ our $HELP = {
         fields => [],
         isa    => [
             {   namespace => "Asset_Thingy",
-                tag       => "thingy asset template variables"
+                tag       => "thingy asset template variables",
             },
             {   namespace => "Asset_Template",
-                tag       => "template variables"
+                tag       => "template variables",
             },
         ],
          variables => [
@@ -30,15 +30,15 @@ our $HELP = {
         ],
         related => [
             {   tag       => 'edit thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'view thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'search thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
-        ]
+        ],
     },
 
   'edit thing template' => {
@@ -47,10 +47,10 @@ our $HELP = {
         fields => [],
         isa    => [
             {   namespace => "Asset_Thingy",
-                tag       => "thingy asset template variables"
+                tag       => "thingy asset template variables",
             },
             {   namespace => "Asset_Template",
-                tag       => "template variables"
+                tag       => "template variables",
             },
         ],
          variables => [
@@ -76,26 +76,26 @@ our $HELP = {
                 ]
             },
             {   'required' => 1,
-                'name'     => 'form_start'
+                'name'     => 'form_start',
             },
             {   'required' => 1,
-                'name'     => 'form_submit'
+                'name'     => 'form_submit',
             },
             {   'required' => 1,
-                'name'     => 'form_end'
+                'name'     => 'form_end',
             }
         ],
         related => [
             {   tag       => 'thingy template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'view thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'search thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
-        ]
+        ],
     },
 
     'view thing template' => {
@@ -103,10 +103,10 @@ our $HELP = {
         body  => '',
         isa   => [
             {   namespace => "Asset_Thingy",
-                tag       => "thingy asset template variables"
+                tag       => "thingy asset template variables",
             },
             {   namespace => "Asset_Template",
-                tag       => "template variables"
+                tag       => "template variables",
             },
         ],
         fields    => [],
@@ -130,13 +130,13 @@ our $HELP = {
         ],
         related => [
             {   tag       => 'edit thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'search thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'thingy template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
         ]
     },
@@ -147,16 +147,16 @@ our $HELP = {
         fields => [],
         isa    => [
             {   namespace => "Asset_Thingy",
-                tag       => "thingy asset template variables"
+                tag       => "thingy asset template variables",
             },
             {   namespace => "Asset_Template",
-                tag       => "template variables"
+                tag       => "template variables",
             },
         ],
          variables => [
             { 'name' => 'add_url' },
             { 'name' => 'import_url' },
-            { 'name' => 'export_url' },            
+            { 'name' => 'export_url' },
             { 'name' => 'searchScreenTitle' },
             { 'name' => 'searchDescription' },
             {   'name'      => 'searchFields_loop',
@@ -169,13 +169,13 @@ our $HELP = {
                 ]
             },
             {   'required' => 1,
-                'name'     => 'form_start'
+                'name'     => 'form_start',
             },
             {   'required' => 1,
-                'name'     => 'form_submit'
+                'name'     => 'form_submit',
             },
             {   'required' => 1,
-                'name'     => 'form_end'
+                'name'     => 'form_end',
             },
             {   'name'      => 'displayInSearchFields_loop',
                 'variables' => [
@@ -201,24 +201,24 @@ our $HELP = {
         ],
         related => [
             {   tag       => 'edit thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'view thing template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
             {   tag       => 'thingy template',
-                namespace => 'Asset_Thingy'
+                namespace => 'Asset_Thingy',
             },
-        ]
+        ],
     },
 
     'thingy asset template variables' => {
         private => 1,
-        title   => 'data form asset template variables title',
-        body    => 'data form asset template variables body',
+        title   => 'thingy asset template variables title',
+        body    => 'thingy asset template variables body',
         isa     => [
             {   namespace => "Asset_Wobject",
-                tag       => "wobject template variables"
+                tag       => "wobject template variables",
             },
         ],
         fields    => [],
@@ -227,8 +227,9 @@ our $HELP = {
             { 'name' => 'manage_url' },
             { 'name' => 'addThing_url' },
         ],
-        related => []
+        related => [],
     },
 };
 
 1;
+

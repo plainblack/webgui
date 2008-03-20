@@ -1,32 +1,31 @@
 package WebGUI::i18n::English::Asset_Thingy;
 
 our $I18N = {
+    'cache timeout' => {
+        message => q|Cache Timeout|,
+        lastUpdated => 0,
+    },
 
-	'cache timeout' => {
-		message => q|Cache Timeout|,
-		lastUpdated => 0
-		},
+    'cache timeout help' => {
+        message => q|Since all users will see this asset the same way, we can cache it for long periods of time to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
+        lastUpdated => 0,
+    },
 
-	'cache timeout help' => {
-		message => q|Since all users will see this asset the same way, we can cache it for long periods of time to increase performance. How long should we cache it?<br /> <br /><b>UI Level: 8</b>|,
-		lastUpdated => 0
-		},
-
-	'assetName' => {
-		message => q|Thingy|,
-        	lastUpdated => 1128830080,
-		context => 'Default name of all snippets'
-	},
+    'assetName' => {
+        message => q|Thingy|,
+        lastUpdated => 1128830080,
+        context => 'Default name of all snippets',
+    },
 
     'template_label' => {
         message => q|Thingy List Template|,
-            lastUpdated => 1121703035,
+        lastUpdated => 1121703035,
     },
-            
-	'add thing label' => {
-		message => q|Add Thing|,
-        	lastUpdated => 1104630516,
-	},
+
+    'add thing label' => {
+        message => q|Add Thing|,
+        lastUpdated => 1104630516,
+    },
 
     'default thing label' => {
         message => q|Default Thing|,
@@ -42,7 +41,7 @@ our $I18N = {
         message => q|Are you sure you want to delete this Thing and all data in it? This is not versioned and can not be undone.|,
         lastUpdated => 1104630516,
     },
-   
+
     'delete thing data warning' => {
         message => q|Are you sure you want to delete this thing? This is not versioned and cannot be undone.|,
         lastUpdated => 1104630516,
@@ -75,6 +74,11 @@ our $I18N = {
 
     'thing name label' => {
         message => q|Thing Name|,
+        lastUpdated => 1104630516,
+    },
+
+    'thing name description' => {
+        message => q|A human readable name for this thing.|,
         lastUpdated => 1104630516,
     },
 
@@ -422,7 +426,12 @@ our $I18N = {
     'default value description' => {
         message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
         lastUpdated => 1119156590,
-        },
+    },
+
+    'default value subtext' => {
+        message => q|One per line.|,
+        lastUpdated => 1206025720,
+    },
 
     'subtext label' => {
         message => q|Subtext|,
@@ -501,7 +510,7 @@ our $I18N = {
         message => q|Vertical|,
         lastUpdated => 1104630516,
     },
-        
+
     'vertical description' => {
         message => q|This property controls whether radio buttons and checklists are laid out horizontally or
 vertically.|,
@@ -568,6 +577,11 @@ you wish to appear, one per line.|,
     'thingy template label' => {
         message => q|Thingy Template|,
         lastUpdated => 1104630516,
+    },
+
+    'thingy template description' => {
+        message => q|Choose a template for your thingy.|,
+        lastUpdated => 1206026038,
     },
 
     'view thing template label' => {
@@ -876,6 +890,16 @@ search has been done.|,
     'no field values message' => {
         message => q|Field does not have any values.|,
         lastUpdated => 1104630516,
+    },
+
+    'thingy asset template variables title' => {
+        message => q|Thingy Asset Template Variables|,
+        lastUpdated => 1164910794,
+    },
+
+    'thingy asset template variables body' => {
+        message => q|Every asset provides a set of variables to most of its templates based on the internal asset properties.  Some of these variables may be useful, others may not.|,
+        lastUpdated => 1164910794,
     },
 };
 
