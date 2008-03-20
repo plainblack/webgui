@@ -442,6 +442,23 @@ our $I18N = {
         context     => 'Body text explaining what kinds of archives can be submitted',
     },
 
+    'template delete message' => {
+        message     => q{Are you sure you wish to delete this gallery?},
+        lastUpdated => 0,
+        context     => q{The message for the delete page},
+    },
+
+    'template delete no' => {
+        message     => q{No},
+        lastUpdated => 0,
+        context     => q{Label for button to cancel the delete},
+    },
+
+    'template delete yes' => {
+        message     => q{Yes},
+        lastUpdated => 0,
+        context     => q{Label for button to confirm the delete},
+    },
 };
 
 1;

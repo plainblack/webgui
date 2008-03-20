@@ -3,7 +3,7 @@ use lib "../lib";
 use strict;
 use Getopt::Long;
 use Pod::Usage;
-use WebGUI::Asset::Wobject::Gallery::Utility;
+use WebGUI::Utility::Gallery;
 use WebGUI::Session;
 
 my $session = start();
@@ -11,7 +11,7 @@ my $session = start();
 my $collab      = getCollaborationFromArgs();
 my $gallery     = getGalleryFromArgs();
 
-WebGUI::Asset::Wobject::Gallery::Utility->addAlbumFromCollaboration( $gallery, $collab );
+WebGUI::Utility::Gallery->addAlbumFromCollaboration( $gallery, $collab );
 
 finish($session);
 
@@ -133,4 +133,4 @@ The WebGUI config file to use.
 =head1 DESCRIPTION
 
 This script migrates a collaboration system's threads into gallery albums. It
-uses C<WebGUI::Asset::Wobject::Gallery::Utility> for its major features.
+uses C<WebGUI::Utility::Gallery> for its major features.

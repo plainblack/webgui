@@ -67,7 +67,7 @@ cmp_deeply(
 );
 
 ok(
-    -e $storage->getPath($gallery->get('imageResolutions') . '.jpg'),
+    -e $storage->getPath($gallery->getImageResolutions->[0] . '.jpg'),
     "Generated resolution file exists on the filesystem",
 );
 

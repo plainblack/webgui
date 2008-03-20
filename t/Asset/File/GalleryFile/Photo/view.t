@@ -18,7 +18,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Test::Maker::HTML;
+use Test::Deep;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
@@ -27,10 +27,11 @@ my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Photo Test"});
-my $maker           = WebGUI::Test::Maker::HTML->new;
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
+        groupIdAddComment   => 7,   # Everyone
+        groupIdAddFile      => 2,   # Registered Users
     });
 my $album
     = $gallery->addChild({
@@ -44,6 +45,7 @@ my $album
 my $photo
     = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
+        ownerUserId         => 3,
     },
     undef,
     undef,
@@ -57,10 +59,47 @@ $photo->setFile( WebGUI::Test->getTestCollateralPath('page_title.jpg') );
 # Tests
 plan tests => 1;
 
-TODO: {
-    local $TODO = "Write some tests";
-    ok(0, 'No tests here, move on');
+#----------------------------------------------------------------------------
+# Test getTemplateVars
+$session->user( { userId => 1 } );
+my $testTemplateVars    = {
+    %{ $photo->get },
+    synopsis            => '',      # Synopsis is not undef, is changed to empty string
+    canComment          => bool( 1 ),
+    canEdit             => bool( 0 ),
+    ownerUsername       => WebGUI::User->new( $session, 3 )->username,
+    url                 => $photo->getUrl,
+    url_addArchive      => $album->getUrl('func=addArchive'),
+    url_delete          => $photo->getUrl('func=delete'),
+    url_demote          => $photo->getUrl('func=demote'),
+    url_edit            => $photo->getUrl('func=edit'),
+    url_gallery         => $gallery->getUrl,
+    url_makeShortcut    => $photo->getUrl('func=makeShortcut'),
+    url_listFilesForOwner
+        => $gallery->getUrl('func=listFilesForUser;userId=3'),
+    url_promote         => $photo->getUrl('func=promote'),
+    fileUrl             => $photo->getFileUrl,
+    thumbnailUrl        => $photo->getThumbnailUrl,
+    numberOfComments    => scalar @{ $photo->getCommentIds },
+    resolutions_loop    => ignore(), # Tested elsewhere
+    exifLoop            => ignore(), # Tested elsewhere
+    # Gallery stuff
+    url_search          => $gallery->getUrl('func=search'),
+    url_listFilesForCurrentUser    => $gallery->getUrl('func=listFilesForUser'),
+
+};
+# Ignore all EXIF tags
+for my $tag ( keys %{ $photo->getExifData } ) {
+    $testTemplateVars->{ 'exif_' . $tag } = ignore();
 }
+# Add search vars
+$gallery->appendTemplateVarsSearchForm( $testTemplateVars );
+
+cmp_deeply(
+    $photo->getTemplateVars,
+    $testTemplateVars,
+    "getTemplateVars is correct and complete",
+);
 
 #----------------------------------------------------------------------------
 # Cleanup

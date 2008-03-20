@@ -15,13 +15,12 @@
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../../../../../lib";
-use lib "$FindBin::Bin/../../../../lib";
+use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
+use WebGUI::Test;
 use WebGUI::Asset;
 use WebGUI::Session;
-use WebGUI::Test;
 
 #----------------------------------------------------------------------------
 # Init
@@ -132,7 +131,7 @@ plan tests => 10
 
 #----------------------------------------------------------------------------
 # Test use
-my $utility = 'WebGUI::Asset::Wobject::Gallery::Utility';
+my $utility = 'WebGUI::Utility::Gallery';
 use_ok($utility);
 
 #----------------------------------------------------------------------------

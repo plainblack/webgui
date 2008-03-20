@@ -1,4 +1,11 @@
 7.5.8
+ - moved Gallery utility methods to WebGUI::Utility::Gallery
+ - Added tests for GalleryAlbum RSS
+ - More tests for comments
+ - Test International Macro sprintf as third+ arguments
+ - Add Gallery search limiting by user ID
+ - Remaining i18n for Gallery templates
+ - Fix: Search form now visible in Photo assets
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's

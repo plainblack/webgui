@@ -19,6 +19,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use Test::Deep;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
@@ -35,6 +36,7 @@ my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
         imageResolutions    => "100\n200\n300",
+        groupIdView         => 7,
     });
 my $album
     = $gallery->addChild({
@@ -46,7 +48,7 @@ my $album
         skipAutoCommitWorkflows => 1,
     });
 my $photo
-    = $gallery->addChild({
+    = $album->addChild({
         className           => "WebGUI::Asset::File::GalleryFile::Photo",
     },
     undef,
@@ -59,12 +61,30 @@ $versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 1;
+plan tests => 3;
 
-TODO: {
-    local $TODO = 'Write some tests for download testing';
-    ok(0, 'No tests yet');
-}
+#----------------------------------------------------------------------------
+# getResolutions returns an array reference of available resolutions
+$photo->setFile( WebGUI::Test->getTestCollateralPath( "lamp.jpg" ) );
+cmp_deeply(
+    $photo->getResolutions,
+    bag( "100.jpg", "200.jpg", "300.jpg" ),
+    "getResolutions returns the correct array reference",
+);
+
+#----------------------------------------------------------------------------
+# getDownloadFileUrl returns the URL to download the resolution
+is(
+    $photo->getDownloadFileUrl("100"),
+    $photo->getStorageLocation->getUrl( "100.jpg" ),
+    "getDownloadFileUrl returns the URL to download the resolution",
+);
+
+ok(
+    !eval{ $photo->getDownloadFileUrl("400"); 1 },
+    "getDownloadFileUrl croaks if resolution doesn't exist",
+);
+
 
 #----------------------------------------------------------------------------
 # Cleanup

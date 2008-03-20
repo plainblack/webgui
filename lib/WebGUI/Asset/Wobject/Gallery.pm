@@ -82,13 +82,6 @@ sub definition {
             label           => $i18n->get("groupIdAddFile label"),
             hoverHelp       => $i18n->get("groupIdAddFile description"),
         },
-        groupIdModerator => {
-            tab             => "security",
-            fieldType       => "group",
-            defaultValue    => 3, # Admins
-            label           => $i18n->get("groupIdModerator label"),
-            hoverHelp       => $i18n->get("groupIdModerator description"),
-        },
         imageResolutions => {
             tab             => "properties",
             fieldType       => "checkList",
@@ -963,6 +956,11 @@ sub www_search {
                         . $db->quote( '%' . $form->get("description") . '%' ) 
                         ;
         }
+        if ( $form->get("userId") ) {
+            $where      .= q{ AND assetData.ownerUserId = }
+                        . $db->quote( $form->get("userId") )
+                        ;
+        }
 
         my $joinClass   = [
             'WebGUI::Asset::Wobject::GalleryAlbum',
@@ -983,6 +981,7 @@ sub www_search {
                 . 'className=' . $form->get('className') . ';'
                 . 'creationDate_after=' . $form->get('creationDate_after') . ';'
                 . 'creationDate_before=' . $form->get('creationDate_before') . ';'
+                . 'userId=' . $form->get("userId") . ';'
             );
 
         my $p

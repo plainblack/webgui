@@ -50,7 +50,7 @@ $versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 29;
+plan tests => 32;
 
 #----------------------------------------------------------------------------
 # Test with no comments
@@ -184,11 +184,70 @@ ok(
 );
 
 #----------------------------------------------------------------------------
-# Test appendTemplateVarsForCommentForm
-TODO: {
-    local $TODO = "Test appendTemplateVarsForCommentForm";
-    ok(0, "Test template variable generation");
-}
+# Test appendTemplateVarsForCommentForm for a new comment
+my $var     = {};
+my $newVar  = $photo->appendTemplateVarsCommentForm( $var );
+
+is ( $var, $newVar, "appendTemplateVarsCommentForm returns the same hashref it's given" );
+cmp_deeply( 
+    $var,
+    superhashof( {
+        commentForm_start => all(
+            re( qr/<input[^>]+name="func"[^>]+value="editCommentSave"[^>]+>/ ),
+            re( qr/<input[^>]+name="commentId"[^>]+value="new"[^>]+>/ ),
+        ),
+        commentForm_end => all(
+            re( qr{</form>} ),
+        ),
+        commentForm_bodyText => all(
+            re( qr{<textarea[^>]+>} ),
+            re( qr{TinyMCE}i ),
+        ),
+        commentForm_submit => all(
+            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment"[^>]+>/ ),
+        ),
+    } ),
+    "appendTemplateVarsCommentForm returns the correct structure",
+);
+
+#----------------------------------------------------------------------------
+# Test appendTemplateVarsForCommentForm for an existing comment
+$var            = {};
+my $comment     = {
+    commentId       => "new",
+    bodyText        => "New comment",
+    creationDate    => WebGUI::DateTime->new( $session, time )->toDatabase,
+    userId          => "3",
+};
+
+my $commentId   = $photo->setComment( $comment );
+
+$newVar         = $photo->appendTemplateVarsCommentForm( $var, $photo->getComment( $commentId ) );
+
+is ( $var, $newVar, "appendTemplateVarsCommentForm returns the same hashref it's given" );
+cmp_deeply( 
+    $var,
+    superhashof( {
+        commentForm_start => all(
+            re( qr/<input[^>]+name="func"[^>]+value="editCommentSave"[^>]+>/ ),
+            re( qr/<input[^>]+name="commentId"[^>]+value="$commentId"[^>]+>/ ),
+            re( qr/<input[^>]+name="creationDate"[^>]+value="$comment->{creationDate}"[^>]+>/ ),
+            re( qr/<input[^>]+name="userId"[^>]+value="$comment->{userId}"[^>]+>/ ),
+        ),
+        commentForm_end => all(
+            re( qr{</form>} ),
+        ),
+        commentForm_bodyText => all(
+            re( qr{<textarea[^>]+>} ),
+            re( qr{TinyMCE}i ),
+            re( qr{$comment->{bodyText}} ),
+        ),
+        commentForm_submit => all(
+            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment"[^>]+>/ ),
+        ),
+    } ),
+    "appendTemplateVarsCommentForm returns the correct structure",
+);
 
 #----------------------------------------------------------------------------
 # Test www_editCommentSave page sanity checks

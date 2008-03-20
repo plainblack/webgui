@@ -510,6 +510,60 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message for Photo comments},
     },
+    
+    'helpvar keywords' => {
+        message     => q{A loop over the keywords associated with this photo},
+        lastUpdated => 0,
+        context     => q{Description of template loop},
+    },
+
+    'helpvar keyword' => {
+        message     => q{The keyword},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar url_searchKeyword' => {
+        message     => q{A URL to the Gallery search page for this keyword},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar url_searchKeywordUser' => {
+        message     => q{A URL to the Gallery search page for this keyword. Limits the search to Photos by this user.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'template makeShortcut title' => {
+        message     => q{Cross Publish},
+        lastUpdated => 0,
+        context     => q{Title for the make shortcut page},
+    },
+
+    'template makeShortcut file' => {
+        message     => q{File},
+        lastUpdated => 0,
+        context     => q{Label for the file we're making a shortcut of},
+    },
+
+    'template makeShortcut album' => {
+        message     => q{Album},
+        lastUpdated => 0,
+        context     => q{Label for the album in which to make the shortcut},
+    },
+
+    'template delete message' => {
+        message     => q{Are you sure you wish to delete this gallery?},
+        lastUpdated => 0,
+        context     => q{The message for the delete page},
+    },
+
+    'template delete albums' => {
+        message     => q{Photo is currently in these albums:},
+        lastUpdated => 0,
+        context     => q{Label for the albums the photo will be removed from.},
+    },
 
 };
 

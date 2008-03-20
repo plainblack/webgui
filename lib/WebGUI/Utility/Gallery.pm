@@ -1,4 +1,4 @@
-package WebGUI::Asset::Wobject::Gallery::Utility;
+package WebGUI::Utility::Gallery;
 
 =head1 LEGAL
 
@@ -26,7 +26,7 @@ use WebGUI::Storage::Image;
 
 =head1 NAME
 
-WebGUI::Asset::Wobject::Gallery::Utility -- Utility functions for working
+WebGUI::Utility::Gallery -- Utility functions for working
 with Gallery assets.
 
 =head1 DESCRIPTION
@@ -38,8 +38,8 @@ This module is B<NOT> to be used by the Gallery asset itself!
 
 =head1 SYNOPSIS
 
- use WebGUI::Asset::Wobject::Gallery::Utility;
- my $utility = "WebGUI::Asset::Wobject::Gallery::Utility" # <- not as cumbersome
+ use WebGUI::Utility::Gallery;
+ my $utility = "WebGUI::Utility::Gallery" # <- not as cumbersome
  
  # Add albums from a collaboration system's threads
  my $gallery        = WebGUI::Asset::Wobject::Gallery->new( ... );

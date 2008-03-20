@@ -21,26 +21,31 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my @testSets = (
-	{
-		input => ['none', 'Asset'],
-		output => q!None!,
-		comment => q|explicit namespace|,
-	},
-	{
-		input => ['change url', 'Asset'],
-		output => q!Change URL!,
-		comment => q|space in label|,
-	},
-	{
-		input => ['webgui', 'WebGUI'],
-		output => q!WebGUI!,
-		comment => q|explicit namespace #2|,
-	},
-	{
-		input => ['webgui', ''],
-		output => q!WebGUI!,
-		comment => q|default namespace|,
-	},
+    {
+        input   => ['none', 'Asset'],
+        output  => q!None!,
+        comment => q|explicit namespace|,
+    },
+    {
+        input   => ['change url', 'Asset'],
+        output  => q!Change URL!,
+        comment => q|space in label|,
+    },
+    {
+        input   => ['webgui', 'WebGUI'],
+        output  => q!WebGUI!,
+        comment => q|explicit namespace #2|,
+    },
+    {
+        input   => ['webgui', ''],
+        output  => q!WebGUI!,
+        comment => q|default namespace|,
+    },
+    {
+        input   => ['template listFilesForUser title', 'Asset_Gallery', 'plainblack'],
+        output  => q{plainblack's Gallery},
+        comment => q{Third and more arguments are passed to sprintf()},
+    },
 );
 
 my $numTests = scalar @testSets;

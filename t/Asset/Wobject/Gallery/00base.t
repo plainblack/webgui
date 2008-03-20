@@ -51,7 +51,13 @@ isa_ok(
 );
 
 #----------------------------------------------------------------------------
-# Test deleting a album
+# Test adding children to Gallery
+
+# Only GalleryAlbums may be added
+
+
+#----------------------------------------------------------------------------
+# Test deleting a gallery
 my $properties  = $gallery->get;
 $gallery->purge;
 

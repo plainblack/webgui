@@ -52,7 +52,7 @@ $versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 2;
+plan tests => 5;
 
 #----------------------------------------------------------------------------
 # Test the addArchive sub
@@ -65,11 +65,30 @@ cmp_deeply(
     bag( "Aana1.jpg", "Aana2.jpg", "Aana3.jpg" ),
 );
 
+cmp_deeply(
+    [ map { $_->get("title") } @$images ],
+    bag( "Aana1", "Aana2", "Aana3" ),
+);
+
+cmp_deeply(
+    [ map { $_->get("menuTitle") } @$images ],
+    bag( "Aana1", "Aana2", "Aana3" ),
+);
+
+cmp_deeply(
+    [ map { $_->get("url") } @$images ],
+    bag( 
+        $session->url->urlize( $album->getUrl . "/Aana1" ), 
+        $session->url->urlize( $album->getUrl . "/Aana2" ), 
+        $session->url->urlize( $album->getUrl . "/Aana3" ), 
+    ),
+);
+
 #----------------------------------------------------------------------------
 # Test the www_addArchive page
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $versionTag->rollback();
+    $versionTag->rollback;
 }

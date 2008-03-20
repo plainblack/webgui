@@ -120,16 +120,18 @@ sub addArchive {
 
     for my $filePath (@files) {
         my ($volume, $directory, $filename) = File::Spec->splitpath( $filePath );
-        $self->session->errorHandler->info( "trying $filename" );
         next if $filename =~ m{^[.]};
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
         $self->session->errorHandler->info( "Adding $filename to album!" );
+        # Remove the file extention
+        $filename   =~ s{\.[^.]+}{};
+
         $properties->{ className        } = $class;
         $properties->{ menuTitle        } = $filename;
         $properties->{ title            } = $filename;
-        $properties->{ url              } = $self->getUrl . "/" . $filename;
+        $properties->{ url              } = $self->session->url->urlize( $self->getUrl . "/" . $filename );
 
         my $asset   = $self->addChild( $properties, undef, undef, { skipAutoCommitWorkflows => 1 } );
         $asset->setFile( $filePath );

@@ -19,7 +19,6 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Test::Maker::HTML;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
@@ -33,10 +32,20 @@ $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 
 $session->user( { userId => 3 } ); # Admins can do everything
 
-my $maker           = WebGUI::Test::Maker::HTML->new;
+# Create a user for testing purposes
+my $user        = WebGUI::User->new( $session, "new" );
+$user->username( 'dufresne' );
+$user->addToGroups( ['3'] );
+my $identifier  = 'ritahayworth';
+my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
+$auth->saveParams( $user->userId, $user->authMethod, {
+    'identifier'    => Digest::MD5::md5_base64( $identifier ), 
+});
+
 my $gallery
     = $node->addChild({
         className           => "WebGUI::Asset::Wobject::Gallery",
+        groupIdAddFile      => 3,   # Admins
     });
 my $album
     = $gallery->addChild({
@@ -61,67 +70,58 @@ $versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan skip_all => "Tests are not working yet.";
+plan skip_all => "Tests not working yet";
+#plan tests => 1;
+
+use_ok("Test::WWW::Mechanize");
+my $mech;
 
 #----------------------------------------------------------------------------
 # Test permissions
+$mech   = Test::WWW::Mechanize->new;
 
 # Edit an existing photo
-$maker->prepare({
-    object      => $photo,
-    method      => "www_edit",
-    userId      => "1",
-    test_privilege  => "insufficient",
-})->run;
+$mech->get( $session->url->getSiteURL . $photo->getUrl("func=edit") );
+$mech->content_contains("permission denied");
+
+$mech->get( $session->url->getSiteURL . $photo->getUrl("func=editSave") );
+$mech->content_contains("permission denied");
 
 # Save a new photo
-$maker->prepare({
-    object      => $photo,
-    method      => "www_editSave",
-    userId      => "1",
-    test_privilege  => "insufficient",
-})->run;
+$mech->get( $session->url->getSiteURL . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
+$mech->content_contains("permission denied");
+
+$mech->get( $session->url->getSiteURL . $album->getUrl("func=editSave;assetId=new;class=WebGUI::Asset::File::GalleryFile::Photo") );
+$mech->content_contains("permission denied");
 
 #----------------------------------------------------------------------------
 # Test processPropertiesFromFormPost errors
 # TODO: This test should use i18n.
 # TODO: This error / test should occur in File, not Photo
-$maker->prepare({
-    object      => $album,
-    method      => "www_editSave",
-    formParams  => {
-       assetId      => "new",
-       className    => "WebGUI::Asset::File::GalleryFile::Photo",
+$mech       = Test::WWW::Mechanize->new;
+# Login mech object
+$mech->get( $session->url->getSiteURL . '?op=auth;method=login;username=dufresne;identifier=ritahayworth' );
+
+$mech->get_ok( $album->getUrl('func=add;class=WebGUI::Asset::File::GalleryFile::Photo') );
+$mech->submit_form( 
+    with_fields => {
+        title           => '',
+        newFile_file    => '',
     },
-    test_regex  => [ 
-        qr/You must select a file/,
-        qr/You must enter a title/,
-    ],
-})->run;
+);
 
 #----------------------------------------------------------------------------
 # Test editSave success result
 # TODO: This test should use i18n
-$maker->prepare({
-    object      => $album,
-    method      => "www_editSave",
-    formParams  => {
-       assetId      => "new",
-       className    => "WebGUI::Asset::File::GalleryFile::Photo",
-    },
-    test_regex  => [ 
-        qr/awaiting approval and commit/,
-    ],
-})->run;
 
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $gallery->purge;
     foreach my $versionTag (@versionTags) {
         $versionTag->rollback;
     }
+    $user->delete;
 }
 
 

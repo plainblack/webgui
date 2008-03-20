@@ -19,6 +19,7 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
+use Test::Deep;
 use WebGUI::Test::Maker::HTML;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
@@ -48,7 +49,7 @@ $versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 11;
+plan tests => 10;
 
 #----------------------------------------------------------------------------
 # makeShortcut argument checking
@@ -76,7 +77,7 @@ ok(
 );
 
 is(
-    blessed $shortcut, "WebGUI::Asset::Shortcut",
+    Scalar::Util::blessed($shortcut), "WebGUI::Asset::Shortcut",
     "Photo->makeShortcut returns a WebGUI::Shortcut asset",
 );
 
@@ -96,7 +97,7 @@ ok(
 );
 
 is(
-    blessed $shortcut, "WebGUI::Asset::Shortcut",
+    Scalar::Util::blessed($shortcut), "WebGUI::Asset::Shortcut",
     "Photo->makeShortcut returns a WebGUI::Shortcut asset",
 );
 
@@ -105,26 +106,15 @@ is(
     "Photo->makeShortcut makes a shortcut to the correct asset",
 );
 
-SKIP: {
-    skip "Asset::Shortcut does not have a getShortcutOverrides method", 1;
-    is_deeply(
-        {$shortcut->getShortcutOverrides}, $overrides,
-        "Photo->makeShortcut makes a shortcut with the correct overrides",
-    );
-}
+my %shortcutOverrides   = $shortcut->getOverrides;
+cmp_deeply(
+    { map({ $_ => $shortcutOverrides{overrides}->{$_}->{newValue} } keys %{ $overrides }) },
+    $overrides,
+    "Photo->makeShortcut makes a shortcut with the correct overrides",
+);
 
 #----------------------------------------------------------------------------
 # www_makeShortcut is only available to those who can edit the photo
-SKIP: {
-    skip "test_privilege has a bug", 1;
-    $maker->prepare({
-        object      => $photo,
-        method      => "www_makeShortcut",
-        userId      => 1,
-        test_privilege  => "insufficient",
-    });
-    $maker->run;
-}
 
 #----------------------------------------------------------------------------
 # www_makeShortcut

@@ -23,6 +23,9 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+removeOldGalleryColumns( $session );
+moveColumnsToGalleryFile( $session );
+moveCommentsToGalleryFile( $session );
 
 finish($session); # this line required
 
@@ -33,6 +36,82 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#----------------------------------------------------------------------------
+sub removeOldGalleryColumns {
+    my $session = shift;
+    $session->db->write(
+        "ALTER TABLE Gallery DROP COLUMN groupIdModerator"
+    );
+}
+
+#----------------------------------------------------------------------------
+# moveColumnsToGalleryFile 
+# Move columns from Photo that are better handled under GalleryFile 
+sub moveColumnsToGalleryFile {
+    my $session = shift;
+    print "\tMoving Photo columns to GalleryFile (its superclass)... " unless $quiet;
+    
+    # Add the galleryfile columns
+    $session->db->write(q{
+        CREATE TABLE GalleryFile (
+            assetId VARCHAR(22) BINARY NOT NULL,
+            revisionDate BIGINT NOT NULL,
+            userDefined1 LONGTEXT,
+            userDefined2 LONGTEXT,
+            userDefined3 LONGTEXT,
+            userDefined4 LONGTEXT,
+            userDefined5 LONGTEXT,
+            views BIGINT DEFAULT 0,
+            friendsOnly INT(1) DEFAULT 0,
+            rating INT(1) DEFAULT 0,
+            PRIMARY KEY ( assetId, revisionDate )
+        )
+    });
+
+    # Move Photo data to GalleryFile
+    my $sth     = $session->db->read( "SELECT * FROM Photo" );
+    while ( my %row = $sth->hash ) {
+        $session->db->write( 
+            q{ INSERT INTO GalleryFile ( 
+                assetId, revisionDate, userDefined1, userDefined2, userDefined3, userDefined4, 
+                userDefined5, views, friendsOnly, rating )
+            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+            },
+            [ @row{ qw( assetId revisionDate userDefined1 userDefined2 userDefined3 userDefined4
+                userDefined5 views friendsOnly rating ) } ],
+        );
+    }
+
+    # Drop the photo columns
+    $session->db->write( q{
+        ALTER TABLE Photo 
+            DROP COLUMN userDefined1, 
+            DROP COLUMN userDefined2, 
+            DROP COLUMN userDefined3,
+            DROP COLUMN userDefined4,
+            DROP COLUMN userDefined5,
+            DROP COLUMN views,
+            DROP COLUMN friendsOnly,
+            DROP COLUMN rating
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# moveCommentsToGalleryFile 
+# Move comments to a better-described table
+sub moveCommentsToGalleryFile {
+    my $session     = shift;
+    print "\tMoving Photo_comment to GalleryFile_comment... " unless $quiet;
+
+    $session->db->write( q{
+        ALTER TABLE Photo_comment RENAME TO GalleryFile_comment
+    } );
+
+    print "DONE!\n" unless $quiet;
+}
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------

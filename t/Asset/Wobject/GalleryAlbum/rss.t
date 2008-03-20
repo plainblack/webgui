@@ -19,11 +19,11 @@ use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
-use WebGUI::Test::Maker::HTML;
+use Test::Deep;
+use XML::Simple;
 
 #----------------------------------------------------------------------------
 # Init
-my $maker           = WebGUI::Test::Maker::HTML->new;
 my $session         = WebGUI::Test->session;
 my $node            = WebGUI::Asset->getImportNode($session);
 my $versionTag      = WebGUI::VersionTag->getWorking($session);
@@ -41,6 +41,7 @@ my $album
     = $gallery->addChild({
         className           => "WebGUI::Asset::Wobject::GalleryAlbum",
         ownerUserId         => "3", # Admin
+        description         => "An RSS Description",
     },
     undef,
     undef,
@@ -53,6 +54,7 @@ for my $i ( 0 .. 5 ) {
         = $album->addChild({
             className           => "WebGUI::Asset::File::GalleryFile::Photo",
             filename            => "$i.jpg",
+            synopsis            => "This is a description for $i.jpg",
         },
         undef,
         undef,
@@ -65,15 +67,38 @@ $versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 1;
+plan tests => 2;
+
+use_ok("Test::WWW::Mechanize");
+my $mech;
 
 #----------------------------------------------------------------------------
 # Test www_viewRss
-
-TODO: {
-    local $TODO = "Write some tests";
-    ok(0, "No tests here");
-}
+$mech   = Test::WWW::Mechanize->new;
+my $url = $session->url->getSiteURL . $session->url->makeAbsolute( $album->getUrl('func=viewRss') ); 
+$mech->get( $url );
+cmp_deeply(
+    XMLin( $mech->content ),
+    {
+        version     => '2.0',
+        channel     => {
+            link        => $session->url->getSiteURL . $album->getUrl,
+            description => $album->get("description"),
+            title       => $album->get("title"),
+            item        => bag(
+                map { 
+                    superhashof({
+                        link        => $session->url->getSiteURL . $_->getUrl,
+                        title       => $_->get("title"),
+                        pubDate     => $session->datetime->epochToMail( $_->get("revisionDate") ),
+                        description => $_->get("synopsis"),
+                    }) 
+                } @photos
+            ),
+        },
+    },
+    "RSS Datastructure is complete and correct",
+);
 
 #----------------------------------------------------------------------------
 # Cleanup

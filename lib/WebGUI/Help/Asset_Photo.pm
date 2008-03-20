@@ -257,6 +257,24 @@ our $HELP = {
                 name        => 'commentLoop_pageBar',
                 description => 'helpvar commentLoop_pageBar',
             },
+            {
+                name        => 'keywords',
+                description => 'helpvar keywords',
+                variables   => [
+                    {
+                        name        => 'keyword',
+                        description => 'helpvar keyword',
+                    },
+                    {
+                        name        => 'url_searchKeyword',
+                        description => 'helpvar url_searchKeyword',
+                    },
+                    {
+                        name        => 'url_searchKeywordUser',
+                        description => 'helpvar url_searchKeywordUser',
+                    },
+                ],
+            },
         ],
     },
 
