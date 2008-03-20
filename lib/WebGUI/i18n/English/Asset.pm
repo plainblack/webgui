@@ -26,6 +26,11 @@ our $I18N = {
 		context => q|the question asked of the admin when they click on a missing page|
 	},
 
+    'package extract error' => {
+        message => q|Unable to extract package!  The package may be corrupt, or there may be a server error preventing packages from being imported.|,
+        lastUpdated => 1206050885,
+    },
+
 	'package corrupt' => {
 		message => q|The package you tried to import appears to be corrupt. We imported up to the point where we detected corruption. If you won't want this portion, roll back your current version tag.|,
 		lastUpdated => 0,

@@ -467,7 +467,7 @@ sub createTemp {
     }
     
 	$id =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $guid, _part1 => 'temp', _part2 => $1};
+	my $self = {_session=>$session, _id => $guid, _part1 => 'temp', _part2 => $1, _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;

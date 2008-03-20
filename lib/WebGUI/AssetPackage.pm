@@ -203,6 +203,8 @@ sub importPackage {
     my $self            = shift;
     my $storage         = shift;
     my $decompressed    = $storage->untar($storage->getFiles->[0]);
+    return undef
+        if $storage->getErrorCount;
     my %assets          = ();               # All the assets we've imported
     my $package         = undef;            # The asset package
     my $error           = $self->session->errorHandler;
@@ -226,15 +228,16 @@ sub importPackage {
         my $newAsset = $asset->importAssetData($data);
         $newAsset->importAssetCollateralData($data);
         $assets{$newAsset->getId} = $newAsset;
-        
         # First imported asset must be the "package"
+
         unless ($package) {
             $package            = $newAsset;
         }
     }
 
-
-    return $package;
+    return $package
+        if $package;
+    return 'corrupt';
 }
 
 #-------------------------------------------------------------------
@@ -307,7 +310,12 @@ sub www_importPackage {
 	}
 	if (!blessed $error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
-		return $self->session->style->userStyle($i18n->get("package corrupt"));
+        if ($error eq 'corrupt') {
+            return $self->session->style->userStyle($i18n->get("package corrupt"));
+        }
+        else {
+            return $self->session->style->userStyle($i18n->get("package extract error"));
+        }
 	}
     # Handle autocommit workflows
     if ($self->session->setting->get("autoRequestCommit")) {
