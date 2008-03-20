@@ -376,14 +376,14 @@ sub www_getTaxesAsJson {
 
 #-------------------------------------------------------------------
 
-=head2 www_view (  )
+=head2 www_manage (  )
 
 User interface to manage taxes.  Provides a list of current taxes, and forms for adding
 new tax info, exporting and importing sets of taxes, and deleting individual tax data.
 
 =cut
 
-sub www_view {
+sub www_manage {
     my $self = shift;
     my $session = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
@@ -423,20 +423,22 @@ EODIV
     ##Build datasource with URL.
     $output .= sprintf <<'EODSURL', $url->page('shop=tax;method=getTaxesAsJson');
     var mySource = new DataSource('%s');
-EODSURL
-    $output .= <<STOP;
     mySource.responseType   = DataSource.TYPE_JSON;
     mySource.responseSchema = {
         resultsList : 'records',
         totalRecords: 'totalRecords',
         fields      : [ 'taxId', 'country', 'state', 'city', 'code', 'taxRate']
     };
+EODSURL
+    $output .= <<STOP;
+    ##Tell YUI how to get back to the site
     var buildQueryString = function (state,dt) {
         return ";startIndex=" + state.pagination.recordOffset +
                ";keywords=" + Dom.get('keywordsField').value +
                ";results=" + state.pagination.rowsPerPage;
     };
 
+    ##Build and configure a paginator
     var myPaginator = new Paginator({
         containers         : ['paging'],
         pageLinks          : 5,
@@ -444,17 +446,37 @@ EODSURL
         rowsPerPageOptions : [10,25,50,100],
         template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
     });
+
+    ##Configure the table to use the paginator.
+    var myTableConfig = {
+        initialRequest         : ';startIndex=0',
+        generateRequest        : buildQueryString,
+        paginationEventHandler : DataTable.handleDataSourcePagination,
+        paginator              : myPaginator
+    };
 STOP
 
-    ##Build column headers.
     $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code');
-var taxColumnDefs = [
-    {key:"country", label:"%s"},
-    {key:"state",   label:"%s"},
-    {key:"city",    label:"%s"},
-    {key:"code",    label:"%s"}
-];
+    ##Build column headers.
+    var taxColumnDefs = [
+        {key:"country", label:"%s"},
+        {key:"state",   label:"%s"},
+        {key:"city",    label:"%s"},
+        {key:"code",    label:"%s"}
+    ];
 EOCHJS
+    $output .= <<STOP;
+    ##Now, finally, the table
+    var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+
+    ##Setup the form to submit an AJAX request back to the site.
+    Dom.get('keywordSearchForm').onsubmit = function () {
+         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+            myTable.onDataReturnInitializeTable, myTable);
+        return false;
+    };
+});
+STOP
     return '';
 }
 
