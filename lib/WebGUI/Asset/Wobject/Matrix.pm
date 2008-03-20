@@ -770,6 +770,26 @@ sub www_editListingSave {
 		$data{status} = "pending";
 		$isNew = 1;
 	}
+    else {
+        my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
+        if ($forum && $forum->get('title') ne $productName) {
+            my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
+            my $newTag = WebGUI::VersionTag->create($self->session, {
+                name => $productName.' / '.$self->session->user->username,
+                workflowId => 'pbworkflow000000000003' });
+            $newTag->setWorking;
+            $forum->addRevision({
+                title       => $productName,
+                menuTitle   => $productName,
+                url         => $productName,
+            });
+            $newTag->requestCommit;
+            $newTag->clearWorking;
+            $oldTag->setWorking
+                if defined $oldTag;
+        }
+        my $forum = WebGUI::
+    }
 	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;
 	my $listingId = $self->session->db->setRow("Matrix_listing","listingId",\%data);
