@@ -9,6 +9,7 @@
  - fixed: Editting matrix listings shows fields from other matrix assets
  - fixed: Matrix assets show pending listings from all matrix assets on a site
  - fixed: Changing name of Matrix listing leaves discussion forum with old name
+ - fixed: Importing a package can break when updating a pending asset
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's

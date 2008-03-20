@@ -1902,6 +1902,39 @@ sub newByUrl {
 
 #-------------------------------------------------------------------
 
+=head2 newPending ( session, assetId )
+
+Instances an existing Asset by assetId, ignoring the status and always selecting the most recent revision.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 assetId
+
+The asset's id
+
+=cut
+
+sub newPending {
+    my $class = shift;
+    my $session = shift;
+    my $assetId = shift;
+    croak "First parameter to newPending needs to be a WebGUI::Session object"
+        unless $session && $session->isa('WebGUI::Session');
+    croak "Second parameter to newPending needs to be an assetId"
+        unless $assetId;
+    my ($className, $revisionDate) = $session->db->quickArray("SELECT asset.className, assetData.revisionDate FROM asset INNER JOIN assetData ON asset.assetId = assetData.assetId WHERE asset.assetId = ? ORDER BY assetData.revisionDate DESC LIMIT 1", [ $assetId ]);
+    if ($className ne "" || $revisionDate ne "") {
+        return WebGUI::Asset->new($session, $assetId, $className, $revisionDate);
+    }
+    else {
+        croak "Invalid asset id '$assetId' requested!";
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 Executes what is necessary to make the view() method work with content chunking. This includes things like processing template head tags.

@@ -136,8 +136,8 @@ sub importAssetData {
     WebGUI::Asset->loadModule( $self->session, $class );
 
     my $asset;
-    my $assetExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
-    if ($assetExists) { # update an existing revision
+    my $revisionExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    if ($revisionExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
         $error->info("Updating an existing revision of asset $id");	
         $asset->update($data->{properties});
@@ -150,13 +150,15 @@ sub importAssetData {
         }
     }
     else {
-        $asset = WebGUI::Asset->new($self->session, $id, $class);
-        if (defined $asset) { # create a new revision of an existing asset
-            $error->info("Creating a new revision of asset $id");	
+        eval {
+            $asset = WebGUI::Asset->newPending($self->session, $id, $class);
+        };
+        if (defined $asset) {   # create a new revision of an existing asset
+            $error->info("Creating a new revision of asset $id");
             $asset = $asset->addRevision($data->{properties}, $version, {skipAutoCommitWorkflows => 1});
         }
-        else { # add an entirely new asset
-            $error->info("Adding $id that didn't previously exist.");	
+        else {  # add an entirely new asset
+            $error->info("Adding $id that didn't previously exist.");
             $asset = $self->addChild($data->{properties}, $id, $version, {skipAutoCommitWorkflows => 1});
         }
     }
