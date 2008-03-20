@@ -18,7 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
-use Test::Exception;
+#use Test::Exception;
 use JSON;
 use HTML::Form;
 
