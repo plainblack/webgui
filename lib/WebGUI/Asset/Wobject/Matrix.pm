@@ -629,10 +629,11 @@ sub www_editListing {
 		$f->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
 		my $a;
 		if ($self->session->form->process("listingId") ne "new") {
-			$a = $self->session->db->read("select a.name, a.fieldType, a.defaultValue, a.description, a.label, b.value, a.fieldId
-				from Matrix_field a left join Matrix_listingData b on a.fieldId=b.fieldId and 
-				listingId=".$self->session->db->quote($self->session->form->process("listingId"))."  where 
-				a.category=".$self->session->db->quote($category)." order by a.label");
+			$a = $self->session->db->read(
+                "select a.name, a.fieldType, a.defaultValue, a.description, a.label, b.value, a.fieldId
+                from Matrix_field a left join Matrix_listingData b on a.fieldId=b.fieldId and
+                listingId=? where a.category=? and a.assetId=? order by a.label",
+                [$self->session->form->process("listingId"), $category, $self->getId]);
 		} else {
 			$a = $self->session->db->read("select name, fieldType, defaultValue, description, label, fieldId
 				from Matrix_field where category=".$self->session->db->quote($category)." and  assetId=".$self->session->db->quote($self->getId));
@@ -1102,7 +1103,7 @@ sub view {
 	($var{'user.count'}) = $self->session->db->quickArray("select count(*) from users");
 	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".($self->session->datetime->time()-600));
 	($var{'listing.count'}) = $self->session->db->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".$self->session->db->quote($self->getId));
-        $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending'");
+        $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending' and assetId=?",[$self->getId]);
         while (my ($id,$name) = $sth->array) {
                 push(@{$var{pending_list}},{
                         url=>$self->formatURL("viewDetail",$id),

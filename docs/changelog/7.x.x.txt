@@ -6,6 +6,8 @@
  - Add Gallery search limiting by user ID
  - Remaining i18n for Gallery templates
  - Fix: Search form now visible in Photo assets
+ - fixed: Editting matrix listings shows fields from other matrix assets
+ - fixed: Matrix assets show pending listings from all matrix assets on a site
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
