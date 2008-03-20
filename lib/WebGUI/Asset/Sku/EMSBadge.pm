@@ -28,7 +28,7 @@ Package WebGUI::Asset::Sku::EMSBadge
 
 =head1 DESCRIPTION
 
-A badge for the Event Manager.
+A badge for the Event Manager. Badges allow you into the convention.
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ sub addToCart {
 	$badgeInfo->{badgeAssetId} = $self->getId;
 	$badgeInfo->{emsAssetId} = $self->getParent->getId;
 	my $badgeId = $self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
-	$self->SUPER::addToCart({badgeId=>$badgeId, name=>$badgeInfo->{name}});
+	$self->SUPER::addToCart({badgeId=>$badgeId});
 }
 
 #-------------------------------------------------------------------
@@ -89,7 +89,8 @@ sub definition {
 #-------------------------------------------------------------------
 sub getConfiguredTitle {
     my $self = shift;
-    return $self->getTitle." (".$self->getOptions->{name}.")";
+	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
+    return $self->getTitle." (".$name.")";
 }
 
 
@@ -107,7 +108,7 @@ sub getPrice {
 #-------------------------------------------------------------------
 sub getQuantityAvailable {
 	my $self = shift;
-	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrant where badgeAssetId=? and purchaseComplete=1",[$self->getId]);
+	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrant where badgeAssetId=?",[$self->getId]);
     return $self->get("seatsAvailable") - $seatsTaken;
 }
 
@@ -218,7 +219,7 @@ sub view {
 		label			=> $i18n->get('email address'),
 		defaultValue	=> $form->get("email","email")
 		);
-	$info->submit(value=>"add to cart");
+	$info->submit(value=>$i18n->get('add to cart','Shop'));
 	
 	# render the page;
 	my $output = '<h1>'.$self->getTitle.'</h1>'

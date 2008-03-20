@@ -69,10 +69,22 @@ sub upgradeEMS {
 		index badgeAssetId_purchaseComplete (badgeAssetId,purchaseComplete)
 		)");
 	$db->write("create table EMSRegistrantTicket (
-		badgeId varchar(22) binary not null primary key,
+		badgeId varchar(22) binary not null,
 		ticketAssetId varchar(22) binary not null,
 		purchaseComplete boolean,
+		primary key (badgeId, ticketAssetId),
 		index ticketAssetId_purchaseComplete (ticketAssetId,purchaseComplete)
+		)");
+	$db->write("create table EMSRegistrantToken (
+		badgeId varchar(22) binary not null,
+		tokenAssetId varchar(22) binary not null,
+		quantity int,
+		primary key (badgeId,tokenAssetId)
+		)");
+	$db->write("create table EMSRegistrantRibbon (
+		badgeId varchar(22) binary not null,
+		tokenAssetId varchar(22) binary not null,
+		primary key (badgeId,tokenAssetId)
 		)");
 	$db->write("create table EMSBadge (
 		assetId varchar(22) binary not null,
@@ -81,7 +93,6 @@ sub upgradeEMS {
 		seatsAvailable int not null default 100,
 		primary key (assetId, revisionDate)
 		)");
-	$db->write("insert into incrementer values ('EMSBadgeNumber', 1)");
 	$db->write("create table EMSTicket (
 		assetId varchar(22) binary not null,
 		revisionDate bigint not null,
@@ -91,6 +102,18 @@ sub upgradeEMS {
 		endDate datetime,
 		eventNumber int,
 		relatedBadges mediumtext,
+		primary key (assetId, revisionDate)
+		)");
+	$db->write("create table EMSToken (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		price float not null default 0.00,
+		primary key (assetId, revisionDate)
+		)");
+	$db->write("create table EMSRibbon (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		price float not null default 0.00,
 		primary key (assetId, revisionDate)
 		)");
 }

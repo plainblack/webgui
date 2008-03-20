@@ -22,15 +22,15 @@ use base 'WebGUI::Asset::Sku';
 
 =head1 NAME
 
-Package WebGUI::Asset::Sku::EMSBadge
+Package WebGUI::Asset::Sku::EMSTicket
 
 =head1 DESCRIPTION
 
-A badge for the Event Manager.
+A ticket for the Event Manager. Tickets allow you into invidivual events at a convention.
 
 =head1 SYNOPSIS
 
-use WebGUI::Asset::Sku::EMSBadge;
+use WebGUI::Asset::Sku::EMSTicket;
 
 =head1 METHODS
 
@@ -43,7 +43,7 @@ sub addToCart {
 	my ($self, $badgeInfo) = @_;
 	$self->session->db->write("insert into EMSRegistrantTicket (badgeId, ticketAssetId) values (?,?)",
 		[$badgeInfo->{badgeId},$self->getId]);
-	$self->addToCart($badgeInfo);
+	$self->SUPER::addToCart($badgeInfo);
 }
 
 #-------------------------------------------------------------------
@@ -115,7 +115,8 @@ sub definition {
 #-------------------------------------------------------------------
 sub getConfiguredTitle {
     my $self = shift;
-    return $self->getTitle." (".$self->getOptions->{name}.")";
+	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
+    return $self->getTitle." (".$name.")";
 }
 
 #-------------------------------------------------------------------
@@ -132,7 +133,7 @@ sub getPrice {
 #-------------------------------------------------------------------
 sub getQuantityAvailable {
 	my $self = shift;
-	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrantTicket where ticketAssetId=? and purchaseComplete=1",[$self->getId]);
+	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
     return $self->get("seatsAvailable") - $seatsTaken;
 }
 
@@ -161,8 +162,15 @@ sub purge {
 #-------------------------------------------------------------------
 sub view {
     my ($self) = @_;
-    my $session = $self->session;
-    return "Don't know what it is to view this thing.";
+    return $self->getParent->view;
+}
+
+#-------------------------------------------------------------------
+sub www_addToCart {
+	my ($self) = @_;
+	return $self->session->privilege->noAccess() unless $self->getParent->canView;
+	$self->addToCart({badgeId=>$self->session->form->get('badgeId')});
+	return $self->getParent->www_view;
 }
 
 

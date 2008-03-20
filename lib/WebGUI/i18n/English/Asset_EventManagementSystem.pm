@@ -1064,6 +1064,18 @@ by setting the "hide" form variable.|,
 		context		=> q|name of asset|,
 	},
 
+	'ems ribbon' => {
+		message 	=> q|Event Manager Ribbon|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems token' => {
+		message 	=> q|Event Manager Token|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
 	'type name here' => {
 		message => q|Type Name Here|,
 		lastUpdated => 1140469381,
