@@ -34,6 +34,185 @@ use Data::Dumper;
 
 
 
+
+#-------------------------------------------------------------------
+
+=head2 appendBadgeVars ( badgeId, vars )
+
+Appends template variables for the current badge which is in the currenBadgeId scratch variable.
+
+=cut
+
+sub appendBadgeVars {
+	my ($self, $badgeId, $vars) = @_;
+	return undef unless $badgeId ne "";
+	my $badgeInfo = $self->session->db->quickHashRef("select * from EMSRegistrant where badgeId=?",[$badgeId]);
+	%{$vars} = (%{$vars}, %{$badgeInfo});
+}
+
+
+#-------------------------------------------------------------------
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
+	%properties = (
+		timezone => {
+			fieldType 		=> 'TimeZone',
+			defaultValue 	=> 'America/Chicago',
+			tab				=> 'properties',
+			label			=> $i18n->get('time zone'),
+			hoverHelp		=> $i18n->get('time zone help'),
+		},
+		templateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> '',
+			tab				=> 'display',
+			label			=> $i18n->get('main template'),
+			hoverHelp		=> $i18n->get('main template help'),
+			namespace		=> 'EMS',
+		},
+		extrasTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> '',
+			tab				=> 'display',
+			label			=> $i18n->get('extras template'),
+			hoverHelp		=> $i18n->get('extras template help'),
+			namespace		=> 'EMS/Extras',
+		},
+	);
+	push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		icon=>'ems.gif',
+		autoGenerateForms=>1,
+		tableName=>'EventManagementSystem',
+		className=>'WebGUI::Asset::Wobject::EventManagementSystem',
+		properties=>\%properties
+		});
+	return $class->SUPER::definition($session,$definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+ 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+#-------------------------------------------------------------------
+
+=head2 view
+
+Displays the list of configured badges. And other links.
+
+=cut
+
+sub view {
+	my ($self) = @_;
+	my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
+
+	# set up objects we'll need
+	my $badgeId = $session->form->get("badgeId");
+	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
+	my %var = ();
+	
+	# get our badges
+	foreach my $badge (@{$self->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::Sku::EMSBadge"]})}) {
+		push(@{$var{availableBadges}}, $self->get);
+		$var{availableBadges}[-1]{isFull} = $badge->getQuantityAvailable;
+		$var{availableBadges}[-1]{url} = $badge->getUrl;
+	}
+	
+	# other template variables
+	$self->appendBadgeVars($badgeId, \%var);
+	
+	# render
+	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getBadgesAsJson ()
+
+Retrieves a list of badges for the www_view() method.
+
+=cut
+
+sub www_getBadgesAsJson {
+    my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
+    my @placeholders = ();
+    my $sql = 'select SQL_CALC_FOUND_ROWS assetId from EMSBadgeIndex';
+    my $keywords = $form->get("keywords");
+    if ($keywords ne "") {
+        ($sql, @placeholders) = $db->buildSearchQuery($sql, $keywords, [qw{amount username orderNumber shippingAddressName shippingAddress1 paymentAddressName paymentAddress1}])
+    }
+    push(@placeholders, $startIndex, $numberOfResults);
+    $sql .= ' order by dateOfPurchase desc limit ?,?';
+    my %results = $db->buildDataTableStructure($sql, \@placeholders);
+    $results{'startIndex'} = $startIndex;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "desc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
+
+=head2 www_viewExtras ( [badgeId] )
+
+Displays available ribbons, tokens, and tickets for the current badge.
+
+=cut
+
+sub www_viewExtras {
+	my ($self, $badgeId) = @_;
+	return $self->session->privilege->noAccess() unless $self->canView;
+	$badgeId = $self->session->form->get("badgeId") unless ($badgeId eq "");
+
+	my %var = ();
+
+	# other template variables
+	$self->appendBadgeVars($badgeId, \%var);
+	
+	# render
+	return $self->processTemplate(\%var,$self->get('viewRibbonsTemplate'));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #-------------------------------------------------------------------
 sub _getFieldHash {
 	my $self = shift;
@@ -4108,25 +4287,7 @@ $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$master
 }
 
 
-#-------------------------------------------------------------------
-sub view {
-	my ($self) = @_;
-	my $session = $self->session;
-	return $session->privilege->noAccess() unless $self->canView;
 
-	# set up objects we'll need
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
-	my %var = ();
-	
-	# get our badges
-	foreach my $badge (@{$self->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::Sku::EMSBadge"]})}) {
-		push(@{$var{availableBadges}}, $self->get);
-		$var{availableBadges}[-1]{isFull} = $badge->getQuantityAvailable;
-		$var{availableBadges}[-1]{url} = $badge->getUrl;
-	}
-	
-	
-}
 
 #-------------------------------------------------------------------
 sub viewOLD {

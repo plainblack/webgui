@@ -39,6 +39,13 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
+=head2 addToCart ( {badgeId=>$badgeId })
+
+Does some bookkeeping to keep track of limited quantities of tickets that are available, then adds to cart.
+
+=cut
+
 sub addToCart {
 	my ($self, $badgeInfo) = @_;
 	$self->session->db->write("insert into EMSRegistrantTicket (badgeId, ticketAssetId) values (?,?)",
@@ -47,6 +54,13 @@ sub addToCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+Adds price, seatsAvailable, eventNumber, startDate, endDate and relatedBadges fields.
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -81,15 +95,15 @@ sub definition {
 			tab             => "properties",
 			fieldType       => "dateTime",
 			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("add/edit event start date"),
-			hoverHelp       => $i18n->get("add/edit event start date description"),
+			label           => $i18n->get("event start date"),
+			hoverHelp       => $i18n->get("start date help"),
 			},
 		endDate => {
 			tab             => "properties",
 			fieldType       => "dateTime",
 			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("add/edit event end date"),
-			hoverHelp       => $i18n->get("add/edit event end date description"),
+			label           => $i18n->get("event end date"),
+			hoverHelp       => $i18n->get("event end date help"),
 			},
 		relatedBadges => {
 			tab             => "properties",
@@ -113,6 +127,13 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+Returns title + badgeholder name.
+
+=cut
+
 sub getConfiguredTitle {
     my $self = shift;
 	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
@@ -120,17 +141,38 @@ sub getConfiguredTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getMaxAllowedInCart
+
+Returns 1.
+
+=cut
+
 sub getMaxAllowedInCart {
 	return 1;
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrice
+
+Returns the value of the price field
+
+=cut
+
 sub getPrice {
     my $self = shift;
     return $self->get("price");
 }
 
 #-------------------------------------------------------------------
+
+=head2 getQuantityAvailable
+
+Returns seatsAvailable minus the count from the EMSRegistrantTicket table.
+
+=cut
+
 sub getQuantityAvailable {
 	my $self = shift;
 	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
@@ -138,6 +180,13 @@ sub getQuantityAvailable {
 }
 
 #-------------------------------------------------------------------
+
+=head2 onCompletePurchase
+
+Marks the ticket as purchased.
+
+=cut
+
 sub onCompletePurchase {
 	my ($self, $item) = @_;
 	$self->session->db->write("update EMSRegistrantTicket set purchaseComplete=1 where ticketAssetId=? and badgeId=?",
@@ -146,6 +195,13 @@ sub onCompletePurchase {
 }
 
 #-------------------------------------------------------------------
+
+=head2 onRemoveFromCart
+
+Frees up the ticket to be purchased by someone else.
+
+=cut
+
 sub onRemoveFromCart {
 	my ($self, $item) = @_;
 	$self->session->db->write("delete from EMSRegistrantTicket where ticketAssetId=? and badgeId=?",
@@ -153,6 +209,13 @@ sub onRemoveFromCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Deletes all ticket purchases of this type. No refunds are given.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
@@ -160,17 +223,52 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view
+
+Displays the ticket description.
+
+=cut
+
 sub view {
-    my ($self) = @_;
-    return $self->getParent->view;
+	my ($self) = @_;
+	
+	# build objects we'll need
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	my $form = $self->session->form;
+		
+	
+	# render the page;
+	my $output = '<h1>'.$self->getTitle.' ('.$self->get('eventNumber').')</h1>'
+		.'<p>'.$self->get('description').'</p>'
+		.'<p>'.$self->get('startDate').'</p>';
+
+	# build the add to cart form
+	if ($form->get('badgeId') ne '') {
+		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+		$addToCart->hidden(name=>"func", value=>"addToCart");
+		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
+		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
+		$output .= $addToCart->print;		
+	}
+		
+	return $output;
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addToCart
+
+Takes form variable badgeId and add the ticket to the cart.
+
+=cut
+
 sub www_addToCart {
 	my ($self) = @_;
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
-	$self->addToCart({badgeId=>$self->session->form->get('badgeId')});
-	return $self->getParent->www_view;
+	my $badgeId = $self->session->form->get('badgeId');
+	$self->addToCart({badgeId=>$badgeId});
+	return $self->getParent->www_viewExtras($badgeId);
 }
 
 

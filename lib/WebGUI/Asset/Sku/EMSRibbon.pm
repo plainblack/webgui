@@ -17,7 +17,7 @@ package WebGUI::Asset::Sku::EMSRibbon;
 use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
-
+use WebGUI::HTMLForm;
 
 
 =head1 NAME
@@ -40,6 +40,13 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+Add price field to the definition.
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -70,6 +77,13 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+Return title + badge holder name.
+
+=cut
+
 sub getConfiguredTitle {
     my $self = shift;
 	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
@@ -77,17 +91,38 @@ sub getConfiguredTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getMaxAllowedInCart
+
+Return 1;
+
+=cut
+
 sub getMaxAllowedInCart {
 	return 1;
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrice
+
+Returns the price from the definition.
+
+=cut
+
 sub getPrice {
     my $self = shift;
     return $self->get("price");
 }
 
 #-------------------------------------------------------------------
+
+=head2 onCompletePurchase
+
+Does bookkeeping on EMSRegistrationRibbon table.
+
+=cut
+
 sub onCompletePurchase {
 	my ($self, $item) = @_;
 	$self->session->db->write("insert into EMSRegistrationRibbon (ribbonAssetId, badgeId) values (?,?)",
@@ -96,6 +131,13 @@ sub onCompletePurchase {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Deletes all entries in EMSRegistrationRibbon table for this sku. No refunds are given.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantRibbon where tokenAssetId=?",[$self->getId]);
@@ -103,17 +145,51 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view
+
+Displays the ribbon description.
+
+=cut
+
 sub view {
-    my ($self) = @_;
-    return $self->getParent->view;
+	my ($self) = @_;
+	
+	# build objects we'll need
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	my $form = $self->session->form;
+		
+	
+	# render the page;
+	my $output = '<h1>'.$self->getTitle.'</h1>'
+		.'<p>'.$self->get('description').'</p>';
+
+	# build the add to cart form
+	if ($form->get('badgeId') ne '') {
+		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+		$addToCart->hidden(name=>"func", value=>"addToCart");
+		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
+		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
+		$output .= $addToCart->print;		
+	}
+		
+	return $output;
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addToCart
+
+Takes form variable badgeId and add the ribbon to the cart.
+
+=cut
+
 sub www_addToCart {
 	my ($self) = @_;
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
-	$self->addToCart({badgeId=>$self->session->form->get('badgeId')});
-	return $self->getParent->www_view;
+	my $badgeId = $self->session->form->get('badgeId');
+	$self->addToCart({badgeId=>$badgeId});
+	return $self->getParent->www_viewExtras($badgeId);
 }
 
 

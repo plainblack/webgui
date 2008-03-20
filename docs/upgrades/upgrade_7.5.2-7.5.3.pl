@@ -45,9 +45,21 @@ sub upgradeEMS {
 	my $session = shift;
 	print "\tUpgrading Event Manager\n" unless ($quiet);
 	my $db = $session->db;
+	print "\t\tGetting rid of old templates.\n" unless ($quiet);
+	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
+		my $templates = $db->read("select assetId from template where namespace=?",[$namespace]);
+		while (my ($id) = $templates->array) {
+			my $asset = WebGUI::Asset->new($session, $id,'WebGUI::Asset::Template');
+			if (defined $asset) {
+					$asset->purge;
+			}
+		}
+	}
+	print "\t\tAltering table structures.\n" unless ($quiet);
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem drop column globalMetadata");
 	$db->write("alter table EventManagementSystem drop column globalPrerequisites");
+	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,
 		userId varchar(22) binary,

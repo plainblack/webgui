@@ -2,7 +2,36 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = { ##hashref of hashes
-			 
+	'assetName' => {
+		message 	=> q|Event Manager (beta)|,
+		lastUpdated => 1131394072,
+		context		=> q|name of asset|,
+	},
+
+	'ems badge' => {
+		message 	=> q|Event Manager Badge|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems ticket' => {
+		message 	=> q|Event Manager Ticket|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems ribbon' => {
+		message 	=> q|Event Manager Ribbon|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems token' => {
+		message 	=> q|Event Manager Token|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
 	'is required' => {
 		message 	=> q|%s is required.|,
 		lastUpdated	=> 0,
@@ -75,143 +104,36 @@ our $I18N = { ##hashref of hashes
 		context		=> q|help for a property label|,
 	},
 	
+ 	'event start date' => {
+		message 	=> q|Event Start Date|,
+		lastUpdated => 0,
+		context 	=> q|Event start date field label|
+	},
+
+	'event start date help' => {
+		message 	=> q|The time and date when the event starts.|,
+		lastUpdated => 0,
+		context 	=> q|hover help for Event Start Date field|
+	},
+
+	'event end date' => {
+		message 	=> q|Event End Date|,
+		lastUpdated => 0,
+		context 	=> q|Event end date field label|
+	},
+
+	'end date help' => {
+		message 	=> q|The time and date when the event ends.|,
+		lastUpdated => 0,
+		context 	=> q|hover help for Event End Date field|
+	},
+
+
+
 	'cancel registration' => {
 		message => q|Cancel Registration|,
 		lastUpdated => 0,
 		context => q|Label for hyperlink asking user if they wish to cancel the registration process during checkout.|,
-	},
-
-    'search template' => { 
-		message => q|Search Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for template selector|
-	},
-
-	'search template description' => {
-		message => q|Controls the layout, look, and appearance of the Event Management System Search Page.|,
-		lastUpdated => 1165364261,
-		context => q|Describes this template field selector|
-	},     
-        
-	'display template' => { 
-		message => q|Display Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for template selector|
-	},
-
-	'display template description' => {
-		message => q|Controls the layout, look, and appearance of an Event Management System.|,
-		lastUpdated => 1165364241,
-		context => q|Describes this template field selector|
-	},
-
-	'checkout template' => { 
-		message => q|Checkout Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'checkout template description' => {
-		message => q|Controls the layout, look, and appearance of the Checkout screen in the Event Management System.|,
-		lastUpdated => 1165364248,
-		context => q|Describes this template field selector|
-	},
-
-	'manage purchases template' => { 
-		message => q|Manage Purchases Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'manage purchases template description' => {
-		message => q|Controls the layout, look, and appearance of the Manage Purchases screen in the Event Management System.|,
-		lastUpdated => 1165364251,
-		context => q|Describes this template field selector|
-	},
-
-	'view purchase template' => { 
-		message => q|View Purchase Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'view purchase template description' => {
-		message => q|Controls the layout, look, and appearance of the View Purchase screen in the Event Management System.|,
-		lastUpdated => 1165364253,
-		context => q|Describes this template field selector|
-	},
-
-	'add/edit event template' => { 
-		message => q|Event Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for event template selector|
-	},
-
-	'add/edit event template description' => {
-		message => q|Controls the layout, look, and appearance of an individual Event in the Event Management System.|,
-		lastUpdated => 1165364256,
-		context => q|Describes the event template field selector|
-	},
-
-	'paginate after' => {
-		message => q|Paginate After|,
-		lastUpdated => 1131394072,
-		context => q|Field label for Paginate After|
-	},
-
-	'paginate after description' => {
-		message => q|Number of events to display on one page.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Paginate After field|
-	},
-
-	'group to add events' => {
-		message => q|Group to Add Events|,
-		lastUpdated => 1131394072,
-		context => q|Field label|
-	},
-
-	'group to add events description' => {
-		message => q|Members of the selected group will have the ability to add events to an Event Management System.
-		Events added will not be available for purchase until the event is approved by a member of the Group to Approve Events.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Group To Add Events field|
-	},
-
-	'add/edit event start date' => {
-		message => q|Event Start Date|,
-		lastUpdated => 1138837472,
-		context => q|Event start date field label|
-	},
-
-	'add/edit event start date description' => {
-		message => q|The time and date when the event starts.|,
-		lastUpdated => 1131394072,
-		context => q|hover help for Event Start Date field|
-	},
-
-	'add/edit event end date' => {
-		message => q|Event End Date|,
-		lastUpdated => 1138837472,
-		context => q|Event end date field label|
-	},
-
-	'add/edit event end date description' => {
-		message => q|The time and date when the event ends.|,
-		lastUpdated => 1138837560,
-		context => q|hover help for Event End Date field|
-	},
-
-	'group to approve events' => {
-		message => q|Group to Approve Events|,
-		lastUpdated => 1131394072,
-		context => q|Field Label|
-	},
-
-	'group to approve events description' => {
-		message => q|Members of the selected group will have the ability to approve a pending event so that it is available for purchase.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Group To Approve Events field|
 	},
 
 	'add/edit event title' => {
@@ -1044,36 +966,6 @@ by setting the "hide" form variable.|,
 	'event template help title' => {
 		message => q|Event Management System Event Template|,
 		lastUpdated => 1140465899,
-	},
-
-	'assetName' => {
-		message 	=> q|Event Manager (beta)|,
-		lastUpdated => 1131394072,
-		context		=> q|name of asset|,
-	},
-
-	'ems badge' => {
-		message 	=> q|Event Manager Badge|,
-		lastUpdated => 0,
-		context		=> q|name of asset|,
-	},
-
-	'ems ticket' => {
-		message 	=> q|Event Manager Ticket|,
-		lastUpdated => 0,
-		context		=> q|name of asset|,
-	},
-
-	'ems ribbon' => {
-		message 	=> q|Event Manager Ribbon|,
-		lastUpdated => 0,
-		context		=> q|name of asset|,
-	},
-
-	'ems token' => {
-		message 	=> q|Event Manager Token|,
-		lastUpdated => 0,
-		context		=> q|name of asset|,
 	},
 
 	'type name here' => {

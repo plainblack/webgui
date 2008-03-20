@@ -42,6 +42,13 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+Adds templateId, thankYouMessage, and defaultPrice fields.
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -86,6 +93,13 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+Returns title + price
+
+=cut
+
 sub getConfiguredTitle {
     my $self = shift;
     return $self->getTitle." (".$self->getOptions->{price}.")";
@@ -93,12 +107,26 @@ sub getConfiguredTitle {
 
 
 #-------------------------------------------------------------------
+
+=head2 getPrice
+
+Returns configured price, or default price, or 100 if neither of those are available.
+
+=cut
+
 sub getPrice {
     my $self = shift;
     return $self->getOptions->{price} || $self->get("defaultPrice") || 100.00;
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView
+
+Prepares the template.
+
+=cut
+
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
@@ -109,6 +137,13 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view
+
+Displays the donation form.
+
+=cut
+
 sub view {
     my ($self) = @_;
     my $session = $self->session;
@@ -125,6 +160,13 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 wwww_donate
+
+Accepts the information from the donation form and adds it to the cart.
+
+=cut
+
 sub www_donate {
     my $self = shift;
     if ($self->canView) {

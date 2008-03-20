@@ -40,6 +40,13 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+Adds price field.
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -70,6 +77,13 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+Returns title + badgeholder name.
+
+=cut
+
 sub getConfiguredTitle {
     my $self = shift;
 	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
@@ -77,12 +91,26 @@ sub getConfiguredTitle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrice
+
+Returns the value of the price field.
+
+=cut
+
 sub getPrice {
     my $self = shift;
     return $self->get("price");
 }
 
 #-------------------------------------------------------------------
+
+=head2 onCompletePurchase
+
+Adds tokens to the badge.
+
+=cut
+
 sub onCompletePurchase {
 	my ($self, $item) = @_;
 	my $db = $self->session->db;
@@ -99,6 +127,13 @@ sub onCompletePurchase {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Destroys all tokens of this type. No refunds are given.
+
+=cut
+
 sub purge {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantToken where tokenAssetId=?",[$self->getId]);
@@ -106,19 +141,53 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view
+
+Displays the token description.
+
+=cut
+
 sub view {
-    my ($self) = @_;
-    return $self->getParent->view;
+	my ($self) = @_;
+	
+	# build objects we'll need
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	my $form = $self->session->form;
+		
+	
+	# render the page;
+	my $output = '<h1>'.$self->getTitle.'</h1>'
+		.'<p>'.$self->get('description').'</p>';
+
+	# build the add to cart form
+	if ($form->get('badgeId') ne '') {
+		my $addToCart = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+		$addToCart->hidden(name=>"func", value=>"addToCart");
+		$addToCart->hidden(name=>"badgeId", value=>$form->get('badgeId'));
+		$addToCart->integer(name=>'quantity', value=>1, label=>$i18n->get('quantity','Shop'));
+		$addToCart->submit(value=>$i18n->get('add to cart','Shop'), label=>$self->getPrice);
+		$output .= $addToCart->print;		
+	}
+		
+	return $output;
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addToCart
+
+Takes form variable badgeId and add the token to the cart.
+
+=cut
+
 sub www_addToCart {
 	my ($self) = @_;
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
-	$self->addToCart({badgeId=>$self->session->form->get('badgeId')});
-	return $self->getParent->www_view;
+	my $badgeId = $self->session->form->get('badgeId');
+	$self->addToCart({badgeId=>$badgeId});
+	return $self->getParent->www_viewExtras($badgeId);
 }
-
 
 
 1;

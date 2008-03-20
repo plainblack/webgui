@@ -41,6 +41,13 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+
+=head2 addToCart ( badgeInfo )
+
+Adds this badge as configured for an individual to the cart.
+
+=cut
+
 sub addToCart {
 	my ($self, $badgeInfo) = @_;
 	$badgeInfo->{badgeId} = "new";
@@ -51,6 +58,13 @@ sub addToCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+Adds price, seatsAvailable fields.
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -87,6 +101,13 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+Returns title + badgeholder name
+
+=cut
+
 sub getConfiguredTitle {
     my $self = shift;
 	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
@@ -95,17 +116,38 @@ sub getConfiguredTitle {
 
 
 #-------------------------------------------------------------------
+
+=head2 getMaxAllowedInCart
+
+Returns 1
+
+=cut
+
 sub getMaxAllowedInCart {
 	return 1;
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrice
+
+Returns the price field value.
+
+=cut
+
 sub getPrice {
     my $self = shift;
     return $self->get("price");
 }
 
 #-------------------------------------------------------------------
+
+=head2 getQuantityAvailable
+
+Returns seatsAvailable - the count from the EMSRegistrant table.
+
+=cut
+
 sub getQuantityAvailable {
 	my $self = shift;
 	my $seatsTaken = $self->session->db->quickScalar("select count(*) from EMSRegistrant where badgeAssetId=?",[$self->getId]);
@@ -113,6 +155,13 @@ sub getQuantityAvailable {
 }
 
 #-------------------------------------------------------------------
+
+=head2 onCompletePurchase (item)
+
+Marks badge order as paid.
+
+=cut
+
 sub onCompletePurchase {
 	my ($self, $item) = @_;
 	my $badgeInfo = $self->getOptions;
@@ -123,6 +172,13 @@ sub onCompletePurchase {
 }
 
 #-------------------------------------------------------------------
+
+=head2 onRemoveFromCart ( item )
+
+Destroys badge.
+
+=cut
+
 sub onRemoveFromCart {
 	my ($self, $item) = @_;
 	my $badgeId = $self->getOptions->{badgeId};
@@ -137,13 +193,31 @@ sub onRemoveFromCart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Deletes all badges and things attached to the badges. No refunds are given.
+
+=cut
+
 sub purge {
 	my $self = shift;
-	$self->session->db->write("delete from EMSRegistrant where badgeAssetId=?",[$self->getId]);
+	my $db = $self->session->db;
+	$db->write("delete from EMSRegistrantTicket where badgeAssetId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrantToken where badgeAssetId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrantRibbon where badgeAssetId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrant where badgeAssetId=?",[$self->getId]);
 	$self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------
+
+=head2 view
+
+Displays badge description.
+
+=cut
+
 sub view {
 	my ($self) = @_;
 	
@@ -235,6 +309,13 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_addToCart
+
+Processes form from view() and then adds to cart.
+
+=cut
+
 sub www_addToCart {
 	my ($self) = @_;
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
@@ -266,7 +347,7 @@ sub www_addToCart {
 	
 	# add it to the cart
 	$self->addToCart(\%badgeInfo);
-	return $self->getParent->www_view;
+	return $self->getParent->www_viewExtras($self->getOptions->{badgeId});
 }
 
 1;
