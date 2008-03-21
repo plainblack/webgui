@@ -23,32 +23,11 @@ use Digest::MD5;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
 use WebGUI::International;
-use WebGUI::Operation::Commerce;
-use WebGUI::Commerce::ShoppingCart;
-use WebGUI::Commerce::Item;
 use WebGUI::Utility;
 use Text::CSV_XS;
 use IO::Handle;
 use File::Temp 'tempfile';
 use Data::Dumper;
-
-
-
-
-#-------------------------------------------------------------------
-
-=head2 appendBadgeVars ( badgeId, vars )
-
-Appends template variables for the current badge which is in the currenBadgeId scratch variable.
-
-=cut
-
-sub appendBadgeVars {
-	my ($self, $badgeId, $vars) = @_;
-	return undef unless $badgeId ne "";
-	my $badgeInfo = $self->session->db->quickHashRef("select * from EMSRegistrant where badgeId=?",[$badgeId]);
-	%{$vars} = (%{$vars}, %{$badgeInfo});
-}
 
 
 #-------------------------------------------------------------------
@@ -108,6 +87,17 @@ sub prepareView {
 	$self->SUPER::prepareView();
  	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
+	
+    # set up all the files that we need
+	my ($style, $url) = $self->session->quick(qw(style url));   
+    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+
+
 	$self->{_viewTemplate} = $template;
 }
 
@@ -129,16 +119,66 @@ sub view {
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = ();
 	
-	# get our badges
-	foreach my $badge (@{$self->getLineage(["children"],{returnObjects=>1, includeOnlyClasses=>["WebGUI::Asset::Sku::EMSBadge"]})}) {
-		push(@{$var{availableBadges}}, $self->get);
-		$var{availableBadges}[-1]{isFull} = $badge->getQuantityAvailable;
-		$var{availableBadges}[-1]{url} = $badge->getUrl;
-	}
-	
-	# other template variables
-	$self->appendBadgeVars($badgeId, \%var);
-	
+
+
+
+
+    # draw the html markup that's needed
+    my $output = q| 
+
+<div class=" yui-skin-sam">
+    <div id="emsBadgeList"></div>
+</div>
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
+        DataTable  = YAHOO.widget.DataTable,
+    |;
+    
+    # the datasource deals with the stuff returned from www_getTransactionsAsJson
+    $output .= "var mySource = new DataSource('".$self->getUrl('func=getBadgesAsJson')."');";
+    $output .= <<STOP;
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable']
+    };
+STOP
+
+    # create the data table, and a special formatter for the view transaction urls
+    $output .= <<STOP;
+    var formatViewBadgeDescription = function(elCell, oRecord, oColumn, orderNumber) {
+STOP
+	$output .= q{elCell.innerHTML = '<a href="transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
+    $output .= '
+        }; 
+        var myColumnDefs = [
+    ';
+    $output .= '{key:"title", label:"'.$i18n->get('title').'", formatter:formatViewBadgeDescription},';
+    $output .= '{key:"price", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
+    $output .= '{key:"quantityAvailable", label:"'.$i18n->get('').'"},';
+    $output .= <<STOP;
+    ];
+    var myTable = new DataTable('emsBadgeList', myColumnDefs, mySource);
+STOP
+
+    # add the necessary event handler to the search button that sends the search request via ajax
+    $output .= <<STOP;
+    Dom.get('keywordSearchForm').onsubmit = function () {
+         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+            myTable.onDataReturnInitializeTable, myTable);
+        return false;
+    };
+
+});
+</script>
+STOP
+	return $output;
+
+
 	# render
 	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -156,23 +196,42 @@ sub www_getBadgesAsJson {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
-    my @placeholders = ();
-    my $sql = 'select SQL_CALC_FOUND_ROWS assetId from EMSBadgeIndex';
-    my $keywords = $form->get("keywords");
-    if ($keywords ne "") {
-        ($sql, @placeholders) = $db->buildSearchQuery($sql, $keywords, [qw{amount username orderNumber shippingAddressName shippingAddress1 paymentAddressName paymentAddress1}])
-    }
-    push(@placeholders, $startIndex, $numberOfResults);
-    $sql .= ' order by dateOfPurchase desc limit ?,?';
-    my %results = $db->buildDataTableStructure($sql, \@placeholders);
-    $results{'startIndex'} = $startIndex;
+    my %results = ();
+	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::Badge']})}) {
+		push(@{$results{records}}, {
+			title 				=> $badge->getTitle,
+			description			=> $badge->get('description'),
+			price				=> $badge->getPrice,
+			quantityAvailable	=> $badge->getQuantityAvailable,
+			url					=> $badge->getUrl
+			});
+	}
+    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
+    $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
-    $results{'dir'}        = "desc";
+    $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_getRegistrantAsJson (  )
+
+Retrieves the properties of the current badge and the items attached to it.
+
+=cut
+
+sub www_getRegistrantAsJson {
+	my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+	my $badgeId = $self->session->form->get('badgeId');
+	my $badgeInfo = $session->db->quickHashRef("select * from EMSRegistrant where badgeId=?",[$badgeId]);
+    $session->http->setMimeType('text/json');
+    return JSON::to_json($badgeInfo);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -624,108 +683,6 @@ sub checkRequiredFields {
   return \@errors;    
 }
 
-#-------------------------------------------------------------------
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
-	%properties = (
-		timezone => {
-			fieldType 		=> 'TimeZone',
-			defaultValue 	=> 'America/Chicago',
-			tab				=> 'properties',
-			label			=> $i18n->get('time zone'),
-			hoverHelp		=> $i18n->get('time zone help'),
-		},
-		displayTemplateId =>{
-			fieldType=>"template",
-			defaultValue=>'EventManagerTmpl000001',	
-			tab=>"display",
-			namespace=>"EventManagementSystem",
-			hoverHelp=>$i18n->get('display template description'),
-			label=>$i18n->get('display template')
-			},
-		checkoutTemplateId =>{
-			fieldType=>"template",
-			defaultValue=>'EventManagerTmpl000003',
-			tab=>"display",
-			namespace=>"EventManagementSystem_checkout",
-			hoverHelp=>$i18n->get('checkout template description'),
-			label=>$i18n->get('checkout template')
-			},
-		managePurchasesTemplateId =>{
-			fieldType=>"template",
-			defaultValue=>'EventManagerTmpl000004',
-			tab=>"display",
-			namespace=>"EventManagementSystem_managePurchas",
-			hoverHelp=>$i18n->get('manage purchases template description'),
-			label=>$i18n->get('manage purchases template')
-			},
-		viewPurchaseTemplateId =>{
-			fieldType=>"template",
-			defaultValue=>'EventManagerTmpl000005',
-			tab=>"display",
-			namespace=>"EventManagementSystem_viewPurchase",
-			hoverHelp=>$i18n->get('view purchase template description'),
-			label=>$i18n->get('view purchase template')
-			},
-		searchTemplateId =>{
-			fieldType=>"template",
-			defaultValue=>'EventManagerTmpl000006',
-			tab=>"display",
-			namespace=>"EventManagementSystem_search",
-			hoverHelp=>$i18n->get('search template description'),
-			label=>$i18n->get('search template')
-			},
-		badgePrinterTemplateId => {
-			fieldType       => "template",
-			defaultValue    => "emsbadgeprintout000000",
-			tab             => "display",
-			namespace       => "emsbadgeprint",
-			lable           => "Badge Printer Template",
-			},
-		ticketPrinterTemplateId => {
-			fieldType       => "template",
-			defaultValue    => "emsticketprintout00000",
-			tab             => "display",
-			namespace       => "emsticketprint",
-			lable           => "Ticket Printer Template",
-			},
-		paginateAfter =>{
-			fieldType=>"integer",
-			defaultValue=>10,
-			tab=>"display",
-			hoverHelp=>$i18n->get('paginate after description'),
-			label=>$i18n->get('paginate after')
-			},
-		groupToAddEvents =>{
-			fieldType=>"group",
-			defaultValue=>3,
-			tab=>"security",
-			hoverHelp=>$i18n->get('group to add events description'),
-			label=>$i18n->get('group to add events')
-			},
-		groupToApproveEvents =>{
-			fieldType=>"group",
-			defaultValue=>3,
-			tab=>"security",
-			hoverHelp=>$i18n->get('group to approve events description'),
-			label=>$i18n->get('group to approve events')
-			},
-		);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'ems.gif',
-		autoGenerateForms=>1,
-		tableName=>'EventManagementSystem',
-		className=>'WebGUI::Asset::Wobject::EventManagementSystem',
-		properties=>\%properties
-		});
-	return $class->SUPER::definition($session,$definition);
-}
 
 #------------------------------------------------------------------
 
@@ -1242,17 +1199,17 @@ sub purge {
         $self->deleteMetaField($id);
     }
     # delete events
-    my $sth = $db->read("select productId from EventManagementSystem_products where assetId=?",[$self->getId]);
+    $sth = $db->read("select productId from EventManagementSystem_products where assetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $self->deleteEvent($id);
     }
     # delete prereqs
-    my $sth = $db->read("select prerequisiteId from EventManagementSystem_prerequisites where assetId=?",[$self->getId]);
+    $sth = $db->read("select prerequisiteId from EventManagementSystem_prerequisites where assetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $self->deletePrereqSet($id);
     }
     # delete badges
-    my $sth = $db->read("select badgeId from EventManagementSystem_badges where assetId=?",[$self->getId]);
+    $sth = $db->read("select badgeId from EventManagementSystem_badges where assetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $self->deleteBadge($id);
     }

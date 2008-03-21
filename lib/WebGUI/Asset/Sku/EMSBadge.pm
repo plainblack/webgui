@@ -20,7 +20,7 @@ use base 'WebGUI::Asset::Sku';
 use JSON;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-
+use WebGUI::Utility;
 
 =head1 NAME
 
