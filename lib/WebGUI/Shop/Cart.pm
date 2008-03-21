@@ -3,6 +3,7 @@ package WebGUI::Shop::Cart;
 use strict;
 
 use Class::InsideOut qw{ :std };
+use JSON;
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
@@ -429,10 +430,10 @@ sub www_setShippingAddress {
     my $self = shift;
     my $form = $self->session->form;
     if ($form->get("itemId") ne "") {
-        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('shippingAddressId')}); 
+        $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('addressId')}); 
     }
     else {
-        $self->update({shippingAddressId=>$form->get('shippingAddressId')}); 
+        $self->update({shippingAddressId=>$form->get('addressId')}); 
     }
     return $self->www_view;
 }
@@ -475,6 +476,17 @@ sub www_view {
     my $url = $session->url;
     my $i18n = WebGUI::International->new($session, "Shop");
     my @items = ();
+    $session->style->setRawHeadTags(q|
+        <script type="text/javascript">
+        function setCallbackForAddressChooser (form, itemId) {
+            form.shop.value='address';
+            form.method.value='view';
+            itemId = (itemId == undefined) ? 'null' : "'" + itemId + "'";
+            form.callback.value='{"url":"|.$url->page.q|","params":[{"name":"shop","value":"cart"},{"name":"method","value":"setShippingAddress"},{"name":"itemId","value":'+itemId+'}]}';
+            form.submit();
+        }
+        </script>
+        |);
     foreach my $item (@{$self->getItems}) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
@@ -489,7 +501,7 @@ sub www_view {
             removeButton            => WebGUI::Form::submit($session, {value=>$i18n->get("remove button"),
                extras=>q|onclick="this.form.method.value='removeItem';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-                extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.itemId.value='|.$item->getId.q|';this.form.submit;"|}),
+                extras=>q|onclick="setCallbackForAddressChooser(this.form,'|.$item->getId.q|');"|}),
             );
         my $address = eval { $item->getShippingAddress };
         unless (WebGUI::Error->caught) {
@@ -504,7 +516,7 @@ sub www_view {
         formHeader              => WebGUI::Form::formHeader($session)
             . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
             . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
-            . WebGUI::Form::hidden($session, {name=>"itemId", value=>""}),
+            . WebGUI::Form::hidden($session, {name=>"callback", value=>""}),
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
         checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
@@ -512,9 +524,9 @@ sub www_view {
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-            extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
+            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
-            extras=>q|onclick="this.form.shop.value='address';this.form.method.value='view';this.form.submit;"|}),
+            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         couponDiscount          => $self->formatCurrency(0),

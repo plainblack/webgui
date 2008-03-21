@@ -85,19 +85,30 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
- 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
 	
     # set up all the files that we need
 	my ($style, $url) = $self->session->quick(qw(style url));   
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
-
-
+    $style->setScript($url->extras('/yui/build/container/container-min.js'), {type=>'text/javascript'});
+	$style->setRawHeadTags(q|
+		<style type="text/css">
+		.badgeDescription {
+		background-color: white;
+		max-width: 400px;
+		border:1px solid #000;
+		padding:10px;
+		}
+		</style>
+						   |);
+	return undef;
+ 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
 	$self->{_viewTemplate} = $template;
 }
 
@@ -116,7 +127,6 @@ sub view {
 
 	# set up objects we'll need
 	my $badgeId = $session->form->get("badgeId");
-	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = ();
 	
 
@@ -127,51 +137,91 @@ sub view {
     my $output = q| 
 
 <div class=" yui-skin-sam">
+	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
     <div id="emsBadgeList"></div>
 </div>
+
 
 <script type="text/javascript">
 YAHOO.util.Event.onDOMReady(function () {
     var DataSource = YAHOO.util.DataSource,
         Dom        = YAHOO.util.Dom,
         DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
     |;
     
-    # the datasource deals with the stuff returned from www_getTransactionsAsJson
+    # the datasource deals with the stuff returned from www_getBadgesAsJson
     $output .= "var mySource = new DataSource('".$self->getUrl('func=getBadgesAsJson')."');";
     $output .= <<STOP;
     mySource.responseType   = DataSource.TYPE_JSON;
     mySource.responseSchema = {
         resultsList : 'records',
         totalRecords: 'totalRecords',
-        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable']
+        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
     };
 STOP
 
-    # create the data table, and a special formatter for the view transaction urls
+    # paginator in case there are a lot of badges
     $output .= <<STOP;
-    var formatViewBadgeDescription = function(elCell, oRecord, oColumn, orderNumber) {
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
 STOP
-	$output .= q{elCell.innerHTML = '<a href="transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
-    $output .= '
+
+	# badge description formatter
+    $output .= q|
+		var formatViewBadgeDescription = function(elCell, oRecord, oColumn, title) {
+			elCell.innerHTML = title;
+			elCell.id = 'cell_' + oRecord.getData('assetId');
+			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
+				{ context:elCell.id, autodismissdelay:250000,
+				text:'<div class="badgeDescription">'+oRecord.getData('description')+'</div>' });
         }; 
+    |;
+
+	# add to cart formatter
+    $output .= q|
+		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
+			elCell.innerHTML = '<a href="' + url + '">Add To Cart</a>'; 
+        }; 
+    |;
+	
+	# manage badge formatter
+    $output .= q|
+		var formatManageBadge = function(elCell, oRecord, oColumn, editUrl) {
+			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
+        }; 
+    |;
+	
+	# quantity available formatter
+    $output .= q|
+		var formatQuantityAvailable = function(elCell, oRecord, oColumn, quantityAvailable) {
+			elCell.innerHTML = (quantityAvailable == 0) ? '<strong>Sold Out!</strong>' : quantityAvailable;
+        }; 
+    |;
+	
+    # create the data table
+    $output .= <<STOP;
+    var myTableConfig = {
+        initialRequest         : '',
+        paginator              : myPaginator 
+    };
         var myColumnDefs = [
-    ';
-    $output .= '{key:"title", label:"'.$i18n->get('title').'", formatter:formatViewBadgeDescription},';
-    $output .= '{key:"price", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
-    $output .= '{key:"quantityAvailable", label:"'.$i18n->get('').'"},';
+STOP
+	if ($session->var->isAdminOn) {
+	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageBadge},';
+	}
+    $output .= '{key:"url", label:"Add To Cart", formatter:formatAddToCart},';
+    $output .= '{key:"title", label:"Title",sortable:true,formatter:formatViewBadgeDescription},';
+    $output .= '{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},';
+    $output .= '{key:"quantityAvailable",sortable:true,label:"Quantity Available", formatter:formatQuantityAvailable},';
     $output .= <<STOP;
     ];
-    var myTable = new DataTable('emsBadgeList', myColumnDefs, mySource);
-STOP
-
-    # add the necessary event handler to the search button that sends the search request via ajax
-    $output .= <<STOP;
-    Dom.get('keywordSearchForm').onsubmit = function () {
-         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
-            myTable.onDataReturnInitializeTable, myTable);
-        return false;
-    };
+    var myTable = new DataTable('emsBadgeList', myColumnDefs, mySource, myTableConfig);
 
 });
 </script>
@@ -197,13 +247,16 @@ sub www_getBadgesAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
-	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::Badge']})}) {
+	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSBadge']})}) {
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
 			description			=> $badge->get('description'),
-			price				=> $badge->getPrice,
+			price				=> $badge->getPrice+0,
 			quantityAvailable	=> $badge->getQuantityAvailable,
-			url					=> $badge->getUrl
+			url					=> $badge->getUrl,
+			editUrl				=> $badge->getUrl('func=edit'),
+			deleteUrl			=> $badge->getUrl('func=delete'),
+			assetId				=> $badge->getId,
 			});
 	}
     $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
@@ -3822,22 +3875,6 @@ sub www_saveRegistrantInfo {
 	return $self->www_view();
 }
 
-#-------------------------------------------------------------------
-
-=head2 prepareView ( )
-
-See WebGUI::Asset::prepareView() for details.
-
-=cut
-
-sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("displayTemplateId");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
-}
 
 #-------------------------------------------------------------------
 sub www_search {

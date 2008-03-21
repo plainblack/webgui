@@ -56,9 +56,20 @@ sub upgradeEMS {
 		}
 	}
 	print "\t\tAltering table structures.\n" unless ($quiet);
-	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem drop column globalMetadata");
 	$db->write("alter table EventManagementSystem drop column globalPrerequisites");
+	$db->write("alter table EventManagementSystem drop column displayTemplateId");
+	$db->write("alter table EventManagementSystem drop column checkoutTemplateId");
+	$db->write("alter table EventManagementSystem drop column managePurchasesTemplateId");
+	$db->write("alter table EventManagementSystem drop column viewPurchaseTemplateId");
+	$db->write("alter table EventManagementSystem drop column searchTemplateId");
+	$db->write("alter table EventManagementSystem drop column paginateAfter");
+	$db->write("alter table EventManagementSystem drop column groupToAddEvents");
+	$db->write("alter table EventManagementSystem drop column badgePrinterTemplateId");
+	$db->write("alter table EventManagementSystem drop column ticketPrinterTemplateId");
+	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
+	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null");
+	$db->write("alter table EventManagementSystem add column extrasTemplateId varchar(22) binary not null");
 	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,
@@ -380,6 +391,7 @@ sub addShippingDrivers {
 	# and here's our code
     $session->config->delete('shippingPlugins');
     $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::FlatRate');
+	$session->db->write("insert into shipper (shipperId, className,options) values ('defaultfreeshipping000','WebGUI::Shop::ShipDriver::FlatRate',?)",[q|{"label":"Free Shipping","enabled":1}|]);
 }
 
 #-------------------------------------------------

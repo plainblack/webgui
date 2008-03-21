@@ -242,18 +242,18 @@ sub view {
 	$info->hidden(name=>"func", value=>"addToCart");
 	$info->text(
 		name			=> 'name',
-		defaultValue	=> (defined $address) ? $address->get("name") : $form->get('name'),
 		label			=> $i18n->get('name','Shop'),
+		defaultValue	=> (defined $address) ? $address->get("name") : $form->get('name'),
 		);
 	$info->text(
 		name			=> 'organization',
-		defaultValue	=> $form->get("organization"),
 		label			=> $i18n->get('organization'),
+		defaultValue	=> $form->get("organization"),
 		);
 	$info->text(
 		name			=> 'address1',
-		defaultValue	=> (defined $address) ? $address->get("address1") : $form->get('address1'),
 		label			=> $i18n->get('address','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("address1") : $form->get('address1'),
 		);
 	$info->text(
 		name			=> 'address2',
@@ -265,35 +265,35 @@ sub view {
 		);
 	$info->text(
 		name			=> 'city',
-		defaultValue	=> (defined $address) ? $address->get("city") : $form->get('city'),
 		label			=> $i18n->get('city','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("city") : $form->get('city'),
 		);
 	$info->text(
 		name			=> 'state',
-		defaultValue	=> (defined $address) ? $address->get("state") : $form->get('state'),
 		label			=> $i18n->get('state','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("state") : $form->get('state'),
 		);
 	$info->zipcode(
 		name			=> 'zipcode',
-		defaultValue	=> (defined $address) ? $address->get("code") : $form->get('zipcode','zipcode'),
 		label			=> $i18n->get('code','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("code") : $form->get('zipcode','zipcode'),
 		);
 	$info->country(
 		name			=> 'country',
-		defaultValue	=> (defined $address) ? $address->get("country") : ($form->get('country') || 'United States'),
 		label			=> $i18n->get('country','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("country") : ($form->get('country') || 'United States'),
 		);
 	$info->phone(
 		name			=> 'phoneNumber',
-		defaultValue	=> (defined $address) ? $address->get("phoneNumber") : $form->get("phone","phone"),
 		label			=> $i18n->get('phone number','Shop'),		
+		defaultValue	=> (defined $address) ? $address->get("phoneNumber") : $form->get("phone","phone"),
 		);
 	$info->email(
 		name			=> 'email',
 		label			=> $i18n->get('email address'),
 		defaultValue	=> $form->get("email","email")
 		);
-	$info->submit(value=>$i18n->get('add to cart','Shop'));
+	$info->submit(value=>$i18n->get('add to cart'));
 	
 	# render the page;
 	my $output = '<h1>'.$self->getTitle.'</h1>'

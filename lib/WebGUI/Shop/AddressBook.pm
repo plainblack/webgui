@@ -3,6 +3,7 @@ package WebGUI::Shop::AddressBook;
 use strict;
 
 use Class::InsideOut qw{ :std };
+use JSON;
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
@@ -142,6 +143,24 @@ sub delete {
     $self->session->db->write("delete from addressBook where addressBookId=?",[$self->getId]);
     undef $self;
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 formatCallbackForm ( callback )
+
+Returns an HTML hidden form field with the callback JSON block properly escaped.
+
+=head3 callback
+
+A JSON string that holds the callback information.
+
+=cut
+
+sub formatCallbackForm {
+    my ($self, $callback) = @_;
+    $callback =~ s/"/'/g;
+    return '<input type="hidden" name="callback" value="'.$callback.'" />';
 }
 
 #-------------------------------------------------------------------
@@ -329,9 +348,9 @@ sub www_editAddress {
         error               => $error,
         formHeader          => WebGUI::Form::formHeader($session)
                                 .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                                .$self->formatCallbackForm($form->get('callback'))
                                 .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddressSave"})
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$form->get("addressId")})
-                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")}),
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$form->get("addressId")}),
         saveButton          => WebGUI::Form::submit($session),
         formFooter          => WebGUI::Form::formFooter($session),
         address1Field       => WebGUI::Form::text($session, {name=>"address1", maxlength=>35, defaultValue=>($form->get("address1") || ((defined $address) ? $address->get('address1') : undef))}),
@@ -419,6 +438,13 @@ sub www_view {
     my $self = shift;
     my $session = $self->session;
     my $form = $session->form;
+    my $callback = $form->get('callback');
+    $callback =~ s/'/"/g;
+    $callback = JSON::from_json($callback);
+    my $callbackForm = '';
+    foreach my $param (@{$callback->{params}}) {
+        $callbackForm .= WebGUI::Form::hidden($session, {name=>$param->{name}, value=>$param->{value}});
+    }
     my $i18n = WebGUI::International->new($session, "Shop");
     my @addresses = ();
     foreach my $address (@{$self->getAddresses}) {
@@ -429,21 +455,19 @@ sub www_view {
                                 .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
                                 .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteAddress"})
                                 .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                                .$self->formatCallbackForm($form->get('callback'))
                                 .WebGUI::Form::submit($session, {value=>$i18n->get("delete")})
                                 .WebGUI::Form::formFooter($session),
             editButton      => WebGUI::Form::formHeader($session)
                                 .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
                                 .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddress"})
                                 .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                                .$self->formatCallbackForm($form->get('callback'))
                                 .WebGUI::Form::submit($session, {value=>$i18n->get("edit")})
                                 .WebGUI::Form::formFooter($session),
-            useButton       => WebGUI::Form::formHeader($session)
-                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
-                                .WebGUI::Form::hidden($session, {name=>"method", value=>"setShippingAddress"})
-                                .WebGUI::Form::hidden($session, {name=>"shippingAddressId", value=>$address->getId})
-                                .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+            useButton       => WebGUI::Form::formHeader($session,{action=>$callback->{url}})
+                                .$callbackForm
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
                                 .WebGUI::Form::submit($session, {value=>$i18n->get("use this address")})
                                 .WebGUI::Form::formFooter($session),
             });
@@ -453,7 +477,7 @@ sub www_view {
         addButton => WebGUI::Form::formHeader($session)
                     .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
                     .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddress"})
-                    .WebGUI::Form::hidden($session, {name=>"itemId", value=>$form->get("itemId")})
+                    .$self->formatCallbackForm($form->get('callback'))
                     .WebGUI::Form::submit($session, {value=>$i18n->get("add a new address")})
                     .WebGUI::Form::formFooter($session),
         );
