@@ -425,12 +425,11 @@ sub _assign_rss_dates {
             $item->{date} = $date;
         }
         else {
-            if (my $pubDate = $session->datetime->mailToEpoch($item->{pubDate})) {
-                $item->{date} = $pubDate;
+            my $pubDate;
+            if ($item->{pubDate}) {
+                $pubDate = $session->datetime->mailToEpoch($item->{pubDate});
             }
-            else {
-                $item->{date} = $session->datetime->time() - (60 * 60 * 24 * 365); # handicap the undated
-            }
+            $item->{date} = $pubDate || $session->datetime->time() - (60 * 60 * 24 * 365); # handicap the undated
             $cache->set($item->{date}, '1 year');
         }
     }
