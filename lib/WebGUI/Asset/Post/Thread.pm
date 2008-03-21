@@ -289,8 +289,12 @@ Returns a list of the post objects in this thread, including the thread post its
 =cut
 
 sub getPosts {
-	my $self = shift;
-	$self->getLineage(["self","descendants"], {returnObjects=>1, includeArchived=>1});	
+    my $self = shift;
+    $self->getLineage(["self","descendants"], {
+        returnObjects       => 1,
+        includeArchived     => 1,
+        includeOnlyClasses  => ["WebGUI::Asset::Post","WebGUI::Asset::Post::Thread"],
+    });
 }
 
 #-------------------------------------------------------------------
@@ -905,6 +909,7 @@ sub view {
 		left join assetData on assetData.assetId=asset.assetId
 		where asset.lineage like ".$self->session->db->quote($self->get("lineage").'%')
 		."	and asset.state='published'
+        and asset.className like 'WebGUI::Asset::Post%'
 		and assetData.revisionDate=(SELECT max(assetData.revisionDate) from assetData where assetData.assetId=asset.assetId
 			and (
 				assetData.status in ('approved','archived')
