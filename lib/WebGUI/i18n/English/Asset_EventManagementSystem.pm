@@ -2,6 +2,78 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = { ##hashref of hashes
+	'badge instructions' => {
+		message 	=> q|Badge Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'badge instructions help' => {
+		message 	=> q|Give the user some help on what to do with a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default badge instructions' => {
+		message 	=> q|You need a badge to attend this convention. Choose a badge that meets your needs and budget.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'ticket instructions' => {
+		message 	=> q|Ticket Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'ticket instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default ticket instructions' => {
+		message 	=> q|Tickets allow you to reserve a seat at events that are going on at the convention. Add tickets to your badge for any events you plan to attend.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'ribbon instructions' => {
+		message 	=> q|Ribbon Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'ribbon instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ribbon.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default ribbon instructions' => {
+		message 	=> q|Ribbons give you discounts on a group of related events. You may add one ore more ribbons to your badge to give you discounts on related events.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'token instructions' => {
+		message 	=> q|Token Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'token instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ribbon.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default token instructions' => {
+		message 	=> q|Tokens are like convention currency. They allow you to purchase events and other items without buying a specific ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
 	'assetName' => {
 		message 	=> q|Event Manager (beta)|,
 		lastUpdated => 1131394072,

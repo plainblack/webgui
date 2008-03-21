@@ -86,7 +86,7 @@ Returns title + badgeholder name.
 
 sub getConfiguredTitle {
     my $self = shift;
-	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
+	my $name = $self->session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
     return $self->getTitle." (".$name.")";
 }
 

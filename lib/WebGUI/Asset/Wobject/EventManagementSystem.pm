@@ -62,6 +62,34 @@ sub definition {
 			hoverHelp		=> $i18n->get('extras template help'),
 			namespace		=> 'EMS/Extras',
 		},
+		badgeInstructions => {
+			fieldType 		=> 'HTMLArea',
+			defaultValue 	=> $i18n->get('default badge instructions'),
+			tab				=> 'properties',
+			label			=> $i18n->get('badge instructions'),
+			hoverHelp		=> $i18n->get('badge instructions help'),
+		},
+		ticketInstructions => {
+			fieldType 		=> 'HTMLArea',
+			defaultValue 	=> $i18n->get('default ticket instructions'),
+			tab				=> 'properties',
+			label			=> $i18n->get('ticket instructions'),
+			hoverHelp		=> $i18n->get('ticket instructions help'),
+		},
+		ribbonInstructions => {
+			fieldType 		=> 'HTMLArea',
+			defaultValue 	=> $i18n->get('default ribbon instructions'),
+			tab				=> 'properties',
+			label			=> $i18n->get('ribbon instructions'),
+			hoverHelp		=> $i18n->get('ribbon instructions help'),
+		},
+		tokenInstructions => {
+			fieldType 		=> 'HTMLArea',
+			defaultValue 	=> $i18n->get('default token instructions'),
+			tab				=> 'properties',
+			label			=> $i18n->get('token instructions'),
+			hoverHelp		=> $i18n->get('token instructions help'),
+		},
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -104,6 +132,18 @@ sub prepareView {
 		border:1px solid #000;
 		padding:10px;
 		}
+		.forwardButton {
+			background-color: green;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		.backwardButton {
+			background-color: red;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
 		</style>
 						   |);
 	return undef;
@@ -138,6 +178,7 @@ sub view {
 
 <div class=" yui-skin-sam">
 	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
+	<p>|.$self->get('badgeInstructions').q|</p>
     <div id="emsBadgeList"></div>
 </div>
 
@@ -186,7 +227,7 @@ STOP
 	# add to cart formatter
     $output .= q|
 		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
-			elCell.innerHTML = '<a href="' + url + '">Add To Cart</a>'; 
+			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<a href="' + url + '" class="forwardButton">Buy</a>'; 
         }; 
     |;
 	
@@ -200,7 +241,7 @@ STOP
 	# quantity available formatter
     $output .= q|
 		var formatQuantityAvailable = function(elCell, oRecord, oColumn, quantityAvailable) {
-			elCell.innerHTML = (quantityAvailable == 0) ? '<strong>Sold Out!</strong>' : quantityAvailable;
+			elCell.innerHTML = (quantityAvailable < 1) ? '<strong>Sold Out!</strong>' : quantityAvailable;
         }; 
     |;
 	
@@ -215,7 +256,7 @@ STOP
 	if ($session->var->isAdminOn) {
 	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageBadge},';
 	}
-    $output .= '{key:"url", label:"Add To Cart", formatter:formatAddToCart},';
+    $output .= '{key:"url", label:"Buy", formatter:formatAddToCart},';
     $output .= '{key:"title", label:"Title",sortable:true,formatter:formatViewBadgeDescription},';
     $output .= '{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},';
     $output .= '{key:"quantityAvailable",sortable:true,label:"Quantity Available", formatter:formatQuantityAvailable},';
@@ -300,10 +341,9 @@ sub www_viewExtras {
 	return $self->session->privilege->noAccess() unless $self->canView;
 	$badgeId = $self->session->form->get("badgeId") unless ($badgeId eq "");
 
+	return "got here";
 	my %var = ();
 
-	# other template variables
-	$self->appendBadgeVars($badgeId, \%var);
 	
 	# render
 	return $self->processTemplate(\%var,$self->get('viewRibbonsTemplate'));

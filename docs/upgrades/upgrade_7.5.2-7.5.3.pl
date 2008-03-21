@@ -70,6 +70,10 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null");
 	$db->write("alter table EventManagementSystem add column extrasTemplateId varchar(22) binary not null");
+	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
+	$db->write("alter table EventManagementSystem add column ribbonInstructions mediumtext");
+	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
+	$db->write("alter table EventManagementSystem add column tokenInstructions mediumtext");
 	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,
@@ -124,6 +128,7 @@ sub upgradeEMS {
 		startDate datetime,
 		endDate datetime,
 		eventNumber int,
+		location varchar(100),
 		relatedBadges mediumtext,
 		primary key (assetId, revisionDate)
 		)");
@@ -290,7 +295,7 @@ sub createSkuAsset {
         overrideTaxRate bool not null default 0,
         taxRateOverride float not null default 0.00,
         primary key (assetId, revisionDate),
-        unique key sku (sku),
+        index sku (sku),
         index salesAgentId (salesAgentId)
     )"); 
 }

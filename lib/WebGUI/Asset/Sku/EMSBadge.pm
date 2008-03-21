@@ -20,6 +20,7 @@ use base 'WebGUI::Asset::Sku';
 use JSON;
 use WebGUI::HTMLForm;
 use WebGUI::International;
+use WebGUI::Shop::AddressBook;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -81,7 +82,7 @@ sub definition {
 			hoverHelp       => $i18n->get("price help"),
 			},
 		seatsAvailable => {
-			tab             => "properties",
+			tab             => "commerce",
 			fieldType       => "integer",
 			defaultValue    => 100,
 			label           => $i18n->get("seats available"),
@@ -110,7 +111,7 @@ Returns title + badgeholder name
 
 sub getConfiguredTitle {
     my $self = shift;
-	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
+	my $name = $self->session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
     return $self->getTitle." (".$name.")";
 }
 
@@ -235,7 +236,7 @@ sub view {
 	$book->submit(value=>$i18n->get("populate from address book"));
 	
 	# instanciate address
-	my $address = WebGUI::Shop::Address->new($self->session, $form->get("addressId")) if ($form->get("addressId"));
+	my $address = WebGUI::Shop::AddressBook->create($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
 	
 	# build the form that the user needs to fill out with badge holder information
 	my $info = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
@@ -348,6 +349,39 @@ sub www_addToCart {
 	# add it to the cart
 	$self->addToCart(\%badgeInfo);
 	return $self->getParent->www_viewExtras($self->getOptions->{badgeId});
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ()
+
+Displays the edit form.
+
+=cut
+
+sub www_edit {
+	my ($self) = @_;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
+	$self->session->style->setRawHeadTags(q|
+		<style type="text/css">
+		.forwardButton {
+			background-color: green;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		.backwardButton {
+			background-color: red;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		</style>
+						   |);	
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	return $self->processStyle('<h1>'.$i18n->get('ems badge').'</h1>'.$self->getEditForm->print);
 }
 
 1;

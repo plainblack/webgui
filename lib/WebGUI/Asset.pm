@@ -2179,7 +2179,7 @@ sub update {
 
     # check the definition of all properties against what was given to us
 	foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my @setPairs;
+		my %setPairs = ();
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
@@ -2222,12 +2222,14 @@ sub update {
 
             # set the property
 			$self->{_properties}{$property} = $value;
-			push(@setPairs, $property."=".$self->session->db->quote($value));
+			$setPairs{$property.'=?'} = $value;
 		}
 
         # if there's anything to update, then do so
-		if (scalar(@setPairs) > 0) {
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
+		if (scalar(keys %setPairs) > 0) {
+			my @values = values %setPairs;
+			push(@values, $self->getId, $self->get("revisionDate"));
+			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",keys %setPairs)." where assetId=? and revisionDate=?",\@values);
 		}
 	}
 

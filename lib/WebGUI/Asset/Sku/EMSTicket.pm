@@ -78,7 +78,7 @@ sub definition {
 			hoverHelp       => $i18n->get("price help"),
 			},
 		seatsAvailable => {
-			tab             => "properties",
+			tab             => "commerce",
 			fieldType       => "integer",
 			defaultValue    => 25,
 			label           => $i18n->get("seats available"),
@@ -104,6 +104,13 @@ sub definition {
 			defaultValue    => $date->toDatabase,
 			label           => $i18n->get("event end date"),
 			hoverHelp       => $i18n->get("event end date help"),
+			},
+		location => {
+			tab             => "properties",
+			fieldType       => "comboBox",
+			options			=> $session->db->buildHashRef("select distinct(location) from EMSTicket order by location"),
+			label           => $i18n->get("seats available"),
+			hoverHelp       => $i18n->get("seats available help"),
 			},
 		relatedBadges => {
 			tab             => "properties",
@@ -136,7 +143,7 @@ Returns title + badgeholder name.
 
 sub getConfiguredTitle {
     my $self = shift;
-	my $name = $self->session->db->getScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
+	my $name = $self->session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$self->getOptions->{badgeId}]);
     return $self->getTitle." (".$name.")";
 }
 
