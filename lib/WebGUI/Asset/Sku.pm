@@ -103,46 +103,46 @@ sub definition {
 	my $i18n = WebGUI::International->new($session, "Asset_Sku");
 	%properties = (
 		description => {
-			tab=>"properties",
-			fieldType=>"HTMLArea",
-			defaultValue=>undef,
-			label=>$i18n->get("description"),
-			hoverHelp=>$i18n->get("description help")
+			tab				=> "properties",
+			fieldType		=> "HTMLArea",
+			defaultValue	=> undef,
+			label			=> $i18n->get("description"),
+			hoverHelp		=> $i18n->get("description help")
 			},
 		sku => {
-			tab=>"commerce",
-			fieldType=>"text",
-			defaultValue=>$session->id->generate,
-			label=>$i18n->get("sku"),
-			hoverHelp=>$i18n->get("sku help")
+			tab				=> "shop",
+			fieldType		=> "text",
+			defaultValue	=> $session->id->generate,
+			label			=> $i18n->get("sku"),
+			hoverHelp		=> $i18n->get("sku help")
 			},
 		displayTitle => {
-			tab=>"display",
-			fieldType=>"yesNo",
-			defaultValue=>1,
-			label=>$i18n->get("display title"),
-			hoverHelp=>$i18n->get("display title")
+			tab				=> "display",
+			fieldType		=> "yesNo",
+			defaultValue	=> 1,
+			label			=> $i18n->get("display title"),
+			hoverHelp		=> $i18n->get("display title")
 			},
 		overrideTaxRate => {
-			tab=>"commerce",
-			fieldType=>"yesNo",
-			defaultValue=>0,
-			label=>$i18n->get("override tax rate"),
-			hoverHelp=>$i18n->get("override tax rate help")
+			tab				=> "shop",
+			fieldType		=> "yesNo",
+			defaultValue	=> 0,
+			label			=> $i18n->get("override tax rate"),
+			hoverHelp		=> $i18n->get("override tax rate help")
 			},
 		taxRateOverride => {
-			tab=>"commerce",
-			fieldType=>"float",
-			defaultValue=>0.00,
-			label=>$i18n->get("tax rate override"),
-			hoverHelp=>$i18n->get("tax rate override help")
+			tab				=> "shop",
+			fieldType		=> "float",
+			defaultValue	=> 0.00,
+			label			=> $i18n->get("tax rate override"),
+			hoverHelp		=> $i18n->get("tax rate override help")
 			},
 		salesAgentId => {
-			tab=>"commerce",
-			fieldType=>"hidden",
-			defaultValue=>undef,
-			label=>$i18n->get("sales agent"),
-			hoverHelp=>$i18n->get("sales agent help")
+			tab				=> "shop",
+			fieldType		=> "hidden",
+			defaultValue	=> undef,
+			label			=> $i18n->get("sales agent"),
+			hoverHelp		=> $i18n->get("sales agent help")
 			},
 	);
 	push(@{$definition}, {
@@ -195,7 +195,7 @@ Not to be modified, just defines a new tab.
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
-	return (['commerce', $i18n->get('commerce'), 9]);
+	return (['shop', $i18n->get('shop'), 9]);
 }
 
 #-------------------------------------------------------------------

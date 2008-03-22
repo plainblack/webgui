@@ -3,8 +3,8 @@ package WebGUI::i18n::English::Asset_Sku;
 use strict;
 
 our $I18N = { 
-	'commerce' => { 
-		message => q|Commerce|,
+	'shop' => { 
+		message => q|Shop|,
 		lastUpdated => 0, 
 		context => q|The name of a tab that all Sku based assets have to put their commerce related settings.|
 	},

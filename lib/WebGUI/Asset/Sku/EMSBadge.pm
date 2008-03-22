@@ -75,14 +75,14 @@ sub definition {
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	%properties = (
 		price => {
-			tab             => "commerce",
+			tab             => "shop",
 			fieldType       => "float",
 			defaultValue    => 0.00,
 			label           => $i18n->get("price"),
 			hoverHelp       => $i18n->get("price help"),
 			},
 		seatsAvailable => {
-			tab             => "commerce",
+			tab             => "shop",
 			fieldType       => "integer",
 			defaultValue    => 100,
 			label           => $i18n->get("seats available"),

@@ -73,7 +73,7 @@ sub definition {
 			hoverHelp       => $i18n->get("thank you message"),
             },
 		defaultPrice => {
-			tab             => "commerce",
+			tab             => "shop",
 			fieldType       => "float",
 			defaultValue    => 100.00,
 			label           => $i18n->get("default price"),

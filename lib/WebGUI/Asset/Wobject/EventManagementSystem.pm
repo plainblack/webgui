@@ -166,7 +166,6 @@ sub view {
 	return $session->privilege->noAccess() unless $self->canView;
 
 	# set up objects we'll need
-	my $badgeId = $session->form->get("badgeId");
 	my %var = ();
 	
 
@@ -177,7 +176,7 @@ sub view {
     my $output = q| 
 
 <div class=" yui-skin-sam">
-	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
+	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a></p>
 	<p>|.$self->get('badgeInstructions').q|</p>
     <div id="emsBadgeList"></div>
 </div>
@@ -310,6 +309,72 @@ sub www_getBadgesAsJson {
 
 #-------------------------------------------------------------------
 
+=head2 www_getRibbonsAsJson ()
+
+Retrieves a list of ribbons for the www_viewExtras() method.
+
+=cut
+
+sub www_getRibbonsAsJson {
+    my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my %results = ();
+	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']})}) {
+		push(@{$results{records}}, {
+			title 				=> $badge->getTitle,
+			description			=> $badge->get('description'),
+			price				=> $badge->getPrice+0,
+			url					=> $badge->getUrl,
+			editUrl				=> $badge->getUrl('func=edit'),
+			deleteUrl			=> $badge->getUrl('func=delete'),
+			assetId				=> $badge->getId,
+			});
+	}
+    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
+    $results{'startIndex'} = 0;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "asc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getTokensAsJson ()
+
+Retrieves a list of tokens for the www_viewExtras() method.
+
+=cut
+
+sub www_getTokensAsJson {
+    my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my %results = ();
+	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']})}) {
+		push(@{$results{records}}, {
+			title 				=> $badge->getTitle,
+			description			=> $badge->get('description'),
+			price				=> $badge->getPrice+0,
+			url					=> $badge->getUrl,
+			editUrl				=> $badge->getUrl('func=edit'),
+			deleteUrl			=> $badge->getUrl('func=delete'),
+			assetId				=> $badge->getId,
+			});
+	}
+    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
+    $results{'startIndex'} = 0;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "asc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_getRegistrantAsJson (  )
 
 Retrieves the properties of the current badge and the items attached to it.
@@ -330,18 +395,311 @@ sub www_getRegistrantAsJson {
 #-------------------------------------------------------------------
 
 
-=head2 www_viewExtras ( [badgeId] )
+=head2 www_viewExtras ( [badgeId, whichTab] )
 
 Displays available ribbons, tokens, and tickets for the current badge.
 
 =cut
 
 sub www_viewExtras {
-	my ($self, $badgeId) = @_;
-	return $self->session->privilege->noAccess() unless $self->canView;
-	$badgeId = $self->session->form->get("badgeId") unless ($badgeId eq "");
+	my ($self, $badgeId, $whichTab) = @_;
+	my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
+	$badgeId = $session->form->get("badgeId") unless ($badgeId eq "");
+	$whichTab ||= "tickets";
 
-	return "got here";
+	my ($style, $url) = $session->quick(qw(style url));   
+    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/container/container-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'), {type=>'text/javascript'});
+	$style->setRawHeadTags(q|
+		<style type="text/css">
+		.skuDescription {
+		background-color: white;
+		max-width: 400px;
+		border:1px solid #000;
+		padding:10px;
+		}
+		.forwardButton {
+			background-color: green;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		.backwardButton {
+			background-color: red;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		</style>
+						   |);
+	
+	my $output = q|
+	
+<div class=" yui-skin-sam"><div id="emsExtras" class="yui-navset">
+    <ul class="yui-nav">
+        <li id="emsticketstab"><a href="#emstickets"><em>Tickets</em></a></li>
+        <li id="emsribbonstab"><a href="#emsribbons"><em>Ribbons</em></a></li>
+        <li id="emstokenstab"><a href="#emstokens"><em>Tokens</em></a></li>
+    </ul>            
+    <div class="yui-content">
+	
+	<!-- TICKETS TAB -->
+	
+        <div id="emstickets">
+		<div class=" yui-skin-sam">
+	<p>
+		<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket').q|">Add a ticket</a>
+		&bull;
+		<a href="">Import</a>
+		&bull;
+		<a href="">Export</a>
+	</p>
+	<p>|.$self->get('ticketInstructions').q|</p>
+    <div id="emsTicketList"></div>
+</div>
+
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
+        DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
+    
+    
+    // the datasource deals with the stuff returned from www_getTicketsAsJson
+    var mySource = new DataSource('|.$self->getUrl('func=getTicketsAsJson').q|');
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
+    };
+
+    // paginator in case there are a lot of tickets
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
+
+	// ticket description formatter
+		var formatViewTicketDescription = function(elCell, oRecord, oColumn, title) {
+			elCell.innerHTML = title;
+			elCell.id = 'cell_' + oRecord.getData('assetId');
+			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
+				{ context:elCell.id, autodismissdelay:250000,
+				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
+        }; 
+
+	// add to cart formatter
+		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
+			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<a href="' + url + '" class="forwardButton">Buy</a>'; 
+        }; 
+	
+	// manage ticket formatter
+		var formatManageTicket = function(elCell, oRecord, oColumn, editUrl) {
+			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
+        }; 
+	
+	// quantity available formatter
+		var formatQuantityAvailable = function(elCell, oRecord, oColumn, quantityAvailable) {
+			elCell.innerHTML = (quantityAvailable < 1) ? '<strong>Sold Out!</strong>' : quantityAvailable;
+        }; 
+	
+    // create the data table
+    var myTableConfig = {
+        initialRequest         : '',
+        paginator              : myPaginator 
+    };
+        var myColumnDefs = [
+	|;
+	if ($session->var->isAdminOn) {
+	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageTicket},';
+	}
+	$output .= q|
+		{key:"url", label:"Buy", formatter:formatAddToCart},
+		{key:"title", label:"Title",sortable:true,formatter:formatViewTicketDescription},
+		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},
+		{key:"quantityAvailable",sortable:true,label:"Quantity Available", formatter:formatQuantityAvailable}
+    ];
+    var myTable = new DataTable('emsTicketList', myColumnDefs, mySource, myTableConfig);
+
+	});
+	</script>
+		</div>
+	
+	<!-- RIBBONS TAB -->
+	
+        <div id="emsribbons">
+		<div class=" yui-skin-sam">
+	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon').q|">Add a ribbon</a></p>
+	<p>|.$self->get('ribbonInstructions').q|</p>
+    <div id="emsRibbonList"></div>
+	</div>
+
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
+        DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
+    
+    // the datasource deals with the stuff returned from www_getRibbonsAsJson
+    var mySource = new DataSource('|.$self->getUrl('func=getRibbonsAsJson').q|');
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'url', 'title', 'description', 'price', 'deleteUrl', 'editUrl', 'assetId']
+    };
+
+    // paginator in case there are a lot of ribbons
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
+
+	// ribbon description formatter
+		var formatViewRibbonDescription = function(elCell, oRecord, oColumn, title) {
+			elCell.innerHTML = title;
+			elCell.id = 'cell_' + oRecord.getData('assetId');
+			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
+				{ context:elCell.id, autodismissdelay:250000,
+				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
+        }; 
+
+	// add to cart formatter
+		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
+			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<a href="' + url + '" class="forwardButton">Buy</a>'; 
+        }; 
+	
+	// manage ribbon formatter
+		var formatManageRibbon = function(elCell, oRecord, oColumn, editUrl) {
+			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
+        }; 
+	
+    // create the data table
+    var myTableConfig = {
+        initialRequest         : '',
+        paginator              : myPaginator 
+    };
+        var myColumnDefs = [
+	|;
+	if ($session->var->isAdminOn) {
+	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageRibbon},';
+	}
+	$output .= q|
+		{key:"url", label:"Buy", formatter:formatAddToCart},
+		{key:"title", label:"Title",sortable:true,formatter:formatViewRibbonDescription},
+		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
+    ];
+    var myTable = new DataTable('emsRibbonList', myColumnDefs, mySource, myTableConfig);
+
+	});
+	</script>
+		</div>
+	
+	<!-- TOKENS TAB -->
+	
+        <div id="emstokens">
+		<div class=" yui-skin-sam">
+	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken').q|">Add a token</a></p>
+	<p>|.$self->get('tokenInstructions').q|</p>
+    <div id="emsTokenList"></div>
+</div>
+
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function () {
+    var DataSource = YAHOO.util.DataSource,
+        Dom        = YAHOO.util.Dom,
+        DataTable  = YAHOO.widget.DataTable,
+        Paginator  = YAHOO.widget.Paginator;
+    
+    // the datasource deals with the stuff returned from www_getTokensAsJson
+    var mySource = new DataSource('|.$self->getUrl('func=getTokensAsJson').q|');
+    mySource.responseType   = DataSource.TYPE_JSON;
+    mySource.responseSchema = {
+        resultsList : 'records',
+        totalRecords: 'totalRecords',
+        fields      : [ 'url', 'title', 'description', 'price', 'deleteUrl', 'editUrl', 'assetId']
+    };
+
+    // paginator in case there are a lot of tokens
+    var myPaginator = new Paginator({
+        containers         : ['paging'],
+        pageLinks          : 5,
+        rowsPerPage        : 25,
+        rowsPerPageOptions : [25,50,100],
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+    });
+
+	// token description formatter
+		var formatViewTokenDescription = function(elCell, oRecord, oColumn, title) {
+			elCell.innerHTML = title;
+			elCell.id = 'cell_' + oRecord.getData('assetId');
+			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
+				{ context:elCell.id, autodismissdelay:250000,
+				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
+        }; 
+
+	// add to cart formatter
+		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
+			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<a href="' + url + '" class="forwardButton">Buy</a>'; 
+        }; 
+	
+	// manage token formatter
+		var formatManageToken = function(elCell, oRecord, oColumn, editUrl) {
+			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
+        }; 
+	
+    // create the data table
+    var myTableConfig = {
+        initialRequest         : '',
+        paginator              : myPaginator 
+    };
+        var myColumnDefs = [
+	|;
+	if ($session->var->isAdminOn) {
+	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageToken},';
+	}
+	$output .= q|
+		{key:"url", label:"Buy", formatter:formatAddToCart},
+		{key:"title", label:"Title",sortable:true,formatter:formatViewTokenDescription},
+		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
+    ];
+    var myTable = new DataTable('emsTokenList', myColumnDefs, mySource, myTableConfig);
+
+	});
+	</script>
+		</div>
+    </div>
+</div></div>
+<script type="text/javascript">
+(function() {
+	var whichTab = '|.$whichTab.q|';
+	YAHOO.util.Dom.addClass(YAHOO.util.Dom.get('ems' + whichTab + 'tab'),'selected');
+    var tabView = new YAHOO.widget.TabView('emsExtras');
+	})();
+</script>
+	|;
+	return $self->processStyle($output);
 	my %var = ();
 
 	

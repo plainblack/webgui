@@ -71,14 +71,14 @@ sub definition {
 	my $date = WebGUI::DateTime->new($session, time());
 	%properties = (
 		price => {
-			tab             => "commerce",
+			tab             => "shop",
 			fieldType       => "float",
 			defaultValue    => 0.00,
 			label           => $i18n->get("price"),
 			hoverHelp       => $i18n->get("price help"),
 			},
 		seatsAvailable => {
-			tab             => "commerce",
+			tab             => "shop",
 			fieldType       => "integer",
 			defaultValue    => 25,
 			label           => $i18n->get("seats available"),
@@ -277,6 +277,54 @@ sub www_addToCart {
 	$self->addToCart({badgeId=>$badgeId});
 	return $self->getParent->www_viewExtras($badgeId);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ()
+
+Displays the edit form.
+
+=cut
+
+sub www_edit {
+	my ($self) = @_;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	return $self->session->privilege->locked() unless $self->canEditIfLocked;
+	$self->session->style->setRawHeadTags(q|
+		<style type="text/css">
+		.forwardButton {
+			background-color: green;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		.backwardButton {
+			background-color: red;
+			color: white;
+			font-weight: bold;
+			padding: 3px;
+		}
+		</style>
+						   |);	
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	my $form = $self->getEditForm;
+	$form->hidden({name=>'proceed', value=>'viewAllTickets'});
+	return $self->processStyle('<h1>'.$i18n->get('ems ticket').'</h1>'.$form->print);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewAllTickets ()
+
+Displays the list of tickets in the parent.
+
+=cut
+
+sub www_viewAllTickets {
+	my $self = shift;
+	return $self->getParent->www_viewExtras(undef,"tickets");
+}
+
 
 
 1;
