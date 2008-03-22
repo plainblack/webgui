@@ -150,7 +150,7 @@ function editListItem(url,fieldId) {
 		function optionalFields() {
 			initOptionalFields("edit_"+fieldId+"_Dialog",fieldId);
 		}
-		editFieldDialog = new YAHOO.widget.Dialog("dialog2", { width:"460px", visible:false, draggable:true, close:true, fixedcenter:true, zIndex:11001,
+		editFieldDialog = new YAHOO.widget.Dialog("edit_"+fieldId+"_Dialog", { width:"460px", visible:false, draggable:true, close:true, fixedcenter:true, zIndex:11001, height: "400px",
 		buttons : [ { text:"Submit", handler:handleSubmit, isDefault:true }, 
 				{ text:"Cancel", handler:handleCancel } ]
 		} );
@@ -160,8 +160,8 @@ function editListItem(url,fieldId) {
 		editFieldDialog.render(document.body);
 		editFieldDialog.callback = { success: handleSuccess, failure: handleFailure };
 		editFieldDialog.show();
-		YAHOO.util.Event.onContentReady("dialog2", optionalFields);
-		
+		YAHOO.util.Event.onContentReady("edit_"+fieldId+"_Dialog", optionalFields);
+		initHoverHelp("edit_"+fieldId+"_Dialog");
 
 	};
 
@@ -270,8 +270,8 @@ function initAddFieldDialog() {
 	this.cancel();
 	};
 
-	var addFieldDialog = new YAHOO.widget.Dialog("dialog1", { width:"460px", visible:false,
-	draggable:true, close:true, fixedcenter:true, zIndex:11002,
+	var addFieldDialog = new YAHOO.widget.Dialog("addDialog", { width:"460px", visible:false,
+	draggable:true, close:true, fixedcenter:true, zIndex:11002, height: "400px",
 	buttons : [ { text:"Submit", handler:handleSubmit, isDefault:true }, 
 			{ text:"Cancel", handler:handleCancel } ]
 	} );

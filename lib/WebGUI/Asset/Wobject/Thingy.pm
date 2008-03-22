@@ -436,15 +436,14 @@ where asset.state = "published"');
     }
     my $defaultValueForm = WebGUI::Form::Textarea($self->session, {
                 name=>"defaultValue",
-                label=>$i18n->get('default value label'),
-                hoverHelp=>$i18n->get('default value description'),
                 value=>$defaultValue,
                 subtext=>'<br />'.$i18n->get('default value subtext'),
                 width=>200,
                 height=>60,
                 resizable=>0,
             });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultValue_module",$defaultValueForm,$i18n->get('default value label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultValue_module",$defaultValueForm,
+        $i18n->get('default value label'),$i18n->get('default value description')));
     
     $f->text(
         -name=>"subtext",
@@ -462,52 +461,56 @@ where asset.state = "published"');
     
     my $widthForm = WebGUI::Form::Integer($self->session, {
             name=>"width",
-            hoverHelp=>$i18n->get('width description'),
             value=>($field->{width} || 250),
             size=>10,
         });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_width_module",$widthForm,$i18n->get('width label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_width_module",$widthForm,$i18n->get('width label'),
+        $i18n->get('width description')));
 
     my $sizeForm = WebGUI::Form::Integer($self->session, {
             name=>"size",
-            hoverHelp=>$i18n->get('size description'),
             value=>($field->{size} || 25),
             size=>10,
         });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_size_module",$sizeForm,$i18n->get('size label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_size_module",$sizeForm,$i18n->get('size label'),
+        $i18n->get('size description'),));
 
     my $heightForm = WebGUI::Form::Integer($self->session, {
             name=>"height",
             value=>$field->{height} || 40,
             label=>$i18n->get('height label'),
-            hoverHelp=>$i18n->get('height description'),
             size=>10,
         });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_height_module",$heightForm,$i18n->get('height label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_height_module",$heightForm,$i18n->get('height label'),
+        $i18n->get('height description')));
 
     my $verticalForm = WebGUI::Form::YesNo($self->session, {
             name=>"vertical",
             value=>$field->{vertical},
             label=>$i18n->get('vertical label'),
-            hoverHelp=>$i18n->get('vertical description'),
         });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_vertical_module",$verticalForm,$i18n->get('vertical label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_vertical_module",$verticalForm,$i18n->get('vertical label'),
+        $i18n->get('vertical description')));
     
     my $valuesForm = WebGUI::Form::Textarea($self->session, { 
             name=>"possibleValues",
-            hoverHelp=>$i18n->get('possible values description'),
             value=>$field->{possibleValues},
             width=>200,
             height=>60,
             resizable=>0,
         });
-    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_values_module",$valuesForm,$i18n->get('possible values label')));
+    $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_values_module",$valuesForm,$i18n->get('possible values label'),
+        $i18n->get('possible values description')));
     $f->text(
         -name=>"extras",
         -value=>$field->{extras},
         -label=>$i18n->get('extras label'),
         -hoverHelp=>$i18n->get('extras description'),
         );
+
+    #unless ($dialogPrefix eq "addDialog") {
+    #    $f->raw('<script type="text/javascript">initHoverHelp("'.$dialogPrefix.'");</script>');
+    #}
     return $f;
 }
 #-------------------------------------------------------------------
@@ -699,13 +702,15 @@ sub getHtmlWithModuleWrapper {
     my $id = shift;
     my $formElement = shift;
     my $formDescription = shift;
+    my $hoverHelp = shift;
 
+    $hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
     my $html =  "\n<tr><td colspan='2'>\n";
     $html .=    "\t<div id='".$id."'>\n";
     $html .=    "\t<div class='bd' style='padding:0px;'>\n";
     $html .=    "\t<table cellpadding='0' cellspacing='0' style='width: 100%;'>\n";
     $html .=    "\t<tr><td class='formDescription' valign='top' style='width:180px'>";
-    $html .=    $formDescription."</td>";
+    $html .=    $formDescription.$hoverHelp."</td>";
     $html .=    "<td valign='top' class='tableData' style='padding-left:4px'>";
     $html .=    $formElement."</td>";
     $html .=    "\t\n</tr>\n";
@@ -1416,7 +1421,7 @@ where thingId != ? and asset.state = 'published'",[$thingId]);
 
     $output = $tabForm->print;
     
-    my $dialog = "<div id='dialog1'>\n"
+    my $dialog = "<div id='addDialog'>\n"
                 ."<div class='hd'>".$i18n->get('add field label')."</div>\n"
                 ."<div class='bd'>\n";
 
@@ -2285,7 +2290,7 @@ sequenceNumber');
                 "searchResult_field_loop" => \@field_loop,
             );
             if ($self->hasPrivileges($thingProperties{groupIdEdit})){
-                $templateVars{searchResult_elete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
+                $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
                 .$thingId.';thingDataId='.$thingDataId,$url,$i18n->get('delete thing data warning'));
                 $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
                 .$thingId.';thingDataId='.$thingDataId,$url);

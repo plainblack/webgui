@@ -7,7 +7,7 @@
     font-weight: normal;
     padding: 3px;
     width: 300px;
-    z-index: 100 !important;
+    z-index: 12000 !important;
     display: none;
 }
 .wg-hoverhelp.yui-tt {
