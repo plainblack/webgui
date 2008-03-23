@@ -431,14 +431,14 @@ EODIV
     };
 EODSURL
     $output .= <<STOP;
-    ##Tell YUI how to get back to the site
+    //Tell YUI how to get back to the site
     var buildQueryString = function (state,dt) {
         return ";startIndex=" + state.pagination.recordOffset +
                ";keywords=" + Dom.get('keywordsField').value +
                ";results=" + state.pagination.rowsPerPage;
     };
 
-    ##Build and configure a paginator
+    //Build and configure a paginator
     var myPaginator = new Paginator({
         containers         : ['paging'],
         pageLinks          : 5,
@@ -447,7 +447,7 @@ EODSURL
         template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
     });
 
-    ##Configure the table to use the paginator.
+    //Configure the table to use the paginator.
     var myTableConfig = {
         initialRequest         : ';startIndex=0',
         generateRequest        : buildQueryString,
@@ -456,28 +456,33 @@ EODSURL
     };
 STOP
 
-    $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code');
-    ##Build column headers.
+    $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'), $i18n->get('tax rate');
+    //Build column headers.
     var taxColumnDefs = [
+        {key:"taxId", label:"taxId"},
         {key:"country", label:"%s"},
         {key:"state",   label:"%s"},
         {key:"city",    label:"%s"},
-        {key:"code",    label:"%s"}
+        {key:"code",    label:"%s"},
+        {key:"taxRate", label:"%s"},
+
     ];
 EOCHJS
     $output .= <<STOP;
-    ##Now, finally, the table
-    var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+    //Now, finally, the table
+    var myTable = new DataTable('dt', taxColumnDefs, mySource, myTableConfig);
 
-    ##Setup the form to submit an AJAX request back to the site.
+    //Setup the form to submit an AJAX request back to the site.
     Dom.get('keywordSearchForm').onsubmit = function () {
-         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+        mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
             myTable.onDataReturnInitializeTable, myTable);
         return false;
     };
+
 });
+</script>
 STOP
-    return '';
+    return $admin->getAdminConsole->render($output, $i18n->get('taxes', 'Shop'));
 }
 
 1;

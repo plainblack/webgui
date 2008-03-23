@@ -27,6 +27,12 @@ our $I18N = {
 		context => q|A postal code, or zip code.|,
 	},
 
+	'tax rate' => {
+		message => q|Tax Rate|,
+		lastUpdated => 1206302052,
+		context => q|The amount that a person is charged to buy something, a percentage of the price.|,
+	},
+
 };
 
 1;
