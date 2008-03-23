@@ -93,6 +93,7 @@ sub upgradeEMS {
 		organization varchar(35),
 		email varchar(255),
 		purchaseComplete boolean,
+		hasCheckedIn boolean,
 		index badgeAssetId_purchaseComplete (badgeAssetId,purchaseComplete)
 		)");
 	$db->write("create table EMSRegistrantTicket (

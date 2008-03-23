@@ -409,7 +409,7 @@ sub www_viewExtras {
 	$whichTab ||= "tickets";
 
 	my ($style, $url) = $session->quick(qw(style url));   
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
@@ -439,23 +439,50 @@ sub www_viewExtras {
 			font-weight: bold;
 			padding: 3px;
 		}
+		#emstickets p, #emsribbons p, #emstokens p { text-align: left; padding: 5px; }
+		#badge {
+			font-size: 15px;
+			-moz-border-radius: 10px;
+			-webkit-border-radius: 10px;
+			border-radius: 10px;
+			border: 3px solid #2647a0;
+		}
+		#badgeHolderName {
+			background-color: #2647a0;
+			width: 100%;
+			color: white;
+			font-family: bold;
+			font-size: 25px;
+			padding: 5px 0px 5px 0px;
+			margin: 5px 0px 5px 0px;
+			margin-bottom: 5px;
+		}
+		#badgeTicketList div , #badgeRibbonList div , #badgeTokenList div {
+			border-top: 1px solid #808080;
+			width: 100%;
+			font-size: 13px;
+			padding: 5px 0px 5px 0px;
+			margin-top: 5px;
+		}
 		</style>
 						   |);
 	
 	my $output = q|
 	
-<div class=" yui-skin-sam"><div id="emsExtras" class="yui-navset">
+<div class=" yui-skin-sam"> <!-- start yui wrapper -->
+   <div class="yui-gc"> <!-- start grid -->
+     <div class="yui-u first"> <!-- start first column -->
+		<div id="emsExtras" class="yui-navset">  <!-- start tabs -->
     <ul class="yui-nav">
         <li id="emsticketstab"><a href="#emstickets"><em>Tickets</em></a></li>
         <li id="emsribbonstab"><a href="#emsribbons"><em>Ribbons</em></a></li>
         <li id="emstokenstab"><a href="#emstokens"><em>Tokens</em></a></li>
     </ul>            
-    <div class="yui-content">
+    <div class="yui-content"> <!-- start tab data -->
 	
 	<!-- TICKETS TAB -->
 	
-        <div id="emstickets">
-		<div class=" yui-skin-sam">
+        <div id="emstickets"> <!-- start ticket tab data -->
 	<p>
 		<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket').q|">Add a ticket</a>
 		&bull;
@@ -465,7 +492,6 @@ sub www_viewExtras {
 	</p>
 	<p>|.$self->get('ticketInstructions').q|</p>
     <div id="emsTicketList"></div>
-</div>
 
 
 <script type="text/javascript">
@@ -538,16 +564,14 @@ YAHOO.util.Event.onDOMReady(function () {
 
 	});
 	</script>
-		</div>
+		</div> <!-- end ticket tab data -->
 	
 	<!-- RIBBONS TAB -->
 	
-        <div id="emsribbons">
-		<div class=" yui-skin-sam">
+        <div id="emsribbons"> <!-- start ribbon tab data -->
 	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon').q|">Add a ribbon</a></p>
 	<p>|.$self->get('ribbonInstructions').q|</p>
     <div id="emsRibbonList"></div>
-	</div>
 
 
 <script type="text/javascript">
@@ -613,16 +637,14 @@ YAHOO.util.Event.onDOMReady(function () {
 
 	});
 	</script>
-		</div>
+		</div> <!-- end ribbon tab data -->
 	
 	<!-- TOKENS TAB -->
 	
-        <div id="emstokens">
-		<div class=" yui-skin-sam">
+        <div id="emstokens"> <!-- start token tab data -->
 	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken').q|">Add a token</a></p>
 	<p>|.$self->get('tokenInstructions').q|</p>
     <div id="emsTokenList"></div>
-</div>
 
 
 <script type="text/javascript">
@@ -688,9 +710,24 @@ YAHOO.util.Event.onDOMReady(function () {
 
 	});
 	</script>
+		</div> <!-- end token tab data -->
+	  </div> <!-- end tab data -->
+     </div> <!-- end tabs -->
+	</div> <!-- end first column -->
+	<div class="yui-u"> <!-- start second column -->
+		<div id="badge">
+			Hello, My Name Is...
+			<div id="badgeHolderName">Test User</div>
+			Badge Type Goes Here
+			<div id="badgeTicketList"><div>Some Event - Tues @ 9am ($9.00)</div><div>Some Other Event - Wed @ 7pm ($3.00)</div></div>
+			<div id="badgeRibbonList"><div>Some Ribbon ($20.00)</div></div>
+			<div id="badgeTokenList"><div>10 - Token - ($10.00)</div></div>
 		</div>
-    </div>
-</div></div>
+	</div> <!-- end second column -->
+	</div> <!-- end grid -->
+</div> <!-- end yui wrapper -->
+
+
 <script type="text/javascript">
 (function() {
 	var whichTab = '|.$whichTab.q|';
