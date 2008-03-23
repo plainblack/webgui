@@ -402,14 +402,16 @@ sub www_manage {
     ##YUI JSON handler
     $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
     ##Default CSS
-    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
+    $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
 
-    my $output =<<EODIV;
+    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $i18n->get('export');
 <div class=" yui-skin-sam">
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
+    <div id="import"></div>
+    <div id="export"><form id="exportForm"><input type="submit" value="%s" /></form></div>
 </div>
 
 <script type="text/javascript">
