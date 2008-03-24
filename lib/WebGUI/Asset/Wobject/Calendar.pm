@@ -975,11 +975,7 @@ sub view {
     $var->{"urlMonth"}      = $self->getUrl("type=month;start=".$params->{start});
     $var->{"urlSearch"}     = $self->getSearchUrl;
     $var->{"urlPrint"}      = $self->getUrl("type=".$params->{type}.";start=".$params->{start}.";print=1");
-    $var->{"urlIcal"}	    = $self->getUrl(
-                                    sprintf "func=ical;type=%s;start=%s",
-                                        $params->{type},
-                                        $params->{start},
-                              );
+    $var->{"urlIcal"}	    = $self->getUrl( "func=ical" );
 
     # Parameters
     $var->{"paramStart"}    = $params->{start};
