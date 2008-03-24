@@ -342,6 +342,26 @@ Accessor for the session object.  Returns the session object.
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteTax (  )
+
+Delete a row of tax information, using the form variable taxId as
+the id of the row to delete.
+
+=cut
+
+sub www_deleteTax {
+    my $self = shift;
+    my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient
+        unless $admin->canManage;
+    my $taxId = $session->form->get('taxId');
+    $self->delete({ taxId => $taxId });
+    return $self->www_manage;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_getTaxesAsJson (  )
 
 Servers side pagination for tax data that is sent as JSON back to the browser to be
@@ -467,14 +487,19 @@ EODSURL
     };
 STOP
 
+    $output .= sprintf <<'STOP', $url->page(q{shop=tax;method=deleteTax});
+    YAHOO.widget.DataTable.formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
+        elCell.innerHTML = '<a href="%s;taxId='+oRecord.getData('taxId')+'">X</a>';
+    };
+STOP
     $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'), $i18n->get('tax rate');
     //Build column headers.
     var taxColumnDefs = [
-        {key:"taxId",   label:"taxId"},
-        {key:"country", label:"%s"},
-        {key:"state",   label:"%s"},
-        {key:"city",    label:"%s"},
-        {key:"code",    label:"%s"},
+        {key:"taxId",   label:"taxId", formatter:YAHOO.widget.DataTable.formatDeleteTaxId},
+        {key:"country", label:"%s", sortable: true},
+        {key:"state",   label:"%s", sortable: true},
+        {key:"city",    label:"%s", sortable: true},
+        {key:"code",    label:"%s", sortable: true},
         {key:"taxRate", label:"%s"}
     ];
 EOCHJS
