@@ -51,6 +51,11 @@ our $I18N = {
 		context => q|To remove one tax entry from the tax tables.|,
 	},
 
+	'add a tax' => {
+		message => q|Add new tax information|,
+		lastUpdated => 1206395083,
+	},
+
 };
 
 1;

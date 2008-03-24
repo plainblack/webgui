@@ -362,6 +362,31 @@ sub www_deleteTax {
 
 #-------------------------------------------------------------------
 
+=head2 www_addTax (  )
+
+Add new tax information into the database, via the UI.
+
+=cut
+
+sub www_addTax {
+    my $self    = shift;
+    my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient
+        unless $admin->canManage;
+    my $params;
+    my ($form)    = $session->quick('form');
+    $params->{country} = $form->get('country');
+    $params->{state}   = $form->get('state');
+    $params->{city}    = $form->get('city');
+    $params->{code}    = $form->get('code');
+    $params->{taxRate} = $form->get('taxRate');
+    $self->add($params);
+    return $self->www_manage;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_exportTax (  )
 
 Export the entire tax table as a CSV file the user can download.
@@ -479,11 +504,37 @@ sub www_manage {
                    . WebGUI::Form::submit($session,{value=>$i18n->get('import'), extras=>q{style="float: left;"} })
                    . q{<input type="file" name="importFile" size="10" />}
                    . WebGUI::Form::formFooter($session);
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $exportForm, $importForm;
+
+    my $addForm = WebGUI::HTMLForm->new($session,action=>$url->page('shop=tax;method=addTax'));
+    $addForm->text(
+        label => $i18n->get('country'),
+        name  => 'country',
+    );
+    $addForm->text(
+        label => $i18n->get('state'),
+        name  => 'state',
+    );
+    $addForm->text(
+        label => $i18n->get('city'),
+        name  => 'city',
+    );
+    $addForm->text(
+        label => $i18n->get('code'),
+        name  => 'code',
+    );
+    $addForm->text(
+        label => $i18n->get('tax rate'),
+        name  => 'taxRate',
+    );
+    $addForm->submit(
+        value => $i18n->get('add a tax'),
+    );
+    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
 <div class=" yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
+    <div id="adding">%s</div>
     <div id="importExport">%s%s</div>
 </div>
 
