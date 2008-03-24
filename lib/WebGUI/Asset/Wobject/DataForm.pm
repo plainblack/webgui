@@ -1068,6 +1068,13 @@ sub www_editFieldSave {
 	my $name = $self->session->url->urlize($form->process("name") || $form->process("label"));
         $name =~ s/\-//g;
         $name =~ s/\///g;
+    my $exists = 1;
+    while ($exists) {
+        $exists = $self->session->db->quickScalar('SELECT DataForm_fieldId FROM DataForm_field WHERE assetId=? AND name=?', [$self->getId, $name]);
+        if ($exists) {
+            $name =~ s/(\d+|)$/$1 + 1/e; # increment number at the end of the name
+        }
+    }
 	$self->setCollateral("DataForm_field","DataForm_fieldId",{
 		DataForm_fieldId=>$form->process("fid"),
 		width=>$form->process("width", 'integer'),
