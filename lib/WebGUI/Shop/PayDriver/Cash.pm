@@ -175,14 +175,6 @@ sub www_pay {
 
     my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
 
-    # Create a transaction and complete the purchase
-    my $transaction = WebGUI::Shop::Transaction->create( $session, {
-        cart            => $cart,
-        paymentAddress  => $billingAddress,
-        paymentMethod   => $self,
-    });
-    $transaction->completePurchase( $cart, 'CASH', 'OK', 'Cash payment' );
-
     # Generate a receipt and send it if enabled.
     if ( $self->get('sendReceipt') ) {
         # Setup receipt tmpl_vars
@@ -204,6 +196,14 @@ sub www_pay {
         $receipt->queue;
 
     }
+
+    # Create a transaction and complete the purchase
+    my $transaction = WebGUI::Shop::Transaction->create( $session, {
+        cart            => $cart,
+        paymentAddress  => $billingAddress,
+        paymentMethod   => $self,
+    });
+    $transaction->completePurchase( $cart, 'CASH', 'OK', 'Cash payment' );
 
     return $session->style->userStyle('Thank you for ordering');
 }
