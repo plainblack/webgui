@@ -6,6 +6,7 @@
  - Add Gallery search limiting by user ID
  - Remaining i18n for Gallery templates
  - Fix: Search form now visible in Photo assets
+ - Added hover help in Thingy's yui popups
  - fixed: Editting matrix listings shows fields from other matrix assets
  - fixed: Matrix assets show pending listings from all matrix assets on a site
  - fixed: Changing name of Matrix listing leaves discussion forum with old name
@@ -17,6 +18,7 @@
  - fixed: Can't purge uncommitted assets if not using its version tag
  - fixed: DataForm will create fields with duplicate names but doesn't use them separately
  - fixed: Bad message if database link for SQL Report doesn't exist
+ - fixed: Thingy shows things from other Thingies
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
