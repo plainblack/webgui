@@ -370,6 +370,7 @@ sub www_getTaxesAsJson {
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
 	while (my $record = $sth->hashRef) {
+        $record->{taxRate} += 0;  ##Convert to numeric
 		push(@records,$record);
 	}
     $results{'recordsReturned'} = $sth->rows()+0;
