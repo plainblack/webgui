@@ -18,18 +18,24 @@ sub definition {
 
     tie my %fields, 'Tie::IxHash';
     %fields = (
-        sendReceipt     => {
+        sendReceipt         => {
             fieldType       => 'yesNo',
             label           => $i18n->echo('send receipt'),
             hoverHelp       => $i18n->echo('send receipt help'),
             defaultValue    => 0,
         },
-        receiptSubject  => {
+        receiptFromAddress  => {
+            fieldType       => 'email',
+            label           => $i18n->echo('receipt from address'),
+            hoverHelp       => $i18n->echo('receipt from address help'),
+            defaultValue    => $session->setting->get('companyEmail'),
+        },
+        receiptSubject      => {
             fieldType       => 'text',
             label           => $i18n->echo('receipt subject'),
             hoverHelp       => $i18n->echo('receipt subject help'),
         },
-        receiptTemplate => {
+        receiptTemplate     => {
             fieldType       => 'template',
             label           => $i18n->echo('receipt template'),
             hoverHelp       => $i18n->echo('receipt template help'),
@@ -188,13 +194,11 @@ sub www_pay {
         # Send receipt
         my $receipt = WebGUI::Mail::Send->create( $session, {
             to          => $session->user->profileField('email'),
-            from        => 'martin@oqapi.nl',
+            from        => $self->get('receiptFromAddress'),
             subject     => $self->get('receiptSubject'),
         });
         $receipt->addText( $template->process( $var ) );
-#        $receipt->addText( 'Thank you for ordering' );
         $receipt->queue;
-
     }
 
     # Create a transaction and complete the purchase
