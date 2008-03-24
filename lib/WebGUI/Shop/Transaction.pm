@@ -67,17 +67,9 @@ sub addItem {
 
 #-------------------------------------------------------------------
 
-=head2 completePurchase ( cart transactionCode, statusCode, statusMessage )
+=head2 completePurchase ( transactionCode, statusCode, statusMessage )
 
 See also denyPurchase(). Completes a purchase by updating the transaction as a success, and clearing the cart of it's items. 
-
-=head3 cart
-
-A reference to the current cart that's full of items just purchased.
-
-=head3 paydriver
-
-A reference to the pay driver that just completed the transaction.
 
 =head3 transactionCode
 
@@ -94,8 +86,7 @@ The extended status message that came back from the payment gateway when trying 
 =cut
 
 sub completePurchase {
-    my ($self, $cart, $transactionCode, $statusCode, $statusMessage) = @_;
-    $cart->onCompletePurchase;
+    my ($self, $transactionCode, $statusCode, $statusMessage) = @_;
     $self->update({
         transactionCode => $transactionCode,
         isSuccessful    => 1,

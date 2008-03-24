@@ -482,14 +482,14 @@ sub processTransaction {
     my ($self, $paymentAddress) = @_;
     my $cart = $self->getCart;
     my $transaction = WebGUI::Shop::Transaction->create($self->session,{
-        cart            => $cart,
         paymentMethod   => $self,
         paymentAddress  => $paymentAddress,
         });
     my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment;
     if ($success) {
-       $transaction->completePurchase($cart, $transactionCode, $statusCode, $statusMessage);
-       $self->sendNotifications($transaction);
+        $transaction->completePurchase($cart, $transactionCode, $statusCode, $statusMessage);
+        $cart->onCompletePurchase;
+        $self->sendNotifications($transaction);
     }
     else {
         $transaction->denyTransaction($transactionCode, $statusCode, $statusMessage);
