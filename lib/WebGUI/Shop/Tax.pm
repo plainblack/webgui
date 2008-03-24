@@ -403,14 +403,13 @@ sub www_manage {
     my ($style, $url) = $session->quick(qw(style url));
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
+    ##YUI JSON handler
+    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
     ##YUI basics
-    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/datasource/datasource-beta-min.js'), {type => 'text/javascript'});
     ##YUI Datatable
     $style->setScript($url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
-    ##YUI JSON handler
-    $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
     ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
