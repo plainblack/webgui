@@ -591,9 +591,12 @@ sub _processQuery {
 	my $i18n = WebGUI::International->new($self->session,"Asset_SQLReport");
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get(17).$query});
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
-        my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId})
-		|| return $self->session->errorHandler->error("Could not find database link '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
-
+        my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
+        if (!$dbLink) {
+            $self->session->errorHandler->error("Could not find database link '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
+            push @{$self->{_debug_loop}}, { 'debug.output' => 'Could not find database link'};
+            return \%var;
+        }
 	my $dbh = $dbLink->db;
         if (defined $dbh) {
 		if ($dbLink->queryIsAllowed($query)) {
