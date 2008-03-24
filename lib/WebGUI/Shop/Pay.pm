@@ -325,6 +325,21 @@ sub www_selectPaymentGateway {
     my $cart    = WebGUI::Shop::Cart->getCartBySession( $session );
     my $i18n    = WebGUI::International->new( $session, 'Shop' );
 
+    # Make sure the user is logged in.
+    if ($session->user->userId eq '1') {
+        $session->scratch->set( 'redirectAfterLogin', $session->url->page('shop=pay;method=selectPaymentGateway') );
+
+        # We cannot use WebGUI::Operation::execute( $session, 'auth'); because the method form param used by the
+        # Shop contenthandler overrides the method param used by WG::Op::Auth
+        $session->http->setRedirect( $session->url->page('op=auth;method=init') );
+
+        # If the redirect fails make sure people can still go to the login screen by giving them a link
+        return $session->style->userStyle(
+            $i18n->echo('You must log in to check out. To login click <a href="'
+            . $session->url->page('op=auth;method=init') . '">here</a>.')
+        );
+    }
+
     # All the output stuff is just a placeholder until it's templated.
     my $output .= $i18n->echo('Choose one of the following payment gateways to check out:');
     $output .= '<table border="0">';
