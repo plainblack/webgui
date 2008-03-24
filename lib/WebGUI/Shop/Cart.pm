@@ -345,7 +345,7 @@ Calls onCompletePurchase() on all the items in the cart. Then deletes all the it
 sub onCompletePurchase {
     my $self = shift;
     foreach my $item (@{$self->getItems}) {
-        $item->getSku->completePurchase($item);
+        $item->getSku->onCompletePurchase($item);
         $item->delete;
     }
     $self->delete;
@@ -459,6 +459,12 @@ sub www_update {
             }
         }
     }
+
+    my $cartProperties;
+    $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
+    $cartProperties->{ couponId     } = $form->process( 'couponId'  ) if $form->process( 'couponId' );
+    $self->update( $cartProperties );
+
     return $self->www_view;
 }
 
@@ -520,7 +526,7 @@ sub www_view {
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
         checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
-            extras=>q|onclick="this.form.shop.value='pay';this.form.methodvalue='viewOptions';this.form.submit;"|}),
+            extras=>q|onclick="this.form.shop.value='pay';this.form.method.value='selectPaymentGateway';this.form.submit;"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 

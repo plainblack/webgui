@@ -91,7 +91,8 @@ The extended status message that came back from the payment gateway when trying 
 
 sub completePurchase {
     my ($self, $cart, $transactionCode, $statusCode, $statusMessage) = @_;
-    $cart->completePurchase;
+    $cart->onCompletePurchase;
+    #$cart->completePurchase;
     $self->update({
         transactionCode => $transactionCode,
         isSuccessful    => 1,
@@ -372,7 +373,7 @@ sub update {
         $newProperties->{couponId} = $cart->get('couponId');
         $newProperties->{couponTitle} = '';
         $newProperties->{couponDiscount} = '';
-        $newProperties->{amount} = $cart->getSubtotal + $newProperties->{couponDiscount} + $newProperties->{shippingPrice} + $newProperties->{taxes};
+        $newProperties->{amount} = $cart->calculateSubtotal + $newProperties->{couponDiscount} + $newProperties->{shippingPrice} + $newProperties->{taxes};
         foreach my $item (@{$cart->getItems}) {
             $self->addItem({item=>$item});
         }

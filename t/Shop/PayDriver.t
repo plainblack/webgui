@@ -71,8 +71,8 @@ $definition = WebGUI::Shop::PayDriver->definition($session);
 cmp_deeply  (
     $definition,
     [ {
-        name => 'Payment Driver',
-        fields => {
+        name        => 'Payment Driver',
+        properties  => {
             label           => {
                 fieldType       => 'text',
                 label           => ignore(),
@@ -109,11 +109,11 @@ cmp_deeply  (
     $definition,
     [
         {
-            name    => 'Red',
+            name        => 'Red',
         },
         {
-            name    => 'Payment Driver',
-            fields  => ignore(),
+            name        => 'Payment Driver',
+            properties  => ignore(),
         }
     ],
     ,
@@ -299,7 +299,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 7, 'getEditForm: the form has 7 controls');
+is          (scalar @inputs, 10, 'getEditForm: the form has 10 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -314,6 +314,18 @@ cmp_deeply(
         {
             name    => undef,
             type    => 'submit',
+        },
+        {
+            name    => 'shop',
+            type    => 'hidden',
+        },
+        {
+            name    => 'method',
+            type    => 'hidden',
+        },
+        {
+            name    => 'do',
+            type    => 'hidden',
         },
         {
             name    => 'paymentGatewayId',
@@ -400,19 +412,19 @@ TODO: {
 
 #######################################################################
 #
-# set
+# update
 #
 #######################################################################
 
-eval { $driver->set(); };
+eval { $driver->update(); };
 $e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'set takes exception to not giving it a hashref of options');
+isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'update takes exception to not giving it a hashref of options');
 cmp_deeply  (
     $e,
     methods(
-        error => 'set was not sent a hashref of options to store in the database',
+        error => 'update was not sent a hashref of options to store in the database',
     ),
-    'set takes exception to not giving it a hashref of options',
+    'update takes exception to not giving it a hashref of options',
 );
 
 my $newOptions = {
@@ -422,7 +434,7 @@ my $newOptions = {
     receiptMessage  => 'Dropjes!',
 };
 
-$driver->set($newOptions);
+$driver->update($newOptions);
 my $storedOptions = $session->db->quickScalar('select options from paymentGateway where paymentGatewayId=?', [
     $driver->getId,
 ]);
@@ -430,7 +442,7 @@ cmp_deeply(
     $newOptions,
     from_json($storedOptions),
     ,
-    'set() actually stores data',
+    'update() actually stores data',
 );
 
 

@@ -169,6 +169,8 @@ throws_deeply( sub { $drivers = $pay->getOptions(); },
     'getOptions takes exception to not giving it a cart',
 );
 
+#TODO: Check th crap getOptions returns
+
 #######################################################################
 #
 # getPaymentGateway

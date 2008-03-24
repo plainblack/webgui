@@ -20,36 +20,203 @@ sub definition {
     %fields = (
         sendReceipt     => {
             fieldType       => 'yesNo',
-            label           => $i18n->echo('sendReceipt'),
-            hoverHelp       => $i18n->echo('sendReceipt help'),
+            label           => $i18n->echo('send receipt'),
+            hoverHelp       => $i18n->echo('send receipt help'),
             defaultValue    => 0,
+        },
+        receiptSubject  => {
+            fieldType       => 'text',
+            label           => $i18n->echo('receipt subject'),
+            hoverHelp       => $i18n->echo('receipt subject help'),
+        },
+        receiptTemplate => {
+            fieldType       => 'template',
+            label           => $i18n->echo('receipt template'),
+            hoverHelp       => $i18n->echo('receipt template help'),
+            namespace       => 'PayDriver/Cash/Receipt',
+            defaultValue    => undef,
         },
     );
 
     push @{ $definition }, {
-        name    => $i18n->echo('Cash'),
-        fields  => \%fields,
+        name        => $i18n->echo('Cash'),
+        properties  => \%fields,
     };
 
     return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
+sub getBillingAddress {
+    my $self    = shift;
+    my $session = $self->session;
 
-sub getButton {
-
+    my $addressId = $session->scratch->get('ShopPayDriverCash_billingAddress');
+    if ($addressId) {
+        return $self->getCart->getAddressBook->getAddress( $addressId );
+    }
+    
+    # No billing address selected yet so return undef.
+    return undef;
 }
 
 #-------------------------------------------------------------------
 
-sub www_collectPaymentInfo {
+sub getButton {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
 
+    my $payForm = WebGUI::Form::formHeader($session)
+        . $self->getDoFormTags('getCredentials')
+        . WebGUI::Form::submit($session, {value => $i18n->echo('Cash') })
+        . WebGUI::Form::formFooter($session);
+
+    return $payForm;
+}
+
+#-------------------------------------------------------------------
+sub getCartTemplateVariables {
+    my $self    = shift;
+    my $cart    = $self->getCart;
+    my @itemLoop;
+
+    # Process items in cart
+    foreach my $item (@{ $cart->getItems }) {
+        my $sku = $item->getSku;
+        $sku->applyOptions( $item->get('options') );
+
+        my $itemProperties = $item->get;
+        $itemProperties->{ itemName             } = $sku->get('title');
+        $itemProperties->{ itemUrl              } = $sku->getUrl;
+        $itemProperties->{ itemPrice            } = $cart->formatCurrency( $sku->getPrice );
+        $itemProperties->{ totalItemPrice       } = $cart->formatCurrency( $sku->getPrice * $item->get('quantity') );
+
+        my $address = eval { $item->getShippingAddress };
+        $itemProperties->{ itemShippingAddres   } = $address->getHtmlFormatted unless (WebGUI::Error->caught);
+
+        push @itemLoop, $itemProperties;
+    }
+
+    my $cartProperties = $cart->get;
+    $cartProperties->{ totalPrice       } = $cart->calculateSubtotal;
+    $cartProperties->{ tax              } = $cart->getTaxes;
+
+    # Include shipping address
+    my $address = eval { $cart->getShippingAddress };
+    $cartProperties->{ shippingAddress  } = $address->getHtmlFormatted unless (WebGUI::Error->caught);
+#    $cartProperties->{ shippingPrice    } = 
+
+    $cartProperties->{ item_loop        } = \@itemLoop;
+
+    return $cartProperties;
 }
 
 #-------------------------------------------------------------------
 
 sub www_displayStatus {
 
+}
+
+#-------------------------------------------------------------------
+sub www_getCredentials {
+    my $self    = shift;
+    my $session = $self->session;
+
+    # Generate the json string that defines where the address book posts the selected address
+    my $callbackParams = {
+        url     => $session->url->page,
+        params  => [
+            { name => 'shop',               value => 'pay' },
+            { name => 'method',             value => 'do' },
+            { name => 'do',                 value => 'setBillingAddress' },
+            { name => 'paymentGatewayId',   value => $self->getId },
+        ],
+    };
+    my $callbackJson = JSON::to_json( $callbackParams );
+
+    # Generate 'Choose billing address' button
+    my $addressButton = WebGUI::Form::formHeader( $session )
+        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address' } )
+        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view' } )
+        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson } )
+        . WebGUI::Form::submit( $session, { value => 'Choose billing address' } )
+        . WebGUI::Form::formFooter( $session);
+
+    # Get billing address
+    my $billingAddress = eval { $self->getBillingAddress };
+    if ( WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
+        # The stored address id is invalid, so remove it
+        $session->scratch->delete('ShopPayDriverCash_billingAddress');
+    }
+   
+    my $billingAddressHtml;
+    if ($billingAddress) {
+        $billingAddressHtml = $billingAddress->getHtmlFormatted;
+    }
+
+    # Generate 'Proceed' button
+    my $proceedButton = WebGUI::Form::formHeader( $session )
+        . $self->getDoFormTags('pay')
+        . WebGUI::Form::submit( $session, { value => 'Pay' } )
+        . WebGUI::Form::formFooter( $session);
+
+    return $session->style->userStyle($addressButton.'<br />'.$billingAddressHtml.'<br />'.$proceedButton);
+}
+
+#-------------------------------------------------------------------
+
+sub www_pay {
+    my $self    = shift;
+    my $session = $self->session;
+    my $cart    = $self->getCart;
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
+    my $var;
+
+    my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
+
+    # Create a transaction and complete the purchase
+    my $transaction = WebGUI::Shop::Transaction->create( $session, {
+        cart            => $cart,
+        paymentAddress  => $billingAddress,
+        paymentMethod   => $self,
+    });
+    $transaction->completePurchase( $cart, 'CASH', 'OK', 'Cash payment' );
+
+    # Generate a receipt and send it if enabled.
+    if ( $self->get('sendReceipt') ) {
+        # Setup receipt tmpl_vars
+        my $var = $self->getCartTemplateVariables;
+ 
+        # Instanciate receipt template
+        my $template = WebGUI::Asset::Template->new( $session, $self->get('receiptTemplate') );
+        WebGUI::Error::ObjectNotFound->throw( id => $self->get('receiptTemplate') )
+            unless $template;
+
+        # Send receipt
+        my $receipt = WebGUI::Mail::Send->create( $session, {
+            to          => $session->user->profileField('email'),
+            from        => 'martin@oqapi.nl',
+            subject     => $self->get('receiptSubject'),
+        });
+        $receipt->addText( $template->process( $var ) );
+#        $receipt->addText( 'Thank you for ordering' );
+        $receipt->queue;
+
+    }
+
+    return $session->style->userStyle('Thank you for ordering');
+}
+
+#-------------------------------------------------------------------
+
+sub www_setBillingAddress {
+    my $self    = shift;
+    my $session = $self->session;
+
+    $session->scratch->set( 'ShopPayDriverCash_billingAddress', $session->form->process('addressId') );
+
+    return $self->www_getCredentials;
 }
 
 1;

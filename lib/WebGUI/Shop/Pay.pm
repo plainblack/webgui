@@ -66,6 +66,7 @@ sub addPaymentGateway {
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
     my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $label, $options ]) };
+
     return $driver;
 }
 
@@ -103,13 +104,15 @@ A WebGUI::Shop::Cart object.  A WebGUI::Error::InvalidParam exception will be th
 sub getOptions {
     my ($self, $cart) = @_;
     WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
+
     my $session = $cart->session; 
     my %options = ();
-    foreach my $gateway (@{$self->getPaymentGateways()}) {
+
+    foreach my $gateway (@{ $self->getPaymentGateways() }) {
         $options{$gateway->getId} = {
-            label => $gateway->get("label"),
-            button => $gateway->getButton($cart),
-            };    
+            label   => $gateway->get("label"),
+            button  => $gateway->getButton($cart),
+        };    
     }
     return \%options;
 }
@@ -193,6 +196,39 @@ Returns a reference to the current session.
 =cut
 
 #-------------------------------------------------------------------
+sub www_addPaymentGateway {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $className = $session->form->process('className') 
+        || WebGUI::Error::InvalidParam->throw(error => 'No class name passed');
+
+    my $payDriver = $self->addPaymentGateway( $className, $className->getName( $session ), { enabled => 0 } );
+    return $payDriver->www_edit;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deletePaymentGateway ()
+
+Deletes a payment gateway from the shop.
+
+=cut
+
+sub www_deletePaymentGateway {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $paymentGatewayId = $session->form->process('paymentGatewayId') 
+        || WebGUI::Error::InvalidParam->throw(error => q{www_deletePaymentGateway requires a paymentGatewayId to be passed});
+
+    my $payDriver = $self->getPaymentGateway( $paymentGatewayId );
+    $payDriver->delete;
+
+    return $self->www_manage;
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_do ( )
 
@@ -203,13 +239,18 @@ Let's payment gateway drivers do method calls. Requires a driver param in the po
 sub www_do {
     my ($self) = @_;
     my $form = $self->session->form;
-    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driver with a driver id }) if ($form->get("driver") eq "");
-    WebGUI::Error::InvalidParam->throw(error => q{must have a form var called do with a www_ method to call }) if ($form->get("do") eq "");
-    my $driver = $self->getPaymentGateway($form->get("driver"));
+    my $paymentGatewayId = $form->get("paymentGatewayId")
+        || WebGUI::Error::InvalidParam->throw(error => q{must have a form var called driver with a payment gateway id});
+
+    my $do = $form->get("do") 
+        || WebGUI::Error::InvalidParam->throw(error => q{must have a form var called do with a www_ method to call});
+
+    my $payDriver = $self->getPaymentGateway( $paymentGatewayId );
+
     my $output = undef;
-    my $method = "www_". ( $form->get("do"));
-    if ($driver->can($method)) {
-        $output = $driver->$method();
+    my $method = "www_$do";
+    if ($payDriver->can($method)) {
+        $output = $payDriver->$method();
     }
     return $output;
 }
@@ -223,22 +264,76 @@ The main management screen for payment gateways.
 =cut
 
 sub www_manage {
-    my ($self) = @_;
+    my $self    = shift;
     my $session = $self->session;
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    my $i18n    = WebGUI::International->new($session, "Pay");
+
     return $session->privilege->adminOnly() unless ($session->user->isInGroup("3"));
-    my $admin = WebGUI::Shop::Admin->new($session);
-    my $i18n = WebGUI::International->new($session, "Shop");
+
+    # Button for adding a payment gateway
     my $output = WebGUI::Form::formHeader($session)
-        .WebGUI::Form::hidden($session, {name=>"shop", value=>"pay"})
-        .WebGUI::Form::hidden($session, {name=>"method", value=>"addDriver"})
-        .WebGUI::Form::selectBox($session, {name=>"className", options=>$self->getDrivers})
-        .WebGUI::Form::submit($session, {value=>$i18n->get("add payment method")})
+        .WebGUI::Form::hidden($session,     { name  => "shop",      value   => "pay" })
+        .WebGUI::Form::hidden($session,     { name  => "method",    value   => "addPaymentGateway" })
+        .WebGUI::Form::selectBox($session,  { name  => "className", options => $self->getDrivers })
+        .WebGUI::Form::submit($session,     { value => $i18n->echo("add payment method") })
         .WebGUI::Form::formFooter($session);
-    foreach my $payer (@{$self->getPaymentGateways}) {
-        
+
+    # Add a row with edit/delete buttons for each payment gateway.
+    foreach my $paymentGateway (@{$self->getPaymentGateways}) {
+        $output .= '<div style="clear: both;">'
+            # Delete button for the current payment gateway.
+			.WebGUI::Form::formHeader($session, {extras=>'style="float: left;"' })
+            .WebGUI::Form::hidden($session, { name   => "shop",                value => "pay" })
+            .WebGUI::Form::hidden($session, { name   => "method",              value => "deletePaymentGateway" })
+            .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",    value => $paymentGateway->getId })
+            .WebGUI::Form::submit($session, { value  => $i18n->echo("delete"), extras => 'class="backwardButton"' }) 
+            .WebGUI::Form::formFooter($session)
+
+            # Edit button for current payment gateway
+            .WebGUI::Form::formHeader($session, {extras=>'style="float: left;"' })
+            .WebGUI::Form::hidden($session, { name   => "shop",              value => "pay" })
+            .WebGUI::Form::hidden($session, { name   => "method",            value => "do" })
+            .WebGUI::Form::hidden($session, { name   => "do",                value => "edit" })
+            .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",  value => $paymentGateway->getId })
+            .WebGUI::Form::submit($session, { value  => $i18n->echo("edit"), extras => 'class="normalButton"' })
+            .WebGUI::Form::formFooter($session)
+
+            # Append payment gateway label
+            .' '. $paymentGateway->get("label") 
+        .'</div>';        
     }
+
+    # Wrap in admin console
     my $console = $admin->getAdminConsole;
-    return $console->render($output, $i18n->get("payment methods"));
+    return $console->render($output, $i18n->echo("payment methods"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_selectPaymentGateway ( )
+
+The screen in which a customer chooses a payment gateway.
+
+TODO: Template this screen.
+=cut
+
+sub www_selectPaymentGateway {
+    my $self    = shift;
+    my $session = $self->session;
+  
+    my $cart    = WebGUI::Shop::Cart->getCartBySession( $session );
+    my $i18n    = WebGUI::International->new( $session, 'Shop' );
+
+    # All the output stuff is just a placeholder until it's templated.
+    my $output .= $i18n->echo('Choose one of the following payment gateways to check out:');
+    $output .= '<table border="0">';
+    foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
+        $output .= '<tr><td>' . $payOption->{label} . '</td><td>' . $payOption->{button} . '</td></tr>';
+    }
+    $output .= '</table>';
+   
+    return $session->style->userStyle( $output );
 }
 
 1;

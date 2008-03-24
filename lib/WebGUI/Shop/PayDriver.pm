@@ -118,8 +118,8 @@ sub create {
         $class,
     ]);
     
-    # Set the options via the set method because set() will automatically serialize the options hash
-    $self->set($options);
+    # Set the options via the update method because update() will automatically serialize the options hash
+    $self->update($options);
 
     return $self;
 }
@@ -172,8 +172,8 @@ sub definition {
     );
 
     my %properties = (
-        name    => 'Payment Driver',
-        fields  => \%fields,
+        name        => 'Payment Driver',
+        properties  => \%fields,
     );
     push @{ $definition }, \%properties;
 
@@ -254,6 +254,41 @@ sub getCart {
     return $cart;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getDoFormTags ( $method, $htmlForm )
+
+Returns a string containing the required form fields for doing a www_do method call. If an HTMLForm object is
+passed the fields are automatically added to it. In that case no form tags a returned by this method.
+
+=head3 $htmlForm
+
+The HTMLForm object you want to add the fields to. This is optional.
+
+=cut
+
+sub getDoFormTags {
+    my $self        = shift;
+    my $doMethod    = shift;
+    my $htmlForm    = shift;
+    my $session     = $self->session;
+
+    if ($htmlForm) {
+        $htmlForm->hidden(name => 'shop',               value => 'pay');
+        $htmlForm->hidden(name => 'method',             value => 'do');
+        $htmlForm->hidden(name => 'do',                 value => $doMethod);
+        $htmlForm->hidden(name => 'paymentGatewayId',   value => $self->getId);
+
+        return undef;
+    }
+    else {
+        return WebGUI::Form::hidden($session, { name => 'shop',               value => 'pay' })
+            . WebGUI::Form::hidden($session, { name => 'method',             value => 'do' })
+            . WebGUI::Form::hidden($session, { name => 'do',                 value => $doMethod })
+            . WebGUI::Form::hidden($session, { name => 'paymentGatewayId',   value => $self->getId })
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -269,15 +304,30 @@ sub getEditForm {
     my $definition = $self->definition($self->session);
     my $form = WebGUI::HTMLForm->new($self->session);
     $form->submit;
-    $form->hidden(
-        name  => 'paymentGatewayId',
-        value => $self->getId,
-    );
+#    $form->hidden(
+#        -name   => 'shop',
+#        -value  => 'pay',
+#    );
+#    $form->hidden(
+#        -name   => 'method',
+#        -value  => 'do',
+#    );
+#    $form->hidden(
+#        -name   => 'do',
+#        -value  => 'editSave',
+#    );
+#
+#    $form->hidden(
+#        name  => 'paymentGatewayId',
+#        value => $self->getId,
+#    );
+    
+    $self->getDoFormTags('editSave', $form);
     $form->hidden(
         name  => 'className',
         value => $self->className,
     );
-    $form->dynamicForm($definition, 'fields', $self);
+    $form->dynamicForm($definition, 'properties', $self);
 
     return $form;
 }
@@ -364,6 +414,33 @@ the C<set> method.
 
 #-------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost ( )
+
+Updates ship driver with data from Form.
+
+=cut
+
+sub processPropertiesFromFormPost {
+    my $self = shift;
+    my %properties;
+    my $fullDefinition = $self->definition($self->session);
+
+    foreach my $definition (@{$fullDefinition}) {
+        foreach my $property (keys %{$definition->{properties}}) {
+            $properties{$property} = $self->session->form->process(
+                $property,
+                $definition->{properties}{$property}{fieldType},
+                $definition->{properties}{$property}{defaultValue}
+            );
+        }
+    }
+    $properties{title} = $fullDefinition->[0]{name} if ($properties{title} eq "" || lc($properties{title}) eq "untitled");
+    $self->update(\%properties);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 session (  )
 
 Accessor for the session object.  Returns the session object.
@@ -372,7 +449,7 @@ Accessor for the session object.  Returns the session object.
 
 #-------------------------------------------------------------------
 
-=head2 set ( $options )
+=head2 update ( $options )
 
 Setter for user configurable options in the payment objects.
 
@@ -383,10 +460,10 @@ flattened into JSON and stored in the database as text.  There is no content che
 
 =cut
 
-sub set {
+sub update {
     my $self        = shift;
     my $properties  = shift;
-    WebGUI::Error::InvalidParam->throw(error => 'set was not sent a hashref of options to store in the database')
+    WebGUI::Error::InvalidParam->throw(error => 'update was not sent a hashref of options to store in the database')
         unless ref $properties eq 'HASH' and scalar keys %{ $properties };
 
     my $jsonOptions = to_json($properties);
@@ -406,5 +483,47 @@ Accessor for the unique identifier for this PayDriver.  The paymentGatewayId is
 a GUID.
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Generates an edit form.
+
+=cut
+
+sub www_edit {
+    my $self    = shift;
+    my $session = $self->session;
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    my $i18n    = WebGUI::International->new($session, "Pay");
+
+    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+
+    my $form = $self->getEditForm;
+    $form->submit;
+  
+    return $admin->getAdminConsole->render($form->print, $i18n->echo("payment methods"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editSave ( )
+
+Saves the data from the post.
+
+=cut
+
+sub www_editSave {
+    my $self = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+
+    $self->processPropertiesFromFormPost;
+    $session->http->setRedirect("/?shop=pay;method=manage");
+
+    return undef;
+}
+
 
 1;
