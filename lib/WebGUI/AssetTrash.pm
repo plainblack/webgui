@@ -282,7 +282,7 @@ Moves list of assets to trash, returns www_manageAssets() method of self if canE
 sub www_deleteList {
 	my $self = shift;
 	foreach my $assetId ($self->session->form->param("assetId")) {
-		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+		my $asset = WebGUI::Asset->newPending($self->session,$assetId);
 		if ($asset->canEdit && $asset->canEditIfLocked) {
 			$asset->trash;
 		}
@@ -376,7 +376,7 @@ Purges a piece of content, including all it's revisions, from the system permane
 sub www_purgeList {
         my $self = shift;
         foreach my $id ($self->session->form->param("assetId")) {
-                my $asset = WebGUI::Asset->newByDynamicClass($self->session,$id);
+                my $asset = WebGUI::Asset->newPending($self->session,$id);
                 $asset->purge if $asset->canEdit;
         }
         if ($self->session->form->process("proceed") ne "") {

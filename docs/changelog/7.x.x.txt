@@ -14,6 +14,7 @@
  - fixed: Optional pubDate RSS field generates warnings when missing
  - fixed: Collaboration System threads can return other object types when asked for replies
  - fixed: Able to cut or trash system assets
+ - fixed: Can't purge uncommitted assets if not using its version tag
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
