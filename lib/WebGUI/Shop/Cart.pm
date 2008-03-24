@@ -353,6 +353,52 @@ sub onCompletePurchase {
 
 #-------------------------------------------------------------------
 
+=head2 readyForCheckout ( )
+
+Returns whether all the required properties of the the cart are set.
+
+=cut
+
+sub readyForCheckout {
+    my $self    = shift;
+    
+    # Check if the shipping address is set and correct
+    my $address = $self->getShippingAddress;
+    return 0 if WebGUI::Error->caught;
+
+    # Check if the ship driver is chosen and existant
+    my $ship = $self->getShipper;
+    return 0 if WebGUI::Error->caught;
+
+    # Check if the cart has items
+    return 0 unless scalar @{ $self->getItems };
+
+    # All checks passed so return true
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 requiresRecurringPayment ( )
+
+Returns whether this cart needs to be checked out with a paydriver that can handle recurring payments.
+
+=cut
+
+sub requiresRecurringPayment {
+    my $self    = shift;
+
+    # Look for recurring items in the cart
+    foreach my $item (@{ $self->getItems }) {
+        return 1 if $item->getSku->isRecurring;
+    }
+
+    # No recurring items in cart so return false
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 update ( properties )
 
 Sets properties in the cart.

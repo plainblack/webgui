@@ -8,6 +8,26 @@ use WebGUI::Exception;
 use base qw/WebGUI::Shop::PayDriver/;
 
 #-------------------------------------------------------------------
+sub canCheckoutCart {
+    my $self    = shift;
+    my $cart    = $self->getCart;
+
+    return 0 unless $cart->readyForCheckout;
+    return 0 if $cart->requiresRecurringPayment;
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+sub credentialsOkay {
+    my $self = shift;
+
+    return 0 unless $self->getBillingAddress;
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
 
 sub definition {
     my $class       = shift;
@@ -92,12 +112,14 @@ sub getCartTemplateVariables {
         my $sku = $item->getSku;
         $sku->applyOptions( $item->get('options') );
 
+        # Item properties
         my $itemProperties = $item->get;
         $itemProperties->{ itemName             } = $sku->get('title');
         $itemProperties->{ itemUrl              } = $sku->getUrl;
         $itemProperties->{ itemPrice            } = $cart->formatCurrency( $sku->getPrice );
         $itemProperties->{ totalItemPrice       } = $cart->formatCurrency( $sku->getPrice * $item->get('quantity') );
 
+        # Custom item shipping address
         my $address = eval { $item->getShippingAddress };
         $itemProperties->{ itemShippingAddres   } = $address->getHtmlFormatted unless (WebGUI::Error->caught);
 
@@ -185,7 +207,11 @@ sub www_pay {
     my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
     my $var;
 
-    my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
+    # Make sure we can checkout the cart
+    return "" unless $self->canCheckoutCart;
+
+    # Make sure all required credentials have been supplied
+    return $self->www_getCredentials unless $self->credentialsOkay;
 
     # Generate a receipt and send it if enabled.
     if ( $self->get('sendReceipt') ) {
@@ -206,6 +232,8 @@ sub www_pay {
         $receipt->addText( $template->process( $var ) );
         $receipt->queue;
     }
+
+    my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
 
     # Create a transaction and complete the purchase
     my $transaction = WebGUI::Shop::Transaction->create( $session, {

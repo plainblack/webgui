@@ -102,17 +102,22 @@ A WebGUI::Shop::Cart object.  A WebGUI::Error::InvalidParam exception will be th
 =cut
 
 sub getOptions {
-    my ($self, $cart) = @_;
+    my $self    = shift;
+    my $cart    = shift;
+
     WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
 
     my $session = $cart->session; 
+    my $recurringRequired = $cart->requiresRecurringPayment;
     my %options = ();
 
     foreach my $gateway (@{ $self->getPaymentGateways() }) {
-        $options{$gateway->getId} = {
-            label   => $gateway->get("label"),
-            button  => $gateway->getButton($cart),
-        };    
+        if (!$recurringRequired || $gateway->handlesRecurring) {
+            $options{$gateway->getId} = {
+                label   => $gateway->get("label"),
+                button  => $gateway->getButton( $cart ),
+            };    
+        }
     }
     return \%options;
 }
@@ -340,7 +345,13 @@ sub www_selectPaymentGateway {
         );
     }
 
-    # All the output stuff is just a placeholder until it's templated.
+    # Check if the cart is ready for checkout
+    unless ($cart->readyForCheckout) {
+        $session->http->setRedirect( $session->url->page('shop=cart;method=view') );
+        return '';
+    }
+
+    # All the output stuff below is just a placeholder until it's templated.
     my $output .= $i18n->echo('Choose one of the following payment gateways to check out:');
     $output .= '<table border="0">';
     foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
