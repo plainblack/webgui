@@ -473,19 +473,18 @@ sub www_manage {
     my $i18n=WebGUI::International->new($session, 'Tax');
 
     my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('export')})
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('export'), extras=>q{style="float: left;"} })
                    . WebGUI::Form::formFooter($session);
     my $importForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=importTax')})
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('import'), extras=>q{style="float: left;"} })
                    . q{<input type="file" name="importFile" size="10" />}
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('import')})
                    . WebGUI::Form::formFooter($session);
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $importForm, $exportForm;
+    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $exportForm, $importForm;
 <div class=" yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
-    <div id="import">%s</div>
-    <div id="export">%s</div>
+    <div id="importExport">%s%s</div>
 </div>
 
 <script type="text/javascript">
