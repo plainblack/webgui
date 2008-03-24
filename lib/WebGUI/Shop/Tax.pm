@@ -362,6 +362,25 @@ sub www_deleteTax {
 
 #-------------------------------------------------------------------
 
+=head2 www_exportTax (  )
+
+Export the entire tax table as a CSV file the user can download.
+
+=cut
+
+sub www_exportTax {
+    my $self = shift;
+    my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient
+        unless $admin->canManage;
+    my $storage = $self->exportTaxData();
+    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_getTaxesAsJson (  )
 
 Servers side pagination for tax data that is sent as JSON back to the browser to be
@@ -432,13 +451,14 @@ sub www_manage {
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
 
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $i18n->get('export');
+    my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')}).WebGUI::Form::submit($session,{value=>$i18n->get('export')}).WebGUI::Form::formFooter($session);
+    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $exportForm;
 <div class=" yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
     <div id="import"></div>
-    <div id="export"><form id="exportForm"><input type="submit" value="%s" /></form></div>
+    <div id="export">%s</div>
 </div>
 
 <script type="text/javascript">
