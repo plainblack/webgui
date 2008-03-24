@@ -39,6 +39,12 @@ our $I18N = {
 		context => q|To ship a copy of the tax data out of the server.|,
 	},
 
+	'delete' => {
+		message => q|delete|,
+		lastUpdated => 1206385749,
+		context => q|To remove one tax entry from the tax tables.|,
+	},
+
 };
 
 1;

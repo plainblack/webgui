@@ -485,20 +485,20 @@ EODSURL
     };
 STOP
 
-    $output .= sprintf <<'STOP', $url->page(q{shop=tax;method=deleteTax});
+    $output .= sprintf <<'STOP', $url->page(q{shop=tax;method=deleteTax}), $i18n->get('delete');
     YAHOO.widget.DataTable.formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
-        elCell.innerHTML = '<a href="%s;taxId='+oRecord.getData('taxId')+'">X</a>';
+        elCell.innerHTML = '<a href="%s;taxId='+oRecord.getData('taxId')+'">%s</a>';
     };
 STOP
     $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'), $i18n->get('tax rate');
     //Build column headers.
     var taxColumnDefs = [
-        {key:"taxId",   label:"taxId", formatter:YAHOO.widget.DataTable.formatDeleteTaxId},
         {key:"country", label:"%s", sortable: true},
         {key:"state",   label:"%s", sortable: true},
         {key:"city",    label:"%s", sortable: true},
         {key:"code",    label:"%s", sortable: true},
-        {key:"taxRate", label:"%s"}
+        {key:"taxRate", label:"%s"},
+        {key:"taxId",   label:"", formatter:YAHOO.widget.DataTable.formatDeleteTaxId}
     ];
 EOCHJS
     $output .= <<STOP;
