@@ -387,7 +387,7 @@ sub www_manage {
     my $self = shift;
     my $session = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
-    return $session->privileges->insufficient
+    return $session->privilege->insufficient
         unless $admin->canManage;
     ##YUI specific datatable CSS
     my ($style, $url) = $session->quick(qw(style url));
@@ -461,13 +461,12 @@ STOP
     $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'), $i18n->get('tax rate');
     //Build column headers.
     var taxColumnDefs = [
-        {key:"taxId", label:"taxId"},
+        {key:"taxId",   label:"taxId"},
         {key:"country", label:"%s"},
         {key:"state",   label:"%s"},
         {key:"city",    label:"%s"},
         {key:"code",    label:"%s"},
-        {key:"taxRate", label:"%s"},
-
+        {key:"taxRate", label:"%s"}
     ];
 EOCHJS
     $output .= <<STOP;
