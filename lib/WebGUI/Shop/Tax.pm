@@ -395,8 +395,8 @@ sub www_getTaxesAsJson {
     return $session->privilege->insufficient
         unless $admin->canManage;
     my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
+    my $startIndex      = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results')    || 25;
     my @placeholders = ();
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
@@ -421,6 +421,27 @@ sub www_getTaxesAsJson {
     $results{'dir'}          = "desc";
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_importTax (  )
+
+Import new tax data from a file provided by the user.  This will replace the current
+data with the new data.
+
+=cut
+
+sub www_importTax {
+    my $self = shift;
+    my $session = $self->session;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient
+        unless $admin->canManage;
+    my $storage = WebGUI::Storage->create($session);
+    my $taxFile = $storage->addFileFromFormPost('importFile', 1);
+    $self->importTaxData($storage->getPath($taxFile)) if $taxFile;
+    return $self->www_manage;
 }
 
 #-------------------------------------------------------------------
@@ -451,13 +472,19 @@ sub www_manage {
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
 
-    my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')}).WebGUI::Form::submit($session,{value=>$i18n->get('export')}).WebGUI::Form::formFooter($session);
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $exportForm;
+    my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')})
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('export')})
+                   . WebGUI::Form::formFooter($session);
+    my $importForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=importTax')})
+                   . q{<input type="file" name="importFile" size="10" />}
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('import')})
+                   . WebGUI::Form::formFooter($session);
+    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $importForm, $exportForm;
 <div class=" yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
-    <div id="import"></div>
+    <div id="import">%s</div>
     <div id="export">%s</div>
 </div>
 

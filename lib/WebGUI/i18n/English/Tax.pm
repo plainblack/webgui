@@ -39,6 +39,12 @@ our $I18N = {
 		context => q|To ship a copy of the tax data out of the server.|,
 	},
 
+	'import' => {
+		message => q|Import|,
+		lastUpdated => 1206390280,
+		context => q|To bring in new tax data that replaces the current data.|,
+	},
+
 	'delete' => {
 		message => q|delete|,
 		lastUpdated => 1206385749,
