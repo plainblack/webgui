@@ -5,9 +5,10 @@ use strict;
 use Class::InsideOut qw{ :std };
 use Carp qw(croak);
 use Tie::IxHash;
+use WebGUI::Exception::Shop;
+use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::HTMLForm;
-use WebGUI::Exception::Shop;
 use WebGUI::Shop::Cart;
 use JSON;
 
@@ -140,7 +141,6 @@ sub definition {
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
     my $definition = shift || [];
-
     my $i18n = WebGUI::International->new($session, 'PayDriver');
 
     tie my %fields, 'Tie::IxHash';
@@ -163,11 +163,25 @@ sub definition {
             hoverHelp       => $i18n->get('who can use help'),
             defaultValue    => 1,
         },
-        receiptMessage  => {
-            fieldType       => 'text',
-            label           => $i18n->get('receipt message'),
-            hoverHelp       => $i18n->get('receipt message help'),
-            defaultValue    => undef,
+        receiptEmailTemplateId => {
+            fieldType       => 'template',
+            namespace       => "Shop/ReceiptEmail",
+            label           => $i18n->get("receipt email template"),
+            hoverHelp       => $i18n->get("receipt email template help"),
+            defaultValue    => '',
+        },
+        saleNotificationTemplateId => {
+            namespace       => "Shop/SaleEmail",
+            fieldType       => 'template',
+            label           => $i18n->get("sale notification template"),
+            hoverHelp       => $i18n->get("sale notification template help"),
+            defaultValue    => '',
+        },
+        saleNotificationGroupId => {
+            fieldType       => 'group',
+            label           => $i18n->get("sale notification group"),
+            hoverHelp       => $i18n->get("sale notification group help"),
+            defaultValue    => '3',
         },
     );
 
@@ -367,6 +381,7 @@ sub getName {
     return $definition->[0]->{name};
 }
 
+
 #-------------------------------------------------------------------
 
 =head2 new ( $session, $paymentGatewayId )
@@ -414,6 +429,19 @@ the C<set> method.
 
 #-------------------------------------------------------------------
 
+=head2 processPayment ()
+
+Should interact with the payment gateway and then return an array containing success/failure (as 1 or 0), transaction code (or payment gateway's transaction id), status code, and status message. Must be overridden by subclasses.
+
+=cut
+
+sub processPayment {
+    my $self = shift;
+    WebGUI::Error::OverrideMe->throw(error=>'Override processPayment()');
+}
+
+#-------------------------------------------------------------------
+
 =head2 processPropertiesFromFormPost ( )
 
 Updates ship driver with data from Form.
@@ -438,6 +466,38 @@ sub processPropertiesFromFormPost {
     $self->update(\%properties);
 }
 
+#-------------------------------------------------------------------
+
+=head2 processTransaction ( [ paymentAddress ] )
+
+This method is responsible for handling success or failure from the payment processor, completing or denying the transaction, and sending out notification and receipt emails. Returns a WebGUI::Shop::Transaction object.
+
+=head3 paymentAddress
+
+A reference to a WebGUI::Shop::Address object that should be attached as payment information. Not required.
+
+=cut
+
+sub processTransaction {
+    my ($self, $paymentAddress) = @_;
+    my $cart = $self->getCart;
+    my $transaction = WebGUI::Shop::Transaction->create($self->session,{
+        cart            => $cart,
+        paymentMethod   => $self,
+        paymentAddress  => $paymentAddress,
+        });
+    my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment;
+    if ($success) {
+       $transaction->completePurchase($cart, $transactionCode, $statusCode, $statusMessage);
+       $self->sendNotifications($transaction);
+    }
+    else {
+        $transaction->denyTransaction($transactionCode, $statusCode, $statusMessage);
+    }
+    return $transaction;
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -446,6 +506,39 @@ sub processPropertiesFromFormPost {
 Accessor for the session object.  Returns the session object.
 
 =cut
+
+
+#-------------------------------------------------------------------
+
+=head2 sendNotifications ( transaction )
+
+Sends out a receipt and a sale notification to the buyer and the store owner respectively.
+
+=cut
+
+sub sendNotifications {
+    my ($self, $transaction) = @_;
+    my $session = $self->session;
+    my %var = (); # this needs to be filled in with transaction data for these emails
+    
+    
+    
+    
+    my $i18n = WebGUI::International->new($session,'PayDriver');
+    my $inbox = WebGUI::Inbox->new($session);
+    $inbox->addMessage({
+        userId      => $transaction->get('userId'),
+        subject     => $i18n->get('thank you for your order'),
+        message     => WebGUI::Asset::Template->new($session, $self->get('emailReceiptTemplateId'))->process(\%var),
+        status      => 'completed',
+        });
+    $inbox->addMessage({
+        groupId     => $self->get('saleNotificationGroupId'),
+        subject     => $i18n->get('a sale has been made'),
+        message     => WebGUI::Asset::Template->new($session, $self->get('saleNotificationTemplateId'))->process(\%var),
+        status      => 'completed',
+        });
+}
 
 #-------------------------------------------------------------------
 

@@ -140,6 +140,20 @@ sub www_editSettings {
         label       => $i18n->get("edit address template"),
         hoverHelp   => $i18n->get("edit address template help"),
         );
+    $form->template(
+        name        => "myPurchasesTemplateId",
+        value       => $setting->get("myPurchasesTemplateId"),
+        namespace   => "Shop/MyPurchases",
+        label       => $i18n->get("my purchases template"),
+        hoverHelp   => $i18n->get("my purchases template help"),
+        );
+    $form->template(
+        name        => "myPurchasesDetailTemplateId",
+        value       => $setting->get("myPurchasesDetailTemplateId"),
+        namespace   => "Shop/MyPurchases/Detail",
+        label       => $i18n->get("my purchases detail template"),
+        hoverHelp   => $i18n->get("my purchases detail template help"),
+        );
     $form->submit;
     return $ac->render($form->print, $i18n->get("shop settings"));
 }

@@ -3,6 +3,30 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'my purchases template' => { 
+		message => q|My Purchases Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'my purchases template help' => { 
+		message => q|Which template should be used to display a user's order history?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'my purchases detail template' => { 
+		message => q|My Purchases Detail Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'my purchases detail template help' => { 
+		message => q|Which template should be used to display a user's order history detail? An individual sale rather than the whole transaction list.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
 	'username' => { 
 		message => q|User|,
 		lastUpdated => 0,

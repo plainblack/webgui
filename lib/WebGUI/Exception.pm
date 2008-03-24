@@ -20,6 +20,10 @@ use Exception::Class (
     'WebGUI::Error' => {
         description     => "A general error occured.",
         },
+    'WebGUI::Error::OverrideMe' => {
+        isa             => 'WebGUI::Error',
+        description     => 'This method should be overridden by subclasses.',
+        },
     'WebGUI::Error::InvalidObject' => {
         isa             => 'WebGUI::Error::InvalidParam',
         description     => "Expected to get a reference to an object type that wasn't gotten.",

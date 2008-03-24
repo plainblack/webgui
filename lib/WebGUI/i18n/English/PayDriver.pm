@@ -3,6 +3,54 @@ package WebGUI::i18n::English::PayDriver;
 use strict; 
 
 our $I18N = {
+	'thank you for your order' => { 
+		message => q|Thank You For Your Order|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'a sale has been made' => { 
+		message => q|A Sale Has Been Made|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'sale notification template' => { 
+		message => q|Sale Notification Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'sale notification template help' => { 
+		message => q|Which template should be used to generate the email that notifies this store owner about a new sale.|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'sale notification group' => { 
+		message => q|Sale Notification Group|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'sale notification group help' => { 
+		message => q|Who should be notified of new transactions?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
+	'receipt email template' => { 
+		message => q|Receipt Email Template|,
+		lastUpdated => 0,
+		context => q|commerce setting|
+	},
+
+	'receipt email template help' => { 
+		message => q|Which template should be used to generate an email that will be sent to the user to acknowledge their purchase?|,
+		lastUpdated => 0,
+		context => q|commerce setting help|
+	},
+
 	'label' => {
 		message => q|Label|,
 		lastUpdated => 0,
@@ -38,18 +86,6 @@ our $I18N = {
         message => q|Specifies which group is allowed to use this payment gateway.|,
         lastUpdated => 0,
         context => q|Hover help for the group to use option.|,
-    },
-
-    'receipt message' => {
-        message => q|Receipt message|,
-        lastUpdated => 0,
-        context => q|Label for the receipt message option.|,
-    },
-
-    'receipt message help' => {
-        message => q|The message that will be attached to the receipt.|,
-        lastUpdated => 0,
-        context => q|Hover help the receipt message option.|,
     },
 
 };

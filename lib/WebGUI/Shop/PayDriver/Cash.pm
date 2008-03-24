@@ -120,6 +120,12 @@ sub getCartTemplateVariables {
 
 #-------------------------------------------------------------------
 
+sub processPayment {
+    return (1, undef, 1, 'Success');
+}
+
+#-------------------------------------------------------------------
+
 sub www_displayStatus {
 
 }
