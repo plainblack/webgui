@@ -268,7 +268,7 @@ sub buildDataTableStructure {
 	}
     $hash{records}         = \@array;
     $hash{totalRecords}    = $self->quickScalar('select found_rows()') + 0; ##Convert to numeric
-    $hash{recordsReturned} = $sth->rows();
+    $hash{recordsReturned} = $sth->rows()+0;
 	$sth->finish;
 	return %hash;
 }

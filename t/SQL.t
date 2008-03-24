@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 57; # increment this value for each test you create
+use Test::More tests => 53; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -284,22 +284,6 @@ cmp_deeply(
     },
     'Check table structure',
 );
-
-#######################################################################
-#
-# buildSearchQuery
-#
-#######################################################################
-
-my ($searchQuery, @placeHolders) = $session->db->buildSearchQuery('select * from users', 'Admin', [qw{username alias}]);
-like($searchQuery, qr{^select \* from users}, 'returned query begins with original query');
-cmp_deeply(
-    \@placeHolders,
-    [('%Admin%') x 2],
-    'placeholders are the keyword repeated 2 times, one for each column, sandwiched in %'
-);
-like($searchQuery, qr{where username like \?}, 'returned query searches username column, first column uses where');
-like($searchQuery, qr{or alias like \?}, 'returned query searches alias column, second column uses or');
 
 END: {
     $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
