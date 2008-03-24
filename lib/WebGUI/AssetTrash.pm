@@ -212,7 +212,7 @@ lineage is changed in state to trash-limbo.
 
 sub trash {
     my $self = shift;
-    return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
+    return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage") || $self->get('isSystem'));
     foreach my $asset ($self, @{$self->getLineage(['descendants'], {returnObjects => 1})}) {
         $asset->_invokeWorkflowOnExportedFiles($self->session->setting->get('trashWorkflow'), 1);
     }
@@ -264,6 +264,7 @@ Moves self to trash, returns www_view() method of Parent if canEdit. Otherwise r
 sub www_delete {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
+	return $self->session->privilege->vitalComponent() if $self->get('isSystem');
 	return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
 	$self->trash;
 	$self->session->asset($self->getParent);

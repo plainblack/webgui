@@ -13,6 +13,7 @@
  - fixed: errors on package importing are always reported as corrupted packages
  - fixed: Optional pubDate RSS field generates warnings when missing
  - fixed: Collaboration System threads can return other object types when asked for replies
+ - fixed: Able to cut or trash system assets
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
