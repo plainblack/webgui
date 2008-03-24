@@ -383,8 +383,7 @@ sub getEditFieldForm {
         "file" => "file",
         );
     
-    $things = $self->session->db->read('select thingId, label from Thingy_things left join asset using(assetId)
-where asset.state = "published"');
+    $things = $self->session->db->read('select thingId, label from Thingy_things where assetId =?',[$self->getId]);
     while (my $thing = $things->hashRef) {
         my $fieldType = "otherThing_".$thing->{thingId};
         $fieldTypes{$fieldType} = $thing->{label};
@@ -1286,8 +1285,8 @@ sub www_editThing {
         "addThing" => $i18n->get('add thing label'),
         "thingyDefault" => $i18n->get('view thingy default label'),
         );
-    my $otherThings = $session->db->read("select thingId, label from Thingy_things left join asset using(assetId)
-where thingId != ? and asset.state = 'published'",[$thingId]);
+    my $otherThings = $session->db->read("select thingId, label from Thingy_things where thingId != ? and assetId =?",
+        [$thingId,$self->getId]);
     while (my $otherThing = $otherThings->hashRef) {
         $afterSave{'searchOther_'.$otherThing->{thingId}} = $i18n->get('search other thing label').$otherThing->{label};
         $afterSave{'addOther_'.$otherThing->{thingId}} = $i18n->get('add other thing label').$otherThing->{label};
