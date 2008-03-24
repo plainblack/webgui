@@ -381,6 +381,18 @@ sub getName {
     return $definition->[0]->{name};
 }
 
+#-------------------------------------------------------------------
+
+=head2 handlesRecurring ()
+
+Returns 0. Should be overridden to return 1 by any subclasses that can handle recurring payments.
+
+=cut
+
+sub handlesRecurring {
+    return 0;
+}
+
 
 #-------------------------------------------------------------------
 
