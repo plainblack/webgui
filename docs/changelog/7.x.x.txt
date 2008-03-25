@@ -1,3 +1,5 @@
+7.4.30
+
 7.4.29
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
  - fix: Calendar's ical link adds extraneous baloney
