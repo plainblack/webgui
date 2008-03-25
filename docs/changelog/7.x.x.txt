@@ -21,6 +21,7 @@
  - fixed: Thingy shows things from other Thingies
  - fixed: Collaboration System errors when missing RSS From Parent
  - fixed: Syndicated Content picks wrong entries for interleaving
+ - fixed: Syndicated Content URLs using macros not updated by caching workflow
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
