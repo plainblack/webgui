@@ -98,8 +98,8 @@ sub definition {
 				},
             useContainers => {
                 tab             => "properties",
-                hoverHelp       => "useContainers help",
-                label           => "useContainers",
+                hoverHelp       => $i18n->get("useContainers help"),
+                label           => $i18n->get("useContainers"),
                 fieldType       => "yesNo",
                 defaultValue    => 0,
                 },
