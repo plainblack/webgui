@@ -436,10 +436,10 @@ sub www_getTaxesAsJson {
 	while (my $record = $sth->hashRef) {
 		push(@records,$record);
 	}
-    $results{'recordsReturned'} = $sth->rows();
+    $results{'recordsReturned'} = $sth->rows()+0;
 	$sth->finish;
     $results{'records'}      = \@records;
-    $results{'totalRecords'} = $db->quickScalar('select found_rows()'); ##Convert to numeric
+    $results{'totalRecords'} = $db->quickScalar('select found_rows()')+0; ##Convert to numeric
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
@@ -551,6 +551,7 @@ EODIV
     mySource.responseType   = DataSource.TYPE_JSON;
     mySource.responseSchema = {
         resultsList : 'records',
+        totalRecords: 'totalRecords',
         fields      : [
             {key:"country", parser:YAHOO.util.DataSource.parseString},
             {key:"state",   parser:YAHOO.util.DataSource.parseString},
@@ -560,9 +561,7 @@ EODIV
             {key:"taxId",   parser:YAHOO.util.DataSource.parseString}
         ],
         metaFields  : [
-            'startIndex', 'sort', 'dir',
-            {key:"recordsReturned", parser:YAHOO.util.DataSource.parseNumber},
-            {key:"totalRecords", parser:YAHOO.util.DataSource.parseNumber}
+            'startIndex', 'sort', 'dir', 'recordsReturned'
         ]
     };
 EODSURL
