@@ -1,4 +1,5 @@
 7.4.30
+ - fixed: Wiki page history shows username instead of alias
 
 7.4.29
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
