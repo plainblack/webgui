@@ -189,7 +189,7 @@ Return all the options
 
 sub displayValue {
 	my ($self) = @_;
-	return join ", ", $self->getValues();
+    return return join ", ", map { $self->get('options')->{$_} } $self->getValues();
 }
 
 #-------------------------------------------------------------------
