@@ -466,27 +466,21 @@ sub _create_grouped_items{
 # No need to return because we're doing everything by reference.
 
 sub _create_interleaved_items {
-    my($items,$rss_feeds,$maxHeadlines,$hasTermsRegex)=@_;
-    my $items_remain = 1;
-    while((@$items < $maxHeadlines) && $items_remain){
-        $items_remain=0;
-	foreach my $rss(@$rss_feeds){
-	    if(defined $rss->{items}
-	       && @$items < $maxHeadlines
-	       && (my $item = shift @{$rss->{items}})
-	      ){
-		$item->{site_title}=$rss->{channel}->{title};
-		$item->{site_link}=$rss->{channel}->{link};
-		if(! $hasTermsRegex || _check_hasTerms($item,$hasTermsRegex)){
-		    push @{$items},$item;
-		}
-		if (@{$rss->{items}}) {
-		    $items_remain = 1;
-		}
-	    }
-	}
+    my ($items, $rss_feeds, $maxHeadlines, $hasTermsRegex) = @_;
+    # put all items together into a single list
+    foreach my $rss (@$rss_feeds) {
+        while (my $item = shift @{$rss->{items}}) {
+            if ($hasTermsRegex && ! _check_hasTerms($item, $hasTermsRegex)) {
+                next;
+            }
+            $item->{site_title} = $rss->{channel}->{title};
+            $item->{site_link} = $rss->{channel}->{link};
+            push @$items, $item;
+        }
     }
     @$items = sort { $b->{date} <=> $a->{date} } @$items;
+    # limit to $maxHeadlines
+    @$items = @$items[0 .. ($maxHeadlines - 1)];
 }
 
 #-------------------------------------------------------------------

@@ -37,6 +37,15 @@ finish($session); # this line required
 #	# and here's our code
 #}
 
+#-------------------------------------------------
+sub clearRSSCache {
+    my $session = shift;
+    print "\tClearing RSS feed cache..." unless $quiet;
+    my $cache = WebGUI::Cache->new($session, '', 'RSS');
+    $cache->flush;
+    print " Done.\n" unless $quiet;
+}
+
 #----------------------------------------------------------------------------
 sub removeOldGalleryColumns {
     my $session = shift;
