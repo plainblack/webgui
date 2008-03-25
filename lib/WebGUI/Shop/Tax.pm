@@ -422,14 +422,20 @@ sub www_getTaxesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
+    my $sortKey         = $form->get('sortKey')    || 'country';
+    my $sortDir         = $form->get('sortDir')    || 'desc';
     my @placeholders = ();
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
     if ($keywords ne "") {
         ($sql, @placeholders) = $db->buildSearchQuery($sql, $keywords, [qw{country state city code}])
     }
-    push(@placeholders, $startIndex, $numberOfResults);
-    $sql .= ' order by country desc limit ?,?';
+    push(@placeholders, $sortKey, $sortDir, $startIndex, $numberOfResults);
+    $sql .= ' order by ? ? limit ?,?';
+    $session->errorHandler->warn("numberOfResults   : $numberOfResults");
+    $session->errorHandler->warn("startIndex: $startIndex");
+    $session->errorHandler->warn("sortKey   : $sortKey");
+    $session->errorHandler->warn("sortDir   : $sortDir");
     my %results = ();
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
@@ -569,25 +575,57 @@ EODSURL
     //Tell YUI how to get back to the site
     var buildQueryString = function (state,dt) {
         return ";startIndex=" + state.pagination.recordOffset +
-               ";keywords=" + Dom.get('keywordsField').value +
-               ";results=" + state.pagination.rowsPerPage;
+               ";keywords="   + Dom.get('keywordsField').value +
+               ";sortKey="    + state.sorting.key +
+               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc") +
+               ";results="    + state.pagination.rowsPerPage;
     };
 
     //Build and configure a paginator
-    var myPaginator = new Paginator({
-        containers         : ['paging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [10,25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
+//    var myPaginator = new Paginator({
+//        containers         : ['paging'],
+//        pageLinks          : 5,
+//        rowsPerPage        : 25,
+//        rowsPerPageOptions : [10,25,50,100],
+//        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
+//    });
+
+    // Custom function to handle pagination requests
+    var handlePagination = function (state,dt) {
+        var sortedBy  = dt.get('sortedBy');
+
+        // Define the new state
+        var newState = {
+            startIndex: state.recordOffset,
+            sorting: {
+                key: sortedBy.key,
+                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
+            },
+            pagination : { // Pagination values
+                recordOffset: state.recordOffset, // Default to first page when sorting
+                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
+            }
+        };
+
+        // Create callback object for the request
+        var oCallback = {
+            success: dt.onDataReturnSetRows,
+            failure: dt.onDataReturnSetRows,
+            scope: dt,
+            argument: newState // Pass in new state as data payload for callback function to use
+        };
+
+        // Send the request
+        dt.getDataSource().sendRequest(buildQueryString(newState), oCallback);
+    };
 
     //Configure the table to use the paginator.
     var myTableConfig = {
-        initialRequest         : ';startIndex=0',
+        initialRequest         : ';startIndex=0;results=25',
         generateRequest        : buildQueryString,
-        paginationEventHandler : DataTable.handleDataSourcePagination,
-        paginator              : myPaginator
+        paginationEventHandler : handlePagination,
+        //paginator              : myPaginator
+        paginator              : new YAHOO.widget.Paginator({rowsPerPage:25})
     };
 STOP
 
@@ -610,6 +648,42 @@ EOCHJS
     $output .= <<STOP;
     //Now, finally, the table
     var myTable = new DataTable('dt', taxColumnDefs, mySource, myTableConfig);
+
+    // Override function for custom server-side sorting 
+    myTable.sortColumn = function(oColumn) { 
+        // Default ascending 
+        var sDir = "asc"; 
+         
+        // If already sorted, sort in opposite direction 
+        if(oColumn.key === this.get("sortedBy").key) { 
+            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ? 
+                    "desc" : "asc"; 
+        } 
+     
+        // Define the new state 
+        var newState = { 
+            startIndex: 0, 
+            sorting: { // Sort values 
+                key: oColumn.key, 
+                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC 
+            }, 
+            pagination : { // Pagination values 
+                recordOffset: 0, // Default to first page when sorting 
+                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting 
+            } 
+        }; 
+     
+        // Create callback object for the request 
+        var oCallback = { 
+            success: this.onDataReturnSetRows, 
+            failure: this.onDataReturnSetRows, 
+            scope: this, 
+            argument: newState // Pass in new state as data payload for callback function to use 
+        }; 
+         
+        // Send the request 
+        this.getDataSource().sendRequest(buildQueryString(newState), oCallback); 
+    }; 
 
     //Setup the form to submit an AJAX request back to the site.
     Dom.get('keywordSearchForm').onsubmit = function () {
