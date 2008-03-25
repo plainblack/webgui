@@ -2761,7 +2761,8 @@ my 				$cmd = '$self->session->form->'.$field->{formFieldType}.'($fieldName)';
 			}
 
 			# Check if input matches its regex
-			if (_matchField($self, $self->session->form->process($fieldName), $field->{regex})) {
+            if ($self->session->form->process($fieldName) eq '' && !$field->{isRequired} ||
+                _matchField($self, $self->session->form->process($fieldName), $field->{regex})) {
 				push(@update, "$fieldName = ".$self->session->db->quote($fieldValue));
 			} else {
 				push(@error, $i18n->get('ers regex mismatch').' '.$regexes{$field->{regex}}.' '.$field->{displayName});
