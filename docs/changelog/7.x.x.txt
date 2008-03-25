@@ -6,6 +6,7 @@
  - fixed: Matrix caches pages, and may not update for new listings
  - fixed: Editting matrix listings shows fields from other matrix assets
  - fixed: Matrix assets show pending listings from all matrix assets on a site
+ - fixed: Changing name of Matrix listing leaves discussion forum with old name
 
 7.4.29
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
