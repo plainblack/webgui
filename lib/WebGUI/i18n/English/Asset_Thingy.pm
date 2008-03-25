@@ -853,8 +853,8 @@ search has been done.|,
     },
 
     'searchResult_loop' => {
-        message => q|A loop containting the search results.|,
-        lastUpdated => 1104630516,
+        message => q|A loop containing the search results.|,
+        lastUpdated => 1206472126,
     },
 
     'searchResult_id' => {
