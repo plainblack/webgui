@@ -293,6 +293,8 @@ Cuts (removes to clipboard) self, returns the www_view of the Parent if canEdit.
 sub www_cut {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->vitalComponent
+        if $self->get('isSystem');
 	$self->cut;
 	$self->session->asset($self->getParent);
 	return $self->getParent->www_view;
@@ -311,7 +313,7 @@ sub www_cutList {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $assetId ($self->session->form->param("assetId")) {
 		my $asset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
-		if ($asset->canEdit) {
+		if ($asset->canEdit && !$asset->get('isSystem')) {
 			$asset->cut;
 		}
 	}
