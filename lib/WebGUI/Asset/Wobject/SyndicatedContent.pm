@@ -324,23 +324,28 @@ sub _normalize_items {
 
 #-------------------------------------------------------------------
 sub _get_rss_data {
-	my $session = shift;
-        my $url = shift;
-        my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
-        my $rss_serial = $cache->get;
-        my $rss = {};
-        if ($rss_serial) {
-                $rss = Storable::thaw($rss_serial);
-        } else {
-                my $ua = LWP::UserAgent->new(timeout => 5);
-		$ua->env_proxy;
-                my $response = $ua->get($url);
-                if (!$response->is_success()) {
-                        $session->errorHandler->warn("Error retrieving url '$url': " . 
-                             $response->status_line());
-                        return undef;
-                }
-                my $xml = $response->content();
+    my $session = shift;
+    my $url = shift;
+    my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
+    my $rss_serial = $cache->get;
+    my $rss = {};
+    if ($rss_serial) {
+        $rss = Storable::thaw($rss_serial);
+    }
+    if ($rss->{error}) {
+        return undef;
+    }
+    else {
+        my $ua = LWP::UserAgent->new(timeout => 5);
+        $ua->env_proxy;
+        my $response = $ua->get($url);
+        if (!$response->is_success()) {
+            $session->errorHandler->warn("Error retrieving url '$url': " . 
+                $response->status_line());
+            $cache->set(Storable::nfreeze({'error' => 1, 'error_status' => $response->status_line}), 3600);
+            return undef;
+        }
+        my $xml = $response->content();
 
 		# Approximate with current time if we don't have a Last-Modified
 		# header coming from the RSS source.
@@ -402,7 +407,7 @@ sub _get_rss_data {
 		$rss->{last_modified} = $last_modified;
 
                 #Default to an hour timeout
-                $cache->set(Storable::freeze($rss), 3600);
+                $cache->set(Storable::nfreeze($rss), 3600);
         }
 
         return $rss;
