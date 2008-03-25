@@ -129,7 +129,7 @@ sub _ensureRssFromParentPresent {
 sub _ensureRssFromParentAbsent {
 	my $self = shift;
 	# Invalidate it, and then it'll get purged along with any others.
-	$self->update({ rssCapableRssFromParentId => undef });
+	$self->update({ rssCapableRssFromParentId => '' });
 	$self->_purgeExtraRssFromParentAssets;
 }
 
