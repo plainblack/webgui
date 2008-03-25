@@ -78,9 +78,10 @@ sub definition {
 sub _rssFromParentValid {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
-	return 0 unless $rssFromParentId;
+	return undef unless $rssFromParentId;
 
 	my $rssFromParent = WebGUI::Asset->newByDynamicClass($self->session, $rssFromParentId);
+    return undef unless $rssFromParent;
 	return ($rssFromParent->isa('WebGUI::Asset::RSSFromParent')
 		&& $rssFromParent->getParent->getId eq $self->getId);
 }
@@ -137,7 +138,6 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	my $error = $self->NEXT::processPropertiesFromFormPost(@_);
 	return $error if ref $error eq 'ARRAY';
-
 	if ($self->get('rssCapableRssEnabled')) {
 		$self->_ensureRssFromParentPresent;
 	} else {
@@ -159,8 +159,10 @@ if there is no such feed.
 sub getRssUrl {
 	my $self = shift;
 	my $rssFromParentId = $self->get('rssCapableRssFromParentId');
-	return undef unless defined $rssFromParentId;
-	WebGUI::Asset->newByDynamicClass($self->session, $rssFromParentId)->getUrl;
+    return undef unless $rssFromParentId;
+    my $rssAsset = WebGUI::Asset->newByDynamicClass($self->session, $rssFromParentId);
+    return undef unless $rssAsset;
+    return $rssAsset->getUrl;
 }
 
 #-------------------------------------------------------------------

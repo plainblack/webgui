@@ -19,6 +19,7 @@
  - fixed: DataForm will create fields with duplicate names but doesn't use them separately
  - fixed: Bad message if database link for SQL Report doesn't exist
  - fixed: Thingy shows things from other Thingies
+ - fixed: Collaboration System errors when missing RSS From Parent
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
