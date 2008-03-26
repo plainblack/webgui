@@ -111,8 +111,8 @@ sub upgradeEMS {
 		)");
 	$db->write("create table EMSRegistrantRibbon (
 		badgeId varchar(22) binary not null,
-		tokenAssetId varchar(22) binary not null,
-		primary key (badgeId,tokenAssetId)
+		ribbonAssetId varchar(22) binary not null,
+		primary key (badgeId,ribbonAssetId)
 		)");
 	$db->write("create table EMSBadge (
 		assetId varchar(22) binary not null,

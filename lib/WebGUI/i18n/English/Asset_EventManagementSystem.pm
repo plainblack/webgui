@@ -2,6 +2,30 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = { ##hashref of hashes
+	'location' => {
+		message 	=> q|Location|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'location help' => {
+		message 	=> q|In what room or location will this event be held?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'event number' => {
+		message 	=> q|Event Number|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'event number help' => {
+		message 	=> q|A number which uniquely identifies this event, so it can be matched up with printed catalogs.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
 	'badge instructions' => {
 		message 	=> q|Badge Instructions|,
 		lastUpdated	=> 0,

@@ -88,8 +88,8 @@ sub definition {
 			tab             => "properties",
 			fieldType       => "integer",
 			defaultValue    => $session->db->quickScalar("select max(eventNumber)+1 from EMSTicket"),
-			label           => $i18n->get("seats available"),
-			hoverHelp       => $i18n->get("seats available help"),
+			label           => $i18n->get("event number"),
+			hoverHelp       => $i18n->get("event number help"),
 			},
 		startDate => {
 			tab             => "properties",
@@ -107,10 +107,10 @@ sub definition {
 			},
 		location => {
 			tab             => "properties",
-			fieldType       => "comboBox",
+			fieldType       => "combo",
 			options			=> $session->db->buildHashRef("select distinct(location) from EMSTicket order by location"),
-			label           => $i18n->get("seats available"),
-			hoverHelp       => $i18n->get("seats available help"),
+			label           => $i18n->get("location"),
+			hoverHelp       => $i18n->get("location help"),
 			},
 		relatedBadges => {
 			tab             => "properties",

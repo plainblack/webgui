@@ -12,6 +12,11 @@ Commerce merge
    migrated to the code provided by YUI 2.5.0.
 -  As a result of the above, we no longer need extjs, and it has been
    removed.
+ - fix: Fwd: lazy guys bug report about the product system
+ - fix: Processing a Cash/Check Order
+ - Rewrote Event Manager fromthe ground up.
+ - Added WebGUI.str javascript class with sprintf and trim methods.
+
 
 7.5.3
  - prevent HTML and Macro injection in usernames
