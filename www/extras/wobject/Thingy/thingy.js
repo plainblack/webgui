@@ -30,35 +30,34 @@ function initOptionalFields(prefix,fieldId) {
 	YAHOO.util.Event.addListener(prefix+"_fieldType_formId", "change", checkFieldType);
 
     	function checkFieldType(){
-
-	if (this.value == "HTMLArea" || this.value == "textarea"){	
+	if (this.value in hasHeightWidth){	
 		height_module.show();
 		width_module.show()
 	}else{
 		height_module.hide();
 		width_module.hide()
 	}
-	if (this.value == "radioList" || this.value == "checkList"){	
+	if (this.value in hasVertical){	
 		vertical_module.show();
 	}else{
 		vertical_module.hide();
 	}
-	if (this.value == "HTMLArea" || this.value == "textarea" || this.value == "radioList" || this.value == "checkList" || this.value == "zipcode"){	
-		size_module.hide()
+	if (this.value in hasSize){	
+		size_module.show()
 	}else{
-		size_module.show();
+		size_module.hide();
 	}
-	if (this.value == "selectList" || this.value == "selectBox" || this.value == "radioList" || this.value == "checkList"){	
+	if (this.value in hasValues){	
 		values_module.show();
 	}else{
 		values_module.hide();
 	}
 	var valueStart = this.value.slice(0,10);
 	
-	if(valueStart == "otherThing" || this.value == "file"){
-		defaultValue_module.hide();
-	}else{
+	if (valueStart != "otherThing"){
 		defaultValue_module.show();
+	}else{
+		defaultValue_module.hide();
 	}
 	if(valueStart == "otherThing"){
 		var thingId = this.value.slice(11);

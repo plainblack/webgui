@@ -347,10 +347,11 @@ returns the form that will be used in the edit dialog for Thingy_fields.
 sub getEditFieldForm {
 
     my $self = shift;
+    my $session = $self->session;
     my $field = shift;
     my (%fieldStatus, $f, %fieldTypes, $things);
     my $fieldId = $field->{fieldId} || "new";
-    my $i18n = WebGUI::International->new($self->session, 'Asset_Thingy');
+    my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
     my $defaultValue;
     tie %fieldStatus, 'Tie::IxHash';
     tie %fieldTypes, 'Tie::IxHash';
@@ -362,26 +363,14 @@ sub getEditFieldForm {
         "required" => $i18n->get('fieldstatus required label'),
     );
     
-    %fieldTypes = (
-        "dateTime" => "dateTime",
-        "TimeField" => "TimeField",
-        "float" => "float",
-        "zipcode" => "zipcode",
-        "text" => "text",
-        "textarea" => "textarea",
-        "HTMLArea" => "HTMLArea",
-        "url" => "url",
-        "date" => "date",
-        "email" => "email",
-        "phone" => "phone",
-        "integer" => "integer",
-        "yesNo" => "yesNo",
-        "selectList" => "select",
-        "radioList" => "radioList",
-        "checkList" => "checkList",
-        "selectBox" => "selectBox",
-        "file" => "file",
-        );
+    foreach my $fieldType ( sort @{ WebGUI::Form::FieldType->new($session)->get("types") }) {
+        my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
+        if ($@) {
+            $session->errorHandler->error($@);
+            next;
+        }
+        $fieldTypes{$fieldType} = $form->getName($self->session);       
+    }
     
     $things = $self->session->db->read('select thingId, label from Thingy_things where assetId =?',[$self->getId]);
     while (my $thing = $things->hashRef) {
@@ -423,7 +412,7 @@ sub getEditFieldForm {
         -name=>"fieldType",
         -label=>$i18n->get('field type label'),
         -hoverHelp=>$i18n->get('field type description'),
-        -value=>$field->{fieldType} || "text",
+        -value=>ucfirst $field->{fieldType} || "Text",
         -options=>\%fieldTypes,
         -id=>$dialogPrefix."_fieldType_formId",
         );
@@ -618,10 +607,11 @@ sub getFormElement {
     $param{vertical} = $data->{vertical};
     $param{fieldType} = $data->{fieldType};
 
-    if ($data->{fieldType} eq "checkbox") {
+    if ($data->{fieldType} eq "Checkbox") {
         $param{value} = ($data->{defaultValue} =~ /checked/xi) ? 1 : "";
     }
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(selectList checkList selectBox))) {
+
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
                     @defaultValues = $self->session->form->selectList($name);
@@ -633,7 +623,8 @@ sub getFormElement {
                 }
         $param{value} = \@defaultValues;
     }    
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(selectList selectBox checkList radioList))) {
+
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList))) {
         delete $param{size};
         my %options;
                 tie %options, 'Tie::IxHash';
@@ -643,13 +634,15 @@ sub getFormElement {
                 }
         $param{options} = \%options;
     }
-    if ($data->{fieldType} eq "yesNo") {
+
+    if ($data->{fieldType} eq "YesNo") {
         if ($data->{defaultValue} =~ /yes/xi) {
                     $param{value} = 1;
                 } elsif ($data->{defaultValue} =~ /no/xi) {
                     $param{value} = 0;
                 }
     }
+
     if ($data->{fieldType} =~ m/^otherThing/x){
         my $otherThingId = $data->{fieldType}; 
         $otherThingId =~ s/^otherThing_(.*)/$1/x;
@@ -1078,6 +1071,7 @@ sub www_editThing {
     my $session = $self->session;
     my ($tabForm, $output, %properties, $tab, %afterSave, %defaultView, $fields);
     my ($fieldsHTML, $fieldsViewScreen, $fieldsSearchScreen);
+    my (@hasHeightWidth,@hasSize,@hasVertical,@hasValues);
     tie %afterSave, 'Tie::IxHash';
     return $session->privilege->insufficient() unless $self->canEdit;
     my $i18n = WebGUI::International->new($session, "Asset_Thingy");
@@ -1137,6 +1131,34 @@ sub www_editThing {
 
     $tab = $tabForm->getTab('fields');
 
+    foreach my $fieldType ( sort @{ WebGUI::Form::FieldType->new($session)->get("types") }) {
+        my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
+        my $definition = $form->definition($session);
+        if ($@) {
+            $session->errorHandler->error($@);
+            next;
+        }
+        if ($form->get("height")){
+            push(@hasHeightWidth, $fieldType);
+        }
+        if ($form->get("size")){
+            push(@hasSize, $fieldType);
+        }
+        if (defined $definition->[0]->{vertical}->{defaultValue}){
+            push(@hasVertical, $fieldType);
+        }
+        if ($form->get("options")){
+            push(@hasValues, $fieldType);
+        }
+
+    }
+    $tab->raw("<script type='text/javascript'>\n");
+    $tab->raw('var hasHeightWidth = {'.join(", ",map {'"'.$_.'": true'} @hasHeightWidth).'};');
+    $tab->raw('var hasSize = {'.join(", ",map {'"'.$_.'": true'} @hasSize).'};');
+    $tab->raw('var hasVertical = {'.join(", ",map {'"'.$_.'": true'} @hasVertical).'};');
+    $tab->raw('var hasValues = {'.join(", ",map {'"'.$_.'": true'} @hasValues).'};');
+    $tab->raw("</script>");
+
     $tab->text(
         -name   => 'label',
         -label  => $i18n->get('thing name label'),
@@ -1184,7 +1206,7 @@ sub www_editThing {
     $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
     while (my $field = $fields->hashRef) {
         my $formElement;
-        if ($field->{fieldType} eq "file"){
+        if ($field->{fieldType} eq "File"){
             $formElement = "<input type='file' name='file'>";
         }
         else{
@@ -1570,7 +1592,7 @@ sub www_editFieldSave {
         $newFieldId = $self->setCollateral("Thingy_fields","fieldId",\%properties,1,1,"thingId",$thingId);
     }
 
-    if ($properties{fieldType} eq "file"){ 
+    if ($properties{fieldType} eq "File"){ 
         $formElement = "<input type='file' name='file'>";
     }
     else{
