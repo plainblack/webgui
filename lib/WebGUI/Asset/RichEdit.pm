@@ -543,7 +543,7 @@ sub getRichEditor {
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
 
-    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
     my $out = "<script type=\"text/javascript\">\n";
     while (my ($plugin, $path) = each %loadPlugins) {
