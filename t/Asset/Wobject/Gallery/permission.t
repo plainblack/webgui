@@ -80,4 +80,5 @@ $maker->run;
 # Cleanup
 END {
     $versionTag->rollback;
+    $nonAdmin->delete;
 }
