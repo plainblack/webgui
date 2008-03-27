@@ -26,6 +26,8 @@ my $session = start(); # this line required
 removeOldGalleryColumns( $session );
 moveColumnsToGalleryFile( $session );
 moveCommentsToGalleryFile( $session );
+clearRSSCache($session);
+addUserSessionExpiresIndex($session);
 
 finish($session); # this line required
 
@@ -36,6 +38,16 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+
+#-------------------------------------------------
+sub addUserSessionExpiresIndex {
+    my $session = shift;
+    print "\tAdding index to userSession expires column..." unless $quiet;
+    $session->db->write(
+        "ALTER TABLE `userSession` ADD INDEX `expires` (`expires`)"
+    );
+    print " Done.\n" unless $quiet;
+}
 
 #-------------------------------------------------
 sub clearRSSCache {

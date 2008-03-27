@@ -30,6 +30,7 @@
  - fix: Users now have permission to add comments
  - fix: Username for comment poster is now shown correctly
  - fix: Slideshow now works
+ - added: Database index on userSession.expires field to speed up workflows
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's
