@@ -1147,7 +1147,7 @@ sub www_editThing {
         if (defined $definition->[0]->{vertical}->{defaultValue}){
             push(@hasVertical, $fieldType);
         }
-        if ($form->get("options")){
+        if ($form->get("optionsSettable")){
             push(@hasValues, $fieldType);
         }
 

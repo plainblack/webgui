@@ -63,6 +63,11 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 If true, this will limit the list of template to only include templates that are committed.
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -88,8 +93,11 @@ sub definition {
 			},
         dbDataType  => {
             defaultValue    => "VARCHAR(22) BINARY",
-        },
-		});
+            },
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

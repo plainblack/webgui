@@ -59,6 +59,11 @@ Defaults to "most". Possible values are "none", "macros", "javascript", "most" a
 
 A tooltip for what to do with this field. Defaults to a general explaination of content filters.
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -81,8 +86,11 @@ sub definition {
 			},
         dbDataType  => {
             defaultValue    => "VARCHAR(16)",
-        },
-		});
+            },
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

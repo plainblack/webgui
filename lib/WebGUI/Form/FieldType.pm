@@ -56,6 +56,11 @@ An array reference containing the form control types to be selectable. Defaults 
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -72,8 +77,11 @@ sub definition {
 			},
 		types=>{
 			defaultValue=>$class->getTypes($session)
-			}
-		});
+			},
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
 	return $class->SUPER::definition($session, $definition);
 }
 

@@ -58,6 +58,11 @@ An array reference of the items to be checked if no value is specified. Defaults
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -77,8 +82,11 @@ sub definition {
 			},
 		defaultValue=>{
 			defaultValue=>"mixed",
-			}
-		});
+			},
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

@@ -51,6 +51,11 @@ The following additional parameters have been added via this sub class.
 Defaults to the Post Rich Editor, the least-featured Rich Text Editor and the
 one most likely to be selected by users of this form control.
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -65,7 +70,10 @@ sub definition {
         defaultValue => {
             defaultValue    => '',
         },
-    };
+        optionsSettable=>{
+            defaultValue    =>0
+        },
+        };
     return $class->SUPER::definition($session, $definition);
 }
 

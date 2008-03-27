@@ -67,6 +67,11 @@ This will be used if no value is specified. Should be passed as an array referen
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -95,8 +100,11 @@ sub definition {
 			},
         dbDataType  => {
             defaultValue    => "VARCHAR(22) BINARY",
-        },
-		});
+            },
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

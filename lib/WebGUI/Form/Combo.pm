@@ -55,6 +55,11 @@ The following additional parameters have been added via this sub class.
 
 Flag that tells the User Profile system that this is a valid form element in a User Profile
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -71,8 +76,11 @@ sub definition {
 			},
         dbDataType  => {
             defaultValue    => "TEXT",
-        },
-		});
+            },
+		optionsSettable=>{
+            defaultValue=>1
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

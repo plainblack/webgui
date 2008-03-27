@@ -51,6 +51,11 @@ The following additional parameters have been added via this sub class.
 
 The identifier for this field. Defaults to "country".
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -71,7 +76,10 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>"United States"
 			},
-		});
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 

@@ -122,6 +122,11 @@ The following additional parameters have been added via this sub class.
 
 A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =head4 defaultValue
 
 An array reference of the items to be checked if no value is specified. Defaults to an empty array reference.
@@ -156,7 +161,10 @@ sub definition {
 		options=>{
 			defaultValue=>{}
 			},
-		defaultValue=>{
+		optionsSettable=>{
+            defaultValue=>1
+            },
+        defaultValue=>{
 			defaultValue=>[],
 			},
 		multiple=>{

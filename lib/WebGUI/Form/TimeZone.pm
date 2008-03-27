@@ -42,6 +42,11 @@ The following methods are specifically available from this class. Check the supe
 
 See the super class for additional details.
 
+=head4 optionsSettable
+
+A boolean indicating whether the options are settable using an options hashref or not settable because this form
+type generates its own options.
+
 =cut
 
 sub definition {
@@ -56,8 +61,11 @@ sub definition {
 		value=>{
 			defaultValue=>undef
 			},
-		});
-        return $class->SUPER::definition($session, $definition);
+		optionsSettable=>{
+            defaultValue=>0
+            },
+        });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
