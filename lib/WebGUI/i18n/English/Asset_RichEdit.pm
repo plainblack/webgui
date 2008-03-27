@@ -276,10 +276,10 @@ our $I18N = {
 		message => q|WebGUI Image|,
         	lastUpdated => 1115150778,
 	},
-	'flash' => {
-		message => q|Flash Movie|,
-        	lastUpdated => 1115150778,
-	},
+    'media' => {
+        message     => q|Embedded Media / Flash|,
+        lastUpdated => 1206564394,
+    },
 	'charmap' => {
 		message => q|Special Character|,
         	lastUpdated => 1115150778,
@@ -318,10 +318,6 @@ our $I18N = {
 	},
 	'preview' => {
 		message => q|Preview|,
-        	lastUpdated => 1115150778,
-	},
-	'zoom' => {
-		message => q|Zoom (IE Only)|,
         	lastUpdated => 1115150778,
 	},
 	'print' => {
@@ -451,6 +447,15 @@ option is set to Yes, then all whitespace entered into the form will be preserve
 		message => q|No dictionaries are configured yet. Spellchecking will not be enabled before at least one is.|,
 		lastUpdated => 0,
 	},
+
+    'inline popups' => {
+        message => q|Inline Popups|,
+        lastUpdated => 1206653834,
+    },
+    'inline popups description' => {
+        message => q|Shows popups inline instead of in a popup browser window.|,
+        lastUpdated => 1206653834,
+    },
 
 };
 

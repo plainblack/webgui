@@ -23,7 +23,8 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 ensureUTF8($session);
-# upgrade functions go here
+addRichEditInlinePopup($session);
+updateRichEditorButtons($session);
 
 finish($session); # this line required
 
@@ -36,6 +37,40 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub addRichEditInlinePopup {
+    my $session = shift;
+    print "\tAdding inline popup column to Rich editor... " unless $quiet;
+    $session->db->write("ALTER TABLE `RichEdit` ADD COLUMN `inlinePopups` INT(11) NOT NULL DEFAULT 0");
+    print "Done!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub updateRichEditorButtons {
+    my $session = shift;
+    print "\tUpdate Rich Editor buttons... " unless $quiet;
+    my $editors = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {
+        includeOnlyClasses  => ['WebGUI::Asset::RichEdit'],
+        returnObjects       => 1,
+    });
+    for my $editor (@$editors) {
+        my %prop;
+        for my $toolbar (qw(toolbarRow1 toolbarRow2 toolbarRow3)) {
+            my $current = $editor->get($toolbar);
+            $current =~ s/^insertImage$/wginsertimage/m;
+            $current =~ s/^pagetree$/wgpagetree/m;
+            $current =~ s/^collateral$/wgmacro/m;
+            if ($current ne $editor->get($toolbar)) {
+                $prop{$toolbar} = $current;
+            }
+        }
+        if (%prop) {
+            $editor->addRevision(\%prop);
+        }
+    }
+    print "Done.\n" unless $quiet;
+
+}
 
 #----------------------------------------------------------------------------
 sub ensureUTF8 {

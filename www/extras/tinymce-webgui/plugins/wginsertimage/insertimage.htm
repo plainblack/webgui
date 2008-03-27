@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{#wginsertimage.desc}</title>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/tiny_mce_popup.js"></script>
+    <script type="text/javascript" src="js/insertimage.js"></script>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/utils/mctabs.js"></script>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/utils/form_utils.js"></script>
+    <link href="css/insertimage.css" rel="stylesheet" type="text/css" />
+    <base target="_self" />
+</head>
+<body>
+<form onsubmit="WGInsertImageDialog.update(this);return false;" action="#">
+    <div class="tabs">
+        <ul>
+            <li id="general_tab" class="current"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#wginsertimage.desc}</a></span></li>
+        </ul>
+    </div>
+
+    <div class="panel_wrapper">
+        <div id="general_panel" class="panel current">
+            <fieldset class="image-manager">
+                <legend>{#wginsertimage.manager}</legend>
+                <iframe id="image-manager"></iframe>
+            </fieldset>
+            <fieldset>
+                <legend>{#wginsertimage.selectedproperties}</legend>
+                <table class="image-properties">
+                    <tr>
+                        <td><label for="image-url">{#wginsertimage.imageurl}</label></td>
+                        <td><input id="image-url" type="text" name="imageurl" /></td>
+                        <td rowspan="3"><iframe id="image-preview"></iframe></td>
+                    </tr>
+                    <tr>
+                        <td><label for="image-alt">{#wginsertimage.imagealt}</label></td>
+                        <td><input id="image-alt" type="text" name="imagealt" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <fieldset>
+                                            <legend>{#wginsertimage.imagelayout}</legend>
+                                            <table class="image-layout">
+                                                <tr>
+                                                    <td><label for="image-align">{#wginsertimage.imagealign}</label></td>
+                                                    <td>
+                                                        <select id="image-align" name="imagealign">
+                                                            <option value="" selected="selected">(none)</option>
+                                                            <option value="absbottom">absbottom</option>
+                                                            <option value="absmiddle">absmiddle</option>
+                                                            <option value="baseline">baseline</option>
+                                                            <option value="bottom">bottom</option>
+                                                            <option value="left">left</option>
+                                                            <option value="middle">middle</option>
+                                                            <option value="right">right</option>
+                                                            <option value="texttop">texttop</option>
+                                                            <option value="top">top</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><label for="image-border">{#wginsertimage.imageborder}</label></td>
+                                                    <td><input id="image-border" type="text" name="imageborder" /></td>
+                                                </tr>
+                                            </table>
+                                        </fieldset>
+                                    </td>
+                                    <td>
+                                        <fieldset>
+                                            <legend>{#wginsertimage.imagespacing}</legend>
+                                            <table class="image-spacing">
+                                                <tr>
+                                                    <td><label for="image-hspace">{#wginsertimage.imagehspace}</label></td>
+                                                    <td><input id="image-hspace" type="text" name="imagehspace" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><label for="image-vspace">{#wginsertimage.imagevspace}</label></td>
+                                                    <td><input id="image-vspace" type="text" name="imagevspace" /></td>
+                                                </tr>
+                                            </table>
+                                        </fieldset>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="mceActionPanel">
+        <div style="float: left">
+            <input type="submit" id="insert" name="insert" value="{#insert}" />
+        </div>
+        <div style="float: right">
+            <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+        </div>
+    </div>
+</form>
+</body>
+</html>

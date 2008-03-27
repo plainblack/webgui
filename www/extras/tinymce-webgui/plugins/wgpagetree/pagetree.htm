@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>{#wgpagetree.desc}</title>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/tiny_mce_popup.js"></script>
+    <script type="text/javascript" src="js/pagetree.js"></script>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/utils/mctabs.js"></script>
+    <script type="text/javascript" src="../../../tinymce/jscripts/tiny_mce/utils/form_utils.js"></script>
+    <link href="css/pagetree.css" rel="stylesheet" type="text/css" />
+    <base target="_self" />
+</head>
+<body>
+<form onsubmit="WGPageTreeDialog.update(this);return false;" action="#">
+    <div class="tabs">
+        <ul>
+            <li id="general_tab" class="current"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#wgpagetree.desc}</a></span></li>
+        </ul>
+    </div>
+
+    <div class="panel_wrapper">
+        <div id="general_panel" class="panel current">
+            <table width="100%">
+                <tr>
+                    <td><label for="link_url">{#wgpagetree.linkurl}</label></td>
+                    <td><input type="text" name="link_url" value="" id="link_url" /></td>
+                </tr>
+                <tr>
+                    <td><label for="link_target">{#wgpagetree.linktarget}</label></td>
+                    <td>
+                        <select type="text" name="link_target" id="link_target">
+                            <option value="_self">{#wgpagetree.samewindow}</option>
+                            <option value="_blank">{#wgpagetree.newwindow}</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <fieldset class="pages">
+                <legend>{#wgpagetree.pages}</legend>
+                <iframe class="pages" id="page_selecter"></iframe>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="mceActionPanel">
+        <div style="float: left">
+            <input type="submit" id="insert" name="insert" value="{#insert}" />
+        </div>
+        <div style="float: right">
+            <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+        </div>
+    </div>
+</form>
+</body>
+</html>

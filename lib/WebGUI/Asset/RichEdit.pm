@@ -19,7 +19,10 @@ use WebGUI::Asset;
 use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
-eval 'use Text::Aspell';  # Optional
+use JSON;
+BEGIN {
+    eval { require Text::Aspell };  # Optional
+}
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -58,92 +61,96 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_RichEdit');
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'richEdit.gif',
-		uiLevel => 5,
-                tableName=>'RichEdit',
-                className=>'WebGUI::Asset::RichEdit',
-                properties=>{
- 			disableRichEditor=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			askAboutRichEdit=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			validElements=>{
-                        	fieldType=>'textarea',
-                                defaultValue=>'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]'
-                                },
- 			preformatted=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			editorWidth=>{
-                        	fieldType=>'integer',
-                                defaultValue=>0
-                                },
- 			editorHeight=>{
-                        	fieldType=>'integer',
-                                defaultValue=>0
-                                },
- 			sourceEditorWidth=>{
-                        	fieldType=>'integer',
-                                defaultValue=>0
-                                },
- 			sourceEditorHeight=>{
-                        	fieldType=>'integer',
-                                defaultValue=>0
-                                },
- 			useBr=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			removeLineBreaks=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			nowrap=>{
-                        	fieldType=>'yesNo',
-                                defaultValue=>0
-                                },
- 			directionality=>{
-                        	fieldType=>'selectBox',
-                                defaultValue=>'ltr'
-                                },
- 			toolbarLocation=>{
-                        	fieldType=>'selectBox',
-                                defaultValue=>'bottom'
-                                },
- 			cssFile=>{
-                        	fieldType=>'text',
-                                defaultValue=>undef
-                                },
- 			toolbarRow1=>{
-                        	fieldType=>'checkList',
-                                defaultValue=>undef
-                                },
- 			toolbarRow2=>{
-                        	fieldType=>'checkList',
-                                defaultValue=>undef
-                                },
- 			toolbarRow3=>{
-                        	fieldType=>'checkList',
-                                defaultValue=>undef
-                                },
-			enableContextMenu => {
-				fildType => "yesNo",
-				defaultValue => 0
-				}
-                        }
-                });
-        return $class->SUPER::definition($session, $definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,'Asset_RichEdit');
+    push(@{$definition}, {
+        assetName   => $i18n->get('assetName'),
+        icon        => 'richEdit.gif',
+        uiLevel     => 5,
+        tableName   => 'RichEdit',
+        className   => 'WebGUI::Asset::RichEdit',
+        properties => {
+            disableRichEditor => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            askAboutRichEdit => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            validElements => {
+                fieldType       => 'textarea',
+                defaultValue    => 'a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]',
+            },
+            preformatted => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            editorWidth => {
+                fieldType       => 'integer',
+                defaultValue    => 0,
+            },
+            editorHeight => {
+                fieldType       => 'integer',
+                defaultValue    => 0,
+            },
+            sourceEditorWidth => {
+                fieldType       => 'integer',
+                defaultValue    => 0,
+            },
+            sourceEditorHeight => {
+                fieldType       => 'integer',
+                defaultValue    => 0,
+            },
+            useBr => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            removeLineBreaks => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            nowrap=>{
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
+            directionality => {
+                fieldType       => 'selectBox',
+                defaultValue    => 'ltr',
+            },
+            toolbarLocation => {
+                fieldType       => 'selectBox',
+                defaultValue    => 'bottom',
+            },
+            cssFile => {
+                fieldType       => 'text',
+                defaultValue    => undef,
+            },
+            toolbarRow1 => {
+                fieldType       => 'checkList',
+                defaultValue    => undef,
+            },
+            toolbarRow2 => {
+                fieldType       => 'checkList',
+                defaultValue    => undef,
+            },
+            toolbarRow3 => {
+                fieldType       => 'checkList',
+                defaultValue    => undef,
+            },
+            enableContextMenu => {
+                fieldType       => "yesNo",
+                defaultValue    => 0,
+            },
+            inlinePopups => {
+                fieldType       => "yesNo",
+                defaultValue    => 0,
+            },
+        },
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 
@@ -193,7 +200,7 @@ sub getEditForm {
 		'forecolor' => $i18n->get('forecolor'),
 		'backcolor' => $i18n->get('backcolor'),
 		'link' => $i18n->get('link'),
-		'pagetree' => $i18n->get('pagetree'),
+		'wgpagetree' => $i18n->get('pagetree'),
 		'anchor' => $i18n->get('anchor'),
 		'unlink' => $i18n->get('unlink'),
 		'tablecontrols' => $i18n->get('tablecontrols'),
@@ -203,10 +210,10 @@ sub getEditForm {
 		'inserttime' => $i18n->get('inserttime'),
 		'insertdate' => $i18n->get('insertdate'),
 		'image' => $i18n->get('image'),
-		'insertImage' => $i18n->get('insertImage'),
-		'flash' => $i18n->get('flash'),
+		'wginsertimage' => $i18n->get('insertImage'),
+		'media' => $i18n->get('media'),
 		'charmap' => $i18n->get('charmap'),
-		'collateral' => $i18n->get('collateral'),
+		'wgmacro' => $i18n->get('collateral'),
 		'emotions' => $i18n->get('emotions'),
 		'help' => $i18n->get('help'),
 		'iespell' => $i18n->get('iespell'),
@@ -216,7 +223,6 @@ sub getEditForm {
 		'save' => $i18n->get('save'),
 		'preview' => $i18n->get('preview'),
 		'fullscreen' => $i18n->get('fullscreen'),
-		'zoom' => $i18n->get('zoom'),
 		'print' => $i18n->get('print'),
 		'spellchecker' => $i18n->get('Server Side Spell Checker'),
 #		'advlink' => "Advanced Link",
@@ -383,6 +389,12 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('enable context menu description'),
 		-name=>"enableContextMenu"
                 );
+    $tabform->getTab("properties")->yesNo(
+        -value=>$self->getValue("inlinePopups"),
+        -label=>$i18n->get('inline popups'),
+        -hoverHelp=>$i18n->get('inline popups description'),
+        -name=>"inlinePopups"
+    );
 	return $tabform;
 }
 
@@ -407,8 +419,8 @@ my $sql = "select asset.assetId, assetData.revisionDate from RichEdit left join 
 	tie %richEditors, 'Tie::IxHash';
 	while (my ($id, $version) = $sth->array) {
 		$richEditors{$id} = WebGUI::Asset::RichEdit->new($session, $id, undef, $version)->getTitle;
-	}	
-	$sth->finish;	
+	}
+	$sth->finish;
 	return \%richEditors;
 }
 
@@ -433,47 +445,51 @@ sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor'));
 	my $nameId = shift;
-	#my @toolbarRows = grep{@$_} map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
-	my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
-	push(@{$toolbarRows[0]},"contextmenu") if ($self->getValue("enableContextMenu"));
-	my @toolbarButtons = map{ @{$_} } @toolbarRows;
-	my @plugins;
+    my @plugins;
+    my %loadPlugins;
+    push @plugins, "safari";
+    push @plugins, "contextmenu"
+        if $self->getValue("enableContextMenu");
+    push @plugins, "inlinepopups"
+        if $self->getValue("inlinePopups");
 
+    my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
+    my @toolbarButtons = map{ @{$_} } @toolbarRows;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_RichEdit');
 	my %config = (
 		mode => "exact",
 		elements => $nameId,
 		theme => "advanced",
-		relative_urls => "false",
-		remove_script_host => "true",
-		auto_reset_designmode => "true",
-    		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
-    		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
-		theme_advanced_resizing => "true",
+		relative_urls => JSON::false(),
+		remove_script_host => JSON::true(),
+		auto_reset_designmode => JSON::true(),
+		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
+		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
+		theme_advanced_resizing => JSON::true(),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
-		ask => $self->getValue("askAboutRichEdit") ? "true" : "false",
-		preformatted => $self->getValue("preformatted") ? "true" : "false",
-		force_br_newlines => $self->getValue("useBr") ? "true" : "false",
-		force_p_newlines => $self->getValue("useBr") ? "false" : "true",
-		remove_linebreaks => $self->getValue("removeLineBreaks") ? "true" : "false",
-		nowrap => $self->getValue("nowrap") ? "true" : "false",
+		ask => $self->getValue("askAboutRichEdit") ? JSON::true() : JSON::false(),
+		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
+		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
+		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
+		remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
+		nowrap => $self->getValue("nowrap") ? JSON::true() : JSON::false(),
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
 		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
-		wg_userIsVisitor => $self->session->user->userId eq '1' ? 'true' : 'false',
+		wg_userIsVisitor => $self->session->user->userId eq '1' ? JSON::true() : JSON::false(),
 		);
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
 			push(@plugins,"spellchecker");
 			$config{spellchecker_languages} = 
-				join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
+			join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
 		}
-		push(@plugins,"table") if ($button eq "tablecontrols");	
-		push(@plugins,"save") if ($button eq "save");	
-		push(@plugins,"advhr") if ($button eq "advhr");	
-		push(@plugins,"fullscreen") if ($button eq "fullscreen");	
+		push(@plugins,"table") if ($button eq "tablecontrols");
+		push(@plugins,"save") if ($button eq "save");
+		push(@plugins,"advhr") if ($button eq "advhr");
+		push(@plugins,"fullscreen") if ($button eq "fullscreen");
 		if ($button eq "advimage") {
 			push(@plugins,"advimage");
 			$config{external_link_list_url} = "";
@@ -483,8 +499,9 @@ sub getRichEditor {
 			$config{file_browser_callback} = "mcFileManager.filebrowserCallBack";
 			push(@plugins,"advlink");
 		}
-		push(@plugins,"emotions") if ($button eq "emotions");	
-		push(@plugins,"iespell") if ($button eq "iespell");	
+		push(@plugins,"emotions") if ($button eq "emotions");
+		push(@plugins,"iespell") if ($button eq "iespell");
+		$config{gecko_spellcheck} = 'true' if ($button eq "iespell");
 		if ($button eq "paste" || $button eq "pastetext" || $button eq "pasteword") {
 			push(@plugins,"paste");
 		}
@@ -493,18 +510,24 @@ sub getRichEditor {
 			$config{plugin_insertdate_timeFormat} = "%H:%M:%S";
 			push(@plugins,"insertdatetime");
 		}
-		push(@plugins,"preview") if ($button eq "preview");	
-		push(@plugins,"zoom") if ($button eq "zoom");	
-		if ($button eq "flash") {
-			push(@plugins,"flash");
-			$config{flash_external_list_url} = "";
+		push(@plugins,"preview") if ($button eq "preview");
+		if ($button eq "media") {
+			push(@plugins,"media");
 		}
-		push(@plugins,"searchreplace") if ($button eq "search" || $button eq "replace" || $button eq "searchreplace");	
-		push(@plugins,"print") if ($button eq "print");	
-		push(@plugins,"contextmenu") if ($button eq "contextmenu");	
-		push(@plugins,"insertImage") if ($button eq "insertImage");	
-		push(@plugins,"collateral") if ($button eq "collateral");	
-		push(@plugins,"pagetree") if ($button eq "pagetree");	
+		push(@plugins,"searchreplace") if ($button eq "search" || $button eq "replace" || $button eq "searchreplace");
+		push(@plugins,"print") if ($button eq "print");
+        if ($button eq "wginsertimage") {
+            push @plugins, "-wginsertimage";
+            $loadPlugins{wginsertimage} = $self->session->url->extras("tinymce-webgui/plugins/wginsertimage/editor_plugin.js");
+        }
+        if ($button eq "wgpagetree") {
+            push @plugins, "-wgpagetree";
+            $loadPlugins{wgpagetree} = $self->session->url->extras("tinymce-webgui/plugins/wgpagetree/editor_plugin.js");
+        }
+        if ($button eq "wgmacro") {
+            push @plugins, "-wgmacro";
+            $loadPlugins{wgmacro} = $self->session->url->extras("tinymce-webgui/plugins/wgmacro/editor_plugin.js");
+        }
 		if ($button eq "code") {
 			$config{theme_advanced_source_editor_width} = $self->getValue("sourceEditorWidth") if ($self->getValue("sourceEditorWidth") > 0);
 			$config{theme_advanced_source_editor_height} = $self->getValue("sourceEditorHeight") if ($self->getValue("sourceEditorHeight") > 0);
@@ -515,26 +538,18 @@ sub getRichEditor {
 		$language = $i18n->getLanguage("English","languageAbbreviation");
 	}
 	$config{language} = $language;
-	$config{content_css} = $self->getValue("cssFile") || $self->session->url->extras('tinymce2/defaultcontent.css');
+	$config{content_css} = $self->getValue("cssFile") || $self->session->url->extras('tinymce-webgui/defaultcontent.css');
 	$config{width} = $self->getValue("editorWidth") if ($self->getValue("editorWidth") > 0);
 	$config{height} = $self->getValue("editorHeight") if ($self->getValue("editorHeight") > 0);
 	$config{plugins} = join(",",@plugins);
-	my @directives;
-	foreach my $key (keys %config) {
-		if ($config{$key} eq "true" || $config{$key} eq "false") {
-			push(@directives,$key." : ".$config{$key});
-		} else {
-			push(@directives,$key." : '".$config{$key}."'");
-		}
-	}
 
-	$self->session->style->setScript($self->session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
-	$self->session->style->setScript($self->session->url->extras("tinymce2/jscripts/webgui.js"),{type=>"text/javascript"});
-	return '<script type="text/javascript">
-		tinyMCE.init({
-			'.join(",\n    ",@directives).'
-			});
-		</script>';
+    $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce_src.js'),{type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
+    my $out = "<script type=\"text/javascript\">\n";
+    while (my ($plugin, $path) = each %loadPlugins) {
+        $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
+    }
+    $out .= "tinyMCE.init(" . JSON::encode_json(\%config) . ");\n</script>";
 }
 
 

@@ -155,98 +155,37 @@ Asset picker for the rich editor.
 =cut
 
 sub www_pageTree {
-	my $session = shift;
-	$session->http->setCacheControl("none");
-	$session->style->setRawHeadTags(q|<style type="text/css">
-                .base {
-                        font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-                        font-size: 12px;
-                }
-                a {
-                        color: #0f3ccc;
-                        text-decoration: none;
-                }
-                a:hover {
-                        color: #000080;
-                        text-decoration: underline;     
-                }
-                .selectLink {
-                        color: #cc7700;
-                }
-                .crumb {
-                        color: orange;
-                }
-                .crumbTrail {
-                        padding: 3px;
-                        background-color: #eeeeee;
-                        -moz-border-radius: 10px;
-                }
-                .traverse {
-                        font-size: 15px;
-                }
-                </style>
-		|);
-	$session->style->setScript($session->url->extras('tinymce2/jscripts/tiny_mce/tiny_mce_popup.js'),{type=>"text/javascript"});
-	my $i18n = WebGUI::International->new($session);
-	my $f = WebGUI::HTMLForm->new($session,-action=>"#");
-	$f->text(
-		-name=>"url",
-		-label=>$i18n->get(104),
-		-hoverHelp=>$i18n->get('104 description'),
-		);
-	my %options = ();
-	tie %options, 'Tie::IxHash';
-	%options = ("_self"=>$i18n->get('link in same window'),
-		           "_blank"=>$i18n->get('link in new window'));
-	$f->selectBox(
-		-name=>"target",
-		-label=>$i18n->get('target'),
-		-hoverHelp=>$i18n->get('target description'),
-		-options=>\%options
-		);
-	$f->button(
-		-name=>"button",
-		-value=>$i18n->get('done'),
-		-extras=>'onclick="createLink()"'
-		);
-	my $output = ' <fieldset><legend>'.$i18n->get('insert a link').'</legend>'.$f->print.'</fieldset>'.<<"JS"
-	<script type="text/javascript">
-//<![CDATA[
-function createLink() {
-    if (window.opener) {        
-        if (document.getElementById("url_formId").value == "") {
-           alert("@{[$i18n->get("link enter alert")]}");
-           document.getElementById("url_formId").focus();
-        }
-	var link = '<a href="'+"^" + "/(" + document.getElementById("url_formId").value+');"';
-        var target = document.getElementById('target_formId').value;
-        if (target != '_self') link += ' target="' + target + '"';
-	link += '>' + window.opener.tinyMCE.selectedInstance.selection.getSelectedHTML() + '</a>';
-	window.opener.tinyMCE.execCommand("mceInsertContent",false,link);
-     window.close();
+    my $session = shift;
+    $session->http->setCacheControl("none");
+    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wgpagetree/css/pagetree.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->style->setRawHeadTags(<<"JS");
+<style type="text/css">body { margin: 0 }</style>
+<script type="text/javascript">//<![CDATA[
+function selectLink(href) {
+    if (window.parent && window.parent.WGPageTreeDialog) {
+        window.parent.WGPageTreeDialog.setUrl(href);
     }
 }
-//]]>
-</script>
+//]]></script>
 JS
-	.'<fieldset><legend>'.$i18n->get('pages').'</legend> ';
-	$output .= '<div class="base">';
-	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
-	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
-	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=pageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
-	}	
-	$output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n";
-	my $children = $base->getLineage(["children"],{returnObjects=>1});
-	foreach my $child (@{$children}) {
-		next unless $child->canView;
-		$output .= '<a href="#" class="selectLink"
-onclick="document.getElementById(\'url_formId\').value=\''.$child->get("url").'\'">['.$i18n->get("select").']</a>
-<a href="'.$child->getUrl("op=formHelper;class=HTMLArea;sub=pageTree").'" class="traverse">'.$child->get("menuTitle").'</a>'."<br />\n";	
-	}
-	$output .= '</div></fieldset>';
-	return $session->style->process($output, 'PBtmpl0000000000000137');
+    my $i18n = WebGUI::International->new($session);
+    my $output = '<div class="nav">';
+    my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getRoot($session);
+    my @crumb;
+    my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
+    foreach my $ancestor (@{$ancestors}) {
+        push(@crumb,'<a href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=pageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
+    }
+    $output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div>\n<ul>";
+    my $children = $base->getLineage(["children"],{returnObjects=>1});
+    foreach my $child (@{$children}) {
+        next unless $child->canView;
+        $output .= '<li><a href="#" class="selectLink" onclick="selectLink(\'' . $child->get('url') . '\'); return false;">['
+            . $i18n->get("select") . ']</a> <a href="' . $child->getUrl("op=formHelper;class=HTMLArea;sub=pageTree")
+            . '" class="traverse">' . $child->get("menuTitle") . '</a>'."</li>\n";
+    }
+    $output .= '</ul></div>';
+    return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
 #-------------------------------------------------------------------
@@ -259,75 +198,66 @@ Each link display a thumbnail of the image via www_viewThumbnail.
 =cut
 
 sub www_imageTree {
-	my $session = shift;
-	$session->http->setCacheControl("none");
-	$session->style->setRawHeadTags(q| <style type="text/css">
-                .base {
-                        font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
-                        font-size: 12px;
-                }
-                a {
-                        color: #0f3ccc;
-                        text-decoration: none;
-                }
-                a:hover {
-                        color: #000080;
-                        text-decoration: underline;     
-                }
-                .selectLink {
-                        color: #cc7700;
-                }
-                .crumb {
-                        color: orange;
-                }
-                .crumbTrail {
-                        padding: 3px;
-                        background-color: #eeeeee;
-                        -moz-border-radius: 10px;
-                }
-                .traverse {
-                        font-size: 15px;
-                }
-                </style>|);
-	my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getMedia($session);
-	my @crumb;
-	my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
-	my $media;
-	my @output;
-	push(@output, '<div class="base">');
-	my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
-	foreach my $ancestor (@{$ancestors}) {
-		push(@crumb,'<a class="crumb" href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=imageTree").'">'.$ancestor->get("menuTitle").'</a>');
-		# check if we are in (a subdirectory of) Media
-		if ($ancestor->get('assetId') eq 'PBasset000000000000003') {
-			$media = $ancestor;
-		}
-	}	
-	if ($media) {
-		# if in (a subdirectory of) Media, give user the ability to create folders or upload images
-		push(@output, '<p>[ <a href="');
-		push(@output, $base->getUrl('op=formHelper;class=HTMLArea;sub=addFolder'));
-		push(@output, '">'.$i18n->get('Create new folder').'</a> ] &nbsp; [ <a href="');
-		push(@output, $base->getUrl('op=formHelper;class=HTMLArea;sub=addImage'));
-		push(@output, '">'.$i18n->get('Upload new image').'</a> ]</p>');
-	} else {
-		$media = WebGUI::Asset->getMedia($session);
-		# if not in Media, provide a direct link to it
-		push(@output, '<p>[ <a href="'.$media->getUrl('op=formHelper;class=HTMLArea;sub=imageTree').'">'.$media->get('title').'</a> ]</p>');
-	}
-	push(@output, '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div><br />\n");
-	my $children = $base->getLineage(["children"],{returnObjects=>1});
-	foreach my $child (@{$children}) {
-		next unless $child->canView;
-		if ($child->get("className") =~ /^WebGUI::Asset::File::Image/) {
-			push(@output, '<a class="selectLink" href="'.$child->getUrl("op=formHelper;class=HTMLArea;sub=viewThumbnail").'" target="viewer">['.$i18n->get("select","WebGUI").']</a> ');
-		} else {
-			push(@output, ' ['.$i18n->get("select","WebGUI")."] ");
-		}
-		push(@output, '<a class="traverse" href="'.$child->getUrl("op=formHelper;class=HTMLArea;sub=imageTree").'">'.$child->get("menuTitle").'</a>'."<br />\n");
-	}
-	push(@output, '</div>');
-	return $session->style->process(join('', @output), 'PBtmpl0000000000000137');
+    my $session = shift;
+    $session->http->setCacheControl("none");
+    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $session->style->setRawHeadTags(<<"JS");
+<style type="text/css">body { margin: 0 }</style>
+<script type="text/javascript">//<![CDATA[
+function selectImage(url, thumburl) {
+    if (window.parent && window.parent.WGInsertImageDialog) {
+        window.parent.WGInsertImageDialog.setUrl(url, thumburl);
+    }
+}
+//]]></script>
+JS
+    my $i18n = WebGUI::International->new($session, 'Operation_FormHelpers');
+    my $output = '<div class="nav">';
+    my $base = WebGUI::Asset->newByUrl($session) || WebGUI::Asset->getMedia($session);
+
+    my @crumb;
+    my $media;
+    my $ancestors = $base->getLineage(["self","ancestors"],{returnObjects=>1});
+    foreach my $ancestor (@{$ancestors}) {
+        push(@crumb,'<a href="'.$ancestor->getUrl("op=formHelper;class=HTMLArea;sub=imageTree").'" class="crumb">'.$ancestor->get("menuTitle").'</a>');
+        if ($ancestor->get('assetId') eq 'PBasset000000000000003') {
+            $media = $ancestor;
+        }
+    }
+
+    if ($media) {
+        # if in (a subdirectory of) Media, give user the ability to create folders or upload images
+        $output .= '<div>[ <a href="' . $base->getUrl('op=formHelper;class=HTMLArea;sub=addFolder')
+            . '">' . $i18n->get('Create new folder') . '</a> ] &nbsp; [ <a href="'
+            . $base->getUrl('op=formHelper;class=HTMLArea;sub=addImage') . '">'
+            . $i18n->get('Upload new image').'</a> ]</div>';
+    } else {
+        $media = WebGUI::Asset->getMedia($session);
+        # if not in Media, provide a direct link to it
+        $output .= '<div>[ <a href="' . $media->getUrl('op=formHelper;class=HTMLArea;sub=imageTree') . '">'
+            . $media->get('title') . '</a> ]</div>';
+    }
+    $output .= '<div class="crumbTrail">'.join(" &gt; ", @crumb)."</div>\n<ul>";
+
+    my $useAssetUrls = $session->config->get("richEditorsUseAssetUrls");
+    my $children = $base->getLineage(["children"],{returnObjects=>1});
+    foreach my $child (@{$children}) {
+        next unless $child->canView;
+        $output .= '<li>';
+        if ($child->isa('WebGUI::Asset::File::Image')) {
+            $output .= '<a href="#" class="selectLink" onclick="selectImage(\''
+                . ($useAssetUrls ? $child->getUrl : $child->getFileUrl) . '\',\''
+                . $session->url->getSiteURL . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail')
+                . '\'); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
+        }
+        else {
+            $output .= '<span class="noselect">[' . $i18n->get("select", 'WebGUI') . ']</span>';
+        }
+        $output .= ' <a href="' . $child->getUrl("op=formHelper;class=HTMLArea;sub=imageTree")
+                . '" class="traverse">' . $child->get("menuTitle") . "</a></li>\n";
+    }
+    $output .= '</ul></div>';
+    return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
 #-------------------------------------------------------------------
@@ -340,35 +270,21 @@ URL in the session object is used to determine which Image is used.
 =cut
 
 sub www_viewThumbnail {
-	my $session = shift;
-	$session->http->setCacheControl("none");
-	my $image = WebGUI::Asset->newByUrl($session);
-	my $i18n = WebGUI::International->new($session);
-	my $output;
-	if ($image->get("className") =~ /WebGUI::Asset::File::Image/) {
-		$output = '<div align="center">';
-		$output .= '<img src="'.$image->getThumbnailUrl.'" style="border-style:none;" alt="'.$i18n->get('preview').'" />';
-		$output .= '<br />';
-		$output .= $image->get("filename");
-		$output .= '</div>';
-		$output .= '<script type="text/javascript">';
-		$output .= "//<![CDATA[\n";
-		if ( $session->config->get("richEditorsUseAssetUrls")) {
-			$output .= "\nvar src = '".$image->getUrl."';\n";
-		} else {
-			$output .= "\nvar src = '".$image->getFileUrl."';\n";
-		}
-		$output .= "if(src.length > 0) {
-				var manager=window.parent;
-   				if(manager)		      	
-		      		manager.document.getElementById('txtFileName').value = src;
-    			}
-                    //]]>
-    		    </script>\n";
-	} else {
-		$output = '<div align="center"><img src="'.$session->url->extras('tinymce2/images/icon.gif').'" style="border-style:none;" alt="'.$i18n->get('image manager').'" /></div>';
-	}
-	return $session->style->process($output, 'PBtmpl0000000000000137');
+    my $session = shift;
+    $session->http->setCacheControl("none");
+    $session->style->setLink($session->url->extras('/tinymce-webgui/plugins/wginsertimage/css/insertimage.css'),{ type=>'text/css', rel=>"stylesheet" });
+    my $image = WebGUI::Asset->newByUrl($session);
+    my $i18n = WebGUI::International->new($session);
+    my $output = '<div class="preview">';
+    if ($image->isa('WebGUI::Asset::File::Image')) {
+        $output .= '<div><img src="' . $image->getThumbnailUrl . '" alt="' . $i18n->get('preview') . '" /></div>'
+            . $image->get("filename") . '</div>';
+    }
+    else {
+        $output .= '<div><img src="' . $session->url->extras('tinymce/images/icon.gif') . '" alt="'
+            . $i18n->get('image manager') . '" /></div>';
+    }
+    return $session->style->process($output, 'PBtmpl0000000000000137');
 }
 
 #-------------------------------------------------------------------

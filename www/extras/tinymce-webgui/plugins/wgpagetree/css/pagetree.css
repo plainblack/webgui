@@ -1,0 +1,46 @@
+.panel_wrapper div.current {
+    height: 423px;
+}
+.panel_wrapper div.current input, .panel_wrapper div.current select {
+    width: 100%;
+}
+fieldset.pages {
+    height: 368px;
+}
+iframe.pages {
+    border-style: none;
+    width: 100%;
+    height: 100%;
+}
+
+.nav {
+        font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+        font-size: 12px;
+}
+.nav a {
+        color: #0f3ccc;
+        text-decoration: none;
+}
+.nav a:hover {
+        color: #000080;
+        text-decoration: underline;     
+}
+.nav ul, .nav li {
+    margin-left: 0;
+    padding-left: 0;
+    list-style: none;
+}
+.nav .selectLink {
+        color: #cc7700;
+}
+.nav .crumb {
+        color: orange;
+}
+.nav .crumbTrail {
+        padding: 3px;
+        background-color: #eeeeee;
+        -moz-border-radius: 10px;
+}
+.nav .traverse {
+        font-size: 15px;
+}
