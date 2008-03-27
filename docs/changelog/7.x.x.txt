@@ -3,6 +3,7 @@
  - fixed: Rich editor image uploader doesn't follow size limits
  - make sure all tables are using UTF-8
  - fixed: Poll question/answers with international text corrupted
+ - fixed: Thingy: on demo sites the edit and delete icons in search results have wrong url's
  - upgraded to TinyMCE 3
 
 7.5.8

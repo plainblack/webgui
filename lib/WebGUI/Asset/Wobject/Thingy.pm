@@ -2314,9 +2314,9 @@ sequenceNumber');
             );
             if ($self->hasPrivileges($thingProperties{groupIdEdit})){
                 $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$url,$i18n->get('delete thing data warning'));
+                .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
                 $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$url);
+                .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
             }
             push(@searchResult_loop,\%templateVars);
         }
