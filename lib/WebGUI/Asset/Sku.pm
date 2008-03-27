@@ -289,6 +289,7 @@ sub indexContent {
 	my $self = shift;
 	my $indexer = $self->SUPER::indexContent;
     $indexer->addKeywords($self->get('sku'));
+	return $indexer;
 }
 
 

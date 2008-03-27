@@ -188,6 +188,23 @@ sub getQuantityAvailable {
 
 #-------------------------------------------------------------------
 
+=head2 indexContent ( )
+
+Adding location and eventNumber as a keyword. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+    $indexer->addKeywords($self->get('location').' '.$self->get('eventNumber'));
+	return $indexer;
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 onCompletePurchase
 
 Marks the ticket as purchased.

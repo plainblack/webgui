@@ -182,6 +182,7 @@ sub view {
 <div class=" yui-skin-sam">
 	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a></p>
 	<p>|.$self->get('badgeInstructions').q|</p>
+    <div id="emsBadgePaging"></div>
     <div id="emsBadgeList"></div>
 </div>
 
@@ -208,7 +209,7 @@ STOP
     # paginator in case there are a lot of badges
     $output .= <<STOP;
     var myPaginator = new Paginator({
-        containers         : ['paging'],
+        containers         : ['emsBadgePaging'],
         pageLinks          : 5,
         rowsPerPage        : 25,
         rowsPerPageOptions : [25,50,100],
@@ -293,6 +294,29 @@ sub www_addRibbonToBadge {
 	my $ribbon = WebGUI::Asset->new($session, $form->get('assetId'), 'WebGUI::Asset::Sku::EMSRibbon');
 	if (defined $ribbon) {
 		$ribbon->addToCart({badgeId=>$form->get('badgeId')});
+	}
+	return $self->www_getRegistrantAsJson();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addTicketsToBadge ()
+
+Adds selected tickets to a badge. Expects two form parameters, assetId (multiples fine) and badgeId, where assetId represents the ticket and badgeId represents the badge.
+
+=cut
+
+sub www_addTicketsToBadge {
+	my $self = shift;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my $form = $session->form;
+	my @ids = $form->param('assetId');
+	foreach my $id (@ids) {
+		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		if (defined $ticket) {
+			$ticket->addToCart({badgeId=>$form->get('badgeId')});
+		}		
 	}
 	return $self->www_getRegistrantAsJson();
 }
@@ -399,9 +423,40 @@ sub www_getTicketsAsJson {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
     my %results = ();
-	foreach my $ticket (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSTicket']})}) {
-		push(@{$results{records}}, {
+	my @ids = ();
+	my $keywords = $form->get('keywords');
+	
+	# looking for specific events
+	if ($keywords =~ m{^[\d+,*\s*]+$}) {
+		@ids = $db->buildArray("select EMSTicket.assetId from EMSTicket left join asset using (assetId) where
+			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.")",[$self->getId]);
+	}
+	
+	# looking for keywords
+	elsif ($keywords ne "") {
+		@ids = @{WebGUI::Search->new($session)->search({
+			keywords	=> $keywords,
+			lineage		=> [$self->get('lineage')],
+			classes		=> ['WebGUI::Asset::Sku::EMSTicket'],
+			})->getAssetIds};
+	}
+	
+	# just get all tickets
+	else {
+		@ids = $db->buildArray("select assetId from asset where parentId=? and className='WebGUI::Asset::Sku::EMSTicket'", [$self->getId]);
+	}
+	
+	# get assets
+	my $counter = 0;
+	my @records = ();
+	foreach my $id (@ids) {
+		next unless ($counter >= $startIndex);
+		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		next unless defined $ticket;
+		push(@records, {
 			title 				=> $ticket->getTitle,
 			description			=> $ticket->get('description'),
 			price				=> $ticket->getPrice+0,
@@ -410,12 +465,22 @@ sub www_getTicketsAsJson {
 			editUrl				=> $ticket->getUrl('func=edit'),
 			deleteUrl			=> $ticket->getUrl('func=delete'),
 			assetId				=> $ticket->getId,
+			eventNumber			=> $ticket->get('eventNumber'),
+			location			=> $ticket->get('location'),
+			startDate			=> $ticket->get('startDate'),
+			endDate				=> $ticket->get('endDate'),
 			});
+		last unless (scalar(@records) < $numberOfResults);
+		$counter++;
 	}
-    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
-    $results{'startIndex'} = 0;
-    $results{'sort'}       = undef;
-    $results{'dir'}        = "asc";
+	
+	# build json
+	$results{records} 			= \@records;
+    $results{totalRecords} 		= scalar(@ids);
+	$results{recordsReturned} 	= scalar(@records);
+    $results{'startIndex'}   	= $startIndex;
+    $results{'sort'}       		= undef;
+    $results{'dir'}        		= "asc";
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
@@ -599,6 +664,7 @@ sub www_viewExtras {
 	my $session = $self->session;
 	return $session->privilege->noAccess() unless $self->canView;
 	$badgeId = $session->form->get("badgeId") if ($badgeId eq "");
+	my $hasBadge = ($badgeId ne "");
 	$whichTab ||= "tickets";
 
 	my ($style, $url) = $session->quick(qw(style url));   
@@ -687,6 +753,7 @@ sub www_viewExtras {
 	<p>|.$self->get('ticketInstructions').q|<br />
 		<div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
 	</p>
+	<div id="emsTicketPaging"></div>
 	<form><div id="emsTicketList"></div></form>
 
 
@@ -703,7 +770,7 @@ YAHOO.util.Event.onDOMReady(function () {
     mySource.responseSchema = {
         resultsList : 'records',
         totalRecords: 'totalRecords',
-        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
+        fields      : [ 'location', 'startDate', 'endDate', 'eventNumber', 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
     };
 
     var buildQueryString = function (state,dt) {
@@ -714,7 +781,7 @@ YAHOO.util.Event.onDOMReady(function () {
 
     // paginator in case there are a lot of tickets
     var myPaginator = new Paginator({
-        containers         : ['paging'],
+        containers         : ['emsTicketPaging'],
         pageLinks          : 5,
         rowsPerPage        : 25,
         rowsPerPageOptions : [25,50,100],
@@ -757,46 +824,56 @@ YAHOO.util.Event.onDOMReady(function () {
 	if ($session->var->isAdminOn) {
 	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageTicket},';
 	}
+	if ($hasBadge) {
+		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';
+	}
 	$output .= q|
-		{key:"assetId", label:"Buy", formatter:formatAddToCart},
+		{key:"eventNumber", label:"Event #",sortable:true},
 		{key:"title", label:"Title",sortable:true,formatter:formatViewTicketDescription},
 		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},
-		{key:"quantityAvailable",sortable:true,label:"Quantity Available", formatter:formatQuantityAvailable}
+		{key:"quantityAvailable",sortable:true,label:"# Available", formatter:formatQuantityAvailable},
+		{key:"startDate", label:"Start",sortable:true},
+		{key:"endDate", label:"End",sortable:true}
     ];
     var myTable = new DataTable('emsTicketList', myColumnDefs, mySource, myTableConfig);
-	
-	var buyButtonAction = function () {
-		onclick="populateRegistrantBadge({func:'addTicketsToBadge',assetId:\'' +assetId+ '\'});" 
-	}
-	
+
+	|;
+	if ($hasBadge) {
+		$output .= q|
 	// buy button in header
 	var thead = myTable.getTbodyEl().parentNode.createTHead();
 	var tr = thead.insertRow(-1);
 	var th = tr.appendChild(document.createElement('th'));
-	th.colSpan = 4;
-	var buyButton = th.appendChild(document.createElement('input'));
-	buyButton.type = 'button';
-	buyButton.value = 'Buy';
-	buyButton.onclick = buyButtonAction;
-	buyButton.className = 'forwardButton';
+	th.colSpan = 7;
+	th.innerHTML = '<input type="button" value="Buy" class="forwardButton" onclick="submitTicketsToBadge(this.form);" />';
 
 	// buy button in footer
 	var tfoot = myTable.getTbodyEl().parentNode.createTFoot();
 	var tr = tfoot.insertRow(-1);
 	var th = tr.appendChild(document.createElement('th'));
-	th.colSpan = 4;
-	var buyButton = th.appendChild(document.createElement('input'));
-	buyButton.type = 'button';
-	buyButton.value = 'Buy';
-	buyButton.onclick = buyButtonAction;
-	buyButton.className = 'forwardButton';
-
+	th.colSpan = 7;
+	th.innerHTML = '<input type="button" value="Buy" class="forwardButton" onclick="submitTicketsToBadge(this.form);" />';
+	|;		
+	}
+	$output .= q|
 	Dom.get('keywordSearchForm').onsubmit = function () {
         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', myTable.onDataReturnInitializeTable, myTable);
         return false;
     };
 
 	});
+	
+	function submitTicketsToBadge (form)  {
+		var field = form.assetId;
+		var assetIds = new Array();
+		for (i = 0; i < field.length; i++) {
+			if (field[i].checked == true) {
+				assetIds.push(field[i].value)
+			}
+		}
+		populateRegistrantBadge({func:'addTicketsToBadge',assetIds: assetIds});
+	}
+
 
 	</script>
 		</div> <!-- end ticket tab data -->
@@ -827,7 +904,7 @@ YAHOO.util.Event.onDOMReady(function () {
 
     // paginator in case there are a lot of ribbons
     var myPaginator = new Paginator({
-        containers         : ['paging'],
+        containers         : ['emsRibbonPaging'],
         pageLinks          : 5,
         rowsPerPage        : 25,
         rowsPerPageOptions : [25,50,100],
@@ -863,8 +940,10 @@ YAHOO.util.Event.onDOMReady(function () {
 	if ($session->var->isAdminOn) {
 	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageRibbon},';
 	}
-	$output .= q|
-		{key:"assetId", label:"Buy", formatter:formatAddToCart},
+	if ($hasBadge) {
+		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';
+	}
+	$output .= q|	
 		{key:"title", label:"Title",sortable:true,formatter:formatViewRibbonDescription},
 		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
     ];
@@ -900,7 +979,7 @@ YAHOO.util.Event.onDOMReady(function () {
 
     // paginator in case there are a lot of tokens
     var myPaginator = new Paginator({
-        containers         : ['paging'],
+        containers         : ['emsTokenPaging'],
         pageLinks          : 5,
         rowsPerPage        : 25,
         rowsPerPageOptions : [25,50,100],
@@ -926,7 +1005,7 @@ YAHOO.util.Event.onDOMReady(function () {
 				var i=1;
 				while (i<101) {
 					selector += '<option value="'+i+'">'+i+'</option>';
-					if (i>=5) {
+					if (i>=20) {
 						i += 5;
 					}
 					else {
@@ -953,8 +1032,10 @@ YAHOO.util.Event.onDOMReady(function () {
 	if ($session->var->isAdminOn) {
 	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageToken},';
 	}
+	if ($hasBadge) {
+		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';		
+	}
 	$output .= q|
-		{key:"assetId", label:"Buy", formatter:formatAddToCart},
 		{key:"title", label:"Title",sortable:true,formatter:formatViewTokenDescription},
 		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
     ];
@@ -966,6 +1047,9 @@ YAHOO.util.Event.onDOMReady(function () {
 	  </div> <!-- end tab data -->
      </div> <!-- end tabs -->
 	</div> <!-- end first column -->
+	|;
+	if ($hasBadge) {
+		$output .= q|
 	<div class="yui-u"> <!-- start second column -->
 		<div id="badge">
 			|.$self->getTitle.q|
@@ -975,6 +1059,12 @@ YAHOO.util.Event.onDOMReady(function () {
 			<div id="badgeRibbonList"></div>
 			<div id="badgeTokenList"></div>
 		</div>
+		<ul style="text-align: left;list-style:disc;">
+			<li><a href="|.$self->getUrl('func=viewDetails;badgeId='.$badgeId).q|">Switch John Smith's Badge</a></li>
+			<li><a href="|.$self->getUrl('func=lookupBadge').q|">Switch To Another Badge</a></li>
+			<li><a href="|.$self->getUrl.q|">Buy Another Badge</a></li>
+			<li><a href="|.$self->getUrl('shop=cart').q|">View Cart</a></li>
+		</ul>
 		<script type="text/javascript">
 		function populateRegistrantBadge (args) {
 			var Dom = YAHOO.util.Dom;
@@ -1036,7 +1126,15 @@ YAHOO.util.Event.onDOMReady(function () {
 			};
 			var url = '|.$self->getUrl('badgeId='.$badgeId).q|';
 			for (var i in args) {
-				url += ';' + i + '=' + args[i];
+				if (i == 'assetIds') {
+					var ids = args[i];
+					for (var j=0; j<ids.length;j++) {
+						url += ';assetId=' + ids[j];	
+					}
+				}
+				else {
+					url += ';' + i + '=' + args[i];
+				}
 			}
             this.request = YAHOO.util.Connect.asyncRequest('GET', url , callback);			
 		}
@@ -1045,6 +1143,9 @@ YAHOO.util.Event.onDOMReady(function () {
 		});
 		</script>
 	</div> <!-- end second column -->
+	|;
+	}
+	$output .= q|
 	</div> <!-- end grid -->
 </div> <!-- end yui wrapper -->
 
