@@ -1,4 +1,5 @@
 7.5.9
+ - fixed: Collaboration System attachments follow site's max size instead of CS's
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

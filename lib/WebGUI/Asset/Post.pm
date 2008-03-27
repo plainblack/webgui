@@ -845,7 +845,7 @@ sub postProcess {
 	my $storage = $self->getStorageLocation;
 	foreach my $file (@{$storage->getFiles}) {
 		if ($storage->isImage($file)) {
-            $storage->adjustMaxImageSize($file);
+            $storage->adjustMaxImageSize($file, $self->getThread->getParent->get('maxImageSize'));
 			$storage->generateThumbnail($file, $self->getThread->getParent->get("thumbnailSize"));
 		}
 		$size += $storage->getFileSize($file);
