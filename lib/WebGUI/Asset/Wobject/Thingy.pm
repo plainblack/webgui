@@ -1663,8 +1663,8 @@ sub www_editThingData {
     
     if ($thingDataId ne "new"){
         # Get Field Values
-        %thingData = $session->db->quickHash("select * from Thingy_".$thingId." where thingDataId =
-".$session->db->quote($thingDataId));
+        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+        ." where thingDataId = ?",[$thingDataId]);
     }
 
     $fields = $session->db->read('select * from Thingy_fields where assetId =
@@ -1938,7 +1938,7 @@ thingId=".$session->db->quote($thingId));
             }
             
             if((scalar @duplicatesConstraint) > 0){
-                my $query = "select thingDataId from Thingy_".$thingId." where ";
+                my $query = "select thingDataId from ".$dbh->quote_identifier("Thingy_".$thingId)." where ";
                 $query .= join(" and ",@duplicatesConstraint);
                 $query .= " limit 1";
                 ($foundDuplicateId) = $session->db->quickArray($query);
@@ -2485,8 +2485,8 @@ thingId=".$self->session->db->quote($thingId));
     }
 
     # Get Field Values
-    %thingData = $session->db->quickHash("select * from Thingy_".$thingId." where thingDataId = "
-    .$session->db->quote($thingDataId));
+    %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+        ." where thingDataId = ?",[$thingDataId]);
 
     $fields = $session->db->read('select * from Thingy_fields where assetId = '
     .$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by

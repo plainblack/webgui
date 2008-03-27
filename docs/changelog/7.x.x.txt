@@ -26,6 +26,7 @@
  - fixed: Syndicated Content URLs using macros not updated by caching workflow
  - fixed: Syndicated Content asset tries too hard to get URLs returning errors
  - fixed: Thingy: field type includes things without fields
+ - fixed: Thingy: problems editing/viewing records
  - fix: Users now have permission to add comments
  - fix: Username for comment poster is now shown correctly
  - fix: Slideshow now works
