@@ -372,7 +372,9 @@ sub getEditFieldForm {
         $fieldTypes{$fieldType} = $form->getName($self->session);       
     }
     
-    $things = $self->session->db->read('select thingId, label from Thingy_things where assetId =?',[$self->getId]);
+    $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
+        .'left join Thingy_fields using(thingId) where Thingy_things.assetId = ? and fieldId != "" '
+        .'group by thingId',[$self->getId]);
     while (my $thing = $things->hashRef) {
         my $fieldType = "otherThing_".$thing->{thingId};
         $fieldTypes{$fieldType} = $thing->{label};

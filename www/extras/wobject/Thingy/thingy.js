@@ -87,7 +87,8 @@ function initOptionalFields(prefix,fieldId) {
 
 		if (fieldInThing_module_rendered == thingId){
 			fieldInThing_module.show();
-		}else{
+			defaultFieldInThing_module.show();
+		}else{	
 			var url = location.pathname + "?func=selectFieldInThing;thingId=" + thingId + ";prefix=" +prefix + ";fieldId=" + fieldId;
 			var handleSuccess = function(o){
 				fieldInThing_module.setBody(o.responseText);
