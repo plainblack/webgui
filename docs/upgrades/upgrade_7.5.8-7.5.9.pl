@@ -22,6 +22,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+ensureUTF8($session);
 # upgrade functions go here
 
 finish($session); # this line required
@@ -34,6 +35,103 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+
+#----------------------------------------------------------------------------
+sub ensureUTF8 {
+    my $session = shift;
+    print "\tConverting all tables to UTF-8... " unless $quiet;
+    my @tables = qw(
+        Article
+        Calendar Calendar_feeds
+        Collaboration
+        Dashboard
+        DataForm DataForm_entry DataForm_entryData DataForm_field DataForm_tab
+        Event
+        EventManagementSystem EventManagementSystem_badges EventManagementSystem_discountPasses
+        EventManagementSystem_metaData EventManagementSystem_metaField EventManagementSystem_prerequisiteEvents
+        EventManagementSystem_prerequisites EventManagementSystem_products EventManagementSystem_purchases
+        EventManagementSystem_registrations EventManagementSystem_sessionPurchaseRef
+        Event_recur Event_relatedlink
+        FileAsset
+        Folder
+        Gallery GalleryAlbum GalleryFile GalleryFile_comment
+        HttpProxy
+        ITransact_recurringStatus
+        ImageAsset
+        InOutBoard InOutBoard_delegates InOutBoard_status InOutBoard_statusLog
+        Layout
+        Matrix Matrix_field Matrix_listing Matrix_listingData Matrix_rating Matrix_ratingSummary
+        MessageBoard
+        MultiSearch
+        Navigation
+        Newsletter Newsletter_subscriptions
+        PM_project PM_task PM_taskResource PM_wobject
+        Photo Photo_rating
+        Poll Poll_answer
+        Post Post_rating
+        Product Product_accessory Product_benefit Product_feature Product_related Product_specification
+        RSSCapable RSSFromParent
+        RichEdit
+        SQLForm SQLForm_fieldDefinitions SQLForm_fieldOrder SQLForm_fieldTypes SQLForm_regexes
+        SQLReport
+        Shortcut Shortcut_overrides
+        StockData
+        Survey Survey_answer Survey_question Survey_questionResponse Survey_response Survey_section
+        SyndicatedContent
+        TT_projectList TT_projectResourceList TT_projectTasks TT_report TT_timeEntry TT_wobject
+        Thingy Thingy_fields Thingy_things
+        Thread Thread_read
+        WSClient
+        WeatherData
+        WikiMaster WikiPage
+        Workflow WorkflowActivity WorkflowActivityData WorkflowInstance WorkflowInstanceScratch WorkflowSchedule
+        ZipArchiveAsset
+        adSpace
+        advertisement
+        asset assetData assetHistory assetIndex assetKeyword assetVersionTag
+        authentication
+        cache
+        commerceSalesTax commerceSettings
+        databaseLink
+        friendInvitations
+        groupGroupings groupings groups
+        imageColor imageFont imagePalette imagePaletteColors
+        inbox
+        incrementer
+        karmaLog
+        ldapLink
+        mailQueue
+        metaData_properties metaData_values
+        passiveProfileAOI passiveProfileLog
+        productParameterOptions productParameters productVariants products
+        redirect
+        replacements
+        search
+        settings
+        shoppingCart
+        snippet
+        storageTranslation
+        subscription subscriptionCode subscriptionCodeBatch subscriptionCodeSubscriptions
+        template
+        transaction transactionItem
+        userInvitations
+        userLoginLog
+        userProfileCategory userProfileData userProfileField
+        userSession userSessionScratch
+        users
+        webguiVersion
+        wgFieldUserData
+        wobject
+    );
+    for my $table (@tables) {
+        $session->db->write(
+            "ALTER TABLE `$table` CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin"
+        );
+    }
+    # and here's our code
+    print "Done!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
