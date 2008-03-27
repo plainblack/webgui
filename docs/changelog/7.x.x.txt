@@ -23,6 +23,9 @@
  - fixed: Syndicated Content picks wrong entries for interleaving
  - fixed: Syndicated Content URLs using macros not updated by caching workflow
  - fixed: Syndicated Content asset tries too hard to get URLs returning errors
+ - fix: Users now have permission to add comments
+ - fix: Username for comment poster is now shown correctly
+ - fix: Slideshow now works
 
 7.5.7
  - fixed: HttpProxy mixes original site's content encoding with WebGUI's

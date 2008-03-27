@@ -316,6 +316,46 @@ sub makeResolutions {
 
 #----------------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost ( )
+
+Process the asset edit form. 
+
+Make the default title into the file name minus the extention.
+
+=cut
+
+sub processPropertiesFromFormPost {
+    my $self    = shift;
+    my $form    = $self->session->form;
+    my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+
+    # Return if errors
+    return $errors if @$errors;
+    
+    ### Passes all checks
+    # If no title was given, make it the file name
+    if ( !$form->get('title') ) {
+        my $title   = $self->get('filename');
+        $title  =~ s/\.[^.]*$//;
+        $title  =~ tr/-/ /; # De-mangle the spaces at the expense of the dashes
+        $self->update( {
+            title       => $title,
+            menuTitle   => $title,
+        } );
+
+        # If this is a new Photo, change some other things too
+        if ( $form->get('assetId') eq "new" ) {
+            $self->update( {
+                url         => $self->session->url->urlize( join "/", $self->getParent->get('url'), $title ),
+            } );
+        }
+    }
+
+    return undef;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 setFile ( filename )
 
 Extend the superclass setFile to automatically generate thumbnails.
@@ -349,6 +389,11 @@ sub updateExifDataFromFile {
         if ( ref $info->{$key} ) {
             delete $info->{$key};
         }
+    }
+
+    # Remove other, pointless keys
+    for my $key ( qw( directory ) ) {
+        delete $info->{ $key };
     }
 
     $self->update({
@@ -410,7 +455,7 @@ sub www_edit {
         url_addArchive      => $self->getParent->getUrl('func=addArchive'),
     };
 
-    if ( $form->get('assetId') eq "new" ) {
+    if ( $form->get('func') eq "add" ) {
         $var->{ isNewPhoto }    = 1;
     }
     
@@ -461,7 +506,7 @@ sub www_edit {
         = WebGUI::Form::HTMLArea( $session, {
             name        => "synopsis",
             value       => ( $form->get("synopsis") || $self->get("synopsis") ),
-            richEditId  => $self->getGallery->get("assetIdRichEditFile"),
+            richEditId  => $self->getGallery->get("richEditIdFile"),
         });
 
     $var->{ form_photo } = $self->getEditFormUploadControl;

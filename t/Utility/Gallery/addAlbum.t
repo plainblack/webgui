@@ -99,7 +99,6 @@ my %threadFields = (
 
 # Post fields mapped to photo fields that should be migrated
 my %postFields = (
-    content         => "synopsis",
     createdBy       => 'createdBy',
     creationDate    => 'creationDate',
     ownerUserId     => "ownerUserId",
@@ -113,8 +112,8 @@ my %postFields = (
 #----------------------------------------------------------------------------
 # Tests
 
-# addAlbumFromThread adds 6 tests for $thread[0] and @{$posts[0]}
-my $threadPostTests     = 6 * ( 1 + scalar @{ $posts[0] } );
+# addAlbumFromThread adds 7 tests for $thread[0] and @{$posts[0]}
+my $threadPostTests     = 7 * ( 1 + scalar @{ $posts[0] } );
 
 # addAlbumFromThread adds 1 test for each field in %threadFields
 my $threadFieldTests    = 1 * scalar keys %threadFields;
@@ -180,25 +179,40 @@ is(
     "addAlbumFromThread adds one file for each attachment to the thread or posts of the thread",
 );
 
-# 6 tests for each post/file + postFields tests
+# 7 tests for each post/file + postFields tests
 my $albumUrl        = $album->get('url');
 for my $fileId ( @{$album->getFileIds} ) {
     my $file = WebGUI::Asset->newByDynamicClass( $session, $fileId );
 
     # Find which Thread or Post this file corresponds to
-    my $post;
+    my ( $post, $isThread );
     if ( length $file->get('userDefined1') == 1 ) {
         # Is a thread, get it
         $post   = $threads[ $file->get('userDefined1') ];
+        $isThread   = 1;
     }
     else {
         my @index   = split //, $file->get('userDefined1');
         $post   = $posts[ $index[0] ][ $index[1] ];
+        $isThread   = 0;
     }
 
     for my $oldField ( sort keys %postFields ) {
         is ( $file->get( $postFields{ $oldField } ), $post->get( $oldField ),
             "addAlbumFromThread migrates Post $oldField to File $postFields{$oldField}",
+        );
+    }
+    
+    # File synopsis should be Post content If and only if Post content is not the same
+    # as the Thread content
+    if ( $isThread ) {
+        is ( $file->get('synopsis'), undef, 
+            "Files do not get the Thread's content"
+        );
+    }
+    else {
+        is ( $file->get('synopsis'), $post->get('content'),
+            "Files get content when they're from posts other than the Thread",
         );
     }
 

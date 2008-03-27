@@ -179,7 +179,7 @@ ok(
 my $assetId = $photo->getId;
 $photo->purge;
 ok(
-    !$session->db->quickScalar("SELECT commentId FROM Photo_comment WHERE assetId=?",[$assetId]),
+    !$session->db->quickScalar("SELECT commentId FROM GalleryFile_comment WHERE assetId=?",[$assetId]),
     "Comments are purged along with asset",
 );
 

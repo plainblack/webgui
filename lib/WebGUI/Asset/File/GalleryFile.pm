@@ -18,6 +18,8 @@ use strict;
 use base 'WebGUI::Asset::File';
 
 use Carp qw( croak confess );
+use URI::Escape;
+use WebGUI::HTML;
 
 
 
@@ -390,6 +392,9 @@ sub getTemplateVars {
     # Add the search form
     $self->getGallery->appendTemplateVarsSearchForm( $var );
 
+    # Add a text-only synopsis
+    $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->get('synopsis'), "all" );
+
     $var->{ canComment          } = $self->canComment;
     $var->{ canEdit             } = $self->canEdit;
     $var->{ numberOfComments    } = scalar @{ $self->getCommentIds };
@@ -400,6 +405,9 @@ sub getTemplateVars {
     $var->{ url_demote          } = $self->getUrl('func=demote');
     $var->{ url_edit            } = $self->getUrl('func=edit');
     $var->{ url_gallery         } = $self->getGallery->getUrl;
+    $var->{ url_album           } = $self->getParent->getUrl;
+    $var->{ url_thumbnails      } = $self->getParent->getUrl('func=thumbnails');
+    $var->{ url_slideshow       } = $self->getParent->getUrl('func=slideshow');
     $var->{ url_makeShortcut    } = $self->getUrl('func=makeShortcut');
     $var->{ url_listFilesForOwner } 
         = $self->getGallery->getUrl('func=listFilesForUser;userId=' . $self->get("ownerUserId"));
@@ -559,6 +567,8 @@ sub processPropertiesFromFormPost {
     ### Passes all checks
 
     $self->requestAutoCommit;
+
+    return;
 }
 
 #----------------------------------------------------------------------------
@@ -756,25 +766,6 @@ sub www_deleteConfirm {
 
 #----------------------------------------------------------------------------
 
-=head2 www_demote
-
-Override the default demote page to send the user back to the GalleryAlbum 
-edit screen.
-
-=cut
-
-sub www_demote {
-    my $self        = shift;
-
-    return $self->session->privilege->insufficient unless $self->canEdit;
-
-    $self->demote;
-    
-    return $self->session->asset( $self->getParent )->www_edit;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 www_editComment ( params )
 
 Form to edit a comment. C<params> is a hash reference of parameters
@@ -788,8 +779,27 @@ sub www_editComment {
     my $self        = shift;
     my $params      = shift;
     my $session     = $self->session;
+    
+    # Get the comment, if needed
+    my $commentId   = $session->form->get( "commentId" );
+    my $comment     = $commentId ne "new"
+                    ? $self->getComment( $commentId )
+                    : {}
+                    ;
 
-    return $session->privilege->insufficient unless $self->canEdit;
+    # Check permissions
+    # Adding a new comment
+    if ( $commentId eq "new" ) {
+        return $session->privilege->insufficient unless $self->canComment;
+    }
+    # Editing your own comment
+    elsif ( $comment->{ userId } ne "1" && $comment->{ userId } eq $self->session->user->userId ) {
+        return $session->privilege->insufficient unless $self->canComment;
+    }
+    # Editing someone else's comment
+    else {
+        return $session->privilege->insufficient unless $self->canEdit;
+    }
 
     my $var         = $self->getTemplateVars;
     
@@ -797,11 +807,6 @@ sub www_editComment {
         $var->{ errors } = [ map { { "error" => $_ } } @{ $params->{errors} } ];
     }
 
-    my $commentId   = $session->form->get( "commentId" );
-    my $comment     = $commentId ne "new"
-                    ? $self->getComment( $commentId )
-                    : {}
-                    ;
     $self->appendTemplateVarsCommentForm( $var, $comment );
 
     $var->{ isNew   } = $commentId eq "new";
@@ -822,19 +827,30 @@ Save a comment being edited
 sub www_editCommentSave {
     my $self        = shift;
     my $session     = $self->session;
-
-    return $session->privilege->insufficient unless $self->canEdit;
-    
     my $i18n        = __PACKAGE__->i18n( $session );
 
+    # Process the form first, so we can know how to check permissions
     my $comment     = eval { $self->processCommentEditForm };
     if ( $@ ) {
         return $self->www_editComment( { errors => [ $@ ] } );
     }
     
+    # Check permissions
+    # Adding a new comment
+    if ( $comment->{ commentId } eq "new" ) {
+        return $session->privilege->insufficient unless $self->canComment;
+    }
+    # Editing your own comment
+    elsif ( $comment->{ userId } ne "1" && $comment->{ userId } eq $self->session->user->userId ) {
+        return $session->privilege->insufficient unless $self->canComment;
+    }
+    # Editing someone else's comment
+    else {
+        return $session->privilege->insufficient unless $self->canEdit;
+    }
+    
     # setComment changes commentId, so keep track if we're adding a new comment
     my $isNew       = $comment->{commentId} eq "new";
-
     $self->setComment( $comment );
 
     # Return different message for adding and editing
@@ -916,25 +932,6 @@ sub www_makeShortcutSave {
     my $shortcut    = $self->makeShortcut( $parentId );
     
     return $shortcut->www_view; 
-}
-
-#----------------------------------------------------------------------------
-
-=head2 www_promote
-
-Override the default promote page to send the user back to the GalleryAlbum 
-edit screen.
-
-=cut
-
-sub www_promote {
-    my $self        = shift;
-
-    return $self->session->privilege->insufficient unless $self->canEdit;
-
-    $self->promote;
-    
-    return $self->session->asset( $self->getParent )->www_edit;
 }
 
 #----------------------------------------------------------------------------

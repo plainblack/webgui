@@ -118,6 +118,22 @@ our $HELP = {
                     },
                 ],
             },
+            {
+                name        => 'synopsis_text',
+                description => 'helpvar synopsis_text',
+            },
+            {
+                name        => 'url_album',
+                description => 'helpvar url_album',
+            },
+            {
+                name        => 'url_thumbnails',
+                description => 'helpvar url_thumbnails',
+            },
+            {
+                name        => 'url_slideshow',
+                description => 'helpvar url_slideshow',
+            },
         ],
     },
 

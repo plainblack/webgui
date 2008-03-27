@@ -184,6 +184,13 @@ sub addAlbumFromThread {
 
                 # Get rid of that file extention
                 my ($title)  = $filename =~ m{(.*)\.[^.]*$};
+                
+                # Don't repeat the thread
+                my $synopsis 
+                    = $post->get('content') ne $thread->get('content') 
+                    ? $post->get('content')
+                    : undef
+                    ;
 
                 my $file = $album->addChild({
                     className           => $className,
@@ -191,7 +198,7 @@ sub addAlbumFromThread {
                     creationDate        => $post->get('creationDate'),
                     menuTitle           => $title,
                     ownerUserId         => $post->get('ownerUserId'),
-                    synopsis            => $post->get('content'),
+                    synopsis            => $synopsis,
                     title               => $title,
                     url                 => $session->url->urlize( $album->get('url') . "/" . $title ),
                     userDefined1        => $post->get('userDefined1'),

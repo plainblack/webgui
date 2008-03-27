@@ -867,6 +867,35 @@ sub view_listAlbums {
 
 #----------------------------------------------------------------------------
 
+=head2 www_add ( )
+
+Add a GalleryAlbum to this Gallery. Overridden here to show an error message
+if the Gallery is not committed.
+
+If a GalleryAlbum is added to an uncommitted Gallery, and the GalleryAlbum
+is committed before the Gallery, problems start happening.
+
+TODO: This could be handled better by the requestAutoCommit subroutine 
+instead of having to block things from being added.
+
+=cut
+
+sub www_add {
+    my $self        = shift;
+    
+    if ( $self->getRevisionCount <= 1 && $self->get('status') eq "pending" ) {
+        my $i18n    = WebGUI::International->new($self->session, 'Asset_Gallery');
+        return $self->processStyle(
+            $i18n->get("error add uncommitted")
+        );
+    }
+    else {
+        return $self->SUPER::www_add( @_ );
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_listAlbums ( )
 
 Show a paginated list of the albums in this gallery.

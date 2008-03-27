@@ -497,6 +497,49 @@ sub prepareView {
 
 #----------------------------------------------------------------------------
 
+=head2 processFileSynopsis ( )
+
+Process the synopsis for the files on the GalleryAlbum C<www_edit> page.
+
+=cut
+
+sub processFileSynopsis {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+    
+    # Do the version tag shuffle
+    my $oldVersionTag   = WebGUI::VersionTag->getWorking( $session, "nocreate" );
+    my $newVersionTag
+        = WebGUI::VersionTag->create( $session, {
+            workflowId      => $self->getParent->get("workflowIdCommit"),
+        } );
+    $newVersionTag->setWorking;
+    
+    for my $key ( grep { /^fileSynopsis_/ } $form->param ) {
+        ( my $assetId ) = $key =~ /^fileSynopsis_(.+)$/;
+        my $synopsis    = $form->get( $key );
+    
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( $asset->get("synopsis") ne $synopsis ) {
+            my $properties  = $asset->get;
+            $properties->{ synopsis } = $synopsis;
+
+            $asset->addRevision( $properties, undef, { skipAutoCommitWorkflows => 1 } );
+        }
+    }
+    
+    # That's what it's all about
+    $newVersionTag->commit;
+    if ( $oldVersionTag ) {
+        WebGUI::VersionTag->setWorking( $oldVersionTag );
+    }
+
+    return;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 processStyle ( )
 
 Gets the parent Gallery's style template
@@ -568,7 +611,7 @@ sub view_slideshow {
     my $var         = $self->getTemplateVars;
 
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
-    
+
     return $self->processTemplate($var, $self->getParent->get("templateIdViewSlideshow"));
 }
 
@@ -765,6 +808,10 @@ sub www_deleteConfirm {
 
 Show the form to add / edit a GalleryAlbum asset.
 
+Due to the advanced requirements of this form, we will ALWAYS post back to 
+this page. This page will decide whether or not to make C<www_editSave> 
+handle things.
+
 =cut
 
 sub www_edit {
@@ -774,8 +821,44 @@ sub www_edit {
     my $var         = $self->getTemplateVars;
     my $i18n        = __PACKAGE__->i18n($session);
 
+    return $session->privilege->insufficient unless $self->canEdit;
+
+    # Handle the button that was pressed
+    # Save button
+    if ( $form->get("save") ) {
+        $self->processFileSynopsis;
+        return $self->www_editSave;
+    }
+    # Cancel button
+    elsif ( $form->get("cancel") ) {
+        return $self->www_view;
+    }
+    # Promote the file
+    elsif ( $form->get("promote") ) {
+        my $assetId     = $form->get("promote");
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( $asset ) {
+            $asset->promote;
+        }
+        else {
+            $session->errorHandler->error("Couldn't promote asset '$assetId' because we couldn't instantiate it.");
+        }
+    }
+    # Demote the file
+    elsif ( $form->get("demote") ) {
+        my $assetId     = $form->get("demote");
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( $asset ) {
+            $asset->demote;
+        }
+        else {
+            $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
+        }
+    }
+
     # Generate the form
     if ($form->get("func") eq "add") {
+        # Add page is exempt from our button handling code since it calls the Gallery www_editSave
         $var->{ isNewAlbum  } = 1;
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
@@ -785,15 +868,30 @@ sub www_edit {
                 name        => "ownerUserId",
                 value       => $session->user->userId,
             });
+
+        # Put in the buttons that may ignore button handling code
+        $var->{ form_cancel }
+            = WebGUI::Form::button( $session, {
+                name        => "cancel",
+                value       => $i18n->get("cancel"),
+                extras      => 'onclick="history.go(-1)"',
+            });
     }
     else {
         $var->{ form_start  } 
             = WebGUI::Form::formHeader( $session, {
-                action      => $self->getUrl('func=editSave'),
+                action      => $self->getUrl('func=edit'),
             })
             . WebGUI::Form::hidden( $session, {
                 name        => "ownerUserId",
                 value       => $self->get("ownerUserId"),
+            });
+        
+        # Put in the buttons that may ignore button handling code
+        $var->{ form_cancel }
+            = WebGUI::Form::submit( $session, {
+                name        => "cancel",
+                value       => $i18n->get("cancel"),
             });
     }
     $var->{ form_start } 
@@ -805,13 +903,6 @@ sub www_edit {
     $var->{ form_end    }
         = WebGUI::Form::formFooter( $session );
 
-    $var->{ form_cancel }
-        = WebGUI::Form::button( $session, {
-            name        => "cancel",
-            value       => $i18n->get("cancel"),
-            extras      => 'onclick="history.go(-1)"',
-        });
-    
     $var->{ form_submit }
         = WebGUI::Form::submit( $session, {
             name        => "save",
@@ -828,15 +919,39 @@ sub www_edit {
         = WebGUI::Form::HTMLArea( $session, {
             name        => "description",
             value       => $form->get("description") || $self->get("description"),
+            richEditId  => $self->getParent->get("richEditIdAlbum"),
         });
 
     # Generate the file loop
-    my $thumbnailUrl        = $self->getThumbnailUrl;
+    my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->get("assetIdThumbnail");
     $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
     for my $file ( @{ $var->{file_loop} } ) {
-        if ( $thumbnailUrl eq $file->{thumbnailUrl} ) {
-            $file->{ isAlbumThumbnail } = 1;
-        }
+        $file->{ form_assetIdThumbnail }
+            = WebGUI::Form::radio( $session, {
+                name        => "assetIdThumbnail",
+                value       => $file->{ assetId },
+                checked     => ( $assetIdThumbnail eq $file->{ assetId } ),
+                id          => "assetIdThumbnail_$file->{ assetId }",
+            } );
+
+        # Raw HTML here to provide proper value for the image
+        $file->{ form_promote }
+            = qq{<button type="submit" name="promote" value="$file->{assetId}">}
+            . $session->icon->moveUp( undef, undef, "disabled" )
+            . qq{</button>}
+            ;
+
+        $file->{ form_demote }
+            = qq{<button type="submit" name="demote" value="$file->{assetId}">}
+            . $session->icon->moveDown( undef, undef, "disabled" )
+            . qq{</button>}
+            ;
+        
+        $file->{ form_synopsis }
+            = WebGUI::Form::text( $session, {
+                name        => "fileSynopsis_$file->{assetId}",
+                value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
+            });
     }
 
     return $self->processStyle( 

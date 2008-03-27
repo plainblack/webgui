@@ -565,6 +565,30 @@ our $I18N = {
         context     => q{Label for the albums the photo will be removed from.},
     },
 
+    'helpvar synopsis_text' => {
+        message     => q{The "synopsis" field with all HTML removed},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar url_album' => {
+        message     => q{The URL of the Album containing this file},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar url_thumbnails' => {
+        message     => q{The URL to the Thumbnails view of the Album containing this file},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar url_slideshow' => {
+        message     => q{The URL to the Slideshow view of the Album containing this file},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;

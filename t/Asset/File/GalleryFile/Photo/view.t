@@ -16,6 +16,7 @@ use lib "$FindBin::Bin/../../../../lib";
 
 use Scalar::Util qw( blessed );
 use WebGUI::Test;
+use WebGUI::HTML;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
@@ -68,6 +69,7 @@ my $testTemplateVars    = {
     canComment          => bool( 1 ),
     canEdit             => bool( 0 ),
     ownerUsername       => WebGUI::User->new( $session, 3 )->username,
+    synopsis_textonly   => WebGUI::HTML::filter( $photo->get('synopsis'), "all" ),
     url                 => $photo->getUrl,
     url_addArchive      => $album->getUrl('func=addArchive'),
     url_delete          => $photo->getUrl('func=delete'),
@@ -78,6 +80,9 @@ my $testTemplateVars    = {
     url_listFilesForOwner
         => $gallery->getUrl('func=listFilesForUser;userId=3'),
     url_promote         => $photo->getUrl('func=promote'),
+    url_album           => $album->getUrl,
+    url_thumbnails      => $album->getUrl('func=thumbnails'),
+    url_slideshow       => $album->getUrl('func=slideshow'),
     fileUrl             => $photo->getFileUrl,
     thumbnailUrl        => $photo->getThumbnailUrl,
     numberOfComments    => scalar @{ $photo->getCommentIds },

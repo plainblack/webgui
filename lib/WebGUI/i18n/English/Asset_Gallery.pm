@@ -687,6 +687,12 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Label for the link to add an Album},
     },
+
+    'error add uncommitted' => {
+        message     => q{<h1>Error!</h1><p>You must commit this Gallery before adding albums</p>},
+        lastUpdated => 0,
+        context     => q{Error message when trying to add albums to uncommitted Gallery assets},
+    },
 };
 
 1;
