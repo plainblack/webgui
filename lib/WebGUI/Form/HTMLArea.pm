@@ -539,11 +539,12 @@ sub www_addImageSave {
 			groupIdView => $session->form->process('groupIdView') || $base->get('groupIdView'),
 			ownerUserId => $session->user->userId,
 			isHidden    => 1,
-			});
+        });
         $child->update({url => $child->fixUrl});
-	}
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
-	return undef;
+        $child->applyConstraints;
+    }
+    $session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+    return undef;
 }
 
 
