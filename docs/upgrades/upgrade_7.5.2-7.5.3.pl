@@ -37,6 +37,7 @@ insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
 convertTransactionLog($session);
 upgradeEMS($session);
+migrateOldProduct($session);
 
 finish($session); # this line required
 
@@ -398,6 +399,25 @@ sub addShippingDrivers {
     $session->config->delete('shippingPlugins');
     $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::FlatRate');
 	$session->db->write("insert into shipper (shipperId, className,options) values ('defaultfreeshipping000','WebGUI::Shop::ShipDriver::FlatRate',?)",[q|{"label":"Free Shipping","enabled":1}|]);
+}
+
+#-------------------------------------------------
+sub migrateOldProduct {
+    return;
+	my $session = shift;
+	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
+	# and here's our code
+    ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
+    my $wobject   = $session->db->prepare('select * from commerceSalesTax');
+    my $sku       = $session->db->prepare('insert into tax (taxId, country, state, city, code, taxRate) VALUES (?,?,?,?,?,?)');
+    my $rmWobject = 
+    $oldTax->execute();
+    while (my $oldTaxData = $oldTax->hashRef()) {
+        $newTax->execute([$oldTaxData->{commerceSalesTaxId}, 'USA', $oldTaxData->{regionIdentifier}, '', '', $oldTaxData->{salesTax}]);
+    }
+    $oldTax->finish;
+    $newTax->finish;
+    ##Delete data from Wobject table.
 }
 
 #-------------------------------------------------
