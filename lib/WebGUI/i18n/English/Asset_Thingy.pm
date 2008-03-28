@@ -343,11 +343,6 @@ our $I18N = {
         lastUpdated => 1104630516,
     },
 
-    'search in label' => {
-        message => q|Search|,
-        lastUpdated => 1104630516,
-    },
-
     'sort by label' => {
         message => q|Sort By|,
         lastUpdated => 1104630516,
