@@ -105,7 +105,7 @@ sub getTypes {
 	my @types;
 	foreach my $type (@rawTypes) {
 		if ($type =~ /^(.*)\.pm$/) {
-			next if (isIn($1, qw/Control List DynamicField/));
+			next if (isIn($1, qw/Control List DynamicField Slider/));
 			push(@types,$1);
 		}
 	}

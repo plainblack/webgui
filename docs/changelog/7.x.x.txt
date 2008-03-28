@@ -4,6 +4,7 @@
  - make sure all tables are using UTF-8
  - fixed: Poll question/answers with international text corrupted
  - fixed: Thingy: on demo sites the edit and delete icons in search results have wrong url's
+ - fixed: Form::FieldType->getTypes should exclude Form::Slider base class (Yung Han Khoe)
  - upgraded to TinyMCE 3
 
 7.5.8
