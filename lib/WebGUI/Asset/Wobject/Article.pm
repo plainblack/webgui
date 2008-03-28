@@ -229,9 +229,6 @@ sub processPropertiesFromFormPost {
     my $size = 0;
     my $storage = $self->getStorageLocation;
     foreach my $file (@{$storage->getFiles}) {
-        if ($storage->isImage($file)) {
-            $storage->adjustMaxImageSize($size);
-        }
         $size += $storage->getFileSize($file);
     }
     $self->setSize($size);

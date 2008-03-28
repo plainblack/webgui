@@ -119,7 +119,7 @@ sub applyConstraints {
     my $parameters      = $self->get("parameters");
     my $storage         = $self->getStorageLocation;
     my $file            = $self->get("filename");
-    $storage->adjustMaxImageSize($file);
+    $storage->adjustMaxImageSize($file, $maxImageSize);
     $self->generateThumbnail;
     $self->setSize;
     $self->makeResolutions;
