@@ -1609,6 +1609,15 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Manage the users in the subscription group for this Collaboration System|,
         lastUpdated => 1170543345,
     },
+
+    'group to edit label' => {
+        message => q|Group to Edit Posts|,
+        lastUpdated => 1206733328,
+    },
+    'group to edit hoverhelp' => {
+        message => q|Group to Edit Posts|,
+        lastUpdated => 1206733328,
+    },
     
     'use captcha label' => {
         message => q|Use Post Captcha|,

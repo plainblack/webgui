@@ -6,6 +6,7 @@
  - fixed: Thingy: on demo sites the edit and delete icons in search results have wrong url's
  - fixed: Form::FieldType->getTypes should exclude Form::Slider base class (Yung Han Khoe)
  - upgraded to TinyMCE 3
+ - fixed: subscription group in CS edit not internationalized
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

@@ -15,7 +15,7 @@ package WebGUI::Form::SubscriptionGroup;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Hidden';
+use base 'WebGUI::Form::Control';
 use WebGUI::International;
 
 =head1 NAME
@@ -76,24 +76,15 @@ Renders the form field to HTML as a table row. The row is not displayed because 
 
 =cut
 
-sub toHtmlWithWrapper {
-	my $self         = shift;
+sub toHtml {
+    my $self         = shift;
     my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value")))) || '';
-	
+
     my $manageButton = "&nbsp;";
-    if($value) {
+    if ($value) {
         $manageButton = $self->session->icon->manage("op=editGroup;gid=".$value);
     }
-    
-	if ($self->passUiLevelCheck) {
-		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-		return '<tr'.$rowClass.'>
-				<td'.$labelClass.$hoverHelp.' valign="top" style="width: 180px;"><label for="'.$self->get("id").'">'.$self->get("label").'</label></td>
-				<td valign="top"'.$fieldClass.'>'.$manageButton.$self->toHtmlAsHidden."</td>
-			</tr>\n";
-	} else {
-		return $self->toHtmlAsHidden;
-	}
+    return $manageButton . $self->toHtmlAsHidden;
 }
 
 
