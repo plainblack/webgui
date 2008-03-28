@@ -25,6 +25,7 @@ my $session = start(); # this line required
 ensureUTF8($session);
 addRichEditInlinePopup($session);
 updateRichEditorButtons($session);
+setPMFloatingDuration($session);
 
 finish($session); # this line required
 
@@ -36,6 +37,14 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub setPMFloatingDuration {
+    my $session = shift;
+    print "\tChanging Project manager to use floating numbers for duration... " unless $quiet;
+    $session->db->write('ALTER TABLE `PM_task` MODIFY `duration` FLOAT');
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addRichEditInlinePopup {

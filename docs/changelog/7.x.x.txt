@@ -9,6 +9,7 @@
  - fixed: subscription group in CS edit not internationalized
  - fixed: profile photos don't obey max image size
  - fixed: Unable to communicate with Spectre under alternate locales
+ - fixed: Project Manager can't track non-integer durations
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery
