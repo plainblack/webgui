@@ -74,7 +74,7 @@ sub notify {
 	my $remote = create_ikc_client(
                 port=>$config->get("spectrePort"),
                 ip=>$config->get("spectreIp"),
-                name=>rand(100000),
+                name=> (time() . int(rand(10000000))),
                 timeout=>10
                 );
 	if (defined $remote) {
