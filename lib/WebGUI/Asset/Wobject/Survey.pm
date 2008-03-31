@@ -796,17 +796,6 @@ sub www_deleteAllResponsesConfirm {
 }
 
 #-------------------------------------------------------------------
-sub www_editSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	my $output = $self->SUPER::www_editSave(); 
-	if ($self->session->form->process("proceed") eq "addQuestion") {
-		return $self->www_editQuestion('new');
-	}
-	return $output;
-}
-
-#-------------------------------------------------------------------
 sub www_editAnswer {
 	my $self = shift;
         my ($question, $f, $answer);	
