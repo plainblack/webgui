@@ -11,6 +11,7 @@
  - fixed: Unable to communicate with Spectre under alternate locales
  - fixed: Project Manager can't track non-integer durations
  - fixed: Unable to edit CS posts that were denied as a normal user
+ - added: Better error messages when SQL Report lacks a query (William McKee, Knowmad Technologies)
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

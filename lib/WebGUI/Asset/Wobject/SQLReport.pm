@@ -577,6 +577,12 @@ sub _processQuery {
 		$prefix = 'query'.$nr.'.';
 	}
 
+    if (! $self->{_query}{$nr}{dbQuery}) {
+        $self->session->errorHandler->warn("No query specified for query $nr on '" . $self->getId . "'");
+        push @{$self->{_debug_loop}}, { 'debug.output' => "No query specfied for query $nr" };
+        return \%var;
+    }
+
 	# Parse placeholder parameters
 	my $placeholderParams = $self->_parsePlaceholderParams($self->{_query}{$nr}{placeholderParams});
 	
@@ -593,7 +599,7 @@ sub _processQuery {
         push(@{$self->{_debug_loop}},{'debug.output'=>$i18n->get('debug placeholder parameters').join(",",@$placeholderParams)});
         my $dbLink = WebGUI::DatabaseLink->new($self->session,$self->{_query}{$nr}{databaseLinkId});
         if (!$dbLink) {
-            $self->session->errorHandler->error("Could not find database link '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
+            $self->session->errorHandler->error("Could not find database link for query #$nr: '".$self->{_query}{$nr}{databaseLinkId}."'. Has it been created?");
             push @{$self->{_debug_loop}}, { 'debug.output' => 'Could not find database link'};
             return \%var;
         }
