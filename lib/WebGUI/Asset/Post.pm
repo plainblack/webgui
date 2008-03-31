@@ -1358,39 +1358,34 @@ We're extending www_editSave() here to deal with editing a post that has been de
 =cut
 
 sub www_editSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    my $self = shift;
     my $assetId = $self->session->form->param("assetId");
-    
     if($assetId eq "new" && $self->getThread->getParent->getValue("useCaptcha")) {
         my $captcha = $self->session->form->process("captcha","Captcha");
         unless ($captcha) {
             return $self->www_edit;
         }
     }
-	if ($self->session->config("maximumAssets")) {
-		my ($count) = $self->session->db->quickArray("select count(*) from asset");
-		my $i18n = WebGUI::International->new($self->session, "Asset");
-		return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
-	}
-	if ($self->session->form->param("assetId") ne "new" && $self->get("status") eq "pending") {
-		my $currentTag = WebGUI::VersionTag->getWorking($self->session, 1);
-		if (defined $currentTag && $currentTag->getAssetCount > 0) {
-			# play a little working tag switcheroo
-			$self->session->stow("temporaryWorkingTagHolder",$currentTag);
-		}
-		my $tag = WebGUI::VersionTag->new($self->session, $self->get("tagId"));
-		$tag->setWorking if defined $tag;
-	}
-	my $output = $self->SUPER::www_editSave();
-	if ($self->session->stow->get("temporaryWorkingTagHolder")) {
-		# undo switcharoo
-		my $tag = $self->session->stow->get("temporaryWorkingTagHolder");
-		$tag->setWorking if defined $tag;
-		$self->session->stow->delete("temporaryWorkingTagHolder");
-	}	
-	return $output;
+    my $currentTag;
+    if ($assetId ne "new" && $self->get("status") eq "pending") {
+        # When editting posts pending approval, temporarily switch to their version tag so
+        # we don't get denied because it is locked
+        $currentTag = WebGUI::VersionTag->getWorking($self->session, 1);
+        my $tag = WebGUI::VersionTag->new($self->session, $self->get("tagId"));
+        if ($tag) {
+            if ($tag->getId eq $currentTag->getId) {
+                undef $currentTag;  # don't restore tag afterward if we are already using it
+            }
+            else {
+                $tag->setWorking;
+            }
+        }
+    }
+    my $output = $self->SUPER::www_editSave();
+    if ($currentTag) { # Go back to our original tag
+        $currentTag->setWorking;
+    }
+    return $output;
 }
 
 #-------------------------------------------------------------------

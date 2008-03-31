@@ -10,6 +10,7 @@
  - fixed: profile photos don't obey max image size
  - fixed: Unable to communicate with Spectre under alternate locales
  - fixed: Project Manager can't track non-integer durations
+ - fixed: Unable to edit CS posts that were denied as a normal user
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery
