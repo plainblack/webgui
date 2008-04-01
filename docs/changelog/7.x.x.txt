@@ -16,6 +16,8 @@
  - fixed: changing style template with edit branch creates new revisions of assets that have no style template
  - fixed: Wiki attachments uploaded by non-Content Managers deleted by maintenance workflow
  - fixed: Non-Content managers unable to paste assets even with edit privaledges
+ - use UTF8 JSON encoding and decoding universally
+ - fixed: Import/Export of packages with international text is broken
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

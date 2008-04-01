@@ -19,7 +19,7 @@ use base 'WebGUI::Asset::File::GalleryFile';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
-use JSON qw/ to_json from_json /;
+use JSON qw/ encode_json decode_json /;
 use URI::Escape;
 use Tie::IxHash;
 
@@ -176,7 +176,7 @@ sub getExifData {
     my $self        = shift;
 
     return unless $self->get('exifData');    
-    return from_json( $self->get('exifData') );
+    return decode_json( $self->get('exifData') );
 }
 
 #----------------------------------------------------------------------------
@@ -397,7 +397,7 @@ sub updateExifDataFromFile {
     }
 
     $self->update({
-        exifData    => to_json( $info ),
+        exifData    => encode_json( $info ),
     });
 }
 

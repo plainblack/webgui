@@ -122,7 +122,7 @@ sub www_spectreGetSiteData {
 		}
 		$siteData{cron} = \@schedules;
 	}
-	return JSON::to_json(\%siteData);
+	return JSON::encode_json(\%siteData);
 }
 
 #-------------------------------------------------------------------
@@ -169,8 +169,8 @@ sub www_spectreStatus {
     }	
 
     my %data = (
-        workflow    =>  from_json($workflowResult),
-        cron        =>  from_json($cronResult),
+        workflow    =>  decode_json($workflowResult),
+        cron        =>  decode_json($cronResult),
     );
 
     my $workflowCount = @{ $data{workflow}{Suspended} } + @{ $data{workflow}{Waiting} } + @{ $data{workflow}{Running} };

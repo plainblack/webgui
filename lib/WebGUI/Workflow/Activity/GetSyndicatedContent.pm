@@ -96,7 +96,7 @@ sub execute {
 
     # if there are urls left, we need to process again
     if (scalar(@syndicatedUrls) > 0) {
-        $instance->setScratch("syndicatedUrls", JSON::to_json(\@syndicatedUrls));
+        $instance->setScratch("syndicatedUrls", JSON::encode_json(\@syndicatedUrls));
         return $self->WAITING;
     }
     $instance->deleteScratch("syndicatedUrls");
@@ -120,7 +120,7 @@ sub getSyndicatedUrls {
     my $instance = shift;
     my $syndicatedUrls = $instance->getScratch("syndicatedUrls");
     if ($syndicatedUrls) {
-        return JSON::from_json($syndicatedUrls);
+        return JSON::decode_json($syndicatedUrls);
     }
 
     my $urls = [];
@@ -131,7 +131,7 @@ sub getSyndicatedUrls {
     foreach my $asset (@$assets) {
         push @$urls, split(/\s+/, $asset->getRssUrl);
     }
-    $instance->setScratch("syndicatedUrls", JSON::to_json($urls));
+    $instance->setScratch("syndicatedUrls", JSON::encode_json($urls));
     return $urls;
 }
 

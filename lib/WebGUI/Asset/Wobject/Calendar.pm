@@ -24,7 +24,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
-use JSON qw/to_json/;
+use JSON qw/encode_json/;
 
 =head1 NAME
 
@@ -627,7 +627,7 @@ ENDHTML
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
     for my $feedId (keys %$feeds) {
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".to_json($feeds->{$feedId}).");\n");
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".encode_json($feeds->{$feedId}).");\n");
     }
     $tab->raw('</script>');
     

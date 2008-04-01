@@ -18,7 +18,7 @@ package WebGUI::Commerce::Transaction;
 use strict;
 use WebGUI::SQL;
 use WebGUI::Commerce::Payment;
-use JSON qw/ from_json to_json /;
+use JSON qw/ decode_json encode_json /;
 
 #-------------------------------------------------------------------
 
@@ -615,12 +615,12 @@ sub shippingOptions {
 	$shippingOptions = shift;
 
 	if (scalar (keys %{$shippingOptions})) {
-		$self->{_properties}{shippingOptions} = to_json($shippingOptions);
+		$self->{_properties}{shippingOptions} = encode_json($shippingOptions);
 		$self->session->db->write("update transaction set shippingOptions=? where transactionId=?",[$self->{_properties}{shippingOptions},$self->{_transactionId}]);
 	}
 
     return {} unless defined $self->{_properties}{shippingOptions};
-	return from_json($self->{_properties}{shippingOptions});
+	return decode_json($self->{_properties}{shippingOptions});
 }
 
 #-------------------------------------------------------------------
