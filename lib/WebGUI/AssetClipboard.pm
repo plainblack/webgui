@@ -445,10 +445,13 @@ Returns "". Pastes an asset. If canEdit is False, returns an insufficient privil
 =cut
 
 sub www_paste {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->paste($self->session->form->process("assetId"));
-	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $pasteAssetId = $self->session->form->process('assetId');
+    my $pasteAsset = WebGUI::Asset->newPending($self->session, $pasteAssetId);
+    return $self->session->privilege->insufficient() unless $pasteAsset->canEdit;
+    $self->paste($pasteAssetId);
+    return "";
 }
 
 #-------------------------------------------------------------------
@@ -463,6 +466,9 @@ sub www_pasteList {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	foreach my $clipId ($self->session->form->param("assetId")) {
+        my $pasteAsset = WebGUI::Asset->newPending($self->session, $clipId);
+        next
+            unless $pasteAsset->canEdit;
 		$self->paste($clipId);
 	}
 	return $self->www_manageAssets();
