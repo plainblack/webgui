@@ -6,6 +6,7 @@
  - added: Database index on userSession.expires field to speed up workflows
  - fixed: Collaboration System attachments follow site's max size instead of CS's
  - fixed: Rich editor image uploader doesn't follow size limits
+ - fixed: Poll question/answers with international text corrupted
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney

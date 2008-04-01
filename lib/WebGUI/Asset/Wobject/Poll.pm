@@ -192,7 +192,7 @@ sub freezeGraphConfig {
     my $self        = shift;
     my $obj         = shift;
     
-    return JSON::to_json($obj);
+    return JSON::encode_json($obj);
 }
 
 
@@ -403,7 +403,8 @@ sub thawGraphConfig {
     my $self        = shift;
     my $string      = shift;
     
-    return JSON::from_json($string);
+    return unless $string;
+    return JSON::decode_json($string);
 }
 
 #-------------------------------------------------------------------
