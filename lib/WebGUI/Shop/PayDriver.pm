@@ -533,15 +533,12 @@ sub sendNotifications {
     my $session = $self->session;
     my %var = (); # this needs to be filled in with transaction data for these emails
     
-    
-    
-    
     my $i18n = WebGUI::International->new($session,'PayDriver');
     my $inbox = WebGUI::Inbox->new($session);
     $inbox->addMessage({
         userId      => $transaction->get('userId'),
         subject     => $i18n->get('thank you for your order'),
-        message     => WebGUI::Asset::Template->new($session, $self->get('emailReceiptTemplateId'))->process(\%var),
+        message     => WebGUI::Asset::Template->new($session, $self->get('receiptEmailTemplateId'))->process(\%var),
         status      => 'completed',
         });
     $inbox->addMessage({

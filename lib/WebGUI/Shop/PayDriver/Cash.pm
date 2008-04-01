@@ -235,13 +235,8 @@ sub www_pay {
 
     my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
 
-    # Create a transaction and complete the purchase
-    my $transaction = WebGUI::Shop::Transaction->create( $session, {
-        cart            => $cart,
-        paymentAddress  => $billingAddress,
-        paymentMethod   => $self,
-    });
-    $transaction->completePurchase( $cart, 'CASH', 'OK', 'Cash payment' );
+    # Complete the transaction
+    $self->processTransaction( $billingAddress );
 
     return $session->style->userStyle('Thank you for ordering');
 }
