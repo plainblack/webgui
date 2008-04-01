@@ -7,6 +7,7 @@
  - fixed: Collaboration System attachments follow site's max size instead of CS's
  - fixed: Rich editor image uploader doesn't follow size limits
  - fixed: Poll question/answers with international text corrupted
+ - fixed: subscription group in CS edit has broken hover help
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney
