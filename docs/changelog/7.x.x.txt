@@ -14,6 +14,8 @@
  - added: Better error messages when SQL Report lacks a query (William McKee, Knowmad Technologies)
  - fixed: edit branch sends thread notifications
  - fixed: changing style template with edit branch creates new revisions of assets that have no style template
+ - fixed: Wiki attachments uploaded by non-Content Managers deleted by maintenance workflow
+ - fixed: Non-Content managers unable to paste assets even with edit privaledges
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

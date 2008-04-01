@@ -48,12 +48,12 @@ sub duplicateBranch {
     my $self = shift;
     my $childrenOnly = shift || 0;
 
-    my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1});
+    my $newAsset = $self->duplicate({skipAutoCommitWorkflows=>1,skipNotification=>1});
     my $contentPositions = $self->get("contentPositions");
     my $assetsToHide = $self->get("assetsToHide");
 
     foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1})}) {
-        my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1}) : $child->duplicateBranch;
+        my $newChild = $childrenOnly ? $child->duplicate({skipAutoCommitWorkflows=>1, skipNotification=>1}) : $child->duplicateBranch;
         $newChild->setParent($newAsset);
         my ($oldChildId, $newChildId) = ($child->getId, $newChild->getId);
         $contentPositions =~ s/\Q${oldChildId}\E/${newChildId}/g if ($contentPositions);

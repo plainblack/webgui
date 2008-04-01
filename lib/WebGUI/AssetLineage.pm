@@ -689,7 +689,6 @@ An asset object reference representing the new parent to paste the asset to.
 sub setParent {
 	my $self = shift;
 	my $newParent = shift;
-	return 0 unless $self->session->user->isInGroup('4');
 	return 0 unless (defined $newParent); # can't move it if a parent object doesn't exist
 	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
