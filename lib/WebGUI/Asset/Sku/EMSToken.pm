@@ -186,7 +186,7 @@ sub www_addToCart {
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
 	my $badgeId = $self->session->form->get('badgeId');
 	$self->addToCart({badgeId=>$badgeId});
-	return $self->getParent->www_viewExtras($badgeId);
+	return $self->getParent->www_buildBadge($badgeId);
 }
 
 #-------------------------------------------------------------------
@@ -219,21 +219,21 @@ sub www_edit {
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAllTokens'});
+	$form->hidden({name=>'proceed', value=>'viewAll'});
 	return $self->processStyle('<h1>'.$i18n->get('ems token').'</h1>'.$form->print);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_viewAllTokens ()
+=head2 www_viewAll ()
 
 Displays the list of tokens in the parent.
 
 =cut
 
-sub www_viewAllTokens {
+sub www_viewAll {
 	my $self = shift;
-	return $self->getParent->www_viewExtras(undef,"tokens");
+	return $self->getParent->www_buildBadge(undef,"tokens");
 }
 
 

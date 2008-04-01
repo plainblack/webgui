@@ -34,6 +34,7 @@ use WebGUI::Asset::Sku::EMSRibbon;
 use WebGUI::Asset::Sku::EMSToken;
 
 
+
 #-------------------------------------------------------------------
 sub definition {
 	my $class = shift;
@@ -58,9 +59,9 @@ sub definition {
 			hoverHelp		=> $i18n->get('main template help'),
 			namespace		=> 'EMS',
 		},
-		extrasTemplateId => {
+		badgeBuilderTemplateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> '',
+			defaultValue 	=> 'BMybD3cEnmXVk2wQ_qEsRQ',
 			tab				=> 'display',
 			label			=> $i18n->get('extras template'),
 			hoverHelp		=> $i18n->get('extras template help'),
@@ -180,7 +181,9 @@ sub view {
     my $output = q| 
 
 <div class=" yui-skin-sam">
-	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a></p>
+	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
+	&bull; <a href="|.$self->getUrl('func=buildBadge').q|">View Events</a>
+	&bull; <a href="|.$self->getUrl('shop=cart').q|">View Cart</a></p>
 	<p>|.$self->get('badgeInstructions').q|</p>
     <div id="emsBadgePaging"></div>
     <div id="emsBadgeList"></div>
@@ -278,6 +281,7 @@ STOP
 	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
+
 #-------------------------------------------------------------------
 
 =head2 www_addRibbonToBadge ()
@@ -344,6 +348,124 @@ sub www_addTokenToBadge {
 
 #-------------------------------------------------------------------
 
+=head2 www_buildBadge ( [badgeId, whichTab] )
+
+Displays available ribbons, tokens, and tickets for the current badge.
+
+=cut
+
+sub www_buildBadge {
+	my ($self, $badgeId, $whichTab) = @_;
+	my $session = $self->session;
+	return $session->privilege->noAccess() unless $self->canView;
+	$badgeId = $session->form->get("badgeId") if ($badgeId eq "");
+	my $hasBadge = ($badgeId ne "");
+	$whichTab ||= "tickets";
+	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
+	my %var = (
+		%{$self->get},
+		addTicketUrl		=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket'),
+		importTicketsUrl	=> undef,
+		exportTicketsUrl	=> undef,
+		getTicketsUrl		=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
+		canEdit				=> $self->canEdit,
+		hasBadge			=> $hasBadge,
+		badgeId				=> $badgeId,
+		whichTab			=> $whichTab,
+		addRibbonUrl		=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
+		getRibbonsUrl		=> $self->getUrl('func=getRibbonsAsJson'),
+		getTokensUrl		=> $self->getUrl('func=getTokensAsJson'),
+		addTokenUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken'),
+		lookupBadgeUrl		=> $self->getUrl('func=lookupRegistrant'),
+		url					=> $self->getUrl,
+		viewCartUrl			=> $self->getUrl('shop=cart'),
+		customRequestUrl	=> $self->getUrl('badgeId='.$badgeId),
+		);
+	my @otherBadges =();
+	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+	foreach my $item (@{$cart->getItems}) {
+		my $id = $item->get('options')->{badgeId};
+		next if ($id eq $badgeId);
+		next unless ($item->getSku->isa("WebGUI::Asset::Sku::EMSBadge"));
+		my $name = $session->db->quickScalar("select name from EMSRegistrant where badgeId=?",[$id]);
+		push(@otherBadges, {
+			badgeUrl	=> $self->getUrl('func=buildBadge;badgeId='.$id),
+			badgeLabel	=> sprintf($i18n->get('switch to badge for'), $name),
+			});
+	}
+	$var{otherBadgesInCart} = \@otherBadges;
+	#return JSON->new->pretty->encode(\@otherBadges);
+
+	# render
+	return $self->processStyle($self->processTemplate(\%var,$self->get('badgeBuilderTemplateId')));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteBadgeGroup ()
+
+Deletes a badge group.
+
+=cut
+
+sub www_deleteBadgeGroup {
+	my $self = shift;
+	return $self->www_manageBadgeGroups;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editBadgeGroup ()
+
+Displays an edit screen for a badge group.
+
+=cut
+
+sub www_editBadgeGroup {
+	my $self = shift;
+	my ($form, $db) = $self->session->quick(qw(form db));
+	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
+	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
+	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
+	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
+	$f->text(
+		name		=> 'name',	
+		value		=> $badgeGroup->{name},
+		label		=>,
+		hoverHelp	=>,
+		);
+	$f->checkList(
+		name		=> 'badgeList',
+		value		=> JSON::decode_json($badgeGroup->{badgeList}),
+		options		=> $db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData
+							using (assetId) where asset.parentId=? and assetData.revisionDate=
+							(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)",
+							[$self->getId]),
+		label		=> ,
+		hoverHelp	=>,
+		);	
+	return $self->processStyle($f->print);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editBadgeGroupSave ()
+
+Saves a badge group.
+
+=cut
+
+sub www_editBadgeGroupSave {
+	my $self = shift;
+	return $self->www_manageBadgeGroups;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_getBadgesAsJson ()
 
 Retrieves a list of badges for the www_view() method.
@@ -366,149 +488,6 @@ sub www_getBadgesAsJson {
 			editUrl				=> $badge->getUrl('func=edit'),
 			deleteUrl			=> $badge->getUrl('func=delete'),
 			assetId				=> $badge->getId,
-			});
-	}
-    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
-    $results{'startIndex'} = 0;
-    $results{'sort'}       = undef;
-    $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_getRibbonsAsJson ()
-
-Retrieves a list of ribbons for the www_viewExtras() method.
-
-=cut
-
-sub www_getRibbonsAsJson {
-    my ($self) = @_;
-	my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canView;
-    my ($db, $form) = $session->quick(qw(db form));
-    my %results = ();
-	foreach my $ribbon (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']})}) {
-		push(@{$results{records}}, {
-			title 				=> $ribbon->getTitle,
-			description			=> $ribbon->get('description'),
-			price				=> $ribbon->getPrice+0,
-			url					=> $ribbon->getUrl,
-			editUrl				=> $ribbon->getUrl('func=edit'),
-			deleteUrl			=> $ribbon->getUrl('func=delete'),
-			assetId				=> $ribbon->getId,
-			});
-	}
-    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
-    $results{'startIndex'} = 0;
-    $results{'sort'}       = undef;
-    $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_getTicketsAsJson ()
-
-Retrieves a list of tickets for the www_viewExtras() method.
-
-=cut
-
-sub www_getTicketsAsJson {
-    my ($self) = @_;
-	my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canView;
-    my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
-    my %results = ();
-	my @ids = ();
-	my $keywords = $form->get('keywords');
-	
-	# looking for specific events
-	if ($keywords =~ m{^[\d+,*\s*]+$}) {
-		@ids = $db->buildArray("select EMSTicket.assetId from EMSTicket left join asset using (assetId) where
-			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.")",[$self->getId]);
-	}
-	
-	# looking for keywords
-	elsif ($keywords ne "") {
-		@ids = @{WebGUI::Search->new($session)->search({
-			keywords	=> $keywords,
-			lineage		=> [$self->get('lineage')],
-			classes		=> ['WebGUI::Asset::Sku::EMSTicket'],
-			})->getAssetIds};
-	}
-	
-	# just get all tickets
-	else {
-		@ids = $db->buildArray("select assetId from asset where parentId=? and className='WebGUI::Asset::Sku::EMSTicket'", [$self->getId]);
-	}
-	
-	# get assets
-	my $counter = 0;
-	my @records = ();
-	foreach my $id (@ids) {
-		next unless ($counter >= $startIndex);
-		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
-		next unless defined $ticket;
-		push(@records, {
-			title 				=> $ticket->getTitle,
-			description			=> $ticket->get('description'),
-			price				=> $ticket->getPrice+0,
-			quantityAvailable	=> $ticket->getQuantityAvailable,
-			url					=> $ticket->getUrl,
-			editUrl				=> $ticket->getUrl('func=edit'),
-			deleteUrl			=> $ticket->getUrl('func=delete'),
-			assetId				=> $ticket->getId,
-			eventNumber			=> $ticket->get('eventNumber'),
-			location			=> $ticket->get('location'),
-			startDate			=> $ticket->get('startDate'),
-			endDate				=> $ticket->get('endDate'),
-			});
-		last unless (scalar(@records) < $numberOfResults);
-		$counter++;
-	}
-	
-	# build json
-	$results{records} 			= \@records;
-    $results{totalRecords} 		= scalar(@ids);
-	$results{recordsReturned} 	= scalar(@records);
-    $results{'startIndex'}   	= $startIndex;
-    $results{'sort'}       		= undef;
-    $results{'dir'}        		= "asc";
-    $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_getTokensAsJson ()
-
-Retrieves a list of tokens for the www_viewExtras() method.
-
-=cut
-
-sub www_getTokensAsJson {
-    my ($self) = @_;
-	my $session = $self->session;
-    return $session->privilege->insufficient() unless $self->canView;
-    my ($db, $form) = $session->quick(qw(db form));
-    my %results = ();
-	foreach my $token (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']})}) {
-		push(@{$results{records}}, {
-			title 				=> $token->getTitle,
-			description			=> $token->get('description'),
-			price				=> $token->getPrice+0,
-			url					=> $token->getUrl,
-			editUrl				=> $token->getUrl('func=edit'),
-			deleteUrl			=> $token->getUrl('func=delete'),
-			assetId				=> $token->getId,
 			});
 	}
     $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
@@ -635,7 +614,7 @@ sub www_getRegistrantAsJson {
 				});
 		}
 		# it's this badge
-		elsif ($sku->isa('WebGUI::Asset::Sku::EMSRibbon')) {
+		elsif ($sku->isa('WebGUI::Asset::Sku::EMSBadge')) {
 			$badgeInfo->{hasPurchased} = 0;
 			$badgeInfo->{itemId} = $item->getId;
 			$badgeInfo->{price} = $sku->getPrice+0;
@@ -652,519 +631,207 @@ sub www_getRegistrantAsJson {
 
 #-------------------------------------------------------------------
 
+=head2 www_getRibbonsAsJson ()
 
-=head2 www_viewExtras ( [badgeId, whichTab] )
-
-Displays available ribbons, tokens, and tickets for the current badge.
+Retrieves a list of ribbons for the www_buildBadge() method.
 
 =cut
 
-sub www_viewExtras {
-	my ($self, $badgeId, $whichTab) = @_;
+sub www_getRibbonsAsJson {
+    my ($self) = @_;
 	my $session = $self->session;
-	return $session->privilege->noAccess() unless $self->canView;
-	$badgeId = $session->form->get("badgeId") if ($badgeId eq "");
-	my $hasBadge = ($badgeId ne "");
-	$whichTab ||= "tickets";
-
-	my ($style, $url) = $session->quick(qw(style url));   
-    $style->setLink($url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/container/container-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui-webgui/build/string/string.js'), {type=>'text/javascript'});
-	$style->setRawHeadTags(q|
-		<style type="text/css">
-		.skuDescription {
-		background-color: white;
-		max-width: 400px;
-		border:1px solid #000;
-		padding:10px;
-		}
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		#emstickets p, #emsribbons p, #emstokens p { text-align: left; padding: 5px; }
-		#badge {
-			font-size: 15px;
-			-moz-border-radius: 10px;
-			-webkit-border-radius: 10px;
-			border-radius: 10px;
-			border: 3px solid #2647a0;
-		}
-		#badgeHolderName {
-			background-color: #2647a0;
-			width: 100%;
-			color: white;
-			font-family: bold;
-			font-size: 25px;
-			padding: 5px 0px 5px 0px;
-			margin: 5px 0px 5px 0px;
-			margin-bottom: 5px;
-		}
-		#badgeTicketList div , #badgeRibbonList div , #badgeTokenList div {
-			border-top: 1px solid #808080;
-			width: 100%;
-			font-size: 13px;
-			padding: 5px 0px 5px 0px;
-			margin-top: 5px;
-		}
-		</style>
-						   |);
-	
-	my $output = q|
-	
-<div class=" yui-skin-sam"> <!-- start yui wrapper -->
-   <div class="yui-gc"> <!-- start grid -->
-     <div class="yui-u first"> <!-- start first column -->
-		<div id="emsExtras" class="yui-navset">  <!-- start tabs -->
-    <ul class="yui-nav">
-        <li id="emsticketstab"><a href="#emstickets"><em>Tickets</em></a></li>
-        <li id="emsribbonstab"><a href="#emsribbons"><em>Ribbons</em></a></li>
-        <li id="emstokenstab"><a href="#emstokens"><em>Tokens</em></a></li>
-    </ul>            
-    <div class="yui-content"> <!-- start tab data -->
-	
-	<!-- TICKETS TAB -->
-	
-        <div id="emstickets"> <!-- start ticket tab data -->
-	<p>
-		<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket').q|">Add a ticket</a>
-		&bull;
-		<a href="">Import</a>
-		&bull;
-		<a href="">Export</a>
-	</p>
-	<p>|.$self->get('ticketInstructions').q|<br />
-		<div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
-	</p>
-	<div id="emsTicketPaging"></div>
-	<form><div id="emsTicketList"></div></form>
-
-
-<script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function () {
-    var DataSource = YAHOO.util.DataSource,
-        Dom        = YAHOO.util.Dom,
-        DataTable  = YAHOO.widget.DataTable,
-        Paginator  = YAHOO.widget.Paginator;
-    
-    // the datasource deals with the stuff returned from www_getTicketsAsJson
-    var mySource = new DataSource('|.$self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId).q|');
-    mySource.responseType   = DataSource.TYPE_JSON;
-    mySource.responseSchema = {
-        resultsList : 'records',
-        totalRecords: 'totalRecords',
-        fields      : [ 'location', 'startDate', 'endDate', 'eventNumber', 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
-    };
-
-    var buildQueryString = function (state,dt) {
-        return ";startIndex=" + state.pagination.recordOffset +
-               ";keywords=" + Dom.get('keywordsField').value +
-               ";results=" + state.pagination.rowsPerPage;
-    };
-
-    // paginator in case there are a lot of tickets
-    var myPaginator = new Paginator({
-        containers         : ['emsTicketPaging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-
-	// ticket description formatter
-		var formatViewTicketDescription = function(elCell, oRecord, oColumn, title) {
-			elCell.innerHTML = title;
-			elCell.id = 'cell_' + oRecord.getData('assetId');
-			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
-				{ context:elCell.id, autodismissdelay:250000,
-				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
-        }; 
-
-	// add to cart formatter
-		var formatAddToCart = function(elCell, oRecord, oColumn, assetId) {
-			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<input type="checkbox" name="assetId" class="forwardButton" value="'+assetId+'" />'; 
-        }; 
-	
-	// manage ticket formatter
-		var formatManageTicket = function(elCell, oRecord, oColumn, editUrl) {
-			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
-        }; 
-	
-	// quantity available formatter
-		var formatQuantityAvailable = function(elCell, oRecord, oColumn, quantityAvailable) {
-			elCell.innerHTML = (quantityAvailable < 1) ? '<strong>Sold Out!</strong>' : quantityAvailable;
-        }; 
-	
-    // create the data table
-    var myTableConfig = {
-        initialRequest         : ';startIndex=0',
-        generateRequest        : buildQueryString,
-        paginationEventHandler : DataTable.handleDataSourcePagination,
-        paginator              : myPaginator
-    };
-        var myColumnDefs = [
-	|;
-	if ($session->var->isAdminOn) {
-	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageTicket},';
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my %results = ();
+	foreach my $ribbon (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']})}) {
+		push(@{$results{records}}, {
+			title 				=> $ribbon->getTitle,
+			description			=> $ribbon->get('description'),
+			price				=> $ribbon->getPrice+0,
+			url					=> $ribbon->getUrl,
+			editUrl				=> $ribbon->getUrl('func=edit'),
+			deleteUrl			=> $ribbon->getUrl('func=delete'),
+			assetId				=> $ribbon->getId,
+			});
 	}
-	if ($hasBadge) {
-		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';
-	}
-	$output .= q|
-		{key:"eventNumber", label:"Event #",sortable:true},
-		{key:"title", label:"Title",sortable:true,formatter:formatViewTicketDescription},
-		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},
-		{key:"quantityAvailable",sortable:true,label:"# Available", formatter:formatQuantityAvailable},
-		{key:"startDate", label:"Start",sortable:true},
-		{key:"endDate", label:"End",sortable:true}
-    ];
-    var myTable = new DataTable('emsTicketList', myColumnDefs, mySource, myTableConfig);
-
-	|;
-	if ($hasBadge) {
-		$output .= q|
-	// buy button in header
-	var thead = myTable.getTbodyEl().parentNode.createTHead();
-	var tr = thead.insertRow(-1);
-	var th = tr.appendChild(document.createElement('th'));
-	th.colSpan = 7;
-	th.innerHTML = '<input type="button" value="Buy" class="forwardButton" onclick="submitTicketsToBadge(this.form);" />';
-
-	// buy button in footer
-	var tfoot = myTable.getTbodyEl().parentNode.createTFoot();
-	var tr = tfoot.insertRow(-1);
-	var th = tr.appendChild(document.createElement('th'));
-	th.colSpan = 7;
-	th.innerHTML = '<input type="button" value="Buy" class="forwardButton" onclick="submitTicketsToBadge(this.form);" />';
-	|;		
-	}
-	$output .= q|
-	Dom.get('keywordSearchForm').onsubmit = function () {
-        mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', myTable.onDataReturnInitializeTable, myTable);
-        return false;
-    };
-
-	});
-	
-	function submitTicketsToBadge (form)  {
-		var field = form.assetId;
-		var assetIds = new Array();
-		for (i = 0; i < field.length; i++) {
-			if (field[i].checked == true) {
-				assetIds.push(field[i].value)
-			}
-		}
-		populateRegistrantBadge({func:'addTicketsToBadge',assetIds: assetIds});
-	}
-
-
-	</script>
-		</div> <!-- end ticket tab data -->
-	
-	<!-- RIBBONS TAB -->
-	
-        <div id="emsribbons"> <!-- start ribbon tab data -->
-	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon').q|">Add a ribbon</a></p>
-	<p>|.$self->get('ribbonInstructions').q|</p>
-    <div id="emsRibbonList"></div>
-
-
-<script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function () {
-    var DataSource = YAHOO.util.DataSource,
-        Dom        = YAHOO.util.Dom,
-        DataTable  = YAHOO.widget.DataTable,
-        Paginator  = YAHOO.widget.Paginator;
-    
-    // the datasource deals with the stuff returned from www_getRibbonsAsJson
-    var mySource = new DataSource('|.$self->getUrl('func=getRibbonsAsJson').q|');
-    mySource.responseType   = DataSource.TYPE_JSON;
-    mySource.responseSchema = {
-        resultsList : 'records',
-        totalRecords: 'totalRecords',
-        fields      : [ 'url', 'title', 'description', 'price', 'deleteUrl', 'editUrl', 'assetId']
-    };
-
-    // paginator in case there are a lot of ribbons
-    var myPaginator = new Paginator({
-        containers         : ['emsRibbonPaging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-
-	// ribbon description formatter
-		var formatViewRibbonDescription = function(elCell, oRecord, oColumn, title) {
-			elCell.innerHTML = title;
-			elCell.id = 'cell_' + oRecord.getData('assetId');
-			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
-				{ context:elCell.id, autodismissdelay:250000,
-				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
-        }; 
-
-	// add to cart formatter
-		var formatAddToCart = function(elCell, oRecord, oColumn, assetId) {
-			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<form style="display:inline;"><input type="button" onclick="populateRegistrantBadge({func:\'addRibbonToBadge\',assetId:\'' +assetId+ '\'});" class="forwardButton" value="Buy" /></form>'; 
-        }; 
-	
-	// manage ribbon formatter
-		var formatManageRibbon = function(elCell, oRecord, oColumn, editUrl) {
-			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
-        }; 
-	
-    // create the data table
-    var myTableConfig = {
-        initialRequest         : '',
-        paginator              : myPaginator 
-    };
-        var myColumnDefs = [
-	|;
-	if ($session->var->isAdminOn) {
-	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageRibbon},';
-	}
-	if ($hasBadge) {
-		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';
-	}
-	$output .= q|	
-		{key:"title", label:"Title",sortable:true,formatter:formatViewRibbonDescription},
-		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
-    ];
-    var myTable = new DataTable('emsRibbonList', myColumnDefs, mySource, myTableConfig);
-
-	});
-	</script>
-		</div> <!-- end ribbon tab data -->
-	
-	<!-- TOKENS TAB -->
-	
-        <div id="emstokens"> <!-- start token tab data -->
-	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken').q|">Add a token</a></p>
-	<p>|.$self->get('tokenInstructions').q|</p>
-    <div id="emsTokenList"></div>
-
-
-<script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function () {
-    var DataSource = YAHOO.util.DataSource,
-        Dom        = YAHOO.util.Dom,
-        DataTable  = YAHOO.widget.DataTable,
-        Paginator  = YAHOO.widget.Paginator;
-    
-    // the datasource deals with the stuff returned from www_getTokensAsJson
-    var mySource = new DataSource('|.$self->getUrl('func=getTokensAsJson').q|');
-    mySource.responseType   = DataSource.TYPE_JSON;
-    mySource.responseSchema = {
-        resultsList : 'records',
-        totalRecords: 'totalRecords',
-        fields      : [ 'url', 'title', 'description', 'price', 'deleteUrl', 'editUrl', 'assetId']
-    };
-
-    // paginator in case there are a lot of tokens
-    var myPaginator = new Paginator({
-        containers         : ['emsTokenPaging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-
-	// token description formatter
-		var formatViewTokenDescription = function(elCell, oRecord, oColumn, title) {
-			elCell.innerHTML = title;
-			elCell.id = 'cell_' + oRecord.getData('assetId');
-			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
-				{ context:elCell.id, autodismissdelay:250000,
-				text:'<div class="skuDescription">'+oRecord.getData('description')+'</div>' });
-        }; 
-
-	// add to cart formatter
-		var formatAddToCart = function(elCell, oRecord, oColumn, assetId) {
-			if (oRecord.getData('quantityAvailable') < 1) {
-				elCell.innerHTML = '';
-			}
-			else {
-				var selector = '<select name="quantity">';
-				var i=1;
-				while (i<101) {
-					selector += '<option value="'+i+'">'+i+'</option>';
-					if (i>=20) {
-						i += 5;
-					}
-					else {
-						i++;
-					}
-				}
-				selector += '</select>';
-				elCell.innerHTML = '<form style="display:inline;"><input type="button" onclick="populateRegistrantBadge({func:\'addTokenToBadge\',assetId:\'' +assetId+ '\',quantity:this.form.quantity.value});" class="forwardButton" value="Buy" />' + selector +'</form>'; 
-			}
-        }; 
-	
-	// manage token formatter
-		var formatManageToken = function(elCell, oRecord, oColumn, editUrl) {
-			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
-        }; 
-	
-    // create the data table
-    var myTableConfig = {
-        initialRequest         : '',
-        paginator              : myPaginator 
-    };
-        var myColumnDefs = [
-	|;
-	if ($session->var->isAdminOn) {
-	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageToken},';
-	}
-	if ($hasBadge) {
-		$output .= '{key:"assetId", label:"Buy", formatter:formatAddToCart},';		
-	}
-	$output .= q|
-		{key:"title", label:"Title",sortable:true,formatter:formatViewTokenDescription},
-		{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency}
-    ];
-    var myTable = new DataTable('emsTokenList', myColumnDefs, mySource, myTableConfig);
-
-	});
-	</script>
-		</div> <!-- end token tab data -->
-	  </div> <!-- end tab data -->
-     </div> <!-- end tabs -->
-	</div> <!-- end first column -->
-	|;
-	if ($hasBadge) {
-		$output .= q|
-	<div class="yui-u"> <!-- start second column -->
-		<div id="badge">
-			|.$self->getTitle.q|
-			<div id="badgeHolderName"></div>
-			<div id="badgeType"></div>
-			<div id="badgeTicketList"></div>
-			<div id="badgeRibbonList"></div>
-			<div id="badgeTokenList"></div>
-		</div>
-		<ul style="text-align: left;list-style:disc;">
-			<li><a href="|.$self->getUrl('func=viewDetails;badgeId='.$badgeId).q|">Switch John Smith's Badge</a></li>
-			<li><a href="|.$self->getUrl('func=lookupBadge').q|">Switch To Another Badge</a></li>
-			<li><a href="|.$self->getUrl.q|">Buy Another Badge</a></li>
-			<li><a href="|.$self->getUrl('shop=cart').q|">View Cart</a></li>
-		</ul>
-		<script type="text/javascript">
-		function populateRegistrantBadge (args) {
-			var Dom = YAHOO.util.Dom;
-			var El = YAHOO.util.Element;
-			var sprintf = WebGUI.str.sprintf;
-		    var callback = {
-				success: function(o) {
-					var badgeData = YAHOO.lang.JSON.parse(o.responseText);
-					if (badgeData.hasPurchased == 0) {
-						Dom.get('badgeType').innerHTML=badgeData.title +' ($' + (sprintf('%.2f',badgeData.price)) + ')';
-					}
-					else {
-						Dom.get('badgeType').innerHTML=badgeData.title;
-					}
-					Dom.get('badgeHolderName').innerHTML=badgeData.name;
-					var tickets = Dom.get('badgeTicketList');
-					
-					// ticket list
-					tickets.innerHTML='';
-					for (var i=0; i < badgeData.tickets.length; i++) {
-						var ticket = badgeData.tickets[i];
-						var div = document.createElement('div');
-						div.innerHTML = ticket.title + ' - ' + ticket.startDate;
-						if (ticket.hasPurchased == 0) {
-							div.innerHTML += ' ($' + (sprintf('%.2f',ticket.price)) + ')';
-						}
-						tickets.appendChild(div);
-					}
-					
-					// ribbon list
-					var ribbons = Dom.get('badgeRibbonList');
-					ribbons.innerHTML='';
-					for (var i=0; i < badgeData.ribbons.length; i++) {
-						var ribbon = badgeData.ribbons[i];
-						var div = document.createElement('div');
-						div.innerHTML = ribbon.title;
-						if (ribbon.hasPurchased == 0) {
-							div.innerHTML += ' ($' + (sprintf('%.2f',ribbon.price)) + ')';
-						}
-						ribbons.appendChild(div);
-					}
-					
-					// token list
-					var tokens = Dom.get('badgeTokenList');
-					tokens.innerHTML='';
-					for (var i=0; i < badgeData.tokens.length; i++) {
-						var token = badgeData.tokens[i];
-						var div = document.createElement('div');
-						div.innerHTML = token.quantity + ' - ' + token.title;
-						if (token.hasPurchased == 0) {
-							div.innerHTML += ' ($' + (sprintf('%.2f',token.price)) + ')';
-						}
-						tokens.appendChild(div);
-					}
-				},
-				failure: function(o) {
-					alert('error communicating with server');
-				}
-			};
-			var url = '|.$self->getUrl('badgeId='.$badgeId).q|';
-			for (var i in args) {
-				if (i == 'assetIds') {
-					var ids = args[i];
-					for (var j=0; j<ids.length;j++) {
-						url += ';assetId=' + ids[j];	
-					}
-				}
-				else {
-					url += ';' + i + '=' + args[i];
-				}
-			}
-            this.request = YAHOO.util.Connect.asyncRequest('GET', url , callback);			
-		}
-		YAHOO.util.Event.onDOMReady(function () {
-			populateRegistrantBadge({'func':'getRegistrantAsJson'});
-		});
-		</script>
-	</div> <!-- end second column -->
-	|;
-	}
-	$output .= q|
-	</div> <!-- end grid -->
-</div> <!-- end yui wrapper -->
-
-
-<script type="text/javascript">
-(function() {
-	var whichTab = '|.$whichTab.q|';
-	YAHOO.util.Dom.addClass(YAHOO.util.Dom.get('ems' + whichTab + 'tab'),'selected');
-    var tabView = new YAHOO.widget.TabView('emsExtras');
-	})();
-</script>
-	|;
-	return $self->processStyle($output);
-	my %var = ();
-
-	
-	# render
-	return $self->processTemplate(\%var,$self->get('viewRibbonsTemplate'));
+    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
+    $results{'startIndex'} = 0;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "asc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 www_getTicketsAsJson ()
+
+Retrieves a list of tickets for the www_buildBadge() method.
+
+=cut
+
+sub www_getTicketsAsJson {
+    my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
+    my %results = ();
+	my @ids = ();
+	my $keywords = $form->get('keywords');
+	
+	# looking for specific events
+	if ($keywords =~ m{^[\d+,*\s*]+$}) {
+		@ids = $db->buildArray("select EMSTicket.assetId from EMSTicket left join asset using (assetId) where
+			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.")",[$self->getId]);
+	}
+	
+	# looking for keywords
+	elsif ($keywords ne "") {
+		@ids = @{WebGUI::Search->new($session)->search({
+			keywords	=> $keywords,
+			lineage		=> [$self->get('lineage')],
+			classes		=> ['WebGUI::Asset::Sku::EMSTicket'],
+			})->getAssetIds};
+	}
+	
+	# just get all tickets
+	else {
+		@ids = $db->buildArray("select assetId from asset where parentId=? and className='WebGUI::Asset::Sku::EMSTicket'", [$self->getId]);
+	}
+	
+	# get assets
+	my $counter = 0;
+	my @records = ();
+	foreach my $id (@ids) {
+		next unless ($counter >= $startIndex);
+		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
+		next unless defined $ticket;
+		my $date = WebGUI::DateTime->new($session, $ticket->get('startDate'));
+		push(@records, {
+			title 				=> $ticket->getTitle,
+			description			=> $ticket->get('description'),
+			price				=> $ticket->getPrice+0,
+			quantityAvailable	=> $ticket->getQuantityAvailable,
+			url					=> $ticket->getUrl,
+			editUrl				=> $ticket->getUrl('func=edit'),
+			deleteUrl			=> $ticket->getUrl('func=delete'),
+			assetId				=> $ticket->getId,
+			eventNumber			=> $ticket->get('eventNumber'),
+			location			=> $ticket->get('location'),
+			startDate			=> $date->webguiDate("%W @ %H:%n%p"),
+			duration			=> $ticket->get('duration'),
+			});
+		last unless (scalar(@records) < $numberOfResults);
+		$counter++;
+	}
+	
+	# build json
+	$results{records} 			= \@records;
+    $results{totalRecords} 		= scalar(@ids);
+	$results{recordsReturned} 	= scalar(@records);
+    $results{'startIndex'}   	= $startIndex;
+    $results{'sort'}       		= undef;
+    $results{'dir'}        		= "asc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_getTokensAsJson ()
+
+Retrieves a list of tokens for the www_buildBadge() method.
+
+=cut
+
+sub www_getTokensAsJson {
+    my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my %results = ();
+	foreach my $token (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']})}) {
+		push(@{$results{records}}, {
+			title 				=> $token->getTitle,
+			description			=> $token->get('description'),
+			price				=> $token->getPrice+0,
+			url					=> $token->getUrl,
+			editUrl				=> $token->getUrl('func=edit'),
+			deleteUrl			=> $token->getUrl('func=delete'),
+			assetId				=> $token->getId,
+			});
+	}
+    $results{totalRecords} = $results{recordsReturned} = scalar(@{$results{records}});
+    $results{'startIndex'} = 0;
+    $results{'sort'}       = undef;
+    $results{'dir'}        = "asc";
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_lookupRegistrant ()
+
+Displays the
+
+=cut
+
+sub www_lookupRegistrant {
+	my $self = shift;
+	return $self->processStyle("here you will be able to look up a registrant by name");
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manageBadgeGroups ()
+
+Displays a list of badge groups.
+
+=cut
+
+sub www_manageBadgeGroups {
+	my $self = shift;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_removeItemFromBadge ()
+
+Removes a ribbon, token, or ticket from a badge that is in the cart.
+
+=cut
+
+sub www_removeItemFromBadge {
+	my $self = shift;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my $form = $session->form;
+	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+	my $item = $cart->getItem($form->get('itemId'));
+    $item->remove;
+	return $self->www_getRegistrantAsJson();	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

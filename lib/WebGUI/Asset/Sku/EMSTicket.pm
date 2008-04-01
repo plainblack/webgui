@@ -98,12 +98,13 @@ sub definition {
 			label           => $i18n->get("event start date"),
 			hoverHelp       => $i18n->get("start date help"),
 			},
-		endDate => {
+		duration => {
 			tab             => "properties",
-			fieldType       => "dateTime",
-			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("event end date"),
-			hoverHelp       => $i18n->get("event end date help"),
+			fieldType       => "float",
+			defaultValue    => 1.0,
+			subtext			=> $i18n->get('hours'),
+			label           => $i18n->get("duration"),
+			hoverHelp       => $i18n->get("duration help"),
 			},
 		location => {
 			tab             => "properties",
@@ -292,7 +293,7 @@ sub www_addToCart {
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
 	my $badgeId = $self->session->form->get('badgeId');
 	$self->addToCart({badgeId=>$badgeId});
-	return $self->getParent->www_viewExtras($badgeId);
+	return $self->getParent->www_buildBadge($badgeId);
 }
 
 #-------------------------------------------------------------------
@@ -325,21 +326,21 @@ sub www_edit {
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAllTickets'});
+	$form->hidden({name=>'proceed', value=>'viewAll'});
 	return $self->processStyle('<h1>'.$i18n->get('ems ticket').'</h1>'.$form->print);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_viewAllTickets ()
+=head2 www_viewAll ()
 
 Displays the list of tickets in the parent.
 
 =cut
 
-sub www_viewAllTickets {
+sub www_viewAll {
 	my $self = shift;
-	return $self->getParent->www_viewExtras(undef,"tickets");
+	return $self->getParent->www_buildBadge(undef,"tickets");
 }
 
 

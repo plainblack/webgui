@@ -189,7 +189,7 @@ sub www_addToCart {
 	return $self->session->privilege->noAccess() unless $self->getParent->canView;
 	my $badgeId = $self->session->form->get('badgeId');
 	$self->addToCart({badgeId=>$badgeId});
-	return $self->getParent->www_viewExtras($badgeId);
+	return $self->getParent->www_buildBadge($badgeId);
 }
 
 #-------------------------------------------------------------------
@@ -222,21 +222,21 @@ sub www_edit {
 						   |);	
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	my $form = $self->getEditForm;
-	$form->hidden({name=>'proceed', value=>'viewAllRibbons'});
+	$form->hidden({name=>'proceed', value=>'viewAll'});
 	return $self->processStyle('<h1>'.$i18n->get('ems ribbon').'</h1>'.$form->print);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_viewAllRibbons ()
+=head2 www_viewAll ()
 
 Displays the list of ribbons in the parent.
 
 =cut
 
-sub www_viewAllRibbons {
+sub www_viewAll {
 	my $self = shift;
-	return $self->getParent->www_viewExtras(undef,"ribbons");
+	return $self->getParent->www_buildBadge(undef,"ribbons");
 }
 
 

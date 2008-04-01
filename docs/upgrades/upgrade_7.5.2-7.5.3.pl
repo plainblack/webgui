@@ -70,7 +70,7 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem drop column ticketPrinterTemplateId");
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null");
-	$db->write("alter table EventManagementSystem add column extrasTemplateId varchar(22) binary not null");
+	$db->write("alter table EventManagementSystem add column badgeBuilderTemplateId varchar(22) binary not null default 'BMybD3cEnmXVk2wQ_qEsRQ'");
 	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ribbonInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
@@ -93,6 +93,7 @@ sub upgradeEMS {
 		phoneNumber varchar(35),
 		organization varchar(35),
 		email varchar(255),
+		notes mediumtext,
 		purchaseComplete boolean,
 		hasCheckedIn boolean,
 		index badgeAssetId_purchaseComplete (badgeAssetId,purchaseComplete)
@@ -128,7 +129,7 @@ sub upgradeEMS {
 		price float not null default 0.00,
 		seatsAvailable int not null default 100,
 		startDate datetime,
-		endDate datetime,
+		duration float not null default 1.0,
 		eventNumber int,
 		location varchar(100),
 		relatedBadges mediumtext,

@@ -348,7 +348,7 @@ sub www_addToCart {
 	
 	# add it to the cart
 	$self->addToCart(\%badgeInfo);
-	return $self->getParent->www_viewExtras($self->getOptions->{badgeId});
+	return $self->getParent->www_buildBadge($self->getOptions->{badgeId});
 }
 
 

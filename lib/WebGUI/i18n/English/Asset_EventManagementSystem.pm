@@ -1,7 +1,139 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
-our $I18N = { ##hashref of hashes
+our $I18N = {
+	'hours' => {
+		message 	=> q|Hours|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'view cart' => {
+		message 	=> q|View Cart|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'buy badge' => {
+		message 	=> q|Buy A Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'switch to badge for' => {
+		message 	=> q|Switch To '%s' Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'lookup badge' => {
+		message 	=> q|Look Up A Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'remove' => {
+		message 	=> q|Remove|,
+		lastUpdated	=> 0,
+		context		=> q|a link label, as in "remove from cart"|,
+	},
+	
+	'import' => {
+		message 	=> q|Import|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'export' => {
+		message 	=> q|Export|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a badge' => {
+		message 	=> q|Add a badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a token' => {
+		message 	=> q|Add a token|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a ticket' => {
+		message 	=> q|Add a ticket|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a ribbon' => {
+		message 	=> q|Add a ribbon|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'sold out' => {
+		message 	=> q|Sold Out|,
+		lastUpdated	=> 0,
+		context		=> q|a message telling the user there are none left to buy|,
+	},
+	
+	'manage' => {
+		message 	=> q|Manage|,
+		lastUpdated	=> 0,
+		context		=> q|a column label in the badge builder|,
+	},
+	
+	'quantity available' => {
+		message 	=> q|# Available|,
+		lastUpdated	=> 0,
+		context		=> q|a column label in the badge builder|,
+	},
+	
+	'buy' => {
+		message 	=> q|Buy|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'delete' => {
+		message 	=> q|Delete|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'edit' => {
+		message 	=> q|Edit|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'search' => {
+		message 	=> q|Search|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'tickets' => {
+		message 	=> q|Tickets|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'ribbons' => {
+		message 	=> q|Ribbons|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'tokens' => {
+		message 	=> q|Tokens|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
 	'location' => {
 		message 	=> q|Location|,
 		lastUpdated	=> 0,
@@ -15,17 +147,17 @@ our $I18N = { ##hashref of hashes
 	},
 	
 	'event number' => {
-		message 	=> q|Event Number|,
+		message 	=> q|Event #|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
 	
 	'event number help' => {
-		message 	=> q|A number which uniquely identifies this event, so it can be matched up with printed catalogs.|,
+		message 	=> q|A number that represents the event, which is easily referenceable for things like event catalogs.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+		
 	'badge instructions' => {
 		message 	=> q|Badge Instructions|,
 		lastUpdated	=> 0,
@@ -176,18 +308,6 @@ our $I18N = { ##hashref of hashes
 		context		=> q|help for a property label|,
 	},
 	
-	'event number' => {
-		message 	=> q|Event Number|,
-		lastUpdated	=> 0,
-		context		=> q|a property label|,
-	},
-	
-	'event number help' => {
-		message 	=> q|A number that represents the event, which is easily referenceable for things like event catalogs.|,
-		lastUpdated	=> 0,
-		context		=> q|help for a property label|,
-	},
-	
 	'time zone' => {
 		message 	=> q|Time Zone|,
 		lastUpdated	=> 0,
@@ -201,7 +321,7 @@ our $I18N = { ##hashref of hashes
 	},
 	
  	'event start date' => {
-		message 	=> q|Event Start Date|,
+		message 	=> q|Start|,
 		lastUpdated => 0,
 		context 	=> q|Event start date field label|
 	},
@@ -212,16 +332,16 @@ our $I18N = { ##hashref of hashes
 		context 	=> q|hover help for Event Start Date field|
 	},
 
-	'event end date' => {
-		message 	=> q|Event End Date|,
+	'duration' => {
+		message 	=> q|Duration|,
 		lastUpdated => 0,
-		context 	=> q|Event end date field label|
+		context 	=> q|duration field label|
 	},
 
-	'end date help' => {
-		message 	=> q|The time and date when the event ends.|,
+	'duration help' => {
+		message 	=> q|How long does this event last?|,
 		lastUpdated => 0,
-		context 	=> q|hover help for Event End Date field|
+		context 	=> q|hover help for duration field|
 	},
 
 

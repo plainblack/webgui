@@ -503,6 +503,9 @@ sub www_update {
                 my $i18n = WebGUI::International->new($self->session, "Shop");
                 $error{id $self} = sprint($i18n->get("too many of this item"), $item->get("configuredTitle"));
             }
+            elsif (my $e = WebGUI::Error->caught) {
+                $error{id $self} = "An unknown error has occured: ".$e->message;
+            }
         }
     }
 
@@ -568,6 +571,7 @@ sub www_view {
         formHeader              => WebGUI::Form::formHeader($session)
             . WebGUI::Form::hidden($session, {name=>"shop", value=>"cart"})
             . WebGUI::Form::hidden($session, {name=>"method", value=>"update"})
+            . WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
             . WebGUI::Form::hidden($session, {name=>"callback", value=>""}),
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
