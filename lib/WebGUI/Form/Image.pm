@@ -81,6 +81,9 @@ sub definition {
 		forceImageOnly=>{
 			defaultValue=>0
 			},
+        enforceSizeLimits => {
+            defaultValue    => 1
+        },
         dbDataType  => {
             defaultValue    => "VARCHAR(22) BINARY",
         },
@@ -201,7 +204,12 @@ sub getValueFromPost {
 			}
 
 			return undef unless @files;
-			$storage->generateThumbnail($_) for @images; # Make a thumbnail for each filename in @images
+            for my $image (@images) {
+                $storage->generateThumbnail($image); # Make a thumbnail for each file
+                if ($self->get('enforceSizeLimits')) {
+                    $storage->adjustMaxImageSize($image);
+                }
+            }
 		}
 	}
 	return $id;

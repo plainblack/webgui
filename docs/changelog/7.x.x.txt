@@ -8,6 +8,7 @@
  - fixed: Rich editor image uploader doesn't follow size limits
  - fixed: Poll question/answers with international text corrupted
  - fixed: subscription group in CS edit has broken hover help
+ - fixed: profile photos don't obey max image size
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney

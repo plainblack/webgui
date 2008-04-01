@@ -160,7 +160,8 @@ sub definition {
     my $properties = {
         storageId => {
             fieldType=>"image",
-            defaultValue=>undef
+            defaultValue=>undef,
+            enforceSizeLimits => 0,
         },
         threadId => {
             noFormPost=>1,
