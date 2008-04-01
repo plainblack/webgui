@@ -243,14 +243,18 @@ sub www_editBranchSave {
 	my %data;
 	$data{isHidden} = $self->session->form->yesNo("isHidden") if ($self->session->form->yesNo("change_isHidden"));
 	$data{newWindow} = $self->session->form->yesNo("newWindow") if ($self->session->form->yesNo("change_newWindow"));
-	$data{displayTitle} = $self->session->form->yesNo("displayTitle") if ($self->session->form->yesNo("change_displayTitle"));
-	$data{styleTemplateId} = $self->session->form->template("styleTemplateId") if ($self->session->form->yesNo("change_styleTemplateId"));
-	$data{printableStyleTemplateId} = $self->session->form->template("printableStyleTemplateId") if ($self->session->form->yesNo("change_printableStyleTemplateId"));
 	$data{encryptPage} = $self->session->form->yesNo("encryptPage") if ($self->session->form->yesNo("change_encryptPage"));
 	$data{ownerUserId} = $self->session->form->selectBox("ownerUserId") if ($self->session->form->yesNo("change_ownerUserId"));
 	$data{groupIdView} = $self->session->form->group("groupIdView") if ($self->session->form->yesNo("change_groupIdView"));
 	$data{groupIdEdit} = $self->session->form->group("groupIdEdit") if ($self->session->form->yesNo("change_groupIdEdit"));
 	$data{extraHeadTags} = $self->session->form->group("extraHeadTags") if ($self->session->form->yesNo("change_extraHeadTags"));
+    my %wobjectData = %data;
+    $wobjectData{displayTitle} = $self->session->form->yesNo("displayTitle")
+        if ($self->session->form->yesNo("change_displayTitle"));
+    $wobjectData{styleTemplateId} = $self->session->form->template("styleTemplateId")
+        if ($self->session->form->yesNo("change_styleTemplateId"));
+    $wobjectData{printableStyleTemplateId} = $self->session->form->template("printableStyleTemplateId")
+        if ($self->session->form->yesNo("change_printableStyleTemplateId"));
 	my ($urlBaseBy, $urlBase, $endOfUrl);
 	my $changeUrl = $self->session->form->yesNo("change_url");
 	if ($changeUrl) {
@@ -279,7 +283,14 @@ sub www_editBranchSave {
 				$data{url} .= $descendant->get("url");
 			}
 		}
-        my $newRevision = $descendant->addRevision(\%data, undef, {skipAutoCommitWorkflows=>1});
+        my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
+        next
+            if (scalar %$newData == 0);
+        my $newRevision = $descendant->addRevision(
+            $newData,
+            undef,
+            {skipAutoCommitWorkflows => 1, skipNotification => 1},
+        );
 		foreach my $form ($self->session->form->param) {
                 	if ($form =~ /^metadata_(.*)$/) {
 				my $fieldName = $1;

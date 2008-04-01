@@ -12,6 +12,8 @@
  - fixed: Project Manager can't track non-integer durations
  - fixed: Unable to edit CS posts that were denied as a normal user
  - added: Better error messages when SQL Report lacks a query (William McKee, Knowmad Technologies)
+ - fixed: edit branch sends thread notifications
+ - fixed: changing style template with edit branch creates new revisions of assets that have no style template
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery
