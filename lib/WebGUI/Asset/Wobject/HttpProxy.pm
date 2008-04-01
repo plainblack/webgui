@@ -399,7 +399,7 @@ sub view {
 					$var{content} = sprintf $i18n->get('no frame error message'), $proxiedUrl;
 				} else {
 					$var{content} =~ s/\<style.*?\/style\>//isg if ($self->get("removeStyle"));
-					$var{content} = WebGUI::HTML::cleanSegment($var{content});
+					$var{content} = WebGUI::HTML::cleanSegment($var{content}, 1);
 					$var{content} = WebGUI::HTML::filter($var{content}, $self->get("filterHtml"));
 				}
 			}

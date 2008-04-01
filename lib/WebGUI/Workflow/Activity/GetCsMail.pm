@@ -82,26 +82,16 @@ sub addPost {
 				$text = WebGUI::HTML::filter($text, "all");
 				$text = WebGUI::HTML::format($text, "text");
 			} 
+            else if ($part->type eq 'text/html') {
+                $text = WebGUI::HTML::cleanSegment($text);
+            }
 			$content .= $text;
 		} else {
 			push(@attachments, $part);
 		}
 	}
-	$prefix =~ s/\\/\\\\/g;
-	$prefix =~ s/\[/\\[/g;
-	$prefix =~ s/\]/\\]/g;
-	$prefix =~ s/\(/\\(/g;
-	$prefix =~ s/\)/\\)/g;
-	$prefix =~ s/\}/\\}/g;
-	$prefix =~ s/\{/\\{/g;
-	$prefix =~ s/\?/\\?/g;
-	$prefix =~ s/\./\\./g;
-	$prefix =~ s/\*/\\*/g;
-	$prefix =~ s/\+/\\+/g;
-	$prefix =~ s/\|/\\|/g;
-	$prefix =~ s/\//\\\//g;
 	my $title = $message->{subject};
-	$title =~ s/$prefix//;
+	$title =~ s/\Q$prefix//;
 	if ($title =~ m/re:/i) {
 		$title =~ s/re://ig;
 		$title = "Re: ".$title;

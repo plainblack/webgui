@@ -46,40 +46,36 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 cleanSegment ( html )
+=head2 cleanSegment ( html , preserveStyleScript )
 
 Returns an HTML segment that has been stripped of the <BODY> tag and anything before it, as well as the </BODY> tag and anything after it. It's main purpose is to get rid of META tags and other garbage from an HTML page that will be used as a segment inside of another page.
-
-B<NOTE:> This filter does have one exception, it leaves anything before the <BODY> tag that is enclosed in <STYLE></STYLE> or <SCRIPT></SCRIPT> tags.
 
 =head3 html
 
 The HTML segment you want cleaned.
 
+=head3 preserveStyleScript
+
+With this option set, <style> and <script> tags will be preserved in the output.
+
 =cut
 
 sub cleanSegment {
-	my $html = shift;
-	# remove windows carriage returns
-	if ($html =~ s/\r/\n/g) {
-		$html =~ s/\n\n/\n/g
-	}
-	# remove meta tags
-	$html =~ s/\<meta.*?\>//ixsg;
-	# remove link tags
-	$html =~ s/\<link.*?\>//ixsg;
-	# remove title tags
-	$html =~ s/\<title\>.*?\<\/title\>//ixsg;
-	# remove head tags
-	$html =~ s/\<head.*?\>//ixsg;
-	$html =~ s/\<\/head>//ixsg;
-	# remove body tags
-	$html =~ s/\<body.*?\>//ixsg;
-	$html =~ s/\<\/body>//ixsg;
-	# remove html tags
-	$html =~ s/\<html>//ixsg;
-	$html =~ s/\<\/html>//ixsg;
-	return $html;
+    my $html = shift;
+    my $preserveStyleScript = shift;
+    my $headers = "";
+    if ($html =~ s{(.*)<body\b.*?>}{}is && $preserveStyleScript) {
+        my $head = $1;
+        # extract every script or style tag
+        while ($head =~ m{(<(script|style)\b.*?</\2>)}isg) {
+            $headers .= $1;
+        }
+    }
+    $html =~ s{</body>.*}{}is;
+    # remove windows carriage returns
+    $html =~ s/\r\n/\n/g;
+    $html =~ s/\r/\n/g;
+    return $headers . $html;
 }
 
 #-------------------------------------------------------------------
