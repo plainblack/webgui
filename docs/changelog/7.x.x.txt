@@ -5,6 +5,7 @@
  - fixed: Event related links truncated on dashes
  - added: Database index on userSession.expires field to speed up workflows
  - fixed: Collaboration System attachments follow site's max size instead of CS's
+ - fixed: Rich editor image uploader doesn't follow size limits
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney

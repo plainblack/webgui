@@ -527,7 +527,7 @@ sub www_addImageSave {
 	##us from future form name changes.
 	my $filename = $imageObj->getFiles->[0];
 	if ($filename) {
-		$base->addChild({
+		my $child = $base->addChild({
 			assetId     => 'new',
 			className   => 'WebGUI::Asset::File::Image',
 			storageId   => $imageObj->getId,
@@ -535,15 +535,16 @@ sub www_addImageSave {
 			title       => $filename,
 			menuTitle   => $filename,
 			templateId  => 'PBtmpl0000000000000088',
-			url         => $base->get("url").'/'.$filename,
 			groupIdEdit => $session->form->process('groupIdEdit') || $base->get('groupIdEdit'),
 			groupIdView => $session->form->process('groupIdView') || $base->get('groupIdView'),
 			ownerUserId => $session->var->get('userId'),
 			isHidden    => 1,
-			});
-	}
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
-	return "";
+        });
+        $child->update({url => $child->fixUrl});
+        $child->applyConstraints;
+    }
+    $session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
+    return undef;
 }
 
 
