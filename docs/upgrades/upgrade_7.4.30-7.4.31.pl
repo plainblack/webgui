@@ -22,6 +22,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 clearRSSCache($session);
+setPMFloatingDuration($session);
 addUserSessionExpiresIndex($session);
 
 finish($session); # this line required
@@ -40,6 +41,15 @@ sub clearRSSCache {
     my $cache = WebGUI::Cache->new($session, '', 'RSS');
     $cache->flush;
     print " Done.\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+sub setPMFloatingDuration {
+    my $session = shift;
+    print "\tChanging Project manager to use floating numbers for duration... " unless $quiet;
+    $session->db->write('ALTER TABLE `PM_task` MODIFY `duration` FLOAT');
+    print "Done.\n" unless $quiet;
 }
 
 

@@ -10,6 +10,7 @@
  - fixed: subscription group in CS edit has broken hover help
  - fixed: profile photos don't obey max image size
  - fixed: Unable to communicate with Spectre under alternate locales
+ - fixed: Project Manager can't track non-integer durations
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney
