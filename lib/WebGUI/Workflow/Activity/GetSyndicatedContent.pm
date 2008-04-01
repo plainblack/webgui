@@ -69,48 +69,38 @@ See WebGUI::Workflow::Activity::execute() for details.
 =cut
 
 sub execute {
-	my $self = shift;
-	my $object = shift;
-	my $instance = shift;
-	unless (defined $instance) {
-		$self->session->errorHandler->error("Could not instanciate Workflow Instance in GetSyndicatedContent Activity");
-		return $self->ERROR;
-	}
+    my $self = shift;
+    my $object = shift;
+    my $instance = shift;
+    unless (defined $instance) {
+        $self->session->errorHandler->error("Could not instanciate Workflow Instance in GetSyndicatedContent Activity");
+        return $self->ERROR;
+    }
 
-	my @syndicatedUrls = @{$self->getSyndicatedUrls($instance)};
-	my @arrayCopy = @syndicatedUrls;	# copy we can delete elements from inside the foreach loop
-	my $time = time();
+    # start time to check for timeouts
+    my $time = time();
 
-    	foreach my $urls (@syndicatedUrls) {
-        	#Loop through the SyndicatedWobjects and split all the URLs they are syndicating off into
-        	#a separate array.
-        	my @urlsToSyndicate = split(/\s+/,$urls);
+    my @syndicatedUrls = @{$self->getSyndicatedUrls($instance)};
+    while (my $url = shift(@syndicatedUrls)) {
+        # Get RSS data, which will be stored in the cache
+        $self->session->errorHandler->info("GetSyndicatedContent workflow: Caching $url");
+        my $returnValue = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session, $url);
+        if (!defined $returnValue) {
+            $self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url, which usually indicates an improper URL, or a malformed document");
+            next;
+        }
+        # Check for timeout
+        last
+            if (time() - $time > 55);
+    }
 
-        	foreach my $url (@urlsToSyndicate) {
-			# We could timeout in here but I don't see a good way to handle that right now
-			# May need to fix this in the future.
-            		my $returnValue = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session, $url);
-			unless (defined $returnValue) {
-				$self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url, which usually indicates an improper URL, or a malformed document");
-				next;
-			}
-        	}
-		
-		# Delete this element from the array
-		splice(@arrayCopy,0,1);
-
-		# Check for timeout
-		last unless (time() - $time <= 60);
-    	}
-
-	# See if we're done
-	if (scalar(@arrayCopy) > 0) {
-		$instance->setScratch("syndicatedUrls", JSON::to_json(@arrayCopy));
-		return $self->WAITING;
-	}
-
-	$instance->deleteScratch("syndicatedUrls");
-	return $self->COMPLETE;
+    # if there are urls left, we need to process again
+    if (scalar(@syndicatedUrls) > 0) {
+        $instance->setScratch("syndicatedUrls", JSON::to_json(\@syndicatedUrls));
+        return $self->WAITING;
+    }
+    $instance->deleteScratch("syndicatedUrls");
+    return $self->COMPLETE;
 }
 
 #---------------------------------------------------------------------
@@ -126,24 +116,23 @@ A reference to the current webgui session
 =cut
 
 sub getSyndicatedUrls {
-	my $self = shift;
-	my $instance = shift;
-	my $syndicatedUrls = $instance->getScratch("syndicatedUrls");
-	
-	unless ($syndicatedUrls) { 
-		my $urls = $self->session->db->buildArrayRef("select 
-					   			distinct SyndicatedContent.rssUrl from SyndicatedContent 
-					   		left join 
-								asset on SyndicatedContent.assetId=asset.assetId 
-					   		where
-								asset.state='published'"
-		);
-		
-		$instance->setScratch("syndicatedUrls", JSON::to_json($urls));
-		return $urls;
-	}
+    my $self = shift;
+    my $instance = shift;
+    my $syndicatedUrls = $instance->getScratch("syndicatedUrls");
+    if ($syndicatedUrls) {
+        return JSON::from_json($syndicatedUrls);
+    }
 
-	return JSON::from_json($syndicatedUrls);
+    my $urls = [];
+    my $assets = WebGUI::Asset->getRoot($self->session)->getLineage(['descendants'], {
+        includeOnlyClasses => ['WebGUI::Asset::Wobject::SyndicatedContent'],
+        returnObjects   => 1,
+    });
+    foreach my $asset (@$assets) {
+        push @$urls, split(/\s+/, $asset->getRssUrl);
+    }
+    $instance->setScratch("syndicatedUrls", JSON::to_json($urls));
+    return $urls;
 }
 
 
