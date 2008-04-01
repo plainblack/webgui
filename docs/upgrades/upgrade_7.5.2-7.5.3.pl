@@ -408,8 +408,8 @@ sub migrateOldProduct {
 	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
 	# and here's our code
     ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
-    my $wobject   = $session->db->prepare('select * from commerceSalesTax');
-    my $sku       = $session->db->prepare('insert into tax (taxId, country, state, city, code, taxRate) VALUES (?,?,?,?,?,?)');
+    my $oldTax   = $session->db->prepare('select * from commerceSalesTax');
+    my $newTax   = $session->db->prepare('insert into tax (taxId, country, state, city, code, taxRate) VALUES (?,?,?,?,?,?)');
     my $rmWobject = 
     $oldTax->execute();
     while (my $oldTaxData = $oldTax->hashRef()) {
