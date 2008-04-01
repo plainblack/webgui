@@ -21,9 +21,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+clearRSSCache($session);
 finish($session); # this line required
 
 
@@ -33,6 +31,15 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+#-------------------------------------------------
+sub clearRSSCache {
+    my $session = shift;
+    print "\tClearing RSS feed cache..." unless $quiet;
+    my $cache = WebGUI::Cache->new($session, '', 'RSS');
+    $cache->flush;
+    print " Done.\n" unless $quiet;
+}
+
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------

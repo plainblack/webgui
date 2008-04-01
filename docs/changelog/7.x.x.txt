@@ -1,4 +1,5 @@
 7.4.31
+ - fixed: Syndicated Content picks wrong entries for interleaving
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney
