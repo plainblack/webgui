@@ -22,6 +22,8 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 clearRSSCache($session);
+addUserSessionExpiresIndex($session);
+
 finish($session); # this line required
 
 
@@ -37,6 +39,16 @@ sub clearRSSCache {
     print "\tClearing RSS feed cache..." unless $quiet;
     my $cache = WebGUI::Cache->new($session, '', 'RSS');
     $cache->flush;
+    print " Done.\n" unless $quiet;
+}
+
+
+sub addUserSessionExpiresIndex {
+    my $session = shift;
+    print "\tAdding index to userSession expires column..." unless $quiet;
+    $session->db->write(
+        "ALTER TABLE `userSession` ADD INDEX `expires` (`expires`)"
+    );
     print " Done.\n" unless $quiet;
 }
 

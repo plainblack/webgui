@@ -3,6 +3,7 @@
  - fixed: Syndicated Content URLs using macros not updated by caching workflow
  - fixed: Syndicated Content asset tries too hard to get URLs returning errors
  - fixed: Event related links truncated on dashes
+ - added: Database index on userSession.expires field to speed up workflows
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney
