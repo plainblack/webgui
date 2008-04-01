@@ -18,6 +18,7 @@
  - fixed: Non-Content managers unable to paste assets even with edit privaledges
  - use UTF8 JSON encoding and decoding universally
  - fixed: Import/Export of packages with international text is broken
+ - fixed: CS rating links are exposed to site spiders
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery
