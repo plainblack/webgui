@@ -2,6 +2,7 @@
  - fixed: Syndicated Content picks wrong entries for interleaving
  - fixed: Syndicated Content URLs using macros not updated by caching workflow
  - fixed: Syndicated Content asset tries too hard to get URLs returning errors
+ - fixed: Event related links truncated on dashes
 
 7.4.30
  - fix: Calendar's ical link adds extraneous baloney

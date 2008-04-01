@@ -1155,7 +1155,7 @@ sub getRelatedLinks {
     my @links;
     my %found_links;
     # This is a regex stolen from Regexp::Common to match urls
-    for my $link ($self->get("relatedLinks") =~ m{\w+://[a-zA-Z0-9\\-_.!~*'():\@&=+\$,/?]+}g) {
+    for my $link ($self->get("relatedLinks") =~ m{\w+://[a-zA-Z0-9\-_.!~*'():\@&=+\$,/?]+}g) {
         push @links, $link
             unless $found_links{$link};
         $found_links{$link}++;
