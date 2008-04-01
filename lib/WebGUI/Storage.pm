@@ -455,11 +455,10 @@ sub delete {
 	
 	my $path = $self->getPath;
 	if ($path) {
-		rmtree($path) if ($path);
+		rmtree($path) if (-d $path);
 		foreach my $subDir ($self->{_part1}.'/'.$self->{_part2}, $self->{_part1}) {
 			my $uDir = $self->session->config->get('uploadsPath') . '/' . $subDir;
-			opendir my ($DH), $uDir;
-			if (defined $DH) {
+			if (opendir my $DH, $uDir) {
 				my @dirs = grep { !/^\.+$/ } readdir($DH);
 				if (scalar @dirs == 0) {
 					rmtree($uDir);
@@ -657,14 +656,16 @@ The name of the file to get the icon for.
 =cut
 
 sub getFileIconUrl {
-	my $self = shift;
-	my $filename = shift;
-	my $extension = $self->getFileExtension($filename);	
-	my $path = $self->session->config->get("extrasPath").'/fileIcons/'.$extension.".gif";
-	if (-e $path && $extension) {
-		return $self->session->url->extras("fileIcons/".$extension.".gif");
-	}
-	return $self->session->url->extras("fileIcons/unknown.gif");
+    my $self = shift;
+    my $filename = shift;
+    my $extension = $self->getFileExtension($filename);	
+    if ($extension) {
+        my $path = $self->session->config->get("extrasPath").'/fileIcons/'.$extension.".gif";
+        if (-e $path) {
+            return $self->session->url->extras("fileIcons/".$extension.".gif");
+        }
+    }
+    return $self->session->url->extras("fileIcons/unknown.gif");
 }
 
 
@@ -929,6 +930,7 @@ sub tar {
 	my $self = shift;
 	my $filename = shift;
 	my $temp = shift || WebGUI::Storage->createTemp($self->session);
+    my $originalDir = Cwd::cwd();
     chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
 	my @files = ();
 	find(sub { push(@files, $File::Find::name)}, ".");
@@ -940,6 +942,7 @@ sub tar {
 	} else {
 		Archive::Tar->create_archive($temp->getPath($filename),1,@files);
 	}
+    chdir $originalDir;
 	return $temp;
 }
 
