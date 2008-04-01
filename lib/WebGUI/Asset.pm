@@ -132,6 +132,7 @@ sub assetDbProperties {
     my $sql = "select * from asset";
     my $where = " where asset.assetId=?";
     my $placeHolders = [$assetId];
+    $class->loadModule($session, $className);
     foreach my $definition (@{$className->definition($session)}) {
         $sql .= ",".$definition->{tableName};
         $where .= " and (asset.assetId=".$definition->{tableName}.".assetId and ".$definition->{tableName}.".revisionDate=".$revisionDate.")";
@@ -1363,12 +1364,12 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 
 sub loadModule {
     my ($class, $session, $className) = @_;
-	(my $module = $className . '.pm') =~ s{::|'}{/}g;
+    (my $module = $className . '.pm') =~ s{::|'}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
     }
-   	$session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
-	return;
+    $session->errorHandler->error("Couldn't compile asset package: ".$className.". Root cause: ".$@);
+    return;
 }
 
 #-------------------------------------------------------------------

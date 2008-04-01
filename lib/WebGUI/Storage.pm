@@ -966,9 +966,11 @@ sub untar {
     my $self = shift;
     my $filename = shift;
     my $temp = shift || WebGUI::Storage->createTemp($self->session);
+    my $originalDir = Cwd::cwd();
     chdir $temp->getPath;
     Archive::Tar->extract_archive($self->getPath($filename),1);
     $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+    chdir $originalDir;
     return $temp;
 }
 
