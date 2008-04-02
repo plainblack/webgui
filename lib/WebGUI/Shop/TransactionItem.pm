@@ -215,24 +215,27 @@ sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
     if (exists $newProperties->{item}) {
-        my $item = $newProperties->{item};
+        my $item = $newProperties->{ item };
         my $sku = $item->getSku;
-        $newProperties->{options} = $sku->getOptions;
-        $newProperties->{assetId} = $sku->getId;       
-        $newProperties->{price} = $sku->getPrice;       
-        $newProperties->{configuredTitle} = $sku->getConfiguredTitle;
+        $newProperties->{ options           } = $sku->getOptions;
+        $newProperties->{ assetId           } = $sku->getId;       
+        $newProperties->{ price             } = $sku->getPrice;       
+        $newProperties->{ configuredTitle   } = $sku->getConfiguredTitle;
+        $newProperties->{ isRecurring       } = $sku->isRecurring;
+        $newProperties->{ recurInterval     } = $sku->getRecurInterval if $sku->isRecurring;
+
         my $address = $item->getShippingAddress;
-        $newProperties->{shippingAddressId} = $address->getId;
-        $newProperties->{shippingAddressName} = $address->get('name');
-        $newProperties->{shippingAddress1} = $address->get('address1');
-        $newProperties->{shippingAddress2} = $address->get('address2');
-        $newProperties->{shippingAddress3} = $address->get('address3');
-        $newProperties->{shippingCity} = $address->get('city');
-        $newProperties->{shippingState} = $address->get('state');
-        $newProperties->{shippingCountry} = $address->get('country');
-        $newProperties->{shippingCode} = $address->get('code');
-        $newProperties->{shippingPhoneNumber} = $address->get('phoneNumber');
-        $newProperties->{quantity} = $item->get('quantity');
+        $newProperties->{ shippingAddressId     } = $address->getId;
+        $newProperties->{ shippingAddressName   } = $address->get('name');
+        $newProperties->{ shippingAddress1      } = $address->get('address1');
+        $newProperties->{ shippingAddress2      } = $address->get('address2');
+        $newProperties->{ shippingAddress3      } = $address->get('address3');
+        $newProperties->{ shippingCity          } = $address->get('city');
+        $newProperties->{ shippingState         } = $address->get('state');
+        $newProperties->{ shippingCountry       } = $address->get('country');
+        $newProperties->{ shippingCode          } = $address->get('code');
+        $newProperties->{ shippingPhoneNumber   } = $address->get('phoneNumber');
+        $newProperties->{ quantity              } = $item->get('quantity');
     }
     my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber shippingStatus
         shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState

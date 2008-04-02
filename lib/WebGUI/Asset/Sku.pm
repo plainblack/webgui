@@ -253,6 +253,19 @@ sub getQuantityAvailable {
 
 #-------------------------------------------------------------------
 
+=head2 getRecurInterval ( )
+
+Returns the recur interval, which must be one of the following: 'Weekly', 'BiWeekly', 'FourWeekly',
+'Monthly', 'Quarterly', 'HalfYearly' or 'Yearly'. Must be overriden by subclass if that is a recurring Sku.
+
+=cut
+
+sub getRecurInterval {
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getTaxRate ( )
 
 Returns undef unless the "Override tax rate?" switch is set to yes. If it is, then it returns the value of the "Tax Rate Override" field.
