@@ -37,6 +37,7 @@ These subroutines are available from this package:
 readonly session => my %session;
 private properties => my %properties;
 private error => my %error;
+private itemCache => my %itemCache;
 
 #-------------------------------------------------------------------
 
@@ -114,6 +115,7 @@ sub delete {
     $self->empty;
     $self->session->db->write("delete from cart where cartId=?",[$self->getId]);
     undef $self;
+    %itemCache{ref $self} = {};
     return undef;
 }
 
@@ -129,7 +131,8 @@ sub empty {
     my ($self) = @_;
     foreach my $item (@{$self->getItems}) {
         $item->remove;
-    } 
+    }
+    %itemCache{ref $self} = {};
 }
 
 #-------------------------------------------------------------------
@@ -238,7 +241,13 @@ sub getItem {
     unless (defined $itemId && $itemId =~ m/^[A-Za-z0-9_-]{22}$/) {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
-    return WebGUI::Shop::CartItem->new($self, $itemId);
+    my $id = ref $self;
+    if (exists $itemCache{$id}{$itemId}) {
+        return $itemCache{$id}{$itemId};
+    }
+    my $item = WebGUI::Shop::CartItem->new($self, $itemId);
+    $itemCache{$id}{$itemId} = $item;
+    return $item;
 }
 
 #-------------------------------------------------------------------
@@ -253,6 +262,28 @@ sub getItems {
     my ($self) = @_;
     my @itemsObjects = ();
     my $items = $self->session->db->read("select itemId from cartItem where cartId=?",[$self->getId]);
+    while (my ($itemId) = $items->array) {
+        push(@itemsObjects, $self->getItem($itemId));
+    }
+    return \@itemsObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getItemsByAssetId ( assetIds )
+
+Returns an array reference of WebGUI::Asset::Sku objects that have a specific asset id that are in the cart.
+
+=head3 assetIds
+
+An array reference of assetIds to look for.
+
+=cut
+
+sub getItemsByAssetId {
+    my ($self, $assetIds) = @_;
+    my @itemsObjects = ();
+    my $items = $self->session->db->read("select itemId from cartItem where cartId=? and assetId in (".$self->session->db->quoteAndJoin($assetIds).")",[$self->getId]);
     while (my ($itemId) = $items->array) {
         push(@itemsObjects, $self->getItem($itemId));
     }
@@ -461,6 +492,7 @@ Remove an item from the cart and then display the cart again.
 sub www_removeItem {
     my $self = shift;
     my $item = $self->getItem($self->session->form->get("itemId"))->remove;
+    delete $itemCache{ref $self}{$item->getId};
     return $self->www_view;
 }
 

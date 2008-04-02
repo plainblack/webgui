@@ -2325,6 +2325,7 @@ sub www_add {
 	}
 	my %properties = (
 		%prototypeProperties,
+		parentId => $self->getId,
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerUserId => $self->get("ownerUserId"),

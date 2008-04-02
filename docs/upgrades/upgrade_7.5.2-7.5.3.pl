@@ -116,6 +116,12 @@ sub upgradeEMS {
 		ribbonAssetId varchar(22) binary not null,
 		primary key (badgeId,ribbonAssetId)
 		)");
+	$db->write("create table EMSBadgeGroup (
+		badgeGroupId varchar(22) binary not null primary key,
+		emsAssetId varchar(22) binary not null,
+		name varchar(100),
+		badgeList text
+		)");
 	$db->write("create table EMSBadge (
 		assetId varchar(22) binary not null,
 		revisionDate bigint not null,
@@ -132,7 +138,8 @@ sub upgradeEMS {
 		duration float not null default 1.0,
 		eventNumber int,
 		location varchar(100),
-		relatedBadges mediumtext,
+		relatedBadgeGroups mediumtext,
+		relatedRibbons mediumtext,
 		primary key (assetId, revisionDate)
 		)");
 	$db->write("create table EMSToken (
@@ -144,6 +151,7 @@ sub upgradeEMS {
 	$db->write("create table EMSRibbon (
 		assetId varchar(22) binary not null,
 		revisionDate bigint not null,
+		percentageDiscount float not null default 10.0,
 		price float not null default 0.00,
 		primary key (assetId, revisionDate)
 		)");

@@ -109,6 +109,71 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getBadges ()
+
+Returns an array reference of badge objects.
+
+=cut
+
+sub getBadges {
+	my $self = shift;
+	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSBadge']});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getBadgeGroups ()
+
+Returns a hash reference of id,name pairs of badge groups.
+
+=cut
+
+sub getBadgeGroups {
+	my $self = shift;
+	return $self->session->db->buildHashRef("select badgeGroupId,name from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRibbons ()
+
+Returns an array reference of ribbon objects.
+
+=cut
+
+sub getRibbons {
+	my $self = shift;
+	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTickets ()
+
+Returns an array reference of ticket objects.
+
+=cut
+
+sub getTickets {
+	my $self = shift;
+	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSTicket']});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTokens ()
+
+Returns an array reference of badge objects.
+
+=cut
+
+sub getTokens {
+	my $self = shift;
+	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']});
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -181,9 +246,12 @@ sub view {
     my $output = q| 
 
 <div class=" yui-skin-sam">
-	<p><a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
+	<p>
+	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
 	&bull; <a href="|.$self->getUrl('func=buildBadge').q|">View Events</a>
-	&bull; <a href="|.$self->getUrl('shop=cart').q|">View Cart</a></p>
+	&bull; <a href="|.$self->getUrl('shop=cart').q|">View Cart</a>
+	&bull; <a href="|.$self->getUrl('func=manageBadgeGroups').q|">Badge Groups</a>
+	</p>
 	<p>|.$self->get('badgeInstructions').q|</p>
     <div id="emsBadgePaging"></div>
     <div id="emsBadgeList"></div>
@@ -394,7 +462,6 @@ sub www_buildBadge {
 			});
 	}
 	$var{otherBadgesInCart} = \@otherBadges;
-	#return JSON->new->pretty->encode(\@otherBadges);
 
 	# render
 	return $self->processStyle($self->processTemplate(\%var,$self->get('badgeBuilderTemplateId')));
@@ -410,6 +477,8 @@ Deletes a badge group.
 
 sub www_deleteBadgeGroup {
 	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	$self->session->db->deleteRow("EMSBadgeGroup","badgeGroupId",$self->session->form->get("badgeGroupId"));
 	return $self->www_manageBadgeGroups;
 }
 
@@ -424,29 +493,33 @@ Displays an edit screen for a badge group.
 
 sub www_editBadgeGroup {
 	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my ($form, $db) = $self->session->quick(qw(form db));
 	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
 	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
+	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::decode_json($badgeGroup->{badgeList}) : [];
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
 	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
 	$f->text(
 		name		=> 'name',	
 		value		=> $badgeGroup->{name},
-		label		=>,
-		hoverHelp	=>,
+		label		=> $i18n->get('badge group name'),
+		hoverHelp	=> $i18n->get('badge group name help'),
 		);
 	$f->checkList(
 		name		=> 'badgeList',
-		value		=> JSON::decode_json($badgeGroup->{badgeList}),
+		value		=> $badgeGroup->{badgeList},
 		options		=> $db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData
 							using (assetId) where asset.parentId=? and assetData.revisionDate=
-							(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)",
-							[$self->getId]),
-		label		=> ,
-		hoverHelp	=>,
-		);	
-	return $self->processStyle($f->print);
+							(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
+							and asset.className='WebGUI::Asset::Sku::EMSBadge'", [$self->getId]),
+		vertical	=> 1,
+		label		=> $i18n->get('badge list'),
+		hoverHelp	=> $i18n->get('badge list help'),
+		);
+	$f->submit;
+	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->print);
 }
 
 
@@ -460,6 +533,16 @@ Saves a badge group.
 
 sub www_editBadgeGroupSave {
 	my $self = shift;
+	return $self->session->privilege->insufficient() unless $self->canEdit;
+	my $form = $self->session->form;
+	my $id = $form->get("badgeGroupId") || "new";
+	my @badgeList = $form->get("badgeList",'checkList');
+	$self->session->db->setRow("EMSBadgeGroup","badgeGroupId",{
+		badgeGroupId	=> $id,
+		emsAssetId		=> $self->getId,
+		name			=> $form->get('name'),
+		badgeList		=> JSON::encode_json(\@badgeList),
+		});
 	return $self->www_manageBadgeGroups;
 }
 
@@ -478,7 +561,7 @@ sub www_getBadgesAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
-	foreach my $badge (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSBadge']})}) {
+	foreach my $badge (@{$self->getBadges}) {
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
 			description			=> $badge->get('description'),
@@ -643,7 +726,7 @@ sub www_getRibbonsAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
-	foreach my $ribbon (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSRibbon']})}) {
+	foreach my $ribbon (@{$self->getRibbons}) {
 		push(@{$results{records}}, {
 			title 				=> $ribbon->getTitle,
 			description			=> $ribbon->get('description'),
@@ -754,7 +837,7 @@ sub www_getTokensAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
-	foreach my $token (@{$self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']})}) {
+	foreach my $token (@{$self->getTokens}) {
 		push(@{$results{records}}, {
 			title 				=> $token->getTitle,
 			description			=> $token->get('description'),
@@ -796,6 +879,22 @@ Displays a list of badge groups.
 
 sub www_manageBadgeGroups {
 	my $self = shift;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+	my $i18n = WebGUI::International->new($session, 'Asset_EventManagementSystem');
+	my $output = '<h1>'.$i18n->get('badge groups')
+		.q|</h1><p><a href="|.$self->getUrl("func=editBadgeGroup").q|">|.$i18n->get('add a badge group').q|</a>
+		&bull; <a href="|.$self->getUrl.q|">|.$i18n->get('view badges').q|</a>
+		&bull; <a href="|.$self->getUrl("func=buildBadge").q|">|.$i18n->get('view tickets').q|</a>
+		</p>|;
+	my $groups = $session->db->read("select badgeGroupId,name from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
+	my $badgeGroups = $self->getBadgeGroups;
+	foreach my $id (keys %{$badgeGroups}) {
+		$output .= q|<div>[<a href="|.$self->getUrl("func=deleteBadgeGroup;badgeGroupId=".$id).q|">|.$i18n->get('delete').q|</a>
+			/ <a href="|.$self->getUrl("func=editBadgeGroup;badgeGroupId=".$id).q|">|.$i18n->get('edit').q|</a>]
+			|.$badgeGroups->{$id}.q|</div>|;
+	}
+	return $self->processStyle($output);
 }
 
 #-------------------------------------------------------------------

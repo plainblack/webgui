@@ -28,7 +28,7 @@ These subroutines are available from this package:
 
 readonly cart => my %cart;
 private properties => my %properties;
-
+private skuCache => my %skuCache;
 
 #-------------------------------------------------------------------
 
@@ -174,7 +174,15 @@ Returns an instanciated WebGUI::Asset::Sku object for this cart item.
 
 sub getSku {
     my ($self) = @_;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
+    my $id = ref $self;
+    my $asset = '';
+    if (exists $skuCache{$id}{$self->get("assetId")}) {
+        $asset = $skuCache{$id}{$self->get("assetId")};
+    }
+    else {
+        $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
+        $skuCache{$id}{$self->get("assetId")} = $asset;
+    }
     $asset->applyOptions($self->get("options"));
     return $asset;
 }

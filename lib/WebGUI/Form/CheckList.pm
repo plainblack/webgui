@@ -134,7 +134,7 @@ sub toHtml {
     tie my %options, 'Tie::IxHash', $self->orderedHash();
 	foreach my $key (keys %options) {
 	$i++;
-        my $checked = (grep { $_ eq $key } @{ $self->get('value') })
+        my $checked = (grep { $_ eq $key } @{ $self->correctValues($self->get('value')) })
                     ? 1
                     : 0
                     ;

@@ -2,14 +2,74 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = {
+	'percentage discount' => {
+		message 	=> q|Percentage Discount|,
+		lastUpdated	=> 0,
+		context		=> q|a ribbon property label|,
+	},
+	
+	'percentage discount help' => {
+		message 	=> q|What percentage discount will be applied to the tickets if the user purchases this ribbon?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ribbon property label|,
+	},
+		
+	'badge group name' => {
+		message 	=> q|Badge Group Name|,
+		lastUpdated	=> 0,
+		context		=> q|a badge group property label|,
+	},
+	
+	'badge group name help' => {
+		message 	=> q|Enter a name to group these badges under.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a badge group property label|,
+	},
+		
+	'badge list' => {
+		message 	=> q|Badge List|,
+		lastUpdated	=> 0,
+		context		=> q|a badge group property label|,
+	},
+	
+	'badge list help' => {
+		message 	=> q|Select the badges that belong to this group.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a badge group property label|,
+	},
+		
+	'badge groups' => {
+		message 	=> q|Badge Groups|,
+		lastUpdated	=> 0,
+		context		=> q|a header label|,
+	},
+	
 	'hours' => {
 		message 	=> q|Hours|,
+		lastUpdated	=> 0,
+		context		=> q|subtext for the duration form field|,
+	},
+	
+	'add a badge group' => {
+		message 	=> q|Add A Badge Group|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
 	
 	'view cart' => {
 		message 	=> q|View Cart|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'view tickets' => {
+		message 	=> q|View Tickets|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'view badges' => {
+		message 	=> q|View Badges|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
@@ -296,16 +356,28 @@ our $I18N = {
 		context		=> q|a button on the add badge to cart screen|,
 	},
 
-	'related badges' => {
-		message 	=> q|Related Badges|,
+	'related badge groups' => {
+		message 	=> q|Related Badge Groups|,
 		lastUpdated	=> 0,
-		context		=> q|a property label|,
+		context		=> q|a ticket property label|,
 	},
 	
-	'related badges help' => {
-		message 	=> q|Check the badges that can act as a prerequisite to being able to attend this event.|,
+	'related badge groups help' => {
+		message 	=> q|Check the badge groups that can act as a prerequisite to being able to attend this event. If none are checked, then any badge will do.|,
 		lastUpdated	=> 0,
-		context		=> q|help for a property label|,
+		context		=> q|help for a ticket property label|,
+	},
+	
+	'related ribbons' => {
+		message 	=> q|Related Ribbons|,
+		lastUpdated	=> 0,
+		context		=> q|a ribbon ticket label|,
+	},
+	
+	'related ribbons help' => {
+		message 	=> q|Check the ribbons that can provide a discount for this ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ticket property label|,
 	},
 	
 	'time zone' => {

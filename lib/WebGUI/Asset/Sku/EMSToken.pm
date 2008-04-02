@@ -191,6 +191,21 @@ sub www_addToCart {
 
 #-------------------------------------------------------------------
 
+=head2 www_delete
+
+Override to return to appropriate page.
+
+=cut
+
+sub www_delete {
+	my ($self) = @_;
+	$self->SUPER::www_delete;
+	return $self->getParent->www_buildBadge(undef,'tokens');
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_edit ()
 
 Displays the edit form.

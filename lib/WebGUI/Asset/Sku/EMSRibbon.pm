@@ -63,6 +63,13 @@ sub definition {
 			label           => $i18n->get("price"),
 			hoverHelp       => $i18n->get("price help"),
 			},
+		percentageDiscount => {
+			tab             => "shop",
+			fieldType       => "float",
+			defaultValue    => 10.0,
+			label           => $i18n->get("percentage discount"),
+			hoverHelp       => $i18n->get("percentage discount help"),
+			},
 	    );
 	push(@{$definition}, {
 		assetName           => $i18n->get('ems ribbon'),
@@ -191,6 +198,21 @@ sub www_addToCart {
 	$self->addToCart({badgeId=>$badgeId});
 	return $self->getParent->www_buildBadge($badgeId);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_delete
+
+Override to return to appropriate page.
+
+=cut
+
+sub www_delete {
+	my ($self) = @_;
+	$self->SUPER::www_delete;
+	return $self->getParent->www_buildBadge(undef,'ribbons');
+}
+
 
 #-------------------------------------------------------------------
 

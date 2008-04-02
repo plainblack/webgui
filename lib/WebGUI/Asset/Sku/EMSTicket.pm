@@ -19,7 +19,6 @@ use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
 
 
-
 =head1 NAME
 
 Package WebGUI::Asset::Sku::EMSTicket
@@ -86,8 +85,8 @@ sub definition {
 			},
 		eventNumber => {
 			tab             => "properties",
-			fieldType       => "integer",
-			defaultValue    => $session->db->quickScalar("select max(eventNumber)+1 from EMSTicket"),
+			fieldType		=> "integer",
+			customDrawMethod=> 'drawEventNumberField',
 			label           => $i18n->get("event number"),
 			hoverHelp       => $i18n->get("event number help"),
 			},
@@ -107,19 +106,25 @@ sub definition {
 			hoverHelp       => $i18n->get("duration help"),
 			},
 		location => {
+			fieldType		=> "combo",
 			tab             => "properties",
-			fieldType       => "combo",
-			options			=> $session->db->buildHashRef("select distinct(location) from EMSTicket order by location"),
+			customDrawMethod=> 'drawLocationField',
 			label           => $i18n->get("location"),
 			hoverHelp       => $i18n->get("location help"),
 			},
-		relatedBadges => {
+		relatedBadgeGroups => {
 			tab             => "properties",
-			fieldType       => "checkList",
-			options			=> {},
-			defaultValue    => undef,
-			label           => $i18n->get("related badges"),
-			hoverHelp       => $i18n->get("related badges help"),
+			fieldType		=> "checkList",
+			customDrawMethod=> 'drawRelatedBadgeGroupsField',
+			label           => $i18n->get("related badge groups"),
+			hoverHelp       => $i18n->get("related badge groups help"),
+			},
+		relatedRibbons => {
+			tab             => "properties",
+			fieldType		=> "checkList",
+			customDrawMethod=> 'drawRelatedRibbonsField',
+			label           => $i18n->get("related ribbons"),
+			hoverHelp       => $i18n->get("related ribbons help"),
 			},
 	    );
 	push(@{$definition}, {
@@ -133,6 +138,83 @@ sub definition {
 	return $class->SUPER::definition($session, $definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 drawEventNumberField ()
+
+Draws the field for the eventNumber property.
+
+=cut
+
+sub drawEventNumberField {
+	my ($self, $params) = @_;
+	my $default = $self->session->db->quickScalar("select max(eventNumber)+1 from EMSTicket left join asset using (assetId)
+		where parentId=?",[$self->get('parentId')]);
+	return WebGUI::Form::integer($self->session, {
+		name			=> $params->{name},
+		value			=> $self->get($params->{name}),
+		defaultValue	=> $default,
+		});
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawLocationField ()
+
+Draws the field for the location property.
+
+=cut
+
+sub drawLocationField {
+	my ($self, $params) = @_;
+	my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
+		where parentId=? order by location",[$self->get('parentId')]);
+	return WebGUI::Form::combo($self->session, {
+		name	=> $params->{name},
+		value	=> $self->get($params->{name}),
+		options	=> $options,
+		});
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawRelatedBadgeGroupsField ()
+
+Draws the field for the relatedBadgeGroups property.
+
+=cut
+
+sub drawRelatedBadgeGroupsField {
+	my ($self, $params) = @_;
+	return WebGUI::Form::checkList($self->session, {
+		name		=> $params->{name},
+		value		=> $self->get($params->{name}),
+		vertical	=> 1,
+		options		=> $self->getParent->getBadgeGroups,
+		});
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawRelatedRibbonsField ()
+
+Draws the field for the relatedRibbons property.
+
+=cut
+
+sub drawRelatedRibbonsField {
+	my ($self, $params) = @_;
+	my %ribbons = ();
+	foreach my $ribbon (@{$self->getParent->getRibbons}) {
+		$ribbons{$ribbon->getId} = $ribbon->getTitle;
+	}
+	return WebGUI::Form::checkList($self->session, {
+		name		=> $params->{name},
+		value		=> $self->get($params->{name}),
+		vertical	=> 1,
+		options		=> \%ribbons,
+		});
+}
 
 #-------------------------------------------------------------------
 
@@ -164,13 +246,20 @@ sub getMaxAllowedInCart {
 
 =head2 getPrice
 
-Returns the value of the price field
+Returns the value of the price field, after applying ribbon discounts.
 
 =cut
 
 sub getPrice {
     my $self = shift;
-    return $self->get("price");
+	my @ribbonIds = split("\n", $self->get('relatedRibbons'));
+	my $price = $self->get("price");
+	foreach my $item (@{$self->getCart->getItemsByAssetId(\@ribbonIds)}) {
+		my $ribbon = $item->getSku;
+		$price -= ($price * $ribbon->get('percentageDiscount') / 100);
+		last;
+	}
+    return $price;
 }
 
 #-------------------------------------------------------------------
@@ -295,6 +384,21 @@ sub www_addToCart {
 	$self->addToCart({badgeId=>$badgeId});
 	return $self->getParent->www_buildBadge($badgeId);
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_delete
+
+Override to return to appropriate page.
+
+=cut
+
+sub www_delete {
+	my ($self) = @_;
+	$self->SUPER::www_delete;
+	return $self->getParent->www_buildBadge(undef,'tickets');
+}
+
 
 #-------------------------------------------------------------------
 
