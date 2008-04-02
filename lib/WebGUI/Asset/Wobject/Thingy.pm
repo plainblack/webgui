@@ -1159,6 +1159,10 @@ sub www_editThing {
     $tab->raw('var hasSize = {'.join(", ",map {'"'.$_.'": true'} @hasSize).'};');
     $tab->raw('var hasVertical = {'.join(", ",map {'"'.$_.'": true'} @hasVertical).'};');
     $tab->raw('var hasValues = {'.join(", ",map {'"'.$_.'": true'} @hasValues).'};');
+    if ($session->form->process("thingId") eq 'new'){
+        $tab->raw("var newThingId = '$thingId';\n");
+        $tab->raw("YAHOO.util.Event.onDOMReady(setCancelButton);\n");
+    }
     $tab->raw("</script>");
 
     $tab->text(
@@ -2092,6 +2096,7 @@ sub www_manage {
     
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
+    $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
     #Get things in this Thingy
     $things = $self->session->db->read('select thingId, label, defaultView from Thingy_things '

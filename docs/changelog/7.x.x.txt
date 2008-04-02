@@ -20,6 +20,7 @@
  - fixed: Import/Export of packages with international text is broken
  - fixed: CS rating links are exposed to site spiders
  - improved behavior of CS mail message filtering
+ - fixed: Thingy: "cancel" -- cannot cancel when adding a thing
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery

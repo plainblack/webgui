@@ -1,3 +1,14 @@
+function setCancelButton () {
+    var cancelButtons = YAHOO.util.Dom.getElementsByClassName('backwardButton','input','application_workarea');
+    function deleteTempThing () {
+	window.location.href = "?func=deleteThingConfirm;thingId="+newThingId;
+    }
+    for (var i = cancelButtons.length; i--; ) {
+        cancelButtons[i].onclick = deleteTempThing;
+    }
+}
+
+
 function initOptionalFields(prefix,fieldId) {
 	
 	var fieldInThing_module_rendered;
