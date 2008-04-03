@@ -12,10 +12,10 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * WebGUI 7.5.6 uses a Unicode database connection, but this can cause problems
    with old data stored in an erroneous format.  The 7.5.6 upgrade has been
-   adjusted to compensate for this, but users who have already upgraded will
-   need to repair the data separately, as any international text added after
-   that point will be stored in the correct format.  Doing the repair on the
-   correct data will corrupt it.  If you have already upgraded, see
+   adjusted to compensate for this.  If you are upgrading from prior to 7.5.6,
+   the data should be repaired automatically.  However, if you had already upgraded
+   past 7.5.6, there is no automated way to resolve the differences in the data.
+   For information on how to resolve this if you have already upgraded, see
         http://www.webgui.org/bugs/tracker/charset-db-connection
 
 7.5.4
