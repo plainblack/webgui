@@ -23,6 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 convertCacheToBinary($session);
+repairDBCharset($session);
 addLayoutOrderSetting( $session );
 installThingyAsset($session);
 
@@ -36,12 +37,66 @@ sub convertCacheToBinary {
     $session->db->write('DELETE FROM `cache`');
 }
 
-##-------------------------------------------------
-#sub exampleFunction {
-#	my $session = shift;
-#	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
-#	# and here's our code
-#}
+sub repairDBCharset {
+    my $session = shift;
+
+    print "\tRepairing erroneous UTF8 data.  This may take a long time... " unless $quiet;
+    # Bypassing normal connection to get default settings
+    my $dbh = DBI->connect( $session->config->get('dsn'), $session->config->get('dbuser'), $session->config->get('dbpass') );
+    my (undef, $connection_charset) = $dbh->selectrow_array("SHOW VARIABLES LIKE 'character_set_connection'");
+    $dbh->disconnect;
+
+    # Now use normal connection
+    $dbh = $session->db->dbh;
+
+    my $sth;
+    my @tables;
+    my @stmts;
+    # Get table list
+    $sth = $dbh->table_info(undef, undef, '%');
+    while (my $row = $sth->fetchrow_hashref) {
+        push @tables, $row->{TABLE_NAME};
+    }
+    $sth->finish;
+
+    for my $table (@tables) {
+        # Find table's default charset
+        my (undef, $create) = $dbh->selectrow_array('SHOW CREATE TABLE ' . $dbh->quote_identifier($table));
+        $create =~ s/.*\)//s;
+        my $table_charset;
+        if ($create =~ /CHARSET=(\S+)/) {
+            $table_charset = $1;
+        }
+        # Getting all columns, and looking at text
+        my $sth = $dbh->prepare("SHOW FULL COLUMNS FROM " . $dbh->quote_identifier($table));
+        $sth->execute;
+        while (my $row = $sth->fetchrow_hashref) {
+            if ($row->{Type} =~ /TEXT/i || $row->{Type} =~ /VARCHAR/i) {
+                # Perl was always sending UTF8, but MySQL may have been treating it like a different charser
+                # This lead to it converting it based on the connection, even if the table was UTF8
+                # First, we undo that conversion
+                push @stmts, sprintf("ALTER TABLE %s CHANGE %s %s %s CHARACTER SET $connection_charset", $dbh->quote_identifier($table), $dbh->quote_identifier($row->{Field}), $dbh->quote_identifier($row->{Field}), $row->{Type});
+                # We should now have the correct byte sequences, but if we do a direct convert to UTF8,
+                # MySQL will attept to convert it again.  Converting to binary first prevents this
+                push @stmts, sprintf("ALTER TABLE %s CHANGE %s %s %s CHARACTER SET binary", $dbh->quote_identifier($table), $dbh->quote_identifier($row->{Field}), $dbh->quote_identifier($row->{Field}), $row->{Type});
+                # Now we convert to UTF8, and it should be stored properly.  We're using a UTF8 connection,
+                # so everything should just work from here on
+                push @stmts, sprintf("ALTER TABLE %s CHANGE %s %s %s CHARACTER SET utf8", $dbh->quote_identifier($table), $dbh->quote_identifier($row->{Field}), $dbh->quote_identifier($row->{Field}), $row->{Type});
+            }
+        }
+        $sth->finish;
+        # We also want to make sure the table is set as UTF8
+        if ($table_charset ne 'utf8') {
+            push @stmts, 'ALTER TABLE ' . $dbh->quote_identifier($table) . ' DEFAULT CHARACTER SET = utf8';
+        }
+    }
+
+    for my $stmt (@stmts) {
+        $dbh->do($stmt);
+    }
+
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add a column to the Gallery

@@ -7,7 +7,18 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-7.5.1
+
+7.5.9
+--------------------------------------------------------------------
+ * WebGUI 7.5.6 uses a Unicode database connection, but this can cause problems
+   with old data stored in an erroneous format.  The 7.5.6 upgrade has been
+   adjusted to compensate for this, but users who have already upgraded will
+   need to repair the data separately, as any international text added after
+   that point will be stored in the correct format.  Doing the repair on the
+   correct data will corrupt it.  If you have already upgraded, see
+        http://www.webgui.org/bugs/tracker/charset-db-connection
+
+7.5.4
 --------------------------------------------------------------------
  * YUI has been upgraded to 2.5.0.  The resizable textarea implementation in
    WebGUI has been rewritten using YUI instead of the Ext library.  This has

@@ -1,7 +1,6 @@
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
  - fixed: Rich editor image uploader doesn't follow size limits
- - make sure all tables are using UTF-8
  - fixed: Poll question/answers with international text corrupted
  - fixed: Thingy: on demo sites the edit and delete icons in search results have wrong url's
  - fixed: Form::FieldType->getTypes should exclude Form::Slider base class (Yung Han Khoe)
@@ -70,6 +69,7 @@
  - fixed: events get start/end time even when none specified (also can offset start/end day)
  - fixed: event related links may not work with some group names
  - Use UTF8 for database connection when connecting to MySQL
+ - Convert all database tables to UTF8, repairing erroneous data
  - Internationalized Calendar templates
  - fixed: exporting as HTML leaks sessions for inaccessible assets, 
  - new YUI based date picker
