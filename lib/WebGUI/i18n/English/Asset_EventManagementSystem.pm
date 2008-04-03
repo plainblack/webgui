@@ -21,19 +21,7 @@ our $I18N = {
 	},
 	
 	'badge group name help' => {
-		message 	=> q|Enter a name to group these badges under.|,
-		lastUpdated	=> 0,
-		context		=> q|help for a badge group property label|,
-	},
-		
-	'badge list' => {
-		message 	=> q|Badge List|,
-		lastUpdated	=> 0,
-		context		=> q|a badge group property label|,
-	},
-	
-	'badge list help' => {
-		message 	=> q|Select the badges that belong to this group.|,
+		message 	=> q|Enter a name to be used to link badges with tickets under.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a badge group property label|,
 	},
@@ -362,8 +350,14 @@ our $I18N = {
 		context		=> q|a ticket property label|,
 	},
 	
-	'related badge groups help' => {
+	'related badge groups ticket help' => {
 		message 	=> q|Check the badge groups that can act as a prerequisite to being able to attend this event. If none are checked, then any badge will do.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ticket property label|,
+	},
+	
+	'related badge groups badge help' => {
+		message 	=> q|Check the badge groups that related to this badge, so that tickets can be assigned prerequisite badges.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a ticket property label|,
 	},

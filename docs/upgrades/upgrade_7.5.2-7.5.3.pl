@@ -119,14 +119,14 @@ sub upgradeEMS {
 	$db->write("create table EMSBadgeGroup (
 		badgeGroupId varchar(22) binary not null primary key,
 		emsAssetId varchar(22) binary not null,
-		name varchar(100),
-		badgeList text
+		name varchar(100)
 		)");
 	$db->write("create table EMSBadge (
 		assetId varchar(22) binary not null,
 		revisionDate bigint not null,
 		price float not null default 0.00,
 		seatsAvailable int not null default 100,
+		relatedBadgeGroups mediumtext,
 		primary key (assetId, revisionDate)
 		)");
 	$db->write("create table EMSTicket (

@@ -117,7 +117,7 @@ sub definition {
 			fieldType		=> "checkList",
 			customDrawMethod=> 'drawRelatedBadgeGroupsField',
 			label           => $i18n->get("related badge groups"),
-			hoverHelp       => $i18n->get("related badge groups help"),
+			hoverHelp       => $i18n->get("related badge groups ticket help"),
 			},
 		relatedRibbons => {
 			tab             => "properties",

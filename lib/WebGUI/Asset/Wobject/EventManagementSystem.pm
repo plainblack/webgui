@@ -427,8 +427,6 @@ sub www_buildBadge {
 	my $session = $self->session;
 	return $session->privilege->noAccess() unless $self->canView;
 	$badgeId = $session->form->get("badgeId") if ($badgeId eq "");
-	my $hasBadge = ($badgeId ne "");
-	$whichTab ||= "tickets";
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = (
 		%{$self->get},
@@ -437,9 +435,9 @@ sub www_buildBadge {
 		exportTicketsUrl	=> undef,
 		getTicketsUrl		=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
 		canEdit				=> $self->canEdit,
-		hasBadge			=> $hasBadge,
+		hasBadge			=> ($badgeId ne ""),
 		badgeId				=> $badgeId,
-		whichTab			=> $whichTab,
+		whichTab			=> $whichTab || "tickets",
 		addRibbonUrl		=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
 		getRibbonsUrl		=> $self->getUrl('func=getRibbonsAsJson'),
 		getTokensUrl		=> $self->getUrl('func=getTokensAsJson'),
@@ -507,17 +505,6 @@ sub www_editBadgeGroup {
 		label		=> $i18n->get('badge group name'),
 		hoverHelp	=> $i18n->get('badge group name help'),
 		);
-	$f->checkList(
-		name		=> 'badgeList',
-		value		=> $badgeGroup->{badgeList},
-		options		=> $db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData
-							using (assetId) where asset.parentId=? and assetData.revisionDate=
-							(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
-							and asset.className='WebGUI::Asset::Sku::EMSBadge'", [$self->getId]),
-		vertical	=> 1,
-		label		=> $i18n->get('badge list'),
-		hoverHelp	=> $i18n->get('badge list help'),
-		);
 	$f->submit;
 	return $self->processStyle('<h1>'.$i18n->get('badge groups').'</h1>'.$f->print);
 }
@@ -536,12 +523,10 @@ sub www_editBadgeGroupSave {
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	my $form = $self->session->form;
 	my $id = $form->get("badgeGroupId") || "new";
-	my @badgeList = $form->get("badgeList",'checkList');
 	$self->session->db->setRow("EMSBadgeGroup","badgeGroupId",{
 		badgeGroupId	=> $id,
 		emsAssetId		=> $self->getId,
 		name			=> $form->get('name'),
-		badgeList		=> JSON::encode_json(\@badgeList),
 		});
 	return $self->www_manageBadgeGroups;
 }
@@ -785,13 +770,57 @@ sub www_getTicketsAsJson {
 		@ids = $db->buildArray("select assetId from asset where parentId=? and className='WebGUI::Asset::Sku::EMSTicket'", [$self->getId]);
 	}
 	
+	# get badge's badge groups
+	my $badgeId = $form->get('badgeId');
+	my @badgeGroups = ();
+	if (defined $badgeId) {
+		my $assetId = $db->quickScalar("select badgeAssetId from EMSRegistrant where badgeId=?",[$badgeId]);
+		my $badge = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Sku::EMSBadge');
+		@badgeGroups = split("\n",$badge->get('relatedBadgeGroups')) if (defined $badge);
+	}
+	
 	# get assets
 	my $counter = 0;
+	my $totalTickets = scalar(@ids);
 	my @records = ();
 	foreach my $id (@ids) {
 		next unless ($counter >= $startIndex);
 		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
-		next unless defined $ticket;
+		
+		# skip borked tickets
+		unless (defined $ticket) {
+			$session->errorHandler->warn("EMSTicket $id couldn't be instanciated by EMS ".$self->getId.".");
+			$totalTickets--;
+			next;
+		}
+		
+		# skip tickets we can't view
+		unless ($ticket->canView) {
+			$totalTickets--;
+			next;
+		}
+		
+		# skip tickets not in our badge's badge groups
+		if (scalar(@badgeGroups) > 0 && $ticket->get('relatedBadgeGroups') ne '') { # skip check if it has no badge groups
+			my @groups = split("\n",$ticket->get('relatedBadgeGroups'));
+			my $found = 0;
+			BADGE: {
+				foreach my $a (@badgeGroups) {
+					foreach my $b (@groups) {
+						if ($a eq $b) {
+							$found = 1;
+							last BADGE;
+						}
+					}
+				}
+			}
+			unless ($found) {
+				$totalTickets--;
+				next;
+			}
+		}
+		
+		# publish the data for this ticket
 		my $date = WebGUI::DateTime->new($session, $ticket->get('startDate'));
 		push(@records, {
 			title 				=> $ticket->getTitle,
@@ -813,7 +842,7 @@ sub www_getTicketsAsJson {
 	
 	# build json
 	$results{records} 			= \@records;
-    $results{totalRecords} 		= scalar(@ids);
+    $results{totalRecords} 		= $totalTickets;
 	$results{recordsReturned} 	= scalar(@records);
     $results{'startIndex'}   	= $startIndex;
     $results{'sort'}       		= undef;

@@ -88,6 +88,13 @@ sub definition {
 			label           => $i18n->get("seats available"),
 			hoverHelp       => $i18n->get("seats available help"),
 			},
+		relatedBadgeGroups => {
+			tab             => "properties",
+			fieldType		=> "checkList",
+			customDrawMethod=> 'drawRelatedBadgeGroupsField',
+			label           => $i18n->get("related badge groups"),
+			hoverHelp       => $i18n->get("related badge groups badge help"),
+			},
 	    );
 	push(@{$definition}, {
 		assetName           => $i18n->get('ems badge'),
@@ -98,6 +105,24 @@ sub definition {
 		properties          => \%properties
 	    });
 	return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawRelatedBadgeGroupsField ()
+
+Draws the field for the relatedBadgeGroups property.
+
+=cut
+
+sub drawRelatedBadgeGroupsField {
+	my ($self, $params) = @_;
+	return WebGUI::Form::checkList($self->session, {
+		name		=> $params->{name},
+		value		=> $self->get($params->{name}),
+		vertical	=> 1,
+		options		=> $self->getParent->getBadgeGroups,
+		});
 }
 
 

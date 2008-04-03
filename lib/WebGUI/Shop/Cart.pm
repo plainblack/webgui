@@ -282,6 +282,7 @@ An array reference of assetIds to look for.
 
 sub getItemsByAssetId {
     my ($self, $assetIds) = @_;
+    return [] unless (scalar(@{$assetIds}) > 0);
     my @itemsObjects = ();
     my $items = $self->session->db->read("select itemId from cartItem where cartId=? and assetId in (".$self->session->db->quoteAndJoin($assetIds).")",[$self->getId]);
     while (my ($itemId) = $items->array) {
