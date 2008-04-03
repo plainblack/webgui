@@ -82,7 +82,7 @@ sub addPost {
 				$text = WebGUI::HTML::filter($text, "all");
 				$text = WebGUI::HTML::format($text, "text");
 			} 
-            else if ($part->type eq 'text/html') {
+            elsif ($part->type eq 'text/html') {
                 $text = WebGUI::HTML::cleanSegment($text);
             }
 			$content .= $text;
