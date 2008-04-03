@@ -254,11 +254,23 @@ sub getPrice {
     my $self = shift;
 	my @ribbonIds = split("\n", $self->get('relatedRibbons'));
 	my $price = $self->get("price");
-	foreach my $item (@{$self->getCart->getItemsByAssetId(\@ribbonIds)}) {
-		my $ribbon = $item->getSku;
-		$price -= ($price * $ribbon->get('percentageDiscount') / 100);
-		last;
+	my $discount = 0;
+	my $badgeId = $self->getOptions->{badgeId};
+	my $ribbonId = $self->session->db->quickScalar("select ribbonAssetId from EMSRegistrantRibbon where badgeId=? limit 1",[$badgeId]);
+	if (defined $ribbonId) {
+		my $ribbon = WebGUI::Asset->new($self->session,$ribbonId,'WebGUI::Asset::Sku::Ribbon');
+		$discount = $ribbon->get('percentageDiscount');
 	}
+	else {
+		foreach my $item (@{$self->getCart->getItemsByAssetId(\@ribbonIds)}) {
+			if ($item->get('options')->{badgeId} eq $badgeId) {
+				my $ribbon = $item->getSku;
+				$discount = $ribbon->get('percentageDiscount');
+				last;
+			}
+		}
+	}
+	$price -= ($price * $discount / 100);
     return $price;
 }
 
