@@ -437,8 +437,12 @@ sub migrateOldProduct {
     $fromWobject->finish;
     $toSku->finish;
     $rmWobject->finish;
+    $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
     ## Remove productNumber from Product;
+	$session->db->write("alter table Product drop column productNumber");
     ## Update config file, deleting Wobject::Product and adding Sku::Product
+    $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');
+    $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
     return;
 }
 

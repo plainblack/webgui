@@ -63,12 +63,12 @@ my $product2 = $root->addChild($properties2);
 diag ref $product2;
 
 $tag->commit;
+sleep 2;
 
 $tag = WebGUI::VersionTag->getWorking($session);
 
 my $product1a = $product1->addRevision({price => 11.11});
 
-sleep 1;
 $tag->commit;
 
 diag "Done.";
