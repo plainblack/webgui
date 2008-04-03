@@ -21,6 +21,7 @@
  - improved behavior of CS mail message filtering
  - fixed: Thingy: "cancel" -- cannot cancel when adding a thing
  - fixed: unable to respond to poll multiple times in same session
+ - fixed: packages try to restore owner
 
 7.5.8
  - moved Gallery utility methods to WebGUI::Utility::Gallery
