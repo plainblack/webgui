@@ -115,7 +115,7 @@ sub delete {
     $self->empty;
     $self->session->db->write("delete from cart where cartId=?",[$self->getId]);
     undef $self;
-    %itemCache{ref $self} = {};
+    $itemCache{ref $self} = {};
     return undef;
 }
 
@@ -132,7 +132,7 @@ sub empty {
     foreach my $item (@{$self->getItems}) {
         $item->remove;
     }
-    %itemCache{ref $self} = {};
+    $itemCache{ref $self} = {};
 }
 
 #-------------------------------------------------------------------
