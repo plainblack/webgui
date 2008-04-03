@@ -1833,7 +1833,8 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.  This creates a standalone asset with no parent.
+Constructor.  This creates a standalone asset with no parent.  It does not update the
+database.
 
 =head3 session
 

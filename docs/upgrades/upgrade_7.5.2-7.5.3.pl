@@ -412,21 +412,34 @@ sub addShippingDrivers {
 
 #-------------------------------------------------
 sub migrateOldProduct {
-    return;
 	my $session = shift;
 	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
 	# and here's our code
     ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
-    my $oldTax   = $session->db->prepare('select * from commerceSalesTax');
-    my $newTax   = $session->db->prepare('insert into tax (taxId, country, state, city, code, taxRate) VALUES (?,?,?,?,?,?)');
-    my $rmWobject = 
-    $oldTax->execute();
-    while (my $oldTaxData = $oldTax->hashRef()) {
-        $newTax->execute([$oldTaxData->{commerceSalesTaxId}, 'USA', $oldTaxData->{regionIdentifier}, '', '', $oldTaxData->{salesTax}]);
+    ##Have to change the className's in the db, too
+    ## Wobject description   -> Sku description
+    ## Wobject displayTitle  -> Sku displayTitle
+    ## Product productNumber -> Sku sku
+    ## asset className WebGUI::Asset::Wobject::Product -> WebGUI::Asset::Sku::Product
+    my $fromWobject   = $session->db->read('select w.assetId, w.revisionDate, w.description, w.displayTitle, p.productNumber from Product as p JOIN wobject as w on p.assetId=w.assetId and p.revisionDate=w.revisionDate');
+    my $toSku         = $session->db->prepare('insert into sku (assetId, revisionDate, sku, description, displayTitle) VALUES (?,?,?,?,?)');
+    my $rmWobject     = $session->db->prepare('delete from wobject where assetId=? and revisionDate=?');
+    while (my $product = $fromWobject->hashRef()) {
+        $toSku->execute([
+            $product->{assetId},
+            $product->{revisionDate},
+            $product->{productNumber},
+            $product->{description},
+            $product->{displayTitle},
+        ]);
+        $rmWobject->execute([$product->{assetId}, $product->{revisionDate}]);
     }
-    $oldTax->finish;
-    $newTax->finish;
-    ##Delete data from Wobject table.
+    $fromWobject->finish;
+    $toSku->finish;
+    $rmWobject->finish;
+    ## Remove productNumber from Product;
+    ## Update config file, deleting Wobject::Product and adding Sku::Product
+    return;
 }
 
 #-------------------------------------------------
