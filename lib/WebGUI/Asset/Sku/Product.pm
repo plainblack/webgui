@@ -156,6 +156,35 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteCollateral ( tableName, keyName, keyValue )
+
+Deletes a row of collateral data where keyName=keyValue.
+
+=head3 tableName
+
+The name of the table you wish to delete the data from.
+
+=head3 keyName
+
+The name of a column in the table. Is not checked for invalid input.
+
+=head3 keyValue
+
+Criteria (value) used to find the data to delete.
+
+=cut
+
+sub deleteCollateral {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $keyValue = shift;
+        $self->session->db->write("delete from $table where $keyName=".$self->session->db->quote($keyValue));
+	$self->updateHistory("deleted collateral item ".$keyName." ".$keyValue);
+}
+
+#-------------------------------------------------------------------
 sub duplicate {
     my $self = shift;
     my $newAsset = $self->SUPER::duplicate(@_);
@@ -186,6 +215,39 @@ sub duplicate {
     }
 
     return $newAsset;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getCollateral ( tableName, keyName, keyValue )
+
+Returns a hash reference containing a row of collateral data.
+
+=head3 tableName
+
+The name of the table you wish to retrieve the data from.
+
+=head3 keyName
+
+A name of a column in the table. Usually the primary key column.
+
+=head3 keyValue
+
+A string containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
+
+=cut
+
+sub getCollateral {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $keyValue = shift;
+	if ($keyValue eq "new" || $keyValue eq "") {
+		return {$keyName=>"new"};
+	} else {
+		return $self->session->db->quickHashRef("select * from $table where $keyName=".$self->session->db->quote($keyValue));
+	}
 }
 
 
@@ -258,6 +320,112 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
+=head2 moveCollateralDown ( tableName, keyName, keyValue [ , setName, setValue ] )
+
+Moves a collateral data item down one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+
+=head3 tableName
+
+A string indicating the table that contains the collateral data.
+
+=head3 keyName
+
+A string indicating the name of the column that uniquely identifies this collateral data item.
+
+=head3 keyValue
+
+An iid that uniquely identifies this collateral data item.
+
+=head3 setName
+
+By default this method assumes that the collateral will have an assetId in the table. However, since there is not always a assetId to separate one data set from another, you may specify another field to do that.
+
+=head3 setValue
+
+The value of the column defined by "setName" to select a data set from.
+
+=cut
+
+### NOTE: There is a redundant use of assetId in some of these statements on purpose to support
+### two different types of collateral data.
+
+sub moveCollateralDown {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $keyValue = shift;
+	my $setName = shift || "assetId";
+        my $setValue = shift;
+	unless (defined $setValue) {
+		$setValue = $self->get($setName);
+	}
+	$self->session->db->beginTransaction;
+        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
+        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." and sequenceNumber=$seq+1");
+        if ($id ne "") {
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($keyValue)." and $setName=" .$self->session->db->quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($id)." and $setName=" .$self->session->db->quote($setValue));
+         }
+	$self->session->db->commit;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 moveCollateralUp ( tableName, keyName, keyValue [ , setName, setValue ] )
+
+Moves a collateral data item up one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+
+=head3 tableName
+
+A string indicating the table that contains the collateral data.
+
+=head3 keyName
+
+A string indicating the name of the column that uniquely identifies this collateral data item.
+
+=head3 keyValue
+
+An id that uniquely identifies this collateral data item.
+
+=head3 setName
+
+By default this method assumes that the collateral will have a asset in the table. However, since there is not always a assetId to separate one data set from another, you may specify another field to do that.
+
+=head3 setValue
+
+The value of the column defined by "setName" to select a data set from.
+
+=cut
+
+### NOTE: There is a redundant use of assetId in some of these statements on purpose to support
+### two different types of collateral data.
+
+sub moveCollateralUp {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $keyValue = shift;
+        my $setName = shift || "assetId";
+        my $setValue = shift;
+	unless (defined $setValue) {
+		$setValue = $self->get($setName);
+	}
+	$self->session->db->beginTransaction;
+        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
+        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)
+		." and sequenceNumber=$seq-1");
+        if ($id ne "") {
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($keyValue)." and $setName="
+			.$self->session->db->quote($setValue));
+                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($id)." and $setName="
+			.$self->session->db->quote($setValue));
+        }
+	$self->session->db->commit;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -318,6 +486,138 @@ sub purgeRevision    {
     WebGUI::Storage->get($self->session,$self->get("warranty"))->delete if    ($self->get("warranty"));
     return $self->SUPER::purgeRevision;
 }
+
+#-------------------------------------------------------------------
+
+=head2 reorderCollateral ( tableName,keyName [,setName,setValue] )
+
+Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
+
+=head3 tableName
+
+The name of the table to resequence.
+
+=head3 keyName
+
+The key column name used to determine which data needs sorting within the table.
+
+=head3 setName
+
+Defaults to "assetId". This is used to define which data set to reorder.
+
+=head3 setValue
+
+Used to define which data set to reorder. Defaults to the value of setName (default "assetId", see above) in the wobject properties.
+
+=cut
+
+sub reorderCollateral {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $setName = shift || "assetId";
+	my $setValue = shift || $self->get($setName);
+	my $i = 1;
+        my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
+	my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
+        while (my ($id) = $sth->array) {
+		$sth2->execute([$i, $setValue, $id]);
+                $i++;
+        }
+	$sth2->finish;
+        $sth->finish;
+        $sth->finish;
+}
+
+
+#-----------------------------------------------------------------
+
+=head2 setCollateral ( tableName,keyName,properties [,useSequenceNumber,useAssetId,setName,setValue] )
+
+Performs and insert/update of collateral data for any wobject's collateral data. Returns the primary key value for that row of data.
+
+=head3 tableName
+
+The name of the table to insert the data.
+
+=head3 keyName
+
+The column name of the primary key in the table specified above.
+
+=head3 properties
+
+A hash reference containing the name/value pairs to be inserted into the database where the name is the column name. Note that the primary key should be specified in this list, and if it's value is "new" or null a new row will be created.
+
+=head3 useSequenceNumber
+
+If set to "1", a new sequenceNumber will be generated and inserted into the row. Note that this means you must have a sequenceNumber column in the table. Also note that this requires the presence of the assetId column. Defaults to "1".
+
+=head3 useAssetId
+
+If set to "1", the current assetId will be inserted into the table upon creation of a new row. Note that this means the table better have a assetId column. Defaults to "1".
+
+=head3 setName
+
+If this collateral data set is not grouped by assetId, but by another column then specify that column here. The useSequenceNumber parameter will then use this column name instead of assetId to generate the sequenceNumber.
+
+=head3 setValue
+
+If you've specified a setName you may also set a value for that set.  Defaults to the value for this id from the wobject properties.
+
+=cut
+
+sub setCollateral {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $properties = shift;
+	my $useSequence = shift;
+	my $useAssetId = shift;
+	my $setName = shift || "assetId";
+	my $setValue = shift || $self->get($setName);
+	my ($key, $seq, $dbkeys, $dbvalues);
+	my $counter = 0;
+	my $sql;
+	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
+		$properties->{$keyName} = $self->session->id->generate();
+		$sql = "insert into $table (";
+		my $dbkeys = "";
+     		my $dbvalues = "";
+		unless ($useSequence eq "0") {
+			unless (exists $properties->{sequenceNumber}) {
+				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=?",[$setValue]);
+				$properties->{sequenceNumber} = $seq+1;
+			}
+		}
+		unless ($useAssetId eq "0") {
+			$properties->{assetId} = $self->get("assetId");
+		}
+		foreach my $key (keys %{$properties}) {
+			if ($counter++ > 0) {
+				$dbkeys .= ',';
+				$dbvalues .= ',';
+			}
+			$dbkeys .= $key;
+			$dbvalues .= $self->session->db->quote($properties->{$key});
+		}
+		$sql .= $dbkeys.') values ('.$dbvalues.')';
+		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
+	} else {
+		$sql = "update $table set ";
+		foreach my $key (keys %{$properties}) {
+			unless ($key eq "sequenceNumber") {
+				$sql .= ',' if ($counter++ > 0);
+				$sql .= $key."=".$self->session->db->quote($properties->{$key});
+			}
+		}
+		$sql .= " where $keyName=".$self->session->db->quote($properties->{$keyName});
+		$self->updateHistory("edited collateral item ".$table." ".$properties->{$keyName});
+	}
+  	$self->session->db->write($sql);
+	$self->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
+	return $properties->{$keyName};
+}
+
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
