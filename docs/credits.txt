@@ -9,6 +9,7 @@ WebGUI Core..........................JT Smith / Plain Black
 
 Contributing Developers..............Lucas Bartholemy
                                      Peter Beardsley / Appropriate Solutions
+                                     Doug Bell / Plain Black
                                      Leendert Bottelberghs / United Knowledge
                                      Richard Caelius / 100 World
                                      Irving Carrion
@@ -29,13 +30,15 @@ Contributing Developers..............Lucas Bartholemy
                                      Roy Johnson / Plain Black
                                      Koen de Jonge / ProcoliX
                                      Martin Kamerbeek / Oqapi
+                                     Graham Knop / Plain Black
                                      Christian Kocourek
                                      John W. Krahn
                                      Len Kranendonk
                                      Colin Kuskie / perlDreamer Consulting LLC
                                      Christophe Marcant
                                      Tony Mountifield
-                                     Tavis Parker / ParkerOne Consulting
+                                     Chris Nehren / Plain Black
+                                     Tavis Parker / Plain Black
                                      Daniel Quinlan
                                      Jukka Raimovaara / Axxion Oy
                                      Alan Ritari / DonorWare
@@ -62,10 +65,6 @@ Perl.................................Larry Wall / O'Reilly
 TinyMCE..............................MoxieCode
                                      http://www.moxiecode.com
 
-JS Calendar..........................Mihai "Mishoo" Bazon
-
-Cool Menus...........................Thomas Brattli
-
-dTree................................Geir Landro
-				     http://www.destroydrop.com
+Yahoo User Interface (YUI)...........Yahoo!
+                                     http://www.yahoo.com
 
