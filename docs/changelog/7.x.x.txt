@@ -1,4 +1,5 @@
 7.5.10
+ - fix: Syntax error in GetCsMail
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
