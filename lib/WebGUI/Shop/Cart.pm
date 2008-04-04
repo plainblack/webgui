@@ -10,7 +10,6 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::CartItem;
-# use WebGUI::Shop::Coupon;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 
@@ -38,6 +37,7 @@ readonly session => my %session;
 private properties => my %properties;
 private error => my %error;
 private itemCache => my %itemCache;
+private addressBookCache => my %addressBookCache;
 
 #-------------------------------------------------------------------
 
@@ -186,7 +186,11 @@ Returns a reference to the address book for the user who's cart this is.
 
 sub getAddressBook {
     my $self = shift;
-    return WebGUI::Shop::AddressBook->create($self->session);
+    my $id = ref $self;
+    unless (exists $addressBookCache{$id}) {
+        $addressBookCache{$id} = WebGUI::Shop::AddressBook->newBySession($self->session);
+    }    
+    return $addressBookCache{$id};
 }
 
 #-------------------------------------------------------------------
@@ -439,10 +443,6 @@ Sets properties in the cart.
 
 A hash reference that contains one of the following:
 
-=head4 couponId
-
-The unique id for a coupon used in this cart.
-
 =head4 shippingAddressId
 
 The unique id for a shipping address attached to this cart.
@@ -459,7 +459,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(couponId shippingAddressId shipperId)) {
+    foreach my $field (qw(shippingAddressId shipperId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});
@@ -492,8 +492,9 @@ Remove an item from the cart and then display the cart again.
 
 sub www_removeItem {
     my $self = shift;
-    my $item = $self->getItem($self->session->form->get("itemId"))->remove;
+    my $item = $self->getItem($self->session->form->get("itemId"));
     delete $itemCache{ref $self}{$item->getId};
+    $item->remove;
     return $self->www_view;
 }
 
@@ -512,7 +513,7 @@ sub www_setShippingAddress {
         $self->getItem($form->get("itemId"))->update({shippingAddressId=>$form->get('addressId')}); 
     }
     else {
-        $self->update({shippingAddressId=>$form->get('addressId')}); 
+        $self->update({shippingAddressId=>$form->get('addressId')});
     }
     return $self->www_view;
 }
@@ -544,7 +545,6 @@ sub www_update {
 
     my $cartProperties;
     $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
-    $cartProperties->{ couponId     } = $form->process( 'couponId'  ) if $form->process( 'couponId' );
     $self->update( $cartProperties );
 
     return $self->www_view;
@@ -564,6 +564,8 @@ sub www_view {
     my $url = $session->url;
     my $i18n = WebGUI::International->new($session, "Shop");
     my @items = ();
+    
+    # set up html header
     $session->style->setRawHeadTags(q|
         <script type="text/javascript">
         function setCallbackForAddressChooser (form, itemId) {
@@ -575,6 +577,8 @@ sub www_view {
         }
         </script>
         |);
+    
+    # generate template variables for the items in the cart
     foreach my $item (@{$self->getItems}) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
@@ -591,7 +595,7 @@ sub www_view {
             shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
                 extras=>q|onclick="setCallbackForAddressChooser(this.form,'|.$item->getId.q|');"|}),
             );
-        my $address = eval { $item->getShippingAddress };
+        my $address = eval {$item->getShippingAddress};
         unless (WebGUI::Error->caught) {
             $properties{shippingAddress} = $address->getHtmlFormatted;
         }
@@ -616,40 +620,42 @@ sub www_view {
             extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
-        couponField             => WebGUI::Form::text($session, {name=>"couponCode", value=>"", size=>20}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
-        couponDiscount          => $self->formatCurrency(0),
         );
-        my $address = eval { $self->getShippingAddress };
-        if (WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
-            # choose another address cuz we've got a problem
-            $self->update({shippingAddressId=>""});
+
+    # get the shipping address    
+    my $address = eval { $self->getShippingAddress };
+    if (WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+        # choose another address cuz we've got a problem
+        $self->update({shippingAddressId=>""});
+    }
+    
+    # if there is no shipping address we can't check out
+    if (WebGUI::Error->caught) {
+       $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
+    }
+    
+    # if there is a shipping address calculate tax and shipping options
+    else {
+        $var{hasShippingAddress} = 1;
+        $var{shippingAddress} = $address->getHtmlFormatted;
+        $var{tax} = $self->getTaxes;
+        my $ship = WebGUI::Shop::Ship->new($self->session);
+        my $options = $ship->getOptions($self);
+        my %formOptions = ();
+        my $defaultOption = "";
+        foreach my $option (keys %{$options}) {
+            $defaultOption = $option;
+            $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
         }
-        if (WebGUI::Error->caught) {
-           $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
-        }
-        else {
-            $var{hasShippingAddress} = 1;
-            $var{shippingAddress} = $address->getHtmlFormatted;
-            $var{tax} = $self->getTaxes;
-            my $ship = WebGUI::Shop::Ship->new($self->session);
-            my $options = $ship->getOptions($self);
-            my %formOptions = ();
-            my $defaultOption = "";
-            foreach my $option (keys %{$options}) {
-                $defaultOption = $option;
-                $formOptions{$option} = $options->{$option}{label}." (".$self->formatCurrency($options->{$option}{price}).")";
-            }
-            $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
-            $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
-            $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-        } 
-        if ($self->get("couponId")) {
-            $var{couponDiscount} = $self->formatCurrency(0);
-        }
-        $var{totalPrice} = $self->formatCurrency($var{subtotalPrice} + $var{couponDiscount} + $var{shippingPrice} + $var{tax}); 
+        $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
+        $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
+        $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
+    } 
+    $var{totalPrice} = $self->formatCurrency($var{subtotalPrice} + $var{shippingPrice} + $var{tax}); 
+
+    # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
-    $template->prepare;
     return $session->style->userStyle($template->process(\%var));
 }
 

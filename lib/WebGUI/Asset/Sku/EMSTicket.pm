@@ -47,9 +47,13 @@ Does some bookkeeping to keep track of limited quantities of tickets that are av
 
 sub addToCart {
 	my ($self, $badgeInfo) = @_;
-	$self->session->db->write("insert into EMSRegistrantTicket (badgeId, ticketAssetId) values (?,?)",
-		[$badgeInfo->{badgeId},$self->getId]);
-	$self->SUPER::addToCart($badgeInfo);
+	my $db = $self->session->db;
+	my @params = ($badgeInfo->{badgeId},$self->getId);
+	# don't let them add a ticket they already have
+	unless ($db->quickScalar("select count(*) from EMSRegistrantTicket where badgeId=? and ticketAssetId=?",\@params)) {
+		$db->write("insert into EMSRegistrantTicket (badgeId, ticketAssetId) values (?,?)", \@params);
+		$self->SUPER::addToCart($badgeInfo);
+	}
 }
 
 #-------------------------------------------------------------------

@@ -32,6 +32,7 @@ These subroutines are available from this package:
 
 readonly session => my %session;
 private properties => my %properties;
+private addressCache => my %addressCache;
 
 #-------------------------------------------------------------------
 
@@ -55,35 +56,9 @@ sub addAddress {
 
 #-------------------------------------------------------------------
 
-=head2 convertToUser ( userId )
-
-Converts a session based address book to be owned by a user. If the user already has an address book then the address book will be merged with this one. 
-
-=head3 userId
-
-The userId to own this address book.
-
-=cut
-
-sub convertToUser {
-    my ($self, $userId) = @_;
-    $self->update({userId=>$userId});
-    my $other = $self->session->db->read("select addressBookId from addressBook where addressBookId<>? and userId=?", [$self->getId, $userId]);
-    while (my ($id) = $other->array) {
-        my $book = __PACKAGE__->new($self->session, $id);
-        foreach my $address (@{$book->getAddresses}) {
-            $address->update({addressBookId=>$self->getId});
-        }
-        $book->delete;
-    }    
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 create ( session )
 
-Constructor. Creates a new address book for this user if they don't have one. If the user is not logged in creates an address book attached to the session if there isn't one for the session. In any case returns a reference to the address book.
+Constructor. Creates a new address book for this user or session if no user is logged in.
 
 =head3 session
 
@@ -96,35 +71,8 @@ sub create {
     unless (defined $session && $session->isa("WebGUI::Session")) {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
-    # check to see if we're dealing with a registered user or just a visitor
-    if ($session->user->userId ne "1") {  
-        # check to see if this user or his session already has an address book
-        my @ids = $session->db->buildArray("select addressBookId from addressBook where userId=? or sessionId=?",[$session->user->userId, $session->getId]);
-        if (scalar(@ids) > 0) {
-            # how are we looking
-            my $book = $class->new($session, $ids[0]);
-            if ($book->get("userId") eq "" || scalar(@ids) > 1) {
-                # it's attached to the session or we have too many
-                $book->convertToUser($session->user->userId);
-            }
-            # it's ours
-            return $book;
-        }
-        else {
-            # nope create one for the user
-            my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$session->user->userId}); 
-            return $class->new($session, $id);
-        }
-    }
-    else {
-        # check to see if this session already has an address book
-        my $addressBookId = $session->db->quickScalar("select addressBookId from addressBook where sessionId=?",[$session->getId]);
-        if ($addressBookId eq "") {
-            # nope, create one for the session
-            $addressBookId = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", sessionId=>$session->getId}); 
-        }
-        return $class->new($session, $addressBookId);
-    }
+    my $id = $session->db->setRow("addressBook", "addressBookId", {addressBookId=>"new", userId=>$session->user->userId, sessionId=>$session->getId}); 
+    return $class->new($session, $id);
 }
 
 #-------------------------------------------------------------------
@@ -187,19 +135,6 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getId ()
-
-Returns the unique id for this cart.
-
-=cut
-
-sub getId {
-    my ($self) = @_;
-    return $self->get("addressBookId");
-}
-
-#-------------------------------------------------------------------
-
 =head2 getAddress ( id )
 
 Returns an address object.
@@ -212,7 +147,11 @@ An address object's unique id.
 
 sub getAddress {
     my ($self, $addressId) = @_;
-    return WebGUI::Shop::Address->new($self, $addressId);
+    my $id = ref $self;
+    unless (exists $addressCache{$id}{$addressId}) {
+        $addressCache{$id}{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
+    }
+    return $addressCache{$id}{$addressId};
 }
 
 #-------------------------------------------------------------------
@@ -231,6 +170,19 @@ sub getAddresses {
         push(@addressObjects, $self->getAddress($addressId));
     }
     return \@addressObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getId ()
+
+Returns the unique id for this cart.
+
+=cut
+
+sub getId {
+    my ($self) = @_;
+    return $self->get("addressBookId");
 }
 
 #-------------------------------------------------------------------
@@ -270,6 +222,56 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 newBySession ( session )
+
+Constructor. Creates a new address book for this user if they don't have one. If the user is not logged in creates an address book attached to the session if there isn't one for the session. In any case returns a reference to the address book.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub newBySession {
+    my ($class, $session) = @_;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $userId = $session->user->userId;
+    
+    # check to see if this user or his session already has an address book
+    my @ids = $session->db->buildArray("select addressBookId from addressBook where (userId<>'1' and userId=?) or sessionId=?",[$session->user->userId, $session->getId]);
+    if (scalar(@ids) > 0) {
+        my $book = $class->new($session, $ids[0]);
+        
+        # convert it to a specific user if we can
+        if ($userId ne '1') {
+            $book->update({userId => $userId, sessionId => ''});
+        }
+        
+        # merge others if needed
+        if (scalar(@ids) > 1) {
+            # it's attached to the session or we have too many so lets merge them
+            shift @ids;
+            foreach my $id (@ids) {
+                my $oldbook = $class->new($session, $id);
+                foreach my $address (@{$oldbook->getAddresses}) {
+                    $address->update({addressBookId=>$book->getId});
+                }
+                $oldbook->delete;
+            }
+        }
+        return $book;
+    }
+    else {
+        # nope create one for the user
+        return $class->create($session);
+    }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 update ( properties )
 
 Sets properties in the addressBook
@@ -277,14 +279,6 @@ Sets properties in the addressBook
 =head3 properties
 
 A hash reference that contains one of the following:
-
-=head4 lastShipId
-
-The last addressId used for shipping.
-
-=head4 lastPayId
-
-The last addressId used for payment.
 
 =head4 userId
 
@@ -299,7 +293,7 @@ Assign the session that owns this adress book. Will automatically be set to "" i
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(lastPayId lastShipId userId sessionId)) {
+    foreach my $field (qw(userId sessionId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     ##Having both a userId and sessionId will confuse create.

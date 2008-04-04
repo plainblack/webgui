@@ -199,9 +199,6 @@ sub convertTransactionLog {
         paymentPhoneNumber varchar(35),
 		paymentDriverId varchar(22) binary,
 		paymentDriverLabel varchar(35),
-		couponId varchar(22),
-		couponTitle varchar(35),
-		couponDiscount float,
 		taxes float,
 		dateOfPurchase datetime
     )");
@@ -240,8 +237,6 @@ sub addAddressBook {
         addressBookId varchar(22) binary not null primary key,
         sessionId varchar(22) binary,
         userId varchar(22) binary,
-        lastPayId varchar(22) binary,
-        lastShipId varchar(22) binary,
         index userId (sessionId),
         index sessionId (sessionId)
     )");

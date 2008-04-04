@@ -261,7 +261,7 @@ sub view {
 	$book->submit(value=>$i18n->get("populate from address book"));
 	
 	# instanciate address
-	my $address = WebGUI::Shop::AddressBook->create($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
+	my $address = WebGUI::Shop::AddressBook->newBySession($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
 	
 	# build the form that the user needs to fill out with badge holder information
 	my $info = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);

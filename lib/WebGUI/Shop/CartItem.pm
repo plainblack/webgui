@@ -159,7 +159,6 @@ Returns the WebGUI::Shop::Address object that is attached to this item for shipp
 
 sub getShippingAddress {
     my $self = shift;
-
     my $addressId = $self->get("shippingAddressId") || $self->cart->get("shippingAddressId");
     return $self->cart->getAddressBook->getAddress($addressId);
 }

@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 70;        # Increment this number for each test you create
+plan tests => 67;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -62,9 +62,6 @@ my $transaction = WebGUI::Shop::Transaction->create($session,{
     paymentPhoneNumber  => '908765',
     paymentDriverId     => 'xxx4',
     paymentDriverLabel  => 'kkk',
-    couponId            => 'xxx5',
-    couponTitle         => 'title1',
-    couponDiscount      => -5,
     taxes               => 7,
     });
 
@@ -100,9 +97,6 @@ is($transaction->get("paymentCode"), '66666', "set and get payment code");
 is($transaction->get("paymentPhoneNumber"), '908765', "set and get payment phone number");
 is($transaction->get("paymentDriverId"), 'xxx4', "set and get payment driver id");
 is($transaction->get("paymentDriverLabel"), 'kkk', "set and get payment driver label");
-is($transaction->get("couponId"), 'xxx5', "set and get coupon id");
-is($transaction->get("couponTitle"), 'title1', "set and get coupon title");
-is($transaction->get("couponDiscount"), -5, "set and get coupon discount");
 is($transaction->get("taxes"), 7, "set and get taxes");
 
 

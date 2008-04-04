@@ -305,11 +305,11 @@ A hash reference that contains one of the following:
 
 =head4 cart
 
-A reference to a cart object. Will pull shipping method, shipping address, tax, items, total, and coupon from
+A reference to a cart object. Will pull shipping method, shipping address, tax, items, and total from
 it. Alternatively you can set manually any of the following properties that are set by cart automatically:
 amount shippingAddressId shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity
 shippingState shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel shippingPrice
-couponId couponTitle couponDiscount taxes
+taxes
 
 You can also use the addItem() method to manually add items to the transaction rather than passing a cart full of items.
 
@@ -364,10 +364,7 @@ sub update {
         $newProperties->{shippingDriverId} = $shipper->getId;
         $newProperties->{shippingDriverLabel} = $shipper->get('label');
         $newProperties->{shippingPrice} = $shipper->calculate($cart);
-        $newProperties->{couponId} = $cart->get('couponId');
-        $newProperties->{couponTitle} = '';
-        $newProperties->{couponDiscount} = '';
-        $newProperties->{amount} = $cart->calculateSubtotal + $newProperties->{couponDiscount} + $newProperties->{shippingPrice} + $newProperties->{taxes};
+        $newProperties->{amount} = $cart->calculateSubtotal + $newProperties->{shippingPrice} + $newProperties->{taxes};
         foreach my $item (@{$cart->getItems}) {
             $self->addItem({item=>$item});
         }
@@ -395,7 +392,7 @@ sub update {
         shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel
         shippingPrice paymentAddressId paymentAddressName
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-        paymentPhoneNumber paymentDriverId paymentDriverLabel couponId couponTitle couponDiscount taxes ));
+        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes ));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
