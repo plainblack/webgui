@@ -344,6 +344,18 @@ our $I18N = {
 		context		=> q|a button on the add badge to cart screen|,
 	},
 
+	'registration staff group' => {
+		message 	=> q|Registration Staff Group|,
+		lastUpdated	=> 0,
+		context		=> q|an ems property label|,
+	},
+	
+	'registration staff group help' => {
+		message 	=> q|Pick a group of users that will handle registration. These users will be able to look up and manage badge registrations for any attendee.|,
+		lastUpdated	=> 0,
+		context		=> q|help for an ems property label|,
+	},
+	
 	'related badge groups' => {
 		message 	=> q|Related Badge Groups|,
 		lastUpdated	=> 0,

@@ -314,7 +314,7 @@ sub buildHashRefOfHashRefs {
                                                                               
 #-------------------------------------------------------------------
 
-=head2 buildSearchQuery ( $sql, $keywords, $columns )
+=head2 buildSearchQuery ( $sql, $placeholders, $keywords, $columns )
 
 Append information to an existing SQL statement for implementing
 basic search functions.  The ammended SQL and an array of placeholder
@@ -322,8 +322,12 @@ variables will be returned.
 
 =head3 $sql
 
-An SQL query.  The clauses to add search-like capabilities will be
+A scalar reference to an SQL query.  The clauses to add search-like capabilities will be
 appended to the end of the query.
+
+=head3 $placeholders
+
+An array reference of placeholders already added to the query.
 
 =head3 $keywords
 
@@ -337,19 +341,22 @@ An arrayref of column names that should be searched for $keywords.
 =cut
 
 sub buildSearchQuery {
-    my $self = shift;
-    my $sql = shift;
-    my $keywords = shift;
-    my $columns = shift || [];
-    my @placeholders;
-    $sql .= ' where';
-    $keywords = '%'.$keywords.'%';
-    foreach my $field (@{ $columns }) {
-        $sql .= ' or' if (scalar @placeholders > 0);
-        $sql .= qq{ $field like ?};
-        push(@placeholders, $keywords);
+    my ($self, $sql, $placeHolders, $keywords, $columns) = @_;
+    if ($$sql =~ m/where/) {
+        $$sql .= ' and (';
     }
-    return ($sql, @placeholders);
+    else { 
+        $$sql .= ' where (';
+    }
+    $keywords = '%'.$keywords.'%';
+    my $counter = 0;
+    foreach my $field (@{ $columns }) {
+        $$sql .= ' or' if ($counter > 0);
+        $$sql .= qq{ $field like ?};
+        push(@{$placeHolders}, $keywords);
+        $counter++;
+    }
+    $$sql .= ')';
 }
 
 #-------------------------------------------------------------------

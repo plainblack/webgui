@@ -95,6 +95,13 @@ sub definition {
 			label			=> $i18n->get('token instructions'),
 			hoverHelp		=> $i18n->get('token instructions help'),
 		},
+		registrationStaffGroupId => {
+			fieldType 		=> 'group',
+			defaultValue 	=> [3],
+			tab				=> 'security',
+			label			=> $i18n->get('registration staff group'),
+			hoverHelp		=> $i18n->get('registration staff group help'),
+		},
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -170,6 +177,24 @@ Returns an array reference of badge objects.
 sub getTokens {
 	my $self = shift;
 	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSToken']});
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRegistrationStaff ( [ user ] )
+
+Returns a boolean indicating whether the user is a member of the registration staff.
+
+=head3 user
+
+A WebGUI::User object. Defaults to $session->user.
+
+=cut
+
+sub isRegistrationStaff {
+	my $self = shift;
+	my $user = shift || $self->session->user;
+	$user->isInGroup($self->get('registrationStaffGroupId'));
 }
 
 #-------------------------------------------------------------------
@@ -570,7 +595,7 @@ sub www_getBadgesAsJson {
 
 =head2 www_getRegistrantAsJson (  )
 
-Retrieves the properties of the current badge and the items attached to it.
+Retrieves the properties of a specific badge and the items attached to it. Expects badgeId to be one of the form params.
 
 =cut
 
@@ -694,6 +719,66 @@ sub www_getRegistrantAsJson {
 	
 	# build json datasource
     return JSON::to_json($badgeInfo);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getRegistrantsAsJson (  )
+
+Returns a list of registrants in the system. Can be a narrowed search by submitting a keywords form param with the request.
+
+=cut
+
+sub www_getRegistrantsAsJson {
+	my ($self) = @_;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+    my ($db, $form) = $session->quick(qw(db form));
+    my $startIndex = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results') || 25;
+	my $keywords = $form->get('keywords');
+	
+	my $sql = "select SQL_CALC_FOUND_ROWS * from EMSRegistrant where purchaseComplete=1 and emsAssetId=?";
+	my @params = ($self->getId);
+	
+	# user or staff
+	my $isEventStaff = 1;
+	unless ($self->isRegistrationStaff) {
+		$isEventStaff = 0;
+		$sql .= " and userId=?";
+		push @params, $session->user->userId;
+	}
+
+	# keyword search
+    if ($keywords ne "") {
+        $db->buildSearchQuery(\$sql, \@params, $keywords, [qw{badgeNumber name address1 address2 address3 city state country email notes zipcode phoneNumber organization}])
+    }
+	
+	# limit
+	$sql .= 'limit ?,?';
+	push(@params, $startIndex, $numberOfResults);
+
+	# get badge info
+	my @records = ();
+	my %results = ();
+	my $badges = $db->read($sql,\@params);
+	while (my $badgeInfo = $badges->hashRef) {
+		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+		$badgeInfo->{title} = $badge->getTitle;
+		$badgeInfo->{sku} = $badge->get('sku');
+		$badgeInfo->{assetId} = $badge->getId;
+		push(@records, $badgeInfo);
+	}
+    $results{'recordsReturned'} = $badges->rows()+0;
+    $results{'totalRecords'} = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
+    $results{'records'}      = \@records;
+    $results{'startIndex'}   = $startIndex;
+    $results{'sort'}         = undef;
+    $results{'dir'}          = "asc";
+	
+	# build json datasource
+    $session->http->setMimeType('text/json');
+    return JSON::to_json(\%results);
 }
 
 
@@ -895,6 +980,7 @@ Displays the
 
 sub www_lookupRegistrant {
 	my $self = shift;
+	return $self->www_getRegistrantsAsJson;
 	return $self->processStyle("here you will be able to look up a registrant by name");
 }
 

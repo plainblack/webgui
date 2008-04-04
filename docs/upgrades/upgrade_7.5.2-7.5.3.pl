@@ -75,6 +75,7 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem add column ribbonInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column tokenInstructions mediumtext");
+	$db->write("alter table EventManagementSystem add column registrationStaffGroupId varchar(22) binary not null");
 	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,
