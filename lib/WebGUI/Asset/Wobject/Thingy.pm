@@ -371,6 +371,7 @@ sub getEditFieldForm {
         }
         $fieldTypes{$fieldType} = $form->getName($self->session);       
     }
+    %fieldTypes = WebGUI::Utility::sortHash(%fieldTypes);
     
     $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
         .'left join Thingy_fields using(thingId) where Thingy_things.assetId = ? and fieldId != "" '
