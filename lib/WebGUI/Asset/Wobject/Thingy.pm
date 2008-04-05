@@ -1219,6 +1219,10 @@ sub www_editThing {
         else{
             $formElement = $self->getFormElement($field);     
         }
+        if ($field->{subText}){
+            $formElement .= '<span class="formSubtext">'.$field->{subText}.'</span>';
+        }
+
         $fieldsHTML .= "<li class='list1' id='$field->{fieldId}'>"
             ."\n<table>\n<tr>\n"
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
@@ -1605,6 +1609,10 @@ sub www_editFieldSave {
     else{
         $formElement = $self->getFormElement(\%properties);
     }
+    if ($properties{subText}){
+        $formElement .= '<span class="formSubtext">'.$properties{subText}.'</span>';
+    }
+
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
         ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
@@ -1672,9 +1680,8 @@ sub www_editThingData {
         ." where thingDataId = ?",[$thingDataId]);
     }
 
-    $fields = $session->db->read('select * from Thingy_fields where assetId =
-'.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
-sequenceNumber');
+    $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber'
+        ,[$self->getId,$thingId]);
     while (my %field = $fields->hash) {
         my $fieldName = 'field_'.$field{fieldId};
         if ($session->form->process("func") eq "editThingDataSave"){
@@ -1698,7 +1705,7 @@ sequenceNumber');
             "isHidden" => $hidden,
             "isVisible" => ($field{status} eq "visible" && !$hidden),
             "isRequired" => ($field{status} eq "required" && !$hidden),
-            "subtext" => $field{subtext},
+            "subtext" => $field{subText},
         );
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
     }
