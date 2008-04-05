@@ -1,6 +1,7 @@
 7.5.10
  - fix: Syntax error in GetCsMail
  - fixed: Thingy: field types not in alphabetical order
+ - fixed: Thingy: Text field type listed twice
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
