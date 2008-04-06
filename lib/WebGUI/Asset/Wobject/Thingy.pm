@@ -614,7 +614,7 @@ sub getFormElement {
         $param{value} = ($data->{defaultValue} =~ /checked/xi) ? 1 : "";
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
                     @defaultValues = $self->session->form->selectList($name);
