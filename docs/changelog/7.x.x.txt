@@ -1,7 +1,7 @@
 7.5.10
  - fix: Syntax error in GetCsMail
  - fixed: Thingy: field types not in alphabetical order
- - fixed: Thingy: Text field type listed twice
+ - fixed: Thingy: Text, File and Hidden field types listed twice (Yung Han Khoe)
  - fixed: Thingy: subtext is not displayed
 
 7.5.9

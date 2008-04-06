@@ -59,7 +59,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		formName=>{
-			defaultValue=>$i18n->get("hidden")
+			defaultValue=>$i18n->get("SubscriptionGroup formName")
 			},
 		profileEnabled=>{
 			defaultValue=>0

@@ -3935,6 +3935,16 @@ LongTruncOk=1</p>
         message     => q{Rich Editor},
         lastUpdated => 1202274234,
     },
+    
+    'SubscriptionGroup formName' => {
+        message     => q{Subscription Group},
+        lastUpdated => 1202274234,
+    },
+
+    'Attachments formName' => {
+        message     => q{Attachments},
+        lastUpdated => 1202274234,
+    },
 };
 
 1;
