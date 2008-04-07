@@ -18,7 +18,6 @@ use WebGUI::HTMLForm;
 use WebGUI::Storage::Image;
 use WebGUI::SQL;
 use WebGUI::Utility;
-use WebGUI::Asset::Wobject;
 
 use base 'WebGUI::Asset::Sku';
 
@@ -88,13 +87,6 @@ sub definition {
                 fieldType=>"text",
                 defaultValue=>undef
             },
-            productNumber=>{
-                tab => "properties",
-                label=>$i18n->get(11),
-                hoverHelp=>$i18n->get('11 description'),
-                fieldType=>"text",
-                defaultValue=>undef
-            },
             image1=>{
                 tab => "properties",
                 fieldType=>"image",
@@ -149,7 +141,7 @@ sub definition {
         autoGenerateForms=>1,
         icon=>'product.gif',
         tableName=>'Product',
-        className=>'WebGUI::Asset::Wobject::Product',
+        className=>'WebGUI::Asset::Sku::Product',
         properties=>\%properties
         });
         return $class->SUPER::definition($session, $definition);
@@ -276,6 +268,12 @@ sub getFileUrl {
     my $self = shift;
     my $store = $_[0];
     return $store->getUrl($self->getFilename($store));
+}
+
+#-------------------------------------------------------------------
+sub getPrice {
+    my $self = shift;
+    return $self->get('price');
 }
 
 #-------------------------------------------------------------------
@@ -631,7 +629,7 @@ sub www_addAccessory {
    );
    @usedAccessories = $self->session->db->buildArray("select accessoryAssetId from Product_accessory where assetId=".$self->session->db->quote($self->getId));
    push(@usedAccessories,$self->getId);
-   $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
+   $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
     my $i18n = WebGUI::International->new($self->session,"Asset_Product");
    $f->selectBox(
         -name => "accessoryAccessId",
@@ -671,7 +669,7 @@ sub www_addRelated {
     );
     @usedRelated = $self->session->db->buildArray("select relatedAssetId from Product_related where assetId=".$self->session->db->quote($self->getId));
     push(@usedRelated,$self->getId);
-    $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Wobject::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
+    $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
      my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     $f->selectBox(
         -name => "relatedAssetId",
@@ -1153,7 +1151,7 @@ sub view {
 
 =head2 www_view ( )
 
-See WebGUI::Asset::Wobject::www_view() for details.
+See WebGUI::Asset::Sku::www_view() for details.
 
 =cut
 
