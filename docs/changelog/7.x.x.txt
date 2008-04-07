@@ -5,6 +5,7 @@
  - fixed: Thingy: subtext is not displayed
  - fixed: Thingy: edit/add field popup doesn't fit all options
  - fixed: selecting some field types will crash Thingy
+ - fixed: Thingy: "add" and "edit" permission problem
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's

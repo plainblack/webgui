@@ -1638,15 +1638,21 @@ sub www_editThingData {
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId') || "new";
-    my (%thingData, $fields,%thingProperties,@field_loop,$fieldValue);
+    my (%thingData, $fields,%thingProperties,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     my $errors = shift;
     $var->{error_loop} = $errors if ($errors);
 
-    %thingProperties = $self->session->db->quickHash("select * from Thingy_things where thingId=".$self->session->db->quote($thingId));
-    return $self->session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdEdit});
+    %thingProperties = $self->session->db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
+    if ($thingDataId eq "new"){
+        $privilegedGroup = $thingProperties{groupIdAdd};
+    }
+    else{
+        $privilegedGroup = $thingProperties{groupIdEdit};
+    }
+    return $self->session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
@@ -1732,14 +1738,20 @@ sub www_editThingDataSave {
 
     my $self = shift;
     my $session = $self->session;
-    my ($var,$newThingDataId, $fields,%thingProperties,%thingData,@errors,$hadErrors,$otherThingId,$workflowId);
+    my ($var,$newThingDataId, $fields,%thingProperties,%thingData,@errors,$hadErrors,$otherThingId);
+    my ($privilegedGroup,$workflowId);
     my $thingId = $session->form->process('thingId');
     my $thingDataId = $session->form->process('thingDataId');
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    %thingProperties = $session->db->quickHash("select * from Thingy_things where
-thingId=".$session->db->quote($thingId));
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdEdit});
+    %thingProperties = $session->db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
+    if ($thingDataId eq "new"){
+        $privilegedGroup = $thingProperties{groupIdAdd};
+    }
+    else{
+        $privilegedGroup = $thingProperties{groupIdEdit};
+    }
+    return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
     %thingData = (
         thingDataId=>$thingDataId,
