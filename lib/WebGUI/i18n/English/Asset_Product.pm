@@ -347,11 +347,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'11' => {
-		message => q|Product Number|,
-		lastUpdated => 1031514049
-	},
-
 	'53' => {
 		message => q|Edit Benefit|,
 		lastUpdated => 1031514049
@@ -404,11 +399,6 @@ our $I18N = {
 
         '10 description' => {
                 message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.|,
-                lastUpdated => 1120332527,
-        },
-
-        '11 description' => {
-                message => q|The product number, SKU, ISBN, or other identifier for this product.|,
                 lastUpdated => 1120332527,
         },
 
