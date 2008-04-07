@@ -510,21 +510,20 @@ Used to define which data set to reorder. Defaults to the value of setName (defa
 =cut
 
 sub reorderCollateral {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
-	my $setName = shift || "assetId";
-	my $setValue = shift || $self->get($setName);
-	my $i = 1;
-        my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
+    my $self = shift;
+    my $table = shift;
+    my $keyName = shift;
+    my $setName = shift || "assetId";
+    my $setValue = shift || $self->get($setName);
+    my $i = 1;
+    my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
 	my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
-        while (my ($id) = $sth->array) {
-		$sth2->execute([$i, $setValue, $id]);
-                $i++;
-        }
-	$sth2->finish;
-        $sth->finish;
-        $sth->finish;
+    while (my ($id) = $sth->array) {
+        $sth2->execute([$i, $setValue, $id]);
+        $i++;
+    }
+    $sth2->finish;
+    $sth->finish;
 }
 
 
@@ -580,7 +579,7 @@ sub setCollateral {
 		$properties->{$keyName} = $self->session->id->generate();
 		$sql = "insert into $table (";
 		my $dbkeys = "";
-     		my $dbvalues = "";
+        my $dbvalues = "";
 		unless ($useSequence eq "0") {
 			unless (exists $properties->{sequenceNumber}) {
 				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=?",[$setValue]);
@@ -600,7 +599,8 @@ sub setCollateral {
 		}
 		$sql .= $dbkeys.') values ('.$dbvalues.')';
 		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
-	} else {
+	}
+    else {
 		$sql = "update $table set ";
 		foreach my $key (keys %{$properties}) {
 			unless ($key eq "sequenceNumber") {
