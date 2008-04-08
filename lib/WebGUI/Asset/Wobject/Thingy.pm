@@ -253,6 +253,10 @@ The id of the field that should be deleted.
 
 The id of the thing to which the field to be deleted belongs.
 
+=head3 keepSequenceNumbers
+
+Boolean indicating that the sequence numbers should not be changed. This is used by importAssetCollateralData.
+
 =cut
 
 sub deleteField {
@@ -260,12 +264,20 @@ sub deleteField {
     my $self = shift;
     my $fieldId = shift;
     my $thingId = shift;
+    my $keepSequenceNumbers = shift;
     my $db = $self->session->db;
     my $error = $self->session->errorHandler;
+    my $deletedSequenceNumber;
 
-    my ($deletedSequenceNumber) = $db->quickArray("select sequenceNumber from Thingy_fields where fieldId = ?",[$fieldId]);
+    if ($keepSequenceNumbers ne "1"){
+        ($deletedSequenceNumber) = $db->quickArray("select sequenceNumber from Thingy_fields where fieldId = ?"
+            ,[$fieldId]);
+    }
     $self->deleteCollateral("Thingy_fields","fieldId",$fieldId);
-    $db->write("update Thingy_fields set sequenceNumber = sequenceNumber -1 where sequenceNumber > ?",[$deletedSequenceNumber]);
+    if ($keepSequenceNumbers ne "1"){
+       $db->write("update Thingy_fields set sequenceNumber = sequenceNumber -1 where sequenceNumber > ?"
+            ,[$deletedSequenceNumber]);
+    }
 
     my ($columnExists) = $db->quickArray("show columns from ".$db->dbh->quote_identifier("Thingy_".$thingId)
         ." like ".$db->quote("field_".$fieldId));
@@ -792,9 +804,10 @@ sub importAssetCollateralData {
         my ($fieldIdExists) = $session->db->quickArray("select fieldId from Thingy_fields where fieldId = ? and thingId = ? ",[$field->{fieldId},$field->{thingId}]);
         if ($assetExists && $fieldIdExists){
             # update existing field
-            $error->info("Updating Field, label: ".$field->{label}.", id: ".$field->{fieldId});
+            $error->info("Updating Field, label: ".$field->{label}.", id: ".$field->{fieldId}.",seq :"
+                .$field->{sequenceNumber});
             $self->_updateFieldType($field->{fieldType},$field->{fieldId},$field->{thingId},$field->{assetId},$dbDataType);
-            $self->setCollateral("Thingy_fields","fieldId",$field,1,0);
+            $self->setCollateral("Thingy_fields","fieldId",$field,1,0,"","",1);
         }
         else{
             # Add field as Collateral, retain fieldId.
@@ -807,7 +820,7 @@ sub importAssetCollateralData {
     while (my $fieldInDataBase = $fieldsInDatabase->hashRef) {
         if (!WebGUI::Utility::isIn($fieldInDataBase->{fieldId},@importFields)){
             # delete field
-            $self->deleteField($fieldInDataBase->{fieldId},$fieldInDataBase->{thingId});        
+            $self->deleteField($fieldInDataBase->{fieldId},$fieldInDataBase->{thingId},"1");        
         }
     }
 

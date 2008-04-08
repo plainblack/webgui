@@ -425,6 +425,11 @@ If this collateral data set is not grouped by assetId, but by another column the
 
 If you've specified a setName you may also set a value for that set.  Defaults to the value for this id from the wobject properties.
 
+=head3 updateSequence
+
+If set to "1" an update of existing collateral data will also update the sequence number. This option is used when
+importing collateral data in a package. Defaults to "0".
+
 =cut
 
 sub setCollateral {
@@ -436,11 +441,13 @@ sub setCollateral {
 	my $useAssetId = shift;
 	my $setName = shift || "assetId";
 	my $setValue = shift || $self->get($setName);
+    my $updateSequence = shift;
     my $db = $self->session->db;
 	my ($key, $seq, $dbkeys, $dbvalues);
 	my $counter = 0;
 	my $sql;
-	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
+	
+    if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
 		$properties->{$keyName} = $self->session->id->generate();
 		$sql = "insert into ".$db->dbh->quote_identifier($table)." (";
 		my $dbkeys = "";
@@ -468,7 +475,7 @@ sub setCollateral {
 	} else {
 		$sql = "update ".$db->dbh->quote_identifier($table)." set ";
 		foreach my $key (keys %{$properties}) {
-			unless ($key eq "sequenceNumber") {
+			unless ($key eq "sequenceNumber" && $updateSequence ne "1") {
 				$sql .= ',' if ($counter++ > 0);
 				$sql .= $db->dbh->quote_identifier($key)."=".$db->quote($properties->{$key});
 			}

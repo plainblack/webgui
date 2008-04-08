@@ -8,6 +8,7 @@
  - fixed: Thingy: "add" and "edit" permission problem
  - fixed: EMail field rejects some valid email addresses
  - fixed: Calendar date localization can be broken
+ - fixed: Thingy: field sequence not imported correctly for existing Thingies
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
