@@ -157,13 +157,13 @@ sub new
 	{
 		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC", locale=>$locale);
 	}
-	else
-	{
-		$self	= $class->SUPER::new(
-				(_splitMysql($_[0])),
-				time_zone	=> "UTC",
-				);
-	}
+    else {
+        $self = $class->SUPER::new(
+            _splitMysql($_[0]),
+            time_zone   => "UTC",
+            locale      => $locale,
+        );
+    }
 	
     #Set the session object
     $self->{_session} = $session;

@@ -2,6 +2,7 @@
  - fixed: unable to respond to poll multiple times in same session
  - fixed: packages try to restore owner
  - fixed: EMail field rejects some valid email addresses
+ - fixed: Calendar date localization can be broken
 
 7.4.31
  - fixed: Syndicated Content picks wrong entries for interleaving
