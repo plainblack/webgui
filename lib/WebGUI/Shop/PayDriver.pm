@@ -500,12 +500,12 @@ sub processTransaction {
     });
     my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment;
     if ($success) {
-        $transaction->completePurchase($cart, $transactionCode, $statusCode, $statusMessage);
+        $transaction->completePurchase($transactionCode, $statusCode, $statusMessage);
         $cart->onCompletePurchase;
         $self->sendNotifications($transaction);
     }
     else {
-        $transaction->denyTransaction($transactionCode, $statusCode, $statusMessage);
+        $transaction->denyPurchase($transactionCode, $statusCode, $statusMessage);
     }
     return $transaction;
 }

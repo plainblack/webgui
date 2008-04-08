@@ -399,11 +399,11 @@ sub readyForCheckout {
     my $self    = shift;
     
     # Check if the shipping address is set and correct
-    my $address = $self->getShippingAddress;
+    my $address = eval{$self->getShippingAddress};
     return 0 if WebGUI::Error->caught;
 
     # Check if the ship driver is chosen and existant
-    my $ship = $self->getShipper;
+    my $ship = eval {$self->getShipper};
     return 0 if WebGUI::Error->caught;
 
     # Check if the cart has items
@@ -467,6 +467,53 @@ sub update {
 
 #-------------------------------------------------------------------
 
+=head2 updateFromForm ( )
+
+Updates the cart totals.
+
+=cut
+
+sub updateFromForm {
+    my $self = shift;
+    my $form = $self->session->form;
+    foreach my $item (@{$self->getItems}) {
+        if ($form->get("quantity-".$item->getId) ne "") {
+            eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
+            if (WebGUI::Error->caught("WebGUI::Error::Shop::MaxOfItemInCartReached")) {
+                my $i18n = WebGUI::International->new($self->session, "Shop");
+                $error{id $self} = sprint($i18n->get("too many of this item"), $item->get("configuredTitle"));
+            }
+            elsif (my $e = WebGUI::Error->caught) {
+                $error{id $self} = "An unknown error has occured: ".$e->message;
+            }
+        }
+    }
+
+    my $cartProperties;
+    $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
+    $self->update( $cartProperties );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_checkout ( )
+
+Update the cart and then redirect the user to the payment gateway screen.
+
+=cut
+
+sub www_continueShopping {
+    my $self = shift;
+    $self->updateFromForm;
+    if ($error{id $self} ne "") {
+        return $self->www_view;
+    }
+    $self->session->http->setRedirect($self->session->url->page('shop=pay;method=selectPaymentGateway'));
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_continueShopping ( )
 
 Update the cart and the return the user back to the asset.
@@ -475,9 +522,9 @@ Update the cart and the return the user back to the asset.
 
 sub www_continueShopping {
     my $self = shift;
-    my $cartView = $self->www_update;
+    $self->updateFromForm;
     if ($error{id $self} ne "") {
-        return $cartView;
+        return $self->www_view;
     }
     return undef;
 }
@@ -529,24 +576,7 @@ Updates the cart totals and then displays the cart again.
 
 sub www_update {
     my $self = shift;
-    my $form = $self->session->form;
-    foreach my $item (@{$self->getItems}) {
-        if ($form->get("quantity-".$item->getId) ne "") {
-            eval { $item->setQuantity($form->get("quantity-".$item->getId)) };
-            if (WebGUI::Error->caught("WebGUI::Error::Shop::MaxOfItemInCartReached")) {
-                my $i18n = WebGUI::International->new($self->session, "Shop");
-                $error{id $self} = sprint($i18n->get("too many of this item"), $item->get("configuredTitle"));
-            }
-            elsif (my $e = WebGUI::Error->caught) {
-                $error{id $self} = "An unknown error has occured: ".$e->message;
-            }
-        }
-    }
-
-    my $cartProperties;
-    $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
-    $self->update( $cartProperties );
-
+    $self->updateFromForm;
     return $self->www_view;
 }
 

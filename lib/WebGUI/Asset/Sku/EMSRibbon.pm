@@ -132,7 +132,7 @@ Does bookkeeping on EMSRegistrationRibbon table.
 
 sub onCompletePurchase {
 	my ($self, $item) = @_;
-	$self->session->db->write("insert into EMSRegistrationRibbon (ribbonAssetId, badgeId) values (?,?)",
+	$self->session->db->write("insert into EMSRegistrantRibbon (ribbonAssetId, badgeId) values (?,?)",
 		[$self->getId, $self->getOptions->{badgeId}]);
 	return undef;
 }

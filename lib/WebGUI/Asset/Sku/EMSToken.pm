@@ -118,10 +118,10 @@ sub onCompletePurchase {
 	my $currentQuantity = $db->quickScalar("select quantity from EMSRegistrantToken where tokenAssetId=? and badgeId=?",\@params);
 	unshift @params, $item->get("quantity");
 	if (defined $currentQuantity) {
-		$db->write("update EMSRegistrationToken set quantity=quantity+? where tokenAssetId=? and badgeId=?",\@params);
+		$db->write("update EMSRegistrantToken set quantity=quantity+? where tokenAssetId=? and badgeId=?",\@params);
 	}
 	else {
-		$db->write("insert into EMSRegistrationToken (quantity, tokenAssetId, badgeId) values (?,?,?)",\@params);
+		$db->write("insert into EMSRegistrantToken (quantity, tokenAssetId, badgeId) values (?,?,?)",\@params);
 	}
 	return undef;
 }

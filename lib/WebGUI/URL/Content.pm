@@ -17,6 +17,7 @@ package WebGUI::URL::Content;
 use strict;
 use Apache2::Const -compile => qw(OK DECLINED);
 use WebGUI::Affiliate;
+use WebGUI::Exception;
 use WebGUI::Pluggable;
 use WebGUI::Session;
 
@@ -53,8 +54,8 @@ sub handler {
         my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
         foreach my $handler (@{$config->get("contentHandlers")}) {
             my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] ) };
-            if ( $@ ) {
-                $session->errorHandler->error($@);
+            if ( my $e = WebGUI::Error->caught ) {
+                $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
             }
             else {
                 if ($output eq "chunked") {
