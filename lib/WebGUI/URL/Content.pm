@@ -68,7 +68,8 @@ sub handler {
                     }
                     last;
                 }
-                elsif ($session->http->getStatus ne "200") {
+                # Keep processing for success codes
+                elsif ($session->http->getStatus < 200 || $session->http->getStatus > 299) {
                     $session->http->sendHeader;
                     last;
                 } 

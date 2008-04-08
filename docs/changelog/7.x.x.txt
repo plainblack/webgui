@@ -9,6 +9,7 @@
  - fixed: EMail field rejects some valid email addresses
  - fixed: Calendar date localization can be broken
  - fixed: Thingy: field sequence not imported correctly for existing Thingies
+ - fixed: anonymous registration leaves user at blank page
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
@@ -32,7 +33,7 @@
  - fixed: CS rating links are exposed to site spiders
  - improved behavior of CS mail message filtering
  - fixed: Thingy: "cancel" -- cannot cancel when adding a thing
- - fixed: unable to respond to poll multiple times in same session
+ - fixed: unable to respond to survey multiple times in same session
  - fixed: packages try to restore owner
 
 7.5.8
