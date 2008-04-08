@@ -91,6 +91,9 @@ sub repairDBCharset {
         }
     }
 
+    unshift @stmts, "ALTER TABLE `assetIndex` DROP INDEX `keywords`";
+    push @stmts, "ALTER TABLE `assetIndex` ADD FULLTEXT INDEX `keywords` (`keywords`)";
+
     for my $stmt (@stmts) {
         $dbh->do($stmt);
     }
