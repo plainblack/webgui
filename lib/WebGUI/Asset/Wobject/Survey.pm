@@ -486,7 +486,7 @@ sub getResponseDrivenQuestionIds {
 				Survey_questionId=".$self->session->db->quote($previousResponse->{Survey_questionId}));
 		}
 		if (!$questionId || $questionId eq '-1') { # terminate survey
-			$self->completeResponse($responseId);	
+			$self->completeResponse($responseId);
 			return ();
 		}
 	} else {
@@ -675,14 +675,16 @@ sub view {
 		
 	$var->{'user.canTakeSurvey'} = $self->session->user->isInGroup($self->get("groupToTakeSurvey"));
 	if ($var->{'user.canTakeSurvey'}) {
-		$var->{'response.Id'} = $self->getResponseId();
+		$var->{'response.Id'} = $self->getResponseId;
 		$var->{'response.Count'} = $self->getResponseCount;
 		$var->{'user.isFirstResponse'} = ($var->{'response.Count'} == 0 && !(exists $var->{'response.id'}));
 		$var->{'user.canRespondAgain'} = ($var->{'response.Count'} < $self->get("maxResponsesPerUser"));
-		if (($var->{'user.isFirstResponse'}) || ($self->session->form->process("startNew") && $var->{'user.canRespondAgain'})) {
-			$var->{'response.Id'} = "new"; #Added 7-11-07 by fdillon
-            #$var->{'response.Id'} = $self->generateResponseId; #Removed 7-11-07 by fdillon
-		}
+        if ($self->session->form->process("startNew") && $var->{'user.canRespondAgain'}) {
+            $var->{'response.Id'} = "new";
+        }
+        elsif ($var->{'user.isFirstResponse'}) {
+            $var->{'response.Id'} ||= "new";
+        }
 		if ($var->{'response.Id'}) {
 			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
 			($var->{'questions.correct.count'}) = $self->session->db->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
@@ -699,10 +701,9 @@ sub view {
 			name=>'func',
 			value=>'respond'
 			});
-    $var->{'form.header'} .= WebGUI::Form::hidden($self->session, { #Added 7-11-07 by fdillon
-        name=>"startNew", 
-        value=>$self->session->form->process("startNew") 
-    });
+    if ($var->{'response.Id'}) {
+        $var->{'form.header'} .= WebGUI::Form::hidden($self->session,{name=>'responseId',value=>$var->{'response.Id'}});
+    }
 	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session,);
 	$var->{'form.submit'} = WebGUI::Form::submit($self->session,{
 			value=>$i18n->get(50)
@@ -1205,13 +1206,12 @@ sub www_respond {
 	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
     #If user has not responded before, create the responseId binding the survey to this session: fdillon 7-11-07
     my $responseCount   = $self->getResponseCount;
-    my $responseId      = $self->getResponseId();
-    my $isFirstResponse = ($responseCount == 0 && !(defined $responseId));
-	my $canRespondAgain = ($responseCount < $self->get("maxResponsesPerUser"));
-	if ($isFirstResponse || ($self->session->form->process("startNew") && $canRespondAgain)) {
-	    $self->generateResponseId;
-	}
-	
+    my $responseId      = $self->getResponseId;
+    my $canRespond      = ($responseCount < $self->get("maxResponsesPerUser"));
+    if ($canRespond && (!defined $responseId || $self->session->form->param('responseId') eq 'new')) {
+        $self->generateResponseId;
+    }
+
     my $varname = $self->getResponseIdString;
 	return "" unless ($self->session->scratch->get($varname));
 	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
