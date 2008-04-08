@@ -1945,10 +1945,8 @@ thingId=".$session->db->quote($thingId));
         open my $importFile,"<",$storage->getPath($file);
         my $lineNumber = 0;
         my @data = ();
-        my @lines = <$importFile>;
-        close $importFile;
         
-        for my $line (@lines){
+        while (my $line = <$importFile>) {
             if ($lineNumber == 0 && $session->form->process('ignoreFirstLine')){
                 $lineNumber++;
                 $error->info("Skipping first line");
@@ -2024,6 +2022,7 @@ thingId=".$session->db->quote($thingId));
             $thingData{updatedById} = $session->user->userId;
             $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0) if ($thingData{thingDataId});
         }
+        close $importFile;
     }
 
     return $self->www_search($thingId);
