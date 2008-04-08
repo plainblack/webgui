@@ -1,3 +1,5 @@
+7.4.32
+
 7.4.31
  - fixed: Syndicated Content picks wrong entries for interleaving
  - fixed: Syndicated Content URLs using macros not updated by caching workflow
