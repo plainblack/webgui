@@ -1,5 +1,7 @@
+7.4.33
+
 7.4.32
- - fixed: unable to respond to poll multiple times in same session
+ - fixed: unable to respond to survey multiple times in same session
  - fixed: packages try to restore owner
  - fixed: EMail field rejects some valid email addresses
  - fixed: Calendar date localization can be broken
