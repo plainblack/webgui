@@ -7,6 +7,7 @@
  - fixed: selecting some field types will crash Thingy
  - fixed: Thingy: "add" and "edit" permission problem
  - fixed: EMail field rejects some valid email addresses
+ - fixed: Calendar date localization can be broken
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
