@@ -83,7 +83,7 @@ An optional value to process instead of POST input.
 sub getValueFromPost {
 	my $self = shift;
 	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
-	if ($value =~ /^([0-9a-zA-Z]([-.+\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/i) {
+	if ($value =~ /^[0-9a-z,_%+-]+@(?:[0-9a-z-]+\.)+[a-z]{2,9})$/i) {
 		return $value;
 	}
 	return undef;
