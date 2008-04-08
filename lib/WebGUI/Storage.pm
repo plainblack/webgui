@@ -932,16 +932,9 @@ sub tar {
 	my $temp = shift || WebGUI::Storage->createTemp($self->session);
     my $originalDir = Cwd::cwd();
     chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
-	my @files = ();
-	find(sub { push(@files, $File::Find::name)}, ".");
-	if ($Archive::Tar::VERSION eq '0.072') {
-		my $tar = Archive::Tar->new();
-		$tar->add_files(@files);
-		$tar->write($temp->getPath($filename),1);
-		
-	} else {
-		Archive::Tar->create_archive($temp->getPath($filename),1,@files);
-	}
+    my @files = ();
+    find(sub { push(@files, $File::Find::name)}, ".");
+    Archive::Tar->create_archive($temp->getPath($filename),1,@files);
     chdir $originalDir;
 	return $temp;
 }
@@ -968,8 +961,15 @@ sub untar {
     my $temp = shift || WebGUI::Storage->createTemp($self->session);
     my $originalDir = Cwd::cwd();
     chdir $temp->getPath;
+    local $Archive::Tar::CHOWN = 0;
     Archive::Tar->extract_archive($self->getPath($filename),1);
     $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+    my @files;
+    find(sub {
+        push(@files, $File::Find::name);
+    }, ".");
+    $self->_changeOwner(@files);
+
     chdir $originalDir;
     return $temp;
 }
