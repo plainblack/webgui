@@ -135,6 +135,7 @@ Fetches the site from each defined site, and loads it into the Workflow and Cron
 sub loadSiteData {
         my ( $kernel, $self) = @_[ KERNEL, OBJECT ];
 	my $configs = WebGUI::Config->readAllConfigs($self->{_config}->getWebguiRoot);
+    $self->debug("Reading site configs.");
 	foreach my $key (keys %{$configs}) {
 		next if $key =~ m/^demo/;
 		$self->debug("Fetching site data for $key");

@@ -1,5 +1,6 @@
 7.5.10
  - fix: Syntax error in GetCsMail
+ - fix: Trapped an exception for corrupt config files.
  - fixed: Thingy: field types not in alphabetical order
  - fixed: Thingy: Text, File and Hidden field types listed twice (Yung Han Khoe)
  - fixed: Thingy: subtext is not displayed

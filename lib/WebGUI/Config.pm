@@ -191,7 +191,10 @@ sub readAllConfigs {
             || $file =~ /^\./
             || $file eq 'log.conf'
             || $file eq 'spectre.conf';
-        $configs{$file} = WebGUI::Config->new($webguiPath,$file);
+        $configs{$file} = eval{WebGUI::Config->new($webguiPath,$file)};
+        if ($@) {
+            warn "Config file ".$file." looks to be corrupt or have a syntax error.";
+        }
 	}
 	return \%configs;
 }
