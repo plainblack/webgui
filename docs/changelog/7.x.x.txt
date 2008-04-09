@@ -18,6 +18,7 @@
  - fixed: "Back to Album" link doesn't work
  - fixed: email validation links can be broken by mail servers
  - fixed: Clipboard select all doesn't work with one item in IE
+ - fixed: able to view visitor profile, send private messages, add as friend
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's

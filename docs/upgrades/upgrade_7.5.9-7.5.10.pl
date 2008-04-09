@@ -14,7 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::User;
 
 my $toVersion = '7.5.10';
 my $quiet; # this line required
@@ -22,7 +22,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+privatizeVisitor($session);
 
 finish($session); # this line required
 
@@ -34,6 +34,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub privatizeVisitor {
+    my $session = shift;
+    my $visitor = WebGUI::User->new($session, '1');
+    $visitor->profileField('allowPrivateMessages', 'none');
+    $visitor->profileField('publicEmail', 0);
+    $visitor->profileField('publicProfile', 0);
+    $visitor->profileField('ableToBeFriend', 0);
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
