@@ -56,6 +56,7 @@ sub handler {
             my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] ) };
             if ( my $e = WebGUI::Error->caught ) {
                 $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
+                $session->errorHandler->debug($e->package.":".$e->line." - ".$e->trace);
             }
             else {
                 if ($output eq "chunked") {

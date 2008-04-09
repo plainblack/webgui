@@ -502,7 +502,7 @@ sub processTransaction {
     if ($success) {
         $transaction->completePurchase($transactionCode, $statusCode, $statusMessage);
         $cart->onCompletePurchase;
-        $self->sendNotifications($transaction);
+     #   $self->sendNotifications($transaction);
     }
     else {
         $transaction->denyPurchase($transactionCode, $statusCode, $statusMessage);

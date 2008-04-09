@@ -156,6 +156,7 @@ sub upgradeEMS {
 		price float not null default 0.00,
 		primary key (assetId, revisionDate)
 		)");
+	$session->config->addToArray("workflowActivities/None","WebGUI::Workflow::Activity::ExpireEmsCartItems");
 }
 
 #-------------------------------------------------

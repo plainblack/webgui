@@ -2,6 +2,24 @@ package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
 our $I18N = {
+	'expire ems cart items' => {
+		message 	=> q|Expire EMS Cart Items|,
+		lastUpdated	=> 0,
+		context		=> q|workflow activity title|,
+	},
+	
+	'item expiration time' => {
+		message 	=> q|Item Expiration Time|,
+		lastUpdated	=> 0,
+		context		=> q|a workflow activity field label|,
+	},
+	
+	'item expiration time help' => {
+		message 	=> q|How long should EMS items be allowed to sit in a cart before they are expired to be freed up for someone else to purchase?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a workflow activity field label|,
+	},
+		
 	'percentage discount' => {
 		message 	=> q|Percentage Discount|,
 		lastUpdated	=> 0,

@@ -502,7 +502,7 @@ Update the cart and then redirect the user to the payment gateway screen.
 
 =cut
 
-sub www_continueShopping {
+sub www_checkout {
     my $self = shift;
     $self->updateFromForm;
     if ($error{id $self} ne "") {
@@ -643,7 +643,7 @@ sub www_view {
         formFooter              => WebGUI::Form::formFooter($session),
         updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
         checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
-            extras=>q|onclick="this.form.shop.value='pay';this.form.method.value='selectPaymentGateway';this.form.submit;"|}),
+            extras=>q|onclick="this.form.method.value='checkout';this.form.submit;"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
             extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
