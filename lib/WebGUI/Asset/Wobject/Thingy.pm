@@ -579,10 +579,14 @@ sub getFieldValue {
     elsif ($field->{fieldType} =~ m/^otherThing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
-        ($processedValue) = $self->session->db->quickArray('select '
-            .$dbh->quote_identifier('field_'.$field->{fieldInOtherThingId})
-            .' from '.$dbh->quote_identifier('Thingy_'.$otherThingId)
-            .' where thingDataId = ?',[$value]);
+        my $tableName = 'Thingy_'.$otherThingId;
+        my ($otherThingTableExists) = $self->session->db->quickArray('show tables like ?',[$tableName]);
+        if ($otherThingTableExists){
+            ($processedValue) = $self->session->db->quickArray('select '
+                .$dbh->quote_identifier('field_'.$field->{fieldInOtherThingId})
+                .' from '.$dbh->quote_identifier($tableName)
+                .' where thingDataId = ?',[$value]);
+        }
     }
     elsif ($field->{fieldType} eq "file") {
         $processedValue = WebGUI::Form::File->new($self->session,{value=>$value})->displayValue();
@@ -609,7 +613,9 @@ sub getFormElement {
     my $self = shift;
     my $data = shift;
     my %param;
-    my $dbh = $self->session->db->dbh;
+    my $db = $self->session->db;
+    my $dbh = $db->dbh;
+    my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -662,16 +668,23 @@ sub getFormElement {
         my $otherThingId = $data->{fieldType}; 
         $otherThingId =~ s/^otherThing_(.*)/$1/x;
         $param{fieldType} = "SelectList"; 
+        my $options = ();
+        my $tableName = 'Thingy_'.$otherThingId;
+        my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);  
+        if ($otherThingTableExists){
+            $options = $db->buildHashRef('select thingDataId, '
+                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
+                .' from '.$dbh->quote_identifier($tableName));
         
-        my $options = $self->session->db->buildHashRef('select thingDataId, '
-            .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-            .' from '.$dbh->quote_identifier('Thingy_'.$otherThingId));
-        
-        my $value = $data->{value} || $data->{defaultValue};
-        ($param{value}) = $self->session->db->quickArray('select '
-            .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-            .' from '.$dbh->quote_identifier('Thingy_'.$otherThingId)
-            .' where thingDataId = ?',[$value]);
+            my $value = $data->{value} || $data->{defaultValue};
+            ($param{value}) = $db->quickArray('select '
+                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
+                .' from '.$dbh->quote_identifier($tableName)
+                .' where thingDataId = ?',[$value]);
+        }
+        else{
+            return $i18n->get('other thing missing message');
+        }
         $param{size} = 1;
         $param{multiple} = 0;
         $param{options} = $options;

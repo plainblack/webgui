@@ -896,6 +896,11 @@ search has been done.|,
         message => q|Every asset provides a set of variables to most of its templates based on the internal asset properties.  Some of these variables may be useful, others may not.|,
         lastUpdated => 1164910794,
     },
+
+    'other thing missing message' => {
+        message => q|The Thing to which this field refers does not exist or has no table.|,
+        lastUpdated => 1104630516,
+    },
 };
 
 1;
