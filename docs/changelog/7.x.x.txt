@@ -10,6 +10,7 @@
  - fixed: Calendar date localization can be broken
  - fixed: Thingy: field sequence not imported correctly for existing Thingies
  - fixed: anonymous registration leaves user at blank page
+ - fixed: Thingy: field type 'other thing' does not stay selected
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's

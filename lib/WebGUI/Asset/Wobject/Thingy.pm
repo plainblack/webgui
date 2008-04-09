@@ -427,7 +427,7 @@ sub getEditFieldForm {
         -name=>"fieldType",
         -label=>$i18n->get('field type label'),
         -hoverHelp=>$i18n->get('field type description'),
-        -value=>ucfirst $field->{fieldType} || "Text",
+        -value=>$field->{fieldType} || "Text",
         -options=>\%fieldTypes,
         -id=>$dialogPrefix."_fieldType_formId",
         );
