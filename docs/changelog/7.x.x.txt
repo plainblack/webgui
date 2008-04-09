@@ -15,6 +15,7 @@
  - fixed: i18n discrepencies in Gallery / GalleryAlbum / Photo
  - fixed: After saving Photo, Add an Image points to wrong link
  - fixed: "Back to Album" link doesn't work
+ - fixed: email validation links can be broken by mail servers
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's

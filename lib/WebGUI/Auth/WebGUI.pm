@@ -239,7 +239,7 @@ sub createAccountSave {
         $mail->addText(
             $i18n->get('email address validation email body','AuthWebGUI') . "\n\n"
             . $session->url->getSiteURL() 
-            . $session->url->page("op=auth;method=validateEmail;key=".$key)
+            . $session->url->page("op=auth;method=validateEmail;key=".$key) . "\n\n"
         );
         $mail->addFooter;
         $mail->send;
