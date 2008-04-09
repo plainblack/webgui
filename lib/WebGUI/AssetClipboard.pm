@@ -425,11 +425,16 @@ $self->session->style->setLink($self->session->url->extras('assetManager/assetMa
 		assetManager.AddButton("'.$i18n->get("restore").'","restoreList","manageClipboard");
                 assetManager.Write();        
                 var assetListSelectAllToggle = false;
-                function toggleAssetListSelectAll(form){
-                        assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
-                        for(var i = 0; i < form.assetId.length; i++)
-                        form.assetId[i].checked = assetListSelectAllToggle;
-                 }
+                function toggleAssetListSelectAll(form) {
+                    assetListSelectAllToggle = assetListSelectAllToggle ? false : true;
+                    if (typeof form.assetId.length == "undefined") {
+                        form.assetId.checked = assetListSelectAllToggle;
+                    }
+                    else {
+                        for (var i = 0; i < form.assetId.length; i++)
+                            form.assetId[i].checked = assetListSelectAllToggle;
+                    }
+                }
 		 //]]>
                 </script> <div class="adminConsoleSpacer"> &nbsp;</div>';
 	return $ac->render($output, $header);
