@@ -919,8 +919,10 @@ sub rate {
 	return undef if $self->hasRated;
 	$self->insertUserPostRating($rating);
 	$self->recalculatePostRating();
-	$self->getThread->updateThreadRating();
-	if ($self->session->setting->get("useKarma")) {
+    my $thread = $self->getThread;
+	$thread->updateThreadRating();
+	if ($self->session->setting->get("useKarma")
+        && $self->session->user->karma > $thread->getParent->get('karmaSpentToRate')) {
 		$self->session->user->karma(-$self->getThread->getParent->get("karmaSpentToRate"), "Rated Post ".$self->getId, "Rated a CS Post.");
 		my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 		$u->karma($self->getThread->getParent->get("karmaRatingMultiplier"), "Post ".$self->getId." Rated by ".$self->session->user->userId, "Had post rated.");

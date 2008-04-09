@@ -20,6 +20,7 @@
  - fixed: Clipboard select all doesn't work with one item in IE
  - fixed: able to view visitor profile, send private messages, add as friend
  - fixed: international characters corrupted in titles
+ - fixed: Users without karma can transfer karma by rating posts
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
