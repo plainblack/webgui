@@ -54,7 +54,7 @@ sub handler {
             $content .= $line;
         }
         close($FILE);
-        print $content;
+        $request->print($content);
         return Apache2::Const::OK;
     } );
 	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
