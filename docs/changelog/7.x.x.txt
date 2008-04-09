@@ -1,4 +1,5 @@
 7.4.33
+ - fix: Trapped an exception for corrupt config files.
 
 7.4.32
  - fixed: unable to respond to survey multiple times in same session
