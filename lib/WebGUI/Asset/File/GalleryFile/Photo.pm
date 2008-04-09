@@ -453,6 +453,7 @@ sub www_edit {
     #my $var     = $self->getTemplateVars; 
     my $var     = {
         url_addArchive      => $self->getParent->getUrl('func=addArchive'),
+        url_album           => $self->getParent->getUrl('func=album'),
     };
 
     if ( $form->get('func') eq "add" ) {
@@ -552,7 +553,7 @@ sub www_showConfirmation {
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 
             $self->getUrl, 
-            $self->getParent->getUrl('func=add;className='.__PACKAGE__),
+            $self->getParent->getUrl('func=add;class='.__PACKAGE__),
         )
     );
 }

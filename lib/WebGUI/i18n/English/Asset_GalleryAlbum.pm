@@ -384,7 +384,7 @@ our $I18N = {
     },
 
     'editForm description label' => {
-        message     => 'Description',
+        message     => 'Album Description',
         lastUpdated => 0,
         context     => 'Label for the "Description" property of the Album asset',
     },
@@ -443,7 +443,7 @@ our $I18N = {
     },
 
     'template delete message' => {
-        message     => q{Are you sure you wish to delete this gallery?},
+        message     => q{Are you sure you wish to delete this album?},
         lastUpdated => 0,
         context     => q{The message for the delete page},
     },

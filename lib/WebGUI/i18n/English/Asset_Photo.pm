@@ -422,7 +422,7 @@ our $I18N = {
     },
 
     'editForm synopsis label' => {
-        message     => 'Description',
+        message     => 'Photo Caption',
         lastUpdated => 0,
         context     => 'Label for "synopsis" property',
     },
@@ -554,7 +554,7 @@ our $I18N = {
     },
 
     'template delete message' => {
-        message     => q{Are you sure you wish to delete this gallery?},
+        message     => q{Are you sure you wish to delete this?},
         lastUpdated => 0,
         context     => q{The message for the delete page},
     },

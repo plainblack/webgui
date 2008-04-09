@@ -12,6 +12,9 @@
  - fixed: anonymous registration leaves user at blank page
  - fixed: Thingy: field type 'other thing' does not stay selected
  - fixed: Thingy: delete a thing dysfunctions linked things
+ - fixed: i18n discrepencies in Gallery / GalleryAlbum / Photo
+ - fixed: After saving Photo, Add an Image points to wrong link
+ - fixed: "Back to Album" link doesn't work
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
