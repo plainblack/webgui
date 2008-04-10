@@ -23,6 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 privatizeVisitor($session);
+ucfirstThingyFieldTypes($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,15 @@ sub privatizeVisitor {
     $visitor->profileField('publicEmail', 0);
     $visitor->profileField('publicProfile', 0);
     $visitor->profileField('ableToBeFriend', 0);
+}
+
+#----------------------------------------------------------------------------
+
+sub ucfirstThingyFieldTypes {
+    my $session = shift;
+    print "\tConverting Thingy's fieldTypes to upper case first.\n" unless ($quiet);
+    $session->db->write("update Thingy_fields set fieldType = (SELECT CONCAT(UPPER(SUBSTRING(fieldType, 1, 1)), SUBSTRING(fieldType FROM 2)) ) where fieldType not like 'otherThing%'");
+
 }
 
 
