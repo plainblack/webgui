@@ -22,6 +22,7 @@ our $STATUS = "beta";
 use strict;
 use Apache2::Const -compile => qw(OK DECLINED);
 use Apache2::Request;
+use Apache2::RequestIO;
 use Apache2::ServerUtil ();
 use WebGUI::Config;
 use WebGUI::Pluggable;
