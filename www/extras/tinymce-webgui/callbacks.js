@@ -1,7 +1,6 @@
 // WebGUI Specific javascript functions for TinyMCE
 
 function tinyMCE_WebGUI_URLConvertor(url, node, on_save) {
-    url = tinyMCE.convertURL(url, node, on_save);
     // Do custom WebGUI convertion, replace back ^();
 
     // turn escaped macro characters back into the real thing

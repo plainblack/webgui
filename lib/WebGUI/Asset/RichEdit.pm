@@ -464,7 +464,7 @@ sub getRichEditor {
 		remove_script_host => JSON::true(),
 		auto_reset_designmode => JSON::true(),
 		cleanup_callback => "tinyMCE_WebGUI_Cleanup",
-		urlconvertor_callback => "tinyMCE_WebGUI_URLConvertor",
+		urlconverter_callback => "tinyMCE_WebGUI_URLConvertor",
 		theme_advanced_resizing => JSON::true(),
 		      (map { "theme_advanced_buttons".($_+1) => (join ',', @{$toolbarRows[$_]}) }
 		       (0..$#toolbarRows)),
