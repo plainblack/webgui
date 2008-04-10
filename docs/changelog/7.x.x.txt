@@ -1,3 +1,5 @@
+7.5.11
+
 7.5.10
  - fix: Syntax error in GetCsMail
  - fix: Trapped an exception for corrupt config files.
