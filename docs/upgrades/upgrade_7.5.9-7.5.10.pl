@@ -24,6 +24,7 @@ my $session = start(); # this line required
 
 privatizeVisitor($session);
 ucfirstThingyFieldTypes($session);
+addEventSequenceNumber($session);
 
 finish($session); # this line required
 
@@ -35,6 +36,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addEventSequenceNumber {
+    my $session = shift;
+    print "\tAdding iCal sequence number to events... " unless $quiet;
+    $session->db->write('ALTER TABLE Event ADD COLUMN iCalSequenceNumber int');
+    $session->db->write('UPDATE Event SET iCalSequenceNumber=0');
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub privatizeVisitor {

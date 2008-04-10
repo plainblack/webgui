@@ -1868,11 +1868,29 @@ sub www_ical {
                 . WebGUI::DateTime->new($self->session, $event->get("creationDate"))->toIcal
                 . "\r\n";
         
+        # SEQUENCE
+        my $sequenceNumber = $event->get("iCalSequenceNumber");
+        if (defined $sequenceNumber) {
+            $ical   .= qq{SEQUENCE:}
+                    . $event->get("iCalSequenceNumber")
+                    . "\r\n";
+        }
+        
         # DTSTART
-        $ical   .= qq{DTSTART:}.$event->getIcalStart."\r\n";
+        my $eventStart = $event->getIcalStart;
+        $ical .= 'DTSTART';
+        if ($eventStart !~ /T/) {
+            $ical .= ';VALUE=DATE';
+        }
+        $ical .= ":$eventStart\r\n";
         
         # DTEND
-        $ical   .= qq{DTEND:}.$event->getIcalEnd."\r\n";
+        my $eventEnd = $event->getIcalEnd;
+        $ical .= 'DTEND';
+        if ($eventEnd !~ /T/) {
+            $ical .= ';VALUE=DATE';
+        }
+        $ical .= ":$eventEnd\r\n";
         
         # Summary (the title)
         # Wrapped at 75 columns

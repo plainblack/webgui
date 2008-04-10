@@ -22,6 +22,7 @@
  - fixed: international characters corrupted in titles
  - fixed: Users without karma can transfer karma by rating posts
  - fixed: gateway macro not usable in links in rich editor
+ - fixed: iCal feeds don't update properly when events are changed
 
 7.5.9
  - fixed: Collaboration System attachments follow site's max size instead of CS's
