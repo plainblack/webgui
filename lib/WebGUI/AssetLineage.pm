@@ -398,11 +398,10 @@ sub getLineage {
             $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
 		foreach my $definition (@{$className->definition($self->session)}) {
-			unless ($definition->{tableName} eq "asset") {
+            unless ($definition->{tableName} eq "asset" || $definition->{tableName} eq "assetData") {
 				my $tableName = $definition->{tableName};
 				$tables .= " left join $tableName on assetData.assetId=".$tableName.".assetId and assetData.revisionDate=".$tableName.".revisionDate";
 			}
-			last;
 		}
 	}
 	# formulate a where clause
