@@ -452,15 +452,12 @@ sub sendImmediate {
 
 	SKIP: {
 		skip "You have an old perl", 1 if $crappyPerl;
-		close STDOUT;
-		my $buffer;
-		open STDOUT, '>', \$buffer or die "Unable to point handle at variable: $!\n";
+        my $request = $style->session->request;
+        $request->clear_output;
 		$style->sent(1);
 		$style->$action($output);
-		like($buffer, qr/$output/, $comment);
+		like($request->get_output, qr/$output/, $comment);
 		$style->sent(0);
-		close STDOUT;
-		open STDOUT, '>-' or die "Unable to restore STDOUT: $!\n";
 	}
 
 }
