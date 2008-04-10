@@ -708,8 +708,8 @@ to add or remove users from their groups.
 	},
 
 	'965' => {
-		message => q|System Trash|,
-		lastUpdated => 1099050265
+		message => q|Everyone's Trash|,
+		lastUpdated => 1207859652
 	},
 
 	'824' => {
@@ -2980,9 +2980,9 @@ or are under your current version tag.</p>
         },
 
 	'trash' => {
-		message => q|Trash|,
-		lastUpdated =>1092930637,
-                context => q|Title of the trash manager for the admin console.|
+		message => q|My Trash|,
+		lastUpdated =>1207859655,
+        context => q|Title of the trash manager for the admin console.|
         },
 
 	'databases' => {
