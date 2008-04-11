@@ -348,11 +348,11 @@ sub buildSearchQuery {
     else { 
         $$sql .= ' where (';
     }
-    $keywords = '%'.$keywords.'%';
+    $keywords = lc('%'.$keywords.'%');
     my $counter = 0;
     foreach my $field (@{ $columns }) {
         $$sql .= ' or' if ($counter > 0);
-        $$sql .= qq{ $field like ?};
+        $$sql .= qq{ LOWER( $field ) like ?};
         push(@{$placeHolders}, $keywords);
         $counter++;
     }

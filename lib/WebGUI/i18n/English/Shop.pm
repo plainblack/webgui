@@ -3,6 +3,12 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'view cart' => {
+		message 	=> q|View Cart|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
 	'my purchases template' => { 
 		message => q|My Purchases Template|,
 		lastUpdated => 0,

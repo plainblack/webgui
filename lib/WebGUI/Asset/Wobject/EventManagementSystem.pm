@@ -18,7 +18,7 @@ use strict;
 use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
-use JSON qw/ to_json /;
+use JSON;
 use Digest::MD5;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
@@ -63,9 +63,17 @@ sub definition {
 			fieldType 		=> 'template',
 			defaultValue 	=> 'BMybD3cEnmXVk2wQ_qEsRQ',
 			tab				=> 'display',
-			label			=> $i18n->get('extras template'),
-			hoverHelp		=> $i18n->get('extras template help'),
-			namespace		=> 'EMS/Extras',
+			label			=> $i18n->get('badge builder template'),
+			hoverHelp		=> $i18n->get('badge builder template help'),
+			namespace		=> 'EMS/BadgeBuilder',
+		},
+		lookupRegistrantTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	=> 'OOyMH33plAy6oCj_QWrxtg',
+			tab				=> 'display',
+			label			=> $i18n->get('lookup registrant template'),
+			hoverHelp		=> $i18n->get('lookup registrant template help'),
+			namespace		=> 'EMS/LookupRegistrant',
 		},
 		badgeInstructions => {
 			fieldType 		=> 'HTMLArea',
@@ -274,7 +282,7 @@ sub view {
 	<p>
 	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
 	&bull; <a href="|.$self->getUrl('func=buildBadge').q|">View Events</a>
-	&bull; <a href="|.$self->getUrl('shop=cart').q|">View Cart</a>
+	&bull; ^ViewCart;
 	&bull; <a href="|.$self->getUrl('func=manageBadgeGroups').q|">Badge Groups</a>
 	</p>
 	<p>|.$self->get('badgeInstructions').q|</p>
@@ -588,7 +596,7 @@ sub www_getBadgesAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -718,7 +726,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{ribbons} = \@ribbons;
 	
 	# build json datasource
-    return JSON::to_json($badgeInfo);
+    return JSON->new->encode($badgeInfo);
 }
 
 #-------------------------------------------------------------------
@@ -742,9 +750,7 @@ sub www_getRegistrantsAsJson {
 	my @params = ($self->getId);
 	
 	# user or staff
-	my $isEventStaff = 1;
 	unless ($self->isRegistrationStaff) {
-		$isEventStaff = 0;
 		$sql .= " and userId=?";
 		push @params, $session->user->userId;
 	}
@@ -755,22 +761,24 @@ sub www_getRegistrantsAsJson {
     }
 	
 	# limit
-	$sql .= 'limit ?,?';
+	$sql .= ' limit ?,?';
 	push(@params, $startIndex, $numberOfResults);
 
 	# get badge info
 	my @records = ();
 	my %results = ();
 	my $badges = $db->read($sql,\@params);
+    $results{'recordsReturned'} = $badges->rows()+0;
+    $results{'totalRecords'} = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
 	while (my $badgeInfo = $badges->hashRef) {
 		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
 		$badgeInfo->{title} = $badge->getTitle;
 		$badgeInfo->{sku} = $badge->get('sku');
 		$badgeInfo->{assetId} = $badge->getId;
+		$badgeInfo->{manageUrl} = $self->getUrl('func=manageRegistrant');
+		$badgeInfo->{buildBadgeUrl} = $self->getUrl('func=buildBadge;badgeId='.$badgeInfo->{badgeId});
 		push(@records, $badgeInfo);
 	}
-    $results{'recordsReturned'} = $badges->rows()+0;
-    $results{'totalRecords'} = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
     $results{'records'}      = \@records;
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
@@ -778,7 +786,7 @@ sub www_getRegistrantsAsJson {
 	
 	# build json datasource
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -812,7 +820,7 @@ sub www_getRibbonsAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -864,12 +872,24 @@ sub www_getTicketsAsJson {
 		@badgeGroups = split("\n",$badge->get('relatedBadgeGroups')) if (defined $badge);
 	}
 	
+	# get a list of tickets already associated with the badge
+	my @existingTickets = $db->buildArray("select ticketAssetId from EMSRegistrantTicket where badgeId=?",[$badgeId]);
+	
 	# get assets
 	my $counter = 0;
 	my $totalTickets = scalar(@ids);
 	my @records = ();
 	foreach my $id (@ids) {
+
+		# gotta get to the page we're working with
 		next unless ($counter >= $startIndex);
+
+		# skip tickets we already have
+		if (isIn($id, @existingTickets)) {
+			$totalTickets--;
+			next;
+		}
+
 		my $ticket = WebGUI::Asset->new($session, $id, 'WebGUI::Asset::Sku::EMSTicket');
 		
 		# skip borked tickets
@@ -925,6 +945,14 @@ sub www_getTicketsAsJson {
 		$counter++;
 	}
 	
+	# humor
+	my $find = pack('u',$keywords);
+	chomp $find;
+	if ($find eq q|'2$%,,C`P,0``|) {
+		push(@records, {title=>unpack('u',q|022=M('-O<G)Y+"!$879E+@``|)});
+		$totalTickets++;
+	}
+	
 	# build json
 	$results{records} 			= \@records;
     $results{totalRecords} 		= $totalTickets;
@@ -933,7 +961,7 @@ sub www_getTicketsAsJson {
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -967,21 +995,33 @@ sub www_getTokensAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_lookupRegistrant ()
 
-Displays the
+Displays the badges purchased by the current user, or all users if the user is part of the registration staff.
 
 =cut
 
 sub www_lookupRegistrant {
-	my $self = shift;
-	return $self->www_getRegistrantsAsJson;
-	return $self->processStyle("here you will be able to look up a registrant by name");
+	my ($self) = @_;
+	my $session = $self->session;
+	return $session->privilege->noAccess() unless ($self->canView && $self->session->user->userId ne "1");
+
+	# set up template variables
+	my %var = (
+		buyBadgeUrl			=> $self->getUrl,
+		viewEventsUrl		=> $self->getUrl('func=buildBadge'),
+		viewCartUrl			=> $self->getUrl('shop=cart'),
+		getRegistrantsUrl	=> $self->getUrl('func=getRegistrantsAsJson'),
+		isRegistrationStaff	=> $self->isRegistrationStaff,		
+		);
+
+	# render the page
+	return $self->processStyle($self->processTemplate(\%var, $self->get('lookupRegistrantTemplateId')));
 }
 
 #-------------------------------------------------------------------
@@ -1872,7 +1912,7 @@ sub getBadgeSelector {
 		};
 	}
 	$js = '<script type="text/javascript">
-	var badges = '.to_json(\%badgeJS).';
+	var badges = '.JSON->new->encode(\%badgeJS).';
 	</script>';
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{

@@ -20,6 +20,12 @@ our $I18N = {
 		context		=> q|help for a workflow activity field label|,
 	},
 		
+	'badge number' => {
+		message 	=> q|Badge #|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
 	'percentage discount' => {
 		message 	=> q|Percentage Discount|,
 		lastUpdated	=> 0,
@@ -58,12 +64,6 @@ our $I18N = {
 	
 	'add a badge group' => {
 		message 	=> q|Add A Badge Group|,
-		lastUpdated	=> 0,
-		context		=> q|a link label|,
-	},
-	
-	'view cart' => {
-		message 	=> q|View Cart|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
@@ -198,6 +198,42 @@ our $I18N = {
 		message 	=> q|Tokens|,
 		lastUpdated	=> 0,
 		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'lookup registrant template' => {
+		message 	=> q|Lookup Registrant|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'lookup registrant template help' => {
+		message 	=> q|Which template would you like to use for the lookup registrant screen?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'badge builder template' => {
+		message 	=> q|Badge Builder Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'badge builder template help' => {
+		message 	=> q|Which template would you like to use for the badge builder screen?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'main template' => {
+		message 	=> q|Main Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'main template help' => {
+		message 	=> q|Which template would you like to use for the main screen that lists the badges for purchase?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
 	},
 	
 	'location' => {

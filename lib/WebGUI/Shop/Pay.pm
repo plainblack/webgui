@@ -352,12 +352,10 @@ sub www_selectPaymentGateway {
     }
 
     # All the output stuff below is just a placeholder until it's templated.
-    my $output .= $i18n->echo('Choose one of the following payment gateways to check out:');
-    $output .= '<table border="0">';
+    my $output .= $i18n->echo('How would you like to pay?');
     foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
-        $output .= '<tr><td>' . $payOption->{label} . '</td><td>' . $payOption->{button} . '</td></tr>';
+        $output .= $payOption->{button} . '<br />';
     }
-    $output .= '</table>';
    
     return $session->style->userStyle( $output );
 }

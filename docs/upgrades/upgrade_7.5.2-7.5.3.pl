@@ -71,6 +71,7 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
 	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null");
 	$db->write("alter table EventManagementSystem add column badgeBuilderTemplateId varchar(22) binary not null default 'BMybD3cEnmXVk2wQ_qEsRQ'");
+	$db->write("alter table EventManagementSystem add column lookupRegistrantTemplateId varchar(22) binary not null default 'OOyMH33plAy6oCj_QWrxtg'");
 	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ribbonInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
@@ -333,6 +334,7 @@ sub migrateToNewCart {
     )");
     $session->db->write("drop table shoppingCart");
     $session->setting->add('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw');
+	$session->config->addToHash("macros","ViewCart","ViewCart");
 }
 
 #-------------------------------------------------
