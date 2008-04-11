@@ -993,58 +993,60 @@ sub www_moveSpecificationUp {
 
 #-------------------------------------------------------------------
 sub view {
-   my $self = shift;
+    my $self = shift;
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
-   my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
-   tie %data, 'Tie::CPHash';
+    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
+    tie %data, 'Tie::CPHash';
     my $brochure = $self->get("brochure");
-    my $manual = $self->get("manual");
+    my $manual   = $self->get("manual");
     my $warranty = $self->get("warranty");
+
     my $image1 = $self->get("image1");
     my $image2 = $self->get("image2");
     my $image3 = $self->get("image3");
-   #---brochure
+
+    #---brochure
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-   if ($brochure) {
-      $file = WebGUI::Storage->get($self->session,$brochure);
-      $var{"brochure.icon"} = $self->getFileIconUrl($file);
-      $var{"brochure.label"} = $i18n->get(13);
-      $var{"brochure.URL"} = $self->getFileUrl($file);
-   }
+    if ($brochure) {
+        $file = WebGUI::Storage->get($self->session,$brochure);
+        $var{"brochure.icon"}  = $self->getFileIconUrl($file);
+        $var{"brochure.label"} = $i18n->get(13);
+        $var{"brochure.URL"}   = $self->getFileUrl($file);
+    }
     #---manual
-   if ($manual) {
-      $file = WebGUI::Storage->get($self->session,$manual);
-      $var{"manual.icon"} = $self->getFileIconUrl($file);
-      $var{"manual.label"} = $i18n->get(14);
-      $var{"manual.URL"} = $self->getFileUrl($file);
-   }
-   #---warranty
-   if ($warranty) {
-      $file = WebGUI::Storage->get($self->session,$warranty);
-      $var{"warranty.icon"} = $self->getFileIconUrl($file);
-      $var{"warranty.label"} = $i18n->get(15);
-      $var{"warranty.URL"} = $self->getFileUrl($file);
-   }
-   #---image1
-   if ($image1) {
-      $file = WebGUI::Storage->get($self->session,$image1);
-      $var{thumbnail1} = $self->getThumbnailUrl($file);
-      $var{image1} = $self->getFileUrl($file);
-   }
-   #---image2
-   if ($image2) {
-      $file = WebGUI::Storage->get($self->session,$image2);
-      $var{thumbnail2} = $self->getThumbnailUrl($file);
-      $var{image2} = $self->getFileUrl($file);
-   }
-   #---image3
-   if ($image3) {
-      $file = WebGUI::Storage->get($self->session,$image3);
-      $var{thumbnail3} = $self->getThumbnailUrl($file);
-      $var{image3} = $self->getFileUrl($file);
+    if ($manual) {
+        $file = WebGUI::Storage->get($self->session,$manual);
+        $var{"manual.icon"}  = $self->getFileIconUrl($file);
+        $var{"manual.label"} = $i18n->get(14);
+        $var{"manual.URL"}   = $self->getFileUrl($file);
+    }
+    #---warranty
+    if ($warranty) {
+        $file = WebGUI::Storage->get($self->session,$warranty);
+        $var{"warranty.icon"}  = $self->getFileIconUrl($file);
+        $var{"warranty.label"} = $i18n->get(15);
+        $var{"warranty.URL"}   = $self->getFileUrl($file);
+    }
+    #---image1
+    if ($image1) {
+        $file = WebGUI::Storage->get($self->session,$image1);
+        $var{thumbnail1} = $self->getThumbnailUrl($file);
+        $var{image1}     = $self->getFileUrl($file);
+    }
+    #---image2
+    if ($image2) {
+        $file = WebGUI::Storage->get($self->session,$image2);
+        $var{thumbnail2} = $self->getThumbnailUrl($file);
+        $var{image2}     = $self->getFileUrl($file);
+    }
+    #---image3
+    if ($image3) {
+        $file = WebGUI::Storage->get($self->session,$image3);
+        $var{thumbnail3} = $self->getThumbnailUrl($file);
+        $var{image3}     = $self->getFileUrl($file);
    }
    
    #---features 
@@ -1081,63 +1083,63 @@ sub view {
    $sth->finish;
    $var{benefit_loop} = \@benefitloop;
 
-   #---specifications 
-   $var{"addSpecification.url"} = $self->getUrl('func=editSpecification&sid=new');
-   $var{"addSpecification.label"} = $i18n->get(35);
-   $sth = $self->session->db->read("select name,value,units,Product_specificationId from Product_specification where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-   while (%data = $sth->hash) {
-      $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),$i18n->get(5))
-                 .$self->session->icon->edit('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
-                 .$self->session->icon->moveUp('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
-                 .$self->session->icon->moveDown('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
-      push(@specificationloop,{
-                                  "specification.controls"=>$segment,
-                                  "specification.specification"=>$data{value},
-                                  "specification.units"=>$data{units},
-                                  "specification.label"=>$data{name}
-                               });
-   }
-   $sth->finish;
-   $var{specification_loop} = \@specificationloop;
+    #---specifications 
+    $var{"addSpecification.url"} = $self->getUrl('func=editSpecification&sid=new');
+    $var{"addSpecification.label"} = $i18n->get(35);
+    $sth = $self->session->db->read("select name,value,units,Product_specificationId from Product_specification where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
+    while (%data = $sth->hash) {
+        $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),$i18n->get(5))
+                 . $self->session->icon->edit('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
+                 . $self->session->icon->moveUp('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
+                 . $self->session->icon->moveDown('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
+        push(@specificationloop,{
+                                   "specification.controls"      => $segment,
+                                   "specification.specification" => $data{value},
+                                   "specification.units"         => $data{units},
+                                   "specification.label"         => $data{name},
+                                });
+    }
+    $sth->finish;
+    $var{specification_loop} = \@specificationloop;
 
     #---accessories 
-   $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
-   $var{"addaccessory.label"} = $i18n->get(36);
-   $sth = $self->session->db->read("select Product_accessory.accessoryAssetId from   Product_accessory
+    $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
+    $var{"addaccessory.label"} = $i18n->get(36);
+    $sth = $self->session->db->read("select Product_accessory.accessoryAssetId from   Product_accessory
                              where Product_accessory.assetId=".$self->session->db->quote($self->getId)." 
                              order by Product_accessory.sequenceNumber");
-   while (my ($id) = $sth->array) {
-      $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),$i18n->get(2))
-                 .$self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get("url"))
-                 .$self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get("url"));
+    while (my ($id) = $sth->array) {
+        $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),$i18n->get(2))
+                 . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get("url"))
+                 . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get("url"));
         my $accessory = WebGUI::Asset->newByDynamicClass($self->session,$id);
-      push(@accessoryloop,{
-                           "accessory.URL"=>$accessory->getUrl,
-                           "accessory.title"=>$accessory->getTitle,
-                           "accessory.controls"=>$segment
+        push(@accessoryloop,{
+                           "accessory.URL"      => $accessory->getUrl,
+                           "accessory.title"    => $accessory->getTitle,
+                           "accessory.controls" => $segment,
                            });
-   }
-   $sth->finish;
-   $var{accessory_loop} = \@accessoryloop;
+    }
+    $sth->finish;
+    $var{accessory_loop} = \@accessoryloop;
 
-   #---related
-   $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
-   $var{"addrelatedproduct.label"} = $i18n->get(37);
-   $sth = $self->session->db->read("select Product_related.relatedAssetId 
-                             from Product_related 
-                             where Product_related.assetId=".$self->session->db->quote($self->getId)." 
-                             order by Product_related.sequenceNumber");
-   while (my ($id) = $sth->array) {
-      $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),$i18n->get(4))
-                 .$self->session->icon->moveUp('func=moveRelatedUp&rid='.$id,$self->get("url"))
-                 .$self->session->icon->moveDown('func=moveRelatedDown&rid='.$id,$self->get("url"));
+    #---related
+    $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
+    $var{"addrelatedproduct.label"} = $i18n->get(37);
+    $sth = $self->session->db->read("select Product_related.relatedAssetId 
+                              from Product_related 
+                              where Product_related.assetId=".$self->session->db->quote($self->getId)." 
+                              order by Product_related.sequenceNumber");
+    while (my ($id) = $sth->array) {
+        $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),$i18n->get(4))
+                 . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id,$self->get("url"))
+                 . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id,$self->get("url"));
         my $related = WebGUI::Asset->newByDynamicClass($self->session,$id);
-      push(@relatedloop,{
-                          "relatedproduct.URL"=>$related->getUrl,
-                          "relatedproduct.title"=>$related->getTitle,
-                          "relatedproduct.controls"=>$segment
-                        });
-   }
+        push(@relatedloop,{
+                          "relatedproduct.URL"      => $related->getUrl,
+                          "relatedproduct.title"    => $related->getTitle,
+                          "relatedproduct.controls" => $segment,
+                          });
+    }
     $sth->finish;
     $var{relatedproduct_loop} = \@relatedloop;
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
