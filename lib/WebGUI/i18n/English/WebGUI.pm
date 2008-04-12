@@ -1226,8 +1226,8 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 	},
 
 	'967' => {
-		message => q|Empty system trash.|,
-		lastUpdated => 1052850265
+		message => q|Empty everyone's trash.|,
+		lastUpdated => 1208022779
 	},
 
 	'322' => {
