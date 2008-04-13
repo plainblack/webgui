@@ -442,6 +442,7 @@ sub migrateOldProduct {
     ## Update config file, deleting Wobject::Product and adding Sku::Product
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');
     $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
+    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
     return;
 }
 
