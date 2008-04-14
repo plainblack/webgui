@@ -38,6 +38,7 @@ addPaymentDrivers($session);
 convertTransactionLog($session);
 upgradeEMS($session);
 migrateOldProduct($session);
+mergeProductsWithCommerce($session);
 
 finish($session); # this line required
 
@@ -444,6 +445,16 @@ sub migrateOldProduct {
     $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
     unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
     return;
+}
+
+#-------------------------------------------------
+sub mergeProductsWithCommerce {
+	my $session = shift;
+	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
+    ## Add the parameter and variants columns
+	$session->db->write("alter table Product add column parameters mediumtext");
+	$session->db->write("alter table Product add column variants   mediumtext");
+    return 1;
 }
 
 #-------------------------------------------------
