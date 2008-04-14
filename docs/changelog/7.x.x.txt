@@ -1,5 +1,6 @@
 7.4.33
  - fix: Trapped an exception for corrupt config files.
+ - fix: template variable isUncommitted is not documented in the help
 
 7.4.32
  - fixed: unable to respond to survey multiple times in same session
