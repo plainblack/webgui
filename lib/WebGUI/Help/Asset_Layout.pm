@@ -22,7 +22,7 @@ our $HELP = {
             { 'name' => 'dragger.icon' },
             { 'name' => 'dragger.init' },
             {   'name'      => 'position1_loop',
-                'variables' => [ { 'name' => 'id' }, { 'name' => 'content' } ]
+                'variables' => [ { 'name' => 'id' }, { 'name' => 'content' }, { 'name' => 'isUncommitted' }, ]
             },
         ],
         fields  => [],

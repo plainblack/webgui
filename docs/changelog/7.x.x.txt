@@ -1,4 +1,5 @@
 7.5.11
+ - fix: template variable isUncommitted is not documented in the help
 
 7.5.10
  - fix: Syntax error in GetCsMail

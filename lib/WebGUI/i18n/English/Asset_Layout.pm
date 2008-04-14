@@ -59,6 +59,12 @@ specifically placed are put inside of position 1.|,
 		lastUpdated => 1148963207,
 	},
 
+	'isUncommitted' => {
+		message => q|A boolean, whether or not this Asset is committed|,
+		lastUpdated => 1208146216,
+        context => q|Help variable in the position1_loop|,
+	},
+
 	'layout template body' => {
                 message => q|<p>The following variables are available in Page Layout Templates:</p>
 		|,
