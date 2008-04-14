@@ -15,8 +15,9 @@ package WebGUI::Asset::Sku::EMSTicket;
 =cut
 
 use strict;
-use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
+use Tie::IxHash;
+use JSON;
 
 
 =head1 NAME
@@ -130,6 +131,11 @@ sub definition {
 			label           => $i18n->get("related ribbons"),
 			hoverHelp       => $i18n->get("related ribbons help"),
 			},
+		eventMetaData => {
+			noFormPost		=> 1,
+			fieldType		=> "hidden",
+			defaultValue	=> '{}',
+			},
 	    );
 	push(@{$definition}, {
 		assetName           => $i18n->get('ems ticket'),
@@ -236,6 +242,31 @@ sub getConfiguredTitle {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm ()
+
+Extended to support event metadata.
+
+=cut
+
+sub getEditForm {
+	my $self = shift;
+	my $form = $self->SUPER::getEditForm(@_);
+	my $metadata = JSON->new->decode($self->get("eventMetaData") || '{}');
+	foreach my $field (@{$self->getParent->getEventMetaFields}) {
+		$form->getTab("meta")->DynamicField(
+			name			=> "eventmeta ".$field->{label},
+			value			=> $metadata->{$field->{label}},
+			defaultValue	=> $field->{defaultValues},
+			options			=> $field->{possibleValues},
+			fieldType		=> $field->{dataType},
+			label			=> $field->{label},
+			);
+	}
+	return $form;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getMaxAllowedInCart
 
 Returns 1.
@@ -336,6 +367,26 @@ sub onRemoveFromCart {
 	my ($self, $item) = @_;
 	$self->session->db->write("delete from EMSRegistrantTicket where ticketAssetId=? and badgeId=?",
 		[$self->getId, $self->getOptions->{badgeId}]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Extended to support event meta fields.
+
+=cut
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost(@_);
+	my $form = $self->session->form;
+	my %metadata = ();
+	foreach my $field (@{$self->getParent->getEventMetaFields}) {
+		$metadata{$field->{label}} = $form->process('eventmeta '.$field->{label}, $field->{dataType},
+			{ defaultValue => $field->{defaultValues}, options => $field->{possibleValues}});
+	}
+	$self->update({eventMetaData => JSON->new->encode(\%metadata)});
 }
 
 #-------------------------------------------------------------------

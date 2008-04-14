@@ -70,7 +70,7 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem drop column badgePrinterTemplateId");
 	$db->write("alter table EventManagementSystem drop column ticketPrinterTemplateId");
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
-	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null");
+	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null default 'IgLHtUXpZRP4ckiVNz8iTQ'");
 	$db->write("alter table EventManagementSystem add column badgeBuilderTemplateId varchar(22) binary not null default 'BMybD3cEnmXVk2wQ_qEsRQ'");
 	$db->write("alter table EventManagementSystem add column lookupRegistrantTemplateId varchar(22) binary not null default 'OOyMH33plAy6oCj_QWrxtg'");
 	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
@@ -78,6 +78,11 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column tokenInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column registrationStaffGroupId varchar(22) binary not null");
+	$db->write("alter table EventManagementSystem_metaData rename EMSEventMetaData");
+	$db->write("alter table EventManagementSystem_metaField rename EMSEventMetaField");
+	$db->write("alter table EMSEventMetaField drop column autoSearch");
+	$db->write("alter table EMSEventMetaField drop column name");
+	
 	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,

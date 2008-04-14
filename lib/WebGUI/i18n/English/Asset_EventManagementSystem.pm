@@ -68,6 +68,12 @@ our $I18N = {
 		context		=> q|a link label|,
 	},
 	
+	'add an event meta field' => {
+		message 	=> q|Add An Event Meta Field|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
 	'view tickets' => {
 		message 	=> q|View Tickets|,
 		lastUpdated	=> 0,
@@ -112,6 +118,12 @@ our $I18N = {
 	
 	'export' => {
 		message 	=> q|Export|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'meta fields' => {
+		message 	=> q|Meta Fields|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
@@ -336,6 +348,23 @@ our $I18N = {
 		message 	=> q|Event Manager (beta)|,
 		lastUpdated => 1131394072,
 		context		=> q|name of asset|,
+	},
+
+	'you do not have any metadata fields to display' => {
+		message => q|You do not have any metadata fields to display.|,
+		lastUpdated => 1145396293,
+	},
+
+	'label' => {
+		message 	=> q|Label|,
+		lastUpdated => 0,
+		context 	=> q|meta field label|,
+	},
+
+	'label help' => {
+		message 	=> q|The label for the field that the user will read to know what the field is for.|,
+		lastUpdated => 0,
+		context 	=> q|meta field label help|,
 	},
 
 	'ems badge' => {
@@ -569,119 +598,6 @@ our $I18N = {
 		message => q|As required events are added to this event, you can specify that all of the events must required (And) or that any of the events are required (Or)|,
 		lastUpdated => 1138899055,
 		context => q|hover help for operator field|,
-	},
-
-	'and' => {
-		message => q|And|,
-		lastUpdated => 1138899055,
-		context => q|logical AND|,
-	},
-
-	'or' => {
-		message => q|Or|,
-		lastUpdated => 1138899055,
-		context => q|logical OR|,
-	},
-
-	'add/edit event what next' => {
-		message => q|What Next?|,
-		lastUpdated => 1138902214,
-		context => q|form field in add/edit event|,
-	},
-
-	'add/edit event what next description' => {
-		message => q|After you have completed filling out this form, you can either add another required event, or simply save your settings and return to the Event Manager page.|,
-		lastUpdated => 1138899055,
-		context => q|hover help for What Next field|,
-	},
-
-	'add/edit event add another prerequisite' => {
-		message => q|Add Another Prerequisite|,
-		lastUpdated => 1138312761,
-		context => q|option for adding another required event in the add/edit event screen|,
-	},
-
-	'add/edit event return to manage events' => {
-		message => q|Return to Manage Events|,
-		lastUpdated => 1138312761,
-		context => q|option for returning to manage events page|,
-	},
-
-	'add/edit event assigned prerequisites' => {
-		message => q|<br />Assigned Prerequisites<br /><br />|,
-		lastUpdated => 1138312761,
-		context => q|Label for displaying required events|,
-	},
-
-	'add/edit event error' => {
-		message => q|ERROR|,
-		lastUpdated => 1138903982,
-		context => q|label for displaying errors when an event has been added or edited, such as missing required fields.|,
-	},
-
-	'event' => {
-		message => q|Event|,
-		lastUpdated => 1138904660,
-	},
-
-	'price must be greater than zero' => {
-		message => q|Price must be greater than zero.|,
-		lastUpdated => 1138312761,
-		context => q|Error message for an illegal price.|,
-	},
-
-	'status' => {
-		message => q|Status|,
-		lastUpdated => 1138908026,
-		context => q|Whether an event has been approved or not|,
-	},
-
-	'approved' => {
-		message => q|Approved|,
-		lastUpdated => 1138908026,
-		context => q|label in Event Manager, approved|,
-	},
-
-	'pending' => {
-		message => q|Pending|,
-		lastUpdated => 1138908026,
-		context => q|label in Event Manager, waiting for approval|,
-	},
-
-	'confirm delete event' => {
-		message => q|Are you sure you want to delete this event?|,
-		lastUpdated => 1138908026,
-		context => q|Confirm whether an event will be deleted|,
-	},
-
-	'confirm delete prerequisite' => {
-		message => q|Are you sure you want to delete this prerequisite?|,
-		lastUpdated => 1138908883,
-		context => q|Confirm whether a prerequisite will be deleted in the add/edit event screen|,
-	},
-
-	'add event' => {
-		message => q|Add Event|,
-		lastUpdated => 1138908251,
-		context => q|Link to add an event to the event manager|,
-	},
-
-	'manage event metadata' => {
-		message => q|Manage Event Metadata|,
-		lastUpdated => 1138908251,
-		context => q|Link to manage event metadata|,
-	},
-
-	'add new event metadata field' => {
-		message => q|Add new Event Metadata Field|,
-		lastUpdated => 1138908251,
-		context => q|In Manage Event Metadata screen|,
-	},
-
-	'add/edit event metadata field' => {
-		message => q|Add/Edit Event Metadata Field|,
-		lastUpdated => 1138908251,
-		context => q|In Manage Event Metadata screen|,
 	},
 
 	'check required fields' => {
@@ -1365,46 +1281,6 @@ by setting the "hide" form variable.|,
 	'create a badge for someone else' => {
 		message => q|Create a badge for someone else|,
 		lastUpdated => 1145396293,
-	},
-
-	'you do not have any metadata fields to display' => {
-		message => q|You do not have any metadata fields to display.|,
-		lastUpdated => 1145396293,
-	},
-
-	'you do not have any events to display' => {
-		message => q|You do not have any events to display.|,
-		lastUpdated => 1145396293,
-	},
-
-	'save approvals' => {
-		message => q|Save Approvals|,
-		lastUpdated => 1145396293,
-	},
-
-	'approve event' => {
-		message => q|Approve Event|,
-		lastUpdated => 1145396293,
-	},
-
-	'approve event description' => {
-		message => q|You can approve events so you may either submit events already approved or directly edit approval of events|,
-		lastUpdated => 1145396293,
-	},
-
-	'approval' => {
-		message => q|Approval|,
-		lastUpdated => 1145396293,
-	},
-
-	'auto search' => {
-		message => q|Initial Search Field|,
-		lastUpdated => 1145400186,
-	},
-
-	'auto search description' => {
-		message => q|Make this appear as a Filter Field on the Advanced Search screen by default|,
-		lastUpdated => 1145400186,
 	},
 
 	'select one' => {

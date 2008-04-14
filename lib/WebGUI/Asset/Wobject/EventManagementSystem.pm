@@ -53,7 +53,7 @@ sub definition {
 		},
 		templateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> '',
+			defaultValue 	=> 'IgLHtUXpZRP4ckiVNz8iTQ',
 			tab				=> 'display',
 			label			=> $i18n->get('main template'),
 			hoverHelp		=> $i18n->get('main template help'),
@@ -122,6 +122,23 @@ sub definition {
 	return $class->SUPER::definition($session,$definition);
 }
 
+#------------------------------------------------------------------
+
+=head2 deleteEventMetaField ( id )
+
+Delete a meta field.
+
+=cut
+
+sub deleteEventMetaField {
+    my $self = shift;
+    my $id = shift;
+	$self->deleteCollateral('EMSEventMetaData', 'fieldId', $id); # deleteCollateral doesn't care about assetId.
+	$self->deleteCollateral('EMSEventMetaField', 'fieldId', $id);
+	$self->reorderCollateral('EMSEventMetaField', 'fieldId');
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 getBadges ()
@@ -146,6 +163,19 @@ Returns a hash reference of id,name pairs of badge groups.
 sub getBadgeGroups {
 	my $self = shift;
 	return $self->session->db->buildHashRef("select badgeGroupId,name from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
+}
+
+#------------------------------------------------------------------
+
+=head2 getEventMetaFields (  )
+
+Returns an arrayref of hash references of the metadata fields.
+
+=cut
+
+sub getEventMetaFields {
+	my $self = shift;
+	return $self->session->db->buildArrayRefOfHashRefs("select * from EMSEventMetaField where assetId=? order by sequenceNumber, assetId",[$self->getId]);
 }
 
 #-------------------------------------------------------------------
@@ -216,40 +246,6 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	
-    # set up all the files that we need
-	my ($style, $url) = $self->session->quick(qw(style url));   
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/container/assets/skins/sam/container.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/container/container-min.js'), {type=>'text/javascript'});
-	$style->setRawHeadTags(q|
-		<style type="text/css">
-		.badgeDescription {
-		background-color: white;
-		max-width: 400px;
-		border:1px solid #000;
-		padding:10px;
-		}
-		.forwardButton {
-			background-color: green;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		.backwardButton {
-			background-color: red;
-			color: white;
-			font-weight: bold;
-			padding: 3px;
-		}
-		</style>
-						   |);
-	return undef;
  	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
@@ -269,114 +265,14 @@ sub view {
 	return $session->privilege->noAccess() unless $self->canView;
 
 	# set up objects we'll need
-	my %var = ();
-	
-
-
-
-
-    # draw the html markup that's needed
-    my $output = q| 
-
-<div class=" yui-skin-sam">
-	<p>
-	<a href="|.$self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge').q|">Add a badge</a>
-	&bull; <a href="|.$self->getUrl('func=buildBadge').q|">View Events</a>
-	&bull; ^ViewCart;
-	&bull; <a href="|.$self->getUrl('func=manageBadgeGroups').q|">Badge Groups</a>
-	</p>
-	<p>|.$self->get('badgeInstructions').q|</p>
-    <div id="emsBadgePaging"></div>
-    <div id="emsBadgeList"></div>
-</div>
-
-
-<script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function () {
-    var DataSource = YAHOO.util.DataSource,
-        Dom        = YAHOO.util.Dom,
-        DataTable  = YAHOO.widget.DataTable,
-        Paginator  = YAHOO.widget.Paginator;
-    |;
-    
-    # the datasource deals with the stuff returned from www_getBadgesAsJson
-    $output .= "var mySource = new DataSource('".$self->getUrl('func=getBadgesAsJson')."');";
-    $output .= <<STOP;
-    mySource.responseType   = DataSource.TYPE_JSON;
-    mySource.responseSchema = {
-        resultsList : 'records',
-        totalRecords: 'totalRecords',
-        fields      : [ 'url', 'title', 'description', 'price', 'quantityAvailable', 'deleteUrl', 'editUrl', 'assetId']
-    };
-STOP
-
-    # paginator in case there are a lot of badges
-    $output .= <<STOP;
-    var myPaginator = new Paginator({
-        containers         : ['emsBadgePaging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-STOP
-
-	# badge description formatter
-    $output .= q|
-		var formatViewBadgeDescription = function(elCell, oRecord, oColumn, title) {
-			elCell.innerHTML = title;
-			elCell.id = 'cell_' + oRecord.getData('assetId');
-			elCell.tooltip = new YAHOO.widget.Tooltip("tt_" + oRecord.getData('assetId'), 
-				{ context:elCell.id, autodismissdelay:250000,
-				text:'<div class="badgeDescription">'+oRecord.getData('description')+'</div>' });
-        }; 
-    |;
-
-	# add to cart formatter
-    $output .= q|
-		var formatAddToCart = function(elCell, oRecord, oColumn, url) {
-			elCell.innerHTML = (oRecord.getData('quantityAvailable') < 1) ? '' : '<a href="' + url + '" class="forwardButton">Buy</a>'; 
-        }; 
-    |;
-	
-	# manage badge formatter
-    $output .= q|
-		var formatManageBadge = function(elCell, oRecord, oColumn, editUrl) {
-			elCell.innerHTML = '<a href="' + oRecord.getData('deleteUrl') + '">Delete</a> / <a href="' + editUrl + '">Edit</a>'; 
-        }; 
-    |;
-	
-	# quantity available formatter
-    $output .= q|
-		var formatQuantityAvailable = function(elCell, oRecord, oColumn, quantityAvailable) {
-			elCell.innerHTML = (quantityAvailable < 1) ? '<strong>Sold Out!</strong>' : quantityAvailable;
-        }; 
-    |;
-	
-    # create the data table
-    $output .= <<STOP;
-    var myTableConfig = {
-        initialRequest         : '',
-        paginator              : myPaginator 
-    };
-        var myColumnDefs = [
-STOP
-	if ($session->var->isAdminOn) {
-	    $output .= '{key:"editUrl", label:"Manage", formatter:formatManageBadge},';
-	}
-    $output .= '{key:"url", label:"Buy", formatter:formatAddToCart},';
-    $output .= '{key:"title", label:"Title",sortable:true,formatter:formatViewBadgeDescription},';
-    $output .= '{key:"price", label:"Price",sortable:true,formatter:YAHOO.widget.DataTable.formatCurrency},';
-    $output .= '{key:"quantityAvailable",sortable:true,label:"Quantity Available", formatter:formatQuantityAvailable},';
-    $output .= <<STOP;
-    ];
-    var myTable = new DataTable('emsBadgeList', myColumnDefs, mySource, myTableConfig);
-
-});
-</script>
-STOP
-	return $output;
-
+	my %var = (
+		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
+		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
+		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
+		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
+		canEdit				=> $self->canEdit,
+		lookupRegistrantUrl	=> $self->getUrl('func=lookupRegistrant'),
+		);
 
 	# render
 	return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
@@ -463,22 +359,23 @@ sub www_buildBadge {
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
 	my %var = (
 		%{$self->get},
-		addTicketUrl		=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket'),
-		importTicketsUrl	=> undef,
-		exportTicketsUrl	=> undef,
-		getTicketsUrl		=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
-		canEdit				=> $self->canEdit,
-		hasBadge			=> ($badgeId ne ""),
-		badgeId				=> $badgeId,
-		whichTab			=> $whichTab || "tickets",
-		addRibbonUrl		=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
-		getRibbonsUrl		=> $self->getUrl('func=getRibbonsAsJson'),
-		getTokensUrl		=> $self->getUrl('func=getTokensAsJson'),
-		addTokenUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken'),
-		lookupBadgeUrl		=> $self->getUrl('func=lookupRegistrant'),
-		url					=> $self->getUrl,
-		viewCartUrl			=> $self->getUrl('shop=cart'),
-		customRequestUrl	=> $self->getUrl('badgeId='.$badgeId),
+		addTicketUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSTicket'),
+		importTicketsUrl			=> undef,
+		exportTicketsUrl			=> undef,
+		getTicketsUrl				=> $self->getUrl('func=getTicketsAsJson;badgeId='.$badgeId),
+		canEdit						=> $self->canEdit,
+		hasBadge					=> ($badgeId ne ""),
+		badgeId						=> $badgeId,
+		whichTab					=> $whichTab || "tickets",
+		addRibbonUrl				=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSRibbon'),
+		getRibbonsUrl				=> $self->getUrl('func=getRibbonsAsJson'),
+		getTokensUrl				=> $self->getUrl('func=getTokensAsJson'),
+		addTokenUrl					=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSToken'),
+		lookupBadgeUrl				=> $self->getUrl('func=lookupRegistrant'),
+		url							=> $self->getUrl,
+		viewCartUrl					=> $self->getUrl('shop=cart'),
+		customRequestUrl			=> $self->getUrl('badgeId='.$badgeId),
+		manageEventMetaFieldsUrl 	=> $self->getUrl('func=manageEventMetaFields'),
 		);
 	my @otherBadges =();
 	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
@@ -513,6 +410,20 @@ sub www_deleteBadgeGroup {
 	return $self->www_manageBadgeGroups;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_deleteEventMetaField ( )
+
+Method to move an event metdata field up one position in display order
+
+=cut
+
+sub www_deleteEventMetaField {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+    $self->deleteEventMetaField($self->session->form->get("fieldId"));
+	return $self->www_manageEventMetaFields;
+}
 
 #-------------------------------------------------------------------
 
@@ -562,6 +473,126 @@ sub www_editBadgeGroupSave {
 		name			=> $form->get('name'),
 		});
 	return $self->www_manageBadgeGroups;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editEventMetaField ( )
+
+Displays the edit form for event meta fields.
+
+=cut
+
+sub www_editEventMetaField {
+	my $self = shift;
+	my $fieldId = shift || $self->session->form->process("fieldId");
+	my $error = shift;
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
+	my $f = WebGUI::HTMLForm->new($self->session, (
+		action => $self->getUrl("func=editEventMetaFieldSave;fieldId=".$fieldId)
+	));
+	my $data = {};
+	if ($error) {
+		# load submitted data.
+		$data = {
+			label => $self->session->form->process("label"),
+			dataType => $self->session->form->process("dataType",'fieldType'),
+			visible => $self->session->form->process("visible",'yesNo'),
+			required => $self->session->form->process("required",'yesNo'),
+			possibleValues => $self->session->form->process("possibleValues",'textarea'),
+			defaultValues => $self->session->form->process("defaultValues",'textarea'),
+		};
+		$f->readOnly(
+			-name => 'error',
+			-label => $i18n2->get('error'),
+			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
+		);
+	} elsif ($fieldId ne 'new') {
+		$data = $self->session->db->quickHashRef("select * from EMSEventMetaField where fieldId=?",[$fieldId]);
+	} else {
+		# new field defaults
+		$data = {
+			label => $i18n2->get('type label here'),
+			dataType => 'text',
+			visible => 1,
+			required => 0,
+		};
+	}
+	$f->text(
+		-name => "label",
+		-label => $i18n2->get('label'),
+		-hoverHelp => $i18n2->get('label help'),
+		-value => $data->{label},
+		-extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
+	);
+	$f->yesNo(
+		-name=>"visible",
+		-label=>$i18n->get('473a'),
+		-hoverHelp=>$i18n->get('473a description'),
+		-value=>$data->{visible},
+		defaultValue=>1,
+	);
+	$f->yesNo(
+		-name=>"required",
+		-label=>$i18n->get(474),
+		-hoverHelp=>$i18n->get('474 description'),
+		-value=>$data->{required}
+	);
+    $f->fieldType(
+        -name=>"dataType",        
+        -label=>$i18n->get(486),        
+        -hoverHelp=>$i18n->get('486 description'),
+        -value=>ucfirst $data->{dataType},        
+        -defaultValue=>"Text",
+        );
+	$f->textarea(
+		-name => "possibleValues",
+		-label => $i18n->get(487),
+		-hoverHelp => $i18n->get('487 description'),
+		-value => $data->{possibleValues},
+	);
+	$f->textarea(
+		-name => "defaultValues",
+		-label => $i18n->get(488),
+		-hoverHelp => $i18n->get('488 description'),
+		-value => $data->{defaultValues},
+	);
+	$f->submit;
+	return $self->processStyle($f->print);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editEventMetaFieldSave ( )
+
+Processes the results from www_editEventMetaField ().
+
+=cut
+
+sub www_editEventMetaFieldSave {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+	my $error = '';
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	foreach ('label') {
+		if ($self->session->form->get($_) eq "" || 
+			$self->session->form->get($_) eq $i18n->get('type label here')) {
+			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
+		}
+	}
+	return $self->www_editEventMetaField(undef,$error) if $error;
+	my $newId = $self->setCollateral("EMSEventMetaField", "fieldId",{
+		fieldId=>$self->session->form->process('fieldId'),
+		label => $self->session->form->process("label"),
+		dataType => $self->session->form->process("dataType",'fieldType'),
+		visible => $self->session->form->process("visible",'yesNo'),
+		required => $self->session->form->process("required",'yesNo'),
+		possibleValues => $self->session->form->process("possibleValues",'textarea'),
+		defaultValues => $self->session->form->process("defaultValues",'textarea'),
+	},1,1);
+	return $self->www_manageEventMetaFields();
 }
 
 
@@ -625,7 +656,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{title} = $badge->getTitle;
 	$badgeInfo->{sku} = $badge->get('sku');
 	$badgeInfo->{assetId} = $badge->getId;
-	$badgeInfo->{hasPurchased} = ($badgeInfo->{puchaseComplete}) ? 1 : 0;
+	$badgeInfo->{hasPurchased} = ($badgeInfo->{purchaseComplete}) ? 1 : 0;
 	
 	# get existing tickets
 	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
@@ -1040,7 +1071,6 @@ sub www_manageBadgeGroups {
 	my $output = '<h1>'.$i18n->get('badge groups')
 		.q|</h1><p><a href="|.$self->getUrl("func=editBadgeGroup").q|">|.$i18n->get('add a badge group').q|</a>
 		&bull; <a href="|.$self->getUrl.q|">|.$i18n->get('view badges').q|</a>
-		&bull; <a href="|.$self->getUrl("func=buildBadge").q|">|.$i18n->get('view tickets').q|</a>
 		</p>|;
 	my $groups = $session->db->read("select badgeGroupId,name from EMSBadgeGroup where emsAssetId=?",[$self->getId]);
 	my $badgeGroups = $self->getBadgeGroups;
@@ -1050,6 +1080,75 @@ sub www_manageBadgeGroups {
 			|.$badgeGroups->{$id}.q|</div>|;
 	}
 	return $self->processStyle($output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manageEventMetaFields ( )
+
+Method to display the event metadata management console.
+
+=cut
+
+sub www_manageEventMetaFields {
+	my $self = shift;
+
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+
+	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
+	my $output = '<h1>'.$i18n->get('meta fields')
+		.q|</h1><p><a href="|.$self->getUrl("func=editEventMetaField").q|">|.$i18n->get('add an event meta field').q|</a>
+		&bull; <a href="|.$self->getUrl('func=buildBadge').q|">|.$i18n->get('view tickets').q|</a>
+		</p>|;
+	my $metadataFields = $self->getEventMetaFields;
+	my $count = 0;
+	my $number = scalar(@{$metadataFields});
+	if ($number) {
+		foreach my $row1 (@{$metadataFields}) {
+			my %row = %{$row1};
+			$count++;
+			$output .= "<div>".
+			$self->session->icon->delete('func=deleteEventMetaField;fieldId='.$row{fieldId},$self->get('url'),$i18n->get('confirm delete event metadata')).
+			$self->session->icon->edit('func=editEventMetaField;fieldId='.$row{fieldId}, $self->get('url')).
+			$self->session->icon->moveUp('func=moveEventMetaFieldUp;fieldId='.$row{fieldId}, $self->get('url'),($count == 1)?1:0);
+			$output .= $self->session->icon->moveDown('func=moveEventMetaFieldDown;fieldId='.$row{fieldId}, $self->get('url'),($count == $number)?1:0).
+			" ".$row{label}."</div>";
+		}
+	}
+	else {
+		$output .= $i18n->get('you do not have any metadata fields to display');
+	}
+	return $self->processStyle($output);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_moveEventMetaFieldDown ( )
+
+Method to move an event down one position in display order
+
+=cut
+
+sub www_moveEventMetaFieldDown {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+	$self->moveCollateralDown('EMSEventMetaField', 'fieldId', $self->session->form->get("fieldId"));
+	return $self->www_manageEventMetaFields;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_moveEventMetaFieldUp ( )
+
+Method to move an event metdata field up one position in display order
+
+=cut
+
+sub www_moveEventMetaFieldUp {
+	my $self = shift;
+	return $self->session->privilege->insufficient unless ($self->canEdit);
+	$self->moveCollateralUp('EMSEventMetaField', 'fieldId', $self->session->form->get("fieldId"));
+	return $self->www_manageEventMetaFields;
 }
 
 #-------------------------------------------------------------------
@@ -1195,7 +1294,7 @@ sub _getFieldHash {
 	);
 	# Add custom metadata fields to the list, matching the types up
 	# automatically.
-	my $fieldList = $self->getEventMetaDataArrayRef;
+	my $fieldList = $self->getEventMetaFields;
 	foreach my $field (@{$fieldList}) {
 	    next unless $field->{visible};
 		my $dataType = $field->{dataType};
@@ -1355,21 +1454,6 @@ sub addToScratchCart {
 	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
 }
 
-#-------------------------------------------------------------------
-
-sub canApproveEvents {
-	my $self = shift;
-	return $self->session->user->isInGroup($self->get("groupToApproveEvents"));
-}
-
-
-#-------------------------------------------------------------------
-
-sub canAddEvents {
-	my $self = shift;
-	return $self->session->user->isInGroup($self->get("groupToAddEvents"));
-}
-
 
 #-------------------------------------------------------------------
 
@@ -1515,304 +1599,6 @@ sub checkRequiredFields {
 }
 
 
-#------------------------------------------------------------------
-
-=head2 deleteBadge ( id )
-
-Delete a badge.
-
-=cut
-
-sub deleteBadge {
-    my $self = shift;
-    my $id = shift;
-	$self->deleteCollateral('EventManagementSystem_badges', 'badgeId', $id); 
-}
-
-#------------------------------------------------------------------
-
-=head2 deleteEvent ( id )
-
-Delete an event.
-
-=cut
-
-sub deleteEvent {
-    my $self = shift;
-    my $id = shift;
-    my $db = $self->session->db;
-    $self->deletePrereq($id);
-	$self->deleteCollateral('EventManagementSystem_registrations', 'productId', $id);
-	$self->deleteCollateral('EventManagementSystem_products', 'productId', $id);
-	$self->deleteCollateral('products','productId',$id);
-	$self->reorderCollateral('EventManagementSystem_products', 'productId');
-}
-
-#------------------------------------------------------------------
-
-=head2 deleteMetaField ( id )
-
-Delete a meta field, and thusly metadata associated with that field.
-
-=cut
-
-sub deleteMetaField {
-    my $self = shift;
-    my $id = shift;
-	$self->deleteCollateral('EventManagementSystem_metaData', 'fieldId', $id); # deleteCollateral doesn't care about assetId.
-	$self->deleteCollateral('EventManagementSystem_metaField', 'fieldId', $id);
-	$self->reorderCollateral('EventManagementSystem_metaField', 'fieldId');
-}
-
-
-#------------------------------------------------------------------
-
-=head2 deletePrereq ( id )
-
-Delete a prerequisite.
-
-=head3 id
-
-a valid event/product id
-
-=cut
-
-sub deletePrereq {
-    my $self = shift;
-    my $id = shift;
-	$self->deleteCollateral('EventManagementSystem_prerequisiteEvents', 'requiredProductId', $id);
-}
-
-#------------------------------------------------------------------
-
-=head2 deletePrereqSet ( id )
-
-Delete a prerequisite set.
-
-=cut
-
-sub deletePrereqSet {
-    my $self = shift;
-    my $id = shift;
-	$self->deleteCollateral('EventManagementSystem_prerequisiteEvents', 'prerequisiteId', $id);
-	$self->deleteCollateral('EventManagementSystem_prerequisites', 'prerequisiteId', $id);
-    $self->session->db->write("update EventManagementSystem_product set prerequisiteId=null where
-        prerequisiteId=?", [$id]);
-}
-
-#-------------------------------------------------------------------
-sub emptyScratchCart {
-	my $self = shift;	
-	$self->session->scratch->delete('EMS_scratch_cart');
-}
-
-#-------------------------------------------------------------------
-
-=head2 error ( errors, callback )
-
-Generates error messages and calls specified method to display them.
-
-=head3 errors
-
-An array reference containing an error stack
-
-=cut
-
-=head3 callback
-
-The method to call and pass the generated error messages to for display to the user
-
-=cut
-
-sub error {
-	my $self = shift;
-	my $errors = shift;
-	my $callback = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my @errorMessages;
-
-	foreach my $error (@$errors) {
-		#Null Field Error
-		if ($error->{type} =~ m/nullField(\d*)/) {
-		  my $num = $1 || ''; # there's a record number stuck in here, if they're doing a batch import of events
-		  if ($num) {
-		  	push(@errorMessages, sprintf($i18n->get('null field error recnum'),$error->{fieldName},$num));
-		  }
-		  else {
-		  	push(@errorMessages, sprintf($i18n->get('null field error'),$error->{fieldName}));
-		  }
-		}
-
-		#General Error Message
-		elsif ($error->{type} eq "general") {
-		  push(@errorMessages, $error->{message});
-		}
-
-		#Scheduling Conflict
-		elsif ($error->{type} eq "conflict") {
-		  push(@errorMessages, $self->resolveConflictForm($error->{event1}, $error->{event2}));
-		}
-
-		elsif ($error->{type} eq "special") {
-		  push(@errorMessages, unpack("u",$error->{message}));
-		}
-	}
-	return $self->$callback(\@errorMessages);
-}
-
-#------------------------------------------------------------------
-
-=head2 eventIsApproved ( eventId )
-
-Returns approval status of a specified event
-
-=head3 eventId
-
-Id of event whose approval status you are trying to determine
-
-=cut
-
-sub eventIsApproved {
-	my $self = shift;
-	my $eventId = shift;
-	my ($result) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId=?",[$eventId]);
-	return ($result eq "1");
-}
-
-#------------------------------------------------------------------
-
-=head2 getAssignedPrerequisites ( eventId )
-
-Returns prerequisiteId of every prerequisite grouping assigned to eventId passed in.
-
-=head3 eventId
-
-Id of the event whose prerequisites you want returned
-
-=cut
-
-sub getAssignedPrerequisites {
-	my $self = shift;
-	my $eventId = shift;
-	my $returnProductIdFlag = shift;
-	my $sql;
-
-	unless ($returnProductIdFlag) {
-		$sql = "select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p 
-			where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?";
-	}
-	else {
-		$sql = "select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p 
-		   where where prereqs.prerequisiteId = p.prerequisiteId and p.productId=?";
-	}
-
-	return $self->session->db->buildHashRef($sql,[$eventId]); 
-}
-
-#------------------------------------------------------------------
-
-=head2 getEventsInCart ( )
-
-Returns an array ref of all items in the cart, by id.
-
-=cut
-
-sub getEventsInCart {
-	my $self = shift;
-	my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	my ($cartItems) = $cart->getItems;
-
-	my @eventsInCart = map { $_->{item}->id } @{ $cartItems };
-
-	return \@eventsInCart;
-}
-
-#------------------------------------------------------------------
-sub getEventsInScratchCart {
-	my $self = shift;
-	my @eventsInCart = split("\n",$self->session->scratch->get('EMS_scratch_cart'));
-	return \@eventsInCart;
-}
-
-#------------------------------------------------------------------
-sub getEventName {
-	my $self = shift;
-	my $eventId = shift;
-
-	my ($eventName) = $self->session->db->quickArray("select title from products where productId=?",[$eventId]);
-
-	return $eventName;
-}
-
-
-#------------------------------------------------------------------
-
-=head2 getPrerequisiteEventList ( eventId )
-
-Returns hash reference of EventId, Name pairs of events that qualify to be a specified Event Id's prerequisite
-
-This method returns all events except for
- a) the event matching the eventId parameter passed in AND
- b) any events currently assigned as a prerequisite to the eventId parameter passed in
-as a hash reference with the productId, and title
-
-Checks property globalPrerequisites to determine if events from all defined Event Managers should be displayed
-or only the events defined in this particular Event Manager
-
-=head3 eventId
-
-Id of the event that you want to return eligible prerequisites for
-
-=cut
-
-sub getPrerequisiteEventList {
-	my $self = shift;
-	my $eventId = shift;
-	my $conditionalWhere;
-
-	if ($self->get("globalPrerequisites") == 0) {
-		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
-	}
-
-	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
-		   where p.productId = e.productId 
-		         and p.productId !=".$self->session->db->quote($eventId)."
-		         $conditionalWhere
-		         and p.productId not in
-		         (select requiredProductId from EventManagementSystem_prerequisites as p,
-							EventManagementSystem_prerequisiteEvents as pe 
-			  where p.prerequisiteId = pe.prerequisiteId 
-			        and p.productId=".$self->session->db->quote($eventId).")";
-
-	return $self->session->db->buildHashRef($sql);
-}
-
-
-#------------------------------------------------------------------
-
-=head2 getEventMetaDataArrayRef (  )
-
-Returns an arrayref of hash references of the metadata fields.
-
-Checks $self->get("globalMetadata") by default; otherwise uses the first parameter.
-
-=head3 useGlobalMetadata
-
-Whether or not to use the asset's global setting, and the override.
-
-=cut
-
-sub getEventMetaDataArrayRef {
-	my $self = shift;
-	my $useGlobalMetadata = shift;
-	my $productId = shift;
-	$useGlobalMetadata = ($useGlobalMetadata)?$useGlobalMetadata:$self->get("globalMetadata");
-	my $globalWhere = ($useGlobalMetadata == 0 || $useGlobalMetadata == 'false')?" where assetId='".$self->getId."'":'';
-	return $self->getEventMetaDataFields($productId) if $productId;
-	return $self->session->db->buildArrayRefOfHashRefs("select * from EventManagementSystem_metaField $globalWhere order by sequenceNumber, assetId");
-}
-
-
 #-------------------------------------------------------------------
 
 =head2 getEventMetaDataFields ( productId )
@@ -1831,8 +1617,8 @@ sub getEventMetaDataFields {
 	my $useGlobalMetadata = shift;
 	my $globalWhere = ($useGlobalMetadata == 0 || $useGlobalMetadata == 'false')?" where f.assetId='".$self->getId."'":'';
 	my $sql = "select f.*, d.fieldData
-		from EventManagementSystem_metaField f
-		left join EventManagementSystem_metaData d on f.fieldId=d.fieldId
+		from EMSEventMetaField f
+		left join EMSEventMetaData d on f.fieldId=d.fieldId
 		and d.productId=? $globalWhere
 		order by f.sequenceNumber";
 	tie my %hash, 'Tie::IxHash';
@@ -1848,184 +1634,11 @@ sub getEventMetaDataFields {
 
 #------------------------------------------------------------------
 
-sub getBadgeSelector {
-	my $self = shift;
-	my $output;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	my $selfName = ($self->session->var->get('userId') ne '1') ? $self->session->user->profileField('firstName').' '.$self->session->user->profileField('lastName').' ('.$i18n->get('you').')' : $i18n->get('create a badge for myself');
-	$selfName = $i18n->get('create a badge for myself') if $selfName eq '  ('.$i18n->get('you').')';
-	my %options;
-	tie %options, 'Tie::IxHash';
-	%options = (
-		'thisIsI' => $selfName,
-		'new' => $i18n->get('create a badge for someone else')
-	);
-	my $isAdmin = $self->canAddEvents;
-
-	my $badges = {};
-	my $me = $self->session->var->get('userId');
-	my $addBadgeId = $self->session->scratch->get('EMS_add_purchase_badgeId');
-
-	if ($isAdmin) {
-		# all badges in the system.
-		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName,' (',email,')') from EventManagementSystem_badges order by lastName");
-	} elsif ($me eq '1') {
-		#none
-		$badges = {};
-		%options = ();
-	} else {
-		#badges we have purchased.
-		$badges = $self->session->db->buildHashRef("select b.badgeId, CONCAT(b.lastName,', ',b.firstName,' (',email,')') from EventManagementSystem_badges as b where b.userId='".$me."' or b.createdByUserId='".$me."' order by b.lastName");
-	}
-	if ($addBadgeId) {
-		$badges = $self->session->db->buildHashRef("select badgeId, CONCAT(lastName,', ',firstName,' (',email,')') from EventManagementSystem_badges where badgeId=?",[$addBadgeId]);
-		%options = ();
-	}
-	my $js;
-	my %badgeJS;
-	my $defaultBadge;
-	my $IHaveOne = 0;
-	my $allBadgeInfo = $self->session->db->buildHashRefOfHashRefs("select * from EventManagementSystem_badges",undef,'badgeId');
-	foreach (keys %$badges) {
-		$badgeJS{$_} = $allBadgeInfo->{$_};
-		$defaultBadge ||= $badgeJS{$_}->{badgeId};
-		if ($badgeJS{$_}->{userId} eq $me) {
-			# we have a match!
-			$IHaveOne = 1;
-			delete $options{'thisIsI'};
-			$defaultBadge = $badgeJS{$_}->{badgeId};
-		}
-	}
-	if (!$IHaveOne && !$isAdmin && $me ne '1') {
-		$defaultBadge = 'thisIsI';
-		my $meUser = WebGUI::User->new($self->session,$me);
-		$badgeJS{'thisIsI'} = {
-			firstName=>$meUser->profileField('firstName'),
-			lastName=>$meUser->profileField('lastName'),
-			'address'=>$meUser->profileField('homeAddress'),
-			city=>$meUser->profileField('homeCity'),
-			state=>$meUser->profileField('homeState'),
-			zipCode=>$meUser->profileField('homeZip'),
-			country=>$meUser->profileField('homeCountry'),
-			phone=>$meUser->profileField('homePhone'),
-			email=>$meUser->profileField('email')
-		};
-	}
-	$js = '<script type="text/javascript">
-	var badges = '.JSON->new->encode(\%badgeJS).';
-	</script>';
-	%options = (%options,%{$badges});
-	$output .= WebGUI::Form::selectBox($self->session,{
-		name => 'badgeId',
-		options => \%options,
-		value => ($addBadgeId ? $addBadgeId : $defaultBadge),
-		extras => 'onchange="swapBadgeInfo(this.value)" onkeyup="swapBadgeInfo(this.value)"'
-	}).($addBadgeId ? WebGUI::Form::hidden($self->session,{
-		name => 'badgeId',value=>$addBadgeId
-	}) : '');
-
-	return $js.$output if scalar(keys(%options));
-	return '';
-}
-
-#------------------------------------------------------------------
-
-=head2 getRequiredEventName ( prerequisiteId )
-
-Returns names of every event assigned to the prerequisite grouping of the prerequisite group id passed in
-
-=head3 prerequisiteId
-
-Id of the prerequisite group whose assigned event names you want returned
-
-=cut
-
-sub getRequiredEventNames {
-	my $self = shift;
-	my $prerequisiteId = shift;
-	my $sql = "select title from products as p, EventManagementSystem_prerequisites as pr, EventManagementSystem_prerequisiteEvents as pe
-		   where 
-		     pe.requiredProductId = p.productId 
-		     and pr.prerequisiteId = pe.prerequisiteId 
-		     and pr.prerequisiteId=?";
-
-	return $self->session->db->buildArrayRef($sql,[$prerequisiteId]);
-}
-
-#------------------------------------------------------------------
-sub getRegistrationInfo {
-	my $self = shift;
-	my $error = shift || [];
-	my %var;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"saveRegistrantInfo"});
-	$var{'form.message'} = $i18n->get('registration info message');
-	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'form.submit'} = WebGUI::Form::submit($self->session);
-	$var{'form.firstName.label'} = $i18n->get("first name");
-	$var{'form.lastName.label'} = $i18n->get("last name");
-	$var{'form.address.label'} = $i18n->get("address");
-	$var{'form.city.label'} = $i18n->get("city");
-	$var{'form.state.label'} = $i18n->get("state");
-	$var{'form.zipCode.label'} = $i18n->get("zip code");
-	$var{'form.country.label'} = $i18n->get("country");
-	$var{'form.phoneNumber.label'} = $i18n->get("phone number");
-	$var{'form.email.label'} = $i18n->get("email address");
-	$var{'form.badgeId.label'} = $i18n->get("which badge");
-	$var{'form.firstName'} = WebGUI::Form::Text($self->session,{name=>'firstName'});
-	$var{'form.lastName'} = WebGUI::Form::Text($self->session,{name=>'lastName'});
-	$var{'form.address'} = WebGUI::Form::Text($self->session,{name=>'address'});
-	$var{'form.city'} = WebGUI::Form::Text($self->session,{name=>'city'});
-	$var{'form.state'} = WebGUI::Form::Text($self->session,{name=>'state'});
-	$var{'form.zipCode'} = WebGUI::Form::Text($self->session,{name=>'zipCode'});
-	$var{'form.country'} = WebGUI::Form::Country($self->session,{name=>'country', value=>'United States'});
-	$var{'form.phoneNumber'} = WebGUI::Form::Phone($self->session,{name=>'phone'});
-	$var{'form.badgeId'} = $self->getBadgeSelector;
-	$var{'form.updateProfile'} = WebGUI::Form::Checkbox($self->session,{name=>'updateProfile'});
-	$var{isLoggedIn} = 1 if ($self->session->user->userId ne '1');
-	$var{'form.email'} = WebGUI::Form::Email($self->session,{name=>'email'});
-	$var{'registration'} = 1;
-	$var{'cancelRegistration.url'} = $self->getUrl('func=resetScratchCart');
-	$var{'cancelRegistration.url.label'} = $i18n->get('cancel registration');
-	$var{'isError'} = ($error) ? 1 : 0;
-	$var{'errorLoop'} = $error;
-	
-	return \%var;
-}
-
-#------------------------------------------------------------------
-sub prerequisiteIsMet {
-	my $self = shift;
-	my $operator = shift;
-	my $requiredEvents = shift;
-	my $userSelectedEvents = $self->getEventsInScratchCart;
-
-	if ($operator eq 'and') { # make sure every required event is in the users cart
-		  foreach my $requiredEvent (@$requiredEvents) {
- 		    unless ( isIn($requiredEvent, @{$userSelectedEvents}) ) {
-		      return 0;
-		    }
-		  }
-		  return 1;
-	} elsif ($operator eq 'or') { # make sure one of the required events is in the users cart
-		  foreach my $requiredEvent (@$requiredEvents) {
-		    if ( isIn($requiredEvent, @{$userSelectedEvents}) ) {
-		      return 1;
-	 	    }
-		  }
-		  return 0;
-	}	
-}
-
-
-#------------------------------------------------------------------
-
 sub purge {
     my $self = shift;
     my $db = $self->session->db;
     # delete meta fields
-    my $sth = $db->read("select fieldId from EventManagementSystem_metaField where assetId=?",[$self->getId]);
+    my $sth = $db->read("select fieldId from EMSEventMetaField where assetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $self->deleteMetaField($id);
     }
@@ -2045,353 +1658,6 @@ sub purge {
         $self->deleteBadge($id);
     }
     $self->SUPER::purge(@_);
-}
-
-
-#------------------------------------------------------------------
-sub removeFromScratchCart {
-	my $self = shift;
-	my $event = shift;
-#	if ($event eq $self->session->scratch->get('currentMainEvent')) {
-#		return $self->resetScratchCart();
-#	}
-	my $currentPurchase = $self->session->scratch->get('currentPurchase');
-	if ($currentPurchase ne "") {
-		my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-		my ($items, $nothing) = $shoppingCart->getItems;
-		foreach my $item (@$items) {
-			if ($item->{item}->{_event}->{productId} eq $event) {
-				$shoppingCart->setQuantity($event,'Event',($item->{quantity} - 1));
-			}
-		}
-	}
-	my $events =  $self->getEventsInScratchCart();
-	my @newArr;
-	foreach (@{$events}) {
-		push (@newArr,$_) unless $_ eq $event;
-	}
-	$self->session->scratch->set('EMS_scratch_cart', join("\n",@newArr));
-}
-
-#------------------------------------------------------------------
-sub www_removeFromScratchCart {
-	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-
-	my $pid = $self->session->form->get("pid");
-	$self->removeFromScratchCart($pid);
-
-	return $self->www_search;
-}
-
-
-#------------------------------------------------------------------
-sub resolveConflictForm {
-	my $self = shift;
-	my $event1 = shift;
-	my $event2 = shift;
-	my $deleteIcon = $self->session->icon->getBaseURL()."delete.gif";
-	my %var;
-	my $sth = $self->session->db->read("
-		select productId, title, price, description
-		from products where productId in (".$self->session->db->quote($event1).","
-		.$self->session->db->quote($event2).")"
-	);
-
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"deleteCartItem"})
-			     .WebGUI::Form::hidden($self->session,{name=>"event1",value=>"$event1"})
-			     .WebGUI::Form::hidden($self->session,{name=>"event2",value=>"$event2"}
-	);
-
-	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
-	$var{'message'}	    = $i18n->get('scheduling conflict message');
-
-	my @loop;
-	while (my $data = $sth->hashRef) {
-		push(@loop, {
-			'form.deleteControl' => "<input type='image' src='$deleteIcon' name='productToRemove' value='".$data->{productId}."' style='border: 0px;'/>",
-			'title' => $data->{title},
-			'description' => $data->{description},
-			'price' => $data->{price}			
-		});
-	}
-	$var{'conflict_loop'} = \@loop;
-	$var{'resolveConflicts'} = 1;
-
-	return \%var;
-}
-
-#------------------------------------------------------------------
-sub verifyAllPrerequisites {
-	my $self = shift;
-	my $cache;
-	my $pId;
-	my $startingEvents = {};
-	my $scratchEvents;
-	$scratchEvents = $self->getEventsInScratchCart;
-	foreach (@$scratchEvents) {
-		$startingEvents->{$_} = $self->getEventDetails($_);
-	}
-	my ($lastResults, $msgLoop) = $self->verifyEventPrerequisites($startingEvents,1);
-	my $lastResultsSize = scalar(keys %$lastResults);
-	my $currentResultsSize = -4;
-	# initial case must not qualify as the base case
-	return [] unless $lastResultsSize;
-	until ($currentResultsSize == $lastResultsSize) {
-		$currentResultsSize = $lastResultsSize;
-		my ($hashTemp,$newMsgLoop) = $self->verifyEventPrerequisites($lastResults,1);
-		$lastResults = {%$lastResults,%$hashTemp};
-		foreach my $newMsg (@$newMsgLoop) {
-			my $add = 1;
-			foreach my $oldMsg (@$msgLoop) {
-				$add = 0 if $oldMsg->{productId} eq $newMsg->{productId};
-			}
-			push (@$msgLoop,$newMsg) if $add;
-		}
-		$lastResultsSize = scalar(keys %$lastResults);
-	}
-
-	my $rowsLoop = [];
-	foreach (keys %$lastResults) {
-		my $details = $lastResults->{$_};
-		push(@$rowsLoop, {
-			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
-				value => $_,
-				name  => "subEventPID"}
-			),
-			'title'		=> $details->{title},
-			'description'	=> $details->{description},
-			'price'		=> $details->{price}
-		});
-	}
-	return $msgLoop, $rowsLoop;
-}
-
-#------------------------------------------------------------------
-sub verifyEventPrerequisites {
-	my $self = shift;
-	my $lastResults = shift;
-	my $returnMsgLoop = shift;
-	my $msgLoop = [];
-	my $newResults = {};
-	foreach (keys %$lastResults) {
-		my ($required,$messageLoop) = $self->getAllPossibleEventPrerequisites($_);
-		# add in any new ones.
-		foreach my $req (@$required) {
-			$newResults->{$req} = $self->getEventDetails($req);
-		}
-		if ($returnMsgLoop) {
-			my $details = $self->getEventDetails($_);
-			push (@$msgLoop,{%$details,messageLoop=>$messageLoop}) if (scalar(@$messageLoop));
-		}
-	}
-	return $newResults,$msgLoop if $returnMsgLoop;
-	return $newResults;
-}
-
-#------------------------------------------------------------------
-sub getAllPossibleEventPrerequisites {
-	my $self = shift;
-	my $eventId = shift;
-	my $required = [];
-	my $messageLoop = [];
-
-	# Get all prerequisite definitions defined for this event
-	my $prerequisiteDefinitions = $self->session->db->buildHashRef("select prereqs.prerequisiteId, prereqs.operator from EventManagementSystem_prerequisites as prereqs, EventManagementSystem_products as p
-									where prereqs.prerequisiteId = p.prerequisiteId and p.approved=1 and p.productId=?",[$eventId]);
-	foreach my $prerequisiteId (keys %{$prerequisiteDefinitions}) {
-		my $message;
-		my $operator = $prerequisiteDefinitions->{$prerequisiteId};
-
-		# Get the events required for each prerequisite definition (the events required for attending $eventId)
-		my $requiredEvents = $self->session->db->buildArrayRef("select requiredProductId from EventManagementSystem_prerequisiteEvents
-								       where prerequisiteId=?",[$prerequisiteId]);
-
-		unless ($self->prerequisiteIsMet($operator, $requiredEvents)) {
-
-			#compare all the required events to the events in the scratch cart and build a list of the ones
-			#that are required but not currently in the scratch cart.
-			my $scratchCart = $self->getEventsInScratchCart;
-			my @missingEventIds;
-
-			foreach my $requiredEvent (@$requiredEvents) {
-				push (@missingEventIds, $requiredEvent) unless isIn($requiredEvent, @$scratchCart);
-			}
-
-			my $missingEventNames = $self->getRequiredEventNames($prerequisiteId);
-
-			foreach my $missingEventName (@$missingEventNames) {
-				$message .= "$missingEventName $operator ";
-			}
-
-			$message =~ s/(\sand\s|\sor\s)$//;  #remove trailing 'and' or 'or' from the message
-
-			foreach (@missingEventIds) {
-				push(@$required,$_) unless isIn($_,@$required);
-			}
-		}
-		push(@$messageLoop,{reqmessage=>$message}) if $message;
-	}	
-	return $required,$messageLoop;
-}
-
-
-#------------------------------------------------------------------
-sub getAllPossibleRequiredEvents {
-	my $self = shift;
-	my $pId = shift;
-	my $cache = WebGUI::Cache->new($self->session,["gAPRE",$pId]);
-	my $eventData = $cache->get;
-	return $eventData->{$pId} if defined $eventData->{$pId};
-
-	# Get all required events for this event (base case)
-	my $lastResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r where r.prerequisiteId = ?",[$pId]);
-	$cache->set({$pId=>$lastResults}, 60*60*24*360);
-	return $lastResults;
-	my $lastResultsSize = scalar(@$lastResults);
-	my $currentResultsSize = -4;
-	# initial case must not qualify as the base case
-	return [] unless $lastResultsSize;
-	until ($currentResultsSize == $lastResultsSize) {
-		$currentResultsSize = $lastResultsSize;
-		my $newResults = $self->session->db->buildArrayRef("select distinct(r.requiredProductId) from EventManagementSystem_prerequisiteEvents as r, EventManagementSystem_products as p where r.prerequisiteId = p.prerequisiteId and p.approved=1 and p.productId in (".$self->session->db->quoteAndJoin($lastResults).")");
-		return $lastResults unless scalar(@$newResults);
-		$lastResults = $newResults;
-		$lastResultsSize = scalar(@$lastResults);
-	}
-	$cache->set({$pId=>$lastResults}, 60*60*24*360);
-	return $lastResults;
-}
-
-
-#------------------------------------------------------------------
-
-=head2 getAllStdEventDetails ( )
-
-Get an aref hrefs of information for all events in this EMS. The information is the result of joining the products and EMS_products tables.
-
-=cut
-
-sub getAllStdEventDetails {
-	my $self = shift;
-	
-	if ($self->{_allEventDetails}) {
-		return $self->{_allEventDetails};
-	}
-	
-	my $sql = <<"";
-		SELECT *
-		FROM products p, EventManagementSystem_products e
-		WHERE p.productId = e.productId
-		AND e.assetId = ?
-		ORDER BY e.sequenceNumber
-
-
-	$self->{_allEventDetails} = $self->session->db->buildArrayRefOfHashRefs($sql, [$self->getId]);
-	return $self->{_allEventDetails};
-}
-
-#------------------------------------------------------------------
-sub getEventDetails {
-	my $self = shift;
-	my $eventId = shift;
-	return $self->{_eventDetails}{$eventId} if $self->{_eventDetails}{$eventId};
-	$self->{_eventDetails}{$eventId} = $self->session->db->quickHashRef(
-		"select productId, title, price, description from products where productId = ?"
-		,[$eventId]
-	);
-	return $self->{_eventDetails}{$eventId};
-}
-
-#------------------------------------------------------------------
-
-=head2 getEventStates
-
-Returns a hash reference containing event approval states
-
-=cut
-
-sub getEventStates {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	my $eventStates = {
-		'-2' => $i18n->echo("Cancelled"),
-		'-1' => $i18n->echo("Pending"),
-		'0'  => $i18n->echo("Denied"),
-		'1'  => $i18n->echo("Approved"),
-	};
-	
-	return $eventStates;
-}
-
-
-#------------------------------------------------------------------
-
-=head2 getEventStateLabel ( status_code )
-
-Returns an internationalized string that corresponds to an events 'approval'
-state
-
-=cut
-
-sub getEventStateLabel {
-	my $self = shift;
-	my $statusCode = shift;
-	my $eventStates = $self->getEventStates;
-	
-	return $eventStates->{$statusCode};
-}
-
-#------------------------------------------------------------------
-sub verifyPrerequisitesForm {
-	my $self = shift;
-	my ($missingEventMessageLoop, $allPrereqsLoop) = $self->verifyAllPrerequisites;
-	my @usedEventIds;
-	my $scratchCart = $self->getEventsInScratchCart;
-	#use Data::Dumper;
-	# $self->session->errorHandler->warn("scratch: <pre>".Dumper($scratchCart)."</pre>");
-	my %var;
-
-	#If there is no missing event data, return nothing
-	return undef unless scalar(@$missingEventMessageLoop);
-
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-
-	$scratchCart = [split("\n",$self->session->scratch->get('EMS_scratch_cart'))];
-
-	foreach (@$scratchCart) {
-		my $details = $self->getEventDetails($_);
-		push(@$allPrereqsLoop, {
-			'form.checkBox' => WebGUI::Form::checkbox($self->session, {
-				value => 1,
-				checked => 1,
-				name  => "subEventDisregard",
-				extras => 'disabled="disabled"',
-			}),
-			'title'		=> $details->{title},
-			'description'	=> $details->{description},
-			'price'		=> $details->{price}
-		});
-	}
-
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-			     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"addToCart"})
-			     .WebGUI::Form::hidden($self->session,{name=>"method",value=>"addSubEvents"}
-	);
-
-	$var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'form.submit'} = WebGUI::Form::Submit($self->session);
-	$var{'message'}	    = $i18n->get('missing prerequisites message');	
-
-	#Set the template vars needed to inform the user of the missing prereqs.
-	$var{'prereqsAreMissing'} = 1;
-	$var{'message_loop'} = $missingEventMessageLoop;
-	$var{'missingEvents_loop'} = $allPrereqsLoop;
-	return \%var;
 }
 
 #------------------------------------------------------------------
@@ -2462,658 +1728,7 @@ sub validateEditEventForm {
 	return $errors;
 }
 
-#-------------------------------------------------------------------
 
-=head2 www_addToCart (  )
-
-Method that will add an event to the users shopping cart.
-
-=cut
-
-sub www_addToCart {
-	my ($self, $pid, @pids, $output, $errors, $conflicts, $errorMessages, $shoppingCart);
-	$self = shift;
-	$conflicts = shift;
-	$pid = shift;
-	$shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	# $self->session->errorHandler->warn("scratch before: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
-	# Check if conflicts were found that the user needs to fix
-	$output = $conflicts->[0] if defined $conflicts;
-
-	unless ($output) { #Skip this if we have errors
-
-		if ($self->session->form->get("method") eq "addSubEvents") { # List of ids from subevent form
-			@pids = $self->session->form->process("subEventPID", "checkList");
-		}
-		else {  # A single id, i.e., a master event
-			my $newPid = $self->session->form->get("pid") || $pid;
-			push(@pids, $newPid) unless ($newPid eq "_noid_");
-		}
-
-		foreach my $eventId (@pids) {
-			$self->addToScratchCart($eventId);
-		}
-
-		# Check to make sure all the prerequisites for this event have been satisfied
-		$output = $self->verifyPrerequisitesForm;
-
-		#$output = $self->getSubEventForm(\@pids) unless ($output);
-		#$output = $self->getSubEventForm($self->getEventsInScratchCart) unless ($output);
-
-		$errors = $self->checkConflicts;
-		if (scalar(@$errors) > 0) { return $self->error($errors, "www_addToCart"); }
-
-		unless ($output) {
-			return $self->saveRegistration;
-		}
-	}
-	# $self->session->errorHandler->warn("scratch after: <pre>".Dumper($self->getEventsInScratchCart).Dumper($self->session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$self->session->getId]))."</pre>");
-	return $self->processStyle($self->processTemplate($output,$self->getValue("checkoutTemplateId")));
-} 
-
-#-------------------------------------------------------------------
-sub www_addToScratchCart {
-	my $self = shift;	
-	my $pid = $self->session->form->get("pid");
-	my $nameOfEventAdded = $self->getEventName($pid);
-	my $masterEventId = $self->session->form->get("mid");
-
-	my $mainEvent = $self->addToScratchCart($pid); #tsc
-	if ($masterEventId eq $pid) {
-		return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")));
-	}
-	return $self->www_search($nameOfEventAdded);
-}
-
-#-------------------------------------------------------------------
-sub addCartVars {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $var = shift;
-	$var->{'cart.purchaseLoop'} = [];
-	my $purchases   = $self->session->db->buildArrayRefOfHashRefs(
-        "SELECT purchaseId, badgeId FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
-        [$self->session->getId]
-    );
-	for my $purchase (@{ $purchases }) {
-		# so we don't show the badge we're currently editing
-		next if ($purchase->{purchaseId} eq $self->session->scratch->get("currentPurchase"));
-		my $theseRegs 
-            = $self->session->db->buildArrayRefOfHashRefs(
-                "select r.*, p.price, q.passId, q.passType 
-                    from EventManagementSystem_registrations as r, 
-                        EventManagementSystem_products as q, 
-                        products as p 
-                    where p.productId=r.productId 
-                        and r.badgeId=? 
-                        and r.returned=0 
-                        and r.purchaseId=? 
-                        and q.productId=r.productId",
-                [$purchase->{badgeId},$purchase->{purchaseId}]
-            );
-		my @currentEvents;
-		$purchase->{registrantInfoLoop} 
-            = $self->session->db->buildArrayRefOfHashRefs(
-                "select * from EventManagementSystem_badges where badgeId=?",
-                [$purchase->{badgeId}]
-            );
-		foreach (@$theseRegs) {
-			my ($isChild) 
-                = $self->session->db->quickArray(
-                    "select prerequisiteId from EventManagementSystem_products where productId = ?",
-                    [$_->{productId}]
-                );
-			$purchase->{'purchase.mainEventTitle'} = $self->getEventName($_->{productId}) unless $isChild;
-			($purchase->{alreadyPurchasedBadge}) 
-                = $self->session->db->quickArray(
-                    "select p.transactionId 
-                    from EventManagementSystem_purchases as p, 
-                        transaction as t 
-                    where p.purchaseId = ? 
-                        and t.transactionId=p.transactionId 
-                        and t.status='Completed'",
-                    [$_->{productId}]
-                ) unless $isChild;
-			push @currentEvents,$_->{productId};
-		}
-		my @pastEvents 
-            = $self->session->db->buildArray(
-                "select r.productId 
-                    from EventManagementSystem_registrations as r, 
-                        EventManagementSystem_purchases as p, 
-                        transaction as t 
-                    where r.returned=0 
-                        and r.badgeId=? 
-                        and t.transactionId=p.transactionId 
-                        and t.status='Completed' 
-                        and p.purchaseId=r.purchaseId 
-                    group by productId",
-                [$purchase->{badgeId}]
-            );
-		push(@currentEvents,@pastEvents);
-		$purchase->{newPrice} = 0;
-		foreach (@$theseRegs) {
-			my @discountPasses = split(/::/,$_->{passId});
-			if (scalar(@discountPasses) && ($_->{passType} eq 'member')) {
-				my $addlPrice = $_->{price};
-				foreach my $eligiblePass (@discountPasses) {
-					my @passEvents = $self->session->db->buildArray("select productId from EventManagementSystem_products where passType='defines' and passId=?",[$eligiblePass]);
-					next unless isIn($eligiblePass,@currentEvents);
-					my $pass = $self->session->db->quickHashRef("select * from EventManagementSystem_discountPasses where passId=?",[$eligiblePass]);
-					if ($pass->{type} eq 'newPrice') {
-						$addlPrice = (0 + $pass->{amount}) if ($addlPrice > (0 + $pass->{amount}));
-					} elsif ($pass->{type} eq 'amountOff') {
-						# not yet implemented!
-					} elsif ($pass->{type} eq 'percentOff') {
-						# not yet implemented!
-					}
-				}
-				$purchase->{newPrice} += $addlPrice;
-			} else {
-				$purchase->{newPrice} += $_->{price};
-			}
-		}
-		$purchase->{editIcon} = $self->session->icon->edit("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseId=".$purchase->{purchaseId}, $self->get('url'));
-		$purchase->{deleteIcon} = $self->session->icon->delete("func=addEventsToBadge;bid=none;purchaseId=".$purchase->{purchaseId},$self->get('url'),$i18n->get('confirm delete purchase'));
-		$purchase->{'edit.url'} = $self->getUrl("func=addEventsToBadge;bid=".$purchase->{badgeId}.";purchaseId=".$purchase->{purchaseId});
-		$purchase->{'delete.url'} = $self->getUrl("func=addEventsToBadge;bid=none;purchaseId=".$purchase->{purchaseId});
-		push(@{$var->{'cart.purchaseLoop'}},$purchase);
-	}
-	$var->{'checkoutUrl'} = $self->getUrl("func=checkout");
-}
-
-#-------------------------------------------------------------------
-sub www_checkout {
-	my $self = shift;	
-	return WebGUI::Operation::Commerce::www_checkout($self->session);
-}
-
-#-------------------------------------------------------------------
-sub www_emptyCart {
-	my $self = shift;	
-	my $shoppingCart = WebGUI::Commerce::ShoppingCart->new($self->session);
-	$shoppingCart->empty;
-    $self->session->db->write(
-        "DELETE FROM EventManagementSystem_sessionPurchaseRef WHERE sessionId=?",
-        [$self->session->getId]
-    );
-	return $self->www_resetScratchCart();
-}
-
-#-------------------------------------------------------------------
-sub www_editRegistrantInfo {
-	my $self = shift;	
-	return $self->processStyle($self->processTemplate($self->getRegistrationInfo(),$self->getValue("checkoutTemplateId")));
-}
-
-#-------------------------------------------------------------------
-sub www_deleteCartItem {
-	my $self = shift;
-	my $event1 = $self->session->form->get("event1");
-	my $event2 = $self->session->form->get("event2");
-	my $eventUserDeleted = $self->session->form->get("productToRemove");
-	#my $cart = WebGUI::Commerce::ShoppingCart->new($self->session);
-
-	# Delete all of the subevents last added by the user
-	#$cart->delete($event1, 'Event');
-	#$cart->delete($event2, 'Event');
-
-	$self->removeFromScratchCart($event1);
-	$self->removeFromScratchCart($event2);
-
-	# Add the subevents back to the cart except for the one the user choose to remove.
-	# This will re-trigger the conflict/sub-event display code correctly
-
-	my $eventToAdd = ($event1 eq $eventUserDeleted) ? $event2 : $event1;
-
-	return $self->www_addToCart(undef,$eventToAdd);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteEvent ( )
-
-Method to delete an event, and to remove the deleted event from all prerequisite definitions
-
-=cut
-
-sub www_deleteEvent {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-    $self->deleteEvent($self->session->form->get("pid"));
-	return $self->www_search;			  
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deletePrereqSet ( )
-
-Method to delete a prerequisite assignment of one event to another
-
-=cut
-
-sub www_deletePrereqSet {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-    $self->deletePrereqSet($self->session->form->get("psid"));
-	return $self->www_editEvent;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_edit (  )
-
-Edit wobject method.
-
-=cut 
-
-sub www_edit {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my ($tag) = ($self->get("className") =~ /::(\w+)$/);
-	my $tag2 = $tag;
-	$tag =~ s/([a-z])([A-Z])/$1 $2/g;  #Separate studly caps
-	$tag =~ s/([A-Z]+(?![a-z]))/$1 /g; #Separate acronyms
-	my $i18n  = WebGUI::International->new($self->session,'Asset_Wobject');
-	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEventMetadata'), $i18n->get('manage event metadata', 'Asset_EventManagementSystem'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=manageEvents'), $i18n->get('manage events', 'Asset_EventManagementSystem'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=importEvents'), $i18n2->get('import events'));
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=exportEvents'), $i18n2->get('export events'));
-	return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_editEvent ( errors )
-
-Method to generate form to Add or Edit an events properties including prerequisite assignments and event approval.
-
-=head3 errors
-
-An array reference of error messages to display to the user
-
-=cut 
-
-sub www_editEvent {
-	my $self = shift;
-	my $errors = shift;
-	my $errorMessages;
-
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	my $pid = shift || $self->session->form->get("pid");
-	my ($storageId) = $self->session->db->quickArray("select imageId from EventManagementSystem_products where productId=?",[$pid]) unless ($pid eq "");
-
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-
-	my $event = $self->session->db->quickHashRef("
-		select p.productId, p.title, p.description, p.price, p.useSalesTax, p.weight, p.sku, p.templateId, p.skuTemplate, e.prerequisiteId, e.passType, e.passId,
-		       e.startDate, e.endDate, e.maximumAttendees, e.approved
-		from
-		       products as p, EventManagementSystem_products as e
-		where
-		       p.productId = e.productId and p.productId=?",[$pid]
-	); 
-
-	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-
-	# Errors
-	foreach (@$errors) {
-		$errorMessages .= sprintf "<span style='color: red; font-weight: bold;'>%s: %s </span><br />", $i18n->get('add/edit event error'), $_;
-	}
-	$f->readOnly( -value=>$errorMessages );
-
-	$f->hidden( -name=>"assetId", -value=>$self->get("assetId") );
-	$f->hidden( -name=>"func",-value=>"editEventSave" );
-	$f->hidden( -name=>"pid", -value=>$pid );
-
-	if ($self->canApproveEvents) {
-		#$f->yesNo(
-		#	-value => $event->{approved},
-		#	-name => 'approved',
-		#	-label => $i18n->get('approve event'),
-		#	-hoverHelp => $i18n->get('approve event description')
-		#);	
-
-		$f->radioList(
-			-name => 'approved',
-			-label => $i18n->get('approve event'),
-			-hoverHelp => $i18n->get('approve event description'),
-			-options => $self->getEventStates,
-			-value => ($event->{"approved"} eq "0" ? "0" : $event->{approved} || '-1'),
-			-vertical => 1,
-			-sortByValue => 1,
-		);
-				
-	} else {
-		$f->hidden(
-			-name  => "approved",
-			-value => $event->{approved}
-		);
-	}
-
-	$f->text(
-		-name  => "title",
-		-value => $self->session->form->get("title") || $event->{title},
-		-hoverHelp => $i18n->get('add/edit event title description'),
-		-label => $i18n->get('add/edit event title')
-	);
-
-	$f->HTMLArea(
-		-name  => "description",
-		-value => $self->session->form->get("description") || $event->{description},
-		-hoverHelp => $i18n->get('add/edit event description description'),
-		-label => $i18n->get('add/edit event description')
-	);
-
-	$f->image(
-		-name => "image",
-		-hoverHelp => $i18n->get('add/edit event image description'),
-		-label => $i18n->get('add/edit event image'),
-		-value => $storageId
-	 );
-
-	$f->yesNo(
-		-name  => "useSalesTax",
-		-value => $self->session->form->get("useSalesTax") || $event->{useSalesTax},
-		-hoverHelp => $i18n->get('add/edit useSalesTax description'),		
-		-label => $i18n->get('add/edit useSalesTax')
-	);
-
-	$f->float(
-		-name  => "price",
-		-value => $self->session->form->get("price") || $event->{price},
-		-hoverHelp => $i18n->get('add/edit event price description'),		
-		-label => $i18n->get('price')
-	);
-
-	$f->template(
-		-name  => "templateId",
-		-namespace => "EventManagementSystem_product",
-		-value => $self->session->form->get("templateId") || $event->{templateId},
-		-hoverHelp => $i18n->get('add/edit event template description'),		
-		-label => $i18n->get('add/edit event template')
-	);
-
-	$f->float(
-		-name  => "weight",
-		-value => $self->session->form->get("weight") || $event->{weight} || 0,
-		-hoverHelp => $i18n->get('weight description'),
-		-label => $i18n->get('weight'),
-	);
-
-	$f->text(
-		-name  => "sku",
-		-value => $self->session->form->get("sku") || $event->{sku} || $self->session->id->generate(),
-		-hoverHelp => $i18n->get('sku description'),
-		-label => $i18n->get('sku'),
-	);
-
-	$f->text(
-		 -name  => "skuTemplate",
-		 -value => $self->session->form->get("skuTemplate") || $event->{skuTemplate},
-		 -hoverHelp => $i18n->get('sku template description'),
-		 -label => $i18n->get('sku template'),
-	);
-
-	$f->dateTime(
-		-name  => "startDate",
-		-value => $self->session->form->process("startDate",'dateTime') || $event->{startDate},
-		-hoverHelp => $i18n->get('add/edit event start date description'),
-		-label => $i18n->get('add/edit event start date')
-	);
-
-	$f->dateTime(
-		-name  => "endDate",
-		-value => $self->session->form->process("endDate",'dateTime') || $event->{endDate},
-		-defaultValue => time()+3600, #one hour from start date
-		-hoverHelp => $i18n->get('add/edit event end date description'),
-		-label => $i18n->get('add/edit event end date')
-	);
-
-	$f->integer(
-		-name  => "maximumAttendees",
-		-value => $self->session->form->get("maximumAttendees") || $event->{maximumAttendees},
-		-defaultValue => 100,
-		-hoverHelp => $i18n->get('add/edit event maximum attendees description'),
-		-label => $i18n->get('add/edit event maximum attendees')
-	);
-	my %prereqSets;
-	tie %prereqSets, 'Tie::IxHash';
-    my $conditionalWhere = "";
-    if ($self->get("globalPrerequisites") == 0) {
-        $conditionalWhere = "where assetId=".$self->session->db->quote($self->getId);
-    }
-	%prereqSets = $self->session->db->buildHash("select prerequisiteId, name from EventManagementSystem_prerequisites $conditionalWhere order by name");
-	my %prereqMemberships = $self->session->db->buildHash("select prerequisiteId, requiredProductId from EventManagementSystem_prerequisiteEvents where requiredProductId=?",[$pid]);
-	if (scalar(keys(%prereqSets)) && (scalar(keys(%prereqMemberships)) == 0)) {
-		#there are some prereq sets entered into the system, and 
-		#this event is not a member of any of them.
-		%prereqSets = (''=>$i18n->get('select one'),%prereqSets);
-		$f->selectBox(
-			-name=>'prerequisiteId',
-			-options=>\%prereqSets,
-			-label=>$i18n->get('assigned prerequisite set'),
-			-hoverHelp=>$i18n->get('assigned prerequisite set description'),
-			-value=>$self->session->form->get("prerequisiteId") || $event->{prerequisiteId}
-		);
-	}
-	my %passOptions;
-	tie %passOptions, 'Tie::IxHash';
-	%passOptions = (
-		''=>$i18n->get('None'),
-		'member'=>$i18n->get('discount pass member'),
-		'defines'=>$i18n->get('defines discount pass')
-	);
-
-	my %discountPasses;
-	tie %discountPasses, 'Tie::IxHash';
-	%discountPasses = $self->session->db->buildHash("select passId, name from EventManagementSystem_discountPasses order by name");
-	if (scalar(keys(%discountPasses))) {
-		#there are some discount passes entered into the system
-		%discountPasses = (''=>$i18n->get('select one'),%discountPasses);
-		$f->radioList(
-			-name=>'passType',
-			-options=>\%passOptions,
-			-value=>$self->session->form->get("passType") || $event->{passType} || '',
-			-vertical=>1,
-			-extras=>' onclick="changePassType();" ',
-			-label=>$i18n->get('discount pass type'),
-			-hoverHelp=>$i18n->get('discount pass type description')
-		);
-		$f->selectList(
-			-name=>'passId',
-			-rowClass=>'" id="passIdRow', # tricky little hack.
-			-options=>\%discountPasses,
-			-label=>$i18n->get('assigned discount pass'),
-			-hoverHelp=>$i18n->get('assigned discount pass description'),
-			-value=>scalar($self->session->form->process("passId",'selectList'))?[($self->session->form->process("passId",'selectList'))]:[split(/::/,$event->{passId})],
-			-subtext=>'<script type="text/javascript">
-function getChosenType() {
-	var i = 0;
-	while(document.forms[0].passType[i]) {
-	  if (document.forms[0].passType[i].checked) return document.forms[0].passType[i].value;
-	  i++;
-	}
-	return "";
-}
-function changePassType() {
-	var passIdRow = document.getElementById("passIdRow");
-	var passType = getChosenType();
-	if (passType == "") {
-		passIdRow.style.display="none";
-	} else {
-		passIdRow.style.display="none";
-		var passIdChooser = document.getElementById("passId_formId");
-		if (passType == "member") {
-			passIdChooser.multiple=true;
-			passIdChooser.size=5;
-			passIdChooser[0].text="'.$i18n->get('select one or more').'";
-		} else {
-			passIdChooser.size=1;
-			passIdChooser.multiple=false;
-			passIdChooser[0].text="'.$i18n->get('select one').'";
-		}
-		passIdRow.style.display="";
-	}
-}
-changePassType();
-</script>'
-		);
-	}
-
-	# add dynamically added metadata fields.
-	my $meta = {};
-	my $fieldList = $self->getEventMetaDataArrayRef;
-	if ($pid ne 'new') {
-		$meta = $self->getEventMetaDataFields($pid);
-	} else {
-		foreach my $field1 (@{$fieldList}) {
-			$meta->{$field1->{fieldId}} = $field1;
-			$meta->{$field1->{fieldId}}->{fieldData} = $field1->{defaultValues};
-		}
-	}
-	foreach my $field (@{$fieldList}) {
-		my $dataType = $meta->{$field->{fieldId}}{dataType};
-		my $options;
-		# Add a "Select..." option on top of a select list to prevent from
-		# saving the value on top of the list when no choice is made.
-		if($dataType eq "selectList" || $dataType eq "selectBox") {
-			$options = {"", $i18n->get("Select", "Asset")};
-		}
-
-		my $val = $self->session->form->process("metadata_".$meta->{$field->{fieldId}}{fieldId},$dataType);
-
-		if(!$val || (ref $val eq "ARRAY" && scalar(@{$val}) == 0 ) ) {
-			if (lc $dataType eq 'timefield') {
-				$val = $self->session->datetime->secondsToTime($meta->{$field->{fieldId}}{fieldData});
-			}
-			else {
-				$val = $meta->{$field->{fieldId}}{fieldData};
-			}
-		}
-
-		$f->dynamicField(
-			name=>"metadata_".$meta->{$field->{fieldId}}{fieldId},
-			label=>$meta->{$field->{fieldId}}{label},
-			value=>$val,
-			extras=>qq/title="$meta->{$field->{fieldId}}{label}"/,
-			possibleValues=>$meta->{$field->{fieldId}}{possibleValues},
-			options=>$options,
-			fieldType=>$dataType
-		);
-	}
-
-	$f->submit;
-
-	my $output = $f->print;
-	my $addEdit = ($pid eq "new" or !$pid) ? $i18n->get('add', 'Asset_Wobject') : $i18n->get('edit', 'Asset_Wobject');
-	return $self->_acWrapper($output, $addEdit.' '.$i18n->get('event'));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_editEventSave ( )
-
-Method that validates the edit event form and saves its contents to the database
-
-=cut
-
-sub www_editEventSave {
-	my $self = shift;
-
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	my $errors = $self->validateEditEventForm;
-        if (scalar(@$errors) > 0) { return $self->error($errors, "www_editEvent"); }
-
-	my $pid = $self->session->form->get("pid");
-       my $eventIsNew = 1 if ($pid eq "" || $pid eq "new");
-        my $event;
-	my $storageId;
-	$storageId = $self->session->form->process("image","image",undef,{name=>"image", value=>$storageId}) || '';
-
-	#Save the extended product data
-	$pid = $self->setCollateral("EventManagementSystem_products", "productId",{
-		productId  => $pid,
-		startDate  => $self->session->form->process("startDate",'dateTime'),
-		endDate	=> $self->session->form->process("endDate",'dateTime'),
-		maximumAttendees => $self->session->form->get("maximumAttendees"),
-		approved	=> $self->session->form->get("approved"),
-		passId	=> join('::',$self->session->form->process("passId",'selectList')),
-		imageId		=> $storageId,
-		prerequisiteId => $self->session->form->process("prerequisiteId",'selectBox'),
-		passType	=> $self->session->form->get("passType",'radioList'),
-	},1,1);
-
-	#Save the event metadata
-	my $mdFields = $self->getEventMetaDataFields;
-	foreach my $mdField (keys %{$mdFields}) {
-		my $value = $self->session->form->process("metadata_".$mdField,$mdFields->{$mdField}->{dataType});
-		$self->session->db->write("insert into EventManagementSystem_metaData values (".$self->session->db->quoteAndJoin([$mdField,$pid,$value]).") on duplicate key update fieldData=".$self->session->db->quote($value));
-	}
-
-	#Save the standard product data
-	$event = {
-		productId	=> $pid,
-		title		=> $self->session->form->get("title", "text"),
-		description	=> $self->session->form->get("description", "HTMLArea"),
-		price		=> $self->session->form->get("price", "float"),
-		useSalesTax	=> $self->session->form->get("useSalesTax", "yesNo"),
-		weight		=> $self->session->form->get("weight", "float"),
-		sku		=> $self->session->form->get("sku", "text"),
-		skuTemplate	=> $self->session->form->get("skuTemplate", "text"),
-		templateId	=> $self->session->form->get("templateId", "template"),
-	};
-
-	if ($eventIsNew) { # Event is new we need to use the same productId so we can join them later
-		$self->session->db->setRow("products", "productId",$event,$pid);
-	}
-	else { # Updating the row
-		$self->session->db->setRow("products", "productId", $event);
-	}
-
-	return $self->www_search;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_manageEventMetadata ( )
-
-Method to display the event metadata management console.
-
-=cut
-
-sub www_manageEventMetadata {
-	my $self = shift;
-
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-
-	my $output;
-	my $metadataFields = $self->getEventMetaDataArrayRef('false');
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $count = 0;
-	my $number = scalar(@{$metadataFields});
-	if ($number) {
-		foreach my $row1 (@{$metadataFields}) {
-			my %row = %{$row1};
-			$count++;
-			$output .= "<div>".
-			$self->session->icon->delete('func=deleteEventMetaDataField;fieldId='.$row{fieldId},$self->get('url'),$i18n->get('confirm delete event metadata')).
-			$self->session->icon->edit('func=editEventMetaDataField;fieldId='.$row{fieldId}, $self->get('url')).
-			$self->session->icon->moveUp('func=moveEventMetaDataFieldUp;fieldId='.$row{fieldId}, $self->get('url'),($count == 1)?1:0);
-			$output .= $self->session->icon->moveDown('func=moveEventMetaDataFieldDown;fieldId='.$row{fieldId}, $self->get('url'),($count == $number)?1:0).
-			" ".$row{name}." ( ".$row{label}." )</div>";
-		}
-	} else {
-		$output .= $i18n->get('you do not have any metadata fields to display');
-	}
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n->get("add new event metadata field"));
-	return $self->_acWrapper($output, $i18n->get("manage event metadata"));
-}
 
 #-------------------------------------------------------------------
 
@@ -3380,7 +1995,7 @@ Method to deliver this EMS's events in CSV format.
 sub www_exportEvents {
 	my $self = shift;
 	
-	return $self->session->privilege->insufficient unless $self->canAddEvents;
+	return $self->session->privilege->insufficient unless $self->canEdit;
 
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $csv = Text::CSV_XS->new({ eol => "\n", binary => 1 }); # TODO use their newline?
@@ -3394,7 +2009,7 @@ sub www_exportEvents {
 		'sku template', 'add/edit event start date', 'add/edit event end date', 'add/edit event maximum attendees',
 		'prereq set name field label' );
 
-	my $meta_fields_aref = $self->getEventMetaDataArrayRef;
+	my $meta_fields_aref = $self->getEventMetaFields;
 	my @meta_labels = map $_->{label}, @$meta_fields_aref;
 	my @all_labels = (@std_labels, @meta_labels);
 
@@ -3487,7 +2102,7 @@ sub getEventDataFields {
 
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
-	my $custom_rows_aref = $self->getEventMetaDataArrayRef;
+	my $custom_rows_aref = $self->getEventMetaFields;
 	my @custom_rows = map {
 			label		=>	$_->{label},
 			name		=>	"metadata_$_->{fieldId}",
@@ -3528,7 +2143,7 @@ sub www_importEvents {
 	my ($self) = shift;
 	my $errors_aref = shift || [];
 
-	return $self->session->privilege->insufficient unless $self->canAddEvents;
+	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $form = $self->session->form;
 	
@@ -3617,7 +2232,7 @@ sub www_doImportEvents {
 	my $start_time = time;
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless $self->canAddEvents;
+	return $self->session->privilege->insufficient unless $self->canEdit;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $csv = Text::CSV_XS->new({ binary => 1 });
 	my $no_action_taken_error = { # on error, always let the user know that we didn't partially import their data
@@ -3693,7 +2308,7 @@ sub www_doImportEvents {
 
 	}
 	my %approved_values = ( Approved => 1, Denied => 0, Pending => -1, Cancelled => -2);
-	my $meta_fields_aref = $self->getEventMetaDataArrayRef;
+	my $meta_fields_aref = $self->getEventMetaFields;
 	my %meta_fields = ();
 	@meta_fields{map {$_->{fieldId}} @$meta_fields_aref} = @$meta_fields_aref; # get them keyed by fieldId
 	my $first_line = 1;
@@ -3873,7 +2488,7 @@ sub www_doImportEvents {
 			$field->{name} =~ /^metadata_(.+)$/;
 			my $field_id = $1;
 			my $data = $data{$field->{name}};
-			my $sql = "insert into EventManagementSystem_metaData values (".
+			my $sql = "insert into EMSEventMetaData values (".
 										$self->session->db->quoteAndJoin([$field_id, $pid, $data]).
 										") on duplicate key update fieldData=".
 										$self->session->db->quote($data);
@@ -3941,7 +2556,7 @@ sub www_managePurchases {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canView;
 	return $self->session->privilege->insufficient if $self->session->var->get('userId') eq '1';
-	my $isAdmin = $self->canAddEvents;
+	my $isAdmin = $self->canEdit;
 	return $self->www_viewPurchase unless $isAdmin;
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $whereClause = ($isAdmin)?'':" and (t.userId='".$self->session->user->userId."' or b.userId='".$self->session->user->userId."' or b.createdByUserId='".$self->session->user->userId."') and e.endDate > '".$self->session->datetime->time()."'";
@@ -3986,7 +2601,7 @@ sub www_viewPurchase {
 	my %var;
 	if ($badgeId) {
 		my %var = $self->session->db->quickHash("select * from EventManagementSystem_badges where badgeId=?",[$badgeId]);
-		my $isAdmin = $self->canAddEvents;
+		my $isAdmin = $self->canEdit;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 		my @purchasesLoop;
@@ -4001,14 +2616,14 @@ sub www_viewPurchase {
 		while (my $reg = $sth2->hashRef) {
 			$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 			$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
-			$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+			$purchase->{canEdit} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 			my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
 			$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 			push(@{$purchase->{regLoop}},$reg);
 			}
 		push(@purchasesLoop,$purchase);
 
-		if ($self->canAddEvents) {  #Build list of badges made that weren't actually purchased and provide an interface for attaching them to purchases
+		if ($self->canEdit) {  #Build list of badges made that weren't actually purchased and provide an interface for attaching them to purchases
 			my @incompleteTransactions;
 
 			# All transactionIds associated with this person (badge)
@@ -4062,7 +2677,7 @@ sub www_viewPurchase {
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} elsif($tid) {
 		my $showAll = $self->session->form->get('showAll');
-		my $isAdmin = $self->canAddEvents;
+		my $isAdmin = $self->canEdit;
 		my ($userId) = $self->session->db->quickArray("select userId from transaction where transactionId=?",[$tid]);
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 		my $filter = ($isAdmin)?'':' and r.returned=0 ';
@@ -4083,7 +2698,7 @@ sub www_viewPurchase {
 				$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 				$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 				$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
-				$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+				$purchase->{canEdit} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 				my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
 				$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 				push(@{$purchase->{regLoop}},$reg);
@@ -4100,7 +2715,7 @@ sub www_viewPurchase {
 		$var{purchasesLoop} = \@purchasesLoop;
 		return $self->processStyle($self->processTemplate(\%var,$self->getValue("viewPurchaseTemplateId")));
 	} else {
-		my $isAdmin = $self->canAddEvents;
+		my $isAdmin = $self->canEdit;
 		my $filter = ($isAdmin)?'':' and r.returned=0 ';
 		my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 		my $sql = "select distinct(r.purchaseId), b.* from EventManagementSystem_registrations as r, EventManagementSystem_badges as b, EventManagementSystem_purchases as t, transaction where r.badgeId=b.badgeId and r.purchaseId=t.purchaseId and transaction.transactionId=t.transactionId and transaction.status='Completed' and (b.userId=? or transaction.userId=? or b.createdByUserId=?) $filter order by b.lastName";
@@ -4119,7 +2734,7 @@ sub www_viewPurchase {
 				$reg->{startDateHuman} = $self->session->datetime->epochToHuman($reg->{'startDate'});
 				$reg->{endDateHuman} = $self->session->datetime->epochToHuman($reg->{'endDate'});
 				$purchase->{canReturnItinerary} = 1 unless $reg->{'returned'};
-				$purchase->{canAddEvents} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
+				$purchase->{canEdit} = 1 if ($isAdmin || ($userId eq $self->session->var->get('userId')) || ($reg->{userId} eq $self->session->var->get('userId'))  || ($reg->{createdByUserId} eq $self->session->var->get('userId')));
 				my ($isMainEvent) = $self->session->db->quickArray("select productId from EventManagementSystem_products where productId = ? and (prerequisiteId is NULL or prerequisiteId = '')",[$reg->{productId}]);
 				$purchase->{purchaseEventId} = $reg->{productId} if ($isMainEvent && $reg->{'returned'} eq '0');
 				push(@{$purchase->{regLoop}},$reg);
@@ -4153,7 +2768,7 @@ sub www_deleteRegistrationsByPurchaseId {
 	my $purchaseId = $self->session->form->get("pid");
 	my $badgeId = $self->session->form->get("bid");
 
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 
 	$self->session->db->write("delete from EventManagementSystem_registrations where purchaseId=?",[$purchaseId]);
 
@@ -4176,7 +2791,7 @@ sub www_linkTransactionToPurchase {
 	my $purchaseId = $self->session->form->get("purchaseId");
 	my $badgeId = $self->session->form->get("badgeId");
 
-	return $self->session->privilege->insufficent unless ($self->canAddEvents);
+	return $self->session->privilege->insufficent unless ($self->canEdit);
 
 	$self->session->db->setRow("EventManagementSystem_purchases", "purchaseId",
 				   { purchaseId    => "new",
@@ -4197,7 +2812,7 @@ Method to go into badge-addition mode.
 
 sub www_addEventsToBadge {
 	my $self = shift;
-	my $isAdmin = $self->canAddEvents;
+	my $isAdmin = $self->canEdit;
 	my $bid = $self->session->form->process('bid') || 'none';
 	my $eventId = $self->session->form->process('eventId');
 	unless ($bid eq 'none') {
@@ -4287,7 +2902,7 @@ Method to set some registrations as returned.
 
 sub www_returnItem {
 	my $self = shift;
-	my $isAdmin = $self->canAddEvents;
+	my $isAdmin = $self->canEdit;
 	my $rid = $self->session->form->process('rid');
 	my $tid = $self->session->form->process('tid');
 	my $pid = $self->session->form->process('pid');
@@ -4305,182 +2920,6 @@ sub www_returnItem {
 	return $self->www_editBadge;
 }
 
-#-------------------------------------------------------------------
-sub www_editEventMetaDataField {
-	my $self = shift;
-	my $fieldId = shift || $self->session->form->process("fieldId");
-	my $error = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	my $i18n2 = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $i18n = WebGUI::International->new($self->session,"WebGUIProfile");
-	my $f = WebGUI::HTMLForm->new($self->session, (
-		action => $self->getUrl("func=editEventMetaDataFieldSave;fieldId=".$fieldId)
-	));
-	my $data = {};
-	if ($error) {
-		# load submitted data.
-		$data = {
-			name => $self->session->form->process("name"),
-			label => $self->session->form->process("label"),
-			dataType => $self->session->form->process("dataType",'fieldType'),
-			visible => $self->session->form->process("visible",'yesNo'),
-			required => $self->session->form->process("required",'yesNo'),
-			possibleValues => $self->session->form->process("possibleValues",'textarea'),
-			defaultValues => $self->session->form->process("defaultValues",'textarea'),
-		};
-		$f->readOnly(
-			-name => 'error',
-			-label => $i18n2->get('error'),
-			-value => '<span style="color:red;font-weight:bold">'.$error.'</span>',
-		);
-	} elsif ($fieldId ne 'new') {
-		$data = $self->session->db->quickHashRef("select * from EventManagementSystem_metaField where fieldId=?",[$fieldId]);
-	} else {
-		# new field defaults
-		$data = {
-			name => $i18n2->get('type name here'),
-			label => $i18n2->get('type label here'),
-			dataType => 'text',
-			visible => 0,
-			required => 0,
-			autoSearch => 0
-		};
-	}
-	$f->text(
-		-name => "name",
-		-label => $i18n->get(475),
-		-hoverHelp => $i18n->get('475 description'),
-		-extras=>(($data->{name} eq $i18n2->get('type name here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type name here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type name here').'\'){this.value=\'\';this.style.color=\'\';}"',
-		-value => $data->{name},
-	);
-	$f->text(
-		-name => "label",
-		-label => $i18n->get(472),
-		-hoverHelp => $i18n->get('472 description'),
-		-value => $data->{label},
-		-extras=>(($data->{label} eq $i18n2->get('type label here'))?' style="color:#bbbbbb" ':'').' onblur="if(!this.value){this.value=\''.$i18n2->get('type label here').'\';this.style.color=\'#bbbbbb\';}" onfocus="if(this.value == \''.$i18n2->get('type label here').'\'){this.value=\'\';this.style.color=\'\';}"',
-	);
-	$f->yesNo(
-		-name=>"visible",
-		-label=>$i18n->get('473a'),
-		-hoverHelp=>$i18n->get('473a description'),
-		-value=>$data->{visible}
-	);
-	$f->yesNo(
-		-name=>"required",
-		-label=>$i18n->get(474),
-		-hoverHelp=>$i18n->get('474 description'),
-		-value=>$data->{required}
-	);
-    $f->fieldType(
-        -name=>"dataType",        
-        -label=>$i18n->get(486),        
-        -hoverHelp=>$i18n->get('486 description'),
-        -value=>ucfirst $data->{dataType},        
-        -defaultValue=>"Text",
-        );
-	$f->textarea(
-		-name => "possibleValues",
-		-label => $i18n->get(487),
-		-hoverHelp => $i18n->get('487 description'),
-		-value => $data->{possibleValues},
-	);
-	$f->textarea(
-		-name => "defaultValues",
-		-label => $i18n->get(488),
-		-hoverHelp => $i18n->get('488 description'),
-		-value => $data->{defaultValues},
-	);
-	$f->yesNo(
-		-name => "autoSearch",
-		-label => $i18n2->get('auto search'),
-		-hoverHelp => $i18n2->get('auto search description'),
-		-value => $data->{autoSearch},
-	);
-	my %hash;
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($self->session)}) {
-		$hash{$category->getId} = $category->getLabel;
-	}
-	$f->submit;
-	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=editEventMetaDataField;fieldId=new'), $i18n2->get("add new event metadata field"));
-	return $self->_acWrapper($f->print, $i18n2->get("add/edit event metadata field"));
-}
-
-#-------------------------------------------------------------------
-sub www_editEventMetaDataFieldSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	my $error = '';
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	foreach ('name','label') {
-		if ($self->session->form->get($_) eq "" || 
-			$self->session->form->get($_) eq $i18n->get('type name here') ||
-			$self->session->form->get($_) eq $i18n->get('type label here')) {
-			$error .= sprintf($i18n->get('null field error'),$_)."<br />";
-		}
-	}
-	return $self->www_editEventMetaDataField(undef,$error) if $error;
-	my $newId = $self->setCollateral("EventManagementSystem_metaField", "fieldId",{
-		fieldId=>$self->session->form->process('fieldId'),
-		name => $self->session->form->process("name"),
-		label => $self->session->form->process("label"),
-		dataType => $self->session->form->process("dataType",'fieldType'),
-		visible => $self->session->form->process("visible",'yesNo'),
-		required => $self->session->form->process("required",'yesNo'),
-		possibleValues => $self->session->form->process("possibleValues",'textarea'),
-		defaultValues => $self->session->form->process("defaultValues",'textarea'),
-		autoSearch => $self->session->form->process("autoSearch",'yesNo')
-	},1,1);
-	return $self->www_manageEventMetadata();
-}
-
-
-
-#-------------------------------------------------------------------
-
-=head2 www_moveEventMetaDataFieldDown ( )
-
-Method to move an event down one position in display order
-
-=cut
-
-sub www_moveEventMetaDataFieldDown {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	$self->moveCollateralDown('EventManagementSystem_metaField', 'fieldId', $self->session->form->get("fieldId"));
-	return $self->www_manageEventMetadata;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_moveEventMetaDataFieldUp ( )
-
-Method to move an event metdata field up one position in display order
-
-=cut
-
-sub www_moveEventMetaDataFieldUp {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-	$self->moveCollateralUp('EventManagementSystem_metaField', 'fieldId', $self->session->form->get("fieldId"));
-	return $self->www_manageEventMetadata;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteEventMetaDataField ( )
-
-Method to move an event metdata field up one position in display order
-
-=cut
-
-sub www_deleteEventMetaDataField {
-	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
-    $self->deleteMetaField($self->session->form->get("fieldId"));
-	return $self->www_manageEventMetadata;
-}
 
 #-------------------------------------------------------------------
 
@@ -4492,7 +2931,7 @@ Method to move an event down one position in display order
 
 sub www_moveEventDown {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	$self->moveCollateralDown('EventManagementSystem_products', 'productId', $self->session->form->get("pid"));
 	return $self->www_search;
 }
@@ -4507,7 +2946,7 @@ Method to move an event up one position in display order
 
 sub www_moveEventUp {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	$self->moveCollateralUp('EventManagementSystem_products', 'productId', $self->session->form->get("pid"));
 	return $self->www_search;
 }
@@ -4873,7 +3312,7 @@ sub www_search {
 			my $phrase;
 			if ($isMeta) {
 				unless(WebGUI::Utility::isIn($fieldId,@joined)) {
-					$joins .= " left join EventManagementSystem_metaData joinedField$count on e.productId=joinedField$count.productId and joinedField$count.fieldId='$fieldId'";
+					$joins .= " left join EMSEventMetaData joinedField$count on e.productId=joinedField$count.productId and joinedField$count.fieldId='$fieldId'";
 					push(@joined,$fieldId);
 				}
 				$phrase = " joinedField".$count.".fieldData ";
@@ -5008,7 +3447,7 @@ $self->getUrl('func=addToScratchCart;pid='.$event->{'productId'}.";mid=".$master
 	$var{'noSearchDialog'} = ($self->session->form->get('hide') eq "1") ? 1 : 0;
 	$var{'addEvent.url'} = $self->getUrl('func=editEvent;pid=new');
 	$var{'addEvent.label'} = $i18n->get('add event');
-    $var{'canManageEvents'} = $self->canAddEvents();
+    $var{'canManageEvents'} = $self->canEdit();
 	my $message;
 	$subSearchFlag = $self->session->form->get("subSearch") || ($self->session->form->get("func"));
 	my $advSearchFlag = $self->session->form->get("advSearch");
@@ -5211,7 +3650,7 @@ Method to display the prereq set management console.
 sub www_managePrereqSets {
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $output;
@@ -5240,7 +3679,7 @@ sub www_editPrereqSet {
 	my $self = shift;
 	my $psid = shift || $self->session->form->process("psid") || 'new';
 	my $error = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
 		action => $self->getUrl("func=editPrereqSetSave;psid=".$psid)
@@ -5305,7 +3744,7 @@ sub www_editPrereqSet {
 #-------------------------------------------------------------------
 sub www_editPrereqSetSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	foreach ('name') {
@@ -5352,8 +3791,8 @@ sub getPrintingVariables {
         [$registrationId]);
     $event{emsTitle} = $self->getTitle;
     my %meta = $self->session->db->buildHash(
-        "select name,fieldData from EventManagementSystem_metaData a
-        join EventManagementSystem_metaField b on a.fieldId=b.fieldId
+        "select name,fieldData from EMSEventMetaData a
+        join EMSEventMetaField b on a.fieldId=b.fieldId
         where productId=?",
         [$event{productId}]);
     my %var = (%meta, %event);
@@ -5377,7 +3816,7 @@ sub www_editBadge {
 	my $self = shift;
 	my $badgeId = shift || $self->session->form->process("badgeId") || 'new';
 	my $error = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, action => $self->getUrl("func=editBadgeSave;badgeId=".$badgeId));
 	my $data = {};
@@ -5554,7 +3993,7 @@ function resetToInitial() {
 #-------------------------------------------------------------------
 sub www_editBadgeSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	foreach ('firstName','lastName','email') {
@@ -5653,7 +4092,7 @@ Method to display the discount pass management console.
 sub www_manageDiscountPasses {
 	my $self = shift;
 
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 
 	my $output;
@@ -5677,7 +4116,7 @@ sub www_editDiscountPass {
 	my $self = shift;
 	my $passId = shift || $self->session->form->process("passId") || 'new';
 	my $error = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	my $f = WebGUI::HTMLForm->new($self->session, (
 		action => $self->getUrl("func=editDiscountPassSave;passId=".$passId)
@@ -5736,7 +4175,7 @@ sub www_editDiscountPass {
 #-------------------------------------------------------------------
 sub www_editDiscountPassSave {
 	my $self = shift;
-	return $self->session->privilege->insufficient unless ($self->canAddEvents);
+	return $self->session->privilege->insufficient unless ($self->canEdit);
 	my $error = '';
 	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
 	foreach ('name','type') {
