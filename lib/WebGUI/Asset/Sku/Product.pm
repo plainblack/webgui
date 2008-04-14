@@ -18,6 +18,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Storage::Image;
 use WebGUI::SQL;
 use WebGUI::Utility;
+use JSON;
 
 use base 'WebGUI::Asset::Sku';
 
@@ -83,7 +84,7 @@ sub definition {
             price=>{
                 label=>$i18n->get(10),
                 hoverHelp=>$i18n->get('10 description'),
-                tab => "properties",
+                tab => "shop",
                 fieldType=>"text",
                 defaultValue=>undef
             },
@@ -134,6 +135,16 @@ sub definition {
                 label=>$i18n->get(15),
                 deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
                 defaultValue=>undef
+            },
+            parameters=>{ ##Parameters and options
+                tab => "properties",
+                fieldType=>"hidden",
+                defaultValue=>'{}',
+            },
+            variants=>{ ##Which variants are enabled and/or disabled
+                tab => "properties",
+                fieldType=>"hidden",
+                defaultValue=>'{}',
             },
         );
     push(@{$definition}, {
@@ -268,6 +279,21 @@ sub getFileUrl {
     my $self = shift;
     my $store = $_[0];
     return $store->getUrl($self->getFilename($store));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getParamData
+
+Return the parameter data from this product as a perl data structure,
+rather than the internally stored JSON.
+
+=cut
+
+sub getParamData {
+    my $self = shift;
+    my $structure = JSON::from_json($self->get('parameters'));
+    return $structure;
 }
 
 #-------------------------------------------------------------------
@@ -616,6 +642,30 @@ sub setCollateral {
 	return $properties->{$keyName};
 }
 
+#-------------------------------------------------------------------
+
+=head2 setParamData ($paramData)
+
+Set the product's parameter data as a perl data structure.  This is stored in the
+db as JSON.
+rather than the internally stored JSON.
+
+=head2 $paramData
+
+A hash of arrays.  The keys in the hash are names of parameters, and the
+values of the arrays are subhashes, containing the names of options as
+well as price and weight modifiers.
+
+=cut
+
+sub setParamData {
+    my $self      = shift;
+    my $paramData = shift;
+    my $json = JSON::to_json($paramData);
+    $self->addRevision({parameters => $json});
+    return 1;
+}
+
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
@@ -846,6 +896,107 @@ sub www_editFeatureSave {
                                              });
     return "" unless($self->session->form->process("proceed"));
     return $self->www_editFeature("new");
+}
+
+#-------------------------------------------------------------------
+sub www_editParameter {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    my $param = shift || $self->session->form->get('name') || 'new';
+    my $paramData = $self->getParamData;
+    $param = "new" unless exists $paramData->{$param};
+    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->hidden(
+        -name => "func",
+        -value => "editParameterSave",
+    );
+    $f->hidden(
+        -name => "origname",
+        -value => $param,
+    );
+    $f->text(
+        -name       => 'name',
+        -label      => $i18n->get('edit parameter name'),
+        -hoverHelp  => $i18n->get('edit parameter name description'),
+        -value      => $param,
+        -maxlength  => 64,
+    );
+    $f->submit;
+    return $self->getAdminConsole->render($f->print, "edit parameter");
+}
+
+#-------------------------------------------------------------------
+sub www_editParameterSave {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+
+    my $param     = $self->session->form->get('name');
+    my $origname  = lc $self->session->form->get('origname');
+
+    my $paramData = $self->getParamData;
+    if (($origname ne "new") and ($origname ne $param)) {
+        ##Rename existing data
+        my @options = @{ $paramData->{$origname} };
+        $paramData->{$param} = \@options;
+        delete $paramData->{$origname};
+        $self->setParamData($paramData);
+        return $self->editParameter($param);
+    }
+    elsif ($origname eq "new") {
+        $paramData->{$param} = [];
+        $self->setParamData($paramData);
+        return $self->editParameterOptions($param);
+    }
+}
+
+#-------------------------------------------------------------------
+sub www_editParameterOptions {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    return 1;
+    my $param = shift || $self->session->form->get('name') || 'new';
+    my $paramData = $self->getParamData;
+    $param = "new" unless exists $paramData->{$param};
+    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->hidden(
+        -name => "func",
+        -value => "editParameterOptionSave",
+    );
+    $f->text(
+        -name       => 'name',
+        -label      => $i18n->get('edit parameter name'),
+        -hoverHelp  => $i18n->get('edit parameter name description'),
+        -value      => $param,
+        -maxlength  => 64,
+    );
+    $f->submit;
+    return $self->getAdminConsole->render($f->print, "edit option");
+}
+
+#-------------------------------------------------------------------
+sub www_editParameterOptionsSave {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+
+    my $param     = $self->session->form->get('name');
+    my $origname  = lc $self->session->form->get('origname');
+
+    my $paramData = $self->getParamData;
+    if ($origname ne "new" and $origname ne $param) {
+        ##Rename existing data
+        my @options = @{ $paramData->{$origname} };
+        $paramData->{$param} = \@options;
+        delete $paramData->{$origname};
+        $self->setParamData($paramData);
+        return $self->editParameter($param);
+    }
+    elsif ($origname eq "new") {
+        $paramData->{$param} = [];
+        $self->setParamData($paramData);
+        return $self->editParameterOptions($param);
+    }
 }
 
 #-------------------------------------------------------------------

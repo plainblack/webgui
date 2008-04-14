@@ -634,6 +634,29 @@ be useful, others may not.|,
 		lastUpdated => 1164841201
 	},
 
+	'edit parameter name' => {
+		message => q|Name|,
+		lastUpdated => 1208130239,
+		context => q|The form label for the name field in editParameter|,
+	},
+
+    'edit parameter name description' => {
+        message => q|<p>The name of this parameter.</p>|,
+        lastUpdated => 1208130267,
+    },
+
+	'edit parameter' => {
+		message => q|Edit product parameter|,
+		lastUpdated => 1208130542,
+		context => q|The name of the editParameter form|
+	},
+
+	'edit option' => {
+		message => q|Edit product parameter option|,
+		lastUpdated => 1208144888,
+		context => q|The name of the editParameter form|
+	},
+
 };
 
 1;
