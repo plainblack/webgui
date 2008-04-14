@@ -31,8 +31,8 @@ my @testSets = (
 	},
 	{
 		comment => 'custom text',
-		label => q!PD Made Me Do It!,
-		output => '<a href="'.$session->url->page('shop=cart').'"><img src="/extras/macro/ViewCart/cart.gif" alt="PD Made Me Do It" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$session->url->page('shop=cart').'">PD Made Me Do It</a>',
+		label => q!A Rock Hammer!,
+		output => '<a href="'.$session->url->page('shop=cart').'"><img src="/extras/macro/ViewCart/cart.gif" alt="A Rock Hammer" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$session->url->page('shop=cart').'">A Rock Hammer</a>',
 	},
 );
 
