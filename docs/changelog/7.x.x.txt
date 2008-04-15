@@ -5,6 +5,7 @@
  - fixed: Import/Export of packages with international text is broken
  - fixed: email validation links can be broken by mail servers
  - fixed: Clipboard select all doesn't work with one item in IE
+ - fixed: Users without karma can transfer karma by rating posts
 
 7.4.32
  - fixed: unable to respond to survey multiple times in same session
