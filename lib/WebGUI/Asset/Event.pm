@@ -43,6 +43,21 @@ use WebGUI::DateTime;
 
 =cut
 
+sub addRevision {
+    my $self = shift;
+    my $newRev = $self->SUPER::addRevision(@_);
+    my $sequenceNumber = $newRev->get('iCalSequenceNumber');
+    if (defined $sequenceNumber) {
+        $sequenceNumber++;
+    }
+    else {
+        $sequenceNumber = 0;
+    }
+    $newRev->update({iCalSequenceNumber => $sequenceNumber});
+    return $newRev;
+}
+
+
 ####################################################################
 
 sub definition {
@@ -114,6 +129,9 @@ sub definition {
         },
         'timeZone' => {
             fieldType       => 'TimeZone',
+        },
+        iCalSequenceNumber => {
+            fieldType       => 'hidden',
         },
     );
     

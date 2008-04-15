@@ -21,7 +21,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
+addEventSequenceNumber($session);
 # upgrade functions go here
 
 finish($session); # this line required
@@ -33,6 +33,14 @@ finish($session); # this line required
 #	print "\tWe're doing some stuff here that you should know about.\n" unless ($quiet);
 #	# and here's our code
 #}
+sub addEventSequenceNumber {
+    my $session = shift;
+    print "\tAdding iCal sequence number to events... " unless $quiet;
+    $session->db->write('ALTER TABLE Event ADD COLUMN iCalSequenceNumber int');
+    $session->db->write('UPDATE Event SET iCalSequenceNumber=0');
+    print "Done.\n" unless $quiet;
+}
+
 
 
 # --------------- DO NOT EDIT BELOW THIS LINE --------------------------------
