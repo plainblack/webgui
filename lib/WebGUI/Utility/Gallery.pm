@@ -50,6 +50,10 @@ This module is B<NOT> to be used by the Gallery asset itself!
  my $thread         = WebGUI::Asset::Post::Thread->new( ... );
  $utility->addAlbumFromThread( $gallery, $thread );
 
+ # Add a single album from a Folder asset
+ my $folder         = WebGUI::Asset::Wobject::Folder->new( ... );
+ $utility->addAlbumFromFolder( $gallery, $folder );
+
  # Add a single album from a filesystem branch
  $utility->addAlbumFromFilesystem( $gallery, "/Users/Doug/Photos" );
 
@@ -125,6 +129,72 @@ sub addAlbumFromFilesystem {
     my $options         = shift;
 
     # TODO!!!
+
+    return undef;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 addAlbumFromFolder ( gallery, folder )
+
+Add an album from a Folder asset filled with File assets. C<gallery> is an 
+instance of a Gallery asset. C<folder> is an instance of a Folder asset.
+
+=cut
+
+sub addAlbumFromFolder {
+    my $class           = shift;
+    my $gallery         = shift;
+    my $folder          = shift;
+
+    croak "First argument must be Gallery asset"
+        unless blessed $gallery && $gallery->isa('WebGUI::Asset::Wobject::Gallery');
+    croak "Second argument must be Folder asset"
+        unless blessed $folder && $folder->isa('WebGUI::Asset::Wobject::Folder');
+
+    my $session         = $gallery->session;
+    my $addOptions      = { skipAutoCommitWorkflows => 1 };
+
+    # Create the new album
+    my $album = $gallery->addChild({
+        className           => 'WebGUI::Asset::Wobject::GalleryAlbum',
+        description         => $folder->get('description'),
+        menuTitle           => $folder->get('menuTitle'),
+        createdBy           => $folder->get('createdBy'),
+        creationDate        => $folder->get('creationDate'),
+        ownerUserId         => $folder->get('ownerUserId'),
+        synopsis            => $folder->get('synopsis'),
+        title               => $folder->get('title'),
+        url                 => $session->url->urlize( $gallery->get('url') . "/" . $folder->get('title') ),
+    }, undef, $folder->get('revisionDate'), $addOptions );
+
+    my $fileIds 
+        = $folder->getLineage( ['children'], {
+            joinClass   => 'WebGUI::Asset::File',
+        } );
+
+    for my $fileId ( @{ $fileIds } ) {
+        my $oldFile     = WebGUI::Asset->newByDynamicClass( $session, $fileId );
+        my $oldStorage  = $oldFile->getStorageLocation;
+        my $className   = $gallery->getAssetClassForFile( $oldStorage->getPath( $oldFile->get('filename') ) );
+        if ( !$className ) {
+            warn "Skipping " . $oldFile->get('filename') . " Gallery doesn't handle this file type";
+            next;
+        }
+
+        my $newFile = $album->addChild({
+            className           => $className,
+            createdBy           => $oldFile->get('createdBy'),
+            creationDate        => $oldFile->get('creationDate'),
+            menuTitle           => $oldFile->get('menuTitle'),
+            ownerUserId         => $oldFile->get('ownerUserId'),
+            synopsis            => $oldFile->get('synopsis'),
+            title               => $oldFile->get('title'),
+            url                 => $session->url->urlize( $album->get('url') . "/" . $oldFile->get('menuTitle') ),
+        }, undef, $oldFile->get('revisionDate'), $addOptions );
+
+        $newFile->setFile( $oldStorage->getPath( $oldFile->get('filename') ) );
+    }
 
     return undef;
 }

@@ -370,7 +370,7 @@ sub appendTemplateVarsDateTime {
 
 #----------------------------------------------------------------------------
 
-=head2 canEdit
+=head2 canEdit ( [userId] )
 
 Returns true if the user can edit this asset.
 
@@ -381,24 +381,33 @@ around the canEdit check when www_editSave is being used to add an asset).
 
 sub canEdit {
     my $self    = shift;
+    my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
-    my $user    = $self->session->user;
     
     # Account for new events
-    return 1 if ($self->canAddEvent && $form->process("func") eq "add");
     return 1 if (
-        $self->canAddEvent 
+        $self->canAddEvent( $userId ) 
+        && $form->process("func") eq "add"
+    );
+    return 1 if (
+        $self->canAddEvent( $userId ) 
         && $form->process("assetId")    eq "new"
         && $form->process("func")       eq "editSave"
         && $form->process("class")      eq "WebGUI::Asset::Event"
     );
 
-    return $self->SUPER::canEdit()
+    # Who can edit the Calendar can do everything
+    if ( $self->SUPER::canEdit( $userId ) ) {
+        return 1;
+    }
+
+    # Fails all checks
+    return 0;
 }
 
 #----------------------------------------------------------------------------
 
-=head2 canAddEvent
+=head2 canAddEvent ( [userId] )
 
 Returns true if able to add events. Checks to make sure that the 
 Calendar has been committed at least once. Checks to make sure that
@@ -409,7 +418,13 @@ the calendar, or the group that can edit events in the calendar).
 
 sub canAddEvent {
     my $self    = shift;
-    
+    my $userId  = shift;
+
+    my $user    = $userId 
+                ? WebGUI::User->new( $self->session, $userId )
+                : $self->session->user
+                ;
+
     # Events can only be added after the Calendar has been committed once
     return 0 if (
         $self->get("status") ne "approved"
@@ -417,8 +432,7 @@ sub canAddEvent {
     );
             
     return 1 if (        
-        $self->session->user->isInGroup($self->get("groupIdEventEdit")) 
-        || $self->SUPER::canEdit
+        $user->isInGroup($self->get("groupIdEventEdit")) 
     );
 }
 

@@ -180,16 +180,26 @@ sub canAdd {
 
 ####################################################################
 
-=head2 canEdit
+=head2 canEdit ( [userId] )
 
-Returns true if a user can edit this asset.  This uses the canEditEvent
-from the parent Calendar.
+Returns true if the given userId can edit this asset. If userId is not given, 
+the userId of the current session is used.
+
+Users can edit this event if they are the owner of the event, or if they are
+allowed to edit the parent Calendar.
 
 =cut
 
 sub canEdit {
     my $self    = shift;
-    return $self->getParent->canAddEvent;
+    my $userId  = shift;
+
+    if ( !$userId ) {
+        $userId     = $self->session->user->userId;
+    }
+
+    return 1 if ( $userId eq $self->get('ownerUserId') );
+    return $self->getParent->canEdit( $userId );
 }
 
 

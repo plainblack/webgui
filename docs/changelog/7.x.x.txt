@@ -1,5 +1,6 @@
 7.5.11
  - fix: template variable isUncommitted is not documented in the help
+ - fix: Event is no longer editable by anyone who can add events
 
 7.5.10
  - fix: Syntax error in GetCsMail
