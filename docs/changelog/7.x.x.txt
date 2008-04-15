@@ -1,3 +1,5 @@
+7.4.34
+
 7.4.33
  - fixed: Package search is slow for large websites
  - fix: Trapped an exception for corrupt config files.
