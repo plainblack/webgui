@@ -955,22 +955,37 @@ sub www_editParameterOptions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     return 1;
-    my $param = shift || $self->session->form->get('name') || 'new';
+    my $session = $self->session;
+    my $param = shift || $self->session->form->get('name');
     my $paramData = $self->getParamData;
-    $param = "new" unless exists $paramData->{$param};
+    if (! exists $paramData->{$param}) {
+        return $self->editParameter($param);
+    }
+    my $option = $paramData->{$param};
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
         -name => "func",
         -value => "editParameterOptionSave",
     );
-    $f->text(
+    $f->readonly(
         -name       => 'name',
-        -label      => $i18n->get('edit parameter name'),
-        -hoverHelp  => $i18n->get('edit parameter name description'),
         -value      => $param,
-        -maxlength  => 64,
     );
+	$f->float(
+		-name		=> 'priceModifier',
+		-label		=> $i18n->get('edit option price modifier'),
+		-hoverHelp	=> $i18n->get('edit option price modifier description'),
+		-value		=> $session->form->process("priceModifier") || $option->{priceModifier},
+		-maxlength	=> 11,
+	);
+	$f->float(
+		-name		=> 'weightModifier',
+		-label		=> $i18n->get('edit option weight modifier'),
+		-hoverHelp	=> $i18n->get('edit option weight modifier description'),
+		-value		=> $session->form->process("weightModifier") || $option->{weightModifier},
+		-maxlength	=> 7,
+	);
     $f->submit;
     return $self->getAdminConsole->render($f->print, "edit option");
 }

@@ -657,6 +657,28 @@ be useful, others may not.|,
 		context => q|The name of the editParameter form|
 	},
 
+	'edit option price modifier' => {
+		message => q|Price modifier|,
+		lastUpdated => 1208292477,
+		context => q|The form label for the priceModifier field in editProductParameterOption|
+	},
+
+    'edit option price modifier description' => {
+        message => q|<p>The amount this option adds to the default price for product variants containig this option.</p>|,
+        lastUpdated => 1146606364,
+    },
+
+	'edit option weight modifier' => {
+		message => q|Weight modifier|,
+		lastUpdated => 1208292479,
+		context => q|The form label for the weightModifier field in editProductParameterOption|
+	},
+
+    'edit option weight modifier description' => {
+        message => q|<p>The weight this option adds to the default weight for product variants consisting of this option.</p>|,
+        lastUpdated => 1208292519,
+    },
+
 };
 
 1;
