@@ -9,6 +9,7 @@
  - fixed: Users without karma can transfer karma by rating posts
  - fixed: iCal feeds don't update properly when events are changed
  - fixed: getLineage with joinClass only joins first table in definition
+ - fixed: datepicker translation to Danish broken
 
 7.4.32
  - fixed: unable to respond to survey multiple times in same session
