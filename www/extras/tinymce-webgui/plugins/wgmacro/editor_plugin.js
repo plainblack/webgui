@@ -10,7 +10,7 @@
                     height : 125 + ed.getLang('wgmacro.delta_height', 0),
                     inline : 1
                 }, {
-                    plugin_url : url,
+                    plugin_url : url
                 });
             });
 

@@ -13,6 +13,10 @@ iframe.pages {
     height: 100%;
 }
 
+td.label-column {
+    width: 4em;
+}
+
 .nav {
         font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
         font-size: 12px;

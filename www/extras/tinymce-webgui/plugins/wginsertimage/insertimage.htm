@@ -25,68 +25,62 @@
             </fieldset>
             <fieldset>
                 <legend>{#wginsertimage.selectedproperties}</legend>
-                <table class="image-properties">
+                <table class="image-properties" style="width: 100%">
                     <tr>
-                        <td><label for="image-url">{#wginsertimage.imageurl}</label></td>
-                        <td><input id="image-url" type="text" name="imageurl" /></td>
+                        <td style="width: 6.5em;"><label for="image-url">{#wginsertimage.imageurl}</label></td>
+                        <td width="100%"><input id="image-url" type="text" name="imageurl" /></td>
                         <td rowspan="3"><iframe id="image-preview"></iframe></td>
                     </tr>
                     <tr>
                         <td><label for="image-alt">{#wginsertimage.imagealt}</label></td>
                         <td><input id="image-alt" type="text" name="imagealt" /></td>
                     </tr>
-                    <tr>
-                        <td colspan="2">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <fieldset>
-                                            <legend>{#wginsertimage.imagelayout}</legend>
-                                            <table class="image-layout">
-                                                <tr>
-                                                    <td><label for="image-align">{#wginsertimage.imagealign}</label></td>
-                                                    <td>
-                                                        <select id="image-align" name="imagealign">
-                                                            <option value="" selected="selected">(none)</option>
-                                                            <option value="absbottom">absbottom</option>
-                                                            <option value="absmiddle">absmiddle</option>
-                                                            <option value="baseline">baseline</option>
-                                                            <option value="bottom">bottom</option>
-                                                            <option value="left">left</option>
-                                                            <option value="middle">middle</option>
-                                                            <option value="right">right</option>
-                                                            <option value="texttop">texttop</option>
-                                                            <option value="top">top</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><label for="image-border">{#wginsertimage.imageborder}</label></td>
-                                                    <td><input id="image-border" type="text" name="imageborder" /></td>
-                                                </tr>
-                                            </table>
-                                        </fieldset>
-                                    </td>
-                                    <td>
-                                        <fieldset>
-                                            <legend>{#wginsertimage.imagespacing}</legend>
-                                            <table class="image-spacing">
-                                                <tr>
-                                                    <td><label for="image-hspace">{#wginsertimage.imagehspace}</label></td>
-                                                    <td><input id="image-hspace" type="text" name="imagehspace" /></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><label for="image-vspace">{#wginsertimage.imagevspace}</label></td>
-                                                    <td><input id="image-vspace" type="text" name="imagevspace" /></td>
-                                                </tr>
-                                            </table>
-                                        </fieldset>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
+                <tr><td colspan="2">
+                    <table style="width: 100%"><tr>
+                        <td>
+                    <fieldset>
+                        <legend>{#wginsertimage.imagelayout}</legend>
+                        <table class="image-layout" style="width: 100%">
+                            <tr>
+                                <td style="width: 6em"><label for="image-align">{#wginsertimage.imagealign}</label></td>
+                                <td>
+                                    <select id="image-align" name="imagealign">
+                                        <option value="" selected="selected">(none)</option>
+                                        <option value="absbottom">absbottom</option>
+                                        <option value="absmiddle">absmiddle</option>
+                                        <option value="baseline">baseline</option>
+                                        <option value="bottom">bottom</option>
+                                        <option value="left">left</option>
+                                        <option value="middle">middle</option>
+                                        <option value="right">right</option>
+                                        <option value="texttop">texttop</option>
+                                        <option value="top">top</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="image-border">{#wginsertimage.imageborder}</label></td>
+                                <td><input id="image-border" type="text" name="imageborder" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    </td>
+                    <td>
+                    <fieldset>
+                        <legend>{#wginsertimage.imagespacing}</legend>
+                        <table class="image-spacing" style="width: 100%">
+                            <tr>
+                                <td style="width: 6em;"><label for="image-hspace">{#wginsertimage.imagehspace}</label></td>
+                                <td><input id="image-hspace" type="text" name="imagehspace" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="image-vspace">{#wginsertimage.imagevspace}</label></td>
+                                <td><input id="image-vspace" type="text" name="imagevspace" /></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    </td></tr></table>
+                </td></tr></table>
             </fieldset>
         </div>
     </div>
