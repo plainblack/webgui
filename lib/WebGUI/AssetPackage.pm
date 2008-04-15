@@ -86,12 +86,12 @@ Returns an array of hashes containing title, assetId, and className for all asse
 
 sub getPackageList {
 	my $self = shift;
-	my @assets;
 	my $sql = "
 		select 
 			asset.assetId, 
 			assetData.revisionDate,
-			asset.className
+			asset.className,
+			assetData.title
 		from 
 			asset 
 		left join 
@@ -101,14 +101,17 @@ sub getPackageList {
 			and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId and
 				(assetData.status='approved'";
 			$sql .= " or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")) if ($self->session->scratch->get("versionTag"));
-			$sql .= ")) and asset.state='published' group by assetData.assetId order by assetData.title desc";
-	my $sth = $self->session->db->read($sql);
-	while (my ($id, $date, $class) = $sth->array) {
-		my $asset = WebGUI::Asset->new($self->session, $id,$class);
-		push(@assets, $asset) if ($asset->get("isPackage"));
-	}
-	$sth->finish;
-	return \@assets;
+			$sql .= ")) and asset.state='published'";
+    my $sth = $self->session->db->read($sql);
+    # MySQL sorts this very slowly, so we do it ourselves
+    my @assets;
+    while (my ($id, $date, $class, $title) = $sth->array) {
+        my $asset = WebGUI::Asset->new($self->session, $id, $class, $date);
+        push(@assets, [$title, $asset]) if ($asset->get("isPackage"));
+    }
+    $sth->finish;
+    @assets = map { $_->[1] } sort { $a->[0] cmp $b->[0] } @assets;
+    return \@assets;
 }
 
 
