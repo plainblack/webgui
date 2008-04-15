@@ -25,7 +25,7 @@ use WebGUI::DateTime;
 use DateTime::TimeZone;
 
 use LWP::UserAgent;
-use JSON qw(to_json from_json);
+use JSON qw(encode_json decode_json);
 
 =head1 NAME
 
@@ -92,8 +92,8 @@ sub execute {
     my $eventList   = [];
     my $feedList;
     if ($instance->getScratch('events')) {
-        $eventList = from_json($instance->getScratch('events'));
-        $feedList = from_json($instance->getScratch('feeds'));
+        $eventList = decode_json($instance->getScratch('events'));
+        $feedList = decode_json($instance->getScratch('feeds'));
     }
     else {
         my $ua      = LWP::UserAgent->new(agent => "WebGUI");
@@ -356,8 +356,8 @@ sub execute {
     }
     while (@$eventList) {
         if ($startTime + 55 < time()) {
-            $instance->setScratch('events', to_json($eventList));
-            $instance->setScratch('feeds', to_json($feedList));
+            $instance->setScratch('events', encode_json($eventList));
+            $instance->setScratch('feeds', encode_json($feedList));
             return $self->WAITING;
         }
         my $eventData = shift @$eventList;

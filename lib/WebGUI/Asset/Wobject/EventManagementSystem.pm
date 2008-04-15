@@ -18,7 +18,7 @@ use strict;
 use base 'WebGUI::Asset::Wobject';
 use Tie::IxHash;
 use WebGUI::HTMLForm;
-use JSON qw/ to_json /;
+use JSON qw/ encode_json /;
 use Digest::MD5;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
@@ -952,7 +952,7 @@ sub getBadgeSelector {
 		};
 	}
 	$js = '<script type="text/javascript">
-	var badges = '.to_json(\%badgeJS).';
+	var badges = '.encode_json(\%badgeJS).';
 	</script>';
 	%options = (%options,%{$badges});
 	$output .= WebGUI::Form::selectBox($self->session,{

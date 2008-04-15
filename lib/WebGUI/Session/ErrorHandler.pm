@@ -398,7 +398,7 @@ sub showDebug {
 			$form->{$key} = "********";
 		}
 	}
-	$text = JSON->new->pretty->encode($form);
+	$text = JSON->new->pretty->utf8->encode($form);
 	$text =~ s/&/&amp;/sg;
 	$text =~ s/>/&gt;/sg;
 	$text =~ s/</&lt;/sg;

@@ -2,6 +2,7 @@
  - fix: Trapped an exception for corrupt config files.
  - fix: template variable isUncommitted is not documented in the help
  - fixed: Events no longer able to be edited by anyone who can add events
+ - fixed: Import/Export of packages with international text is broken
 
 7.4.32
  - fixed: unable to respond to survey multiple times in same session

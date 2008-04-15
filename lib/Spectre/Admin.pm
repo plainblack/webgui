@@ -153,7 +153,7 @@ sub loadSiteData {
         	} 
 		else {
 			my $siteData = {};
-			eval { $siteData = JSON::from_json($response->content); };
+			eval { $siteData = JSON::decode_json($response->content); };
 			if ($@) {
 				$self->error("Couldn't fetch Spectre configuration data for $key");
 			}
