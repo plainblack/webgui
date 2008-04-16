@@ -495,10 +495,10 @@ sub processTransaction {
     my $cart = $self->getCart;
     my $transaction = WebGUI::Shop::Transaction->create($self->session,{
         paymentMethod   => $self,
-        paymentAddress  => $paymentAddress,
+#        paymentAddress  => $paymentAddress,
         cart            => $cart,
     });
-    my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment;
+    my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment( $transaction );
     if ($success) {
         $transaction->completePurchase($transactionCode, $statusCode, $statusMessage);
         $cart->onCompletePurchase;

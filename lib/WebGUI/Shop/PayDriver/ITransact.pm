@@ -42,7 +42,7 @@ sub definition {
     my $session     = shift;
     my $definition  = shift;
 
-    my $i18n = WebGUI::International->new($session, 'PayDriver_Cash');
+    my $i18n = WebGUI::International->new($session, 'PayDriver_ITransact');
 
     tie my %fields, 'Tie::IxHash';
     %fields = (
@@ -70,7 +70,7 @@ sub definition {
     );
  
     push @{ $definition }, {
-        name        => $i18n->echo('Cash'),
+        name        => $i18n->echo('Itransact'),
         properties  => \%fields,
     };
 
@@ -82,7 +82,7 @@ sub _generatePaymentRequestXML {
     my $self            = shift;
     my $transaction     = shift;
     my $session         = $self->session;
-    my $paymentAddress  = $self->{ _paymentAddress };
+    my $paymentAddress  = $self->{ _billingAddress };
     my $cardData        = $self->{ _cardData };
 
     # Set up the XML.
@@ -102,11 +102,11 @@ sub _generatePaymentRequestXML {
     my $cardInfo;
     $cardInfo->{ CCNum      } = $cardData->{ acct       };
     $cardInfo->{ CCMo       } = $cardData->{ expMonth   };
-    $cardInfo->{ CCYear     } = $cardData->{ expYear    };
+    $cardInfo->{ CCYr       } = $cardData->{ expYear    };
     $cardInfo->{ CVV2Number } = $cardData->{ cvv2       } if $self->get('useCVV2');
 
     my $customerData;
-    $customerData->{ Email                          } = $session->user->profileField('email');
+    $customerData->{ Email                          } = $paymentAddress->{ email };
     $customerData->{ BillingAddress                 } = $billingAddress;
     $customerData->{ AccountInfo    }->{ CardInfo   } = $cardInfo;
 
@@ -127,17 +127,19 @@ sub _generatePaymentRequestXML {
         if ( (scalar @{ $items } > 1) && (grep { $_->get('isRecurring') } @{ $items }) );
 
     foreach my $item (@{ $transaction->getItems }) {
+        my $sku = $item->getSku;
+
         ####TODO: How to handle intial payment?
         if ( $item->get('isRecurring') ) {
-            $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $item->get('recurInterval') );
+            $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $sku->get('recurInterval') );
             $recurringData->{ RecurReps     } = 99999;
-            $recurringData->{ RecurTotal    } = $item->getPrice;
-            $recurringData->{ RecurDesc     } = $item->get('title');
+            $recurringData->{ RecurTotal    } = $sku->getPrice;
+            $recurringData->{ RecurDesc     } = $sku->get('title');
         }
 
         push @{ $orderItems->{ Item } }, {
-            Description     => $item->get('title'),
-            Cost            => $item->getPrice,
+            Description     => $sku->get('title'),
+            Cost            => $sku->getPrice,
             Qty             => $item->get('quantity'),
         }
     }
@@ -163,7 +165,29 @@ sub _generatePaymentRequestXML {
         }
     };
 
-    my $xml = XMLout( $xmlStructure );
+    my $xml = 
+        '<?xml version="1.0" standalone="yes"?>'
+        . XMLout( $xmlStructure,
+            NoAttr      => 1,
+            KeepRoot    => 1,
+            KeyAttr     => [],
+        );
+
+    return $xml;
+}
+
+#-------------------------------------------------------------------
+sub getButton {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITansact');
+
+    my $payForm = WebGUI::Form::formHeader($session)
+        . $self->getDoFormTags('getCredentials')
+        . WebGUI::Form::submit($session, {value => $i18n->echo('ITransact') })
+        . WebGUI::Form::formFooter($session);
+
+    return $payForm;
 }
 
 #-------------------------------------------------------------------
@@ -231,6 +255,7 @@ sub processPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generatePaymentRequestXML( $transaction );
+    $session->errorHandler->info("XML Request: $xml");
 
 	# Set up LWP
     my $userAgent = LWP::UserAgent->new;
@@ -238,6 +263,7 @@ sub processPayment {
 	$userAgent->agent("WebGUI ");
     
     # Create a request and stuff the xml in it
+    $session->errorHandler->info('Starting request');
     my $xmlTransactionScript = 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans.cgi';
     my $request = HTTP::Request->new( POST => $xmlTransactionScript );
 	$request->content_type( 'application/x-www-form-urlencoded' );
@@ -249,10 +275,12 @@ sub processPayment {
     # Process response
 	if ($response->is_success) {
 		# We got some XML back from iTransact, now parse it.
+        $session->errorHandler->info('Starting request');
         my $transactionResult = XMLin( $response->content );
 #### TODO: More checking: price, address, etc
 		unless (defined $transactionResult->{ TransactionData }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
+            $session->errorHandler->info("GatewayFailureResponse: result: [".$response->content."]");
             return( 
                 0, 
                 undef, 
@@ -262,6 +290,7 @@ sub processPayment {
 		} else {
             # SaleResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean that
             # the transaction has succeeded. It only has if Status is set to OK.
+            $session->errorHandler->info("SaleResponse: result: [".$response->content."]");
             my $transactionData = $transactionResult->{ TransactionData };
 
             my $status          = $transactionData->{ Status            };
@@ -274,6 +303,7 @@ sub processPayment {
 		}
 	} else {
 		# Connection Error
+        $session->errorHandler->info("Connection error");
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
@@ -372,15 +402,18 @@ sub www_getCredentials {
 	);
 	$f->readOnly(
 		-label	    => $i18n->get('expiration date'),
-		-value	    => monthYear( $session ),
+		-value	    => _monthYear( $session ),
 	);
 	$f->integer(
 		-name	=> 'cvv2',
 		-label	=> $i18n->get('cvv2'),
 		-value  => $self->session->form->process("cvv2")
 	) if ($self->get('useCVV2'));
-
-	return $f->print;	
+    $f->submit(
+        -value  => 'Checkout',
+    );
+    
+	return $session->style->userStyle($f->print);	
 }
 
 #-------------------------------------------------------------------
