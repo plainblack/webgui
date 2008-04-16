@@ -4,6 +4,8 @@
  - fix: Event is no longer editable by anyone who can add events
  - fixed: Package search is slow for large websites
  - fixed: rich editor image picker displays incorrectly in IE
+ - fixed: the export system was largely incomprehensible. rewritten.
+ - the new export system now needs Path::Class
 
 7.5.10
  - fix: Syntax error in GetCsMail
