@@ -657,6 +657,17 @@ be useful, others may not.|,
 		context => q|The name of the editParameter form|
 	},
 
+    'edit option value' => {
+        message => q|Value|,
+        lastUpdated => 1208320423,
+        context => q|The form label for the value field in editParameterOption|
+    },
+
+    'edit option value description' => {
+        message => q|<p>The value of this option (ie. 'Blue').</p>|,
+        lastUpdated => 1208320422,
+    },
+
 	'edit option price modifier' => {
 		message => q|Price modifier|,
 		lastUpdated => 1208292477,

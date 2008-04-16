@@ -972,6 +972,13 @@ sub www_editParameterOptions {
         -name       => 'name',
         -value      => $param,
     );
+	$f->text(
+		-name		=> 'value',
+		-label		=> $i18n->get('edit option value'),
+		-hoverHelp	=> $i18n->get('edit option value description'),
+		-value		=> $session->form->process("value") || $option->{value},
+		-maxlength	=> 64,
+	);
 	$f->float(
 		-name		=> 'priceModifier',
 		-label		=> $i18n->get('edit option price modifier'),
