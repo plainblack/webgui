@@ -53,30 +53,19 @@ Defaults to "0". Set to "1" if this field should be checked.
 
 The value returned by this field if it is checked and no value is specified. Defaults to "1".
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("943"),
-			},
 		checked=>{
 			defaultValue=> 0
 			},
 		defaultValue=>{
 			defaultValue=>1
 			},
-		profileEnabled=>{
-			defaultValue=>0
-			}
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -96,24 +85,27 @@ sub generateIdParameter {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
 
-Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return undef.
-
-=head3 value
-
-An optional value to process, instead of POST input.
+Returns the human readable name of this control.
 
 =cut
 
-sub getValueFromPost {
-	my $self = shift;
-	my $formValue = @_ ? shift : $self->session->form->param($self->get("name"));
-	if (defined $formValue) {
-		return $formValue;
-	} else {
-		return undef;
-	}
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('943');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -126,7 +118,7 @@ Renders and input tag of type checkbox.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value")))) || '';
+	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue))) || '';
 	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
 	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';
 	return '<input type="checkbox" name="'.($self->get("name")||'').'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';

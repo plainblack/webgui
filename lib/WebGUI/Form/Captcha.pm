@@ -51,10 +51,6 @@ The following additional parameters have been added via this sub class.
 
 Defaults to "Verify Your Humanity"
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
@@ -63,36 +59,64 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session,"Form_Captcha");
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("topicName")
-			},
 		label => {
 			defaultValue=>$i18n->get("verify your humanity")
 			},
-		profileEnabled=>{
-			defaultValue=>0
-			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(6)",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2  getDatabaseFieldType ( )
+
+Returns "BOOLEAN".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "BOOLEAN";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'Form_Captcha')->get('topicName');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Returns a boolean indicating whether the string typed matched the image.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+    my $value = $self->SUPER::getValue(@_); 
 	my $challenge = $self->session->scratch->get("captcha_".$self->get("name"));
 	$self->session->scratch->delete("captcha_".$self->get("name"));
 	return (lc($value) eq lc($challenge));
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

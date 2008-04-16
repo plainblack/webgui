@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -59,9 +71,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get('country')
-			},
 		label=>{
 			defaultValue=>$i18n->get('country')
 			},
@@ -71,8 +80,33 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>"United States"
 			},
-		});
+        });
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('country');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -83,6 +117,8 @@ Renders a country picker control.
 
 =cut
 
+sub toHtml {
+	my $self = shift;
 my %countries;
 tie %countries, 'Tie::IxHash';
 %countries = (
@@ -329,8 +365,6 @@ tie %countries, 'Tie::IxHash';
 'Zimbabwe' => 'Zimbabwe'
 	);
 
-sub toHtml {
-	my $self = shift;
 	$self->set("options", \%countries);
 	return $self->SUPER::toHtml();
 }

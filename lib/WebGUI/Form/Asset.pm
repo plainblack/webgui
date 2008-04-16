@@ -69,9 +69,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "Asset");
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("asset"),
-			},
 		label=>{
 			defaultValue=>$i18n->get("asset"),
 			},
@@ -81,11 +78,63 @@ sub definition {
 		class=>{
 			defaultValue=> undef
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'Asset')->get('asset');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Formats as a link.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getValue);
+    if (defined $asset) {
+        return '<a href="'.$asset->getUrl.'">'.$asset->getTitle.'</a>';
+    }
+    return undef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -98,7 +147,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->get("value")) || WebGUI::Asset->getRoot($self->session);
+        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->getDefaultValue) || WebGUI::Asset->getRoot($self->session);
 	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,

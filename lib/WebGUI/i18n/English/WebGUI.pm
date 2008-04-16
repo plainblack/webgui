@@ -2639,6 +2639,24 @@ div.tabs {
 		lastUpdated => 1044705103
 	},
 
+    'class name' => {
+        message => q|Class Name|,
+        lastUpdated => 0,
+        context=> 'Form Type Name, as in "Object Class Name"',
+    },
+
+    'fieldType' => {
+        message => q|Field Type|,
+        lastUpdated => 0,
+        context=> 'form field type',
+    },
+
+    'slider' => {
+        message => q|Slider|,
+        lastUpdated => 0,
+        context=> 'form field type that has a slide selector',
+    },
+
 	'980' => {
 		message => q|Empty this folder.|,
 		lastUpdated => 1055908341

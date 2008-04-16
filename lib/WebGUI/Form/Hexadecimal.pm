@@ -58,21 +58,13 @@ Defaults to 0. Used if no value is specified.
 
 Defaults to 11. The number of characters that will be displayed at once in this field. Usually no need to override the default.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("hexadecimal")
-			},
 		maxlength=>{
 			defaultValue=> 11
 			},
@@ -82,28 +74,50 @@ sub definition {
 		size=>{
 			defaultValue=>11
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('hexadecimal');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Returns the integer from the form post, or returns 0 if the post result is invalid.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = $self->session->form->param($self->get("name"));
+	my $value = $self->SUPER::getValue(@_);
 	if ($value =~ /^[0-9a-f]+$/i) {
 		return $value;
 	}
 	return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

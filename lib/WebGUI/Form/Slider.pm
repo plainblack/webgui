@@ -60,21 +60,13 @@ Defaults to "0". The minimum value that the slider can go to.
 Defaults to 1. Setting this option to 0 will hide the input element tied to the 
 slider.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=> "No name",
-			},
 		maximum=>{
 			defaultValue=> "100",
 			},
@@ -83,9 +75,6 @@ sub definition {
 			},
 		editable=>{
 			defaultValue=> "1",
-			},
-		profileEnabled=>{
-			defaultValue=>0,
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -152,6 +141,19 @@ sub getInputVariable {
 	$uniqueness =~ s/-/\$/g;
 	
 	return 'i_'.$uniqueness;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('slider');
 }
 
 #-------------------------------------------------------------------

@@ -36,47 +36,42 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2  getDatabaseFieldType ( )
 
-See the super class for additional details.
+Returns "TEXT".
 
-=head3 additionalTerms
+=cut 
 
-The following additional parameters have been added via this sub class.
+sub getDatabaseFieldType {
+    return "TEXT";
+}
 
-=head4 options
+#-------------------------------------------------------------------
 
-A hash reference containing name value pairs. The name of each pair will be used to fill the value attribute of the hidden field. Defaults to an empty hash reference.
+=head2 getName ( session )
 
-=head4 defaultValue
-
-value and defaultValue are array referneces containing the names from the options list that should be stored.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-        my $class = shift;
-	my $session = shift;
-        my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-        push(@{$definition}, {
-                formName=>{
-                        defaultValue=>$i18n->get("hidden list"),
-                        },
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "TEXT",
-        },
-                });
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('hidden list');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

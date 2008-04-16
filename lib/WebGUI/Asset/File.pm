@@ -270,7 +270,7 @@ Get the storage location created by the form post.
 sub getStorageFromPost {
     my $self      = shift;
     my $storageId = shift;
-    my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValueFromPost;
+    my $fileStorageId = WebGUI::Form::File->new($self->session, {name => 'newFile', value=>$storageId })->getValue;
     $self->session->errorHandler->info( "File Storage Id: $fileStorageId" );
     return $self->getStorageClass->get($self->session, $fileStorageId);
 }

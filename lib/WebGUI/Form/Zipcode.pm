@@ -50,26 +50,15 @@ The following additional parameters have been added via this sub class.
 
 Defaults to 10. Determines the maximum number of characters allowed in this field.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=> $i18n->get("944")
-			},
 		maxlength=>{
 			defaultValue=> 10
-			},
-		profileEnabled=>{
-			defaultValue=>1
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -77,7 +66,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('944');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, it returns undef instead.
 
@@ -87,14 +89,26 @@ An optional value to use instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+	my $value = $self->SUPER::getValue(@_);
 	$value =~ tr/\r\n//d;
    	if ($value =~ /^[A-Z\d\s\-]+$/) {
 		return $value;
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

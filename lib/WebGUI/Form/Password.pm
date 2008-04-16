@@ -54,32 +54,59 @@ Defaults to 35. Determines the maximum number of characters allowed in this fiel
 
 Defaults to 30. Specifies how big of a text box to display.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("51")
-			},
 		maxlength=>{
 			defaultValue=>35
 			},
 		size=>{
 			defaultValue=>30
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('51');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Formats as ******.
+
+=cut
+
+sub getValueAsHtml {
+    return '******';
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -92,7 +119,7 @@ Renders an input tag of type password.
 
 sub toHtml {
 	my $self = shift;
-	my $html = '<input type="password" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->get("value")).'" size="'.$self->get("size").'" id="'.$self->get('id').'" ';
+	my $html = '<input type="password" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->getDefaultValue).'" size="'.$self->get("size").'" id="'.$self->get('id').'" ';
 	$html .= 'maxlength="'.$self->get("maxlength").'" ' if ($self->get("maxlength"));
 	$html .= $self->get("extras").' />';
 	return $html;

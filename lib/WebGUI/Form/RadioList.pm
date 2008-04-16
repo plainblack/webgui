@@ -37,17 +37,6 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
-##-------------------------------------------------------------------
-
-=head2 correctValues ( )
-
-Override method from master class since RadioList only supports a single value
-
-=cut
-
-sub correctValues { }
-
-
 #-------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )
@@ -62,26 +51,15 @@ The following additional parameters have been added via this sub class.
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("942")
-			},
 		vertical=>{
 			defaultValue=>0
-			},
-		profileEnabled=>{
-			defaultValue=>1
 			},
 		defaultValue=>{
 			defaultValue=>''
@@ -90,6 +68,57 @@ sub definition {
         return $class->SUPER::definition($session, $definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('942');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
+
+See WebGUI::Form::Control::getValue()
+
+=cut
+
+sub getValue {
+	my $self = shift;
+    return $self->WebGUI::Form::Control::getValue(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( [ value ] )
+
+See WebGUI::Form::Control::getDefaultValue()
+
+=cut
+
+sub getDefaultValue {
+	my $self = shift;
+    return $self->WebGUI::Form::Control::getDefaultValue(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
+}
 
 #-------------------------------------------------------------------
 
@@ -103,26 +132,24 @@ sub toHtml {
 	my $self = shift;
 	my $output;
 	my $alignment = $self->alignmentSeparator;
-        my %options;
-        tie %options, 'Tie::IxHash';
-        %options = $self->orderedHash;
 	my $i=0;
-	foreach my $key (keys %options) {
+    my $options = $self->getOptions;
+	foreach my $key (keys %{$options}) {
 		$i++;
-                my $checked = 0;
-                if ($self->get('value') eq $key) {
-                        $checked = 1;
-                }
-                $output .= WebGUI::Form::Radio->new($self->session, {
-                        name=>$self->get('name'),
-                        value=>$key,
-                        extras=>$self->get('extras'),
-                        checked=>$checked,
-                        id=>$self->get('name').$i
-                        })->toHtml;
-                $output .= '<label for="'.$self->get('name').$i.'">'.$self->get('options')->{$key}."</label>" . $alignment;
+        my $checked = 0;
+        if ($self->get('value') eq $key) {
+            $checked = 1;
         }
-        return $output;
+        $output .= WebGUI::Form::Radio->new($self->session, {
+            name=>$self->get('name'),
+            value=>$key,
+            extras=>$self->get('extras'),
+            checked=>$checked,
+            id=>$self->get('name').$i
+            })->toHtml;
+            $output .= '<label for="'.$self->get('name').$i.'">'.$options->{$key}."</label>" . $alignment;
+    }
+    return $output;
 }
 
 1;

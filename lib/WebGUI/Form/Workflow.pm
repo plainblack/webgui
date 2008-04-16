@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -74,11 +86,8 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session, 'Workflow');
+    my $i18n = WebGUI::International->new($session, 'Workflow');
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("topicName")
-			},
 		label=>{
 			defaultValue=>$i18n->get("topicName")
 			},
@@ -94,11 +103,33 @@ sub definition {
         includeRealtime => {
             defaultValue => 0
             },
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
-		});
-        return $class->SUPER::definition($session, $definition);
+        });
+    return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'Workflow')->get('topicName');
 }
 
 #-------------------------------------------------------------------
@@ -130,7 +161,6 @@ sub toHtmlWithWrapper {
         my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
         my $buttons;
 	# This edit button will not work with multiple workflows.
-	#$buttons .= $self->session->icon->edit("op=editWorkflow;workflowId=".$self->get("value")->[0].$returnUrl) if ($self->get("value"));
         $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
 	$self->set("subtext",$buttons . $self->get("subtext"));
 	return $self->SUPER::toHtmlWithWrapper;

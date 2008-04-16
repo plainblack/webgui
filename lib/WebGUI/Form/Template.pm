@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -71,9 +83,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, 'Asset_Template');
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("assetName")
-			},
 		label=>{
 			defaultValue=>$i18n->get("assetName")
 			},
@@ -86,11 +95,45 @@ sub definition {
 		onlyCommitted=>{
 			defaultValue=>''
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
-		});
+        });
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'Asset_Template')->get('assetName');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------

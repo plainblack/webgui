@@ -55,37 +55,48 @@ The following additional parameters have been added via this sub class.
 
 A time interval in seconds that is used if value is not specified. Defaults to 1.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("interval"),
-			},
 		defaultValue=>{
 			defaultValue=>1,
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "BIGINT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ num_and_units ] )
+=head2  getDatabaseFieldType ( )
+
+Returns "BIGINT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "BIGINT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('interval');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ num_and_units ] )
 
 Returns either the interval that was posted (in seconds) or if nothing comes back it returns 0.
 
@@ -95,7 +106,7 @@ The number and units for this interval, to use instead of POST input, which is t
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 
 	if (@_) {
@@ -104,6 +115,18 @@ sub getValueFromPost {
 	}
 
 	return $self->session->datetime->intervalToSeconds($self->session->form->param($self->get("name")."_interval"),$self->session->form->param($self->get("name")."_units")) || 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -126,7 +149,7 @@ sub toHtml {
                 'weeks'=>$i18n->get(701),
                 'months'=>$i18n->get(702),
                 'years'=>$i18n->get(703));
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->get("value"));
+        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getDefaultValue);
 	# not sure why, but these things need to be defined like this or
 	# they fail under some circumstnaces 
 	my $cmd = "WebGUI::Form::Integer";
@@ -141,7 +164,7 @@ sub toHtml {
 		options=>\%units,
 		name=>$self->get("name")."_units",
 		id=>$self->get('id')."_units",
-		value=>[$units]
+		value=>$units
 		)->toHtml;
 	return $out;
 }
@@ -157,7 +180,7 @@ Returns the field as hidden controls rather than displayable controls.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->get("value"));
+        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getDefaultValue);
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name").'_interval',
                         value=>$interval

@@ -108,5 +108,5 @@ WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 #
 # test WebGUI::FormValidator::Checkbox(undef,@values)
 #
-is(WebGUI::Form::Checkbox->new($session)->getValueFromPost('test'), 'test', '$cbox->getValueFromPost(arg)');
+is(WebGUI::Form::Checkbox->new($session)->getValue('test'), 'test', '$cbox->getValue(arg)');
 is($session->form->checkbox(undef,'test'),                          'test', 'WebGUI::FormValidator::checkbox');

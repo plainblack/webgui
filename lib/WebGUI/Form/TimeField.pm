@@ -66,21 +66,13 @@ Defaults to 8. Determines the maximum number of characters allowed in this field
 
 Default to 8. Determines how many characters wide the field wlll be.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("971")
-			},
 		maxlength=>{
 			defaultValue=>8
 			},
@@ -90,19 +82,38 @@ sub definition {
 		format => {
             defaultValue => undef,
         },
-        profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "BIGINT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2  getDatabaseFieldType ( )
+
+Returns "BIGINT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "BIGINT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('971');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 If the defaultValue is a MySQL time, the value returned by this form element 
 will be a MySQL time. Note: Will not be adjusted for the user's time zone.
@@ -116,11 +127,10 @@ An optional value to process, instead of POST input. This should be in the form 
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-
+    my $value = $self->SUPER::getValue(@_);
 	if (@_) {
-		my $value = shift;
 		if ($self->get('format') ne 'mysql' && (
             !$self->get("defaultValue") 
         || $self->get("defaultValue") =~ m/^\d+$/
@@ -143,13 +153,25 @@ sub getValueFromPost {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/)) {
 		# epoch format
-		return $self->session->datetime->timeToSeconds($self->session->form->param($self->get("name")))-($self->session->user->profileField("timeOffset")*3600);
-	} else {
+		return $self->session->datetime->timeToSeconds($value)-($self->session->user->profileField("timeOffset")*3600);
+	} 
+    else {
 		# Mysql format
-		my $value = $self->session->form->param($self->get("name"));
 		return undef unless $value =~ /^\d{2}\D\d{2}(\D\d{2})?$/;
 		return $value;
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -162,18 +184,7 @@ Renders a time field.
 
 sub toHtml {
     my $self = shift;
-	my $value;
-    # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		# Epoch format
-		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
-	} else {
-		# MySQL format
-		$value	= $self->get("value");
-	}
+	my $value = $self->getDefaultValue;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
@@ -195,18 +206,7 @@ Renders the field as a hidden field.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-	my $value;
-    # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		# Epoch format
-		$value 	= $self->session->datetime->secondsToTime($self->get("value"));
-	} else {
-		# MySQL format
-		$value	= $self->get("value");
-	}
+	my $value = $self->getDefaultValue;
 	return WebGUI::Form::Hidden->new($self->session,
 		name=>$self->get("name"),
 		value=>$value

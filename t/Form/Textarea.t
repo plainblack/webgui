@@ -95,11 +95,11 @@ is($input->value, 'Some & text in " here', 'Checking default value');
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
-# just testing that getValueFromPost works with an argument
+# just testing that getValue works with an argument
 
 my $txt = WebGUI::Form::Textarea->new($session);
-is($txt->getValueFromPost("some test here"), "some test here", 'getValueFromPost(text)');
-is($txt->getValueFromPost("some \ntest \r\nhere"), "some \ntest \r\nhere", 'getValueFromPost(newlines)');
+is($txt->getValue("some test here"), "some test here", 'getValue(text)');
+is($txt->getValue("some \ntest \r\nhere"), "some \ntest \r\nhere", 'getValue(newlines)');
 
 is($session->form->textarea(undef,"some test here"), "some test here", 'session->form->textarea(undef,text)');
 is($session->form->textarea(undef,"some \ntest \r\nhere"), "some \ntest \r\nhere", 'session->form->textarea(undef,newlines)');

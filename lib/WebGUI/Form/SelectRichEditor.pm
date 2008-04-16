@@ -36,6 +36,18 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )
@@ -57,16 +69,25 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift || [];
-    my $i18n        = WebGUI::International->new($session);
     push @{$definition}, {
-        formName => {
-            defaultValue    => $i18n->get("475"),
-        },
         defaultValue => {
             defaultValue    => '',
         },
     };
     return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('SelectRichEditor formName');
 }
 
 #----------------------------------------------------------------------------

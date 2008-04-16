@@ -120,11 +120,11 @@ WebGUI::Form_Checking::auto_check($session, 'Zipcode', $testBlock);
 
 # test that we can process non-POST values correctly
 my $cntl = WebGUI::Form::Zipcode->new($session,{ defaultValue => 4242 });
-is($cntl->getValueFromPost('ABCDE'), 'ABCDE', 'alpha');
-is($cntl->getValueFromPost('02468'), '02468', 'numeric');
-is($cntl->getValueFromPost('NO WHERE'), 'NO WHERE', 'alpha space');
-is($cntl->getValueFromPost('-'), '-', 'bare dash');
-is($cntl->getValueFromPost('abcde'), undef, 'lower case');
+is($cntl->getValue('ABCDE'), 'ABCDE', 'alpha');
+is($cntl->getValue('02468'), '02468', 'numeric');
+is($cntl->getValue('NO WHERE'), 'NO WHERE', 'alpha space');
+is($cntl->getValue('-'), '-', 'bare dash');
+is($cntl->getValue('abcde'), undef, 'lower case');
 
 is($session->form->zipcode(undef,'ABCDE'), 'ABCDE', 'alpha');
 is($session->form->zipcode(undef,'02468'), '02468', 'numeric');

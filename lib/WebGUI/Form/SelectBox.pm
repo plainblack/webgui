@@ -36,16 +36,6 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
-##-------------------------------------------------------------------
-
-=head2 correctValues ( )
-
-Override method from master class since SelectBox only support a single value
-
-=cut
-
-sub correctValues { }
-
 #-------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )
@@ -60,58 +50,92 @@ The following additional parameters have been added via this sub class.
 
 The number of characters tall this list should be. Defaults to '1'.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("487"),
-			},
 		defaultValue=>{
 			defaultValue=>'', # gotta be a scalar, not an arrayref.
 			},
 		size=>{
 			defaultValue=>1,
 			},
-		profileEnabled=>{
-			defaultValue=>1,
-			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(255)",
-        }
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2  getDatabaseFieldType ( )
 
-Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Note, this is exactly the same method as used by Control since SelectBoxes only support a single value.
+Returns "VARCHAR(255)".
 
-=head3 value
+=cut 
 
-Optional values to process (read "return"), instead of POST input.
+sub getDatabaseFieldType {
+    return "VARCHAR(255)";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
 
 =cut
 
-sub getValueFromPost {
-	my $self = shift;
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('487');
+}
 
-	my $formValue = @_ ? shift : $self->session->form->param($self->get("name"));
-	if (defined $formValue) {
-		return $formValue;
-	} else {
-		return $self->get("defaultValue");
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
+
+See WebGUI::Form::Control::getValue()
+
+=cut
+
+sub getValue {
+	my $self = shift;
+    return $self->WebGUI::Form::Control::getValue(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( )
+
+Returns the either the "value" ore "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
+
+=cut
+
+sub getDefaultValue {
+    my $self = shift;
+    my $value = $self->get("value");
+    unless (defined $value) {
+		$value = $self->get("defaultValue");
 	}
+	if (ref $value eq 'ARRAY') {
+		$value = $value->[0];
+	}
+	return $value;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -125,17 +149,15 @@ Renders a select list form control.
 sub toHtml {
 	my $self = shift;
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').'>';
-	my %options;
-	tie %options, 'Tie::IxHash';
-	%options = $self->orderedHash;
-	my ($value) = $self->getValues();
-        foreach my $key (keys %options) {
+    my $options = $self->getOptions;
+	my $value = $self->getDefaultValue();
+    foreach my $key (keys %{$options}) {
 		$output .= '<option value="'.$key.'"';
 		if ($value eq $key) {
 			$output .= ' selected="selected"';
 		}
-		$output .= '>'.$self->get('options')->{$key}.'</option>';
-        }
+		$output .= '>'.$options->{$key}.'</option>';
+    }
 	$output .= '</select>'."\n";
 	return $output;
 }

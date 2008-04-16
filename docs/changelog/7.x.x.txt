@@ -7,6 +7,140 @@ Commerce merge
    amounts of money using the new commerce system.
  - Merged all the old shipping plugins into one "Flat Rate" shipping plugin.
    See gotchas.
+
+7.5.11
+ - fix: template variable isUncommitted is not documented in the help
+ - Cleaned the pollution from the forms system.
+ - fix: Event is no longer editable by anyone who can add events
+ - fixed: Package search is slow for large websites
+ - fixed: rich editor image picker displays incorrectly in IE
+
+7.5.10
+ - fix: Syntax error in GetCsMail
+ - fix: Trapped an exception for corrupt config files.
+ - fixed: Thingy: field types not in alphabetical order
+ - fixed: Thingy: Text, File and Hidden field types listed twice (Yung Han Khoe)
+ - fixed: Thingy: subtext is not displayed
+ - fixed: Thingy: edit/add field popup doesn't fit all options
+ - fixed: selecting some field types will crash Thingy
+ - fixed: Thingy: "add" and "edit" permission problem
+ - fixed: EMail field rejects some valid email addresses
+ - fixed: Calendar date localization can be broken
+ - fixed: Thingy: field sequence not imported correctly for existing Thingies
+ - fixed: anonymous registration leaves user at blank page
+ - fixed: Thingy: field type 'other thing' does not stay selected
+ - fixed: Thingy: delete a thing dysfunctions linked things
+ - fixed: i18n discrepencies in Gallery / GalleryAlbum / Photo
+ - fixed: After saving Photo, Add an Image points to wrong link
+ - fixed: "Back to Album" link doesn't work
+ - fixed: email validation links can be broken by mail servers
+ - fixed: Clipboard select all doesn't work with one item in IE
+ - fixed: able to view visitor profile, send private messages, add as friend
+ - fixed: international characters corrupted in titles
+ - fixed: Users without karma can transfer karma by rating posts
+ - fixed: gateway macro not usable in links in rich editor
+ - fixed: iCal feeds don't update properly when events are changed
+ - fixed: getLineage with joinClass only joins first table in definition
+
+7.5.9
+ - fixed: Collaboration System attachments follow site's max size instead of CS's
+ - fixed: Rich editor image uploader doesn't follow size limits
+ - fixed: Poll question/answers with international text corrupted
+ - fixed: Thingy: on demo sites the edit and delete icons in search results have wrong url's
+ - fixed: Form::FieldType->getTypes should exclude Form::Slider base class (Yung Han Khoe)
+ - upgraded to TinyMCE 3
+ - fixed: subscription group in CS edit not internationalized
+ - fixed: profile photos don't obey max image size
+ - fixed: Unable to communicate with Spectre under alternate locales
+ - fixed: Project Manager can't track non-integer durations
+ - fixed: Unable to edit CS posts that were denied as a normal user
+ - added: Better error messages when SQL Report lacks a query (William McKee, Knowmad Technologies)
+ - fixed: edit branch sends thread notifications
+ - fixed: changing style template with edit branch creates new revisions of assets that have no style template
+ - fixed: Wiki attachments uploaded by non-Content Managers deleted by maintenance workflow
+ - fixed: Non-Content managers unable to paste assets even with edit privaledges
+ - use UTF8 JSON encoding and decoding universally
+ - fixed: Import/Export of packages with international text is broken
+ - fixed: CS rating links are exposed to site spiders
+ - improved behavior of CS mail message filtering
+ - fixed: Thingy: "cancel" -- cannot cancel when adding a thing
+ - fixed: unable to respond to survey multiple times in same session
+ - fixed: packages try to restore owner
+
+7.5.8
+ - moved Gallery utility methods to WebGUI::Utility::Gallery
+ - Added tests for GalleryAlbum RSS
+ - More tests for comments
+ - Test International Macro sprintf as third+ arguments
+ - Add Gallery search limiting by user ID
+ - Remaining i18n for Gallery templates
+ - Fix: Search form now visible in Photo assets
+ - Added hover help in Thingy's yui popups
+ - Thingy now shows all field types when editing a field
+ - Added an optionsSettable flag to form types that have an options property (Yung Han Khoe)
+ - fixed: Editting matrix listings shows fields from other matrix assets
+ - fixed: Matrix assets show pending listings from all matrix assets on a site
+ - fixed: Changing name of Matrix listing leaves discussion forum with old name
+ - fixed: Importing a package can break when updating a pending asset
+ - fixed: errors on package importing are always reported as corrupted packages
+ - fixed: Optional pubDate RSS field generates warnings when missing
+ - fixed: Collaboration System threads can return other object types when asked for replies
+ - fixed: Able to cut or trash system assets
+ - fixed: Can't purge uncommitted assets if not using its version tag
+ - fixed: DataForm will create fields with duplicate names but doesn't use them separately
+ - fixed: Bad message if database link for SQL Report doesn't exist
+ - fixed: Thingy shows things from other Thingies
+ - fixed: Collaboration System errors when missing RSS From Parent
+ - fixed: Syndicated Content picks wrong entries for interleaving
+ - fixed: Syndicated Content URLs using macros not updated by caching workflow
+ - fixed: Syndicated Content asset tries too hard to get URLs returning errors
+ - fixed: Thingy: field type includes things without fields
+ - fixed: Thingy: problems editing/viewing records
+ - fix: Users now have permission to add comments
+ - fix: Username for comment poster is now shown correctly
+ - fix: Slideshow now works
+ - added: Database index on userSession.expires field to speed up workflows
+
+7.5.7
+ - fixed: HttpProxy mixes original site's content encoding with WebGUI's
+ - fixed: Thingy i18n has an empty message
+ - fixed: Thingy has no icon
+ - fixed: Wiki page history shows username instead of alias
+ - added: Uploads locations and files are set to the same uid/gid that owns the uploads root
+ - fixed: SQL Form fields with a regex are required even if not set to required
+ - fixed: Matrix caches pages, and may not update for new listings
+
+7.5.6
+ - fixed: events get start/end time even when none specified (also can offset start/end day)
+ - fixed: event related links may not work with some group names
+ - Use UTF8 for database connection when connecting to MySQL
+ - Convert all database tables to UTF8, repairing erroneous data
+ - Internationalized Calendar templates
+ - fixed: exporting as HTML leaks sessions for inaccessible assets, 
+ - new YUI based date picker
+ - fixed: changing image thumbnail size doesn't resize image
+ - fixed: loadAddConfigs loads hidden files
+ - ensure proper XML encoding for ITransact messages
+ - fixed: fatal error duplicate keywords added to a wiki page
+ - rfe:  added the ability to choose whether assets should be added to the front or end of the first content position of the page (Dept of State)
+ - Added Thingy asset
+
+7.5.5
+ - fixed: Several typos in the new Calendar help documentation.
+ - fix: List View now starts at the beginning of the day passed in.
+ - Removed some spurious warnings from the calendar.
+ - Added ability to edit comments. Entirely changed how comments work in prep
+   for turning it into a mixin.
+ - fixed: Child assets not indicated by plus sign in uncommited tags
+ - Added WebGUI::Asset::File::GalleryFile as a subclass for all files to be 
+   used inside the Gallery.
+ - Changed WebGUI::Asset::File::Image::Photo to subclass GalleryFile
+
+7.5.4
+ - fixed: unable to remove calendar feeds in IE6
+ - Moved the Wiki Help link into i18n so it can be pointed to other sites for
+   other lanugages.
+>>>>>>> .merge-right.r6153
  - The YUI library used in WebGUI has been upgraded to 2.5.0.
  - The resizable text area implementation used in WebGUI has been
    migrated to the code provided by YUI 2.5.0.

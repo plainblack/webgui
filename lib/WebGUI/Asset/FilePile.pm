@@ -143,7 +143,7 @@ sub editSave {
 	my $self = shift;
 
 	##This is a hack.  File uploads should go through the WebGUI::Form::File API
-    my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValueFromPost;
+    my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValue;
 	my $tempStorage       = WebGUI::Storage::Image->get($self->session, $tempFileStorageId);
 
 	foreach my $filename (@{$tempStorage->getFiles}) {

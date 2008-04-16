@@ -58,21 +58,13 @@ Defaults to 0. Used if no value is specified.
 
 Defaults to 11. The number of characters that will be displayed at once in this field. Usually no need to override the default.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("float")
-			},
 		maxlength=>{
 			defaultValue=> 14
 			},
@@ -82,19 +74,38 @@ sub definition {
 		size=>{
 			defaultValue=>11
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "DOUBLE",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2  getDatabaseFieldType ( )
+
+Returns "DOUBLE".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "DOUBLE";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('float');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns the integer from the form post, or returns 0.0 if the post result is invalid.
 
@@ -104,13 +115,25 @@ An optional value to process, instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+	my $value = $self->SUPER::getValue(@_);
 	if ($value =~ /^-?[\d\.]+$/ and $value =~ /\d/) {
 		return $value;
 	}
 	return 0.0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
