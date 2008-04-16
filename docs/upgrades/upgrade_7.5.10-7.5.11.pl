@@ -23,17 +23,38 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addCalendarEventWorkflow( $session );
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
+# Describe what our function does
 #sub exampleFunction {
 #    my $session = shift;
 #    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add the database column to select the workflow to approve Calendar Events
+sub addCalendarEventWorkflow {
+    my $session = shift;
+    print "\tAdding Calendar Event Workflow field..." unless $quiet;
+    
+    $session->db->write(
+        qq{ ALTER TABLE Calendar ADD COLUMN workflowIdCommit VARCHAR(22) BINARY },
+    );
+
+    # Add a nice default value
+    $session->db->write(
+        qq{ UPDATE Calendar SET workflowIdCommit = ? },
+        [ $session->setting->get('defaultVersionTagWorkflow') ],
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

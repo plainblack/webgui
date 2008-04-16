@@ -1,0 +1,111 @@
+# vim:syntax=perl
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#------------------------------------------------------------------
+
+# This script uses Test::WWW::Mechanize to test the operation of something
+# This skeleton sets up some things for you, such as a user to use for
+# testing.
+
+# Note: In order to test properly, you will probably have to commit your
+# version tags as they are created. By adding your version tags to 
+# @versionTags, they will get cleaned up in the END block
+
+# Note 2: Test::WWW::Mechanize should not be used to test permissions, 
+# or any API methods.
+
+# This is best used to test forms, do they have the required fields, do
+# they get saved properly?
+
+use FindBin;
+use strict;
+use lib "$FindBin::Bin/lib";
+use Test::More;
+use WebGUI::Test; # Must use this before any other WebGUI modules
+use WebGUI::Asset;
+use WebGUI::VersionTag;
+use WebGUI::Session;
+
+#----------------------------------------------------------------------------
+# Init
+my $session         = WebGUI::Test->session;
+my $node            = WebGUI::Asset->getImportNode( $session );
+my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
+
+# Override some settings to make things easier to test
+my %oldSettings;
+# userFunctionStyleId 
+$oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
+$session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+
+# Create a user for testing purposes
+my $user        = WebGUI::User->new( $session, "new" );
+$user->username( 'dufresne' . time );
+my $identifier  = 'ritahayworth';
+my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
+$auth->saveParams( $user->userId, $user->authMethod, {
+    'identifier'    => Digest::MD5::md5_base64( $identifier ), 
+});
+
+my ( $mech );
+
+# Get the site's base URL
+my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
+
+
+#----------------------------------------------------------------------------
+# Tests
+
+plan tests => 1;        # Increment this number for each test you create
+
+use_ok( 'Test::WWW::Mechanize' ) or BAIL_OUT( "Cannot continue without Test::WWW::Mechanize" );
+
+#----------------------------------------------------------------------------
+# put your tests here
+
+# example
+#$mech      = Test::WWW::Mechanize->new;
+#$mech->get_ok( $baseUrl . "?op=adminConsole" );
+#$mech      = getMechLogin( $baseUrl, $user, $identifier );
+
+#----------------------------------------------------------------------------
+# Cleanup
+END {
+    for my $tag ( @versionTags ) {
+        $tag->rollback;
+    }
+
+    $user->delete;
+
+    for my $key ( keys %oldSettings ) {
+        $session->setting->set( $key, $oldSettings{ $key } );
+    }
+}
+
+#----------------------------------------------------------------------------
+# getMechLogin( baseUrl, WebGUI::User, "identifier" )
+# Returns a Test::WWW::Mechanize session after logging in the given user using
+# the given identifier (password)
+# baseUrl is a fully-qualified URL to the site to login to
+sub getMechLogin {
+    my $baseUrl     = shift;
+    my $user        = shift;
+    my $identifier  = shift;
+    
+    my $mech    = Test::WWW::Mechanize->new;
+    $mech->get( $baseUrl . '?op=auth;method=displayLogin' );
+    $mech->submit_form( 
+        with_fields => {
+            username        => $user->username,
+            identifier      => $identifier,
+        },
+    ); 
+
+    return $mech;
+}

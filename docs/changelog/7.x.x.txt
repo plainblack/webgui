@@ -2,10 +2,13 @@
  - fix: template variable isUncommitted is not documented in the help
  - Cleaned the pollution from the forms system.
  - fix: Event is no longer editable by anyone who can add events
+ - fix: Event now sets ownerUserId correctly
+ - add: Calendar can now select which workflow to use for committing Events
  - fixed: Package search is slow for large websites
  - fixed: rich editor image picker displays incorrectly in IE
  - fixed: the export system was largely incomprehensible. rewritten.
  - the new export system now needs Path::Class
+ - add: GalleryAlbum now shows link to add Photo
 
 7.5.10
  - fix: Syntax error in GetCsMail

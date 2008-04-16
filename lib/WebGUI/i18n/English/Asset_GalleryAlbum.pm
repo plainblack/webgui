@@ -459,6 +459,12 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Label for button to confirm the delete},
     },
+
+    'what next' => {
+        message     => q{What Next?},
+        lastUpdated => 0,
+        context     => 'Title for the list of actions a user can take after saving a Gallery Album',
+    },
 };
 
 1;

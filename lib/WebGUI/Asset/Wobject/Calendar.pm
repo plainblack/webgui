@@ -263,14 +263,14 @@ sub definition {
             unitsAvailable  => [ qw( days weeks months years ) ],
         },
  
-        # This doesn't function currently
-        #subscriberNotifyOffset => {
-        #    fieldType       => "integer",
-        #    defaultValue    => "2",
-        #    tab             => "properties",
-        #    hoverHelp       => $i18n->get('subscriberNotifyOffset description'),
-        #    label           => $i18n->get('subscriberNotifyOffset label'),
-        #},    
+        workflowIdCommit => {
+            fieldType       => "workflow",
+            defaultValue    => $session->setting->get('defaultVersionTagWorkflow'),
+            tab             => 'security',
+            label           => $i18n->get('editForm workflowIdCommit label'),
+            hoverHelp       => $i18n->get('editForm workflowIdCommit description'),
+            type            => 'WebGUI::VersionTag',
+        },
     );
     
     push @{$definition}, {
@@ -432,7 +432,7 @@ sub canAddEvent {
     );
             
     return 1 if (        
-        $user->isInGroup($self->get("groupIdEventEdit")) 
+        $user->isInGroup( $self->get("groupIdEventEdit") ) 
     );
 }
 

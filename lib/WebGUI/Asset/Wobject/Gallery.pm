@@ -617,6 +617,21 @@ sub getAssetClassForFile {
 
 #----------------------------------------------------------------------------
 
+=head2 getGalleryFileClassesAvailable ( )
+
+Returns an array reference of the Asset classes available to be added to this
+Gallery.
+
+=cut
+
+sub getGalleryFileClassesAvailable {
+    my $self        = shift;
+
+    return [ 'WebGUI::Asset::File::GalleryFile::Photo' ];
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getImageResolutions ( )
 
 Gets an array reference of the image resolutions to create for image-type

@@ -298,7 +298,8 @@ By specifying this method, you activate this feature.
 
 sub getAutoCommitWorkflowId {
     my $self = shift;
-    return "pbworkflow000000000003"; 
+    return $self->getParent->get('workflowIdCommit')
+        || $self->session->setting->get('defaultVersionTagWorkflow');
 }
 
 
@@ -1916,7 +1917,12 @@ sub www_edit {
             . WebGUI::Form::hidden($self->session, {
                 name    => "class",
                 value   => $self->session->form->process("class","className"),
-            });
+            })
+            . WebGUI::Form::hidden( $self->session, {
+                name    => 'ownerUserId',
+                value   => $self->session->user->userId,
+            } )
+            ;
     }
     else {
         $var->{"formHeader"} 
@@ -1926,7 +1932,12 @@ sub www_edit {
             . WebGUI::Form::hidden($self->session, {
                 name    => "sequenceNumber",
                 value   => $self->get("sequenceNumber"),
-            });
+            })
+            . WebGUI::Form::hidden( $self->session, {
+                name    => 'ownerUserId',
+                value   => $self->session->user->userId,
+            } )
+            ;
     }
     
     $var->{"formHeader"}

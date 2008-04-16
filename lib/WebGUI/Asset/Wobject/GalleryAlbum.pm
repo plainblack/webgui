@@ -972,7 +972,12 @@ sub www_showConfirmation {
     my $self        = shift;
     my $i18n        = __PACKAGE__->i18n( $self->session );
 
-    my $output      = sprintf $i18n->get('save message'), $self->getUrl;
+    my $output      = '<p>' . sprintf( $i18n->get('save message'), $self->getUrl ) . '</p>'
+                    . '<p>' . $i18n->get('what next') . '</p>'
+                    . '<ul>'
+                    . sprintf( '<li><a href="%s">Add Photo</a></li>', $self->getUrl('func=add;class=WebGUI::Asset::File::GalleryFile::Photo') )
+                    . '</ul>'
+                    ;
 
     return $self->processStyle(
         $output

@@ -36,7 +36,7 @@ $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
-$user->username( 'dufresne' );
+$user->username( 'dufresne' . time );
 my $identifier  = 'ritahayworth';
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
 $auth->saveParams( $user->userId, $user->authMethod, {

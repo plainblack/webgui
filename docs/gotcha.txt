@@ -7,12 +7,26 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
-
 7.5.11
 --------------------------------------------------------------------
  * The exporting system before this release was largely incomprehensible and
    difficult to understand. It has been rewritten, and now requires Path::Class to
    function.
+
+ * WebGUI versions since 7.3.0 (when the new Calendar was added) 
+   have allowed users to post Events to Calendars, but the owner of
+   the Event has been saved as Admin (user ID 3). Also, anyone who
+   was allowed to add an Event was allowed to edit any Event in the
+   Calendar.
+   The permissions have now been fixed, but it is not possible to
+   fix the owner of Events posted by individual users. Users are
+   not allowed to edit the owner of an Event from the web interface
+   as a security measure.
+   The new permissions are:
+        * Users who post an Event are allowed to edit and delete the
+          Events they post
+        * Users who can edit the Calendar are allowed to add, edit,
+          and delete all Events
 
 7.5.9
 --------------------------------------------------------------------
