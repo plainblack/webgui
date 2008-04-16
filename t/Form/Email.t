@@ -107,11 +107,11 @@ is($input->{maxlength}, 200, 'Checking maxlength param, set');
 
 WebGUI::Form_Checking::auto_check($session, 'email', $testBlock);
 
-# just testing that getValueFromPost works with an argument
+# just testing that getValue works with an argument
 
 my $email = WebGUI::Form::Email->new($session);
-is($email->getValueFromPost('james@plainblack.com'), 'james@plainblack.com', 'getValueFromPost(valid) returned a valid email');
-is($email->getValueFromPost('this*isn"t and@emailaddres,s'), undef, 'getValueFromPost(invalid) returned undef instead of an invalid email');
+is($email->getValue('james@plainblack.com'), 'james@plainblack.com', 'getValue(valid) returned a valid email');
+is($email->getValue('this*isn"t and@emailaddres,s'), undef, 'getValue(invalid) returned undef instead of an invalid email');
 is($session->form->email(undef,'james@plainblack.com'), 'james@plainblack.com', '$form->email(valid) returned a valid email');
 is($session->form->email(undef,'this*isn"t and@emailaddres,s'), undef, '$form->email(invalid) returned undef instead of an invalid email');
 

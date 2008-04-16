@@ -41,25 +41,40 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=> $i18n->get("select slider")
-			},
 		options =>{
 			defaultValue=>{},
 			},
 		value	=>{
 			defaultValue=>[],
 		},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue => "TEXT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "TEXT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "TEXT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('select slider');
 }
 
 #-------------------------------------------------------------------
@@ -73,7 +88,7 @@ Returns the value that should be displayed initially.
 sub getDisplayValue {
 	my $self = shift;
 
-	return $self->get('options')->{$self->get('value')->[0]};
+	return $self->getOptions->{$self->get('value')->[0]};
 }
 
 #-------------------------------------------------------------------
@@ -90,7 +105,7 @@ sub getInputElement {
 	return WebGUI::Form::selectList($self->session, {
 		-name	=> $self->get('name'),
 		-value	=> $self->get('value'),
-		-options=> $self->get('options'),
+		-options=> $self->getOptions,
 		-id	=> 'view-'.$self->get('id'),
 		-size	=> 1,
 	});
@@ -131,6 +146,35 @@ sub getOnChangeSlider {
 
 #-------------------------------------------------------------------
 
+=head2 getOptions ( )
+
+Options are passed in for many list types. Those options can come in as a hash ref, or a \n separated string, or a key|value\n separated string. This method returns a hash ref regardless of what's passed in.
+
+=cut
+
+sub getOptions {
+    my ($self) = @_;
+    my $possibleValues = $self->get('options');
+    my %options = ();
+    tie %options, 'Tie::IxHash';
+    if (ref $possibleValues eq "HASH") {
+       %options = %{$possibleValues};
+    }
+    else {
+        foreach my $line (split "\n", $possibleValues) {
+            if ($line =~ m/(.*)|(.*)/) {
+                $options{$1} = $2;
+            }
+            else {
+                $options{$line} = $line;
+            }
+        }
+    } 
+    return \%options;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getSliderMaximum ( )
 
 Returns the maximum value the slider can be set to in slider units.
@@ -140,7 +184,7 @@ Returns the maximum value the slider can be set to in slider units.
 sub getSliderMaximum {
 	my $self = shift;
 
-	return scalar(keys %{$self->get('options')}) - 1;
+	return scalar(keys %{$self->getOptions}) - 1;
 }
 
 #-------------------------------------------------------------------
@@ -168,7 +212,7 @@ Returns the initial position of the slider in slider units.
 sub getSliderValue {
 	my $self = shift;
 
-	my @keys = keys %{$self->get('options')};
+	my @keys = keys %{$self->getOptions};
 	for (my $i = 0; $i < @keys; $i++) {
 		return $i if $keys[$i] eq $self->get('value')->[0];
 	}
@@ -178,7 +222,7 @@ sub getSliderValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getValue ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes
 back as undef, this method will return the defaultValue instead. Strip
@@ -190,21 +234,33 @@ A value to process instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 	my @args = @_;
 
 	my $properties =  {
 		-name	=> $self->get('name'),
 		-value	=> $self->get('value'),
-		-options=> $self->get('options'),
+		-options=> $self->getOptions,
 		-id	=> 'view-'.$self->get('id'),
 		-size	=> 1,
 	};
 
-	return WebGUI::Form::SelectList->new($self->session, $properties)->getValueFromPost(@args);
+	return WebGUI::Form::SelectList->new($self->session, $properties)->getValue(@args);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
+}
 
 1;
 

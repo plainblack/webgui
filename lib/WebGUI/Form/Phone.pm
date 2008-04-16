@@ -38,39 +38,20 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2 getName ( session )
 
-See the super class for additional details.
-
-=head3 additionalTerms
-
-The following additional parameters have been added via this sub class.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("481")
-			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('481');
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getValue ( [ value ] )
 
 Returns a string filtered to allow only digits, spaces, and these special characters: + - ( ) or it will return undef it the number doesn't validate to those.
 
@@ -80,13 +61,25 @@ An input value to use instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+	my $value = $self->SUPER::getValue(@_);
 	if ($value =~ /^[x\d \.\-\+\(\)]+$/ and $value =~ /\d/) {
 		return $value;
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

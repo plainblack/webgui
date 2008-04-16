@@ -59,21 +59,13 @@ Style attributes besides width and height which should be specified using the ab
 
 The following additional parameters have been added via this sub class.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("codearea")
-			},
 		height=>{
 			defaultValue=> 450 
 			},
@@ -83,14 +75,45 @@ sub definition {
 		style=>{
 			defaultValue => undef,
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "TEXT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "MEDIUMTEXT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "MEDIUMTEXT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('codearea');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

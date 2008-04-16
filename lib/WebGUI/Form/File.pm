@@ -57,10 +57,6 @@ If no name is specified a default name of "file" will be used.
 How many attachments will be allowed to be uploaded.  However, the file form
 only supports displaying/deleting 1 attachment.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =head4 deleteFileUrl
 
 A url that will get a filename appended to it and then links to delete the files will be generated automatically.
@@ -75,18 +71,11 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("file")
-			},
 		name=>{
 			defaultValue=>"file"
 			},
 		maxAttachments=>{
-			defaultValue=>1
-			},
-		profileEnabled=>{
 			defaultValue=>1
 			},
 		deleteFileUrl=>{
@@ -95,56 +84,33 @@ sub definition {
         size=>{
             defaultValue=>40
             },
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 displayForm ( )
+=head2  getDatabaseFieldType ( )
 
-If an file is uploaded, then return an icon for that file's type and a control to
-delete it.  Otherwise, display a form element to upload a file.
+Returns "VARCHAR(22) BINARY".
 
-=cut
+=cut 
 
-sub displayForm {
-	my ($self) = @_;
-	return $self->toHtml unless $self->get("value");
-	##There are files inside here, for each one, display the file icon
-	##and another form control for deleting it.
-	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
-	my $fileForm = '';
-	my $i18n = WebGUI::International->new($self->session);
-	my $file = shift @{ $location->getFiles };
-	$fileForm .= sprintf qq!<img src="%s" /><br />!, $location->getFileIconUrl($file);
-	$fileForm .= $i18n->get(392)
-		  .  "&nbsp"x4
-		  . WebGUI::Form::YesNo->new($self->session,{-name=>$self->privateName('delete'), -value=>0})->toHtml;
-	$fileForm .= $self->toHtmlAsHidden();
-	$fileForm .= WebGUI::Form::Hidden->new($self->session, {-name => $self->privateName('action'), -value => 'keep'})->toHtml();
-	return $fileForm;
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
 }
 
 #-------------------------------------------------------------------
 
-=head2 displayValue ( )
+=head2 getName ( session )
 
-This utility method is used to format values for the Profile system.  Most
-form elements will just return their value. 
+Returns the human readable name of this control.
 
 =cut
 
-sub displayValue {
-	my ($self) = @_;
-	return '' unless $self->get("value");
-	my $location = WebGUI::Storage->get($self->session,$self->get("value"));
-	my $file = shift @{ $location->getFiles };
-	my $fileValue = sprintf qq|<img src="%s" />&nbsp;<a href="%s">%s</a>|, $location->getFileIconUrl($file), $location->getUrl($file), $file; 
-	return $fileValue;
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('file');
 }
 
 #-------------------------------------------------------------------
@@ -162,6 +128,7 @@ A WebGUI::Storage object.
 sub getFilePreview {
     my $self = shift;
     my $storage = shift;
+	my $i18n = WebGUI::International->new($self->session);
     my $preview = "";
 	foreach my $file (@{$storage->getFiles}) {
 		if ($self->get("deleteFileUrl")) {
@@ -171,9 +138,11 @@ sub getFilePreview {
 		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
    		    .'<img src="'.$storage->getFileIconUrl($file).'" style="vertical-align:middle;border: 0px;" alt="'
 			.$file.'" /> '.$file.'</a></p><br />';
+	    $preview .= $i18n->get(392) .  ("&nbsp"x4) . WebGUI::Form::YesNo->new($self->session,{name=>$self->privateName('delete'), value=>0})->toHtml;
 	}
     return $preview;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -185,14 +154,15 @@ Returns the WebGUI::Storage object for this control.
 
 sub getStorageLocation {
     my $self = shift;
-	my $storage = WebGUI::Storage->get($self->session, $self->get("value")) if ($self->get("value"));
+    my $value = $self->getDefaultValue;
+	my $storage = WebGUI::Storage->get($self->session, $value) if ( defined $value );
     return $storage;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValue ( )
 
 Returns the storageId for the storage location that the file(s) got
 uploaded to. Returns undef if no files were uploaded.  Also handles
@@ -200,7 +170,7 @@ deleting the file if it was specified.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 	my $value = $self->get("value");
 	if ($self->session->form->param($self->privateName('delete'))) {
@@ -228,6 +198,36 @@ sub getValueFromPost {
 		}
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Displays the file as a link.
+
+=cut
+
+sub getValueAsHtml {
+	my ($self) = @_;
+    my $value = $self->getValue;
+	return '' unless $value;
+	my $location = WebGUI::Storage->get($self->session,$value);
+	my $file = shift @{ $location->getFiles };
+	my $fileValue = sprintf qq|<img src="%s" />&nbsp;<a href="%s">%s</a>|, $location->getFileIconUrl($file), $location->getUrl($file), $file; 
+	return $fileValue;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -274,7 +274,7 @@ sub toHtml {
     else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
             name    => $self->get("name"), 
-            value   => $self->get("value"),
+            value   => $self->getDefaultValue,
             id      => $self->get("id")
             })->toHtml()."<br />";
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
@@ -284,6 +284,9 @@ sub toHtml {
             })->toHtml()."<br />";
 	}
 	if (scalar(@files)) {
+        if ($self->get('maxAttachments') == 1) {
+            $self->set("");
+        }
         $uploadControl .= $self->getFilePreview($storage);
 	}
     return $uploadControl;

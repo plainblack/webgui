@@ -58,17 +58,24 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session,"WebGUI");
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get('button')
-			},
 		defaultValue=>{
 			defaultValue=>$i18n->get(62)
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(255)",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('button');
 }
 
 #-------------------------------------------------------------------
@@ -81,7 +88,7 @@ Renders a button.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixQuotes($self->get("value"));
+ 	my $value = $self->fixQuotes($self->getDefaultValue);
 	my $html = '<input type="button" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");

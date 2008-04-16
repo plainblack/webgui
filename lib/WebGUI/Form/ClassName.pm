@@ -36,43 +36,45 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2 getName ( session )
 
-See the super class for additional details.
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>"Class Name"
-			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('class name');
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValue ( )
 
 Returns a class name which has been taint checked.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+    my $value = $self->SUPER::getValue(@_);
 	$value =~ s/[^\w:]//g;
 	return $value;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------

@@ -36,41 +36,23 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2 getName ( session )
 
-See the super class for additional details.
-
-=head3 additionalTerms
-
-The following additional parameters have been added via this sub class.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("480")
-			},
-		profileEnabled=>{
-			defaultValue=>1
-			}
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('480');
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getValue ( [ value ] )
 
 Returns a validated email address. If the result does not pass validation, it returns undef instead.
 
@@ -80,13 +62,40 @@ An optional value to process instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
 	if ($value =~ /^[0-9a-z,_%+-]+@(?:[0-9a-z-]+\.)+[a-z]{2,9}$/i) {
 		return $value;
 	}
 	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Formats as an email link.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $email = $self->getValue;
+    return '<a href="mailto:'.$email.'">'.$email.'</a>';
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------

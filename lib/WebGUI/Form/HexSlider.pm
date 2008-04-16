@@ -62,21 +62,13 @@ The length of the input box.
 
 Pad the value to padLength characters by adding zeros in front if necesarry.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=> $i18n->get("hex slider")
-			},
 		maximum=>{
 			defaultValue=> "ff",
 			},
@@ -88,9 +80,6 @@ sub definition {
 			},
 		padLength=>{
 			defaultValue=>"2",
-			},
-		profileEnabled=>{
-			defaultValue=>1
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -160,17 +149,16 @@ sub getOnChangeSlider {
 
 #-------------------------------------------------------------------
 
-#=head2 getSliderMaximum ( )
-#
-#Returns the maximum value the slider can be set to in slider units.
-#
-#=cut
-#
-#sub getSliderMaximum {
-#	my $self = shift;
-#
-#	return scalar(keys %{$self->get('options')}) - 1;
-#}
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('hex slider');
+}
 
 #-------------------------------------------------------------------
 
@@ -216,13 +204,13 @@ sub getSliderValue {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getValue ( )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 
 	my $properties = {
@@ -232,7 +220,19 @@ sub getValueFromPost {
 		id	=> 'view-'.$self->get('id'),
 	};
 	
-	return WebGUI::Form::Hexadecimal->new($self->session, $properties)->getValueFromPost;
+	return WebGUI::Form::Hexadecimal->new($self->session, $properties)->getValue;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 1;

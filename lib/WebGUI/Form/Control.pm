@@ -15,7 +15,6 @@ package WebGUI::Form::Control;
 =cut
 
 use strict;
-use WebGUI::Operation::Shared;
 use WebGUI::International;
 
 =head1 NAME
@@ -41,6 +40,11 @@ Subclasses will look like this:
  my $html = $obj->toHtmlAsHidden;
  my $tableRows = $obj->toHtmlWithWrapper;
 
+ my $value = $obj->getValue;
+ my $value = $obj->getDefaultValue;
+ my $html = $obj->getValueAsHtml;
+
+
 =head1 METHODS 
 
 The following methods are available via this package.
@@ -50,23 +54,21 @@ The following methods are available via this package.
 
 #-------------------------------------------------------------------
 
-=head2 privateName ( )
+=head2 areOptionsSettable ( )
 
-Creates a safe, private name for additional use in multi-part forms
-like File and Image.
+Returns a boolean indicating whether the options of the list are settable. Some have a predefined set of options. This is useful in generating dynamic forms. Really only used by form controls with an "options" field, which are mostly subclasses if WebGUI::Form::List. Returns 0.
 
 =cut
 
-sub privateName {
-	my ($self, $action) = @_;
-	return join '_', '_', $self->get('name'), $action;
+sub areOptionsSettable {
+    return 1;
 }
 
 #-------------------------------------------------------------------
 
 =head2 definition ( session, [ additionalTerms ] )
 
-Defines the schema or parameters for a form field.
+Defines passible parameters for a form field.
 
 =head3 session
 
@@ -108,10 +110,6 @@ an initial blank field, instead of using a default, like WebGUI::Form::Date.pm
 Add extra attributes to the form tag like 
 
   onmouseover='doSomething()'
-
-=head4 formName
-
-The key to look up for the form name.
 
 =head4 label
 
@@ -155,16 +153,6 @@ A stylesheet class assigned to each label/field pair.
 
 A text string that will pop up when the user hovers over the label when toHtmlWithWrapper() is called. This string should indicate how to use the field and is usually tied into the help system.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
-=head4 dbDataType
-
-The SQL data type for this form element. Fields created using this form control
-will create a column with this data type. If undef, will not create a database 
-column. Defaults to "VARCHAR(255)".
-
 =cut
 
 sub definition {
@@ -172,9 +160,6 @@ sub definition {
 	my $session = shift;
 	my $definition = shift || [];
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>'A name for this form was not supplied'
-			},
 		name=>{
 			defaultValue=>undef
 			},
@@ -220,12 +205,6 @@ sub definition {
 		idPrefix=>{
 			defaultValue=>undef
 			},
-		profileEnabled=>{
-			defaultValue=>0
-            },
-        dbDataType => {
-            defaultValue => "VARCHAR(255)",
-        },
     });
 	return $definition;
 }
@@ -234,51 +213,39 @@ sub definition {
 
 =head2 displayForm ( )
 
-This utility method is used to format values for the Profile system but can
-be used in other areas as well.  Most form elements will just return toHtml. 
+Depricated, see toHtml().
 
 =cut
 
 sub displayForm {
-	my ($self) = @_;
-	$self->toHtml;
+	my $self = shift;
+	return $self->toHtml(@_);
 }
 
 #-------------------------------------------------------------------
 
 =head2 displayFormWithWrapper ( )
 
-This utility method is used to format values for the Profile system but can
-be used in other areas as well.  Most form elements will just return displayForm. 
+Depricated, see toHtmlWithWrapper().
 
 =cut
 
 sub displayFormWithWrapper {
 	my $self = shift;
-	if ($self->passUiLevelCheck) {
-		my ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext)  = $self->prepareWrapper;
-		$hoverHelp &&= '<div class="wg-hoverhelp">' . $hoverHelp . '</div>';
-        return '<tr'.$rowClass.'>
-				<td'.$labelClass.' valign="top" style="width: 25%;">'.$self->get("label") . $hoverHelp . '</td>
-				<td valign="top"'.$fieldClass.' style="width: 75%;">'.$self->displayForm().$subtext."</td>
-			</tr>\n";
-	} else {
-		return $self->toHtmlAsHidden;
-	}
+    return $self->toHtmlWithWrapper(@_);
 }
 
 #-------------------------------------------------------------------
 
 =head2 displayValue ( )
 
-This utility method is used to format values for the Profile system.  Most
-form elements will just return their value. 
+Depricated, see getValueAsHtml().
 
 =cut
 
 sub displayValue {
 	my ($self) = @_;
-	return $self->get("value");
+	return $self->getValueAsHtml;
 }
 
 #-------------------------------------------------------------------
@@ -300,39 +267,6 @@ sub generateIdParameter {
 }
 
 
-#-------------------------------------------------------------------
-
-=head2 get ( var )
-
-Returns a property of this form object.
-
-=head3 var
-
-The variable name of the value to return.
-
-=cut
-
-sub get {
-	my $self = shift;
-	my $var = shift;
-	return $self->{_params}{$var};
-}
-
-#-------------------------------------------------------------------
-
-=head2 getName ( )
-
-Returns a human readable name for this form control type. You MUST override this method with your own when creating new form controls.
-
-=cut
-
-sub getName {
-	my $self = shift;
-	my $session = shift;
-	my $definition = $self->definition($session);
-	return $definition->[0]->{formName}->{defaultValue};
-}
-
 
 #-------------------------------------------------------------------
 
@@ -348,9 +282,9 @@ The string to search for macros in.
 
 sub fixMacros {
 	my $self = shift;
-        my $value = shift;
-        $value =~ s/\^/\&\#94\;/g;
-        return $value;
+    my $value = shift;
+    $value =~ s/\^/\&\#94\;/g;
+    return $value;
 }
 
 #-------------------------------------------------------------------
@@ -413,9 +347,52 @@ sub fixTags {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 get ( var )
 
-Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.
+Returns a property of this form object.
+
+=head3 var
+
+The variable name of the value to return.
+
+=cut
+
+sub get {
+	my $self = shift;
+	my $var = shift;
+	return $self->{_params}{$var};
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+A class method that tells you what database field type this form field should be stored in. Defaults to "VARCHAR(255)".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(255)";
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns a human readable name for this form control type. You MUST override this method with your own when creating new form controls.
+
+=cut
+
+sub getName {
+    return "Override Me";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
+
+Gets the value of this form field from the following sources in order: passed in value, form post/get value, definition value, definition default value.
 
 =head3 value
 
@@ -423,30 +400,75 @@ An optional value to process, instead of POST input.
 
 =cut
 
+sub getValue {
+	my ($self, $value) = @_;
+    return $value if (defined $value);
+    if ($self->session->request) {
+        $value = $self->session->form->param($self->get("name"));
+        return $value if (defined $value);
+    }
+    return $self->getDefaultValue;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( )
+
+Returns the either the "value" ore "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
+
+=cut
+
+sub getDefaultValue {
+    my $self = shift;
+    my $value = $self->get("value");
+    return $value if (defined $value);
+	return $self->get("defaultValue");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Returns the value rendered suitably in HTML. This is useful for forms that are rendered dynamically like user profiling and Thingy.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    return $self->getValue(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueFromPost
+
+Depricated. See getValue().
+
+=cut
+
 sub getValueFromPost {
-	my $self = shift;
-	my $formValue;
+    my $self = shift;
+    return $self->getValue(@_);
+}
 
-	if (@_) {
-		$formValue = shift;
-	}
-	elsif ($self->session->request) {
-		$formValue = $self->session->form->param($self->get("name"));
-	}
+#-------------------------------------------------------------------
 
-	if (defined $formValue) {
-		return $formValue;
-	} else {
-		return $self->get("defaultValue");
-	}
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control. Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------
 
 =head2 isProfileEnabled ( session )
 
-A class method. Returns a 1 if this control can be used by the profiling system. In general that means that the
-field is safe for dynamic generation.
+Depricated. See isDynamicCompatible().
 
 =cut
 
@@ -454,7 +476,7 @@ field is safe for dynamic generation.
 sub isProfileEnabled {
     my $class = shift;
     my $session = shift;
-    return $class->definition($session)->[0]{profileEnabled};
+    return $class->isDynamicCompatible();
 }
 
 
@@ -528,6 +550,29 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 passUiLevelCheck ( )
+
+Renders the form field to HTML as a table row complete with labels, subtext, hoverhelp, etc.
+
+=cut
+
+sub passUiLevelCheck {
+	my $self = shift;
+	my $passUiLevelCheck = 0;
+	my $override = $self->session->config->get($self->get("uiLevelOverride")."_uiLevel");
+	if (defined $override && $override->{$self->get("name")}) { # use override if it exists
+		$passUiLevelCheck = ($override->{$self->get("name")} <= $self->session->user->profileField("uiLevel"));
+	} else { # use programmed default
+		$passUiLevelCheck = ($self->get("uiLevel") <= $self->session->user->profileField("uiLevel"));
+	}
+	$passUiLevelCheck = $self->session->user->isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
+	return $passUiLevelCheck;
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 prepareWrapper ( )
 
 Common code for preparing wrappers for *WithWrapper
@@ -549,6 +594,19 @@ sub prepareWrapper {
 	return ($fieldClass, $rowClass, $labelClass, $hoverHelp, $subtext);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 privateName ( )
+
+Creates a safe, private name for additional use in multi-part forms like File and Image.
+
+=cut
+
+sub privateName {
+	my ($self, $action) = @_;
+	return join '_', '_', $self->get('name'), $action;
+}
 
 #-------------------------------------------------------------------
 
@@ -634,27 +692,6 @@ sub toHtmlWithWrapper {
 	} else {
 		return $self->toHtmlAsHidden;
 	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 passUiLevelCheck ( )
-
-Renders the form field to HTML as a table row complete with labels, subtext, hoverhelp, etc.
-
-=cut
-
-sub passUiLevelCheck {
-	my $self = shift;
-	my $passUiLevelCheck = 0;
-	my $override = $self->session->config->get($self->get("uiLevelOverride")."_uiLevel");
-	if (defined $override && $override->{$self->get("name")}) { # use override if it exists
-		$passUiLevelCheck = ($override->{$self->get("name")} <= $self->session->user->profileField("uiLevel"));
-	} else { # use programmed default
-		$passUiLevelCheck = ($self->get("uiLevel") <= $self->session->user->profileField("uiLevel"));
-	}
-	$passUiLevelCheck = $self->session->user->isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
-	return $passUiLevelCheck;
 }
 
 

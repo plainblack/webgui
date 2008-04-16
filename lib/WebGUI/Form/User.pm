@@ -69,9 +69,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session, "WebGUI");
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("user"),
-			},
 		label=>{
 			defaultValue=>$i18n->get("user"),
 			},
@@ -81,11 +78,63 @@ sub definition {
 		readOnly=>{
 			defaultValue=>0,
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('user');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Formats as a name.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $user = WebGUI::User->new($self->session, $self->getValue);
+    if (defined $user) {
+        return $user->username;
+    }
+    return undef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -98,7 +147,7 @@ Renders a user selector.
 
 sub toHtml {
 	my $self = shift;
-        my $user = WebGUI::User->new($self->session, $self->get("value"));
+        my $user = WebGUI::User->new($self->session, $self->getDefaultValue);
 	my $manage = undef;
         if ($self->session->user->isInGroup(3)) {
                  $manage = " ".$self->session->icon->manage('op=listUsers');

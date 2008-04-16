@@ -58,10 +58,6 @@ The height of this control in pixels.  Defaults to 150 pixels.
 
 Style attributes besides width and height which should be specified using the above parameters. Be sure to escape quotes if you use any.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =head4 resizable 
 
 A boolean indicating whether the text area can be reized by users. Defaults to 1.
@@ -72,11 +68,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("476")
-			},
 		height=>{
 			defaultValue=> 150
 			},
@@ -89,14 +81,45 @@ sub definition {
 		resizable => {
 			defaultValue => 1,
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "LONGTEXT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "LONGTEXT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "LONGTEXT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('476');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -109,7 +132,7 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->get("value"))));
+ 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getDefaultValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
 	my ($style, $url) = $self->session->quick(qw(style url));

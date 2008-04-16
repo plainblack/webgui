@@ -20,7 +20,6 @@ use WebGUI::Text;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
 
-our $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
 
@@ -342,7 +341,7 @@ sub _getDbDataType {
     else{
         $formClass   = 'WebGUI::Form::' . ucfirst $fieldType;
         my $formElement = eval { WebGUI::Pluggable::instanciate($formClass, "new", [$session]) };
-        $dbDataType = $formElement->get("dbDataType");
+        $dbDataType = $formElement->getDatabaseFieldType;
     }
     return $dbDataType;
 
@@ -375,14 +374,7 @@ sub getEditFieldForm {
         "required" => $i18n->get('fieldstatus required label'),
     );
     
-    foreach my $fieldType ( sort @{ WebGUI::Form::FieldType->new($session)->get("types") }) {
-        my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
-        if ($@) {
-            $session->errorHandler->error($@);
-            next;
-        }
-        $fieldTypes{$fieldType} = $form->getName($self->session);       
-    }
+    %fieldTypes = %{WebGUI::Form::FieldType->new($session)->getTypes}; 
     %fieldTypes = WebGUI::Utility::sortHash(%fieldTypes);
     
     $things = $self->session->db->read('select thingId, Thingy_things.label, count(*) from Thingy_things '
@@ -589,7 +581,7 @@ sub getFieldValue {
         }
     }
     elsif ($field->{fieldType} eq "file") {
-        $processedValue = WebGUI::Form::File->new($self->session,{value=>$value})->displayValue();
+        $processedValue = WebGUI::Form::File->new($self->session,{value=>$value})->getValueAsHtml();
     }
 
     return $processedValue;
@@ -1159,14 +1151,13 @@ sub www_editThing {
     =>'text/css', rel=>'stylesheet'});
 
     $tab = $tabForm->getTab('fields');
-
-    foreach my $fieldType ( sort @{ WebGUI::Form::FieldType->new($session)->get("types") }) {
+    foreach my $fieldType ( keys %{ WebGUI::Form::FieldType->new($session)->getTypes }) {
         my $form = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session]) };
-        my $definition = $form->definition($session);
         if ($@) {
             $session->errorHandler->error($@);
             next;
         }
+        my $definition = $form->definition($session);
         if ($form->get("height")){
             push(@hasHeightWidth, $fieldType);
         }
@@ -1176,10 +1167,9 @@ sub www_editThing {
         if (defined $definition->[0]->{vertical}->{defaultValue}){
             push(@hasVertical, $fieldType);
         }
-        if ($form->get("optionsSettable")){
+        if ($form->areOptionsSettable){
             push(@hasValues, $fieldType);
         }
-
     }
     $tab->raw("<script type='text/javascript'>\n");
     $tab->raw('var hasHeightWidth = {'.join(", ",map {'"'.$_.'": true'} @hasHeightWidth).'};');

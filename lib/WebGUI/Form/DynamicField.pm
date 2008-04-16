@@ -17,6 +17,7 @@ package WebGUI::Form::DynamicField;
 use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::International;
+use WebGUI::Pluggable;
 use WebGUI::Utility;
 
 =head1 NAME
@@ -57,16 +58,25 @@ sub definition {
         my $class = shift;
 	my $session = shift;
         my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
-                formName=>{
-                        defaultValue=>$i18n->get("475"),
-                        },
                 fieldType=>{
                         defaultValue=> "Text"
                         },
                 });
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('475');
 }
 
 #-------------------------------------------------------------------
@@ -99,12 +109,11 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my %raw = @_;
-	my $param = \%raw;
-        my $fieldType = ucfirst($param->{fieldType});
-	delete $param->{fieldType};
+    my $fieldType = ucfirst($raw{fieldType});
+	delete $raw{fieldType};
         # Return the appropriate field object.
 	if ($fieldType eq "") {
-		$session->errorHandler->warn("Something is trying to create a dynamic field called ".$param->{name}.", but didn't pass in a field type.");
+		$session->errorHandler->warn("Something is trying to create a dynamic field called ".$raw{name}.", but didn't pass in a field type.");
 		$fieldType = "Text";
 	}
 	##No infinite loops, please
@@ -112,23 +121,7 @@ sub new {
 		$session->errorHandler->warn("Something is trying to create a DynamicField via DynamicField.");
 		$fieldType = "Text";
 	}
-        no strict 'refs';
-	my $cmd = "WebGUI::Form::".$fieldType;
-	my $load = "use ".$cmd;
-	eval ($load);
-	if ($@) {
-                $session->errorHandler->error("Couldn't compile form control: ".$fieldType.". Root cause: ".$@);
-                return undef;
-        }
-	my $formObj = $cmd->new($session, $param);
-	if ($formObj->isa('WebGUI::Form::List')) {
-		$formObj->correctValues($param->{value});
-		$formObj->correctOptions($param->{possibleValues});
-	}
-    if ($param->{size}) {
-		$formObj->set('size',$param->{size});
-	}
-        return $formObj;
+    return WebGUI::Pluggable::instanciate("WebGUI::Form::".$fieldType, "new", [$session, \%raw]);
 }
 
 

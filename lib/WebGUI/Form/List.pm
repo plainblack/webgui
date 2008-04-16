@@ -58,55 +58,15 @@ sub alignmentSeparator {
 
 #-------------------------------------------------------------------
 
-=head2 correctOptions ( )
+=head2 areOptionsSettable ( )
 
-Parse a string for a list of options to present to the user.  This method
-will mainly be called from WebGUI::Form::DynamicField.
-
-=cut
-
-sub correctOptions {
-	my ($self, $possibleValues) = @_;
-	my %options;
-	tie %options, 'Tie::IxHash';
-	foreach (split(/\n/, $possibleValues)) {
-		s/\s+$//; # remove trailing spaces
-		$options{$_} = $_;
-	}
-	if ($self->get('options') && ref($self->get('options')) eq "HASH") {
-		%options = (%{$self->get('options')} , %options);
-	}
-	$self->set('options', \%options);
-}
-
-
-##-------------------------------------------------------------------
-
-=head2 correctValues ( )
-
-Parse a string for a list of values that should be selected.  This method
-will mainly be called from WebGUI::Form::DynamicField.  Form types that
-don't have multiple select, like RadioLists, need to override this
-method.
+Returns a boolean indicating whether the options of the list are settable. Some have a predefined set of options. This is useful in generating dynamic forms. Returns 1.
 
 =cut
 
-sub correctValues {
-	my ($self, $value) = @_;
-	return undef unless defined $value;
-	my @defaultValues;
-	if (ref $value eq "ARRAY") {
-		@defaultValues = @{ $value };
-	}
-	else {
-		foreach (split(/\n/, $value)) {
-				s/\s+$//; # remove trailing spaces
-				push(@defaultValues, $_);
-		}
-	}
-	$self->set("value", \@defaultValues);
+sub areOptionsSettable {
+    return 1;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -121,11 +81,6 @@ The following additional parameters have been added via this sub class.
 =head4 options
 
 A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
-
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
 
 =head4 defaultValue
 
@@ -143,27 +98,16 @@ A boolean indicating whether the user can select multiple items from this list l
 
 A boolean value for whether or not the values in the options hash should be sorted. Defaults to "0".
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("486"),
-			},
 		options=>{
 			defaultValue=>{}
 			},
-		optionsSettable=>{
-            defaultValue=>1
-            },
         defaultValue=>{
 			defaultValue=>[],
 			},
@@ -176,12 +120,6 @@ sub definition {
 		size=>{
 			defaultValue=>1
 			},
-		profileEnabled=>{
-			defaultValue=>0
-			},
-        dbDataType  => {
-            defaultValue    => "TEXT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -189,22 +127,72 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 displayValue ( )
+=head2  getDatabaseFieldType ( )
 
-Return all the options
+Returns "LONGTEXT".
 
-=cut
+=cut 
 
-sub displayValue {
-	my ($self) = @_;
-    return return join ", ", map { $self->get('options')->{$_} } $self->getValues();
+sub getDatabaseFieldType {
+    return "LONGTEXT";
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
 
-Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar.
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('486');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getOptions ( )
+
+Options are passed in for many list types. Those options can come in as a hash ref, or a \n separated string, or a key|value\n separated string. This method returns a hash ref regardless of what's passed in.
+
+=cut
+
+sub getOptions {
+    my ($self) = @_;
+    my $possibleValues = $self->get('options');
+    my %options = ();
+    tie %options, 'Tie::IxHash';
+    if (ref $possibleValues eq "HASH") {
+       %options = %{$possibleValues};
+    }
+    else {
+        foreach my $line (split "\n", $possibleValues) {
+            if ($line =~ m/(.*)|(.*)/) {
+                $options{$1} = $2;
+            }
+            else {
+                $options{$line} = $line;
+            }
+        }
+    } 
+    if ($self->get('sortByValue')) {
+        my %ordered = ();
+        tie %ordered, 'Tie::IxHash';
+        foreach my $optionKey (sort {"\L$options{$a}" cmp "\L$options{$b}" } keys %options) {
+            $ordered{$optionKey} = $options{$optionKey};
+        }
+        return \%ordered;
+    }
+    return \%options;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
+
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar. Also parses the input values (wherever they come from) to see if it's a scalar then it splits on \n.
 
 =head3 value
 
@@ -212,56 +200,78 @@ Optional values to process, instead of POST input.
 
 =cut
 
-sub getValueFromPost {
-	my $self = shift;
-	my @data = @_ ? @_ : $self->session->form->param($self->get("name"));
-	return wantarray ? @data : join("\n",@data);
+sub getValue {
+	my ($self, $value) = @_;
+    my @values = ();
+    if (defined $value) {
+        if (ref $value eq "ARRAY") {
+            @values = @{$value};
+        }
+        else {
+            @values = split "\n", $value;
+        }
+    }
+    if (scalar @values < 1 && $self->session->request) {
+        my $value = $self->session->form->param($self->get("name"));
+        if (defined $value) {
+            @values = $self->session->form->param($self->get("name"));
+        }
+    }
+    if (scalar @values < 1) {
+        @values = $self->getDefaultValue;
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( )
+
+Returns the either the "value" ore "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
+
+=cut
+
+sub getDefaultValue {
+    my $self = shift;
+    my @values = ();
+    foreach my $value ($self->get("value"), $self->get("defaultValue")) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+                @values = split "\n", $value;
+            }
+        }
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Return all the options
+
+=cut
+
+sub getValueAsHtml {
+	my ($self) = @_;
+    my $options = $self->getOptions;
+    return join ", ", map { $options->{$_} } $self->getValue();
 }
 
 #-------------------------------------------------------------------
 
 =head2 getValues ( )
 
-Safely handle returning values whether the stored data is scalar or an array
-ref.
+Depricated. See getValue().
 
 =cut
 
 sub getValues {
 	my $self = shift;
-	my @values = ();
-	if (ref $self->get("value") eq 'ARRAY') {
-		@values = @{ $self->get("value") };
-	}
-	else {
-		push @values, $self->get("value");
-	}
-        return @values;
-}
-
-#-------------------------------------------------------------------
-
-=head2 orderedHash ( )
-
-Based on whether the sortByValue flag is set, return the options hash
-for List type Forms sorted by values.  The sort is done without regard
-to the case of the values.
-
-=cut
-
-sub orderedHash {
-	my ($self) = @_;
-        my %options;
-        tie %options, 'Tie::IxHash';
-	my $original = $self->get("options");
-        if ($self->get('sortByValue')) {
-                foreach my $optionKey (sort {"\L$original->{$a}" cmp "\L$original->{$b}" } keys %{$original}) {
-                         $options{$optionKey} = $original->{$optionKey};
-                }
-        } else {
-                %options = %{$original};
-        }
-        return %options;
+    return $self->getValue(@_);
 }
 
 
@@ -275,21 +285,19 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        my %options;
-        tie %options, 'Tie::IxHash';
-	%options = $self->orderedHash();
+	my $options = $self->getOptions();
 	my $output;
-	my @values = $self->getValues();
-        foreach my $key (keys %options) {
-                foreach my $item (@values) {
-                        if ($item eq $key) {
-                                $output .= WebGUI::Form::Hidden->new($self->session,
-                                        name=>$self->get("name"),
-                                        value=>$key
-                                        )->toHtmlAsHidden;
-                        }
-                }
-        }
+	my @values = $self->getDefaultValue();
+    foreach my $key (keys %{$options}) {
+        foreach my $item (@values) {
+            if ($item eq $key) {
+                $output .= WebGUI::Form::Hidden->new($self->session,
+                    name=>$self->get("name"),
+                    value=>$key
+                    )->toHtmlAsHidden;
+             }
+         }
+    }
 	return $output;
 }
 

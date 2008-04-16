@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -67,11 +79,6 @@ A tooltip to tell the user what to do with the field. Defaults a standard piece 
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
 
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
-
 =cut
 
 sub definition {
@@ -80,9 +87,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("1075")
-			},
 		label=>{
 			defaultValue=>$i18n->get("1075")
 			},
@@ -98,14 +102,45 @@ sub definition {
 		hoverHelp=>{
 			defaultValue=>$i18n->get('1075 description')
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-            },
-		optionsSettable=>{
-            defaultValue=>0
-            },
         });
 	return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('1075');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -135,11 +170,10 @@ sub toHtmlWithWrapper {
 	if ($self->session->user->isInGroup(3)) {
 		my $subtext;
 		if ($self->get("afterEdit")) {
-			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->get("value").";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
+			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->getDefaultValue.";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
 		}
 		$subtext .= $self->session->icon->manage("op=listDatabaseLinks");
 		$self->set("subtext", $subtext . $self->get("subtext"));
-#		$self->get("subtext") = $subtext . $self->get("subtext");
 	}
 	return $self->SUPER::toHtmlWithWrapper;
 }

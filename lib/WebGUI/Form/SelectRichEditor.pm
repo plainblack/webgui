@@ -36,6 +36,18 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 definition ( [ additionalTerms ] )
@@ -51,30 +63,31 @@ The following additional parameters have been added via this sub class.
 Defaults to the Post Rich Editor, the least-featured Rich Text Editor and the
 one most likely to be selected by users of this form control.
 
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
-
 =cut
 
 sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift || [];
-    my $i18n        = WebGUI::International->new($session);
     push @{$definition}, {
-        formName => {
-            defaultValue    => $i18n->get("SelectRichEditor formName"),
-        },
         defaultValue => {
             defaultValue    => '',
         },
-        optionsSettable=>{
-            defaultValue    =>0
-        },
         };
     return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('SelectRichEditor formName');
 }
 
 #----------------------------------------------------------------------------

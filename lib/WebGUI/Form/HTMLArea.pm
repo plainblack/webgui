@@ -67,21 +67,13 @@ Style attributes besides width and height which should be specified using the ab
 
 The ID of the WebGUI::Asset::RichEdit object to load. Defaults to the richEditor setting or  "PBrichedit000000000001" if that's not set.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
         my $class = shift;
 	my $session = shift;
         my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
         push(@{$definition}, {
-                formName=>{
-                        defaultValue=>$i18n->get("477")
-                        },
 		height=>{
 			defaultValue=> 400
 			},
@@ -94,19 +86,38 @@ sub definition {
                 richEditId=>{
                         defaultValue=>$session->setting->get("richEditor") || "PBrichedit000000000001"
                         },
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "LONGTEXT",
-        },
                 });
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2  getDatabaseFieldType ( )
+
+Returns "LONGTEXT".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "LONGTEXT";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('477');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns the value of this form field after stipping unwanted tags like <body>.
 
@@ -116,11 +127,23 @@ An optional value to process, instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	return WebGUI::HTML::cleanSegment($self->SUPER::getValueFromPost(@_));
+	return WebGUI::HTML::cleanSegment($self->SUPER::getValue(@_));
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
+}
 
 #-------------------------------------------------------------------
 
@@ -437,7 +460,7 @@ sub www_addImageSave {
 	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
 	#my $imageId = WebGUI::Form::Image->create($session);
-	my $imageId = WebGUI::Form::Image->new($session,{name => 'filename'})->getValueFromPost;
+	my $imageId = WebGUI::Form::Image->new($session,{name => 'filename'})->getDefaultValue;
     my $imageObj = WebGUI::Storage::Image->get($session, $imageId);
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.

@@ -16,9 +16,10 @@ package WebGUI::Form::FieldType;
 
 use strict;
 use base 'WebGUI::Form::SelectBox';
-use WebGUI::International;
-use WebGUI::Utility;
 use Tie::IxHash;
+use WebGUI::International;
+use WebGUI::Pluggable;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -26,7 +27,7 @@ Package WebGUI::Form::FieldType
 
 =head1 DESCRIPTION
 
-Creates a form control that will allow you to select a form control type.
+Creates a form control that will allow you to select a form control type. It's meant to be used in conjunction with the DynamicField form control.
 
 =head1 SEE ALSO
 
@@ -40,6 +41,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -50,16 +63,11 @@ The following additional parameters have been added via this sub class.
 
 =head4 types
 
-An array reference containing the form control types to be selectable. Defaults to all available types.
+An array reference containing the form control types to be selectable. Defaults to all available dynamic types.
 
 =head4 label
 
 A text label that will be displayed if toHtmlWithWrapper() is called. Defaults to getName().
-
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
 
 =cut
 
@@ -69,62 +77,83 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("fieldtype","WebGUI")
-			},
 		label=>{
 			defaultValue=>$i18n->get("fieldtype","WebGUI")
 			},
 		types=>{
-			defaultValue=>$class->getTypes($session)
+			defaultValue=>[],
 			},
-		optionsSettable=>{
-            defaultValue=>0
-            },
         });
 	return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getTypes ( )
+=head2 getName ( session )
 
-A class method that returns an array reference of all the valid form
-control types present in the system.  Invalid form types include
-Control.pm, the form master class and List, the list form master class
-and DynamicField, the form class dispatcher.
+Returns the human readable name of this control.
 
 =cut
 
-sub getTypes {
-	my $class = shift;
-	my $session = shift;
-	opendir(DIR,$session->config->getWebguiRoot."/lib/WebGUI/Form/");
-	my @rawTypes = readdir(DIR);
-	closedir(DIR);
-	my @types;
-	foreach my $type (@rawTypes) {
-		if ($type =~ /^(.*)\.pm$/) {
-			next if (isIn($1, qw/Control List DynamicField Slider/));
-			push(@types,$1);
-		}
-	}
-	return \@types;
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('fieldType');
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getTypes (  )
+
+Returns a hash reference of field types and human readable names. Defaultly returns all that have isDynamicCompatible() set to 1, but if types is specified in the constructor, will return the ones from that list.
+
+=cut
+
+sub getTypes {
+    my $self = shift;
+    my @types = @{$self->get('types')};
+    unless (scalar(@types)) {
+        opendir(DIR,$self->session->config->getWebguiRoot."/lib/WebGUI/Form/");
+        foreach my $type (readdir(DIR)) {
+            if ($type =~ s/^(.*)\.pm$/$1/) {
+                if (WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type),'isDynamicCompatible')) {
+                    push @types, $type;
+                }
+            }
+        }
+        closedir(DIR);
+    }
+    my %fields = ();
+    foreach my $type (@types) {
+        $fields{$type} = WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type), 'getName', [$self->session]);
+    }
+    return \%fields;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Returns either what's posted or if nothing comes back it returns "text".
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $fieldType = $self->session->form->param($self->get("name"));
+	my $fieldType = $self->SUPER::getValue(@_);
 	$fieldType =~ s/[^\w]//g;
 	return $fieldType || "text";
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -139,19 +168,7 @@ sub toHtml {
 	my $self = shift;
 	my %options;
 	tie %options, "Tie::IxHash";
-	foreach my $type (@{ $self->get('types') }) {
-		my $class = "WebGUI::Form::".ucfirst($type);
-		my $cmd = "use ".$class;
-        	eval ($cmd);    
-        	if ($@) { 
-                	$self->session->errorHandler->error("Couldn't compile form control: ".$type.". Root cause: ".$@);
-			next;
-        	} 
-        next unless $class->isProfileEnabled($self->session);
-		$options{$type} = $class->getName($self->session);
-	}
-	$self->set('options',\%options);
-
+    $self->set('options', $self->getTypes);
 	return $self->SUPER::toHtml();
 }
 

@@ -50,10 +50,6 @@ The following additional parameters have been added via this sub class.
 
 Defaults to 2048. Determines the maximum number of characters allowed in this field.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
@@ -62,14 +58,8 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("478")
-			},
 		maxlength=>{
 			defaultValue=> 2048
-			},
-		profileEnabled=>{
-			defaultValue=>1
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -77,24 +67,66 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('478');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Parses the posted value and tries to make corrections if necessary.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $value = @_ ? shift : $self->session->form->param($self->get("name"));
+	my $value = $self->SUPER::getValue(@_);
 	$value =~ tr/\r\n//d;
      	if ($value =~ /mailto:/) {
                 return $value;
-        } elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+        } 
+        elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
                 return "mailto:".$value;
-        } elsif ($value =~ /^\// || $value =~ /:\/\// || $value =~ /^\^/) {
+        } 
+        elsif ($value =~ /^\// || $value =~ /:\/\// || $value =~ /^\^/) {
                 return $value;
         }
         return "http://".$value;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Formats as a link.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $url = $self->getValue;
+    return '<a href="'.$url.'">'.$url.'</a>';
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -106,7 +138,7 @@ Renders a URL field.
 =cut
 
 sub toHtml {
-        my $self = shift;
+    my $self = shift;
 	$self->session->style->setScript($self->session->url->extras('addHTTP.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onblur="addHTTP(this.form.'.$self->get("name").')"');
 	return $self->SUPER::toHtml;

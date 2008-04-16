@@ -71,21 +71,13 @@ If no value is specified, this will be used. Defaults to today and now.
 If the defaultValue is a MySQL date string, this form control will return MySQL
 date strings instead of epoch times.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("352")
-			},
 		defaultValue=>{
 			defaultValue=>$session->datetime->time()
 			},
@@ -98,42 +90,38 @@ sub definition {
 		noDate=>{
 			defaultValue=>0
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "BIGINT",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 displayValue ( )
+=head2  getDatabaseFieldType ( )
 
-Return the date in a human readable format for the Profile system.
+Returns "BIGINT".
 
-=cut
+=cut 
 
-sub displayValue {
-	my ($self) = @_;
-    # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->epochToHuman($self->get("value"),"%z");
-	} else {
-		# MySQL format
-		my $value = $self->get("value");
-        return $value;
-	}
+sub getDatabaseFieldType {
+    return "BIGINT";
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('352');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns a validated form post result. If the result does not pass validation, 
 it returns undef instead.
@@ -144,24 +132,58 @@ An optional value to process, instead of POST input. This should be in the 'YY(Y
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
     # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->setToEpoch(@_ ? shift : $self->session->form->param($self->get("name")));
-	} else {
+    my $value = $self->SUPER::getValue(@_);
+	if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
+		return $self->session->datetime->setToEpoch($value);
+	} 
+    else {
 		# MySQL format
 		# YY(YY)?-MM-DD
-		my $value	= @_ ? shift : $self->session->form->param($self->get("name"));
 		
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 		
 		return $1
 			if ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Return the date in a human readable format.
+
+=cut
+
+sub getValueAsHtml {
+	my ($self) = @_;
+    # This should probably be rewritten as a cascading ternary
+	if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || !$self->get("value")     
+        || $self->get("value") =~ m/^\d+$/) {
+		return $self->session->datetime->epochToHuman($self->getValue,"%z");
+	} 
+    else {
+		# MySQL format
+		my $value = $self->getValue;
+        return $value;
+	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -185,11 +207,11 @@ sub toHtml {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		$value = $self->set("value",$self->session->datetime->epochToSet($self->get("value")));
+		$value = $self->set("value",$self->session->datetime->epochToSet($self->getDefaultValue));
 	} 
     else {
 		# MySQL format
-		$value = $self->get("value");
+		$value = $self->getDefaultValue;
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 	}
 
@@ -229,10 +251,10 @@ sub toHtmlAsHidden {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		$value = $self->session->datetime->epochToSet($self->get("value"),"%z");
+		$value = $self->session->datetime->epochToSet($self->getDefaultValue,"%z");
 	} else {
 		# MySQL format
-		$value = $self->get("value");
+		$value = $self->getDefaultValue;
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 	}
 	

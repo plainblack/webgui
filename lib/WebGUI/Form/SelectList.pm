@@ -54,35 +54,46 @@ The number of characters tall this list should be. Defaults to '5'.
 
 A boolean indicating whether the user can select multiple items from this list like a checkList. Defaults to "1".
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("484"),
-        },
 		multiple=>{
 			defaultValue=>1
         },
 		size=>{
 			defaultValue=>5
         },
-		profileEnabled=>{
-			defaultValue=>1
-        },
-        dbDataType => {
-            defaultValue => "LONGTEXT",
-        },
     });
     return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('484');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -97,18 +108,16 @@ sub toHtml {
 	my $self = shift;
 	my $multiple = $self->get("multiple") ? ' multiple="multiple"' : '';
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').$multiple.'>';
-	my %options;
-	tie %options, 'Tie::IxHash';
-	%options = $self->orderedHash;
-	my @values = $self->getValues();
-	foreach my $key (keys %options) {
+    my $options = $self->getOptions;
+	my @values = $self->getDefaultValue();
+	foreach my $key (keys %{$options}) {
 		$output .= '<option value="'.$key.'"';
 		foreach my $item (@values) {
 			if ($item eq $key) {
 				$output .= ' selected="selected"';
 			}
 		}
-		$output .= '>'.$self->get("options")->{$key}.'</option>';
+		$output .= '>'.$options->{$key}.'</option>';
 	}
 	$output .= '</select>'."\n";
 	return $output;

@@ -143,11 +143,11 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
-# just testing that getValueFromPost works with an argument
+# just testing that getValue works with an argument
 
 my $float = WebGUI::Form::Float->new($session);
-is($float->getValueFromPost('112.233'), 112.233, 'Got a valid float');
-is($float->getValueFromPost('fred'), 0, 'Returned 0 instead of an invalid float');
+is($float->getValue('112.233'), 112.233, 'Got a valid float');
+is($float->getValue('fred'), 0, 'Returned 0 instead of an invalid float');
 
 __END__
 

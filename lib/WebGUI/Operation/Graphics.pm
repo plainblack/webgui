@@ -272,7 +272,7 @@ sub www_editFontSave {
 	
 	if ($session->form->process('fid') eq 'new') {
 
-        my $fileStorageId = WebGUI::Form::File->new($session,{name => 'fontFile'})->getValueFromPost;
+        my $fileStorageId = WebGUI::Form::File->new($session,{name => 'fontFile'})->getValue;
         my $storage = WebGUI::Storage->get($session, $fileStorageId);
         my $filename = $storage->getFiles()->[0];
 

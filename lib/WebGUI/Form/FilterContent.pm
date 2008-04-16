@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2 areOptionsSettable ( )
+
+Returns 0.
+
+=cut
+
+sub areOptionsSettable {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( [ additionalTerms ] )
 
 See the super class for additional details.
@@ -59,11 +71,6 @@ Defaults to "most". Possible values are "none", "macros", "javascript", "most" a
 
 A tooltip for what to do with this field. Defaults to a general explaination of content filters.
 
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
-
 =cut
 
 sub definition {
@@ -72,9 +79,6 @@ sub definition {
 	my $definition = shift || [];
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("418")
-			},
 		name=>{
 			defaultValue=>"filterContent"
 			},
@@ -84,27 +88,58 @@ sub definition {
 		defaultValue=>{
 			defaultValue=>"most",
 			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(16)",
-            },
-		optionsSettable=>{
-            defaultValue=>0
-            },
         });
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(16)".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(16)";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('418');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Returns either what's posted or if nothing comes back it returns "most".
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	return $self->session->form->param($self->get("name")) || "most";
+	return $self->SUPER::getValue(@_) || "most";
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
 }
 
 #-------------------------------------------------------------------

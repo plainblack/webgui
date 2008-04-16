@@ -52,10 +52,6 @@ The following additional parameters have been added via this sub class.
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =head4 showSelectAllButton
 
 Flag that toggles a "Select All" toggle button on or off.
@@ -66,22 +62,28 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift || [];
-    my $i18n        = WebGUI::International->new($session);
     push @{$definition}, {
-        formName => {
-            defaultValue    => $i18n->get("941"),
-        },
         vertical => {
             defaultValue    => 0,
-        },
-        profileEnabled => {
-            defaultValue    => 1,
         },
         showSelectAll => {
             defaultValue    => 0,
         },
     };
     return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('941');
 }
 
 #-------------------------------------------------------------------
@@ -115,6 +117,18 @@ sub getSelectAllButton {
 
 #-------------------------------------------------------------------
 
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a series of checkboxes.
@@ -131,23 +145,21 @@ sub toHtml {
         $output .= $self->getSelectAllButton;
     }
     my $i=0;
-    tie my %options, 'Tie::IxHash', $self->orderedHash();
-	foreach my $key (keys %options) {
-	$i++;
+    my $options = $self->getOptions;
+	foreach my $key (keys %{$options}) {
+	    $i++;
         my $checked = (grep { $_ eq $key } @{ $self->get('value') })
                     ? 1
                     : 0
                     ;
-
-        $output 
-            .= WebGUI::Form::Checkbox->new($self->session, {
+        $output .= WebGUI::Form::Checkbox->new($self->session, {
                 name    => $self->get('name'),
                 value   => $key,
                 extras  => $self->get('extras'),
                 checked => $checked,
                 id => $self->get('name').$i,
             })->toHtml
-            . '<label for="'.$self->get('name').$i.'">'.$self->get('options')->{$key}."</label>" 
+            . '<label for="'.$self->get('name').$i.'">'.$options->{$key}."</label>" 
             . $alignment
             ;
     }

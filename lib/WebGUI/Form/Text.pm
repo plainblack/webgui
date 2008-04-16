@@ -54,29 +54,18 @@ Defaults to 255. Determines the maximum number of characters allowed in this fie
 
 Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=> $i18n->get("475")
-			},
 		maxlength=>{
 			defaultValue=> 255
 			},
 		size=>{
 			defaultValue=>$session->setting->get("textBoxSize") || 30
-			},
-		profileEnabled=>{
-			defaultValue=>1
 			},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -84,7 +73,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('475');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Retrieves a value from a form GET or POST and returns it. If the value comes back as undef, this method will return the defaultValue instead.  Strip newlines/carriage returns from the value.
 
@@ -94,22 +96,23 @@ An optional value to process, instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $formValue;
+    my $value = $self->SUPER::getValue(@_);
+    $value =~ tr/\n\n//d;
+    return $value;
+}
 
-	if (@_) {
-		$formValue = shift;
-	}
-	elsif ($self->session->request) {
-		$formValue = $self->session->form->param($self->get("name"));
-	}
-	if (defined $formValue) {
-		$formValue =~ tr/\r\n//d;
-		return $formValue;
-	} else {
-		return $self->{defaultValue};
-	}
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -122,7 +125,7 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value"))));
+ 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue)));
         return '<input id="'.$self->get('id').'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'" maxlength="'.$self->get("maxlength").'" '.$self->get("extras").' />';
 }
 

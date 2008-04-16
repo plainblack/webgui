@@ -34,7 +34,7 @@ conjunction with one or more Rich Editors (see WebGUI::Form::HTMLArea) and shoul
 list for ease of use.
 
 B<WARNING:> This form control is not capable of handling all aspects of the files uploaded to it. So you as the
-developer need to complete the process after the form has been submitted. See the getValueFromPost() method for
+developer need to complete the process after the form has been submitted. See the getValue() method for
 details.
 
 =head1 SEE ALSO
@@ -85,11 +85,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("Attachments formName")
-			},
 		name=>{
 			defaultValue=>"attachments"
 			},
@@ -98,26 +94,45 @@ sub definition {
 			},
         maxImageSize=>{},
         thumbnailSize=>{},
-		profileEnabled=>{
-			defaultValue=>0
-			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(22) BINARY",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( )
+=head2  getDatabaseFieldType ( )
+
+Returns "VARCHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "VARCHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('Attachments formName');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( )
 
 Returns an array reference of asset ids that have been uploaded. New assets are uploaded to a temporary location,
 and you must move them to the place in the asset tree you want them, or they will be automatically deleted.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
     my @values = $self->session->form->param($self->get("name"));
     return \@values;
@@ -133,7 +148,7 @@ Renders an attachments control.
 
 sub toHtml {
 	my $self = shift;
-    my @assetIds = @{$self->get("value")};
+    my @assetIds = @{$self->getDefaultValue};
     my $thumbnail = $self->get("thumbnailSize") || $self->session->setting->get("thumbnailSize");
     my $image = $self->get("maxImageSize") || $self->session->setting->get("maxImageSize");
     my $attachmentsList = "attachments=".join(";attachments=", @assetIds) if (scalar(@assetIds));

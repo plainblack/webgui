@@ -41,52 +41,35 @@ The following methods are specifically available from this class. Check the supe
 =cut
 
 
+
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2  getDatabaseFieldType ( )
 
-See the super class for additional details.
+Returns "TEXT".
 
-=head3 additionalTerms
+=cut 
 
-The following additional parameters have been added via this sub class.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
-=head4 optionsSettable
-
-A boolean indicating whether the options are settable using an options hashref or not settable because this form
-type generates its own options.
-
-=cut
-
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("combobox")
-			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "TEXT",
-            },
-		optionsSettable=>{
-            defaultValue=>1
-            },
-        });
-        return $class->SUPER::definition($session, $definition);
+sub getDatabaseFieldType {
+    return "TEXT";
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('combobox');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns an array or a carriage return ("\n") separated scalar depending
 upon whether you're returning the values into an array or a scalar.  If
@@ -99,18 +82,30 @@ Optional values to process, instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
 
 	if (@_) {
-		return $self->SUPER::getValueFromPost(@_);
+		return $self->SUPER::getValue(@_);
 	}
 	elsif ($self->session->form->param($self->get("name")."_new")) {
 		my $formValue = $self->session->form->param($self->get("name")."_new");
 		$formValue =~ tr/\r\n//d;
 		return $formValue;
 	}
-	return $self->SUPER::getValueFromPost;
+	return $self->SUPER::getValue(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -124,8 +119,9 @@ Renders a combo box form control.
 sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	$self->get("options")->{''} = '['.$i18n->get(582).']';
-        $self->get("options")->{_new_} = $i18n->get(581).'-&gt;';
+    my $options = $self->getOptions;
+	$options->{''} = '['.$i18n->get(582).']';
+    $options->{_new_} = $i18n->get(581).'-&gt;';
 	return $self->SUPER::toHtml
 		.WebGUI::Form::Text->new($self->session,
 			size=>$self->session->setting->get("textBoxSize")-5,

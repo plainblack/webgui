@@ -1,5 +1,6 @@
 7.5.11
  - fix: template variable isUncommitted is not documented in the help
+ - Cleaned the pollution from the forms system.
  - fix: Event is no longer editable by anyone who can add events
  - fixed: Package search is slow for large websites
  - fixed: rich editor image picker displays incorrectly in IE

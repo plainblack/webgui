@@ -36,36 +36,18 @@ The following methods are specifically available from this class. Check the supe
 
 =cut
 
+
 #-------------------------------------------------------------------
 
-=head2 definition ( [ additionalTerms ] )
+=head2 getName ( session )
 
-See the super class for additional details.
-
-=head3 additionalTerms
-
-The following additional parameters have been added via this sub class.
-
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("SubscriptionGroup formName")
-			},
-		profileEnabled=>{
-			defaultValue=>0
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('SubscriptionGroup formName');
 }
 
 #-------------------------------------------------------------------
@@ -78,7 +60,7 @@ Renders the form field to HTML as a table row. The row is not displayed because 
 
 sub toHtml {
     my $self         = shift;
-    my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->get("value")))) || '';
+    my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue))) || '';
 
     my $manageButton = "&nbsp;";
     if ($value) {

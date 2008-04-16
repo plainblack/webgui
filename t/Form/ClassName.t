@@ -130,5 +130,5 @@ WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 #
 # test WebGUI::FormValidator::ClassName(undef,@values)
 #
-is(WebGUI::Form::ClassName->new($session)->getValueFromPost('t*est'), 'test', '$cname->getValueFromPost(arg)');
+is(WebGUI::Form::ClassName->new($session)->getValue('t*est'), 'test', '$cname->getValue(arg)');
 is($session->form->className(undef,'t*est'),                          'test', 'WebGUI::FormValidator::className');

@@ -110,11 +110,11 @@ WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
 # test that we can process non-POST values correctly
 my $cntl = WebGUI::Form::SelectBox->new($session,{ defaultValue => 4242 });
-is($cntl->getValueFromPost('text'), 'text', 'getValueFromPost(text)');
-is($cntl->getValueFromPost(42), 42, 'getValueFromPost(int)');
-is($cntl->getValueFromPost(0), 0, 'zero');
-is($cntl->getValueFromPost(''), '', '""');
-is($cntl->getValueFromPost(1,2,3), 1, 'list returns first item');
+is($cntl->getValue('text'), 'text', 'getValue(text)');
+is($cntl->getValue(42), 42, 'getValue(int)');
+is($cntl->getValue(0), 0, 'zero');
+is($cntl->getValue(''), '', '""');
+is($cntl->getValue(1,2,3), 1, 'list returns first item');
 is($session->form->selectBox(undef,'text'), 'text', 'text');
 is($session->form->selectBox(undef,42), 42, 'int');
 is($session->form->selectBox(undef,0), 0, 'zero');

@@ -38,23 +38,15 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
+=head2 getName ( session )
 
-See the super class for additional details.
+Returns the human readable name of this control.
 
 =cut
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("submit")
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('submit');
 }
 
 #-------------------------------------------------------------------
@@ -67,7 +59,7 @@ Renders a button.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixQuotes($self->get("value"));
+	my $value = $self->fixQuotes($self->getDefaultValue);
     my $extras = $self->get("extras") || q|class="forwardButton"|;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->{_params}{extras} ||= 'onclick="this.value=\''.$i18n->get(452).'\'"';

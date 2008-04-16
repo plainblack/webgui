@@ -134,13 +134,13 @@ WebGUI::Form_Checking::auto_check($session, 'Url', $testBlock);
 
 # test that we can process non-POST values correctly
 my $cntl = WebGUI::Form::Url->new($session,{ defaultValue => 4242 });
-is($cntl->getValueFromPost('mailto:whatever'), 'mailto:whatever', 'mailto processing');
-is($cntl->getValueFromPost('me@nowhere.com'), 'mailto:me@nowhere.com', 'email address processing');
-is($cntl->getValueFromPost('/'), '/', '/');
-is($cntl->getValueFromPost('://'), '://', '://');
-is($cntl->getValueFromPost('^'), '^', '^');
-is($cntl->getValueFromPost('mySite'), 'http://mySite', 'http://mySite');
-is($cntl->getValueFromPost('??**()!!'), 'http://??**()!!', 'random crap is passed through');
+is($cntl->getValue('mailto:whatever'), 'mailto:whatever', 'mailto processing');
+is($cntl->getValue('me@nowhere.com'), 'mailto:me@nowhere.com', 'email address processing');
+is($cntl->getValue('/'), '/', '/');
+is($cntl->getValue('://'), '://', '://');
+is($cntl->getValue('^'), '^', '^');
+is($cntl->getValue('mySite'), 'http://mySite', 'http://mySite');
+is($cntl->getValue('??**()!!'), 'http://??**()!!', 'random crap is passed through');
 
 is($session->form->url(undef,'mailto:whatever'), 'mailto:whatever', 'mailto processing');
 is($session->form->url(undef,'me@nowhere.com'), 'mailto:me@nowhere.com', 'email address processing');

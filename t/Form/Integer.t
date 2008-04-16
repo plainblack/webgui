@@ -120,14 +120,14 @@ is($input->{maxlength}, 20, 'set maxlength');
 
 WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
-# just testing that getValueFromPost works with an argument
+# just testing that getValue works with an argument
 
 my $int = WebGUI::Form::Integer->new($session);
-is($int->getValueFromPost(-123456), -123456, 'getValueFromPost(-123456)');
-is($int->getValueFromPost('002300'), '002300', 'getValueFromPost(002300)');
-is($int->getValueFromPost('+123456'), 0, 'getValueFromPost(+123456)');
-is($int->getValueFromPost('123-456.'), 0, 'getValueFromPost(123-456.)');
-is($int->getValueFromPost(123.456), 0, 'getValueFromPost(123.456)');
+is($int->getValue(-123456), -123456, 'getValue(-123456)');
+is($int->getValue('002300'), '002300', 'getValue(002300)');
+is($int->getValue('+123456'), 0, 'getValue(+123456)');
+is($int->getValue('123-456.'), 0, 'getValue(123-456.)');
+is($int->getValue(123.456), 0, 'getValue(123.456)');
 
 is($session->form->integer(undef,-123456), -123456, 'session->form->integer(undef,-123456)');
 is($session->form->integer(undef,'002300'), '002300', 'session->form->integer(undef,002300)');

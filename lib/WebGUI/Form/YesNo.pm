@@ -51,53 +51,48 @@ The following additional parameters have been added via this sub class.
 
 Can be a 1 or 0. Defaults to 0 if no value is specified.
 
-=head4 profileEnabled
-
-Flag that tells the User Profile system that this is a valid form element in a User Profile
-
 =cut
 
 sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("483")
-			},
 		defaultValue=>{
 			defaultValue=>0
 			},
-		profileEnabled=>{
-			defaultValue=>1
-			},
-        dbDataType  => {
-            defaultValue    => "INT(1)",
-        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 yesNo ( )
+=head2  getDatabaseFieldType ( )
 
-Returns either a 1 or 0 representing yes, no. 
+Returns "BOOLEAN".
 
-=cut
+=cut 
 
-sub yesNo {
-	my $self = shift;
-        if ($self->session->form->param($self->get("name")) > 0) {
-                return 1;
-        }
-	return 0;
+sub getDatabaseFieldType {
+    return "BOOLEAN";
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('483');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 If value is present, we will process it, otherwise the superclass will handle the request.
 
@@ -107,11 +102,39 @@ An optional value to process, instead of POST input. This should be in the form 
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-    my $value = shift;
-    $value = $self->SUPER::getValueFromPost unless (defined $value);
+    my $value = $self->SUPER::getValue(@_);
 	return ($value =~ /^y/i || $value eq '1') ? 1 : 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ()
+
+Shows either Yes or No.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session);
+    if ($self->getValue) {
+        return $i18n->get(138);
+    }
+    return $i18n->get(139);
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -126,7 +149,7 @@ sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
         my ($checkYes, $checkNo);
-        if ($self->get("value")) {
+        if ($self->getDefaultValue) {
                 $checkYes = 1;
         } else {
                 $checkNo = 1;

@@ -76,7 +76,7 @@ sub AUTOLOAD {
         $self->session->errorHandler->error($@);
         return undef;
     }
-	return $control->getValueFromPost(@args);
+	return $control->getValue(@args);
 }
 
 #-------------------------------------------------------------------

@@ -707,7 +707,7 @@ sub www_editListingSave {
 		versionNumber=>$self->session->form->process("versionNumber")
 		);
     
-    my $storageId = WebGUI::Form::Image->new($self->session,{name => 'screenshot', value => $listing->{storageId}})->getValueFromPost;
+    my $storageId = WebGUI::Form::Image->new($self->session,{name => 'screenshot', value => $listing->{storageId}})->getValue;
     if ($storageId) {
         $data{storageId} = $storageId;
         $data{filename} = WebGUI::Storage->get($self->session, $storageId)->getFiles->[0];

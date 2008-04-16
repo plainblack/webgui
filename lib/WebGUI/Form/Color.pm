@@ -38,31 +38,32 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
-=head2 definition ( )
+=head2  getDatabaseFieldType ( )
 
-See the super class for additional details.
+Returns "VARCHAR(7)".
 
-=cut
+=cut 
 
-sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	my $i18n = WebGUI::International->new($session);
-	push(@{$definition}, {
-		formName=>{
-			defaultValue=>$i18n->get("color")
-			},
-        dbDataType  => {
-            defaultValue    => "VARCHAR(7)",
-        },
-		});
-        return $class->SUPER::definition($session, $definition);
+sub getDatabaseFieldType {
+    return "VARCHAR(7)";
 }
 
 #-------------------------------------------------------------------
 
-=head2 getValueFromPost ( [ value ] )
+=head2 getName ( session )
+
+Returns the human readable name of this control.
+
+=cut
+
+sub getName {
+    my ($self, $session) = @_;
+    return WebGUI::International->new($session, 'WebGUI')->get('color');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
 
 Returns a hex color like "#000000". Returns undef if the return value is not a valid color.
 
@@ -72,11 +73,23 @@ An optional value to use instead of POST input.
 
 =cut
 
-sub getValueFromPost {
+sub getValue {
 	my $self = shift;
-	my $color = @_ ? shift : $self->session->form->param($self->get("name"));
+    my $color = $self->SUPER::getValue(@_);
 	return undef unless $color =~ /\#\w{6}/;
 	return $color;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
+
+=cut
+
+sub isDynamicCompatible {
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -104,7 +117,7 @@ sub toHtml {
     $style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
     my $id = $self->get("id");
-    my $value = $self->get("value");
+    my $value = $self->getDefaultValue;
     my $name = $self->get("name");
     return qq{<a href="javascript:YAHOO.WebGUI.ColorPicker.display('$id', '${id}_swatch');" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: $value"></a>
 <input onchange="YAHOO.util.Dom.setStyle('${id}_swatch', 'background-color', this.value)" 

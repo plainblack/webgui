@@ -122,7 +122,7 @@ sub create {
     $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = 'WebGUI::Form::' . ucfirst $properties->{fieldType};
     eval "use $formClass;";
-    my $dbDataType = $formClass->new($session, $self->formProperties($properties))->get("dbDataType");
+    my $dbDataType = $formClass->getDatabaseFieldType;
 
     # Add the column to the userProfileData table
     $db->write(
@@ -245,11 +245,11 @@ sub formField {
 	    }
 	}
 	if ($withWrapper == 1) {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayFormWithWrapper;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtmlWithWrapper;
 	} elsif ($withWrapper == 2) {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayValue;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->getValueAsHtml;
 	} else {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->displayForm;
+		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtml;
 	}
 }
 
@@ -592,7 +592,7 @@ sub rename {
     # Rename the userProfileData column
     my $fieldClass  = $self->getFormControlClass;
     eval "use $fieldClass;";
-    my $dbDataType  = $fieldClass->new($session, $self->formProperties)->get("dbDataType");
+    my $dbDataType  = $fieldClass->getDatabaseFieldType;
 
     $self->session->db->write(
         "ALTER TABLE userProfileData "
@@ -698,7 +698,7 @@ sub set {
         my $fieldClass  = "WebGUI::Form::".ucfirst($properties->{fieldType});
         eval "use $fieldClass;";
         my $dbDataType 
-            = $fieldClass->new($session, $self->formProperties($properties))->get("dbDataType");
+            = $fieldClass->new($session, $self->formProperties($properties))->getDatabaseFieldType;
         
         my $sql 
             = "ALTER TABLE userProfileData MODIFY COLUMN " 
