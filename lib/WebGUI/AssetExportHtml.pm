@@ -31,7 +31,8 @@ Package WebGUI::AssetExportHtml
 
 =head1 DESCRIPTION
 
-This is a mixin package for WebGUI::Asset that contains all clipboard related functions.
+This is a mixin package for WebGUI::Asset that contains all exporting related
+functions.
 
 =head1 SYNOPSIS
 
@@ -55,25 +56,19 @@ appropriate exception on failure and returns a true value on success.
 
 Takes the following parameters:
 
-=over 4
-
-=item session
+=head3 session
 
 A reference to a L<WebGUI::Session> object.
 
 Throws the following exceptions:
 
-=over 4
-
-=item WebGUI::Error::InvalidParam
+=head3 WebGUI::Error::InvalidParam
 
 exportPath isn't defined in the configuration file.
 
-=item WebGUI::Error
+=head3 WebGUI::Error
 
 Encountered filesystem permission problems with the defined exportPath
-
-=back 4
 
 =cut
 
@@ -129,20 +124,18 @@ sub exportCheckPath {
 
 #-------------------------------------------------------------------
 
-=head2 exportasHtml ( params )
+=head2 exportAsHtml ( params )
 
 Main logic hub for export functionality. This method calls most of the rest of
 the methods that handle exporting. Any exceptions thrown by the called methods
 are returned as strings to the caller. Returns a status description upon
 completion. Takes a hashref of arguments, containing the following keys:
 
-=over 4
-
-=item quiet
+=head3 quiet
 
 Boolean. To be or not to be quiet with our output. Defaults to false.
 
-=item userId
+=head3 userId
 
 The WebGUI user ID as which to perform the export. Note that this user must be
 able to view the assets which you want to export (i.e.,
@@ -151,23 +144,21 @@ C<$asset->canView($userId)>, or this will return a permissions error.
 If given a L<WebGUI::User> object as a userId, will use that, but you didn't just read
 that.
 
-=item indexFileName
+=head3 indexFileName
 
 The file name to give to page layout and similar index files. Typically
 C<index.html>, and also the default.
 
-=item extrasUploadAction
+=head3 extrasUploadAction
 
 A string, either 'symlink' or something false, describing what to do with the
 C<extras> and C<uploads> directories. If 'symlink', will symlink the site's
 directories into the exported content. If false, will do nothing.
 
-=item rootUrlAction
+=head3 rootUrlAction
 
 The same as for C<extrasUploadAction>, where 'symlink' will make a symlink and
 false will do nothing.
-
-=back 4
 
 =cut
 
@@ -325,6 +316,17 @@ sub exportAsHtml {
             $returnCode = 0;
             $message    = $@;
             $self->session->output->print("could not export asset with URL " . $asset->getUrl . ": $@");
+            return ($returnCode, $message);
+        }
+
+        # next, tell the asset that we're exporting, so that it can export any
+        # of its collateral or other extra data.
+        eval { $asset->exportAssetCollateral($asset->exportGetUrlAsPath, $args) };
+        if($@) {
+            $returnCode = 0;
+            $message    = $@;
+            $self->session->output->print("failed to export asset collateral for URL " . $asset->getUrl . ": $@");
+            return ($returnCode, $message);
         }
 
         # we exported this one successfully, so count it
@@ -372,6 +374,34 @@ sub exportAsHtml {
 
 #-------------------------------------------------------------------
 
+=head2 exportAssetCollateral ( basePath, params )
+
+Plug in point for complicated assets (like the CS, the Calendar) to manage
+exporting their collateral data like other views, children threads and posts,
+and the like. The base method in WebGUI::Asset doesn't do anything. This method
+will be called from L</exportAsHtml> after L</exportWriteFile>, so any
+exceptions that occur during this process will be separate from those that
+occur during writing of the parent asset.
+
+This method will be called with the following parameters:
+
+=head3 basePath
+
+A L<Path::Class> object representing the base filesystem path for this
+particular asset.
+
+=head3 params
+
+A hashref with the quiet, userId, depth, and indexFileName parameters from
+L</exportAsHtml>.
+
+=cut
+
+sub exportAssetCollateral {
+}
+
+#-------------------------------------------------------------------
+
 =head2 exportCheckExportable ( )
 
 Determines whether this asset is exportable, first by checking whether all of
@@ -404,31 +434,23 @@ sub exportCheckExportable {
 Gets the descendants of this asset for exporting, walking the lineage as the
 user specified. Takes the following parameters:
 
-=over 4
-
-=item userId
+=head3 userId
 
 The WebGUI user ID as which to do the export. 
 
-=item depth
+=head3 depth
 
 The depth to pass to getLineage. How many levels in the lineage to go.
 
-=back 4
-
 Throws the following exceptions:
 
-=over 4
-
-=item WebGUI::Error::InvalidObject
+=head3 WebGUI::Error::InvalidObject
 
 The given WebGUI user is not valid.
 
-=item WebGUI::Error::InvalidParam
+=head3 WebGUI::Error::InvalidParam
 
 The value given for depth is invalid.
-
-=back
 
 =cut
 
@@ -539,25 +561,19 @@ Class method. Sets up the extras and uploads symlinks.
 
 Takes the following parameters:
 
-=over 4
-
-=item session
+=head3 session
 
 A reference to a L<WebGUI::Session> object.
 
 Throws the following exceptions:
 
-=over 4
-
-=item WebGUI::Error
+=head3 WebGUI::Error
 
 Encountered a filesystem error in setting up the links.
 
-=item WebGUI::InvalidObject
+=head3 WebGUI::InvalidObject
 
 The first parameter is not a L<WebGUI::Session>.
-
-=back 4
 
 =cut
 
@@ -620,38 +636,32 @@ the default asset.
 
 Takes the following parameters:
 
-=over 4
-
-=item session
+=head3 session
 
 A reference to a L<WebGUI::Session> object.
 
 Throws the following exceptions:
 
-=item defaultAsset
+=head3 defaultAsset
 
 The path to this asset's exported location on disk will be the target of the
 symlink for the root URL.
 
-=item indexFile
+=head3 indexFile
 
 Optional. Specifies a file name for the index URL. Defaults to C<index.html>.
 
-=item quiet
+=head3 quiet
 
 Optional. Whether to be quiet with our output.
 
-=over 4
-
-=item WebGUI::Error
+=head3 WebGUI::Error
 
 Encountered a filesystem error in setting up the link.
 
-=item WebGUI::InvalidObject
+=head3 WebGUI::InvalidObject
 
 The first parameter is not a L<WebGUI::Session>.
-
-=back 4
 
 =cut
 
@@ -708,14 +718,10 @@ file, and writes that content to disk.
 
 Throws the following exceptions:
 
-=over 4
-
-=item WebGUI::Error
+=head3 WebGUI::Error
 
 Insufficient privileges for writing to the FS path as this OS user, or
 insufficient viewing privileges for the asset.
-
-=back
 
 =cut
 
