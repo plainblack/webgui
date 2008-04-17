@@ -192,7 +192,6 @@ sub exportAsHtml {
     my $startTime           = $session->datetime->time;
 
     # before even looking at the parameters, make sure the exportPath is valid.
-    my $exportPath          = $session->config->get('exportPath');
     eval { WebGUI::Asset->exportCheckPath($session) };
 
     # something went wrong. we don't really care what at this point. we did
@@ -203,6 +202,9 @@ sub exportAsHtml {
         $message            = $@;
         return ($returnCode, $message);
     }
+
+    # if we're still here, then the exportPath is valid.
+    my $exportPath          = $session->config->get('exportPath');
 
     # get parameters
     my $args                = shift;
