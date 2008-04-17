@@ -10,6 +10,8 @@
  - the new export system now needs Path::Class
  - add: GalleryAlbum now shows link to add Photo
  - add: More vars to GalleryAlbum and GalleryFile
+ - fix: thumbnails.js now more easily stylable in anticipation of new Gallery
+   templates
 
 7.5.10
  - fix: Syntax error in GetCsMail
