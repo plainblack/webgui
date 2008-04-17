@@ -517,7 +517,7 @@ sub exportGetUrlAsPath {
     my $config          = $self->session->config;
 
     # make sure that the export path is valid
-    WebGUI::Asset->exportCheckPath($session);
+    WebGUI::Asset->exportCheckPath($self->session);
 
     # if we're still here, it's valid. get it.
     my $exportPath      = $config->get('exportPath');
