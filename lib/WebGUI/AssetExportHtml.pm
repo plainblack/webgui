@@ -102,8 +102,9 @@ sub exportCheckPath {
             WebGUI::Error->throw(error => "can't create exportPath $exportPath");
         }
 
-        # the path didn't exist, and we succeeded creating it. Therefore we know we can write to it and that it's an actual directory. Nothing more
-        # left to do. indicate success to our caller.
+        # the path didn't exist, and we succeeded creating it. Therefore we
+        # know we can write to it and that it's an actual directory. Nothing
+        # more left to do. indicate success to our caller.
         return 1;
     }
 
@@ -112,9 +113,12 @@ sub exportCheckPath {
         WebGUI::Error->throw(error => "$exportPath isn't a directory");
     }
 
-    # the path is defined, isn't an empty string, exists on disk as a directory. let's make sure we have the appropriate permissions. On Unix systems,
-    # we need to be able to write to the directory to create files and directories beneath it, and we need to be able to 'execute' the directory to
-    # list files in it. and of course we need to be able to read it too. check for all of these.
+    # the path is defined, isn't an empty string, exists on disk as a
+    # directory. let's make sure we have the appropriate permissions. On Unix
+    # systems, we need to be able to write to the directory to create files and
+    # directories beneath it, and we need to be able to 'execute' the directory
+    # to list files in it. and of course we need to be able to read it too.
+    # check for all of these.
     if(! (-w $exportPath) || ! (-x _) || ! (-r _) ) {
         WebGUI::Error->throw(error => "can't access $exportPath");
     }
@@ -172,7 +176,8 @@ false will do nothing.
 #   2. construct the list of assets for exporting
 #   3. for each asset, check that the user can view the asset. skip it if we can't.
 #   4. for each asset, check if it's exportable. skip it if it isn't.
-#   5. for each asset, write its contents to disk, making all the required paths beforehand
+#   5. for each asset, write its contents to disk, making all the required
+#      paths beforehand
 #   6. handle symlinking if required  
 
 sub exportAsHtml {
@@ -278,7 +283,8 @@ sub exportAsHtml {
     my $exportSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
     $exportSession->user( { userId => $userId } );
 
-    # make sure this user can view the top level asset we're exporting. if not, don't do anything.
+    # make sure this user can view the top level asset we're exporting. if not,
+    # don't do anything.
     unless ( $self->canView($userId) ) {
         $returnCode = 0;
         $message    = "can't view asset at URL " . $self->getUrl;
@@ -325,10 +331,13 @@ sub exportAsHtml {
         $exportedCount++;
 
         # track when this asset was last exported for external caching and the like
-        $session->db->write("UPDATE asset SET lastExportedAs = ? WHERE assetId = ?", [$fullPath, $asset->getId]);
+        $session->db->write( "UPDATE asset SET lastExportedAs = ? WHERE assetId = ?",
+            [ $fullPath, $asset->getId ] );
 
         # tell the user we did this asset correctly
-        $session->output->print($i18n->get('done')) unless $quiet;
+        unless( $quiet ) {
+            $session->output->print($i18n->get('done'));
+        }
     }
     
     # handle symlinking
@@ -374,10 +383,12 @@ boolean indicating whether or not this asset is exportable.
 sub exportCheckExportable {
     my $self = shift;
 
-    # get this asset's ancestors. return objects as a shortcut since we'd be instantiating them all anyway.
+    # get this asset's ancestors. return objects as a shortcut since we'd be
+    # instantiating them all anyway.
     my $assets = $self->getLineage( ['ancestors'], { returnObjects => 1 } );
 
-    # process each one. return false if any of the assets in the lineage, or this asset itself, isn't exportable.
+    # process each one. return false if any of the assets in the lineage, or
+    # this asset itself, isn't exportable.
     foreach my $asset ( @{$assets}, $self ) {
         return 0 unless $asset->get('isExportable');
     }
@@ -430,15 +441,21 @@ sub exportGetDescendants {
 
     # check for parameter validity
     if( (!defined $user) or (ref $user ne 'WebGUI::User') ) {
-        WebGUI::Error::InvalidObject->throw(expected => 'WebGUI::User', got => ref $user, error => 'Need a WebGUI::User object', param => $user);
+        WebGUI::Error::InvalidObject->throw(
+            expected => 'WebGUI::User', 
+            got => ref $user, 
+            error => 'Need a WebGUI::User object', 
+            param => $user
+        );
     }
 
     if( (!defined $depth) or (!looks_like_number($depth)) ) {
         WebGUI::Error::InvalidParam->throw(error => 'Need a depth', param => $depth);
     }
 
-    # open a temporary session as the user doing the exporting so we don't get assets that they can't see
-    my $tempSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+    # open a temporary session as the user doing the exporting so we don't get
+    # assets that they can't see
+    my $tempSession = WebGUI::Session->open($self->session->config->getWebguiRoot,$self->session->config->getFilename);
     $tempSession->user( { userId => $user->userId } );
 
     # clone self in the new session and get its lineage as the new user
@@ -481,7 +498,9 @@ sub exportGetUrlAsPath {
     my $exportPath      = $config->get('exportPath');
     
     # specify a list of file types apache recognises to be passed through as-is
-    my @fileTypes = qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml .rss .bmp .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx .zip .tar .rar .gz .bz2/;
+    my @fileTypes = qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml
+    .rss .bmp .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx
+    .zip .tar .rar .gz .bz2/;
 
     # get the asset's URL as a URI::URL object for easy parsing of components
     my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
@@ -507,7 +526,7 @@ sub exportGetUrlAsPath {
             return Path::Class::File->new($exportPath, @pathComponents, $filename, $index);
         }
     }
-}	
+}
 
 #-------------------------------------------------------------------
 
@@ -561,7 +580,9 @@ sub exportSymlinkExtrasUploads {
     my $exportPath  = $config->get('exportPath');
 
     # chop off leading / so we don't accidentally get absolute paths
-    s#^/*## for ($extrasUrl, $uploadsUrl);
+    for my $url ($extrasUrl, $uploadsUrl) {
+        s#^/*##;
+    }
 
     # construct the destination paths
     my $extrasDst   = Path::Class::File->new($exportPath, $extrasUrl)->absolute->stringify;
@@ -575,15 +596,15 @@ sub exportSymlinkExtrasUploads {
     # if that doesn't work, throw an exception
 
     foreach my $rec ([$extrasPath, $extrasDst], [$uploadsPath, $uploadsDst]) {
-        my ($path, $dst) = @$rec;
-        if (-l $dst) {
-            next if (readlink $dst eq $path);
-            unlink $dst or WebGUI::Error->throw(error => "could not unlink $dst: $!");
+        my ($source, $destination) = @{$rec};
+        if (-l $destination) {
+            next if (readlink $destination eq $source);
+            unlink $destination or WebGUI::Error->throw(error => "could not unlink $destination: $!");
         }
 
         # the path holding the symlinks is the export path, which exists at
         # this point
-        symlink $path, $dst or WebGUI::Error->throw(error => "could not symlink $path, $dst: $!");
+        symlink $source, $destination or WebGUI::Error->throw(error => "could not symlink $source, $destination: $!");
     }
 }
 
@@ -749,8 +770,8 @@ depends on there being an actual HTTP response on the other end.
 =cut
 
 sub exportHtml_view {
-	my $self = shift;
-	$self->www_view(@_);
+    my $self = shift;
+    $self->www_view(@_);
 }
 
 #-------------------------------------------------------------------
@@ -762,9 +783,9 @@ Displays the export page administrative interface
 =cut
 
 sub www_export {
-	my $self    = shift;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-	my $i18n    = WebGUI::International->new($self->session, "Asset");
+    my $self    = shift;
+    return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
+    my $i18n    = WebGUI::International->new($self->session, "Asset");
     my $f       = WebGUI::HTMLForm->new($self->session, -action => $self->getUrl);
     $f->hidden(
         -name           => "func",
@@ -828,16 +849,16 @@ Displays the export status page
 =cut
 
 sub www_exportStatus {
-	my $self        = shift;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-	my $i18n        = WebGUI::International->new($self->session, "Asset");
-	my $iframeUrl   = $self->getUrl('func=exportGenerate');
-	foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction/) {
-		$iframeUrl  = $self->session->url->append($iframeUrl, $formVar . '=' . $self->session->form->process($formVar));
-	}
+    my $self        = shift;
+    return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
+    my $i18n        = WebGUI::International->new($self->session, "Asset");
+    my $iframeUrl   = $self->getUrl('func=exportGenerate');
+    foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction/) {
+        $iframeUrl  = $self->session->url->append($iframeUrl, $formVar . '=' . $self->session->form->process($formVar));
+    }
 
-	my $output      = '<iframe src="' . $iframeUrl . '" title="' . $i18n->get('Page Export Status') . '" width="700" height="500"></iframe>';
-        $self->getAdminConsole->render($output, $i18n->get('Page Export Status'), "Asset");
+    my $output      = '<iframe src="' . $iframeUrl . '" title="' . $i18n->get('Page Export Status') . '" width="700" height="500"></iframe>';
+    $self->getAdminConsole->render($output, $i18n->get('Page Export Status'), "Asset");
 }
 
 #-------------------------------------------------------------------
@@ -848,11 +869,14 @@ Executes the export process and displays real time status. This operation is dis
 
 =cut
 
+# This routine is called in an IFRAME and prints status output directly to the browser.
+
 sub www_exportGenerate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
-    # This routine is called in an IFRAME and prints status output directly to the browser.
-    $|++;				# Unbuffered data output
+
+    # Unbuffered data output
+    $|++;
     $self->session->style->useEmptyStyle(1);
     $self->session->http->sendHeader;
 
@@ -865,7 +889,7 @@ sub www_exportGenerate {
         rootUrlAction       => $self->session->form->process('rootUrlAction'),
         depth               => $self->session->form->process('depth'),
     });
-    if (!$success) {	
+    if (!$success) {
         $self->session->output->print($description, 1);
         return "chunked";
     }
