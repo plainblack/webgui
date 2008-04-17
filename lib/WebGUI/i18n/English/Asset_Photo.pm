@@ -589,6 +589,48 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar gallery_title' => {
+        message     => q{The title of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar gallery_menuTitle' => {
+        message     => q{The menu title of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar gallery_url' => {
+        message     => q{The URL of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar album_title' => {
+        message     => q{The title of the album containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar album_menuTitle' => {
+        message     => q{The menu title of the album containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar album_url' => {
+        message     => q{The URL of the album containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar album_thumbnailUrl' => {
+        message     => q{The URL for the thumbnail of the album containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;

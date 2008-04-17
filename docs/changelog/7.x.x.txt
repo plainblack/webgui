@@ -9,6 +9,7 @@
  - fixed: the export system was largely incomprehensible. rewritten.
  - the new export system now needs Path::Class
  - add: GalleryAlbum now shows link to add Photo
+ - add: More vars to GalleryAlbum and GalleryFile
 
 7.5.10
  - fix: Syntax error in GetCsMail

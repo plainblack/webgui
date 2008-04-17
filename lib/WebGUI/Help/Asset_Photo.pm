@@ -134,6 +134,34 @@ our $HELP = {
                 name        => 'url_slideshow',
                 description => 'helpvar url_slideshow',
             },
+            {
+                name        => 'gallery_title',
+                description => 'helpvar gallery_title',
+            },
+            {
+                name        => 'gallery_menuTitle',
+                description => 'helpvar gallery_menuTitle',
+            },
+            {
+                name        => 'gallery_url',
+                description => 'helpvar gallery_url',
+            },
+            {
+                name        => 'album_title',
+                description => 'helpvar album_title',
+            },
+            {
+                name        => 'album_menuTitle',
+                description => 'helpvar album_menuTitle',
+            },
+            {
+                name        => 'album_thumbnailUrl',
+                description => 'helpvar album_thumbnailUrl',
+            },
+            {
+                name        => 'album_url',
+                description => 'helpvar album_url',
+            },
         ],
     },
 

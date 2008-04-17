@@ -408,6 +408,12 @@ sub getTemplateVars {
     $var->{ url_listFilesForCurrentUser } = $gallery->getUrl('func=listFilesForUser');
     $var->{ url_search                  } = $gallery->getUrl('func=search');
 
+    # Add some specific vars from the Gallery
+    my $galleryVar      = $gallery->getTemplateVars;
+    for my $key ( qw{ title menuTitle url } ) {
+        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
+    }
+
     # Friendly URLs
     $var->{ url                     } = $self->getUrl;
     $var->{ url_addArchive          } = $self->getUrl('func=addArchive');

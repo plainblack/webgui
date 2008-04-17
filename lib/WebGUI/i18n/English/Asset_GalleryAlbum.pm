@@ -465,6 +465,25 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Title for the list of actions a user can take after saving a Gallery Album',
     },
+
+    'helpvar gallery_title' => {
+        message     => q{The title of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar gallery_menuTitle' => {
+        message     => q{The menu title of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar gallery_url' => {
+        message     => q{The URL of the Gallery containing this File},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;

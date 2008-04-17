@@ -84,6 +84,18 @@ our $HELP = {
                 name        => 'thumbnailUrl',
                 description => 'helpvar thumbnailUrl',
             },
+            {
+                name        => 'gallery_title',
+                description => 'helpvar gallery_title',
+            },
+            {
+                name        => 'gallery_menuTitle',
+                description => 'helpvar gallery_menuTitle',
+            },
+            {
+                name        => 'gallery_url',
+                description => 'helpvar gallery_url',
+            },
         ],
     },
 

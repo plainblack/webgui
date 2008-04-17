@@ -389,6 +389,17 @@ sub getTemplateVars {
         $var->{ $key } = $galleryVar->{ $key };
     }
 
+    # More things from Gallery, but with different names
+    for my $key ( qw{ title menuTitle url } ) {
+        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
+    }
+
+    # Add some things from Album
+    my $albumVar    = $self->getParent->getTemplateVars;
+    for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
+        $var->{ "album_" . $key } = $albumVar->{ $key };
+    }
+
     # Add the search form
     $self->getGallery->appendTemplateVarsSearchForm( $var );
 

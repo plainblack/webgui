@@ -392,7 +392,7 @@ sub updateExifDataFromFile {
     }
 
     # Remove other, pointless keys
-    for my $key ( qw( directory ) ) {
+    for my $key ( qw( Directory ) ) {
         delete $info->{ $key };
     }
 

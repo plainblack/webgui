@@ -54,6 +54,10 @@ for my $key ( keys %$exif ) {
         delete $exif->{$key};
     }
 }
+# Also remove things that Photo explicitly removed
+for my $key ( qw{ Directory } ) {
+    delete $exif->{ $key };
+}
 
 $photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
