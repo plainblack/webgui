@@ -214,9 +214,8 @@ sub exportAsHtml {
     my $rootUrlAction       = $args->{rootUrlAction};
 
     # if we're doing symlinking of the root URL, then the current default asset
-    # is the root of the tree. take down that asset ID so we can check each
-    # asset we export against it later in the loop. that way, we can get its
-    # path on disk and set it as the destination of the root symlink.
+    # is the root of the tree. take down that asset ID so we can pass it to
+    # exportSymlinkRoot later.
     my $defaultAssetId      = $self->session->setting->get('defaultPage');
     my $defaultAsset        = WebGUI::Asset->newByDynamicClass($session, $defaultAssetId);
 
@@ -279,7 +278,6 @@ sub exportAsHtml {
 
     # now, create a new session as the user doing the exports. this is so that
     # the exported assets are taken from that user's perspective.
-
     my $exportSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
     $exportSession->user( { userId => $userId } );
 
@@ -399,18 +397,16 @@ sub exportCheckExportable {
 
 #-------------------------------------------------------------------
 
-=head2 exportGetDescendants ( userId, depth )
+=head2 exportGetDescendants ( user, depth )
 
 Gets the descendants of this asset for exporting, walking the lineage as the
-userId specified. Throws an exception if the given user ID is invalid. Takes the
-following parameters:
+user specified. Takes the following parameters:
 
 =over 4
 
 =item userId
 
-The WebGUI user ID as which to do the export. If not specified, performs the
-export as the current session's user.
+The WebGUI user ID as which to do the export. 
 
 =item depth
 
@@ -424,7 +420,7 @@ Throws the following exceptions:
 
 =item WebGUI::Error::InvalidObject
 
-The given WebGUI user ID is not valid.
+The given WebGUI user is not valid.
 
 =item WebGUI::Error::InvalidParam
 
@@ -495,6 +491,11 @@ sub exportGetUrlAsPath {
     my $index           = shift || 'index.html';
 
     my $config          = $self->session->config;
+
+    # make sure that the export path is valid
+    WebGUI::Asset->exportCheckPath($session);
+
+    # if we're still here, it's valid. get it.
     my $exportPath      = $config->get('exportPath');
     
     # specify a list of file types apache recognises to be passed through as-is
@@ -530,7 +531,7 @@ sub exportGetUrlAsPath {
 
 #-------------------------------------------------------------------
 
-=head2 exportSymlinkExtrasUploads
+=head2 exportSymlinkExtrasUploads ( session )
 
 Class method. Sets up the extras and uploads symlinks.
 
