@@ -53,7 +53,7 @@ sub definition {
 		},
 		templateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> 'IgLHtUXpZRP4ckiVNz8iTQ',
+			defaultValue 	=> '2rC4ErZ3c77OJzJm7O5s3w',
 			tab				=> 'display',
 			label			=> $i18n->get('main template'),
 			hoverHelp		=> $i18n->get('main template help'),

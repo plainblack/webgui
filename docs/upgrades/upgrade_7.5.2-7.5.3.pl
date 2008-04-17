@@ -70,7 +70,7 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem drop column badgePrinterTemplateId");
 	$db->write("alter table EventManagementSystem drop column ticketPrinterTemplateId");
 	$db->write("alter table EventManagementSystem add column timezone varchar(30) not null default 'America/Chicago'");
-	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null default 'IgLHtUXpZRP4ckiVNz8iTQ'");
+	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null default '2rC4ErZ3c77OJzJm7O5s3w'");
 	$db->write("alter table EventManagementSystem add column badgeBuilderTemplateId varchar(22) binary not null default 'BMybD3cEnmXVk2wQ_qEsRQ'");
 	$db->write("alter table EventManagementSystem add column lookupRegistrantTemplateId varchar(22) binary not null default 'OOyMH33plAy6oCj_QWrxtg'");
 	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
