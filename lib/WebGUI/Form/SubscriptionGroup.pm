@@ -52,6 +52,18 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control. Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtmlWithWrapper ( )
 
 Renders the form field to HTML as a table row. The row is not displayed because there is nothing to display, but it may not be left away because <input> may not be a child of <table> according to the XHTML standard.
