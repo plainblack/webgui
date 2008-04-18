@@ -97,8 +97,6 @@ Returns a list of options for the user to pay to.  It is a hash of hashrefs, wit
 
 A WebGUI::Shop::Cart object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
 
-=head3
-
 =cut
 
 sub getOptions {
@@ -153,8 +151,6 @@ sub getPaymentGateway {
 =head2 getPaymentGateways ( )
 
 Returns an array ref of all payment gateway objects in the db.
-
-=head3
 
 =cut
 

@@ -90,8 +90,6 @@ with the key of the primary hash being the shipperId of the driver, and sub keys
 
 A WebGUI::Shop::Cart object.  A WebGUI::Error::InvalidParam exception will be thrown if it doesn't get one.
 
-=head3
-
 =cut
 
 sub getOptions {
@@ -139,8 +137,6 @@ sub getShipper {
 =head2 getShippers ( )
 
 Returns an array ref of all shipping objects in the db.
-
-=head3
 
 =cut
 

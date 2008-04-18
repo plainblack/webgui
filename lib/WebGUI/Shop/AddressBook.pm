@@ -284,9 +284,9 @@ A hash reference that contains one of the following:
 
 Assign the user that owns this address book.
 
-=head4
+=head4 sessionId
 
-Assign the session that owns this adress book. Will automatically be set to "" if a user owns it.
+Assign the session, by id, that owns this address book. Will automatically be set to "" if a user owns it.
 
 =cut
 
