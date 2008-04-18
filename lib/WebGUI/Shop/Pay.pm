@@ -321,6 +321,7 @@ sub www_manage {
 The screen in which a customer chooses a payment gateway.
 
 TODO: Template this screen.
+
 =cut
 
 sub www_selectPaymentGateway {
