@@ -168,7 +168,8 @@ sub getOptions {
     }
     else {
         foreach my $line (split "\n", $possibleValues) {
-            if ($line =~ m/(.*)|(.*)/) {
+			$line =~ s/^(.*)\r|\s*$/$1/;
+            if ($line =~ m/(.*)\|(.*)/) {
                 $options{$1} = $2;
             }
             else {
@@ -208,6 +209,7 @@ sub getValue {
             @values = @{$value};
         }
         else {
+			$value =~ s/\r//g;
             @values = split "\n", $value;
         }
     }
@@ -240,6 +242,7 @@ sub getDefaultValue {
                 @values = @{$value};
             }
             else {
+				$value =~ s/\r//g;
                 @values = split "\n", $value;
             }
         }

@@ -146,9 +146,12 @@ sub toHtml {
     }
     my $i=0;
     my $options = $self->getOptions;
+    		$self->session->errorHandler->warn(JSON->new->encode($options));
+
 	foreach my $key (keys %{$options}) {
 	    $i++;
-        my $checked = (grep { $_ eq $key } @{ $self->get('value') })
+        my @values = $self->getDefaultValue;
+        my $checked = (grep { $_ eq $key } @values)
                     ? 1
                     : 0
                     ;
