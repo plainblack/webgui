@@ -90,6 +90,18 @@ sub getName {
     return WebGUI::International->new($session, 'WebGUI')->get('SelectRichEditor formName');
 }
 
+#-------------------------------------------------------------------
+
+=head2 isDynamicCompatible ( )
+
+A class method that returns a boolean indicating whether this control is compatible with the DynamicField control. Returns 0.
+
+=cut
+
+sub isDynamicCompatible {
+    return 0;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 new

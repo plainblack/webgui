@@ -169,6 +169,7 @@ sub toHtml {
 	my %options;
 	tie %options, "Tie::IxHash";
     $self->set('options', $self->getTypes);
+    $self->set('sortByValue', 1);
 	return $self->SUPER::toHtml();
 }
 

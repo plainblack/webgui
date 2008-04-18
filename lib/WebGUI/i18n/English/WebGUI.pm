@@ -2645,6 +2645,18 @@ div.tabs {
         context=> 'Form Type Name, as in "Object Class Name"',
     },
 
+    'SubscriptionGroup formName' => {
+        message => q|Subscription Group|,
+        lastUpdated => 0,
+        context=> 'form field type',
+    },
+
+    'SelectRichEditor formName' => {
+        message => q|Choose Rich Editor|,
+        lastUpdated => 0,
+        context=> 'form field type',
+    },
+
     'fieldType' => {
         message => q|Field Type|,
         lastUpdated => 0,
