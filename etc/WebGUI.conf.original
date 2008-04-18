@@ -48,13 +48,13 @@
 
 "gateway" : "/",
 
-# The relative or fully qualified URL to the extras folder
-# that comes with WebGUI.
+# Enable this flag if you run or back up files on a case sensitive
+# file system.  This will ensure uniqueness in the uploads folder
 
 #"caseInsensitiveOS" : "1",
 
-# Enable this flag if you run or back up files on a case sensitive
-# file system.  This will ensure uniqueness in the uploads folder
+# The relative or fully qualified URL to the extras folder
+# that comes with WebGUI.
 
 "extrasURL" : "/extras",
 
