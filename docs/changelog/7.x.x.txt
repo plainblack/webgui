@@ -12,6 +12,8 @@
  - add: More vars to GalleryAlbum and GalleryFile
  - fix: thumbnails.js now more easily stylable in anticipation of new Gallery
    templates
+ - add: GalleryFile now sets GalleryAlbum thumbnail if the Album doesn't yet
+   have one and a File is saved.
 
 7.5.10
  - fix: Syntax error in GetCsMail

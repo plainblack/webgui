@@ -577,6 +577,13 @@ sub processPropertiesFromFormPost {
     
     ### Passes all checks
 
+    # If the album doesn't yet have a thumbnail, make this File the thumbnail
+    if ( !$self->getParent->get('assetIdThumbnail') ) {
+        $self->getParent->update( {
+            assetIdThumbnail        => $self->getId,
+        } );
+    }
+
     $self->requestAutoCommit;
 
     return;
