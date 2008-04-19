@@ -1,0 +1,408 @@
+if (typeof Survey == "undefined") {
+    var Survey = {};
+}
+
+Survey.Form = new function() {
+   
+    var sliders;
+    var dSliders;
+    var texts;
+    var buttons;
+    var cals;
+    var files;
+
+    var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1,'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
+        'Likelihood':1,'Certainty':1,'Satisfaction':1,'Confidence':1,'Effectiveness':1,'Concern':1,'Risk':1,'Threat':1,'Security':1,'Ideology':1,
+        'Race':1,'Party':1,'Education':1};
+    var text = {'Text':1, 'Email':1, 'Phone Number':1, 'Text Date':1, 'Currency':1};
+    var slider = {'Slider':1, 'Dual Slider - Range':1, 'Multi Slider - Allocate':1};
+    var dateType = {'Date':1,'Date Range':1};
+    var fileUpload = {'File Upload':1};
+    var hidden = {'Hidden':1};
+
+    this.displayQuestions = function(params){
+        sliders = new Array();
+        dSliders = new Array();
+        texts = new Array();
+        buttons = new Array();
+        cals = new Array();
+        files = new Array();
+
+        var section = params.section;
+        var questions = params.questions;
+        document.getElementById('headertitle').innerHTML = "Section: "+section.sequenceNumber+" "+section.sectionName + "<hr>";
+        
+        if(section.questionsOnSectionPage){
+            document.getElementById('headertext').innerHTML = section.sectionText;
+        }
+        
+        var qs = params.questions;
+        var s = params.survey;
+        var html = "";
+
+//        html = '<form id=surveyForm>';
+        document.getElementById('survey').innerHTML = html;html = '';
+        for(var i = 0; i < qs.length; i++){
+            var q = qs[i];
+            var verts = '';
+            var verte = '';
+            for(var x in q.answers){
+                for(var y in q.answers[x]){
+                    if(q.answers[x][y] == undefined){q.answers[x][y] = '';}
+                }
+            }
+
+            if(q.verticalDisplay != 0){
+                verts = "<p>";
+                verte = "</p>";
+            }
+
+            html += "<hr>";
+            html += "<div class='question'>Q"+q.sequenceNumber+": "+q.questionText+"</div>";
+
+            if(multipleChoice[q.questionType]){
+                if(q.maxAnswers > 1){
+                    html += "<div class='"+q.Survey_questionId+"qmessage'>Selections left: <span id='"+q.Survey_questionId+"max'>"+q.maxAnswers+"</span></div>";
+                }
+                var butts = new Array();   
+                for(var x = 0; x < q.answers.length; x++){
+                    var a = q.answers[x];
+                    html += verts+"<span class=answer id="+a.Survey_answerId+"container></span>"+verte;
+//                    html += verts+"<input type=checkbox id="+a.Survey_answerId+" name="+a.Survey_answerId+" value=1></input>"+verte;
+                    document.getElementById('survey').innerHTML += html;html = '';
+                    var b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId, name: a.Survey_answerId, value: a.Survey_answerId, 
+                        container: a.Survey_answerId+"container", checked: false });
+                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts]);
+                    butts.push(b);
+                    buttons.push(b);
+                }
+            }
+            else if(text[q.questionType]){
+                for(var x = 0; x < q.answers.length; x++){
+                    var a = q.answers[x];
+                    html += verts+"<span class=answer>";
+
+                    if(q.questionType == 'Text'){
+                        html += "<textarea name="+a.Survey_answerId+"></textarea>";
+                    }else if(q.questionType == 'Email'){
+                        html += "<input type=text name="+a.Survey_answerId+"></input>";
+                    }else if(q.questionType == 'Phone Number'){
+                        html += "<input type=text name="+a.Survey_answerId+"></input>";
+                    }else if(q.questionType == 'Text Date'){
+                        html += "<input type=text name="+a.Survey_answerId+"></input>";
+                    }else if(q.questionType == 'Currency'){
+                        html += "<input type=text name="+a.Survey_answerId+"></input>";
+                    }
+                    html += "</span>"+verte;
+                    document.getElementById('survey').innerHTML += html;html = '';
+                } 
+            }
+            else if(dateType[q.questionType]){
+                for(var x = 0; x < q.answers.length; x++){
+                    var a = q.answers[x];
+                    var calid = a.Survey_answerId+'container';
+                    html += verts+"<span class=dateanswer>";
+                    html += "<table><tr><td/><td>"+a.answerText+"</td><td/></tr>";
+                    html += "<div id='"+calid+"'></div>";
+                    html += "<input name='"+a.Survey_answerId+"' id='"+a.Survey_answerId+"' type=text></input>";
+                    html += "<span id='"+a.Survey_answerId+"button'></span>";
+                    html += "</span>"+verte;
+                    document.getElementById('survey').innerHTML += html;html = '';
+                    var c = new YAHOO.widget.Calendar(calid,{title:'Choose a date:', close:true});
+                    c.selectEvent.subscribe(this.selectCalendar,[c,a.Survey_answerId],true);
+                    c.render();
+                    c.hide();
+                    var b = new YAHOO.widget.Button({  label:"Select Date",  id:"pushbutton"+a.Survey_answerId, container:a.Survey_answerId+'button' });
+                    b.on("click", this.showCalendar,[c]);
+                }
+            }
+            else if(fileUpload[q.questionType]){
+                for(var x = 0; x < q.answers.length; x++){
+                    var a = q.answers[x];
+                    html += verts+"<span class=answer>";
+                    html += "<input type='file' name='"+a.Survey_answerId+"' id='"+a.Survey_answerId+"' size='50' />"; 
+                    html += "</span>"+verte;
+                    document.getElementById('survey').innerHTML += html;html = '';
+                    files.push(a.Survey_answerId);
+                }
+            }
+            else if(slider[q.questionType]){
+                //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
+                var max = 0;
+                if(q.questionType == 'Dual Slider - Range'){
+                    var a1 = q.answers[0];
+                    var a2 = q.answers[1];
+                    html += "<input type=hidden id='"+a1.Survey_answerId+"' name='"+a1.Survey_answerId+"' value=0>";
+                    html += "<input type=hidden id='"+a2.Survey_answerId+"' name='"+a2.Survey_answerId+"' value="+a1.max+">";
+
+                    html += verts+"<span class=answer>";
+                    html += "<p><table><tr><td>";
+                    html += "<span id='"+a1.Survey_answerId+"show'>0</span>";
+                    html += "</td><td></td><td>";
+                    html += "<span id='"+a2.Survey_answerId+"show'>"+a2.max+"</span>";
+                    html += "</td></tr>";
+                    html += "<tr><td>0&nbsp;&nbsp;</td><td>";
+                    html += "<div id='"+q.Survey_questionId+"slider-bg' tabindex='-1' title='Slider' class=slider-bg>";
+                    html += "<div id='"+a1.Survey_answerId+"slider-min-thumb' class=slider-min-thumb>\
+                                <img src='/extras/wobject/Survey/thumb-n.gif'></div>\
+                            <div id='"+a2.Survey_answerId+"slider-max-thumb' class=slider-max-thumb>\
+                                <img src='/extras/wobject/Survey/thumb-n.gif'></div>";
+
+                    html += "    </div>\
+                            </div>";
+                    html += "<td>"+a1.max+"</td><td>";
+                    html += "</table>";
+
+                    html += "</span>"+verte;
+                    document.getElementById('survey').innerHTML += html;html = '';
+                    new this.dualSliders(q);
+                }else{
+                    for(var i in q.answers){
+                        var a = q.answers[i];
+                        html += verts+"<span class=answer>";
+                        html += "<p><table><tr><td></td><td>";
+                        html += a.answerText+" ";
+                        html += "<span id='"+a.Survey_answerId+"show'>0</span>";
+                        html += "<input type=hidden id='"+a.Survey_answerId+"' name='"+a.Survey_answerId+"'>";
+                        html += "</td><td></td></tr>";
+                        html += "<tr><td>0&nbsp;&nbsp;</td><td>";
+                        html += "<div id='"+a.Survey_answerId+"slider-bg' tabindex='-1' title='Slider' class=slider-bg>";
+                        if(q.questionType == 'Dual Slider - Range'){
+                            html += "<div id='"+a.Survey_answerId+"slider-min-thumb' class=slider-min-thumb>\
+                                        <img src='/extras/wobject/Survey/thumb-n.gif'>\
+                                    <div id='"+a.Survey_answerId+"slider-max-thumb' class=slider-max-thumb>\
+                                        <img src='/extras/wobject/Survey/thumb-n.gif'>";
+
+                        }else{
+                            html += "<div id='"+a.Survey_answerId+"slider-thumb' class=slider-thumb>\
+                                        <img src='/extras/wobject/Survey/thumb-n.gif'>";
+                        }
+                        html += "    </div>\
+                                </div>";
+                        html += "<td>"+a.max+"</td><td>";
+                        html += "</table>";
+
+                        html += "</span>"+verte;
+                        document.getElementById('survey').innerHTML += html;html = '';
+                        if(a.max - a.min > max){max = a.max - a.min;}
+                    }
+                }
+                if(q.questionType == 'Multi Slider - Allocate'){
+                    //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
+                    new this.sliderManager(q,max);
+                }
+                else if(q.questionType == 'Slider'){
+                    new this.sliders(q); 
+                }
+            }
+            else if(hidden[q.questionType]){
+            }
+        }
+        html += "<hr><input type=button id=submit value=submit></input>";
+        document.getElementById('survey').innerHTML += html;html = '';
+        document.getElementById('footer').innerHTML = "<hr>You are |---| close to being done.";
+        YAHOO.util.Event.addListener("submit", "click", this.submit);   
+        YAHOO.util.Event.addListener("testSubmit", "click", this.tsubmit);   
+    }
+
+
+    this.tsubmit = function(){
+//        console.log(YAHOO.util.Connect.setForm('surveyForm',1));
+var t = document.getElementById('surveyTest');
+//        Survey.Comm.callServer('','submitQuestions',document.getElementById('surveyTest'));
+        Survey.Comm.callServer('','submitQuestions','surveyTest');
+    }
+
+    this.submit = function(){
+//        console.log(YAHOO.util.Connect.setForm('surveyForm',1));
+        Survey.Comm.callServer('','submitQuestions','surveyForm');
+    }
+
+
+
+
+    this.dualSliders = function(q){
+        var total = 200; 
+        var sliders = new Array();
+            var a1 = q.answers[0];
+            var a2 = q.answers[1];
+            var scale = 200/a1.max;
+//console.log(scale);
+
+            var id = q.Survey_questionId;
+            var a1id = a1.Survey_answerId;
+            var a2id = a2.Survey_answerId;
+
+            var a1h = document.getElementById(a1id);
+            var a2h = document.getElementById(a2id);
+            var a1s = document.getElementById(a1id+'show');
+            var a2s = document.getElementById(a2id+'show');
+            var s = YAHOO.widget.Slider.getHorizDualSlider(id+'slider-bg', 
+                a1id+"slider-min-thumb", a2id+"slider-max-thumb", 
+                200, 1*scale, [1,200]);
+
+            s.minRange = 4; 
+            var updateUI = function () { 
+               var min = Math.round(s.minVal/scale), 
+                   max = Math.round(s.maxVal/scale); 
+               a1h.value = min;  
+               a1s.innerHTML = min;  
+               a2h.value = max;  
+               a2s.innerHTML = max;  
+           }; 
+   
+           // Subscribe to the dual thumb slider's change and ready events to 
+           // report the state. 
+//           s.subscribe('ready', updateUI); 
+           s.subscribe('change', updateUI);  
+    }
+    this.sliders = function(q){
+        var total = 200; 
+        var sliders = new Array();
+        for(var i in q.answers){
+            var a = q.answers[i];
+            var step = q.answers[i].step; 
+            var scale = 200/q.answers[i].max;
+            var Event = YAHOO.util.Event;
+            var lang  = YAHOO.lang;
+            var id = a.Survey_answerId+'slider-bg';
+            var s = YAHOO.widget.Slider.getHorizSlider(id, a.Survey_answerId+'slider-thumb', 
+                0, 200, (scale*step));
+            s.max = a.max*scale; 
+            s.input = a.Survey_answerId; 
+            s.scale = scale;
+            var check = function() {
+                var t = document.getElementById(this.input);
+                var tshow = document.getElementById(this.input+'show');
+                t.value = this.getRealValue();
+                tshow.innerHTML = this.getRealValue();
+            };
+            s.getRealValue = function() { 
+                return this.getValue() / this.scale; 
+            }
+            s.subscribe("slideEnd", check);
+            s.subscribe("change", check);
+            sliders.push(s);
+        }
+    }
+    //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
+    this.sliderManager = function(q,t){
+        var total = 200; 
+        var step = q.answers[0].step; 
+        var scale = 200/q.answers[0].max;
+        var sliders = new Array();
+
+        for(var i in q.answers){
+            var a = q.answers[i];
+            var Event = YAHOO.util.Event;
+            var lang  = YAHOO.lang;
+            var id = a.Survey_answerId+'slider-bg';
+            var s = YAHOO.widget.Slider.getHorizSlider(id, a.Survey_answerId+'slider-thumb', 
+                0, 200, scale*step);
+            s.input = a.Survey_answerId; 
+            s.lastValue = 0; 
+//console.log(s);
+            var check = function() {
+                var t = 0;
+                for(var x in sliders){
+                    t+= sliders[x].getValue();
+                }
+                if(t > total){
+                    this.setValue(this.lastValue);
+                }else{ 
+                    this.lastValue = this.getValue();
+//                    alert("Setting "+this.input+" to "+this.getRealValue());
+                    document.getElementById(this.input).value = this.getRealValue();
+                }
+            };
+            s.subscribe("slideEnd", check);
+            s.subscribe("change", check);
+            var manualEntry = function(e){
+              // set the value when the 'return' key is detected 
+              if (Event.getCharCode(e) === 13 || e.type == 'blur') { 
+                  var v = parseFloat(this.value, 10); 
+                  v = (lang.isNumber(v)) ? v : 0; 
+                  v *= scale;
+   
+                  // convert the real value into a pixel offset 
+                  for(var sl in sliders){
+                    if(sliders[sl].input == this.id){
+                        sliders[sl].setValue(Math.round(v)); 
+                    }
+                  }
+              } 
+            }
+            Event.on(document.getElementById(s.input), "keydown", manualEntry);
+            Event.on(document.getElementById(s.input), "blur", manualEntry);
+            
+            s.getRealValue = function() { 
+                return Math.round(this.getValue() / scale); 
+            }
+            sliders.push(s);
+            document.getElementById(s.input).value = s.getRealValue();
+        }
+    }
+
+    this.selectCalendar = function(event,args,obj){
+        var id = obj[1];
+        var selected = args[0]; 
+        var date = selected[0];
+        var year = date[0], month = date[1], day = date[2];
+        var input = document.getElementById(id);
+        input.value = month + "/" + day + "/" + year;
+        obj[0].hide();
+    }
+
+
+    this.showCalendar = function(event,objs){
+ //console.log('showing '+objs[0].id);
+        objs[0].show();
+    }
+    this.buttonChanged = function(event,objs){
+        var b = objs[0];
+        var qid = objs[1];
+        var maxA = objs[2];
+        var butts = objs[3];
+        max = parseInt(max);
+        if(maxA == 1){
+            for(var i in butts){
+                butts[i].set('checked',false);
+            }
+            b.set('checked',true);
+        } 
+        else if(b.get('checked')){
+            var max = parseInt(document.getElementById(qid+'max').innerHTML);
+                if(max == 0){
+                    b.set('checked',false);
+                    //warn that options used up
+                }
+                else{
+                    document.getElementById(qid+'max').innerHTML = parseInt(max-1);
+                }
+        }else{
+            var max = parseInt(document.getElementById(qid+'max').innerHTML);
+            document.getElementById(qid+'max').innerHTML = parseInt(max+1);
+        }
+    }
+}();
+
+
+
+
+//----------------------------------------------------------------
+//
+//      Initialize survey 
+//
+//----------------------------------------------------------------
+Survey.OnLoad = new function() {
+    var e = YAHOO.util.Event;
+    this.init = function() {
+        e.onDOMReady(this.initHandler);
+    }
+    this.initHandler = function(){
+        Survey.Comm.setUrl('/'+document.getElementById('assetPath').value);
+        Survey.Comm.callServer('','loadQuestions');
+    }
+}();
+
+Survey.OnLoad.init();
