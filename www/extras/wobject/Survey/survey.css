@@ -1,0 +1,34 @@
+div.dateanswer {
+    min-height: 250px;
+}
+div.slider-bg {
+    position: relative;
+    background:url(/extras/wobject/Survey/bg-fader.gif) 5px 0 no-repeat;
+    height:28px;
+    width:228px; 
+}
+div.slider-thumb {
+    cursor:default;
+    position: absolute;
+    top: 4px;
+}
+div.slider-min-thumb {
+    cursor:default;
+    position: absolute;
+    top: 4px;
+}
+div.slider-max-thumb {
+    cursor:default;
+    position: absolute;
+    top: 4px;
+}
+#headertitle {
+    display: none;
+}
+#headertext {
+    display: none;
+}
+#questions {
+    display: none;
+}
+
