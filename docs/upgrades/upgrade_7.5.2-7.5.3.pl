@@ -73,16 +73,17 @@ sub upgradeEMS {
 	$db->write("alter table EventManagementSystem add column templateId varchar(22) binary not null default '2rC4ErZ3c77OJzJm7O5s3w'");
 	$db->write("alter table EventManagementSystem add column badgeBuilderTemplateId varchar(22) binary not null default 'BMybD3cEnmXVk2wQ_qEsRQ'");
 	$db->write("alter table EventManagementSystem add column lookupRegistrantTemplateId varchar(22) binary not null default 'OOyMH33plAy6oCj_QWrxtg'");
+	$db->write("alter table EventManagementSystem add column printBadgeTemplateId varchar(22) binary not null default 'PsFn7dJt4wMwBa8hiE3hOA'");
+	$db->write("alter table EventManagementSystem add column printTicketTemplateId varchar(22) binary not null default 'yBwydfooiLvhEFawJb0VTQ'");
 	$db->write("alter table EventManagementSystem add column badgeInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ribbonInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column ticketInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column tokenInstructions mediumtext");
 	$db->write("alter table EventManagementSystem add column registrationStaffGroupId varchar(22) binary not null");
-	$db->write("alter table EventManagementSystem_metaData rename EMSEventMetaData");
 	$db->write("alter table EventManagementSystem_metaField rename EMSEventMetaField");
 	$db->write("alter table EMSEventMetaField drop column autoSearch");
 	$db->write("alter table EMSEventMetaField drop column name");
-	
+
 	print "\t\tCreating new tables.\n" unless ($quiet);
 	$db->write("create table EMSRegistrant (
 		badgeId varchar(22) binary not null primary key,
@@ -148,6 +149,7 @@ sub upgradeEMS {
 		location varchar(100),
 		relatedBadgeGroups mediumtext,
 		relatedRibbons mediumtext,
+		eventMetaData mediumtext,
 		primary key (assetId, revisionDate)
 		)");
 	$db->write("create table EMSToken (
@@ -164,6 +166,10 @@ sub upgradeEMS {
 		primary key (assetId, revisionDate)
 		)");
 	$session->config->addToArray("workflowActivities/None","WebGUI::Workflow::Activity::ExpireEmsCartItems");
+	
+	print "\t\tMigrating old EMS data.\n" unless ($quiet);
+	#$db->write("alter table EventManagementSystem_metaData rename EMSEventMetaData");
+
 }
 
 #-------------------------------------------------

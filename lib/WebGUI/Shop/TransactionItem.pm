@@ -223,7 +223,6 @@ sub update {
         $newProperties->{ configuredTitle   } = $sku->getConfiguredTitle;
         $newProperties->{ isRecurring       } = $sku->isRecurring;
         $newProperties->{ recurInterval     } = $sku->getRecurInterval if $sku->isRecurring;
-
         my $address = $item->getShippingAddress;
         $newProperties->{ shippingAddressId     } = $address->getId;
         $newProperties->{ shippingAddressName   } = $address->get('name');

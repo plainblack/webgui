@@ -213,13 +213,37 @@ our $I18N = {
 	},
 	
 	'lookup registrant template' => {
-		message 	=> q|Lookup Registrant|,
+		message 	=> q|Lookup Registrant Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
 	
 	'lookup registrant template help' => {
 		message 	=> q|Which template would you like to use for the lookup registrant screen?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'print badge template' => {
+		message 	=> q|Print Badge Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'print badge template help' => {
+		message 	=> q|Which template would you like to use for printing badges?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'print ticket template' => {
+		message 	=> q|Print Ticket Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'print ticket template help' => {
+		message 	=> q|Which template would you like to use for printing tickets?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
@@ -312,6 +336,54 @@ our $I18N = {
 		message 	=> q|Ribbon Instructions|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
+	},
+	
+	'print' => {
+		message 	=> q|Print|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'checked in' => {
+		message 	=> q|Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
+	},
+	
+	'not checked in' => {
+		message 	=> q|Not Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
+	},
+	
+	'mark as not checked in' => {
+		message 	=> q|Mark As Not Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'mark as checked in' => {
+		message 	=> q|Mark As Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'refund' => {
+		message 	=> q|Refund|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add more items' => {
+		message 	=> q|Add More Items|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'notes' => {
+		message 	=> q|Notes|,
+		lastUpdated	=> 0,
+		context		=> q|a property label for registrant notes|,
 	},
 	
 	'ribbon instructions help' => {
