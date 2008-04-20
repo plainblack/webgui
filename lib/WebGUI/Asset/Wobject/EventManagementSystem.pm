@@ -931,8 +931,8 @@ sub www_getTicketsAsJson {
 	
 	# looking for specific events
 	if ($keywords =~ m{^[\d+,*\s*]+$}) {
-		@ids = $db->buildArray("select EMSTicket.assetId from EMSTicket left join asset using (assetId) where
-			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.")",[$self->getId]);
+		@ids = $db->buildArray("select distinct(EMSTicket.assetId) from EMSTicket left join asset using (assetId) where
+			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.") order by EMSTicket.eventNumber",[$self->getId]);
 	}
 	
 	# looking for keywords
@@ -946,7 +946,7 @@ sub www_getTicketsAsJson {
 	
 	# just get all tickets
 	else {
-		@ids = $db->buildArray("select assetId from asset where parentId=? and className='WebGUI::Asset::Sku::EMSTicket'", [$self->getId]);
+		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and className='WebGUI::Asset::Sku::EMSTicket' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by eventNumber", [$self->getId]);
 	}
 	
 	# get badge's badge groups
@@ -992,7 +992,7 @@ sub www_getTicketsAsJson {
 		}
 		
 		# skip tickets not in our badge's badge groups
-		if (scalar(@badgeGroups) > 0 && $ticket->get('relatedBadgeGroups') ne '') { # skip check if it has no badge groups
+		if ($badgeId ne "" && scalar(@badgeGroups) > 0 && $ticket->get('relatedBadgeGroups') ne '') { # skip check if it has no badge groups
 			my @groups = split("\n",$ticket->get('relatedBadgeGroups'));
 			my $found = 0;
 			BADGE: {
@@ -1012,10 +1012,17 @@ sub www_getTicketsAsJson {
 		}
 		
 		# publish the data for this ticket
+        my $description = $ticket->get('description');
+        my $data = $ticket->get('eventMetaData');
+        $data = '{}' if ($data eq "");
+        my $meta = JSON->new->utf8->decode($data);
+        foreach my $field (keys %{$meta}) {
+            $description .= '<p><b>'.$field.'</b>: '.$meta->{$field}.'</p>' unless ($meta->{$field} eq "");
+        }
 		my $date = WebGUI::DateTime->new($session, $ticket->get('startDate'));
 		push(@records, {
 			title 				=> $ticket->getTitle,
-			description			=> $ticket->get('description'),
+			description			=> $description,
 			price				=> $ticket->getPrice+0,
 			quantityAvailable	=> $ticket->getQuantityAvailable,
 			url					=> $ticket->getUrl,
