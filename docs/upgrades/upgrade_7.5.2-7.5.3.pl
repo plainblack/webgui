@@ -23,7 +23,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+adddingInStoreCredit($session);
 insertCommerceTaxTable($session);
 migrateOldTaxTable($session);
 insertCommerceShipDriverTable($session);
@@ -41,6 +41,21 @@ migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 
 finish($session); # this line required
+
+#-------------------------------------------------
+sub addingInStoreCredit {
+	my $session = shift;
+	print "\tAdding refunds and in-store credit.\n" unless ($quiet);
+	$session->db->write("create table shopCredit (
+		creditId varchar(22) binary not null primary key,
+		userId varchar(22) binary not null,
+		amount float not null default 0.00,
+		comment text,
+		dateOfAdjustment datetime,
+		index userId (userId)
+		)");
+}
+
 
 #-------------------------------------------------
 sub upgradeEMS {
@@ -105,12 +120,14 @@ sub upgradeEMS {
 		notes mediumtext,
 		purchaseComplete boolean,
 		hasCheckedIn boolean,
+		transactionItemId varchar(22) binary,
 		index badgeAssetId_purchaseComplete (badgeAssetId,purchaseComplete)
 		)");
 	$db->write("create table EMSRegistrantTicket (
 		badgeId varchar(22) binary not null,
 		ticketAssetId varchar(22) binary not null,
 		purchaseComplete boolean,
+		transactionItemId varchar(22) binary,
 		primary key (badgeId, ticketAssetId),
 		index ticketAssetId_purchaseComplete (ticketAssetId,purchaseComplete)
 		)");
@@ -118,11 +135,13 @@ sub upgradeEMS {
 		badgeId varchar(22) binary not null,
 		tokenAssetId varchar(22) binary not null,
 		quantity int,
+		transactionItemIds text binary,
 		primary key (badgeId,tokenAssetId)
 		)");
 	$db->write("create table EMSRegistrantRibbon (
 		badgeId varchar(22) binary not null,
 		ribbonAssetId varchar(22) binary not null,
+		transactionItemId varchar(22) binary,
 		primary key (badgeId,ribbonAssetId)
 		)");
 	$db->write("create table EMSBadgeGroup (

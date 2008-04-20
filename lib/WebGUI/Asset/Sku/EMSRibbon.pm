@@ -132,8 +132,22 @@ Does bookkeeping on EMSRegistrationRibbon table.
 
 sub onCompletePurchase {
 	my ($self, $item) = @_;
-	$self->session->db->write("insert into EMSRegistrantRibbon (ribbonAssetId, badgeId) values (?,?)",
-		[$self->getId, $self->getOptions->{badgeId}]);
+	$self->session->db->write("insert into EMSRegistrantRibbon (transactionItemId, ribbonAssetId, badgeId) values (?,?,?)",
+		[$item->getId, $self->getId, $self->getOptions->{badgeId}]);
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item)
+
+Destroys the ribbon so that it can be resold.
+
+=cut
+
+sub onRefund {
+	my ($self, $item) = @_;
+	$self->session->db->write("delete from EMSRegistrantRibbon where transactionItemId=?",[$item->getId]);
 	return undef;
 }
 

@@ -251,7 +251,7 @@ Extended to support event metadata.
 sub getEditForm {
 	my $self = shift;
 	my $form = $self->SUPER::getEditForm(@_);
-	my $metadata = JSON->new->decode($self->get("eventMetaData") || '{}');
+	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {
 		$form->getTab("meta")->DynamicField(
 			name			=> "eventmeta ".$field->{label},
@@ -293,7 +293,7 @@ sub getPrice {
 	my $badgeId = $self->getOptions->{badgeId};
 	my $ribbonId = $self->session->db->quickScalar("select ribbonAssetId from EMSRegistrantRibbon where badgeId=? limit 1",[$badgeId]);
 	if (defined $ribbonId) {
-		my $ribbon = WebGUI::Asset->new($self->session,$ribbonId,'WebGUI::Asset::Sku::Ribbon');
+		my $ribbon = WebGUI::Asset->new($self->session,$ribbonId,'WebGUI::Asset::Sku::EMSRibbon');
 		$discount = $ribbon->get('percentageDiscount');
 	}
 	else {
@@ -350,8 +350,22 @@ Marks the ticket as purchased.
 
 sub onCompletePurchase {
 	my ($self, $item) = @_;
-	$self->session->db->write("update EMSRegistrantTicket set purchaseComplete=1 where ticketAssetId=? and badgeId=?",
-		[$self->getId, $self->getOptions->{badgeId}]);
+	$self->session->db->write("update EMSRegistrantTicket set purchaseComplete=1, transactionItemId=? where ticketAssetId=? and badgeId=?",
+		[$item->getId, $self->getId, $self->getOptions->{badgeId}]);
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item)
+
+Destroys the ticket so that it can be resold.
+
+=cut
+
+sub onRefund {
+	my ($self, $item) = @_;
+	$self->session->db->write("delete from EMSRegistrantTicket where transactionItemId=?",[$item->getId]);
 	return undef;
 }
 
@@ -386,7 +400,7 @@ sub processPropertiesFromFormPost {
 		$metadata{$field->{label}} = $form->process('eventmeta '.$field->{label}, $field->{dataType},
 			{ defaultValue => $field->{defaultValues}, options => $field->{possibleValues}});
 	}
-	$self->update({eventMetaData => JSON->new->encode(\%metadata)});
+	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata)});
 }
 
 #-------------------------------------------------------------------

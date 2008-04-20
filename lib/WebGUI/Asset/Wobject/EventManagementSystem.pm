@@ -642,6 +642,7 @@ sub www_editRegistrantSave {
 	foreach my $field (qw(name address1 address2 address3 city state organization notes)) {
 		$badgeInfo{$field} = $form->get($field, "text");
 	}
+	$badgeInfo{'userId'} = $form->get('userId', 'user');
 	$badgeInfo{'phoneNumber'} = $form->get('phoneNumber', 'phone');
 	$badgeInfo{'email'} = $form->get('email', 'email');
 	$badgeInfo{'country'} = $form->get('country', 'country');
@@ -681,7 +682,7 @@ sub www_getBadgesAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->encode(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -811,7 +812,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{ribbons} = \@ribbons;
 	
 	# build json datasource
-    return JSON->new->encode($badgeInfo);
+    return JSON->new->utf8->encode($badgeInfo);
 }
 
 #-------------------------------------------------------------------
@@ -871,7 +872,7 @@ sub www_getRegistrantsAsJson {
 	
 	# build json datasource
     $session->http->setMimeType('text/json');
-    return JSON->new->encode(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 
@@ -905,7 +906,7 @@ sub www_getRibbonsAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->encode(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 
@@ -1046,7 +1047,7 @@ sub www_getTicketsAsJson {
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->encode(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 
@@ -1080,7 +1081,7 @@ sub www_getTokensAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->encode(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -1194,13 +1195,27 @@ sub www_manageRegistrant {
 	my $badgeId = $self->session->form->get('badgeId');
 	my $db = $session->db;
 	my $i18n = WebGUI::International->new($session, "Asset_EventManagementSystem");
+	my $registrant = $self->getRegistrant($badgeId);
+
+	# show lookup registrant if registrant requested doesn't exist
+	unless ($registrant->{badgeId} ne "") {
+		return $self->www_lookupRegistrant;
+	}
 	
 	# build form
-	my $registrant = $self->getRegistrant($badgeId);
-	my $f = WebGUI::HTMLForm->new($session, action=>$self->getUrl);
+	my $f = WebGUI::HTMLForm->new($session, action=>$self->getUrl, tableExtras=>'class="manageRegistrant"');
 	$f->submit;
 	$f->hidden(name=>"func", value=>"editRegistrantSave");
 	$f->hidden(name=>'badgeId', value=>$badgeId);
+	$f->readOnly(
+		label			=> $i18n->get('badge number'),
+		value			=> $registrant->{badgeNumber},
+	);
+	$f->user(
+		name			=> 'userId',
+		label			=> $i18n->get('user'),
+		defaultValue	=> $registrant->{userId},
+	);
 	$f->text(
 		name			=> 'name',
 		label			=> $i18n->get('name','Shop'),
@@ -1270,7 +1285,7 @@ sub www_manageRegistrant {
 			&bull; <a href="|.$self->getUrl.q|">|.$i18n->get('buy badge').q|</a>
 		</div>
 		<div id="bd">
-			<div class="yui-g">
+			<div class="yui-gc">
 				<div class="yui-u first">
 				|.$f->print.q|
 				</div>
@@ -1288,7 +1303,7 @@ sub www_manageRegistrant {
 	my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $registrant->{badgeAssetId});
 	$output .= q|<p><b style="font-size: 150%; line-height: 150%;">|.$badge->getTitle.q|</b><br />
 		<a href="|.$self->getUrl('func=printBadge;badgeId='.$badgeId).q|" target="_blank">|.$i18n->get('print').q|</a>
-		&bull; <a href="">|.$i18n->get('refund').q|</a>
+		&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$registrant->{transactionItemId}).q|">|.$i18n->get('refund').q|</a>
 		&bull; |;
 	if ($registrant->{hasCheckedIn}) {
 		$output .= q|<a href="|.$self->getUrl('func=toggleRegistrantCheckedIn;badgeId='.$badgeId).q|">|.$i18n->get('mark as not checked in').q|</a>|;
@@ -1301,30 +1316,31 @@ sub www_manageRegistrant {
 		</p><br />|;
 	
 	# ticket management
-	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
-	while (my ($id) = $existingTickets->array) {
+	my $existingTickets = $db->read("select ticketAssetId, transactionItemId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
+	while (my ($id, $itemId) = $existingTickets->array) {
 		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
 		$output .= q|<p><b>|.$ticket->getTitle.q|</b><br />
 			<a href="|.$self->getUrl('func=printTicket;badgeId='.$badgeId.';ticketAssetId='.$id).q|" target="_blank">|.$i18n->get('print').q|</a>
-			&bull; <a href="">|.$i18n->get('refund').q|</a>
+			&bull; <a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
 			</p><br />|;
 	}
 
 	# ribbon management
-	my $existingRibbons = $db->read("select ribbonAssetId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
-	while (my ($id) = $existingRibbons->array) {
+	my $existingRibbons = $db->read("select ribbonAssetId, transactionItemId from EMSRegistrantRibbon where badgeId=?",[$badgeId]);
+	while (my ($id, $itemId) = $existingRibbons->array) {
 		my $ribbon = WebGUI::Asset::Sku::EMSRibbon->new($session, $id);
 		$output .= q|<p><b>|.$ribbon->getTitle.q|</b><br />
-			<a href="">|.$i18n->get('refund').q|</a>
+			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.$itemId).q|">|.$i18n->get('refund').q|</a>
 			</p><br />|;
 	}
 
 	# token management
-	my $existingTokens = $db->read("select tokenAssetId,quantity from EMSRegistrantToken where badgeId=?",[$badgeId]);
-	while (my ($id, $quantity) = $existingTokens->array) {
+	my $existingTokens = $db->read("select tokenAssetId,quantity,transactionItemIds from EMSRegistrantToken where badgeId=?",[$badgeId]);
+	while (my ($id, $quantity, $itemIds) = $existingTokens->array) {
 		my $token = WebGUI::Asset::Sku::EMSToken->new($session, $id);
+		my @itemIds = split(',', $itemIds);
 		$output .= q|<p><b>|.$token->getTitle.q|</b> (|.$quantity.q|)<br />
-			<a href="">|.$i18n->get('refund').q|</a>
+			<a href="|.$self->getUrl('func=refundItem;badgeId='.$badgeId.';transactionItemId='.join(';transactionItemId=', @itemIds)).q|">|.$i18n->get('refund').q|</a>
 			</p><br />|;
 	}
 
@@ -1338,6 +1354,11 @@ sub www_manageRegistrant {
 
 	# render
 	$session->style->setLink($session->url->extras('/yui/build/reset-fonts-grids/reset-fonts-grids.css'), {rel=>"stylesheet", type=>"text/css"});
+	$session->style->setRawHeadTags(q|
+		<style type="text/css">
+		.manageRegistrant tbody tr td { padding: 2px;}
+		</style>
+		|);
 	return $self->processStyle($output);
 }
 
@@ -1411,6 +1432,29 @@ sub www_printTicket {
 	$registrant->{ticketLocation} = $ticket->get('location');
 	$registrant->{ticketEventNumber} = $ticket->get('eventNumber');
 	return $self->processTemplate($registrant,$self->get('printTicketTemplateId'));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_refundItem ()
+
+Removes a ribbon, token, or ticket or badge that is attached to a registrant.
+
+=cut
+
+sub www_refundItem {
+	my $self = shift;
+	my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canView;
+	my @itemIds = $session->form->param("transactionItemId");
+	foreach my $id (@itemIds) {
+		my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction($session, $id);
+		if (defined $item) {
+			$item->issueCredit;
+		}
+	}
+	return $self->www_manageRegistrant();	
 }
 
 

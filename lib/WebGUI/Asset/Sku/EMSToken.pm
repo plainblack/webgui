@@ -115,13 +115,43 @@ sub onCompletePurchase {
 	my ($self, $item) = @_;
 	my $db = $self->session->db;
 	my @params = ($self->getId, $self->getOptions->{badgeId});
-	my $currentQuantity = $db->quickScalar("select quantity from EMSRegistrantToken where tokenAssetId=? and badgeId=?",\@params);
+	my ($currentQuantity, $currentItemIds) = $db->quickArray("select quantity, transactionItemids from EMSRegistrantToken where tokenAssetId=? and badgeId=?",\@params);
 	unshift @params, $item->get("quantity");
 	if (defined $currentQuantity) {
-		$db->write("update EMSRegistrantToken set quantity=quantity+? where tokenAssetId=? and badgeId=?",\@params);
+		unshift @params, join(",", $currentItemIds, $item->getId);
+		$db->write("update EMSRegistrantToken set transactionItemIds=?, quantity=quantity+? where tokenAssetId=? and badgeId=?",\@params);
 	}
 	else {
-		$db->write("insert into EMSRegistrantToken (quantity, tokenAssetId, badgeId) values (?,?,?)",\@params);
+		unshift @params, $item->getId;
+		$db->write("insert into EMSRegistrantToken (transactionItemIds, quantity, tokenAssetId, badgeId) values (?,?,?,?)",\@params);
+	}
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item)
+
+Destroys the token so that it can be resold.
+
+=cut
+
+sub onRefund {
+	my ($self, $item) = @_;
+	my $db = $self->session->db;
+	my $token = $db->quickHashRef("select * from EMSRegistrantToken where transactionItemIds like ?",['%'.$item->getId.'%']);
+	my @itemIds = split ',', $token->{transactionItemIds};
+	for (my $i=0; $i<scalar @itemIds; $i++) {
+		if ($itemIds[$i] eq $item->getId) {
+			delete $itemIds[$i];
+		}
+	}
+	if (scalar @itemIds < 2) {
+		$db->write("delete from EMSRegistrantToken where badgeId=? and tokenAssetId=?",[$token->{badgeId}, $self->getId]);		
+	}
+	else {
+		$db->write("update EMSRegistrantToken set quantity=?, transactionItemIds=? where badgeId=? and tokenAssetId=?",
+			[($token->{quantity} - $item->get('quantity')), join(',', @itemIds), $token->{badgeId}, $self->getId]);
 	}
 	return undef;
 }

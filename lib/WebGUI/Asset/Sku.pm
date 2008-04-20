@@ -384,11 +384,28 @@ tasks to be performed. It should be overriden by subclasses that need to do spec
 
 =head3 item
 
-Receives a reference to the WebGUI::Shop::CartItem so it can determine things like itemId and quantity if it needs them for book keeping purposes.
+Receives a reference to the WebGUI::Shop::TransactionItem so it can determine things like itemId and quantity if it needs them for book keeping purposes.
 
 =cut
 
 sub onCompletePurchase {
+	my ($self, $item) = @_;
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item )
+
+Called by a transaction upon issuing a refund for this item. Extend to do extra book keeping or restocking.
+
+=head3 item
+
+The WebGUI::Shop::TransactionItem being refunded.
+
+=cut
+
+sub onRefund {
 	my ($self, $item) = @_;
 	return undef;
 }

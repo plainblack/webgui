@@ -5,6 +5,7 @@ use Class::InsideOut qw{ :std };
 use JSON;
 use WebGUI::DateTime;
 use WebGUI::Exception::Shop;
+use WebGUI::Shop::Transaction;
 
 =head1 NAME
 
@@ -97,7 +98,7 @@ sub get {
                 return {};
             }
             else {
-                return JSON::from_json($properties{id $self}{$name});
+                return JSON->new->utf8->decode($properties{id $self}{$name});
             }
         }
         return $properties{id $self}{$name};
@@ -135,6 +136,21 @@ sub getSku {
     return $asset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 issueCredit ( )
+
+Returns the money from this item to the user in the form of in-store credit.
+
+=cut
+
+sub issueCredit {
+    my $self = shift;
+    my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->get('userId'));
+    $credit->adjust($self->get('price'), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
+    $self->getSku->onRefund($self);
+    $self->update({shippingStatus=>'Cancelled'});
+}
 
 #-------------------------------------------------------------------
 
@@ -173,6 +189,36 @@ sub new {
     $properties{ $id } = $item;
     return $self;
 }
+
+#-------------------------------------------------------------------
+
+=head2 newByDynamicTransaction ( session, itemId )
+
+Constructor, but will dynamically find the approriate transaction and attach it to the item object.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 itemId
+
+The unique id for this transaction item.
+
+=cut
+
+sub newByDynamicTransaction {
+    my ($class, $session, $itemId) = @_;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    unless (defined $itemId) {
+        WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
+    }
+    my $transactionId = $session->db->quickScalar("select transactionId from transactionItem where itemId=?",[$itemId]);
+    my $transaction = WebGUI::Shop::Transaction->new($session, $transactionId);
+    return $class->new($transaction, $itemId);
+}
+
 
 
 #-------------------------------------------------------------------
@@ -243,7 +289,7 @@ sub update {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
-        $properties{$id}{options} = JSON::to_json($newProperties->{options});
+        $properties{$id}{options} = JSON->new->utf8->encode($newProperties->{options});
     }
     if (exists $newProperties->{shippingStatus}) {
         $properties{$id}{shippingDate} = WebGUI::DateTime->new($self->transaction->session,time())->toDatabase;

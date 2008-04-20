@@ -11,6 +11,7 @@ use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
+use WebGUI::Shop::Credit;
 use WebGUI::Shop::TransactionItem;
 
 =head1 NAME
@@ -69,7 +70,7 @@ sub addItem {
 
 =head2 completePurchase ( transactionCode, statusCode, statusMessage )
 
-See also denyPurchase(). Completes a purchase by updating the transaction as a success, and clearing the cart of it's items. 
+See also denyPurchase(). Completes a purchase by updating the transaction as a success, and calling onCompletePurchase on all the skus in the transaction.
 
 =head3 transactionCode
 
@@ -87,6 +88,9 @@ The extended status message that came back from the payment gateway when trying 
 
 sub completePurchase {
     my ($self, $transactionCode, $statusCode, $statusMessage) = @_;
+    foreach my $item (@{$self->getItems}) {
+        $item->getSku->onCompletePurchase($item);
+    }
     $self->update({
         transactionCode => $transactionCode,
         isSuccessful    => 1,
@@ -437,7 +441,7 @@ sub www_getTransactionsAsJson {
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
     $session->http->setMimeType('text/json');
-    return JSON::to_json(\%results);
+    return JSON->new->utf8->encode(\%results);
 }
 
 #-------------------------------------------------------------------

@@ -20,6 +20,12 @@ our $I18N = {
 		context		=> q|help for a workflow activity field label|,
 	},
 		
+	'user' => {
+		message 	=> q|User|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
 	'badge number' => {
 		message 	=> q|Badge #|,
 		lastUpdated	=> 0,

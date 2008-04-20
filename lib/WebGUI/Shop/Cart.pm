@@ -374,14 +374,13 @@ sub new {
 
 =head2 onCompletePurchase ()
 
-Calls onCompletePurchase() on all the items in the cart. Then deletes all the items in the cart without calling $item->remove() on them which would affect inventory levels. See also delete() and empty().
+Deletes all the items in the cart without calling $item->remove() on them which would affect inventory levels. See also delete() and empty().
 
 =cut
 
 sub onCompletePurchase {
     my $self = shift;
     foreach my $item (@{$self->getItems}) {
-        $item->getSku->onCompletePurchase($item);
         $item->delete;
     }
     $self->delete;

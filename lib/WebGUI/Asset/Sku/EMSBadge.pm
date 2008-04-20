@@ -193,7 +193,62 @@ sub onCompletePurchase {
 	my $badgeInfo = $self->getOptions;
 	$badgeInfo->{purchaseComplete} = 1;
 	$badgeInfo->{userId} = $self->session->user->userId; # they have to be logged in at this point
+	$badgeInfo->{transactionItemId} = $item->getId;
 	$self->session->db->setRow("EMSRegistrant","badgeId", $badgeInfo);
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item)
+
+Destroys the badge so that it can be resold.
+
+=cut
+
+sub onRefund {
+	my ($self, $item) = @_;
+	my $db = $self->session->db;
+	my $badgeId = $self->getOptions->{badgeId};
+
+	# refund any purchased tickets related to the badge 
+	foreach my $id ($db->buildArray("select transactionItemId from EMSRegistrantTicket where badgeId=?",[$badgeId])) {		
+		my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction($self->session, $id);
+		if (defined $item) {
+			$item->issueCredit;
+		}
+	}
+	
+	# refund any purchased ribbons related to the badge
+	foreach my $id ($db->buildArray("select transactionItemId from EMSRegistrantRibbon where badgeId=?",[$badgeId])) {		
+		my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction($self->session, $id);
+		if (defined $item) {
+			$item->issueCredit;
+		}
+	}
+	
+	# refund any purchased tokens related to this badge
+	foreach my $ids ($db->buildArray("select transactionItemIds from EMSRegistrantToken where badgeId=?",[$badgeId])) {
+		foreach my $id (split(',', $ids)) {
+			my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction($self->session, $id);
+			if (defined $item) {
+				$item->issueCredit;
+			}
+		}
+	}
+	
+	# get rid of any items in the cart related to this badge
+	foreach my $cartitem (@{$self->getCart->getItems()}) {
+		my $sku = $cartitem->getSku;
+		if (isIn((ref $sku), qw(WebGUI::Asset::Sku::EMSTicket WebGUI::Asset::Sku::EMSRibbon WebGUI::Asset::Sku::EMSToken))) {
+			if ($sku->getOptions->{badgeId} eq $badgeId) {
+				$cartitem->remove;
+			}
+		}
+	}
+	
+	# get rid ofthe badge itself 
+	$db->write("delete from EMSRegistrant where transactionItemId=?",[$item->getId]);
 	return undef;
 }
 
@@ -209,8 +264,9 @@ sub onRemoveFromCart {
 	my ($self, $item) = @_;
 	my $badgeId = $self->getOptions->{badgeId};
 	foreach my $cartitem (@{$item->cart->getItems()}) {
-		if (isIn((ref $cartitem), qw(WebGUI::Asset::Sku::EMSTicket WebGUI::Asset::Sku::EMSRibbon WebGUI::Asset::Sku::EMSToken))) {
-			if ($cartitem->getSku->getOptions->{badgeId} eq $badgeId) {
+		my $sku = $cartitem->getSku;
+		if (isIn((ref $sku), qw(WebGUI::Asset::Sku::EMSTicket WebGUI::Asset::Sku::EMSRibbon WebGUI::Asset::Sku::EMSToken))) {
+			if ($sku->getOptions->{badgeId} eq $badgeId) {
 				$cartitem->remove;
 			}
 		}
@@ -255,7 +311,7 @@ sub view {
 	my $book = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
 	$book->hidden(name=>"shop", value=>"address");
 	$book->hidden(name=>"method", value=>"view");
-	$book->hidden(name=>"callback", value=>JSON::to_json({
+	$book->hidden(name=>"callback", value=>JSON->new->utf8->encode({
 		url		=> $self->getUrl,
 		}));
 	$book->submit(value=>$i18n->get("populate from address book"));
