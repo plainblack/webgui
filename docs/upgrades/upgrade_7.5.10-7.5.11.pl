@@ -25,7 +25,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addCalendarEventWorkflow( $session );
-adddingInStoreCredit($session);
+addingInStoreCredit($session);
 insertCommerceTaxTable($session);
 migrateOldTaxTable($session);
 insertCommerceShipDriverTable($session);
