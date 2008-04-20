@@ -381,7 +381,11 @@ cmp_deeply(
 );
 
 # the exception was thrown, but make sure that the file also wasn't written
-ok(!-e $home->exportGetUrlAsPath->absolute->stringify, "exportWriteFile does not write the file when it can't create the exportPath");
+# can't call exportGetUrlAsPath on $home right now, since the path is
+# inaccessible and exportGetUrlAsPath calls exportCheckPath which throws an
+# exception. therefore, specify this single specific case specifically for the
+# sake of the test.
+ok(!-e Path::Class::File->new($unwritablePath, 'home', 'index.html')->absolute->stringify, "exportWriteFile does not write the file when it can't create the exportPath");
 
 # let's go a level deeper
 # but reset the exportPath first
