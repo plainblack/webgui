@@ -18,9 +18,9 @@ body {
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/treeview/assets/skins/sam/treeview.css" />
-<script type="text/javascript" src="../../build/yahoo/yahoo.js"></script>
-<script type="text/javascript" src="../../build/event/event.js"></script>
-<script type="text/javascript" src="../../build/treeview/treeview.js"></script>
+<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
+<script type="text/javascript" src="../../build/treeview/treeview-min.js"></script>
 
 
 <!--begin custom header content for this example-->
@@ -31,13 +31,14 @@ body {
 <style type="text/css">
     #treewrapper {background: #fff; position:relative;}
 	#treediv {position:relative; width:250px; background: #fff; padding:1em;}
-    .icon-ppt { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 0px no-repeat; }
-    .icon-dmg { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -36px no-repeat; }
-    .icon-prv { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -72px no-repeat; }
-    .icon-gen { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -108px no-repeat; }
-    .icon-doc { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -144px no-repeat; }
-    .icon-jar { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -180px no-repeat; }
-    .icon-zip { display:block; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -216px no-repeat; }
+    .icon-ppt { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 0px no-repeat; }
+    .icon-dmg { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -36px no-repeat; }
+    .icon-prv { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -72px no-repeat; }
+    .icon-gen { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -108px no-repeat; }
+    .icon-doc { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -144px no-repeat; }
+    .icon-jar { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -180px no-repeat; }
+    .icon-zip { display:block; height: 22px; padding-left: 20px; background: transparent url(../treeview/assets/img/icons.png) 0 -216px no-repeat; }
+    .htmlnodelabel { margin-left: 20px; }
 </style>
 
 
@@ -88,15 +89,15 @@ body {
 		//First, create a parent node for her documents:
 		var sushDocs = new YAHOO.widget.TextNode("Susheela's Documents", root, true);
 			//Create a child node for her zipped files:
-			var sushZip = new YAHOO.widget.HTMLNode("Zipped Files", sushDocs, false, true);
+			var sushZip = new YAHOO.widget.HTMLNode("<span class=\"htmlnodelabel\">Zipped Files</span>", sushDocs, false, true);
 			//Now, apply the "icon-zip" style to this HTML node's
 			//content:
 			sushZip.contentStyle = "icon-zip";
-			var sushDmg = new YAHOO.widget.HTMLNode("Files -- .dmg version", sushDocs, false, true);
+			var sushDmg = new YAHOO.widget.HTMLNode("<span class=\"htmlnodelabel\">Files -- .dmg version</span>", sushDocs, false, true);
 			sushDmg.contentStyle = "icon-dmg";
-			var sushGen = new YAHOO.widget.HTMLNode("Script -- text version", sushDocs, false, true);
+			var sushGen = new YAHOO.widget.HTMLNode("<span class=\"htmlnodelabel\">Script -- text version</span>", sushDocs, false, true);
 			sushGen.contentStyle = "icon-gen";
-			var sushJar = new YAHOO.widget.HTMLNode("JAR file", sushDocs, false, true);
+			var sushJar = new YAHOO.widget.HTMLNode("<span class=\"htmlnodelabel\">JAR file</span>", sushDocs, false, true);
 			sushJar.contentStyle = "icon-jar";
 	
 		tree.draw();

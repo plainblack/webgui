@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>layout&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>layout&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_layout.html">layout</a>
@@ -204,29 +204,27 @@
             <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">right</span> <span class="o">=</span> <span class="o">{</span>
                 <span class="nx">h</span><span class="o">:</span> <span class="nx">newH</span><span class="o">,</span> <span class="nx">w</span><span class="o">:</span> <span class="o">((</span><span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">)</span> <span class="o">?</span> <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;width&#39;</span><span class="o">)</span> <span class="o">:</span> <span class="m">0</span><span class="o">),</span>
                 <span class="nx">l</span><span class="o">:</span> <span class="o">((</span><span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">)</span> <span class="o">?</span> <span class="o">(</span><span class="nx">w</span> <span class="o">-</span> <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;width&#39;</span><span class="o">))</span> <span class="o">:</span> <span class="m">0</span><span class="o">),</span>
-                <span class="nx">t</span><span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">top</span><span class="o">.</span><span class="nx">h</span>
+                <span class="nx">t</span><span class="o">:</span> <span class="o">((</span><span class="k">this</span><span class="o">.</span><span class="nx">_top</span><span class="o">)</span> <span class="o">?</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">top</span><span class="o">.</span><span class="nx">h</span> <span class="o">:</span> <span class="m">0</span><span class="o">)</span>
             <span class="o">};</span>
             
             <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_right</span> <span class="o">&amp;&amp;</span> <span class="nx">set</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_top</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;top&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">right</span><span class="o">.</span><span class="nx">t</span><span class="o">);</span>
-                <span class="o">}</span>
+                <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;top&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">right</span><span class="o">.</span><span class="nx">t</span><span class="o">);</span>
                 <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">_collapsing</span><span class="o">)</span> <span class="o">{</span> 
                     <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;left&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">right</span><span class="o">.</span><span class="nx">l</span><span class="o">);</span>
                 <span class="o">}</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">_right</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;height&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">right</span><span class="o">.</span><span class="nx">h</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
             <span class="o">}</span>
             <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">l</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
                 <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_top</span><span class="o">)</span> <span class="o">{</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">t</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">top</span><span class="o">.</span><span class="nx">h</span><span class="o">;</span>
-                    <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">l</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">set</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;top&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">top</span><span class="o">.</span><span class="nx">h</span><span class="o">);</span>
-                        <span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;left&#39;</span><span class="o">,</span> <span class="m">0</span><span class="o">);</span>
-                    <span class="o">}</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">t</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
                 <span class="o">}</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">set</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;top&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">t</span><span class="o">);</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;height&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_sizes</span><span class="o">.</span><span class="nx">left</span><span class="o">.</span><span class="nx">h</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_left</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;left&#39;</span><span class="o">,</span> <span class="m">0</span><span class="o">);</span>
                 <span class="o">}</span>
             <span class="o">}</span>
             <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_bottom</span><span class="o">)</span> <span class="o">{</span>
@@ -265,7 +263,7 @@
         <span class="o">},</span>
         <span class="c">/**</span>
 <span class="c">        * @method getSizes</span>
-<span class="c">        * @description Get a reference to the internal Layout Unit sizes</span>
+<span class="c">        * @description Get a reference to the internal Layout Unit sizes object used to build the layout wireframe</span>
 <span class="c">        * @return {Object} An object of the layout unit sizes</span>
 <span class="c">        */</span>
         <span class="nx">getSizes</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
@@ -433,7 +431,7 @@
 <span class="c">        * @description Sets up the main doc element when using the body as the main element.</span>
 <span class="c">        */</span>
         <span class="nx">_setupBodyElements</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="nx">_doc</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;doc&#39;</span><span class="o">);</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">_doc</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;layout-doc&#39;</span><span class="o">);</span>
             <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_doc</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">_doc</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s1">&#39;div&#39;</span><span class="o">);</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">_doc</span><span class="o">.</span><span class="nx">id</span> <span class="o">=</span> <span class="s1">&#39;layout-doc&#39;</span><span class="o">;</span>

@@ -1833,7 +1833,7 @@ sub newByDynamicClass {
 
 =head2 newByPropertyHashRef ( session,  properties )
 
-Constructor.  This creates a standalone asset with no parent.
+Constructor.  This creates a standalone asset with no parent.  It does not update the database.
 
 =head3 session
 
@@ -2049,6 +2049,22 @@ sub processTemplate {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 processStyle ( html )
+
+Returns some HTML wrappered in a style. Should be overridden by subclasses, because this one actually doesn't do anything other than return the html back to you.
+
+=head3 html
+
+The content to wrap up.
+
+=cut
+
+sub processStyle {
+	my ($self, $output) = @_;
+	return $output;
+}
 
 #-------------------------------------------------------------------
 
@@ -2196,7 +2212,7 @@ sub update {
 
     # check the definition of all properties against what was given to us
 	foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my @setPairs;
+		my %setPairs = ();
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
@@ -2239,12 +2255,14 @@ sub update {
 
             # set the property
 			$self->{_properties}{$property} = $value;
-			push(@setPairs, $property."=".$self->session->db->quote($value));
+			$setPairs{$property.'=?'} = $value;
 		}
 
         # if there's anything to update, then do so
-		if (scalar(@setPairs) > 0) {
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@setPairs)." where assetId=".$self->session->db->quote($self->getId)." and revisionDate=".$self->get("revisionDate"));
+		if (scalar(keys %setPairs) > 0) {
+			my @values = values %setPairs;
+			push(@values, $self->getId, $self->get("revisionDate"));
+			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",keys %setPairs)." where assetId=? and revisionDate=?",\@values);
 		}
 	}
 
@@ -2340,6 +2358,7 @@ sub www_add {
 	}
 	my %properties = (
 		%prototypeProperties,
+		parentId => $self->getId,
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
 		ownerUserId => $self->get("ownerUserId"),

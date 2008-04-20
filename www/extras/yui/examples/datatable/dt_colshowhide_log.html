@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<title>YUI Library Examples: DataTable Control (beta): Showing and Hiding Columns</title>
+	<title>YUI Library Examples: DataTable Control (beta): Showing, Hiding, and Reordering Columns.</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
 
@@ -23,6 +23,7 @@
 <script type="text/javascript" src="../../build/event/event-min.js"></script>
 <script type="text/javascript" src="../../build/dom/dom-min.js"></script>
 <script type="text/javascript" src="../../build/logger/logger-min.js"></script>
+<script type="text/javascript" src="../../build/dragdrop/dragdrop-min.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 <script type="text/javascript" src="../../build/container/container-min.js"></script>
@@ -49,19 +50,20 @@
 		<input type="submit" value="Search" class="ygbt"></form>
 	</div>
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
-	<div id="pagetitle"><h1>YUI Library Examples: DataTable Control (beta): Showing and Hiding Columns</h1></div>
+	<div id="pagetitle"><h1>YUI Library Examples: DataTable Control (beta): Showing, Hiding, and Reordering Columns.</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
 			  <div class="yui-u first example">
 	
 	<div class="promo">
-	<h1>DataTable Control (beta): Showing and Hiding Columns</h1>
+	<h1>DataTable Control (beta): Showing, Hiding, and Reordering Columns.</h1>
 	
 	<div class="exampleIntro">
-	<p>This example uses the Dialog and Button widgets to interactively show and hide Columns.</p>
+	<p>This example uses the Dialog and Button widgets to interactively show and hide Columns. Columns are also reorderable via built-in integration with the Drag and Drop Utility.</p>
 			
 	</div>	
 					
@@ -213,15 +215,57 @@
         };
 
         // Create DataTable
-        var myDT = this.myDataTable = new YAHOO.widget.DataTable("columnshowhide", myColumnDefs, this.myDataSource);
-
-        // Define handler functions for the SimpleDialog
-        this.showDlg = function(e, myDlg) {
+        var myDT = this.myDataTable = new YAHOO.widget.DataTable("columnshowhide", myColumnDefs, this.myDataSource, {draggableColumns:true});
+                    
+        // Shows dialog, creating one when necessary
+        this.newCols = true;
+        this.showDlg = function(e) {
             YAHOO.util.Event.stopEvent(e);
-            this.show();
-            this.center();
+
+            if(this.newCols) {
+                // Populate Dialog
+                // Using a template to create elements for the SimpleDialog
+                var allColumns = myDT.getColumnSet().keys;
+                var elPicker = YAHOO.util.Dom.get("dt-dlg-picker");
+                var elTemplateCol = document.createElement("div");
+                YAHOO.util.Dom.addClass(elTemplateCol, "dt-dlg-pickercol");
+                var elTemplateKey = elTemplateCol.appendChild(document.createElement("span"));
+                YAHOO.util.Dom.addClass(elTemplateKey, "dt-dlg-pickerkey");
+                var elTemplateBtns = elTemplateCol.appendChild(document.createElement("span"));
+                YAHOO.util.Dom.addClass(elTemplateBtns, "dt-dlg-pickerbtns");
+                var onclickObj = {fn:this.handleButtonClick, obj:this, scope:false };
+                
+                // Create one section in the SimpleDialog for each Column
+                var elColumn, elKey, elButton, oButtonGrp;
+                for(var i=0,l=allColumns.length;i<l;i++) {
+                    var oColumn = allColumns[i];
+                    
+                    // Use the template
+                    elColumn = elTemplateCol.cloneNode(true);
+                    
+                    // Write the Column key
+                    elKey = elColumn.firstChild;
+                    elKey.innerHTML = oColumn.getKey();
+                    
+                    // Create a ButtonGroup
+                    oButtonGrp = new YAHOO.widget.ButtonGroup({ 
+                                    id: "buttongrp"+i, 
+                                    name: oColumn.getKey(), 
+                                    container: elKey.nextSibling
+                    });
+                    oButtonGrp.addButtons([
+                        { label: "Show", value: "Show", checked: ((!oColumn.hidden)), onclick: onclickObj},
+                        { label: "Hide", value: "Hide", checked: ((oColumn.hidden)), onclick: onclickObj}
+                    ]);
+                                    
+                    elPicker.appendChild(elColumn);
+                }
+                this.newCols = false;
+        	}
+            this.myDlg.show();
+            this.myDlg.center();
         };
-        this.hideDlg = function(e, myDlg) {
+        this.hideDlg = function(e) {
             this.hide();
         };
         this.handleButtonClick = function(e, oSelf) {
@@ -234,56 +278,29 @@
                 // Shows a Column
                 oSelf.myDataTable.showColumn(sKey);
             }
-        }
-        
-        // Use a template to create elements for the SimpleDialog
-        var allColumns = myDT.getColumnSet().keys;
-        var elPicker = YAHOO.util.Dom.get("dt-dlg-picker");
-        var elTemplateCol = document.createElement("div");
-        YAHOO.util.Dom.addClass(elTemplateCol, "dt-dlg-pickercol");
-        var elTemplateKey = elTemplateCol.appendChild(document.createElement("span"));
-        YAHOO.util.Dom.addClass(elTemplateKey, "dt-dlg-pickerkey");
-        var elTemplateBtns = elTemplateCol.appendChild(document.createElement("span"));
-        YAHOO.util.Dom.addClass(elTemplateBtns, "dt-dlg-pickerbtns");
-        var onclickObj = {fn:this.handleButtonClick, obj:this, scope:false };
-        
-        // Create one section in the SimpleDialog for each Column
-        var elColumn, elKey, elButton;
-        for(var i=0,l=allColumns.length;i<l;i++) {
-            // Use the template
-            elColumn = elTemplateCol.cloneNode(true);
-            
-            // Write the Column key
-            elKey = elColumn.firstChild;
-            elKey.innerHTML = allColumns[i].getKey();
-            
-            // Create a ButtonGroup
-            oButtonGrp = new YAHOO.widget.ButtonGroup({ 
-                            id: "buttongrp"+i, 
-                            name: allColumns[i].getKey(), 
-                            container: elKey.nextSibling
-            });
-            oButtonGrp.addButtons([
-                { label: "Show", value: "Show", checked: true, onclick: onclickObj},
-                { label: "Hide", value: "Hide", onclick: onclickObj}
-            ]);
-                            
-            elPicker.appendChild(elColumn);
-        }
+        };
         
         // Create the SimpleDialog
         YAHOO.util.Dom.removeClass("dt-dlg", "inprogress");
         this.myDlg = new YAHOO.widget.SimpleDialog("dt-dlg", {
                 width: "30em",
 			    visible: false,
+			    modal: true,
 			    buttons: [ 
 					{ text:"Close",  handler:this.hideDlg }
                 ]
 		});
 		this.myDlg.render();
+
+        // Nulls out myDlg to force a new one to be created
+        myDT.subscribe("columnReorderEvent", function(){
+            this.newCols = true;
+            YAHOO.util.Event.purgeElement("dt-dlg-picker", true);
+            YAHOO.util.Dom.get("dt-dlg-picker").innerHTML = "";
+        }, this, true);
 		
 		// Hook up the SimpleDialog to the link
-		YAHOO.util.Event.addListener("dt-options-link", "click", this.showDlg, this.myDlg, true);
+		YAHOO.util.Event.addListener("dt-options-link", "click", this.showDlg, this, true);
     };
 });
 </textarea>
@@ -296,7 +313,7 @@
 	
 						<div id="exampleToc">
 							<ul>
-								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li class='selected'><a href='../datatable/dt_colshowhide.html'>Showing and Hiding Columns</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
+								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li class='selected'><a href='../datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
 						</div>
 					</div>
 					
@@ -309,8 +326,6 @@
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/datatable.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

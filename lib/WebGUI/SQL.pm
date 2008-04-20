@@ -225,8 +225,7 @@ sub buildArrayRefOfHashRefs {
 	my $sql = shift;
 	my $params = shift;
 	my $sth = $class->read($sql,$params);
-	my $data;
-	while ($data = $sth->hashRef) {
+	while (my $data = $sth->hashRef) {
 		push(@array,$data);
 	}
 	$sth->finish;
@@ -236,7 +235,47 @@ sub buildArrayRefOfHashRefs {
 
 #-------------------------------------------------------------------
 
-=head2 buildHashRefOfHashRefs ( sql )
+=head2 buildDataTableStructure ( sql, params )
+
+Builds a data structure that can be converted to JSON and sent
+to a YUI Data Table.  This is basically a hash of information about
+the results, with one of the keys being an array ref of hashrefs.  It also
+calculates the total records that could have been matched without a limit
+statement, as well as how many were actually matched.  It returns a hash.
+
+=head3 sql
+
+An SQL query. The query may select as many columns of data as you wish.  The query
+should contain a SQL_CALC_ROWS_FOUND entry so that the total number of available
+rows can be sent to the Data Table.
+
+=head3 params
+
+An array reference containing values for any placeholder params used in the SQL query.
+
+=cut
+
+sub buildDataTableStructure {
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my %hash;
+    my @array;
+    ##Note, I need a valid statement handle for doing the rows method on.
+	my $sth = $self->read($sql,$params);
+	while (my $data = $sth->hashRef) {
+		push(@array,$data);
+	}
+    $hash{records}         = \@array;
+    $hash{totalRecords}    = $self->quickScalar('select found_rows()') + 0; ##Convert to numeric
+    $hash{recordsReturned} = $sth->rows()+0;
+	$sth->finish;
+	return %hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 buildHashRefOfHashRefs ( sql, params, key )
 
 Builds a hash reference of hash references of data 
 from a series of rows.  Useful for returning many rows at once.
@@ -273,6 +312,53 @@ sub buildHashRefOfHashRefs {
 }
 
                                                                               
+#-------------------------------------------------------------------
+
+=head2 buildSearchQuery ( $sql, $placeholders, $keywords, $columns )
+
+Append information to an existing SQL statement for implementing
+basic search functions.  The ammended SQL and an array of placeholder
+variables will be returned.
+
+=head3 $sql
+
+A scalar reference to an SQL query.  The clauses to add search-like capabilities will be
+appended to the end of the query.
+
+=head3 $placeholders
+
+An array reference of placeholders already added to the query.
+
+=head3 $keywords
+
+This is the data that will be searched for in columns.  An SQL wildcard '%' will
+be added to the beginning and end of $keywords.
+
+=head3 $columns
+
+An arrayref of column names that should be searched for $keywords.
+
+=cut
+
+sub buildSearchQuery {
+    my ($self, $sql, $placeHolders, $keywords, $columns) = @_;
+    if ($$sql =~ m/where/) {
+        $$sql .= ' and (';
+    }
+    else { 
+        $$sql .= ' where (';
+    }
+    $keywords = lc('%'.$keywords.'%');
+    my $counter = 0;
+    foreach my $field (@{ $columns }) {
+        $$sql .= ' or' if ($counter > 0);
+        $$sql .= qq{ LOWER( $field ) like ?};
+        push(@{$placeHolders}, $keywords);
+        $counter++;
+    }
+    $$sql .= ')';
+}
+
 #-------------------------------------------------------------------
 
 =head2 commit ( )
@@ -758,7 +844,8 @@ sub quoteAndJoin {
 
 =head2 read ( sql [ , placeholders ] )
 
-This is a convenience method for WebGUI::SQL::ResultSet->read().
+This is a convenience method for WebGUI::SQL::ResultSet->read().  It returns the statement
+handler.
 
 =head3 sql
 

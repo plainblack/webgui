@@ -68,8 +68,8 @@ Returns the next row of data as an array reference. Note that this is 12% faster
 =cut
 
 sub arrayRef {
-	my $self = shift;
-        return $self->sth->fetchrow_arrayref() or $self->db->session->errorHandler->fatal("Couldn't fetch array. ".$self->errorMessage);
+    my $self = shift;
+    return $self->sth->fetchrow_arrayref() or $self->db->session->errorHandler->fatal("Couldn't fetch array. ".$self->errorMessage);
 }
 
 
@@ -82,8 +82,8 @@ A reference to the current WebGUI::SQL object.
 =cut
 
 sub db {
-	my $self = shift;
-	return $self->{_db};
+    my $self = shift;
+    return $self->{_db};
 }
 
 #-------------------------------------------------------------------
@@ -227,7 +227,8 @@ sub prepare {
 
 =head2 read ( sql, db, placeholders )
 
-Constructor. Returns a result set statement handler.
+Constructor. Returns a result set statement handler after doing a prepare and execute on
+the supplied SQL query and the placeholders.
 
 =head3 sql
 

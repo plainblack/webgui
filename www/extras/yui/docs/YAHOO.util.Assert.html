@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>yuitest&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>yuitest&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_yuitest.html">yuitest</a>
@@ -62,9 +62,64 @@ an error is thrown.
                         <div class="section method details">
                             <h3 id="methods">Methods</h3>
                             <div class="content">
+                                    <div class="protected">
+                                    <h4>
+                                        <a name="method__formatMessage">_formatMessage</a></h4>
+                                    <div class="detail">
+                                        <code>
+                                         protected 
+                                         static 
+                                        
+                                        String
+                                            <strong>_formatMessage</strong>
+                                           (
+                                                
+                                                        
+                                                         customMessage
+                                                    
+                                                
+                                                        , 
+                                                         defaultMessage
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description">
+                                            Formats a message so that it can contain the original assertion message
+in addition to the custom message.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl>
+                                                    <dt>Parameters:</dt>
+                                                        <dd>
+                                                            <code>customMessage &lt;String&gt;</code>
+                                                             The message passed in by the developer.
+                                                        </dd>
+                                                        <dd>
+                                                            <code>defaultMessage &lt;String&gt;</code>
+                                                             The message created by the error by default.
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code>
+                                                        String
+                                                    </code></dt>
+                                                    <dd>The final error message, containing either or both.</dd>
+                                                </dl>
+             
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
                                     <div class="">
                                     <h4>
-                                        <a name="areEqual">areEqual</a></h4>
+                                        <a name="method_areEqual">areEqual</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -127,7 +182,7 @@ so type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="areNotEqual">areNotEqual</a></h4>
+                                        <a name="method_areNotEqual">areNotEqual</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -190,7 +245,7 @@ so type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="areNotSame">areNotSame</a></h4>
+                                        <a name="method_areNotSame">areNotSame</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -253,7 +308,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="areSame">areSame</a></h4>
+                                        <a name="method_areSame">areSame</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -316,7 +371,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="fail">fail</a></h4>
+                                        <a name="method_fail">fail</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -362,7 +417,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isArray">isArray</a></h4>
+                                        <a name="method_isArray">isArray</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -416,7 +471,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isBoolean">isBoolean</a></h4>
+                                        <a name="method_isBoolean">isBoolean</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -470,7 +525,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isFalse">isFalse</a></h4>
+                                        <a name="method_isFalse">isFalse</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -525,7 +580,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isFunction">isFunction</a></h4>
+                                        <a name="method_isFunction">isFunction</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -579,7 +634,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isInstanceOf">isInstanceOf</a></h4>
+                                        <a name="method_isInstanceOf">isInstanceOf</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -643,7 +698,7 @@ another frame. For best results, don't use in a cross-frame manner.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNaN">isNaN</a></h4>
+                                        <a name="method_isNaN">isNaN</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -697,7 +752,7 @@ another frame. For best results, don't use in a cross-frame manner.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNotNaN">isNotNaN</a></h4>
+                                        <a name="method_isNotNaN">isNotNaN</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -751,7 +806,7 @@ another frame. For best results, don't use in a cross-frame manner.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNotNull">isNotNull</a></h4>
+                                        <a name="method_isNotNull">isNotNull</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -806,7 +861,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNotUndefined">isNotUndefined</a></h4>
+                                        <a name="method_isNotUndefined">isNotUndefined</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -861,7 +916,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNull">isNull</a></h4>
+                                        <a name="method_isNull">isNull</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -916,7 +971,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isNumber">isNumber</a></h4>
+                                        <a name="method_isNumber">isNumber</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -970,7 +1025,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isObject">isObject</a></h4>
+                                        <a name="method_isObject">isObject</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -1024,7 +1079,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isString">isString</a></h4>
+                                        <a name="method_isString">isString</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -1078,7 +1133,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isTrue">isTrue</a></h4>
+                                        <a name="method_isTrue">isTrue</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -1133,7 +1188,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isTypeOf">isTypeOf</a></h4>
+                                        <a name="method_isTypeOf">isTypeOf</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -1195,7 +1250,7 @@ so no type cohersion may occur.
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="isUndefined">isUndefined</a></h4>
+                                        <a name="method_isUndefined">isUndefined</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -1206,10 +1261,6 @@ so no type cohersion may occur.
                                            (
                                                 
                                                         
-                                                         expected
-                                                    
-                                                
-                                                        , 
                                                          actual
                                                     
                                                 
@@ -1229,10 +1280,6 @@ so no type cohersion may occur.
 
                                                 <dl>
                                                     <dt>Parameters:</dt>
-                                                        <dd>
-                                                            <code>expected &lt;Object&gt;</code>
-                                                             The expected value.
-                                                        </dd>
                                                         <dd>
                                                             <code>actual &lt;Object&gt;</code>
                                                              The actual value to test.
@@ -1393,68 +1440,71 @@ so no type cohersion may occur.
                     <div class="module">
                         <h4>Methods</h4>
                         <ul class="content">        
-                                <li class=""><!--<code>void</code>-->
-                                <a href="#areEqual">areEqual</a>
+                                <li class="protected"><!--<code>String</code>-->
+                                <a href="#method__formatMessage">_formatMessage</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#areNotEqual">areNotEqual</a>
+                                <a href="#method_areEqual">areEqual</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#areNotSame">areNotSame</a>
+                                <a href="#method_areNotEqual">areNotEqual</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#areSame">areSame</a>
+                                <a href="#method_areNotSame">areNotSame</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#fail">fail</a>
+                                <a href="#method_areSame">areSame</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isArray">isArray</a>
+                                <a href="#method_fail">fail</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isBoolean">isBoolean</a>
+                                <a href="#method_isArray">isArray</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isFalse">isFalse</a>
+                                <a href="#method_isBoolean">isBoolean</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isFunction">isFunction</a>
+                                <a href="#method_isFalse">isFalse</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isInstanceOf">isInstanceOf</a>
+                                <a href="#method_isFunction">isFunction</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNaN">isNaN</a>
+                                <a href="#method_isInstanceOf">isInstanceOf</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNotNaN">isNotNaN</a>
+                                <a href="#method_isNaN">isNaN</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNotNull">isNotNull</a>
+                                <a href="#method_isNotNaN">isNotNaN</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNotUndefined">isNotUndefined</a>
+                                <a href="#method_isNotNull">isNotNull</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNull">isNull</a>
+                                <a href="#method_isNotUndefined">isNotUndefined</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isNumber">isNumber</a>
+                                <a href="#method_isNull">isNull</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isObject">isObject</a>
+                                <a href="#method_isNumber">isNumber</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isString">isString</a>
+                                <a href="#method_isObject">isObject</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isTrue">isTrue</a>
+                                <a href="#method_isString">isString</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isTypeOf">isTypeOf</a>
+                                <a href="#method_isTrue">isTrue</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#isUndefined">isUndefined</a>
+                                <a href="#method_isTypeOf">isTypeOf</a>
+                                </li>
+                                <li class=""><!--<code>void</code>-->
+                                <a href="#method_isUndefined">isUndefined</a>
                                 </li>
                         </ul>
                     </div>

@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * The Slider component is a UI control that enables the user to adjust 
@@ -1937,4 +1937,4 @@ YAHOO.widget.Slider.getVertDualSlider =
 
         return new YW.DualSlider(new Slider(bg, bg, mint, "vert"), new Slider(bg, bg, maxt, "vert"), range, initVals);
 };
-YAHOO.register("slider", YAHOO.widget.Slider, {version: "2.5.0", build: "895"});
+YAHOO.register("slider", YAHOO.widget.Slider, {version: "2.5.1", build: "984"});

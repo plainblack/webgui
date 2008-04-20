@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
  /**
  * The AutoComplete control provides the front-end logic for text-entry suggestion and
@@ -3613,4 +3613,4 @@ YAHOO.widget.DS_JSArray.prototype.doQuery = function(oCallbackFn, sQuery, oParen
     oCallbackFn(sQuery, aResults, oParent);
 };
 
-YAHOO.register("autocomplete", YAHOO.widget.AutoComplete, {version: "2.5.0", build: "895"});
+YAHOO.register("autocomplete", YAHOO.widget.AutoComplete, {version: "2.5.1", build: "984"});

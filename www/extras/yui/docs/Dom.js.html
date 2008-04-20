@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>dom&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>dom&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_dom.html">dom</a>
@@ -60,8 +60,9 @@
     <span class="c">// regex cache</span>
 <span class="c"></span>    <span class="k">var</span> <span class="nx">patterns</span> <span class="o">=</span> <span class="o">{</span>
         <span class="nx">HYPHEN</span><span class="o">:</span> <span class="sr">/(-[a-z])/i</span><span class="o">,</span> <span class="c">// to normalize get/setStyle</span>
-<span class="c"></span>        <span class="nx">ROOT_TAG</span><span class="o">:</span> <span class="sr">/^body|html$/i</span> <span class="c">// body for quirks mode, html for standards</span>
-<span class="c"></span>    <span class="o">};</span>
+<span class="c"></span>        <span class="nx">ROOT_TAG</span><span class="o">:</span> <span class="sr">/^body|html$/i</span><span class="o">,</span> <span class="c">// body for quirks mode, html for standards,</span>
+<span class="c"></span>        <span class="nx">OP_SCROLL</span><span class="o">:</span><span class="sr">/^(?:inline|table-row)$/i</span>
+    <span class="o">};</span>
 
     <span class="k">var</span> <span class="nx">toCamel</span> <span class="o">=</span> <span class="k">function</span><span class="o">(</span><span class="nx">property</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span> <span class="o">!</span><span class="nx">patterns</span><span class="o">.</span><span class="nx">HYPHEN</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">property</span><span class="o">)</span> <span class="o">)</span> <span class="o">{</span>
@@ -102,7 +103,7 @@
 <span class="c"></span>                <span class="nx">property</span> <span class="o">=</span> <span class="s1">&#39;cssFloat&#39;</span><span class="o">;</span>
             <span class="o">}</span>
 
-            <span class="k">var</span> <span class="nx">computed</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">defaultView</span><span class="o">.</span><span class="nx">getComputedStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
+            <span class="k">var</span> <span class="nx">computed</span> <span class="o">=</span> <span class="nx">el</span><span class="o">.</span><span class="nx">ownerDocument</span><span class="o">.</span><span class="nx">defaultView</span><span class="o">.</span><span class="nx">getComputedStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
             <span class="k">if</span> <span class="o">(</span><span class="nx">computed</span><span class="o">)</span> <span class="o">{</span> <span class="c">// test computed before touching for safari</span>
 <span class="c"></span>                <span class="nx">value</span> <span class="o">=</span> <span class="nx">computed</span><span class="o">[</span><span class="nx">toCamel</span><span class="o">(</span><span class="nx">property</span><span class="o">)];</span>
             <span class="o">}</span>
@@ -373,7 +374,7 @@
         <span class="nx">getRegion</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">function</span><span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">if</span> <span class="o">(</span> <span class="o">(</span><span class="nx">el</span><span class="o">.</span><span class="nx">parentNode</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">el</span><span class="o">.</span><span class="nx">offsetParent</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">||</span>
-                        <span class="k">this</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s1">&#39;display&#39;</span><span class="o">)</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">el</span> <span class="o">!=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">body</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">this</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s1">&#39;display&#39;</span><span class="o">)</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">el</span> <span class="o">!=</span> <span class="nx">el</span><span class="o">.</span><span class="nx">ownerDocument</span><span class="o">.</span><span class="nx">body</span><span class="o">)</span> <span class="o">{</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s1">&#39;getRegion failed: element not available&#39;</span><span class="o">,</span> <span class="s1">&#39;error&#39;</span><span class="o">,</span> <span class="s1">&#39;Dom&#39;</span><span class="o">);</span>
                     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
                 <span class="o">}</span>
@@ -1089,10 +1090,14 @@
                 <span class="c">// account for any scrolled ancestors</span>
 <span class="c"></span>                <span class="k">while</span> <span class="o">(</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">tagName</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">patterns</span><span class="o">.</span><span class="nx">ROOT_TAG</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">parentNode</span><span class="o">.</span><span class="nx">tagName</span><span class="o">)</span> <span class="o">)</span> 
                 <span class="o">{</span>
-                   <span class="c">// work around opera inline/table scrollLeft/Top bug</span>
-<span class="c"></span>                   <span class="k">if</span> <span class="o">(</span><span class="nx">Y</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">parentNode</span><span class="o">,</span> <span class="s1">&#39;display&#39;</span><span class="o">).</span><span class="nx">search</span><span class="o">(</span><span class="sr">/^inline|table-row.*$/i</span><span class="o">))</span> <span class="o">{</span> 
-                        <span class="nx">pos</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">-=</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollLeft</span><span class="o">;</span>
-                        <span class="nx">pos</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">-=</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollTop</span><span class="o">;</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollTop</span> <span class="o">||</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollLeft</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="c">// work around opera inline/table scrollLeft/Top bug (false reports offset as scroll)</span>
+<span class="c"></span>                        <span class="k">if</span> <span class="o">(!</span><span class="nx">patterns</span><span class="o">.</span><span class="nx">OP_SCROLL</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">Y</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">parentNode</span><span class="o">,</span> <span class="s1">&#39;display&#39;</span><span class="o">)))</span> <span class="o">{</span> 
+                            <span class="k">if</span> <span class="o">(!</span><span class="nx">isOpera</span> <span class="o">||</span> <span class="nx">Y</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">parentNode</span><span class="o">,</span> <span class="s1">&#39;overflow&#39;</span><span class="o">)</span> <span class="o">!==</span> <span class="s1">&#39;visible&#39;</span><span class="o">)</span> <span class="o">{</span> <span class="c">// opera inline-block misreports when visible</span>
+<span class="c"></span>                                <span class="nx">pos</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">-=</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollLeft</span><span class="o">;</span>
+                                <span class="nx">pos</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">-=</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">scrollTop</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
                     <span class="o">}</span>
                     
                     <span class="nx">parentNode</span> <span class="o">=</span> <span class="nx">parentNode</span><span class="o">.</span><span class="nx">parentNode</span><span class="o">;</span> 

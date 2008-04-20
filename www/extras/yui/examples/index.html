@@ -33,7 +33,8 @@
 	<div id="ygma"><a href="../"><img src="../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>Yahoo! User Interface Library (YUI): Index of Library Examples</h1></div>
 </div>
-<div id="bd"><div id="yui-main">
+<div id="bd">
+<div id="yui-main">
 	<div class="yui-b">
 	  <div class="yui-ge">
 		  <div class="yui-u first">
@@ -56,7 +57,7 @@
 	
 <h1 class="firstContent">YUI Library: Index of Official Examples</h1>
 	
-<p>Every YUI Library component ships with a series of 272 examples that illustrate its implementation.  These examples can serve as starting points for your exploration of YUI, as code snippets to get you started in your own programming, or simply as an inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
+<p>Every YUI Library component ships with a series of 275 examples that illustrate its implementation.  These examples can serve as starting points for your exploration of YUI, as code snippets to get you started in your own programming, or simply as an inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
 
 <p>The navigation controls on the left side of this page allow you to explore these examples component-by-component; on this page you'll find the full index of library examples with a link to and short description of each one.</p>
 
@@ -158,10 +159,11 @@
 <tr class='odd'><td class='title'><a href='animation/from.html'>Animating From a Given Value</a></td><td class='description'>Animations usually begin with the current value (e.g., a motion animation usually begins with the current position of the moving element).  However, the starting position can be customized; this example shows you how.</td></tr>
 <tr class='even'><td class='title'><a href='animation/units.html'>Using Custom Units for an Animation</a></td><td class='description'>By default, animations are set in terms of a property's default units (often pixels or percent).  This example shows you how to specificy custom units with Animation.</td></tr>
 <tr class='odd'><td class='title'><a href='animation/attributes.html'>Animating Multiple Attributes</a></td><td class='description'>This example demonstrates how to animate multiple attributes of an HTMLElement.</td></tr>
-<tr class='even'><td class='title'><a href='animation/colors.html'>Animating Colors</a></td><td class='description'>Color animations can be effective indicators of state during the lifespan of a dynamic page.  This example shows you how to animate color attributes of an HTMLElement.</td></tr>
-<tr class='odd'><td class='title'><a href='animation/motion.html'>Animating Motion</a></td><td class='description'>This example shows you how to animate the motion path of an HTMLElement.</td></tr>
-<tr class='even'><td class='title'><a href='animation/control.html'>Animating Along a Curved Path</a></td><td class='description'>This example explores motion animation by moving an HTMLElement along a curved path using control points.</td></tr>
-<tr class='odd'><td class='title'><a href='animation/scroll.html'>Animated Scrolling</a></td><td class='description'>This example shows how to animate the scrolling of an HTMLElement.</td></tr>
+<tr class='even'><td class='title'><a href='animation/anim-chaining.html'>Chaining Animations Using <code>onComplete</code></a></td><td class='description'>Animations can be chained (set to fire sequentially) using Animation's onComplete custom event; this simple example shows you how.</td></tr>
+<tr class='odd'><td class='title'><a href='animation/colors.html'>Animating Colors</a></td><td class='description'>Color animations can be effective indicators of state during the lifespan of a dynamic page.  This example shows you how to animate color attributes of an HTMLElement.</td></tr>
+<tr class='even'><td class='title'><a href='animation/motion.html'>Animating Motion</a></td><td class='description'>This example shows you how to animate the motion path of an HTMLElement.</td></tr>
+<tr class='odd'><td class='title'><a href='animation/control.html'>Animating Along a Curved Path</a></td><td class='description'>This example explores motion animation by moving an HTMLElement along a curved path using control points.</td></tr>
+<tr class='even'><td class='title'><a href='animation/scroll.html'>Animated Scrolling</a></td><td class='description'>This example shows how to animate the scrolling of an HTMLElement.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -263,6 +265,7 @@
 <tr class='odd'><td class='title'><a href='yuiloader/yl-basic.html'>Using YUI Loader to Load the Calendar Control</a></td><td class='description'>This example demonstrates a simple implementation in which we bring in the YUI Calendar Control &mdash; and its JavaScript and CSS dependencies &mdash; using the YUI Loader Utility.</td></tr>
 <tr class='even'><td class='title'><a href='yuiloader/yl-insert.html'>Using YUI Loader to Place Additional Components on a Page</a></td><td class='description'>In some cases, you may wish to use YUI Loader to bring additional components into a page that already contains some YUI content.  In this example, we'll look at how to use YUI Loader to augment a page's existing YUI content by bringing in additional dependencies for a new component.</td></tr>
 <tr class='odd'><td class='title'><a href='yuiloader/yl-addmodule.html'>Using addModule to Add Custom (Non-YUI) Content with YUILoader</a></td><td class='description'>YUILoader can be used to add YUI components to the page, but it can also be used to add other components that you create yourself (or that you pull from a third-party source).  This example shows one simple way to pull in external content with YUILoader.</td></tr>
+<tr class='even'><td class='title'><a href='yuiloader/yl-list.html'>Use YUILoader to list requirements for a set of components.</a></td><td class='description'>Select one or more YUI components and see an optimized list of file includes.</td></tr>
 </tbody>
 </table>
 
@@ -375,30 +378,31 @@
 <tr class='even'><td class='title'><a href='datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></td><td class='description'>The display of XML data retrieved via an XHR POST request.</td></tr>
 <tr class='odd'><td class='title'><a href='datatable/dt_xhrtext.html'>Textual Data Over XHR</a></td><td class='description'>The display of textual data retrieved over XHR</td></tr>
 <tr class='even'><td class='title'><a href='datatable/dt_xhrlocalxml.html'>Local XML Data</a></td><td class='description'>The display of XML data placed locally within the page by Connection Manager.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_clientpagination.html'>Client-side Pagination</a></td><td class='description'>The use of client-side pagination to break up a dataset into manageable, page-sized chunks.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_clientsorting.html'>Client-side Sorting</a></td><td class='description'>Client-side Column sort using a custom function.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></td><td class='description'>Server-side pagination using the Paginator widget.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_serversorting.html'>Server-side Sorting</a></td><td class='description'>Sorting handled by a server.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></td><td class='description'>Integration of server-side pagination and sorting, integrated with the Browser History Manager.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></td><td class='description'>Scrolling along x, y, or xy axes.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_rowselect.html'>Row Selection</a></td><td class='description'>Row selection models.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_cellselect.html'>Cell Selection</a></td><td class='description'>Cell selection models.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_cellediting.html'>Inline Cell Editing</a></td><td class='description'>Implementing inline cell editing.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_contextmenu.html'>Context Menu Integration</a></td><td class='description'>Integration of DataTable with the the <a href='http://developer.yahoo.com/yui/menu'>Menu Control</a>'s ContextMenu feature.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_colshowhide.html'>Showing and Hiding Columns</a></td><td class='description'>Interactively showing and hiding Columns</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></td><td class='description'>Enable highlighting on cells, rows, or columns</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_complex.html'>Complex Example of Multiple Features</a></td><td class='description'>Several features combined into one DataTable.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></td><td class='description'>Use an AutoComplete Control to filter Datatable results.</td></tr>
-<tr class='odd'><td class='title'><a href='datatable/dt_skinning.html'>Skinning Model</a></td><td class='description'>An explanation of DataTable's skinning model.</td></tr>
-<tr class='even'><td class='title'><a href='datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></td><td class='description'>Exhibition of Paginator instance configuration.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></td><td class='description'>Adding and deleting rows with dynamic data.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_clientpagination.html'>Client-side Pagination</a></td><td class='description'>The use of client-side pagination to break up a dataset into manageable, page-sized chunks.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_clientsorting.html'>Client-side Sorting</a></td><td class='description'>Client-side Column sort using a custom function.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></td><td class='description'>Server-side pagination using the Paginator widget.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_serversorting.html'>Server-side Sorting</a></td><td class='description'>Sorting handled by a server.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></td><td class='description'>Integration of server-side pagination and sorting, integrated with the Browser History Manager.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></td><td class='description'>Scrolling along x, y, or xy axes.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_rowselect.html'>Row Selection</a></td><td class='description'>Row selection models.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_cellselect.html'>Cell Selection</a></td><td class='description'>Cell selection models.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_cellediting.html'>Inline Cell Editing</a></td><td class='description'>Implementing inline cell editing.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_contextmenu.html'>Context Menu Integration</a></td><td class='description'>Integration of DataTable with the the <a href='http://developer.yahoo.com/yui/menu'>Menu Control</a>'s ContextMenu feature.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></td><td class='description'>Showing, hiding, and reordering Columns.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></td><td class='description'>Enable highlighting on cells, rows, or columns</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_complex.html'>Complex Example of Multiple Features</a></td><td class='description'>Several features combined into one DataTable.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></td><td class='description'>Use an AutoComplete Control to filter Datatable results.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/dt_skinning.html'>Skinning Model</a></td><td class='description'>An explanation of DataTable's skinning model.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></td><td class='description'>Exhibition of Paginator instance configuration.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
 <tr><th class='title' colspan='2'><h3>ImageCropper Control (beta)</h3></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='imagecropper/simple_crop.html'>Simple Crop Interface</a></td><td class='description'>This example shows how to make an image crappable.</td></tr>
-<tr class='even'><td class='title'><a href='imagecropper/adv_crop.html'>Advanced Crop Interface</a></td><td class='description'>This example shows how to make an image crappable with some advanced features.</td></tr>
+<tr class='odd'><td class='title'><a href='imagecropper/simple_crop.html'>Simple Crop Interface</a></td><td class='description'>This example shows how to make an image croppable.</td></tr>
+<tr class='even'><td class='title'><a href='imagecropper/adv_crop.html'>Advanced Crop Interface</a></td><td class='description'>This example shows how to make an image croppable with some advanced features.</td></tr>
 <tr class='odd'><td class='title'><a href='imagecropper/feedback_crop.html'>Real Time Crop Feedback</a></td><td class='description'>This example shows how to use a few of the built in events to real time crop feedback.</td></tr>
 <tr class='even'><td class='title'><a href='imagecropper/conn_crop.html'>Connection Manager assisted image crop</a></td><td class='description'>This example shows how to use Connection Manager to issue an image crop request.</td></tr>
 <tr class='odd'><td class='title'><a href='imagecropper/skinning_crop.html'>Skinning the ImageCropper</a></td><td class='description'>ImageCropper skinning is done via CSS.  The ImageCropper comes with a default skin, but you can extend or override this as needed.</td></tr>

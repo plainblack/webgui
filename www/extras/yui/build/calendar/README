@@ -1,5 +1,46 @@
 Calendar Release Notes
 
+*** version 2.5.1 *** 
+
++ Fixed bug with mindate, maxdate being applied incorrectly if 
+  set to a day on which time change took place (DST, E.U Summertime) 
+  and the day is not the first day of the week.
+
++ Fixed DateMath.getWeekNumber implementation to return correct 
+  week numbers. The older implementation would return Week 0 for 
+  certain weeks (e.g. the week starting Sun Dec 28th 2008)
+
+  To suppor the fix, DateMath.getWeekNumber has a signature 
+  change in 2.5.1 and can now support U.S Week calculations based 
+  on Jan 1st identifying the first week of the year, as well as 
+  ISO8601 week calculations based on Jan 4th identifying the first 
+  week of the year
+
+  The arguments which the method expected prior to 2.5.1 were not 
+  being used in calculating the week number. The new signature is:
+
+  DateMath.getWeekNumber(Date dt, Number firstDayOfWeek, Number janDate)
+
+  Where:
+
+    dt is the date for which week number is required
+
+    firstDayOfWeek is the day index identifying the first 
+    day of the week. Default is 0 (Sunday).
+
+    janDate is the date in the first week of January, which
+    identifies the first week of the year. 
+    Default is YAHOO.widget.DateMath.WEEK_ONE_JAN_DATE (1)
+
+  NOTE: Calendar instances themselves do not currently expose a 
+  configuration property to change the week numbering system 
+  used. A "janDate" value is not passed to the getWeekNumber 
+  method, when used by Calendar, resulting in it using the default value.
+
+  Therefore, ISO8601 week numbering can be generated for Calendars 
+  by setting the value of YAHOO.widget.DateMath.WEEK_ONE_JAN_DATE
+  to 4.
+
 *** version 2.5.0 *** 
 
 + Prevent default event handling in CalendarNavigator enter key 

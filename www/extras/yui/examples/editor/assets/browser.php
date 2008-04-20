@@ -53,6 +53,10 @@
             window.close();
         }
     });
+    //Internet Explorer will throw this window to the back, this brings it to the front on load
+    Event.on(window, 'load', function() {
+        window.focus();
+    });
 })();
 </script>
 </body>

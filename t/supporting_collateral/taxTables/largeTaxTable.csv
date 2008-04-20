@@ -1,0 +1,1779 @@
+country,state,city,code,taxRate
+USA,,,,0.0
+USA,WI,,,5.0
+USA,WI,,53701,0.5
+USA,WI,,53702,0.5
+USA,WI,,53703,0.5
+USA,WI,,53704,0.5
+USA,,,97123,0.0
+USA,CA,Acampo,,7.750
+USA,CA,Acton,,8.250
+USA,CA,Adelaida,,7.250
+USA,CA,Adelanto,,7.750
+USA,CA,Adin,,7.250
+USA,CA,Agoura,,8.250
+USA,CA,Agoura Hills,,8.250
+USA,CA,Agua Caliente,,7.750
+USA,CA,Agua Caliente Springs,,7.750
+USA,CA,Agua Dulce,,8.250
+USA,CA,Aguanga,,7.750
+USA,CA,Ahwahnee,,7.750
+USA,CA,Al Tahoe,,7.250
+USA,CA,Alameda,,8.750
+USA,CA,Alamo,,8.250
+USA,CA,Albany,,8.750
+USA,CA,Alberhill (Lake Elsinore),,7.750
+USA,CA,Albion,,7.250
+USA,CA,Alderpoint,,7.250
+USA,CA,Alhambra,,8.250
+USA,CA,Aliso Viejo,,7.750
+USA,CA,Alleghany,,7.250
+USA,CA,Almaden Valley,,8.250
+USA,CA,Almanor,,7.250
+USA,CA,Almondale,,8.250
+USA,CA,Alondra,,8.250
+USA,CA,Alpaugh,,7.750
+USA,CA,Alpine,,7.750
+USA,CA,Alta,,7.250
+USA,CA,Alta Loma (Rancho Cucamonga),,7.750
+USA,CA,Altadena,,8.250
+USA,CA,Altaville,,7.250
+USA,CA,Alton,,7.250
+USA,CA,Alturas,,7.250
+USA,CA,Alviso (San Jose),,8.250
+USA,CA,Amador City,,7.250
+USA,CA,Amargosa (Death Valley),,7.750
+USA,CA,Amboy,,7.750
+USA,CA,American Canyon,,7.750
+USA,CA,Anaheim,,7.750
+USA,CA,Anderson,,7.250
+USA,CA,Angels Camp,,7.250
+USA,CA,Angelus Oaks,,7.750
+USA,CA,Angwin,,7.750
+USA,CA,Annapolis,,7.750
+USA,CA,Antelope,,7.750
+USA,CA,Antelope Acres,,8.250
+USA,CA,Antioch,,8.250
+USA,CA,Anza,,7.750
+USA,CA,Apple Valley,,7.750
+USA,CA,Applegate,,7.250
+USA,CA,Aptos,,8.000
+USA,CA,Arbuckle,,7.250
+USA,CA,Arcadia,,8.250
+USA,CA,Arcata,,7.250
+USA,CA,Argus,,7.750
+USA,CA,Arleta (Los Angeles),,8.250
+USA,CA,Arlington (Riverside),,7.750
+USA,CA,Armona,,7.250
+USA,CA,Army Terminal,,8.750
+USA,CA,Arnold,,7.250
+USA,CA,Aromas,,7.250
+USA,CA,Arrowbear Lake,,7.750
+USA,CA,Arrowhead Highlands,,7.750
+USA,CA,Arroyo Grande,,7.750
+USA,CA,Artesia,,8.250
+USA,CA,Artois,,7.250
+USA,CA,Arvin,,7.250
+USA,CA,Ashland,,8.750
+USA,CA,Asti,,7.750
+USA,CA,Atascadero,,7.250
+USA,CA,Athens,,8.250
+USA,CA,Atherton,,8.250
+USA,CA,Atwater,,7.250
+USA,CA,Atwood,,7.750
+USA,CA,Auberry,,7.975
+USA,CA,Auburn,,7.250
+USA,CA,Avalon,,8.750
+USA,CA,Avenal,,7.250
+USA,CA,Avery,,7.250
+USA,CA,Avila Beach,,7.250
+USA,CA,Azusa,,8.250
+USA,CA,Badger,,7.750
+USA,CA,Bailey,,8.250
+USA,CA,Baker,,7.750
+USA,CA,Bakersfield,,7.250
+USA,CA,Balboa (Newport Beach),,7.750
+USA,CA,Balboa Island (Newport Beach),,7.750
+USA,CA,Balboa Park (San Diego),,7.750
+USA,CA,Baldwin Park,,8.250
+USA,CA,Ballard,,7.750
+USA,CA,Ballico,,7.250
+USA,CA,Ballroad,,7.750
+USA,CA,Bangor,,7.250
+USA,CA,Banning,,7.750
+USA,CA,Banta,,7.750
+USA,CA,Bard,,7.750
+USA,CA,Barrington,,8.250
+USA,CA,Barstow,,7.750
+USA,CA,Bartlett,,7.750
+USA,CA,Barton,,7.975
+USA,CA,Base Line,,7.750
+USA,CA,Bass Lake,,7.750
+USA,CA,Bassett,,8.250
+USA,CA,Baxter,,7.250
+USA,CA,Bayside,,7.250
+USA,CA,Baywood Park,,7.250
+USA,CA,Beale A.F.B.,,7.250
+USA,CA,Bear River Lake,,7.250
+USA,CA,Bear Valley,,7.250
+USA,CA,Bear Valley,,7.750
+USA,CA,Beaumont,,7.750
+USA,CA,Beckwourth,,7.250
+USA,CA,Bel Air Estates,,8.250
+USA,CA,Belden,,7.250
+USA,CA,Bell Gardens,,8.250
+USA,CA,Bell,,8.250
+USA,CA,Bella Vista,,7.250
+USA,CA,Bellflower,,8.250
+USA,CA,Belmont,,8.250
+USA,CA,Belvedere,,7.750
+USA,CA,Ben Lomond,,8.000
+USA,CA,Benicia,,7.375
+USA,CA,Benton,,7.250
+USA,CA,Berkeley,,8.750
+USA,CA,Bermuda Dunes,,7.750
+USA,CA,Berry Creek,,7.250
+USA,CA,Bethel Island,,8.250
+USA,CA,Betteravia,,7.750
+USA,CA,Beverly Hills,,8.250
+USA,CA,Bieber,,7.250
+USA,CA,Big Bar,,7.250
+USA,CA,Big Basin,,8.000
+USA,CA,Big Bear City,,7.750
+USA,CA,Big Bear Lake,,7.750
+USA,CA,Big Bend,,7.250
+USA,CA,Big Creek,,7.975
+USA,CA,Big Oak Flat,,7.250
+USA,CA,Big Pine,,7.750
+USA,CA,Big River,,7.750
+USA,CA,Big Sur,,7.250
+USA,CA,Biggs,,7.250
+USA,CA,Bijou,,7.250
+USA,CA,Biola,,7.975
+USA,CA,Biola College (La Mirada),,8.250
+USA,CA,Birds Landing,,7.375
+USA,CA,Bishop,,7.750
+USA,CA,Black Hawk,,8.250
+USA,CA,Blairsden,,7.250
+USA,CA,Blocksburg,,7.250
+USA,CA,Bloomington,,7.750
+USA,CA,Blossom Hill,,8.250
+USA,CA,Blossom Valley,,8.250
+USA,CA,Blue Jay,,7.750
+USA,CA,Blue Lake,,7.250
+USA,CA,Blythe,,7.750
+USA,CA,Bodega,,7.750
+USA,CA,Bodega Bay,,7.750
+USA,CA,Bodfish,,7.250
+USA,CA,Bolinas,,7.750
+USA,CA,Bolsa,,7.750
+USA,CA,Bombay Beach,,7.750
+USA,CA,Bonita,,7.750
+USA,CA,Bonny Doon,,8.000
+USA,CA,Bonsall,,7.750
+USA,CA,Boonville,,7.250
+USA,CA,Boron,,7.250
+USA,CA,Borrego Springs,,7.750
+USA,CA,Bostonia,,7.750
+USA,CA,Boulder Creek,,8.000
+USA,CA,Boulevard,,7.750
+USA,CA,Bouquet Canyon (Santa Clarita),,8.250
+USA,CA,Bowman,,7.250
+USA,CA,Boyes Hot Springs,,7.750
+USA,CA,Bradbury,,8.250
+USA,CA,Bradford,,8.750
+USA,CA,Bradley,,7.250
+USA,CA,Branscomb,,7.250
+USA,CA,Brawley,,7.750
+USA,CA,Brea,,7.750
+USA,CA,Brents Junction,,8.250
+USA,CA,Brentwood (Los Angeles),,8.250
+USA,CA,Brentwood,,8.250
+USA,CA,Briceland,,7.250
+USA,CA,Bridgeport,,7.750
+USA,CA,Bridgeport,,7.250
+USA,CA,Bridgeville,,7.250
+USA,CA,Brisbane,,8.250
+USA,CA,Broderick (West Sacramento),,7.750
+USA,CA,Brookdale,,8.000
+USA,CA,Brookhurst Center,,7.750
+USA,CA,Brooks,,7.250
+USA,CA,Browns Valley,,7.250
+USA,CA,Brownsville,,7.250
+USA,CA,Bryn Mawr,,7.750
+USA,CA,Bryte (West Sacramento),,7.750
+USA,CA,Buellton,,7.750
+USA,CA,Buena Park,,7.750
+USA,CA,Burbank,,8.250
+USA,CA,Burlingame,,8.250
+USA,CA,Burney,,7.250
+USA,CA,Burnt Ranch,,7.250
+USA,CA,Burrel,,7.975
+USA,CA,Burson,,7.250
+USA,CA,Butte City,,7.250
+USA,CA,Butte Meadows,,7.250
+USA,CA,Buttonwillow,,7.250
+USA,CA,Byron,,8.250
+USA,CA,Cabazon,,7.750
+USA,CA,Cabrillo,,8.250
+USA,CA,Cadiz,,7.750
+USA,CA,Calabasas Highlands,,8.250
+USA,CA,Calabasas Park,,8.250
+USA,CA,Calabasas,,8.250
+USA,CA,Calexico,,7.750
+USA,CA,Caliente,,7.250
+USA,CA,California City,,7.250
+USA,CA,California Hot Springs,,7.750
+USA,CA,California Valley,,7.250
+USA,CA,Calimesa,,7.750
+USA,CA,Calipatria,,7.750
+USA,CA,Calistoga,,7.750
+USA,CA,Callahan,,7.250
+USA,CA,Calpella,,7.250
+USA,CA,Calpine,,7.250
+USA,CA,Calwa,,7.975
+USA,CA,Camarillo,,7.250
+USA,CA,Cambria,,7.250
+USA,CA,Cambrian Park,,8.250
+USA,CA,Cameron Park,,7.250
+USA,CA,Camino,,7.250
+USA,CA,Camp Beale,,7.250
+USA,CA,Camp Connell,,7.250
+USA,CA,Camp Curry,,7.750
+USA,CA,Camp Kaweah,,7.750
+USA,CA,Camp Meeker,,7.750
+USA,CA,Camp Nelson,,7.750
+USA,CA,Camp Pendleton,,7.750
+USA,CA,Camp Roberts,,7.250
+USA,CA,Campbell,,8.250
+USA,CA,Campo,,7.750
+USA,CA,Campo Seco,,7.250
+USA,CA,Camptonville,,7.250
+USA,CA,Canby,,7.250
+USA,CA,Canoga Annex,,8.250
+USA,CA,Canoga Park (Los Angeles),,8.250
+USA,CA,Cantil,,7.250
+USA,CA,Cantua Creek,,7.975
+USA,CA,Canyon,,8.250
+USA,CA,Canyon Country (Santa Clarita),,8.250
+USA,CA,Canyon Lake,,7.750
+USA,CA,Canyondam,,7.250
+USA,CA,Capay,,7.250
+USA,CA,Capistrano Beach (Dana Point),,7.750
+USA,CA,Capitola,,8.250
+USA,CA,Cardiff By The Sea (Encinitas),,7.750
+USA,CA,Cardwell,,7.975
+USA,CA,Carlotta,,7.250
+USA,CA,Carlsbad,,7.750
+USA,CA,Carmel Rancho,,7.250
+USA,CA,Carmel Valley,,7.250
+USA,CA,Carmel,,7.250
+USA,CA,Carmichael,,7.750
+USA,CA,Carnelian Bay,,7.250
+USA,CA,Carpinteria,,7.750
+USA,CA,Carson,,8.250
+USA,CA,Cartago,,7.750
+USA,CA,Caruthers,,7.975
+USA,CA,Casitas Springs,,7.250
+USA,CA,Casmalia,,7.750
+USA,CA,Caspar,,7.250
+USA,CA,Cassel,,7.250
+USA,CA,Castaic,,8.250
+USA,CA,Castella,,7.250
+USA,CA,Castle A.F.B.,,7.250
+USA,CA,Castro Valley,,8.750
+USA,CA,Castroville,,7.250
+USA,CA,Cathedral City,,7.750
+USA,CA,Catheys Valley,,7.750
+USA,CA,Cayucos,,7.250
+USA,CA,Cazadero,,7.750
+USA,CA,Cecilville,,7.250
+USA,CA,Cedar,,8.250
+USA,CA,Cedar Crest,,7.975
+USA,CA,Cedar Glen,,7.750
+USA,CA,Cedar Ridge,,7.375
+USA,CA,Cedarpines Park,,7.750
+USA,CA,Cedarville,,7.250
+USA,CA,Central Valley,,7.250
+USA,CA,Century City,,8.250
+USA,CA,Ceres,,7.875
+USA,CA,Cerritos,,8.250
+USA,CA,Challenge,,7.250
+USA,CA,Chambers Lodge,,7.250
+USA,CA,Charter Oak,,8.250
+USA,CA,Chatsworth (Los Angeles),,8.250
+USA,CA,Cherry Valley,,7.750
+USA,CA,Chester,,7.250
+USA,CA,Chicago Park,,7.375
+USA,CA,Chico,,7.250
+USA,CA,Chilcoot,,7.250
+USA,CA,China Lake NWC (Ridgecrest),,7.250
+USA,CA,Chinese Camp,,7.250
+USA,CA,Chino Hills,,7.750
+USA,CA,Chino,,7.750
+USA,CA,Chiriaco Summit,,7.750
+USA,CA,Cholame,,7.250
+USA,CA,Chowchilla,,7.750
+USA,CA,Chualar,,7.250
+USA,CA,Chula Vista,,7.750
+USA,CA,Cima,,7.750
+USA,CA,Citrus Heights,,7.750
+USA,CA,City of Commerce,,8.250
+USA,CA,City of Industry,,8.250
+USA,CA,City Terrace,,8.250
+USA,CA,Claremont,,8.250
+USA,CA,Clarksburg,,7.250
+USA,CA,Clayton,,8.250
+USA,CA,Clear Creek,,7.250
+USA,CA,Clearlake Highlands,,7.250
+USA,CA,Clearlake Oaks,,7.250
+USA,CA,Clearlake Park (Clearlake),,7.750
+USA,CA,Clearlake,,7.750
+USA,CA,Clements,,7.750
+USA,CA,Clinter,,7.975
+USA,CA,Clio,,7.250
+USA,CA,Clipper Mills,,7.250
+USA,CA,Cloverdale,,7.750
+USA,CA,Clovis,,8.275
+USA,CA,Coachella,,7.750
+USA,CA,Coalinga,,7.975
+USA,CA,Coarsegold,,7.750
+USA,CA,Cobb,,7.250
+USA,CA,Cohasset,,7.250
+USA,CA,Cole,,8.250
+USA,CA,Coleville,,7.250
+USA,CA,Colfax,,7.250
+USA,CA,College City,,7.250
+USA,CA,College Grove Center,,7.750
+USA,CA,Colma,,8.250
+USA,CA,Coloma,,7.250
+USA,CA,Colorado,,7.750
+USA,CA,Colton,,7.750
+USA,CA,Columbia,,7.250
+USA,CA,Colusa,,7.250
+USA,CA,Commerce,,8.250
+USA,CA,Comptche,,7.250
+USA,CA,Compton,,8.250
+USA,CA,Concord,,8.250
+USA,CA,Cool,,7.250
+USA,CA,Copperopolis,,7.250
+USA,CA,Corcoran,,7.250
+USA,CA,Cornell,,8.250
+USA,CA,Corning,,7.250
+USA,CA,Corona Del Mar (Newport Beach),,7.750
+USA,CA,Corona,,7.750
+USA,CA,Coronado,,7.750
+USA,CA,Corralitos (Watsonville),,8.250
+USA,CA,Corte Madera,,7.750
+USA,CA,Coso Junction,,7.750
+USA,CA,Costa Mesa,,7.750
+USA,CA,Cotati,,7.750
+USA,CA,Cottonwood,,7.250
+USA,CA,Coulterville,,7.750
+USA,CA,Courtland,,7.750
+USA,CA,Covelo,,7.250
+USA,CA,Covina,,8.250
+USA,CA,Cowan Heights,,7.750
+USA,CA,Coyote,,8.250
+USA,CA,Crannell,,7.250
+USA,CA,Crenshaw,,8.250
+USA,CA,Crescent City,,7.250
+USA,CA,Crescent Mills,,7.250
+USA,CA,Cressey,,7.250
+USA,CA,Crest Park,,7.750
+USA,CA,Cresta Blanca,,8.750
+USA,CA,Crestline,,7.750
+USA,CA,Creston,,7.250
+USA,CA,Crockett,,8.250
+USA,CA,Cromberg,,7.250
+USA,CA,Cross Roads,,7.750
+USA,CA,Crowley Lake (Mammoth Lake),,7.250
+USA,CA,Crows Landing,,7.375
+USA,CA,Cucamonga (Rancho Cucamonga),,7.750
+USA,CA,Cudahy,,8.250
+USA,CA,Culver City,,8.250
+USA,CA,Cummings,,7.250
+USA,CA,Cupertino,,8.250
+USA,CA,Curry Village,,7.750
+USA,CA,Cutler,,7.750
+USA,CA,Cutten,,7.250
+USA,CA,Cuyama,,7.750
+USA,CA,Cypress,,7.750
+USA,CA,Daggett,,7.750
+USA,CA,Dairy Farm,,7.375
+USA,CA,Daly City,,8.250
+USA,CA,Dana Point,,7.750
+USA,CA,Danville,,8.250
+USA,CA,Dardanelle,,7.250
+USA,CA,Darwin,,7.750
+USA,CA,Davenport,,8.000
+USA,CA,Davis Creek,,7.250
+USA,CA,Davis,,7.750
+USA,CA,Death Valley,,7.750
+USA,CA,Death Valley Junction,,7.750
+USA,CA,Deer Park,,7.750
+USA,CA,Del Kern (Bakersfield),,7.250
+USA,CA,Del Mar Heights (Morro Bay),,7.750
+USA,CA,Del Mar,,7.750
+USA,CA,Del Monte Park (Monterey),,7.250
+USA,CA,Del Rey,,7.975
+USA,CA,Del Rey Oaks,,8.250
+USA,CA,Del Rosa,,7.750
+USA,CA,Del Sur,,8.250
+USA,CA,Delano,,8.250
+USA,CA,Deleven,,7.250
+USA,CA,Delhi,,7.250
+USA,CA,Denair,,7.375
+USA,CA,Denny,,7.250
+USA,CA,Descanso,,7.750
+USA,CA,Desert Center,,7.750
+USA,CA,Desert Hot Springs,,7.750
+USA,CA,Di Giorgio,,7.250
+USA,CA,Diablo,,8.250
+USA,CA,Diamond Bar,,8.250
+USA,CA,Diamond Springs,,7.250
+USA,CA,Dillon Beach,,7.750
+USA,CA,Dinkey Creek,,7.975
+USA,CA,Dinuba,,8.500
+USA,CA,Dixon,,7.375
+USA,CA,Dobbins,,7.250
+USA,CA,Dogtown,,7.750
+USA,CA,Dollar Ranch,,8.250
+USA,CA,Dorris,,7.250
+USA,CA,Dos Palos,,7.250
+USA,CA,Dos Rios,,7.250
+USA,CA,Douglas City,,7.250
+USA,CA,Douglas Flat,,7.250
+USA,CA,Downey,,8.250
+USA,CA,Downieville,,7.250
+USA,CA,Doyle,,7.250
+USA,CA,Drytown,,7.250
+USA,CA,Duarte,,8.250
+USA,CA,Dublin,,8.750
+USA,CA,Ducor,,7.750
+USA,CA,Dulzura,,7.750
+USA,CA,Duncans Mills,,7.750
+USA,CA,Dunlap,,7.975
+USA,CA,Dunnigan,,7.250
+USA,CA,Dunsmuir,,7.250
+USA,CA,Durham,,7.250
+USA,CA,Dutch Flat,,7.250
+USA,CA,Eagle Mountain,,7.750
+USA,CA,Eagle Rock (Los Angeles),,8.250
+USA,CA,Eagleville,,7.250
+USA,CA,Earlimart,,7.750
+USA,CA,Earp,,7.750
+USA,CA,East Highlands (Highland),,7.750
+USA,CA,East Irvine (Irvine),,7.750
+USA,CA,East Los Angeles,,8.250
+USA,CA,East Lynwood (Lynwood),,8.250
+USA,CA,East Nicolaus,,7.250
+USA,CA,East Palo Alto,,8.250
+USA,CA,East Porterville (Porterville),,8.250
+USA,CA,East Rancho Dominguez,,8.250
+USA,CA,East San Pedro (Los Angeles),,8.250
+USA,CA,Eastgate,,8.250
+USA,CA,Easton,,7.975
+USA,CA,Eastside,,7.750
+USA,CA,Echo Lake,,7.250
+USA,CA,Echo Park (Los Angeles),,8.250
+USA,CA,Edgemont (Moreno Valley),,7.750
+USA,CA,Edgewood,,7.250
+USA,CA,Edison,,7.250
+USA,CA,Edwards,,7.250
+USA,CA,Edwards A.F.B.,,7.250
+USA,CA,El Cajon,,8.250
+USA,CA,El Centro,,7.750
+USA,CA,El Cerrito,,8.250
+USA,CA,El Dorado,,7.250
+USA,CA,El Dorado Hills,,7.250
+USA,CA,El Granada,,8.250
+USA,CA,El Macero,,7.250
+USA,CA,El Modena,,7.750
+USA,CA,El Monte,,8.250
+USA,CA,El Nido,,7.250
+USA,CA,El Portal,,7.750
+USA,CA,El Segundo,,8.250
+USA,CA,El Sobrante,,8.250
+USA,CA,El Toro (Lake Forest),,7.750
+USA,CA,El Toro M.C.A.S.,,7.750
+USA,CA,El Verano,,7.750
+USA,CA,El Viejo,,7.375
+USA,CA,Eldridge,,7.750
+USA,CA,Elizabeth Lake,,8.250
+USA,CA,Elk,,7.250
+USA,CA,Elk Creek,,7.250
+USA,CA,Elk Grove,,7.750
+USA,CA,Elmira,,7.375
+USA,CA,Elmwood,,8.750
+USA,CA,Elverta,,7.750
+USA,CA,Emerald Hills (Redwood City),,8.250
+USA,CA,Emeryville,,8.750
+USA,CA,Emigrant Gap,,7.250
+USA,CA,Empire,,7.375
+USA,CA,Encinitas,,7.750
+USA,CA,Encino (Los Angeles),,8.250
+USA,CA,Enterprise,,7.250
+USA,CA,Escalon,,7.750
+USA,CA,Escondido,,7.750
+USA,CA,Esparto,,7.250
+USA,CA,Essex,,7.750
+USA,CA,Etiwanda (Rancho Cucamonga),,7.750
+USA,CA,Etna,,7.250
+USA,CA,Ettersburg,,7.250
+USA,CA,Eureka,,7.250
+USA,CA,Exeter,,7.750
+USA,CA,Fair Oaks,,7.750
+USA,CA,Fairfax,,7.750
+USA,CA,Fairfield,,7.375
+USA,CA,Fairmount,,8.250
+USA,CA,Fall River Mills,,7.250
+USA,CA,Fallbrook,,7.750
+USA,CA,Fallbrook Junction,,7.750
+USA,CA,Fallen Leaf,,7.250
+USA,CA,Fallon,,7.750
+USA,CA,Fancher,,7.975
+USA,CA,Farmersville,,8.250
+USA,CA,Farmington,,7.750
+USA,CA,Fawnskin,,7.750
+USA,CA,Feather Falls,,7.250
+USA,CA,Fellows,,7.250
+USA,CA,Felton,,8.000
+USA,CA,Fenner,,7.750
+USA,CA,Fernbridge (Fortuna),,7.250
+USA,CA,Ferndale,,7.250
+USA,CA,Fiddletown,,7.250
+USA,CA,Fields Landing,,7.250
+USA,CA,Fig Garden Village (Fresno),,7.975
+USA,CA,Fillmore,,7.250
+USA,CA,Finley,,7.250
+USA,CA,Firebaugh,,7.975
+USA,CA,Fish Camp,,7.750
+USA,CA,Five Points,,7.975
+USA,CA,Flinn Springs,,7.750
+USA,CA,Flintridge (LaCanada/ Flintridge),,8.250
+USA,CA,Florence,,8.250
+USA,CA,Floriston,,7.375
+USA,CA,Flournoy,,7.250
+USA,CA,Folsom,,7.750
+USA,CA,Fontana,,7.750
+USA,CA,Foothill Ranch,,7.750
+USA,CA,Forbestown,,7.250
+USA,CA,Forest Falls,,7.750
+USA,CA,Forest Glen,,7.250
+USA,CA,Forest Knolls,,7.750
+USA,CA,Forest Park,,8.250
+USA,CA,Forest Ranch,,7.250
+USA,CA,Foresthill,,7.250
+USA,CA,Forestville,,7.750
+USA,CA,Forks of Salmon,,7.250
+USA,CA,Fort Bidwell,,7.250
+USA,CA,Fort Bragg,,7.750
+USA,CA,Fort Dick,,7.250
+USA,CA,Fort Irwin,,7.750
+USA,CA,Fort Jones,,7.250
+USA,CA,Fort Ord (Seaside),,7.250
+USA,CA,Fort Seward,,7.250
+USA,CA,Fortuna,,7.250
+USA,CA,Foster City,,8.250
+USA,CA,Fountain Valley,,7.750
+USA,CA,Fowler,,7.975
+USA,CA,Frazier Park,,7.250
+USA,CA,Freedom,,8.000
+USA,CA,Freeport,,7.750
+USA,CA,Freestone,,7.750
+USA,CA,Fremont,,8.750
+USA,CA,French Camp,,7.750
+USA,CA,French Gulch,,7.250
+USA,CA,Freshwater,,7.250
+USA,CA,Fresno,,7.975
+USA,CA,Friant,,7.975
+USA,CA,Friendly Valley (Santa Clarita),,8.250
+USA,CA,Frontera,,7.750
+USA,CA,Fullerton,,7.750
+USA,CA,Fulton,,7.750
+USA,CA,Galt,,7.750
+USA,CA,Garberville,,7.250
+USA,CA,Garden Grove,,7.750
+USA,CA,Garden Valley,,7.250
+USA,CA,Gardena,,8.250
+USA,CA,Garey,,7.750
+USA,CA,Garnet,,7.750
+USA,CA,Gasquet,,7.250
+USA,CA,Gaviota,,7.750
+USA,CA,Gazelle,,7.250
+USA,CA,George A.F.B.,,7.750
+USA,CA,Georgetown,,7.250
+USA,CA,Gerber,,7.250
+USA,CA,Geyserville,,7.750
+USA,CA,Giant Forest,,7.750
+USA,CA,Gillman Hot Springs,,7.750
+USA,CA,Gilroy,,8.250
+USA,CA,Glassell Park (Los Angeles),,8.250
+USA,CA,Glen Avon,,7.750
+USA,CA,Glen Ellen,,7.750
+USA,CA,Glenburn,,7.250
+USA,CA,Glencoe,,7.250
+USA,CA,Glendale,,8.250
+USA,CA,Glendora,,8.250
+USA,CA,Glenhaven,,7.250
+USA,CA,Glenn,,7.250
+USA,CA,Glennville,,7.250
+USA,CA,Gold River (Rancho Cordova),,7.750
+USA,CA,Gold Run,,7.250
+USA,CA,Golden Hills,,7.250
+USA,CA,Goleta,,7.750
+USA,CA,Gonzales,,7.250
+USA,CA,Goodyears Bar,,7.250
+USA,CA,Gorman,,8.250
+USA,CA,Goshen,,7.750
+USA,CA,Government Island,,8.750
+USA,CA,Graeagle,,7.250
+USA,CA,Granada Hills (Los Angeles),,8.250
+USA,CA,Grand Terrace,,7.750
+USA,CA,Granite Bay,,7.250
+USA,CA,Grass Valley,,7.375
+USA,CA,Graton,,7.750
+USA,CA,Green Valley,,8.250
+USA,CA,Green Valley Lake,,7.750
+USA,CA,Greenacres,,7.250
+USA,CA,Greenbrae (Larkspur),,7.750
+USA,CA,Greenfield,,7.250
+USA,CA,Greenview,,7.250
+USA,CA,Greenville,,7.250
+USA,CA,Greenwood,,7.250
+USA,CA,Grenada,,7.250
+USA,CA,Gridley,,7.250
+USA,CA,Grimes,,7.250
+USA,CA,Grizzly Flats,,7.250
+USA,CA,Groveland,,7.250
+USA,CA,Grover Beach,,7.750
+USA,CA,Guadalupe,,7.750
+USA,CA,Gualala,,7.250
+USA,CA,Guasti (Ontario),,7.750
+USA,CA,Guatay,,7.750
+USA,CA,Guerneville,,7.750
+USA,CA,Guinda,,7.250
+USA,CA,Gustine,,7.250
+USA,CA,Hacienda Heights,,8.250
+USA,CA,Halcyon,,7.250
+USA,CA,Half Moon Bay,,8.250
+USA,CA,Hamilton A.F.B. (Novato),,7.750
+USA,CA,Hamilton City,,7.250
+USA,CA,Hanford,,7.250
+USA,CA,Happy Camp,,7.250
+USA,CA,Harbor City (Los Angeles),,8.250
+USA,CA,Harmony,,7.250
+USA,CA,Harris,,7.250
+USA,CA,Hat Creek,,7.250
+USA,CA,Hathaway Pines,,7.250
+USA,CA,Havasu Lake,,7.750
+USA,CA,Hawaiian Gardens,,8.250
+USA,CA,Hawthorne,,8.250
+USA,CA,Hayfork,,7.250
+USA,CA,Hayward,,8.750
+USA,CA,Hazard,,8.250
+USA,CA,Healdsburg,,7.750
+USA,CA,Heber,,7.750
+USA,CA,Helena,,7.250
+USA,CA,Helendale,,7.750
+USA,CA,Helm,,7.975
+USA,CA,Hemet,,7.750
+USA,CA,Herald,,7.750
+USA,CA,Hercules,,8.250
+USA,CA,Herlong,,7.250
+USA,CA,Hermosa Beach,,8.250
+USA,CA,Herndon,,7.975
+USA,CA,Hesperia,,7.750
+USA,CA,Heyer,,8.750
+USA,CA,Hickman,,7.375
+USA,CA,Hidden Hills,,8.250
+USA,CA,Highgrove,,7.750
+USA,CA,Highland Park (Los Angeles),,8.250
+USA,CA,Highland,,7.750
+USA,CA,Highway City (Fresno),,7.975
+USA,CA,Hillcrest (San Diego),,7.750
+USA,CA,Hillsborough,,8.250
+USA,CA,Hillsdale (San Mateo),,8.250
+USA,CA,Hilmar,,7.250
+USA,CA,Hilt,,7.250
+USA,CA,Hinkley,,7.750
+USA,CA,Hobergs,,7.250
+USA,CA,Hollister,,8.250
+USA,CA,Hollywood (Los Angeles),,8.250
+USA,CA,Holmes,,7.250
+USA,CA,Holt,,7.750
+USA,CA,Holtville,,7.750
+USA,CA,Holy City,,8.250
+USA,CA,Homeland,,7.750
+USA,CA,Homestead,,7.250
+USA,CA,Homestead,,7.750
+USA,CA,Homewood,,7.250
+USA,CA,Honby,,8.250
+USA,CA,Honeydew,,7.250
+USA,CA,Hood,,7.750
+USA,CA,Hoopa,,7.250
+USA,CA,Hope Valley (Forest Camp),,7.250
+USA,CA,Hopland,,7.250
+USA,CA,Hornbrook,,7.250
+USA,CA,Hornitos,,7.750
+USA,CA,Horse Creek,,7.250
+USA,CA,Horse Lake,,7.250
+USA,CA,Hughson,,7.375
+USA,CA,Hume,,7.975
+USA,CA,Huntington,,7.750
+USA,CA,Huntington Beach,,7.750
+USA,CA,Huntington Lake,,7.975
+USA,CA,Huntington Park,,8.250
+USA,CA,Huron,,7.975
+USA,CA,Hyampom,,7.250
+USA,CA,Hyde Park (Los Angeles),,8.250
+USA,CA,Hydesville,,7.250
+USA,CA,Idria,,7.250
+USA,CA,Idyllwild,,7.750
+USA,CA,Ignacio (Novato),,7.750
+USA,CA,Igo,,7.250
+USA,CA,Imola (Napa),,7.750
+USA,CA,Imperial Beach,,7.750
+USA,CA,Imperial,,7.750
+USA,CA,Independence,,7.750
+USA,CA,Indian Wells,,7.750
+USA,CA,Indio,,7.750
+USA,CA,Industry,,8.250
+USA,CA,Inglewood,,8.750
+USA,CA,Inverness,,7.750
+USA,CA,Inyo,,7.750
+USA,CA,Inyokern,,7.250
+USA,CA,Ione,,7.250
+USA,CA,Iowa Hill,,7.250
+USA,CA,Irvine,,7.750
+USA,CA,Irwindale,,8.250
+USA,CA,Isla Vista,,7.750
+USA,CA,Island Mountain,,7.250
+USA,CA,Isleton,,7.750
+USA,CA,Ivanhoe,,7.750
+USA,CA,Ivanpah,,7.750
+USA,CA,Jackson,,7.250
+USA,CA,Jacumba,,7.750
+USA,CA,Jamacha,,7.750
+USA,CA,Jamestown,,7.250
+USA,CA,Jamul,,7.750
+USA,CA,Janesville,,7.250
+USA,CA,Jenner,,7.750
+USA,CA,Johannesburg,,7.250
+USA,CA,Johnsondale,,7.750
+USA,CA,Johnstonville,,7.250
+USA,CA,Johnstown,,7.750
+USA,CA,Jolon,,7.250
+USA,CA,Joshua Tree,,7.750
+USA,CA,Julian,,7.750
+USA,CA,Junction City,,7.250
+USA,CA,June Lake,,7.250
+USA,CA,Juniper,,7.250
+USA,CA,Kagel Canyon,,8.250
+USA,CA,Kaweah,,7.750
+USA,CA,Keddie,,7.250
+USA,CA,Keeler,,7.750
+USA,CA,Keene,,7.250
+USA,CA,Kelsey,,7.250
+USA,CA,Kelseyville,,7.250
+USA,CA,Kelso,,7.750
+USA,CA,Kensington,,8.250
+USA,CA,Kentfield,,7.750
+USA,CA,Kenwood,,7.750
+USA,CA,Kerman,,7.975
+USA,CA,Kernville,,7.250
+USA,CA,Keswick,,7.250
+USA,CA,Kettleman City,,7.250
+USA,CA,Keyes,,7.375
+USA,CA,King City,,7.250
+USA,CA,Kings Beach,,7.250
+USA,CA,Kings Canyon National Park,,7.750
+USA,CA,Kingsburg,,7.975
+USA,CA,Kinyon,,7.250
+USA,CA,Kirkwood,,7.250
+USA,CA,Kit Carson,,7.250
+USA,CA,Klamath,,7.250
+USA,CA,Klamath River,,7.250
+USA,CA,Kneeland,,7.250
+USA,CA,Knights Ferry,,7.375
+USA,CA,Knights Landing,,7.250
+USA,CA,Knightsen,,8.250
+USA,CA,Korbel,,7.250
+USA,CA,Korbel,,7.750
+USA,CA,Kyburz,,7.250
+USA,CA,L.A. Airport (Los Angeles),,8.250
+USA,CA,La Canada- Flintridge,,8.250
+USA,CA,La Crescenta,,8.250
+USA,CA,La Cresta Village,,7.250
+USA,CA,La Grange,,7.375
+USA,CA,La Habra Heights,,8.250
+USA,CA,La Habra,,7.750
+USA,CA,La Honda,,8.250
+USA,CA,La Jolla (San Diego),,7.750
+USA,CA,La Mesa,,7.750
+USA,CA,La Mirada,,8.250
+USA,CA,La Palma,,7.750
+USA,CA,La Porte,,7.250
+USA,CA,La Puente,,8.250
+USA,CA,La Quinta,,7.750
+USA,CA,La Selva Beach,,8.000
+USA,CA,La Verne,,8.250
+USA,CA,La Vina,,8.250
+USA,CA,Ladera,,8.250
+USA,CA,Ladera Heights,,8.250
+USA,CA,Ladera Ranch,,7.750
+USA,CA,Lafayette,,8.250
+USA,CA,Laguna Beach,,8.250
+USA,CA,Laguna Hills,,7.750
+USA,CA,Laguna Niguel,,7.750
+USA,CA,Laguna Woods,,7.750
+USA,CA,Lagunitas,,7.750
+USA,CA,Lake Alpine,,7.250
+USA,CA,Lake Arrowhead,,7.750
+USA,CA,Lake City,,7.250
+USA,CA,Lake City,,7.375
+USA,CA,Lake Elsinore,,7.750
+USA,CA,Lake Forest (El Toro),,7.750
+USA,CA,Lake Hughes,,8.250
+USA,CA,Lake Isabella,,7.250
+USA,CA,Lake Los Angeles,,8.250
+USA,CA,Lake Mary,,7.250
+USA,CA,Lake San Marcos,,7.750
+USA,CA,Lake Shastina,,7.250
+USA,CA,Lake Sherwood,,7.250
+USA,CA,Lakehead,,7.250
+USA,CA,Lakeport,,7.750
+USA,CA,Lakeshore,,7.975
+USA,CA,Lakeside,,7.750
+USA,CA,Lakeview,,7.750
+USA,CA,Lakeview Terrace (Los Angeles),,8.250
+USA,CA,Lakewood,,8.250
+USA,CA,Lamont,,7.250
+USA,CA,Lancaster,,8.250
+USA,CA,Landers,,7.750
+USA,CA,Landscape,,8.750
+USA,CA,Lang,,8.250
+USA,CA,Larkfield,,7.750
+USA,CA,Larkspur,,7.750
+USA,CA,Larwin Plaza,,7.375
+USA,CA,Lathrop,,7.750
+USA,CA,Laton,,7.975
+USA,CA,Lawndale,,8.250
+USA,CA,Laws,,7.750
+USA,CA,Laytonville,,7.250
+USA,CA,Le Grand (Also Legrand),,7.250
+USA,CA,Lebec,,7.250
+USA,CA,Lee Vining,,7.250
+USA,CA,Leggett,,7.250
+USA,CA,Leisure World,,7.750
+USA,CA,Leisure World (Seal Beach),,7.750
+USA,CA,Lemon Grove,,7.750
+USA,CA,Lemoncove,,7.750
+USA,CA,Lemoore,,7.250
+USA,CA,Lennox,,8.250
+USA,CA,Lenwood,,7.750
+USA,CA,Leona Valley,,8.250
+USA,CA,Leucadia (Encinitas),,7.750
+USA,CA,Lewiston,,7.250
+USA,CA,Liberty Farms,,7.375
+USA,CA,Likely,,7.250
+USA,CA,Lincoln Acres,,7.750
+USA,CA,Lincoln Heights (Los Angeles),,8.250
+USA,CA,Lincoln Village,,7.750
+USA,CA,Lincoln,,7.250
+USA,CA,Linda,,7.250
+USA,CA,Linden,,7.750
+USA,CA,Lindsay,,7.750
+USA,CA,Linnell,,7.750
+USA,CA,Litchfield,,7.250
+USA,CA,Little Lake,,7.750
+USA,CA,Little Norway,,7.250
+USA,CA,Little Valley,,7.250
+USA,CA,Littleriver,,7.250
+USA,CA,Littlerock (Also Little Rock),,8.250
+USA,CA,Live Oak,,7.250
+USA,CA,Livermore,,8.750
+USA,CA,Livingston,,7.250
+USA,CA,Llano,,8.250
+USA,CA,Loch Lomond,,7.250
+USA,CA,Locke,,7.750
+USA,CA,Lockeford,,7.750
+USA,CA,Lockheed,,8.000
+USA,CA,Lockwood,,7.250
+USA,CA,Lodi,,7.750
+USA,CA,Loleta,,7.250
+USA,CA,Loma Linda,,7.750
+USA,CA,Loma Mar,,8.250
+USA,CA,Loma Rica,,7.250
+USA,CA,Lomita,,8.250
+USA,CA,Lompoc,,7.750
+USA,CA,London,,7.750
+USA,CA,Lone Pine,,7.750
+USA,CA,Long Barn,,7.250
+USA,CA,Long Beach,,8.250
+USA,CA,Longview,,8.250
+USA,CA,Lookout,,7.250
+USA,CA,Loomis,,7.250
+USA,CA,Lorre Estates,,8.250
+USA,CA,Los Alamitos,,7.750
+USA,CA,Los Alamos,,7.750
+USA,CA,Los Altos Hills,,8.250
+USA,CA,Los Altos,,8.250
+USA,CA|California,Los Angeles,,8.250
+USA,CA,Los Banos,,7.750
+USA,CA,Los Gatos,,8.250
+USA,CA,Los Molinos,,7.250
+USA,CA,Los Nietos,,8.250
+USA,CA,Los Olivos,,7.750
+USA,CA,Los Osos,,7.250
+USA,CA,Los Padres,,7.250
+USA,CA,Los Serranos (Chino Hills),,7.750
+USA,CA,Lost Hills,,7.250
+USA,CA,Lost Lake,,7.750
+USA,CA,Lotus,,7.250
+USA,CA,Lower Lake,,7.250
+USA,CA,Loyalton,,7.250
+USA,CA,Lucerne,,7.250
+USA,CA,Lucerne Valley,,7.750
+USA,CA,Lucia,,7.250
+USA,CA,Ludlow,,7.750
+USA,CA,Lugo,,8.250
+USA,CA,Luther Burbank (Santa Rosa),,8.000
+USA,CA,Lynwood,,8.250
+USA,CA,Lytle Creek,,7.750
+USA,CA,Macdoel,,7.250
+USA,CA,Maclay,,8.250
+USA,CA,Mad River,,7.250
+USA,CA,Madeline,,7.250
+USA,CA,Madera,,7.750
+USA,CA,Madison,,7.250
+USA,CA,Magalia,,7.250
+USA,CA,Malaga,,7.975
+USA,CA,Malibu,,8.250
+USA,CA,Mammoth Lakes,,7.250
+USA,CA,Manhattan Beach,,8.250
+USA,CA,Manteca,,8.250
+USA,CA,Manton,,7.250
+USA,CA,Manzanita Lake,,7.250
+USA,CA,Mar Vista,,8.250
+USA,CA,Marcelina,,8.250
+USA,CA,March A.F.B.,,7.750
+USA,CA,Mare Island (Vallejo),,7.375
+USA,CA,Maricopa,,7.250
+USA,CA,Marin City,,7.750
+USA,CA,Marina Del Rey,,8.250
+USA,CA,Marina,,7.250
+USA,CA,Marine Corps (Twentynine Palms),,7.750
+USA,CA,Mariner,,7.750
+USA,CA,Mariposa,,7.750
+USA,CA,Markleeville,,7.250
+USA,CA,Marsh Manor,,8.250
+USA,CA,Marshall,,7.750
+USA,CA,Martell,,7.250
+USA,CA,Martinez,,8.250
+USA,CA,Marysville,,7.250
+USA,CA,Mather,,7.250
+USA,CA,Mather,,7.750
+USA,CA,Maxwell,,7.250
+USA,CA,Maywood,,8.250
+USA,CA,McArthur,,7.250
+USA,CA,McClellan,,7.750
+USA,CA,McCloud,,7.250
+USA,CA,McFarland,,7.250
+USA,CA,McKinleyville,,7.250
+USA,CA,McKittrick,,7.250
+USA,CA,Mead Valley,,7.750
+USA,CA,Meadow Valley,,7.250
+USA,CA,Meadow Vista,,7.250
+USA,CA,Meadowbrook,,7.750
+USA,CA,Mecca,,7.750
+USA,CA,Meeks Bay,,7.250
+USA,CA,Meiners Oaks,,7.250
+USA,CA,Mendocino,,7.250
+USA,CA,Mendota,,7.975
+USA,CA,Menifee,,7.750
+USA,CA,Menlo Park,,8.250
+USA,CA,Mentone,,7.750
+USA,CA,Merced,,7.750
+USA,CA,Meridian,,7.250
+USA,CA,Mettler,,7.250
+USA,CA,Meyers,,7.250
+USA,CA,Middletown,,7.250
+USA,CA,Midland,,7.750
+USA,CA,Midpines,,7.750
+USA,CA,Midway City,,7.750
+USA,CA,Milford,,7.250
+USA,CA,Mill Creek,,7.250
+USA,CA,Mill Valley,,7.750
+USA,CA,Millbrae,,8.250
+USA,CA,Millville,,7.250
+USA,CA,Milpitas,,8.250
+USA,CA,Mineral,,7.250
+USA,CA,Mineral King,,7.750
+USA,CA,Mint Canyon,,8.250
+USA,CA,Mira Loma,,7.750
+USA,CA,Mira Vista,,8.250
+USA,CA,Miracle Hot Springs,,7.250
+USA,CA,Miramar (San Diego),,7.750
+USA,CA,Miramonte,,7.975
+USA,CA,Miranda,,7.250
+USA,CA,Mission Hills (Los Angeles),,8.250
+USA,CA,Mission Viejo,,7.750
+USA,CA,Mi-Wuk Village,,7.250
+USA,CA,Moccasin,,7.250
+USA,CA,Modesto,,7.375
+USA,CA,Moffett Field,,8.250
+USA,CA,Mojave,,7.250
+USA,CA,Mokelumne Hill,,7.250
+USA,CA,Moneta,,8.250
+USA,CA,Mono Hot Springs,,7.975
+USA,CA,Mono Lake,,7.250
+USA,CA,Monolith,,7.250
+USA,CA,Monrovia,,8.250
+USA,CA,Monta Vista,,8.250
+USA,CA,Montague,,7.250
+USA,CA,Montalvo (Ventura),,7.250
+USA,CA,Montara,,8.250
+USA,CA,Montclair,,8.000
+USA,CA,Monte Rio,,7.750
+USA,CA,Monte Sereno,,8.250
+USA,CA,Montebello,,8.250
+USA,CA,Montecito,,7.750
+USA,CA,Monterey Bay Academy,,8.000
+USA,CA,Monterey Park,,8.250
+USA,CA,Monterey,,7.250
+USA,CA,Montgomery Creek,,7.250
+USA,CA,Montrose,,8.250
+USA,CA,Mooney,,7.750
+USA,CA,Moonridge,,7.750
+USA,CA,Moorpark,,7.250
+USA,CA,Moraga,,8.250
+USA,CA,Moreno Valley,,7.750
+USA,CA,Morgan Hill,,8.250
+USA,CA,Morongo Valley,,7.750
+USA,CA,Morro Bay,,7.750
+USA,CA,Morro Plaza,,7.250
+USA,CA,Moss Beach,,8.250
+USA,CA,Moss Landing,,7.250
+USA,CA,Mount Hamilton,,8.250
+USA,CA,Mount Hebron,,7.250
+USA,CA,Mount Hermon,,8.000
+USA,CA,Mount Laguna,,7.750
+USA,CA,Mount Shasta,,7.250
+USA,CA,Mount Wilson,,8.250
+USA,CA,Mountain Center,,7.750
+USA,CA,Mountain Mesa,,7.250
+USA,CA,Mountain Pass,,7.750
+USA,CA,Mountain Ranch,,7.250
+USA,CA,Mountain View,,8.250
+USA,CA,Mt. Aukum,,7.250
+USA,CA,Mt. Baldy,,7.750
+USA,CA,Murphys,,7.250
+USA,CA,Murrieta,,7.750
+USA,CA,Muscoy,,7.750
+USA,CA,Myers Flat,,7.250
+USA,CA,Napa,,7.750
+USA,CA,Naples,,8.250
+USA,CA,Nashville,,7.250
+USA,CA,National City,,8.750
+USA,CA,Naval (Port Hueneme),,7.250
+USA,CA,Naval (San Diego),,7.750
+USA,CA,Naval Air Station (Alameda),,8.750
+USA,CA,Naval Air Station (Coronado),,7.750
+USA,CA,Naval Air Station (Lemoore),,7.250
+USA,CA,Naval Hospital (Oakland),,8.750
+USA,CA,Naval Hospital (San Diego),,7.750
+USA,CA,Naval Supply Center (Oakland),,8.750
+USA,CA,Naval Training Center (San Diego),,7.750
+USA,CA,Navarro,,7.250
+USA,CA,Needles,,7.750
+USA,CA,Nelson,,7.250
+USA,CA,Nevada City,,7.875
+USA,CA,New Almaden,,8.250
+USA,CA,New Cuyama,,7.750
+USA,CA,New Idria,,7.250
+USA,CA,Newark,,8.750
+USA,CA,Newberry,,7.750
+USA,CA,Newberry Springs,,7.750
+USA,CA,Newbury Park (Thousand Oaks),,7.250
+USA,CA,Newcastle,,7.250
+USA,CA,Newhall (Santa Clarita),,8.250
+USA,CA,Newman,,7.375
+USA,CA,Newport Beach,,7.750
+USA,CA,Nicasio,,7.750
+USA,CA,Nice,,7.250
+USA,CA,Nicolaus,,7.250
+USA,CA,Niland,,7.750
+USA,CA,Nipomo,,7.250
+USA,CA,Nipton,,7.750
+USA,CA,Norco,,7.750
+USA,CA,Norden,,7.375
+USA,CA,North Edwards,,7.250
+USA,CA,North Fork,,7.750
+USA,CA,North Gardena,,8.250
+USA,CA,North Highlands,,7.750
+USA,CA,North Hills (Los Angeles),,8.250
+USA,CA,North Hollywood (Los Angeles),,8.250
+USA,CA,North Palm Springs,,7.750
+USA,CA,North San Juan,,7.375
+USA,CA,North Shore,,7.750
+USA,CA,Northridge (Los Angeles),,8.250
+USA,CA,Norton A.F.B. (San Bernardino),,8.000
+USA,CA,Norwalk,,8.250
+USA,CA,Novato,,7.750
+USA,CA,Nubieber,,7.250
+USA,CA,Nuevo,,7.750
+USA,CA,Nyeland Acres,,7.250
+USA,CA,Oak Park,,7.250
+USA,CA,Oak Run,,7.250
+USA,CA,Oak View,,7.250
+USA,CA,Oakdale,,7.375
+USA,CA,Oakhurst,,7.750
+USA,CA,Oakland,,8.750
+USA,CA,Oakley,,8.250
+USA,CA,Oakville,,7.750
+USA,CA,Oasis,,7.750
+USA,CA,Oban,,8.250
+USA,CA,O'Brien,,7.250
+USA,CA,Occidental,,7.750
+USA,CA,Oceano,,7.250
+USA,CA,Oceanside,,7.750
+USA,CA,Ocotillo,,7.750
+USA,CA,Ocotillo Wells,,7.750
+USA,CA,Oildale,,7.250
+USA,CA,Ojai,,7.250
+USA,CA,Olancha,,7.750
+USA,CA,Old Station,,7.250
+USA,CA,Olema,,7.750
+USA,CA,Olinda,,7.250
+USA,CA,Olive View (Los Angeles),,8.250
+USA,CA,Olivehurst,,7.250
+USA,CA,Olivenhain (Encinitas),,7.750
+USA,CA,Olympic Valley,,7.250
+USA,CA,Omo Ranch,,7.250
+USA,CA,O'Neals,,7.750
+USA,CA,Ono,,7.250
+USA,CA,Ontario,,7.750
+USA,CA,Onyx,,7.250
+USA,CA,Opal Cliffs,,8.000
+USA,CA,Orange Cove,,7.975
+USA,CA,Orange,,7.750
+USA,CA,Orangevale,,7.750
+USA,CA,Orcutt,,7.750
+USA,CA,Ordbend,,7.250
+USA,CA,Oregon House,,7.250
+USA,CA,Orick,,7.250
+USA,CA,Orinda,,8.250
+USA,CA,Orland,,7.250
+USA,CA,Orleans,,7.250
+USA,CA,Oro Grande,,7.750
+USA,CA,Orosi,,7.750
+USA,CA,Oroville,,7.250
+USA,CA,Otay (Chula Vista),,7.750
+USA,CA,Oxnard,,7.250
+USA,CA,Pacheco,,8.250
+USA,CA,Pacific Grove,,7.250
+USA,CA,Pacific House,,7.250
+USA,CA,Pacific Palisades (Los Angeles),,8.250
+USA,CA,Pacifica,,8.250
+USA,CA,Pacoima (Los Angeles),,8.250
+USA,CA,Paicines,,7.250
+USA,CA,Pajaro,,7.250
+USA,CA,Pala,,7.750
+USA,CA,Palermo,,7.250
+USA,CA,Pallett,,8.250
+USA,CA,Palm City,,7.750
+USA,CA,Palm City (San Diego),,7.750
+USA,CA,Palm Desert,,7.750
+USA,CA,Palm Springs,,7.750
+USA,CA,Palmdale,,8.250
+USA,CA,Palo (Vista),,8.250
+USA,CA,Palo Alto,,8.250
+USA,CA,Palo Cedro,,7.250
+USA,CA,Palo Verde,,7.750
+USA,CA,Palomar Mountain,,7.750
+USA,CA,Palos Verdes Estates,,8.250
+USA,CA,Palos Verdes/Peninsula,,8.250
+USA,CA,Panorama City (Los Angeles),,8.250
+USA,CA,Paradise,,7.250
+USA,CA,Paramount,,8.250
+USA,CA,Parker Dam,,7.750
+USA,CA,Parkfield,,7.250
+USA,CA,Parlier,,7.975
+USA,CA,Pasadena,,8.250
+USA,CA,Paskenta,,7.250
+USA,CA,Paso Robles,,7.250
+USA,CA,Patterson,,7.375
+USA,CA,Patton,,7.750
+USA,CA,Pauma Valley,,7.750
+USA,CA,Paynes Creek,,7.250
+USA,CA,Pearblossom,,8.250
+USA,CA,Pearland,,8.250
+USA,CA,Pebble Beach,,7.250
+USA,CA,Pedley,,7.750
+USA,CA,Peninsula Village,,7.250
+USA,CA,Penn Valley,,7.375
+USA,CA,Penngrove,,7.750
+USA,CA,Penryn,,7.250
+USA,CA,Pepperwood,,7.250
+USA,CA,Permanente,,8.250
+USA,CA,Perris,,7.750
+USA,CA,Perry (Whittier),,8.250
+USA,CA,Pescadero,,8.250
+USA,CA,Petaluma,,7.750
+USA,CA,Petrolia,,7.250
+USA,CA,Phelan,,7.750
+USA,CA,Phillipsville,,7.250
+USA,CA,Philo,,7.250
+USA,CA,Pico Rivera,,8.250
+USA,CA,Piedmont,,8.750
+USA,CA,Piedra,,7.975
+USA,CA,Piercy,,7.250
+USA,CA,Pilot Hill,,7.250
+USA,CA,Pine Grove,,7.250
+USA,CA,Pine Valley,,7.750
+USA,CA,Pinecrest,,7.250
+USA,CA,Pinedale (Fresno),,7.975
+USA,CA,Pinetree,,8.250
+USA,CA,Pinole,,8.750
+USA,CA,Pinon Hills,,7.750
+USA,CA,Pioneer,,7.250
+USA,CA,Pioneertown,,7.750
+USA,CA,Piru,,7.250
+USA,CA,Pismo Beach,,7.250
+USA,CA,Pittsburg,,8.250
+USA,CA,Pixley,,7.750
+USA,CA,Placentia,,7.750
+USA,CA,Placerville,,7.500
+USA,CA,Plainview,,7.750
+USA,CA,Planada,,7.250
+USA,CA,Plaster City,,7.750
+USA,CA,Platina,,7.250
+USA,CA,Playa Del Rey (Los Angeles),,8.250
+USA,CA,Pleasant Grove,,7.250
+USA,CA,Pleasant Hill,,8.250
+USA,CA,Pleasanton,,8.750
+USA,CA,Plymouth,,7.250
+USA,CA,Point Arena,,7.750
+USA,CA,Point Mugu,,7.250
+USA,CA,Point Pittsburg (Pittsburg),,8.250
+USA,CA,Point Reyes Station,,7.750
+USA,CA,Pollock Pines,,7.250
+USA,CA,Pomona,,8.250
+USA,CA,Pond,,7.250
+USA,CA,Pondosa,,7.250
+USA,CA,Pope Valley,,7.750
+USA,CA,Poplar,,7.750
+USA,CA,Port Costa,,8.250
+USA,CA,Port Hueneme,,7.250
+USA,CA,Porter Ranch (Los Angeles),,8.250
+USA,CA,Porterville,,8.250
+USA,CA,Portola Valley,,8.250
+USA,CA,Portola,,7.250
+USA,CA,Portuguese Bend (Rancho Palos Verdes),,8.250
+USA,CA,Posey,,7.750
+USA,CA,Potrero,,7.750
+USA,CA,Potter Valley,,7.250
+USA,CA,Poway,,7.750
+USA,CA,Prather,,7.975
+USA,CA,Presidio (San Francisco),,8.500
+USA,CA,Presidio of Monterey (Monterey),,7.250
+USA,CA,Priest Valley,,7.250
+USA,CA,Princeton,,7.250
+USA,CA,Proberta,,7.250
+USA,CA,Project City,,7.250
+USA,CA,Prunedale,,7.250
+USA,CA,Pt. Dume,,8.250
+USA,CA,Pulga,,7.250
+USA,CA,Pumpkin Center,,7.250
+USA,CA,Quail Valley,,7.750
+USA,CA,Quartz Hill,,8.250
+USA,CA,Quincy,,7.250
+USA,CA,Rackerby,,7.250
+USA,CA,Rail Road Flat,,7.250
+USA,CA,Rainbow,,7.750
+USA,CA,Raisin City,,7.975
+USA,CA,Ramona,,7.750
+USA,CA,Ranchita,,7.750
+USA,CA,Rancho Bernardo (San Diego),,7.750
+USA,CA,Rancho California,,7.750
+USA,CA,Rancho Cordova,,7.750
+USA,CA,Rancho Cucamonga,,7.750
+USA,CA,Rancho Dominguez,,8.250
+USA,CA,Rancho Mirage,,7.750
+USA,CA,Rancho Murieta,,7.750
+USA,CA,Rancho Palos Verdes,,8.250
+USA,CA,Rancho Park (Los Angeles),,8.250
+USA,CA,Rancho Santa Fe,,7.750
+USA,CA,Rancho Santa Margarita,,7.750
+USA,CA,Randsburg,,7.250
+USA,CA,Ravendale,,7.250
+USA,CA,Ravenna,,8.250
+USA,CA,Raymond,,7.750
+USA,CA,Red Bluff,,7.250
+USA,CA,Red Mountain,,7.750
+USA,CA,Red Top,,7.750
+USA,CA,Redcrest,,7.250
+USA,CA,Redding,,7.250
+USA,CA,Redlands,,7.750
+USA,CA,Redondo Beach,,8.250
+USA,CA,Redway,,7.250
+USA,CA,Redwood City,,8.250
+USA,CA,Redwood Estates,,8.250
+USA,CA,Redwood Valley,,7.250
+USA,CA,Reedley,,7.975
+USA,CA,Refugio Beach,,7.750
+USA,CA,Represa (Folsom Prison),,7.750
+USA,CA,Requa,,7.250
+USA,CA,Rescue,,7.250
+USA,CA,Reseda (Los Angeles),,8.250
+USA,CA,Rheem Valley (Moraga),,8.250
+USA,CA,Rialto,,7.750
+USA,CA,Richardson Grove,,7.250
+USA,CA,Richardson Springs,,7.250
+USA,CA,Richfield,,7.250
+USA,CA,Richgrove,,7.750
+USA,CA,Richmond,,8.750
+USA,CA,Richvale,,7.250
+USA,CA,Ridgecrest,,7.250
+USA,CA,Rimforest,,7.750
+USA,CA,Rimpau (Los Angeles),,8.250
+USA,CA,Rio Bravo (Bakersfield),,7.250
+USA,CA,Rio Dell,,7.250
+USA,CA,Rio Linda,,7.750
+USA,CA,Rio Nido,,7.750
+USA,CA,Rio Oso,,7.250
+USA,CA,Rio Vista,,7.375
+USA,CA,Ripley,,7.750
+USA,CA,Ripon,,7.750
+USA,CA,River Pines,,7.250
+USA,CA,Riverbank,,7.375
+USA,CA,Riverdale,,7.975
+USA,CA,Riverside,,7.750
+USA,CA,Robbins,,7.250
+USA,CA,Rocklin,,7.250
+USA,CA,Rodeo,,8.250
+USA,CA,Rohnert Park,,7.750
+USA,CA,Rohnerville,,7.250
+USA,CA,Rolling Hills Estates,,8.250
+USA,CA,Rolling Hills,,8.250
+USA,CA,Romoland,,7.750
+USA,CA,Rosamond,,7.250
+USA,CA,Rose Bowl (Pasadena),,8.250
+USA,CA,Roseland (Santa Rosa),,8.000
+USA,CA,Rosemead,,8.250
+USA,CA,Roseville,,7.250
+USA,CA,Ross,,7.750
+USA,CA,Rossmoor,,7.750
+USA,CA,Rough and Ready,,7.375
+USA,CA,Round Mountain,,7.250
+USA,CA,Rowland Heights,,8.250
+USA,CA,Royal Oaks,,7.250
+USA,CA,Rubidoux,,7.750
+USA,CA,Ruby Valley,,7.250
+USA,CA,Rumsey,,7.250
+USA,CA,Running Springs,,7.750
+USA,CA,Ruth,,7.250
+USA,CA,Rutherford,,7.750
+USA,CA,Ryde,,7.750
+USA,CA,Sacramento,,7.750
+USA,CA,Saint Helena,,7.750
+USA,CA,Salida,,7.375
+USA,CA,Salinas,,7.750
+USA,CA,Salton City,,7.750
+USA,CA,Salyer,,7.250
+USA,CA,Samoa,,7.250
+USA,CA,San Andreas,,7.250
+USA,CA,San Anselmo,,7.750
+USA,CA,San Ardo,,7.250
+USA,CA,San Benito,,7.250
+USA,CA,San Bernardino,,8.000
+USA,CA,San Bruno,,8.250
+USA,CA,San Carlos,,8.250
+USA,CA,San Clemente,,7.750
+USA,CA,San Diego,,7.750
+USA,CA,San Dimas,,8.250
+USA,CA,San Fernando,,8.250
+USA,CA,San Francisco,,8.500
+USA,CA,San Gabriel,,8.250
+USA,CA,San Geronimo,,7.750
+USA,CA,San Gregorio,,8.250
+USA,CA,San Jacinto,,7.750
+USA,CA,San Joaquin,,7.975
+USA,CA,San Jose,,8.250
+USA,CA,San Juan Bautista,,8.000
+USA,CA,San Juan Capistrano,,7.750
+USA,CA,San Juan Plaza (San Juan Capistrano),,7.750
+USA,CA,San Leandro,,8.750
+USA,CA,San Lorenzo,,8.750
+USA,CA,San Lucas,,7.250
+USA,CA,San Luis Obispo,,7.750
+USA,CA,San Luis Rey (Oceanside),,7.750
+USA,CA,San Marcos,,7.750
+USA,CA,San Marino,,8.250
+USA,CA,San Martin,,8.250
+USA,CA,San Mateo,,8.250
+USA,CA,San Miguel,,7.250
+USA,CA,San Pablo,,8.250
+USA,CA,San Pedro (Los Angeles),,8.250
+USA,CA,San Quentin,,7.750
+USA,CA,San Rafael,,8.250
+USA,CA,San Ramon,,8.250
+USA,CA,San Simeon,,7.250
+USA,CA,San Tomas,,8.250
+USA,CA,San Ysidro (San Diego),,7.750
+USA,CA,Sand City,,7.750
+USA,CA,Sanger,,7.975
+USA,CA,Santa Ana,,7.750
+USA,CA,Santa Barbara,,7.750
+USA,CA,Santa Clara,,8.250
+USA,CA,Santa Clarita,,8.250
+USA,CA,Santa Cruz,,8.500
+USA,CA,Santa Fe Springs,,8.250
+USA,CA,Santa Margarita,,7.250
+USA,CA,Santa Maria,,7.750
+USA,CA,Santa Monica,,8.250
+USA,CA,Santa Nella,,7.250
+USA,CA,Santa Paula,,7.250
+USA,CA,Santa Rita Park,,7.250
+USA,CA,Santa Rosa,,8.000
+USA,CA,Santa Ynez,,7.750
+USA,CA,Santa Ysabel,,7.750
+USA,CA,Santee,,7.750
+USA,CA,Saratoga,,8.250
+USA,CA,Saticoy,,7.250
+USA,CA,Sattley,,7.250
+USA,CA,Saugus (Santa Clarita),,8.250
+USA,CA,Sausalito,,7.750
+USA,CA,Sawtelle (Los Angeles),,8.250
+USA,CA,Sawyers Bar,,7.250
+USA,CA,Scotia,,7.250
+USA,CA,Scott Bar,,7.250
+USA,CA,Scotts Valley,,8.500
+USA,CA,Sea Ranch,,7.750
+USA,CA,Seabright,,8.000
+USA,CA,Seal Beach,,7.750
+USA,CA,Seaside,,7.250
+USA,CA,Sebastopol,,8.000
+USA,CA,Seeley,,7.750
+USA,CA,Seiad Valley,,7.250
+USA,CA,Selby,,8.250
+USA,CA,Selma,,8.475
+USA,CA,Seminole Hot Springs,,8.250
+USA,CA,Sepulveda (Los Angeles),,8.250
+USA,CA,Sequoia National Park,,7.750
+USA,CA,Shafter,,7.250
+USA,CA,Shandon,,7.250
+USA,CA,Sharpe Army Depot,,7.750
+USA,CA,Shasta,,7.250
+USA,CA,Shasta Lake,,7.250
+USA,CA,Shaver Lake,,7.975
+USA,CA,Sheepranch,,7.250
+USA,CA,Shell Beach (Pismo Beach),,7.250
+USA,CA,Sheridan,,7.250
+USA,CA,Sherman Island,,7.750
+USA,CA,Sherman Oaks (Los Angeles),,8.250
+USA,CA,Sherwin Plaza,,7.250
+USA,CA,Shingle Springs,,7.250
+USA,CA,Shingletown,,7.250
+USA,CA,Shively,,7.250
+USA,CA,Shore Acres,,8.250
+USA,CA,Shoshone,,7.750
+USA,CA,Sierra City,,7.250
+USA,CA,Sierra Madre,,8.250
+USA,CA,Sierraville,,7.250
+USA,CA,Signal Hill,,8.250
+USA,CA,Silver Lake,,7.250
+USA,CA,Silverado Canyon,,7.750
+USA,CA,Simi Valley,,7.250
+USA,CA,Sisquoc,,7.750
+USA,CA,Sites,,7.250
+USA,CA,Sky Valley,,7.750
+USA,CA,Skyforest,,7.750
+USA,CA,Sleepy Valley,,8.250
+USA,CA,Sloat,,7.250
+USA,CA,Sloughhouse,,7.750
+USA,CA,Smartville,,7.250
+USA,CA,Smith River,,7.250
+USA,CA,Smithflat,,7.250
+USA,CA,Smoke Tree (Palm Springs),,7.750
+USA,CA,Snelling,,7.250
+USA,CA,Soda Springs,,7.375
+USA,CA,Solana Beach,,7.750
+USA,CA,Soledad,,7.250
+USA,CA,Solemint,,8.250
+USA,CA,Solvang,,7.750
+USA,CA,Somerset,,7.250
+USA,CA,Somes Bar,,7.250
+USA,CA,Somis,,7.250
+USA,CA,Sonoma,,7.750
+USA,CA,Sonora,,7.750
+USA,CA,Soquel,,8.000
+USA,CA,Soulsbyville,,7.250
+USA,CA,South Dos Palos,,7.250
+USA,CA,South El Monte,,8.250
+USA,CA,South Fork,,7.250
+USA,CA,South Gate,,8.250
+USA,CA,South Laguna (Laguna Beach),,8.250
+USA,CA,South Lake Tahoe,,7.750
+USA,CA,South Pasadena,,8.250
+USA,CA,South San Francisco,,8.250
+USA,CA,South Shore (Alameda),,8.750
+USA,CA,South Whittier,,8.250
+USA,CA,Spanish Flat,,7.750
+USA,CA,Spreckels,,7.250
+USA,CA,Spring Garden,,7.250
+USA,CA,Spring Valley,,7.750
+USA,CA,Springville,,7.750
+USA,CA,Spyrock,,7.250
+USA,CA,Squaw Valley,,7.975
+USA,CA,St. Helena,,7.750
+USA,CA,Standard,,7.250
+USA,CA,Standish,,7.250
+USA,CA,Stanford,,8.250
+USA,CA,Stanislaus,,7.250
+USA,CA,Stanton,,7.750
+USA,CA,Steele Park,,7.750
+USA,CA,Stevinson,,7.250
+USA,CA,Stewarts Point,,7.750
+USA,CA,Stinson Beach,,7.750
+USA,CA,Stirling City,,7.250
+USA,CA,Stockton,,8.000
+USA,CA,Stonyford,,7.250
+USA,CA,Storrie,,7.250
+USA,CA,Stratford,,7.250
+USA,CA,Strathmore,,7.750
+USA,CA,Strawberry,,7.250
+USA,CA,Strawberry Valley,,7.250
+USA,CA,Studio City (Los Angeles),,8.250
+USA,CA,Sugarloaf,,7.750
+USA,CA,Suisun City,,7.375
+USA,CA,Sulphur Springs,,8.250
+USA,CA,Sultana,,7.750
+USA,CA,Summerland,,7.750
+USA,CA,Summit,,7.750
+USA,CA,Summit City,,7.250
+USA,CA,Sun City,,7.750
+USA,CA,Sun Valley (Los Angeles),,8.250
+USA,CA,Sunland (Los Angeles),,8.250
+USA,CA,Sunnymead (Moreno Valley),,7.750
+USA,CA,Sunnyside,,7.750
+USA,CA,Sunnyvale,,8.250
+USA,CA,Sunol,,8.750
+USA,CA,Sunset Beach,,7.750
+USA,CA,Sunset Whitney Ranch,,7.250
+USA,CA,Surfside (Seal Beach),,7.750
+USA,CA,Susanville,,7.250
+USA,CA,Sutter,,7.250
+USA,CA,Sutter Creek,,7.250
+USA,CA,Swall Meadows (Bishop),,7.750
+USA,CA,Sylmar (Los Angeles),,8.250
+USA,CA,Taft,,7.250
+USA,CA,Tagus Ranch,,7.750
+USA,CA,Tahoe City,,7.250
+USA,CA,Tahoe Paradise,,7.250
+USA,CA,Tahoe Valley,,7.250
+USA,CA,Tahoe Vista,,7.250
+USA,CA,Tahoma,,7.250
+USA,CA,Talmage,,7.250
+USA,CA,Tamal (San Quentin),,7.750
+USA,CA,Tarzana (Los Angeles),,8.250
+USA,CA,Taylorsville,,7.250
+USA,CA,Tecate,,7.750
+USA,CA,Tecopa,,7.750
+USA,CA,Tehachapi,,7.250
+USA,CA,Tehama,,7.250
+USA,CA,Temecula,,7.750
+USA,CA,Temple City,,8.250
+USA,CA,Templeton,,7.250
+USA,CA,Terminal Island (Los Angeles),,8.250
+USA,CA,Termo,,7.250
+USA,CA,Terra Bella,,7.750
+USA,CA,Thermal,,7.750
+USA,CA,Thornton,,7.750
+USA,CA,Thousand Oaks,,7.250
+USA,CA,Thousand Palms,,7.750
+USA,CA,Three Rivers,,7.750
+USA,CA,Tiburon,,7.750
+USA,CA,Tierra Del Sol,,7.750
+USA,CA,Tierrasanta (San Diego),,7.750
+USA,CA,Tipton,,7.750
+USA,CA,Tollhouse,,7.975
+USA,CA,Toluca Lake (Los Angeles),,8.250
+USA,CA,Tomales,,7.750
+USA,CA,Toms Place,,7.250
+USA,CA,Topanga (Los Angeles),,8.250
+USA,CA,Topanga Park (Los Angeles),,8.250
+USA,CA,Topaz,,7.250
+USA,CA,Torrance,,8.250
+USA,CA,Town Center,,7.750
+USA,CA,Trabuco Canyon,,7.750
+USA,CA,Tracy,,7.750
+USA,CA,Tranquillity,,7.975
+USA,CA,Traver,,7.750
+USA,CA,Travis A.F.B. (Fairfield),,7.375
+USA,CA,Tres Pinos,,7.250
+USA,CA,Trinidad,,8.250
+USA,CA,Trinity Center,,7.250
+USA,CA,Trona,,7.750
+USA,CA,Trowbridge,,7.250
+USA,CA,Truckee,,7.875
+USA,CA,Tujunga (Los Angeles),,8.250
+USA,CA,Tulare,,8.250
+USA,CA,Tulelake,,7.250
+USA,CA,Tuolumne,,7.250
+USA,CA,Tuolumne Meadows,,7.750
+USA,CA,Tupman,,7.250
+USA,CA,Turlock,,7.375
+USA,CA,Tustin,,7.750
+USA,CA,Twain,,7.250
+USA,CA,Twain Harte,,7.250
+USA,CA,Twentynine Palms,,7.750
+USA,CA,Twin Bridges,,7.250
+USA,CA,Twin Peaks,,7.750
+USA,CA,Two Rock Coast Guard Station,,7.750
+USA,CA,U.S.Naval Postgrad School (Monterey),,7.250
+USA,CA,Ukiah,,7.750
+USA,CA,Union City,,8.750
+USA,CA,Universal City,,8.250
+USA,CA,University,,7.750
+USA,CA,University Park (Irvine),,7.750
+USA,CA,Upland,,7.750
+USA,CA,Upper Lake/ Upper Lake Valley,,7.250
+USA,CA,Vacaville,,7.375
+USA,CA,Val Verde Park,,8.250
+USA,CA,Valencia (Santa Clarita),,8.250
+USA,CA,Valinda,,8.250
+USA,CA,Vallecito,,7.250
+USA,CA,Vallejo,,7.375
+USA,CA,Valley Center,,7.750
+USA,CA,Valley Fair,,8.250
+USA,CA,Valley Ford,,7.750
+USA,CA,Valley Home,,7.375
+USA,CA,Valley Springs,,7.250
+USA,CA,Valley Village,,8.250
+USA,CA,Valyermo,,8.250
+USA,CA,Van Nuys (Los Angeles),,8.250
+USA,CA,Vandenberg A.F.B,,7.750
+USA,CA,Vasquez Rocks,,8.250
+USA,CA,Venice (Los Angeles),,8.250
+USA,CA,Ventucopa,,7.750
+USA,CA,Ventura,,7.250
+USA,CA,Verdugo City (Glendale),,8.250
+USA,CA,Vernalis,,7.750
+USA,CA,Vernon,,8.250
+USA,CA,Veteran's Hospital (Los Angeles),,8.250
+USA,CA,Victor,,7.750
+USA,CA,Victorville,,7.750
+USA,CA,Vidal,,7.750
+USA,CA,View Park,,8.250
+USA,CA,Villa Grande,,7.750
+USA,CA,Villa Park,,7.750
+USA,CA,Vina,,7.250
+USA,CA,Vincent,,8.250
+USA,CA,Vineburg,,7.750
+USA,CA,Vinton,,7.250
+USA,CA,Virgilia,,7.250
+USA,CA,Visalia,,8.000
+USA,CA,Vista Park,,7.250
+USA,CA,Vista,,8.250
+USA,CA,Volcano,,7.250
+USA,CA,Volta,,7.250
+USA,CA,Wallace,,7.250
+USA,CA,Walnut Creek,,8.250
+USA,CA,Walnut Grove,,7.750
+USA,CA,Walnut Park,,8.250
+USA,CA,Walnut,,8.250
+USA,CA,Warm Spring (Fremont),,8.750
+USA,CA,Warner Springs,,7.750
+USA,CA,Wasco,,7.250
+USA,CA,Waterford,,7.375
+USA,CA,Watsonville,,8.250
+USA,CA,Watts,,8.250
+USA,CA,Waukena,,7.750
+USA,CA,Wawona,,7.750
+USA,CA,Weaverville,,7.250
+USA,CA,Weed,,7.250
+USA,CA,Weimar,,7.250
+USA,CA,Weldon,,7.250
+USA,CA,Wendel,,7.250
+USA,CA,Weott,,7.250
+USA,CA,West Covina,,8.250
+USA,CA,West Hills (Los Angeles),,8.250
+USA,CA,West Hollywood,,8.250
+USA,CA,West Los Angeles (Los Angeles),,8.250
+USA,CA,West Pittsburg,,8.250
+USA,CA,West Point,,7.250
+USA,CA,West Sacramento,,7.750
+USA,CA,Westchester (Los Angeles),,8.250
+USA,CA,Westend,,7.750
+USA,CA,Westhaven,,7.250
+USA,CA,Westlake (Los Angeles),,8.250
+USA,CA,Westlake Village (Thousand Oaks),,7.250
+USA,CA,Westlake Village,,8.250
+USA,CA,Westley,,7.375
+USA,CA,Westminster,,7.750
+USA,CA,Westmorland,,7.750
+USA,CA,Westport,,7.250
+USA,CA,Westside,,7.375
+USA,CA,Westwood,,7.250
+USA,CA,Westwood (Los Angeles),,8.250
+USA,CA,Wheatland,,7.250
+USA,CA,Wheeler Ridge,,7.250
+USA,CA,Whiskeytown,,7.250
+USA,CA,Whispering Pines,,7.250
+USA,CA,White Pines,,7.250
+USA,CA,Whitethorn,,7.250
+USA,CA,Whitewater,,7.750
+USA,CA,Whitlow,,7.250
+USA,CA,Whitmore,,7.250
+USA,CA,Whittier,,8.250
+USA,CA,Wildomar,,7.750
+USA,CA,Wildwood,,7.250
+USA,CA,Williams,,7.750
+USA,CA,Willits,,7.750
+USA,CA,Willow Creek,,7.250
+USA,CA,Willow Ranch,,7.250
+USA,CA,Willowbrook,,8.250
+USA,CA,Willows,,7.250
+USA,CA,Wilmington (Los Angeles),,8.250
+USA,CA,Wilseyville,,7.250
+USA,CA,Wilsona Gardens,,8.250
+USA,CA,Wilton,,7.750
+USA,CA,Winchester,,7.750
+USA,CA,Windsor Hills,,8.250
+USA,CA,Windsor,,7.750
+USA,CA,Winnetka (Los Angeles),,8.250
+USA,CA,Winterhaven,,7.750
+USA,CA,Winters,,7.250
+USA,CA,Winton,,7.250
+USA,CA,Wishon,,7.750
+USA,CA,Witter Springs,,7.250
+USA,CA,Wofford Heights,,7.250
+USA,CA,Woodacre,,7.750
+USA,CA,Woodbridge,,7.750
+USA,CA,Woodfords,,7.250
+USA,CA,Woodlake,,7.750
+USA,CA,Woodland,,7.750
+USA,CA,Woodland Hills (Los Angeles),,8.250
+USA,CA,Woodleaf,,7.250
+USA,CA,Woodside,,8.250
+USA,CA,Woodville,,7.750
+USA,CA,Woody,,7.250
+USA,CA,Wrightwood,,7.750
+USA,CA,Yankee Hill,,7.250
+USA,CA,Yermo,,7.750
+USA,CA,Yettem,,7.750
+USA,CA,Yolo,,7.250
+USA,CA,Yorba Linda,,7.750
+USA,CA,Yorkville,,7.250
+USA,CA,Yosemite Lodge,,7.750
+USA,CA,Yosemite National Park,,7.750
+USA,CA,Yountville,,7.750
+USA,CA,Yreka,,7.250
+USA,CA,Yuba City,,7.250
+USA,CA,Yucaipa,,7.750
+USA,CA,Yucca Valley,,7.750
+USA,CA,Zamora,,7.250
+USA,CA,Zenia,,7.250

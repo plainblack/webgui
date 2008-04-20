@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * The Connection Manager provides a simplified interface to the XMLHttpRequest
@@ -1362,4 +1362,4 @@ YAHOO.util.Connect =
 	}
 };
 
-YAHOO.register("connection", YAHOO.util.Connect, {version: "2.5.0", build: "895"});
+YAHOO.register("connection", YAHOO.util.Connect, {version: "2.5.1", build: "984"});

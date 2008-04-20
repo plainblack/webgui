@@ -16,16 +16,18 @@ body {
 }
 </style>
 
-<link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
-<link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
 <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
 <link rel="stylesheet" type="text/css" href="../../build/editor/assets/skins/sam/editor.css" />
-<script type="text/javascript" src="../../build/utilities/utilities.js"></script>
-<script type="text/javascript" src="../../build/container/container.js"></script>
-<script type="text/javascript" src="../../build/menu/menu.js"></script>
-<script type="text/javascript" src="../../build/button/button.js"></script>
-<script type="text/javascript" src="../../build/editor/editor-beta.js"></script>
+<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../build/animation/animation-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/container/container-min.js"></script>
+<script type="text/javascript" src="../../build/menu/menu-min.js"></script>
+<script type="text/javascript" src="../../build/button/button-min.js"></script>
+<script type="text/javascript" src="../../build/editor/editor-beta-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
@@ -60,7 +62,7 @@ body {
 
     var myEditor = new YAHOO.widget.Editor('msgpost', {
         height: '300px',
-        width: '522px',
+        width: '532px',
         dompath: true, //Turns on the bar at the bottom
         animate: true //Animates the opening, closing and moving of Editor windows
     });

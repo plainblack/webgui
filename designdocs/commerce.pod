@@ -1,0 +1,1237 @@
+=head1 WebGUI 7.5+ Commerce System Needs and Wants
+
+We need a massive overhaul of the commerce system, not just for the
+sake of it, but because of the current system's inflexibility. The new
+system must support everything the current system supports, plus
+resolve these limitations.
+
+=head2 Must Haves
+
+The following items must be introduced to the commerce system in order
+to fix fundamental flaws:
+
+=over
+
+=item Flexible Prices
+
+Currently because price is attached to the base object every product
+must have a price and there is no way to override it. The problem with
+this is that some configurable products have a variable price, and
+other products (like donations and auctions) you want the user to be
+able to type in a price. Therefore the new system needs to allow for
+variable price. This is a limitation of the current shopping cart and
+the current base product.
+
+=item Item Callbacks
+
+There must be a callback system after checkout. Right now there's no
+way to trigger custom functionality in custom products after purchase.
+So if you want a workflow to kick off after someone has purchased
+something to give them a bunch of privileges, send an email, etc you
+couldn't do it. Or if your product needed to mark something as out of
+stock, that's not possible either.
+
+=item Web Based Payment Gateways
+
+There's currently no way to pass off the checkout process to a
+third-party web site such as PayPal, 2checkout, or Google Checkout. The
+system right now is designed to work with payment gateways that have
+behind the scenes APIs.
+
+=item Vendor Id
+
+If you want two different vendors to sell from the same site (like
+Amazon does) you have a problem because currently WebGUI treats
+everything as one site one store. Therefore we need a vendor id
+attached to each product so we can keep track of who sold what. This
+might even be used by a single vendor to keep track of sales by
+department.
+
+=item Independent Skus
+
+Not all products have SKUs, but the current system requires a sku. For
+example, does a donation have a SKU? It may or may not. Obviously every
+product has to have a unique id to track it behind the scenes, but
+whether or not a store owner cares about this number is largely
+dependent upon the type of thing being purchased or sold.
+
+=item Merge Ops And Assets
+
+Currently we have the product asset, the product macro, and the product
+manager in admin console. This needs to be brought down to a single
+item, and that item needs to be an asset which is easily placable on
+the site by people familiar with WebGUI. This is not to say that the
+base product class should be an asset. Maybe it should, maybe it
+shouldn't, but the three mechanisms we have now must be merged. This
+will go a long way toward ease of use.
+
+And since the current product system will become a product asset, the
+subscription system should become a subscription asset.
+
+=item Cart Macro
+
+We need a macro or other mechanism to display what's in the user's
+cart. This also means we need a good API for querying this information
+quickly and easily.
+
+=item Plugins as Drivers
+
+All plugins for shipping, payment, tax, etc should be built like
+drivers, so that the API remains consistent for all of them, and a
+driver is loaded behind the scenes for the appropriate plugin based
+upon rules or users choice.
+
+=item Pretty Checkout
+
+The checkout process must be streamlined, easy to use, and pretty.
+Right now it's none of those things.
+
+=item Unique Items
+
+We need to be able to handle unique items in the cart. For example,
+with the Event Manager, someone buys a badge to an event, that badge is
+unique to them and can't possibly have a quantity of anything greater
+than one. However, the current cart allows for more than one of it.
+
+=back
+
+=head2 Niceties
+
+The following items would make the commerce system better, but can be
+added at a later date if need be:
+
+=over
+
+=item Aisles
+
+An aisle is an asset container for products. It would display
+all of it's children as well as any product that fit within a
+particular keyword group using the WebGUI keywords system. Aisles
+should also have a nifty import/export mechanism to make uploading
+products to the system easier.
+
+=item Affiliates
+
+Affiliate tracking system. We need a way to track who's sending us
+sales, so that we can automatically commission them. Note that the
+automatic commissioning is a big part of this. Just tracking stuff
+isn't good enough as it creates a lot of manual labor for writing out
+checks at the end of the month. It may be that we just need to hook in
+with some third party affiliate programs rather than build our own.
+
+=item Discounts
+
+Discounts, coupons, sales, and gift certificates. These may all be
+separate items, but the goal is virtually the same, we need mechanisms
+to give discounts based upon the group a user is in, sale period,
+coupons, discount codes, gift certificates, etc.
+
+=item Ad Manager Tie In
+
+Tie the ad management system in with commerce so that people can buy
+ads on a site without human intervention.
+
+=item Saved Carts
+
+Allow for saved shopping carts, so that users can come back to a cart
+later. This will most likely mean that the user has to create an
+account to attach their cart to.
+
+=back
+
+=head2 Pipe Dream
+
+The following items are pie in the sky that we should build at some
+point, but definitely won't make it into WebGUI in the 7.5 or 7.6 time
+frames unless someone funds them:
+
+=over
+
+=item Auction System. 
+
+We're not talking ebay here, but a way to conduct
+simple auctions would still be nice.
+
+=item Product configurator. 
+
+If you're buying something complex, you're
+probably going to have lots of options to switch. Therefore we need a
+product configurator system. Dell's web site for buying computers is a
+great example of a configurator.
+
+=back
+
+=head1 Coupon
+
+Coupons (sometimes called promotional codes) are a way to apply
+discounts to a purchase. Only one coupon per purchase though because we
+don't want to have to deal with coupon magnification effects.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+"coupon".
+
+Field
+
+Schema
+
+Description
+
+couponId
+
+guid
+
+The unique id for this coupon.
+
+code
+
+varchar(35), unique
+
+The coupon code the user has to type in to use this coupon.
+
+title
+
+varchar(100)
+
+A title for this coupon.
+
+options
+
+mediumtext
+
+A json serialized hash reference with the coupon rules.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Coupon
+class.
+
+Method
+
+Description
+
+create
+
+Creates a new WebGUI::Shop::Coupon object. Returns a reference to the
+object.
+
+param: session - a reference to the current session
+
+param: hashRef - a hash reference containing a list
+of the parameters in coupon table, except for couponId.
+
+delete
+
+Deletes this coupon.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field - returns the value of a field
+rather than the hash reference.
+
+getId
+
+Returns the coupon id.
+
+new
+
+Instantiates a coupon based upon couponId.
+
+param: session - a reference to the current session
+
+param: couponId - the unique id to instantiate
+
+newByCode
+
+Instantiates a coupon based upon coupon code.
+
+param: session - a reference to the current session
+
+param: code - the coupon code.
+
+set
+
+Update a parameter for the coupon.
+
+param: hashRef - a hash reference containing a list
+of the parameters in coupon table, except for couponId.
+
+
+=head1 Taxes
+
+There are various taxes that need to be applied to an order based upon
+where an order is being shipped to. This class deals with that.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+"tax".
+
+Field
+
+Schema
+
+Description
+
+taxId
+
+guid
+
+The unique id for this tax.
+
+field
+
+varchar(100)
+
+The field to match against to calculate this tax.
+
+value
+
+varchar(100)
+
+The value of the field to match.
+
+taxRate
+
+float, default 0
+
+A percentage of the sale price to tax.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Tax
+class.
+
+Method
+
+Description
+
+add
+
+Adds an item to the tax table.
+
+param: field - choose from
+"country",
+"state", or
+"code".
+
+param: value - the value to match against field. For
+example, for state it might be
+"WI".
+
+param: taxRate - the rate to apply to this locale in
+percent.
+
+calculate
+
+Returns a tax price. Calculates the tax price using the following
+formula:
+
+sum(
+    sku price * ( $sku->getTaxRate? $sku->getTaxRate : percentageOfPrice)
+)
+
++
+
+flatFee
+
++
+
+total weight of shippable items * pricePerWeight
+
++
+
+total quantity of shippable items * pricePerItem
+
+param: cart - a reference to the cart object.
+
+delete
+
+Deletes an item from the tax table.
+
+param: taxId - the id of the item to delete
+
+exportTaxData
+
+Creates a tab delimited file from the tax table using the field, value,
+and taxRate in a temporary storage location, and returns a reference to
+the storage location.
+
+getItems
+
+Returns a WebGUI::SQL::Result object containing the information in the
+tax table.
+
+importTaxData
+
+Deletes all the existing records in the tax table, and replaces them
+with the values in the file.
+
+param: path - the path to the tab delimited file to
+import. See the export() method for details.
+
+new
+
+Instanciates the tax object.
+
+param: session - a reference to the current session
+
+www_add
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, adds an item
+to the the tax table. Returns www_view.
+
+www_delete
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, deletes a
+tax item based upon taxId. Returns www_view.
+
+www_export
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, returns a
+tab delimited file generated via the export() method. Returns the
+www_view method.
+
+www_import
+
+Checks to see if the user has privileges to access commerce functions.
+If not, returns an insufficient privileges message. If so, pull a tab
+delimited file off the POST, and puts it into a storage location. Then
+passes the path into the import() method. Then deletes the storage
+location. Returns the www_view method.
+
+www_view
+
+Draws an HTML fragment showing the tax options. See the diagram below
+for details.
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Convert existing state based tax tables to the new system.
+
+=back
+
+=head1 Address
+
+Addresses are used to store address information for users, for
+shipping, billing, and other uses. In the future the address object may
+be used by other subsystems, but it will first be used by commerce.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+"address".
+
+Field
+
+Schema
+
+Description
+
+addressId
+
+guid
+
+The unique id for this address.
+
+label
+
+varchar(100)
+
+A label for this address like
+"home",
+"work", etc.
+
+name
+
+varchar(100)
+
+The name of this shipping location be it a business name or a personal
+name.
+
+address
+
+varchar(100)
+
+The street address of this location.
+
+city
+
+varchar(100)
+
+The city of this location.
+
+state
+
+varchar(100)
+
+The state or province of this location.
+
+code
+
+varchar(35)
+
+The zip code or postal code of this location.
+
+country
+
+varchar(100)
+
+The country of this location.
+
+phoneNumber
+
+varchar(35)
+
+A phone number for this location, used for shipping.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Address
+class.
+
+Method
+
+Description
+
+create
+
+Creates a new WebGUI::Shop::Address object. Returns a reference to the
+object.
+
+param: session - a reference to the current session
+
+param: hashRef - a hash reference containing a list
+of the parameters in address table, except for addressId.
+
+delete
+
+Deletes this object.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field - returns the value of a field
+rather than the hash reference
+
+getId
+
+Returns the addressId.
+
+new
+
+Instantiates a address based upon addressId.
+
+param: session - a reference to the current session
+
+param: addressId - the unique id to instantiate
+
+set
+
+Update a parameter for the address.
+
+param: hashRef - a hash reference containing a list
+of the parameters in address table, except for addressId.
+
+=head1 Transaction History
+
+Transaction history keeps track of all orders attempted whether
+successful or not as well as the state of all objects involved at the
+time of sale, because things change over time.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called
+"transaction".
+
+Field
+
+Schema
+
+Description
+
+transactionId
+
+guid
+
+The unique id for this transaction.
+
+isSuccessful
+
+tinyint
+
+A boolean indicating whether the transaction succeeded or not.
+
+transactionCode
+
+varchar(100)
+
+The transaction id or code received from the payment gateway. In
+iTransact it is called "xid".
+
+statusCode
+
+varchar(35)
+
+A string indicating the status code for the transaction.
+
+statusMessage
+
+varchar(100)
+
+If a longer message was given with the status code that is stored here.
+
+userId
+
+guid
+
+The userId that made the purchase.
+
+username
+
+varchar(35)
+
+The username of the user making the purchase.
+
+amount
+
+float
+
+The total purchase amount.
+
+shippingAddressId
+
+guid
+
+The unqiue id of the shipping address.
+
+shippingAddressName
+
+varchar(100)
+
+The name of the person/company to ship to.
+
+shippingAddress
+
+varchar(100)
+
+The street address to ship to.
+
+shippingState
+
+varchar(100)
+
+The state or province to ship to.
+
+shippingCity
+
+varchar(100)
+
+The city to ship to.
+
+shippingCode
+
+varchar(20)
+
+The postal code or zip code to ship to.
+
+shippingCountry
+
+varchar(100)
+
+The country to ship to.
+
+shippingPhone
+
+varchar(35)
+
+The phone number for this location.
+
+shippingMethodId
+
+guid
+
+The id of the shipping plugin used.
+
+shippingMethodTitle
+
+varchar(100)
+
+The name of the shipping method used.
+
+shippingTrackingNumber
+
+varchar(100)
+
+A tracking number received back from a shipping module, if any.
+
+shippingStatus
+
+varchar(35), default 'NotShipped'
+
+A flag indicating whether the order has shipped, is on back order, or
+whatever.
+
+billingAddressId
+
+guid
+
+The unique id of the billing address for this order.
+
+billingName
+
+varchar(100)
+
+The name this of person/company to bill to.
+
+billingAddress
+
+varchar(100)
+
+The street address to bill to.
+
+billingState
+
+varchar(100)
+
+The state or province to bill to.
+
+billingCity
+
+varchar(100)
+
+The city to bill to.
+
+billingCode
+
+varchar(20)
+
+The postal code or zip code to bill to.
+
+billingCountry
+
+varchar(100)
+
+The country to bill to.
+
+billingPhone
+
+varchar(35)
+
+The phone number for this location.
+
+billingMethodId
+
+guid
+
+The id of the billing method used.
+
+billingMethodTitle
+
+varchar(100)
+
+The name of the billing method used.
+
+couponId
+
+guid
+
+The unique id of the coupon applied to this order.
+
+couponTitle
+
+varchar(100)
+
+The title of the coupon applied to this order.
+
+totalPrice
+
+float
+
+The final sale price.
+
+The following fields are needed to construct this object's table called
+"transactionItems".
+
+Field
+
+Schema
+
+Description
+
+transactionId
+
+guid
+
+The unique id for this transaction.
+
+assetId
+
+guid
+
+The assetId for this item.
+
+title
+
+varchar(100)
+
+The title of this item.
+
+options
+
+mediumText
+
+A json serialized hashref of any configuration data associated with
+this item so that it can be edited or whatnot.
+
+shippingAddressId
+
+guid
+
+Assign a special shipping address to this item beyond the one attached
+at the cart level.
+
+shippingAddressName
+
+varchar(100)
+
+The name of the person/company to ship to. Only used when a special
+shipping address has been attached to this item.
+
+shippingAddress
+
+varchar(100)
+
+The street address to ship to. Only used when a special shipping
+address has been attached to this item.
+
+shippingState
+
+varchar(100)
+
+The state or province to ship to. Only used when a special shipping
+address has been attached to this item.
+
+shippingCity
+
+varchar(100)
+
+The city to ship to. Only used when a special shipping address has been
+attached to this item.
+
+shippingCode
+
+varchar(20)
+
+The postal code or zip code to ship to. Only used when a special
+shipping address has been attached to this item.
+
+shippingCountry
+
+varchar(100)
+
+The country to ship to. Only used when a special shipping address has
+been attached to this item.
+
+shippingMethodId
+
+guid
+
+The id of the shipping plugin used. Only used when a special shipping
+address has been attached to this item.
+
+shippingMethodTitle
+
+varchar(100)
+
+The name of the shipping method used. Only used when a special shipping
+address has been attached to this item.
+
+shippingStatus
+
+varchar(35),default 'NotShipped'
+
+A flag indicating whether the item has shipped, is on back order, or
+whatever. Only used when a special shipping address has been attached
+to this item.
+
+quantity
+
+integer
+
+The number of this sku desired.
+
+price
+
+float
+
+The price paid for this item.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::Transaction class.
+
+Method
+
+Description
+
+addItem
+
+Adds an item to the transactionItems table. Automatically serialize
+hashRefs like options into json. Make a callback to the original SKU to
+let it know that the item has been purchased. This enables things like
+tickets to be decremented, kick off a workflow, and subscriptions to
+give permissions, etc.
+
+create
+
+Creates a new transaction object. Returns a reference to the object.
+
+param: session - a reference to the current session
+
+param: hashRef - a hash reference containing any/all
+of the fields from the transaction table minus the
+"transactionId" field.
+
+delete
+
+Deletes this transaction and all related transaction items.
+
+get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field - returns the value of a field
+rather than the hash reference
+
+getId
+
+Returns the transaction id.
+
+getItems
+
+Returns an array reference of hash references for all the rows of data
+in the transactionItem table. Automatically convert serilized json into
+hash reference.
+
+new
+
+Instantiates a WebGUI::Shop::Transaction object using transactionId.
+
+param: session - a reference to the current session
+
+param: transactionId
+
+set
+
+Updates a transaction object.
+
+param: hashRef - a hash reference containing any/all
+of the fields from the transaction table minus the
+"transactionId" field.
+
+setStatus
+
+Default status is "pending" as
+items are being added to it.
+
+param: status - The status to set:
+
+pending - default
+
+pending payment - waiting on payment to complete
+
+pending shipment - waiting on shipment to be marked
+
+complete - order has been paid and shipped
+
+returned - order has been cancelled
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Convert all existing transactions in the current transactions table
+into the new style transactions.
+
+=item 2.
+
+Convert recurring transactions back into their relevant subscription
+asset types so subscriptions are tracking their own subscribers.
+
+=item 3.
+
+As soon as a transaction object has been created a workflow should be
+kicked off. The workflow will go through various stages as the status
+of the order is updated. Various workflow activities will need to be
+completed for this.
+
+=item 4.
+
+We need to create screens for users to see their transaction history,
+and administrators to manage their transaction history.
+
+=back
+
+
+=head1 Donation Asset
+
+This asset will be used by sites that want to accept variable amount
+funds from it's users. But the reason it will be built as part of this
+project is to prove variable pricing.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+"Donation".
+
+Field
+
+Schema
+
+Description
+
+assetId
+
+guid
+
+revisionDate
+
+bigint
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Donation class.
+
+Method
+
+Description
+
+view
+
+Displays the donation amount form.
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Subscription Asset
+
+This will be an asset in the form of the subscription manager.
+
+=head2 Todo
+
+=over
+
+=item 1.
+
+Write a subscription asset.
+
+=over
+
+=item 1.
+
+Move the "redeem a subscription
+code" functionality from the user account to the
+subscription asset.
+
+=back
+
+=item 2.
+
+Convert all subscriptions into subscription assets.
+
+=over
+
+=item 1.
+
+Create subscription assets in the import node under a folder called
+"Subscriptions".
+
+=item 2.
+
+Write an upgrade migration to convert all ^SubscriptionItem(); macros
+into ^AssetProxy macros.
+
+=item 3.
+
+Write an upgrade migration to convert all ^SubscriptionItemPurchaseUrl
+macros into ^AssetProxy macros. I know this isn't a 1:1 translation,
+which is why we also need to add something to the gotchas to warn
+people about the change.
+
+=item 4.
+
+Convert subscription recurring urls to new subscription urls or provide
+instructions for doing it.
+
+=back
+
+=item 3.
+
+Delete the SubscriptionItem macro code and its reference from the
+config file.
+
+=item 4.
+
+Delete the SubscriptionItemPurchaseUrl code and its reference from the
+config file.
+
+=item 5.
+
+Make new templates that look good, and throw out the old ones.
+
+=back
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+"Subscription".
+
+Field
+
+Schema
+
+Description
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Subscription class.
+
+Method
+
+Description
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Product Asset
+
+This asset will be the mix of the current product asset and the
+products that are in the product manager in the admin console.
+
+=head2 Todo
+
+=over
+
+=item *
+
+Merge the products in the product manager into the product asset.
+
+=over
+
+=item *
+
+Make the URL of the new products the skew.
+
+=item *
+
+Place all the new products in the import node under a
+"Products" folder.
+
+=item *
+
+Write an upgrade migration to get rid of the ^Product(); macro and
+replace it with the ^AssetProxy; macro.
+
+=back
+
+=item *
+
+Convert all products to use the base product class.
+
+=item *
+
+Eliminate all product manager code from the admin console.
+
+=item *
+
+Delete the Product macro code and it's reference from the config file.
+
+=item *
+
+Make new templates that look good, and throw out the old ones.
+
+=back
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+"Product".
+
+Field
+
+Schema
+
+Description
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Asset::Wobject::Product class.
+
+Method
+
+Description
+
+www_addToCart
+
+Adds this item to the cart.
+
+=head1 Event Manager Asset
+
+The event manager asset needs to be updated to use the new commerce
+subsystem.
+
+TODO:
+
+=over
+
+=item *
+
+Make use of the new base product class.
+
+=item *
+
+Set all cart items to unique so that quantity cannot be incremented.
+
+=item *
+
+Set a callback workflow to mark tickets out of stock, associate a
+transaction id with the badge, etc.
+
+=item *
+
+Update the templates to reflect changes
+
+=item *
+
+Update the templates to reflect suggestions from GAMA
+
+=back
+
+=cut
+
+#Pod::HTML2Pod conversion notes:
+#From file commerce.html
+# 91169 bytes of input
+#Fri Feb 15 15:16:43 2008 jtsmith
+# No a_name switch not specified, so will not try to render <a name='...'>
+# Will try to render <a href='...'>

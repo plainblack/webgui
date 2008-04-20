@@ -16,16 +16,16 @@
 <link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
 <!--Script and CSS includes for YUI dependencies on this page-->
 <link rel="stylesheet" type="text/css" href="../../build/logger/assets/skins/sam/logger.css" />
-<link rel="stylesheet" type="text/css" href="../../build/datatable/assets/skins/sam/datatable.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="../../build/datatable/assets/skins/sam/datatable.css" />
 <script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
 <script type="text/javascript" src="../../build/event/event-min.js"></script>
 <script type="text/javascript" src="../../build/dom/dom-min.js"></script>
 <script type="text/javascript" src="../../build/logger/logger-min.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/button/button-min.js"></script>
 <script type="text/javascript" src="../../build/datasource/datasource-beta-debug.js"></script>
 <script type="text/javascript" src="../../build/datatable/datatable-beta-debug.js"></script>
-<script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
@@ -49,7 +49,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: DataTable Control (beta): XY-scrolling, Y-scrolling, and X-scrolling</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -87,29 +88,30 @@ values.</p>
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.Scrolling = new function() {
         var myColumnDefs = [
-                {key:"field1"},
-                {key:"field2"},
-                {key:"field3"},
-                {key:"field4"},
-                {key:"field5"},
+                {key:"field1", width:50},
+                {key:"field2", width:100, formatter:"date"},
+                {key:"field3", width:50},
+                {key:"field4", width:50},
+                {key:"field5", width:50},
                 {key:"field6", width:150}
             ];
             
         var myColumnDefsY = [
-                {key:"field2"},
-                {key:"field3"},
-                {key:"field4"},
-                {key:"field5"},
-                {key:"field6"}
+                {key:"field1", width:50},
+                {key:"field2", width:100, formatter:"date"},
+                {key:"field3", width:50},
+                {key:"field4", width:50},
+                {key:"field5", width:50},
+                {key:"field6", width:150}
             ];
 
         var myColumnDefsX = [
-                {key:"field1", width:300},
-                {key:"field2", width:300},
-                {key:"field3", width:300},
-                {key:"field4", width:300},
-                {key:"field5", width:300},
-                {key:"field6", width:300}
+                {key:"field1", width:50},
+                {key:"field2", width:100, formatter:"date"},
+                {key:"field3", width:50},
+                {key:"field4", width:50},
+                {key:"field5", width:50},
+                {key:"field6", width:150}
             ];
 
         this.myDataSource = new YAHOO.util.DataSource(YAHOO.example.Data.multitypes);
@@ -118,7 +120,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             resultsList: "items",
             fields: [
                 {key:"field1"},
-                {key:"field2"},
+                {key:"field2", formatter:"date"},
                 {key:"field3"},
                 {key:"field4"},
                 {key:"field5"},
@@ -128,7 +130,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         // Set "scrollable:true" and set width and height string values
         this.myDataTableXY = new YAHOO.widget.DataTable("xyscrolling", myColumnDefs,
-                this.myDataSource, {scrollable:true, width:"40em", height:"20em"});
+                this.myDataSource, {scrollable:true, width:"30em", height:"10em"});
 
         // Set "scrollable:true" and set only height string value
         this.myDataTableY = new YAHOO.widget.DataTable("yscrolling", myColumnDefsY,
@@ -156,16 +158,16 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
 <textarea name="code" class="HTML" cols="60" rows="1">YAHOO.example.Data.multitypes = {
     items: [
-        {field1: "001", field2:new Date(2007, 1, 1), field3:111, field4:"23.4", field5:"bob", field6:"http://www.yahoo.com"},
+        {field1: "bananas", field2:new Date(2007, 1, 1), field3:111, field4:"23.4", field5:"bob", field6:"http://www.yahoo.com"},
         {field1: undefined, field2:new Date(2006, 1, 1), field3:12.3, field4:"35.12", field5:"ann", field6:"http://www.yahoo.com"},
-        {field1: 001, field2:new Date(2007, 11, 1), field3:1, field4:34.12, field5:"charlie", field6:"http://www.yahoo.com"},
-        {field1: "aaab", field2:new Date(2007, 1, 11), field3:1112, field4:"03", field5:"diane", field6:"http://www.yahoo.com"},
-        {field1: "1", field2:new Date(1999, 1, 11), field3:124, field4:03, field5:"edgar", field6:"http://www.yahoo.com"},
-        {field1: new Date(1999, 1, 11), field2:"January 10, 2005", field3:"12", field4:"34", field5:"francine", field6:"http://www.yahoo.com"},
-        {field1: "11", field2:"January 1, 2005", field3:"19.1", field4:"234.5", field5:"george", field6:"http://www.yahoo.com"},
+        {field1: "apples", field2:new Date(2007, 11, 1), field3:1, field4:34.12, field5:"charlie", field6:"http://www.yahoo.com"},
+        {field1: "bananas", field2:new Date(2007, 1, 11), field3:1112, field4:"03", field5:"diane", field6:"http://www.yahoo.com"},
+        {field1: "cherries", field2:new Date(1999, 1, 11), field3:124, field4:03, field5:"edgar", field6:"http://www.yahoo.com"},
+        {field1: "", field2:"January 10, 2005", field3:"12", field4:"34", field5:"francine", field6:"http://www.yahoo.com"},
+        {field1: "unknown", field2:"January 1, 2005", field3:"19.1", field4:"234.5", field5:"george", field6:"http://www.yahoo.com"},
         {field1: null, field2:"1/11/05", field3:"10.02", field4:"345.654", field5:"hannah", field6:"http://www.yahoo.com"},
-        {field1: 110, field2:"1/11/2005", field3:"109", field4:23.456, field5:"igor", field6:"http://www.yahoo.com"},
-        {field1: [1,2,3], field2:"November 1, 2005", field3:"11111", field4:23.0123, field5:"julie", field6:"http://www.yahoo.com"}
+        {field1: "cherries", field2:"1/11/2005", field3:"109", field4:23.456, field5:"igor", field6:"http://www.yahoo.com"},
+        {field1: "bananas", field2:"November 1, 2005", field3:"11111", field4:23.0123, field5:"julie", field6:"http://www.yahoo.com"}
     ]
 }
 </textarea>
@@ -190,15 +192,16 @@ YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.Scrolling = new function() {
         var myColumnDefs = [
                 {key:"field1"},
-                {key:"field2", width:300},
+                {key:"field2", formatter:"date"},
                 {key:"field3"},
                 {key:"field4"},
                 {key:"field5"},
-                {key:"field6"}
+                {key:"field6", width:150}
             ];
             
         var myColumnDefsY = [
-                {key:"field2"},
+                {key:"field1"},
+                {key:"field2", formatter:"date"},
                 {key:"field3"},
                 {key:"field4"},
                 {key:"field5"},
@@ -207,7 +210,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         var myColumnDefsX = [
                 {key:"field1", width:300},
-                {key:"field2", width:300},
+                {key:"field2", formatter:"date", width:300},
                 {key:"field3", width:300},
                 {key:"field4", width:300},
                 {key:"field5", width:300},
@@ -220,7 +223,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             resultsList: "items",
             fields: [
                 {key:"field1"},
-                {key:"field2"},
+                {key:"field2", formatter:"date"},
                 {key:"field3"},
                 {key:"field4"},
                 {key:"field5"},
@@ -230,7 +233,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         // Set "scrollable:true" and set width and height string values
         this.myDataTableXY = new YAHOO.widget.DataTable("xyscrolling", myColumnDefs,
-                this.myDataSource, {scrollable:true, width:"40em", height:"20em"});
+                this.myDataSource, {scrollable:true, width:"30em", height:"10em"});
 
         // Set "scrollable:true" and set only height string value
         this.myDataTableY = new YAHOO.widget.DataTable("yscrolling", myColumnDefsY,
@@ -260,7 +263,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 						<div id="exampleToc">
 							<ul>
-								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li class='selected'><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing and Hiding Columns</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
+								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li class='selected'><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
 						</div>
 					</div>
 					
@@ -273,8 +276,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/datatable.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

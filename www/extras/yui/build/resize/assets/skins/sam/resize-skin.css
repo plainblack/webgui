@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /* Give the handle a background color */
 .yui-skin-sam .yui-resize .yui-resize-handle {
@@ -12,6 +12,12 @@ version: 2.5.0
 .yui-skin-sam .yui-resize .yui-resize-handle-active {
     background-color: #7D98B8;
     zoom: 1;
+}
+.yui-skin-sam .yui-resize .yui-resize-handle-l,
+.yui-skin-sam .yui-resize .yui-resize-handle-r,
+.yui-skin-sam .yui-resize .yui-resize-handle-l-active,
+.yui-skin-sam .yui-resize .yui-resize-handle-r-active {
+    height: 100%;
 }
 /* Give a border to the 8-way knob style handles */
 .yui-skin-sam .yui-resize-knob .yui-resize-handle {
@@ -111,4 +117,12 @@ version: 2.5.0
 .yui-skin-sam .yui-resize-knob .yui-resize-handle-inner-bl,
 .yui-skin-sam .yui-resize-knob .yui-resize-handle-inner-br {
     background-image: none;
+}
+
+.yui-skin-sam .yui-resize-knob .yui-resize-handle-l,
+.yui-skin-sam .yui-resize-knob .yui-resize-handle-r,
+.yui-skin-sam .yui-resize-knob .yui-resize-handle-l-active,
+.yui-skin-sam .yui-resize-knob .yui-resize-handle-r-active {
+    height: 6px;
+    width: 6px;
 }

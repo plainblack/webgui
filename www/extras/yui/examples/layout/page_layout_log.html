@@ -19,16 +19,16 @@
 <link rel="stylesheet" type="text/css" href="../../build/resize/assets/skins/sam/resize.css" />
 <link rel="stylesheet" type="text/css" href="../../build/layout/assets/skins/sam/layout.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
-<script type="text/javascript" src="../../build/yahoo/yahoo.js"></script>
-<script type="text/javascript" src="../../build/event/event.js"></script>
-<script type="text/javascript" src="../../build/dom/dom.js"></script>
-<script type="text/javascript" src="../../build/logger/logger.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta.js"></script>
-<script type="text/javascript" src="../../build/dragdrop/dragdrop.js"></script>
-<script type="text/javascript" src="../../build/resize/resize-beta.js"></script>
-<script type="text/javascript" src="../../build/animation/animation.js"></script>
-<script type="text/javascript" src="../../build/layout/layout-beta.js"></script>
-<script type="text/javascript" src="../../build/button/button.js"></script>
+<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
+<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
+<script type="text/javascript" src="../../build/logger/logger-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/dragdrop/dragdrop-min.js"></script>
+<script type="text/javascript" src="../../build/resize/resize-beta-min.js"></script>
+<script type="text/javascript" src="../../build/animation/animation-min.js"></script>
+<script type="text/javascript" src="../../build/layout/layout-beta-min.js"></script>
+<script type="text/javascript" src="../../build/button/button-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
@@ -52,7 +52,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: Layout Manager (beta): Full Page Layout</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -184,7 +185,7 @@ layout.render();
     Event.onDOMReady(function() {
         var layout = new YAHOO.widget.Layout({
             units: [
-                { position: 'top', height: 50, resize: false, body: 'top1', header: 'Top', gutter: '5px', collapse: true, resize: true },
+                { position: 'top', height: 50, body: 'top1', header: 'Top', gutter: '5px', collapse: true, resize: true },
                 { position: 'right', header: 'Right', width: 300, resize: true, gutter: '5px', footer: 'Footer', collapse: true, scroll: true, body: 'right1', animate: true },
                 { position: 'bottom', header: 'Bottom', height: 100, resize: true, body: 'bottom1', gutter: '5px', collapse: true },
                 { position: 'left', header: 'Left', width: 200, resize: true, body: 'left1', gutter: '5px', collapse: true, close: true, collapseSize: 50, scroll: true, animate: true },
@@ -260,8 +261,6 @@ layout.render();
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/layout.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

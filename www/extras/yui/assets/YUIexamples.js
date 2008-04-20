@@ -29,4 +29,4 @@ YAHOO.yui.examples.onLinkButtonsMarkupReady = function() {
 }
 //wait until loggerDiv is present; the window buttons will have loaded
 //by then as well:
-YAHOO.util.Event.onContentReady("module", YAHOO.yui.examples.onLinkButtonsMarkupReady);
+YAHOO.util.Event.onDOMReady(YAHOO.yui.examples.onLinkButtonsMarkupReady);

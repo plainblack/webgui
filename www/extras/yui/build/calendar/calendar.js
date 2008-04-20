@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 (function () {
 
@@ -731,6 +731,19 @@ YAHOO.widget.DateMath = {
 	* @type Number
 	*/
 	ONE_DAY_MS : 1000*60*60*24,
+	
+	/**
+	 * Constant field representing the date in first week of January
+	 * which identifies the first week of the year.
+	 * <p>
+	 * In the U.S, Jan 1st is normally used based on a Sunday start of week.
+	 * ISO 8601, used widely throughout Europe, uses Jan 4th, based on a Monday start of week.
+	 * </p>
+	 * @property WEEK_ONE_JAN_DATE
+	 * @static
+	 * @type Number
+	 */
+	WEEK_ONE_JAN_DATE : 1,
 
 	/**
 	* Adds the specified amount of time to the this instance.
@@ -894,27 +907,76 @@ YAHOO.widget.DateMath = {
 	},
 
 	/**
-	* Calculates the week number for the given date. This function assumes that week 1 is the
-	* week in which January 1 appears, regardless of whether the week consists of a full 7 days.
-	* The calendar year can be specified to help find what a the week number would be for a given
-	* date if the date overlaps years. For instance, a week may be considered week 1 of 2005, or
-	* week 53 of 2004. Specifying the optional calendarYear allows one to make this distinction
-	* easily.
+	* Calculates the week number for the given date. Can currently support standard
+	* U.S. week numbers, based on Jan 1st defining the 1st week of the year, and 
+	* ISO8601 week numbers, based on Jan 4th defining the 1st week of the year.
+	* 
 	* @method getWeekNumber
-	* @param {Date}	date	The JavaScript date for which to find the week number
-	* @param {Number} calendarYear	OPTIONAL - The calendar year to use for determining the week number. Default is
-	*											the calendar year of parameter "date".
-	* @return {Number}	The week number of the given date.
+	* @param {Date}	date The JavaScript date for which to find the week number
+	* @param {Number} firstDayOfWeek The index of the first day of the week (0 = Sun, 1 = Mon ... 6 = Sat).
+	* Defaults to 0
+	* @param {Number} janDate The date in the first week of January which defines week one for the year
+	* Defaults to the value of YAHOO.widget.DateMath.WEEK_ONE_JAN_DATE, which is 1 (Jan 1st). 
+	* For the U.S, this is normally Jan 1st. ISO8601 uses Jan 4th to define the first week of the year.
+	* 
+	* @return {Number} The number of the week containing the given date.
 	*/
-	getWeekNumber : function(date, calendarYear) {
-		date = this.clearTime(date);
-		var nearestThurs = new Date(date.getTime() + (4 * this.ONE_DAY_MS) - ((date.getDay()) * this.ONE_DAY_MS));
+	getWeekNumber : function(date, firstDayOfWeek, janDate) {
 
-		var jan1 = this.getDate(nearestThurs.getFullYear(),0,1);
-		var dayOfYear = ((nearestThurs.getTime() - jan1.getTime()) / this.ONE_DAY_MS) - 1;
+		// Setup Defaults
+		firstDayOfWeek = firstDayOfWeek || 0;
+		janDate = janDate || this.WEEK_ONE_JAN_DATE;
 
-		var weekNum = Math.ceil((dayOfYear)/ 7);
+		var targetDate = this.clearTime(date),
+			startOfWeek,
+			endOfWeek;
+
+		if (targetDate.getDay() === firstDayOfWeek) { 
+			startOfWeek = targetDate;
+		} else {
+			startOfWeek = this.getFirstDayOfWeek(targetDate, firstDayOfWeek);
+		}
+
+		var startYear = startOfWeek.getFullYear(),
+			startTime = startOfWeek.getTime();
+
+		// DST shouldn't be a problem here, math is quicker than setDate();
+		endOfWeek = new Date(startOfWeek.getTime() + 6*this.ONE_DAY_MS);
+
+		var weekNum;
+		if (startYear !== endOfWeek.getFullYear() && endOfWeek.getDate() >= janDate) {
+			// If years don't match, endOfWeek is in Jan. and if the 
+			// week has WEEK_ONE_JAN_DATE in it, it's week one by definition.
+			weekNum = 1;
+		} else {
+			// Get the 1st day of the 1st week, and 
+			// find how many days away we are from it.
+			var weekOne = this.clearTime(this.getDate(startYear, 0, janDate)),
+				weekOneDayOne = this.getFirstDayOfWeek(weekOne, firstDayOfWeek);
+
+			// Round days to smoothen out 1 hr DST diff
+			var daysDiff  = Math.round((targetDate.getTime() - weekOneDayOne.getTime())/this.ONE_DAY_MS);
+
+			// Calc. Full Weeks
+			var rem = daysDiff % 7;
+			var weeksDiff = (daysDiff - rem)/7;
+			weekNum = weeksDiff + 1;
+		}
 		return weekNum;
+	},
+
+	/**
+	 * Get the first day of the week, for the give date. 
+	 * @param {Date} dt The date in the week for which the first day is required.
+	 * @param {Number} startOfWeek The index for the first day of the week, 0 = Sun, 1 = Mon ... 6 = Sat (defaults to 0)
+	 * @return {Date} The first day of the week
+	 */
+	getFirstDayOfWeek : function (dt, startOfWeek) {
+		startOfWeek = startOfWeek || 0;
+		var dayOfWeekIndex = dt.getDay(),
+			dayOfWeek = (dayOfWeekIndex - startOfWeek + 7) % 7;
+
+		return this.subtract(dt, this.DAY, dayOfWeek);
 	},
 
 	/**
@@ -1943,9 +2005,9 @@ YAHOO.widget.Calendar.prototype = {
 		* @default false
 		*/
 		this.cfg.addProperty(defCfg.MULTI_SELECT.key,	{ value:defCfg.MULTI_SELECT.value, handler:this.configOptions, validator:this.cfg.checkBoolean } );
-	
+
 		/**
-		* The weekday the week begins on. Default is 0 (Sunday).
+		* The weekday the week begins on. Default is 0 (Sunday = 0, Monday = 1 ... Saturday = 6).
 		* @config START_WEEKDAY
 		* @type number
 		* @default 0
@@ -2650,7 +2712,7 @@ YAHOO.widget.Calendar.prototype = {
 	*/
 	renderHeader : function(html) {
 		var colSpan = 7;
-		
+
 		var DEPR_NAV_LEFT = "us/tr/callt.gif";
 		var DEPR_NAV_RIGHT = "us/tr/calrt.gif";	
 		var defCfg = YAHOO.widget.Calendar._DEFAULT_CONFIG;
@@ -2662,14 +2724,14 @@ YAHOO.widget.Calendar.prototype = {
 		if (this.cfg.getProperty(defCfg.SHOW_WEEK_FOOTER.key)) {
 			colSpan += 1;
 		}
-	
+
 		html[html.length] = "<thead>";
 		html[html.length] =		"<tr>";
 		html[html.length] =			'<th colspan="' + colSpan + '" class="' + this.Style.CSS_HEADER_TEXT + '">';
 		html[html.length] =				'<div class="' + this.Style.CSS_HEADER + '">';
-	
+
 		var renderLeft, renderRight = false;
-	
+
 		if (this.parent) {
 			if (this.index === 0) {
 				renderLeft = true;
@@ -2681,7 +2743,7 @@ YAHOO.widget.Calendar.prototype = {
 			renderLeft = true;
 			renderRight = true;
 		}
-	
+
 		if (renderLeft) {
 			var leftArrow = this.cfg.getProperty(defCfg.NAV_ARROW_LEFT.key);
 			// Check for deprecated customization - If someone set IMG_ROOT, but didn't set NAV_ARROW_LEFT, then set NAV_ARROW_LEFT to the old deprecated value
@@ -2756,10 +2818,14 @@ YAHOO.widget.Calendar.prototype = {
 	* @return {Array} The current working HTML array
 	*/
 	renderBody : function(workingDate, html) {
-		var defCfg = YAHOO.widget.Calendar._DEFAULT_CONFIG;
-	
+
+		var DM = YAHOO.widget.DateMath,
+			CAL = YAHOO.widget.Calendar,
+			D = YAHOO.util.Dom,
+			defCfg = CAL._DEFAULT_CONFIG;
+
 		var startDay = this.cfg.getProperty(defCfg.START_WEEKDAY.key);
-	
+
 		this.preMonthDays = workingDate.getDay();
 		if (startDay > 0) {
 			this.preMonthDays -= startDay;
@@ -2767,67 +2833,64 @@ YAHOO.widget.Calendar.prototype = {
 		if (this.preMonthDays < 0) {
 			this.preMonthDays += 7;
 		}
-		
-		this.monthDays = YAHOO.widget.DateMath.findMonthEnd(workingDate).getDate();
-		this.postMonthDays = YAHOO.widget.Calendar.DISPLAY_DAYS-this.preMonthDays-this.monthDays;
-		
-		workingDate = YAHOO.widget.DateMath.subtract(workingDate, YAHOO.widget.DateMath.DAY, this.preMonthDays);
+
+		this.monthDays = DM.findMonthEnd(workingDate).getDate();
+		this.postMonthDays = CAL.DISPLAY_DAYS-this.preMonthDays-this.monthDays;
+
+
+		workingDate = DM.subtract(workingDate, DM.DAY, this.preMonthDays);
 	
-		var weekNum,weekClass;
-		var weekPrefix = "w";
-		var cellPrefix = "_cell";
-		var workingDayPrefix = "wd";
-		var dayPrefix = "d";
-		
-		var cellRenderers;
-		var renderer;
-		
-		var todayYear = this.today.getFullYear();
-		var todayMonth = this.today.getMonth();
-		var todayDate = this.today.getDate();
-		
-		var useDate = this.cfg.getProperty(defCfg.PAGEDATE.key);
-		var hideBlankWeeks = this.cfg.getProperty(defCfg.HIDE_BLANK_WEEKS.key);
-		var showWeekFooter = this.cfg.getProperty(defCfg.SHOW_WEEK_FOOTER.key);
-		var showWeekHeader = this.cfg.getProperty(defCfg.SHOW_WEEK_HEADER.key);
-		var mindate = this.cfg.getProperty(defCfg.MINDATE.key);
-		var maxdate = this.cfg.getProperty(defCfg.MAXDATE.key);
-	
+		var weekNum,
+			weekClass,
+			weekPrefix = "w",
+			cellPrefix = "_cell",
+			workingDayPrefix = "wd",
+			dayPrefix = "d",
+			cellRenderers,
+			renderer,
+			todayYear = this.today.getFullYear(),
+			todayMonth = this.today.getMonth(),
+			todayDate = this.today.getDate(),
+			useDate = this.cfg.getProperty(defCfg.PAGEDATE.key),
+			hideBlankWeeks = this.cfg.getProperty(defCfg.HIDE_BLANK_WEEKS.key),
+			showWeekFooter = this.cfg.getProperty(defCfg.SHOW_WEEK_FOOTER.key),
+			showWeekHeader = this.cfg.getProperty(defCfg.SHOW_WEEK_HEADER.key),
+			mindate = this.cfg.getProperty(defCfg.MINDATE.key),
+			maxdate = this.cfg.getProperty(defCfg.MAXDATE.key);
+
 		if (mindate) {
-			mindate = YAHOO.widget.DateMath.clearTime(mindate);
+			mindate = DM.clearTime(mindate);
 		}
 		if (maxdate) {
-			maxdate = YAHOO.widget.DateMath.clearTime(maxdate);
+			maxdate = DM.clearTime(maxdate);
 		}
-		
+
 		html[html.length] = '<tbody class="m' + (useDate.getMonth()+1) + ' ' + this.Style.CSS_BODY + '">';
-		
-		var i = 0;
-	
-		var tempDiv = document.createElement("div");
-		var cell = document.createElement("td");
+
+		var i = 0,
+			tempDiv = document.createElement("div"),
+			cell = document.createElement("td");
+
 		tempDiv.appendChild(cell);
-	
+
 		var cal = this.parent || this;
-	
+
 		for (var r=0;r<6;r++) {
-	
-			weekNum = YAHOO.widget.DateMath.getWeekNumber(workingDate, useDate.getFullYear(), startDay);
+			weekNum = DM.getWeekNumber(workingDate, startDay);
 			weekClass = weekPrefix + weekNum;
-	
+
 			// Local OOM check for performance, since we already have pagedate
 			if (r !== 0 && hideBlankWeeks === true && workingDate.getMonth() != useDate.getMonth()) {
 				break;
 			} else {
-	
 				html[html.length] = '<tr class="' + weekClass + '">';
-				
+
 				if (showWeekHeader) { html = this.renderRowHeader(weekNum, html); }
-				
-				for (var d=0;d<7;d++){ // Render actual days
-	
+
+				for (var d=0; d < 7; d++){ // Render actual days
+
 					cellRenderers = [];
-	
+
 					this.clearElement(cell);
 					cell.className = this.Style.CSS_CELL;
 					cell.id = this.id + cellPrefix + i;
@@ -2837,64 +2900,59 @@ YAHOO.widget.Calendar.prototype = {
 						workingDate.getFullYear()	== todayYear) {
 						cellRenderers[cellRenderers.length]=cal.renderCellStyleToday;
 					}
-					
+
 					var workingArray = [workingDate.getFullYear(),workingDate.getMonth()+1,workingDate.getDate()];
 					this.cellDates[this.cellDates.length] = workingArray; // Add this date to cellDates
-					
+
 					// Local OOM check for performance, since we already have pagedate
 					if (workingDate.getMonth() != useDate.getMonth()) {
 						cellRenderers[cellRenderers.length]=cal.renderCellNotThisMonth;
 					} else {
-						YAHOO.util.Dom.addClass(cell, workingDayPrefix + workingDate.getDay());
-						YAHOO.util.Dom.addClass(cell, dayPrefix + workingDate.getDate());
-					
+						D.addClass(cell, workingDayPrefix + workingDate.getDay());
+						D.addClass(cell, dayPrefix + workingDate.getDate());
+
 						for (var s=0;s<this.renderStack.length;++s) {
-	
+
 							renderer = null;
-	
-							var rArray = this.renderStack[s];
-							var type = rArray[0];
-							
-							var month;
-							var day;
-							var year;
-							
+
+							var rArray = this.renderStack[s],
+								type = rArray[0],
+								month,
+								day,
+								year;
+
 							switch (type) {
-								case YAHOO.widget.Calendar.DATE:
+								case CAL.DATE:
 									month = rArray[1][1];
 									day = rArray[1][2];
 									year = rArray[1][0];
-	
+
 									if (workingDate.getMonth()+1 == month && workingDate.getDate() == day && workingDate.getFullYear() == year) {
 										renderer = rArray[2];
 										this.renderStack.splice(s,1);
 									}
 									break;
-								case YAHOO.widget.Calendar.MONTH_DAY:
+								case CAL.MONTH_DAY:
 									month = rArray[1][0];
 									day = rArray[1][1];
-									
+
 									if (workingDate.getMonth()+1 == month && workingDate.getDate() == day) {
 										renderer = rArray[2];
 										this.renderStack.splice(s,1);
 									}
 									break;
-								case YAHOO.widget.Calendar.RANGE:
-									var date1 = rArray[1][0];
-									var date2 = rArray[1][1];
-	
-									var d1month = date1[1];
-									var d1day = date1[2];
-									var d1year = date1[0];
-									
-									var d1 = YAHOO.widget.DateMath.getDate(d1year, d1month-1, d1day);
-	
-									var d2month = date2[1];
-									var d2day = date2[2];
-									var d2year = date2[0];
-	
-									var d2 = YAHOO.widget.DateMath.getDate(d2year, d2month-1, d2day);
-	
+								case CAL.RANGE:
+									var date1 = rArray[1][0],
+										date2 = rArray[1][1],
+										d1month = date1[1],
+										d1day = date1[2],
+										d1year = date1[0],
+										d1 = DM.getDate(d1year, d1month-1, d1day),
+										d2month = date2[1],
+										d2day = date2[2],
+										d2year = date2[0],
+										d2 = DM.getDate(d2year, d2month-1, d2day);
+
 									if (workingDate.getTime() >= d1.getTime() && workingDate.getTime() <= d2.getTime()) {
 										renderer = rArray[2];
 	
@@ -2903,33 +2961,31 @@ YAHOO.widget.Calendar.prototype = {
 										}
 									}
 									break;
-								case YAHOO.widget.Calendar.WEEKDAY:
-									
+								case CAL.WEEKDAY:
 									var weekday = rArray[1][0];
 									if (workingDate.getDay()+1 == weekday) {
 										renderer = rArray[2];
 									}
 									break;
-								case YAHOO.widget.Calendar.MONTH:
-									
+								case CAL.MONTH:
 									month = rArray[1][0];
 									if (workingDate.getMonth()+1 == month) {
 										renderer = rArray[2];
 									}
 									break;
 							}
-							
+
 							if (renderer) {
 								cellRenderers[cellRenderers.length]=renderer;
 							}
 						}
-	
+
 					}
-	
+
 					if (this._indexOfSelectedFieldArray(workingArray) > -1) {
 						cellRenderers[cellRenderers.length]=cal.renderCellStyleSelected; 
 					}
-	
+
 					if ((mindate && (workingDate.getTime() < mindate.getTime())) ||
 						(maxdate && (workingDate.getTime() > maxdate.getTime()))
 					) {
@@ -2938,25 +2994,27 @@ YAHOO.widget.Calendar.prototype = {
 						cellRenderers[cellRenderers.length]=cal.styleCellDefault;
 						cellRenderers[cellRenderers.length]=cal.renderCellDefault;	
 					}
-					
+
 					for (var x=0; x < cellRenderers.length; ++x) {
-						if (cellRenderers[x].call(cal, workingDate, cell) == YAHOO.widget.Calendar.STOP_RENDER) {
+						if (cellRenderers[x].call(cal, workingDate, cell) == CAL.STOP_RENDER) {
 							break;
 						}
 					}
-	
-					workingDate.setTime(workingDate.getTime() + YAHOO.widget.DateMath.ONE_DAY_MS);
-	
+
+					workingDate.setTime(workingDate.getTime() + DM.ONE_DAY_MS);
+					// Just in case we crossed DST/Summertime boundaries
+					workingDate = DM.clearTime(workingDate);
+
 					if (i >= 0 && i <= 6) {
-						YAHOO.util.Dom.addClass(cell, this.Style.CSS_CELL_TOP);
+						D.addClass(cell, this.Style.CSS_CELL_TOP);
 					}
 					if ((i % 7) === 0) {
-						YAHOO.util.Dom.addClass(cell, this.Style.CSS_CELL_LEFT);
+						D.addClass(cell, this.Style.CSS_CELL_LEFT);
 					}
 					if (((i+1) % 7) === 0) {
-						YAHOO.util.Dom.addClass(cell, this.Style.CSS_CELL_RIGHT);
+						D.addClass(cell, this.Style.CSS_CELL_RIGHT);
 					}
-					
+
 					var postDays = this.postMonthDays; 
 					if (hideBlankWeeks && postDays >= 7) {
 						var blankWeeks = Math.floor(postDays/7);
@@ -2966,7 +3024,7 @@ YAHOO.widget.Calendar.prototype = {
 					}
 					
 					if (i >= ((this.preMonthDays+postDays+this.monthDays)-7)) {
-						YAHOO.util.Dom.addClass(cell, this.Style.CSS_CELL_BOTTOM);
+						D.addClass(cell, this.Style.CSS_CELL_BOTTOM);
 					}
 	
 					html[html.length] = tempDiv.innerHTML;
@@ -4107,13 +4165,13 @@ YAHOO.widget.Calendar.prototype = {
 	* Adds a weekday to the render stack. The function reference passed to this method will be executed
 	* when a date cell matches the weekday passed to this method.
 	* @method addWeekdayRenderer
-	* @param	{Number}	weekday		The weekday (0-6) to associate with this renderer
+	* @param	{Number}	weekday		The weekday (Sunday = 1, Monday = 2 ... Saturday = 7) to associate with this renderer
 	* @param	{Function}	fnRender	The function executed to render cells that match the render rules for this renderer.
 	*/
 	addWeekdayRenderer : function(weekday, fnRender) {
 		this._addRenderer(YAHOO.widget.Calendar.WEEKDAY,[weekday],fnRender);
 	},
-	
+
 	// END RENDERER METHODS
 	
 	// BEGIN CSS METHODS
@@ -6323,16 +6381,16 @@ YAHOO.widget.CalendarNavigator.prototype = {
 	 * @method applyKeyListeners
 	 */
 	applyKeyListeners : function() {
-		var E = YAHOO.util.Event;
+		var E = YAHOO.util.Event,
+			ua = YAHOO.env.ua;
 
-		// IE doesn't fire keypress for arrow/pg keys (non-char keys)
-		var ua = YAHOO.env.ua;
-		var arrowEvt = (ua.ie) ? "keydown" : "keypress";
+		// IE/Safari 3.1 doesn't fire keypress for arrow/pg keys (non-char keys)
+		var arrowEvt = (ua.ie || ua.webkit) ? "keydown" : "keypress";
 
-		// - IE doesn't fire keypress for non-char keys
+		// - IE/Safari 3.1 doesn't fire keypress for non-char keys
 		// - Opera doesn't allow us to cancel keydown or keypress for tab, but 
 		//   changes focus successfully on keydown (keypress is too late to change focus - opera's already moved on).
-		var tabEvt = (ua.ie || ua.opera) ? "keydown" : "keypress";
+		var tabEvt = (ua.ie || ua.opera || ua.webkit) ? "keydown" : "keypress";
 
 		// Everyone likes keypress for Enter (char keys) - whoo hoo!
 		E.on(this.yearEl, "keypress", this._handleEnterKey, this, true);
@@ -6348,10 +6406,11 @@ YAHOO.widget.CalendarNavigator.prototype = {
 	 * @method purgeKeyListeners
 	 */
 	purgeKeyListeners : function() {
-		var E = YAHOO.util.Event;
+		var E = YAHOO.util.Event,
+			ua = YAHOO.env.ua;
 
-		var arrowEvt = (YAHOO.env.ua.ie) ? "keydown" : "keypress";
-		var tabEvt = (YAHOO.env.ua.ie || YAHOO.env.ua.opera) ? "keydown" : "keypress";
+		var arrowEvt = (ua.ie || ua.webkit) ? "keydown" : "keypress";
+		var tabEvt = (ua.ie || ua.opera || ua.webkit) ? "keydown" : "keypress";
 
 		E.removeListener(this.yearEl, "keypress", this._handleEnterKey);
 		E.removeListener(this.yearEl, arrowEvt, this._handleDirectionKeys);
@@ -6788,4 +6847,4 @@ YAHOO.widget.CalendarNavigator.prototype = {
 
 };
 
-YAHOO.register("calendar", YAHOO.widget.Calendar, {version: "2.5.0", build: "895"});
+YAHOO.register("calendar", YAHOO.widget.Calendar, {version: "2.5.1", build: "984"});

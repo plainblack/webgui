@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>editor&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>editor&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_editor.html">editor</a>
@@ -121,6 +121,7 @@
         <span class="nx">oConfig</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">setAttribute</span><span class="o">(</span><span class="s1">&#39;unselectable&#39;</span><span class="o">,</span> <span class="s1">&#39;on&#39;</span><span class="o">);</span>
         <span class="nx">oConfig</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;yui-button yui-&#39;</span> <span class="o">+</span> <span class="nx">oConfig</span><span class="o">.</span><span class="nx">attributes</span><span class="o">.</span><span class="nx">type</span> <span class="o">+</span> <span class="s1">&#39;-button&#39;</span><span class="o">;</span>
         <span class="nx">oConfig</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&lt;span class=&quot;first-child&quot;&gt;&lt;a href=&quot;#&quot;&gt;LABEL&lt;/a&gt;&lt;/span&gt;&#39;</span><span class="o">;</span>
+        <span class="nx">oConfig</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">tabIndex</span> <span class="o">=</span> <span class="s1">&#39;-1&#39;</span><span class="o">;</span>
         <span class="nx">oConfig</span><span class="o">.</span><span class="nx">attributes</span><span class="o">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">generateId</span><span class="o">();</span>
 
         <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">ToolbarButton</span><span class="o">.</span><span class="nx">superclass</span><span class="o">.</span><span class="nx">constructor</span><span class="o">.</span><span class="nx">call</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="nx">oConfig</span><span class="o">.</span><span class="nx">element</span><span class="o">,</span> <span class="nx">oConfig</span><span class="o">.</span><span class="nx">attributes</span><span class="o">);</span>
@@ -316,6 +317,20 @@
 <span class="c">        */</span>        
         <span class="nx">getMenu</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
             <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;menu&#39;</span><span class="o">);</span>
+        <span class="o">},</span>
+        <span class="c">/** </span>
+<span class="c">        * @method destroy</span>
+<span class="c">        * @description Destroy the button</span>
+<span class="c">        */</span>        
+        <span class="nx">destroy</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nx">Event</span><span class="o">.</span><span class="nx">purgeElement</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;element&#39;</span><span class="o">),</span> <span class="kc">true</span><span class="o">);</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;element&#39;</span><span class="o">).</span><span class="nx">parentNode</span><span class="o">.</span><span class="nx">removeChild</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;element&#39;</span><span class="o">));</span>
+            <span class="c">//Brutal Object Destroy</span>
+<span class="c"></span>            <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span> <span class="k">in</span> <span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">Lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="nx">i</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>       
         <span class="o">},</span>
         <span class="c">/** </span>
 <span class="c">        * @method fireEvent</span>

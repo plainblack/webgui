@@ -122,10 +122,6 @@ sub toHtml {
     return qq{<a href="javascript:YAHOO.WebGUI.ColorPicker.display('$id', '${id}_swatch');" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: $value"></a>
 <input onchange="YAHOO.util.Dom.setStyle('${id}_swatch', 'background-color', this.value)" 
 maxlength="7" name="$name" type="text" size="8" value="$value" id="$id" />};
-
-#        <a href="#" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: #008000;"></a>
-#        <input maxlength="7" name="$name" type="text" size="8" value="$value" id="$id" />
-#        <script type="text/javascript">YAHOO.WebGUI.Form.ColorPicker.attach('$id', '${id}_swatch')</script>
 }
 
 1;

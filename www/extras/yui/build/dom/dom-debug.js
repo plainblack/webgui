@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * The dom module provides helper methods for manipulating Dom elements.
@@ -29,7 +29,8 @@ version: 2.5.0
     // regex cache
     var patterns = {
         HYPHEN: /(-[a-z])/i, // to normalize get/setStyle
-        ROOT_TAG: /^body|html$/i // body for quirks mode, html for standards
+        ROOT_TAG: /^body|html$/i, // body for quirks mode, html for standards,
+        OP_SCROLL:/^(?:inline|table-row)$/i
     };
 
     var toCamel = function(property) {
@@ -71,7 +72,7 @@ version: 2.5.0
                 property = 'cssFloat';
             }
 
-            var computed = document.defaultView.getComputedStyle(el, '');
+            var computed = el.ownerDocument.defaultView.getComputedStyle(el, '');
             if (computed) { // test computed before touching for safari
                 value = computed[toCamel(property)];
             }
@@ -342,7 +343,7 @@ version: 2.5.0
         getRegion: function(el) {
             var f = function(el) {
                 if ( (el.parentNode === null || el.offsetParent === null ||
-                        this.getStyle(el, 'display') == 'none') && el != document.body) {
+                        this.getStyle(el, 'display') == 'none') && el != el.ownerDocument.body) {
                     YAHOO.log('getRegion failed: element not available', 'error', 'Dom');
                     return false;
                 }
@@ -1058,10 +1059,14 @@ version: 2.5.0
                 // account for any scrolled ancestors
                 while ( parentNode.tagName && !patterns.ROOT_TAG.test(parentNode.tagName) ) 
                 {
-                   // work around opera inline/table scrollLeft/Top bug
-                   if (Y.Dom.getStyle(parentNode, 'display').search(/^inline|table-row.*$/i)) { 
-                        pos[0] -= parentNode.scrollLeft;
-                        pos[1] -= parentNode.scrollTop;
+                    if (parentNode.scrollTop || parentNode.scrollLeft) {
+                        // work around opera inline/table scrollLeft/Top bug (false reports offset as scroll)
+                        if (!patterns.OP_SCROLL.test(Y.Dom.getStyle(parentNode, 'display'))) { 
+                            if (!isOpera || Y.Dom.getStyle(parentNode, 'overflow') !== 'visible') { // opera inline-block misreports when visible
+                                pos[0] -= parentNode.scrollLeft;
+                                pos[1] -= parentNode.scrollTop;
+                            }
+                        }
                     }
                     
                     parentNode = parentNode.parentNode; 
@@ -1258,4 +1263,4 @@ YAHOO.util.Point = function(x, y) {
 
 YAHOO.util.Point.prototype = new YAHOO.util.Region();
 
-YAHOO.register("dom", YAHOO.util.Dom, {version: "2.5.0", build: "895"});
+YAHOO.register("dom", YAHOO.util.Dom, {version: "2.5.1", build: "984"});

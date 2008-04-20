@@ -1,0 +1,237 @@
+=head1 Shipper
+
+This is the master class to manage shipper drivers. In Perl terms the
+DBI to DBD.
+
+=head2 Data Dictionary
+
+There is no table for this object.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Ship class.
+
+=head3 create
+
+A class method.
+
+Creates a new WebGUI::Shop::ShipDriver object. Returns a reference to the object.
+
+param: session - a reference to the current session
+
+param: class - the classname of a driver to create
+
+param: hashRef - A hash reference of properties. See WebGUI::Shop::ShipDriver->set for details.
+
+=head3 getDrivers
+
+A class method.
+
+Returns an array reference of the driver classes enabled in the config file.
+
+=head3 getShippers
+
+A class method.
+
+Returns an array reference of the configured shipping objects.
+
+=head3 getOptions
+
+A class method.
+
+Returns a hash reference of shipperIds as keys, with "label" and "price" as subkeys. Label provides the human readable label for the object, and price provides the calculated price for shipping.
+
+param: cart - a reference to the cart object to calculate for.
+
+=head3 new
+
+Instantiates a WebGUI::Shop::ShipDriver object based upon shipperId. 
+
+param: session - a reference to the current session
+
+param: shipperId - the unique id to instantiate
+
+=head3 www_listShippers
+
+Returns a list of the shippers configured currently.
+
+=head3 www_editShipper
+
+The add/edit form for managing a shipper.
+
+=head3 www_editShipperSave
+
+Saves the result of www_editShipper and then displays www_listShippers.
+
+
+=head1 Shipper Driver
+
+Shipping modules are used to calculate shipping costs. Shipping modules
+are not allowed to have a user interface. Instead, they plug their data
+into the shopping cart screen if any items in the shopping cart have
+shipping. In Perl terms this is the DBD to DBI. All shipping drivers
+(flat rate, fedex, ups, dhl, usps, etc) will be derived from this base
+class.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called "shipper".
+
+ Field          Schema          Description
+ shipperId      guid            The unique id for this shipper.
+ className      varchar(255)    The plugin classname that will be used for this shipping module.
+ options        mediumtext      A json serialized hash reference with configuration data for this shipper.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::ShipDriver class.
+
+=head3 calculate
+
+Returns a shipping price.
+
+param: cart - a reference to the cart object.
+
+=head3 create
+
+A class method.
+
+Creates a new WebGUI::Shop::ShipDriver object. Returns a reference to the object.
+
+param: session - a reference to the current session
+
+param: hashRef - A hash reference of properties. See WebGUI::Shop::ShipDriver->set for details.
+
+=head3 definition
+
+A class method.
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition - an array ref of hash refs
+
+field:
+
+ [
+    name => "Shipper Type",
+    fields => {
+        label => {
+            fieldType => "text",
+            label => "Label",
+            defaultValue => undef
+        },
+        enabled => {
+            fieldType => "yesNo",
+            label => "Enabled?",
+            defaultValue => 1
+        },
+    }
+ ],
+
+=head3 delete
+
+Deletes this object.
+
+=head3 get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field - returns the value of a field
+rather than the shippingId. Automatically converts the options json
+into a hash reference.
+
+=head3 getId
+
+Returns the shipperId.
+
+=head3 getName
+
+Return a human readable name for this driver. Never overridden in the
+subclass, instead specified in definition.
+
+=head3 getEditForm
+
+Similar to the method of the same name in WebGUI asset, but uses the
+definition from this module.
+
+=head3 new
+
+A class method.
+
+Instantiates a driver.
+
+param: session - a reference to the current session
+
+param: options - a hash reference of configurable
+parameters for this driver
+
+=head3 set
+
+Update a parameter for the ship object.
+
+param: hashRef - a hash reference containing a list of the parameters in shipper table, except for shipperId. Automatically convert the options parameter into json.
+
+
+=head1 Flat Rate Shipper
+
+This allows for basic shipping calculations without any tie-ins to external shippers.
+
+=head2 Data Dictionary
+
+Shipping drivers have no database tables, unless they need it on a one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::ShipDriver::Flat class.
+
+=head3 calculate
+
+Returns a shipping price. Calculates the shipping price using the following formula:
+
+ total price of shippable items * percentageOfPrice 
+ + flatFee
+ + total weight of shippable items * pricePerWeight
+ + total quantity of shippable items * pricePerItem
+
+param: cart - a reference to the cart object.
+
+=head4 definition
+
+A class method.
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition - an array ref of hash refs of definitions
+
+ [
+    {
+        name => "Flat Rate",
+        fields => {
+            percentageOfPrice => {
+                fieldType => "float",
+                label => "Percentage Of Price",
+                defaultValue => 0
+            },
+            flatFee => {
+                fieldType => "float",
+                label => "Flat Fee",
+                defaultValue => 0
+            },
+            pricePerWeight => {
+                fieldType => "float",
+                label => "Price Per Weight",
+                defaultValue => 0
+            },
+            pricePerItem => {
+                label => "Price Per Item",
+                fieldType => "float",
+                defaultValue => 0
+            },
+        }
+    }
+ ]
+
+
+=cut

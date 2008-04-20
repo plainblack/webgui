@@ -1,144 +1,594 @@
 package WebGUI::i18n::English::Asset_EventManagementSystem;
 use strict;
 
-our $I18N = { ##hashref of hashes
+our $I18N = {
+	'expire ems cart items' => {
+		message 	=> q|Expire EMS Cart Items|,
+		lastUpdated	=> 0,
+		context		=> q|workflow activity title|,
+	},
+	
+	'item expiration time' => {
+		message 	=> q|Item Expiration Time|,
+		lastUpdated	=> 0,
+		context		=> q|a workflow activity field label|,
+	},
+	
+	'item expiration time help' => {
+		message 	=> q|How long should EMS items be allowed to sit in a cart before they are expired to be freed up for someone else to purchase?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a workflow activity field label|,
+	},
+		
+	'user' => {
+		message 	=> q|User|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'badge number' => {
+		message 	=> q|Badge #|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'percentage discount' => {
+		message 	=> q|Percentage Discount|,
+		lastUpdated	=> 0,
+		context		=> q|a ribbon property label|,
+	},
+	
+	'percentage discount help' => {
+		message 	=> q|What percentage discount will be applied to the tickets if the user purchases this ribbon?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ribbon property label|,
+	},
+		
+	'badge group name' => {
+		message 	=> q|Badge Group Name|,
+		lastUpdated	=> 0,
+		context		=> q|a badge group property label|,
+	},
+	
+	'badge group name help' => {
+		message 	=> q|Enter a name to be used to link badges with tickets under.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a badge group property label|,
+	},
+		
+	'badge groups' => {
+		message 	=> q|Badge Groups|,
+		lastUpdated	=> 0,
+		context		=> q|a header label|,
+	},
+	
+	'hours' => {
+		message 	=> q|Hours|,
+		lastUpdated	=> 0,
+		context		=> q|subtext for the duration form field|,
+	},
+	
+	'add a badge group' => {
+		message 	=> q|Add A Badge Group|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add an event meta field' => {
+		message 	=> q|Add An Event Meta Field|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'view tickets' => {
+		message 	=> q|View Tickets|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'view badges' => {
+		message 	=> q|View Badges|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'buy badge' => {
+		message 	=> q|Buy A Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'switch to badge for' => {
+		message 	=> q|Switch To '%s' Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'lookup badge' => {
+		message 	=> q|Look Up A Badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'remove' => {
+		message 	=> q|Remove|,
+		lastUpdated	=> 0,
+		context		=> q|a link label, as in "remove from cart"|,
+	},
+	
+	'import' => {
+		message 	=> q|Import|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'export' => {
+		message 	=> q|Export|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'meta fields' => {
+		message 	=> q|Meta Fields|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a badge' => {
+		message 	=> q|Add a badge|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a token' => {
+		message 	=> q|Add a token|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a ticket' => {
+		message 	=> q|Add a ticket|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add a ribbon' => {
+		message 	=> q|Add a ribbon|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'sold out' => {
+		message 	=> q|Sold Out|,
+		lastUpdated	=> 0,
+		context		=> q|a message telling the user there are none left to buy|,
+	},
+	
+	'manage' => {
+		message 	=> q|Manage|,
+		lastUpdated	=> 0,
+		context		=> q|a column label in the badge builder|,
+	},
+	
+	'quantity available' => {
+		message 	=> q|# Available|,
+		lastUpdated	=> 0,
+		context		=> q|a column label in the badge builder|,
+	},
+	
+	'buy' => {
+		message 	=> q|Buy|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'delete' => {
+		message 	=> q|Delete|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'edit' => {
+		message 	=> q|Edit|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'search' => {
+		message 	=> q|Search|,
+		lastUpdated	=> 0,
+		context		=> q|a button label in the badge builder|,
+	},
+	
+	'tickets' => {
+		message 	=> q|Tickets|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'ribbons' => {
+		message 	=> q|Ribbons|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'tokens' => {
+		message 	=> q|Tokens|,
+		lastUpdated	=> 0,
+		context		=> q|a template label a tab in the badge builder|,
+	},
+	
+	'lookup registrant template' => {
+		message 	=> q|Lookup Registrant Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'lookup registrant template help' => {
+		message 	=> q|Which template would you like to use for the lookup registrant screen?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'print badge template' => {
+		message 	=> q|Print Badge Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'print badge template help' => {
+		message 	=> q|Which template would you like to use for printing badges?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'print ticket template' => {
+		message 	=> q|Print Ticket Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'print ticket template help' => {
+		message 	=> q|Which template would you like to use for printing tickets?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'badge builder template' => {
+		message 	=> q|Badge Builder Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'badge builder template help' => {
+		message 	=> q|Which template would you like to use for the badge builder screen?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'main template' => {
+		message 	=> q|Main Template|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'main template help' => {
+		message 	=> q|Which template would you like to use for the main screen that lists the badges for purchase?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'location' => {
+		message 	=> q|Location|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'location help' => {
+		message 	=> q|In what room or location will this event be held?|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'event number' => {
+		message 	=> q|Event #|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'event number help' => {
+		message 	=> q|A number that represents the event, which is easily referenceable for things like event catalogs.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+		
+	'badge instructions' => {
+		message 	=> q|Badge Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'badge instructions help' => {
+		message 	=> q|Give the user some help on what to do with a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default badge instructions' => {
+		message 	=> q|You need a badge to attend this convention. Choose a badge that meets your needs and budget.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'ticket instructions' => {
+		message 	=> q|Ticket Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'ticket instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default ticket instructions' => {
+		message 	=> q|Tickets allow you to reserve a seat at events that are going on at the convention. Add tickets to your badge for any events you plan to attend.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'ribbon instructions' => {
+		message 	=> q|Ribbon Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'print' => {
+		message 	=> q|Print|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'checked in' => {
+		message 	=> q|Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
+	},
+	
+	'not checked in' => {
+		message 	=> q|Not Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
+	},
+	
+	'mark as not checked in' => {
+		message 	=> q|Mark As Not Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'mark as checked in' => {
+		message 	=> q|Mark As Checked In|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'refund' => {
+		message 	=> q|Refund|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'add more items' => {
+		message 	=> q|Add More Items|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
+	'notes' => {
+		message 	=> q|Notes|,
+		lastUpdated	=> 0,
+		context		=> q|a property label for registrant notes|,
+	},
+	
+	'ribbon instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ribbon.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default ribbon instructions' => {
+		message 	=> q|Ribbons give you discounts on a group of related events. You may add one ore more ribbons to your badge to give you discounts on related events.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'token instructions' => {
+		message 	=> q|Token Instructions|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'token instructions help' => {
+		message 	=> q|Give the user some help on what to do with a ribbon.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+	'default token instructions' => {
+		message 	=> q|Tokens are like convention currency. They allow you to purchase events and other items without buying a specific ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|the default value for a property|,
+	},
+	
+	'assetName' => {
+		message 	=> q|Event Manager (beta)|,
+		lastUpdated => 1131394072,
+		context		=> q|name of asset|,
+	},
+
+	'you do not have any metadata fields to display' => {
+		message => q|You do not have any metadata fields to display.|,
+		lastUpdated => 1145396293,
+	},
+
+	'label' => {
+		message 	=> q|Label|,
+		lastUpdated => 0,
+		context 	=> q|meta field label|,
+	},
+
+	'label help' => {
+		message 	=> q|The label for the field that the user will read to know what the field is for.|,
+		lastUpdated => 0,
+		context 	=> q|meta field label help|,
+	},
+
+	'ems badge' => {
+		message 	=> q|Event Manager Badge|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems ticket' => {
+		message 	=> q|Event Manager Ticket|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems ribbon' => {
+		message 	=> q|Event Manager Ribbon|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'ems token' => {
+		message 	=> q|Event Manager Token|,
+		lastUpdated => 0,
+		context		=> q|name of asset|,
+	},
+
+	'is required' => {
+		message 	=> q|%s is required.|,
+		lastUpdated	=> 0,
+		context		=> q|used in an error message|,
+	},
+	
+	'email address' => {
+		message 	=> q|Email Address|,
+		lastUpdated	=> 0,
+		context		=> q|form label|,
+	},
+	
+	'organization' => {
+		message 	=> q|Organization|,
+		lastUpdated	=> 0,
+		context		=> q|form label for company/school/etc|,
+	},
+	
+	'badge holder information' => {
+		message 	=> q|Badge Holder Information|,
+		lastUpdated	=> 0,
+		context		=> q|heading on add badge to cart screen|,
+	},
+	
+	'add to cart' => {
+		message 	=> q|Add To Cart|,
+		lastUpdated	=> 0,
+		context		=> q|a button on the add badge to cart screen|,
+	},
+	
+	'populate from address book' => {
+		message 	=> q|Populate From Address Book|,
+		lastUpdated	=> 0,
+		context		=> q|a button on the add badge to cart screen|,
+	},
+
+	'registration staff group' => {
+		message 	=> q|Registration Staff Group|,
+		lastUpdated	=> 0,
+		context		=> q|an ems property label|,
+	},
+	
+	'registration staff group help' => {
+		message 	=> q|Pick a group of users that will handle registration. These users will be able to look up and manage badge registrations for any attendee.|,
+		lastUpdated	=> 0,
+		context		=> q|help for an ems property label|,
+	},
+	
+	'related badge groups' => {
+		message 	=> q|Related Badge Groups|,
+		lastUpdated	=> 0,
+		context		=> q|a ticket property label|,
+	},
+	
+	'related badge groups ticket help' => {
+		message 	=> q|Check the badge groups that can act as a prerequisite to being able to attend this event. If none are checked, then any badge will do.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ticket property label|,
+	},
+	
+	'related badge groups badge help' => {
+		message 	=> q|Check the badge groups that related to this badge, so that tickets can be assigned prerequisite badges.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ticket property label|,
+	},
+	
+	'related ribbons' => {
+		message 	=> q|Related Ribbons|,
+		lastUpdated	=> 0,
+		context		=> q|a ribbon ticket label|,
+	},
+	
+	'related ribbons help' => {
+		message 	=> q|Check the ribbons that can provide a discount for this ticket.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a ticket property label|,
+	},
+	
+	'time zone' => {
+		message 	=> q|Time Zone|,
+		lastUpdated	=> 0,
+		context		=> q|a property label|,
+	},
+	
+	'time zone help' => {
+		message 	=> q|Select the time zone that this event will be taking place in.|,
+		lastUpdated	=> 0,
+		context		=> q|help for a property label|,
+	},
+	
+ 	'event start date' => {
+		message 	=> q|Start|,
+		lastUpdated => 0,
+		context 	=> q|Event start date field label|
+	},
+
+	'event start date help' => {
+		message 	=> q|The time and date when the event starts.|,
+		lastUpdated => 0,
+		context 	=> q|hover help for Event Start Date field|
+	},
+
+	'duration' => {
+		message 	=> q|Duration|,
+		lastUpdated => 0,
+		context 	=> q|duration field label|
+	},
+
+	'duration help' => {
+		message 	=> q|How long does this event last?|,
+		lastUpdated => 0,
+		context 	=> q|hover help for duration field|
+	},
+
+
+
 	'cancel registration' => {
 		message => q|Cancel Registration|,
 		lastUpdated => 0,
 		context => q|Label for hyperlink asking user if they wish to cancel the registration process during checkout.|,
-	},
-
-        'search template' => { 
-		message => q|Search Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for template selector|
-	},
-
-	'search template description' => {
-		message => q|Controls the layout, look, and appearance of the Event Management System Search Page.|,
-		lastUpdated => 1165364261,
-		context => q|Describes this template field selector|
-	},     
-        
-	'display template' => { 
-		message => q|Display Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for template selector|
-	},
-
-	'display template description' => {
-		message => q|Controls the layout, look, and appearance of an Event Management System.|,
-		lastUpdated => 1165364241,
-		context => q|Describes this template field selector|
-	},
-
-	'checkout template' => { 
-		message => q|Checkout Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'checkout template description' => {
-		message => q|Controls the layout, look, and appearance of the Checkout screen in the Event Management System.|,
-		lastUpdated => 1165364248,
-		context => q|Describes this template field selector|
-	},
-
-	'manage purchases template' => { 
-		message => q|Manage Purchases Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'manage purchases template description' => {
-		message => q|Controls the layout, look, and appearance of the Manage Purchases screen in the Event Management System.|,
-		lastUpdated => 1165364251,
-		context => q|Describes this template field selector|
-	},
-
-	'view purchase template' => { 
-		message => q|View Purchase Template|,
-		lastUpdated => 1145400901,
-		context => q|Field label for template selector|
-	},
-
-	'view purchase template description' => {
-		message => q|Controls the layout, look, and appearance of the View Purchase screen in the Event Management System.|,
-		lastUpdated => 1165364253,
-		context => q|Describes this template field selector|
-	},
-
-	'add/edit event template' => { 
-		message => q|Event Template|,
-		lastUpdated => 1131394070,
-		context => q|Field label for event template selector|
-	},
-
-	'add/edit event template description' => {
-		message => q|Controls the layout, look, and appearance of an individual Event in the Event Management System.|,
-		lastUpdated => 1165364256,
-		context => q|Describes the event template field selector|
-	},
-
-	'paginate after' => {
-		message => q|Paginate After|,
-		lastUpdated => 1131394072,
-		context => q|Field label for Paginate After|
-	},
-
-	'paginate after description' => {
-		message => q|Number of events to display on one page.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Paginate After field|
-	},
-
-	'group to add events' => {
-		message => q|Group to Add Events|,
-		lastUpdated => 1131394072,
-		context => q|Field label|
-	},
-
-	'group to add events description' => {
-		message => q|Members of the selected group will have the ability to add events to an Event Management System.
-		Events added will not be available for purchase until the event is approved by a member of the Group to Approve Events.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Group To Add Events field|
-	},
-
-	'add/edit event start date' => {
-		message => q|Event Start Date|,
-		lastUpdated => 1138837472,
-		context => q|Event start date field label|
-	},
-
-	'add/edit event start date description' => {
-		message => q|The time and date when the event starts.|,
-		lastUpdated => 1131394072,
-		context => q|hover help for Event Start Date field|
-	},
-
-	'add/edit event end date' => {
-		message => q|Event End Date|,
-		lastUpdated => 1138837472,
-		context => q|Event end date field label|
-	},
-
-	'add/edit event end date description' => {
-		message => q|The time and date when the event ends.|,
-		lastUpdated => 1138837560,
-		context => q|hover help for Event End Date field|
-	},
-
-	'group to approve events' => {
-		message => q|Group to Approve Events|,
-		lastUpdated => 1131394072,
-		context => q|Field Label|
-	},
-
-	'group to approve events description' => {
-		message => q|Members of the selected group will have the ability to approve a pending event so that it is available for purchase.|,
-		lastUpdated => 1131394072,
-		context => q|Describes the Group To Approve Events field|
 	},
 
 	'add/edit event title' => {
@@ -172,8 +622,15 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'price' => {
-		message => q|Price|,
+		message 	=> q|Price|,
 		lastUpdated => 1138312761,
+		context		=> q|field label|,
+	},
+	
+	'price help' => {
+		message		=> q|How much do you want to charge for this item?|,
+		lastUpdated	=> 0,
+		context		=> q|field label help|,
 	},
 
 	'add/edit event price description' => {
@@ -191,20 +648,10 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1160109886,
 	},
 
-	'add/edit event maximum attendees' => {
-		message => q|Maximum Attendees|,
-		lastUpdated => 1138312761,
-	},
-
 	'add/edit approve event' => {
 		message => q|Approve Event|,
 		lastUpdated => 1138312761,
 		context => q|URL to approve an event in the Add/Edit Event form|,
-	},
-
-	'add/edit event maximum attendees description' => {
-		message => q|Based on room size, chairs, staffing and other requirements, the number of people who can attend the event.|,
-		lastUpdated => 1138899055,
 	},
 
 	'add/edit event required events' => {
@@ -229,129 +676,6 @@ our $I18N = { ##hashref of hashes
 		message => q|As required events are added to this event, you can specify that all of the events must required (And) or that any of the events are required (Or)|,
 		lastUpdated => 1138899055,
 		context => q|hover help for operator field|,
-	},
-
-	'and' => {
-		message => q|And|,
-		lastUpdated => 1138899055,
-		context => q|logical AND|,
-	},
-
-	'or' => {
-		message => q|Or|,
-		lastUpdated => 1138899055,
-		context => q|logical OR|,
-	},
-
-	'add/edit event what next' => {
-		message => q|What Next?|,
-		lastUpdated => 1138902214,
-		context => q|form field in add/edit event|,
-	},
-
-	'add/edit event what next description' => {
-		message => q|After you have completed filling out this form, you can either add another required event, or simply save your settings and return to the Event Manager page.|,
-		lastUpdated => 1138899055,
-		context => q|hover help for What Next field|,
-	},
-
-	'add/edit event add another prerequisite' => {
-		message => q|Add Another Prerequisite|,
-		lastUpdated => 1138312761,
-		context => q|option for adding another required event in the add/edit event screen|,
-	},
-
-	'add/edit event return to manage events' => {
-		message => q|Return to Manage Events|,
-		lastUpdated => 1138312761,
-		context => q|option for returning to manage events page|,
-	},
-
-	'add/edit event assigned prerequisites' => {
-		message => q|<br />Assigned Prerequisites<br /><br />|,
-		lastUpdated => 1138312761,
-		context => q|Label for displaying required events|,
-	},
-
-	'add/edit event error' => {
-		message => q|ERROR|,
-		lastUpdated => 1138903982,
-		context => q|label for displaying errors when an event has been added or edited, such as missing required fields.|,
-	},
-
-	'event' => {
-		message => q|Event|,
-		lastUpdated => 1138904660,
-	},
-
-	'global prerequisite' => {
-		message => q|Global Prerequisites|,
-		lastUpdated => 1138312761,
-	},
-
-	'global prerequisite description' => {
-		message => q|When set to yes, you may assign events belonging to another instance of an Event Management System Asset as a prerequisite event for one of the events defined in this instance of the asset.  When set to no, only events defined within this instance of the asset may be used as prerequisites.|,
-		lastUpdated => 1165364300,
-	},
-
-	'price must be greater than zero' => {
-		message => q|Price must be greater than zero.|,
-		lastUpdated => 1138312761,
-		context => q|Error message for an illegal price.|,
-	},
-
-	'status' => {
-		message => q|Status|,
-		lastUpdated => 1138908026,
-		context => q|Whether an event has been approved or not|,
-	},
-
-	'approved' => {
-		message => q|Approved|,
-		lastUpdated => 1138908026,
-		context => q|label in Event Manager, approved|,
-	},
-
-	'pending' => {
-		message => q|Pending|,
-		lastUpdated => 1138908026,
-		context => q|label in Event Manager, waiting for approval|,
-	},
-
-	'confirm delete event' => {
-		message => q|Are you sure you want to delete this event?|,
-		lastUpdated => 1138908026,
-		context => q|Confirm whether an event will be deleted|,
-	},
-
-	'confirm delete prerequisite' => {
-		message => q|Are you sure you want to delete this prerequisite?|,
-		lastUpdated => 1138908883,
-		context => q|Confirm whether a prerequisite will be deleted in the add/edit event screen|,
-	},
-
-	'add event' => {
-		message => q|Add Event|,
-		lastUpdated => 1138908251,
-		context => q|Link to add an event to the event manager|,
-	},
-
-	'manage event metadata' => {
-		message => q|Manage Event Metadata|,
-		lastUpdated => 1138908251,
-		context => q|Link to manage event metadata|,
-	},
-
-	'add new event metadata field' => {
-		message => q|Add new Event Metadata Field|,
-		lastUpdated => 1138908251,
-		context => q|In Manage Event Metadata screen|,
-	},
-
-	'add/edit event metadata field' => {
-		message => q|Add/Edit Event Metadata Field|,
-		lastUpdated => 1138908251,
-		context => q|In Manage Event Metadata screen|,
 	},
 
 	'check required fields' => {
@@ -510,7 +834,7 @@ our $I18N = { ##hashref of hashes
 		context => q|When a required field is empty/blank, then this message is used in sprintf to tell the user which field it is and that it cannot be blank|,
 	},
 
-	'add to cart' => {
+	'add to badge' => {
 		message => q|Add To Badge|,
 		lastUpdated => 1140466438,
 		context => q|Label to invite the user to purchase this event and add it to their shopping cart.|,
@@ -986,21 +1310,6 @@ by setting the "hide" form variable.|,
 		lastUpdated => 1140465899,
 	},
 
-	'assetName' => {
-		message => q|Event Manager (beta)|,
-		lastUpdated => 1131394072,
-	},
-
-	'global metadata' => {
-		message => q|Use Global Event Metadata|,
-		lastUpdated => 1140469381,
-	},
-
-	'global metadata description' => {
-		message => q|Whether or not to use all other Event Management Systems Metadata Fields when assigning metadata to events and searching for events.<br /><br />The management screen list of metadata fields for this asset will still remain limited to those created by this EMS asset.<br />|,
-		lastUpdated => 1140469381,
-	},
-
 	'type name here' => {
 		message => q|Type Name Here|,
 		lastUpdated => 1140469381,
@@ -1017,8 +1326,8 @@ by setting the "hide" form variable.|,
 	},
 
 	'confirm delete event metadata' => {
-		message => q|Are you certain you want to delete this metadata field?  The metadata values for this field will be deleted from all events, including events in other EMS wobjects that are set to use global metadata.|,
-		lastUpdated => 1140469381,
+		message => q|Are you certain you want to delete this metadata field?  The metadata values for this field will be deleted from all events.|,
+		lastUpdated => 1205860492,
 	},
 
 	'manage purchases' => {
@@ -1052,46 +1361,6 @@ by setting the "hide" form variable.|,
 		lastUpdated => 1145396293,
 	},
 
-	'you do not have any metadata fields to display' => {
-		message => q|You do not have any metadata fields to display.|,
-		lastUpdated => 1145396293,
-	},
-
-	'you do not have any events to display' => {
-		message => q|You do not have any events to display.|,
-		lastUpdated => 1145396293,
-	},
-
-	'save approvals' => {
-		message => q|Save Approvals|,
-		lastUpdated => 1145396293,
-	},
-
-	'approve event' => {
-		message => q|Approve Event|,
-		lastUpdated => 1145396293,
-	},
-
-	'approve event description' => {
-		message => q|You can approve events so you may either submit events already approved or directly edit approval of events|,
-		lastUpdated => 1145396293,
-	},
-
-	'approval' => {
-		message => q|Approval|,
-		lastUpdated => 1145396293,
-	},
-
-	'auto search' => {
-		message => q|Initial Search Field|,
-		lastUpdated => 1145400186,
-	},
-
-	'auto search description' => {
-		message => q|Make this appear as a Filter Field on the Advanced Search screen by default|,
-		lastUpdated => 1145400186,
-	},
-
 	'select one' => {
 		message => q|Select One|,
 		lastUpdated => 1145400186,
@@ -1105,8 +1374,15 @@ by setting the "hide" form variable.|,
 	},
 
 	'seats available' => {
-		message => q|Seats Available|,
+		message 	=> q|Seats Available|,
 		lastUpdated => 1145400186,
+		context		=> q|field label|,
+	},
+
+	'seats available help' => {
+		message 	=> q|How many people may purchase this item before you run out of room?|,
+		lastUpdated => 0,
+		context		=> q|field label help|,
 	},
 
 	'missing prerequisites message' => {

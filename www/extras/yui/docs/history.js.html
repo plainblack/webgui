@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Browser History Manager&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Browser History Manager&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_history.html">history</a>
@@ -569,7 +569,7 @@
 <span class="c"></span>                <span class="c">// As a consequence, the best thing we can do is to throw an</span>
 <span class="c"></span>                <span class="c">// exception. The application should catch it, and degrade</span>
 <span class="c"></span>                <span class="c">// gracefully. This is the sad state of history management.</span>
-<span class="c"></span>                <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="o">(</span><span class="s2">&quot;Unsupported browser&quot;</span><span class="o">);</span>
+<span class="c"></span>                <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Unsupported browser.&quot;</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
             <span class="o">}</span>
 
             <span class="k">if</span> <span class="o">(</span><span class="k">typeof</span> <span class="nx">stateField</span> <span class="o">===</span> <span class="s2">&quot;string&quot;</span><span class="o">)</span> <span class="o">{</span>

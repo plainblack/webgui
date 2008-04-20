@@ -79,7 +79,7 @@
                     tar = null;
                 }
                 //Make sure we are a link in the list's 
-                if (YAHOO.util.Selector.test(tar, '#folder_list ul li a')) {
+                if (tar && YAHOO.util.Selector.test(tar, '#folder_list ul li a')) {
                     //if the href is a '#' then select the proper tab and change it's label
                     if (tar && tar.getAttribute('href', 2) == '#') {
                         YAHOO.util.Dom.removeClass(YAHOO.util.Selector.query('#folder_list li'), 'selected');

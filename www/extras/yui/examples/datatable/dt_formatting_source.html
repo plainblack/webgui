@@ -14,6 +14,7 @@
 var loader = new YAHOO.util.YUILoader();
 loader.insert({
     require: ["fonts", "datatable", "json"],
+    filter: 'debug',
     base: '../../build/',
     onSuccess: function() {
         YAHOO.example.CustomFormatting = new function() {
@@ -29,22 +30,26 @@ loader.insert({
                     elCell.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-dn.png">';
                 }
             };
+            
+            // Add the custom formatter to the shortcuts
+            YAHOO.widget.DataTable.Formatter.myCustom = this.myCustomFormatter;
 
             // Override the built-in formatter
             YAHOO.widget.DataTable.formatEmail = function(elCell, oRecord, oColumn, oData) {
                 var user = oData;
                 elCell.innerHTML = "<a href=\"mailto:" + user + "@mycompany.com\">" + user + "</a>";
             };
+            
 
             var myColumnDefs = [
-                {key:"flag", formatter:this.myCustomFormatter}, // use custom formatter
-                {key:"radio", formatter:YAHOO.widget.DataTable.formatRadio}, // use the built-in radio formatter
+                {key:"flag", formatter:"myCustom"}, // use custom shortcut
+                {key:"radio", formatter:"radio"}, // use the built-in radio formatter
                 {key:"check", formatter:"checkbox"}, // use the built-in checkbox formatter (shortcut)
                 {key:"button", label:"Show record data", formatter:YAHOO.widget.DataTable.formatButton}, // use the built-in button formatter
-                {key:"field1", sortable:true},
-                {key:"field2", sortable:true, formatter:YAHOO.widget.DataTable.formatDate}, // use the built-in date formatter
+                {key:"field1", formatter:"dropdown", dropdownOptions:["apples","bananas","cherries"],sortable:true},
+                {key:"field2", sortable:true, formatter:"date"}, // use the built-in date formatter
                 {key:"field3", sortable:true},
-                {key:"field4", sortable:true, formatter:YAHOO.widget.DataTable.formatCurrency}, // use the built-in currency formatter
+                {key:"field4", sortable:true, formatter:"currency"}, // use the built-in currency formatter
                 {key:"field5", sortable:true, formatter:YAHOO.widget.DataTable.formatEmail}, // use the overridden email formatter
                 {key:"field6", sortable:true, formatter:YAHOO.widget.DataTable.formatLink} // use the built-in link formatter
             ];
@@ -72,22 +77,27 @@ loader.insert({
                     lastSelectedRadioRecord.setData("radio",false);
                 }
                 var elRadio = oArgs.target;
-                var elRecord = this.getRecord(elRadio);
-                elRecord.setData("radio",true);
-                lastSelectedRadioRecord = elRecord;
-                var name = elRecord.getData("field5");
+                var oRecord = this.getRecord(elRadio);
+                oRecord.setData("radio",true);
+                lastSelectedRadioRecord = oRecord;
+                var name = oRecord.getData("field5");
             });
 
             this.myDataTable.subscribe("checkboxClickEvent", function(oArgs){
                 var elCheckbox = oArgs.target;
-                var elRecord = this.getRecord(elCheckbox);
-                elRecord.setData("check",elCheckbox.checked);
-                var name = elRecord.getData("field5");
+                var oRecord = this.getRecord(elCheckbox);
+                oRecord.setData("check",elCheckbox.checked);
             });
 
             this.myDataTable.subscribe("buttonClickEvent", function(oArgs){
                 var oRecord = this.getRecord(oArgs.target);
                 alert(YAHOO.lang.dump(oRecord.getData()));
+            });
+
+            this.myDataTable.subscribe("dropdownChangeEvent", function(oArgs){
+                var elDropdown = oArgs.target;
+                var oRecord = this.getRecord(elDropdown);
+                oRecord.setData("field1",elDropdown.options[elDropdown.selectedIndex].value);
             });
         };
     }

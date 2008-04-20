@@ -171,12 +171,12 @@
 # List the merchant gateways you have installed and wish to be
 # available on this site.
 
-"paymentPlugins" : ["ITransact","Cash"],
+"paymentDrivers" : ["WebGUI::Shop::PayDriver::Cash"],
 
-# List the shipping plugins you have installed and wish to be
+# List the shipping drivers you have installed and wish to be
 # available for configuration on the site.
 
-"shippingPlugins" : ["ByPrice", "ByWeight", "PerTransaction"],
+"shippingDrivers" : ["WebGUI::Shop::ShipDriver::FlatRate"],
 
 # Specify the list of template parsers available in the system.
 
@@ -209,6 +209,7 @@
 # Add Content menus.
 
 "assets" : [
+    "WebGUI::Asset::Sku::Donation",
 	"WebGUI::Asset::Snippet", 
 	"WebGUI::Asset::Redirect", 
 	"WebGUI::Asset::FilePile", 
@@ -330,6 +331,7 @@
 	"#" : "Hash_userId", 
         "/" : "Slash_gatewayUrl", 
         "@" : "At_username", 
+        "ViewCart" : "ViewCart",
         "AOIHits" : "AOIHits", 
         "AOIRank" : "AOIRank", 
         "AdminBar" : "AdminBar", 
@@ -358,8 +360,6 @@
 	"RandomThread" : "RandomThread", 
         "RootTitle" : "RootTitle", 
         "Spacer" : "Spacer", 
-        "SubscriptionItem" : "SubscriptionItem", 
-        "SubscriptionItemPurchaseUrl" : "SubscriptionItemPurchaseUrl", 
         "Thumbnail" : "Thumbnail", 
         "User" : "User", 
         "a" : "a_account", 
@@ -401,7 +401,7 @@
 			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
 			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
 			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
-			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", 
+			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", "WebGUI::Workflow::Activity::ExpireEmsCartItems",
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
 			"WebGUI::Workflow::Activity::SendQueuedMailMessages","WebGUI::Workflow::Activity::CleanDatabaseCache",
@@ -471,6 +471,7 @@
     "WebGUI::Content::Maintenance",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
+    "WebGUI::Content::Shop",
     "WebGUI::Content::Asset",
     "WebGUI::Content::NotFound"
     ]

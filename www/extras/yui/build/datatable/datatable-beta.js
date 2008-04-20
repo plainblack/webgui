@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * Mechanism to execute a series of callbacks in a non-blocking queue.  Each callback is executed via setTimout unless configured with a negative timeout, in which case it is run in blocking mode in the same execution thread as the previous callback.  Callbacks can be function references or object literals with the following keys:
@@ -28,6 +28,13 @@ YAHOO.util.Chain = function () {
      * @private
      */
     this.q = [].slice.call(arguments);
+
+    /**
+     * Event fired when the callback queue is emptied via execution (not via
+     * a call to chain.stop().
+     * @event end
+     */
+    this.createEvent('end');
 };
 
 YAHOO.util.Chain.prototype = {
@@ -51,7 +58,10 @@ YAHOO.util.Chain.prototype = {
 
         // If there is no callback in the queue or the Chain is currently
         // in an execution mode, return
-        if (!c || this.id) {
+        if (!c) {
+            this.fireEvent('end');
+            return this;
+        } else if (this.id) {
             return this;
         }
 
@@ -155,7 +165,7 @@ YAHOO.util.Chain.prototype = {
         return this;
     }
 };
-
+YAHOO.lang.augmentProto(YAHOO.util.Chain,YAHOO.util.EventProvider);
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
@@ -1328,13 +1338,14 @@ if(YAHOO.util.DDProxy) {
         onDragDrop: function() {
             if(YAHOO.lang.isNumber(this.newIndex) && (this.newIndex !== this.column.getTreeIndex())) {
                 var oDataTable = this.datatable;
-                oDataTable._oChain.stop();
+                oDataTable._oChainRender.stop();
                 var aColumnDefs = oDataTable._oColumnSet.getDefinitions();
                 var oColumn = aColumnDefs.splice(this.column.getTreeIndex(),1)[0];
                 aColumnDefs.splice(this.newIndex, 0, oColumn);
                 oDataTable._initColumnSet(aColumnDefs);
                 oDataTable._initTheadEls();
                 oDataTable.render();
+                oDataTable.fireEvent("columnReorderEvent");
             }
         },
         endDrag: function() {
@@ -1408,7 +1419,13 @@ if(YAHOO.util.DD) {
          */
         onMouseUp : function(e) {
             this.resetResizerEl();
-            this.datatable.fireEvent("columnResizeEvent", {column:this.column,target:this.headCell});
+            
+            var el = this.headCell.firstChild;
+            var newWidth = el.offsetWidth -
+                (parseInt(YAHOO.util.Dom.getStyle(el,"paddingLeft"),10)|0) -
+                (parseInt(YAHOO.util.Dom.getStyle(el,"paddingRight"),10)|0);
+
+            this.datatable.fireEvent("columnResizeEvent", {column:this.column,target:this.headCell,width:newWidth});
         },
     
         /**
@@ -1456,7 +1473,6 @@ if(YAHOO.util.DD) {
         }
     });
 }
-
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
@@ -1871,6 +1887,7 @@ YAHOO.widget.RecordSet.prototype = {
             return oRecord;
         }
         else {
+            return null;
         }
     },
 
@@ -1906,56 +1923,25 @@ YAHOO.widget.RecordSet.prototype = {
      * @return {YAHOO.widget.Record[]} An array of Record instances.
      */
     setRecords : function(aData, index) {
-        if(YAHOO.lang.isArray(aData)) {
-            var Rec = YAHOO.widget.Record,
-                spliceParams = [index,0],
-                i = aData.length - 1,
-                r;
+        var Rec   = YAHOO.widget.Record,
+            a     = YAHOO.lang.isArray(aData) ? aData : [aData],
+            added = [],
+            i = 0, l = a.length, j = 0;
 
-            // build up a parameter array for a single call to splice in
-            // the new records.
-            for(; i >= 0 ; --i) {
-                // If the data in aData isn't valid, use the existing
-                // record to avoid harming valid records
-                r = aData[i] && typeof aData[i] === 'object' ?
-                                new Rec(aData[i]) : this._records[i];
-                if (r) {
-                    spliceParams[i+2] = r;
-                }
+        index = parseInt(index,10)|0;
+
+        for(; i < l; ++i) {
+            if (typeof a[i] === 'object' && a[i]) {
+                added[j++] = this._records[index + i] = new Rec(a[i]);
             }
-
-            // We need to explicitly set the last record because splice doesn't
-            // honor start indexes higher than the current length.
-            this._records[index + spliceParams.length - 3] =
-                spliceParams[spliceParams.length - 1];
-
-            // Set the number of records to change (length minus first 2
-            // placeholders).  This must be done here because the end of aData
-            // may have contained invalid record data so we avoid increasing
-            // _records.length incorrectly.  And we do need to set the last
-            // record, although we just did that.
-            spliceParams[1] = spliceParams.length - 2;
-
-            // Call splice.apply to simulate a single update to _records
-            // rather than looping through the new records and setting them
-            // to the index one by one.  Use the spliceParams array to get
-            // the splice method to apply.  A bit convoluted, I know.
-            spliceParams.splice.apply(this._records,spliceParams);
-
-            this.fireEvent("recordsSet",{records:spliceParams,data:aData});
-
-            // return the records that were set.  The first two indexes
-            // in spliceParams are the start index and length, so return
-            // everything starting at index 2
-            return spliceParams.slice(2);
         }
-        else if(aData && (aData.constructor == Object)) {
-            var oRecord = this._setRecord(aData);
-            this.fireEvent("recordsSetEvent",{records:[oRecord],data:aData});
-            return oRecord;
+
+        this.fireEvent("recordsSet",{records:added,data:aData});
+
+        if (a.length && !added.length) {
         }
-        else {
-        }
+
+        return added.length > 1 ? added : added[0];
     },
 
     /**
@@ -2076,11 +2062,7 @@ YAHOO.widget.RecordSet.prototype = {
     deleteRecord : function(index) {
         if(YAHOO.lang.isNumber(index) && (index > -1) && (index < this.getLength())) {
             // Copy data from the Record for the event that gets fired later
-            var oRecordData = this.getRecord(index).getData();
-            var oData = {};
-            for(var key in oRecordData) {
-                oData[key] = oRecordData[key];
-            }
+            var oData = YAHOO.widget.DataTable._cloneObject(this.getRecord(index).getData());
             
             this._deleteRecord(index);
             this.fireEvent("recordDeleteEvent",{data:oData,index:index});
@@ -2099,6 +2081,7 @@ YAHOO.widget.RecordSet.prototype = {
      * @method deleteRecords
      * @param index {Number} Record's RecordSet position index.
      * @param range {Number} (optional) How many Records to delete.
+     * @return {Object[]} An array of copies of the data held by the deleted Records.     
      */
     deleteRecords : function(index, range) {
         if(!YAHOO.lang.isNumber(range)) {
@@ -2108,19 +2091,18 @@ YAHOO.widget.RecordSet.prototype = {
             var recordsToDelete = this.getRecords(index, range);
             // Copy data from each Record for the event that gets fired later
             var deletedData = [];
+            
             for(var i=0; i<recordsToDelete.length; i++) {
-                var oData = {};
-                for(var key in recordsToDelete[i]) {
-                    oData[key] = recordsToDelete[i][key];
-                }
-                deletedData.push(oData);
+                deletedData[deletedData.length] = YAHOO.widget.DataTable._cloneObject(recordsToDelete[i]);
             }
             this._deleteRecord(index, range);
 
             this.fireEvent("recordsDeleteEvent",{data:deletedData,index:index});
 
+            return deletedData;
         }
         else {
+            return null;
         }
     },
 
@@ -2247,7 +2229,6 @@ YAHOO.widget.Record.prototype = {
         this._oData[sKey] = oData;
     }
 };
-
 /**
  * The Paginator widget provides a set of controls to navigate through paged
  * data.
@@ -2427,10 +2408,10 @@ YAHOO.widget.Paginator.prototype = {
          * Total number of records to paginate through
          * @attribute totalRecords
          * @type integer
-         * @default Paginator.VALUE_UNLIMITED
+         * @default 0
          */
         this.setAttributeConfig('totalRecords', {
-            value     : UNLIMITED,
+            value     : 0,
             validator : l.isNumber
         });
 
@@ -2761,8 +2742,8 @@ YAHOO.widget.Paginator.prototype = {
      */
     getCurrentPage : function () {
         var perPage = this.get('rowsPerPage');
-        if (!perPage) {
-            return null;
+        if (!perPage || !this.get('totalRecords')) {
+            return 0;
         }
         return Math.floor(this.get('recordOffset') / perPage) + 1;
     },
@@ -2776,11 +2757,7 @@ YAHOO.widget.Paginator.prototype = {
         var currentPage = this.getCurrentPage(),
             totalPages  = this.getTotalPages();
 
-        if (currentPage === null) {
-            return false;
-        }
-
-        return (totalPages === YAHOO.widget.Paginator.VALUE_UNLIMITED ? true : currentPage < totalPages);
+        return currentPage && (totalPages === YAHOO.widget.Paginator.VALUE_UNLIMITED || currentPage < totalPages);
     },
 
     /**
@@ -2827,7 +2804,7 @@ YAHOO.widget.Paginator.prototype = {
             records = this.get('totalRecords'),
             start, end;
 
-        if (!perPage) {
+        if (!page || !perPage) {
             return null;
         }
 
@@ -3819,12 +3796,8 @@ ui.PageLinks.calculateRange = function (currentPage,totalPages,numPages) {
     var UNLIMITED = Paginator.VALUE_UNLIMITED,
         start, end, delta;
 
-    if (!currentPage) {
-        return null;
-    }
-
     // Either has no pages, or unlimited pages.  Show none.
-    if (numPages === 0 || totalPages === 0 ||
+    if (!currentPage || numPages === 0 || totalPages === 0 ||
         (totalPages === UNLIMITED && numPages === UNLIMITED)) {
         return [0,-1];
     }
@@ -3860,7 +3833,7 @@ ui.PageLinks.prototype = {
      * @type number
      * @private
      */
-    current     : null,
+    current     : 0,
 
     /**
      * Span node containing the page links
@@ -4210,15 +4183,15 @@ ui.CurrentPageReport.init = function (p) {
     p.setAttributeConfig('pageReportValueGenerator', {
         value : function (paginator) {
             var curPage = paginator.getCurrentPage(),
-                records = paginator.getPageRecords(curPage);
+                records = paginator.getPageRecords();
 
             return {
-                'currentPage' : curPage,
+                'currentPage' : records ? curPage : 0,
                 'totalPages'  : paginator.getTotalPages(),
-                'startIndex'  : records[0],
-                'endIndex'    : records[1],
-                'startRecord' : records[0] + 1,
-                'endRecord'   : records[1] + 1,
+                'startIndex'  : records ? records[0] : 0,
+                'endIndex'    : records ? records[1] : 0,
+                'startRecord' : records ? records[0] + 1 : 0,
+                'endRecord'   : records ? records[1] + 1 : 0,
                 'totalRecords': paginator.get('totalRecords')
             };
         },
@@ -4289,7 +4262,6 @@ ui.CurrentPageReport.prototype = {
 };
 
 })();
-
 /**
  * The DataTable widget provides a progressively enhanced DHTML control for
  * displaying tabular data across A-grade browsers.
@@ -4324,7 +4296,9 @@ YAHOO.widget.DataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs) 
     // Internal vars
     this._nIndex = DT._nCount;
     this._sId = "yui-dt"+this._nIndex;
-    this._oChain = new YAHOO.util.Chain();
+    this._oChainRender = new YAHOO.util.Chain();
+    this._oChainSync = new YAHOO.util.Chain();
+    this._oChainRender.subscribe("end",this._sync, this, true);
 
     // Initialize configs
     this._initConfigs(oConfigs);
@@ -4398,8 +4372,8 @@ YAHOO.widget.DataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs) 
     
     // Send a simple initial request
     var oCallback = {
-        success : this.onDataReturnSetRecords,
-        failure : this.onDataReturnSetRecords,
+        success : this.onDataReturnSetRows,
+        failure : this.onDataReturnSetRows,
         scope   : this,
         argument: {}
     };
@@ -4409,7 +4383,7 @@ YAHOO.widget.DataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs) 
     // Do not send an initial request at all
     else if(this.get("initialLoad") === false) {
         this.showTableMessage(DT.MSG_EMPTY, DT.CLASS_EMPTY);
-        this._oChain.add({
+        this._oChainRender.add({
             method: function() {
                 if((this instanceof DT) && this._sId && this._bInit) {
                     this._bInit = false;
@@ -4418,7 +4392,7 @@ YAHOO.widget.DataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs) 
             },
             scope: this
         });
-        this._oChain.run();
+        this._oChainRender.run();
     }
     // Send an initial request with a custom payload
     else {
@@ -4893,7 +4867,7 @@ lang.augmentObject(DT, {
      * @private
      * @static     
      */
-    _bStylesheetFallback : false,
+    _bStylesheetFallback : (ua.ie && (ua.ie<7)) ? true : false,
 
     /**
      * Object literal hash of Columns and their dynamically create style rules.
@@ -4934,7 +4908,7 @@ lang.augmentObject(DT, {
      * @static     
      */
     _cloneObject : function(o) {
-        if(lang.isUndefined(o)) {
+        if(!lang.isValue(o)) {
             return o;
         }
         
@@ -4947,7 +4921,7 @@ lang.augmentObject(DT, {
             }
             copy = array;
         }
-        else if(o.constructor == Object) { 
+        else if(o.constructor && (o.constructor == Object)) { 
             for (var x in o){
                 if(lang.hasOwnProperty(o, x)) {
                     if(lang.isValue(o[x]) && (o[x].constructor == Object) || lang.isArray(o[x])) {
@@ -5170,11 +5144,14 @@ lang.augmentObject(DT, {
                     optionEl.innerHTML = (lang.isValue(option.text)) ?
                             option.text : option;
                     optionEl = selectEl.appendChild(optionEl);
+                    if (optionEl.value == selectedValue) {
+                        optionEl.selected = true;
+                    }
                 }
             }
             // Selected value is our only option
             else {
-                selectEl.innerHTML = "<option value=\"" + selectedValue + "\">" + selectedValue + "</option>";
+                selectEl.innerHTML = "<option selected value=\"" + selectedValue + "\">" + selectedValue + "</option>";
             }
         }
         else {
@@ -5337,25 +5314,21 @@ lang.augmentObject(DT, {
     handleDataSourcePagination : function (oState,self) {
         var requestedRecords = oState.records[1] - oState.recordOffset;
 
-        if (self._oRecordSet.hasRecords(oState.recordOffset, requestedRecords)) {
-            DT.handleSimplePagination(oState,self);
-        } else {
-            // Translate the proposed page state into a DataSource request param
-            var generateRequest = self.get('generateRequest');
-            var request = generateRequest({ pagination : oState }, self);
+        // Translate the proposed page state into a DataSource request param
+        var generateRequest = self.get('generateRequest');
+        var request = generateRequest({ pagination : oState }, self);
 
-            var callback = {
-                success : self.onDataReturnSetRecords,
-                failure : self.onDataReturnSetRecords,
-                argument : {
-                    startIndex : oState.recordOffset,
-                    pagination : oState
-                },
-                scope : self
-            };
+        var callback = {
+            success : self.onDataReturnSetRows,
+            failure : self.onDataReturnSetRows,
+            argument : {
+                startIndex : oState.recordOffset,
+                pagination : oState
+            },
+            scope : self
+        };
 
-            self._oDataSource.sendRequest(request, callback);
-        }
+        self._oDataSource.sendRequest(request, callback);
     },
 
     /**
@@ -5461,7 +5434,7 @@ lang.augmentObject(DT, {
             calendar.render();
             calContainer.style.cssFloat = "none";
 
-            if(ua.ie == 6) {
+            if(ua.ie) {
                 var calFloatClearer = elContainer.appendChild(document.createElement("br"));
                 calFloatClearer.style.clear = "both";
             }
@@ -5638,15 +5611,33 @@ lang.augmentObject(DT, {
         }
 
         // Textbox
-        var elTextbox = elContainer.appendChild(document.createElement("input"));
+        var elTextbox;
+        // Bug 1802582: SF3/Mac needs a form element wrapping the input
+        if(ua.webkit>420) {
+            elTextbox = elContainer.appendChild(document.createElement("form")).appendChild(document.createElement("input"));
+        }
+        else {
+            elTextbox = elContainer.appendChild(document.createElement("input"));
+        }
         elTextbox.type = "text";
         elTextbox.style.width = elCell.offsetWidth + "px"; //(parseInt(elCell.offsetWidth,10)) + "px";
         //elTextbox.style.height = "1em"; //(parseInt(elCell.offsetHeight,10)) + "px";
         elTextbox.value = value;
 
+        // Bug: 1802582 Set up a listener on each textbox to track on keypress
+        // since SF/OP can't preventDefault on keydown
+        Ev.addListener(elTextbox, "keypress", function(v){
+            // Prevent form submit
+            // Save on "enter"
+            if((v.keyCode === 13)) {
+                YAHOO.util.Event.preventDefault(v);
+                oSelf.saveCellEditor();
+            }
+        });
+
         // Set up a listener on each textbox to track the input value
-        Ev.addListener(elTextbox, "keyup", function(){
-            //TODO: set on a timeout
+        Ev.addListener(elTextbox, "keyup", function(v){
+            // Update the tracker value
             oSelf._oCellEditor.value = elTextbox.value;
             oSelf.fireEvent("editorUpdateEvent",{editor:oSelf._oCellEditor});
         });
@@ -5682,7 +5673,7 @@ lang.augmentObject(DT, {
     /**
      * Translates (proposed) DataTable state data into a form consumable by
      * DataSource sendRequest as the request parameter.  Use
-     * set('generateParameter', yourFunc) to use a custom function rather than this
+     * set('generateRequest', yourFunc) to use a custom function rather than this
      * one.
      * @method DataTable._generateRequest
      * @param oData {Object} Object literal defining the current or proposed state
@@ -5857,13 +5848,18 @@ initAttributes : function(oConfigs) {
     *     <dt>sortedBy.dir</dt>
     *     <dd>{String} Initial sort direction, either DT.CLASS_ASC or DT.CLASS_DESC</dd>
     * </dl>
-    * @type Object
+    * @type Object | null
     */
     this.setAttributeConfig("sortedBy", {
         value: null,
         // TODO: accepted array for nested sorts
         validator: function(oNewSortedBy) {
-            return (oNewSortedBy && (oNewSortedBy.constructor == Object) && oNewSortedBy.key);
+            if(oNewSortedBy) {
+                return ((oNewSortedBy.constructor == Object) && oNewSortedBy.key);
+            }
+            else {
+                return (oNewSortedBy === null);
+            }
         },
         method: function(oNewSortedBy) {
             // Remove ASC/DESC from TH
@@ -5876,18 +5872,20 @@ initAttributes : function(oConfigs) {
             }
 
             // Set ASC/DESC on TH
-            var column = (oNewSortedBy.column) ? oNewSortedBy.column : this._oColumnSet.getColumn(oNewSortedBy.key);
-            if(column) {
-                // Backward compatibility
-                if(oNewSortedBy.dir && ((oNewSortedBy.dir == "asc") ||  (oNewSortedBy.dir == "desc"))) {
-                    var newClass = (oNewSortedBy.dir == "desc") ?
-                            DT.CLASS_DESC :
-                            DT.CLASS_ASC;
-                    Dom.addClass(column.getThEl(), newClass);
-                }
-                else {
-                     var sortClass = oNewSortedBy.dir || DT.CLASS_ASC;
-                     Dom.addClass(column.getThEl(), sortClass);
+            if(oNewSortedBy) {
+                var column = (oNewSortedBy.column) ? oNewSortedBy.column : this._oColumnSet.getColumn(oNewSortedBy.key);
+                if(column) {
+                    // Backward compatibility
+                    if(oNewSortedBy.dir && ((oNewSortedBy.dir == "asc") ||  (oNewSortedBy.dir == "desc"))) {
+                        var newClass = (oNewSortedBy.dir == "desc") ?
+                                DT.CLASS_DESC :
+                                DT.CLASS_ASC;
+                        Dom.addClass(column.getThEl(), newClass);
+                    }
+                    else {
+                         var sortClass = oNewSortedBy.dir || DT.CLASS_ASC;
+                         Dom.addClass(column.getThEl(), sortClass);
+                    }
                 }
             }
         }
@@ -5956,7 +5954,7 @@ initAttributes : function(oConfigs) {
                                     lang.isNumber(oNewPaginator.rowsThisPage) &&
                                     lang.isNumber(oNewPaginator.pageLinks) &&
                                     lang.isNumber(oNewPaginator.pageLinksStart) &&
-                                    lang.isArray(oNewPaginator.dropdownOptions) &&
+                                    (lang.isArray(oNewPaginator.dropdownOptions) || lang.isNull(oNewPaginator.dropdownOptions)) &&
                                     lang.isArray(oNewPaginator.containers) &&
                                     lang.isArray(oNewPaginator.dropdowns) &&
                                     lang.isArray(oNewPaginator.links)) {
@@ -6163,7 +6161,9 @@ initAttributes : function(oConfigs) {
         method: function(sCaption) {
             // Create CAPTION element
             if(!this._elCaption) {
-                this._elCaption = this._elThead.parentNode.insertBefore(document.createElement("caption"), this._elThead.parentNode.firstChild);
+                var bodyTable = this._elTbodyContainer.getElementsByTagName('table')[0];
+                
+                this._elCaption = bodyTable.createCaption();
             }
             // Set CAPTION value
             this._elCaption.innerHTML = sCaption;
@@ -6182,24 +6182,54 @@ initAttributes : function(oConfigs) {
             return (lang.isBoolean(oParam));
         },
         method: function(oParam) {
+            var headTable = this._elTheadContainer.getElementsByTagName('table')[0],
+                bodyTable = this._elTbodyContainer.getElementsByTagName('table')[0],
+                headThead = headTable.getElementsByTagName('thead')[0],
+                bodyThead = bodyTable.getElementsByTagName('thead')[0];
+
             if(oParam) {
-                Dom.addClass(this._elContainer,DT.CLASS_SCROLLABLE);
-                // Bug 1743176 - Safari 2 shifts the _elTbodyContainer up
-                // when placed in overflow:auto container.  Should only shift
-                // the table inside.  Apply topMargin to _elTbodyContainer
-                // to account for the bug.
-                if (ua.webkit && ua.webkit < 420) {
-                    this._elTbodyContainer.style.marginTop =
-                        this._elTbody.parentNode.style.marginTop.replace('-','');
+                if (headThead) {
+                    headTable.removeChild(headThead);
                 }
+                if (bodyThead) {
+                    bodyTable.removeChild(bodyThead);
+                }
+                headTable.appendChild(this._elThead);
+                bodyTable.insertBefore(this._elA11yThead,bodyTable.firstChild || null);
+
+                // Move the caption from the body table to the head table
+                // if there is a caption
+                if (bodyTable.caption) {
+                    headTable.insertBefore(bodyTable.caption,headTable.firstChild);
+                }
+
+                Dom.addClass(this._elContainer,DT.CLASS_SCROLLABLE);
+
+                // Bug 1716354 - fix gap in Safari 2 and 3 (also seen in
+                // other browsers)
+                bodyTable.style.marginTop = "-"+this._elTbody.offsetTop+"px";
+
+                this._syncColWidths();
                 this._syncScrollPadding();
             }
             else {
-                Dom.removeClass(this._elContainer,DT.CLASS_SCROLLABLE);
-                if (ua.webkit && ua.webkit < 420) {
-                    this._elTbodyContainer.style.marginTop = "";
+                if (headThead) {
+                    headTable.removeChild(headThead);
                 }
-                this._syncScrollPadding();
+                if (bodyThead) {
+                    bodyTable.removeChild(bodyThead);
+                }
+                headTable.appendChild(this._elA11yThead);
+                bodyTable.insertBefore(this._elThead,bodyTable.firstChild || null);
+                bodyTable.style.marginTop = '';
+
+                // Move the caption from the head table to the body table
+                // if there is a caption
+                if (headTable.caption) {
+                    bodyTable.insertBefore(headTable.caption,bodyTable.firstChild);
+                }
+
+                Dom.removeClass(this._elContainer,DT.CLASS_SCROLLABLE);
             }
         }
     });
@@ -6320,11 +6350,20 @@ _sId : null,
 /**
  * Render chain.
  *
- * @property _oChain
+ * @property _oChainRender
  * @type YAHOO.util.Chain
  * @private
  */
-_oChain : null,
+_oChainRender : null,
+
+/**
+ * Sync chain.
+ *
+ * @property _oChainSync
+ * @type YAHOO.util.Chain
+ * @private
+ */
+_oChainSync : null,
 
 /**
  * Sparse array of custom functions to set column widths for browsers that don't
@@ -6573,6 +6612,17 @@ _focusEl : function(el) {
 },
 
 /**
+ * Post render syncing of Column widths and scroll padding
+ *
+ * @method _sync
+ * @private
+ */
+_sync : function() {
+    this._syncColWidths();
+    this._forceGeckoRedraw();
+},
+
+/**
  * Syncs up widths of THs and TDs across all those Columns without width values.
  * Actual adjustment is to the liner DIVs so window resizing will not affect cells. 
  *
@@ -6580,77 +6630,90 @@ _focusEl : function(el) {
  * @private
  */
 _syncColWidths : function() {
-    // Validate there is at least one row with cells and at least one Column
-    var allKeys = this._oColumnSet.keys,
-        elRow = this.getFirstTrEl();
+    if(!this.get('scrollable')) {
+        return;
+    }
 
-    if(allKeys && elRow && (elRow.cells.length === allKeys.length)) {
-        // Temporarily unsnap container since it causes inaccurate calculations
-        var bUnsnap = false;
-        if((YAHOO.env.ua.gecko || YAHOO.env.ua.opera) && this.get("scrollable") && this.get("width")) {
-            bUnsnap = true;
-            this._elTheadContainer.style.width = "";
-            this._elTbodyContainer.style.width = "";
-        }
-
-        var i,
-            oColumn,
-            cellsLen = elRow.cells.length;
-        // First time through, reset the widths to get an accurate measure of the TD
-        for(i=0; i<cellsLen; i++) {
-            oColumn = allKeys[i];
-            // Only for Columns without widths
-            if(!oColumn.width) {
-                this._setColumnWidth(oColumn, "auto");
-            }
-        }
-
-        // Calculate width for every Column
-        for(i=0; i<cellsLen; i++) {
-            oColumn = allKeys[i];
-            var newWidth;
-            
-            // Columns without widths
-            if(!oColumn.width) {
-                var elTh = oColumn.getThEl();
-                var elTd = elRow.cells[i];
-                
-                if(elTh.offsetWidth !== elTd.offsetWidth) {
-                    var elWider = (elTh.offsetWidth > elTd.offsetWidth) ? elTh.firstChild : elTd.firstChild;               
-                    // Calculate the final width by comparing liner widths
-                    newWidth = elWider.offsetWidth -
-                            (parseInt(Dom.getStyle(elWider,"paddingLeft"),10)|0) -
-                            (parseInt(Dom.getStyle(elWider,"paddingRight"),10)|0);
-                    
-                    // Validate against minWidth        
-                    newWidth = (oColumn.minWidth && (oColumn.minWidth > newWidth)) ?
-                            oColumn.minWidth : newWidth;
-            
+    if(this._elTbody.rows.length > 0) {
+        // Validate there is at least one row with cells and at least one Column
+        var allKeys = this._oColumnSet.keys,
+            elRow = this.getFirstTrEl();
+    
+        if(allKeys && elRow && (elRow.cells.length === allKeys.length)) {
+            // Temporarily unsnap container since it causes inaccurate calculations
+            var bUnsnap = false;
+            if((YAHOO.env.ua.gecko || YAHOO.env.ua.opera) && this.get("scrollable")) {
+                bUnsnap = true;
+                if(this.get("width")) {
+                    this._elTheadContainer.style.width = "";
+                    this._elTbodyContainer.style.width = "";
+                }
+                else {
+                    this._elContainer.style.width = "";
                 }
             }
-            // Columns with widths
-            else {
-                newWidth = oColumn.width;
-            }
-            
-            // Hidden Columns
-            if(oColumn.hidden) {
-                oColumn._nLastWidth = newWidth;
-                newWidth = 1;
-            }
-            
-            // Update to the new width
-            this._setColumnWidth(oColumn, newWidth+"px"); 
-        }
-        
-        // Resnap unsnapped containers
-        if(bUnsnap) {
-            var sWidth = this.get("width");
-            this._elTheadContainer.style.width = sWidth;
-            this._elTbodyContainer.style.width = sWidth;     
-        } 
-    }
     
+            var i,
+                oColumn,
+                cellsLen = elRow.cells.length;
+            // First time through, reset the widths to get an accurate measure of the TD
+            for(i=0; i<cellsLen; i++) {
+                oColumn = allKeys[i];
+                // Only for Columns without widths
+                if(!oColumn.width) {
+                    this._setColumnWidth(oColumn, "auto");
+                }
+            }
+    
+            // Calculate width for every Column
+            for(i=0; i<cellsLen; i++) {
+                oColumn = allKeys[i];
+                var newWidth;
+                
+                // Columns without widths
+                if(!oColumn.width) {
+                    var elTh = oColumn.getThEl();
+                    var elTd = elRow.cells[i];
+                    
+                    if(elTh.offsetWidth !== elTd.offsetWidth) {
+                        var elWider = (elTh.offsetWidth > elTd.offsetWidth) ? elTh.firstChild : elTd.firstChild;               
+                        // Calculate the final width by comparing liner widths
+                        newWidth = elWider.offsetWidth -
+                                (parseInt(Dom.getStyle(elWider,"paddingLeft"),10)|0) -
+                                (parseInt(Dom.getStyle(elWider,"paddingRight"),10)|0);
+                        
+                        // Validate against minWidth        
+                        newWidth = (oColumn.minWidth && (oColumn.minWidth > newWidth)) ?
+                                oColumn.minWidth : newWidth;
+                
+                    }
+                }
+                // Columns with widths
+                else {
+                    newWidth = oColumn.width;
+                }
+                
+                // Hidden Columns
+                if(oColumn.hidden) {
+                    oColumn._nLastWidth = newWidth;
+                    newWidth = 1;
+                }
+                
+                // Update to the new width
+                if(newWidth) {
+                    this._setColumnWidth(oColumn, newWidth+"px"); 
+                }
+            }
+            
+            // Resnap unsnapped containers
+            if(bUnsnap) {
+                var sWidth = this.get("width");
+                this._elTheadContainer.style.width = sWidth;
+                this._elTbodyContainer.style.width = sWidth;     
+            } 
+        }
+    }
+
     this._syncScrollPadding();
 },
 
@@ -6672,12 +6735,20 @@ _syncScrollPadding : function() {
         if(!this.get("height") && (ua.ie)) {
             // Snap outer container height to content
             // but account for x-scrollbar if it is visible
-            elTbodyContainer.style.height = 
-                    (elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth) ?
-                    (elTbody.offsetHeight + 19) + "px" : 
-                    elTbody.offsetHeight + "px";
+            if(elTbody.rows.length > 0) {
+                elTbodyContainer.style.height = 
+                        (elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth) ?
+                        (elTbody.offsetHeight + 19) + "px" : 
+                        elTbody.offsetHeight + "px";
+            }
+            else {
+                elTbodyContainer.style.height = 
+                        (elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth) ?
+                        (this._elMsgTbody.offsetHeight + 19) + "px" : 
+                        this._elMsgTbody.offsetHeight + "px";
+            }
         }
-        
+
         // X-scrolling not enabled
         if(!this.get("width")) {
             // Snap outer container width to content
@@ -6685,10 +6756,12 @@ _syncScrollPadding : function() {
             this._elContainer.style.width = 
                     (elTbodyContainer.scrollHeight > elTbodyContainer.offsetHeight) ?
                     (elTbody.parentNode.offsetWidth + 19) + "px" :
-                    (elTbody.parentNode.offsetWidth) + "px";
+                    //TODO: Can we detect left and right border widths instead of hard coding?
+                    (elTbody.parentNode.offsetWidth + 2) + "px";
         }
         // X-scrolling is enabled and x-scrollbar is visible
-        else if(elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth) {
+        else if((elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth) ||
+            ((elTbodyContainer.scrollHeight > elTbodyContainer.offsetHeight) && (elTbodyContainer.scrollWidth > elTbodyContainer.offsetWidth-16))) {
             // Perform sync routine
             if(!this._bScrollbarX) {
                 // Add Column header right-padding
@@ -6700,7 +6773,7 @@ _syncScrollPadding : function() {
                     elLiner = Dom.get(prefix+aLastHeaders[i]).firstChild;
                     elLiner.style.marginRight = 
                             (parseInt(Dom.getStyle(elLiner,"marginRight"),10) + 
-                            27) + "px";
+                            16) + "px";
                 }
                 
                 // Save state   
@@ -6725,8 +6798,45 @@ _syncScrollPadding : function() {
                 this._bScrollbarX = false;
             }
         }
+    
+        // Sync message tbody
+        if(this._elTbody.rows.length === 0) {
+            this._elMsgTbody.parentNode.width = this.getTheadEl().parentNode.offsetWidth;
+        }
+        else {
+            this._elMsgTbody.parentNode.width = "";
+        }
     }
 },
+
+/**
+ * Forces Gecko repaint by removing/adding the no-op class name
+ *
+ * @method _forceGeckoRedraw
+ * @private
+ */
+_forceGeckoRedraw : function() {
+    // Bug 1741322: Needed to force FF to redraw to fix squishy headers on wide tables when new content comes in
+    if(ua.gecko) {
+        var elContainer = this.getContainerEl();
+        setTimeout(function() {
+            Dom.removeClass(elContainer,"yui-dt-noop");
+        },0);
+        setTimeout(function() {
+            Dom.addClass(elContainer,"yui-dt-noop");
+        },0);
+    }
+},
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6839,6 +6949,8 @@ _initColumnSet : function(aColumnDefs) {
     else if(aColumnDefs instanceof YAHOO.widget.ColumnSet) {
         this._oColumnSet =  aColumnDefs;
     }
+
+
 },
 
 /**
@@ -6954,9 +7066,6 @@ _initTableEl : function() {
     this._elTbody = elBodyTable.appendChild(document.createElement("tbody"));
     this._elTbody.tabIndex = 0;
     Dom.addClass(this._elTbody,DT.CLASS_BODY);
-    // Bug 1716354 - fix gap in Safari 2 and 3 (Also saw small gap in Opera.
-    // this fixes all)
-    this._elTbody.parentNode.style.marginTop = "-"+this._elTbody.offsetTop+"px";
 
     // Create TBODY for messages
     var elMsgTbody = document.createElement("tbody");
@@ -7015,11 +7124,8 @@ _initTheadEls : function() {
     // First time through
     if(!this._elThead) {
         // Create THEADs
-        elThead = this._elTheadContainer.firstChild.appendChild(document.createElement("thead"));
-        this._elThead = elThead;
-    
-        elA11yThead = this._elTbodyContainer.firstChild.appendChild(document.createElement("thead"));
-        this._elA11yThead = elA11yThead;
+        elThead     = this._elThead     = document.createElement('thead');
+        elA11yThead = this._elA11yThead = document.createElement('thead');
         
         aTheads = [elThead, elA11yThead];
 
@@ -7031,6 +7137,12 @@ _initTheadEls : function() {
         Ev.addListener(elThead, "mouseup", this._onTableMouseup, this);
         Ev.addListener(elThead, "click", this._onTheadClick, this);
         Ev.addListener(elThead.parentNode, "dblclick", this._onTableDblclick, this);
+        
+        // Add the accessibility-only thead to the header table by default.
+        // The theads will be swapped for scrollable DataTables, the display
+        // thead fixed in place, and the a11y thead hidden
+        this._elTheadContainer.firstChild.appendChild(elA11yThead);
+        this._elTbodyContainer.firstChild.appendChild(elThead);
     }
     // Reinitialization
     else {
@@ -7053,11 +7165,12 @@ _initTheadEls : function() {
 
     // Add TRs to the THEADs
     var colTree = oColumnSet.tree;
-    var elTheadCell;
+    var elTheadCell, id;
     for(l=0; l<aTheads.length; l++) {
         for(i=0; i<colTree.length; i++) {
             var elTheadRow = aTheads[l].appendChild(document.createElement("tr"));
-            elTheadRow.id = this._sId+"-hdrow"+i;
+            id = (l===1) ? this._sId+"-hdrow" + i + "-a11y": this._sId+"-hdrow" + i;
+            elTheadRow.id = id;
     
             // ...and create TH cells
             for(j=0; j<colTree[i].length; j++) {
@@ -7066,7 +7179,7 @@ _initTheadEls : function() {
                 if(l===0) {
                     oColumn._elTh = elTheadCell;
                 }
-                var id = (l===1) ? this._sId+"-th" + oColumn.getId() + "-a11y": this._sId+"-th" + oColumn.getId();
+                id = (l===1) ? this._sId+"-th" + oColumn.getId() + "-a11y": this._sId+"-th" + oColumn.getId();
                 elTheadCell.id = id;
                 elTheadCell.yuiCellIndex = j;
                 this._initThEl(elTheadCell,oColumn,i,j, (l===1));
@@ -7147,6 +7260,30 @@ _initTheadEls : function() {
         }
         else {
         }
+    }
+
+
+     // Set widths for hidden Columns
+    for(var g=0, h=this._oColumnSet.keys.length; g<h; g++) {
+        // Hidden Columns
+        if(this._oColumnSet.keys[g].hidden) {
+            var oHiddenColumn = this._oColumnSet.keys[g];
+            var oHiddenThEl = oHiddenColumn.getThEl();
+            oHiddenColumn._nLastWidth = oHiddenThEl.offsetWidth -
+                        (parseInt(Dom.getStyle(oHiddenThEl,"paddingLeft"),10)|0) -
+                        (parseInt(Dom.getStyle(oHiddenThEl,"paddingRight"),10)|0);
+            this._setColumnWidth(oHiddenColumn, "1px"); 
+        }
+    }
+
+
+    // Bug 1806891
+    if(ua.webkit && ua.webkit < 420) {
+        var oSelf = this;
+        setTimeout(function() {
+            oSelf._elThead.style.display = "";
+        },0);
+        this._elThead.style.display = 'none';
     }
 },
 
@@ -7373,14 +7510,15 @@ _updateTrEl : function(elRow, oRecord) {
         var oColumn     = oColumnSet.keys[i],
             elCell      = elRow.childNodes[i],
             elCellLiner = elCell.firstChild,
-            cellHeaders = '';
+            cellHeaders = '',
+            headerType  = this.get('scrollable') ? "-a11y " : " ";
 
         // Set the cell content
         this.formatCell(elCellLiner, oRecord, oColumn);
 
         // Set the cell's accessibility headers
         for(j=0,jlen=oColumnSet.headers[i].length; j < jlen; ++j) {
-            cellHeaders += this._sId + "-th" + oColumnSet.headers[i][j] + "-a11y ";
+            cellHeaders += this._sId + "-th" + oColumnSet.headers[i][j] + headerType;
         }
         elCell.headers = cellHeaders;
 
@@ -7471,11 +7609,12 @@ _deleteTrEl : function(row) {
         rowIndex = row;
     }
     if(lang.isNumber(rowIndex) && (rowIndex > -2) && (rowIndex < this._elTbody.rows.length)) {
-        this._elTbody.deleteRow(rowIndex);
-        return true;
+        // Cannot use tbody.deleteRow due to IE6 instability
+        //return this._elTbody.deleteRow(rowIndex);
+        return this._elTbody.removeChild(this.getTrEl(row));
     }
     else {
-        return false;
+        return null;
     }
 },
 
@@ -8985,12 +9124,9 @@ getTrIndex : function(row) {
 
 /**
  * Resets a RecordSet with the given data and populates the page view
- * with the new data. Any previous data and selection states are cleared.
- * However, sort states are not cleared, so if the given data is in a particular
- * sort order, implementers should take care to reset the sortedBy property. If
- * pagination is enabled, the currentPage is shown and Paginator UI updated,
- * otherwise all rows are displayed as a single page. For performance, existing
- * DOM elements are reused when possible.
+ * with the new data. Any previous data, and selection and sort states are
+ * cleared. The render method should be called as a separate step in order
+ * to update the UI. 
  *
  * @method initializeTable
  */
@@ -9007,6 +9143,9 @@ initializeTable : function() {
     this._aSelections = null;
     this._oAnchorRecord = null;
     this._oAnchorCell = null;
+    
+    // Clear sort
+    this.set("sortedBy", null);
 },
 
 /**
@@ -9017,7 +9156,7 @@ initializeTable : function() {
  * @method render
  */
 render : function() {
-    this._oChain.stop();
+    this._oChainRender.stop();
     this.showTableMessage(DT.MSG_LOADING, DT.CLASS_LOADING);
 
     var i, j, k, l, len, allRecords;
@@ -9075,11 +9214,11 @@ render : function() {
         var loopN = this.get("renderLoopSize");
         var loopStart,
             loopEnd;
-
+        
         // From the top, update in-place existing rows, so as to reuse DOM elements
         if(allRows.length > 0) {
             loopEnd = allRows.length; // End at last row
-            this._oChain.add({
+            this._oChainRender.add({
                 method: function(oArg) {
                     if((this instanceof DT) && this._sId) {
                         var i = oArg.nCurrentRow,
@@ -9108,7 +9247,7 @@ render : function() {
         loopEnd = allRecords.length; // where to end
         var nRowsNeeded = (loopEnd - loopStart); // how many needed
         if(nRowsNeeded > 0) {
-            this._oChain.add({
+            this._oChainRender.add({
                 method: function(oArg) {
                     if((this instanceof DT) && this._sId) {
                         var i = oArg.nCurrentRow,
@@ -9134,7 +9273,7 @@ render : function() {
             });
         }
 
-        this._oChain.add({
+        this._oChainRender.add({
             method: function(oArg) {
                 if((this instanceof DT) && this._sId) {
                     this._setFirstRow();
@@ -9178,7 +9317,9 @@ render : function() {
                 }
                 
                 if(this._bInit) {
-                    this._oChain.add({
+                    this._forceGeckoRedraw();
+
+                    this._oChainRender.add({
                         method: function() {
                             if((this instanceof DT) && this._sId && this._bInit) {
                                 this._bInit = false;
@@ -9187,7 +9328,7 @@ render : function() {
                         },
                         scope: this
                     });
-                    this._oChain.run();
+                    this._oChainRender.run();
                 }
                 else {
                     this.fireEvent("renderEvent");
@@ -9195,13 +9336,12 @@ render : function() {
                     this.fireEvent("refreshEvent");
                 }
             
-            
             },
             scope: this,
             timeout: (loopN > 0) ? 0 : -1
         }); 
         
-        this._oChain.add({
+        this._oChainRender.add({
             method: function() {
                 if((this instanceof DT) && this._sId) {
                     this._syncColWidths();
@@ -9209,28 +9349,8 @@ render : function() {
             },
             scope: this
         });
-        
-        // Bug 1741322: Force FF to redraw to fix squishy headers on wide tables
-        if(ua.gecko) {
-            this._oChain.add({
-                method: function(oArg) {
-                    if((this instanceof DT) && this._sId) {
-                        Dom.removeClass(this.getContainerEl(),"yui-dt-noop");
-                    }
-                },
-                scope: this
-            });
-            this._oChain.add({
-                method: function() {
-                    if((this instanceof DT) && this._sId) {
-                        Dom.addClass(this.getContainerEl(),"yui-dt-noop");
-                    }
-                },
-                scope:this
-            });
-        }
-            
-        this._oChain.run();  
+                    
+        this._oChainRender.run();  
     }
     // Empty
     else {
@@ -9252,7 +9372,7 @@ render : function() {
  * @method destroy
  */
 destroy : function() {
-    this._oChain.stop();
+    this._oChainRender.stop();
     
     //TODO: destroy static resizer proxy and column proxy?
     
@@ -9326,12 +9446,10 @@ showTableMessage : function(sHTML, sClassName) {
         Dom.addClass(elCell.firstChild, sClassName);
     }
 
-    var elCellLiner = elCell.firstChild;
-    elCellLiner.style.width = ((this.getTheadEl().parentNode.offsetWidth) -
-        (parseInt(Dom.getStyle(elCellLiner,"paddingLeft"),10)) -
-        (parseInt(Dom.getStyle(elCellLiner,"paddingRight"),10))) + "px";
+    this._elMsgTbody.parentNode.style.width = this.getTheadEl().parentNode.offsetWidth+"px";
 
     this._elMsgTbody.style.display = "";
+
     this.fireEvent("tableMsgShowEvent", {html:sHTML, className:sClassName});
 },
 
@@ -9343,6 +9461,7 @@ showTableMessage : function(sHTML, sClassName) {
 hideTableMessage : function() {
     if(this._elMsgTbody.style.display != "none") {
         this._elMsgTbody.style.display = "none";
+        this._elMsgTbody.parentNode.style.width = "";
         this.fireEvent("tableMsgHideEvent");
     }
 },
@@ -9743,11 +9862,12 @@ _setColumnWidth : function(oColumn, sWidth) {
                 var rule = DT._oStylesheetRules[sClassname];
                 if (!rule) {
                     if (s.styleSheet && s.styleSheet.addRule) {
+                        s.styleSheet.addRule(sClassname,"overflow:hidden");
                         s.styleSheet.addRule(sClassname,"width:"+sWidth);
                         rule = s.styleSheet.rules[s.styleSheet.rules.length-1];
                     } else if (s.sheet && s.sheet.insertRule) {
-                        s.sheet.insertRule(sClassname+" {width:"+sWidth+";}",s.sheet.cssRules.length);
-                        rule = s.sheet.cssRules[s.sheet.cssRules.length];
+                        s.sheet.insertRule(sClassname+" {overflow:hidden;width:"+sWidth+";}",s.sheet.cssRules.length);
+                        rule = s.sheet.cssRules[s.sheet.cssRules.length-1];
                     } else {
                         DT._bStylesheetFallback = true;
                     }
@@ -9757,15 +9877,14 @@ _setColumnWidth : function(oColumn, sWidth) {
                 // Update existing rule for the Column
                 else {
                     rule.style.width = sWidth;
-                }
-                
+                } 
                 return;
             }
             
             DT._bStylesheetFallback = true;
         }
         // Do it the old fashioned way
-        if(DT._bStylesheetFallback) {
+        if(DT._bStylesheetFallback) {           
             if(sWidth == "auto") {
                 sWidth = ""; 
             }
@@ -9789,12 +9908,12 @@ _setColumnWidth : function(oColumn, sWidth) {
                     ending with the sWidth as the initial assignment   ^
                 }
                 */
-
+                var i,j,k;
                 var resizerDef = [
                     'var colIdx=oColumn.getKeyIndex();',
                     'oColumn.getThEl().firstChild.style.width='
                 ];
-                for (var i=this._elTbody.rows.length-1, j=2; i >= 0; --i) {
+                for (i=this._elTbody.rows.length-1, j=2; i >= 0; --i) {
                     resizerDef[j++] = 'this._elTbody.rows[';
                     resizerDef[j++] = i;
                     resizerDef[j++] = '].cells[colIdx].firstChild.style.width=';
@@ -9803,6 +9922,16 @@ _setColumnWidth : function(oColumn, sWidth) {
                     resizerDef[j++] = '].cells[colIdx].style.width=';
                 }
                 resizerDef[j] = 'sWidth;';
+                resizerDef[j+1] = 'oColumn.getThEl().firstChild.style.overflow=';
+                for (i=this._elTbody.rows.length-1, k=j+2; i >= 0; --i) {
+                    resizerDef[k++] = 'this._elTbody.rows[';
+                    resizerDef[k++] = i;
+                    resizerDef[k++] = '].cells[colIdx].firstChild.style.overflow=';
+                    resizerDef[k++] = 'this._elTbody.rows[';
+                    resizerDef[k++] = i;
+                    resizerDef[k++] = '].cells[colIdx].style.overflow=';
+                }
+                resizerDef[k] = '"hidden";';
                 this._aFallbackColResizer[this._elTbody.rows.length] =
                     new Function('oColumn','sWidth',resizerDef.join(''));
             }
@@ -9810,6 +9939,8 @@ _setColumnWidth : function(oColumn, sWidth) {
 
             if (resizerFn) {
                 resizerFn.call(this,oColumn,sWidth);
+                //this._syncScrollPadding();
+                return;
             }
         }
     }
@@ -9829,22 +9960,20 @@ setColumnWidth : function(oColumn, nWidth) {
     oColumn = this.getColumn(oColumn);
     if(oColumn) {
         // Validate new width against minimum width
-        var sWidth = "";
         if(lang.isNumber(nWidth)) {
-            sWidth = (nWidth > oColumn.minWidth) ? nWidth + "px" : oColumn.minWidth + "px";
-        }
+            nWidth = (nWidth > oColumn.minWidth) ? nWidth : oColumn.minWidth;
 
-        // Save state
-        oColumn.width = parseInt(sWidth,10);
-        
-        // Resize the DOM elements
-        this._setColumnWidth(oColumn, sWidth);
-        
-        this._syncScrollPadding();
-        
-        this.fireEvent("columnSetWidthEvent",{column:oColumn,width:nWidth});
-    }
-    else {
+            // Save state
+            oColumn.width = nWidth;
+            
+            // Resize the DOM elements
+            //this._oChainSync.stop();
+            this._setColumnWidth(oColumn, nWidth+"px");
+            this._syncScrollPadding();
+            
+            this.fireEvent("columnSetWidthEvent",{column:oColumn,width:nWidth});
+            return;
+        }
     }
 },
 
@@ -9975,7 +10104,7 @@ showColumn : function(oColumn) {
 removeColumn : function(oColumn) {
     var nColTreeIndex = oColumn.getTreeIndex();
     if(nColTreeIndex !== null) {
-        this._oChain.stop();
+        this._oChainRender.stop();
         var aOrigColumnDefs = this._oColumnSet.getDefinitions();
 
         oColumn = aOrigColumnDefs.splice(nColTreeIndex,1)[0];
@@ -10014,7 +10143,7 @@ insertColumn : function(oColumn, index) {
         index = oColumnSet.tree[0].length;
     }
     
-    this._oChain.stop();
+    this._oChainRender.stop();
     var aNewColumnDefs = this._oColumnSet.getDefinitions();
     aNewColumnDefs.splice(index, 0, oColumn);
     this._initColumnSet(aNewColumnDefs);
@@ -10044,8 +10173,8 @@ selectColumn : function(oColumn) {
 
             // Update body cells
             var allRows = this.getTbodyEl().rows;
-            var oChain = this._oChain;
-            oChain.add({
+            var oChainRender = this._oChainRender;
+            oChainRender.add({
                 method: function(oArg) {
                     if((this instanceof DT) && this._sId && allRows[oArg.rowIndex] && allRows[oArg.rowIndex].cells[oArg.cellIndex]) {
                         Dom.addClass(allRows[oArg.rowIndex].cells[oArg.cellIndex],DT.CLASS_SELECTED);                    
@@ -10056,7 +10185,7 @@ selectColumn : function(oColumn) {
                 iterations: allRows.length,
                 argument: {rowIndex:0,cellIndex:oColumn.getKeyIndex()}
             });
-            oChain.run();       
+            oChainRender.run();       
             
             this.fireEvent("columnSelectEvent",{column:oColumn});
         }
@@ -10086,8 +10215,8 @@ unselectColumn : function(oColumn) {
 
             // Update body cells
             var allRows = this.getTbodyEl().rows;
-            var oChain = this._oChain;
-            oChain.add({
+            var oChainRender = this._oChainRender;
+            oChainRender.add({
                 method: function(oArg) {
                     if((this instanceof DT) && this._sId && allRows[oArg.rowIndex] && allRows[oArg.rowIndex].cells[oArg.cellIndex]) {
                         Dom.removeClass(allRows[oArg.rowIndex].cells[oArg.cellIndex],DT.CLASS_SELECTED); 
@@ -10098,7 +10227,7 @@ unselectColumn : function(oColumn) {
                 iterations:allRows.length,
                 argument: {rowIndex:0,cellIndex:oColumn.getKeyIndex()}
             });
-            oChain.run();       
+            oChainRender.run();       
             
             this.fireEvent("columnUnselectEvent",{column:oColumn});
         }
@@ -10152,8 +10281,8 @@ highlightColumn : function(column) {
 
         // Update body cells
         var allRows = this.getTbodyEl().rows;
-        var oChain = this._oChain;
-        oChain.add({
+        var oChainRender = this._oChainRender;
+        oChainRender.add({
             method: function(oArg) {
                 if((this instanceof DT) && this._sId && allRows[oArg.rowIndex] && allRows[oArg.rowIndex].cells[oArg.cellIndex]) {
                     Dom.addClass(allRows[oArg.rowIndex].cells[oArg.cellIndex],DT.CLASS_HIGHLIGHTED);   
@@ -10164,7 +10293,7 @@ highlightColumn : function(column) {
             iterations:allRows.length,
             argument: {rowIndex:0,cellIndex:oColumn.getKeyIndex()}
         });
-        oChain.run();       
+        oChainRender.run();       
             
         this.fireEvent("columnHighlightEvent",{column:oColumn});
     }
@@ -10191,8 +10320,8 @@ unhighlightColumn : function(column) {
 
         // Update body cells
         var allRows = this.getTbodyEl().rows;
-        var oChain = this._oChain;
-        oChain.add({
+        var oChainRender = this._oChainRender;
+        oChainRender.add({
             method: function(oArg) {
                 if((this instanceof DT) && this._sId && allRows[oArg.rowIndex] && allRows[oArg.rowIndex].cells[oArg.cellIndex]) {
                     Dom.removeClass(allRows[oArg.rowIndex].cells[oArg.cellIndex],DT.CLASS_HIGHLIGHTED);
@@ -10203,7 +10332,7 @@ unhighlightColumn : function(column) {
             iterations:allRows.length,
             argument: {rowIndex:0,cellIndex:oColumn.getKeyIndex()}
         });
-        oChain.run();       
+        oChainRender.run();       
             
         this.fireEvent("columnUnhighlightEvent",{column:oColumn});
     }
@@ -10256,6 +10385,33 @@ unhighlightColumn : function(column) {
 
 // ROW FUNCTIONS
 
+/**
+ * Adds one TR element at the given index and populates with given Record data.
+ *
+ * @method _addTrEl
+ * @param oRecord {YAHOO.widget.Record} Record instance. 
+ * @param index {Number} TR index.
+ * @return {HTMLElement} Reference to new TR element. 
+ * @private 
+ */
+_addTrEl : function(oRecord, index) {
+    var elNewTr = this._createTrEl(oRecord);
+    if(elNewTr) {
+        if (index >= 0 && index < this._elTbody.rows.length) {
+            this._elTbody.insertBefore(elNewTr,
+                this._elTbody.rows[index]);
+            if (!index) {
+                this._setFirstRow();
+            }
+        } else {
+            this._elTbody.appendChild(elNewTr);
+            this._setLastRow();
+            index = this._elTbody.rows.length - 1;
+        }
+        this._setRowStripes(index);
+    }
+    return elNewTr;
+},
 
 /**
  * Adds one new Record of data into the RecordSet at the index if given,
@@ -10274,8 +10430,7 @@ addRow : function(oData, index) {
             var oPaginator = this.get('paginator');
 
             // Paginated
-            if (oPaginator instanceof Pag ||
-                this.get('paginated')) {
+            if (oPaginator instanceof Pag || this.get('paginated')) {
                 recIndex = this.getRecordIndex(oRecord);
                 var endRecIndex;
                 if (oPaginator instanceof Pag) {
@@ -10296,50 +10451,33 @@ addRow : function(oData, index) {
 
                 // New record affects the view
                 if (recIndex <= endRecIndex) {
+                    // Defer UI updates to the render method
                     this.render();
                 }
                 
-                // TODO: what args to pass?
                 this.fireEvent("rowAddEvent", {record:oRecord});
-        
-                // For log message
-                recIndex = (lang.isValue(recIndex))? recIndex : "n/a";
-        
-                
                 return;
             }
             // Not paginated
             else {
                 recIndex = this.getTrIndex(oRecord);
                 if(lang.isNumber(recIndex)) {
-                    if((this instanceof DT) && this._sId) {
-                        // Add the TR element
-                        var elNewTr = this._createTrEl(oRecord);
-                        if(elNewTr) {
-                            if (recIndex >= 0 && recIndex < this._elTbody.rows.length) {
-                                this._elTbody.insertBefore(elNewTr,
-                                    this._elTbody.rows[recIndex]);
-                                if (!recIndex) {
-                                    this._setFirstRow();
+                    // Add the TR element
+                    this._oChainRender.add({
+                        method: function(oArg) {
+                            if((this instanceof DT) && this._sId) {
+                                var elNewTr = this._addTrEl(oRecord, recIndex);
+                                if(elNewTr) {
+                                    this.hideTableMessage();
+            
+                                    this.fireEvent("rowAddEvent", {record:oRecord});
                                 }
-                            } else {
-                                this._elTbody.appendChild(elNewTr);
-                                this._setLastRow();
-                                recIndex = this._elTbody.rows.length - 1;
                             }
-                            this._setRowStripes(recIndex);
-
-                            this._syncColWidths();
-                        }
-                        this.hideTableMessage();
-
-                        // TODO: what args to pass?
-                        this.fireEvent("rowAddEvent", {record:oRecord});
-
-                        // For log message
-                        recIndex = (lang.isValue(recIndex))? recIndex : "n/a";
-
-                    }
+                        },
+                        scope: this,
+                        timeout: (this.get("renderLoopSize") > 0) ? 0 : -1
+                    });
+                    this._oChainRender.run();
                     return;
                 }
             }            
@@ -10356,19 +10494,75 @@ addRow : function(oData, index) {
  */
 addRows : function(aData, index) {
     if(lang.isArray(aData)) {
-        var i;
-        if(lang.isNumber(index)) {
-            for(i=aData.length-1; i>-1; i--) {
-                this.addRow(aData[i], index);
+        var aRecords = this._oRecordSet.addRecords(aData, index);
+        if(aRecords) {
+            var recIndex = this.getRecordIndex(aRecords[0]);
+            
+            // Paginated
+            var oPaginator = this.get('paginator');
+            if (oPaginator instanceof Pag ||
+                this.get('paginated')) {
+                var endRecIndex;
+                if (oPaginator instanceof Pag) {
+                    // Update the paginator's totalRecords
+                    var totalRecords = oPaginator.get('totalRecords');
+                    if (totalRecords !== Pag.VALUE_UNLIMITED) {
+                        oPaginator.set('totalRecords',totalRecords + aRecords.length);
+                    }
+
+                    endRecIndex = (oPaginator.getPageRecords())[1];
+                }
+                // Backward compatibility
+                else {
+                    endRecIndex = oPaginator.startRecordIndex +
+                                  oPaginator.rowsPerPage - 1;
+                    this.updatePaginator();
+                }
+
+                // At least one of the new records affects the view
+                if (recIndex <= endRecIndex) {
+                    this.render();
+                }
+                
+                this.fireEvent("rowsAddEvent", {records:aRecords});
+                return;
             }
+            // Not paginated
+            else {
+                // Add the TR elements
+                var loopN = this.get("renderLoopSize");
+                var loopEnd = recIndex + aData.length;
+                var nRowsNeeded = (loopEnd - recIndex); // how many needed
+                this._oChainRender.add({
+                    method: function(oArg) {
+                        if((this instanceof DT) && this._sId) {
+                            var i = oArg.nCurrentRow,
+                                j = oArg.nCurrentRecord,
+                                len = loopN > 0 ? Math.min(i + loopN,loopEnd) : loopEnd;
+                            for(; i < len; ++i,++j) {
+                                this._addTrEl(aRecords[j], i);
+                            }
+                            oArg.nCurrentRow = i;
+                            oArg.nCurrentRecord = j;
+                        }
+                    },
+                    iterations: (loopN > 0) ? Math.ceil(loopEnd/loopN) : 1,
+                    argument: {nCurrentRow:recIndex,nCurrentRecord:0},
+                    scope: this,
+                    timeout: (loopN > 0) ? 0 : -1
+                });
+                this._oChainRender.add({
+                    method: function() {
+                        this.fireEvent("rowsAddEvent", {records:aRecords});
+                    },
+                    scope: this,
+                    timeout: -1 // Needs to run immediately after the DOM insertions above
+                });
+                this._oChainRender.run();
+                this.hideTableMessage();                
+                return;
+            }            
         }
-        else {
-            for(i=0; i<aData.length; i++) {
-                this.addRow(aData[i]);
-            }
-        }
-    }
-    else {
     }
 },
 
@@ -10417,23 +10611,22 @@ updateRow : function(row, oData) {
 
     // Update the TR only if row is on current page
     if(elRow) {
-        this._oChain.add({
+        this._oChainRender.add({
             method: function() {
                 if((this instanceof DT) && this._sId) {
                     this._updateTrEl(elRow, updatedRecord);
-                    this._syncColWidths();
+                    //this._oChainSync.run();
                     this.fireEvent("rowUpdateEvent", {record:updatedRecord, oldData:oldData});
                 }
             },
             scope: this,
             timeout: (this.get("renderLoopSize") > 0) ? 0 : -1
         });
-        this._oChain.run();
+        this._oChainRender.run();
     }
     else {
         this.fireEvent("rowUpdateEvent", {record:updatedRecord, oldData:oldData});
     }
-
 },
 
 /**
@@ -10445,115 +10638,98 @@ updateRow : function(row, oData) {
  * to DataTable page element or RecordSet index.
  */
 deleteRow : function(row) {
-    // Get the Record index...
-    var oRecord = null;
-    // ...by Record index
-    if(lang.isNumber(row)) {
-        oRecord = this._oRecordSet.getRecord(row);
-    }
-    // ...by element reference
-    else {
-        var elRow = Dom.get(row);
-        elRow = this.getTrEl(elRow);
-        if(elRow) {
-            oRecord = this.getRecord(elRow);
-        }
-    }
-    if(oRecord) {
-        var oPaginator = this.get('paginator');
-        var sRecordId = oRecord.getId();
-
-        // Remove from selection tracker if there
-        var tracker = this._aSelections || [];
-        for(var j=tracker.length-1; j>-1; j--) {
-            if((lang.isNumber(tracker[j]) && (tracker[j] === sRecordId)) ||
-                    ((tracker[j].constructor == Object) && (tracker[j].recordId === sRecordId))) {
-                tracker.splice(j,1);
-            }
-        }
-
-        // Copy data from the Record for the event that gets fired later
-        var nTrIndex = this.getTrIndex(oRecord);
-        var nRecordIndex = this.getRecordIndex(oRecord);
-        var oRecordData = oRecord.getData();
-        var oData = YAHOO.widget.DataTable._cloneObject(oRecordData);
-
-        // Delete Record from RecordSet
-        this._oRecordSet.deleteRecord(nRecordIndex);
-
-        // If paginated and the deleted row was on this or a prior page, just
-        // re-render
-        if (oPaginator instanceof Pag ||
-            this.get('paginated')) {
-
-            var endRecIndex;
-            if (oPaginator instanceof Pag) {
-                // Update the paginator's totalRecords
-                var totalRecords = oPaginator.get('totalRecords');
-                if (totalRecords !== Pag.VALUE_UNLIMITED) {
-                    oPaginator.set('totalRecords',totalRecords - 1);
+    var nRecordIndex = this.getRecordIndex(row);
+    if(lang.isNumber(nRecordIndex)) {
+        var oRecord = this.getRecord(nRecordIndex);
+        if(oRecord) {
+            var nTrIndex = this.getTrIndex(nRecordIndex);
+            
+            // Remove from selection tracker if there
+            var sRecordId = oRecord.getId();
+            var tracker = this._aSelections || [];
+            for(var j=tracker.length-1; j>-1; j--) {
+                if((lang.isNumber(tracker[j]) && (tracker[j] === sRecordId)) ||
+                        ((tracker[j].constructor == Object) && (tracker[j].recordId === sRecordId))) {
+                    tracker.splice(j,1);
                 }
-
-                endRecIndex = (oPaginator.getPageRecords())[1];
-            } else {
-                // Backward compatibility
-                endRecIndex = oPaginator.startRecordIndex +
-                              oPaginator.rowsPerPage - 1;
-
-                this.updatePaginator();
             }
-
-            // If the deleted record was on this or a prior page, re-render
-            if (nRecordIndex <= endRecIndex) {
-                this.render();
-            }
-        }
-        else {
-            if(lang.isNumber(nTrIndex)) {
-                this._oChain.add({
-                    method: function() {
-                        if((this instanceof DT) && this._sId) {
-                            var isLast = (nTrIndex == this.getLastTrEl().sectionRowIndex);
-                            this._deleteTrEl(nTrIndex);
-            
-                            // Empty body
-                            if(this._elTbody.rows.length === 0) {
-                                this.showTableMessage(DT.MSG_EMPTY, DT.CLASS_EMPTY);
-                            }
-                            // Update UI
-                            else {
-                                // Set FIRST/LAST
-                                if(nTrIndex === 0) {
-                                    this._setFirstRow();
-                                }
-                                if(isLast) {
-                                    this._setLastRow();
-                                }
-                                // Set EVEN/ODD
-                                if(nTrIndex != this._elTbody.rows.length) {
-                                    this._setRowStripes(nTrIndex);
-                                }                                
-                            }
-            
-                            this._syncColWidths();
-                            
-                            this.fireEvent("rowDeleteEvent", {recordIndex:nRecordIndex,
-                                    oldData:oData, trElIndex:nTrIndex});
+    
+            // Delete Record from RecordSet
+            var oData = this._oRecordSet.deleteRecord(nRecordIndex);
+    
+            // Update the UI
+            if(oData) {
+                // If paginated and the deleted row was on this or a prior page, just
+                // re-render
+                var oPaginator = this.get('paginator');
+                if (oPaginator instanceof Pag ||
+                    this.get('paginated')) {
+        
+                    var endRecIndex;
+                    if (oPaginator instanceof Pag) {
+                        // Update the paginator's totalRecords
+                        var totalRecords = oPaginator.get('totalRecords');
+                        if (totalRecords !== Pag.VALUE_UNLIMITED) {
+                            oPaginator.set('totalRecords',totalRecords - 1);
                         }
-                    },
-                    scope: this,
-                    timeout: (this.get("renderLoopSize") > 0) ? 0 : -1
-                });
-                this._oChain.run();
-                return;
+        
+                        endRecIndex = (oPaginator.getPageRecords())[1];
+                    } else {
+                        // Backward compatibility
+                        endRecIndex = oPaginator.startRecordIndex +
+                                      oPaginator.rowsPerPage - 1;
+        
+                        this.updatePaginator();
+                    }
+        
+                    // If the deleted record was on this or a prior page, re-render
+                    if (nRecordIndex <= endRecIndex) {
+                        this.render();
+                    }
+                    return;
+                }
+                else {
+                    if(lang.isNumber(nTrIndex)) {
+                        this._oChainRender.add({
+                            method: function() {
+                                if((this instanceof DT) && this._sId) {
+                                    var isLast = (nTrIndex == this.getLastTrEl().sectionRowIndex);
+                                    this._deleteTrEl(nTrIndex);
+                    
+                                    // Empty body
+                                    if(this._elTbody.rows.length === 0) {
+                                        this.showTableMessage(DT.MSG_EMPTY, DT.CLASS_EMPTY);
+                                    }
+                                    // Update UI
+                                    else {
+                                        // Set FIRST/LAST
+                                        if(nTrIndex === 0) {
+                                            this._setFirstRow();
+                                        }
+                                        if(isLast) {
+                                            this._setLastRow();
+                                        }
+                                        // Set EVEN/ODD
+                                        if(nTrIndex != this._elTbody.rows.length) {
+                                            this._setRowStripes(nTrIndex);
+                                        }                                
+                                    }
+                    
+                                    this.fireEvent("rowDeleteEvent", {recordIndex:nRecordIndex,
+                                    oldData:oData, trElIndex:nTrIndex});
+                                }
+                            },
+                            scope: this,
+                            timeout: (this.get("renderLoopSize") > 0) ? 0 : -1
+                        });
+                        this._oChainRender.run();
+                        return;
+                    }
+                }
             }
         }
-
-        this.fireEvent("rowDeleteEvent", {recordIndex:nRecordIndex,
-                oldData:oData, trElIndex:nTrIndex});
     }
-    else {
-    }
+    return null;
 },
 
 /**
@@ -10566,35 +10742,117 @@ deleteRow : function(row) {
  * will delete towards the beginning.
  */
 deleteRows : function(row, count) {
-    // Get the Record index...
-    var nRecordIndex = null;
-    // ...by Record index
-    if(lang.isNumber(row)) {
-        nRecordIndex = row;
-    }
-    // ...by element reference
-    else {
-        var elRow = Dom.get(row);
-        elRow = this.getTrEl(elRow);
-        if(elRow) {
-            nRecordIndex = this.getRecordIndex(elRow);
-        }
-    }
-    if(nRecordIndex !== null) {
-        if(count && lang.isNumber(count)) {
-            // Start with highest index and work down
-            var startIndex = (count > 0) ? nRecordIndex + count -1 : nRecordIndex;
-            var endIndex = (count > 0) ? nRecordIndex : nRecordIndex + count + 1;
-            for(var i=startIndex; i>endIndex-1; i--) {
-                this.deleteRow(i);
+    var nRecordIndex = this.getRecordIndex(row);
+    if(lang.isNumber(nRecordIndex)) {
+        var oRecord = this.getRecord(nRecordIndex);
+        if(oRecord) {
+            var nTrIndex = this.getTrIndex(nRecordIndex);
+            
+            // Remove from selection tracker if there
+            var sRecordId = oRecord.getId();
+            var tracker = this._aSelections || [];
+            for(var j=tracker.length-1; j>-1; j--) {
+                if((lang.isNumber(tracker[j]) && (tracker[j] === sRecordId)) ||
+                        ((tracker[j].constructor == Object) && (tracker[j].recordId === sRecordId))) {
+                    tracker.splice(j,1);
+                }
+            }
+    
+            // Delete Record from RecordSet
+            var highIndex = nRecordIndex+1;
+            var lowIndex = nRecordIndex;
+        
+            // Validate count and account for negative value
+            if(count && lang.isNumber(count)) {
+                highIndex = (count > 0) ? nRecordIndex + count -1 : nRecordIndex;
+                lowIndex = (count > 0) ? nRecordIndex : nRecordIndex + count + 1;
+                count = (count > 0) ? count : count*-1;
+            }
+            else {
+                count = 1;
+            }
+            
+            var aData = this._oRecordSet.deleteRecords(lowIndex, count);
+    
+            // Update the UI
+            if(aData) {
+                // If paginated and the deleted row was on this or a prior page, just
+                // re-render
+                var oPaginator = this.get('paginator');
+                if (oPaginator instanceof Pag ||
+                    this.get('paginated')) {
+        
+                    var endRecIndex;
+                    if (oPaginator instanceof Pag) {
+                        // Update the paginator's totalRecords
+                        var totalRecords = oPaginator.get('totalRecords');
+                        if (totalRecords !== Pag.VALUE_UNLIMITED) {
+                            oPaginator.set('totalRecords',totalRecords - 1);
+                        }
+        
+                        endRecIndex = (oPaginator.getPageRecords())[1];
+                    } else {
+                        // Backward compatibility
+                        endRecIndex = oPaginator.startRecordIndex +
+                                      oPaginator.rowsPerPage - 1;
+        
+                        this.updatePaginator();
+                    }
+        
+                    // If the lowest deleted record was on this or a prior page, re-render
+                    if (lowIndex <= endRecIndex) {
+                        this.render();
+                    }
+                    return;
+                }
+                else {
+                    if(lang.isNumber(nTrIndex)) {
+                        // Delete the TR elements starting with highest index
+                        var loopN = this.get("renderLoopSize");
+                        var loopEnd = lowIndex;
+                        var nRowsNeeded = count; // how many needed
+                        this._oChainRender.add({
+                            method: function(oArg) {
+                                if((this instanceof DT) && this._sId) {
+                                    var i = oArg.nCurrentRow,
+                                        len = (loopN > 0) ? (Math.max(i - loopN,loopEnd)-1) : loopEnd-1;
+                                    for(; i>len; --i) {
+                                        this._deleteTrEl(i);
+                                    }
+                                    oArg.nCurrentRow = i;
+                                }
+                            },
+                            iterations: (loopN > 0) ? Math.ceil(count/loopN) : 1,
+                            argument: {nCurrentRow:highIndex},
+                            scope: this,
+                            timeout: (loopN > 0) ? 0 : -1
+                        });
+                        this._oChainRender.add({
+                            method: function() {    
+                                // Empty body
+                                if(this._elTbody.rows.length === 0) {
+                                    this.showTableMessage(DT.MSG_EMPTY, DT.CLASS_EMPTY);
+                                }
+                                else {
+                                    this._setFirstRow();
+                                    this._setLastRow();
+                                    this._setRowStripes();
+                                }
+                                
+                                this.fireEvent("rowsDeleteEvent", {recordIndex:count,
+                                oldData:aData, count:nTrIndex});
+                            },
+                            scope: this,
+                            timeout: -1 // Needs to run immediately after the DOM deletions above
+                        });
+                        this._oChainRender.run();
+                        return;
+                    }
+                }
             }
         }
-        else {
-            this.deleteRow(nRecordIndex);
-        }
     }
-    else {
-    }
+    return null;
 },
 
 
@@ -12680,13 +12938,11 @@ unselectAllCells: function() {
  * @return {Boolean} True if item is selected.
  */
 isSelected : function(o) {
-    var oRecord, sRecordId, j;
-
-    var el = this.getTrEl(o) || this.getTdEl(o);
-    if(el) {
-        return Dom.hasClass(el,DT.CLASS_SELECTED);
+    if(o && (o.ownerDocument == document)) {
+        return (Dom.hasClass(this.getTdEl(o),DT.CLASS_SELECTED) || Dom.hasClass(this.getTrEl(o),DT.CLASS_SELECTED));
     }
     else {
+        var oRecord, sRecordId, j;
         var tracker = this._aSelections;
         if(tracker && tracker.length > 0) {
             // Looking for a Record?
@@ -13107,6 +13363,7 @@ resetCellEditor : function() {
     elContainer.innerHTML = "";
     this._oCellEditor.value = null;
     this._oCellEditor.isActive = false;
+    
 },
 
 /**
@@ -13130,14 +13387,19 @@ saveCellEditor : function() {
                 return;
             }
         }
-
         // Update the Record
         this._oRecordSet.updateRecordValue(this._oCellEditor.record, this._oCellEditor.column.key, this._oCellEditor.value);
-
         // Update the UI
         this.formatCell(this._oCellEditor.cell.firstChild);
-        this._syncColWidths();
-
+        
+        // Bug fix 1764044
+        this._oChainRender.add({
+            method: function() {
+                this._syncColWidths();
+            },
+            scope: this
+        });
+        this._oChainRender.run();
         // Clear out the Cell Editor
         this.resetCellEditor();
 
@@ -13517,7 +13779,7 @@ onEventCancelCellEditor : function(oArgs) {
 onDataReturnInitializeTable : function(sRequest, oResponse, oPayload) {
     this.initializeTable();
 
-    this.onDataReturnSetRecords(sRequest,oResponse,oPayload);
+    this.onDataReturnSetRows(sRequest,oResponse,oPayload);
 },
 
 /**
@@ -13538,10 +13800,19 @@ onDataReturnAppendRows : function(sRequest, oResponse, oPayload) {
 
     // Data ok to append
     if(ok && oResponse && !oResponse.error && lang.isArray(oResponse.results)) {
+
         this.addRows(oResponse.results);
 
-        // Update the instance with any payload data
-        this._handleDataReturnPayload(sRequest,oResponse,oPayload);
+        // Handle the meta && payload
+        this._handleDataReturnPayload(sRequest, oResponse,
+            this._mergeResponseMeta(oPayload, oResponse.meta));
+
+        // Default the Paginator's totalRecords from the RecordSet length
+        var oPaginator = this.get('paginator');
+        if (oPaginator && oPaginator instanceof Pag &&
+            oPaginator.get('totalRecords') < this._oRecordSet.getLength()) {
+            oPaginator.set('totalRecords',this._oRecordSet.getLength());
+        }
     }
     // Error
     else if(ok && oResponse.error) {
@@ -13562,17 +13833,27 @@ onDataReturnAppendRows : function(sRequest, oResponse, oPayload) {
 onDataReturnInsertRows : function(sRequest, oResponse, oPayload) {
     this.fireEvent("dataReturnEvent", {request:sRequest,response:oResponse,payload:oPayload});
 
-    oPayload = oPayload || { insertIndex : 0 };
-
     // Pass data through abstract method for any transformations
     var ok = this.doBeforeLoadData(sRequest, oResponse, oPayload);
 
     // Data ok to append
     if(ok && oResponse && !oResponse.error && lang.isArray(oResponse.results)) {
-        this.addRows(oResponse.results, oPayload.insertIndex || 0);
+        var meta = this._mergeResponseMeta({
+                // backward compatibility
+                recordInsertIndex: (oPayload ? oPayload.insertIndex || 0 : 0) },
+                oPayload, oResponse.meta);
 
-        // Update the instance with any payload data
-        this._handleDataReturnPayload(sRequest,oResponse,oPayload);
+        this.addRows(oResponse.results, meta.insertIndex);
+
+        // Handle the magic meta values
+        this._handleDataReturnPayload(sRequest,oResponse,meta);
+
+        // Default the Paginator's totalRecords from the RecordSet length
+        var oPaginator = this.get('paginator');
+        if (oPaginator && oPaginator instanceof Pag &&
+            oPaginator.get('totalRecords') < this._oRecordSet.getLength()) {
+            oPaginator.set('totalRecords',this._oRecordSet.getLength());
+        }
     }
     // Error
     else if(ok && oResponse.error) {
@@ -13583,12 +13864,12 @@ onDataReturnInsertRows : function(sRequest, oResponse, oPayload) {
 /**
  * Receives reponse from DataSource and populates the RecordSet with the
  * results.
- * @method onDataReturnSetRecords
+ * @method onDataReturnSetRows
  * @param oRequest {MIXED} Original generated request.
  * @param oResponse {Object} Response object.
  * @param oPayload {MIXED} (optional) Additional argument(s)
  */
-onDataReturnSetRecords : function(oRequest, oResponse, oPayload) {
+onDataReturnSetRows : function(oRequest, oResponse, oPayload) {
     this.fireEvent("dataReturnEvent", {request:oRequest,response:oResponse,payload:oPayload});
 
     // Pass data through abstract method for any transformations
@@ -13597,22 +13878,30 @@ onDataReturnSetRecords : function(oRequest, oResponse, oPayload) {
     // Data ok to set
     if(ok && oResponse && !oResponse.error && lang.isArray(oResponse.results)) {
         var oPaginator = this.get('paginator');
-        var startIndex = oPayload && lang.isNumber(oPayload.startIndex) ?
-                            oPayload.startIndex : 0;
-
-        // If paginating, set the number of total records if provided
-        if (oPaginator instanceof Pag) {
-            if (lang.isNumber(oResponse.totalRecords)) {
-                oPaginator.setTotalRecords(oResponse.totalRecords,true);
-            } else {
-                oPaginator.setTotalRecords(oResponse.results.length,true);
-            }
+        if (!(oPaginator instanceof Pag)) {
+            oPaginator = null;
         }
 
-        this._oRecordSet.setRecords(oResponse.results, startIndex);
+        var meta = this._mergeResponseMeta({
+                // backward compatibility
+                recordStartIndex: oPayload ? oPayload.startIndex : null },
+                oPayload, oResponse.meta);
 
-        // Update the instance with any payload data
-        this._handleDataReturnPayload(oRequest,oResponse,oPayload);
+        if (!lang.isNumber(meta.recordStartIndex)) {
+            // Default to the current page offset if paginating; 0 if not.
+            meta.recordStartIndex = oPaginator && meta.pagination ?
+                meta.pagination.recordOffset || 0 : 0;
+        }
+
+        this._oRecordSet.setRecords(oResponse.results, meta.recordStartIndex);
+
+        // Handle the magic meta values
+        this._handleDataReturnPayload(oRequest,oResponse,meta);
+
+        // Default the Paginator's totalRecords from the RecordSet length
+        if (oPaginator && oPaginator.get('totalRecords') < this._oRecordSet.getLength()) {
+            oPaginator.set('totalRecords',this._oRecordSet.getLength());
+        }
 
         this.render();
     }
@@ -13623,34 +13912,78 @@ onDataReturnSetRecords : function(oRequest, oResponse, oPayload) {
 },
 
 /**
+ * Merges meta information from the response (as defined in the DataSource's
+ * responseSchema.metaFields member) into the payload.  A few magic keys are
+ * given special treatment: sortKey and sortDir => sorting.key|dir and all
+ * keys paginationFoo => pagination.foo.  Merging is shallow with the exception
+ * of the magic keys being added to their respective nested objects.
+ *
+ * @method _mergeResponseMeta
+ * @param * {object} Any number of objects to merge together.  Last in wins.
+ * @return {object} A new object containing the combined keys of all objects.
+ * @private
+ */
+_mergeResponseMeta : function () {
+    var meta = {},
+        a = arguments,
+        i = 0,len = a.length,
+        k,o;
+
+    for (; i < len; ++i) {
+        o = a[i];
+        if (lang.isObject(o)) {
+            for (k in o) {
+                if (lang.hasOwnProperty(o,k)) {
+                    if (k.indexOf('pagination') === 0 && k.charAt(10)) {
+                        if (!meta.pagination) {
+                            meta.pagination = {};
+                        }
+                        meta.pagination[k.substr(10,1).toLowerCase()+k.substr(11)] = o[k];
+                    } else if (/^sort(Key|Dir)/.test(k)) {
+                        if (!meta.sorting) {
+                            var curSort = this.get('sortedBy');
+                            meta.sorting = curSort ? { key : curSort.key } : {};
+                        }
+                        meta.sorting[RegExp.$1.toLowerCase()] = o[k];
+                    } else {
+                        meta[k] = o[k];
+                    }
+                }
+            }
+        }
+    }
+
+    return meta;
+},
+
+/**
  * Updates the DataTable with data sent in an onDataReturn* payload
  * @method _handleDataReturnPayload
  * @param oRequest {MIXED} Original generated request.
  * @param oResponse {Object} Response object.
- * @param oPayload {MIXED} Additional argument(s)
+ * @param meta {MIXED} Argument(s) provided in payload or response meta
  * @private
  */
-_handleDataReturnPayload : function (oRequest, oResponse, oPayload) {
-    if (oPayload) {
+_handleDataReturnPayload : function (oRequest, oResponse, meta) {
+    if (meta) {
         // Update with any pagination information
-        var oState = oPayload.pagination;
-
-        if (oState) {
-            // Set the paginator values in preparation for refresh
-            var oPaginator = this.get('paginator');
-            if (oPaginator && oPaginator instanceof Pag) {
-                oPaginator.setStartIndex(oState.recordOffset,true);
-                oPaginator.setRowsPerPage(oState.rowsPerPage,true);
+        var oPaginator = this.get('paginator');
+        if (oPaginator instanceof Pag) {
+            if (!lang.isUndefined(meta.totalRecords)) {
+                oPaginator.set('totalRecords',parseInt(meta.totalRecords,10)|0);
             }
 
+            if (lang.isObject(meta.pagination)) {
+                // Set the paginator values in preparation for refresh
+                oPaginator.set('rowsPerPage',meta.pagination.rowsPerPage);
+                oPaginator.set('recordOffset',meta.pagination.recordOffset);
+            }
         }
 
         // Update with any sorting information
-        oState = oPayload.sorting;
-
-        if (oState) {
+        if (meta.sorting) {
             // Set the sorting values in preparation for refresh
-            this.set('sortedBy', oState);
+            this.set('sortedBy', meta.sorting);
         }
     }
 },
@@ -13991,6 +14324,13 @@ _handleDataReturnPayload : function (oRequest, oResponse, oPayload) {
      * @event columnResizeEvent
      * @param oArgs.column {YAHOO.widget.Column} The Column instance.
      * @param oArgs.target {HTMLElement} The TH element.
+     * @param oArgs.width {Number} Width in pixels.     
+     */
+
+    /**
+     * Fired when a ColumnSet is re-initialized due to a Column being drag-reordered.
+     *
+     * @event columnReorderEvent
      */
 
     /**
@@ -14096,6 +14436,13 @@ _handleDataReturnPayload : function (oRequest, oResponse, oPayload) {
      * @event rowAddEvent
      * @param oArgs.record {YAHOO.widget.Record} The added Record.
      */
+     
+    /**
+     * Fired when rows are added.
+     *
+     * @event rowsAddEvent
+     * @param oArgs.record {YAHOO.widget.Record[]} The added Records.
+     */
 
     /**
      * Fired when a row is updated.
@@ -14112,6 +14459,15 @@ _handleDataReturnPayload : function (oRequest, oResponse, oPayload) {
      * @param oArgs.oldData {Object} Object literal of the deleted data.
      * @param oArgs.recordIndex {Number} Index of the deleted Record.
      * @param oArgs.trElIndex {Number} Index of the deleted TR element, if on current page.
+     */
+     
+    /**
+     * Fired when rows are deleted.
+     *
+     * @event rowsDeleteEvent
+     * @param oArgs.oldData {Object[]} Array of object literals of the deleted data.
+     * @param oArgs.recordIndex {Number} Index of the first deleted Record.
+     * @param oArgs.count {Number} Number of deleted Records.
      */
 
     /**
@@ -14810,6 +15166,13 @@ onDataReturnReplaceRows : function(sRequest, oResponse) {
  */
 
 });
-})();
 
-YAHOO.register("datatable", YAHOO.widget.DataTable, {version: "2.5.0", build: "895"});
+/**
+ * Alias for onDataReturnSetRows for backward compatibility
+ * @method onDataReturnSetRecords
+ * @deprecated Use onDataReturnSetRows
+ */
+DT.prototype.onDataReturnSetRecords = DT.prototype.onDataReturnSetRows;
+
+})();
+YAHOO.register("datatable", YAHOO.widget.DataTable, {version: "2.5.1", build: "984"});

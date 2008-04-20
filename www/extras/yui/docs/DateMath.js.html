@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Calendar&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Calendar&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_calendar.html">calendar</a>
@@ -86,6 +86,19 @@
 <span class="c">	* @type Number</span>
 <span class="c">	*/</span>
 	<span class="nx">ONE_DAY_MS</span> <span class="o">:</span> <span class="m">1000</span><span class="o">*</span><span class="m">60</span><span class="o">*</span><span class="m">60</span><span class="o">*</span><span class="m">24</span><span class="o">,</span>
+	
+	<span class="c">/**</span>
+<span class="c">	 * Constant field representing the date in first week of January</span>
+<span class="c">	 * which identifies the first week of the year.</span>
+<span class="c">	 * &lt;p&gt;</span>
+<span class="c">	 * In the U.S, Jan 1st is normally used based on a Sunday start of week.</span>
+<span class="c">	 * ISO 8601, used widely throughout Europe, uses Jan 4th, based on a Monday start of week.</span>
+<span class="c">	 * &lt;/p&gt;</span>
+<span class="c">	 * @property WEEK_ONE_JAN_DATE</span>
+<span class="c">	 * @static</span>
+<span class="c">	 * @type Number</span>
+<span class="c">	 */</span>
+	<span class="nx">WEEK_ONE_JAN_DATE</span> <span class="o">:</span> <span class="m">1</span><span class="o">,</span>
 
 	<span class="c">/**</span>
 <span class="c">	* Adds the specified amount of time to the this instance.</span>
@@ -249,27 +262,76 @@
 	<span class="o">},</span>
 
 	<span class="c">/**</span>
-<span class="c">	* Calculates the week number for the given date. This function assumes that week 1 is the</span>
-<span class="c">	* week in which January 1 appears, regardless of whether the week consists of a full 7 days.</span>
-<span class="c">	* The calendar year can be specified to help find what a the week number would be for a given</span>
-<span class="c">	* date if the date overlaps years. For instance, a week may be considered week 1 of 2005, or</span>
-<span class="c">	* week 53 of 2004. Specifying the optional calendarYear allows one to make this distinction</span>
-<span class="c">	* easily.</span>
+<span class="c">	* Calculates the week number for the given date. Can currently support standard</span>
+<span class="c">	* U.S. week numbers, based on Jan 1st defining the 1st week of the year, and </span>
+<span class="c">	* ISO8601 week numbers, based on Jan 4th defining the 1st week of the year.</span>
+<span class="c">	* </span>
 <span class="c">	* @method getWeekNumber</span>
-<span class="c">	* @param {Date}	date	The JavaScript date for which to find the week number</span>
-<span class="c">	* @param {Number} calendarYear	OPTIONAL - The calendar year to use for determining the week number. Default is</span>
-<span class="c">	*											the calendar year of parameter &quot;date&quot;.</span>
-<span class="c">	* @return {Number}	The week number of the given date.</span>
+<span class="c">	* @param {Date}	date The JavaScript date for which to find the week number</span>
+<span class="c">	* @param {Number} firstDayOfWeek The index of the first day of the week (0 = Sun, 1 = Mon ... 6 = Sat).</span>
+<span class="c">	* Defaults to 0</span>
+<span class="c">	* @param {Number} janDate The date in the first week of January which defines week one for the year</span>
+<span class="c">	* Defaults to the value of YAHOO.widget.DateMath.WEEK_ONE_JAN_DATE, which is 1 (Jan 1st). </span>
+<span class="c">	* For the U.S, this is normally Jan 1st. ISO8601 uses Jan 4th to define the first week of the year.</span>
+<span class="c">	* </span>
+<span class="c">	* @return {Number} The number of the week containing the given date.</span>
 <span class="c">	*/</span>
-	<span class="nx">getWeekNumber</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">date</span><span class="o">,</span> <span class="nx">calendarYear</span><span class="o">)</span> <span class="o">{</span>
-		<span class="nx">date</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">date</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">nearestThurs</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="o">(</span><span class="nx">date</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">+</span> <span class="o">(</span><span class="m">4</span> <span class="o">*</span> <span class="k">this</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">)</span> <span class="o">-</span> <span class="o">((</span><span class="nx">date</span><span class="o">.</span><span class="nx">getDay</span><span class="o">())</span> <span class="o">*</span> <span class="k">this</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">));</span>
+	<span class="nx">getWeekNumber</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">date</span><span class="o">,</span> <span class="nx">firstDayOfWeek</span><span class="o">,</span> <span class="nx">janDate</span><span class="o">)</span> <span class="o">{</span>
 
-		<span class="k">var</span> <span class="nx">jan1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">nearestThurs</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">(),</span><span class="m">0</span><span class="o">,</span><span class="m">1</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">dayOfYear</span> <span class="o">=</span> <span class="o">((</span><span class="nx">nearestThurs</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">-</span> <span class="nx">jan1</span><span class="o">.</span><span class="nx">getTime</span><span class="o">())</span> <span class="o">/</span> <span class="k">this</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">)</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span>
+		<span class="c">// Setup Defaults</span>
+<span class="c"></span>		<span class="nx">firstDayOfWeek</span> <span class="o">=</span> <span class="nx">firstDayOfWeek</span> <span class="o">||</span> <span class="m">0</span><span class="o">;</span>
+		<span class="nx">janDate</span> <span class="o">=</span> <span class="nx">janDate</span> <span class="o">||</span> <span class="k">this</span><span class="o">.</span><span class="nx">WEEK_ONE_JAN_DATE</span><span class="o">;</span>
 
-		<span class="k">var</span> <span class="nx">weekNum</span> <span class="o">=</span> <span class="nb">Math</span><span class="o">.</span><span class="nx">ceil</span><span class="o">((</span><span class="nx">dayOfYear</span><span class="o">)/</span> <span class="m">7</span><span class="o">);</span>
+		<span class="k">var</span> <span class="nx">targetDate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">date</span><span class="o">),</span>
+			<span class="nx">startOfWeek</span><span class="o">,</span>
+			<span class="nx">endOfWeek</span><span class="o">;</span>
+
+		<span class="k">if</span> <span class="o">(</span><span class="nx">targetDate</span><span class="o">.</span><span class="nx">getDay</span><span class="o">()</span> <span class="o">===</span> <span class="nx">firstDayOfWeek</span><span class="o">)</span> <span class="o">{</span> 
+			<span class="nx">startOfWeek</span> <span class="o">=</span> <span class="nx">targetDate</span><span class="o">;</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+			<span class="nx">startOfWeek</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getFirstDayOfWeek</span><span class="o">(</span><span class="nx">targetDate</span><span class="o">,</span> <span class="nx">firstDayOfWeek</span><span class="o">);</span>
+		<span class="o">}</span>
+
+		<span class="k">var</span> <span class="nx">startYear</span> <span class="o">=</span> <span class="nx">startOfWeek</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">(),</span>
+			<span class="nx">startTime</span> <span class="o">=</span> <span class="nx">startOfWeek</span><span class="o">.</span><span class="nx">getTime</span><span class="o">();</span>
+
+		<span class="c">// DST shouldn&#39;t be a problem here, math is quicker than setDate();</span>
+<span class="c"></span>		<span class="nx">endOfWeek</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="o">(</span><span class="nx">startOfWeek</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">+</span> <span class="m">6</span><span class="o">*</span><span class="k">this</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">);</span>
+
+		<span class="k">var</span> <span class="nx">weekNum</span><span class="o">;</span>
+		<span class="k">if</span> <span class="o">(</span><span class="nx">startYear</span> <span class="o">!==</span> <span class="nx">endOfWeek</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="nx">endOfWeek</span><span class="o">.</span><span class="nx">getDate</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="nx">janDate</span><span class="o">)</span> <span class="o">{</span>
+			<span class="c">// If years don&#39;t match, endOfWeek is in Jan. and if the </span>
+<span class="c"></span>			<span class="c">// week has WEEK_ONE_JAN_DATE in it, it&#39;s week one by definition.</span>
+<span class="c"></span>			<span class="nx">weekNum</span> <span class="o">=</span> <span class="m">1</span><span class="o">;</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+			<span class="c">// Get the 1st day of the 1st week, and </span>
+<span class="c"></span>			<span class="c">// find how many days away we are from it.</span>
+<span class="c"></span>			<span class="k">var</span> <span class="nx">weekOne</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">startYear</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="nx">janDate</span><span class="o">)),</span>
+				<span class="nx">weekOneDayOne</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getFirstDayOfWeek</span><span class="o">(</span><span class="nx">weekOne</span><span class="o">,</span> <span class="nx">firstDayOfWeek</span><span class="o">);</span>
+
+			<span class="c">// Round days to smoothen out 1 hr DST diff</span>
+<span class="c"></span>			<span class="k">var</span> <span class="nx">daysDiff</span>  <span class="o">=</span> <span class="nb">Math</span><span class="o">.</span><span class="nx">round</span><span class="o">((</span><span class="nx">targetDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">-</span> <span class="nx">weekOneDayOne</span><span class="o">.</span><span class="nx">getTime</span><span class="o">())/</span><span class="k">this</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">);</span>
+
+			<span class="c">// Calc. Full Weeks</span>
+<span class="c"></span>			<span class="k">var</span> <span class="nx">rem</span> <span class="o">=</span> <span class="nx">daysDiff</span> <span class="o">%</span> <span class="m">7</span><span class="o">;</span>
+			<span class="k">var</span> <span class="nx">weeksDiff</span> <span class="o">=</span> <span class="o">(</span><span class="nx">daysDiff</span> <span class="o">-</span> <span class="nx">rem</span><span class="o">)/</span><span class="m">7</span><span class="o">;</span>
+			<span class="nx">weekNum</span> <span class="o">=</span> <span class="nx">weeksDiff</span> <span class="o">+</span> <span class="m">1</span><span class="o">;</span>
+		<span class="o">}</span>
 		<span class="k">return</span> <span class="nx">weekNum</span><span class="o">;</span>
+	<span class="o">},</span>
+
+	<span class="c">/**</span>
+<span class="c">	 * Get the first day of the week, for the give date. </span>
+<span class="c">	 * @param {Date} dt The date in the week for which the first day is required.</span>
+<span class="c">	 * @param {Number} startOfWeek The index for the first day of the week, 0 = Sun, 1 = Mon ... 6 = Sat (defaults to 0)</span>
+<span class="c">	 * @return {Date} The first day of the week</span>
+<span class="c">	 */</span>
+	<span class="nx">getFirstDayOfWeek</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">dt</span><span class="o">,</span> <span class="nx">startOfWeek</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nx">startOfWeek</span> <span class="o">=</span> <span class="nx">startOfWeek</span> <span class="o">||</span> <span class="m">0</span><span class="o">;</span>
+		<span class="k">var</span> <span class="nx">dayOfWeekIndex</span> <span class="o">=</span> <span class="nx">dt</span><span class="o">.</span><span class="nx">getDay</span><span class="o">(),</span>
+			<span class="nx">dayOfWeek</span> <span class="o">=</span> <span class="o">(</span><span class="nx">dayOfWeekIndex</span> <span class="o">-</span> <span class="nx">startOfWeek</span> <span class="o">+</span> <span class="m">7</span><span class="o">)</span> <span class="o">%</span> <span class="m">7</span><span class="o">;</span>
+
+		<span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="nx">subtract</span><span class="o">(</span><span class="nx">dt</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">DAY</span><span class="o">,</span> <span class="nx">dayOfWeek</span><span class="o">);</span>
 	<span class="o">},</span>
 
 	<span class="c">/**</span>

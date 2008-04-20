@@ -17,9 +17,9 @@ body {
 </style>
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
-<script type="text/javascript" src="../../build/yahoo/yahoo.js"></script>
-<script type="text/javascript" src="../../build/event/event.js"></script>
-<script type="text/javascript" src="../../build/connection/connection.js"></script>
+<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
+<script type="text/javascript" src="../../build/connection/connection-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
@@ -32,7 +32,7 @@ body {
 <div class="exampleIntro">
 	<p>This example demonstrates how to use the <a href="http://developer.yahoo.com/yui/connection/">Connection Manager</a> and a PHP proxy &mdash; to work around XMLHttpRequest's same-domain policy &mdash; to retrieve an XML document from <code>http://xml.weather.yahoo.com/forecastrss</code>.</p>
 
-<p>To try out the example, fill in your five-digit US zip code, your desired units (C or F), and click "Get Weather RSS".</p>			
+<p>To try out the example, fill in your five-digit US zip code, or Location ID.</p>			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
@@ -41,10 +41,6 @@ body {
 <fieldset>
 	<label>Zip Code or Location ID</label> <input type="text" name="zip" value="94089">
 	<p>Please enter a U.S. Zip Code or a location ID to get the current temperature.  The default is Zip Code 94089 for Sunnyvale, California; its location ID is: USCA1116.</p>
-</fieldset>
-<fieldset>
-<label>Unit</label> <input type="text" name="unit" length="1" maxlength="1">
-<p>Enter *F* for Fahrenheit or *C* for Celsius temperature unit.
 </fieldset>
 <div id="weatherModule"></div>
 <input type="button" value="Get Weather RSS" onClick="getModule()">
@@ -62,7 +58,7 @@ function successHandler(o){
 	var descriptionNode = root.getElementsByTagName('description')[1].firstChild.nodeValue;
 
 	div.innerHTML = "<p>" + oTitle + "</p>" + "<p>" + oDateTime + "</p>" + descriptionNode;
-	
+
 	YAHOO.log("Success handler is complete.", "info", "example");
 }
 
@@ -74,12 +70,11 @@ function failureHandler(o){
 
 function getModule(){
 	var iZip = oForm.elements['zip'].value;
-	var sUnit = oForm.elements['unit'].value;
 	var entryPoint = 'assets/weather.php';
-	var queryString = encodeURI('?p=' + iZip + '&' + 'u=' + sUnit);
+	var queryString = encodeURI('?p=' + iZip);
 	var sUrl = entryPoint + queryString;
-	
-	YAHOO.log("Submitting request; zip code: " + iZip + "; units: " + sUnit, "info", "example");
+
+	YAHOO.log("Submitting request; zip code: " + iZip, "info", "example");
 
 	var request = YAHOO.util.Connect.asyncRequest('GET', sUrl, { success:successHandler, failure:failureHandler });
 }

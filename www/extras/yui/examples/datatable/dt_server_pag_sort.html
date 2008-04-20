@@ -67,7 +67,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: DataTable Control (beta): Server-side Pagination and Sorting, with Browser History Manager</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -97,12 +98,18 @@ History Manager for managing states.</p>
 <div id="serverintegration"></div>
 
 <script type="text/javascript">
-YAHOO.example.ServerIntegration = new function() {
-    var History = YAHOO.util.History;
+(function () {
+    var History = YAHOO.util.History,
+        myPaginator,  // to hold the Paginator instance
+        myDataSource, // to hold the DataSource instance
+        myDataTable;  // to hold the DataTable instance
 
     // function to generate a query string for the DataSource.  Also used
     // as the state indicator for the History Manager
     var generateStateString = function (start,key,dir) {
+        start = start || 0;
+        key   = key || 'id';
+        dir   = dir || 'asc';
         return "results=15&startIndex="+start+"&sort="+key+"&dir="+dir;
     };
 
@@ -148,33 +155,13 @@ YAHOO.example.ServerIntegration = new function() {
         // Create a payload to pass through the DataSource request to the
         // handler
         var parsed = parseStateString(state);
-        var oPayload = {
-            startIndex : parsed.startIndex,
-            pagination : {
-                recordOffset : parsed.startIndex
-            },
-            sorting : {
-                key : parsed.sort,
-                dir : parsed.dir
-            }
-        };
 
         // Use the DataTable's baked in server-side pagination handler
-        this.myDataSource.sendRequest(state,{
-                success  : this.myDataTable.onDataReturnSetRecords,
-                failure  : this.myDataTable.onDataReturnSetRecords,
-                scope    : this.myDataTable,
-                argument : oPayload
+        myDataSource.sendRequest(state,{
+                success  : myDataTable.onDataReturnSetRows,
+                failure  : myDataTable.onDataReturnSetRows,
+                scope    : myDataTable
         });
-    };
-
-    var doBeforeLoadData = function (oRequest, oResponse, oPayload) {
-        oPayload = oPayload || {};
-        if (!YAHOO.lang.isNumber(oPayload.startIndex)) {
-            oPayload.startIndex = this.get('paginator').getStartIndex();
-        }
-
-        return true;
     };
 
     var initialState = History.getBookmarkedState('myDataTable') ||
@@ -190,12 +177,17 @@ YAHOO.example.ServerIntegration = new function() {
             state          = parseStateString(initialRequest);
 
         // Create the DataSource
-        this.myDataSource = new YAHOO.util.DataSource("assets/php/json_proxy.php?");
-        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-        this.myDataSource.responseSchema = {
+        myDataSource = new YAHOO.util.DataSource("assets/php/json_proxy.php?");
+        myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+        myDataSource.responseSchema = {
             resultsList: "records",
-            totalRecords: "totalRecords",
-            fields: ["id","name","date","price"]
+            fields: ["id","name","date","price"],
+            metaFields: {
+                totalRecords: "totalRecords",
+                paginationRecordOffset : "startIndex",
+                sortKey: "sort",
+                sortDir: "dir"
+            }
         };
 
         // Column definitions
@@ -208,7 +200,7 @@ YAHOO.example.ServerIntegration = new function() {
 
         // Create the DataTable configuration and Paginator using the state
         // information we pulled from the History Manager
-        this.paginator = new YAHOO.widget.Paginator({
+        myPaginator = new YAHOO.widget.Paginator({
             rowsPerPage : state.results,
             recordOffset : state.startIndex,
             containers : ['dt-pag-nav'],
@@ -217,7 +209,7 @@ YAHOO.example.ServerIntegration = new function() {
         });
 
         var myConfig = {
-            paginator : this.paginator,
+            paginator : myPaginator,
             paginationEventHandler : handlePagination,
             // generateRequest : generateStateString, // moot
             sortedBy : {
@@ -228,26 +220,29 @@ YAHOO.example.ServerIntegration = new function() {
         };
 
         // Instantiate DataTable
-        this.myDataTable = new YAHOO.widget.DataTable(
+        myDataTable = new YAHOO.widget.DataTable(
             "serverintegration", // The dom element to contain the DataTable
             myColumnDefs,        // What columns will display
-            this.myDataSource,   // The DataSource for our records
-            myConfig             // The configuration for *this* instantiation
+            myDataSource,        // The DataSource for our records
+            myConfig             // Other configurations
         );
 
         // Listen to header link clicks to sort the column
-        this.myDataTable.subscribe('theadCellClickEvent', this.myDataTable.onEventSortColumn);
+        myDataTable.subscribe('theadCellClickEvent', myDataTable.onEventSortColumn);
 
         // Override the DataTable's sortColumn method with our intercept handler
-        this.myDataTable.sortColumn = handleSorting;
+        myDataTable.sortColumn = handleSorting;
         
-        // Override the doBeforeLoadData method to make sure we initialize the
-        // DataTable's RecordSet from the proper starting index
-        this.myDataTable.doBeforeLoadData = doBeforeLoadData
+        // Add the example objects to the YAHOO.example namespace for inspection
+        YAHOO.example.ServerIntegration = {
+            myPaginator  : myPaginator,
+            myDataSource : myDataSource,
+            myDataTable  : myDataTable
+        };
     });
 
     YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
-};
+})();
 </script>
 	
 	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
@@ -320,12 +315,18 @@ YAHOO.example.ServerIntegration = new function() {
 
 <p>The Browser History Manager remembers &quot;states&quot;.  For this example, we'll use the query string sent to the server script as the state indicator.  First we create a couple functions to generate and parse the query/state string, then set up the <code>onStateChange</code> function for the BHM to use when calls to <code>History.navigate(...)</code> are made.</p>
 <textarea name="code" class="JScript" cols="60" rows="1">
-YAHOO.example.ServerIntegration = new function() {
-    var History = YAHOO.util.History;
+(function () {
+    var History = YAHOO.util.History,
+        myPaginator,  // to hold the Paginator instance
+        myDataSource, // to hold the DataSource instance
+        myDataTable;  // to hold the DataTable instance
 
     // function to generate a query string for the DataSource.  Also used
     // as the state indicator for the History Manager
     var generateStateString = function (start,key,dir) {
+        start = start || 0;
+        key   = key || 'id';
+        dir   = dir || 'asc';
         return "results=15&startIndex="+start+"&sort="+key+"&dir="+dir;
     };
 
@@ -344,23 +345,12 @@ YAHOO.example.ServerIntegration = new function() {
         // Create a payload to pass through the DataSource request to the
         // handler
         var parsed = parseStateString(state);
-        var oPayload = {
-            startIndex : parsed.startIndex,
-            pagination : {
-                recordOffset : parsed.startIndex
-            },
-            sorting : {
-                key : parsed.sort,
-                dir : parsed.dir
-            }
-        };
 
-        // Use the DataTable's baked in server-side data handler
-        this.myDataSource.sendRequest(state,{
-                success  : this.myDataTable.onDataReturnSetRecords,
-                failure  : this.myDataTable.onDataReturnSetRecords,
-                scope    : this.myDataTable,
-                argument : oPayload
+        // Use the DataTable's baked in server-side pagination handler
+        myDataSource.sendRequest(state,{
+                success  : myDataTable.onDataReturnSetRows,
+                failure  : myDataTable.onDataReturnSetRows,
+                scope    : myDataTable
         });
     };
 
@@ -405,19 +395,8 @@ YAHOO.example.ServerIntegration = new function() {
     };
 </textarea>
 
-<p>Here's something a bit more cryptic.  To support returning to a DataTable state that is not on the first page, we need to override the DataTable instance's <code>doBeforeLoadData</code> method to default the insertion point for the records returned from the server to their appropriate index in the larger data set.  DataTable assumes during construction that its DataSource represents the complete data set, so it stores records internally from index 0 (unless we intervene).</p>
-<textarea name="code" class="JScript" cols="60" rows="1">
-    var doBeforeLoadData = function (oRequest, oResponse, oPayload) {
-        oPayload = oPayload || {};
-        if (!YAHOO.lang.isNumber(oPayload.startIndex)) {
-            oPayload.startIndex = this.get('paginator').getStartIndex();
-        }
-
-        return true;
-    };
-</textarea>
-
 <p>Finally, we create the DataTable instance and the supporting class instances in the History Manager's <code>onReady</code> handler.  This guarantees that whether users arrive at the page fresh, from a bookmark, or from navigating via the browser's back/forward buttons, the DataTable will display the appropriate state.</p>
+<p>Note the DataSource is configured with a number of <code>metaFields</code>, which are processed by the DataTable to automatically update sorting and pagination information.  See the note on <a href="http://developer.yahoo.com/yui/datatable/#magic_meta">magic meta</a> in the DataTable docs for more information.</p>
 <textarea name="code" class="JScript" cols="60" rows="1">
     History.onReady(function() {
         // Pull the state from the History Manager, or default from the
@@ -427,12 +406,17 @@ YAHOO.example.ServerIntegration = new function() {
             state          = parseStateString(initialRequest);
 
         // Create the DataSource
-        this.myDataSource = new YAHOO.util.DataSource("assets/php/json_proxy.php?");
-        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-        this.myDataSource.responseSchema = {
+        myDataSource = new YAHOO.util.DataSource("assets/php/json_proxy.php?");
+        myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+        myDataSource.responseSchema = {
             resultsList: "records",
-            totalRecords: "totalRecords",
-            fields: ["id","name","date","price"]
+            fields: ["id","name","date","price"],
+            metaFields: {
+                totalRecords: "totalRecords",
+                paginationRecordOffset : "startIndex",
+                sortKey: "sort",
+                sortDir: "dir"
+            }
         };
 
         // Column definitions
@@ -445,7 +429,7 @@ YAHOO.example.ServerIntegration = new function() {
 
         // Create the DataTable configuration and Paginator using the state
         // information we pulled from the History Manager
-        this.paginator = new YAHOO.widget.Paginator({
+        myPaginator = new YAHOO.widget.Paginator({
             rowsPerPage : state.results,
             recordOffset : state.startIndex,
             containers : ['dt-pag-nav'],
@@ -454,7 +438,7 @@ YAHOO.example.ServerIntegration = new function() {
         });
 
         var myConfig = {
-            paginator : this.paginator,
+            paginator : myPaginator,
             paginationEventHandler : handlePagination,
             // generateRequest : generateStateString, // moot
             sortedBy : {
@@ -465,26 +449,29 @@ YAHOO.example.ServerIntegration = new function() {
         };
 
         // Instantiate DataTable
-        this.myDataTable = new YAHOO.widget.DataTable(
+        myDataTable = new YAHOO.widget.DataTable(
             "serverintegration", // The dom element to contain the DataTable
             myColumnDefs,        // What columns will display
-            this.myDataSource,   // The DataSource for our records
-            myConfig             // The configuration for *this* instantiation
+            myDataSource,        // The DataSource for our records
+            myConfig             // Other configurations
         );
 
         // Listen to header link clicks to sort the column
-        this.myDataTable.subscribe('theadCellClickEvent', this.myDataTable.onEventSortColumn);
+        myDataTable.subscribe('theadCellClickEvent', myDataTable.onEventSortColumn);
 
         // Override the DataTable's sortColumn method with our intercept handler
-        this.myDataTable.sortColumn = handleSorting;
+        myDataTable.sortColumn = handleSorting;
         
-        // Override the doBeforeLoadData method to make sure we initialize the
-        // DataTable's RecordSet from the proper starting index
-        this.myDataTable.doBeforeLoadData = doBeforeLoadData
+        // Add the example objects to the YAHOO.example namespace for inspection
+        YAHOO.example.ServerIntegration = {
+            myPaginator  : myPaginator,
+            myDataSource : myDataSource,
+            myDataTable  : myDataTable
+        };
     });
 
     YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
-};
+})();
 </textarea>
 				</div>
 				<div class="yui-u">
@@ -502,7 +489,7 @@ YAHOO.example.ServerIntegration = new function() {
 	
 						<div id="exampleToc">
 							<ul>
-								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li class='selected'><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing and Hiding Columns</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
+								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li class='selected'><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
 						</div>
 					</div>
 					
@@ -515,8 +502,6 @@ YAHOO.example.ServerIntegration = new function() {
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/datatable.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

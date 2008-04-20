@@ -47,7 +47,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: DataTable Control (beta): Custom Cell Formatting</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -82,16 +83,16 @@ Column displays custom UI that is based on data in another Column.</p>
 <textarea name="code" class="HTML" cols="60" rows="1">YAHOO.example.Data = {
     formatting: {
         items: [
-            {field1: "001", field2:new Date(2007, 1, 1), field3:111, field4:"23.4", field5:"bob", field6:"http://www.yahoo.com"},
+            {field1: "bananas", field2:new Date(2007, 1, 1), field3:111, field4:"23.4", field5:"bob", field6:"http://www.yahoo.com"},
             {field1: undefined, field2:new Date(2006, 1, 1), field3:12.3, field4:"35.12", field5:"ann", field6:"http://www.yahoo.com"},
-            {field1: 001, field2:new Date(2007, 11, 1), field3:1, field4:34.12, field5:"charlie", field6:"http://www.yahoo.com"},
-            {field1: "aaab", field2:new Date(2007, 1, 11), field3:1112, field4:"03", field5:"diane", field6:"http://www.yahoo.com"},
-            {field1: "1", field2:new Date(1999, 1, 11), field3:124, field4:03, field5:"edgar", field6:"http://www.yahoo.com"},
-            {field1: new Date(1999, 1, 11), field2:"January 10, 2005", field3:"12", field4:"34", field5:"francine", field6:"http://www.yahoo.com"},
-            {field1: "11", field2:"January 1, 2005", field3:"19.1", field4:"234.5", field5:"george", field6:"http://www.yahoo.com"},
+            {field1: "apples", field2:new Date(2007, 11, 1), field3:1, field4:34.12, field5:"charlie", field6:"http://www.yahoo.com"},
+            {field1: "bananas", field2:new Date(2007, 1, 11), field3:1112, field4:"03", field5:"diane", field6:"http://www.yahoo.com"},
+            {field1: "cherries", field2:new Date(1999, 1, 11), field3:124, field4:03, field5:"edgar", field6:"http://www.yahoo.com"},
+            {field1: "", field2:"January 10, 2005", field3:"12", field4:"34", field5:"francine", field6:"http://www.yahoo.com"},
+            {field1: "unknown", field2:"January 1, 2005", field3:"19.1", field4:"234.5", field5:"george", field6:"http://www.yahoo.com"},
             {field1: null, field2:"1/11/05", field3:"10.02", field4:"345.654", field5:"hannah", field6:"http://www.yahoo.com"},
-            {field1: 110, field2:"1/11/2005", field3:"109", field4:23.456, field5:"igor", field6:"http://www.yahoo.com"},
-            {field1: [1,2,3], field2:"November 1, 2005", field3:"11111", field4:23.0123, field5:"julie", field6:"http://www.yahoo.com"}
+            {field1: "cherries", field2:"1/11/2005", field3:"109", field4:23.456, field5:"igor", field6:"http://www.yahoo.com"},
+            {field1: "bananas", field2:"November 1, 2005", field3:"11111", field4:23.0123, field5:"julie", field6:"http://www.yahoo.com"}
         ]
     }
 }
@@ -124,22 +125,26 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 elCell.innerHTML = '&nbsp;<img src="../../build/datatable/assets/skins/sam/dt-arrow-dn.png">';
             }
         };
+        
+        // Add the custom formatter to the shortcuts
+        YAHOO.widget.DataTable.Formatter.myCustom = this.myCustomFormatter;
 
         // Override the built-in formatter
         YAHOO.widget.DataTable.formatEmail = function(elCell, oRecord, oColumn, oData) {
             var user = oData;
             elCell.innerHTML = "<a href=\"mailto:" + user + "@mycompany.com\">" + user + "</a>";
         };
+        
 
         var myColumnDefs = [
-            {key:"flag", formatter:this.myCustomFormatter}, // use custom formatter
-            {key:"radio", formatter:YAHOO.widget.DataTable.formatRadio}, // use the built-in radio formatter
-            {key:"check", formatter:YAHOO.widget.DataTable.formatCheckbox}, // use the built-in checkbox formatter
+            {key:"flag", formatter:"myCustom"}, // use custom shortcut
+            {key:"radio", formatter:"radio"}, // use the built-in radio formatter
+            {key:"check", formatter:"checkbox"}, // use the built-in checkbox formatter (shortcut)
             {key:"button", label:"Show record data", formatter:YAHOO.widget.DataTable.formatButton}, // use the built-in button formatter
-            {key:"field1", sortable:true},
-            {key:"field2", sortable:true, formatter:YAHOO.widget.DataTable.formatDate}, // use the built-in date formatter
+            {key:"field1", formatter:"dropdown", dropdownOptions:["apples","bananas","cherries"],sortable:true},
+            {key:"field2", sortable:true, formatter:"date"}, // use the built-in date formatter
             {key:"field3", sortable:true},
-            {key:"field4", sortable:true, formatter:YAHOO.widget.DataTable.formatCurrency}, // use the built-in currency formatter
+            {key:"field4", sortable:true, formatter:"currency"}, // use the built-in currency formatter
             {key:"field5", sortable:true, formatter:YAHOO.widget.DataTable.formatEmail}, // use the overridden email formatter
             {key:"field6", sortable:true, formatter:YAHOO.widget.DataTable.formatLink} // use the built-in link formatter
         ];
@@ -167,22 +172,27 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 lastSelectedRadioRecord.setData("radio",false);
             }
             var elRadio = oArgs.target;
-            var elRecord = this.getRecord(elRadio);
-            elRecord.setData("radio",true);
-            lastSelectedRadioRecord = elRecord;
-            var name = elRecord.getData("field5");
+            var oRecord = this.getRecord(elRadio);
+            oRecord.setData("radio",true);
+            lastSelectedRadioRecord = oRecord;
+            var name = oRecord.getData("field5");
         });
 
         this.myDataTable.subscribe("checkboxClickEvent", function(oArgs){
             var elCheckbox = oArgs.target;
-            var elRecord = this.getRecord(elCheckbox);
-            elRecord.setData("check",elCheckbox.checked);
-            var name = elRecord.getData("field5");
+            var oRecord = this.getRecord(elCheckbox);
+            oRecord.setData("check",elCheckbox.checked);
         });
 
         this.myDataTable.subscribe("buttonClickEvent", function(oArgs){
             var oRecord = this.getRecord(oArgs.target);
             alert(YAHOO.lang.dump(oRecord.getData()));
+        });
+
+        this.myDataTable.subscribe("dropdownChangeEvent", function(oArgs){
+            var elDropdown = oArgs.target;
+            var oRecord = this.getRecord(elDropdown);
+            oRecord.setData("field1",elDropdown.options[elDropdown.selectedIndex].value);
         });
     };
 });
@@ -196,7 +206,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	
 						<div id="exampleToc">
 							<ul>
-								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li class='selected'><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing and Hiding Columns</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
+								<li><a href='../datatable/dt_basic.html'>Basic Example</a></li><li><a href='../datatable/dt_enhanced.html'>Progressive Enhancement</a></li><li class='selected'><a href='../datatable/dt_formatting.html'>Custom Cell Formatting</a></li><li><a href='../datatable/dt_nestedheaders.html'>Nested Headers</a></li><li><a href='../datatable/dt_xhrjson.html'>JSON Data Over XHR</a></li><li><a href='../datatable/dt_xhrpostxml.html'>XML Data Over XHR With POST</a></li><li><a href='../datatable/dt_xhrtext.html'>Textual Data Over XHR</a></li><li><a href='../datatable/dt_xhrlocalxml.html'>Local XML Data</a></li><li><a href='../datatable/dt_rowadddelete.html'>Adding and Deleting Rows</a></li><li><a href='../datatable/dt_clientpagination.html'>Client-side Pagination</a></li><li><a href='../datatable/dt_clientsorting.html'>Client-side Sorting</a></li><li><a href='../datatable/paginator_datatable_serverpaging.html'>Server-side Pagination</a></li><li><a href='../datatable/dt_serversorting.html'>Server-side Sorting</a></li><li><a href='../datatable/dt_server_pag_sort.html'>Server-side Pagination and Sorting, with Browser History Manager</a></li><li><a href='../datatable/dt_fixedscroll.html'>XY-scrolling, Y-scrolling, and X-scrolling</a></li><li><a href='../datatable/dt_rowselect.html'>Row Selection</a></li><li><a href='../datatable/dt_cellselect.html'>Cell Selection</a></li><li><a href='../datatable/dt_cellediting.html'>Inline Cell Editing</a></li><li><a href='../datatable/dt_contextmenu.html'>Context Menu Integration</a></li><li><a href='../datatable/dt_colshowhide.html'>Showing, Hiding, and Reordering Columns.</a></li><li><a href='../datatable/dt_highlighting.html'>Highlighting Cells, Rows, or Columns</a></li><li><a href='../datatable/dt_complex.html'>Complex Example of Multiple Features</a></li><li><a href='../datatable/dt_autocomplete.html'>Datatable with Autocomplete</a></li><li><a href='../datatable/dt_skinning.html'>Skinning Model</a></li><li><a href='../datatable/pg_paginator_exhibition.html'>Configuring the Paginator</a></li><li><a href='../layout/adv_layout.html'>Complex Application (included with examples for Layout Manager (beta))</a></li>							</ul>
 						</div>
 					</div>
 					
@@ -209,8 +219,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/datatable.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

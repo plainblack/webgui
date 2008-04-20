@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Selector Utility&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Selector Utility&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_selector.html">selector</a>
@@ -59,7 +59,7 @@
                             <h3 id="properties">Properties</h3>
                             <div class="content">
                                     <div class="">
-                                    <h4><a name="attrAliases">attrAliases</a>
+                                    <h4><a name="property_attrAliases">attrAliases</a>
                                         <code>- object</code>
                                     </h4>
                                     <div class="detail">
@@ -75,7 +75,7 @@ that conflict with JS reserved words.
                                     <hr />
                                     </div>
                                     <div class="">
-                                    <h4><a name="document">document</a>
+                                    <h4><a name="property_document">document</a>
                                         <code>- object</code>
                                     </h4>
                                     <div class="detail">
@@ -93,7 +93,7 @@ that conflict with JS reserved words.
                                     <hr />
                                     </div>
                                     <div class="">
-                                    <h4><a name="operators">operators</a>
+                                    <h4><a name="property_operators">operators</a>
                                         <code>- object</code>
                                     </h4>
                                     <div class="detail">
@@ -109,7 +109,7 @@ These functions are passed the attribute and the current node's value of the att
                                     <hr />
                                     </div>
                                     <div class="">
-                                    <h4><a name="pseudos">pseudos</a>
+                                    <h4><a name="property_pseudos">pseudos</a>
                                         <code>- object</code>
                                     </h4>
                                     <div class="detail">
@@ -125,7 +125,7 @@ These functions are called with the current node, and any value that was parsed 
                                     <hr />
                                     </div>
                                     <div class="">
-                                    <h4><a name="shorthand">shorthand</a>
+                                    <h4><a name="property_shorthand">shorthand</a>
                                         <code>- object</code>
                                     </h4>
                                     <div class="detail">
@@ -150,7 +150,7 @@ These functions are called with the current node, and any value that was parsed 
                             <div class="content">
                                     <div class="">
                                     <h4>
-                                        <a name="filter">filter</a></h4>
+                                        <a name="method_filter">filter</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -161,7 +161,7 @@ These functions are called with the current node, and any value that was parsed 
                                            (
                                                 
                                                         
-                                                         A
+                                                         nodes
                                                     
                                                 
                                                         , 
@@ -180,8 +180,8 @@ These functions are called with the current node, and any value that was parsed 
                                                 <dl>
                                                     <dt>Parameters:</dt>
                                                         <dd>
-                                                            <code>A &lt;array&gt;</code>
-                                                             set of nodes/ids to filter.
+                                                            <code>nodes &lt;array&gt;</code>
+                                                             A set of nodes/ids to filter.
                                                         </dd>
                                                         <dd>
                                                             <code>selector &lt;string&gt;</code>
@@ -204,7 +204,7 @@ These functions are called with the current node, and any value that was parsed 
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="query">query</a></h4>
+                                        <a name="method_query">query</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -266,7 +266,7 @@ These functions are called with the current node, and any value that was parsed 
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="test">test</a></h4>
+                                        <a name="method_test">test</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -320,7 +320,7 @@ These functions are called with the current node, and any value that was parsed 
                                     </div>
                                     <div class="">
                                     <h4>
-                                        <a name="tokenize">tokenize</a></h4>
+                                        <a name="method_tokenize">tokenize</a></h4>
                                     <div class="detail">
                                         <code>
                                         
@@ -460,19 +460,19 @@ Combinator is attached to left-hand selector.
                     <div class="module">
                         <h4>Properties</h4>
                         <ul class="content">        
-                                <li class=""><a href="#attrAliases">attrAliases</a>
+                                <li class=""><a href="#property_attrAliases">attrAliases</a>
                                         <!--<code>&lt;object&gt;</code>-->
                                 </li>
-                                <li class=""><a href="#document">document</a>
+                                <li class=""><a href="#property_document">document</a>
                                         <!--<code>&lt;object&gt;</code>-->
                                 </li>
-                                <li class=""><a href="#operators">operators</a>
+                                <li class=""><a href="#property_operators">operators</a>
                                         <!--<code>&lt;object&gt;</code>-->
                                 </li>
-                                <li class=""><a href="#pseudos">pseudos</a>
+                                <li class=""><a href="#property_pseudos">pseudos</a>
                                         <!--<code>&lt;object&gt;</code>-->
                                 </li>
-                                <li class=""><a href="#shorthand">shorthand</a>
+                                <li class=""><a href="#property_shorthand">shorthand</a>
                                         <!--<code>&lt;object&gt;</code>-->
                                 </li>
                         </ul>
@@ -482,16 +482,16 @@ Combinator is attached to left-hand selector.
                         <h4>Methods</h4>
                         <ul class="content">        
                                 <li class=""><!--<code>array</code>-->
-                                <a href="#filter">filter</a>
+                                <a href="#method_filter">filter</a>
                                 </li>
                                 <li class=""><!--<code>Array</code>-->
-                                <a href="#query">query</a>
+                                <a href="#method_query">query</a>
                                 </li>
                                 <li class=""><!--<code>boolean</code>-->
-                                <a href="#test">test</a>
+                                <a href="#method_test">test</a>
                                 </li>
                                 <li class=""><!--<code>void</code>-->
-                                <a href="#tokenize">tokenize</a>
+                                <a href="#method_tokenize">tokenize</a>
                                 </li>
                         </ul>
                     </div>

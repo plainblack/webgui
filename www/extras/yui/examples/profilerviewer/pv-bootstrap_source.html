@@ -49,11 +49,10 @@
 
 <p>First, we load the minimal dependencies for profiling code with YUI Profiler.  To that, we add the DP Syntax Highlighter code (ie, the code that we'll be profiling).</p>
 
-<textarea name="code" class="HTML" cols="60" rows="1"><link rel="stylesheet" type="text/css" href="assets/dpSyntaxHighlighter.css"> 
+<textarea name="code" class="HTML" cols="60" rows="1"><script type="text/javascript" src="http://yui.yahooapis.com//build/yuiloader/yuiloader-beta-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com//build/profiler/profiler-beta-min.js"></script>
+<script type="text/javascript" src="http://developer.yahoo.com/yui/examples/profilerviewer/assets/dpSyntaxHighlighter.js"></script></textarea>
 
-<script type="text/javascript" src="../../build/yuiloader/yuiloader-beta-min.js"></script>
-<script type="text/javascript" src="../../build/profiler/profiler-beta-min.js"></script>
-<script type="text/javascript" src="assets/dpSyntaxHighlighter.js"></script></textarea>
 
 
 <p>Next, we set up a simple initialization function that (a) sets up the code we want to profile then (b) executes the code:</p>
@@ -73,7 +72,7 @@
 
 YAHOO.example.pv.init();</textarea>
 
-<p>At this point, we've told Profiler what parts of Syntax Highlighter we want profilerd and we've then run Syntax Highlighter, capturing data about its performance.  And we've done all this with the smallest possible amount of YUI code on the page.  <em>Note that Profiler is loaded now, but ProfilerViewer and all of the YUI infrastructure it leverages &mdash; like Element, DataTable and Charts &mdash; is still absent.</em></p>
+<p>At this point, we've told Profiler what parts of Syntax Highlighter we want profiled and we've then run Syntax Highlighter, capturing data about its performance.  And we've done all this with the smallest possible amount of YUI code on the page.  <em>Note that Profiler is loaded now, but ProfilerViewer and all of the YUI infrastructure it leverages &mdash; like Element, DataTable and Charts &mdash; is still absent.</em></p>
 
 <p>Now it's time to set up a button that brings in the YUI ProfilerViewer and all of its dependencies.  That button executes the following code:</p>
 

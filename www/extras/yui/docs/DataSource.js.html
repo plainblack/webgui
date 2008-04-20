@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>DataSource Utility&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>DataSource Utility&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_datasource.html">datasource</a>
@@ -439,12 +439,13 @@
 <span class="c"> *</span>
 <span class="c"> * &lt;dl&gt;</span>
 <span class="c"> * &lt;dt&gt;resultsList&lt;/dt&gt; &lt;dd&gt;Pointer to array of tabular data&lt;/dd&gt;</span>
-<span class="c"> * &lt;dt&gt;totalRecords&lt;/dt&gt; &lt;dd&gt;Pointer to number of records (JSON over XHR only)&lt;/dd&gt;</span>
 <span class="c"> * &lt;dt&gt;resultNode&lt;/dt&gt; &lt;dd&gt;Pointer to node name of row data (XML data only)&lt;/dd&gt;</span>
 <span class="c"> * &lt;dt&gt;recordDelim&lt;/dt&gt; &lt;dd&gt;Record delimiter (text data only)&lt;/dd&gt;</span>
 <span class="c"> * &lt;dt&gt;fieldDelim&lt;/dt&gt; &lt;dd&gt;Field delimiter (text data only)&lt;/dd&gt;</span>
 <span class="c"> * &lt;dt&gt;fields&lt;/dt&gt; &lt;dd&gt;Array of field names (aka keys), or array of object literals</span>
 <span class="c"> * such as: {key:&quot;fieldname&quot;,parser:YAHOO.util.DataSource.parseDate}&lt;/dd&gt;</span>
+<span class="c"> * &lt;dt&gt;metaFields&lt;/dt&gt; &lt;dd&gt;Object literal of keys to include in the oParsedResponse.meta collection&lt;/dd&gt;</span>
+<span class="c"> * &lt;dt&gt;metaNode&lt;/dt&gt; &lt;dd&gt;Name of the node under which to search for meta information in XML response data&lt;/dd&gt;</span>
 <span class="c"> * &lt;/dl&gt;</span>
 <span class="c"> *</span>
 <span class="c"> * @property responseSchema</span>
@@ -1395,59 +1396,70 @@
 <span class="c"> *     - totalRecords (Number) Total number of records (if available)</span>
 <span class="c"> */</span>
 <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">DataSource</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">parseXMLData</span> <span class="o">=</span> <span class="k">function</span><span class="o">(</span><span class="nx">oRequest</span><span class="o">,</span> <span class="nx">oFullResponse</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">var</span> <span class="nx">bError</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-    <span class="k">var</span> <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="o">{};</span>
-    <span class="k">var</span> <span class="nx">xmlList</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-    <span class="k">var</span> <span class="nx">totRecLocator</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">;</span>
+    <span class="k">var</span> <span class="nx">bError</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span>
+        <span class="nx">schema</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">,</span>
+        <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="o">{</span><span class="nx">meta</span><span class="o">:{}},</span>
+        <span class="nx">xmlList</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span>
+        <span class="nx">metaNode</span>      <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">metaNode</span><span class="o">,</span>
+        <span class="nx">metaLocators</span>  <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">metaFields</span> <span class="o">||</span> <span class="o">{},</span>
+        <span class="nx">totRecLocator</span> <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">,</span> <span class="c">// Back compat</span>
+<span class="c"></span>        <span class="nx">i</span><span class="o">,</span><span class="nx">k</span><span class="o">,</span><span class="nx">loc</span><span class="o">,</span><span class="nx">v</span><span class="o">;</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="nx">totRecLocator</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">metaLocators</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nx">metaLocators</span><span class="o">.</span><span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">totRecLocator</span><span class="o">;</span>
+    <span class="o">}</span>
 
     <span class="c">// In case oFullResponse is something funky</span>
 <span class="c"></span>    <span class="k">try</span> <span class="o">{</span>
-        <span class="nx">xmlList</span> <span class="o">=</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">resultNode</span><span class="o">)</span> <span class="o">?</span>
-            <span class="nx">oFullResponse</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">resultNode</span><span class="o">)</span> <span class="o">:</span>
+        <span class="nx">xmlList</span> <span class="o">=</span> <span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">resultNode</span><span class="o">)</span> <span class="o">?</span>
+            <span class="nx">oFullResponse</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">resultNode</span><span class="o">)</span> <span class="o">:</span>
             <span class="kc">null</span><span class="o">;</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="nx">totRecLocator</span><span class="o">)</span> <span class="o">{</span>
-            <span class="c">// Look for a totalRecords node</span>
-<span class="c"></span>            <span class="k">var</span> <span class="nx">totalRecords</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-            <span class="k">var</span> <span class="nx">totRec</span> <span class="o">=</span> <span class="nx">oFullResponse</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="nx">totRecLocator</span><span class="o">)[</span><span class="m">0</span><span class="o">];</span>
-            <span class="k">if</span> <span class="o">(</span><span class="nx">totRec</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">totRec</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">nodeValue</span><span class="o">;</span>
-            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                <span class="nx">totRec</span> <span class="o">=</span> <span class="nx">oFullResponse</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">attributes</span><span class="o">.</span><span class="nx">getNamedItem</span><span class="o">(</span><span class="nx">totRecLocator</span><span class="o">);</span>
-                <span class="k">if</span> <span class="o">(</span><span class="nx">totRec</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">totRec</span><span class="o">.</span><span class="nx">value</span><span class="o">;</span>
-                <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="nx">xmlList</span> <span class="o">&amp;&amp;</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">length</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="k">var</span> <span class="nx">par</span> <span class="o">=</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">item</span><span class="o">(</span><span class="m">0</span><span class="o">).</span><span class="nx">parentNode</span><span class="o">;</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">par</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="nx">totRec</span> <span class="o">=</span> <span class="nx">par</span><span class="o">.</span><span class="nx">attributes</span><span class="o">.</span><span class="nx">getNamedItem</span><span class="o">(</span><span class="nx">totRecLocator</span><span class="o">);</span>
-                        <span class="k">if</span> <span class="o">(</span><span class="nx">totRec</span><span class="o">)</span> <span class="o">{</span>
-                            <span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">totRec</span><span class="o">.</span><span class="nx">value</span><span class="o">;</span>
+        <span class="c">// Pull any meta identified</span>
+<span class="c"></span>        <span class="nx">metaNode</span> <span class="o">=</span> <span class="nx">metaNode</span> <span class="o">?</span> <span class="nx">oFullResponse</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="nx">metaNode</span><span class="o">)[</span><span class="m">0</span><span class="o">]</span> <span class="o">:</span>
+                   <span class="nx">oFullResponse</span><span class="o">;</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="nx">metaNode</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="nx">k</span> <span class="k">in</span> <span class="nx">metaLocators</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">metaLocators</span><span class="o">,</span> <span class="nx">k</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="nx">loc</span> <span class="o">=</span> <span class="nx">metaLocators</span><span class="o">[</span><span class="nx">k</span><span class="o">];</span>
+                    <span class="c">// Look for a node</span>
+<span class="c"></span>                    <span class="nx">v</span> <span class="o">=</span> <span class="nx">metaNode</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="nx">loc</span><span class="o">)[</span><span class="m">0</span><span class="o">];</span>
+
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">v</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="nx">v</span> <span class="o">=</span> <span class="nx">v</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">nodeValue</span><span class="o">;</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                        <span class="c">// Look for an attribute</span>
+<span class="c"></span>                        <span class="nx">v</span> <span class="o">=</span> <span class="nx">metaNode</span><span class="o">.</span><span class="nx">attributes</span><span class="o">.</span><span class="nx">getNamedItem</span><span class="o">(</span><span class="nx">loc</span><span class="o">);</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="nx">v</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">v</span> <span class="o">=</span> <span class="nx">v</span><span class="o">.</span><span class="nx">value</span><span class="o">;</span>
                         <span class="o">}</span>
                     <span class="o">}</span>
-                <span class="o">}</span>
-            <span class="o">}</span>
 
-            <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isValue</span><span class="o">(</span><span class="nx">totalRecords</span><span class="o">))</span> <span class="o">{</span>
-                <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">totalRecords</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="o">(</span><span class="nx">totalRecords</span><span class="o">,</span><span class="m">10</span><span class="o">)|</span><span class="m">0</span><span class="o">;</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isValue</span><span class="o">(</span><span class="nx">v</span><span class="o">))</span> <span class="o">{</span>
+                        <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">meta</span><span class="o">[</span><span class="nx">k</span><span class="o">]</span> <span class="o">=</span> <span class="nx">v</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+                
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span>
     <span class="k">catch</span><span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
         <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Error while parsing XML data: &quot;</span> <span class="o">+</span> <span class="nx">e</span><span class="o">.</span><span class="nx">message</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">if</span><span class="o">(!</span><span class="nx">xmlList</span> <span class="o">||</span> <span class="o">!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">fields</span><span class="o">))</span> <span class="o">{</span>
+    <span class="k">if</span><span class="o">(!</span><span class="nx">xmlList</span> <span class="o">||</span> <span class="o">!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">))</span> <span class="o">{</span>
         <span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
     <span class="o">}</span>
     <span class="c">// Loop through each result</span>
 <span class="c"></span>    <span class="k">else</span> <span class="o">{</span>
 
         <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span> <span class="o">=</span> <span class="o">[];</span>
-        <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">k</span> <span class="o">=</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">k</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">;</span> <span class="nx">k</span><span class="o">--)</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">item</span><span class="o">(</span><span class="nx">k</span><span class="o">);</span>
+        <span class="k">for</span><span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">xmlList</span><span class="o">.</span><span class="nx">item</span><span class="o">(</span><span class="nx">i</span><span class="o">);</span>
             <span class="k">var</span> <span class="nx">oResult</span> <span class="o">=</span> <span class="o">{};</span>
             <span class="c">// Loop through each data field in each result using the schema</span>
-<span class="c"></span>            <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">fields</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">m</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">;</span> <span class="nx">m</span><span class="o">--)</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">fields</span><span class="o">[</span><span class="nx">m</span><span class="o">];</span>
+<span class="c"></span>            <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">m</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">;</span> <span class="nx">m</span><span class="o">--)</span> <span class="o">{</span>
+                <span class="k">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">[</span><span class="nx">m</span><span class="o">];</span>
                 <span class="k">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isValue</span><span class="o">(</span><span class="nx">field</span><span class="o">.</span><span class="nx">key</span><span class="o">))</span> <span class="o">?</span> <span class="nx">field</span><span class="o">.</span><span class="nx">key</span> <span class="o">:</span> <span class="nx">field</span><span class="o">;</span>
                 <span class="k">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="c">// Values may be held in an attribute...</span>
@@ -1481,7 +1493,7 @@
                 <span class="nx">oResult</span><span class="o">[</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">data</span><span class="o">;</span>
             <span class="o">}</span>
             <span class="c">// Capture each array of values into an array of results</span>
-<span class="c"></span>            <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span><span class="o">[</span><span class="nx">k</span><span class="o">]</span> <span class="o">=</span> <span class="nx">oResult</span><span class="o">;</span>
+<span class="c"></span>            <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="nx">oResult</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
     <span class="k">if</span><span class="o">(</span><span class="nx">bError</span><span class="o">)</span> <span class="o">{</span>
@@ -1497,107 +1509,6 @@
 <span class="o">};</span>
 
 <span class="c">/**</span>
-<span class="c"> * Executes a function created on the fly to parse the response JSON according to </span>
-<span class="c"> * the defined schema.</span>
-<span class="c"> * @method executeJSONParser</span>
-<span class="c"> * @param oFullResponse {Object} The raw JSON-typed data from the server.</span>
-<span class="c"> * @return {Object}</span>
-<span class="c"> * @private</span>
-<span class="c"> */</span>
-<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">DataSource</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">executeJSONParser</span> <span class="o">=</span> <span class="k">function</span> <span class="o">(</span><span class="nx">oFullResponse</span><span class="o">)</span> <span class="o">{</span>
-    <span class="c">// Create the parsing method per the responseSchema only once</span>
-<span class="c"></span>    <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">jsonResponseParser</span><span class="o">)</span> <span class="o">{</span>
-        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Creating json parsing function&quot;</span><span class="o">,</span><span class="s2">&quot;info&quot;</span><span class="o">,</span><span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-
-        <span class="k">var</span> <span class="nx">schema</span>       <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">,</span>
-            <span class="nx">fields</span>       <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">,</span>
-            <span class="nx">resultsList</span>  <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">resultsList</span><span class="o">,</span>
-            <span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">,</span>
-            <span class="nx">keys</span>         <span class="o">=</span> <span class="o">[],</span>
-            <span class="nx">keyAssign</span><span class="o">,</span>
-            <span class="nx">i</span><span class="o">;</span>
-
-        <span class="k">if</span> <span class="o">(</span><span class="sr">/\(/</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">resultsList</span><span class="o">))</span> <span class="o">{</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Invalid contents in resultsList: &#39;&quot;</span><span class="o">+</span><span class="nx">resultsList</span><span class="o">+</span><span class="s2">&quot;&#39;&quot;</span><span class="o">,</span><span class="s2">&quot;error&quot;</span><span class="o">,</span><span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">SyntaxError</span><span class="o">(</span><span class="s2">&quot;resultsList may only contain valid characters for variable names&quot;</span><span class="o">);</span>
-        <span class="o">}</span>
-
-        <span class="c">// Commit the atrocity of creating a function on the fly. parserDef</span>
-<span class="c"></span>        <span class="c">// will become the body passed to new Function.  The signature will be</span>
-<span class="c"></span>        <span class="c">// function (oFullResponse)</span>
-<span class="c"></span>        <span class="k">var</span> <span class="nx">parserDef</span> <span class="o">=</span> 
-            <span class="c">// grab the results list from the response</span>
-<span class="c"></span>            <span class="s2">&quot;var results=oFullResponse&quot;</span><span class="o">;</span>
-        
-        <span class="c">// Default direct assignment of oFullResponse as the resultsList if</span>
-<span class="c"></span>        <span class="c">// the schema was not configured with a resultsList key.  Otherwise</span>
-<span class="c"></span>        <span class="c">// create results=oFullResponse.location[&#39;in&#39;].resultsList</span>
-<span class="c"></span>        <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isValue</span><span class="o">(</span><span class="nx">resultsList</span><span class="o">))</span> <span class="o">{</span>
-            <span class="nx">parserDef</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nx">resultsList</span><span class="o">;</span>
-        <span class="o">}</span>
-        <span class="nx">parserDef</span> <span class="o">+=</span> <span class="s2">&quot;;&quot;</span><span class="o">;</span>
-
-        <span class="c">// if the list wasn&#39;t found at that location, default an empty array</span>
-<span class="c"></span>        <span class="nx">parserDef</span> <span class="o">+=</span>
-            <span class="s2">&quot;if(!results){&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;results=[];&quot;</span> <span class="o">+</span>
-            <span class="s2">&quot;}&quot;</span> <span class="o">+</span>
-
-            <span class="c">// make sure it&#39;s an array</span>
-<span class="c"></span>            <span class="s2">&quot;if(!YAHOO.lang.isArray(results)){&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;results=[results];&quot;</span> <span class="o">+</span>
-            <span class="s2">&quot;}&quot;</span><span class="o">;</span>
-
-        <span class="c">// Check for non-flat field keys.  If no keys need depth greater than</span>
-<span class="c"></span>        <span class="c">// 1 (e.g. {key:&quot;a.b.c&quot;}), the raw data records can be used.</span>
-<span class="c"></span>        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">fields</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-            <span class="nx">keys</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">typeof</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span> <span class="o">?</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">key</span> <span class="o">:</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-        <span class="o">}</span>
-
-        <span class="c">// Test for any key having a &#39;.&#39; or &#39;[&#39; char</span>
-<span class="c"></span>        <span class="k">if</span> <span class="o">(</span><span class="sr">/\[|\./</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">keys</span><span class="o">.</span><span class="nx">join</span><span class="o">(</span><span class="s1">&#39;&#39;</span><span class="o">)))</span> <span class="o">{</span>
-            <span class="c">// There are non-flat keys.  Iterate through the results, flattening</span>
-<span class="c"></span>            <span class="c">// the keys -- {key:&#39;a.b.c&#39;} pulls value into result data like</span>
-<span class="c"></span>            <span class="c">// { &#39;a.b.c&#39;: result.a.b.c, ... } (note the key is a flat string)</span>
-<span class="c"></span>            <span class="nx">parserDef</span> <span class="o">+=</span>
-            <span class="s2">&quot;for(var i=results.length-1;i&gt;=0;--i){&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;var r=results[i];&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;results[i]={&quot;</span><span class="o">;</span>
-
-            <span class="nx">keyAssign</span> <span class="o">=</span> <span class="o">[];</span>
-            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">keys</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                <span class="c">// Escape the quotes in &#39;a[&quot;b&quot;]&#39; style notation for the key</span>
-<span class="c"></span>                <span class="c">// portion.</span>
-<span class="c"></span>                <span class="nx">keyAssign</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="nx">keys</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&quot;/g</span><span class="o">,</span><span class="s1">&#39;\\&quot;&#39;</span><span class="o">)+</span><span class="s1">&#39;&quot;:r.&#39;</span><span class="o">+</span><span class="nx">keys</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-            <span class="o">}</span>
-            <span class="nx">parserDef</span> <span class="o">+=</span> <span class="nx">keyAssign</span><span class="o">.</span><span class="nx">join</span><span class="o">(</span><span class="s1">&#39;,&#39;</span><span class="o">)</span> <span class="o">+</span>
-                <span class="s2">&quot;};&quot;</span> <span class="o">+</span>
-            <span class="s2">&quot;}&quot;</span><span class="o">;</span>
-        <span class="o">}</span>
-
-        <span class="c">// Generate the oParsedResponse</span>
-<span class="c"></span>        <span class="nx">parserDef</span> <span class="o">+=</span>
-            <span class="s2">&quot;return {&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;results:results&quot;</span><span class="o">;</span>
-
-        <span class="c">// Include totalRecords if defined in the schema</span>
-<span class="c"></span>        <span class="k">if</span> <span class="o">(</span><span class="nx">totalRecords</span><span class="o">)</span> <span class="o">{</span>
-            <span class="nx">parserDef</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span>
-                <span class="s2">&quot;totalRecords:oFullResponse.&quot;</span><span class="o">+</span><span class="nx">totalRecords</span><span class="o">;</span>
-        <span class="o">}</span>
-        
-        <span class="nx">parserDef</span> <span class="o">+=</span>
-            <span class="s2">&quot;};&quot;</span><span class="o">;</span>
-
-        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Parser defined as:\n&quot;</span><span class="o">+</span><span class="nx">parserDef</span><span class="o">,</span><span class="s2">&quot;info&quot;</span><span class="o">,</span><span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-
-        <span class="k">this</span><span class="o">.</span><span class="nx">jsonResponseParser</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="o">(</span><span class="s2">&quot;oFullResponse&quot;</span><span class="o">,</span><span class="nx">parserDef</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="nx">jsonResponseParser</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">);</span>
-<span class="o">};</span>
-
-<span class="c">/**</span>
 <span class="c"> * Overridable method parses JSON data into a response object.</span>
 <span class="c"> *</span>
 <span class="c"> * @method parseJSONData</span>
@@ -1609,59 +1520,148 @@
 <span class="c"> *     - totalRecords (Number) Total number of records (if available)</span>
 <span class="c"> */</span>
 <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">DataSource</span><span class="o">.</span><span class="nx">prototype</span><span class="o">.</span><span class="nx">parseJSONData</span> <span class="o">=</span> <span class="k">function</span><span class="o">(</span><span class="nx">oRequest</span><span class="o">,</span> <span class="nx">oFullResponse</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">var</span> <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="o">{</span><span class="nx">results</span><span class="o">:[]};</span>
-    <span class="k">if</span><span class="o">(</span><span class="nx">oFullResponse</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isObject</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">)))</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">fields</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">fields</span>          <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">.</span><span class="nx">fields</span><span class="o">,</span>
-                <span class="nx">parserMap</span>       <span class="o">=</span> <span class="o">{},</span>
+    <span class="k">var</span> <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="o">{</span><span class="nx">results</span><span class="o">:[],</span><span class="nx">meta</span><span class="o">:{}},</span>
+        <span class="nx">schema</span>          <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">responseSchema</span><span class="o">;</span>
+
+    <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isObject</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">fields</span>          <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">fields</span><span class="o">,</span>
+                <span class="nx">resultsList</span>     <span class="o">=</span> <span class="nx">oFullResponse</span><span class="o">,</span>
+                <span class="nx">results</span>         <span class="o">=</span> <span class="o">[],</span>
+                <span class="nx">metaFields</span>      <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">metaFields</span> <span class="o">||</span> <span class="o">{},</span>
+                <span class="nx">fieldParsers</span>    <span class="o">=</span> <span class="o">[],</span>
+                <span class="nx">fieldPaths</span>      <span class="o">=</span> <span class="o">[],</span>
+                <span class="nx">simpleFields</span>    <span class="o">=</span> <span class="o">[],</span>
                 <span class="nx">bError</span>          <span class="o">=</span> <span class="kc">false</span><span class="o">,</span>
-                <span class="nx">bHasParser</span>      <span class="o">=</span> <span class="kc">false</span><span class="o">,</span>
-                <span class="nx">i</span><span class="o">;</span>
+                <span class="nx">i</span><span class="o">,</span><span class="nx">len</span><span class="o">,</span><span class="nx">j</span><span class="o">,</span><span class="nx">v</span><span class="o">,</span><span class="nx">key</span><span class="o">,</span><span class="nx">parser</span><span class="o">,</span><span class="nx">path</span><span class="o">;</span>
 
-            <span class="c">// Build the parser map</span>
-<span class="c"></span>            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">fields</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">key</span>    <span class="o">=</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">key</span> <span class="o">||</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span>
-                    <span class="nx">parser</span> <span class="o">=</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">parser</span> <span class="o">||</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">converter</span><span class="o">;</span>
-
-                <span class="k">if</span> <span class="o">(</span><span class="nx">parser</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">parserMap</span><span class="o">[</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">parser</span><span class="o">;</span>
-                    <span class="nx">bHasParser</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-                <span class="o">}</span>
-            <span class="o">}</span>
-
-            <span class="c">// Parse out a jsonList</span>
-<span class="c"></span>            <span class="k">try</span> <span class="o">{</span>
-                <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">executeJSONParser</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">);</span>
-            <span class="o">}</span>
-            <span class="k">catch</span><span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="o">}</span>
-
-            <span class="c">// Check for errors</span>
-<span class="c"></span>            <span class="k">if</span><span class="o">(</span><span class="nx">bError</span> <span class="o">||</span> <span class="o">!</span><span class="nx">oParsedResponse</span> <span class="o">||</span> <span class="o">!</span><span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;JSON data could not be parsed: &quot;</span> <span class="o">+</span>
-                        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">),</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-                <span class="k">if</span> <span class="o">(!</span><span class="nx">oParsedResponse</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="o">{</span><span class="nx">results</span><span class="o">:[]};</span>
-                <span class="o">}</span>
-
-                <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="o">}</span>
-
-            <span class="c">// Loop through the results to parse data if there are parsers</span>
-<span class="c"></span>            <span class="k">if</span> <span class="o">(</span><span class="nx">bHasParser</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="k">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-                    <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">p</span> <span class="k">in</span> <span class="nx">parserMap</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">parserMap</span><span class="o">,</span><span class="nx">p</span><span class="o">))</span> <span class="o">{</span>
-                            <span class="nx">r</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">=</span> <span class="nx">parserMap</span><span class="o">[</span><span class="nx">p</span><span class="o">].</span><span class="nx">call</span><span class="o">(</span><span class="k">this</span><span class="o">,</span><span class="nx">r</span><span class="o">[</span><span class="nx">p</span><span class="o">]);</span>
-                            <span class="k">if</span> <span class="o">(</span><span class="nx">r</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">===</span> <span class="kc">undefined</span><span class="o">)</span> <span class="o">{</span>
-                                <span class="nx">r</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="c">// Function to parse the schema&#39;s locator keys into walk paths</span>
+<span class="c"></span>            <span class="k">var</span> <span class="nx">buildPath</span> <span class="o">=</span> <span class="k">function</span> <span class="o">(</span><span class="nx">needle</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">keys</span> <span class="o">=</span> <span class="o">[],</span> <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">needle</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="c">// Strip the [&quot;string keys&quot;] and [1] array indexes</span>
+<span class="c"></span>                    <span class="nx">needle</span> <span class="o">=</span> <span class="nx">needle</span><span class="o">.</span>
+                        <span class="nx">replace</span><span class="o">(</span><span class="sr">/\[([&#39;&quot;])(.*?)\1\]/g</span><span class="o">,</span>
+                        <span class="k">function</span> <span class="o">(</span><span class="nx">x</span><span class="o">,</span><span class="nx">$1</span><span class="o">,</span><span class="nx">$2</span><span class="o">)</span> <span class="o">{</span><span class="nx">keys</span><span class="o">[</span><span class="nx">i</span><span class="o">]=</span><span class="nx">$2</span><span class="o">;</span><span class="k">return</span> <span class="s1">&#39;.@&#39;</span><span class="o">+(</span><span class="nx">i</span><span class="o">++);}).</span>
+                        <span class="nx">replace</span><span class="o">(</span><span class="sr">/\[(\d+)\]/g</span><span class="o">,</span>
+                        <span class="k">function</span> <span class="o">(</span><span class="nx">x</span><span class="o">,</span><span class="nx">$1</span><span class="o">)</span> <span class="o">{</span><span class="nx">keys</span><span class="o">[</span><span class="nx">i</span><span class="o">]=</span><span class="nb">parseInt</span><span class="o">(</span><span class="nx">$1</span><span class="o">,</span><span class="m">10</span><span class="o">)|</span><span class="m">0</span><span class="o">;</span><span class="k">return</span> <span class="s1">&#39;.@&#39;</span><span class="o">+(</span><span class="nx">i</span><span class="o">++);}).</span>
+                        <span class="nx">replace</span><span class="o">(</span><span class="sr">/^\./</span><span class="o">,</span><span class="s1">&#39;&#39;</span><span class="o">);</span> <span class="c">// remove leading dot</span>
+<span class="c"></span>
+                    <span class="c">// If the cleaned needle contains invalid characters, the</span>
+<span class="c"></span>                    <span class="c">// path is invalid</span>
+<span class="c"></span>                    <span class="k">if</span> <span class="o">(!</span><span class="sr">/[^\w\.\$@]/</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">needle</span><span class="o">))</span> <span class="o">{</span>
+                        <span class="nx">path</span> <span class="o">=</span> <span class="nx">needle</span><span class="o">.</span><span class="nx">split</span><span class="o">(</span><span class="s1">&#39;.&#39;</span><span class="o">);</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">path</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="nx">path</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">charAt</span><span class="o">(</span><span class="m">0</span><span class="o">)</span> <span class="o">===</span> <span class="s1">&#39;@&#39;</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="nx">path</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="nx">keys</span><span class="o">[</span><span class="nb">parseInt</span><span class="o">(</span><span class="nx">path</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">substr</span><span class="o">(</span><span class="m">1</span><span class="o">),</span><span class="m">10</span><span class="o">)];</span>
                             <span class="o">}</span>
                         <span class="o">}</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
+                <span class="k">return</span> <span class="nx">path</span><span class="o">;</span>
+            <span class="o">};</span>
+
+            <span class="c">// build function to walk a path and return the pot of gold</span>
+<span class="c"></span>            <span class="k">var</span> <span class="nx">walkPath</span> <span class="o">=</span> <span class="k">function</span> <span class="o">(</span><span class="nx">path</span><span class="o">,</span> <span class="nx">origin</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">var</span> <span class="nx">v</span><span class="o">=</span><span class="nx">origin</span><span class="o">,</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">path</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span>
+                <span class="k">for</span> <span class="o">(;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span> <span class="o">&amp;&amp;</span> <span class="nx">v</span><span class="o">;++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">v</span> <span class="o">=</span> <span class="nx">v</span><span class="o">[</span><span class="nx">path</span><span class="o">[</span><span class="nx">i</span><span class="o">]];</span>
+                <span class="o">}</span>
+                <span class="k">return</span> <span class="nx">v</span><span class="o">;</span>
+            <span class="o">};</span>
+
+            <span class="c">// Build the parser map and location paths</span>
+<span class="c"></span>            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">fields</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nx">key</span>    <span class="o">=</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">key</span> <span class="o">||</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                <span class="nx">parser</span> <span class="o">=</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">parser</span> <span class="o">||</span> <span class="nx">fields</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">converter</span><span class="o">;</span>
+                <span class="nx">path</span>   <span class="o">=</span> <span class="nx">buildPath</span><span class="o">(</span><span class="nx">key</span><span class="o">);</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="nx">parser</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">fieldParsers</span><span class="o">[</span><span class="nx">fieldParsers</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="o">{</span><span class="nx">key</span><span class="o">:</span><span class="nx">key</span><span class="o">,</span><span class="nx">parser</span><span class="o">:</span><span class="nx">parser</span><span class="o">};</span>
+                <span class="o">}</span>
+
+                <span class="k">if</span> <span class="o">(</span><span class="nx">path</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">path</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="nx">fieldPaths</span><span class="o">[</span><span class="nx">fieldPaths</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="o">{</span><span class="nx">key</span><span class="o">:</span><span class="nx">key</span><span class="o">,</span><span class="nx">path</span><span class="o">:</span><span class="nx">path</span><span class="o">};</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                        <span class="nx">simpleFields</span><span class="o">[</span><span class="nx">simpleFields</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="nx">key</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Invalid key syntax: &quot;</span> <span class="o">+</span> <span class="nx">key</span><span class="o">,</span><span class="s2">&quot;warn&quot;</span><span class="o">,</span><span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
+                <span class="o">}</span>
             <span class="o">}</span>
+
+            <span class="c">// Parse the response</span>
+<span class="c"></span>            <span class="c">// Step 1. Pull the resultsList from oFullResponse (default assumes</span>
+<span class="c"></span>            <span class="c">// oFullResponse IS the resultsList)</span>
+<span class="c"></span>            <span class="k">if</span> <span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">resultsList</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nx">path</span> <span class="o">=</span> <span class="nx">buildPath</span><span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">resultsList</span><span class="o">);</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">path</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">resultsList</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="o">(</span><span class="nx">path</span><span class="o">,</span> <span class="nx">oFullResponse</span><span class="o">);</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">resultsList</span> <span class="o">===</span> <span class="kc">undefined</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="nx">resultsList</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nx">resultsList</span> <span class="o">=</span> <span class="o">[];</span>
+            <span class="o">}</span>
+
+            <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">resultsList</span><span class="o">))</span> <span class="o">{</span>
+                <span class="nx">resultsList</span> <span class="o">=</span> <span class="o">[</span><span class="nx">resultsList</span><span class="o">];</span>
+            <span class="o">}</span>
+
+            <span class="k">if</span> <span class="o">(!</span><span class="nx">bError</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c">// Step 2. Process the results, flattening the records and/or</span>
+<span class="c"></span>                <span class="c">// applying parsers if needed</span>
+<span class="c"></span>                <span class="c">//if (fieldParsers.length || fieldPaths.length) {</span>
+<span class="c"></span>                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">resultsList</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">resultsList</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span> <span class="nx">rec</span> <span class="o">=</span> <span class="o">{};</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">simpleFields</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">j</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">rec</span><span class="o">[</span><span class="nx">simpleFields</span><span class="o">[</span><span class="nx">j</span><span class="o">]]</span> <span class="o">=</span> <span class="nx">r</span><span class="o">[</span><span class="nx">simpleFields</span><span class="o">[</span><span class="nx">j</span><span class="o">]];</span>
+                        <span class="o">}</span>
+
+                        <span class="k">for</span> <span class="o">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">fieldPaths</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">j</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">rec</span><span class="o">[</span><span class="nx">fieldPaths</span><span class="o">[</span><span class="nx">j</span><span class="o">].</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="o">(</span><span class="nx">fieldPaths</span><span class="o">[</span><span class="nx">j</span><span class="o">].</span><span class="nx">path</span><span class="o">,</span><span class="nx">r</span><span class="o">);</span>
+                        <span class="o">}</span>
+
+                        <span class="k">for</span> <span class="o">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="m">0</span><span class="o">;</span> <span class="o">--</span><span class="nx">j</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="k">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="o">[</span><span class="nx">j</span><span class="o">].</span><span class="nx">key</span><span class="o">;</span>
+                            <span class="nx">rec</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="o">[</span><span class="nx">j</span><span class="o">].</span><span class="nx">parser</span><span class="o">(</span><span class="nx">rec</span><span class="o">[</span><span class="nx">p</span><span class="o">]);</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="nx">rec</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">===</span> <span class="kc">undefined</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="nx">rec</span><span class="o">[</span><span class="nx">p</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
+                        <span class="nx">results</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="nx">rec</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="c">//}</span>
+<span class="c"></span>
+                <span class="c">// Step 3. Pull meta fields from oFullResponse if identified</span>
+<span class="c"></span>                <span class="k">if</span> <span class="o">(</span><span class="nx">schema</span><span class="o">.</span><span class="nx">totalRecords</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">metaFields</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="c">// for backward compatibility</span>
+<span class="c"></span>                    <span class="nx">metaFields</span><span class="o">.</span><span class="nx">totalRecords</span> <span class="o">=</span> <span class="nx">schema</span><span class="o">.</span><span class="nx">totalRecords</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="k">for</span> <span class="o">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">metaFields</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">metaFields</span><span class="o">,</span><span class="nx">key</span><span class="o">))</span> <span class="o">{</span>
+                        <span class="nx">path</span> <span class="o">=</span> <span class="nx">buildPath</span><span class="o">(</span><span class="nx">metaFields</span><span class="o">[</span><span class="nx">key</span><span class="o">]);</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="nx">path</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">v</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="o">(</span><span class="nx">path</span><span class="o">,</span> <span class="nx">oFullResponse</span><span class="o">);</span>
+                            <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">meta</span><span class="o">[</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">v</span><span class="o">;</span>
+                        <span class="o">}</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;JSON data could not be parsed: &quot;</span> <span class="o">+</span>
+                        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">oFullResponse</span><span class="o">),</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
+
+                <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="nx">oParsedResponse</span><span class="o">.</span><span class="nx">results</span> <span class="o">=</span> <span class="nx">results</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">}</span>
     <span class="k">else</span> <span class="o">{</span>

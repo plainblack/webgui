@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Container&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Container&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_container.html">container</a>
@@ -75,11 +75,9 @@
 <span class="c">        * @type Object</span>
 <span class="c">        */</span>
         <span class="nx">EVENT_TYPES</span> <span class="o">=</span> <span class="o">{</span>
-        
             <span class="s2">&quot;SHOW_MASK&quot;</span><span class="o">:</span> <span class="s2">&quot;showMask&quot;</span><span class="o">,</span>
             <span class="s2">&quot;HIDE_MASK&quot;</span><span class="o">:</span> <span class="s2">&quot;hideMask&quot;</span><span class="o">,</span>
             <span class="s2">&quot;DRAG&quot;</span><span class="o">:</span> <span class="s2">&quot;drag&quot;</span>
-        
         <span class="o">},</span>
 
         <span class="c">/**</span>
@@ -151,6 +149,23 @@
 <span class="c">    */</span>
     <span class="nx">Panel</span><span class="o">.</span><span class="nx">CSS_PANEL_CONTAINER</span> <span class="o">=</span> <span class="s2">&quot;yui-panel-container&quot;</span><span class="o">;</span>
 
+    <span class="c">/**</span>
+<span class="c">     * Constant representing the default set of focusable elements </span>
+<span class="c">     * on the pagewhich Modal Panels will prevent access to, when</span>
+<span class="c">     * the modal mask is displayed</span>
+<span class="c">     * </span>
+<span class="c">     * @property YAHOO.widget.Panel.FOCUSABLE</span>
+<span class="c">     * @static</span>
+<span class="c">     * @type Array</span>
+<span class="c">     */</span>
+    <span class="nx">Panel</span><span class="o">.</span><span class="nx">FOCUSABLE</span> <span class="o">=</span> <span class="o">[</span>
+        <span class="s2">&quot;a&quot;</span><span class="o">,</span>
+        <span class="s2">&quot;button&quot;</span><span class="o">,</span>
+        <span class="s2">&quot;select&quot;</span><span class="o">,</span>
+        <span class="s2">&quot;textarea&quot;</span><span class="o">,</span>
+        <span class="s2">&quot;input&quot;</span>
+    <span class="o">];</span>
+
     <span class="c">// Private CustomEvent listeners</span>
 <span class="c"></span>
     <span class="c">/* </span>
@@ -216,86 +231,6 @@
         <span class="o">}</span>
     <span class="o">}</span>
 
-    <span class="c">/* </span>
-<span class="c">        &quot;focus&quot; event handler for a focuable element.  Used to automatically </span>
-<span class="c">        blur the element when it receives focus to ensure that a Panel </span>
-<span class="c">        instance&#39;s modality is not compromised.</span>
-<span class="c">    */</span>
-
-    <span class="k">function</span> <span class="nx">onElementFocus</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="nx">blur</span><span class="o">();</span>
-    <span class="o">}</span>
-
-    <span class="c">/* </span>
-<span class="c">        &quot;showMask&quot; event handler that adds a &quot;focus&quot; event handler to all</span>
-<span class="c">        focusable elements in the document to enforce a Panel instance&#39;s </span>
-<span class="c">        modality from being compromised.</span>
-<span class="c">    */</span>
-
-    <span class="k">function</span> <span class="nx">addFocusEventHandlers</span><span class="o">(</span><span class="nx">p_sType</span><span class="o">,</span> <span class="nx">p_aArgs</span><span class="o">)</span> <span class="o">{</span>
-
-        <span class="k">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>
-
-        <span class="k">function</span> <span class="nx">isFocusable</span><span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
-
-            <span class="k">var</span> <span class="nx">sTagName</span> <span class="o">=</span> <span class="nx">el</span><span class="o">.</span><span class="nx">tagName</span><span class="o">.</span><span class="nx">toUpperCase</span><span class="o">(),</span>
-                <span class="nx">bFocusable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-            
-            <span class="nx">switch</span> <span class="o">(</span><span class="nx">sTagName</span><span class="o">)</span> <span class="o">{</span>
-            
-            <span class="nx">case</span> <span class="s2">&quot;A&quot;</span><span class="o">:</span>
-            <span class="nx">case</span> <span class="s2">&quot;BUTTON&quot;</span><span class="o">:</span>
-            <span class="nx">case</span> <span class="s2">&quot;SELECT&quot;</span><span class="o">:</span>
-            <span class="nx">case</span> <span class="s2">&quot;TEXTAREA&quot;</span><span class="o">:</span>
-
-                <span class="k">if</span> <span class="o">(!</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">isAncestor</span><span class="o">(</span><span class="nx">me</span><span class="o">.</span><span class="nx">element</span><span class="o">,</span> <span class="nx">el</span><span class="o">))</span> <span class="o">{</span>
-                    <span class="nx">Event</span><span class="o">.</span><span class="nx">on</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s2">&quot;focus&quot;</span><span class="o">,</span> <span class="nx">onElementFocus</span><span class="o">,</span> <span class="nx">el</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-                    <span class="nx">bFocusable</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-                <span class="o">}</span>
-
-                <span class="k">break</span><span class="o">;</span>
-
-            <span class="nx">case</span> <span class="s2">&quot;INPUT&quot;</span><span class="o">:</span>
-
-                <span class="k">if</span> <span class="o">(</span><span class="nx">el</span><span class="o">.</span><span class="nx">type</span> <span class="o">!=</span> <span class="s2">&quot;hidden&quot;</span> <span class="o">&amp;&amp;</span> 
-                    <span class="o">!</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">isAncestor</span><span class="o">(</span><span class="nx">me</span><span class="o">.</span><span class="nx">element</span><span class="o">,</span> <span class="nx">el</span><span class="o">))</span> <span class="o">{</span>
-
-                    <span class="nx">Event</span><span class="o">.</span><span class="nx">on</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="s2">&quot;focus&quot;</span><span class="o">,</span> <span class="nx">onElementFocus</span><span class="o">,</span> <span class="nx">el</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-                    <span class="nx">bFocusable</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-
-                <span class="o">}</span>
-
-                <span class="k">break</span><span class="o">;</span>
-            
-            <span class="o">}</span>
-
-            <span class="k">return</span> <span class="nx">bFocusable</span><span class="o">;</span>
-
-        <span class="o">}</span>
-
-        <span class="k">this</span><span class="o">.</span><span class="nx">focusableElements</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getElementsBy</span><span class="o">(</span><span class="nx">isFocusable</span><span class="o">);</span>
-    
-    <span class="o">}</span>
-
-    <span class="c">/* </span>
-<span class="c">        &quot;hideMask&quot; event handler that removes all &quot;focus&quot; event handlers added </span>
-<span class="c">        by the &quot;addFocusEventHandlers&quot; method.</span>
-<span class="c">    */</span>
-    
-    <span class="k">function</span> <span class="nx">removeFocusEventHandlers</span><span class="o">(</span><span class="nx">p_sType</span><span class="o">,</span> <span class="nx">p_aArgs</span><span class="o">)</span> <span class="o">{</span>
-
-        <span class="k">var</span> <span class="nx">aElements</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">focusableElements</span><span class="o">,</span>
-            <span class="nx">nElements</span> <span class="o">=</span> <span class="nx">aElements</span><span class="o">.</span><span class="nx">length</span><span class="o">,</span>
-            <span class="nx">el2</span><span class="o">,</span>
-            <span class="nx">i</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">nElements</span><span class="o">;</span> <span class="nx">i</span><span class="o">++)</span> <span class="o">{</span>
-            <span class="nx">el2</span> <span class="o">=</span> <span class="nx">aElements</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-            <span class="nx">Event</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">el2</span><span class="o">,</span> <span class="s2">&quot;focus&quot;</span><span class="o">,</span> <span class="nx">onElementFocus</span><span class="o">);</span>
-        <span class="o">}</span>
-
-    <span class="o">}</span>
-
     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">extend</span><span class="o">(</span><span class="nx">Panel</span><span class="o">,</span> <span class="nx">Overlay</span><span class="o">,</span> <span class="o">{</span>
 
         <span class="c">/**</span>
@@ -329,13 +264,86 @@
                 <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">applyConfig</span><span class="o">(</span><span class="nx">userConfig</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
             <span class="o">}</span>
 
-            <span class="k">this</span><span class="o">.</span><span class="nx">subscribe</span><span class="o">(</span><span class="s2">&quot;showMask&quot;</span><span class="o">,</span> <span class="nx">addFocusEventHandlers</span><span class="o">);</span>
-            <span class="k">this</span><span class="o">.</span><span class="nx">subscribe</span><span class="o">(</span><span class="s2">&quot;hideMask&quot;</span><span class="o">,</span> <span class="nx">removeFocusEventHandlers</span><span class="o">);</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">subscribe</span><span class="o">(</span><span class="s2">&quot;showMask&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_addFocusHandlers</span><span class="o">);</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">subscribe</span><span class="o">(</span><span class="s2">&quot;hideMask&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_removeFocusHandlers</span><span class="o">);</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">subscribe</span><span class="o">(</span><span class="s2">&quot;beforeRender&quot;</span><span class="o">,</span> <span class="nx">createHeader</span><span class="o">);</span>
 
             <span class="k">this</span><span class="o">.</span><span class="nx">initEvent</span><span class="o">.</span><span class="nx">fire</span><span class="o">(</span><span class="nx">Panel</span><span class="o">);</span>
         <span class="o">},</span>
-        
+
+        <span class="c">/**</span>
+<span class="c">         * @method _onElementFocus </span>
+<span class="c">         * @private</span>
+<span class="c">         * </span>
+<span class="c">         * &quot;focus&quot; event handler for a focuable element. Used to automatically </span>
+<span class="c">         * blur the element when it receives focus to ensure that a Panel </span>
+<span class="c">         * instance&#39;s modality is not compromised.</span>
+<span class="c">         * </span>
+<span class="c">         * @param {Event} e The DOM event object</span>
+<span class="c">         */</span>
+        <span class="nx">_onElementFocus</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">e</span><span class="o">){</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">blur</span><span class="o">();</span>
+        <span class="o">},</span>
+
+        <span class="c">/** </span>
+<span class="c">         *  @method _addFocusHandlers</span>
+<span class="c">         *  @protected</span>
+<span class="c">         *  </span>
+<span class="c">         *  &quot;showMask&quot; event handler that adds a &quot;focus&quot; event handler to all</span>
+<span class="c">         *  focusable elements in the document to enforce a Panel instance&#39;s </span>
+<span class="c">         *  modality from being compromised.</span>
+<span class="c">         *  </span>
+<span class="c">         *  @param p_sType {String} Custom event type</span>
+<span class="c">         *  @param p_aArgs {Array} Custom event arguments</span>
+<span class="c">         */</span>
+        <span class="nx">_addFocusHandlers</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">p_sType</span><span class="o">,</span> <span class="nx">p_aArgs</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="o">,</span>
+                <span class="nx">focus</span> <span class="o">=</span> <span class="s2">&quot;focus&quot;</span><span class="o">,</span>
+                <span class="nx">hidden</span> <span class="o">=</span> <span class="s2">&quot;hidden&quot;</span><span class="o">;</span>
+
+            <span class="k">function</span> <span class="nx">isFocusable</span><span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c">// NOTE: if e.type is undefined that&#39;s fine, want to avoid perf </span>
+<span class="c"></span>                <span class="c">// impact of tagName check to filter for inputs</span>
+<span class="c"></span>                <span class="k">if</span> <span class="o">(</span><span class="nx">el</span><span class="o">.</span><span class="nx">type</span> <span class="o">!==</span> <span class="nx">hidden</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">isAncestor</span><span class="o">(</span><span class="nx">me</span><span class="o">.</span><span class="nx">element</span><span class="o">,</span> <span class="nx">el</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="nx">Event</span><span class="o">.</span><span class="nx">on</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="nx">focus</span><span class="o">,</span> <span class="nx">me</span><span class="o">.</span><span class="nx">_onElementFocus</span><span class="o">);</span>
+                    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="o">}</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="k">var</span> <span class="nx">focusable</span> <span class="o">=</span> <span class="nx">Panel</span><span class="o">.</span><span class="nx">FOCUSABLE</span><span class="o">,</span>
+                <span class="nx">l</span> <span class="o">=</span> <span class="nx">focusable</span><span class="o">.</span><span class="nx">length</span><span class="o">,</span>
+                <span class="nx">arr</span> <span class="o">=</span> <span class="o">[];</span>
+
+            <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="o">;</span> <span class="nx">i</span><span class="o">++)</span> <span class="o">{</span>
+                <span class="nx">arr</span> <span class="o">=</span> <span class="nx">arr</span><span class="o">.</span><span class="nx">concat</span><span class="o">(</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getElementsBy</span><span class="o">(</span><span class="nx">isFocusable</span><span class="o">,</span> <span class="nx">focusable</span><span class="o">[</span><span class="nx">i</span><span class="o">]));</span>
+            <span class="o">}</span>
+
+            <span class="k">this</span><span class="o">.</span><span class="nx">focusableElements</span> <span class="o">=</span> <span class="nx">arr</span><span class="o">;</span>
+        <span class="o">},</span>
+
+        <span class="c">/** </span>
+<span class="c">         *  @method _removeFocusHandlers</span>
+<span class="c">         *  @protected</span>
+<span class="c">         *  </span>
+<span class="c">         *  &quot;hideMask&quot; event handler that removes all &quot;focus&quot; event handlers added </span>
+<span class="c">         *  by the &quot;addFocusEventHandlers&quot; method.</span>
+<span class="c">         *  </span>
+<span class="c">         *  @param p_sType {String} Event type</span>
+<span class="c">         *  @param p_aArgs {Array} Event Arguments</span>
+<span class="c">         */</span>
+        <span class="nx">_removeFocusHandlers</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">p_sType</span><span class="o">,</span> <span class="nx">p_aArgs</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">aElements</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">focusableElements</span><span class="o">,</span>
+                <span class="nx">nElements</span> <span class="o">=</span> <span class="nx">aElements</span><span class="o">.</span><span class="nx">length</span><span class="o">,</span>
+                <span class="nx">focus</span> <span class="o">=</span> <span class="s2">&quot;focus&quot;</span><span class="o">;</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="nx">aElements</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">nElements</span><span class="o">;</span> <span class="nx">i</span><span class="o">++)</span> <span class="o">{</span>
+                    <span class="nx">Event</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">aElements</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span> <span class="nx">focus</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_onElementFocus</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">},</span>
+
         <span class="c">/**</span>
 <span class="c">        * Initializes the custom events for Module which are fired </span>
 <span class="c">        * automatically at appropriate times by the Module class.</span>

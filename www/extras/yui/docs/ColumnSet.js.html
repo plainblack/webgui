@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_datatable.html">datatable</a>
@@ -1162,7 +1162,7 @@
 <span class="c"></span>        <span class="k">this</span><span class="o">.</span><span class="nx">setPadding</span><span class="o">(</span><span class="m">10</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">datatable</span><span class="o">.</span><span class="nx">getTheadEl</span><span class="o">().</span><span class="nx">offsetHeight</span> <span class="o">+</span> <span class="m">10</span><span class="o">)</span> <span class="o">,</span> <span class="m">0</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">else</span> <span class="o">{</span>
-        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Column dragdrop could not be created&quot;</span><span class="o">,</span><span class="s2">&quot;warn&quot;</span><span class="o">);</span>
+        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Column dragdrop could not be created&quot;</span><span class="o">,</span><span class="s2">&quot;warn&quot;</span><span class="o">,</span><span class="nx">oDataTable</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
     <span class="o">}</span>
 <span class="o">};</span>
 
@@ -1251,13 +1251,14 @@
         <span class="nx">onDragDrop</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
             <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">newIndex</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">newIndex</span> <span class="o">!==</span> <span class="k">this</span><span class="o">.</span><span class="nx">column</span><span class="o">.</span><span class="nx">getTreeIndex</span><span class="o">()))</span> <span class="o">{</span>
                 <span class="k">var</span> <span class="nx">oDataTable</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">datatable</span><span class="o">;</span>
-                <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">_oChain</span><span class="o">.</span><span class="nx">stop</span><span class="o">();</span>
+                <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">_oChainRender</span><span class="o">.</span><span class="nx">stop</span><span class="o">();</span>
                 <span class="k">var</span> <span class="nx">aColumnDefs</span> <span class="o">=</span> <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">_oColumnSet</span><span class="o">.</span><span class="nx">getDefinitions</span><span class="o">();</span>
                 <span class="k">var</span> <span class="nx">oColumn</span> <span class="o">=</span> <span class="nx">aColumnDefs</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">column</span><span class="o">.</span><span class="nx">getTreeIndex</span><span class="o">(),</span><span class="m">1</span><span class="o">)[</span><span class="m">0</span><span class="o">];</span>
                 <span class="nx">aColumnDefs</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">newIndex</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="nx">oColumn</span><span class="o">);</span>
                 <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">_initColumnSet</span><span class="o">(</span><span class="nx">aColumnDefs</span><span class="o">);</span>
                 <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">_initTheadEls</span><span class="o">();</span>
                 <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">render</span><span class="o">();</span>
+                <span class="nx">oDataTable</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;columnReorderEvent&quot;</span><span class="o">);</span>
             <span class="o">}</span>
         <span class="o">},</span>
         <span class="nx">endDrag</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
@@ -1294,7 +1295,7 @@
         <span class="k">this</span><span class="o">.</span><span class="nx">initFrame</span><span class="o">();</span> <span class="c">// Needed for proxy</span>
 <span class="c"></span>    <span class="o">}</span>
     <span class="k">else</span> <span class="o">{</span>
-        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Column resizer could not be created&quot;</span><span class="o">,</span><span class="s2">&quot;warn&quot;</span><span class="o">);</span>
+        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Column resizer could not be created&quot;</span><span class="o">,</span><span class="s2">&quot;warn&quot;</span><span class="o">,</span><span class="nx">oDataTable</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
     <span class="o">}</span>
 <span class="o">};</span>
 
@@ -1332,7 +1333,13 @@
 <span class="c">         */</span>
         <span class="nx">onMouseUp</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">resetResizerEl</span><span class="o">();</span>
-            <span class="k">this</span><span class="o">.</span><span class="nx">datatable</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;columnResizeEvent&quot;</span><span class="o">,</span> <span class="o">{</span><span class="nx">column</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">column</span><span class="o">,</span><span class="nx">target</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">headCell</span><span class="o">});</span>
+            
+            <span class="k">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">headCell</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">;</span>
+            <span class="k">var</span> <span class="nx">newWidth</span> <span class="o">=</span> <span class="nx">el</span><span class="o">.</span><span class="nx">offsetWidth</span> <span class="o">-</span>
+                <span class="o">(</span><span class="nb">parseInt</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span><span class="s2">&quot;paddingLeft&quot;</span><span class="o">),</span><span class="m">10</span><span class="o">)|</span><span class="m">0</span><span class="o">)</span> <span class="o">-</span>
+                <span class="o">(</span><span class="nb">parseInt</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span><span class="s2">&quot;paddingRight&quot;</span><span class="o">),</span><span class="m">10</span><span class="o">)|</span><span class="m">0</span><span class="o">);</span>
+
+            <span class="k">this</span><span class="o">.</span><span class="nx">datatable</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;columnResizeEvent&quot;</span><span class="o">,</span> <span class="o">{</span><span class="nx">column</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">column</span><span class="o">,</span><span class="nx">target</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">headCell</span><span class="o">,</span><span class="nx">width</span><span class="o">:</span><span class="nx">newWidth</span><span class="o">});</span>
         <span class="o">},</span>
     
         <span class="c">/**</span>

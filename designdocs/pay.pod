@@ -1,0 +1,269 @@
+=head1 Payment Gateway
+
+Payment gateways are the mechanism by which users can pay for the items in their shopping cart.
+
+=head2 Data Dictionary
+
+There is no table for this class.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::Pay class.
+
+=head3 _loadDriver
+
+A method used load a payment gateway driver. See WebGUI::Pluggable.
+
+=head3 create
+
+A class method.
+
+Creates a new WebGUI::Shop::PayDriver object. Returns a reference to the object.
+
+param: session - a reference to the current session
+
+param: class - the classname of the driver for the gateway you want to configure
+
+param: hashRef - a hash reference containing a list of the parameters in paymentGateway table, except for paymentGatewayId.
+
+=head3 getDrivers
+
+A class method.
+
+Returns an array reference of the driver classes enabled in the config file.
+
+=head3 getPaymentGateways
+
+A class method.
+
+Returns an array reference of the configured payment objects.
+
+=head3 getOptions
+
+A class method.
+
+Returns a hash reference of paymentGatewayIds as keys, with "label" and "form" as subkeys. Label provides the human readable label for the object, and form provides the HTML form, that includes the button for the payment gateway option. This is required since some payment gateways take the user off site and have very complex forms that need to be created and posted to the remote site.
+
+param: cart - a reference to the cart object to
+generate options for.
+
+=head3 new
+
+A class method.
+
+Instantiates a payment gateway based upon paymentGatewayId.
+
+param: session - a reference to the current session
+
+param: paymentGatewayId - the unique id to instantiate
+
+=head3 www_listPaymentGateways
+
+Returns a list of the payment gateways configured currently.
+
+=head3 www_editPaymentGateway
+
+The add/edit form for managing a payment gateway.
+
+=head3 www_editPaymentGatwaySave
+
+Saves the result of www_editPaymentGateway and then displays
+www_listPaymentGateways.
+
+
+
+
+=head1 Payment Gateway Driver
+
+Payment gateway drivers are used to collect payment. In Perl terms this
+is the DBD to DBI. All payment gateway drivers (itransact, paypal,
+google checkout, etc) will be derived from this base class.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this object's table called "paymentGateway".
+
+ Field              Schema          Description
+ paymentGatewayId   guid            the primary key
+ label              varchar(100)    A title for this payment that will be displayed to the user. For example "Pay Pal" or "Credit Card" or "Check"
+ className          varchar(255)    The plugin classname that will be used for this payment gateway.
+ options            mediumtext      A json serialized hash reference with configuration data for this payment gateway.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Shop::PayDriver class.
+
+=head3 create
+
+A class method.
+
+Creates a new WebGUI::Shop::PayDriver object. Returns a reference to the object.
+
+param: session - a reference to the current session
+
+param: hashRef - a hash reference containing a list of the parameters in paymentGateway table, except for paymentGatewayId.
+
+=head3 definition
+
+A class method.
+
+Returns an array reference of hash references of fields that are
+defined for this payment gateway driver similar to definition() in
+WebGUI::Asset.
+
+param: definition - an array ref of hash refs
+
+field:
+
+ [
+    {
+        name =E<gt> "Payment Type",
+        fields =E<gt> {
+            label =E<gt> {
+                fieldType =E<gt> "text",
+                label =E<gt> "Label",
+                defaultValue =E<gt> "Credit Card"
+            },
+            enabled =E<gt> {
+                fieldType =E<gt> "yesNo",
+                label =E<gt> "Enabled?",
+                defaultValue =E<gt> 1
+            },
+            groupToUse =E<gt> {
+                fieldType =E<gt> "group",
+                label =E<gt> "Who can use?",
+                defaultValue =E<gt> 1
+            },
+            receiptMessage =E<gt> {
+                fieldType =E<gt> "text",
+                label =E<gt> "Receipt Email Message",
+                defaultValue =E<gt> undef
+            },
+        }
+    }
+ ],
+
+=head3 delete
+
+Deletes this payment gateway.
+
+=head3 get
+
+Returns a duplicated hash reference of this object's data.
+
+param: any field - returns the value of a field rather than the hash reference.
+
+=head3 getId
+
+Returns the payment gateway id.
+
+=head3 getButton
+
+Returns the HTML postable form that will take the user to check out
+using this payment gateway.
+
+=head3 getName
+
+Return a human readable name for this driver. Never overridden in the
+subclass, instead specified in definition.
+
+=head3 new
+
+A class method.
+
+Instantiates a driver.
+
+param: session - a reference to the current session
+
+param: options - a hash reference of configurable parameters for this driver
+
+=head2 Todo
+
+We need the following payment gateways converted to the new API:
+
+=over
+
+=item 1.
+
+itransact
+
+=item 2.
+
+cash
+
+=item 3.
+
+check
+
+=back
+
+=head3 set
+
+Update a parameter for the payment gateway.
+
+param: hashRef - a hash reference containing a list
+of the parameters in paymentGateway table, except for paymentGatewayId.
+
+
+
+=head1 iTransact Driver
+
+This allows for credit card payments via the iTransact payment gateway.
+
+=head2 Data Dictionary
+
+Payment gateway drivers have no database tables, unless they need it on
+a one-off basis.
+
+=head2 Method Dictionary
+
+The following methods will be available from the
+WebGUI::Shop::PayDriver::Itransact class.
+
+=head2 definition
+
+Returns an array reference of hash references of fields that are
+defined for this ship driver similar to definition() in WebGUI::Asset.
+
+param: definition - an array ref of hash refs of definitions
+
+ [
+    {
+        name =E<gt> "iTransact",
+        fields =E<gt> {
+            username =E<gt> {
+                label =E<gt> "Vendor ID",
+                fieldType =E<gt> "text",
+                defaultValue =E<gt> undef
+            },
+            password =E<gt> {
+                label =E<gt> "Password",
+                fieldType =E<gt> "password",
+                defaultValue =E<gt> undef
+            },
+            useCvv2 =E<gt> {
+                label =E<gt> "Use CVV2?",
+                fieldType =E<gt> "yesNo",
+                defaultValue =E<gt> 1
+            },
+        }
+    }
+ ]
+
+=head3 getButton
+
+Returns the HTML postable form that will take the user to check out
+using this payment gateway.
+
+=head3 www_collectPaymentInfo
+
+Collects payment info from the user.
+
+=head3 www_displayStatus
+
+Displays a status message to the user after collecting payment info.
+The status may be a success message along with a printable receipt, or
+an error message like "Credit card
+declined."
+
+=cut

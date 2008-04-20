@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>yuitest&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>yuitest&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_yuitest.html">yuitest</a>
@@ -53,6 +53,29 @@
 <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span> <span class="o">=</span> <span class="o">{</span>
 
     <span class="c">//-------------------------------------------------------------------------</span>
+<span class="c"></span>    <span class="c">// Helper Methods</span>
+<span class="c"></span>    <span class="c">//-------------------------------------------------------------------------</span>
+<span class="c"></span>    
+    <span class="c">/**</span>
+<span class="c">     * Formats a message so that it can contain the original assertion message</span>
+<span class="c">     * in addition to the custom message.</span>
+<span class="c">     * @param {String} customMessage The message passed in by the developer.</span>
+<span class="c">     * @param {String} defaultMessage The message created by the error by default.</span>
+<span class="c">     * @return {String} The final error message, containing either or both.</span>
+<span class="c">     * @protected</span>
+<span class="c">     * @static</span>
+<span class="c">     * @method _formatMessage</span>
+<span class="c">     */</span>
+    <span class="nx">_formatMessage</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">customMessage</span> <span class="c">/*:String*/</span><span class="o">,</span> <span class="nx">defaultMessage</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:String*/</span> <span class="o">{</span>
+        <span class="k">var</span> <span class="nx">message</span> <span class="o">=</span> <span class="nx">customMessage</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">customMessage</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">customMessage</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">){</span>
+            <span class="k">return</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">substitute</span><span class="o">(</span><span class="nx">customMessage</span><span class="o">,</span> <span class="o">{</span> <span class="nx">message</span><span class="o">:</span> <span class="nx">defaultMessage</span> <span class="o">});</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nx">defaultMessage</span><span class="o">;</span>
+        <span class="o">}</span>        
+    <span class="o">},</span>
+    
+    <span class="c">//-------------------------------------------------------------------------</span>
 <span class="c"></span>    <span class="c">// Generic Assertion Methods</span>
 <span class="c"></span>    <span class="c">//-------------------------------------------------------------------------</span>
 <span class="c"></span>    
@@ -63,7 +86,7 @@
 <span class="c">     * @static</span>
 <span class="c">     */</span>
     <span class="nx">fail</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">AssertionError</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Test force-failed.&quot;</span><span class="o">);</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">AssertionError</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Test force-failed.&quot;</span><span class="o">));</span>
     <span class="o">},</span>       
     
     <span class="c">//-------------------------------------------------------------------------</span>
@@ -81,7 +104,7 @@
 <span class="c">     */</span>
     <span class="nx">areEqual</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">expected</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">expected</span> <span class="o">!=</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should be equal.&quot;</span><span class="o">,</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should be equal.&quot;</span><span class="o">),</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -97,7 +120,7 @@
     <span class="nx">areNotEqual</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">unexpected</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> 
                          <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">unexpected</span> <span class="o">==</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should not be equal.&quot;</span><span class="o">,</span> <span class="nx">unexpected</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should not be equal.&quot;</span><span class="o">),</span> <span class="nx">unexpected</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -112,7 +135,7 @@
 <span class="c">     */</span>
     <span class="nx">areNotSame</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">unexpected</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">unexpected</span> <span class="o">===</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should not be the same.&quot;</span><span class="o">,</span> <span class="nx">unexpected</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should not be the same.&quot;</span><span class="o">),</span> <span class="nx">unexpected</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
 
@@ -127,7 +150,7 @@
 <span class="c">     */</span>
     <span class="nx">areSame</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">expected</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">expected</span> <span class="o">!==</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should be the same.&quot;</span><span class="o">,</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should be the same.&quot;</span><span class="o">),</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>    
     
@@ -145,7 +168,7 @@
 <span class="c">     */</span>
     <span class="nx">isFalse</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Boolean*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="kc">false</span> <span class="o">!==</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be false.&quot;</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be false.&quot;</span><span class="o">),</span> <span class="kc">false</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -159,7 +182,7 @@
 <span class="c">     */</span>
     <span class="nx">isTrue</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Boolean*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="kc">true</span> <span class="o">!==</span> <span class="nx">actual</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be true.&quot;</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be true.&quot;</span><span class="o">),</span> <span class="kc">true</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
 
     <span class="o">},</span>
@@ -177,7 +200,7 @@
 <span class="c">     */</span>
     <span class="nb">isNaN</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span><span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nb">isNaN</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be NaN.&quot;</span><span class="o">,</span> <span class="kc">NaN</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be NaN.&quot;</span><span class="o">),</span> <span class="kc">NaN</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>
     
@@ -190,7 +213,7 @@
 <span class="c">     */</span>
     <span class="nx">isNotNaN</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span><span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nb">isNaN</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should not be NaN.&quot;</span><span class="o">,</span> <span class="kc">NaN</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should not be NaN.&quot;</span><span class="o">),</span> <span class="kc">NaN</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>
     
@@ -204,7 +227,7 @@
 <span class="c">     */</span>
     <span class="nx">isNotNull</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNull</span><span class="o">(</span><span class="nx">actual</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Values should not be null.&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Values should not be null.&quot;</span><span class="o">),</span> <span class="kc">null</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
 
@@ -218,7 +241,7 @@
 <span class="c">     */</span>
     <span class="nx">isNotUndefined</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isUndefined</span><span class="o">(</span><span class="nx">actual</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should not be undefined.&quot;</span><span class="o">,</span> <span class="kc">undefined</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should not be undefined.&quot;</span><span class="o">),</span> <span class="kc">undefined</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
 
@@ -232,14 +255,13 @@
 <span class="c">     */</span>
     <span class="nx">isNull</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNull</span><span class="o">(</span><span class="nx">actual</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be null.&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be null.&quot;</span><span class="o">),</span> <span class="kc">null</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
         
     <span class="c">/**</span>
 <span class="c">     * Asserts that a value is undefined. This uses the triple equals sign</span>
 <span class="c">     * so no type cohersion may occur.</span>
-<span class="c">     * @param {Object} expected The expected value.</span>
 <span class="c">     * @param {Object} actual The actual value to test.</span>
 <span class="c">     * @param {String} message (Optional) The message to display if the assertion fails.</span>
 <span class="c">     * @method isUndefined</span>
@@ -247,7 +269,7 @@
 <span class="c">     */</span>
     <span class="nx">isUndefined</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isUndefined</span><span class="o">(</span><span class="nx">actual</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be undefined.&quot;</span><span class="o">,</span> <span class="kc">undefined</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be undefined.&quot;</span><span class="o">),</span> <span class="kc">undefined</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>    
     
@@ -264,7 +286,7 @@
 <span class="c">     */</span>
     <span class="nx">isArray</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be an array.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be an array.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>
    
@@ -277,7 +299,7 @@
 <span class="c">     */</span>
     <span class="nx">isBoolean</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isBoolean</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be a Boolean.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be a Boolean.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>
    
@@ -290,7 +312,7 @@
 <span class="c">     */</span>
     <span class="nx">isFunction</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isFunction</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be a function.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be a function.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>
    
@@ -306,7 +328,7 @@
 <span class="c">     */</span>
     <span class="nx">isInstanceOf</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">expected</span> <span class="c">/*:Function*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!(</span><span class="nx">actual</span> <span class="k">instanceof</span> <span class="nx">expected</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value isn&#39;t an instance of expected type.&quot;</span><span class="o">,</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value isn&#39;t an instance of expected type.&quot;</span><span class="o">),</span> <span class="nx">expected</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -319,7 +341,7 @@
 <span class="c">     */</span>
     <span class="nx">isNumber</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be a number.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be a number.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>    
     <span class="o">},</span>    
     
@@ -332,7 +354,7 @@
 <span class="c">     */</span>
     <span class="nx">isObject</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isObject</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be an object.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be an object.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -345,7 +367,7 @@
 <span class="c">     */</span>
     <span class="nx">isString</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">actual</span><span class="o">)){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be a string.&quot;</span><span class="o">,</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">UnexpectedValue</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be a string.&quot;</span><span class="o">),</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">},</span>
     
@@ -359,7 +381,7 @@
 <span class="c">     */</span>
     <span class="nx">isTypeOf</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">expectedType</span> <span class="c">/*:String*/</span><span class="o">,</span> <span class="nx">actualValue</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span><span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="k">typeof</span> <span class="nx">actualValue</span> <span class="o">!=</span> <span class="nx">expectedType</span><span class="o">){</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> <span class="s2">&quot;Value should be of type &quot;</span> <span class="o">+</span> <span class="nx">expected</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="o">,</span> <span class="nx">expected</span><span class="o">,</span> <span class="k">typeof</span> <span class="nx">actual</span><span class="o">);</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">ComparisonFailure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Value should be of type &quot;</span> <span class="o">+</span> <span class="nx">expected</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="o">),</span> <span class="nx">expected</span><span class="o">,</span> <span class="k">typeof</span> <span class="nx">actual</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
 <span class="o">};</span>
@@ -622,6 +644,13 @@
 <span class="c">     * @property name</span>
 <span class="c">     */</span>
     <span class="k">this</span><span class="o">.</span><span class="nx">name</span> <span class="c">/*:String*/</span> <span class="o">=</span> <span class="s2">&quot;UnexpectedError&quot;</span><span class="o">;</span>
+    
+    <span class="c">/**</span>
+<span class="c">     * Stack information for the error (if provided).</span>
+<span class="c">     * @type String</span>
+<span class="c">     * @property stack</span>
+<span class="c">     */</span>
+    <span class="k">this</span><span class="o">.</span><span class="nx">stack</span> <span class="c">/*:String*/</span> <span class="o">=</span> <span class="nx">cause</span><span class="o">.</span><span class="nx">stack</span><span class="o">;</span>
     
 <span class="o">};</span>
 

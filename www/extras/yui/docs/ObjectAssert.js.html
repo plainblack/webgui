@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>yuitest&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>yuitest&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_yuitest.html">yuitest</a>
@@ -63,6 +63,8 @@
     <span class="nx">propertiesAreEqual</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">expected</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">actual</span> <span class="c">/*:Object*/</span><span class="o">,</span> 
                            <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         
+        <span class="k">var</span> <span class="nx">Assert</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">;</span>
+        
         <span class="c">//get all properties in the object</span>
 <span class="c"></span>        <span class="k">var</span> <span class="nx">properties</span> <span class="c">/*:Array*/</span> <span class="o">=</span> <span class="o">[];</span>        
         <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">property</span> <span class="k">in</span> <span class="nx">expected</span><span class="o">){</span>
@@ -71,8 +73,8 @@
         
         <span class="c">//see if the properties are in the expected object</span>
 <span class="c"></span>        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">properties</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">++){</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">.</span><span class="nx">isNotUndefined</span><span class="o">(</span><span class="nx">actual</span><span class="o">[</span><span class="nx">properties</span><span class="o">[</span><span class="nx">i</span><span class="o">]],</span> <span class="nx">message</span> <span class="o">||</span> 
-                    <span class="s2">&quot;Property&#39;&quot;</span> <span class="o">+</span> <span class="nx">properties</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; expected.&quot;</span><span class="o">);</span>
+            <span class="nx">Assert</span><span class="o">.</span><span class="nx">isNotUndefined</span><span class="o">(</span><span class="nx">actual</span><span class="o">[</span><span class="nx">properties</span><span class="o">[</span><span class="nx">i</span><span class="o">]],</span> 
+                <span class="nx">Assert</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Property &#39;&quot;</span> <span class="o">+</span> <span class="nx">properties</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">+</span> <span class="s2">&quot;&#39; expected.&quot;</span><span class="o">));</span>
         <span class="o">}</span>
 
     <span class="o">},</span>
@@ -86,9 +88,9 @@
 <span class="c">     * @static</span>
 <span class="c">     */</span>    
     <span class="nx">hasProperty</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">propertyName</span> <span class="c">/*:String*/</span><span class="o">,</span> <span class="nx">object</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isUndefined</span><span class="o">(</span><span class="nx">object</span><span class="o">[</span><span class="nx">propertyName</span><span class="o">])){</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">.</span><span class="nx">fail</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> 
-                    <span class="s2">&quot;Property &quot;</span> <span class="o">+</span> <span class="nx">propertyName</span> <span class="o">+</span> <span class="s2">&quot; not found on object.&quot;</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(!(</span><span class="nx">propertyName</span> <span class="k">in</span> <span class="nx">object</span><span class="o">)){</span>
+            <span class="k">var</span> <span class="nx">Assert</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">;</span>
+            <span class="nx">Assert</span><span class="o">.</span><span class="nx">fail</span><span class="o">(</span><span class="nx">Assert</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Property &#39;&quot;</span> <span class="o">+</span> <span class="nx">propertyName</span> <span class="o">+</span> <span class="s2">&quot;&#39; not found on object.&quot;</span><span class="o">));</span>
         <span class="o">}</span>    
     <span class="o">},</span>
     
@@ -102,8 +104,8 @@
 <span class="c">     */</span>    
     <span class="nx">hasOwnProperty</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">propertyName</span> <span class="c">/*:String*/</span><span class="o">,</span> <span class="nx">object</span> <span class="c">/*:Object*/</span><span class="o">,</span> <span class="nx">message</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Void*/</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="nx">object</span><span class="o">,</span> <span class="nx">propertyName</span><span class="o">)){</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">.</span><span class="nx">fail</span><span class="o">(</span><span class="nx">message</span> <span class="o">||</span> 
-                    <span class="s2">&quot;Property &quot;</span> <span class="o">+</span> <span class="nx">propertyName</span> <span class="o">+</span> <span class="s2">&quot; not found on object instance.&quot;</span><span class="o">);</span>
+            <span class="k">var</span> <span class="nx">Assert</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Assert</span><span class="o">;</span>
+            <span class="nx">Assert</span><span class="o">.</span><span class="nx">fail</span><span class="o">(</span><span class="nx">Assert</span><span class="o">.</span><span class="nx">_formatMessage</span><span class="o">(</span><span class="nx">message</span><span class="o">,</span> <span class="s2">&quot;Property &#39;&quot;</span> <span class="o">+</span> <span class="nx">propertyName</span> <span class="o">+</span> <span class="s2">&quot;&#39; not found on object instance.&quot;</span><span class="o">));</span>
         <span class="o">}</span>     
     <span class="o">}</span>
 <span class="o">};</span>

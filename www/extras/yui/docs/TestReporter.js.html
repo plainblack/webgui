@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>yuitest&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>yuitest&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_yuitest.html">yuitest</a>
@@ -180,9 +180,13 @@
         <span class="c">//add fields to the form</span>
 <span class="c"></span>        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="k">this</span><span class="o">.</span><span class="nx">_fields</span><span class="o">){</span>
             <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">hasOwnProperty</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_fields</span><span class="o">,</span> <span class="nx">prop</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="k">this</span><span class="o">.</span><span class="nx">_fields</span><span class="o">[</span><span class="nx">prop</span><span class="o">]</span> <span class="o">!=</span> <span class="s2">&quot;function&quot;</span><span class="o">){</span>
-                <span class="nx">input</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;input&quot;</span><span class="o">);</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">env</span><span class="o">.</span><span class="nx">ua</span><span class="o">.</span><span class="nx">ie</span><span class="o">){</span>
+                    <span class="nx">input</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;&lt;input name=\&quot;&quot;</span> <span class="o">+</span> <span class="nx">prop</span> <span class="o">+</span> <span class="s2">&quot;\&quot; &gt;&quot;</span><span class="o">);</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="nx">input</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;input&quot;</span><span class="o">);</span>
+                    <span class="nx">input</span><span class="o">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">prop</span><span class="o">;</span>
+                <span class="o">}</span>
                 <span class="nx">input</span><span class="o">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s2">&quot;hidden&quot;</span><span class="o">;</span>
-                <span class="nx">input</span><span class="o">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">prop</span><span class="o">;</span>
                 <span class="nx">input</span><span class="o">.</span><span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_fields</span><span class="o">[</span><span class="nx">prop</span><span class="o">];</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">_form</span><span class="o">.</span><span class="nx">appendChild</span><span class="o">(</span><span class="nx">input</span><span class="o">);</span>
             <span class="o">}</span>

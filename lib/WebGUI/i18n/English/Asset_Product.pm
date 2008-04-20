@@ -347,11 +347,6 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'11' => {
-		message => q|Product Number|,
-		lastUpdated => 1031514049
-	},
-
 	'53' => {
 		message => q|Edit Benefit|,
 		lastUpdated => 1031514049
@@ -404,11 +399,6 @@ our $I18N = {
 
         '10 description' => {
                 message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.|,
-                lastUpdated => 1120332527,
-        },
-
-        '11 description' => {
-                message => q|The product number, SKU, ISBN, or other identifier for this product.|,
                 lastUpdated => 1120332527,
         },
 
@@ -643,6 +633,62 @@ be useful, others may not.|,
 		message => q|The unique identifier for the storage object for a product warranty.|,
 		lastUpdated => 1164841201
 	},
+
+	'edit parameter name' => {
+		message => q|Name|,
+		lastUpdated => 1208130239,
+		context => q|The form label for the name field in editParameter|,
+	},
+
+    'edit parameter name description' => {
+        message => q|<p>The name of this parameter.</p>|,
+        lastUpdated => 1208130267,
+    },
+
+	'edit parameter' => {
+		message => q|Edit product parameter|,
+		lastUpdated => 1208130542,
+		context => q|The name of the editParameter form|
+	},
+
+	'edit option' => {
+		message => q|Edit product parameter option|,
+		lastUpdated => 1208144888,
+		context => q|The name of the editParameter form|
+	},
+
+    'edit option value' => {
+        message => q|Value|,
+        lastUpdated => 1208320423,
+        context => q|The form label for the value field in editParameterOption|
+    },
+
+    'edit option value description' => {
+        message => q|<p>The value of this option (ie. 'Blue').</p>|,
+        lastUpdated => 1208320422,
+    },
+
+	'edit option price modifier' => {
+		message => q|Price modifier|,
+		lastUpdated => 1208292477,
+		context => q|The form label for the priceModifier field in editProductParameterOption|
+	},
+
+    'edit option price modifier description' => {
+        message => q|<p>The amount this option adds to the default price for product variants containig this option.</p>|,
+        lastUpdated => 1146606364,
+    },
+
+	'edit option weight modifier' => {
+		message => q|Weight modifier|,
+		lastUpdated => 1208292479,
+		context => q|The form label for the weightModifier field in editProductParameterOption|
+	},
+
+    'edit option weight modifier description' => {
+        message => q|<p>The weight this option adds to the default weight for product variants consisting of this option.</p>|,
+        lastUpdated => 1208292519,
+    },
 
 };
 

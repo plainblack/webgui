@@ -17,7 +17,7 @@ use WebGUI::Session;
 use Data::Dumper;
 use Test::Deep;
 
-use Test::More tests => 52; # increment this value for each test you create
+use Test::More tests => 53; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -263,6 +263,27 @@ $hrefHref = $session->db->buildHashRefOfHashRefs('select message, myIndex from t
 		grep { $_->[2] eq 'B' } @tableData;
 cmp_deeply($hrefHref, \%expected, 'buildHashRefOfHashRefs, 2 columns, 1 param');
 
+#######################################################################
+#
+# buildDataTableStructure
+#
+# Uses the testTable data from the preceeding *RefOf*Ref tests above
+#
+#######################################################################
+
+my %tableStruct = $session->db->buildDataTableStructure('select * from testTable');
+
+my @hashedTableData = map { { myIndex=>$_->[0], message=>$_->[1], myKey=>$_->[2]} } @tableData;
+
+cmp_deeply(
+    \%tableStruct,
+    {
+        totalRecords    => 8,
+        recordsReturned => 8,
+        records         => \@hashedTableData,
+    },
+    'Check table structure',
+);
 
 END: {
     $session->db->dbh->do('DROP TABLE IF EXISTS testTable');

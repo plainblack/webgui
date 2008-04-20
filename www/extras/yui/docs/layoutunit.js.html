@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>layout&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>layout&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_layout.html">layout</a>
@@ -215,6 +215,20 @@
 <span class="c">        * @type Boolean</span>
 <span class="c">        */</span>
         <span class="nx">_lastScroll</span><span class="o">:</span> <span class="kc">null</span><span class="o">,</span>
+        <span class="c">/**</span>
+<span class="c">        * @private</span>
+<span class="c">        * @property _lastCenetrScroll</span>
+<span class="c">        * @description A holder for the last known scroll state of the center unit</span>
+<span class="c">        * @type Boolean</span>
+<span class="c">        */</span>
+        <span class="nx">_lastCenterScroll</span><span class="o">:</span> <span class="kc">null</span><span class="o">,</span>
+        <span class="c">/**</span>
+<span class="c">        * @private</span>
+<span class="c">        * @property _lastScrollTop</span>
+<span class="c">        * @description A holder for the last known scrollTop state of the unit</span>
+<span class="c">        * @type Number</span>
+<span class="c">        */</span>
+        <span class="nx">_lastScrollTop</span><span class="o">:</span> <span class="kc">null</span><span class="o">,</span>
         <span class="c">/**</span>
 <span class="c">        * @method resize</span>
 <span class="c">        * @description Resize either the unit or it&#39;s clipped state, also updating the box inside</span>
@@ -452,7 +466,7 @@
         <span class="o">},</span>
         <span class="c">/**</span>
 <span class="c">        * @method getSizes</span>
-<span class="c">        * @description Get a reference to the internal sizes object</span>
+<span class="c">        * @description Get a reference to the internal sizes object for this unit</span>
 <span class="c">        * @return {Object} An object of the sizes used for calculations</span>
 <span class="c">        */</span>
         <span class="nx">getSizes</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
@@ -477,10 +491,11 @@
 <span class="c">        * @return {&lt;a href=&quot;YAHOO.widget.LayoutUnit.html&quot;&gt;YAHOO.widget.LayoutUnit&lt;/a&gt;} The LayoutUnit instance</span>
 <span class="c">        */</span>
         <span class="nx">expand</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;collapse&#39;</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
             <span class="o">}</span>
-            <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">retVal</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;beforeExpand&#39;</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="nx">retVal</span> <span class="o">===</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
             <span class="o">}</span>
 
@@ -545,6 +560,9 @@
                     <span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">resize</span><span class="o">();</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScroll</span><span class="o">);</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span><span class="o">;</span>
+                    <span class="o">}</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">_anim</span><span class="o">.</span><span class="nx">onComplete</span><span class="o">.</span><span class="nx">unsubscribe</span><span class="o">(</span><span class="nx">expand</span><span class="o">,</span> <span class="k">this</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;expand&#39;</span><span class="o">);</span>
                 <span class="o">};</span>
@@ -562,6 +580,9 @@
                 <span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">resize</span><span class="o">();</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScroll</span><span class="o">);</span>
+                <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span><span class="o">;</span>
+                <span class="o">}</span>
                 <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;expand&#39;</span><span class="o">);</span>
             <span class="o">}</span>
             <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
@@ -572,10 +593,11 @@
 <span class="c">        * @return {&lt;a href=&quot;YAHOO.widget.LayoutUnit.html&quot;&gt;YAHOO.widget.LayoutUnit&lt;/a&gt;} The LayoutUnit instance</span>
 <span class="c">        */</span>
         <span class="nx">collapse</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;collapse&#39;</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
             <span class="o">}</span>
-            <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">var</span> <span class="nx">retValue</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;beforeCollapse&#39;</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="nx">retValue</span> <span class="o">===</span> <span class="kc">false</span><span class="o">)</span> <span class="o">{</span>
                 <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
             <span class="o">}</span>
             <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_clip</span><span class="o">)</span> <span class="o">{</span>
@@ -588,6 +610,7 @@
             <span class="k">this</span><span class="o">.</span><span class="nx">_lastWidth</span> <span class="o">=</span> <span class="nx">w</span><span class="o">;</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">_lastHeight</span> <span class="o">=</span> <span class="nx">h</span><span class="o">;</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">_lastScroll</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">);</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span><span class="o">;</span>            
             <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">_lastLeft</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;element&#39;</span><span class="o">).</span><span class="nx">style</span><span class="o">.</span><span class="nx">left</span><span class="o">,</span> <span class="m">10</span><span class="o">);</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">_lastTop</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;element&#39;</span><span class="o">).</span><span class="nx">style</span><span class="o">.</span><span class="nx">top</span><span class="o">,</span> <span class="m">10</span><span class="o">);</span>
@@ -731,7 +754,8 @@
             <span class="o">}</span>
 
             <span class="k">this</span><span class="o">.</span><span class="nx">on</span><span class="o">(</span><span class="s1">&#39;contentChange&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">resize</span><span class="o">,</span> <span class="k">this</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-            
+            <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
+
             <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;animate&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;animate&#39;</span><span class="o">));</span>
         <span class="o">},</span>
         <span class="c">/**</span>
@@ -1166,8 +1190,21 @@
             <span class="k">this</span><span class="o">.</span><span class="nx">setAttributeConfig</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="o">{</span>
                 <span class="nx">value</span><span class="o">:</span> <span class="nx">attr</span><span class="o">.</span><span class="nx">scroll</span> <span class="o">||</span> <span class="kc">false</span><span class="o">,</span>
                 <span class="nx">method</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">scroll</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">((</span><span class="nx">scroll</span> <span class="o">===</span> <span class="kc">false</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="k">this</span><span class="o">.</span><span class="nx">_collapsed</span><span class="o">)</span> <span class="o">{</span> <span class="c">//Removing scroll bar</span>
+<span class="c"></span>                        <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
+                    <span class="o">}</span>
+                    
                     <span class="k">if</span> <span class="o">(</span><span class="nx">scroll</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">this</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="s1">&#39;yui-layout-scroll&#39;</span><span class="o">);</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="k">this</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScrollTop</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
                     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                         <span class="k">this</span><span class="o">.</span><span class="nx">removeClass</span><span class="o">(</span><span class="s1">&#39;yui-layout-scroll&#39;</span><span class="o">);</span>
                     <span class="o">}</span>
@@ -1247,6 +1284,9 @@
                                 <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
                                 <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;parent&#39;</span><span class="o">))</span> <span class="o">{</span>
                                     <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;parent&#39;</span><span class="o">).</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;startResize&#39;</span><span class="o">);</span>
+                                    <span class="k">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;parent&#39;</span><span class="o">).</span><span class="nx">getUnitByPosition</span><span class="o">(</span><span class="s1">&#39;center&#39;</span><span class="o">);</span>
+                                    <span class="k">this</span><span class="o">.</span><span class="nx">_lastCenterScroll</span> <span class="o">=</span> <span class="nx">c</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">);</span>
+                                    <span class="nx">c</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
                                 <span class="o">}</span>
                                 <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s1">&#39;startResize&#39;</span><span class="o">);</span>
                             <span class="o">},</span> <span class="k">this</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
@@ -1254,6 +1294,10 @@
                                 <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;height&#39;</span><span class="o">,</span> <span class="nx">ev</span><span class="o">.</span><span class="nx">height</span><span class="o">);</span>
                                 <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;width&#39;</span><span class="o">,</span> <span class="nx">ev</span><span class="o">.</span><span class="nx">width</span><span class="o">);</span>
                                 <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastScroll</span><span class="o">);</span>
+                                <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;parent&#39;</span><span class="o">))</span> <span class="o">{</span>
+                                    <span class="k">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;parent&#39;</span><span class="o">).</span><span class="nx">getUnitByPosition</span><span class="o">(</span><span class="s1">&#39;center&#39;</span><span class="o">);</span>
+                                    <span class="nx">c</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;scroll&#39;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_lastCenterScroll</span><span class="o">);</span>
+                                <span class="o">}</span>
                             <span class="o">},</span> <span class="k">this</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
                         <span class="o">}</span>
                     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
@@ -1367,6 +1411,11 @@
 <span class="c">    * @type YAHOO.util.CustomEvent</span>
 <span class="c">    */</span>
     <span class="c">/**</span>
+<span class="c">    * @event beforeCollapse</span>
+<span class="c">    * @description Fired before the unit is collapsed. If you return false, the collapse is cancelled.</span>
+<span class="c">    * @type YAHOO.util.CustomEvent</span>
+<span class="c">    */</span>
+    <span class="c">/**</span>
 <span class="c">    * @event collapse</span>
 <span class="c">    * @description Fired when the unit is collapsed</span>
 <span class="c">    * @type YAHOO.util.CustomEvent</span>
@@ -1374,6 +1423,11 @@
     <span class="c">/**</span>
 <span class="c">    * @event expand</span>
 <span class="c">    * @description Fired when the unit is exanded</span>
+<span class="c">    * @type YAHOO.util.CustomEvent</span>
+<span class="c">    */</span>
+    <span class="c">/**</span>
+<span class="c">    * @event beforeExpand</span>
+<span class="c">    * @description Fired before the unit is exanded. If you return false, the collapse is cancelled.</span>
 <span class="c">    * @type YAHOO.util.CustomEvent</span>
 <span class="c">    */</span>
     <span class="o">});</span>

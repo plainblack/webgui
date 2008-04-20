@@ -15,21 +15,21 @@
 
 <link rel="stylesheet" type="text/css" href="../../assets/dpSyntaxHighlighter.css">
 <!--Script and CSS includes for YUI dependencies on this page-->
-<link rel="stylesheet" type="text/css" href="../../build/logger/assets/skins/sam/logger.css" />
-<link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
 <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="../../build/logger/assets/skins/sam/logger.css" />
+<link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
 <link rel="stylesheet" type="text/css" href="../../build/editor/assets/skins/sam/editor.css" />
-<script type="text/javascript" src="../../build/yahoo/yahoo.js"></script>
-<script type="text/javascript" src="../../build/event/event.js"></script>
-<script type="text/javascript" src="../../build/dom/dom.js"></script>
-<script type="text/javascript" src="../../build/logger/logger.js"></script>
-<script type="text/javascript" src="../../build/animation/animation.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta.js"></script>
-<script type="text/javascript" src="../../build/container/container.js"></script>
-<script type="text/javascript" src="../../build/menu/menu.js"></script>
-<script type="text/javascript" src="../../build/button/button.js"></script>
-<script type="text/javascript" src="../../build/editor/editor-beta.js"></script>
+<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
+<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
+<script type="text/javascript" src="../../build/logger/logger-min.js"></script>
+<script type="text/javascript" src="../../build/animation/animation-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/container/container-min.js"></script>
+<script type="text/javascript" src="../../build/menu/menu-min.js"></script>
+<script type="text/javascript" src="../../build/button/button-min.js"></script>
+<script type="text/javascript" src="../../build/editor/editor-beta-min.js"></script>
 
 <!--there is no custom header content for this example-->
 
@@ -53,7 +53,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: Rich Text Editor (beta): Editor with Custom Image Browser</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -93,7 +94,7 @@
 
     var myEditor = new YAHOO.widget.Editor('msgpost', {
         height: '300px',
-        width: '522px',
+        width: '532px',
         dompath: true, //Turns on the bar at the bottom
         animate: true //Animates the opening, closing and moving of Editor windows
     });
@@ -227,6 +228,10 @@ Calling it from <code>window.opener</code> will give us a usable reference to th
             window.close();
         }
     });
+    //Internet Explorer will throw this window to the back, this brings it to the front on load
+    Event.on(window, 'load', function() {
+        window.focus();
+    });    
 })();
 </textarea>
 
@@ -345,8 +350,6 @@ myEditor.on('afterOpenWindow', function() {
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/editor.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

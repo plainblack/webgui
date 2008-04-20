@@ -146,8 +146,6 @@ sub toHtml {
     }
     my $i=0;
     my $options = $self->getOptions;
-    		$self->session->errorHandler->warn(JSON->new->encode($options));
-
 	foreach my $key (keys %{$options}) {
 	    $i++;
         my @values = $self->getDefaultValue;

@@ -1,0 +1,80 @@
+=head1 SKU (base product class)
+
+The SKU class is what all other products will be subclassed from. It
+needs to be simple so it can be extended to fit any need.
+
+=head2 Data Dictionary
+
+The following fields are needed to construct this assets table called
+"SKU".
+
+ Field              Schema              Description
+ assetId            guid                The unique id assigned to this sku that may never change. It's with all assets 
+ revisionDate       bigint
+ sku                varchar(35) unique  The unique id that the shop keeper assigns to this item. It may be changed by the shop keeper. By default this is set equal to assetId.
+ salesAgentId       guid                The unique id of the vendor associated with this sku, if any
+ overrideTaxRate    yesNo               Do you want to use an override for tax rate?
+ taxRateOverride    float               An override value for the default tax rate.
+
+=head2 Method Dictionary
+
+The following methods will be available from the WebGUI::Asset::Sku
+class.
+
+=head3 addToCart
+
+Adds this sku to the shopping cart.
+
+param: options - Takes an options hash reference and calls applyOptions() if specified as a shortcut.
+
+=head3 applyOptions
+
+Accepts a configuration data hash reference that can configure a sku a
+certain way. For example, "a size XL red
+t-shirt" instead of just "a
+t-shirt".
+
+param: options - a hash reference containing the
+configuration properties returned from getOptions()
+
+=head3 getOptions
+
+Returns a hash reference of configuration data that can return this sku
+to a configured state. See applyOptions() for details.
+
+=head3 getMaxAllowedInCart
+
+By default returns 99999999. Should be overridden by subclasses. For
+unique items should return 1. For items that have a count in stock,
+should return the number that are currently in stock.
+
+=head3 getPrice
+
+By default return 0.00. Should be overridden by subclasses.
+
+=head3 getTaxRate
+
+Returns undef. However, if the user specifies a tax override in this Sku then it returns the special tax rate.
+
+=head3 isShippingRequired
+
+By default return 0. Should be overridden by subclasses.
+
+=head3 newBySku
+
+Class method. 
+
+Instanciates based on an existing sku, rather than an assetId. Dynamically looks up class and creates appropriate object.
+
+param: session - a reference to the current session
+
+param: sku - the sku to instanciate
+
+=head3 processStyle
+
+Looks up the style from the container and and wrappers the product in
+it.
+
+param: html - the HTML output to be wrapped by the
+style
+

@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Menu&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Menu&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_menu.html">menu</a>
@@ -2061,8 +2061,18 @@
 			<span class="k">if</span> <span class="o">(</span><span class="nx">bInMenuAnchor</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">oItem</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="s2">&quot;target&quot;</span><span class="o">))</span> <span class="o">{</span>
 	
 				<span class="nx">Event</span><span class="o">.</span><span class="nx">preventDefault</span><span class="o">(</span><span class="nx">oEvent</span><span class="o">);</span>
-	
-				<span class="nx">oItem</span><span class="o">.</span><span class="nx">focus</span><span class="o">();</span>
+				
+
+				<span class="k">if</span> <span class="o">(</span><span class="nx">UA</span><span class="o">.</span><span class="nx">webkit</span><span class="o">)</span> <span class="o">{</span>
+				
+					<span class="nx">oItem</span><span class="o">.</span><span class="nx">focus</span><span class="o">();</span>
+				
+				<span class="o">}</span>
+				<span class="k">else</span> <span class="o">{</span>
+
+					<span class="nx">oItem</span><span class="o">.</span><span class="nx">focusEvent</span><span class="o">.</span><span class="nx">fire</span><span class="o">();</span>
+				
+				<span class="o">}</span>
 			
 			<span class="o">}</span>
 	
@@ -3254,106 +3264,37 @@
 <span class="c">*/</span>
 <span class="nx">enforceConstraints</span><span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">type</span><span class="o">,</span> <span class="nx">args</span><span class="o">,</span> <span class="nx">obj</span><span class="o">)</span> <span class="o">{</span>
 
-    <span class="k">var</span> <span class="nx">oParentMenuItem</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">parent</span><span class="o">,</span>
-        <span class="nx">nViewportOffset</span> <span class="o">=</span> <span class="nx">Overlay</span><span class="o">.</span><span class="nx">VIEWPORT_OFFSET</span><span class="o">,</span>
-        <span class="nx">oElement</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">element</span><span class="o">,</span>
-        <span class="nx">oConfig</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">,</span>
-        <span class="nx">pos</span> <span class="o">=</span> <span class="nx">args</span><span class="o">[</span><span class="m">0</span><span class="o">],</span>
-        <span class="nx">offsetHeight</span> <span class="o">=</span> <span class="nx">oElement</span><span class="o">.</span><span class="nx">offsetHeight</span><span class="o">,</span>
-        <span class="nx">offsetWidth</span> <span class="o">=</span> <span class="nx">oElement</span><span class="o">.</span><span class="nx">offsetWidth</span><span class="o">,</span>
-        <span class="nx">viewPortWidth</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getViewportWidth</span><span class="o">(),</span>
-        <span class="nx">viewPortHeight</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getViewportHeight</span><span class="o">(),</span>
-        <span class="nx">nPadding</span> <span class="o">=</span> <span class="o">(</span><span class="nx">oParentMenuItem</span> <span class="o">&amp;&amp;</span> 
-            <span class="nx">oParentMenuItem</span><span class="o">.</span><span class="nx">parent</span> <span class="k">instanceof</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">MenuBar</span><span class="o">)</span> <span class="o">?</span> 
-            <span class="m">0</span> <span class="o">:</span> <span class="nx">nViewportOffset</span><span class="o">,</span>
-        <span class="nx">aContext</span> <span class="o">=</span> <span class="nx">oConfig</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="s2">&quot;context&quot;</span><span class="o">),</span>
-        <span class="nx">oContextElement</span> <span class="o">=</span> <span class="nx">aContext</span> <span class="o">?</span> <span class="nx">aContext</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">:</span> <span class="kc">null</span><span class="o">,</span>
-        <span class="nx">topConstraint</span><span class="o">,</span>
-        <span class="nx">leftConstraint</span><span class="o">,</span>
-        <span class="nx">bottomConstraint</span><span class="o">,</span>
-        <span class="nx">rightConstraint</span><span class="o">,</span>
-        <span class="nx">scrollX</span><span class="o">,</span>
-        <span class="nx">scrollY</span><span class="o">,</span>
-        <span class="nx">x</span><span class="o">,</span>
-        <span class="nx">y</span><span class="o">;</span>
-    
+	<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Menu</span><span class="o">.</span><span class="nx">superclass</span><span class="o">.</span><span class="nx">enforceConstraints</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="nx">arguments</span><span class="o">);</span>
+	
+	<span class="k">var</span> <span class="nx">oParent</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">parent</span><span class="o">,</span>
+		<span class="nx">oParentMenu</span><span class="o">,</span>
+		<span class="nx">nParentMenuX</span><span class="o">,</span>
+		<span class="nx">nNewX</span><span class="o">,</span>
+		<span class="nx">nX</span><span class="o">;</span>
+	
+	
+	<span class="k">if</span> <span class="o">(</span><span class="nx">oParent</span><span class="o">)</span> <span class="o">{</span>
+	
+		<span class="nx">oParentMenu</span> <span class="o">=</span> <span class="nx">oParent</span><span class="o">.</span><span class="nx">parent</span><span class="o">;</span>
 
-    <span class="k">if</span> <span class="o">(</span><span class="nx">offsetWidth</span> <span class="o">&lt;</span> <span class="nx">viewPortWidth</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">if</span> <span class="o">(!(</span><span class="nx">oParentMenu</span> <span class="k">instanceof</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">MenuBar</span><span class="o">))</span> <span class="o">{</span>
+	
+			<span class="nx">nParentMenuX</span> <span class="o">=</span> <span class="nx">oParentMenu</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="s2">&quot;x&quot;</span><span class="o">);</span>
+			<span class="nx">nX</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="s2">&quot;x&quot;</span><span class="o">);</span>
+		
+	
+			<span class="k">if</span> <span class="o">(</span><span class="nx">nX</span> <span class="o">&lt;</span> <span class="o">(</span><span class="nx">nParentMenuX</span> <span class="o">+</span> <span class="nx">oParent</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">offsetWidth</span><span class="o">))</span> <span class="o">{</span>
 
-        <span class="nx">x</span> <span class="o">=</span> <span class="nx">pos</span><span class="o">[</span><span class="m">0</span><span class="o">];</span>
-        <span class="nx">scrollX</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getDocumentScrollLeft</span><span class="o">();</span>
-        <span class="nx">leftConstraint</span> <span class="o">=</span> <span class="nx">scrollX</span> <span class="o">+</span> <span class="nx">nPadding</span><span class="o">;</span>
-        <span class="nx">rightConstraint</span> <span class="o">=</span> <span class="nx">scrollX</span> <span class="o">+</span> <span class="nx">viewPortWidth</span> <span class="o">-</span> <span class="nx">offsetWidth</span> <span class="o">-</span> <span class="nx">nPadding</span><span class="o">;</span>
-
-        <span class="k">if</span> <span class="o">(</span><span class="nx">x</span> <span class="o">&lt;</span> <span class="nx">nViewportOffset</span><span class="o">)</span> <span class="o">{</span>
-    
-            <span class="nx">x</span> <span class="o">=</span> <span class="nx">leftConstraint</span><span class="o">;</span>
-    
-        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">((</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">offsetWidth</span><span class="o">)</span> <span class="o">&gt;</span> <span class="nx">viewPortWidth</span><span class="o">)</span> <span class="o">{</span>
-    
-            <span class="k">if</span><span class="o">(</span><span class="nx">oContextElement</span> <span class="o">&amp;&amp;</span>
-                <span class="o">((</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">oContextElement</span><span class="o">.</span><span class="nx">offsetWidth</span><span class="o">)</span> <span class="o">&gt;</span> <span class="nx">offsetWidth</span><span class="o">))</span> <span class="o">{</span>
-    
-                <span class="k">if</span> <span class="o">(</span><span class="nx">oParentMenuItem</span> <span class="o">&amp;&amp;</span> 
-                    <span class="nx">oParentMenuItem</span><span class="o">.</span><span class="nx">parent</span> <span class="k">instanceof</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">MenuBar</span><span class="o">)</span> <span class="o">{</span>
-    
-                    <span class="nx">x</span> <span class="o">=</span> <span class="o">(</span><span class="nx">x</span> <span class="o">-</span> <span class="o">(</span><span class="nx">offsetWidth</span> <span class="o">-</span> <span class="nx">oContextElement</span><span class="o">.</span><span class="nx">offsetWidth</span><span class="o">));</span>
-    
-                <span class="o">}</span>
-                <span class="k">else</span> <span class="o">{</span>
-    
-                    <span class="nx">x</span> <span class="o">=</span> <span class="o">(</span><span class="nx">x</span> <span class="o">-</span> <span class="o">(</span><span class="nx">oContextElement</span><span class="o">.</span><span class="nx">offsetWidth</span> <span class="o">+</span> <span class="nx">offsetWidth</span><span class="o">));</span>
-    
-                <span class="o">}</span>
-    
-            <span class="o">}</span>
-            <span class="k">else</span> <span class="o">{</span>
-    
-                <span class="nx">x</span> <span class="o">=</span> <span class="nx">rightConstraint</span><span class="o">;</span>
-    
-            <span class="o">}</span>
-    
-        <span class="o">}</span>
-    
-    <span class="o">}</span>
-
-
-    <span class="k">if</span> <span class="o">(</span><span class="nx">offsetHeight</span> <span class="o">&lt;</span> <span class="nx">viewPortHeight</span><span class="o">)</span> <span class="o">{</span>
-
-        <span class="nx">y</span> <span class="o">=</span> <span class="nx">pos</span><span class="o">[</span><span class="m">1</span><span class="o">];</span>
-        <span class="nx">scrollY</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getDocumentScrollTop</span><span class="o">();</span>
-        <span class="nx">topConstraint</span> <span class="o">=</span> <span class="nx">scrollY</span> <span class="o">+</span> <span class="nx">nPadding</span><span class="o">;</span>
-        <span class="nx">bottomConstraint</span> <span class="o">=</span> <span class="nx">scrollY</span> <span class="o">+</span> <span class="nx">viewPortHeight</span> <span class="o">-</span> <span class="nx">offsetHeight</span> <span class="o">-</span> <span class="nx">nPadding</span><span class="o">;</span>
-
-
-
-        <span class="k">if</span> <span class="o">(</span><span class="nx">y</span> <span class="o">&lt;</span> <span class="nx">nViewportOffset</span><span class="o">)</span> <span class="o">{</span>
-    
-            <span class="nx">y</span> <span class="o">=</span> <span class="nx">topConstraint</span><span class="o">;</span>
-    
-        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="nx">y</span> <span class="o">&gt;</span> <span class="nx">bottomConstraint</span><span class="o">)</span> <span class="o">{</span>
-    
-            <span class="k">if</span> <span class="o">(</span><span class="nx">oContextElement</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">y</span> <span class="o">&gt;</span> <span class="nx">offsetHeight</span><span class="o">))</span> <span class="o">{</span>
-    
-                <span class="nx">y</span> <span class="o">=</span> <span class="o">((</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">oContextElement</span><span class="o">.</span><span class="nx">offsetHeight</span><span class="o">)</span> <span class="o">-</span> <span class="nx">offsetHeight</span><span class="o">);</span>
-    
-            <span class="o">}</span>
-            <span class="k">else</span> <span class="o">{</span>
-    
-                <span class="nx">y</span> <span class="o">=</span> <span class="nx">bottomConstraint</span><span class="o">;</span>
-                
-
-    
-            <span class="o">}</span>
-    
-        <span class="o">}</span>
-
-    <span class="o">}</span>
-
-
-    <span class="nx">oConfig</span><span class="o">.</span><span class="nx">setProperty</span><span class="o">(</span><span class="s2">&quot;x&quot;</span><span class="o">,</span> <span class="nx">x</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-    <span class="nx">oConfig</span><span class="o">.</span><span class="nx">setProperty</span><span class="o">(</span><span class="s2">&quot;y&quot;</span><span class="o">,</span> <span class="nx">y</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-    <span class="nx">oConfig</span><span class="o">.</span><span class="nx">setProperty</span><span class="o">(</span><span class="s2">&quot;xy&quot;</span><span class="o">,</span> <span class="o">[</span><span class="nx">x</span><span class="o">,</span><span class="nx">y</span><span class="o">],</span> <span class="kc">true</span><span class="o">);</span>
+				<span class="nx">nNewX</span> <span class="o">=</span> <span class="o">(</span><span class="nx">nParentMenuX</span> <span class="o">-</span> <span class="k">this</span><span class="o">.</span><span class="nx">element</span><span class="o">.</span><span class="nx">offsetWidth</span><span class="o">);</span>
+			
+				<span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">setProperty</span><span class="o">(</span><span class="s2">&quot;x&quot;</span><span class="o">,</span>  <span class="nx">nNewX</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+				<span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">setProperty</span><span class="o">(</span><span class="s2">&quot;xy&quot;</span><span class="o">,</span> <span class="o">[</span><span class="nx">nNewX</span><span class="o">,</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="s2">&quot;y&quot;</span><span class="o">))],</span> <span class="kc">true</span><span class="o">);</span>
+			
+			<span class="o">}</span>
+		
+		<span class="o">}</span>
+	
+	<span class="o">}</span>
 
 <span class="o">},</span>
 

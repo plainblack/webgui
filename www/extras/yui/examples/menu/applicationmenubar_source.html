@@ -49,9 +49,20 @@
             
             #filemenu.visible .yuimenuitemlabel,
             #editmenu.visible .yuimenuitemlabel {
-            
+
                 *zoom: 1;
-            
+
+            }
+
+
+			/*
+				Remove "hasLayout" from the submenu of the file menu.			
+			*/
+
+            #filemenu.visible .yuimenu .yuimenuitemlabel {
+
+                *zoom: normal;
+
             }
         
         </style>
@@ -197,7 +208,7 @@
 
                     if (this.id == "yahoo") {
                 
-                        this.cfg.setProperty("x", 0);
+                        YAHOO.util.Dom.setX(this.element, 0);
                     
                     }
 

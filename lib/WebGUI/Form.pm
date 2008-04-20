@@ -136,9 +136,9 @@ sub formHeader {
     croak "Second parameter must be hash reference"
         if ref $params ne "HASH";
     
-    my $action  = $params->{ action  } || $session->url->page();
-    my $method  = $params->{ method  } || "post";
-    my $enctype = $params->{ enctype } || "multipart/form-data";
+    my $action      = (exists $params->{action} && $params->{action} ne "") ? $params->{action} : $session->url->page();
+    my $method      = (exists $params->{method} && $params->{method} ne "") ? $params->{method} : "post";
+    my $enctype     = (exists $params->{enctype} && $params->{enctype} ne "") ? $params->{enctype} : "multipart/form-data";
 
     # Fix a query string in the action URL
     my $hidden;

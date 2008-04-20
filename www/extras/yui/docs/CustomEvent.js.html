@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Event Utility&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Event Utility&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_event.html">event</a>
@@ -247,14 +247,11 @@
     <span class="nx">fire</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">var</span> <span class="nx">len</span><span class="o">=</span><span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span>
         <span class="k">if</span> <span class="o">(!</span><span class="nx">len</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="o">.</span><span class="nx">silent</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="c">//YAHOO.log(&#39;DEBUG no subscribers&#39;);</span>
+<span class="c"></span>            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
         <span class="o">}</span>
 
-        <span class="k">var</span> <span class="nx">args</span><span class="o">=[],</span> <span class="nx">ret</span><span class="o">=</span><span class="kc">true</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">rebuild</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">arguments</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-            <span class="nx">args</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">arguments</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
-        <span class="o">}</span>
+        <span class="k">var</span> <span class="nx">args</span><span class="o">=[].</span><span class="nx">slice</span><span class="o">.</span><span class="nx">call</span><span class="o">(</span><span class="nx">arguments</span><span class="o">,</span> <span class="m">0</span><span class="o">),</span> <span class="nx">ret</span><span class="o">=</span><span class="kc">true</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">rebuild</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span>
 
         <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">silent</span><span class="o">)</span> <span class="o">{</span>
             <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span> <span class="s2">&quot;Firing &quot;</span>       <span class="o">+</span> <span class="k">this</span>  <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> 
@@ -263,14 +260,18 @@
                        <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span>                  <span class="o">);</span>
         <span class="o">}</span>
 
+        <span class="c">// make a copy of the subscribers so that there are</span>
+<span class="c"></span>        <span class="c">// no index problems if one subscriber removes another.</span>
+<span class="c"></span>        <span class="k">var</span> <span class="nx">subs</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">.</span><span class="nx">slice</span><span class="o">();</span>
+
         <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+            <span class="k">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">subs</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
             <span class="k">if</span> <span class="o">(!</span><span class="nx">s</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">rebuild</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span>
+                <span class="c">//YAHOO.log(&#39;DEBUG rebuilding array&#39;);</span>
+<span class="c"></span>                <span class="nx">rebuild</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span>
             <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                 <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">silent</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span> <span class="k">this</span><span class="o">.</span><span class="nx">type</span> <span class="o">+</span> <span class="s2">&quot;-&gt;&quot;</span> <span class="o">+</span> <span class="o">(</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span>  <span class="nx">s</span><span class="o">,</span> 
-                                <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span> <span class="o">);</span>
+<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span> <span class="k">this</span><span class="o">.</span><span class="nx">type</span> <span class="o">+</span> <span class="s2">&quot;-&gt;&quot;</span> <span class="o">+</span> <span class="o">(</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span>  <span class="nx">s</span><span class="o">,</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span> <span class="o">);</span>
                 <span class="o">}</span>
 
                 <span class="k">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="nx">s</span><span class="o">.</span><span class="nx">getScope</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">scope</span><span class="o">);</span>
@@ -285,22 +286,19 @@
                         <span class="nx">ret</span> <span class="o">=</span> <span class="nx">s</span><span class="o">.</span><span class="nx">fn</span><span class="o">.</span><span class="nx">call</span><span class="o">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">param</span><span class="o">,</span> <span class="nx">s</span><span class="o">.</span><span class="nx">obj</span><span class="o">);</span>
                     <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">this</span><span class="o">.</span><span class="nx">lastError</span> <span class="o">=</span> <span class="nx">e</span><span class="o">;</span>
-                        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span> <span class="o">+</span> <span class="s2">&quot; subscriber exception: &quot;</span> <span class="o">+</span> <span class="nx">e</span><span class="o">,</span>
-                                  <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
+<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span> <span class="o">+</span> <span class="s2">&quot; subscriber exception: &quot;</span> <span class="o">+</span> <span class="nx">e</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
                     <span class="o">}</span>
                 <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                     <span class="k">try</span> <span class="o">{</span>
                         <span class="nx">ret</span> <span class="o">=</span> <span class="nx">s</span><span class="o">.</span><span class="nx">fn</span><span class="o">.</span><span class="nx">call</span><span class="o">(</span><span class="nx">scope</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">type</span><span class="o">,</span> <span class="nx">args</span><span class="o">,</span> <span class="nx">s</span><span class="o">.</span><span class="nx">obj</span><span class="o">);</span>
                     <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nx">ex</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">this</span><span class="o">.</span><span class="nx">lastError</span> <span class="o">=</span> <span class="nx">ex</span><span class="o">;</span>
-                        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span> <span class="o">+</span> <span class="s2">&quot; subscriber exception: &quot;</span> <span class="o">+</span> <span class="nx">ex</span><span class="o">,</span>
-                                  <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
+<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span> <span class="o">+</span> <span class="s2">&quot; subscriber exception: &quot;</span> <span class="o">+</span> <span class="nx">ex</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
                 <span class="k">if</span> <span class="o">(</span><span class="kc">false</span> <span class="o">===</span> <span class="nx">ret</span><span class="o">)</span> <span class="o">{</span>
                     <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">silent</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Event cancelled, subscriber &quot;</span> <span class="o">+</span> <span class="nx">i</span> <span class="o">+</span> 
-                                  <span class="s2">&quot; of &quot;</span> <span class="o">+</span> <span class="nx">len</span><span class="o">,</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
+<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Event stopped, sub &quot;</span> <span class="o">+</span> <span class="nx">i</span> <span class="o">+</span> <span class="s2">&quot; of &quot;</span> <span class="o">+</span> <span class="nx">len</span><span class="o">,</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
                     <span class="o">}</span>
 
                     <span class="c">//break;</span>
@@ -309,15 +307,16 @@
             <span class="o">}</span>
         <span class="o">}</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="nx">rebuild</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">newlist</span><span class="o">=[],</span><span class="nx">subs</span><span class="o">=</span><span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">;</span>
-            <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">subs</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">newlist</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">subs</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
-            <span class="o">}</span>
-
-            <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">=</span><span class="nx">newlist</span><span class="o">;</span>
-        <span class="o">}</span>
-
+        
+        <span class="c">// if (rebuild) {</span>
+<span class="c"></span>        <span class="c">//     var newlist=this.,subs=this.subscribers;</span>
+<span class="c"></span>        <span class="c">//     for (i=0,len=subs.length; i&lt;len; i=i+1) {</span>
+<span class="c"></span>        <span class="c">//         // this wasn&#39;t doing anything before</span>
+<span class="c"></span>        <span class="c">//         newlist.push(subs[i]);</span>
+<span class="c"></span>        <span class="c">//     }</span>
+<span class="c"></span>        <span class="c">//     this.subscribers=newlist;</span>
+<span class="c"></span>        <span class="c">// }</span>
+<span class="c"></span>
         <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
     <span class="o">},</span>
 
@@ -327,8 +326,8 @@
 <span class="c">     * @return {int} The number of listeners unsubscribed</span>
 <span class="c">     */</span>
     <span class="nx">unsubscribeAll</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="nx">_delete</span><span class="o">(</span><span class="nx">len</span> <span class="o">-</span> <span class="m">1</span> <span class="o">-</span> <span class="nx">i</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">--)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="nx">_delete</span><span class="o">(</span><span class="nx">i</span><span class="o">);</span>
         <span class="o">}</span>
 
         <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">=[];</span>
@@ -347,7 +346,8 @@
             <span class="nx">delete</span> <span class="nx">s</span><span class="o">.</span><span class="nx">obj</span><span class="o">;</span>
         <span class="o">}</span>
 
-        <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">[</span><span class="nx">index</span><span class="o">]=</span><span class="kc">null</span><span class="o">;</span>
+        <span class="c">// this.subscribers[index]=null;</span>
+<span class="c"></span>        <span class="k">this</span><span class="o">.</span><span class="nx">subscribers</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span> <span class="m">1</span><span class="o">);</span>
     <span class="o">},</span>
 
     <span class="c">/**</span>

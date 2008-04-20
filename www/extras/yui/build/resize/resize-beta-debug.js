@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * @description <p>Makes an element resizable</p>
@@ -530,6 +530,8 @@ var D = YAHOO.util.Dom,
             this._cache.start.left = this._cache.xy[0];
             this._cache.top = this._cache.xy[1];
             this._cache.left = this._cache.xy[0];
+            this.set('height', this._cache.height, true);
+            this.set('width', this._cache.width, true);
         },
         /** 
         * @private
@@ -543,22 +545,6 @@ var D = YAHOO.util.Dom,
             var handle = '_handle_for_' + this._currentHandle;
             this._currentDD.unsubscribe('dragEvent', this[handle], this, true);
             this._currentDD.unsubscribe('mouseUpEvent', this._handleMouseUp, this, true);
-
-            D.removeClass(this._handles[this._currentHandle], this.CSS_HANDLE + '-' + this._currentHandle + '-active');
-            D.removeClass(this._handles[this._currentHandle], this.CSS_HANDLE + '-active');
-
-            this._currentHandle = null;
-            if (!this.get('animate')) {
-                if (this.get('setSize')) {
-                    YAHOO.log('Setting Height and Width', 'info', 'Resize');
-                    this.set('height', this._cache.height);
-                    this.set('width', this._cache.width);
-                } else {
-                    YAHOO.log('Setting Height and Width silently', 'info', 'Resize');
-                    this.set('height', this._cache.height, true);
-                    this.set('width', this._cache.width, true);
-                }
-            }
 
             if (this._proxy) {
                 YAHOO.log('Hide Proxy Element', 'info', 'Resize');
@@ -578,30 +564,40 @@ var D = YAHOO.util.Dom,
                 }
             }
 
-            D.removeClass(this._wrap, this.CSS_RESIZING);
             if (this.get('hover')) {
-                YAHOO.log('Adding hover class', 'info', 'Resize');
                 D.addClass(this._wrap, this.CSS_HOVER);
             }
             if (this._status) {
-                YAHOO.log('Hiding Status Box', 'info', 'Resize');
                 D.setStyle(this._status, 'display', 'none');
             }
             if (this.browser.ie) {
                 YAHOO.log('Resetting IE onselectstart function', 'info', 'Resize');
                 document.body.onselectstart = this._ieSelectBack;
             }
+
+            if (this.browser.ie) {
+                D.removeClass(this._wrap, this.CSS_RESIZE);
+            }
+
             for (var i in this._handles) {
                 if (Lang.hasOwnProperty(this._handles, i)) {
-                    YAHOO.log('Removing active class', 'info', 'Resize');
                     D.removeClass(this._handles[i], this.CSS_HANDLE + '-active');
                 }
             }
             if (this.get('hover') && !this._active) {
-                YAHOO.log('Adding Hover Class', 'info', 'Resize');
                 D.addClass(this._wrap, this.CSS_HOVER);
             }
+            D.removeClass(this._wrap, this.CSS_RESIZING);
+
+            D.removeClass(this._handles[this._currentHandle], this.CSS_HANDLE + '-' + this._currentHandle + '-active');
+            D.removeClass(this._handles[this._currentHandle], this.CSS_HANDLE + '-active');
+
+            if (this.browser.ie) {
+                D.addClass(this._wrap, this.CSS_RESIZE);
+            }
+
             this._resizeEvent = null;
+            this._currentHandle = null;
         },
         /** 
         * @private
@@ -678,6 +674,12 @@ var D = YAHOO.util.Dom,
                 if ((oh != h) || (ow != w)) {
                     t = 0;
                     l = 0;
+                    if (oh != h) {
+                        ow = this._cache.width;
+                    }
+                    if (ow != w) {
+                        oh = this._cache.height;
+                    }
                 }
             }
             return [oh, ow, t, l];
@@ -735,11 +737,12 @@ var D = YAHOO.util.Dom,
         * @param {Number} t The new top setting.
         * @param {Number} l The new left setting.
         * @param {Boolean} force Resize the element (used for proxy resize).
+        * @param {Boolean} silent Don't fire the beforeResize Event.
         * @description Resizes the element, wrapper or proxy based on the data from the handlers.
         * @return {<a href="YAHOO.util.Resize.html">YAHOO.util.Resize</a>} The Resize instance
         */
-        resize: function(ev, h, w, t, l, force) {
-            YAHOO.log('Resize: ' + h + ',' + w, 'info', 'Resize');
+        resize: function(ev, h, w, t, l, force, silent) {
+            YAHOO.log('Resize: ' + h + ',' + w + ',' + t + ',' + l, 'info', 'Resize');
             this._resizeEvent = ev;
             var el = this._wrap, anim = this.get('animate'), set = true;
             if (this._proxy && !force) {
@@ -769,7 +772,6 @@ var D = YAHOO.util.Dom,
                 l = D.getX(el);
             }
 
-            this._updateStatus(h, w, t, l);
             
 
             if (this._positioned) {
@@ -793,8 +795,8 @@ var D = YAHOO.util.Dom,
                             }
                         }
                         if (this.get('maxY')) {
-                            if ((t + h) > this.get('maxY')) {
-                                t = (this.get('maxY') - h);
+                            if (t > this.get('maxY')) {
+                                t = this.get('maxY');
                             }
                         }
                     }
@@ -812,12 +814,17 @@ var D = YAHOO.util.Dom,
                     }
                 }
             }
-            YAHOO.log('beforeResize', 'info', 'Resize');
-            var beforeReturn = this.fireEvent('beforeResize', { ev: 'beforeResize', target: this, height: h, width: w, top: t, left: l });
-            if (beforeReturn === false) {
-                YAHOO.log('Resized cancelled because befireResize returned false', 'info', 'Resize');
-                return false;
+            if (!silent) {
+                YAHOO.log('beforeResize', 'info', 'Resize');
+                var beforeReturn = this.fireEvent('beforeResize', { ev: 'beforeResize', target: this, height: h, width: w, top: t, left: l });
+                if (beforeReturn === false) {
+                    YAHOO.log('Resized cancelled because befireResize returned false', 'info', 'Resize');
+                    return false;
+                }
             }
+
+            this._updateStatus(h, w, t, l);
+
             if (this._positioned) {
                 if (this._proxy && force) {
                     //Do nothing
@@ -1573,6 +1580,9 @@ var D = YAHOO.util.Dom,
             if (this._proxy) {
                 this._proxy.parentNode.removeChild(this._proxy);
             }
+            if (this._status) {
+                this._status.parentNode.removeChild(this._status);
+            }
             if (this.dd) {
                 this.dd.unreg();
                 D.removeClass(this._wrap, this.CSS_DRAG);
@@ -1637,4 +1647,4 @@ var D = YAHOO.util.Dom,
 
 })();
 
-YAHOO.register("resize", YAHOO.util.Resize, {version: "2.5.0", build: "895"});
+YAHOO.register("resize", YAHOO.util.Resize, {version: "2.5.1", build: "984"});

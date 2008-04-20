@@ -64,13 +64,15 @@
 }
 
 .inprogress {position:absolute;} /* transitional progressive enhancement state */
+
+.yui-dt-liner {white-space:nowrap;}
 </style>
 </head>
 
 <body class="yui-skin-sam">
-<h1>Interactively Showing and Hiding Columns</h1>
+<h1>Showing, Hiding, and Reordering Columns</h1>
 
-<p>This example uses the SimpleDialog and Button widgets to interactively show and hide Columns.</p>
+<p>This example uses the Dialog and Button widgets to interactively show and hide Columns. Columns are also reorderable via built-in integration with the Drag and Drop Utility.</p>
 
 <div id="dt-example">
     <div id="dt-options"><a id="dt-options-link" href="fallbacklink.html">Table Options</a></div>
@@ -94,9 +96,10 @@
 <script type="text/javascript">
 var loader = new YAHOO.util.YUILoader();
 loader.insert({
-    require: ["fonts", "container", "button", "datatable"],
+    require: ["fonts", "dragdrop", "container", "button", "datatable"],
     base: '../../build/',
     filter: 'debug',
+    allowRollup: false,
     onSuccess: function() {
         YAHOO.example.ColumnShowHide = new function() {
             // Define Columns
@@ -118,15 +121,57 @@ loader.insert({
             };
     
             // Create DataTable
-            var myDT = this.myDataTable = new YAHOO.widget.DataTable("columnshowhide", myColumnDefs, this.myDataSource);
-
-            // Define handler functions for the SimpleDialog
-            this.showDlg = function(e, myDlg) {
+            var myDT = this.myDataTable = new YAHOO.widget.DataTable("columnshowhide", myColumnDefs, this.myDataSource, {draggableColumns:true});
+                        
+            // Shows dialog, creating one when necessary
+            this.newCols = true;
+            this.showDlg = function(e) {
                 YAHOO.util.Event.stopEvent(e);
-                this.show();
-                this.center();
+
+                if(this.newCols) {
+                    // Populate Dialog
+                    // Using a template to create elements for the SimpleDialog
+                    var allColumns = myDT.getColumnSet().keys;
+                    var elPicker = YAHOO.util.Dom.get("dt-dlg-picker");
+                    var elTemplateCol = document.createElement("div");
+                    YAHOO.util.Dom.addClass(elTemplateCol, "dt-dlg-pickercol");
+                    var elTemplateKey = elTemplateCol.appendChild(document.createElement("span"));
+                    YAHOO.util.Dom.addClass(elTemplateKey, "dt-dlg-pickerkey");
+                    var elTemplateBtns = elTemplateCol.appendChild(document.createElement("span"));
+                    YAHOO.util.Dom.addClass(elTemplateBtns, "dt-dlg-pickerbtns");
+                    var onclickObj = {fn:this.handleButtonClick, obj:this, scope:false };
+                    
+                    // Create one section in the SimpleDialog for each Column
+                    var elColumn, elKey, elButton, oButtonGrp;
+                    for(var i=0,l=allColumns.length;i<l;i++) {
+                        var oColumn = allColumns[i];
+                        
+                        // Use the template
+                        elColumn = elTemplateCol.cloneNode(true);
+                        
+                        // Write the Column key
+                        elKey = elColumn.firstChild;
+                        elKey.innerHTML = oColumn.getKey();
+                        
+                        // Create a ButtonGroup
+                        oButtonGrp = new YAHOO.widget.ButtonGroup({ 
+                                        id: "buttongrp"+i, 
+                                        name: oColumn.getKey(), 
+                                        container: elKey.nextSibling
+                        });
+                        oButtonGrp.addButtons([
+                            { label: "Show", value: "Show", checked: ((!oColumn.hidden)), onclick: onclickObj},
+                            { label: "Hide", value: "Hide", checked: ((oColumn.hidden)), onclick: onclickObj}
+                        ]);
+                                        
+                        elPicker.appendChild(elColumn);
+                    }
+                    this.newCols = false;
+            	}
+                this.myDlg.show();
+                this.myDlg.center();
             };
-            this.hideDlg = function(e, myDlg) {
+            this.hideDlg = function(e) {
                 this.hide();
             };
             this.handleButtonClick = function(e, oSelf) {
@@ -139,56 +184,29 @@ loader.insert({
                     // Shows a Column
                     oSelf.myDataTable.showColumn(sKey);
                 }
-            }
-            
-            // Use a template to create elements for the SimpleDialog
-            var allColumns = myDT.getColumnSet().keys;
-            var elPicker = YAHOO.util.Dom.get("dt-dlg-picker");
-            var elTemplateCol = document.createElement("div");
-            YAHOO.util.Dom.addClass(elTemplateCol, "dt-dlg-pickercol");
-            var elTemplateKey = elTemplateCol.appendChild(document.createElement("span"));
-            YAHOO.util.Dom.addClass(elTemplateKey, "dt-dlg-pickerkey");
-            var elTemplateBtns = elTemplateCol.appendChild(document.createElement("span"));
-            YAHOO.util.Dom.addClass(elTemplateBtns, "dt-dlg-pickerbtns");
-            var onclickObj = {fn:this.handleButtonClick, obj:this, scope:false };
-            
-            // Create one section in the SimpleDialog for each Column
-            var elColumn, elKey, elButton;
-            for(var i=0,l=allColumns.length;i<l;i++) {
-                // Use the template
-                elColumn = elTemplateCol.cloneNode(true);
-                
-                // Write the Column key
-                elKey = elColumn.firstChild;
-                elKey.innerHTML = allColumns[i].getKey();
-                
-                // Create a ButtonGroup
-                oButtonGrp = new YAHOO.widget.ButtonGroup({ 
-                                id: "buttongrp"+i, 
-                                name: allColumns[i].getKey(), 
-                                container: elKey.nextSibling
-                });
-                oButtonGrp.addButtons([
-                    { label: "Show", value: "Show", checked: true, onclick: onclickObj},
-                    { label: "Hide", value: "Hide", onclick: onclickObj}
-                ]);
-                                
-                elPicker.appendChild(elColumn);
-            }
+            };
             
             // Create the SimpleDialog
             YAHOO.util.Dom.removeClass("dt-dlg", "inprogress");
             this.myDlg = new YAHOO.widget.SimpleDialog("dt-dlg", {
                     width: "30em",
     			    visible: false,
+    			    modal: true,
     			    buttons: [ 
     					{ text:"Close",  handler:this.hideDlg }
                     ]
     		});
     		this.myDlg.render();
+
+            // Nulls out myDlg to force a new one to be created
+            myDT.subscribe("columnReorderEvent", function(){
+                this.newCols = true;
+                YAHOO.util.Event.purgeElement("dt-dlg-picker", true);
+                YAHOO.util.Dom.get("dt-dlg-picker").innerHTML = "";
+            }, this, true);
     		
     		// Hook up the SimpleDialog to the link
-    		YAHOO.util.Event.addListener("dt-options-link", "click", this.showDlg, this.myDlg, true);
+    		YAHOO.util.Event.addListener("dt-options-link", "click", this.showDlg, this, true);
         };
     }
 });

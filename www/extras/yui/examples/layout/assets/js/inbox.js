@@ -39,11 +39,12 @@
                 {key:"Size", sortable: false, width: 35 }
             ];
             //Create the datasource
+            
             var myDataSource = new YAHOO.util.DataSource(emails);
             myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             myDataSource.responseSchema = {
-                resultsList: ["messages"],
-                fields: ["Date","To","From","Subject","XID","Date","Attachment", 'Size']
+                resultsList: 'messages',
+                fields: ["Date","To","From","Subject",'Size', 'Link', 'Body']
             };
             //Give the DT a custom Height
             var dtH = (h - 27 - YAHOO.example.app.inboxToolbarHeight);
@@ -140,13 +141,15 @@
                 });
                 //On resize, resize the table and set the custom width on the Subject Column
                 layout2.on('resize', function() {
-                    this.getUnitByPosition('top')._setWidth(Dom.get('standard'), this.getSizes().top.w);
-                    this.getUnitByPosition('top')._setWidth(Dom.get('yui-dt0-table'), this.getSizes().top.w);
-                    dataTable.set('height', (this.getSizes().top.h - 27 - YAHOO.example.app.inboxToolbarHeight) + 'px');
-                    dataTable.set('width', (this.getSizes().top.w) + 'px');
-                    dataTable.setColumnWidth(dataTable.getColumn('Subject'), (this.getSizes().top.w - magicNum));
-                    dataTable._syncColWidths();
-                    dataTable._syncScrollPadding();
+                    if (dataTable) {
+                        this.getUnitByPosition('top')._setWidth(Dom.get('standard'), this.getSizes().top.w);
+                        this.getUnitByPosition('top')._setWidth(Dom.get('yui-dt0-table'), this.getSizes().top.w);
+                        dataTable.set('height', (this.getSizes().top.h - 27 - YAHOO.example.app.inboxToolbarHeight) + 'px');
+                        dataTable.set('width', (this.getSizes().top.w) + 'px');
+                        dataTable.setColumnWidth(dataTable.getColumn('Subject'), (this.getSizes().top.w - magicNum));
+                        dataTable._syncColWidths();
+                        dataTable._syncScrollPadding();
+                    }
                 }, layout2, true);
                 layout2.on('render', function() {
                     YAHOO.log('On render create the inbox Toolbar', 'info', 'inbox.js');

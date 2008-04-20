@@ -240,6 +240,7 @@ p.loggerButton {text-align:center;}
 #exampleToc ul li.selected a { color:#fff; }
 #exampleToc ul li a { display:block; padding:2px 2px 2px 10px; text-decoration:none; }
 #exampleToc ul li a:hover { color:#fff; background:#e60; }
+#exampleToc ul li.selected a code { color:#fff; }
 
 /*theater page styles*/
 .theater h1 {border-bottom:1px dashed #CCC; margin-bottom:1em;padding-bottom:.2em;}

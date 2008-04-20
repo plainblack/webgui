@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Event Utility&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Event Utility&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_event.html">event</a>
@@ -368,7 +368,9 @@
                                        <span class="nx">override</span><span class="o">:</span>   <span class="nx">p_override</span><span class="o">,</span> 
                                        <span class="nx">checkReady</span><span class="o">:</span> <span class="nx">checkContent</span> <span class="o">});</span>
                 <span class="o">}</span>
+
                 <span class="nx">retryCount</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">POLL_RETRYS</span><span class="o">;</span>
+
                 <span class="k">this</span><span class="o">.</span><span class="nx">startInterval</span><span class="o">();</span>
             <span class="o">},</span>
 
@@ -471,8 +473,7 @@
             <span class="nx">addListener</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="nx">sType</span><span class="o">,</span> <span class="nx">fn</span><span class="o">,</span> <span class="nx">obj</span><span class="o">,</span> <span class="nx">override</span><span class="o">)</span> <span class="o">{</span>
 
                 <span class="k">if</span> <span class="o">(!</span><span class="nx">fn</span> <span class="o">||</span> <span class="o">!</span><span class="nx">fn</span><span class="o">.</span><span class="nx">call</span><span class="o">)</span> <span class="o">{</span>
-<span class="c">// throw new TypeError(sType + &quot; addListener call failed, callback undefined&quot;);</span>
-<span class="c"></span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="nx">sType</span> <span class="o">+</span> <span class="s2">&quot; addListener call failed, invalid callback&quot;</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
+<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="nx">sType</span> <span class="o">+</span> <span class="s2">&quot; addListener failed, invalid callback&quot;</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="s2">&quot;Event&quot;</span><span class="o">);</span>
                     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
                 <span class="o">}</span>
 
@@ -606,11 +607,12 @@
 <span class="c">             */</span>
             <span class="nx">fireLegacyEvent</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">e</span><span class="o">,</span> <span class="nx">legacyIndex</span><span class="o">)</span> <span class="o">{</span>
                 <span class="c">// this.logger.debug(&quot;fireLegacyEvent &quot; + legacyIndex);</span>
-<span class="c"></span>                <span class="k">var</span> <span class="nx">ok</span><span class="o">=</span><span class="kc">true</span><span class="o">,</span><span class="nx">le</span><span class="o">,</span><span class="nx">lh</span><span class="o">,</span><span class="nx">li</span><span class="o">,</span><span class="nx">scope</span><span class="o">,</span><span class="nx">ret</span><span class="o">;</span>
+<span class="c"></span>                <span class="k">var</span> <span class="nx">ok</span><span class="o">=</span><span class="kc">true</span><span class="o">,</span> <span class="nx">le</span><span class="o">,</span> <span class="nx">lh</span><span class="o">,</span> <span class="nx">li</span><span class="o">,</span> <span class="nx">scope</span><span class="o">,</span> <span class="nx">ret</span><span class="o">;</span>
                 
-                <span class="nx">lh</span> <span class="o">=</span> <span class="nx">legacyHandlers</span><span class="o">[</span><span class="nx">legacyIndex</span><span class="o">];</span>
-                <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">lh</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">li</span> <span class="o">=</span> <span class="nx">lh</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                <span class="nx">lh</span> <span class="o">=</span> <span class="nx">legacyHandlers</span><span class="o">[</span><span class="nx">legacyIndex</span><span class="o">].</span><span class="nx">slice</span><span class="o">();</span>
+                <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">lh</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c">// for (var i in lh.length) {</span>
+<span class="c"></span>                    <span class="nx">li</span> <span class="o">=</span> <span class="nx">lh</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                     <span class="k">if</span> <span class="o">(</span> <span class="nx">li</span> <span class="o">&amp;&amp;</span> <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">WFN</span><span class="o">]</span> <span class="o">)</span> <span class="o">{</span>
                         <span class="nx">scope</span> <span class="o">=</span> <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">ADJ_SCOPE</span><span class="o">];</span>
                         <span class="nx">ret</span> <span class="o">=</span> <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">WFN</span><span class="o">].</span><span class="nx">call</span><span class="o">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">e</span><span class="o">);</span>
@@ -689,7 +691,7 @@
                 <span class="c">// The el argument can be an array of elements or element ids.</span>
 <span class="c"></span>                <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span> <span class="k">this</span><span class="o">.</span><span class="nx">_isValidCollection</span><span class="o">(</span><span class="nx">el</span><span class="o">))</span> <span class="o">{</span>
                     <span class="k">var</span> <span class="nx">ok</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">el</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">el</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">--)</span> <span class="o">{</span>
                         <span class="nx">ok</span> <span class="o">=</span> <span class="o">(</span> <span class="k">this</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">el</span><span class="o">[</span><span class="nx">i</span><span class="o">],</span> <span class="nx">sType</span><span class="o">,</span> <span class="nx">fn</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">ok</span> <span class="o">);</span>
                     <span class="o">}</span>
                     <span class="k">return</span> <span class="nx">ok</span><span class="o">;</span>
@@ -703,15 +705,15 @@
 
                 <span class="k">if</span> <span class="o">(</span><span class="s2">&quot;unload&quot;</span> <span class="o">==</span> <span class="nx">sType</span><span class="o">)</span> <span class="o">{</span>
 
-                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">unloadListeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">++)</span> <span class="o">{</span>
+                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">unloadListeners</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">--)</span> <span class="o">{</span>
                         <span class="nx">li</span> <span class="o">=</span> <span class="nx">unloadListeners</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                         <span class="k">if</span> <span class="o">(</span><span class="nx">li</span> <span class="o">&amp;&amp;</span> 
                             <span class="nx">li</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">==</span> <span class="nx">el</span> <span class="o">&amp;&amp;</span> 
                             <span class="nx">li</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">==</span> <span class="nx">sType</span> <span class="o">&amp;&amp;</span> 
                             <span class="nx">li</span><span class="o">[</span><span class="m">2</span><span class="o">]</span> <span class="o">==</span> <span class="nx">fn</span><span class="o">)</span> <span class="o">{</span>
-                                <span class="c">//unloadListeners.splice(i, 1);</span>
-<span class="c"></span>                                <span class="nx">unloadListeners</span><span class="o">[</span><span class="nx">i</span><span class="o">]=</span><span class="kc">null</span><span class="o">;</span>
-                                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+                                <span class="nx">unloadListeners</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">i</span><span class="o">,</span> <span class="m">1</span><span class="o">);</span>
+                                <span class="c">// unloadListeners[i]=null;</span>
+<span class="c"></span>                                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
                         <span class="o">}</span>
                     <span class="o">}</span>
 
@@ -745,14 +747,15 @@
                     <span class="k">var</span> <span class="nx">llist</span> <span class="o">=</span> <span class="nx">legacyHandlers</span><span class="o">[</span><span class="nx">legacyIndex</span><span class="o">];</span>
                     <span class="k">if</span> <span class="o">(</span><span class="nx">llist</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">llist</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                            <span class="nx">li</span> <span class="o">=</span> <span class="nx">llist</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                        <span class="c">// for (i in llist.length) {</span>
+<span class="c"></span>                            <span class="nx">li</span> <span class="o">=</span> <span class="nx">llist</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                             <span class="k">if</span> <span class="o">(</span><span class="nx">li</span> <span class="o">&amp;&amp;</span> 
                                 <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">EL</span><span class="o">]</span> <span class="o">==</span> <span class="nx">el</span> <span class="o">&amp;&amp;</span> 
                                 <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">TYPE</span><span class="o">]</span> <span class="o">==</span> <span class="nx">sType</span> <span class="o">&amp;&amp;</span> 
                                 <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">FN</span><span class="o">]</span> <span class="o">==</span> <span class="nx">fn</span><span class="o">)</span> <span class="o">{</span>
-                                    <span class="c">//llist.splice(i, 1);</span>
-<span class="c"></span>                                    <span class="nx">llist</span><span class="o">[</span><span class="nx">i</span><span class="o">]=</span><span class="kc">null</span><span class="o">;</span>
-                                    <span class="k">break</span><span class="o">;</span>
+                                    <span class="nx">llist</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">i</span><span class="o">,</span> <span class="m">1</span><span class="o">);</span>
+                                    <span class="c">// llist[i]=null;</span>
+<span class="c"></span>                                    <span class="k">break</span><span class="o">;</span>
                             <span class="o">}</span>
                         <span class="o">}</span>
                     <span class="o">}</span>
@@ -769,9 +772,9 @@
                 <span class="c">// removed the wrapped handler</span>
 <span class="c"></span>                <span class="nx">delete</span> <span class="nx">listeners</span><span class="o">[</span><span class="nx">index</span><span class="o">][</span><span class="k">this</span><span class="o">.</span><span class="nx">WFN</span><span class="o">];</span>
                 <span class="nx">delete</span> <span class="nx">listeners</span><span class="o">[</span><span class="nx">index</span><span class="o">][</span><span class="k">this</span><span class="o">.</span><span class="nx">FN</span><span class="o">];</span>
-                <span class="c">//listeners.splice(index, 1);</span>
-<span class="c"></span>                <span class="nx">listeners</span><span class="o">[</span><span class="nx">index</span><span class="o">]=</span><span class="kc">null</span><span class="o">;</span>
-
+                <span class="nx">listeners</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span> <span class="m">1</span><span class="o">);</span>
+                <span class="c">// listeners[index]=null;</span>
+<span class="c"></span>
                 <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
 
             <span class="o">},</span>
@@ -1000,7 +1003,7 @@
 <span class="c">             * @private</span>
 <span class="c">             */</span>
             <span class="nx">_getCacheIndex</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="nx">sType</span><span class="o">,</span> <span class="nx">fn</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">listeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">l</span><span class="o">=</span><span class="nx">listeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">l</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                     <span class="k">var</span> <span class="nx">li</span> <span class="o">=</span> <span class="nx">listeners</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                     <span class="k">if</span> <span class="o">(</span> <span class="nx">li</span>                 <span class="o">&amp;&amp;</span> 
                          <span class="nx">li</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">FN</span><span class="o">]</span> <span class="o">==</span> <span class="nx">fn</span>  <span class="o">&amp;&amp;</span> 
@@ -1055,8 +1058,7 @@
 <span class="c"></span>                             <span class="o">!</span><span class="nx">o</span><span class="o">.</span><span class="nx">alert</span>              <span class="o">&amp;&amp;</span> <span class="c">// o is not a window</span>
 <span class="c"></span>                             <span class="k">typeof</span> <span class="nx">o</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">!==</span> <span class="s2">&quot;undefined&quot;</span> <span class="o">);</span>
                 <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nx">ex</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;_isValidCollection error, assuming that &quot;</span> <span class="o">+</span>
-                <span class="s2">&quot; this is a cross frame problem and not a collection&quot;</span><span class="o">,</span> <span class="s2">&quot;warn&quot;</span><span class="o">);</span>
+                    <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;node access error (xframe?)&quot;</span><span class="o">,</span> <span class="s2">&quot;warn&quot;</span><span class="o">);</span>
                     <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
                 <span class="o">}</span>
 
@@ -1153,8 +1155,15 @@
 <span class="c">             */</span>
             <span class="nx">_tryPreloadAttach</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
 
+                <span class="k">if</span> <span class="o">(</span><span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span> <span class="o">===</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">retryCount</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
+                    <span class="nx">clearInterval</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_interval</span><span class="o">);</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_interval</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="o">}</span>
+
                 <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">locked</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+                    <span class="k">return</span><span class="o">;</span>
                 <span class="o">}</span>
 
                 <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">isIE</span><span class="o">)</span> <span class="o">{</span>
@@ -1163,7 +1172,7 @@
 <span class="c"></span>                    <span class="c">// issue.</span>
 <span class="c"></span>                    <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">DOMReady</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">this</span><span class="o">.</span><span class="nx">startInterval</span><span class="o">();</span>
-                        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+                        <span class="k">return</span><span class="o">;</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
 
@@ -1177,7 +1186,7 @@
 <span class="c"></span>                <span class="c">// tested appropriately</span>
 <span class="c"></span>                <span class="k">var</span> <span class="nx">tryAgain</span> <span class="o">=</span> <span class="o">!</span><span class="nx">loadComplete</span><span class="o">;</span>
                 <span class="k">if</span> <span class="o">(!</span><span class="nx">tryAgain</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">tryAgain</span> <span class="o">=</span> <span class="o">(</span><span class="nx">retryCount</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">);</span>
+                    <span class="nx">tryAgain</span> <span class="o">=</span> <span class="o">(</span><span class="nx">retryCount</span> <span class="o">&gt;</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">);</span>
                 <span class="o">}</span>
 
                 <span class="c">// onAvailable</span>
@@ -1195,32 +1204,20 @@
                     <span class="nx">item</span><span class="o">.</span><span class="nx">fn</span><span class="o">.</span><span class="nx">call</span><span class="o">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">item</span><span class="o">.</span><span class="nx">obj</span><span class="o">);</span>
                 <span class="o">};</span>
 
-                <span class="k">var</span> <span class="nx">i</span><span class="o">,</span><span class="nx">len</span><span class="o">,</span><span class="nx">item</span><span class="o">,</span><span class="nx">el</span><span class="o">;</span>
+                <span class="k">var</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">len</span><span class="o">,</span> <span class="nx">item</span><span class="o">,</span> <span class="nx">el</span><span class="o">,</span> <span class="nx">ready</span><span class="o">=[];</span>
 
-                <span class="c">// onAvailable</span>
-<span class="c"></span>                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c">// onAvailable onContentReady</span>
+<span class="c"></span>                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                     <span class="nx">item</span> <span class="o">=</span> <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">item</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">item</span><span class="o">.</span><span class="nx">checkReady</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">item</span><span class="o">)</span> <span class="o">{</span>
                         <span class="nx">el</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getEl</span><span class="o">(</span><span class="nx">item</span><span class="o">.</span><span class="nx">id</span><span class="o">);</span>
                         <span class="k">if</span> <span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
-                            <span class="nx">executeItem</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="nx">item</span><span class="o">);</span>
-                            <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-                        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                            <span class="nx">notAvail</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">item</span><span class="o">);</span>
-                        <span class="o">}</span>
-                    <span class="o">}</span>
-                <span class="o">}</span>
-
-                <span class="c">// onContentReady</span>
-<span class="c"></span>                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">item</span> <span class="o">=</span> <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">item</span> <span class="o">&amp;&amp;</span> <span class="nx">item</span><span class="o">.</span><span class="nx">checkReady</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="nx">el</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getEl</span><span class="o">(</span><span class="nx">item</span><span class="o">.</span><span class="nx">id</span><span class="o">);</span>
-
-                        <span class="k">if</span> <span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">{</span>
-                            <span class="c">// The element is available, but not necessarily ready</span>
-<span class="c"></span>                            <span class="c">// @todo should we test parentNode.nextSibling?</span>
-<span class="c"></span>                            <span class="k">if</span> <span class="o">(</span><span class="nx">loadComplete</span> <span class="o">||</span> <span class="nx">el</span><span class="o">.</span><span class="nx">nextSibling</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="nx">item</span><span class="o">.</span><span class="nx">checkReady</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="k">if</span> <span class="o">(</span><span class="nx">loadComplete</span> <span class="o">||</span> <span class="nx">el</span><span class="o">.</span><span class="nx">nextSibling</span> <span class="o">||</span> <span class="o">!</span><span class="nx">tryAgain</span><span class="o">)</span> <span class="o">{</span>
+                                    <span class="nx">ready</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">item</span><span class="o">);</span>
+                                    <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                                <span class="o">}</span>
+                            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                                 <span class="nx">executeItem</span><span class="o">(</span><span class="nx">el</span><span class="o">,</span> <span class="nx">item</span><span class="o">);</span>
                                 <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                             <span class="o">}</span>
@@ -1229,20 +1226,31 @@
                         <span class="o">}</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
+                
+                <span class="c">// make sure onContentReady fires after onAvailable</span>
+<span class="c"></span>                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">ready</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">=</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">item</span> <span class="o">=</span> <span class="nx">ready</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                    <span class="nx">executeItem</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">getEl</span><span class="o">(</span><span class="nx">item</span><span class="o">.</span><span class="nx">id</span><span class="o">),</span> <span class="nx">item</span><span class="o">);</span>
+                <span class="o">}</span>
 
-                <span class="nx">retryCount</span> <span class="o">=</span> <span class="o">(</span><span class="nx">notAvail</span><span class="o">.</span><span class="nx">length</span> <span class="o">===</span> <span class="m">0</span><span class="o">)</span> <span class="o">?</span> <span class="m">0</span> <span class="o">:</span> <span class="nx">retryCount</span> <span class="o">-</span> <span class="m">1</span><span class="o">;</span>
+
+                <span class="nx">retryCount</span><span class="o">--;</span>
 
                 <span class="k">if</span> <span class="o">(</span><span class="nx">tryAgain</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="c">// we may need to strip the nulled out items here</span>
-<span class="c"></span>                    <span class="k">this</span><span class="o">.</span><span class="nx">startInterval</span><span class="o">();</span>
+                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">--)</span> <span class="o">{</span>
+                        <span class="nx">item</span> <span class="o">=</span> <span class="nx">onAvailStack</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                        <span class="k">if</span> <span class="o">(!</span><span class="nx">item</span> <span class="o">||</span> <span class="o">!</span><span class="nx">item</span><span class="o">.</span><span class="nx">id</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">onAvailStack</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">i</span><span class="o">,</span> <span class="m">1</span><span class="o">);</span>
+                        <span class="o">}</span>
+                    <span class="o">}</span>
+
+                    <span class="k">this</span><span class="o">.</span><span class="nx">startInterval</span><span class="o">();</span>
                 <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                     <span class="nx">clearInterval</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_interval</span><span class="o">);</span>
                     <span class="k">this</span><span class="o">.</span><span class="nx">_interval</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="o">}</span>
 
                 <span class="k">this</span><span class="o">.</span><span class="nx">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-
-                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
 
             <span class="o">},</span>
 
@@ -1262,9 +1270,9 @@
                 <span class="k">var</span> <span class="nx">oEl</span> <span class="o">=</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">el</span><span class="o">))</span> <span class="o">?</span> <span class="k">this</span><span class="o">.</span><span class="nx">getEl</span><span class="o">(</span><span class="nx">el</span><span class="o">)</span> <span class="o">:</span> <span class="nx">el</span><span class="o">;</span>
                 <span class="k">var</span> <span class="nx">elListeners</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getListeners</span><span class="o">(</span><span class="nx">oEl</span><span class="o">,</span> <span class="nx">sType</span><span class="o">),</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">len</span><span class="o">;</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">elListeners</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">elListeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span> <span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">elListeners</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">i</span><span class="o">--)</span> <span class="o">{</span>
                         <span class="k">var</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">elListeners</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-                        <span class="k">this</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">oEl</span><span class="o">,</span> <span class="nx">l</span><span class="o">.</span><span class="nx">type</span><span class="o">,</span> <span class="nx">l</span><span class="o">.</span><span class="nx">fn</span><span class="o">,</span> <span class="nx">l</span><span class="o">.</span><span class="nx">index</span><span class="o">);</span>
+                        <span class="k">this</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">oEl</span><span class="o">,</span> <span class="nx">l</span><span class="o">.</span><span class="nx">type</span><span class="o">,</span> <span class="nx">l</span><span class="o">.</span><span class="nx">fn</span><span class="o">);</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
 
@@ -1305,7 +1313,7 @@
 
                 <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">j</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">j</span><span class="o">&lt;</span><span class="nx">searchLists</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">j</span><span class="o">=</span><span class="nx">j</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
                     <span class="k">var</span> <span class="nx">searchList</span> <span class="o">=</span> <span class="nx">searchLists</span><span class="o">[</span><span class="nx">j</span><span class="o">];</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">searchList</span> <span class="o">&amp;&amp;</span> <span class="nx">searchList</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">searchList</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">searchList</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span> <span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
                             <span class="k">var</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">searchList</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                             <span class="k">if</span> <span class="o">(</span> <span class="nx">l</span>  <span class="o">&amp;&amp;</span> <span class="nx">l</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">EL</span><span class="o">]</span> <span class="o">===</span> <span class="nx">oEl</span> <span class="o">&amp;&amp;</span> 
@@ -1335,11 +1343,12 @@
 <span class="c">             */</span>
             <span class="nx">_unload</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
 
-                <span class="k">var</span> <span class="nx">EU</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">j</span><span class="o">,</span> <span class="nx">l</span><span class="o">,</span> <span class="nx">len</span><span class="o">,</span> <span class="nx">index</span><span class="o">;</span>
+                <span class="k">var</span> <span class="nx">EU</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">,</span> <span class="nx">i</span><span class="o">,</span> <span class="nx">j</span><span class="o">,</span> <span class="nx">l</span><span class="o">,</span> <span class="nx">len</span><span class="o">,</span> <span class="nx">index</span><span class="o">,</span>
+                         <span class="nx">ul</span> <span class="o">=</span> <span class="nx">unloadListeners</span><span class="o">.</span><span class="nx">slice</span><span class="o">();</span>
 
                 <span class="c">// execute and clear stored unload listeners</span>
 <span class="c"></span>                <span class="k">for</span> <span class="o">(</span><span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">unloadListeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">l</span> <span class="o">=</span> <span class="nx">unloadListeners</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
+                    <span class="nx">l</span> <span class="o">=</span> <span class="nx">ul</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
                     <span class="k">if</span> <span class="o">(</span><span class="nx">l</span><span class="o">)</span> <span class="o">{</span>
                         <span class="k">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="nb">window</span><span class="o">;</span>
                         <span class="k">if</span> <span class="o">(</span><span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">ADJ_SCOPE</span><span class="o">])</span> <span class="o">{</span>
@@ -1350,7 +1359,7 @@
                             <span class="o">}</span>
                         <span class="o">}</span>
                         <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">FN</span><span class="o">].</span><span class="nx">call</span><span class="o">(</span><span class="nx">scope</span><span class="o">,</span> <span class="nx">EU</span><span class="o">.</span><span class="nx">getEvent</span><span class="o">(</span><span class="nx">e</span><span class="o">,</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">EL</span><span class="o">]),</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">UNLOAD_OBJ</span><span class="o">]</span> <span class="o">);</span>
-                        <span class="nx">unloadListeners</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                        <span class="nx">ul</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                         <span class="nx">l</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span>
                         <span class="nx">scope</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span>
                     <span class="o">}</span>
@@ -1365,15 +1374,12 @@
 <span class="c"></span>                <span class="c">// at least some listeners between page refreshes, potentially causing</span>
 <span class="c"></span>                <span class="c">// errors during page load (mouseover listeners firing before they</span>
 <span class="c"></span>                <span class="c">// should if the user moves the mouse at the correct moment).</span>
-<span class="c"></span>                <span class="k">if</span> <span class="o">(</span><span class="nx">listeners</span> <span class="o">&amp;&amp;</span> <span class="nx">listeners</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">j</span> <span class="o">=</span> <span class="nx">listeners</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span>
-                    <span class="k">while</span> <span class="o">(</span><span class="nx">j</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="nx">index</span> <span class="o">=</span> <span class="nx">j</span><span class="o">-</span><span class="m">1</span><span class="o">;</span>
-                        <span class="nx">l</span> <span class="o">=</span> <span class="nx">listeners</span><span class="o">[</span><span class="nx">index</span><span class="o">];</span>
+<span class="c"></span>                <span class="k">if</span> <span class="o">(</span><span class="nx">listeners</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">for</span> <span class="o">(</span><span class="nx">j</span><span class="o">=</span><span class="nx">listeners</span><span class="o">.</span><span class="nx">length</span><span class="o">-</span><span class="m">1</span><span class="o">;</span> <span class="nx">j</span><span class="o">&gt;-</span><span class="m">1</span><span class="o">;</span> <span class="nx">j</span><span class="o">--)</span> <span class="o">{</span>
+                        <span class="nx">l</span> <span class="o">=</span> <span class="nx">listeners</span><span class="o">[</span><span class="nx">j</span><span class="o">];</span>
                         <span class="k">if</span> <span class="o">(</span><span class="nx">l</span><span class="o">)</span> <span class="o">{</span>
-                            <span class="nx">EU</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">EL</span><span class="o">],</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">TYPE</span><span class="o">],</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">FN</span><span class="o">],</span> <span class="nx">index</span><span class="o">);</span>
+                            <span class="nx">EU</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">EL</span><span class="o">],</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">TYPE</span><span class="o">],</span> <span class="nx">l</span><span class="o">[</span><span class="nx">EU</span><span class="o">.</span><span class="nx">FN</span><span class="o">],</span> <span class="nx">j</span><span class="o">);</span>
                         <span class="o">}</span> 
-                        <span class="nx">j</span><span class="o">--;</span>
                     <span class="o">}</span>
                     <span class="nx">l</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span>
                 <span class="o">}</span>
@@ -1506,14 +1512,15 @@
 <span class="c"></span>        <span class="c">// it is safe to do so.</span>
 <span class="c"></span>        <span class="k">if</span> <span class="o">(</span><span class="nx">EU</span><span class="o">.</span><span class="nx">isIE</span><span class="o">)</span> <span class="o">{</span>
 
-            <span class="c">// Process onAvailable/onContentReady items when when the </span>
+            <span class="c">// Process onAvailable/onContentReady items when the </span>
 <span class="c"></span>            <span class="c">// DOM is ready.</span>
 <span class="c"></span>            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">.</span><span class="nx">onDOMReady</span><span class="o">(</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">.</span><span class="nx">_tryPreloadAttach</span><span class="o">,</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+            
+            <span class="k">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s1">&#39;p&#39;</span><span class="o">);</span>  
 
             <span class="nx">EU</span><span class="o">.</span><span class="nx">_dri</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="o">(</span><span class="k">function</span><span class="o">()</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s1">&#39;p&#39;</span><span class="o">);</span>  
                 <span class="k">try</span> <span class="o">{</span>
                     <span class="c">// throws an error if doc is not ready</span>
 <span class="c"></span>                    <span class="nx">n</span><span class="o">.</span><span class="nx">doScroll</span><span class="o">(</span><span class="s1">&#39;left&#39;</span><span class="o">);</span>
@@ -1522,7 +1529,6 @@
                     <span class="nx">EU</span><span class="o">.</span><span class="nx">_ready</span><span class="o">();</span>
                     <span class="nx">n</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nx">ex</span><span class="o">)</span> <span class="o">{</span> 
-                    <span class="nx">n</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="o">}</span>
             <span class="o">},</span> <span class="nx">EU</span><span class="o">.</span><span class="nx">POLL_INTERVAL</span><span class="o">);</span> 
 

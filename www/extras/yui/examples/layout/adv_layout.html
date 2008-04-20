@@ -44,7 +44,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: Layout Manager (beta): Complex Application</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -222,7 +223,7 @@
                     tar = null;
                 }
                 //Make sure we are a link in the list's 
-                if (YAHOO.util.Selector.test(tar, '#folder_list ul li a')) {
+                if (tar && YAHOO.util.Selector.test(tar, '#folder_list ul li a')) {
                     //if the href is a '#' then select the proper tab and change it's label
                     if (tar && tar.getAttribute('href', 2) == '#') {
                         YAHOO.util.Dom.removeClass(YAHOO.util.Selector.query('#folder_list li'), 'selected');
@@ -694,11 +695,12 @@
                 {key:"Size", sortable: false, width: 35 }
             ];
             //Create the datasource
+            
             var myDataSource = new YAHOO.util.DataSource(emails);
             myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             myDataSource.responseSchema = {
-                resultsList: ["messages"],
-                fields: ["Date","To","From","Subject","XID","Date","Attachment", 'Size']
+                resultsList: 'messages',
+                fields: ["Date","To","From","Subject",'Size', 'Link', 'Body']
             };
             //Give the DT a custom Height
             var dtH = (h - 27 - YAHOO.example.app.inboxToolbarHeight);
@@ -795,13 +797,15 @@
                 });
                 //On resize, resize the table and set the custom width on the Subject Column
                 layout2.on('resize', function() {
-                    this.getUnitByPosition('top')._setWidth(Dom.get('standard'), this.getSizes().top.w);
-                    this.getUnitByPosition('top')._setWidth(Dom.get('yui-dt0-table'), this.getSizes().top.w);
-                    dataTable.set('height', (this.getSizes().top.h - 27 - YAHOO.example.app.inboxToolbarHeight) + 'px');
-                    dataTable.set('width', (this.getSizes().top.w) + 'px');
-                    dataTable.setColumnWidth(dataTable.getColumn('Subject'), (this.getSizes().top.w - magicNum));
-                    dataTable._syncColWidths();
-                    dataTable._syncScrollPadding();
+                    if (dataTable) {
+                        this.getUnitByPosition('top')._setWidth(Dom.get('standard'), this.getSizes().top.w);
+                        this.getUnitByPosition('top')._setWidth(Dom.get('yui-dt0-table'), this.getSizes().top.w);
+                        dataTable.set('height', (this.getSizes().top.h - 27 - YAHOO.example.app.inboxToolbarHeight) + 'px');
+                        dataTable.set('width', (this.getSizes().top.w) + 'px');
+                        dataTable.setColumnWidth(dataTable.getColumn('Subject'), (this.getSizes().top.w - magicNum));
+                        dataTable._syncColWidths();
+                        dataTable._syncScrollPadding();
+                    }
                 }, layout2, true);
                 layout2.on('render', function() {
                     YAHOO.log('On render create the inbox Toolbar', 'info', 'inbox.js');
@@ -1168,8 +1172,6 @@
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/layout.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

@@ -18,12 +18,11 @@
 <link rel="stylesheet" type="text/css" href="../../build/profilerviewer/assets/skins/sam/profilerviewer.css" />
 <link rel="stylesheet" type="text/css" href="../../build/calendar/assets/skins/sam/calendar.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
-<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
-<script type="text/javascript" src="../../build/event/event-min.js"></script>
-<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
 <script type="text/javascript" src="../../build/yuiloader/yuiloader-beta-min.js"></script>
 <script type="text/javascript" src="../../build/profiler/profiler-beta-min.js"></script>
+<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
 <script type="text/javascript" src="../../build/profilerviewer/profilerviewer-beta-min.js"></script>
 <script type="text/javascript" src="../../build/calendar/calendar-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
@@ -53,7 +52,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: ProfilerViewer Control (beta): ProfilerViewer Internationalization: German</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -81,6 +81,18 @@
 	<h2 class="first">Adding a German Translation for the ProfilerViewer UI:</h2>
 
 <p>Customizing the <a href="http://developer.yahoo.com/yui/profilerviewer/">ProfilerViewer</a> UI for non-English languages is easy.  In the example below, we've applied a German translation provided by Christian Heilmann to the ProfilerViewer.</p>
+
+<p>This example has the following dependencies:</p>
+
+<textarea name="code" class="HTML" cols="60" rows="1"><link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/http://yui.yahooapis.com/2.5.1//build/calendar/assets/skins/sam/calendar.css"> 
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.1/build/profilerviewer/assets/skins/sam/profilerviewer.css">
+
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/calendar/calendar.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/yuiloader/yuiloader-beta-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/profiler/profiler-beta-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/profilerviewer/profilerviewer-beta-min.js"></script></textarea>
 
 <p>All of the interface's language strings live in the static member <code>YAHOO.widget.ProfilerViewer.STRINGS</code>.  Customizing the interface simply involves modifying or replacing that object prior to creating your ProfilerViewer instance.</p>
 
@@ -128,8 +140,6 @@
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/profilerviewer.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

@@ -14,6 +14,19 @@
    templates
  - add: GalleryFile now sets GalleryAlbum thumbnail if the Album doesn't yet
    have one and a File is saved.
+ - The getEditForm code was refactored out of WebGUI::Workflow::Activity and
+   put into WebGUI::HTMLForm.  Now any WebGUI code can dynamically generate
+   tabless forms.
+ - Rewrote the commerce system from the ground up.
+ - Added a new donation asset which allows visitors to donate arbitrary
+   amounts of money using the new commerce system.
+ - Merged all the old shipping plugins into one "Flat Rate" shipping plugin.
+   See gotchas.
+ - fix: Fwd: lazy guys bug report about the product system
+ - fix: Processing a Cash/Check Order
+ - Rewrote Event Manager fromthe ground up.
+ - Added WebGUI.str javascript class with sprintf and trim methods.
+
 
 7.5.10
  - fix: Syntax error in GetCsMail
@@ -155,6 +168,7 @@
  - prevent HTML and Macro injection in usernames
  - Fixed a problem that caused all Cron job parameters to return an empty hash
    ref.
+ - fixed: Running WebGUI Tests on Windows (William McKee, Knowmad Technologies)
 
 7.4.26
  - fixed: rich text editor image uploads deleted immediately

@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_datatable.html">datatable</a>
@@ -460,6 +460,7 @@
         <span class="k">else</span> <span class="o">{</span>
             <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Could not add Records with data &quot;</span> <span class="o">+</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">aData</span><span class="o">),</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">},</span>
 
@@ -499,63 +500,29 @@
 <span class="c">     * @return {YAHOO.widget.Record[]} An array of Record instances.</span>
 <span class="c">     */</span>
     <span class="nx">setRecords</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">aData</span><span class="o">,</span> <span class="nx">index</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">aData</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">Rec</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Record</span><span class="o">,</span>
-                <span class="nx">spliceParams</span> <span class="o">=</span> <span class="o">[</span><span class="nx">index</span><span class="o">,</span><span class="m">0</span><span class="o">],</span>
-                <span class="nx">i</span> <span class="o">=</span> <span class="nx">aData</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">,</span>
-                <span class="nx">r</span><span class="o">;</span>
+        <span class="k">var</span> <span class="nx">Rec</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Record</span><span class="o">,</span>
+            <span class="nx">a</span>     <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isArray</span><span class="o">(</span><span class="nx">aData</span><span class="o">)</span> <span class="o">?</span> <span class="nx">aData</span> <span class="o">:</span> <span class="o">[</span><span class="nx">aData</span><span class="o">],</span>
+            <span class="nx">added</span> <span class="o">=</span> <span class="o">[],</span>
+            <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">a</span><span class="o">.</span><span class="nx">length</span><span class="o">,</span> <span class="nx">j</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
 
-            <span class="c">// build up a parameter array for a single call to splice in</span>
-<span class="c"></span>            <span class="c">// the new records.</span>
-<span class="c"></span>            <span class="k">for</span><span class="o">(;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">;</span> <span class="o">--</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
-                <span class="c">// If the data in aData isn&#39;t valid, use the existing</span>
-<span class="c"></span>                <span class="c">// record to avoid harming valid records</span>
-<span class="c"></span>                <span class="nx">r</span> <span class="o">=</span> <span class="nx">aData</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">aData</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span> <span class="o">?</span>
-                                <span class="k">new</span> <span class="nx">Rec</span><span class="o">(</span><span class="nx">aData</span><span class="o">[</span><span class="nx">i</span><span class="o">])</span> <span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="nx">_records</span><span class="o">[</span><span class="nx">i</span><span class="o">];</span>
-                <span class="k">if</span> <span class="o">(</span><span class="nx">r</span><span class="o">)</span> <span class="o">{</span>
-                    <span class="nx">spliceParams</span><span class="o">[</span><span class="nx">i</span><span class="o">+</span><span class="m">2</span><span class="o">]</span> <span class="o">=</span> <span class="nx">r</span><span class="o">;</span>
-                <span class="o">}</span>
+        <span class="nx">index</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span><span class="m">10</span><span class="o">)|</span><span class="m">0</span><span class="o">;</span>
+
+        <span class="k">for</span><span class="o">(;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="o">;</span> <span class="o">++</span><span class="nx">i</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="k">typeof</span> <span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">]</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">])</span> <span class="o">{</span>
+                <span class="nx">added</span><span class="o">[</span><span class="nx">j</span><span class="o">++]</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_records</span><span class="o">[</span><span class="nx">index</span> <span class="o">+</span> <span class="nx">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Rec</span><span class="o">(</span><span class="nx">a</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
             <span class="o">}</span>
-
-            <span class="c">// We need to explicitly set the last record because splice doesn&#39;t</span>
-<span class="c"></span>            <span class="c">// honor start indexes higher than the current length.</span>
-<span class="c"></span>            <span class="k">this</span><span class="o">.</span><span class="nx">_records</span><span class="o">[</span><span class="nx">index</span> <span class="o">+</span> <span class="nx">spliceParams</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">3</span><span class="o">]</span> <span class="o">=</span>
-                <span class="nx">spliceParams</span><span class="o">[</span><span class="nx">spliceParams</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">1</span><span class="o">];</span>
-
-            <span class="c">// Set the number of records to change (length minus first 2</span>
-<span class="c"></span>            <span class="c">// placeholders).  This must be done here because the end of aData</span>
-<span class="c"></span>            <span class="c">// may have contained invalid record data so we avoid increasing</span>
-<span class="c"></span>            <span class="c">// _records.length incorrectly.  And we do need to set the last</span>
-<span class="c"></span>            <span class="c">// record, although we just did that.</span>
-<span class="c"></span>            <span class="nx">spliceParams</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">=</span> <span class="nx">spliceParams</span><span class="o">.</span><span class="nx">length</span> <span class="o">-</span> <span class="m">2</span><span class="o">;</span>
-
-            <span class="c">// Call splice.apply to simulate a single update to _records</span>
-<span class="c"></span>            <span class="c">// rather than looping through the new records and setting them</span>
-<span class="c"></span>            <span class="c">// to the index one by one.  Use the spliceParams array to get</span>
-<span class="c"></span>            <span class="c">// the splice method to apply.  A bit convoluted, I know.</span>
-<span class="c"></span>            <span class="nx">spliceParams</span><span class="o">.</span><span class="nx">splice</span><span class="o">.</span><span class="nx">apply</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_records</span><span class="o">,</span><span class="nx">spliceParams</span><span class="o">);</span>
-
-            <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;recordsSet&quot;</span><span class="o">,{</span><span class="nx">records</span><span class="o">:</span><span class="nx">spliceParams</span><span class="o">,</span><span class="nx">data</span><span class="o">:</span><span class="nx">aData</span><span class="o">});</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Set &quot;</span> <span class="o">+</span> <span class="nx">spliceParams</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">+</span> <span class="s2">&quot; Record(s) at index &quot;</span> <span class="o">+</span>
-                      <span class="nx">spliceParams</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">+</span> <span class="s2">&quot; through &quot;</span> <span class="o">+</span>
-                      <span class="o">(</span><span class="nx">spliceParams</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">+</span> <span class="nx">spliceParams</span><span class="o">[</span><span class="m">1</span><span class="o">])</span><span class="c">/* + &quot; with data &quot; + YAHOO.lang.dump(aData)*/</span><span class="o">,</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-
-            <span class="c">// return the records that were set.  The first two indexes</span>
-<span class="c"></span>            <span class="c">// in spliceParams are the start index and length, so return</span>
-<span class="c"></span>            <span class="c">// everything starting at index 2</span>
-<span class="c"></span>            <span class="k">return</span> <span class="nx">spliceParams</span><span class="o">.</span><span class="nx">slice</span><span class="o">(</span><span class="m">2</span><span class="o">);</span>
         <span class="o">}</span>
-        <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="nx">aData</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">aData</span><span class="o">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nb">Object</span><span class="o">))</span> <span class="o">{</span>
-            <span class="k">var</span> <span class="nx">oRecord</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_setRecord</span><span class="o">(</span><span class="nx">aData</span><span class="o">);</span>
-            <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;recordsSetEvent&quot;</span><span class="o">,{</span><span class="nx">records</span><span class="o">:[</span><span class="nx">oRecord</span><span class="o">],</span><span class="nx">data</span><span class="o">:</span><span class="nx">aData</span><span class="o">});</span>
-            <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Set 1 Record at index &quot;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span>
-                    <span class="s2">&quot; with data &quot;</span> <span class="o">+</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">aData</span><span class="o">),</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
-            <span class="k">return</span> <span class="nx">oRecord</span><span class="o">;</span>
-        <span class="o">}</span>
-        <span class="k">else</span> <span class="o">{</span>
+
+        <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;recordsSet&quot;</span><span class="o">,{</span><span class="nx">records</span><span class="o">:</span><span class="nx">added</span><span class="o">,</span><span class="nx">data</span><span class="o">:</span><span class="nx">aData</span><span class="o">});</span>
+        <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Set &quot;</span><span class="o">+</span><span class="nx">j</span><span class="o">+</span><span class="s2">&quot; Record(s) at index &quot;</span><span class="o">+</span><span class="nx">index</span><span class="o">,</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span>
+                  <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="nx">a</span><span class="o">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">added</span><span class="o">.</span><span class="nx">length</span><span class="o">)</span> <span class="o">{</span>
             <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Could not set Records with data &quot;</span> <span class="o">+</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">aData</span><span class="o">),</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
         <span class="o">}</span>
+
+        <span class="k">return</span> <span class="nx">added</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">1</span> <span class="o">?</span> <span class="nx">added</span> <span class="o">:</span> <span class="nx">added</span><span class="o">[</span><span class="m">0</span><span class="o">];</span>
     <span class="o">},</span>
 
     <span class="c">/**</span>
@@ -683,11 +650,7 @@
     <span class="nx">deleteRecord</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">index</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">if</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="nx">index</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="m">1</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">index</span> <span class="o">&lt;</span> <span class="k">this</span><span class="o">.</span><span class="nx">getLength</span><span class="o">()))</span> <span class="o">{</span>
             <span class="c">// Copy data from the Record for the event that gets fired later</span>
-<span class="c"></span>            <span class="k">var</span> <span class="nx">oRecordData</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getRecord</span><span class="o">(</span><span class="nx">index</span><span class="o">).</span><span class="nx">getData</span><span class="o">();</span>
-            <span class="k">var</span> <span class="nx">oData</span> <span class="o">=</span> <span class="o">{};</span>
-            <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">oRecordData</span><span class="o">)</span> <span class="o">{</span>
-                <span class="nx">oData</span><span class="o">[</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">oRecordData</span><span class="o">[</span><span class="nx">key</span><span class="o">];</span>
-            <span class="o">}</span>
+<span class="c"></span>            <span class="k">var</span> <span class="nx">oData</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DataTable</span><span class="o">.</span><span class="nx">_cloneObject</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">getRecord</span><span class="o">(</span><span class="nx">index</span><span class="o">).</span><span class="nx">getData</span><span class="o">());</span>
             
             <span class="k">this</span><span class="o">.</span><span class="nx">_deleteRecord</span><span class="o">(</span><span class="nx">index</span><span class="o">);</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;recordDeleteEvent&quot;</span><span class="o">,{</span><span class="nx">data</span><span class="o">:</span><span class="nx">oData</span><span class="o">,</span><span class="nx">index</span><span class="o">:</span><span class="nx">index</span><span class="o">});</span>
@@ -709,6 +672,7 @@
 <span class="c">     * @method deleteRecords</span>
 <span class="c">     * @param index {Number} Record&#39;s RecordSet position index.</span>
 <span class="c">     * @param range {Number} (optional) How many Records to delete.</span>
+<span class="c">     * @return {Object[]} An array of copies of the data held by the deleted Records.     </span>
 <span class="c">     */</span>
     <span class="nx">deleteRecords</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span> <span class="nx">range</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">if</span><span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isNumber</span><span class="o">(</span><span class="nx">range</span><span class="o">))</span> <span class="o">{</span>
@@ -718,12 +682,9 @@
             <span class="k">var</span> <span class="nx">recordsToDelete</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getRecords</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span> <span class="nx">range</span><span class="o">);</span>
             <span class="c">// Copy data from each Record for the event that gets fired later</span>
 <span class="c"></span>            <span class="k">var</span> <span class="nx">deletedData</span> <span class="o">=</span> <span class="o">[];</span>
+            
             <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">recordsToDelete</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span><span class="o">++)</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">oData</span> <span class="o">=</span> <span class="o">{};</span>
-                <span class="k">for</span><span class="o">(</span><span class="k">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">recordsToDelete</span><span class="o">[</span><span class="nx">i</span><span class="o">])</span> <span class="o">{</span>
-                    <span class="nx">oData</span><span class="o">[</span><span class="nx">key</span><span class="o">]</span> <span class="o">=</span> <span class="nx">recordsToDelete</span><span class="o">[</span><span class="nx">i</span><span class="o">][</span><span class="nx">key</span><span class="o">];</span>
-                <span class="o">}</span>
-                <span class="nx">deletedData</span><span class="o">.</span><span class="nx">push</span><span class="o">(</span><span class="nx">oData</span><span class="o">);</span>
+                <span class="nx">deletedData</span><span class="o">[</span><span class="nx">deletedData</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DataTable</span><span class="o">.</span><span class="nx">_cloneObject</span><span class="o">(</span><span class="nx">recordsToDelete</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
             <span class="o">}</span>
             <span class="k">this</span><span class="o">.</span><span class="nx">_deleteRecord</span><span class="o">(</span><span class="nx">index</span><span class="o">,</span> <span class="nx">range</span><span class="o">);</span>
 
@@ -731,9 +692,11 @@
             <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="nx">range</span> <span class="o">+</span> <span class="s2">&quot;Record(s) deleted at index &quot;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span>
                     <span class="s2">&quot; and containing data &quot;</span> <span class="o">+</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">dump</span><span class="o">(</span><span class="nx">deletedData</span><span class="o">),</span> <span class="s2">&quot;info&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
 
+            <span class="k">return</span> <span class="nx">deletedData</span><span class="o">;</span>
         <span class="o">}</span>
         <span class="k">else</span> <span class="o">{</span>
             <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Could not delete Records at index &quot;</span> <span class="o">+</span> <span class="nx">index</span><span class="o">,</span> <span class="s2">&quot;error&quot;</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">toString</span><span class="o">());</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
     <span class="o">},</span>
 

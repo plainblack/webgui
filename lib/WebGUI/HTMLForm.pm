@@ -109,6 +109,73 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
+=head2 dynamicForm ( $formDefinition, $listName, $who ) 
+
+Build a form dynamically from an array of hash refs.  The format is
+based on the definition sub from Asset, Workflow::Activity and
+elements of the ShipDriver and PaymentDriver.
+
+=head3 $formDefinition
+
+An arrayref of hashrefs.  The arrays are processed in order, but the only
+way to guarantee the order of the hashes to tie them with Tie::IxHash.
+
+These fields are allowed in each sub hash
+
+=head4 label
+
+A readable, probably internationalized label.
+
+=head4 hoverHelp
+
+A tooltip that will activate when the label is hovered over.
+
+=head4 fieldType
+
+The kind of HTML form field to build.  This is a lower case version of
+any WebGUI::Form plugin.
+
+=head4 defaultValue
+
+The default value the form field should have if the caller has no value
+for this field.
+
+=head3 $listName
+
+The name of the key in the structure that contains the list of
+fields.  For example, in Workflow Activities, it is called "properties".
+Inside the Shop modules, it is called "fields".
+
+=head3 $who
+
+In order to populate the form with current information from an object,
+you need to it the object.  dynamicForm expects each object to have
+a C<get> method to provide that information.
+
+=cut
+
+sub dynamicForm {
+	my ($self, $formDefinition, $fieldList, $parent) = @_;
+    foreach my $definition (reverse @{$formDefinition}) {
+        my $properties = $definition->{$fieldList};
+        foreach my $fieldname (keys %{$properties}) {
+            my %params;
+            foreach my $key (keys %{$properties->{$fieldname}}) {
+                $params{$key} = $properties->{$fieldname}{$key};
+                if ($fieldname eq "title" && lc($params{$key}) eq "untitled") {
+                    $params{$key} = $formDefinition->[0]{name};
+                }
+            }
+            $params{value} = $parent->get($fieldname);
+            $params{name}  = $fieldname;
+            $self->dynamicField(%params);
+        }
+    }
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 fieldSetEnd ( ) 
 
 Closes a field set that was opened by fieldSetStart();

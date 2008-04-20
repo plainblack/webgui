@@ -1,0 +1,7 @@
+ # Use the program 'html2pod' that comes in this dist, or:
+  use Pod::HTML2Pod;
+  print Pod::HTML2Pod::convert(
+    'file' => 'commerce.html',  # input file
+    'a_href' => 1,  # try converting links
+  );
+

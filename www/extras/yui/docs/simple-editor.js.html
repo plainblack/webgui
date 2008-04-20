@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>editor&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>editor&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_editor.html">editor</a>
@@ -142,7 +142,7 @@
 <span class="c">        * @description The default CSS used in the config for &#39;css&#39;. This way you can add to the config like this: { css: YAHOO.widget.SimpleEditor.prototype._defaultCSS + &#39;ADD MYY CSS HERE&#39; }</span>
 <span class="c">        * @type String</span>
 <span class="c">        */</span>
-        <span class="nx">_defaultCSS</span><span class="o">:</span> <span class="s1">&#39;html { height: 95%; } body { padding: 7px; background-color: #fff; font:13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a { color: blue; text-decoration: underline; cursor: pointer; } .warning-localfile { border-bottom: 1px dashed red !important; } .yui-busy { cursor: wait !important; } img.selected { border: 2px dotted #808080; } img { cursor: pointer !important; border: none; }&#39;</span><span class="o">,</span>
+        <span class="nx">_defaultCSS</span><span class="o">:</span> <span class="s1">&#39;html { height: 95%; } body { padding: 7px; background-color: #fff; font:13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a { color: blue; text-decoration: underline; cursor: text; } .warning-localfile { border-bottom: 1px dashed red !important; } .yui-busy { cursor: wait !important; } img.selected { border: 2px dotted #808080; } img { cursor: pointer !important; border: none; }&#39;</span><span class="o">,</span>
         <span class="c">/**</span>
 <span class="c">        * @property _defaultToolbar</span>
 <span class="c">        * @private</span>
@@ -817,9 +817,23 @@
             <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">ie</span> <span class="o">||</span> <span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">webkit</span> <span class="o">||</span> <span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">opera</span> <span class="o">||</span> <span class="o">(</span><span class="nx">navigator</span><span class="o">.</span><span class="nx">userAgent</span><span class="o">.</span><span class="nx">indexOf</span><span class="o">(</span><span class="s1">&#39;Firefox/1.5&#39;</span><span class="o">)</span> <span class="o">!=</span> <span class="o">-</span><span class="m">1</span><span class="o">))</span> <span class="o">{</span>
                 <span class="c">//Firefox 1.5 doesn&#39;t like setting designMode on an document created with a data url</span>
 <span class="c"></span>                <span class="k">try</span> <span class="o">{</span>
-                    <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">open</span><span class="o">();</span>
-                    <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">write</span><span class="o">(</span><span class="nx">html</span><span class="o">);</span>
-                    <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">close</span><span class="o">();</span>
+                    <span class="c">//Adobe AIR Code</span>
+<span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">air</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">implementation</span><span class="o">.</span><span class="nx">createHTMLDocument</span><span class="o">();</span>
+                        <span class="k">var</span> <span class="nx">origDoc</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">();</span>
+                        <span class="nx">origDoc</span><span class="o">.</span><span class="nx">open</span><span class="o">();</span>
+                        <span class="nx">origDoc</span><span class="o">.</span><span class="nx">close</span><span class="o">();</span>
+                        <span class="nx">doc</span><span class="o">.</span><span class="nx">open</span><span class="o">();</span>
+                        <span class="nx">doc</span><span class="o">.</span><span class="nx">write</span><span class="o">(</span><span class="nx">html</span><span class="o">);</span>
+                        <span class="nx">doc</span><span class="o">.</span><span class="nx">close</span><span class="o">();</span>
+                        <span class="k">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">origDoc</span><span class="o">.</span><span class="nx">importNode</span><span class="o">(</span><span class="nx">doc</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="s2">&quot;html&quot;</span><span class="o">)[</span><span class="m">0</span><span class="o">],</span> <span class="kc">true</span><span class="o">);</span>
+                        <span class="nx">origDoc</span><span class="o">.</span><span class="nx">replaceChild</span><span class="o">(</span><span class="nx">node</span><span class="o">,</span> <span class="nx">origDoc</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="s2">&quot;html&quot;</span><span class="o">)[</span><span class="m">0</span><span class="o">]);</span>
+                        <span class="nx">origDoc</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">_rteLoaded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>               
+                        <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">open</span><span class="o">();</span>
+                        <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">write</span><span class="o">(</span><span class="nx">html</span><span class="o">);</span>
+                        <span class="k">this</span><span class="o">.</span><span class="nx">_getDoc</span><span class="o">().</span><span class="nx">close</span><span class="o">();</span>
+                    <span class="o">}</span>
                 <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nx">e</span><span class="o">)</span> <span class="o">{</span>
                     <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s1">&#39;Setting doc failed.. (_setInitialContent)&#39;</span><span class="o">,</span> <span class="s1">&#39;error&#39;</span><span class="o">,</span> <span class="s1">&#39;SimpleEditor&#39;</span><span class="o">);</span>
                     <span class="c">//Safari will only be here if we are hidden</span>
@@ -1525,7 +1539,10 @@
             <span class="nx">switch</span> <span class="o">(</span><span class="nx">ev</span><span class="o">.</span><span class="nx">keyCode</span><span class="o">)</span> <span class="o">{</span>
                 <span class="nx">case</span> <span class="m">84</span><span class="o">:</span> <span class="c">//Focus Toolbar Header -- Ctrl + Shift + T</span>
 <span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="nx">ev</span><span class="o">.</span><span class="nx">shiftKey</span> <span class="o">&amp;&amp;</span> <span class="nx">ev</span><span class="o">.</span><span class="nx">ctrlKey</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="k">this</span><span class="o">.</span><span class="nx">toolbar</span><span class="o">.</span><span class="nx">_titlebar</span><span class="o">.</span><span class="nx">firstChild</span><span class="o">.</span><span class="nx">focus</span><span class="o">();</span>
+                        <span class="k">var</span> <span class="nx">h</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">toolbar</span><span class="o">.</span><span class="nx">getElementsByTagName</span><span class="o">(</span><span class="s1">&#39;h2&#39;</span><span class="o">)[</span><span class="m">0</span><span class="o">];</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="nx">h</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="nx">h</span><span class="o">.</span><span class="nx">focus</span><span class="o">();</span>
+                        <span class="o">}</span>
                         <span class="nx">Event</span><span class="o">.</span><span class="nx">stopEvent</span><span class="o">(</span><span class="nx">ev</span><span class="o">);</span>
                         <span class="nx">doExec</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
                     <span class="o">}</span>
@@ -1970,7 +1987,7 @@
         <span class="nx">browser</span><span class="o">:</span> <span class="k">function</span><span class="o">()</span> <span class="o">{</span>
             <span class="k">var</span> <span class="nx">br</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">env</span><span class="o">.</span><span class="nx">ua</span><span class="o">;</span>
             <span class="c">//Check for webkit3</span>
-<span class="c"></span>            <span class="k">if</span> <span class="o">(</span><span class="nx">br</span><span class="o">.</span><span class="nx">webkit</span> <span class="o">&gt;</span> <span class="m">420</span><span class="o">)</span> <span class="o">{</span>
+<span class="c"></span>            <span class="k">if</span> <span class="o">(</span><span class="nx">br</span><span class="o">.</span><span class="nx">webkit</span> <span class="o">&gt;=</span> <span class="m">420</span><span class="o">)</span> <span class="o">{</span>
                 <span class="nx">br</span><span class="o">.</span><span class="nx">webkit3</span> <span class="o">=</span> <span class="nx">br</span><span class="o">.</span><span class="nx">webkit</span><span class="o">;</span>
             <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                 <span class="nx">br</span><span class="o">.</span><span class="nx">webkit3</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
@@ -2326,7 +2343,7 @@
 <span class="c">            * @type String</span>
 <span class="c">            */</span>            
             <span class="k">this</span><span class="o">.</span><span class="nx">setAttributeConfig</span><span class="o">(</span><span class="s1">&#39;extracss&#39;</span><span class="o">,</span> <span class="o">{</span>
-                <span class="nx">value</span><span class="o">:</span> <span class="nx">attr</span><span class="o">.</span><span class="nx">css</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="o">,</span>
+                <span class="nx">value</span><span class="o">:</span> <span class="nx">attr</span><span class="o">.</span><span class="nx">extracss</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="o">,</span>
                 <span class="nx">writeOnce</span><span class="o">:</span> <span class="kc">true</span>
             <span class="o">});</span>
 
@@ -2528,16 +2545,24 @@
             <span class="o">}</span>
             <span class="k">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">;</span>
             <span class="k">if</span> <span class="o">(!</span><span class="k">this</span><span class="o">.</span><span class="nx">_blankImageLoaded</span><span class="o">)</span> <span class="o">{</span>
-                <span class="k">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s1">&#39;div&#39;</span><span class="o">);</span>
-                <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">position</span> <span class="o">=</span> <span class="s1">&#39;absolute&#39;</span><span class="o">;</span>
-                <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">top</span> <span class="o">=</span> <span class="s1">&#39;-9999px&#39;</span><span class="o">;</span>
-                <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">left</span> <span class="o">=</span> <span class="s1">&#39;-9999px&#39;</span><span class="o">;</span>
-                <span class="nx">div</span><span class="o">.</span><span class="nx">className</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">CLASS_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;-blankimage&#39;</span><span class="o">;</span>
-                <span class="nb">document</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">appendChild</span><span class="o">(</span><span class="nx">div</span><span class="o">);</span>
-                <span class="nx">img</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">div</span><span class="o">,</span> <span class="s1">&#39;background-image&#39;</span><span class="o">);</span>
-                <span class="nx">img</span> <span class="o">=</span> <span class="nx">img</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="s1">&#39;url(&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">).</span><span class="nx">replace</span><span class="o">(</span><span class="s1">&#39;)&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">).</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&quot;/g</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
-                <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;blankimage&#39;</span><span class="o">,</span> <span class="nx">img</span><span class="o">);</span>
-                <span class="k">this</span><span class="o">.</span><span class="nx">_blankImageLoaded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">EditorInfo</span><span class="o">.</span><span class="nx">blankImage</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;blankimage&#39;</span><span class="o">,</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">EditorInfo</span><span class="o">.</span><span class="nx">blankImage</span><span class="o">);</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_blankImageLoaded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="k">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s1">&#39;div&#39;</span><span class="o">);</span>
+                    <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">position</span> <span class="o">=</span> <span class="s1">&#39;absolute&#39;</span><span class="o">;</span>
+                    <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">top</span> <span class="o">=</span> <span class="s1">&#39;-9999px&#39;</span><span class="o">;</span>
+                    <span class="nx">div</span><span class="o">.</span><span class="nx">style</span><span class="o">.</span><span class="nx">left</span> <span class="o">=</span> <span class="s1">&#39;-9999px&#39;</span><span class="o">;</span>
+                    <span class="nx">div</span><span class="o">.</span><span class="nx">className</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">CLASS_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;-blankimage&#39;</span><span class="o">;</span>
+                    <span class="nb">document</span><span class="o">.</span><span class="nx">body</span><span class="o">.</span><span class="nx">appendChild</span><span class="o">(</span><span class="nx">div</span><span class="o">);</span>
+                    <span class="nx">img</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">div</span><span class="o">,</span> <span class="s1">&#39;background-image&#39;</span><span class="o">);</span>
+                    <span class="nx">img</span> <span class="o">=</span> <span class="nx">img</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="s1">&#39;url(&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">).</span><span class="nx">replace</span><span class="o">(</span><span class="s1">&#39;)&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">).</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&quot;/g</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
+                    <span class="c">//Adobe AIR Code</span>
+<span class="c"></span>                    <span class="nx">img</span> <span class="o">=</span> <span class="nx">img</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="s1">&#39;app:/&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>                    
+                    <span class="k">this</span><span class="o">.</span><span class="nx">set</span><span class="o">(</span><span class="s1">&#39;blankimage&#39;</span><span class="o">,</span> <span class="nx">img</span><span class="o">);</span>
+                    <span class="k">this</span><span class="o">.</span><span class="nx">_blankImageLoaded</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">EditorInfo</span><span class="o">.</span><span class="nx">blankImage</span> <span class="o">=</span> <span class="nx">img</span><span class="o">;</span>
+                <span class="o">}</span>
             <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                 <span class="nx">img</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;blankimage&#39;</span><span class="o">);</span>
             <span class="o">}</span>
@@ -2599,11 +2624,11 @@
                 <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Event</span><span class="o">.</span><span class="nx">removeListener</span><span class="o">(</span><span class="nx">form</span><span class="o">,</span> <span class="s1">&#39;submit&#39;</span><span class="o">,</span> <span class="nx">self</span><span class="o">.</span><span class="nx">_handleFormSubmit</span><span class="o">);</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">env</span><span class="o">.</span><span class="nx">ua</span><span class="o">.</span><span class="nx">ie</span><span class="o">)</span> <span class="o">{</span>
                     <span class="nx">form</span><span class="o">.</span><span class="nx">fireEvent</span><span class="o">(</span><span class="s2">&quot;onsubmit&quot;</span><span class="o">);</span>
-                    <span class="k">if</span> <span class="o">(</span><span class="nx">tar</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">tar</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">tar</span><span class="o">.</span><span class="nx">disabled</span><span class="o">)</span> <span class="o">{</span>
                         <span class="nx">tar</span><span class="o">.</span><span class="nx">click</span><span class="o">();</span>
                     <span class="o">}</span>
                 <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>  <span class="c">// Gecko, Opera, and Safari</span>
-<span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="nx">tar</span><span class="o">)</span> <span class="o">{</span>
+<span class="c"></span>                    <span class="k">if</span> <span class="o">(</span><span class="nx">tar</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">tar</span><span class="o">.</span><span class="nx">disabled</span><span class="o">)</span> <span class="o">{</span>
                         <span class="nx">tar</span><span class="o">.</span><span class="nx">click</span><span class="o">();</span>
                     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
                         <span class="k">var</span> <span class="nx">oEvent</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createEvent</span><span class="o">(</span><span class="s2">&quot;HTMLEvents&quot;</span><span class="o">);</span>
@@ -2616,19 +2641,6 @@
                         <span class="o">}</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
-                <span class="c">/*</span>
-<span class="c">                if (YAHOO.env.ua.ie || YAHOO.env.ua.webkit) {</span>
-<span class="c">                    if (YAHOO.lang.isFunction(form.submit)) {</span>
-<span class="c">                        form.submit();</span>
-<span class="c">                    } else {</span>
-<span class="c">                        if (YAHOO.lang.isObject(form.submit)) {</span>
-<span class="c">                            form.submit.click();</span>
-<span class="c">                        } else {</span>
-<span class="c">                            YAHOO.log(&#39;Form submit failed because form.submit was not a function. Please change the submit buttons name and id.&#39;, &#39;error&#39;, &#39;SimpleEditor&#39;);</span>
-<span class="c">                        }</span>
-<span class="c">                    }</span>
-<span class="c">                }</span>
-<span class="c">                */</span>
             <span class="o">},</span> <span class="m">200</span><span class="o">);</span>
             
         <span class="o">},</span>
@@ -2702,6 +2714,8 @@
                 <span class="nx">family</span> <span class="o">=</span> <span class="nx">elm</span><span class="o">.</span><span class="nx">getAttribute</span><span class="o">(</span><span class="s1">&#39;face&#39;</span><span class="o">);</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">elm</span><span class="o">,</span> <span class="s1">&#39;font-family&#39;</span><span class="o">))</span> <span class="o">{</span>
                     <span class="nx">family</span> <span class="o">=</span> <span class="nx">Dom</span><span class="o">.</span><span class="nx">getStyle</span><span class="o">(</span><span class="nx">elm</span><span class="o">,</span> <span class="s1">&#39;font-family&#39;</span><span class="o">);</span>
+                    <span class="c">//Adobe AIR Code</span>
+<span class="c"></span>                    <span class="nx">family</span> <span class="o">=</span> <span class="nx">family</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&#39;/g</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>                    
                 <span class="o">}</span>
 
                 <span class="k">if</span> <span class="o">(</span><span class="nx">tag</span><span class="o">.</span><span class="nx">substring</span><span class="o">(</span><span class="m">0</span><span class="o">,</span> <span class="m">1</span><span class="o">)</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="o">)</span> <span class="o">{</span>
@@ -3778,6 +3792,10 @@
             <span class="k">if</span> <span class="o">((</span><span class="nx">markup</span> <span class="o">==</span> <span class="s1">&#39;semantic&#39;</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="nx">markup</span> <span class="o">==</span> <span class="s1">&#39;xhtml&#39;</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="nx">markup</span> <span class="o">==</span> <span class="s1">&#39;css&#39;</span><span class="o">))</span> <span class="o">{</span>
                 <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="k">new</span> <span class="nb">RegExp</span><span class="o">(</span><span class="s1">&#39;&lt;font([^&gt;]*)face=&quot;([^&gt;]*)&quot;&gt;(.*?)&lt;\/font&gt;&#39;</span><span class="o">,</span> <span class="s1">&#39;gi&#39;</span><span class="o">),</span> <span class="s1">&#39;&lt;span $1 style=&quot;font-family: $2;&quot;&gt;$3&lt;/span&gt;&#39;</span><span class="o">);</span>
                 <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&lt;u/gi</span><span class="o">,</span> <span class="s1">&#39;&lt;span style=&quot;text-decoration: underline;&quot;&#39;</span><span class="o">);</span>
+                <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">webkit</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="k">new</span> <span class="nb">RegExp</span><span class="o">(</span><span class="s1">&#39;&lt;span class=&quot;Apple-style-span&quot; style=&quot;font-weight: bold;&quot;&gt;([^&gt;]*)&lt;\/span&gt;&#39;</span><span class="o">,</span> <span class="s1">&#39;gi&#39;</span><span class="o">),</span> <span class="s1">&#39;&lt;strong&gt;$1&lt;/strong&gt;&#39;</span><span class="o">);</span>
+                    <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="k">new</span> <span class="nb">RegExp</span><span class="o">(</span><span class="s1">&#39;&lt;span class=&quot;Apple-style-span&quot; style=&quot;font-style: italic;&quot;&gt;([^&gt;]*)&lt;\/span&gt;&#39;</span><span class="o">,</span> <span class="s1">&#39;gi&#39;</span><span class="o">),</span> <span class="s1">&#39;&lt;em&gt;$1&lt;/em&gt;&#39;</span><span class="o">);</span>
+                <span class="o">}</span>
                 <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/\/u&gt;/gi</span><span class="o">,</span> <span class="s1">&#39;/span&gt;&#39;</span><span class="o">);</span>
                 <span class="k">if</span> <span class="o">(</span><span class="nx">markup</span> <span class="o">==</span> <span class="s1">&#39;css&#39;</span><span class="o">)</span> <span class="o">{</span>
                     <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&lt;em([^&gt;]*)&gt;/gi</span><span class="o">,</span> <span class="s1">&#39;&lt;i$1&gt;&#39;</span><span class="o">);</span>
@@ -3886,6 +3904,8 @@
 <span class="c">        */</span>
         <span class="nx">filter_safari</span><span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">html</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">browser</span><span class="o">.</span><span class="nx">webkit</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c">//&lt;span class=&quot;Apple-tab-span&quot; style=&quot;white-space:pre&quot;&gt;	&lt;/span&gt;</span>
+<span class="c"></span>                <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/&lt;span class=&quot;Apple-tab-span&quot; style=&quot;white-space:pre&quot;&gt;([^&gt;])&lt;\/span&gt;/gi</span><span class="o">,</span> <span class="s1">&#39;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&#39;</span><span class="o">);</span>
                 <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/Apple-style-span/gi</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
                 <span class="nx">html</span> <span class="o">=</span> <span class="nx">html</span><span class="o">.</span><span class="nx">replace</span><span class="o">(</span><span class="sr">/style=&quot;line-height: normal;&quot;/gi</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">);</span>
                 <span class="c">//Remove bogus LI&#39;s</span>
@@ -4186,6 +4206,13 @@
 <span class="c">        * @type Object</span>
 <span class="c">        */</span>
         <span class="nx">_instances</span><span class="o">:</span> <span class="o">{},</span>
+        <span class="c">/**</span>
+<span class="c">        * @private</span>
+<span class="c">        * @property blankImage</span>
+<span class="c">        * @description A reference to the blankImage url</span>
+<span class="c">        * @type String </span>
+<span class="c">        */</span>
+        <span class="nx">blankImage</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="o">,</span>
         <span class="c">/**</span>
 <span class="c">        * @private</span>
 <span class="c">        * @property window</span>

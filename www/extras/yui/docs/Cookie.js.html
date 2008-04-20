@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>cookie&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>cookie&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_cookie.html">cookie</a>
@@ -142,7 +142,7 @@
         
         <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">hashParts</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">++){</span>
             <span class="nx">hashPart</span> <span class="o">=</span> <span class="nx">hashParts</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">split</span><span class="o">(</span><span class="s2">&quot;=&quot;</span><span class="o">);</span>
-            <span class="nx">hash</span><span class="o">[</span><span class="nx">hashPart</span><span class="o">[</span><span class="m">0</span><span class="o">]]</span> <span class="o">=</span> <span class="nx">hashPart</span><span class="o">[</span><span class="m">1</span><span class="o">];</span>
+            <span class="nx">hash</span><span class="o">[</span><span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">hashPart</span><span class="o">[</span><span class="m">0</span><span class="o">])]</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">hashPart</span><span class="o">[</span><span class="m">1</span><span class="o">]);</span>
         <span class="o">}</span>
         
         <span class="k">return</span> <span class="nx">hash</span><span class="o">;</span>
@@ -151,25 +151,38 @@
     <span class="c">/**</span>
 <span class="c">     * Parses a cookie string into an object representing all accessible cookies.</span>
 <span class="c">     * @param {String} text The cookie string to parse.</span>
+<span class="c">     * @param {Boolean} decode (Optional) Indicates if the cookie values should be decoded or not. Default is true.</span>
 <span class="c">     * @return {Object} An object containing entries for each accessible cookie.</span>
 <span class="c">     * @method _parseCookieString</span>
 <span class="c">     * @private</span>
 <span class="c">     * @static</span>
 <span class="c">     */</span>
-    <span class="nx">_parseCookieString</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">text</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Object*/</span> <span class="o">{</span>
+    <span class="nx">_parseCookieString</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">text</span> <span class="c">/*:String*/</span><span class="o">,</span> <span class="nx">decode</span> <span class="c">/*:Boolean*/</span><span class="o">)</span> <span class="c">/*:Object*/</span> <span class="o">{</span>
     
-        <span class="k">var</span> <span class="nx">cookies</span> <span class="c">/*:Object*/</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Object</span><span class="o">();</span>
+        <span class="k">var</span> <span class="nx">cookies</span> <span class="c">/*:Object*/</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Object</span><span class="o">();</span>        
         
         <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">text</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nx">text</span><span class="o">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
+        
+            <span class="k">var</span> <span class="nx">decodeValue</span> <span class="o">=</span> <span class="o">(</span><span class="nx">decode</span> <span class="o">===</span> <span class="kc">false</span> <span class="o">?</span> <span class="k">function</span><span class="o">(</span><span class="nx">s</span><span class="o">){</span><span class="k">return</span> <span class="nx">s</span><span class="o">;}</span> <span class="o">:</span> <span class="nb">decodeURIComponent</span><span class="o">);</span>
         
             <span class="k">if</span> <span class="o">(</span><span class="sr">/[^=]+=[^=;]?(?:; [^=]+=[^=]?)?/</span><span class="o">.</span><span class="nx">test</span><span class="o">(</span><span class="nx">text</span><span class="o">)){</span>            
                 <span class="k">var</span> <span class="nx">cookieParts</span> <span class="c">/*:Array*/</span> <span class="o">=</span> <span class="nx">text</span><span class="o">.</span><span class="nx">split</span><span class="o">(</span><span class="sr">/;\s/g</span><span class="o">);</span>
                 <span class="k">var</span> <span class="nx">cookieName</span> <span class="c">/*:String*/</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 <span class="k">var</span> <span class="nx">cookieValue</span> <span class="c">/*:String*/</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="k">var</span> <span class="nx">cookieNameValue</span> <span class="c">/*:Array*/</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
                 
                 <span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">i</span><span class="o">=</span><span class="m">0</span><span class="o">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">cookieParts</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="o">;</span> <span class="nx">i</span><span class="o">++){</span>
-                    <span class="nx">cookieName</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">cookieParts</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">match</span><span class="o">(</span><span class="sr">/([a-z]+)=/i</span><span class="o">)[</span><span class="m">1</span><span class="o">]);</span>
-                    <span class="nx">cookieValue</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">cookieParts</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">substring</span><span class="o">(</span><span class="nx">cookieName</span><span class="o">.</span><span class="nx">length</span><span class="o">+</span><span class="m">1</span><span class="o">));</span>
+                
+                    <span class="c">//check for normally-formatted cookie (name-value)</span>
+<span class="c"></span>                    <span class="nx">cookieNameValue</span> <span class="o">=</span> <span class="nx">cookieParts</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">match</span><span class="o">(</span><span class="sr">/([^=]+)=/i</span><span class="o">);</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="nx">cookieNameValue</span> <span class="k">instanceof</span> <span class="nb">Array</span><span class="o">){</span>
+                        <span class="nx">cookieName</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">cookieNameValue</span><span class="o">[</span><span class="m">1</span><span class="o">]);</span>
+                        <span class="nx">cookieValue</span> <span class="o">=</span> <span class="nx">decodeValue</span><span class="o">(</span><span class="nx">cookieParts</span><span class="o">[</span><span class="nx">i</span><span class="o">].</span><span class="nx">substring</span><span class="o">(</span><span class="nx">cookieName</span><span class="o">.</span><span class="nx">length</span><span class="o">+</span><span class="m">1</span><span class="o">));</span>
+                    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                        <span class="c">//means the cookie does not have an &quot;=&quot;, so treat it as a boolean flag</span>
+<span class="c"></span>                        <span class="nx">cookieName</span> <span class="o">=</span> <span class="nb">decodeURIComponent</span><span class="o">(</span><span class="nx">cookieParts</span><span class="o">[</span><span class="nx">i</span><span class="o">]);</span>
+                        <span class="nx">cookieValue</span> <span class="o">=</span> <span class="nx">cookieName</span><span class="o">;</span>
+                    <span class="o">}</span>
                     <span class="nx">cookies</span><span class="o">[</span><span class="nx">cookieName</span><span class="o">]</span> <span class="o">=</span> <span class="nx">cookieValue</span><span class="o">;</span>
                 <span class="o">}</span>
             <span class="o">}</span>
@@ -261,7 +274,17 @@
 <span class="c">     * @static</span>
 <span class="c">     */</span>
     <span class="nx">getSubs</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">name</span> <span class="c">/*:String*/</span><span class="o">)</span> <span class="c">/*:Object*/</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="nx">name</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">_parseCookieHash</span><span class="o">);</span>    
+        
+        <span class="c">//check cookie name</span>
+<span class="c"></span>        <span class="k">if</span> <span class="o">(!</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">name</span><span class="o">)</span> <span class="o">||</span> <span class="nx">name</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span><span class="o">){</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="o">(</span><span class="s2">&quot;Cookie.getSubs(): Cookie name must be a non-empty string.&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+        
+        <span class="k">var</span> <span class="nx">cookies</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">_parseCookieString</span><span class="o">(</span><span class="nb">document</span><span class="o">.</span><span class="nx">cookie</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">lang</span><span class="o">.</span><span class="nx">isString</span><span class="o">(</span><span class="nx">cookies</span><span class="o">[</span><span class="nx">name</span><span class="o">])){</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="nx">_parseCookieHash</span><span class="o">(</span><span class="nx">cookies</span><span class="o">[</span><span class="nx">name</span><span class="o">]);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
     <span class="o">},</span>
     
     <span class="c">/**</span>

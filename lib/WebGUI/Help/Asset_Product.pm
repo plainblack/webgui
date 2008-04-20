@@ -80,7 +80,7 @@ our $HELP = {
         title   => 'product asset template variables title',
         body    => 'product asset template variables body',
         isa     => [
-            {   namespace => 'Asset_Wobject',
+            {   namespace => 'Asset_Sku',
                 tag       => 'wobject template variables'
             },
         ],

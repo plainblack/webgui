@@ -20,10 +20,10 @@ body {
 <link rel="stylesheet" type="text/css" href="../../build/calendar/assets/skins/sam/calendar.css" />
 <link rel="stylesheet" type="text/css" href="../../build/datatable/assets/skins/sam/datatable.css" />
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="../../build/calendar/calendar.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta.js"></script>
-<script type="text/javascript" src="../../build/datasource/datasource-beta.js"></script>
-<script type="text/javascript" src="../../build/datatable/datatable-beta.js"></script>
+<script type="text/javascript" src="../../build/calendar/calendar-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/datasource/datasource-beta-min.js"></script>
+<script type="text/javascript" src="../../build/datatable/datatable-beta-min.js"></script>
 
 
 <!--begin custom header content for this example-->
@@ -59,40 +59,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
             elCell.innerHTML = "<pre class=\"address\">" + oData + "</pre>";
         };
 
-        // Custom editor for city column to save input on "enter"
-        this.editCity = function(oEditor, oSelf) {
-            var elCell = oEditor.cell;
-            var oRecord = oEditor.record;
-            var oColumn = oEditor.column;
-            var elContainer = oEditor.container;
-            var value = oRecord.getData(oColumn.key);
-
-            // Textbox
-            var elTextbox = elContainer.appendChild(document.createElement("input"));
-            elTextbox.type = "text";
-            elTextbox.style.width = (elCell.offsetWidth + 20) + "px";
-            elTextbox.value = value;
-
-            // Set up a listener
-            YAHOO.util.Event.addListener(elTextbox, "keyup", function(v){
-                // Save on "enter"
-                if(v.keyCode === 13) {
-                    oSelf.saveCellEditor();
-                }
-                // Update the tracker value
-                else {
-                    oSelf._oCellEditor.value = elTextbox.value;
-                }
-            });
-
-            // Select the text
-            elTextbox.select();
-        };
-
         var myColumnDefs = [
             {key:"uneditable"},
             {key:"address", formatter:this.formatAddress, editor:"textarea"},
-            {key:"city", editor:this.editCity},
+            {key:"city", editor:"textbox"},
             {key:"state", editor:"dropdown", editorOptions:{dropdownOptions:YAHOO.example.Data.stateAbbrs}},
             {key:"amount", editor:"textbox", editorOptions:{validator:YAHOO.widget.DataTable.validateNumber}},
             {key:"active", editor:"radio", editorOptions:{radioOptions:["yes","no","maybe"],disableBtns:true}},

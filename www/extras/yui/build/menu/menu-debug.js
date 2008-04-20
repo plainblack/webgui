@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 
 
@@ -2850,8 +2850,18 @@ _onClick: function (p_sType, p_aArgs) {
 			if (bInMenuAnchor && !oItem.cfg.getProperty("target")) {
 	
 				Event.preventDefault(oEvent);
-	
-				oItem.focus();
+				
+
+				if (UA.webkit) {
+				
+					oItem.focus();
+				
+				}
+				else {
+
+					oItem.focusEvent.fire();
+				
+				}
 			
 			}
 	
@@ -4043,106 +4053,37 @@ _onMenuItemConfigChange: function (p_sType, p_aArgs, p_oItem) {
 */
 enforceConstraints: function (type, args, obj) {
 
-    var oParentMenuItem = this.parent,
-        nViewportOffset = Overlay.VIEWPORT_OFFSET,
-        oElement = this.element,
-        oConfig = this.cfg,
-        pos = args[0],
-        offsetHeight = oElement.offsetHeight,
-        offsetWidth = oElement.offsetWidth,
-        viewPortWidth = Dom.getViewportWidth(),
-        viewPortHeight = Dom.getViewportHeight(),
-        nPadding = (oParentMenuItem && 
-            oParentMenuItem.parent instanceof YAHOO.widget.MenuBar) ? 
-            0 : nViewportOffset,
-        aContext = oConfig.getProperty("context"),
-        oContextElement = aContext ? aContext[0] : null,
-        topConstraint,
-        leftConstraint,
-        bottomConstraint,
-        rightConstraint,
-        scrollX,
-        scrollY,
-        x,
-        y;
-    
+	YAHOO.widget.Menu.superclass.enforceConstraints.apply(this, arguments);
+	
+	var oParent = this.parent,
+		oParentMenu,
+		nParentMenuX,
+		nNewX,
+		nX;
+	
+	
+	if (oParent) {
+	
+		oParentMenu = oParent.parent;
 
-    if (offsetWidth < viewPortWidth) {
+		if (!(oParentMenu instanceof YAHOO.widget.MenuBar)) {
+	
+			nParentMenuX = oParentMenu.cfg.getProperty("x");
+			nX = this.cfg.getProperty("x");
+		
+	
+			if (nX < (nParentMenuX + oParent.element.offsetWidth)) {
 
-        x = pos[0];
-        scrollX = Dom.getDocumentScrollLeft();
-        leftConstraint = scrollX + nPadding;
-        rightConstraint = scrollX + viewPortWidth - offsetWidth - nPadding;
-
-        if (x < nViewportOffset) {
-    
-            x = leftConstraint;
-    
-        } else if ((x + offsetWidth) > viewPortWidth) {
-    
-            if(oContextElement &&
-                ((x - oContextElement.offsetWidth) > offsetWidth)) {
-    
-                if (oParentMenuItem && 
-                    oParentMenuItem.parent instanceof YAHOO.widget.MenuBar) {
-    
-                    x = (x - (offsetWidth - oContextElement.offsetWidth));
-    
-                }
-                else {
-    
-                    x = (x - (oContextElement.offsetWidth + offsetWidth));
-    
-                }
-    
-            }
-            else {
-    
-                x = rightConstraint;
-    
-            }
-    
-        }
-    
-    }
-
-
-    if (offsetHeight < viewPortHeight) {
-
-        y = pos[1];
-        scrollY = Dom.getDocumentScrollTop();
-        topConstraint = scrollY + nPadding;
-        bottomConstraint = scrollY + viewPortHeight - offsetHeight - nPadding;
-
-
-
-        if (y < nViewportOffset) {
-    
-            y = topConstraint;
-    
-        } else if (y > bottomConstraint) {
-    
-            if (oContextElement && (y > offsetHeight)) {
-    
-                y = ((y + oContextElement.offsetHeight) - offsetHeight);
-    
-            }
-            else {
-    
-                y = bottomConstraint;
-                
-
-    
-            }
-    
-        }
-
-    }
-
-
-    oConfig.setProperty("x", x, true);
-    oConfig.setProperty("y", y, true);
-    oConfig.setProperty("xy", [x,y], true);
+				nNewX = (nParentMenuX - this.element.offsetWidth);
+			
+				this.cfg.setProperty("x",  nNewX, true);
+				this.cfg.setProperty("xy", [nNewX, (this.cfg.getProperty("y"))], true);
+			
+			}
+		
+		}
+	
+	}
 
 },
 
@@ -6527,7 +6468,7 @@ MenuItem.prototype = {
 
                     if (oAnchor) {
 
-                        sURL = oAnchor.getAttribute("href");
+                        sURL = oAnchor.getAttribute("href", 2);
                         sTarget = oAnchor.getAttribute("target");
 
                         sText = oAnchor.innerHTML;
@@ -9085,4 +9026,4 @@ toString: function() {
 }
     
 }); // END YAHOO.lang.extend
-YAHOO.register("menu", YAHOO.widget.Menu, {version: "2.5.0", build: "895"});
+YAHOO.register("menu", YAHOO.widget.Menu, {version: "2.5.1", build: "984"});

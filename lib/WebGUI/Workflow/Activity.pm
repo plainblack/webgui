@@ -224,28 +224,14 @@ Returns the form that will be used to edit the properties of an activity.
 =cut
 
 sub getEditForm {
-        my $self = shift;
-	my $form = WebGUI::HTMLForm->new($self->session);
-	$form->submit;
-	$form->hidden(name=>"activityId", value=>$self->getId);
-	$form->hidden(name=>"className", value=>$self->get("className"));
-	my $fullDefinition = $self->definition($self->session);
-        foreach my $definition (reverse @{$fullDefinition}) {
-                my $properties = $definition->{properties};
-                foreach my $fieldname (keys %{$properties}) {
-                        my %params;
-                        foreach my $key (keys %{$properties->{$fieldname}}) {
-                                $params{$key} = $properties->{$fieldname}{$key};
-				if ($fieldname eq "title" && lc($params{$key}) eq "untitled") {
-					$params{$key} = $fullDefinition->[0]{name};
-				}
-                        }
-                        $params{value} = $self->get($fieldname);
-                        $params{name} = $fieldname;
-                        $form->dynamicField(%params);
-                }
-        }
-        return $form;
+    my $self = shift;
+    my $form = WebGUI::HTMLForm->new($self->session);
+    $form->submit;
+    $form->hidden(name=>"activityId", value=>$self->getId);
+    $form->hidden(name=>"className", value=>$self->get("className"));
+    my $fullDefinition = $self->definition($self->session);
+    $form->dynamicForm($fullDefinition, "properties", $self);
+    return $form;
 }
 
 #-------------------------------------------------------------------

@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>Calendar&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>Calendar&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_calendar.html">calendar</a>
@@ -968,9 +968,9 @@
 <span class="c">		* @default false</span>
 <span class="c">		*/</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">addProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MULTI_SELECT</span><span class="o">.</span><span class="nx">key</span><span class="o">,</span>	<span class="o">{</span> <span class="nx">value</span><span class="o">:</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MULTI_SELECT</span><span class="o">.</span><span class="nx">value</span><span class="o">,</span> <span class="nx">handler</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">configOptions</span><span class="o">,</span> <span class="nx">validator</span><span class="o">:</span><span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">checkBoolean</span> <span class="o">}</span> <span class="o">);</span>
-	
+
 		<span class="c">/**</span>
-<span class="c">		* The weekday the week begins on. Default is 0 (Sunday).</span>
+<span class="c">		* The weekday the week begins on. Default is 0 (Sunday = 0, Monday = 1 ... Saturday = 6).</span>
 <span class="c">		* @config START_WEEKDAY</span>
 <span class="c">		* @type number</span>
 <span class="c">		* @default 0</span>
@@ -1676,7 +1676,7 @@
 	<span class="nx">renderHeader</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">html</span><span class="o">)</span> <span class="o">{</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Rendering header&quot;</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
 		<span class="k">var</span> <span class="nx">colSpan</span> <span class="o">=</span> <span class="m">7</span><span class="o">;</span>
-		
+
 		<span class="k">var</span> <span class="nx">DEPR_NAV_LEFT</span> <span class="o">=</span> <span class="s2">&quot;us/tr/callt.gif&quot;</span><span class="o">;</span>
 		<span class="k">var</span> <span class="nx">DEPR_NAV_RIGHT</span> <span class="o">=</span> <span class="s2">&quot;us/tr/calrt.gif&quot;</span><span class="o">;</span>	
 		<span class="k">var</span> <span class="nx">defCfg</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">_DEFAULT_CONFIG</span><span class="o">;</span>
@@ -1688,14 +1688,14 @@
 		<span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">SHOW_WEEK_FOOTER</span><span class="o">.</span><span class="nx">key</span><span class="o">))</span> <span class="o">{</span>
 			<span class="nx">colSpan</span> <span class="o">+=</span> <span class="m">1</span><span class="o">;</span>
 		<span class="o">}</span>
-	
+
 		<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;thead&gt;&quot;</span><span class="o">;</span>
 		<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span>		<span class="s2">&quot;&lt;tr&gt;&quot;</span><span class="o">;</span>
 		<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span>			<span class="s1">&#39;&lt;th colspan=&quot;&#39;</span> <span class="o">+</span> <span class="nx">colSpan</span> <span class="o">+</span> <span class="s1">&#39;&quot; class=&quot;&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_HEADER_TEXT</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span><span class="o">;</span>
 		<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span>				<span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_HEADER</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span><span class="o">;</span>
-	
+
 		<span class="k">var</span> <span class="nx">renderLeft</span><span class="o">,</span> <span class="nx">renderRight</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-	
+
 		<span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">parent</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">index</span> <span class="o">===</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
 				<span class="nx">renderLeft</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
@@ -1707,7 +1707,7 @@
 			<span class="nx">renderLeft</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 			<span class="nx">renderRight</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 		<span class="o">}</span>
-	
+
 		<span class="k">if</span> <span class="o">(</span><span class="nx">renderLeft</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">var</span> <span class="nx">leftArrow</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">NAV_ARROW_LEFT</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
 			<span class="c">// Check for deprecated customization - If someone set IMG_ROOT, but didn&#39;t set NAV_ARROW_LEFT, then set NAV_ARROW_LEFT to the old deprecated value</span>
@@ -1783,10 +1783,14 @@
 <span class="c">	*/</span>
 	<span class="nx">renderBody</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">,</span> <span class="nx">html</span><span class="o">)</span> <span class="o">{</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Rendering body&quot;</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">defCfg</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">_DEFAULT_CONFIG</span><span class="o">;</span>
-	
+
+		<span class="k">var</span> <span class="nx">DM</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">,</span>
+			<span class="nx">CAL</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">,</span>
+			<span class="nx">D</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">,</span>
+			<span class="nx">defCfg</span> <span class="o">=</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">_DEFAULT_CONFIG</span><span class="o">;</span>
+
 		<span class="k">var</span> <span class="nx">startDay</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">START_WEEKDAY</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-	
+
 		<span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span> <span class="o">=</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDay</span><span class="o">();</span>
 		<span class="k">if</span> <span class="o">(</span><span class="nx">startDay</span> <span class="o">&gt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span> <span class="o">-=</span> <span class="nx">startDay</span><span class="o">;</span>
@@ -1794,71 +1798,68 @@
 		<span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span> <span class="o">&lt;</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span> <span class="o">+=</span> <span class="m">7</span><span class="o">;</span>
 		<span class="o">}</span>
-		
-		<span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">findMonthEnd</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">).</span><span class="nx">getDate</span><span class="o">();</span>
-		<span class="k">this</span><span class="o">.</span><span class="nx">postMonthDays</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">DISPLAY_DAYS</span><span class="o">-</span><span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span><span class="o">-</span><span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span><span class="o">;</span>
+
+		<span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">findMonthEnd</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">).</span><span class="nx">getDate</span><span class="o">();</span>
+		<span class="k">this</span><span class="o">.</span><span class="nx">postMonthDays</span> <span class="o">=</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">DISPLAY_DAYS</span><span class="o">-</span><span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span><span class="o">-</span><span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span><span class="o">;</span>
+
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span> <span class="o">+</span> <span class="s2">&quot; preciding out-of-month days&quot;</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span> <span class="o">+</span> <span class="s2">&quot; month days&quot;</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">postMonthDays</span> <span class="o">+</span> <span class="s2">&quot; post-month days&quot;</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
-		
-		<span class="nx">workingDate</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">subtract</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">,</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">DAY</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span><span class="o">);</span>
+
+		<span class="nx">workingDate</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">subtract</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">,</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">DAY</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span><span class="o">);</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;Calendar page starts on &quot;</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">,</span> <span class="s2">&quot;render&quot;</span><span class="o">);</span>
 	
-		<span class="k">var</span> <span class="nx">weekNum</span><span class="o">,</span><span class="nx">weekClass</span><span class="o">;</span>
-		<span class="k">var</span> <span class="nx">weekPrefix</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="o">;</span>
-		<span class="k">var</span> <span class="nx">cellPrefix</span> <span class="o">=</span> <span class="s2">&quot;_cell&quot;</span><span class="o">;</span>
-		<span class="k">var</span> <span class="nx">workingDayPrefix</span> <span class="o">=</span> <span class="s2">&quot;wd&quot;</span><span class="o">;</span>
-		<span class="k">var</span> <span class="nx">dayPrefix</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="o">;</span>
-		
-		<span class="k">var</span> <span class="nx">cellRenderers</span><span class="o">;</span>
-		<span class="k">var</span> <span class="nx">renderer</span><span class="o">;</span>
-		
-		<span class="k">var</span> <span class="nx">todayYear</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">();</span>
-		<span class="k">var</span> <span class="nx">todayMonth</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">();</span>
-		<span class="k">var</span> <span class="nx">todayDate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getDate</span><span class="o">();</span>
-		
-		<span class="k">var</span> <span class="nx">useDate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">PAGEDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">hideBlankWeeks</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">HIDE_BLANK_WEEKS</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">showWeekFooter</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">SHOW_WEEK_FOOTER</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">showWeekHeader</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">SHOW_WEEK_HEADER</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">mindate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MINDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">maxdate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MAXDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
-	
+		<span class="k">var</span> <span class="nx">weekNum</span><span class="o">,</span>
+			<span class="nx">weekClass</span><span class="o">,</span>
+			<span class="nx">weekPrefix</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="o">,</span>
+			<span class="nx">cellPrefix</span> <span class="o">=</span> <span class="s2">&quot;_cell&quot;</span><span class="o">,</span>
+			<span class="nx">workingDayPrefix</span> <span class="o">=</span> <span class="s2">&quot;wd&quot;</span><span class="o">,</span>
+			<span class="nx">dayPrefix</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="o">,</span>
+			<span class="nx">cellRenderers</span><span class="o">,</span>
+			<span class="nx">renderer</span><span class="o">,</span>
+			<span class="nx">todayYear</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">(),</span>
+			<span class="nx">todayMonth</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">(),</span>
+			<span class="nx">todayDate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">today</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(),</span>
+			<span class="nx">useDate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">PAGEDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">),</span>
+			<span class="nx">hideBlankWeeks</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">HIDE_BLANK_WEEKS</span><span class="o">.</span><span class="nx">key</span><span class="o">),</span>
+			<span class="nx">showWeekFooter</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">SHOW_WEEK_FOOTER</span><span class="o">.</span><span class="nx">key</span><span class="o">),</span>
+			<span class="nx">showWeekHeader</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">SHOW_WEEK_HEADER</span><span class="o">.</span><span class="nx">key</span><span class="o">),</span>
+			<span class="nx">mindate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MINDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">),</span>
+			<span class="nx">maxdate</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">cfg</span><span class="o">.</span><span class="nx">getProperty</span><span class="o">(</span><span class="nx">defCfg</span><span class="o">.</span><span class="nx">MAXDATE</span><span class="o">.</span><span class="nx">key</span><span class="o">);</span>
+
 		<span class="k">if</span> <span class="o">(</span><span class="nx">mindate</span><span class="o">)</span> <span class="o">{</span>
-			<span class="nx">mindate</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">mindate</span><span class="o">);</span>
+			<span class="nx">mindate</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">mindate</span><span class="o">);</span>
 		<span class="o">}</span>
 		<span class="k">if</span> <span class="o">(</span><span class="nx">maxdate</span><span class="o">)</span> <span class="o">{</span>
-			<span class="nx">maxdate</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">maxdate</span><span class="o">);</span>
+			<span class="nx">maxdate</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">maxdate</span><span class="o">);</span>
 		<span class="o">}</span>
-		
+
 		<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;tbody class=&quot;m&#39;</span> <span class="o">+</span> <span class="o">(</span><span class="nx">useDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span><span class="o">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_BODY</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span><span class="o">;</span>
-		
-		<span class="k">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">;</span>
-	
-		<span class="k">var</span> <span class="nx">tempDiv</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;div&quot;</span><span class="o">);</span>
-		<span class="k">var</span> <span class="nx">cell</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;td&quot;</span><span class="o">);</span>
+
+		<span class="k">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="m">0</span><span class="o">,</span>
+			<span class="nx">tempDiv</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;div&quot;</span><span class="o">),</span>
+			<span class="nx">cell</span> <span class="o">=</span> <span class="nb">document</span><span class="o">.</span><span class="nx">createElement</span><span class="o">(</span><span class="s2">&quot;td&quot;</span><span class="o">);</span>
+
 		<span class="nx">tempDiv</span><span class="o">.</span><span class="nx">appendChild</span><span class="o">(</span><span class="nx">cell</span><span class="o">);</span>
-	
+
 		<span class="k">var</span> <span class="nx">cal</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">parent</span> <span class="o">||</span> <span class="k">this</span><span class="o">;</span>
-	
+
 		<span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">r</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">r</span><span class="o">&lt;</span><span class="m">6</span><span class="o">;</span><span class="nx">r</span><span class="o">++)</span> <span class="o">{</span>
-	
-			<span class="nx">weekNum</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">getWeekNumber</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">,</span> <span class="nx">useDate</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">(),</span> <span class="nx">startDay</span><span class="o">);</span>
+			<span class="nx">weekNum</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">getWeekNumber</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">,</span> <span class="nx">startDay</span><span class="o">);</span>
 			<span class="nx">weekClass</span> <span class="o">=</span> <span class="nx">weekPrefix</span> <span class="o">+</span> <span class="nx">weekNum</span><span class="o">;</span>
-	
+
 			<span class="c">// Local OOM check for performance, since we already have pagedate</span>
 <span class="c"></span>			<span class="k">if</span> <span class="o">(</span><span class="nx">r</span> <span class="o">!==</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="nx">hideBlankWeeks</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">&amp;&amp;</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()</span> <span class="o">!=</span> <span class="nx">useDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">())</span> <span class="o">{</span>
 				<span class="k">break</span><span class="o">;</span>
 			<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-	
 				<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;tr class=&quot;&#39;</span> <span class="o">+</span> <span class="nx">weekClass</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span><span class="o">;</span>
-				
+
 				<span class="k">if</span> <span class="o">(</span><span class="nx">showWeekHeader</span><span class="o">)</span> <span class="o">{</span> <span class="nx">html</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">renderRowHeader</span><span class="o">(</span><span class="nx">weekNum</span><span class="o">,</span> <span class="nx">html</span><span class="o">);</span> <span class="o">}</span>
-				
-				<span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">d</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">d</span><span class="o">&lt;</span><span class="m">7</span><span class="o">;</span><span class="nx">d</span><span class="o">++){</span> <span class="c">// Render actual days</span>
-<span class="c"></span>	
+
+				<span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">d</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">d</span> <span class="o">&lt;</span> <span class="m">7</span><span class="o">;</span> <span class="nx">d</span><span class="o">++){</span> <span class="c">// Render actual days</span>
+<span class="c"></span>
 					<span class="nx">cellRenderers</span> <span class="o">=</span> <span class="o">[];</span>
-	
+
 					<span class="k">this</span><span class="o">.</span><span class="nx">clearElement</span><span class="o">(</span><span class="nx">cell</span><span class="o">);</span>
 					<span class="nx">cell</span><span class="o">.</span><span class="nx">className</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL</span><span class="o">;</span>
 					<span class="nx">cell</span><span class="o">.</span><span class="nx">id</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">id</span> <span class="o">+</span> <span class="nx">cellPrefix</span> <span class="o">+</span> <span class="nx">i</span><span class="o">;</span>
@@ -1869,64 +1870,59 @@
 						<span class="nx">workingDate</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">()</span>	<span class="o">==</span> <span class="nx">todayYear</span><span class="o">)</span> <span class="o">{</span>
 						<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">cal</span><span class="o">.</span><span class="nx">renderCellStyleToday</span><span class="o">;</span>
 					<span class="o">}</span>
-					
+
 					<span class="k">var</span> <span class="nx">workingArray</span> <span class="o">=</span> <span class="o">[</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">(),</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span><span class="o">,</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">()];</span>
 					<span class="k">this</span><span class="o">.</span><span class="nx">cellDates</span><span class="o">[</span><span class="k">this</span><span class="o">.</span><span class="nx">cellDates</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="nx">workingArray</span><span class="o">;</span> <span class="c">// Add this date to cellDates</span>
-<span class="c"></span>					
+<span class="c"></span>
 					<span class="c">// Local OOM check for performance, since we already have pagedate</span>
 <span class="c"></span>					<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()</span> <span class="o">!=</span> <span class="nx">useDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">())</span> <span class="o">{</span>
 						<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">cal</span><span class="o">.</span><span class="nx">renderCellNotThisMonth</span><span class="o">;</span>
 					<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="nx">workingDayPrefix</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDay</span><span class="o">());</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="nx">dayPrefix</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">());</span>
-					
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="nx">workingDayPrefix</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDay</span><span class="o">());</span>
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="nx">dayPrefix</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">());</span>
+
 						<span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">s</span><span class="o">=</span><span class="m">0</span><span class="o">;</span><span class="nx">s</span><span class="o">&lt;</span><span class="k">this</span><span class="o">.</span><span class="nx">renderStack</span><span class="o">.</span><span class="nx">length</span><span class="o">;++</span><span class="nx">s</span><span class="o">)</span> <span class="o">{</span>
-	
+
 							<span class="nx">renderer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-	
-							<span class="k">var</span> <span class="nx">rArray</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">renderStack</span><span class="o">[</span><span class="nx">s</span><span class="o">];</span>
-							<span class="k">var</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">0</span><span class="o">];</span>
-							
-							<span class="k">var</span> <span class="nx">month</span><span class="o">;</span>
-							<span class="k">var</span> <span class="nx">day</span><span class="o">;</span>
-							<span class="k">var</span> <span class="nx">year</span><span class="o">;</span>
-							
+
+							<span class="k">var</span> <span class="nx">rArray</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">renderStack</span><span class="o">[</span><span class="nx">s</span><span class="o">],</span>
+								<span class="nx">type</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">0</span><span class="o">],</span>
+								<span class="nx">month</span><span class="o">,</span>
+								<span class="nx">day</span><span class="o">,</span>
+								<span class="nx">year</span><span class="o">;</span>
+
 							<span class="nx">switch</span> <span class="o">(</span><span class="nx">type</span><span class="o">)</span> <span class="o">{</span>
-								<span class="nx">case</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">DATE</span><span class="o">:</span>
+								<span class="nx">case</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">DATE</span><span class="o">:</span>
 									<span class="nx">month</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">1</span><span class="o">];</span>
 									<span class="nx">day</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">2</span><span class="o">];</span>
 									<span class="nx">year</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">];</span>
-	
+
 									<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span> <span class="o">==</span> <span class="nx">month</span> <span class="o">&amp;&amp;</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">()</span> <span class="o">==</span> <span class="nx">day</span> <span class="o">&amp;&amp;</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">()</span> <span class="o">==</span> <span class="nx">year</span><span class="o">)</span> <span class="o">{</span>
 										<span class="nx">renderer</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
 										<span class="k">this</span><span class="o">.</span><span class="nx">renderStack</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">s</span><span class="o">,</span><span class="m">1</span><span class="o">);</span>
 									<span class="o">}</span>
 									<span class="k">break</span><span class="o">;</span>
-								<span class="nx">case</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">MONTH_DAY</span><span class="o">:</span>
+								<span class="nx">case</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">MONTH_DAY</span><span class="o">:</span>
 									<span class="nx">month</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">];</span>
 									<span class="nx">day</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">1</span><span class="o">];</span>
-									
+
 									<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span> <span class="o">==</span> <span class="nx">month</span> <span class="o">&amp;&amp;</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">()</span> <span class="o">==</span> <span class="nx">day</span><span class="o">)</span> <span class="o">{</span>
 										<span class="nx">renderer</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
 										<span class="k">this</span><span class="o">.</span><span class="nx">renderStack</span><span class="o">.</span><span class="nx">splice</span><span class="o">(</span><span class="nx">s</span><span class="o">,</span><span class="m">1</span><span class="o">);</span>
 									<span class="o">}</span>
 									<span class="k">break</span><span class="o">;</span>
-								<span class="nx">case</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">RANGE</span><span class="o">:</span>
-									<span class="k">var</span> <span class="nx">date1</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">];</span>
-									<span class="k">var</span> <span class="nx">date2</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">1</span><span class="o">];</span>
-	
-									<span class="k">var</span> <span class="nx">d1month</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">1</span><span class="o">];</span>
-									<span class="k">var</span> <span class="nx">d1day</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
-									<span class="k">var</span> <span class="nx">d1year</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">0</span><span class="o">];</span>
-									
-									<span class="k">var</span> <span class="nx">d1</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">d1year</span><span class="o">,</span> <span class="nx">d1month</span><span class="o">-</span><span class="m">1</span><span class="o">,</span> <span class="nx">d1day</span><span class="o">);</span>
-	
-									<span class="k">var</span> <span class="nx">d2month</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">1</span><span class="o">];</span>
-									<span class="k">var</span> <span class="nx">d2day</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
-									<span class="k">var</span> <span class="nx">d2year</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">0</span><span class="o">];</span>
-	
-									<span class="k">var</span> <span class="nx">d2</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">d2year</span><span class="o">,</span> <span class="nx">d2month</span><span class="o">-</span><span class="m">1</span><span class="o">,</span> <span class="nx">d2day</span><span class="o">);</span>
-	
+								<span class="nx">case</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">RANGE</span><span class="o">:</span>
+									<span class="k">var</span> <span class="nx">date1</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">],</span>
+										<span class="nx">date2</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">1</span><span class="o">],</span>
+										<span class="nx">d1month</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">1</span><span class="o">],</span>
+										<span class="nx">d1day</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">2</span><span class="o">],</span>
+										<span class="nx">d1year</span> <span class="o">=</span> <span class="nx">date1</span><span class="o">[</span><span class="m">0</span><span class="o">],</span>
+										<span class="nx">d1</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">d1year</span><span class="o">,</span> <span class="nx">d1month</span><span class="o">-</span><span class="m">1</span><span class="o">,</span> <span class="nx">d1day</span><span class="o">),</span>
+										<span class="nx">d2month</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">1</span><span class="o">],</span>
+										<span class="nx">d2day</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">2</span><span class="o">],</span>
+										<span class="nx">d2year</span> <span class="o">=</span> <span class="nx">date2</span><span class="o">[</span><span class="m">0</span><span class="o">],</span>
+										<span class="nx">d2</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">getDate</span><span class="o">(</span><span class="nx">d2year</span><span class="o">,</span> <span class="nx">d2month</span><span class="o">-</span><span class="m">1</span><span class="o">,</span> <span class="nx">d2day</span><span class="o">);</span>
+
 									<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="nx">d1</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">&lt;=</span> <span class="nx">d2</span><span class="o">.</span><span class="nx">getTime</span><span class="o">())</span> <span class="o">{</span>
 										<span class="nx">renderer</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
 	
@@ -1935,33 +1931,31 @@
 										<span class="o">}</span>
 									<span class="o">}</span>
 									<span class="k">break</span><span class="o">;</span>
-								<span class="nx">case</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">WEEKDAY</span><span class="o">:</span>
-									
+								<span class="nx">case</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">WEEKDAY</span><span class="o">:</span>
 									<span class="k">var</span> <span class="nx">weekday</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">];</span>
 									<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDay</span><span class="o">()+</span><span class="m">1</span> <span class="o">==</span> <span class="nx">weekday</span><span class="o">)</span> <span class="o">{</span>
 										<span class="nx">renderer</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
 									<span class="o">}</span>
 									<span class="k">break</span><span class="o">;</span>
-								<span class="nx">case</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">MONTH</span><span class="o">:</span>
-									
+								<span class="nx">case</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">MONTH</span><span class="o">:</span>
 									<span class="nx">month</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">1</span><span class="o">][</span><span class="m">0</span><span class="o">];</span>
 									<span class="k">if</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span> <span class="o">==</span> <span class="nx">month</span><span class="o">)</span> <span class="o">{</span>
 										<span class="nx">renderer</span> <span class="o">=</span> <span class="nx">rArray</span><span class="o">[</span><span class="m">2</span><span class="o">];</span>
 									<span class="o">}</span>
 									<span class="k">break</span><span class="o">;</span>
 							<span class="o">}</span>
-							
+
 							<span class="k">if</span> <span class="o">(</span><span class="nx">renderer</span><span class="o">)</span> <span class="o">{</span>
 								<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">renderer</span><span class="o">;</span>
 							<span class="o">}</span>
 						<span class="o">}</span>
-	
+
 					<span class="o">}</span>
-	
+
 					<span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">_indexOfSelectedFieldArray</span><span class="o">(</span><span class="nx">workingArray</span><span class="o">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="m">1</span><span class="o">)</span> <span class="o">{</span>
 						<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">cal</span><span class="o">.</span><span class="nx">renderCellStyleSelected</span><span class="o">;</span> 
 					<span class="o">}</span>
-	
+
 					<span class="k">if</span> <span class="o">((</span><span class="nx">mindate</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">&lt;</span> <span class="nx">mindate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()))</span> <span class="o">||</span>
 						<span class="o">(</span><span class="nx">maxdate</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">&gt;</span> <span class="nx">maxdate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()))</span>
 					<span class="o">)</span> <span class="o">{</span>
@@ -1970,26 +1964,28 @@
 						<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">cal</span><span class="o">.</span><span class="nx">styleCellDefault</span><span class="o">;</span>
 						<span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">]=</span><span class="nx">cal</span><span class="o">.</span><span class="nx">renderCellDefault</span><span class="o">;</span>	
 					<span class="o">}</span>
-					
+
 					<span class="k">for</span> <span class="o">(</span><span class="k">var</span> <span class="nx">x</span><span class="o">=</span><span class="m">0</span><span class="o">;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="nx">cellRenderers</span><span class="o">.</span><span class="nx">length</span><span class="o">;</span> <span class="o">++</span><span class="nx">x</span><span class="o">)</span> <span class="o">{</span>
 						<span class="k">this</span><span class="o">.</span><span class="nx">logger</span><span class="o">.</span><span class="nx">log</span><span class="o">(</span><span class="s2">&quot;renderer[&quot;</span> <span class="o">+</span> <span class="nx">x</span> <span class="o">+</span> <span class="s2">&quot;] for (&quot;</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getFullYear</span><span class="o">()</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getMonth</span><span class="o">()+</span><span class="m">1</span><span class="o">)</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nx">workingDate</span><span class="o">.</span><span class="nx">getDate</span><span class="o">()</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="o">,</span> <span class="s2">&quot;cellrender&quot;</span><span class="o">);</span>
-						<span class="k">if</span> <span class="o">(</span><span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">x</span><span class="o">].</span><span class="nx">call</span><span class="o">(</span><span class="nx">cal</span><span class="o">,</span> <span class="nx">workingDate</span><span class="o">,</span> <span class="nx">cell</span><span class="o">)</span> <span class="o">==</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">STOP_RENDER</span><span class="o">)</span> <span class="o">{</span>
+						<span class="k">if</span> <span class="o">(</span><span class="nx">cellRenderers</span><span class="o">[</span><span class="nx">x</span><span class="o">].</span><span class="nx">call</span><span class="o">(</span><span class="nx">cal</span><span class="o">,</span> <span class="nx">workingDate</span><span class="o">,</span> <span class="nx">cell</span><span class="o">)</span> <span class="o">==</span> <span class="nx">CAL</span><span class="o">.</span><span class="nx">STOP_RENDER</span><span class="o">)</span> <span class="o">{</span>
 							<span class="k">break</span><span class="o">;</span>
 						<span class="o">}</span>
 					<span class="o">}</span>
-	
-					<span class="nx">workingDate</span><span class="o">.</span><span class="nx">setTime</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">+</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">DateMath</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">);</span>
-	
+
+					<span class="nx">workingDate</span><span class="o">.</span><span class="nx">setTime</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">.</span><span class="nx">getTime</span><span class="o">()</span> <span class="o">+</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">ONE_DAY_MS</span><span class="o">);</span>
+					<span class="c">// Just in case we crossed DST/Summertime boundaries</span>
+<span class="c"></span>					<span class="nx">workingDate</span> <span class="o">=</span> <span class="nx">DM</span><span class="o">.</span><span class="nx">clearTime</span><span class="o">(</span><span class="nx">workingDate</span><span class="o">);</span>
+
 					<span class="k">if</span> <span class="o">(</span><span class="nx">i</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="m">6</span><span class="o">)</span> <span class="o">{</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_TOP</span><span class="o">);</span>
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_TOP</span><span class="o">);</span>
 					<span class="o">}</span>
 					<span class="k">if</span> <span class="o">((</span><span class="nx">i</span> <span class="o">%</span> <span class="m">7</span><span class="o">)</span> <span class="o">===</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_LEFT</span><span class="o">);</span>
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_LEFT</span><span class="o">);</span>
 					<span class="o">}</span>
 					<span class="k">if</span> <span class="o">(((</span><span class="nx">i</span><span class="o">+</span><span class="m">1</span><span class="o">)</span> <span class="o">%</span> <span class="m">7</span><span class="o">)</span> <span class="o">===</span> <span class="m">0</span><span class="o">)</span> <span class="o">{</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_RIGHT</span><span class="o">);</span>
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_RIGHT</span><span class="o">);</span>
 					<span class="o">}</span>
-					
+
 					<span class="k">var</span> <span class="nx">postDays</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">postMonthDays</span><span class="o">;</span> 
 					<span class="k">if</span> <span class="o">(</span><span class="nx">hideBlankWeeks</span> <span class="o">&amp;&amp;</span> <span class="nx">postDays</span> <span class="o">&gt;=</span> <span class="m">7</span><span class="o">)</span> <span class="o">{</span>
 						<span class="k">var</span> <span class="nx">blankWeeks</span> <span class="o">=</span> <span class="nb">Math</span><span class="o">.</span><span class="nx">floor</span><span class="o">(</span><span class="nx">postDays</span><span class="o">/</span><span class="m">7</span><span class="o">);</span>
@@ -1999,7 +1995,7 @@
 					<span class="o">}</span>
 					
 					<span class="k">if</span> <span class="o">(</span><span class="nx">i</span> <span class="o">&gt;=</span> <span class="o">((</span><span class="k">this</span><span class="o">.</span><span class="nx">preMonthDays</span><span class="o">+</span><span class="nx">postDays</span><span class="o">+</span><span class="k">this</span><span class="o">.</span><span class="nx">monthDays</span><span class="o">)-</span><span class="m">7</span><span class="o">))</span> <span class="o">{</span>
-						<span class="nx">YAHOO</span><span class="o">.</span><span class="nx">util</span><span class="o">.</span><span class="nx">Dom</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_BOTTOM</span><span class="o">);</span>
+						<span class="nx">D</span><span class="o">.</span><span class="nx">addClass</span><span class="o">(</span><span class="nx">cell</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="nx">Style</span><span class="o">.</span><span class="nx">CSS_CELL_BOTTOM</span><span class="o">);</span>
 					<span class="o">}</span>
 	
 					<span class="nx">html</span><span class="o">[</span><span class="nx">html</span><span class="o">.</span><span class="nx">length</span><span class="o">]</span> <span class="o">=</span> <span class="nx">tempDiv</span><span class="o">.</span><span class="nx">innerHTML</span><span class="o">;</span>
@@ -3149,13 +3145,13 @@
 <span class="c">	* Adds a weekday to the render stack. The function reference passed to this method will be executed</span>
 <span class="c">	* when a date cell matches the weekday passed to this method.</span>
 <span class="c">	* @method addWeekdayRenderer</span>
-<span class="c">	* @param	{Number}	weekday		The weekday (0-6) to associate with this renderer</span>
+<span class="c">	* @param	{Number}	weekday		The weekday (Sunday = 1, Monday = 2 ... Saturday = 7) to associate with this renderer</span>
 <span class="c">	* @param	{Function}	fnRender	The function executed to render cells that match the render rules for this renderer.</span>
 <span class="c">	*/</span>
 	<span class="nx">addWeekdayRenderer</span> <span class="o">:</span> <span class="k">function</span><span class="o">(</span><span class="nx">weekday</span><span class="o">,</span> <span class="nx">fnRender</span><span class="o">)</span> <span class="o">{</span>
 		<span class="k">this</span><span class="o">.</span><span class="nx">_addRenderer</span><span class="o">(</span><span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Calendar</span><span class="o">.</span><span class="nx">WEEKDAY</span><span class="o">,[</span><span class="nx">weekday</span><span class="o">],</span><span class="nx">fnRender</span><span class="o">);</span>
 	<span class="o">},</span>
-	
+
 	<span class="c">// END RENDERER METHODS</span>
 <span class="c"></span>	
 	<span class="c">// BEGIN CSS METHODS</span>

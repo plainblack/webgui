@@ -10,7 +10,6 @@
 <link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css"> 
 <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css"> 
 <link rel="stylesheet" type="text/css" href="../../build/profilerviewer/assets/skins/sam/profilerviewer.css"> 
-<link rel="stylesheet" type="text/css" href="../../build/datatable/assets/skins/sam/datatable.css"> 
 
 <script type="text/javascript" src="../../build/utilities/utilities.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
@@ -76,7 +75,7 @@
   <li>The height of the table and the number of functions profiled in the chart are increased;</li>
   <li>A filter is used to show only functions that have been called at least once.</li>
 </ol>
-<p>Use the button below to show the Menu system, then launch ProfilerViewer to explore the detailed performance profile of Menu and its subcomponents.</p>
+<p>Use the button below to show the Menu system, then launch ProfilerViewer to explore the detailed performance profile of Menu and its subcomponents. <strong>Note:</strong> Because ProfilerViewer uses the same dependencies as Menu, only the first "view" in ProfilerViewer will be isolated to Menu performance data.  After the first view, "Refresh Data" actions will begin showing performance information (on the Dom Collection, for example) reflecting both Menu's usage and ProfilerViewer's usage of that component.</p>
 
 <div id="container">
     <div id="profiler"></div>

@@ -13,7 +13,7 @@
 
 	<div id="hd">
         <a href="http://developer.yahoo.com/yui/"><h1>Yahoo! UI Library</h1></a>
-        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.0</span></h3>
+        <h3>DataTable Widget&nbsp; <span class="subtitle">2.5.1</span></h3>
         <p>
         <a href="./index.html">Yahoo! UI Library</a> 
             &gt; <a href="./module_datatable.html">datatable</a>
@@ -214,10 +214,10 @@
 <span class="c">         * Total number of records to paginate through</span>
 <span class="c">         * @attribute totalRecords</span>
 <span class="c">         * @type integer</span>
-<span class="c">         * @default Paginator.VALUE_UNLIMITED</span>
+<span class="c">         * @default 0</span>
 <span class="c">         */</span>
         <span class="k">this</span><span class="o">.</span><span class="nx">setAttributeConfig</span><span class="o">(</span><span class="s1">&#39;totalRecords&#39;</span><span class="o">,</span> <span class="o">{</span>
-            <span class="nx">value</span>     <span class="o">:</span> <span class="nx">UNLIMITED</span><span class="o">,</span>
+            <span class="nx">value</span>     <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
             <span class="nx">validator</span> <span class="o">:</span> <span class="nx">l</span><span class="o">.</span><span class="nx">isNumber</span>
         <span class="o">});</span>
 
@@ -548,8 +548,8 @@
 <span class="c">     */</span>
     <span class="nx">getCurrentPage</span> <span class="o">:</span> <span class="k">function</span> <span class="o">()</span> <span class="o">{</span>
         <span class="k">var</span> <span class="nx">perPage</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;rowsPerPage&#39;</span><span class="o">);</span>
-        <span class="k">if</span> <span class="o">(!</span><span class="nx">perPage</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nx">perPage</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;totalRecords&#39;</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="m">0</span><span class="o">;</span>
         <span class="o">}</span>
         <span class="k">return</span> <span class="nb">Math</span><span class="o">.</span><span class="nx">floor</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;recordOffset&#39;</span><span class="o">)</span> <span class="o">/</span> <span class="nx">perPage</span><span class="o">)</span> <span class="o">+</span> <span class="m">1</span><span class="o">;</span>
     <span class="o">},</span>
@@ -563,11 +563,7 @@
         <span class="k">var</span> <span class="nx">currentPage</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getCurrentPage</span><span class="o">(),</span>
             <span class="nx">totalPages</span>  <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">getTotalPages</span><span class="o">();</span>
 
-        <span class="k">if</span> <span class="o">(</span><span class="nx">currentPage</span> <span class="o">===</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
-        <span class="o">}</span>
-
-        <span class="k">return</span> <span class="o">(</span><span class="nx">totalPages</span> <span class="o">===</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Paginator</span><span class="o">.</span><span class="nx">VALUE_UNLIMITED</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="nx">currentPage</span> <span class="o">&lt;</span> <span class="nx">totalPages</span><span class="o">);</span>
+        <span class="k">return</span> <span class="nx">currentPage</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nx">totalPages</span> <span class="o">===</span> <span class="nx">YAHOO</span><span class="o">.</span><span class="nx">widget</span><span class="o">.</span><span class="nx">Paginator</span><span class="o">.</span><span class="nx">VALUE_UNLIMITED</span> <span class="o">||</span> <span class="nx">currentPage</span> <span class="o">&lt;</span> <span class="nx">totalPages</span><span class="o">);</span>
     <span class="o">},</span>
 
     <span class="c">/**</span>
@@ -614,7 +610,7 @@
             <span class="nx">records</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;totalRecords&#39;</span><span class="o">),</span>
             <span class="nx">start</span><span class="o">,</span> <span class="nx">end</span><span class="o">;</span>
 
-        <span class="k">if</span> <span class="o">(!</span><span class="nx">perPage</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nx">page</span> <span class="o">||</span> <span class="o">!</span><span class="nx">perPage</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
         <span class="o">}</span>
 
@@ -1606,12 +1602,8 @@
     <span class="k">var</span> <span class="nx">UNLIMITED</span> <span class="o">=</span> <span class="nx">Paginator</span><span class="o">.</span><span class="nx">VALUE_UNLIMITED</span><span class="o">,</span>
         <span class="nx">start</span><span class="o">,</span> <span class="nx">end</span><span class="o">,</span> <span class="nx">delta</span><span class="o">;</span>
 
-    <span class="k">if</span> <span class="o">(!</span><span class="nx">currentPage</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-    <span class="o">}</span>
-
     <span class="c">// Either has no pages, or unlimited pages.  Show none.</span>
-<span class="c"></span>    <span class="k">if</span> <span class="o">(</span><span class="nx">numPages</span> <span class="o">===</span> <span class="m">0</span> <span class="o">||</span> <span class="nx">totalPages</span> <span class="o">===</span> <span class="m">0</span> <span class="o">||</span>
+<span class="c"></span>    <span class="k">if</span> <span class="o">(!</span><span class="nx">currentPage</span> <span class="o">||</span> <span class="nx">numPages</span> <span class="o">===</span> <span class="m">0</span> <span class="o">||</span> <span class="nx">totalPages</span> <span class="o">===</span> <span class="m">0</span> <span class="o">||</span>
         <span class="o">(</span><span class="nx">totalPages</span> <span class="o">===</span> <span class="nx">UNLIMITED</span> <span class="o">&amp;&amp;</span> <span class="nx">numPages</span> <span class="o">===</span> <span class="nx">UNLIMITED</span><span class="o">))</span> <span class="o">{</span>
         <span class="k">return</span> <span class="o">[</span><span class="m">0</span><span class="o">,-</span><span class="m">1</span><span class="o">];</span>
     <span class="o">}</span>
@@ -1647,7 +1639,7 @@
 <span class="c">     * @type number</span>
 <span class="c">     * @private</span>
 <span class="c">     */</span>
-    <span class="nx">current</span>     <span class="o">:</span> <span class="kc">null</span><span class="o">,</span>
+    <span class="nx">current</span>     <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
 
     <span class="c">/**</span>
 <span class="c">     * Span node containing the page links</span>
@@ -1997,15 +1989,15 @@
     <span class="nx">p</span><span class="o">.</span><span class="nx">setAttributeConfig</span><span class="o">(</span><span class="s1">&#39;pageReportValueGenerator&#39;</span><span class="o">,</span> <span class="o">{</span>
         <span class="nx">value</span> <span class="o">:</span> <span class="k">function</span> <span class="o">(</span><span class="nx">paginator</span><span class="o">)</span> <span class="o">{</span>
             <span class="k">var</span> <span class="nx">curPage</span> <span class="o">=</span> <span class="nx">paginator</span><span class="o">.</span><span class="nx">getCurrentPage</span><span class="o">(),</span>
-                <span class="nx">records</span> <span class="o">=</span> <span class="nx">paginator</span><span class="o">.</span><span class="nx">getPageRecords</span><span class="o">(</span><span class="nx">curPage</span><span class="o">);</span>
+                <span class="nx">records</span> <span class="o">=</span> <span class="nx">paginator</span><span class="o">.</span><span class="nx">getPageRecords</span><span class="o">();</span>
 
             <span class="k">return</span> <span class="o">{</span>
-                <span class="s1">&#39;currentPage&#39;</span> <span class="o">:</span> <span class="nx">curPage</span><span class="o">,</span>
+                <span class="s1">&#39;currentPage&#39;</span> <span class="o">:</span> <span class="nx">records</span> <span class="o">?</span> <span class="nx">curPage</span> <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
                 <span class="s1">&#39;totalPages&#39;</span>  <span class="o">:</span> <span class="nx">paginator</span><span class="o">.</span><span class="nx">getTotalPages</span><span class="o">(),</span>
-                <span class="s1">&#39;startIndex&#39;</span>  <span class="o">:</span> <span class="nx">records</span><span class="o">[</span><span class="m">0</span><span class="o">],</span>
-                <span class="s1">&#39;endIndex&#39;</span>    <span class="o">:</span> <span class="nx">records</span><span class="o">[</span><span class="m">1</span><span class="o">],</span>
-                <span class="s1">&#39;startRecord&#39;</span> <span class="o">:</span> <span class="nx">records</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">+</span> <span class="m">1</span><span class="o">,</span>
-                <span class="s1">&#39;endRecord&#39;</span>   <span class="o">:</span> <span class="nx">records</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">+</span> <span class="m">1</span><span class="o">,</span>
+                <span class="s1">&#39;startIndex&#39;</span>  <span class="o">:</span> <span class="nx">records</span> <span class="o">?</span> <span class="nx">records</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
+                <span class="s1">&#39;endIndex&#39;</span>    <span class="o">:</span> <span class="nx">records</span> <span class="o">?</span> <span class="nx">records</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
+                <span class="s1">&#39;startRecord&#39;</span> <span class="o">:</span> <span class="nx">records</span> <span class="o">?</span> <span class="nx">records</span><span class="o">[</span><span class="m">0</span><span class="o">]</span> <span class="o">+</span> <span class="m">1</span> <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
+                <span class="s1">&#39;endRecord&#39;</span>   <span class="o">:</span> <span class="nx">records</span> <span class="o">?</span> <span class="nx">records</span><span class="o">[</span><span class="m">1</span><span class="o">]</span> <span class="o">+</span> <span class="m">1</span> <span class="o">:</span> <span class="m">0</span><span class="o">,</span>
                 <span class="s1">&#39;totalRecords&#39;</span><span class="o">:</span> <span class="nx">paginator</span><span class="o">.</span><span class="nx">get</span><span class="o">(</span><span class="s1">&#39;totalRecords&#39;</span><span class="o">)</span>
             <span class="o">};</span>
         <span class="o">},</span>

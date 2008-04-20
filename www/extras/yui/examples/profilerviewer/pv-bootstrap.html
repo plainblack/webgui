@@ -17,10 +17,9 @@
 <!--Script and CSS includes for YUI dependencies on this page-->
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
 <script type="text/javascript" src="../../build/yuiloader/yuiloader-beta-min.js"></script>
-<script type="text/javascript" src="../../build/yahoo/yahoo-min.js"></script>
-<script type="text/javascript" src="../../build/event/event-min.js"></script>
-<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
 <script type="text/javascript" src="../../build/profiler/profiler-beta-min.js"></script>
+<script type="text/javascript" src="../../build/dom/dom-min.js"></script>
+<script type="text/javascript" src="../../build/event/event-min.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
 
@@ -49,7 +48,8 @@
 	<div id="ygma"><a href="../../"><img src="../../assets/yui.gif"  border="0" width="378" height="28"></a></div>
 	<div id="pagetitle"><h1>YUI Library Examples: ProfilerViewer Control (beta): Using Profiler and ProfilerViewer to Profile non-YUI Code</h1></div>
 </div>
-<div id="bd">	
+<div id="bd">
+	
 	<div id="yui-main">
 		<div class="yui-b">
 		  <div class="yui-ge">
@@ -86,11 +86,11 @@
 
 <p>First, we load the minimal dependencies for profiling code with YUI Profiler.  To that, we add the DP Syntax Highlighter code (ie, the code that we'll be profiling).</p>
 
-<textarea name="code" class="HTML" cols="60" rows="1"><link rel="stylesheet" type="text/css" href="assets/dpSyntaxHighlighter.css"> 
+<textarea name="code" class="HTML" cols="60" rows="1"><link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/examples/profilerviewer/assets/dpSyntaxHighlighter.css"> 
 
-<script type="text/javascript" src="../../build/yuiloader/yuiloader-beta-min.js"></script>
-<script type="text/javascript" src="../../build/profiler/profiler-beta-min.js"></script>
-<script type="text/javascript" src="assets/dpSyntaxHighlighter.js"></script></textarea>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/yuiloader/yuiloader-beta-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/profiler/profiler-beta-min.js"></script>
+<script type="text/javascript" src="http://developer.yahoo.com/yui/examples/profilerviewer/assets/dpSyntaxHighlighter.js"></script></textarea>
 
 
 <p>Next, we set up a simple initialization function that (a) sets up the code we want to profile then (b) executes the code:</p>
@@ -230,8 +230,6 @@ YAHOO.example.pv.init();</textarea>
                             
 							<li><a href="http://yuiblog.com/assets/pdf/cheatsheets/profilerviewer.pdf">Cheat Sheet PDF</a> (external)</li></ul>
 					</div>
-					
-	
 			  </div>
 		</div>
 		

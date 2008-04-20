@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.0
+version: 2.5.1
 */
 /**
  * @description <p>Provides a fixed layout containing, top, bottom, left, right and center layout units. It can be applied to either the body or an element.</p>
@@ -173,29 +173,27 @@ version: 2.5.0
             this._sizes.right = {
                 h: newH, w: ((this._right) ? this._right.get('width') : 0),
                 l: ((this._right) ? (w - this._right.get('width')) : 0),
-                t: this._sizes.top.h
+                t: ((this._top) ? this._sizes.top.h : 0)
             };
             
             if (this._right && set) {
-                if (this._top) {
-                    this._right.set('top', this._sizes.right.t);
-                }
+                this._right.set('top', this._sizes.right.t);
                 if (!this._right._collapsing) { 
                     this._right.set('left', this._sizes.right.l);
                 }
                 this._right.set('height', this._sizes.right.h, true);
             }
             if (this._left) {
+                this._sizes.left.l = 0;
                 if (this._top) {
                     this._sizes.left.t = this._sizes.top.h;
-                    this._sizes.left.l = 0;
-                    if (set) {
-                        this._left.set('top', this._sizes.top.h);
-                        this._left.set('left', 0);
-                    }
+                } else {
+                    this._sizes.left.t = 0;
                 }
                 if (set) {
+                    this._left.set('top', this._sizes.left.t);
                     this._left.set('height', this._sizes.left.h, true);
+                    this._left.set('left', 0);
                 }
             }
             if (this._bottom) {
@@ -234,7 +232,7 @@ version: 2.5.0
         },
         /**
         * @method getSizes
-        * @description Get a reference to the internal Layout Unit sizes
+        * @description Get a reference to the internal Layout Unit sizes object used to build the layout wireframe
         * @return {Object} An object of the layout unit sizes
         */
         getSizes: function() {
@@ -402,7 +400,7 @@ version: 2.5.0
         * @description Sets up the main doc element when using the body as the main element.
         */
         _setupBodyElements: function() {
-            this._doc = Dom.get('doc');
+            this._doc = Dom.get('layout-doc');
             if (!this._doc) {
                 this._doc = document.createElement('div');
                 this._doc.id = 'layout-doc';
@@ -842,6 +840,20 @@ version: 2.5.0
         */
         _lastScroll: null,
         /**
+        * @private
+        * @property _lastCenetrScroll
+        * @description A holder for the last known scroll state of the center unit
+        * @type Boolean
+        */
+        _lastCenterScroll: null,
+        /**
+        * @private
+        * @property _lastScrollTop
+        * @description A holder for the last known scrollTop state of the unit
+        * @type Number
+        */
+        _lastScrollTop: null,
+        /**
         * @method resize
         * @description Resize either the unit or it's clipped state, also updating the box inside
         * @param {Boolean} force This will force full calculations even when the unit is collapsed
@@ -1078,7 +1090,7 @@ version: 2.5.0
         },
         /**
         * @method getSizes
-        * @description Get a reference to the internal sizes object
+        * @description Get a reference to the internal sizes object for this unit
         * @return {Object} An object of the sizes used for calculations
         */
         getSizes: function() {
@@ -1103,10 +1115,11 @@ version: 2.5.0
         * @return {<a href="YAHOO.widget.LayoutUnit.html">YAHOO.widget.LayoutUnit</a>} The LayoutUnit instance
         */
         expand: function() {
-            if (!this.get('collapse')) {
+            if (!this._collapsed) {
                 return this;
             }
-            if (!this._collapsed) {
+            var retVal = this.fireEvent('beforeExpand');
+            if (retVal === false) {
                 return this;
             }
 
@@ -1171,6 +1184,9 @@ version: 2.5.0
                     this._collapsed = false;
                     this.resize();
                     this.set('scroll', this._lastScroll);
+                    if (this._lastScrollTop > 0) {
+                        this.body.scrollTop = this._lastScrollTop;
+                    }
                     this._anim.onComplete.unsubscribe(expand, this, true);
                     this.fireEvent('expand');
                 };
@@ -1188,6 +1204,9 @@ version: 2.5.0
                 this._collapsed = false;
                 this.resize();
                 this.set('scroll', this._lastScroll);
+                if (this._lastScrollTop > 0) {
+                    this.body.scrollTop = this._lastScrollTop;
+                }
                 this.fireEvent('expand');
             }
             return this;
@@ -1198,10 +1217,11 @@ version: 2.5.0
         * @return {<a href="YAHOO.widget.LayoutUnit.html">YAHOO.widget.LayoutUnit</a>} The LayoutUnit instance
         */
         collapse: function() {
-            if (!this.get('collapse')) {
+            if (this._collapsed) {
                 return this;
             }
-            if (this._collapsed) {
+            var retValue = this.fireEvent('beforeCollapse');
+            if (retValue === false) {
                 return this;
             }
             if (!this._clip) {
@@ -1214,6 +1234,7 @@ version: 2.5.0
             this._lastWidth = w;
             this._lastHeight = h;
             this._lastScroll = this.get('scroll');
+            this._lastScrollTop = this.body.scrollTop;            
             this.set('scroll', false, true);
             this._lastLeft = parseInt(this.get('element').style.left, 10);
             this._lastTop = parseInt(this.get('element').style.top, 10);
@@ -1357,7 +1378,8 @@ version: 2.5.0
             }
 
             this.on('contentChange', this.resize, this, true);
-            
+            this._lastScrollTop = 0;
+
             this.set('animate', this.get('animate'));
         },
         /**
@@ -1792,8 +1814,21 @@ version: 2.5.0
             this.setAttributeConfig('scroll', {
                 value: attr.scroll || false,
                 method: function(scroll) {
+                    if ((scroll === false) && !this._collapsed) { //Removing scroll bar
+                        if (this.body) {
+                            if (this.body.scrollTop > 0) {
+                                this._lastScrollTop = this.body.scrollTop;
+                            }
+                        }
+                    }
+                    
                     if (scroll) {
                         this.addClass('yui-layout-scroll');
+                        if (this._lastScrollTop > 0) {
+                            if (this.body) {
+                                this.body.scrollTop = this._lastScrollTop;
+                            }
+                        }
                     } else {
                         this.removeClass('yui-layout-scroll');
                     }
@@ -1873,6 +1908,9 @@ version: 2.5.0
                                 this.set('scroll', false);
                                 if (this.get('parent')) {
                                     this.get('parent').fireEvent('startResize');
+                                    var c = this.get('parent').getUnitByPosition('center');
+                                    this._lastCenterScroll = c.get('scroll');
+                                    c.set('scroll', false);
                                 }
                                 this.fireEvent('startResize');
                             }, this, true);
@@ -1880,6 +1918,10 @@ version: 2.5.0
                                 this.set('height', ev.height);
                                 this.set('width', ev.width);
                                 this.set('scroll', this._lastScroll);
+                                if (this.get('parent')) {
+                                    var c = this.get('parent').getUnitByPosition('center');
+                                    c.set('scroll', this._lastCenterScroll);
+                                }
                             }, this, true);
                         }
                     } else {
@@ -1993,6 +2035,11 @@ version: 2.5.0
     * @type YAHOO.util.CustomEvent
     */
     /**
+    * @event beforeCollapse
+    * @description Fired before the unit is collapsed. If you return false, the collapse is cancelled.
+    * @type YAHOO.util.CustomEvent
+    */
+    /**
     * @event collapse
     * @description Fired when the unit is collapsed
     * @type YAHOO.util.CustomEvent
@@ -2002,8 +2049,13 @@ version: 2.5.0
     * @description Fired when the unit is exanded
     * @type YAHOO.util.CustomEvent
     */
+    /**
+    * @event beforeExpand
+    * @description Fired before the unit is exanded. If you return false, the collapse is cancelled.
+    * @type YAHOO.util.CustomEvent
+    */
     });
 
     YAHOO.widget.LayoutUnit = LayoutUnit;
 })();
-YAHOO.register("layout", YAHOO.widget.Layout, {version: "2.5.0", build: "895"});
+YAHOO.register("layout", YAHOO.widget.Layout, {version: "2.5.1", build: "984"});
