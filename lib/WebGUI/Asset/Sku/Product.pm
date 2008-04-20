@@ -646,9 +646,11 @@ sub setCollateral {
 
 =head2 setParamData ($paramData)
 
-Set the product's parameter data as a perl data structure.  This is stored in the
-db as JSON.
-rather than the internally stored JSON.
+Set the product's parameter data as a perl data structure.  This is
+stored in the db as JSON.  This adds a revision to the Product, since
+parameters and options are stored directly in the asset table.
+
+Returns a copy to the new version of the Product Asset.
 
 =head2 $paramData
 
@@ -662,8 +664,8 @@ sub setParamData {
     my $self      = shift;
     my $paramData = shift;
     my $json = JSON::to_json($paramData);
-    $self->addRevision({parameters => $json});
-    return 1;
+    my $newSelf = $self->addRevision({parameters => $json});
+    return $newSelf;
 }
 
 
@@ -936,17 +938,19 @@ sub www_editParameterSave {
 
     my $paramData = $self->getParamData;
     if (($origname ne "new") and ($origname ne $param)) {
+        $self->session->errorHandler->warn('Rename');
         ##Rename existing data
         my @options = @{ $paramData->{$origname} };
         $paramData->{$param} = \@options;
         delete $paramData->{$origname};
-        $self->setParamData($paramData);
-        return $self->editParameter($param);
+        my $newSelf = $self->setParamData($paramData);
+        return $newSelf->www_editParameter($param);
     }
     elsif ($origname eq "new") {
+        $self->session->errorHandler->warn('New');
         $paramData->{$param} = [];
-        $self->setParamData($paramData);
-        return $self->editParameterOptions($param);
+        my $newSelf = $self->setParamData($paramData);
+        return $newSelf->www_editParameterOptions($param);
     }
 }
 
@@ -954,12 +958,12 @@ sub www_editParameterSave {
 sub www_editParameterOptions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    return 1;
     my $session = $self->session;
     my $param = shift || $self->session->form->get('name');
     my $paramData = $self->getParamData;
     if (! exists $paramData->{$param}) {
-        return $self->editParameter($param);
+        $self->session->errorHandler->warn('Not in param data');
+        return $self->www_editParameter($param);
     }
     my $option = $paramData->{$param};
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
@@ -968,7 +972,7 @@ sub www_editParameterOptions {
         -name => "func",
         -value => "editParameterOptionSave",
     );
-    $f->readonly(
+    $f->readOnly(
         -name       => 'name',
         -value      => $param,
     );
@@ -1011,13 +1015,13 @@ sub www_editParameterOptionsSave {
         my @options = @{ $paramData->{$origname} };
         $paramData->{$param} = \@options;
         delete $paramData->{$origname};
-        $self->setParamData($paramData);
-        return $self->editParameter($param);
+        my $newSelf = $self->setParamData($paramData);
+        return $newSelf->www_editParameter($param);
     }
     elsif ($origname eq "new") {
         $paramData->{$param} = [];
-        $self->setParamData($paramData);
-        return $self->editParameterOptions($param);
+        my $newSelf = $self->setParamData($paramData);
+        return $newSelf->www_editParameterOptions($param);
     }
 }
 
