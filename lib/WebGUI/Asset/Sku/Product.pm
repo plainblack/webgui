@@ -960,12 +960,19 @@ sub www_editParameterOptions {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $session = $self->session;
     my $param = shift || $self->session->form->get('name');
+    my $value = shift || $self->session->form->get('value');
     my $paramData = $self->getParamData;
     if (! exists $paramData->{$param}) {
         $self->session->errorHandler->warn('Not in param data');
         return $self->www_editParameter($param);
     }
-    my $option = $paramData->{$param};
+    my $option = {};
+    OPTION: foreach my $subOption (@{ $paramData->{$param} }) {
+        if ($subOption->{value} eq $value) {
+            $option = $subOption;
+            last OPTION;
+        }
+    }
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
@@ -1007,22 +1014,9 @@ sub www_editParameterOptionsSave {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
 
     my $param     = $self->session->form->get('name');
-    my $origname  = lc $self->session->form->get('origname');
+    my $value     = $self->session->form->get('value');
+    my $origValue = $self->session->form->get('origValue');
 
-    my $paramData = $self->getParamData;
-    if ($origname ne "new" and $origname ne $param) {
-        ##Rename existing data
-        my @options = @{ $paramData->{$origname} };
-        $paramData->{$param} = \@options;
-        delete $paramData->{$origname};
-        my $newSelf = $self->setParamData($paramData);
-        return $newSelf->www_editParameter($param);
-    }
-    elsif ($origname eq "new") {
-        $paramData->{$param} = [];
-        my $newSelf = $self->setParamData($paramData);
-        return $newSelf->www_editParameterOptions($param);
-    }
 }
 
 #-------------------------------------------------------------------
