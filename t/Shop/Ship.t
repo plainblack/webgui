@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 19;
+my $tests = 20;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -40,6 +40,9 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Ship');
 
 my $storage;
+my $driver;
+my $driver2;
+my $ship;
 
 SKIP: {
 
@@ -52,7 +55,6 @@ skip 'Unable to load module WebGUI::Shop::Ship', $tests unless $loaded;
 #######################################################################
 
 my $e;
-my $ship;
 
 eval { $ship = WebGUI::Shop::Ship->new(); };
 $e = Exception::Class->caught();
@@ -143,7 +145,7 @@ cmp_deeply(
     'addShipper croaks without options to build a object with',
 );
 
-my $driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}});
+$driver = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Jake's Jailbird Airmail}});
 isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured FlatRate driver');
 
 #######################################################################
@@ -153,15 +155,15 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured F
 #######################################################################
 
 my $shippers;
-my $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
+$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
 
 $shippers = $ship->getShippers();
-is(scalar @{$shippers}, 2, 'getShippers: got both shippers');
+is(scalar @{$shippers}, 3, 'getShippers: got both shippers');
 
 my @shipperNames = map { $_->get("label") } @{ $shippers };
 cmp_bag(
     \@shipperNames,
-    [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping}],
+    [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping},q{Free Shipping}, ],
     'Returned shippers have the right data'
 );
 
@@ -187,5 +189,7 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from shipper');
+    $driver->delete;
+    $driver2->delete;
+    is(scalar @{$ship->getShippers()}, 1, 'getShippers: deleted all test shippers');
 }
