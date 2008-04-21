@@ -37,11 +37,11 @@ my $session             = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $configExportPath = $session->config->get('exportPath');
+my $originalExportPath = $session->config->get('exportPath');
 
 my $testRan = 1;
 
-if ($configExportPath) {
+if ($originalExportPath) {
     plan tests => 145;        # Increment this number for each test you create
 }
 else {
@@ -72,7 +72,6 @@ cmp_deeply(
 # wiping out someone's exportPath setting isn't precisely the paragon of
 # politeness. Take a backup of the current exportPath before undefining it.
 
-my $originalExportPath = $session->config->get('exportPath');
 my $config = $session->config;
 $config->delete('exportPath');
 
