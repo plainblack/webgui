@@ -27,7 +27,6 @@ use Cwd;
 use Exception::Class;
 use File::Path;
 use File::Temp qw/tempfile tempdir/;
-use File::Slurp;
 use Path::Class;
 use Test::Deep;
 
@@ -347,7 +346,7 @@ $session->http->{_http}->{noHeader} = 1;
 $session->user( { userId => 1 } );
 my $content;
 my $guid = $session->id->generate;
-my $guidPath = Path::Class::Dir->new($config->getWebguiRoot, '..', 'domains', $guid);
+my $guidPath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', $guid);
 $config->set('exportPath', $guidPath->absolute->stringify);
 eval { $home->exportWriteFile() };
 is($@, '', "exportWriteFile works when creating exportPath");
@@ -365,10 +364,11 @@ is(scalar $home->exportGetUrlAsPath->absolute->slurp, $content, "exportWriteFile
 
 # first, set the exportPath to a *sub*directory of $guid to ensure that it
 # doesn't already exist, and then deny ourselves permissions to it.
-my $unwritablePath = Path::Class::Dir->new($config->getWebguiRoot, '..', 'domains', $guid, $guid);
+my $unwritablePath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', $guid, $guid);
+chmod 0000, $guidPath->stringify;
 $config->set('exportPath', $unwritablePath->absolute->stringify);
-chmod 0000, $guidPath;
 
+$session->http->{_http}->{noHeader} = 1;
 eval { $home->exportWriteFile() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error', "exportWriteFile throws if it can't create the export path");
@@ -392,7 +392,7 @@ ok(!-e Path::Class::File->new($unwritablePath, 'home', 'index.html')->absolute->
 $config->set('exportPath', $guidPath->absolute->stringify);
 
 # and clean up the temp directory
-chmod 0755, $guidPath;
+chmod 0755, $guidPath->stringify;
 $unwritablePath->remove;
 
 $session->http->{_http}->{noHeader} = 1;
@@ -985,11 +985,9 @@ END {
     # exportCheckPath.
     $session->config->set('exportPath', $originalExportPath);
 
+    # we created a couple of assets; roll them back so they don't stick around
     $versionTag->rollback();
 
-    # clean out the files written to the $guid export directory.
-    rmtree($guid);
-    
     # make sure people can view /home
     $home->update( { groupIdView => 7 } ); # everyone
 }
