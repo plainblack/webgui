@@ -33,16 +33,25 @@ use Test::Deep;
 #----------------------------------------------------------------------------
 # Init
 my $session             = WebGUI::Test->session;
-$session->{_request}    = WebGUI::PseudoRequest->new();
-
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 145;        # Increment this number for each test you create
+my $configExportPath = $session->config->get('exportPath');
+
+my $testRan = 1;
+
+if ($configExportPath) {
+    plan tests => 145;        # Increment this number for each test you create
+}
+else {
+    $testRan = 0;
+    plan skip_all => 'No exportPath in the config file';
+}
 
 #----------------------------------------------------------------------------
 # exportCheckPath()
+
 
 my $e;
 
@@ -977,17 +986,18 @@ is($home->exportGetUrlAsPath->absolute->stringify, readlink $rootUrlSymlink->abs
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    if ($testRan) {
+        # remove $tempDirectory since it now exists in the filesystem
+        rmtree($tempDirectory);
 
-    # remove $tempDirectory since it now exists in the filesystem
-    rmtree($tempDirectory);
+        # restore the original exportPath setting, now that we're done testing
+        # exportCheckPath.
+        $session->config->set('exportPath', $originalExportPath);
 
-    # restore the original exportPath setting, now that we're done testing
-    # exportCheckPath.
-    $session->config->set('exportPath', $originalExportPath);
+        # we created a couple of assets; roll them back so they don't stick around
+        $versionTag->rollback();
 
-    # we created a couple of assets; roll them back so they don't stick around
-    $versionTag->rollback();
-
-    # make sure people can view /home
-    $home->update( { groupIdView => 7 } ); # everyone
+        # make sure people can view /home
+        $home->update( { groupIdView => 7 } ); # everyone
+    }
 }
