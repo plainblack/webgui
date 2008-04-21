@@ -350,7 +350,7 @@ The sku attached to the object you wish to instanciate.
 
 sub newBySku {
     my ($class, $session, $sku) = @_;
-    my $assetId = $session->db->quickScalar("select assetId from Sku where sku=?", [$sku]);
+    my $assetId = $session->db->quickScalar("select assetId from sku where sku=?", [$sku]);
     return WebGUI::Asset->newByDynamicClass($session, $assetId); 
 }
 
