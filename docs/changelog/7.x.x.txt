@@ -27,6 +27,8 @@
  - Rewrote Event Manager fromthe ground up.
  - Added WebGUI.str javascript class with sprintf and trim methods.
  - fixed: Default Thing Name when adding a Thing is Thingy and should be Thing
+ - fixed: When latest Thing is removed from a Thingy only a drag button is
+   displayed
 
 
 7.5.10

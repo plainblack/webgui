@@ -1004,6 +1004,9 @@ sub view {
         elsif ($defaultView eq "addThing"){
             return $self->www_editThingData($defaultThingId,"new");
         }
+        else{
+            return $self->processTemplate($var, undef, $self->{_viewTemplate});
+        }
     }
     else{
 	    return $self->processTemplate($var, undef, $self->{_viewTemplate});
