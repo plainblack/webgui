@@ -226,9 +226,8 @@ is($isExportable, 1, "exportCheckExportable exportable asset, parent, grandparen
 #----------------------------------------------------------------------------
 # exportGetUrlAsPath()
 
-# exportPath won't be changing any more, so store it.
-$config->set('exportPath', $originalExportPath);
-my $exportPath = $originalExportPath;
+# store the exportPath for future reference
+my $exportPath = $config->get('exportPath');
 
 my $litmus;
 # start with something simple: export the root URL.
@@ -508,8 +507,9 @@ cmp_deeply(
 
 
 # now test that it works as it should, when it should
-$config->set('exportPath', $originalExportPath);
-$exportPath             = Path::Class::Dir->new($originalExportPath);
+#$config->set('exportPath', $originalExportPath);
+#$exportPath             = Path::Class::Dir->new($originalExportPath);
+$exportPath             = $config->get('exportPath');
 my $extrasPath          = $config->get('extrasPath');
 my $extrasUrl           = $config->get('extrasURL');
 my $uploadsPath         = $config->get('uploadsPath');
