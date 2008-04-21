@@ -26,6 +26,7 @@
  - fix: Processing a Cash/Check Order
  - Rewrote Event Manager fromthe ground up.
  - Added WebGUI.str javascript class with sprintf and trim methods.
+ - fixed: Default Thing Name when adding a Thing is Thingy and should be Thing
 
 
 7.5.10

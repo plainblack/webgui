@@ -1104,7 +1104,7 @@ sub www_editThing {
         my $groupIdEdit = $self->get("groupIdEdit");
         %properties = (
             thingId=>$thingId,
-            label=>$i18n->get('assetName'),
+            label=>$i18n->get('thing name label'),
             editScreenTitle=>$i18n->get('edit screen title label'),
             groupIdAdd=>$groupIdEdit,
             groupIdEdit=>$groupIdEdit,
