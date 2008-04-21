@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 22;
+my $tests = 23;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -120,13 +120,13 @@ is($session->getId, $book->session->getId, 'session method returns OUR session o
 
 ok($session->id->valid($book->getId), 'create makes a valid GUID style addressBookId');
 
-is(undef, $book->get('userId'), 'create does not automatically set the userId');
+is($book->get('userId'), 1, 'create uses $session->user to get the userid for this book');
 
 my $bookCount = $session->db->quickScalar('select count(*) from addressBook');
 is($bookCount, 1, 'only 1 address book was created');
 
 my $alreadyHaveBook = WebGUI::Shop::AddressBook->create($session);
-is($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, when you already have one, returns the one already created');
+isnt($book->getId, $alreadyHaveBook->getId, 'creating an addressbook as visitor, even when you already have one, always returns a new one');
 
 #######################################################################
 #
@@ -175,8 +175,6 @@ cmp_deeply(
         userId     => ignore,
         sessionId  => ignore,
         addressBookId  => ignore,
-        lastShipId => $address1->getId,
-        lastPayId  => $address2->getId,
     },
     'update updates the object properties cache'
 );
@@ -194,6 +192,12 @@ cmp_deeply(
 # delete
 #
 #######################################################################
+
+$alreadyHaveBook->delete();
+$bookCount = $session->db->quickScalar('select count(*) from addressBook');
+my $addrCount = $session->db->quickScalar('select count(*) from address');
+
+is($bookCount, 1, 'delete: one book deleted');
 
 $bookClone->delete();
 $bookCount = $session->db->quickScalar('select count(*) from addressBook');
