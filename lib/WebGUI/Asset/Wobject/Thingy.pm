@@ -2535,6 +2535,7 @@ thingId=".$self->session->db->quote($thingId));
     .$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
 sequenceNumber');
     while (my %field = $fields->hash) {
+        next unless ($field{display} eq '1');
         my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
 
         my $originalValue = $thingData{"field_".$field{fieldId}};
