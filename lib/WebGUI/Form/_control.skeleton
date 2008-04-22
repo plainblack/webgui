@@ -53,14 +53,14 @@ Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big o
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	push(@{$definition}, {
-		size=>{
-			defaultValue=>$session->setting->get("textBoxSize") || 30
-			},
-		});
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift || [];
+    push(@{$definition}, {
+        size=>{
+            defaultValue=>$session->setting->get("textBoxSize") || 30
+            },
+        });
         return $class->SUPER::definition($session, $definition);
 }
 
@@ -87,7 +87,7 @@ Does some special processing.
 =cut
 
 sub getValue {
-	my $self = shift;
+    my $self = shift;
     my $value = $self->SUPER::getValue(@_);
 
     # ... do your work here
@@ -104,8 +104,8 @@ Renders an input tag of type text.
 =cut
 
 sub toHtml {
-	my $self = shift;
- 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue)));
+    my $self = shift;
+    my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue)));
     return '<input id="'.$self->get('id').'" type="text" name="'.$self->get("name").'" value="'.$value.'" size="'.$self->get("size").'"  '.$self->get("extras").' />';
 }
 
