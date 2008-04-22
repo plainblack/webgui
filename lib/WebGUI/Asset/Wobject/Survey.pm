@@ -891,7 +891,8 @@ $self->session->errorHandler->warn("2-2 with $responseId");
             }else{
 $self->session->errorHandler->warn("2-3");
                 $self->setCurrentSection($responseId,$currentSection);
-                return $self->www_loadQuestions($responseId);
+#                return $self->www_loadQuestions($responseId);
+                return $self->www_loadQuestions();
 #                $section = $self->getSpecificSection($currentSection);
 #                $questions = $self->getQuestionsAndAnswers($responseId,$section);
             }
