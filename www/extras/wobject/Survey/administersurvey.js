@@ -86,7 +86,7 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                     var b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
                          value: a.Survey_answerId, 
                         container: a.Survey_answerId+"container", checked: false });
-                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts]);
+                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length]);
                     b.hid = a.Survey_answerId;
                     butts.push(b);
                 }
@@ -278,6 +278,7 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
         var qid = objs[1];
         var maxA = objs[2];
         var butts = objs[3];
+        var qsize = objs[4];
         max = parseInt(max);
         if(maxA == 1){
             for(var i in butts){
@@ -301,6 +302,9 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             var max = parseInt(document.getElementById(qid+'max').innerHTML);
             document.getElementById(qid+'max').innerHTML = parseInt(max+1);
             document.getElementById(b.hid).value = 1;
+        }
+        if(qsize == 1){
+            Survey.Form.formsubmit();
         }
     }
 }();

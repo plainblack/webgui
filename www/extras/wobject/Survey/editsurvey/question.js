@@ -27,7 +27,7 @@ Survey.QuestionTemplate = new function(){
         else{
             html = html + "<textarea name='questionText'>"+params.questionText+"</textArea>\n";
         }
-        html = html + "<p>Question custom variable name:<input maxlength=35 size=10 type=text value='"+ params.questionVariable +"' name=questionVariable size=2>";
+        html = html + "<p>Question custom variable name:<input maxlength=35 size=10 type=text value='"+ params.questionVariable +"' name=questionVariable size=2></p>";
         html = html + "<p>Randomize answers:";
  
         html = html+ this.makeRadio('randomizeAnswers',[{text:'Yes',value:1},{text:'No',value:0}],params.randomizeAnswers);

@@ -29,6 +29,7 @@ Survey.SectionTemplate = new function(){
                     <input type='radio' name='randomizeQuestions' value=1>Yes\
                     <input type='radio' name='randomizeQuestions' value=0 checked>No";
             }
+            html = html + "<p>Section custom variable name:<input maxlength=35 size=10 type=text value='"+ params.sectionVariable +"' name=sectionVariable size=2></p>";
             html = html + "\
                 <p>Question per Page:\
                      <select name='questionsPerPage'>";
@@ -66,7 +67,7 @@ Survey.SectionTemplate = new function(){
         }
 
         var form = new YAHOO.widget.Dialog("section",
-           { width : "300px",
+           { width : "400px",
              fixedcenter : true,
              visible : false,
              constraintoviewport : true,
