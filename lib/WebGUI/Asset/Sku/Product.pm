@@ -934,12 +934,11 @@ sub www_editParameterSave {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
 
     my $param     = $self->session->form->get('name');
-    my $origname  = lc $self->session->form->get('origname');
+    my $origname  = $self->session->form->get('origname');
 
     my $paramData = $self->getParamData;
     if (($origname ne "new") and ($origname ne $param)) {
-        $self->session->errorHandler->warn('Rename');
-        ##Rename existing data
+        ##Rename existing param
         my @options = @{ $paramData->{$origname} };
         $paramData->{$param} = \@options;
         delete $paramData->{$origname};
@@ -947,7 +946,6 @@ sub www_editParameterSave {
         return $newSelf->www_editParameter($param);
     }
     elsif ($origname eq "new") {
-        $self->session->errorHandler->warn('New');
         $paramData->{$param} = [];
         my $newSelf = $self->setParamData($paramData);
         return $newSelf->www_editParameterOptions($param);
@@ -960,12 +958,14 @@ sub www_editParameterOptions {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $session = $self->session;
     my $param = shift || $self->session->form->get('name');
-    my $value = shift || $self->session->form->get('value');
+    my $value = shift || $self->session->form->get('value') || "new";
     my $paramData = $self->getParamData;
+    ##You cannot add an option to a non-existant parameter.
     if (! exists $paramData->{$param}) {
         $self->session->errorHandler->warn('Not in param data');
         return $self->www_editParameter($param);
     }
+    ##Convert to a byname interface
     my $option = {};
     OPTION: foreach my $subOption (@{ $paramData->{$param} }) {
         if ($subOption->{value} eq $value) {
@@ -979,6 +979,13 @@ sub www_editParameterOptions {
         -name => "func",
         -value => "editParameterOptionSave",
     );
+    ##Editing an existing option
+    if (defined $value) {
+        $f->hidden(
+            -name => "origValue",
+            -value => $value,
+        );
+    }
     $f->readOnly(
         -name       => 'name',
         -value      => $param,
@@ -987,7 +994,7 @@ sub www_editParameterOptions {
 		-name		=> 'value',
 		-label		=> $i18n->get('edit option value'),
 		-hoverHelp	=> $i18n->get('edit option value description'),
-		-value		=> $session->form->process("value") || $option->{value},
+		-value		=> $value,
 		-maxlength	=> 64,
 	);
 	$f->float(
@@ -1016,6 +1023,12 @@ sub www_editParameterOptionsSave {
     my $param     = $self->session->form->get('name');
     my $value     = $self->session->form->get('value');
     my $origValue = $self->session->form->get('origValue');
+    
+    my $paramData = $self->getParamData();
+    if (($origvalue ne "new") and ($origvalue new $value)) {
+        ##Rename existing option
+
+    }
 
 }
 
