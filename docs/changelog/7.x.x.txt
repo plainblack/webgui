@@ -30,6 +30,7 @@
  - fixed: When latest Thing is removed from a Thingy only a drag button is
    displayed
  - fixed: Thingy: thing view screen always displays all fields
+ - fixed: Thingy: search result "sort by" not working
 
 
 7.5.10

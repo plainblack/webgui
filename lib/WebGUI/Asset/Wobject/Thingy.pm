@@ -2245,7 +2245,7 @@ sub www_search {
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdSearch});
 
     $doSearch = $session->form->process("doSearch");
-    $orderBy = $session->form->process("orderBy");
+    $orderBy = $session->form->process("orderBy") || $thingProperties{sortBy};
     $var = $self->get;
     $url = $self->getUrl;
 
