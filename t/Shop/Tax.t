@@ -623,7 +623,7 @@ SKIP: {
                 state=>ignore,
                 city=>ignore,
                 code=>ignore,
-                taxRate=>re('^\d+\.\d+$')
+                taxRate=>re('^\d+(\.\d+)?$')
             }),
         },
         'Check major elements of tax JSON',
