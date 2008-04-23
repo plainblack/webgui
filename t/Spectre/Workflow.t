@@ -88,12 +88,12 @@ SKIP: {
     undef $remote;
 
     # first test the data structure returned for all sites
-    ok($allSitesStructure = jsonToObj($allSitesResult), 'workflow/getJsonStatus for all sites returns a proper JSON data structure');
+    ok($allSitesStructure = from_json($allSitesResult), 'workflow/getJsonStatus for all sites returns a proper JSON data structure');
     isa_ok($allSitesStructure, 'HASH', 'workflow/getJsonStatus for all sites returns a JSON structure parseable into a Perl hashref');
     ok(exists $allSitesStructure->{$sitename}, "$sitename exists in all sites result structure");
 
     # then check it for the old style, single site result structure
-    ok($oneSiteStructure = jsonToObj($oneSiteResult),  'workflow/getJsonStatus for one site returns a proper JSON data structure');
+    ok($oneSiteStructure = from_json($oneSiteResult),  'workflow/getJsonStatus for one site returns a proper JSON data structure');
     isa_ok($oneSiteStructure, 'HASH', 'workflow/getJsonStatus for one site returns a JSON structure parseable into a Perl hashref');
 }
 
