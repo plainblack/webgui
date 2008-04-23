@@ -4,7 +4,8 @@ if (typeof Survey == "undefined") {
 
 Survey.Form = new function() {
    
-    var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1,'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
+    var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1};
+    var scale = {'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
         'Likelihood':1,'Certainty':1,'Satisfaction':1,'Confidence':1,'Effectiveness':1,'Concern':1,'Risk':1,'Threat':1,'Security':1,'Ideology':1,
         'Race':1,'Party':1,'Education':1};
     var text = {'Text':1, 'Email':1, 'Phone Number':1, 'Text Date':1, 'Currency':1};
@@ -14,12 +15,13 @@ Survey.Form = new function() {
     var hidden = {'Hidden':1};
 
     var hasFile;
+    var verb = 0; 
+    var lastSection = 'first';
 
     this.displayQuestions = function(params){
         
         var qs = params.questions;
         var s = params.section;
-       
 
         //What to show and where 
         document.getElementById('survey').innerHTML = params.html; 
@@ -29,14 +31,16 @@ document.getElementById('survey').appendChild(te);
 YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});   
 
         if(qs[0] != undefined){
-            if(qs[0].sequenceNumber == '1' || s.everyPageTitle > 0){
+            if(lastSection != s.Survey_sectionId || s.everyPageTitle > 0){
                 document.getElementById('headertitle').style.display='block';
             }
-            if(qs[0].sequenceNumber == '1' || s.everyPageText > 0){
+            if(lastSection != s.Survey_sectionId || s.everyPageText > 0){
+            //if(qs[0].sequenceNumber == '1' || s.everyPageText > 0){
                 document.getElementById('headertext').style.display = 'block';
             }
 
-            if(qs[0].sequenceNumber == '1' && s.questionsOnSectionPage != '1'){
+            if((lastSection != s.Survey_sectionId && lastSection != 'first') || s.questionsOnSectionPage != '1'){
+//            if(qs[0].sequenceNumber == '1' && s.questionsOnSectionPage != '1'){
                 var span = document.createElement("div"); 
                 span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                 span.style.display = 'block';
@@ -56,6 +60,7 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             }else{
                 document.getElementById('questions').style.display='inline';
             }
+            lastSection = s.Survey_sectionId;
         }else{
             document.getElementById('headertitle').style.display='block';
             document.getElementById('headertext').style.display = 'block';
@@ -79,14 +84,28 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             html += "<hr>";
             html += "<div class='question'>Q"+q.sequenceNumber+": "+q.questionText+"</div>";
 
-            if(multipleChoice[q.questionType]){
-                var butts = new Array();   
+            if(multipleChoice[q.questionType] || scale[q.questionType]){
+                var butts = new Array(); 
+                verb = 0; 
                 for(var x = 0; x < q.answers.length; x++){
                     var a = q.answers[x];
-                    var b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
-                         value: a.Survey_answerId, 
-                        container: a.Survey_answerId+"container", checked: false });
+                    var b;
+                    if(scale[q.questionType]){
+                        b = new YAHOO.widget.Button({ type: "checkbox", label: a.recordedAnswer, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
+                            value: a.Survey_answerId, 
+                            container: a.Survey_answerId+"container", checked: false });
+                        b.label=a.recordedAnswer;
+                    }else{
+                        b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
+                            value: a.Survey_answerId, 
+                            container: a.Survey_answerId+"container", checked: false });
+                        b.label=a.answerText;
+                    }
+                    b.setStyle('text-align','center'); 
                     b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length]);
+                    if(a.verbatim == 1){
+                        verb = 1;
+                    }
                     b.hid = a.Survey_answerId;
                     butts.push(b);
                 }
@@ -303,7 +322,8 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             document.getElementById(qid+'max').innerHTML = parseInt(max+1);
             document.getElementById(b.hid).value = 1;
         }
-        if(qsize == 1){
+//console.log('qsize '+qsize+' verb '+verb);
+        if(qsize == 1 && verb == 0){
             Survey.Form.formsubmit();
         }
     }

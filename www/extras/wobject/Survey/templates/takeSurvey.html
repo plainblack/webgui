@@ -7,8 +7,6 @@
 
 <form name='surveyForm'>
 
-<input type='hidden' name='section' value='<tmpl_var name='Survey_sectionId'>'>
-
 <tmpl_loop name='questions'>
     <hr>
     <div class='question'>Q<tmpl_var name='sequenceNumber'>: <tmpl_var name='questionText'></div>
@@ -36,6 +34,12 @@
         </tmpl_loop>
     </tmpl_if>
 
+    <tmpl_if name='hidden'>
+    <tmpl_loop name='answers'>
+            <input type='hidden' name='<tmpl_var name="Survey_answerId">' value='<tmpl_var name='recordedAnswer'>'>
+    </tmpl_loop>
+    </tmpl_if>
+
     <tmpl_if name='text'>
         <tmpl_loop name=answers>
             <tmpl_var name='verts'>
@@ -48,6 +52,33 @@
             <tmpl_var name='verte'>
         </tmpl_loop>
     </tmpl_if>
+
+
+    <tmpl_if name='scale'>
+        <table class="scale">
+            <tr>
+                <tmpl_loop name=answers>
+                    <th>
+                        <tmpl_var name='answerText'>
+                    </th>
+                </tmpl_loop>
+            </tr>
+            <tr>
+                <tmpl_loop name=answers>
+                    <td align="center" width="2em">
+                        <span class=answer id="<tmpl_var name='Survey_answerId'>container"></span>
+                        <tmpl_if name='verbatim'>
+                            <span><input type=text name='<tmpl_var name='Survey_answerId'>verbatim'></span>
+                        </tmpl_if>  
+                    </td>
+                </tmpl_loop>
+            </tr>
+        </table>
+        <tmpl_loop name=answers>
+            <input type=hidden name=<tmpl_var name='Survey_answerId'> id=<tmpl_var name='Survey_answerId'>>
+        </tmpl_loop>
+    </tmpl_if>
+
 
     <tmpl_if name='multipleChoice'>
         <tmpl_loop name=answers>
@@ -140,6 +171,11 @@
         </tmpl_if>
     </tmpl_if>
 
+    <tmpl_if name='allowComment'>
+        <p>Comment: <input type='text' name='<tmpl_var name='Survey_questionId'>comment'></p>
+    </tmpl_if>
+
+
 </tmpl_loop>
 <hr><input type=button id=submitbutton value=submitbutton></input>
 </form>
@@ -147,5 +183,7 @@
 </div>
 
 <div id="footer"></div>
+
+
 
 

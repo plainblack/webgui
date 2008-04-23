@@ -33,11 +33,13 @@ Survey.QuestionTemplate = new function(){
         html = html+ this.makeRadio('randomizeAnswers',[{text:'Yes',value:1},{text:'No',value:0}],params.randomizeAnswers);
         html = html + "<p>Previous answers to display:<textarea name='previousAnswerWords' cols=4 rows=2>"+params.previousAnswerWords+"</textarea>";
         html = html + "<p>Question type:";
-
-        var questions = ['Multiple Choice','Gender','Yes/No','True/False','Agree/Disagree','Oppose/Support','Importance','Likelihood','Certainty','Satisfaction',
-            'Confidence','Effectiveness','Concern','Risk','Threat','Security','Ideology','Race','Party','Education',
-            'Text', 'Email', 'Phone Number', 'Text Date', 'Currency',
-            'Slider','Dual Slider - Range','Multi Slider - Allocate', 'Date','Date Range', 'File Upload','Hidden'];
+        var questions = ['Agree/Disagree','Certainty','Concern','Confidence','Currency','Date','Date Range','Dual Slider - Range','Education','Effectiveness',
+            'Email','File Upload','Gender','Hidden','Ideology','Importance','Likelihood','Multi Slider - Allocate','Multiple Choice','Oppose/Support',
+            'Party','Phone Number','Race','Risk','Satisfaction','Security','Slider','Text','Text Date','Threat','True/False','Yes/No'];
+//        var questions = ['Multiple Choice','Gender','Yes/No','True/False','Agree/Disagree','Oppose/Support','Importance','Likelihood','Certainty','Satisfaction',
+//            'Confidence','Effectiveness','Concern','Risk','Threat','Security','Ideology','Race','Party','Education',
+//            'Text', 'Email', 'Phone Number', 'Text Date', 'Currency',
+//            'Slider','Dual Slider - Range','Multi Slider - Allocate', 'Date','Date Range', 'File Upload','Hidden'];
 
         html = html + this.makeMenu('questionType',questions,questions,params.questionType);
         

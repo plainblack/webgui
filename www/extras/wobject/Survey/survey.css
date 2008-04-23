@@ -31,4 +31,10 @@ div.slider-max-thumb {
 #questions {
     display: none;
 }
-
+.yui-button{
+    text-align: center;
+}
+.yui-button button{
+    text-align: center;
+    min-width: 50px;
+}
