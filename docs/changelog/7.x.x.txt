@@ -1,5 +1,6 @@
 7.4.34
  - fixed: email validation rejects periods
+ - fixed: day/week/month tabs non-functional on calendar search screen
 
 7.4.33
  - fixed: Package search is slow for large websites

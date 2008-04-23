@@ -1674,6 +1674,10 @@ sub www_search {
     
     my $var         = $self->get;
     $var->{url}     = $self->getUrl;
+    $var->{"urlDay"}        = $self->getUrl("type=day");
+    $var->{"urlWeek"}       = $self->getUrl("type=week");
+    $var->{"urlMonth"}      = $self->getUrl("type=month");
+    $var->{"urlSearch"}     = $self->getSearchUrl;
     
     # If there is a search to perform
     if ($keywords || $startDate || $endDate) {
