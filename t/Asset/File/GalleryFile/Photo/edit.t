@@ -69,57 +69,60 @@ my $photo;
 
 plan tests => 6;        # Increment this number for each test you create
 
-use_ok( 'Test::WWW::Mechanize' ) or BAIL_OUT( "Cannot continue without Test::WWW::Mechanize" );
+SKIP: {
 
-#----------------------------------------------------------------------------
-# Test permissions for new photos
-$mech   = Test::WWW::Mechanize->new;
+    use_ok( 'Test::WWW::Mechanize' ) or skip( "Cannot continue without Test::WWW::Mechanize", 5 );
 
-# Save a new photo
-$mech->get( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
-$mech->content_lacks( 'value="editSave"' );
+    #----------------------------------------------------------------------------
+    # Test permissions for new photos
+    $mech   = Test::WWW::Mechanize->new;
 
-#----------------------------------------------------------------------------
-# Test creating a new Photo
-SKIP: { 
-    skip "File control needs to be fixed to be more 508-compliant before this can be used", 4;
-    $mech   = getMechLogin( $baseUrl, $user, $identifier );
-    $mech->get_ok( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
+    # Save a new photo
+    $mech->get( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
+    $mech->content_lacks( 'value="editSave"' );
 
-    open my $file, '<', WebGUI::Test->getTestCollateralPath( 'lamp.jpg' ) 
-        or BAIL_OUT( "Couldn't open test collateral 'lamp.jpg' for reading: $!" );
-    my $properties  = {
-        title           => 'Photo Title' . time,
-        synopsis        => '<p>Photo Synopsis' . time . '</p>',
-        newFile_file    => $file,
-    };
+    #----------------------------------------------------------------------------
+    # Test creating a new Photo
+    SKIP: { 
+        skip "File control needs to be fixed to be more 508-compliant before this can be used", 4;
+        $mech   = getMechLogin( $baseUrl, $user, $identifier );
+        $mech->get_ok( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
 
-    $mech->submit_form_ok( 
-        {
-            form_number => 1,
-            fields      => $properties,
-        }, 
-        'Submit new Photo' 
-    );
+        open my $file, '<', WebGUI::Test->getTestCollateralPath( 'lamp.jpg' ) 
+            or die( "Couldn't open test collateral 'lamp.jpg' for reading: $!" );
+        my $properties  = {
+            title           => 'Photo Title' . time,
+            synopsis        => '<p>Photo Synopsis' . time . '</p>',
+            newFile_file    => $file,
+        };
 
-    # Add properties that should be default and remove those that should be different
-    delete $properties->{ newFile_file };
-    $properties = {
-        %{ $properties },
-        ownerUserId     => $user->userId,
-        filename        => 'lamp.jpg',
-    };
+        $mech->submit_form_ok( 
+            {
+                form_number => 1,
+                fields      => $properties,
+            }, 
+            'Submit new Photo' 
+        );
 
-    # Make sure properties were saved
-    my $photo   = WebGUI::Asset->newByDynamicClass( $session, $album->getFileIds->[0] );
-    cmp_deeply( $photo->get, superhashof( $properties ), "Photo properties saved correctly" );
+        # Add properties that should be default and remove those that should be different
+        delete $properties->{ newFile_file };
+        $properties = {
+            %{ $properties },
+            ownerUserId     => $user->userId,
+            filename        => 'lamp.jpg',
+        };
 
-    # First File in an album should update assetIdThumbnail
-    my $album   = WebGUI::Asset->newByDynamicClass( $session, $album->getId );
-    is( 
-        $album->get('assetIdThumbnail'), $photo->getId, 
-        "Album assetIdThumbnail gets set by first File added",
-    );
+        # Make sure properties were saved
+        my $photo   = WebGUI::Asset->newByDynamicClass( $session, $album->getFileIds->[0] );
+        cmp_deeply( $photo->get, superhashof( $properties ), "Photo properties saved correctly" );
+
+        # First File in an album should update assetIdThumbnail
+        my $album   = WebGUI::Asset->newByDynamicClass( $session, $album->getId );
+        is( 
+            $album->get('assetIdThumbnail'), $photo->getId, 
+            "Album assetIdThumbnail gets set by first File added",
+        );
+    }
 }
 
 #----------------------------------------------------------------------------
