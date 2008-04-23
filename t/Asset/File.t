@@ -84,7 +84,7 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
-$mocker->set_always('getValueFromPost', $fileStorage->getId);
+$mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
 isnt(ref $fileFormStorage, 'WebGUI::Storage::Image', 'getStorageFromPost does not return an image storage object');
