@@ -91,11 +91,25 @@ cmp_deeply  (
                 hoverHelp       => ignore(),
                 defaultValue    => 1,
             },
-            receiptMessage  => {
-                fieldType       => 'text',
+            receiptEmailTemplateId  => {
+                fieldType       => 'template',
                 label           => ignore(),
                 hoverHelp       => ignore(),
-                defaultValue    => undef,
+                defaultValue    => '',
+                namespace       => 'Shop/ReceiptEmail',
+            },
+            saleNotificationTemplateId  => {
+                fieldType       => 'template',
+                label           => ignore(),
+                hoverHelp       => ignore(),
+                defaultValue    => '',
+                namespace       => 'Shop/SaleEmail',
+            },
+            saleNotificationGroupId  => {
+                fieldType       => 'group',
+                label           => ignore(),
+                hoverHelp       => ignore(),
+                defaultValue    => 3,
             },
         }
     } ],
@@ -299,7 +313,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 10, 'getEditForm: the form has 10 controls');
+is          (scalar @inputs, 12, 'getEditForm: the form has 10 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -348,8 +362,16 @@ cmp_deeply(
             type    => 'option',
         },
         {
-            name    => 'receiptMessage',
-            type    => 'text',
+            name    => 'receiptEmailTemplateId',
+            type    => 'option',
+        },
+        {
+            name    => 'saleNotificationTemplateId',
+            type    => 'option',
+        },
+        {
+            name    => 'saleNotificationGroupId',
+            type    => 'option',
         },
     ],
     'getEditForm made the correct form with all the elements'
