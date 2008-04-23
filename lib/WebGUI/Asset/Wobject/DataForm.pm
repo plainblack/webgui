@@ -46,7 +46,7 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-sub _createField {
+sub _getForm {
 	my $self = shift;
 	my $data = $_[0];
 	my %param;
@@ -93,8 +93,20 @@ sub _createField {
                 	$param{value} = 0;
                 }
 	}
-	my $cmd = "WebGUI::Form::".$data->{type};
-	return &$cmd($self->session, \%param);
+    my $class = "WebGUI::Form::".ucfirst($data->{type});
+    (my $module = $class . ".pm") =~ s{::|'}{/}g;
+    if (! eval { require $module; 1 } ) {
+        return undef;
+    }
+    return $class->new($self->session, \%param);
+}
+
+sub _createField {
+    my $self = shift;
+    my $form = $self->_getForm(@_);
+    return undef
+        unless $form;
+    return $form->toHtml;
 }
 
 #-------------------------------------------------------------------
@@ -406,7 +418,13 @@ sub getListTemplateVars {
 			order by b.sequenceNumber");
 		while (my $data = $dloop->hashRef) {
 			my $value = $data->{value};
-			$value = $self->getAttachedFiles({returnType=>'link',storageId=>$value}) if ($value && $data->{type} eq 'file');
+            if ($value && $data->{type} eq 'file') {
+                $value = $self->getAttachedFiles({returnType=>'link',storageId=>$value});
+            }
+            else {
+                my $form = $self->_getForm($data);
+                $value = $form->displayValue;
+            }
 			push(@dataLoop,{
 				"record.data.name"=>$data->{name},
 				"record.data.label"=>$data->{label},
@@ -431,7 +449,7 @@ sub getListTemplateVars {
 			});
 	}
 	$entries->finish;
-	$var->{record_loop} = \@recordLoop;	
+	$var->{record_loop} = \@recordLoop;
 	return $var;
 }
 
@@ -526,16 +544,14 @@ sub getRecordTemplateVars {
 				$data{value} = $defaultValue;
 			}
 			my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
-			my $value = $data{value};
-			$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
-			$value = $self->session->datetime->epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
+			my $form = $self->_getForm(\%data);
 			my $subtext = $data{subtext};
-			$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
+			$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $data{value});
 			push(@fields, {
 				"tab.field.form" => $self->_createField(\%data),
 				"tab.field.name" => $data{name},
 				"tab.field.tid" => $data{DataForm_tabId},
-				"tab.field.value" => $value,
+				"tab.field.value" => $form->displayValue,
 				"tab.field.label" => $data{label},
 				"tab.field.isMailField" => $data{isMailField},
 				"tab.field.isHidden" => $hidden,
@@ -573,18 +589,16 @@ sub getRecordTemplateVars {
 			$data{value} = $defaultValue;
 		}
 		my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
-		my $value = $data{value};
-		$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
-		$value = $self->session->datetime->epochToHuman($value) if ($data{type} eq "dateTime");
+		my $form = $self->_getForm(\%data);
 		my $subtext = $data{subtext};
-		$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
+		$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $data{value});
 
 		my %fieldProperties = (
 			"form" => $self->_createField(\%data),
 			"name" => $data{name},
 			"tid" => $data{DataForm_tabId},
 			"inTab".$data{DataForm_tabId} => 1,
-			"value" => $value,
+			"value" => $form->displayValue,
 			"label" => $data{label},
 			"isMailField" => $data{isMailField},
 			"isHidden" => $hidden,

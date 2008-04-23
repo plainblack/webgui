@@ -103,6 +103,29 @@ sub definition {
         return $class->SUPER::definition($session, $definition);
 }
 
+sub displayValue {
+    my $self = shift;
+    my $value = $self->get("value");
+    return $value
+        if !$value;
+
+    # This should probably be rewritten as a cascading ternary
+    if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || $value =~ m/^\d+$/) {
+        $value = $self->session->datetime->epochToSet($self->get("value"),1);
+    }
+    else {
+        # MySQL format
+        # Fix Time zone
+        $value 	= WebGUI::DateTime->new($value)
+            ->set_time_zone($self->session->user->profileField("timeZone"))
+            ->toMysql;
+    }
+    return $value;
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 getValueFromPost ( [ value ] )

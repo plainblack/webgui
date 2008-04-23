@@ -102,6 +102,25 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+sub displayValue {
+    my $self = shift;
+    my $value = $self->get("value");
+    return $value
+        if !$value;
+    # This should probably be rewritten as a cascading ternary
+    if (!$self->get("defaultValue") 
+        || $self->get("defaultValue") =~ m/^\d+$/
+        || $value =~ m/^\d+$/) {
+        return $self->session->datetime->secondsToTime($self->get("value"));
+    }
+    else {
+        # MySQL format
+        return $value;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getValueFromPost ( [ value ] )
 
 If the defaultValue is a MySQL time, the value returned by this form element 
@@ -174,6 +193,7 @@ sub toHtml {
 		# MySQL format
 		$value	= $self->get("value");
 	}
+    $self->set('value', $value);
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
