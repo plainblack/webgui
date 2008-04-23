@@ -283,14 +283,14 @@ sub getFileUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getParamData
+=head2 getParams
 
 Return the parameter data from this product as a perl data structure,
 rather than the internally stored JSON.
 
 =cut
 
-sub getParamData {
+sub getParams {
     my $self = shift;
     my $structure = JSON::from_json($self->get('parameters'));
     return $structure;
@@ -904,11 +904,14 @@ sub www_editFeatureSave {
 sub www_editParameter {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $param = shift || $self->session->form->get('name') || 'new';
-    my $paramData = $self->getParamData;
-    $param = "new" unless exists $paramData->{$param};
+    my $param      = shift || $self->session->form->get('name') || 'new';
+    my $allParams = $self->getParams;
+
+    $param = "new" unless exists $allParams->{$param};
+
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+
     $f->hidden(
         -name => "func",
         -value => "editParameterSave",
@@ -933,48 +936,49 @@ sub www_editParameterSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
 
-    my $param     = $self->session->form->get('name');
-    my $origname  = $self->session->form->get('origname');
+    my $param      = $self->session->form->get('name');
+    my $origname   = $self->session->form->get('origname');
 
-    my $paramData = $self->getParamData;
+    my $allParams = $self->getParams;
     if (($origname ne "new") and ($origname ne $param)) {
         ##Rename existing param
-        my @options = @{ $paramData->{$origname} };
-        $paramData->{$param} = \@options;
-        delete $paramData->{$origname};
-        my $newSelf = $self->setParamData($paramData);
+        my @options = @{ $allParams->{$origname} };
+        $allParams->{$param} = \@options;
+        delete $allParams->{$origname};
+        my $newSelf = $self->setParamData($allParams);
         return $newSelf->www_editParameter($param);
     }
     elsif ($origname eq "new") {
-        $paramData->{$param} = [];
-        my $newSelf = $self->setParamData($paramData);
+        $allParams->{$param} = [];
+        my $newSelf = $self->setParamData($allParams);
         return $newSelf->www_editParameterOptions($param);
     }
+    return $self->www_view();
 }
 
 #-------------------------------------------------------------------
 sub www_editParameterOptions {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $session = $self->session;
-    my $param = shift || $self->session->form->get('name');
-    my $value = shift || $self->session->form->get('value') || "new";
-    my $paramData = $self->getParamData;
+    my $session    = $self->session;
+    my $param      = shift || $session->form->get('name');
+    my $value      = shift || $session->form->get('value') || "new";
+    my $allParams = $self->getParams;
     ##You cannot add an option to a non-existant parameter.
-    if (! exists $paramData->{$param}) {
-        $self->session->errorHandler->warn('Not in param data');
+    if (! exists $allParams->{$param}) {
+        $session->errorHandler->warn("$param is not in param data");
         return $self->www_editParameter($param);
     }
     ##Convert to a byname interface
     my $option = {};
-    OPTION: foreach my $subOption (@{ $paramData->{$param} }) {
+    OPTION: foreach my $subOption (@{ $allParams->{$param} }) {
         if ($subOption->{value} eq $value) {
             $option = $subOption;
             last OPTION;
         }
     }
-    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $i18n = WebGUI::International->new($session,'Asset_Product');
+    my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
     $f->hidden(
         -name => "func",
         -value => "editParameterOptionSave",
@@ -1020,16 +1024,43 @@ sub www_editParameterOptionsSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
 
-    my $param     = $self->session->form->get('name');
-    my $value     = $self->session->form->get('value');
-    my $origValue = $self->session->form->get('origValue');
+    my $form       = $self->session->form;
+    my $param      = $form->get('name');
+    my $value      = $form->get('value');
+    my $origValue  = $form->get('origValue');
     
-    my $paramData = $self->getParamData();
-    if (($origvalue ne "new") and ($origvalue new $value)) {
-        ##Rename existing option
-
+    my $allParams = $self->getParams();
+    if (! exists $allParams->{$param}) {
+        $self->session->errorHandler->warn("$param is not an existing parameter");
+        return $self->www_editParameter($param);
     }
-
+    my $paramData = $allParams->{$param};
+    if (($origValue ne "new") and ($origValue ne $value)) {
+        ##Rename existing option
+        my $option = {};
+        OPTION: foreach my $subOption (@{ $allParams->{$param} }) {
+            if ($subOption->{value} eq $value) {
+                $option = $subOption;
+                last OPTION;
+            }
+        }
+        ##Warning for a non-existant option
+        if (! keys %{ $option } ) {
+            $self->session->errorHandler->warn("$value is not an existing option of $param");
+            return $self->www_editParameter($param, $value);
+        }
+        $option->{value}         = $value;
+        $option->{priceModifer}  = $form->get('priceModifier');
+        $option->{weightModifer} = $form->get('weightModifier');
+    }
+    elsif ($origValue eq "new") {
+        my $newOption = {};
+        $newOption->{value}         = $value;
+        $newOption->{priceModifer}  = $form->get('priceModifier');
+        $newOption->{weightModifer} = $form->get('weightModifier');
+        push @{ $paramData }, $newOption;
+    }
+    return $self->www_view();
 }
 
 #-------------------------------------------------------------------
