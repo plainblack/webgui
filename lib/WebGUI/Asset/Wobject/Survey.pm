@@ -376,7 +376,7 @@ sub www_dragDrop{
             elsif($before->{'type'} eq 'answer'){
                 $pid = my $section =  $self->session->db->quickScalar("
                     select sq.Survey_sectionId 
-                    from Survey_answer as, Survey_question sq 
+                    from Survey_answer sa, Survey_question sq 
                     where sa.Survey_answerId = ? and sa.Survey_questionId = sq.Survey_questionId",
                     [$before->{'id'}]);
             }
@@ -724,23 +724,17 @@ sub www_submitQuestions{
     
     $self->session->errorHandler->warn("\n\nIn submitQuestions with reponseId $responseId");
 
-####If we get back only a section id but with no questions, we need to move to the next section
     my $responses = $self->session->form->paramsHashRef();
-
-#    if((scalar keys %$responses) < 3){#func and section are the first two
-#        return $self->www_loadQuestions($responseId, $$responses{'section'});
-#    }
 
     delete $$responses{'func'};
 
-    #list of responses with values
-#    my @goodResponses = grep($$responses{$_} =~ /[\d\w]/,keys %$responses);
 ###########
 
 #  GO THROUGH ALL RESPONSES LOOKING FOR VERBATIMS AND ADD THEM ACCORDINGLY
 
 #######
-    my @goodResponses = keys %$responses;#load everything.  Responses without values were skipped, so don't jump on them and remember that in reports
+
+    my @goodResponses = keys %$responses;#load everything.  
 
     if(@goodResponses == 0){##nothing to load
         return $self->www_loadQuestions($responseId);
@@ -749,14 +743,27 @@ sub www_submitQuestions{
     my $sql = "select max(answerOrder) from Survey_questionResponse where Survey_responseId = ?";
     my $lastOrder = $self->session->db->quickScalar($sql, [$responseId]);
 
+
+    #handle comments
+    foreach my $r(@goodResponses){
+        if($r =~ /(.*?)comment$/){
+            my $t = $1;
+$self->session->errorHandler->warn("Inserting a comment: key is $r regex key is $t responseid is $responseId and value is ".$$responses{$r});
+            $self->session->db->write("insert into Survey_questionResponseComment values(?,?,?,?)",[$self->getId(),$responseId,$t,$$responses{$r}]);
+        }
+    }
+
     if(!$lastOrder){$lastOrder = 0;}
 
-    #get order of responses
+    #get order of responses ##Comments will be ignored in this query as they use an id of the questionId concatted with 'comment' which will never match a Survey_answerId
     my $orderOf = $self->session->db->buildArrayRefOfHashRefs("select distinct(a.Survey_answerId), q.questionType 
         from Survey_answer a, Survey_question q where a.Survey_answerId in (".
         (join (',',map("?",@goodResponses))).
         ") and a.Survey_questionId = q.Survey_questionId order by q.sequenceNumber ASC",
        \@goodResponses);
+use Data::Dumper;
+$self->session->errorHandler->warn("OrderOf".Dumper $orderOf);
+$self->session->errorHandler->warn("goodReponses".Dumper @goodResponses);
     
     my $files = 0;
  
@@ -769,6 +776,7 @@ sub www_submitQuestions{
             my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
             $path = $storage->getPath($filename);
         }
+$self->session->errorHandler->warn("Inserting a response ".$id->{'Survey_answerId'});
         $self->session->db->write("insert into Survey_questionResponse 
             select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
             [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
@@ -967,9 +975,9 @@ $self->session->errorHandler->warn("-------SurveyEnd $url");
 #sends the processed template and questions structure to the client
 sub showQuestions{
     my ($self,$section,$questions) = @_;
-    my %multipleChoice = ('Multiple Choice',1,'Gender',1,'Yes/No',1,'True/False',1,'Agree/Disagree',1,'Oppose/Support',1,'Importance',1,
-        'Likelihood',1,'Certainty',1,'Satisfaction',1,'Confidence',1,'Effectiveness',1,'Concern',1,'Risk',1,'Threat',1,'Security',1,'Ideology',1,
-        'Race',1,'Party',1,'Education',1);
+    my %multipleChoice = ('Multiple Choice',1,'Gender',1,'Yes/No',1,'True/False',1);
+    my %scale = ('Agree/Disagree',1,'Oppose/Support',1,'Importance',1, 'Likelihood',1,'Certainty',1,'Satisfaction',1,'Confidence',1,
+        'Effectiveness',1,'Concern',1,'Risk',1,'Threat',1,'Security',1,'Ideology',1, 'Race',1,'Party',1,'Education',1);
     my %text = ('Text',1, 'Email',1, 'Phone Number',1, 'Text Date',1, 'Currency',1);
     my %slider = ('Slider',1, 'Dual Slider - Range',1, 'Multi Slider - Allocate',1);
     my %dateType = ('Date',1,'Date Range',1);
@@ -983,6 +991,12 @@ sub showQuestions{
         elsif($hidden{$$q{'questionType'}}){ $q->{'hidden'} = 1; }
         elsif($multipleChoice{$$q{'questionType'}}){ 
             $q->{'multipleChoice'} = 1; 
+            if($$q{'maxAnswers'} > 1){
+                $q->{'maxMoreOne'} = 1; 
+            }
+        }
+        elsif($scale{$$q{'questionType'}}){ 
+            $q->{'scale'} = 1; 
             if($$q{'maxAnswers'} > 1){
                 $q->{'maxMoreOne'} = 1; 
             }
@@ -1338,39 +1352,39 @@ sub createDefaultAnswers{
     my ($self,$sid,$qid,$type) = @_;
     $self->session->db->write("delete from Survey_answer where Survey_questionId = ?",[$qid]);
     if($type eq 'Gender'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'male', 1, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'female', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Male', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'Female', 0, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Yes/No'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'yes', 1, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'no', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Yes', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'No', 0, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'True/False'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'true', 1, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'false', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'True', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'False', 0, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Agree/Disagree'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'strongly disagree', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Strongly disagree', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 3, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 4, 
             undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, '', 5, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, '', 6, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'strongly agree', 7, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'Strongly agree', 7, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Oppose/Support'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'strongly oppose', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Strongly oppose', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 3, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 4, 
             undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, '', 5, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, '', 6, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'strongly support', 7, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'Strongly support', 7, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Importance'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all important', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all important', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1380,10 +1394,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely important', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely important', 10, undef, undef,undef,undef,0]);
     
     }elsif($type eq 'Likelihood'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all likely', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all likely', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1393,10 +1407,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely likely', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely likely', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Certainty'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all certain', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all certain', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1406,10 +1420,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely certain', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely certain', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Satisfaction'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all satisfied', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all satisfied', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1419,10 +1433,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'completely satisfied', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Completely satisfied', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Confidence'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all confident', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all confident', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1432,10 +1446,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely confident', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely confident', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Effectiveness'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all effective', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all effective', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1445,10 +1459,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely effective', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely effective', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Concern'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all concerned', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all concerned', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1458,10 +1472,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely concerned', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely concerned', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Risk'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'no risk', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'No risk', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1471,10 +1485,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extreme risk', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extreme risk', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Threat'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'no threat', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'No threat', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1484,10 +1498,10 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extreme threat', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extreme threat', 10, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Security'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'not at all secure', 0, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Not at all secure', 0, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, '', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, '', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, '', 3, undef, undef,undef,undef,0]);
@@ -1497,17 +1511,17 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, '', 7, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 9, undef, '', 8, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 10, undef, '', 9, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'extremely secure', 10, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 11, undef, 'Extremely secure', 10, undef, undef,undef,undef,0]);
 
 
     }elsif($type eq 'Ideology'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'strongly liberal', 1, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'liberal', 2, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, 'somewhat liberal', 3, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'middle of the road', 4, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, 'slightly conservative', 5, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, 'conservative', 6, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'strongly conservative', 7, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Strongly liberal', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'Liberal', 2, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, 'Somewhat liberal', 3, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'Middle of the road', 4, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, 'Slightly conservative', 5, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, 'Conservative', 6, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'Strongly conservative', 7, undef, undef,undef,undef,0]);
 
     }elsif($type eq 'Race'){
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'American Indian', 1, undef, undef,undef,undef,0]);
@@ -1521,17 +1535,17 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Democratic party', 1, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'Republican party (or GOP)', 2, undef, undef,undef,undef,0]);
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, 'Independant party', 3, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'other party (verbatim)', 4, undef, undef,undef,undef,1,]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'Other party (verbatim)', 4, undef, undef,undef,undef,1,]);
 
     }elsif($type eq 'Education'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'elementary or some high school', 1, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'high school/GED', 2, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, 'some college/vocational school', 3, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'college graduate', 4, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, 'some graduate work', 5, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, 'master\'s degree', 6, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'doctorate (of any type)', 7, undef, undef,undef,undef,0]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, 'other degree (verbatim)', 8, undef, undef,undef,undef,1,]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, 'Elementary or some high school', 1, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, 'High school/GED', 2, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 3, undef, 'Some college/vocational school', 3, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 4, undef, 'College graduate', 4, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 5, undef, 'Some graduate work', 5, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 6, undef, 'Master\'s degree', 6, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 7, undef, 'Doctorate (of any type)', 7, undef, undef,undef,undef,0]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 8, undef, 'Other degree (verbatim)', 8, undef, undef,undef,undef,1,]);
        
     }elsif($type eq 'Text'){
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, undef,undef,undef,0]);
