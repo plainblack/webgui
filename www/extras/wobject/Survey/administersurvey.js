@@ -4,10 +4,9 @@ if (typeof Survey == "undefined") {
 
 Survey.Form = new function() {
    
-    var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1};
+    var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1,'Ideology':1, 'Race':1,'Party':1,'Education':1};
     var scale = {'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
-        'Likelihood':1,'Certainty':1,'Satisfaction':1,'Confidence':1,'Effectiveness':1,'Concern':1,'Risk':1,'Threat':1,'Security':1,'Ideology':1,
-        'Race':1,'Party':1,'Education':1};
+        'Likelihood':1,'Certainty':1,'Satisfaction':1,'Confidence':1,'Effectiveness':1,'Concern':1,'Risk':1,'Threat':1,'Security':1};
     var text = {'Text':1, 'Email':1, 'Phone Number':1, 'Text Date':1, 'Currency':1};
     var slider = {'Slider':1, 'Dual Slider - Range':1, 'Multi Slider - Allocate':1};
     var dateType = {'Date':1,'Date Range':1};
