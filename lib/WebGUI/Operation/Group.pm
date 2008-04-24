@@ -248,13 +248,22 @@ sub www_autoDeleteFromGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteGroup
+
+Delete's the group specified by id, in the form variable gid.  Groups 1-17
+are reserved for WebGUI internal groups and are not allowed to be deleted.
+Returns you to www_listGroups when done.
+
+=cut
+
 sub www_deleteGroup {
-	my $session = shift;
-	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
-	return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
-	my $g = WebGUI::Group->new($session,$session->form->process("gid"));
-	$g->delete;
-        return www_listGroups($session);
+    my $session = shift;
+    return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+    return $session->privilege->vitalComponent() if (isIn($session->form->process("gid"), qw(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)));
+    my $g = WebGUI::Group->new($session,$session->form->process("gid"));
+    $g->delete;
+    return www_listGroups($session);
 }
 
 #-------------------------------------------------------------------
