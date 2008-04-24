@@ -288,7 +288,7 @@ SKIP: {
     my $taxFile = WebGUI::Test->getTestCollateralPath('taxTables/goodTaxTable.csv');
     
     SKIP: {
-        skip 'Root will cause this test to fail since it does not obey file permissions', 1
+        skip 'Root will cause this test to fail since it does not obey file permissions', 3
             if $< == 0;
     
         my $originalChmod = (stat $taxFile)[2];
