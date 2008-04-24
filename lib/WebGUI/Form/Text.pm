@@ -99,7 +99,7 @@ An optional value to process, instead of POST input.
 sub getValue {
 	my $self = shift;
     my $value = $self->SUPER::getValue(@_);
-    $value =~ tr/\n\n//d;
+    $value =~ tr/\r\n//d;
     return $value;
 }
 
