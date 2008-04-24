@@ -153,8 +153,8 @@ is($cntl->getValue(''), undef, '""');
 is($session->form->phone(undef,'123-123-1234'), '123-123-1234', 'valid');
 is($session->form->phone(undef,'123/123-1234'), undef, 'invalid');
 is($session->form->phone(undef,0), 0, 'zero');
-is($session->form->phone(undef,undef), undef, 'undef returns undef');
-is($session->form->phone(undef,''), undef, '""');
+is($session->form->phone(undef,undef), 0, 'undef returns returns 0');
+is($session->form->phone(undef,''), undef, 'empty string');
 
 __END__
 
