@@ -9,7 +9,7 @@
 
 <tmpl_loop name='questions'>
     <hr>
-    <div class='question'>Q<tmpl_var name='sequenceNumber'>: <tmpl_var name='questionText'></div>
+    <div class='question'><span id='<tmpl_var name='Survey_questionId'>required></span>Q<tmpl_var name='sequenceNumber'>: <tmpl_var name='questionText'></div>
 
     <tmpl_if name='multipleChoice'>
         <tmpl_if name='maxMoreOne'>
@@ -65,8 +65,8 @@
             </tr>
             <tr>
                 <tmpl_loop name=answers>
-                    <td align="center" width="2em">
-                        <span class=answer id="<tmpl_var name='Survey_answerId'>container"></span>
+                    <td align="center"  width=75px>
+                        <span class=scaleanswer id="<tmpl_var name='Survey_answerId'>container"></span>
                         <tmpl_if name='verbatim'>
                             <span><input type=text name='<tmpl_var name='Survey_answerId'>verbatim'></span>
                         </tmpl_if>  

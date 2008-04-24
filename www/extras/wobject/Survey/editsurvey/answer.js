@@ -24,6 +24,8 @@ Survey.AnswerTemplate = new function(){
         html = html + "<p>Answer Text:\n<textarea name='answerText'>"+params.answerText+"</textArea>\n";
         html = html + "<p>Recorded Answer\n<textarea name='recordedAnswer'>"+params.recordedAnswer+"</textArea>\n";
         html = html + "<p>Jump to Question:<input type=text value='"+params.gotoQuestion+"' name=gotoQuestion size=4>";
+        html = html + "<span id='textParams'><p>Text Answer Cols:<input type=text size=2 value='"+params.textCols+"' name=textCols> Rows: \
+            <input type=text size=2 value='"+params.textRows+"' name=textRows> </p></span>";
         html = html + "<p>Is this the correct answer:\n" + 
             this.makeRadio('isCorrect',[{text:'Yes',value:1},{text:'No',value:0}],params.isCorrect);
         html = html + "<p>Min:<input type=text value='"+params.min+"' name=min size=2>";

@@ -5,7 +5,7 @@ if (typeof Survey == "undefined") {
 Survey.Form = new function() {
    
     var multipleChoice = {'Multiple Choice':1,'Gender':1,'Yes/No':1,'True/False':1,'Ideology':1, 'Race':1,'Party':1,'Education':1};
-    var scale = {'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
+    var scale = {'Scale':1,'Agree/Disagree':1,'Oppose/Support':1,'Importance':1,
         'Likelihood':1,'Certainty':1,'Satisfaction':1,'Confidence':1,'Effectiveness':1,'Concern':1,'Risk':1,'Threat':1,'Security':1};
     var text = {'Text':1, 'Email':1, 'Phone Number':1, 'Text Date':1, 'Currency':1};
     var slider = {'Slider':1, 'Dual Slider - Range':1, 'Multi Slider - Allocate':1};
@@ -17,8 +17,11 @@ Survey.Form = new function() {
     var verb = 0; 
     var lastSection = 'first';
 
+    var toValidate;
+
     this.displayQuestions = function(params){
         
+        toValidate = new Array();//clear array
         var qs = params.questions;
         var s = params.section;
 
@@ -34,12 +37,10 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                 document.getElementById('headertitle').style.display='block';
             }
             if(lastSection != s.Survey_sectionId || s.everyPageText > 0){
-            //if(qs[0].sequenceNumber == '1' || s.everyPageText > 0){
                 document.getElementById('headertext').style.display = 'block';
             }
 
-            if((lastSection != s.Survey_sectionId && lastSection != 'first') || s.questionsOnSectionPage != '1'){
-//            if(qs[0].sequenceNumber == '1' && s.questionsOnSectionPage != '1'){
+            if(lastSection != s.Survey_sectionId && s.questionsOnSectionPage != '1'){
                 var span = document.createElement("div"); 
                 span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                 span.style.display = 'block';
@@ -55,9 +56,11 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                             document.getElementById('headertext').style.display = 'none';
                         }
                         document.getElementById('questions').style.display='inline';
+                        Survey.Form.addWidgets(qs);             
                     });   
             }else{
                 document.getElementById('questions').style.display='inline';
+                Survey.Form.addWidgets(qs);             
             }
             lastSection = s.Survey_sectionId;
         }else{
@@ -65,10 +68,9 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             document.getElementById('headertext').style.display = 'block';
             document.getElementById('questions').style.display='inline';
         }
-
+    }
         //Display questions
-
-        var html;
+    this.addWidgets = function(qs){ 
         hasFile = false;
         for(var i = 0; i < qs.length; i++){
             var q = qs[i];
@@ -80,14 +82,21 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                 }
             }
 
-            html += "<hr>";
-            html += "<div class='question'>Q"+q.sequenceNumber+": "+q.questionText+"</div>";
+            //Check if this question should be validated
+            if(q.required == 1){
+               toValidate[q.Survey_questionId] = new Array();
+            } 
+            
 
             if(multipleChoice[q.questionType] || scale[q.questionType]){
                 var butts = new Array(); 
                 verb = 0; 
                 for(var x = 0; x < q.answers.length; x++){
+
                     var a = q.answers[x];
+                    if(toValidate[a.Survey_questionId]){
+                        toValidate[a.Survey_questionId][a.Survey_answerId] = 1; 
+                    }
                     var b;
                     if(scale[q.questionType]){
                         b = new YAHOO.widget.Button({ type: "checkbox", label: a.recordedAnswer, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
@@ -101,7 +110,7 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                         b.label=a.answerText;
                     }
                     b.setStyle('text-align','center'); 
-                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length]);
+                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length,a.Survey_answerId]);
                     if(a.verbatim == 1){
                         verb = 1;
                     }
@@ -149,7 +158,27 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
 
 
     this.formsubmit = function(){
-        Survey.Comm.callServer('','submitQuestions','surveyForm',hasFile);
+        var submit = 1;//boolean for if all was good or not
+        for(var i in toValidate){
+            console.log(i);
+            var answered = 0;
+            for(var z in toValidate[i]){
+                var v = document.getElementById(z).value;
+                if(v != '' && v != undefined){
+                    answered = 1;
+                    break;
+                }
+            }
+            if(answered == 0){
+                submit = 0;
+                document.getElementById(i+'required').innerHTML = "<font color=red>*</font>";
+            }else{
+                document.getElementById(i+'required').innerHTML = "";
+            }
+        }
+        if(submit == 1){
+            Survey.Comm.callServer('','submitQuestions','surveyForm',hasFile);
+        }
     }
 
 
@@ -242,8 +271,10 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                 if(t > total){
                     t -= this.getValue();
                     t = Math.round(t);
+console.log("setting value: "+scale+" "+step);
                     this.setValue(total-t + scale*step);
                 }else{ 
+console.log("setting value in else: "+this.getValue());
                     this.lastValue = this.getValue();
                     document.getElementById(this.input).value = this.getRealValue();
                     document.getElementById(this.input+'show').innerHTML = this.getRealValue();
@@ -270,10 +301,13 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             Event.on(document.getElementById(s.input), "blur", manualEntry);
             
             s.getRealValue = function() { 
-                return Math.round(this.getValue() / scale); 
+console.log("getRealValue is getting the real value for the slider:"+this.getValue()+" "+this+" "+scale);
+
+                return Math.round(parseInt(this.getValue()) / scale); 
             }
             sliders.push(s);
             document.getElementById(s.input).value = s.getRealValue();
+console.log("Slider starting value = "+s.getValue());
         }
     }
 
@@ -291,12 +325,15 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
     this.showCalendar = function(event,objs){
         objs[0].show();
     }
+
+
     this.buttonChanged = function(event,objs){
         var b = objs[0];
         var qid = objs[1];
         var maxA = objs[2];
         var butts = objs[3];
         var qsize = objs[4];
+        var aid = objs[5];
         max = parseInt(max);
         if(maxA == 1){
             for(var i in butts){
@@ -321,9 +358,10 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             document.getElementById(qid+'max').innerHTML = parseInt(max+1);
             document.getElementById(b.hid).value = 1;
         }
-//console.log('qsize '+qsize+' verb '+verb);
-        if(qsize == 1 && verb == 0){
-            Survey.Form.formsubmit();
+        if(qsize == 1){
+            if(! document.getElementById(aid+'verbatim')){
+                Survey.Form.formsubmit();
+            }
         }
     }
 }();

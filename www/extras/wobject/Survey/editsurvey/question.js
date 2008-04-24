@@ -31,11 +31,10 @@ Survey.QuestionTemplate = new function(){
         html = html + "<p>Randomize answers:";
  
         html = html+ this.makeRadio('randomizeAnswers',[{text:'Yes',value:1},{text:'No',value:0}],params.randomizeAnswers);
-        html = html + "<p>Previous answers to display:<textarea name='previousAnswerWords' cols=4 rows=2>"+params.previousAnswerWords+"</textarea>";
         html = html + "<p>Question type:";
         var questions = ['Agree/Disagree','Certainty','Concern','Confidence','Currency','Date','Date Range','Dual Slider - Range','Education','Effectiveness',
             'Email','File Upload','Gender','Hidden','Ideology','Importance','Likelihood','Multi Slider - Allocate','Multiple Choice','Oppose/Support',
-            'Party','Phone Number','Race','Risk','Satisfaction','Security','Slider','Text','Text Date','Threat','True/False','Yes/No'];
+            'Party','Phone Number','Race','Risk','Satisfaction','Scale','Security','Slider','Text','Text Date','Threat','True/False','Yes/No'];
 //        var questions = ['Multiple Choice','Gender','Yes/No','True/False','Agree/Disagree','Oppose/Support','Importance','Likelihood','Certainty','Satisfaction',
 //            'Confidence','Effectiveness','Concern','Risk','Threat','Security','Ideology','Race','Party','Education',
 //            'Text', 'Email', 'Phone Number', 'Text Date', 'Currency',
@@ -50,7 +49,9 @@ Survey.QuestionTemplate = new function(){
 
         html = html+ this.makeRadio('verticalDisplay',[{text:'Yes',value:1},{text:'No',value:0}],params.verticalDisplay);
         html = html + "<p>Allow comment:";
-        html = html+ this.makeRadio('allowComment',[{text:'Yes',value:1},{text:'No',value:0}],params.allowComment);
+        html = html + this.makeRadio('allowComment',[{text:'Yes',value:1},{text:'No',value:0}]);
+        html = html + "<span id='commentParams'><p>&nbsp;&nbsp; Cols:<input type=text size=2 value='"+params.commentCols+"' name=commentCols> Rows: \
+            <input type=text size=2 value='"+params.commentRows+"' name=commentRows> </p></span>";
         html = html + "<p>Maximum number of answers:<input type=text value='"+params.maxAnswers+"' name=maxAnswers size=2>";
         html = html + "<p>Required:";
         html = html+ this.makeRadio('required',[{text:'Yes',value:1},{text:'No',value:0}],params.required);
@@ -97,9 +98,9 @@ Survey.QuestionTemplate = new function(){
         var html = '';
         for(var i in values){
             if(checked == values[i]['value']){
-                html = html+ "<input type='radio' name='" + name + "' value='" + values[i]['value'] + "' checked>" + values[i]['text'];
+                html = html+ "<input type='radio' id='"+name+"' name='" + name + "' value='" + values[i]['value'] + "' checked>" + values[i]['text'];
             }else{
-                html = html+ "<input type='radio' name='" + name + "' value='" + values[i]['value'] + "' >" + values[i]['text'];
+                html = html+ "<input type='radio' id='"+name+"' name='" + name + "' value='" + values[i]['value'] + "' >" + values[i]['text'];
             }
         }
         html = html + "\n";
