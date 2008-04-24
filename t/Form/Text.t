@@ -119,10 +119,10 @@ my $cntl = WebGUI::Form::Text->new($session,{ defaultValue => 4242 });
 is($cntl->getValue('123-123-1234'), '123-123-1234', 'getValue(valid)');
 is($cntl->getValue(0), 0, 'zero');
 is($cntl->getValue(''), '', '""');
-is($cntl->getValue(undef), undef, 'undef returns undef');
+is($cntl->getValue(undef), 0, 'undef returns 0');
 is($session->form->text(undef,'123-123-1234'), '123-123-1234', 'valid');
 is($session->form->text(undef,0), 0, 'zero');
-is($session->form->text(undef,undef), undef, 'undef returns undef');
+is($session->form->text(undef,undef), 0, 'undef returns 0');
 is($session->form->text(undef,''), '', '""');
 
 __END__
