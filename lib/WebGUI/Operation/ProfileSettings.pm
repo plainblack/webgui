@@ -310,7 +310,7 @@ sub www_editProfileField {
             $session->errorHandler->error($@);
             next;
         }
-        push @profileForms, $form if $w->get("profileEnabled");
+        push @profileForms, $form if $w->isDynamicCompatible();
 	}
 
 	$fieldType->set("types", \@profileForms);
