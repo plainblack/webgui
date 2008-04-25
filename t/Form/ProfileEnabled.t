@@ -30,7 +30,7 @@ my $session = WebGUI::Test->session;
 
 # put your tests here
 
-my @formTypes = sort @{ WebGUI::Form::FieldType->getTypes($session) };
+my @formTypes = sort keys %{ WebGUI::Form::FieldType->new($session)->getTypes() };
 
 ##We have to remove DynamicField from this list, since when you call new
 ##it wants to return a type.  We'll check it manually.
