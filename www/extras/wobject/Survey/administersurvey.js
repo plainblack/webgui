@@ -67,6 +67,7 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             document.getElementById('headertitle').style.display='block';
             document.getElementById('headertext').style.display = 'block';
             document.getElementById('questions').style.display='inline';
+            Survey.Form.addWidgets(qs);             
         }
     }
         //Display questions
@@ -121,6 +122,9 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             else if(dateType[q.questionType]){
                 for(var x = 0; x < q.answers.length; x++){
                     var a = q.answers[x];
+                    if(toValidate[a.Survey_questionId]){
+                        toValidate[a.Survey_questionId][a.Survey_answerId] = 1; 
+                    }
                     var calid = a.Survey_answerId+'container';
                     var c = new YAHOO.widget.Calendar(calid,{title:'Choose a date:', close:true});
                     c.selectEvent.subscribe(this.selectCalendar,[c,a.Survey_answerId],true);
@@ -152,6 +156,12 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
             else if(fileUpload[q.questionType]){
                 hasFile = true;
             }
+            else if(text[q.questionType]){
+                var a = q.answers[x];
+                if(toValidate[a.Survey_questionId]){
+                    toValidate[a.Survey_questionId][a.Survey_answerId] = 1; 
+                }
+            }
         }
         YAHOO.util.Event.addListener("submitbutton", "click", this.formsubmit);   
     }
@@ -160,7 +170,6 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
     this.formsubmit = function(){
         var submit = 1;//boolean for if all was good or not
         for(var i in toValidate){
-            console.log(i);
             var answered = 0;
             for(var z in toValidate[i]){
                 var v = document.getElementById(z).value;
@@ -271,10 +280,8 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                 if(t > total){
                     t -= this.getValue();
                     t = Math.round(t);
-console.log("setting value: "+scale+" "+step);
                     this.setValue(total-t + scale*step);
                 }else{ 
-console.log("setting value in else: "+this.getValue());
                     this.lastValue = this.getValue();
                     document.getElementById(this.input).value = this.getRealValue();
                     document.getElementById(this.input+'show').innerHTML = this.getRealValue();
@@ -301,13 +308,11 @@ console.log("setting value in else: "+this.getValue());
             Event.on(document.getElementById(s.input), "blur", manualEntry);
             
             s.getRealValue = function() { 
-console.log("getRealValue is getting the real value for the slider:"+this.getValue()+" "+this+" "+scale);
 
                 return Math.round(parseInt(this.getValue()) / scale); 
             }
             sliders.push(s);
             document.getElementById(s.input).value = s.getRealValue();
-console.log("Slider starting value = "+s.getValue());
         }
     }
 

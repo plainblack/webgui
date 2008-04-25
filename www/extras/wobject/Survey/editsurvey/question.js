@@ -49,7 +49,7 @@ Survey.QuestionTemplate = new function(){
 
         html = html+ this.makeRadio('verticalDisplay',[{text:'Yes',value:1},{text:'No',value:0}],params.verticalDisplay);
         html = html + "<p>Allow comment:";
-        html = html + this.makeRadio('allowComment',[{text:'Yes',value:1},{text:'No',value:0}]);
+        html = html + this.makeRadio('allowComment',[{text:'Yes',value:1},{text:'No',value:0}],params.allowComment);
         html = html + "<span id='commentParams'><p>&nbsp;&nbsp; Cols:<input type=text size=2 value='"+params.commentCols+"' name=commentCols> Rows: \
             <input type=text size=2 value='"+params.commentRows+"' name=commentRows> </p></span>";
         html = html + "<p>Maximum number of answers:<input type=text value='"+params.maxAnswers+"' name=maxAnswers size=2>";
