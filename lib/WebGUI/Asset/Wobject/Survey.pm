@@ -221,7 +221,7 @@ $self->session->errorHandler->warn("questionVariable was ".$$ref{'questionVariab
         my $seqNum = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$ref->{'Survey_sectionId'}]);
         $seqNum++;
         $ref->{'Survey_questionId'} = $self->session->id->generate(); 
-        $self->session->db->write("insert into Survey_question values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        $self->session->db->write("insert into Survey_question values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [ $self->getId,$$ref{'Survey_questionId'},$$ref{'questionVariable'},$$ref{'questionText'},$seqNum,$$ref{'allowComment'},$$ref{'commentCols'},$$ref{'commentRows'},
                 $$ref{'randomizeAnswers'},$$ref{'questionType'}, $$ref{'Survey_sectionId'},$$ref{'randomizedWords'},
                 $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'points'} ]
@@ -294,7 +294,7 @@ $self->session->errorHandler->warn("MAX SeqNumber was $id");
     $edit->{'type'} = 'loadQuestion';
     $edit->{'params'} = {'assetId', $self->getId, 'Survey_sectionId', $sid, 'Survey_questionId','', 'questionText','', 'sequenceNumber', $id,
             'allowComment',0, 'randomizeAnswers',0, 'questionType',1, 'required',0,'randomizedWords','','previousAnswerWords','','verticalDisplay',0,'maxAnswers','1',
-            'questionVariable','' };
+            'questionVariable','','commentCols',20,'commentRows',1 };
     return $self->www_loadSurvey($sid,$edit); 
 }
 
