@@ -18,7 +18,7 @@ use WebGUI::Form::DynamicField;
 use WebGUI::Session;
 use WebGUI::Utility;
 
-#The goal of this test is to verify that the profileEnabled setting
+#The goal of this test is to verify that the isDynamicCompatible setting
 #works on all form elements and that only the correct forms are profile
 #enabled.
 
@@ -40,16 +40,16 @@ $numTests = scalar @formTypes + 1;
 plan tests => $numTests;
 
 
-my @notEnabled = qw/Asset Button Captcha Checkbox Color Control List MimeType SubscriptionGroup Slider Submit User Attachments/;
+my @notEnabled = qw/Button Control List MimeType SubscriptionGroup Slider Submit Attachments/;
 
 foreach my $formType (@formTypes) {
 	my $form = WebGUI::Form::DynamicField->new($session, fieldType => $formType);
 	my $ref = (split /::/, ref $form)[-1];
 	if (isIn($ref, @notEnabled)) {
-		ok(!$form->get('profileEnabled'), " $ref should not be profile enabled");
+		ok(!$form->isDynamicCompatible, " $ref should not be profile enabled");
 	}
 	else {
-		ok($form->get('profileEnabled'), "$ref should be profile enabled");
+		ok($form->isDynamicCompatible, "$ref should be profile enabled");
 	}
 }
 
@@ -57,4 +57,4 @@ foreach my $formType (@formTypes) {
 ##an object of type Text!
 my $form = WebGUI::Form::DynamicField->new($session);
 
-ok($form->get('profileEnabled'), 'DynamicField lies about being profile enable');
+ok($form->isDynamicCompatible, 'DynamicField lies about being profile enable');
