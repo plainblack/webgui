@@ -157,7 +157,7 @@ sub getKeywordsForAsset {
         return \@keywords;
     }
     else {
-        return join(" ", @keywords);
+        return wantarray ? @keywords : join(" ", map({ m/\s/ ? '"' . $_ . '"' : $_ } @keywords));
     }
 }
 
@@ -266,7 +266,7 @@ sub setKeywordsForAsset {
        $keywords = $options->{keywords}; 
     }
     else {
-        @{$keywords} = split(" ", $options->{keywords});
+        $keywords = string2list($options->{keywords});
     }
 
     $self->deleteKeywordsForAsset($options->{asset});
@@ -284,6 +284,45 @@ sub setKeywordsForAsset {
     }
 }
 
+#------------------------------------------------------------------------------
+
+=head2 string2list ( string )
+
+Returns an array reference of phrases.
+
+=head3 string
+
+A scalar containing space separated phrases.
+
+=cut
+
+sub string2list {
+    my $text = shift;
+    return if (ref $text);
+    my @words = ();
+    my $word = '';
+    my $errorFlag = 0;
+    while ( defined $text and length $text and not $errorFlag) {
+        if ($text =~ s/\A(?: ([^\"\s\\]+) | \\(.) )//mx) {
+            $word .= $1;
+        } 
+        elsif ($text =~ s/\A"((?:[^\"\\]|\\.)*)"//mx) {
+            $word .= $1;
+        } 
+        elsif ($text =~ s/\A\s+//m){
+            push(@words, $word);
+            $word = '';
+        } 
+        elsif ($text =~ s/\A"//) {
+            $errorFlag = 1;
+        } 
+        else {
+            $errorFlag = 1;
+        }
+    }
+    push(@words, $word);
+    return \@words;
+}
 
 
 1;

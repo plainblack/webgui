@@ -14,6 +14,12 @@ our $I18N = {
 		context => q|A label for the property that relates assets to keywords.|
 	},
 
+	'keywords help' => {
+		message => q|Add some keywords here for this asset. They'll automatically be added to the search index, and as the keywords metatag.|,
+		lastUpdated => 0,
+		context => q|help for the keywords property|
+	},
+
 	'add the missing page' => {
 		message => q|Add the missing page.|,
 		lastUpdated => 0,

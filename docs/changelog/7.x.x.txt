@@ -1,4 +1,7 @@
 7.5.11
+ - rfe: Not being limited to single-worded Tags 
+ - Exposed keywords API to all assets through edit screen. Now keywords are
+   searchable and add metatags for all assets.
  - fix: template variable isUncommitted is not documented in the help
  - Cleaned the pollution from the forms system.
  - fix: Event is no longer editable by anyone who can add events

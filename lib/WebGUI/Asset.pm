@@ -944,7 +944,16 @@ sub getEditForm {
 		}
 	}
 
-        if ($self->session->setting->get("metaDataEnabled")) {
+    # display keywords field
+    $tabform->getTab('meta')->text(
+        name        => 'keywords',
+        value       => $self->get('keywords'),
+        label       => $i18n->get('keywords'),
+        hoverHelp   => $i18n->get('keywords help'),
+        );
+
+    # metadata / content profiling
+    if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
                         my $fieldType = $meta->{$field}{fieldType} || "text";
@@ -1944,7 +1953,15 @@ Executes what is necessary to make the view() method work with content chunking.
 sub prepareView {
 	my $self = shift;
 	$self->{_toolbar} = $self->getToolbar;
-	$self->session->style->setRawHeadTags($self->getExtraHeadTags);
+    my $style = $self->session->style;
+    my @keywords = $self->get('keywords');
+    if (scalar @keywords) {
+        $style->setMeta( {
+            name    => 'keywords',
+            content => join(',', @keywords),
+            }); 
+    }
+	$style->setRawHeadTags($self->getExtraHeadTags);
 }
 
 #-------------------------------------------------------------------
