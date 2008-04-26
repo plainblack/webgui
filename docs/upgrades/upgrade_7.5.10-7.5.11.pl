@@ -25,6 +25,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addCalendarEventWorkflow( $session );
+addPurgeOldInboxActivity( $session );
 addingInStoreCredit($session);
 insertCommerceTaxTable($session);
 migrateOldTaxTable($session);
@@ -63,6 +64,12 @@ sub addCalendarEventWorkflow {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Add the new PurgeOldInboxMessages activity to the config file
+sub addPurgeOldInboxActivity {
+    my $session = shift;
+    print "\tAdding Purge Old Inbox Messages workflow activity... " unless $quiet;
+
 #-------------------------------------------------
 sub addingInStoreCredit {
 	my $session = shift;
@@ -77,6 +84,12 @@ sub addingInStoreCredit {
 		)");
 }
 
+    my $activity    = $session->config->get( "workflowActivities" );
+    push @{ $activity->{"None"} }, 'WebGUI::Workflow::Activity::PurgeOldInboxMessages';
+    $session->config->set( "workflowActivities", $activity );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #-------------------------------------------------
 sub upgradeEMS {

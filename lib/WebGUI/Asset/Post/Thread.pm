@@ -47,14 +47,19 @@ sub canAdd {
 
 #-------------------------------------------------------------------
 sub canReply {
-	my $self = shift;
-	return !$self->isThreadLocked && $self->getParent->get("allowReplies") && $self->getParent->canPost;
+    my $self        = shift;
+    my $userId      = shift || $self->session->user->userId;
+    return !$self->isThreadLocked 
+        && $self->getParent->get("allowReplies") 
+        && $self->getParent->canPost( $userId )
+        ;
 }
 
 #-------------------------------------------------------------------
 sub canSubscribe {
-	my $self = shift;
-	return ($self->session->user->userId ne "1" && $self->canView);
+    my $self    = shift;
+    my $userId  = shift || $self->session->user->userId;
+    return ($userId ne "1" && $self->canView( $userId ) );
 }
 
 #-------------------------------------------------------------------

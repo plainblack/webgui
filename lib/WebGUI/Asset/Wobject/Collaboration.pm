@@ -248,7 +248,8 @@ sub appendTemplateLabels {
 
 #-------------------------------------------------------------------
 sub canEdit {
-        my $self = shift;
+        my $self    = shift;
+        my $userId  = shift     || $self->session->user->userId;
         return (
 		(
 			(
@@ -259,85 +260,109 @@ sub canEdit {
 					$self->session->form->process("class") eq "WebGUI::Asset::Post::Thread"
 				)
 			) && 
-			$self->canPost
-		) || # account for new posts
-		$self->SUPER::canEdit()
+			$self->canStartThread( $userId )
+		) || # account for new threads
+		$self->SUPER::canEdit( $userId )
 	);
 }
 
 #-------------------------------------------------------------------
 sub canModerate {
-	my $self = shift;
-	return $self->SUPER::canEdit;
+    my $self    = shift;
+    my $userId  = shift     || $self->session->user->userId;
+    return $self->SUPER::canEdit( $userId );
 }
 
 #-------------------------------------------------------------------
 sub canPost {
-	my $self = shift;
-	return (
-		(
-			$self->get("status") eq "approved" || 
-			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
-		) && (
-			$self->session->user->isInGroup($self->get("postGroupId")) 
-			|| $self->SUPER::canEdit
-		)
-	);
+    my $self    = shift;
+    my $userId  = shift;
+    my $session = $self->session;
+    my $user    = $userId
+                ? WebGUI::User->new( $session, $userId )
+                : $self->session->user
+                ;
+
+    # checks to make sure that the cs has been committed at least once
+    if  ( $self->get("status") ne "approved" && $self->getTagCount <= 1 ) {
+        return 0;
+    }
+    # Users in the postGroupId can post
+    elsif ( $user->isInGroup( $self->get("postGroupId") ) ) {
+        return 1;
+    }
+    # Users who can edit the collab can post
+    else {
+        return $self->SUPER::canEdit( $userId );
+    }
 }
 
 
 #-------------------------------------------------------------------
 sub canSubscribe {
-        my $self = shift;
-        return ($self->session->user->userId ne "1" && $self->canView);
+    my $self    = shift;
+    my $userId  = shift;
+    my $session = $self->session;
+    my $user    = $userId
+                ? WebGUI::User->new( $session, $userId )
+                : $self->session->user
+                ;
+    return ($user->userId ne "1" && $self->canView( $userId ) );
 }
 
 #-------------------------------------------------------------------
 sub canStartThread {
-	my $self = shift;
-	return (
-		(
-			$self->get("status") eq "approved" || 
-			$self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
-		) && (
-			$self->session->user->isInGroup($self->get("canStartThreadGroupId")) 
-			|| $self->SUPER::canEdit
-		)
-	);
+    my $self    = shift;
+    my $userId  = shift;
+    my $session = $self->session;
+    my $user    = $userId
+                ? WebGUI::User->new( $session, $userId )
+                : $self->session->user
+                ;
+    return (
+            (
+                    $self->get("status") eq "approved" || 
+                    $self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
+            ) && (
+                    $user->isInGroup($self->get("canStartThreadGroupId")) 
+                    || $self->SUPER::canEdit( $userId )
+            )
+    );
 }
 
 
 #-------------------------------------------------------------------
 sub canView {
 	my $self = shift;
-	return $self->SUPER::canView || $self->canPost;
+        my $userId  = shift     || $self->session->user->userId;
+	return $self->SUPER::canView( $userId ) || $self->canPost( $userId );
 }
 
 #-------------------------------------------------------------------
 sub commit {
-	my $self = shift;
-	$self->SUPER::commit;
-	my $cron = undef;
-	if ($self->get("getMailCronId")) {
-		$cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
-	}
-	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
-	unless (defined $cron) {
-		$cron = WebGUI::Workflow::Cron->create($self->session, {
-			title=>$self->getTitle." ".$i18n->get("mail"),
-			minuteOfHour=>"*/".($self->get("getMailInterval")/60),
-			className=>(ref $self),
-			methodName=>"new",
-			parameters=>$self->getId,
-			workflowId=>"csworkflow000000000001"
-			});
-		$self->update({getMailCronId=>$cron->getId});
-	}
-	if ($self->get("getMail")) {
-		$cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
-	} else {
-		$cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
-	}
+    my $self = shift;
+    $self->SUPER::commit;
+    my $cron = undef;
+    if ($self->get("getMailCronId")) {
+        $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
+    }
+    my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
+    unless (defined $cron) {
+            $cron = WebGUI::Workflow::Cron->create($self->session, {
+                    title=>$self->getTitle." ".$i18n->get("mail"),
+                    minuteOfHour=>"*/".($self->get("getMailInterval")/60),
+                    className=>(ref $self),
+                    methodName=>"new",
+                    parameters=>$self->getId,
+                    workflowId=>"csworkflow000000000001"
+                    });
+            $self->update({getMailCronId=>$cron->getId});
+    }
+    if ($self->get("getMail")) {
+            $cron->set({enabled=>1,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+    } else {
+            $cron->set({enabled=>0,title=>$self->getTitle." ".$i18n->get("mail"), minuteOfHour=>"*/".($self->get("getMailInterval")/60)});
+    }
 }
 
 #-------------------------------------------------------------------

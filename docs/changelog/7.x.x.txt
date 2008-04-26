@@ -31,6 +31,12 @@
    displayed
  - fixed: Thingy: thing view screen always displays all fields
  - fixed: Thingy: search result "sort by" not working
+ - added: Inbox is now pruned after 1 year
+ - Added about a hundred tests for Collaboration system, Post, and Thread 
+   permissions
+ - Cleaned up code tested by the aforementioned tests
+ - Fixed all Test::WWW::Mechanize tests and updated the skeleton. Should be 
+   usable now.
 
 
 7.5.10

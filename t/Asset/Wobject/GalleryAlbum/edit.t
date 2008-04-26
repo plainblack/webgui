@@ -33,6 +33,9 @@ my %oldSettings;
 # userFunctionStyleId 
 $oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+# specialState
+$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
+$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
@@ -61,6 +64,15 @@ $versionTags[-1]->commit;
 
 #----------------------------------------------------------------------------
 # Tests
+
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
 
 plan tests => 6;        # Increment this number for each test you create
 

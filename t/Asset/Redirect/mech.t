@@ -33,10 +33,13 @@ my %oldSettings;
 # userFunctionStyleId 
 $oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+# specialState
+$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
+$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
-$user->username( 'dufresne' . time );
+$user->username( 'dufresne' );
 my $identifier  = 'ritahayworth';
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
 $auth->saveParams( $user->userId, $user->authMethod, {
@@ -65,9 +68,16 @@ $versionTags[-1]->commit;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 13;        # Increment this number for each test you create
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
 
-use_ok( 'Test::WWW::Mechanize' );
+plan tests => 12;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test operation with a public Redirect

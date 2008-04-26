@@ -65,9 +65,16 @@ $versionTags[-1]->commit;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
 
-use_ok( 'Test::WWW::Mechanize' ) or BAIL_OUT("Cannot continue without Test::WWW::Mechanize");
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Add event: Users without permission are not shown form

@@ -92,13 +92,36 @@ sub canAdd {
 
 #-------------------------------------------------------------------
 sub canEdit {
-	my $self = shift;
-	return (($self->session->form->process("func") eq "add" || ($self->session->form->process("assetId") eq "new" && $self->session->form->process("func") eq "editSave" && $self->session->form->process("class","className") eq "WebGUI::Asset::Post")) && $self->getThread->getParent->canPost) || # account for new posts
+    my $self    = shift;
+    my $userId  = shift || $self->session->user->userId;
+    my $session = $self->session;
+    my $form    = $self->session->form;
+    my $user    = WebGUI::User->new( $session, $userId );
 
-		($self->isPoster && $self->getThread->getParent->get("editTimeout") > ($self->session->datetime->time() - $self->get("revisionDate"))) ||
-        $self->session->user->isInGroup($self->getThread->getParent->get('groupToEditPost')) ||
-		$self->getThread->getParent->canEdit;
+    # Handle adding new posts
+    if (  
+        ( $form->get("func") eq "add" 
+            || ( $form->get("func") eq "editSave" && $form->get("assetId") eq "new" )
+        )
+        && $form->get("class") eq "WebGUI::Asset::Post"
+    ) {
+        return $self->getThread->getParent->canPost;
+    }
 
+    # User who posted can edit their own post
+    if ( $self->isPoster( $userId ) ) {
+        my $editTimeout = $self->getThread->getParent->get( 'editTimeout' );
+        if ( $editTimeout > time - $self->get( "revisionDate" ) ) {
+            return 1;
+        }
+    }
+
+    # Users in groupToEditPost of the Collab can edit any post
+    if ( $user->isInGroup( $self->getThread->getParent->get('groupToEditPost') ) ) {
+        return 1;
+    }
+
+    return $self->getThread->getParent->canEdit( $userId );
 }
 
 #-------------------------------------------------------------------
@@ -690,15 +713,16 @@ sub isNew {
 
 #-------------------------------------------------------------------
 
-=head2 isPoster ( )
+=head2 isPoster ( userId )
 
 Returns a boolean that is true if the current user created this post and is not a visitor.
 
 =cut
 
 sub isPoster {
-	my $self = shift;
-	return ($self->session->user->userId ne "1" && $self->session->user->userId eq $self->get("ownerUserId"));
+    my $self    = shift;
+    my $userId  = shift     || $self->session->user->userId;
+    return ( $userId ne "1" && $userId eq $self->get("ownerUserId") );
 }
 
 

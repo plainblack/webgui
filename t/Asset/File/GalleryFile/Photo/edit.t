@@ -31,6 +31,9 @@ my %oldSettings;
 # userFunctionStyleId 
 $oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+# specialState
+$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
+$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
@@ -67,62 +70,66 @@ my $photo;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
 
-SKIP: {
+plan tests => 5;        # Increment this number for each test you create
 
-    use_ok( 'Test::WWW::Mechanize' ) or skip( "Cannot continue without Test::WWW::Mechanize", 5 );
+#----------------------------------------------------------------------------
+# Test permissions for new photos
+$mech   = Test::WWW::Mechanize->new;
 
-    #----------------------------------------------------------------------------
-    # Test permissions for new photos
-    $mech   = Test::WWW::Mechanize->new;
+# Save a new photo
+$mech->get( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
+$mech->content_lacks( 'value="editSave"' );
 
-    # Save a new photo
-    $mech->get( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
-    $mech->content_lacks( 'value="editSave"' );
+#----------------------------------------------------------------------------
+# Test creating a new Photo
+SKIP: { 
+    skip "File control needs to be fixed to be more 508-compliant before this can be used", 4;
+    $mech   = getMechLogin( $baseUrl, $user, $identifier );
+    $mech->get_ok( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
 
-    #----------------------------------------------------------------------------
-    # Test creating a new Photo
-    SKIP: { 
-        skip "File control needs to be fixed to be more 508-compliant before this can be used", 4;
-        $mech   = getMechLogin( $baseUrl, $user, $identifier );
-        $mech->get_ok( $baseUrl . $album->getUrl("func=add;class=WebGUI::Asset::File::GalleryFile::Photo") );
+    open my $file, '<', WebGUI::Test->getTestCollateralPath( 'lamp.jpg' ) 
+        or die( "Couldn't open test collateral 'lamp.jpg' for reading: $!" );
+    my $properties  = {
+        title           => 'Photo Title' . time,
+        synopsis        => '<p>Photo Synopsis' . time . '</p>',
+        newFile_file    => $file,
+    };
 
-        open my $file, '<', WebGUI::Test->getTestCollateralPath( 'lamp.jpg' ) 
-            or die( "Couldn't open test collateral 'lamp.jpg' for reading: $!" );
-        my $properties  = {
-            title           => 'Photo Title' . time,
-            synopsis        => '<p>Photo Synopsis' . time . '</p>',
-            newFile_file    => $file,
-        };
+    $mech->submit_form_ok( 
+        {
+            form_number => 1,
+            fields      => $properties,
+        }, 
+        'Submit new Photo' 
+    );
 
-        $mech->submit_form_ok( 
-            {
-                form_number => 1,
-                fields      => $properties,
-            }, 
-            'Submit new Photo' 
-        );
+    # Add properties that should be default and remove those that should be different
+    delete $properties->{ newFile_file };
+    $properties = {
+        %{ $properties },
+        ownerUserId     => $user->userId,
+        filename        => 'lamp.jpg',
+    };
 
-        # Add properties that should be default and remove those that should be different
-        delete $properties->{ newFile_file };
-        $properties = {
-            %{ $properties },
-            ownerUserId     => $user->userId,
-            filename        => 'lamp.jpg',
-        };
+    # Make sure properties were saved
+    my $photo   = WebGUI::Asset->newByDynamicClass( $session, $album->getFileIds->[0] );
+    cmp_deeply( $photo->get, superhashof( $properties ), "Photo properties saved correctly" );
 
-        # Make sure properties were saved
-        my $photo   = WebGUI::Asset->newByDynamicClass( $session, $album->getFileIds->[0] );
-        cmp_deeply( $photo->get, superhashof( $properties ), "Photo properties saved correctly" );
-
-        # First File in an album should update assetIdThumbnail
-        my $album   = WebGUI::Asset->newByDynamicClass( $session, $album->getId );
-        is( 
-            $album->get('assetIdThumbnail'), $photo->getId, 
-            "Album assetIdThumbnail gets set by first File added",
-        );
-    }
+    # First File in an album should update assetIdThumbnail
+    my $album   = WebGUI::Asset->newByDynamicClass( $session, $album->getId );
+    is( 
+        $album->get('assetIdThumbnail'), $photo->getId, 
+        "Album assetIdThumbnail gets set by first File added",
+    );
 }
 
 #----------------------------------------------------------------------------

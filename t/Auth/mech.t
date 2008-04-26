@@ -38,6 +38,9 @@ my %oldSettings;
 # userFunctionStyleId 
 $oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+# specialState
+$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
+$session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $USERNAME    = 'dufresne';
@@ -72,9 +75,16 @@ my $assetUrl    = $baseUrl . $asset->get('url');
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 41;        # Increment this number for each test you create
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
 
-use_ok( 'Test::WWW::Mechanize' );
+plan tests => 40;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # no form: Test logging in on a normal page sends the user back to the same page
