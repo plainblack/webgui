@@ -53,7 +53,7 @@ sub handler {
         return Apache2::Const::OK;
     } );
 	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
-    return Apache2::Const::DECLINED;
+    return Apache2::Const::OK;
 }
 
 

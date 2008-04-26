@@ -15,7 +15,7 @@ package WebGUI::URL::MyHandler;
 =cut
 
 use strict;
-use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND DIR_MAGIC_TYPE);
+use Apache2::Const -compile => qw(OK DECLINED NOT_FOUND);
 
 
 =head1 NAME
@@ -48,7 +48,7 @@ The Apache request handler for this package.
 sub handler {
     my ($request, $server, $config) = @_;
     # ...
-    return Apache2::Const::DECLINED;
+    return Apache2::Const::OK;
 }
 
 1;

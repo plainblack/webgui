@@ -77,7 +77,7 @@ sub handler {
 		    return Apache2::Const::NOT_FOUND;
 	    }
     } );
-    return Apache2::Const::DECLINED;
+    return Apache2::Const::OK;
 }
 
 

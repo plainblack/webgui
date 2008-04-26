@@ -24,6 +24,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addReferralHandler( $session );
 addCalendarEventWorkflow( $session );
 addPurgeOldInboxActivity( $session );
 addingInStoreCredit($session);
@@ -45,6 +46,23 @@ mergeProductsWithCommerce($session);
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub addReferralHandler {
+    my $session = shift;
+    print "\tAdding a referral handler." unless $quiet;
+    my $config = $session->config;
+    my @handlers = ();
+    foreach my $element (@{$config->get("contentHandlers")}) {
+        if ($element eq "WebGUI::Content::Operation") {
+            push @handlers, "WebGUI::Content::Referral";
+        }
+        push @handlers, $element;
+    }
+    $config->set("contentHandlers", \@handlers);
+    print "DONE!\n" unless $quiet;
+}
+
+    
 #----------------------------------------------------------------------------
 # Add the database column to select the workflow to approve Calendar Events
 sub addCalendarEventWorkflow {

@@ -67,20 +67,27 @@ sub handler {
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
     $matchUri =~ s{^$gateway(.*)}{/$1};
+	my $gotMatch = 0;
     foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
         if ($matchUri =~ m{$regex}i) {
             my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
             if ($@) {
-                die $@ if ($@ =~ "^fatal:");
-                # bad
-                return Apache2::Const::DECLINED;
+				$error = $@;
+                warn $@ if ($@ =~ "^fatal:");
+                last;
             }
             else {
-                return $output;
+				$gotMatch = 1;
+				if ($output ne Apache2::Const::DECLINED) {
+					return $output;
+				}
             }                
         }
 	}
+	return Apache2::Const::DECLINED if ($gotMatch);
+	
+	# can't handle the url due to error or misconfiguration
     $request->push_handlers(PerlResponseHandler => sub { 
         print "This server is unable to handle the url '".$request->uri."' that you requested. ".$error;
         return Apache2::Const::OK;
