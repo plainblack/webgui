@@ -43,8 +43,22 @@ convertTransactionLog($session);
 upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
+addCaptchaToDataForm( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+# Add the useCaptcha field to DataForm assets
+sub addCaptchaToDataForm {
+    my $session = shift;
+    print "\tAdding CAPTCHA to DataForm... " unless $quiet;
+
+    $session->db->write( 
+        q{ ALTER TABLE DataForm ADD COLUMN useCaptcha INT(1) DEFAULT 0 }
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addReferralHandler {

@@ -100,11 +100,16 @@ Returns a boolean indicating whether the string typed matched the image.
 =cut
 
 sub getValue {
-	my $self = shift;
-    my $value = $self->SUPER::getValue(@_); 
-	my $challenge = $self->session->scratch->get("captcha_".$self->get("name"));
-	$self->session->scratch->delete("captcha_".$self->get("name"));
-	return (lc($value) eq lc($challenge));
+    my $self        = shift;
+    my $value       = $self->SUPER::getValue(@_); 
+    my $challenge   = $self->session->scratch->get("captcha_".$self->get("name"));
+    $self->session->scratch->delete("captcha_".$self->get("name"));
+    my $passed  = lc $value eq lc $challenge;
+    $self->session->errorHandler->info( 
+        "Checking CAPTCHA '" . $self->get("name") . "': " . ( $passed ? "PASSED!" : "FAILED!" )
+        . " Got: '" . $value . "', Wanted: '" . $challenge . "'"
+    );
+    return $passed;
 }
 
 #-------------------------------------------------------------------

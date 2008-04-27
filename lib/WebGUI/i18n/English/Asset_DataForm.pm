@@ -955,6 +955,42 @@ be useful, others may not.|,
 		 lastUpdated => 1164910794,
         },
 
+        'error captcha' => {
+            message     => q{CAPTCHA entered incorrectly. Please try again.},
+            lastUpdated => 0,
+            context     => q{Error message for CAPTCHA "Verify Your Humanity" failure},
+        },
+        
+        'template captcha label' => {
+            message     => q{Verify Your Humanity},
+            lastUpdated => 0,
+            context     => q{Label for CAPTCHA field in data form},
+        },
+
+        'editForm useCaptcha label' => {
+            message     => q{Use Captcha for Visitors?},
+            lastUpdated => 0,
+            context     => q{Label for asset property},
+        },
+
+        'editForm useCaptcha description' => {
+            message     => q{If 'yes', the DataForm will require a CAPTCHA for Visitors. Registered users
+                            will not see the CAPTCHA.},
+            lastUpdated => 0,
+            context     => q{Description of asset property},
+        },
+
+        'helpvar useCaptcha' => {
+            message     => q{This variable is true when the CAPTCHA should be shown.},
+            lastUpdated => 0,
+            context     => q{Description of template variable},
+        },
+
+        'helpvar form.captcha' => {
+            message     => q{The input field and image for the CAPTCHA},
+            lastUpdated => 0,
+            context     => q{Description of template variable},
+        },
 };
 
 1;

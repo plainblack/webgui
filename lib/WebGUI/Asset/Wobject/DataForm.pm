@@ -175,40 +175,44 @@ sub definition {
 			templateId =>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000141',
-				},
+                        },
 			acknowledgement=>{
 				fieldType=>"textarea",
 				defaultValue=>undef
-				},
+                        },
 			emailTemplateId=>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000085',
-				},
+                        },
 			acknowlegementTemplateId=>{
 				fieldType=>"template",
 				defaultValue=>'PBtmpl0000000000000104',
-				},
+                        },
 			listTemplateId=>{
 				defaultValue=>'PBtmpl0000000000000021',
 				fieldType=>"template"
-				},
+                        },
 			mailData=>{
 				defaultValue=>0,
 				fieldType=>"yesNo"
-				},
+                        },
 			mailAttachments=>{
 				defaultValue=>0,
 				fieldType=>'yesNo',
-				},
+                        },
 			defaultView=>{
 				defaultValue=>0,
 				fieldType=>"integer"
-				},
+                        },
 			groupToViewEntries=>{
 				defaultValue=>7,
 				fieldType=>"group"
-				},
-			}
+                        },
+                        useCaptcha  => {
+                            fieldType       => "yesNo",
+                            defaultValue    => 0,
+                        },
+                    }
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -353,6 +357,13 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get("mail attachments description"),
 		-value=>$self->getValue("mailAttachments"),
 		);
+
+        $tabform->getTab("properties")->yesNo(
+            -name       => "useCaptcha",
+            -label      => $i18n->get( "editForm useCaptcha label" ),
+            -hoverHelp  => $i18n->get( "editForm useCaptcha description" ),
+            -value      => $self->getValue( "useCaptcha" ),
+        );
 
 	$tabform->getTab("security")->group(
 		-name=>"groupToViewEntries",
@@ -605,6 +616,18 @@ sub getRecordTemplateVars {
 	$var->{tab_loop} = \@tabs;
 	$var->{"form.send"} = WebGUI::Form::submit($self->session,{value=>$i18n->get(73)});
 	$var->{"form.save"} = WebGUI::Form::submit($self->session,);
+        
+        # Create CAPTCHA if configured and user is not a Registered User
+        if ( $self->useCaptcha ) {
+            # Create one captcha we can use multiple times
+            my $captcha
+                = WebGUI::Form::Captcha( $self->session, {
+                    name        => 'captcha',
+                } );
+
+            $var->{ "form.captcha" } = $captcha;
+        }
+
 	$var->{"form.end"} = WebGUI::Form::formFooter($self->session,);
 	return $var;
 }
@@ -621,24 +644,25 @@ as well as shared template vars.
 sub getTemplateVars {
     my $self        = shift;
     my $var         = $self->get;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 
-	$var->{canEdit} = ($self->canEdit);
+    $var->{ useCaptcha } = ( $self->useCaptcha ? 1 : 0 );
+    $var->{canEdit} = ($self->canEdit);
     $var->{canViewEntries}  = ($self->session->user->isInGroup($self->get("groupToViewEntries")));
-	$var->{"hasEntries"} = $self->hasEntries;
-	$var->{"entryList.url"} = $self->getListUrl;
-	$var->{"entryList.label"} = $i18n->get(86);
-	$var->{"export.tab.url"} = $self->getUrl('func=exportTab');
-	$var->{"export.tab.label"} = $i18n->get(84);
-	$var->{"addField.url"} = $self->getUrl('func=editField');
-	$var->{"addField.label"} = $i18n->get(76);
-	$var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
-	$var->{"deleteAllEntries.label"} = $i18n->get(91);
-	$var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
-	$var->{"javascript.confirmation.deleteOne"} = sprintf("return confirm('%s');",$i18n->get('confirm delete one'));
-	$var->{"addTab.label"}=  $i18n->get(105);;
-	$var->{"addTab.url"}= $self->getUrl('func=editTab');
-	$var->{"tab.init"}= $self->_createTabInit($self->getId);
+    $var->{"hasEntries"} = $self->hasEntries;
+    $var->{"entryList.url"} = $self->getListUrl;
+    $var->{"entryList.label"} = $i18n->get(86);
+    $var->{"export.tab.url"} = $self->getUrl('func=exportTab');
+    $var->{"export.tab.label"} = $i18n->get(84);
+    $var->{"addField.url"} = $self->getUrl('func=editField');
+    $var->{"addField.label"} = $i18n->get(76);
+    $var->{"deleteAllEntries.url"} = $self->getUrl("func=deleteAllEntriesConfirm");
+    $var->{"deleteAllEntries.label"} = $i18n->get(91);
+    $var->{"javascript.confirmation.deleteAll"} = sprintf("return confirm('%s');",$i18n->get('confirm delete all'));
+    $var->{"javascript.confirmation.deleteOne"} = sprintf("return confirm('%s');",$i18n->get('confirm delete one'));
+    $var->{"addTab.label"}=  $i18n->get(105);;
+    $var->{"addTab.url"}= $self->getUrl('func=editTab');
+    $var->{"tab.init"}= $self->_createTabInit($self->getId);
 
     return $var;
 }
@@ -852,6 +876,29 @@ sub sendEmail {
             }
         }
     }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 useCaptcha ( )
+
+Returns true if we should use and process the CAPTCHA.
+
+We should use the CAPTCHA if it is selected in the asset properties and the
+user is not a Registered User.
+
+=cut
+
+sub useCaptcha {
+    my $self        = shift;
+
+    if ( $self->get('useCaptcha') ) {
+        if ( !$self->session->user->isInGroup( '2' ) ) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -1257,65 +1304,107 @@ sub www_moveTabLeft {
 
 #-------------------------------------------------------------------
 sub www_process {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canView;
-	my $entryId = $self->setCollateral("DataForm_entry","DataForm_entryId",{
-		DataForm_entryId=>$self->session->form->process("entryId") || undef,
-                assetId=>$self->getId,
-                userId=>$self->session->user->userId,
-                username=>$self->session->user->username,
-                ipAddress=>$self->session->env->getIp,
-                submissionDate=>$self->session->datetime->time()
-		},0);
-	my ($var, %row, @errors, $updating, $hadErrors);
-    $var = $self->getTemplateVars;
-	$var->{entryId} = $entryId;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	tie %row, "Tie::CPHash";
-	my $sth = $self->session->db->read("select DataForm_fieldId,label,name,status,type,defaultValue,isMailField from DataForm_field 
-		where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-	while (%row = $sth->hash) {
-		my $value = $row{defaultValue};
-		if ($row{status} eq "required" || $row{status} eq "editable") {
-			$value = $self->session->form->process($row{name},$row{type},$row{defaultValue});
-			WebGUI::Macro::filter(\$value);
-		}
-		if ($row{status} eq "required" && ($value =~ /^\s$/ || $value eq "" || not defined $value)) {
-			push (@errors,{
-				"error.message"=>$row{label}." ".$i18n->get(29).".",
-				});
-			$hadErrors = 1;
-			delete $var->{entryId};
-		}
-		if ($row{status} eq "hidden") {
-			$value = $row{defaultValue};
-                        WebGUI::Macro::process($self->session,\$value);
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+    my $session = $self->session;
+    my $db      = $self->session->db;
+    my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
+    # TODO: Why do we create the entire entry instead of just generating the entryId 
+    # and only adding the entry data if there are no errors?
+    my $entryId 
+        = $self->setCollateral("DataForm_entry","DataForm_entryId", {
+            DataForm_entryId    => $session->form->process("entryId") || undef,
+            assetId             => $self->getId,
+            userId              => $session->user->userId,
+            username            => $session->user->username,
+            ipAddress           => $session->env->getIp,
+            submissionDate      => $session->datetime->time,
+        }, 0
+    );
+    my $var = $self->getTemplateVars;
+    $var->{entryId} = $entryId;
+    
+    # Process form
+    my (@errors, $updating, $hadErrors);
+    tie my %row, "Tie::CPHash";
+    my $sth = $self->session->db->read(
+        "SELECT * FROM DataForm_field WHERE assetId=? ORDER BY sequenceNumber",
+        [ $self->getId ]
+    );
+    while (%row = $sth->hash) {
+        my $value = $row{defaultValue};
+        if ($row{status} eq "required" || $row{status} eq "editable") {
+            $value = $self->session->form->process($row{name},$row{type},$row{defaultValue});
+            WebGUI::Macro::filter(\$value);
+        }
+        if ($row{status} eq "required" && (!$value || $value =~ /^\s*$/)) {
+            push @errors, {
+                "error.message" => $row{label} . " " . $i18n->get(29) . ".",
+            };
+            $hadErrors = 1;
+            delete $var->{entryId};
+        }
+        if ($row{status} eq "hidden") {
+            $value = $row{defaultValue};
+            WebGUI::Macro::process($self->session,\$value);
+        }
+
+        # Keep adding rows unless there was an error
+        unless ($hadErrors) {
+            # Check if this entry / field exists and do what's appropriate
+            # TODO: This should be refactored into a method
+            my $exists 
+                = $db->quickScalar(
+                    "SELECT COUNT(*) FROM DataForm_entryData WHERE DataForm_entryId=?
+                    AND DataForm_fieldId=?",
+                    [ $entryId, $row{DataForm_fieldId} ]
+                );
+            if ($exists) {
+                if ( $self->canEdit ) {
+                    $db->write(
+                        "UPDATE DataForm_entryData SET value=?
+                        WHERE DataForm_entryId=? AND DataForm_fieldId=?",
+                        [ $value, $entryId, $row{DataForm_fieldId} ],
+                    );
+                    $updating = 1;
                 }
-		unless ($hadErrors) {
-			my ($exists) = $self->session->db->quickArray("select count(*) from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId)."
-				and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId}));
-			if ($exists) {
-				$self->session->db->write("update DataForm_entryData set value=".$self->session->db->quote($value)."
-					where DataForm_entryId=".$self->session->db->quote($entryId)." and DataForm_fieldId=".$self->session->db->quote($row{DataForm_fieldId})) if $self->canEdit;
-				$updating = 1;
-			} else {
-				$self->session->db->write("insert into DataForm_entryData (DataForm_entryId,DataForm_fieldId,assetId,value) values
-					(".$self->session->db->quote($entryId).", ".$self->session->db->quote($row{DataForm_fieldId}).", ".$self->session->db->quote($self->getId).", ".$self->session->db->quote($value).")");
-			}
-		}
-	}
-	$sth->finish;
-	$var->{error_loop} = \@errors;
-	$var = $self->getRecordTemplateVars($var);
-	if ($hadErrors && !$updating) {
-		$self->session->db->write("delete from DataForm_entryData where DataForm_entryId=".$self->session->db->quote($entryId));
-		$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
-		$self->prepareView($var);
-		$self->processStyle($self->view);
-	} else {
-		$self->sendEmail($var) if ($self->get("mailData") && !$updating);
-		return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
-	}
+            } else {
+                $db->write(
+                    "INSERT INTO DataForm_entryData ( DataForm_entryId, DataForm_fieldId, assetId, value) 
+                    VALUES ( ?, ?, ?, ? )",
+                    [ $entryId, $row{DataForm_fieldId}, $self->getId, $value ],
+                );
+            }
+        }
+    }
+    $sth->finish;
+
+    # Process CAPTCHA
+    if ( $self->useCaptcha ) {
+        if ( !$self->session->form->process( 'captcha', 'captcha' ) ) {
+            $hadErrors  = 1;
+            delete $var->{ entryId };
+            push @errors, {
+                "error.message" => $i18n->get( 'error captcha' ),
+            };
+        }
+    }
+
+    $var->{error_loop} = \@errors;
+    $var = $self->getRecordTemplateVars($var);
+    if ($hadErrors && !$updating) {
+        # TODO: This is not right. See the TODO at the top of this method (where the entry is created)
+        $db->write(
+            "DELETE FROM DataForm_entryData WHERE DataForm_entryId=?",
+            [ $entryId ]
+        );
+        $self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
+        $self->prepareView($var);
+        $self->processStyle($self->view);
+    } else {
+        $self->sendEmail($var) if ($self->get("mailData") && !$updating);
+        return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
+    }
 }
 
 

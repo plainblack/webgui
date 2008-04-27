@@ -111,7 +111,18 @@ our $HELP = {
             },
             {   'required' => 1,
                 'name'     => 'form.end'
-            }
+            },
+            {
+                name        => 'useCaptcha',
+                required    => 1,
+                description => 'helpvar useCaptcha',
+            },
+            {
+                name        => 'form.captcha',
+                required    => 1,
+                description => 'helpvar form.captcha',
+            },
+
         ],
         related => [
             {   tag       => 'data form list template',

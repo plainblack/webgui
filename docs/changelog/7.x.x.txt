@@ -41,6 +41,8 @@
  - Fixed all Test::WWW::Mechanize tests and updated the skeleton. Should be 
    usable now.
  - fixed: Registration form now saves all progress if there is an error
+ - added: DataForm now can use CAPTCHA for Visitors
+ - Spent some time cleaning up DataForm, but it could use more.
 
 
 7.5.10
