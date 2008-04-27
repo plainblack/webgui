@@ -40,6 +40,7 @@
  - Cleaned up code tested by the aforementioned tests
  - Fixed all Test::WWW::Mechanize tests and updated the skeleton. Should be 
    usable now.
+ - fixed: Registration form now saves all progress if there is an error
 
 
 7.5.10

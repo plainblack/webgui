@@ -172,52 +172,61 @@ Array ref of template vars from subclass
 =cut
 
 sub createAccount {
-	my $self = shift;
-	my $method = $_[0];
-	my $vars = $_[1];
-	my $i18n = WebGUI::International->new($self->session);
-	$vars->{title} = $i18n->get(54);
-   	
-	$vars->{'create.form.header'} = WebGUI::Form::formHeader($self->session,{});
-	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"});
-	$vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method});
-	
-	#User Defined Options
+    my $self    = shift;
+    my $method  = shift;
+    my $vars    = shift;
+    my $i18n    = WebGUI::International->new($self->session);
+    $vars->{title} = $i18n->get(54);
+    
+    $vars->{'create.form.header'} 
+        = WebGUI::Form::formHeader($self->session,{})
+        . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
+        . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
+        ;
+    
+    # User Defined Options
     my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
-	$vars->{'create.form.profile'} = [];
-	foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
-		my $id           = $field->getId;
-		my $label        = $field->getLabel;
-        my $emailAddress = '';
+    $vars->{'create.form.profile'} = [];
+    foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
+        my $id           = $field->getId;
+        my $label        = $field->getLabel;
+        my $defaultValue = undef;
+        
+        # Get the default email from the invitation
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
-           my $code = $self->session->form->get('code')
-                   || $self->session->form->get('uniqueUserInvitationCode');
-           ($emailAddress) = $self->session->db->quickArray('select email from userInvitations where inviteId=?',[$code]);
-           $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+            my $code = $self->session->form->get('code')
+                    || $self->session->form->get('uniqueUserInvitationCode');
+            $defaultValue 
+                = $self->session->db->quickScalar(
+                    'SELECT email FROM userInvitations WHERE inviteId=?',
+                    [$code]
+                );
+            $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
         }
-        my $formField = $field->formField(undef, undef, undef, undef, $emailAddress); ##Manually set the field
-		my $required = $field->isRequired;
+        my $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
+        my $required    = $field->isRequired;
 
-		# Old-style field loop.
-		push @{$vars->{'create.form.profile'}},
-		    { 'profile.formElement' => $formField,
-		       'profile.formElement.label' => $label,
-		       'profile.required' => $required };
+        # Old-style field loop.
+        push @{$vars->{'create.form.profile'}}, { 
+            'profile.formElement'       => $formField,
+            'profile.formElement.label' => $label,
+            'profile.required'          => $required,
+        };
 
-		# Individual field template vars.
-		my $prefix = 'create.form.profile.'.$id.'.';
-		$vars->{$prefix.'formElement'} = $formField;
-		$vars->{$prefix.'formElement.label'} = $label;
-		$vars->{$prefix.'required'} = $required;
-	}
+        # Individual field template vars.
+        my $prefix = 'create.form.profile.'.$id.'.';
+        $vars->{ $prefix . 'formElement'        } = $formField;
+        $vars->{ $prefix . 'formElement.label'  } = $label;
+        $vars->{ $prefix . 'required'           } = $required;
+    }
 
-	$vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
-	$vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
+    $vars->{'create.form.submit'} = WebGUI::Form::submit($self->session,{});
+    $vars->{'create.form.footer'} = WebGUI::Form::formFooter($self->session,);
 
-	$vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
-	$vars->{'login.label'} = $i18n->get(58);
+    $vars->{'login.url'} = $self->session->url->page('op=auth;method=init');
+    $vars->{'login.label'} = $i18n->get(58);
 
-	return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
+    return WebGUI::Asset::Template->new($self->session,$self->getCreateAccountTemplateId)->process($vars);
 }
 
 #-------------------------------------------------------------------
