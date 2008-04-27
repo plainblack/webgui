@@ -118,9 +118,7 @@ is($cntl->getValue(1,2,3), 1, 'list returns first item');
 is($session->form->selectBox(undef,'text'), 'text', 'text');
 is($session->form->selectBox(undef,42), 42, 'int');
 is($session->form->selectBox(undef,0), 0, 'zero');
-is($session->form->selectBox(undef,undef), '', 'undef returns ""');
+is($session->form->selectBox(undef,undef), 0, 'undef returns 0');
 is($session->form->selectBox(undef,''), '', '""');
 is($session->form->selectBox(undef,1,2,3), 1, 'list returns first item');
-
-__END__
 
