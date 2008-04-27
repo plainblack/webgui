@@ -65,12 +65,22 @@ for my $i ( 0 .. 5 ) {
 
 $versionTag->commit;
 
+my ( $mech );
+
 #----------------------------------------------------------------------------
 # Tests
+
+if ( !eval { require Test::WWW::Mechanize; 1; } ) {
+    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
+}
+$mech    = Test::WWW::Mechanize->new;
+$mech->get( $baseUrl );
+if ( !$mech->success ) {
+    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
+}
+
 plan tests => 2;
 
-use_ok("Test::WWW::Mechanize");
-my $mech;
 
 #----------------------------------------------------------------------------
 # Test www_viewRss
