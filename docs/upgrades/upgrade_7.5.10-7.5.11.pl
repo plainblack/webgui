@@ -560,6 +560,17 @@ sub migrateOldProduct {
 sub mergeProductsWithCommerce {
 	my $session = shift;
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
+    $session->db->write(<<'EOSQL');
+CREATE TABLE Product_Variants (
+    sku                 VARCHAR(255) binary NOT NULL primary key,
+    mastersku           VARCHAR(255) binary NOT NULL
+    title               VARCHAR(255),           
+    shortdesc           VARCHAR(30),
+    price               FLOAT,
+    weight              FLOAT,
+    quantity            INT
+);
+EOSQL
     ## Add the parameter and variants columns
     return 1;
 }
