@@ -526,12 +526,14 @@ sub getEditForm {
 
     my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->get("assetId")]);
 
-	$tabform->getTab("display")->selectBox(
-		-name=>"defaultThingId",
-        -value=>$self->get("defaultThingId"),
-		-label=>$i18n->get("default thing label"),
-        -options=>$things,
-	);
+    unless (scalar(keys(%{$things}))) {
+    	$tabform->getTab("display")->selectBox(
+	    	-name=>"defaultThingId",
+            -value=>$self->get("defaultThingId"),
+    		-label=>$i18n->get("default thing label"),
+            -options=>$things,
+    	);
+    }
 	
 	return $tabform;
 }
