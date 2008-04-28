@@ -552,6 +552,13 @@ sub definition {
 			label=>$i18n->get('posts/page'),
 			hoverHelp=>$i18n->get('posts/page description'),
 			},
+                archiveEnabled => {
+                    fieldType       => "yesNo",
+                    defaultValue    => 1,
+                    tab             => 'properties',
+                    label           => $i18n->get('editForm archiveEnabled label'),
+                    hoverHelp       => $i18n->get('editForm archiveEnabled description'),
+                },
 		archiveAfter =>{
 			fieldType=>"interval",
 			defaultValue=>31536000,

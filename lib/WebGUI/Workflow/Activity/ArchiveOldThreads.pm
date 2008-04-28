@@ -74,6 +74,7 @@ sub execute {
         while (my ($assetId) = $a->array) {
                 my $cs = WebGUI::Asset->new($self->session, $assetId, "WebGUI::Asset::Wobject::Collaboration");
 		next unless defined $cs;
+                next unless $cs->get("archiveEnabled");
                 my $archiveDate = $epoch - $cs->get("archiveAfter");
                 my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
                         left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate

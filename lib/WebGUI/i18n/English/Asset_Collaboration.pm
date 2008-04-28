@@ -1633,6 +1633,19 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Verify your humanity|,
         lastUpdated => 1170543345,
     },
+
+    'editForm archiveEnabled label' => {
+        message     => q{Enable Archiving?},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'editForm archiveEnabled description' => {
+        message     => q{If Yes, Threads will be automatically hidden after a certain interval},
+        lastUpdated => 0,
+        context     => q{Hover help for asset property},
+    },
+
 };
 
 1;

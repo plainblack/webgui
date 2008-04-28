@@ -44,9 +44,22 @@ upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 addCaptchaToDataForm( $session );
+addArchiveEnabledToCollaboration( $session );
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+# Add the archiveEnabled field to Collaboration assets
+sub addArchiveEnabledToCollaboration {
+    my $session = shift;
+    print "\tAdding archiveEnabled to Collaboration... " unless $quiet;
+
+    $session->db->write( 
+        q{ ALTER TABLE Collaboration ADD COLUMN archiveEnabled INT(1) DEFAULT 1 }
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 #----------------------------------------------------------------------------
 # Add the useCaptcha field to DataForm assets
 sub addCaptchaToDataForm {
