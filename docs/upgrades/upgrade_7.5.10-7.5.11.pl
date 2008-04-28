@@ -561,8 +561,6 @@ sub mergeProductsWithCommerce {
 	my $session = shift;
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
     ## Add the parameter and variants columns
-	$session->db->write("alter table Product add column parameters mediumtext");
-	$session->db->write("alter table Product add column variants   mediumtext");
     return 1;
 }
 

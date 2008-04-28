@@ -634,62 +634,6 @@ be useful, others may not.|,
 		lastUpdated => 1164841201
 	},
 
-	'edit parameter name' => {
-		message => q|Name|,
-		lastUpdated => 1208130239,
-		context => q|The form label for the name field in editParameter|,
-	},
-
-    'edit parameter name description' => {
-        message => q|<p>The name of this parameter.</p>|,
-        lastUpdated => 1208130267,
-    },
-
-	'edit parameter' => {
-		message => q|Edit product parameter|,
-		lastUpdated => 1208130542,
-		context => q|The name of the editParameter form|
-	},
-
-	'edit option' => {
-		message => q|Edit product parameter option|,
-		lastUpdated => 1208144888,
-		context => q|The name of the editParameter form|
-	},
-
-    'edit option value' => {
-        message => q|Value|,
-        lastUpdated => 1208320423,
-        context => q|The form label for the value field in editParameterOption|
-    },
-
-    'edit option value description' => {
-        message => q|<p>The value of this option (ie. 'Blue').</p>|,
-        lastUpdated => 1208320422,
-    },
-
-	'edit option price modifier' => {
-		message => q|Price modifier|,
-		lastUpdated => 1208292477,
-		context => q|The form label for the priceModifier field in editProductParameterOption|
-	},
-
-    'edit option price modifier description' => {
-        message => q|<p>The amount this option adds to the default price for product variants containig this option.</p>|,
-        lastUpdated => 1146606364,
-    },
-
-	'edit option weight modifier' => {
-		message => q|Weight modifier|,
-		lastUpdated => 1208292479,
-		context => q|The form label for the weightModifier field in editProductParameterOption|
-	},
-
-    'edit option weight modifier description' => {
-        message => q|<p>The weight this option adds to the default weight for product variants consisting of this option.</p>|,
-        lastUpdated => 1208292519,
-    },
-
 };
 
 1;

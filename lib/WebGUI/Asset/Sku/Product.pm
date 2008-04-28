@@ -136,16 +136,6 @@ sub definition {
                 deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
                 defaultValue=>undef
             },
-            parameters=>{ ##Parameters and options
-                tab => "properties",
-                fieldType=>"hidden",
-                defaultValue=>'{}',
-            },
-            variants=>{ ##Which variants are enabled and/or disabled
-                tab => "properties",
-                fieldType=>"hidden",
-                defaultValue=>'{}',
-            },
         );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -279,21 +269,6 @@ sub getFileUrl {
     my $self = shift;
     my $store = $_[0];
     return $store->getUrl($self->getFilename($store));
-}
-
-#-------------------------------------------------------------------
-
-=head2 getParams
-
-Return the parameter data from this product as a perl data structure,
-rather than the internally stored JSON.
-
-=cut
-
-sub getParams {
-    my $self = shift;
-    my $structure = JSON::from_json($self->get('parameters'));
-    return $structure;
 }
 
 #-------------------------------------------------------------------
@@ -643,33 +618,6 @@ sub setCollateral {
 }
 
 #-------------------------------------------------------------------
-
-=head2 setParamData ($paramData)
-
-Set the product's parameter data as a perl data structure.  This is
-stored in the db as JSON.  This adds a revision to the Product, since
-parameters and options are stored directly in the asset table.
-
-Returns a copy to the new version of the Product Asset.
-
-=head2 $paramData
-
-A hash of arrays.  The keys in the hash are names of parameters, and the
-values of the arrays are subhashes, containing the names of options as
-well as price and weight modifiers.
-
-=cut
-
-sub setParamData {
-    my $self      = shift;
-    my $paramData = shift;
-    my $json = JSON::to_json($paramData);
-    my $newSelf = $self->addRevision({parameters => $json});
-    return $newSelf;
-}
-
-
-#-------------------------------------------------------------------
 sub www_addAccessory {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
@@ -898,169 +846,6 @@ sub www_editFeatureSave {
                                              });
     return "" unless($self->session->form->process("proceed"));
     return $self->www_editFeature("new");
-}
-
-#-------------------------------------------------------------------
-sub www_editParameter {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $param      = shift || $self->session->form->get('name') || 'new';
-    my $allParams = $self->getParams;
-
-    $param = "new" unless exists $allParams->{$param};
-
-    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-
-    $f->hidden(
-        -name => "func",
-        -value => "editParameterSave",
-    );
-    $f->hidden(
-        -name => "origname",
-        -value => $param,
-    );
-    $f->text(
-        -name       => 'name',
-        -label      => $i18n->get('edit parameter name'),
-        -hoverHelp  => $i18n->get('edit parameter name description'),
-        -value      => $param,
-        -maxlength  => 64,
-    );
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, "edit parameter");
-}
-
-#-------------------------------------------------------------------
-sub www_editParameterSave {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless ($self->canEdit);
-
-    my $param      = $self->session->form->get('name');
-    my $origname   = $self->session->form->get('origname');
-
-    my $allParams = $self->getParams;
-    if (($origname ne "new") and ($origname ne $param)) {
-        ##Rename existing param
-        my @options = @{ $allParams->{$origname} };
-        $allParams->{$param} = \@options;
-        delete $allParams->{$origname};
-        my $newSelf = $self->setParamData($allParams);
-        return $newSelf->www_editParameter($param);
-    }
-    elsif ($origname eq "new") {
-        $allParams->{$param} = [];
-        my $newSelf = $self->setParamData($allParams);
-        return $newSelf->www_editParameterOptions($param);
-    }
-    return $self->www_view();
-}
-
-#-------------------------------------------------------------------
-sub www_editParameterOptions {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $session    = $self->session;
-    my $param      = shift || $session->form->get('name');
-    my $value      = shift || $session->form->get('value') || "new";
-    my $allParams = $self->getParams;
-    ##You cannot add an option to a non-existant parameter.
-    if (! exists $allParams->{$param}) {
-        $session->errorHandler->warn("$param is not in param data");
-        return $self->www_editParameter($param);
-    }
-    ##Convert to a byname interface
-    my $option = {};
-    OPTION: foreach my $subOption (@{ $allParams->{$param} }) {
-        if ($subOption->{value} eq $value) {
-            $option = $subOption;
-            last OPTION;
-        }
-    }
-    my $i18n = WebGUI::International->new($session,'Asset_Product');
-    my $f = WebGUI::HTMLForm->new($session,-action=>$self->getUrl);
-    $f->hidden(
-        -name => "func",
-        -value => "editParameterOptionSave",
-    );
-    ##Editing an existing option
-    if (defined $value) {
-        $f->hidden(
-            -name => "origValue",
-            -value => $value,
-        );
-    }
-    $f->readOnly(
-        -name       => 'name',
-        -value      => $param,
-    );
-	$f->text(
-		-name		=> 'value',
-		-label		=> $i18n->get('edit option value'),
-		-hoverHelp	=> $i18n->get('edit option value description'),
-		-value		=> $value,
-		-maxlength	=> 64,
-	);
-	$f->float(
-		-name		=> 'priceModifier',
-		-label		=> $i18n->get('edit option price modifier'),
-		-hoverHelp	=> $i18n->get('edit option price modifier description'),
-		-value		=> $session->form->process("priceModifier") || $option->{priceModifier},
-		-maxlength	=> 11,
-	);
-	$f->float(
-		-name		=> 'weightModifier',
-		-label		=> $i18n->get('edit option weight modifier'),
-		-hoverHelp	=> $i18n->get('edit option weight modifier description'),
-		-value		=> $session->form->process("weightModifier") || $option->{weightModifier},
-		-maxlength	=> 7,
-	);
-    $f->submit;
-    return $self->getAdminConsole->render($f->print, "edit option");
-}
-
-#-------------------------------------------------------------------
-sub www_editParameterOptionsSave {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless ($self->canEdit);
-
-    my $form       = $self->session->form;
-    my $param      = $form->get('name');
-    my $value      = $form->get('value');
-    my $origValue  = $form->get('origValue');
-    
-    my $allParams = $self->getParams();
-    if (! exists $allParams->{$param}) {
-        $self->session->errorHandler->warn("$param is not an existing parameter");
-        return $self->www_editParameter($param);
-    }
-    my $paramData = $allParams->{$param};
-    if (($origValue ne "new") and ($origValue ne $value)) {
-        ##Rename existing option
-        my $option = {};
-        OPTION: foreach my $subOption (@{ $allParams->{$param} }) {
-            if ($subOption->{value} eq $value) {
-                $option = $subOption;
-                last OPTION;
-            }
-        }
-        ##Warning for a non-existant option
-        if (! keys %{ $option } ) {
-            $self->session->errorHandler->warn("$value is not an existing option of $param");
-            return $self->www_editParameter($param, $value);
-        }
-        $option->{value}         = $value;
-        $option->{priceModifer}  = $form->get('priceModifier');
-        $option->{weightModifer} = $form->get('weightModifier');
-    }
-    elsif ($origValue eq "new") {
-        my $newOption = {};
-        $newOption->{value}         = $value;
-        $newOption->{priceModifer}  = $form->get('priceModifier');
-        $newOption->{weightModifer} = $form->get('weightModifier');
-        push @{ $paramData }, $newOption;
-    }
-    return $self->www_view();
 }
 
 #-------------------------------------------------------------------
