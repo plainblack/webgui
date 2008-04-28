@@ -43,6 +43,7 @@
  - fixed: Registration form now saves all progress if there is an error
  - added: DataForm now can use CAPTCHA for Visitors
  - Spent some time cleaning up DataForm, but it could use more.
+ - added: Commit Version Tag screen shows revisions in the tag
 
 
 7.5.10

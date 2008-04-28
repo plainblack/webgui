@@ -202,49 +202,103 @@ A reference to the current session.
 =cut
 
 sub www_commitVersionTag {
-	my $session = shift;
-	my $tagId = $session->form->param("tagId");
-	if ($tagId) {
-		my $tag = WebGUI::VersionTag->new($session, $tagId);
-		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
-            my $remote = WebGUI::Operation::Spectre::getASpectre($session);
-			my $i18n = WebGUI::International->new($session, "VersionTag");
-            if (!defined $remote) {
-               $session->errorHandler->warn('Unable to connect to spectre.  Canceling the commit');
-               my $output = sprintf qq{<h1>%s</h1>\n<p>%s</p><p><a href="%s">%s</a>},
-                   $i18n->get('broken spectre title', 'WebGUI'),
-                   $i18n->get('broken spectre body',  'WebGUI'),
-                   $session->url->getBackToSiteURL(),
-                   $i18n->get('493', 'WebGUI');
-               return $session->style->userStyle($output);
-            }
-            $remote->disconnect;
-			my $f = WebGUI::HTMLForm->new($session);
-			$f->submit;
-			$f->readOnly(
-				label=>$i18n->get("version tag name"),
-				hoverHelp=>$i18n->get("version tag name description commit"),
-				value=>$tag->get("name")
-				);
-			$f->hidden(
-				name=>"tagId",
-				value=>$session->form->param("tagId")
-				);
-			$f->hidden(
-				name=>"op",
-				value=>"commitVersionTagConfirm"
-				);
-			$f->textarea(
-				name=>"comments",
-				label=>$i18n->get("comments"),
-				hoverHelp=>$i18n->get("comments description commit")
-				);
-			$f->submit;
-            my $ac = WebGUI::AdminConsole->new($session,"versions");
-			return $ac->render($f->print);
-		}
-	}
-	return www_manageVersions($session);
+    my $session = shift;
+    my $tagId = $session->form->param("tagId");
+
+    if ( !$tagId ) { 
+        return www_manageVersions( $session );
+    }
+    
+    my $tag = WebGUI::VersionTag->new($session, $tagId);
+    if ( !defined $tag || !$session->user->isInGroup($tag->get("groupToUse")) ) {
+        return www_manageVersions( $session );
+    }
+    
+    # Make sure we can connect to SPECTRE
+    my $remote  = WebGUI::Operation::Spectre::getASpectre($session);
+    my $i18n    = WebGUI::International->new($session, "VersionTag");
+    if (!defined $remote) {
+       $session->errorHandler->warn('Unable to connect to spectre.  Canceling the commit');
+       my $output = sprintf qq{<h1>%s</h1>\n<p>%s</p><p><a href="%s">%s</a>},
+           $i18n->get('broken spectre title', 'WebGUI'),
+           $i18n->get('broken spectre body',  'WebGUI'),
+           $session->url->getBackToSiteURL(),
+           $i18n->get('493', 'WebGUI');
+       return $session->style->userStyle($output);
+    }
+    $remote->disconnect;
+    
+    # Build the page
+    my $output  = '';
+
+    # Commit comments form
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->submit;
+    $f->readOnly(
+            label=>$i18n->get("version tag name"),
+            hoverHelp=>$i18n->get("version tag name description commit"),
+            value=>$tag->get("name")
+            );
+    $f->hidden(
+            name=>"tagId",
+            value=>$session->form->param("tagId")
+            );
+    $f->hidden(
+            name=>"op",
+            value=>"commitVersionTagConfirm"
+            );
+    $f->textarea(
+            name=>"comments",
+            label=>$i18n->get("comments"),
+            hoverHelp=>$i18n->get("comments description commit")
+            );
+    $f->submit;
+    $output .= $f->print;
+    
+    # Revisions in this tag
+    $output 
+        .= '<table width="100%" class="content">'
+        . '<tr>'
+        . '<th></th>'
+        . '<th>'.$i18n->get(99,"Asset").'</th>'
+        . '<th>'.$i18n->get("type","Asset").'</th>'
+        . '<th>'.$i18n->get("revision date","Asset").'</th>'
+        . '<th>'.$i18n->get("revised by","Asset").'</th>'
+        . '</tr> '
+        ;
+    
+    my $p 
+        = WebGUI::Paginator->new( $session,
+            $session->url->page("op=commitVersionTag;tagId=".$tag->getId),
+        );
+    $p->setDataByQuery(q{
+        SELECT assetData.revisionDate, users.username, asset.assetId, asset.className 
+        FROM assetData 
+        LEFT JOIN asset ON assetData.assetId = asset.assetId
+        LEFT JOIN users ON assetData.revisedBy = users.userId
+        WHERE assetData.tagId=? },
+        undef, 
+        undef, 
+        [$tag->getId]
+    );
+
+    foreach my $row ( @{$p->getPageData} ) {
+        my ( $date, $by, $id, $class) = @{ $row }{ qw( revisionDate username assetId className ) };
+        my $asset = WebGUI::Asset->new($session, $id, $class, $date);
+        $output 
+            .= '<tr><td>'
+            .$session->icon->view("func=view;revision=".$date, $asset->get("url"))
+            .'</td>
+            <td>'.$asset->getTitle.'</td>
+            <td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
+            <td>'.$session->datetime->epochToHuman($date).'</td>
+            <td>'.$by.'</td></tr>';
+    }
+    $output .= '</table>'.$p->getBarSimple;
+    
+    # Render and send
+    my $ac = WebGUI::AdminConsole->new($session,"versions");
+    return $ac->render( $output );
 }
 
 #-------------------------------------------------------------------
