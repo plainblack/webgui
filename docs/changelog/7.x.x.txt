@@ -25,7 +25,9 @@
    amounts of money using the new commerce system.
  - Merged all the old shipping plugins into one "Flat Rate" shipping plugin.
    See gotchas.
+ - rfe: Colorize Buttons on EMS
  - fix: Fwd: lazy guys bug report about the product system
+ - Added an asset called Shelf, which allows you to create categories of Skus.
  - fix: Processing a Cash/Check Order
  - Rewrote Event Manager fromthe ground up.
  - Added WebGUI.str javascript class with sprintf and trim methods.

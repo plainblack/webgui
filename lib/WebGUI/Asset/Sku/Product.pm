@@ -278,23 +278,10 @@ sub getPrice {
 }
 
 #-------------------------------------------------------------------
-sub getThumbnailFilename {
-    my $self = shift;
-    my $filestore = $_[0];
-    my $files = $filestore->getFiles();
-    foreach my $file (@{$files}){
-        if($file =~ m/^thumb-/){
-            return $file;
-        }
-    }
-    return "";
-}
-
-#-------------------------------------------------------------------
 sub getThumbnailUrl {
     my $self = shift;
-    my $store = $_[0];
-    return $store->getUrl($self->getThumbnailFilename($store));
+    my $store = shift || WebGUI::Storage::Image->get($self->session, $self->get('image1'));
+    return $store->getThumbnailUrl($store->getFiles->[0]);
 }
 
 #-------------------------------------------------------------------

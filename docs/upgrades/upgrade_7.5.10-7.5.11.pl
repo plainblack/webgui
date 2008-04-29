@@ -45,6 +45,7 @@ migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
+addShelf( $session );
 
 finish($session); # this line required
 
@@ -58,6 +59,24 @@ sub addArchiveEnabledToCollaboration {
         q{ ALTER TABLE Collaboration ADD COLUMN archiveEnabled INT(1) DEFAULT 1 }
     );
 
+    print "DONE!\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+sub addShelf {
+    my $session = shift;
+    print "\tAdding Shelves" unless $quiet;
+
+    $session->db->write(q{
+        create table Shelf (
+            assetId varchar(22) binary not null,
+            revisionDate bigint,
+            templateId varchar(22) binary not null default 'nFen0xjkZn8WkpM93C9ceQ',
+            primary key (assetId,revisionDate)
+            )
+        });
+    $session->config->addToArray("assetContainers","WebGUI::Asset::Wobject::Shelf");
     print "DONE!\n" unless $quiet;
 }
 #----------------------------------------------------------------------------

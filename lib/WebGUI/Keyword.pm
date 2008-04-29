@@ -157,7 +157,7 @@ sub getKeywordsForAsset {
         return \@keywords;
     }
     else {
-        return wantarray ? @keywords : join(" ", map({ m/\s/ ? '"' . $_ . '"' : $_ } @keywords));
+        return join(" ", map({ m/\s/ ? '"' . $_ . '"' : $_ } @keywords));
     }
 }
 
@@ -166,34 +166,89 @@ sub getKeywordsForAsset {
 
 =head2 getMatchingAssets ( { startAsset => $asset, keyword => $keyword } )
 
-Returns an array reference of asset ids matching the start point + keyword.
+Returns an array reference of asset ids matching the params.
 
 =head3 startAsset
 
-An asset object where you'd like to start searching for matching keywords.
+An asset object where you'd like to start searching for matching keywords. Doesn't search any particular branch if one isn't specified.
 
 =head3 keyword
 
 The keyword to match.
 
+=head3 keywords
+
+An array reference of keywords to match.
+
+=head3 matchAssetKeywords
+
+A reference to an asset that has a list of keywords to match. This can help locate assets that are similar to another asset.
+
+=head3 isa
+
+A classname pattern to match. For example, if you provide 'WebGUI::Asset::Sku' then everything that has a class name that starts with that including 'WebGUI::Asset::Sku::Product' will be included.
+
 =head3 usePaginator
 
-Instead of returning an array reference of assetId's, return a paginator object. 
+Instead of returning an array reference of assetId's, return a paginator object.
 
 =cut
 
 sub getMatchingAssets {
     my ($self, $options) = @_;
-    my $query = "select assetKeyword.assetId from assetKeyword left join asset using (assetId) 
-        where lineage like ? and keyword=? order by creationDate desc";
-    my $params = [$options->{startAsset}->get("lineage").'%', $options->{keyword}];
+    
+    # base query
+    my @clauses = ();
+    my @params = ();
+
+    # what lineage are we looking for
+    if (exists $options->{startAsset}) {
+        push @clauses, 'lineage like ?';
+        push @params, $options->{startAsset}->get("lineage").'%';
+    }
+    
+    # matching keywords against another asset
+    if (exists $options->{matchAssetKeywords}) {
+        $options->{keywords} = $self->getKeywordsForAsset({
+            asset       => $options->{matchAssetKeywords},
+            asArrayRef  => 1,
+            });
+    }
+
+    # looking for a class name match
+    if (exists $options->{isa}) {
+        push @clauses, 'className like ?';
+        push @params, $options->{isa}.'%';
+    }
+
+    # looking for a single keyword
+    if (exists $options->{keyword}) {
+        push @clauses, 'keyword=?';
+        push @params, $options->{keyword};
+    }
+
+    # looking for a list of keywords
+    if (exists $options->{keywords}) {
+        my @placeholders = ();
+        foreach my $word (@{$options->{keywords}}){
+            push @placeholders, '?';
+            push @params, $word;
+        }
+        push @clauses, 'keyword in ('.join(',', @placeholders).')';
+    }
+
+    # write the query
+    my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
+        where '.join(' and ', @clauses).' order by creationDate desc';
+        
+    # perform the search
     if ($options->{usePaginator}) {
         my $p = WebGUI::Paginator->new($self->session);
-        $p->setDataByQuery($query, undef, undef, $params);
+        $p->setDataByQuery($query, undef, undef, \@params);
         return $p;
     }
     else {
-        return $self->session->db->buildArrayRef($query, $params);
+        return $self->session->db->buildArrayRef($query, \@params);
     }
 }
 

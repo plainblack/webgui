@@ -279,6 +279,19 @@ sub getTaxRate {
 
 #-------------------------------------------------------------------
 
+=head2 getThumbnailUrl ( )
+
+Returns undef. Should be overridden by any skus that have images.
+
+=cut
+
+sub getThumbnailUrl {
+    my $self = shift;
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getWeight ( )
 
 Returns 0. Needs to be overriden by subclasses.

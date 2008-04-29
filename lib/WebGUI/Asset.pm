@@ -947,9 +947,9 @@ sub getEditForm {
     # display keywords field
     $tabform->getTab('meta')->text(
         name        => 'keywords',
-        value       => $self->get('keywords'),
         label       => $i18n->get('keywords'),
         hoverHelp   => $i18n->get('keywords help'),
+        value       => $self->get('keywords'),
         );
 
     # metadata / content profiling
@@ -1954,7 +1954,7 @@ sub prepareView {
 	my $self = shift;
 	$self->{_toolbar} = $self->getToolbar;
     my $style = $self->session->style;
-    my @keywords = $self->get('keywords');
+    my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
         $style->setMeta( {
             name    => 'keywords',

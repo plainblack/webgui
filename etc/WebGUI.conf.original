@@ -217,13 +217,12 @@
 	"WebGUI::Asset::Wobject::Collaboration", 
 	"WebGUI::Asset::Wobject::DataForm", 
 	"WebGUI::Asset::Wobject::Calendar", 
-	"WebGUI::Asset::Wobject::EventManagementSystem", 
-        "WebGUI::Asset::Wobject::Gallery",
+	"WebGUI::Asset::Wobject::EventManagementSystem",
+	"WebGUI::Asset::Wobject::Gallery",
 	"WebGUI::Asset::Wobject::HttpProxy", 
 	"WebGUI::Asset::Wobject::Navigation", 
 	"WebGUI::Asset::Wobject::Matrix", 
 	"WebGUI::Asset::Wobject::Poll", 
-	"WebGUI::Asset::Wobject::Product", 
 	"WebGUI::Asset::Wobject::ProjectManager",
 	"WebGUI::Asset::Wobject::SQLReport", 
 	"WebGUI::Asset::Wobject::Search",
@@ -236,6 +235,7 @@
 	"WebGUI::Asset::Wobject::InOutBoard",
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
+	"WebGUI::Asset::Wobject::Shelf", 
 	"WebGUI::Asset::Wobject::SQLForm",
 	"WebGUI::Asset::Wobject::Thingy"
     ],
@@ -254,6 +254,7 @@
 "assetContainers" : [
     "WebGUI::Asset::Wobject::Layout", "WebGUI::Asset::Wobject::Folder",
     "WebGUI::Asset::Wobject::Dashboard", "WebGUI::Asset::Wobject::MessageBoard", 
+	"WebGUI::Asset::Sku::Product", 
 	"WebGUI::Asset::Wobject::WikiMaster"
     ],
 
