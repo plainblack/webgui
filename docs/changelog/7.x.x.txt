@@ -1,3 +1,5 @@
+7.4.35
+
 7.4.34
  - fixed: email validation rejects periods
  - fixed: day/week/month tabs non-functional on calendar search screen
