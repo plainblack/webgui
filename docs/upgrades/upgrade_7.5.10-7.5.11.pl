@@ -602,10 +602,9 @@ sub mergeProductsWithCommerce {
 	my $session = shift;
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
     $session->db->write(<<'EOSQL');
-CREATE TABLE Product_Variants (
-    sku                 VARCHAR(255) binary NOT NULL primary key,
-    mastersku           VARCHAR(255) binary NOT NULL,
-    title               VARCHAR(255),           
+CREATE TABLE Product_variants (
+    sku                 VARCHAR(255) BINARY NOT NULL PRIMARY KEY,
+    mastersku           VARCHAR(255) BINARY NOT NULL,
     shortdesc           VARCHAR(30),
     price               FLOAT,
     weight              FLOAT,

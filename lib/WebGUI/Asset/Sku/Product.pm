@@ -899,6 +899,67 @@ sub www_editSpecificationSave {
 }
 
 #-------------------------------------------------------------------
+sub www_editVariant {
+    my $self = shift;
+    my $sku  = shift || $self->session->form->process("sku");
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    my ($data, $f, $hashRef);
+    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
+    $data = $self->getCollateral("Product_specification","Product_specificationId",$sku);
+    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->readonly(
+        -name => "mastersku",
+        -value => $data->{mastersku},
+    );
+    $f->hidden(
+        -name => "func",
+        -value => "editVariantSave",
+    );
+    $f->integer(
+        -name => "shortdesc",
+        -size => 30,
+        -label => $i18n->get('shortdesc'),
+        -hoverHelp => $i18n->get('shortdesc description'),
+        -value => $data->{price},
+    );
+    $f->integer(
+        -name => "price",
+        -label => $i18n->get(10),
+        -hoverHelp => $i18n->get('10 description'),
+        -value => $data->{price},
+    );
+    $f->float(
+        -name => "weight",
+        -label => $i18n->get('weight'),
+        -hoverHelp => $i18n->get('weight description'),
+        -value => $data->{weight},
+    );
+    $f->integer(
+        -name => "quantity",
+        -label => $i18n->get('quantity'),
+        -hoverHelp => $i18n->get('quantity description'),
+        -value => $data->{quantity},
+    );
+    $f->submit;
+    return $self->getAdminConsole->render($f->print, 'add variant');
+}
+
+#-------------------------------------------------------------------
+sub www_editVariantSave {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    $self->setCollateral("Product_variants", "Product_specificationId", {
+        Product_specificationId => $self->session->form->process("sid"),
+        shortdesc => $self->session->form->process('shortdesc', 'text'),
+        price     => $self->session->form->process('name',      'float'),
+        weight    => $self->session->form->process('weight',    'float'),
+        quantity  => $self->session->form->process('quantity',  'integer'),
+    });
+
+    return $self->www_editVariant("new");
+}
+
+#-------------------------------------------------------------------
 sub www_moveAccessoryDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);

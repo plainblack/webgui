@@ -398,8 +398,8 @@ our $I18N = {
         },
 
         '10 description' => {
-                message => q|The price of this product. You may optionally enter text like "call for pricing" if you wish, or you may leave it blank.|,
-                lastUpdated => 1120332527,
+                message => q|The price of this variant.|,
+                lastUpdated => 1209496419,
         },
 
         '7 description' => {
@@ -633,6 +633,44 @@ be useful, others may not.|,
 		message => q|The unique identifier for the storage object for a product warranty.|,
 		lastUpdated => 1164841201
 	},
+
+	'weight' => {
+		message => q|Weight|,
+		context => q|How much something weighs, with no units|
+		lastUpdated => 1209494301,
+	},
+
+    'weight description' => {
+        message => q|The default weight of the variant.|,
+        lastUpdated => 1209494298,
+    },
+
+	'quantity' => {
+		message => q|Quantity|,
+		lastUpdated => 1209494301,
+	},
+
+    'quantity description' => {
+        message => q|How many units of this variant are available.|,
+        lastUpdated => 1209494298,
+    },
+
+	'shortdesc' => {
+		message => q|Short Description|,
+		lastUpdated => 1209494301,
+	},
+
+    'shortdesc description' => {
+        message => q|The will be displayed to the user so they can purchase this variant of your product.|,
+        lastUpdated => 1209494298,
+    },
+
+    'add variant' => {
+        message => q|Add Variant.|,
+        context => q|Add a variant to this product.  For example, if you sell shirts, this could be a large shirt, a blue shirt, or
+        a large blue shirt.|,
+        lastUpdated => 1209494298,
+    },
 
 };
 
