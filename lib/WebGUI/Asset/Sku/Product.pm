@@ -1019,19 +1019,19 @@ sub view {
     }
     #---image1
     if ($image1) {
-        $file = WebGUI::Storage->get($self->session,$image1);
+        $file = WebGUI::Storage::Image->get($self->session,$image1);
         $var{thumbnail1} = $self->getThumbnailUrl($file);
         $var{image1}     = $self->getFileUrl($file);
     }
     #---image2
     if ($image2) {
-        $file = WebGUI::Storage->get($self->session,$image2);
+        $file = WebGUI::Storage::Image->get($self->session,$image2);
         $var{thumbnail2} = $self->getThumbnailUrl($file);
         $var{image2}     = $self->getFileUrl($file);
     }
     #---image3
     if ($image3) {
-        $file = WebGUI::Storage->get($self->session,$image3);
+        $file = WebGUI::Storage::Image->get($self->session,$image3);
         $var{thumbnail3} = $self->getThumbnailUrl($file);
         $var{image3}     = $self->getFileUrl($file);
    }
