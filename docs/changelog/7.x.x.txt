@@ -1,3 +1,5 @@
+7.4.36
+
 7.4.35
  - fixed: security flaw on data form list view
 
