@@ -46,6 +46,7 @@ mergeProductsWithCommerce($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
+modifyThingyPossibleValues( $session );
 
 finish($session); # this line required
 
@@ -607,6 +608,13 @@ CREATE TABLE paymentGateway (
     options             mediumtext
 )
 EOSQL
+}
+
+#-------------------------------------------------
+sub modifyThingyPossibleValues {
+    my $session = shift;
+    print "\tModify data type of Thingy field's possible Values property.\n" unless ($quiet);
+    $session->db->write("alter table Thingy_fields modify possibleValues text");
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
