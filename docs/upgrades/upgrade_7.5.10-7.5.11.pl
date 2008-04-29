@@ -583,7 +583,7 @@ sub mergeProductsWithCommerce {
     $session->db->write(<<'EOSQL');
 CREATE TABLE Product_Variants (
     sku                 VARCHAR(255) binary NOT NULL primary key,
-    mastersku           VARCHAR(255) binary NOT NULL
+    mastersku           VARCHAR(255) binary NOT NULL,
     title               VARCHAR(255),           
     shortdesc           VARCHAR(30),
     price               FLOAT,
