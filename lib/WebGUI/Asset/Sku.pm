@@ -137,12 +137,12 @@ sub definition {
 			label			=> $i18n->get("tax rate override"),
 			hoverHelp		=> $i18n->get("tax rate override help")
 			},
-		salesAgentId => {
+		vendorId => {
 			tab				=> "shop",
-			fieldType		=> "hidden",
-			defaultValue	=> undef,
-			label			=> $i18n->get("sales agent"),
-			hoverHelp		=> $i18n->get("sales agent help")
+			fieldType		=> "vendor",
+			defaultValue	=> 'defaultvendor000000000',
+			label			=> $i18n->get("vendor"),
+			hoverHelp		=> $i18n->get("vendor help")
 			},
 	);
 	push(@{$definition}, {

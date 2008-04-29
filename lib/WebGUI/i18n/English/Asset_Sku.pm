@@ -33,16 +33,16 @@ our $I18N = {
 		context => q|help for sku field|
 	},
 
-	'sales agent' => {
-		message => q|sales agent|,
+	'vendor' => {
+		message => q|Vendor|,
 		lastUpdated => 0,
 		context => q|asset field relating to who is selling this product|
 	},
 
-	'sales agent help' => {
+	'vendor help' => {
 		message => q|Which person/company defined in the commerce system should get credit for selling this item, if any?|,
 		lastUpdated => 0,
-		context => q|help for sales agent field|
+		context => q|help for vendor field|
 	},
 
 	'override tax rate' => {

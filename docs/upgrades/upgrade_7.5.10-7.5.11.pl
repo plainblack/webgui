@@ -46,9 +46,28 @@ mergeProductsWithCommerce($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
+addVendors($session);
 modifyThingyPossibleValues( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addVendors {
+    my $session = shift;
+    print "\tAdding vendors... " unless $quiet;
+
+    $session->db->write(q{
+        create table vendor (
+            vendorId varchar(22) binary not null primary key,
+            dateCreated datetime,
+            name varchar(255)
+        )
+        });
+    $session->db->write(q{
+        insert into vendor (vendorId,name,dateCreated) values ('defaultvendor000000000','Default Vendor',now())
+        });
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add the archiveEnabled field to Collaboration assets
@@ -355,7 +374,9 @@ sub convertTransactionLog {
 		shippingDate datetime,
 		quantity int not null default 1,
 		price float,
-		index transactionId (transactionId)
+        vendorId varchar(22) binary not null default 'defaultvendor000000000',
+		index transactionId (transactionId),
+        index vendorId (vendorId)
 	)");
     $session->setting->add('shopMyPurchasesTemplateId','');
     $session->setting->add('shopMyPurchaseDetailTemplateId','');
@@ -429,13 +450,13 @@ sub createSkuAsset {
         revisionDate bigint not null,
         description mediumtext,
         sku varchar(35) binary not null,
-        salesAgentId varchar(22) binary,
+        vendorId varchar(22) binary not null default 'defaultvendor000000000',
         displayTitle bool not null default 1,
         overrideTaxRate bool not null default 0,
         taxRateOverride float not null default 0.00,
         primary key (assetId, revisionDate),
         index sku (sku),
-        index salesAgentId (salesAgentId)
+        index vendorId (vendorId)
     )"); 
 }
 

@@ -245,7 +245,7 @@ A hash reference that contains one of the following:
 A reference to a WebGUI::Shop::CartItem. Alternatively you can manually pass in any of the following
 fields that would be created automatically by this object: assetId configuredTitle options shippingAddressId
 shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState shippingCountry
-shippingCode shippingPhoneNumber quantity price
+shippingCode shippingPhoneNumber quantity price vendorId
 
 =head4 shippingTrackingNumber
 
@@ -284,7 +284,7 @@ sub update {
     }
     my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber shippingStatus
         shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
-        shippingCountry shippingCode shippingPhoneNumber quantity price));
+        shippingCountry shippingCode shippingPhoneNumber quantity price vendorId));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }

@@ -268,9 +268,9 @@ sub www_manage {
     my $self    = shift;
     my $session = $self->session;
     my $admin   = WebGUI::Shop::Admin->new($session);
-    my $i18n    = WebGUI::International->new($session, "Pay");
+    my $i18n    = WebGUI::International->new($session, "Shop");
 
-    return $session->privilege->adminOnly() unless ($session->user->isInGroup("3"));
+    return $session->privilege->adminOnly() unless ($admin->canManage);
 
     # Button for adding a payment gateway
     my $output = WebGUI::Form::formHeader($session)

@@ -247,8 +247,8 @@ The main management screen for shippers.
 sub www_manage {
     my ($self) = @_;
     my $session = $self->session;
-    return $session->privilege->adminOnly() unless ($session->user->isInGroup("3"));
     my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
     my $i18n = WebGUI::International->new($session, "Shop");
     my $output = WebGUI::Form::formHeader($session)
         .WebGUI::Form::hidden($session, {name=>"shop", value=>"ship"})

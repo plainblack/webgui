@@ -22,6 +22,7 @@ use WebGUI::Shop::Pay;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 use WebGUI::Shop::Transaction;
+use WebGUI::Shop::Vendor;
 
 =head1 NAME
 
@@ -81,8 +82,8 @@ sub www_address {
     my $output = undef;
     my $method = "www_". ( $session->form->get("method") || "view");
     my $cart = WebGUI::Shop::AddressBook->newBySession($session);
-    if ($cart->can($method)) {
-        $output = $cart->$method();
+    if (my $sub = $cart->can($method)) {
+        $output = $sub->();
     }
     return $output;
 }
@@ -196,6 +197,24 @@ sub www_transaction {
     my $method = "www_".$session->form->get("method");
     if ($method ne "www_" && WebGUI::Shop::Transaction->can($method)) {
         $output = WebGUI::Shop::Transaction->$method($session);
+    }
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_vendor ()
+
+Hand off to the vendor system.
+
+=cut
+
+sub www_vendor {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_".$session->form->get("method");
+    if ($method ne "www_" && WebGUI::Shop::Vendor->can($method)) {
+        $output = WebGUI::Shop::Vendor->$method($session);
     }
     return $output;
 }

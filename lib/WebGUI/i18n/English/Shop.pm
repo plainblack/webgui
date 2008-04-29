@@ -39,6 +39,12 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'vendors' => { 
+		message => q|Vendors|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
 	'date' => { 
 		message => q|Date|,
 		lastUpdated => 0,
@@ -201,10 +207,22 @@ our $I18N = {
 		context => q|a label in the address editor|
 	},
 
+	'date created' => { 
+		message => q|Date Created|,
+		lastUpdated => 0,
+		context => q|a label in the vendor manager|
+	},
+
 	'add a new address' => { 
 		message => q|Add A New Address|,
 		lastUpdated => 0,
 		context => q|a button in the address book|
+	},
+
+	'add a vendor' => { 
+		message => q|Add A Vendor|,
+		lastUpdated => 0,
+		context => q|a button in the vendor manager|
 	},
 
 	'delete' => { 

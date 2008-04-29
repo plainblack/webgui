@@ -67,6 +67,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($url->page("shop=pay;method=manage"), $i18n->get("payment methods"));
     $ac->addSubmenuItem($url->page("shop=ship;method=manage"), $i18n->get("shipping methods"));
     $ac->addSubmenuItem($url->page("shop=transaction;method=manage"), $i18n->get("transactions"));
+    $ac->addSubmenuItem($url->page("shop=vendor;method=manage"), $i18n->get("vendors"));
     return $ac;
 }
 
