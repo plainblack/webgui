@@ -17,6 +17,7 @@ package WebGUI::Form::Control;
 use strict;
 use WebGUI::Operation::Shared;
 use WebGUI::International;
+use WebGUI::HTML;
 
 =head1 NAME
 
@@ -277,8 +278,10 @@ form elements will just return their value.
 =cut
 
 sub displayValue {
-	my ($self) = @_;
-	return $self->get("value");
+    my ($self) = @_;
+    my $value = $self->get("value");
+    $value = WebGUI::HTML::format($value, 'text');
+    return $value;
 }
 
 #-------------------------------------------------------------------

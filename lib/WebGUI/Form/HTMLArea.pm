@@ -104,6 +104,11 @@ sub definition {
         return $class->SUPER::definition($session, $definition);
 }
 
+sub displayValue {
+    my $self = shift;
+    return $self->get("value");
+}
+
 #-------------------------------------------------------------------
 
 =head2 getValueFromPost ( [ value ] )
