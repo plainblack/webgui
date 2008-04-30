@@ -73,7 +73,15 @@ our $HELP = {
                     { 'name' => 'field_name' },
                     { 'name' => 'field_value' },
                     { 'name' => 'field_subtext' },
-                ]
+                ],
+            },
+            {   'name'      => 'listOfThings',
+                'variables' => [
+                    { 'name' => 'name' },
+                    { 'name' => 'search_url' },
+                    { 'name' => 'canView' },
+                    { 'name' => 'isCurrent' },
+                ],
             },
             {   'required' => 1,
                 'name'     => 'form_start',
@@ -117,6 +125,14 @@ our $HELP = {
             { 'name' => 'add_url' },
             { 'name' => 'edit_url' },
             { 'name' => 'viewScreenTitle' },
+            {   'name'      => 'listOfThings',
+                'variables' => [
+                    { 'name' => 'name' },
+                    { 'name' => 'search_url' },
+                    { 'name' => 'canView' },
+                    { 'name' => 'isCurrent' },
+                ],
+            },
             {   'name'      => 'field_loop',
                 'variables' => [
                     { 'name' => 'field_isHidden' },
@@ -125,8 +141,8 @@ our $HELP = {
                     { 'name' => 'field_name' },
                     { 'name' => 'field_id' },
                     { 'name' => 'field_url' },
-                ]
-            }
+                ],
+            },
         ],
         related => [
             {   tag       => 'edit thing template',
@@ -166,7 +182,15 @@ our $HELP = {
                     { 'name' => 'searchFields_textForm' },
                     { 'name' => 'searchFields_label' },
                     { 'name' => 'searchFields_is__fieldType__' },
-                ]
+                ],
+            },
+            {   'name'      => 'listOfThings',
+                'variables' => [
+                    { 'name' => 'name' },
+                    { 'name' => 'search_url' },
+                    { 'name' => 'canView' },
+                    { 'name' => 'isCurrent' },
+                ],
             },
             {   'required' => 1,
                 'name'     => 'form_start',

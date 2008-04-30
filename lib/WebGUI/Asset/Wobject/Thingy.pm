@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Thingy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2006 Plain Black Corporation.
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -142,6 +142,62 @@ sub addThing {
     return $newThingId;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 appendThingsVars ( vars, currentThingId )
+
+Appends the list of things to a set of template vars.
+
+=head3 vars
+
+A hashref containing template variables.
+
+=head3 currentThingId
+
+A thingId. Will set the isCurrent flag in these template variables for the thing that the user is currently working with.
+
+=cut
+
+sub appendThingsVars {
+    my ($self, $vars, $currentThingId) = @_;
+    my $things = $self->getThings;
+    my @thingLoop = ();
+    while (my $thing = $things->hashRef) {
+        push @thingLoop, {
+            name        => $thing->{label},
+            canView     => $self->hasPrivileges($thing->{groupIdView}),
+            search_url  => $self->getUrl('func=search;thingId='.$thing->{thingId}),
+            isCurrent   => ($currentThingId eq $thing->{thingId}),
+            };
+    }
+    $vars->{listOfThings} = \@thingLoop;
+}
+
+#-------------------------------------------------------------------
+
+=head2 canViewThing ( thingId, [ groupId ] )
+
+Can the current user view the specified thing.
+
+=head3 thingId
+
+The unique id for a thing.
+
+=head3 groupId
+
+Pass in the groupId if you already have the view group for the thing.
+
+=cut
+
+sub canViewThing {
+    my ($self, $thingId, $groupId) = @_;
+    if ($groupId eq "") {
+        $groupId = $self->session->db->quickScalar("select groupIdView from Thingy_things where thingId=?", [$thingId]);
+    }
+    return $self->hasPrivileges($groupId);
+}
+
 #-------------------------------------------------------------------
 
 =head2 definition ( )
@@ -203,8 +259,8 @@ sub duplicate {
     my $assetId = $self->get("assetId");
     my $fields;
 
-    my $things = $db->buildArrayRefOfHashRefs('select * from Thingy_things where assetId = ?',[$assetId]);
-    foreach my $thing (@$things) {
+    my $things = $self->getThings;
+    while ( my $thing = $things->hashRef) {
         my $oldThingId = $thing->{thingId};
         my $newThingId = $newAsset->addThing($thing,0);
         $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
@@ -219,25 +275,6 @@ sub duplicate {
     return $newAsset;
 }
 
-#-------------------------------------------------------------------
-
-=head2 exportAssetData ( )
-
-See WebGUI::AssetPackage::exportAssetData() for details.
-
-=cut
-
-sub exportAssetData {
-    my $self = shift;
-    my $data = $self->SUPER::exportAssetData;
-    my $db = $self->session->db;
-    my $assetId = $self->get("assetId");
-
-    $data->{things} = $db->buildArrayRefOfHashRefs('select * from Thingy_things where assetId = ?',[$assetId]);
-    $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
-
-    return $data;
-}
 #-------------------------------------------------------------------
 
 =head2 deleteField ( fieldId , thingId )
@@ -309,10 +346,31 @@ sub deleteThing {
 
     $self->deleteCollateral("Thingy_things","thingId",$thingId);
     $self->deleteCollateral("Thingy_fields","thingId",$thingId);
-    $self->session->db->write("drop table if exists ".$session->db->dbh->quote_identifier("Thingy_".$thingId));
+    $session->db->write("drop table if exists ".$session->db->dbh->quote_identifier("Thingy_".$thingId));
     
     $error->info("Deleted thing: $thingId.");
     return undef;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData ( )
+
+See WebGUI::AssetPackage::exportAssetData() for details.
+
+=cut
+
+sub exportAssetData {
+    my $self = shift;
+    my $data = $self->SUPER::exportAssetData;
+    my $db = $self->session->db;
+    my $assetId = $self->get("assetId");
+
+    $data->{things} = $db->buildArrayRefOfHashRefs('select * from Thingy_things where assetId = ?',[$assetId]);
+    $data->{fields} = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId = ?',[$assetId]);
+
+    return $data;
 }
 
 #-------------------------------------------------------------------
@@ -508,6 +566,7 @@ sub getEditFieldForm {
     #}
     return $f;
 }
+
 #-------------------------------------------------------------------
 
 =head2 getEditForm ( )
@@ -738,6 +797,38 @@ sub getHtmlWithModuleWrapper {
 
 #-------------------------------------------------------------------
 
+=head2 getThing  ( thingId )
+
+Returns a hash reference of the properties of a thing.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=cut
+
+sub getThing {
+    my ($self, $thingId) = @_;
+    return $self->session->db->quickHashRef("select * from Thingy_things where thingId=?",[$thingId]);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getThings  (  )
+
+Returns a result set with all the things in the database.
+
+=cut
+
+sub getThings {
+    my ($self) = @_;
+    return $self->session->db->read("select * from Thingy_things where assetId=?",[$self->getId]);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 hasPrivileges  ( groupId )
 
 Checks if the current user has a certain privilege on a Thing.
@@ -753,9 +844,10 @@ sub hasPrivileges {
 
     my $self = shift;
     my $privilegedGroupId = shift;
-    return ($self->canEdit || $self->session->user->isInGroup($privilegedGroupId));
+    return ($self->session->user->isInGroup($privilegedGroupId) || $self->canEdit);
 
 }
+
 #-------------------------------------------------------------------
 
 =head2 importAssetCollateralData ( data )
@@ -783,8 +875,8 @@ sub importAssetCollateralData {
     my @importThings;
     foreach my $thing (@{$data->{things}}) {
         push(@importThings,$thing->{thingId});
-        my ($thingIdExists) = $session->db->quickArray("select thingId from Thingy_things where thingId = ".
-            $session->db->quote($thing->{thingId}));
+        my ($thingIdExists) = $session->db->quickArray("select thingId from Thingy_things where thingId = ?",
+            [$thing->{thingId}]);
         if ($assetExists && $thingIdExists){
             # update existing thing
             $error->info("Updating Thing, label: ".$thing->{label}.", id: ".$thing->{thingId});
@@ -796,7 +888,7 @@ sub importAssetCollateralData {
         }
     }
     # delete deleted things
-    my $thingsInDatabase = $session->db->read('select thingId from Thingy_things where assetId=?',[$self->get("assetId")]);
+    my $thingsInDatabase = $self->getThings;
     while (my $thingInDataBase = $thingsInDatabase->hashRef) {
         if (!WebGUI::Utility::isIn($thingInDataBase->{thingId},@importThings)){
         # delete thing
@@ -822,8 +914,8 @@ sub importAssetCollateralData {
         }
     }
     # delete deleted fields
-    my $fieldsInDatabase = $session->db->read('select fieldId, thingId from Thingy_fields where assetId = '
-        .$session->db->quote($self->get("assetId")));
+    my $fieldsInDatabase = $session->db->read('select fieldId, thingId from Thingy_fields where assetId = ?',
+        [$self->get("assetId")]);
     while (my $fieldInDataBase = $fieldsInDatabase->hashRef) {
         if (!WebGUI::Utility::isIn($fieldInDataBase->{fieldId},@importFields)){
             # delete field
@@ -865,14 +957,13 @@ purges it's data.
 sub purge {
 	my $self = shift;
     my $session = $self->session;
-	
-    my @thingIds = $session->db->buildArray("select thingId from Thingy_things where assetId = "
-        .$session->db->quote($self->getId));
+	my $db = $self->session->db;
+    my @thingIds = $db->buildArray("select thingId from Thingy_things where assetId = ?", [$self->getId]);
     foreach my $thingId (@thingIds){
-        $session->db->write("drop table if exists ".$session->db->dbh->quote_identifier("Thingy_".$thingId));        
+        $db->write("drop table if exists ".$db->dbh->quote_identifier("Thingy_".$thingId));        
     }
-    $self->session->db->write("delete from Thingy_things where assetId = ".$self->session->db->quote($self->getId));
-    $self->session->db->write("delete from Thingy_fields where assetId = ".$self->session->db->quote($self->getId));
+    $db->write("delete from Thingy_things where assetId = ?",[$self->getId]);
+    $db->write("delete from Thingy_fields where assetId = ?",[$self->getId]);
 
     return $self->SUPER::purge;
 }
@@ -996,8 +1087,9 @@ sub view {
 
     #Get this Thingy's default thing
     $defaultThingId = $self->get("defaultThingId");
+    $self->appendThingsVars($var, $defaultThingId);
 
-    if ($defaultThingId){
+    if ($defaultThingId ne ""){
         # get default view
         ($defaultView) = $db->quickArray("select defaultView from Thingy_things where thingId=?",[$defaultThingId]);
         if ($defaultView eq "searchThing"){
@@ -1129,7 +1221,7 @@ sub www_editThing {
         $thingId = $self->addThing(\%properties,0);
     }
     else{
-        %properties = $self->session->db->quickHash("select * from Thingy_things where thingId=".$self->session->db->quote($thingId));
+        %properties = $self->getThing($thingId);
     }
 
     $tabForm = WebGUI::TabForm->new($self->session, undef, undef, $self->getUrl('func=view'));
@@ -1504,33 +1596,33 @@ sub www_editThingSave {
 
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
-
+    my $form = $self->session->form;
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
     $self->setCollateral("Thingy_things","thingId",{
         thingId=>$thingId,
-        label=>$self->session->form->process("label"),
-        editScreenTitle=>$self->session->form->process("editScreenTitle"),
-        editInstructions=>$self->session->form->process("editInstructions"),
-        groupIdAdd=>$self->session->form->process("groupIdAdd"),
-        groupIdEdit=>$self->session->form->process("groupIdEdit"),
-        saveButtonLabel=>$self->session->form->process("saveButtonLabel"),
-        afterSave=>$self->session->form->process("afterSave"),
-        editTemplateId=>$self->session->form->process("editTemplateId") || 1,
-        onAddWorkflowId=>$self->session->form->process("onAddWorkflowId"),
-        onEditWorkflowId=>$self->session->form->process("onEditWorkflowId"),
-        onDeleteWorkflowId=>$self->session->form->process("onDeleteWorkflowId"),
-        groupIdView=>$self->session->form->process("groupIdView"),
-        viewTemplateId=>$self->session->form->process("viewTemplateId") || 1,
-        defaultView=>$self->session->form->process("defaultView"),
-        searchScreenTitle=>$self->session->form->process("searchScreenTitle"),
-        searchDescription=>$self->session->form->process("searchDescription"),
-        groupIdSearch=>$self->session->form->process("groupIdSearch"),
-        groupIdImport=>$self->session->form->process("groupIdImport"),
-        groupIdExport=>$self->session->form->process("groupIdExport"),
-        searchTemplateId=>$self->session->form->process("searchTemplateId") || 1,
-        thingsPerPage=>$self->session->form->process("thingsPerPage") || 25,
-        sortBy=>$self->session->form->process("sortBy"),
+        label=>$form->process("label"),
+        editScreenTitle=>$form->process("editScreenTitle"),
+        editInstructions=>$form->process("editInstructions"),
+        groupIdAdd=>$form->process("groupIdAdd"),
+        groupIdEdit=>$form->process("groupIdEdit"),
+        saveButtonLabel=>$form->process("saveButtonLabel"),
+        afterSave=>$form->process("afterSave"),
+        editTemplateId=>$form->process("editTemplateId") || 1,
+        onAddWorkflowId=>$form->process("onAddWorkflowId"),
+        onEditWorkflowId=>$form->process("onEditWorkflowId"),
+        onDeleteWorkflowId=>$form->process("onDeleteWorkflowId"),
+        groupIdView=>$form->process("groupIdView"),
+        viewTemplateId=>$form->process("viewTemplateId") || 1,
+        defaultView=>$form->process("defaultView"),
+        searchScreenTitle=>$form->process("searchScreenTitle"),
+        searchDescription=>$form->process("searchDescription"),
+        groupIdSearch=>$form->process("groupIdSearch"),
+        groupIdImport=>$form->process("groupIdImport"),
+        groupIdExport=>$form->process("groupIdExport"),
+        searchTemplateId=>$form->process("searchTemplateId") || 1,
+        thingsPerPage=>$form->process("thingsPerPage") || 25,
+        sortBy=>$form->process("sortBy"),
         },0,1);
     
     $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
@@ -1659,19 +1751,19 @@ sub www_editThingData {
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId') || "new";
-    my (%thingData, $fields,%thingProperties,@field_loop,$fieldValue, $privilegedGroup);
+    my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     my $errors = shift;
     $var->{error_loop} = $errors if ($errors);
 
-    %thingProperties = $self->session->db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
+    my $thingProperties = $self->getThing($thingId);
     if ($thingDataId eq "new"){
-        $privilegedGroup = $thingProperties{groupIdAdd};
+        $privilegedGroup = $thingProperties->{groupIdAdd};
     }
     else{
-        $privilegedGroup = $thingProperties{groupIdEdit};
+        $privilegedGroup = $thingProperties->{groupIdEdit};
     }
     return $self->session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
@@ -1679,16 +1771,16 @@ sub www_editThingData {
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
-    if($self->hasPrivileges($thingProperties{groupIdEdit})){
+    if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         if ($thingDataId ne "new"){
             $var->{"delete_url"} = $session->url->append($url, 'func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId);
         }
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties{label};
+        $var->{"thing_label"} = $thingProperties->{label};
     }
-    if($self->hasPrivileges($thingProperties{groupIdSearch})){
+    if($self->hasPrivileges($thingProperties->{groupIdSearch})){
         $var->{"search_url"} = $session->url->append($url, 'func=search;thingId='.$thingId);
     }
 
@@ -1697,8 +1789,8 @@ sub www_editThingData {
     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"editThingDataSave"});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingDataId",value=>$thingDataId});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingId",value=>$thingId});
-    $var->{editScreenTitle} = $thingProperties{editScreenTitle};
-    $var->{editInstructions} = $thingProperties{editInstructions};
+    $var->{editScreenTitle} = $thingProperties->{editScreenTitle};
+    $var->{editInstructions} = $thingProperties->{editInstructions};
 
     
     if ($thingDataId ne "new"){
@@ -1737,13 +1829,14 @@ sub www_editThingData {
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
     }
     $var->{field_loop} = \@field_loop;
-    $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties{saveButtonLabel}});
+    $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties->{saveButtonLabel}});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
+    $self->appendThingsVars($var, $thingId);
     if (WebGUI::Utility::isIn($session->form->process("func"),qw(editThingData editThingDataSave))){
-        return $self->session->style->process($self->processTemplate($var,$thingProperties{editTemplateId}),$self->get("styleTemplateId"));
+        return $self->session->style->process($self->processTemplate($var,$thingProperties->{editTemplateId}),$self->get("styleTemplateId"));
     }
     else{
-        return $self->processTemplate($var,$thingProperties{editTemplateId});
+        return $self->processTemplate($var,$thingProperties->{editTemplateId});
     }
 }
 
@@ -1759,18 +1852,18 @@ sub www_editThingDataSave {
 
     my $self = shift;
     my $session = $self->session;
-    my ($var,$newThingDataId, $fields,%thingProperties,%thingData,@errors,$hadErrors,$otherThingId);
+    my ($var,$newThingDataId, $fields,%thingData,@errors,$hadErrors,$otherThingId);
     my ($privilegedGroup,$workflowId);
     my $thingId = $session->form->process('thingId');
     my $thingDataId = $session->form->process('thingDataId');
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    %thingProperties = $session->db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
+    my $thingProperties = $self->getThing($thingId);
     if ($thingDataId eq "new"){
-        $privilegedGroup = $thingProperties{groupIdAdd};
+        $privilegedGroup = $thingProperties->{groupIdAdd};
     }
     else{
-        $privilegedGroup = $thingProperties{groupIdEdit};
+        $privilegedGroup = $thingProperties->{groupIdEdit};
     }
     return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
@@ -1831,22 +1924,22 @@ sub www_editThingDataSave {
         }
     }
 
-    if ($thingProperties{afterSave} eq "searchThisThing") {
+    if ($thingProperties->{afterSave} eq "searchThisThing") {
         return $self->www_search($thingId);
     }
-    elsif ($thingProperties{afterSave} eq "viewLastEdited"){
+    elsif ($thingProperties->{afterSave} eq "viewLastEdited"){
         return $self->www_viewThingData($thingId,$newThingDataId);
     }
-    elsif ($thingProperties{afterSave} eq "addThing") {
+    elsif ($thingProperties->{afterSave} eq "addThing") {
         return $self->www_editThingData($thingId,"new");
     }
-    elsif ($thingProperties{afterSave} =~ m/^searchOther_/x){
-        $otherThingId = $thingProperties{afterSave};
+    elsif ($thingProperties->{afterSave} =~ m/^searchOther_/x){
+        $otherThingId = $thingProperties->{afterSave};
         $otherThingId =~ s/^searchOther_//x;
         return $self->www_search($otherThingId);
     }
-    elsif ($thingProperties{afterSave} =~ m/^addOther_/x){
-        $otherThingId = $thingProperties{afterSave};
+    elsif ($thingProperties->{afterSave} =~ m/^addOther_/x){
+        $otherThingId = $thingProperties->{afterSave};
         $otherThingId =~ s/^addOther_//x;
         return $self->www_editThingData($otherThingId,"new");
     }
@@ -1867,11 +1960,11 @@ Exports search results as csv.
 sub www_export {
     my $self = shift;
     my $session = $self->session;
-    my ($query,$sth,$out,%thingProperties,$fields,@fields,$fileName,@fieldLabels);
+    my ($query,$sth,$out,$fields,@fields,$fileName,@fieldLabels);
     my $thingId = $session->form->process('thingId');
 
-    %thingProperties = $session->db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdExport});
+    my $thingProperties = $self->getThing($thingId);
+    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdExport});
    
     $fields = $session->db->read('select * from Thingy_fields where assetId =? and thingId = ? order by sequenceNumber',
         [$self->get("assetId"),$thingId]);
@@ -1906,7 +1999,7 @@ sub www_export {
         );
     }
     
-    $fileName = "export_".$thingProperties{label}.".csv";
+    $fileName = "export_".$thingProperties->{label}.".csv";
     $self->session->http->setFilename($fileName,"application/octet-stream");
     $self->session->http->sendHeader;
     return $out;
@@ -1925,13 +2018,12 @@ sub www_import {
     my $self = shift;
     my $session = $self->session;
     my $dbh = $session->db->dbh;
-    my ($sql,%thingProperties,$fields,@fields,$fileName,@insertColumns);
+    my ($sql,$fields,@fields,$fileName,@insertColumns);
     my ($handleDuplicates,$newThingDataId);
 
     my $thingId = $session->form->process('thingId');
-    %thingProperties = $session->db->quickHash("select * from Thingy_things where
-thingId=".$session->db->quote($thingId));
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdImport});
+    my $thingProperties = $self->getThing($thingId);
+    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdImport});
 
     $fields = $session->db->read('select label, fieldId, fieldType, fieldInOtherThingId from Thingy_fields '
         .' where assetId = '.$session->db->quote($self->get("assetId"))
@@ -2049,11 +2141,11 @@ sub www_importForm {
     my $self = shift;
     my $session = $self->session;
     my $db = $session->db;
-    my ($i18n,$form,%thingProperties,$fields,$fieldOptions,$output);
+    my ($i18n,$form,$fields,$fieldOptions,$output);
     my $thingId = $session->form->process('thingId');
 
-    %thingProperties = $db->quickHash("select * from Thingy_things where thingId=?",[$thingId]);
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdImport});
+    my $thingProperties = $self->getThing($thingId);
+    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdImport});
 
     $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     
@@ -2139,8 +2231,7 @@ sub www_manage {
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
     #Get things in this Thingy
-    $things = $self->session->db->read('select thingId, label, defaultView from Thingy_things '
-                                        .'where assetId =?',[$self->get("assetId")]);
+    $things = $self->getThings;
     while (my $thing = $things->hashRef) {
         my %templateVars = (
             'thing_id' => $thing->{thingId},
@@ -2240,14 +2331,14 @@ sub www_search {
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
     my ($var,$url,$doSearch,$orderBy);
-    my ($fields,%thingProperties,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
+    my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
     my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
 
-    %thingProperties = $session->db->quickHash("select * from Thingy_things where thingId=".$self->session->db->quote($thingId));
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdSearch});
+    my $thingProperties = $self->getThing($thingId);
+    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdSearch});
 
     $doSearch = $session->form->process("doSearch");
-    $orderBy = $session->form->process("orderBy") || $thingProperties{sortBy};
+    $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
     $var = $self->get;
     $url = $self->getUrl;
 
@@ -2255,18 +2346,18 @@ sub www_search {
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
-    if ($doSearch && $self->hasPrivileges($thingProperties{groupIdExport})){
+    if ($doSearch && $self->hasPrivileges($thingProperties->{groupIdExport})){
         $var->{"export_url"} = $session->url->append($url, 'func=export;thingId='.$thingId);
     }
-    if ($self->hasPrivileges($thingProperties{groupIdImport})){
+    if ($self->hasPrivileges($thingProperties->{groupIdImport})){
         $var->{"import_url"} = $session->url->append($url, 'func=importForm;thingId='.$thingId);
     }
-    if ($self->hasPrivileges($thingProperties{groupIdEdit})){
+    if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties{label}; 
+        $var->{"thing_label"} = $thingProperties->{label}; 
     }
-    $var->{searchScreenTitle} = $thingProperties{searchScreenTitle};    
-    $var->{searchDescription} = $thingProperties{searchDescription};
+    $var->{searchScreenTitle} = $thingProperties->{searchScreenTitle};    
+    $var->{searchDescription} = $thingProperties->{searchDescription};
 
     $currentUrl = $self->getUrl();
     foreach ($self->session->form->param) {
@@ -2337,7 +2428,7 @@ sequenceNumber');
         $paginatePage = $self->session->form->param('pn') || 1;
         $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
         
-        $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties{thingsPerPage}, undef, $paginatePage);
+        $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
         $p->setDataByQuery($query);
         $searchResults = $p->getPageData($paginatePage);
         foreach my $searchResult (@$searchResults){
@@ -2357,7 +2448,7 @@ sequenceNumber');
                 .$thingId.';thingDataId='.$thingDataId),
                 "searchResult_field_loop" => \@field_loop,
             );
-            if ($self->hasPrivileges($thingProperties{groupIdEdit})){
+            if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
                 $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
                 .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
                 $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
@@ -2365,7 +2456,7 @@ sequenceNumber');
             }
             push(@searchResult_loop,\%templateVars);
         }
-        $var->{canEditThingData} = $self->hasPrivileges($thingProperties{groupIdEdit});
+        $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
         $var->{searchResult_loop} = \@searchResult_loop;    
         $p->appendTemplateVars($var);
     }
@@ -2379,12 +2470,12 @@ sequenceNumber');
 
     $var->{searchFields_loop} = \@searchFields_loop;
     $var->{displayInSearchFields_loop} = \@displayInSearchFields_loop;
-
+    $self->appendThingsVars($var, $thingId);
     if (WebGUI::Utility::isIn($session->form->process("func"),qw(search import editThingDataSave deleteThingDataConfirm))){
-        return $session->style->process($self->processTemplate($var,$thingProperties{searchTemplateId}),$self->get("styleTemplateId"));
+        return $session->style->process($self->processTemplate($var,$thingProperties->{searchTemplateId}),$self->get("styleTemplateId"));
     }
     else{
-        return $self->processTemplate($var,$thingProperties{searchTemplateId});
+        return $self->processTemplate($var,$thingProperties->{searchTemplateId});
     }
 }
 
@@ -2408,8 +2499,7 @@ sub www_selectDefaultFieldValue {
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    my ($groupIdView) = $session->db->quickArray("select groupIdView from Thingy_things where thingId=?",[$thingId]);
-    return $session->privilege->insufficient() unless $self->hasPrivileges($groupIdView);
+    return $session->privilege->insufficient() unless $self->canViewThing($thingId);
 
     my $options = $session->db->buildHashRef('select thingDataId, '
         .$dbh->quote_identifier('field_'.$fieldInOtherThingId)
@@ -2459,8 +2549,7 @@ sub www_selectFieldInThing {
     my $session = $self->session;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    my ($groupIdView) = $session->db->quickArray("select groupIdView from Thingy_things where thingId=".$self->session->db->quote($thingId));
-    return $session->privilege->insufficient() unless $self->hasPrivileges($groupIdView);
+    return $session->privilege->insufficient() unless $self->canViewThing($thingId);
 
     my $fields = $session->db->buildHashRef('select fieldId, label from Thingy_fields'
         .' where assetId = ? and thingId = ? and fieldId != ? order by sequenceNumber',
@@ -2503,29 +2592,28 @@ sub www_viewThingData {
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
-    my (%thingData, $fields,%thingProperties,@field_loop,@viewScreenTitleFields);
+    my (%thingData, $fields,@field_loop,@viewScreenTitleFields);
     my $var = $self->get;
     my $url = $self->getUrl;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    %thingProperties = $self->session->db->quickHash("select * from Thingy_things where
-thingId=".$self->session->db->quote($thingId));
-    return $self->session->privilege->insufficient() unless $self->hasPrivileges($thingProperties{groupIdView});
+    my $thingProperties = $self->getThing($thingId);
+    return $self->session->privilege->insufficient() unless $self->canViewThing($thingId, $thingProperties->{groupIdView});
 
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
 
-    if($self->hasPrivileges($thingProperties{groupIdEdit})){
+    if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         $var->{"edit_url"} = $session->url->append($url,'func=editThingData;thingId='
         .$thingId.';thingDataId='.$thingDataId);
         $var->{"delete_url"} = $session->url->append($url, 'func=deleteThingDataConfirm;thingId='
         .$thingId.';thingDataId='.$thingDataId);
         $var->{"add_url"} = $session->url->append($url, 'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties{label};
+        $var->{"thing_label"} = $thingProperties->{label};
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
-    if($self->hasPrivileges($thingProperties{groupIdSearch})){    
+    if($self->hasPrivileges($thingProperties->{groupIdSearch})){    
         $var->{"search_url"} = $session->url->append($url, 'func=search;thingId='.$thingId);
     }
 
@@ -2547,8 +2635,7 @@ sequenceNumber');
         if ($field{fieldType} =~ m/^otherThing/x) {
             my $otherThingId = $field{fieldType};
             $otherThingId =~ s/^otherThing_//x;
-            my ($groupIdView) = $session->db->quickArray("select groupIdView from Thingy_things where thingId=?",[$otherThingId]);
-            if($self->hasPrivileges($groupIdView)){ 
+            if($self->canViewThing($otherThingId)){ 
                 $otherThingUrl = $session->url->append($url,"func=viewThingData;thingId=$otherThingId;thingDataId=$originalValue");
             }
         }
@@ -2566,7 +2653,8 @@ sequenceNumber');
     }
     $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
     $var->{field_loop} = \@field_loop;
-    return $self->session->style->process($self->processTemplate($var,$thingProperties{viewTemplateId}),$self->get("styleTemplateId"));
+    $self->appendThingsVars($var, $thingId);
+    return $self->session->style->process($self->processTemplate($var,$thingProperties->{viewTemplateId}),$self->get("styleTemplateId"));
 
 }
 

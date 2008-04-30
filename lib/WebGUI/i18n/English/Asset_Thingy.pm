@@ -706,6 +706,30 @@ field.|,
         lastUpdated => 1104630516,
     },
 
+    'listOfThings' => {
+        message 	=> q|A loop containing a list of all the Things defined in this Thingy.|,
+        lastUpdated => 0,
+		context		=> q|A template variable|,
+    },
+
+    'canView' => {
+        message 	=> q|A condition indicating whether the current user has the rights to view this thing.|,
+        lastUpdated => 0,
+		context		=> q|A template variable|,
+    },
+
+    'name' => {
+        message 	=> q|The name of the Thing.|,
+        lastUpdated => 0,
+		context		=> q|A template variable|,
+    },
+
+    'isCurrent' => {
+        message 	=> q|A condition indicating whether this Thing is the one that the user is currently interacting with.|,
+        lastUpdated => 0,
+		context		=> q|A template variable|,
+    },
+
     'field_isHidden' => {
         message => q|A conditional indicating whether this field is supposed to be hidden.|,
         lastUpdated => 1104630516,
