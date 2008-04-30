@@ -1033,6 +1033,3 @@ do this your databases will become corrupted.
 	may have failed and will cause the SQL Report templates to not
 	be automatically generated.
 
-
-
-
