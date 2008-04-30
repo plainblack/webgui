@@ -588,6 +588,18 @@ sub migrateOldProduct {
 	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
 	# and here's our code
     ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
+	print "\t\tAdding new product variants table.\n" unless ($quiet);
+    $session->db->write(<<'EOSQL');
+CREATE TABLE Product_variants (
+    varSku              VARCHAR(255) BINARY NOT NULL PRIMARY KEY,
+    mastersku           VARCHAR(22)  BINARY NOT NULL,
+    varTitle            VARCHAR(255) BINARY NOT NULL,
+    shortdesc           VARCHAR(30),
+    price               FLOAT,
+    weight              FLOAT,
+    quantity            INT
+);
+EOSQL
     ##Have to change the className's in the db, too
     ## Wobject description   -> Sku description
     ## Wobject displayTitle  -> Sku displayTitle
@@ -623,17 +635,6 @@ sub migrateOldProduct {
 sub mergeProductsWithCommerce {
 	my $session = shift;
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
-    $session->db->write(<<'EOSQL');
-CREATE TABLE Product_variants (
-    sku                 VARCHAR(255) BINARY NOT NULL PRIMARY KEY,
-    mastersku           VARCHAR(255) BINARY NOT NULL,
-    shortdesc           VARCHAR(30),
-    price               FLOAT,
-    weight              FLOAT,
-    quantity            INT
-);
-EOSQL
-    ## Add the parameter and variants columns
     return 1;
 }
 

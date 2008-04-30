@@ -901,44 +901,45 @@ sub www_editSpecificationSave {
 #-------------------------------------------------------------------
 sub www_editVariant {
     my $self = shift;
-    my $sku  = shift || $self->session->form->process("sku");
+    my $sku  = shift || $self->session->form->process("varSku");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my ($data, $f, $hashRef);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $data = $self->getCollateral("Product_specification","Product_specificationId",$sku);
-    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-    $f->readonly(
-        -name => "mastersku",
-        -value => $data->{mastersku},
-    );
+    my $data = $self->getCollateral("Product_variants", "varSku", $sku);
+    my $f = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
     $f->hidden(
-        -name => "func",
+        -name => 'func',
         -value => "editVariantSave",
     );
-    $f->integer(
-        -name => "shortdesc",
-        -size => 30,
-        -label => $i18n->get('shortdesc'),
+    $f->text(
+        -name      => 'varSku',
+        -label     => $i18n->get('variant sku'),
+        -hoverHelp => $i18n->get('variant sku description'),
+        -value     => $data->{price},
+    );
+    $f->text(
+        -name      => 'shortdesc',
+        -size      => 30,
+        -label     => $i18n->get('shortdesc'),
         -hoverHelp => $i18n->get('shortdesc description'),
-        -value => $data->{price},
+        -value     => $data->{price},
     );
     $f->integer(
-        -name => "price",
-        -label => $i18n->get(10),
+        -name      => 'price',
+        -label     => $i18n->get(10),
         -hoverHelp => $i18n->get('10 description'),
-        -value => $data->{price},
+        -value     => $data->{price},
     );
     $f->float(
-        -name => "weight",
-        -label => $i18n->get('weight'),
+        -name      => 'weight',
+        -label     => $i18n->get('weight'),
         -hoverHelp => $i18n->get('weight description'),
-        -value => $data->{weight},
+        -value     => $data->{weight},
     );
     $f->integer(
-        -name => "quantity",
-        -label => $i18n->get('quantity'),
+        -name      => 'quantity',
+        -label     => $i18n->get('quantity'),
         -hoverHelp => $i18n->get('quantity description'),
-        -value => $data->{quantity},
+        -value     => $data->{quantity},
     );
     $f->submit;
     return $self->getAdminConsole->render($f->print, 'add variant');
@@ -948,8 +949,10 @@ sub www_editVariant {
 sub www_editVariantSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("Product_variants", "Product_specificationId", {
-        Product_specificationId => $self->session->form->process("sid"),
+    ##Mandatory variable check
+    $self->setCollateral('Product_variants', 'varSku', {
+        varSku    => $self->session->form->process('varSku', 'text'),
+        mastersku => $self->get('sku'),
         shortdesc => $self->session->form->process('shortdesc', 'text'),
         price     => $self->session->form->process('name',      'float'),
         weight    => $self->session->form->process('weight',    'float'),

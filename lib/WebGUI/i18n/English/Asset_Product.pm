@@ -599,11 +599,6 @@ be useful, others may not.|,
 		lastUpdated => 1164841201
 	},
 
-	'productNumber' => {
-		message => q|The product number, SKU, ISBN, or other identifier for this product.|,
-		lastUpdated => 1164841201
-	},
-
 	'image1' => {
 		message => q|The unique identifier for the storage object for the first image.|,
 		lastUpdated => 1164841201
@@ -636,7 +631,7 @@ be useful, others may not.|,
 
 	'weight' => {
 		message => q|Weight|,
-		context => q|How much something weighs, with no units|
+		context => q|How much something weighs, with no units|,
 		lastUpdated => 1209494301,
 	},
 
@@ -671,6 +666,16 @@ be useful, others may not.|,
         a large blue shirt.|,
         lastUpdated => 1209494298,
     },
+
+	'variant sku' => {
+		message => q|SKU|,
+		lastUpdated => 1209576604,
+	},
+
+	'variant sku description' => {
+		message => q|A completely unique identifier for this variant of a product.  Should be the same as used in your inventory software so you can sync them.|,
+		lastUpdated => 1209576604,
+	},
 
 };
 
