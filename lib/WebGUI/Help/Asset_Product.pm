@@ -81,7 +81,7 @@ our $HELP = {
         body    => 'product asset template variables body',
         isa     => [
             {   namespace => 'Asset_Sku',
-                tag       => 'wobject template variables'
+                tag       => 'sku properties'
             },
         ],
         fields    => [],
