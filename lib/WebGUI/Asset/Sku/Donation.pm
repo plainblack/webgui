@@ -70,7 +70,7 @@ sub definition {
 			defaultValue    => $i18n->get("default thank you message"),
 			fieldType       => "HTMLArea",
 			label           => $i18n->get("thank you message"),
-			hoverHelp       => $i18n->get("thank you message"),
+			hoverHelp       => $i18n->get("thank you message help"),
             },
 		defaultPrice => {
 			tab             => "shop",

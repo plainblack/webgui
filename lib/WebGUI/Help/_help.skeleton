@@ -1,10 +1,9 @@
-package WebGUI::Help::_Help; ## Be sure to change the package name to match your filename.
+package WebGUI::Help::Asset_FlatDiscount;
 
-use strict; ##Required for good Perl::Critic code
+use strict; 
 
-##Stub document for creating help documents.
 
-our $HELP = {  ##hashref of hashes
+our $HELP = { 
 	'help article' => {	#name of article, used as a reference by other articles
 				#note, all Assets should have an "assetName add/edit" entry if
 				#you want them automatically listed in Asset, List of Available

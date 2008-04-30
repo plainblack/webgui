@@ -3,6 +3,42 @@ package WebGUI::i18n::English::Asset_Donation;
 use strict;
 
 our $I18N = { 
+	'donation template help' => {
+		message => q|Donation Template|,
+		lastUpdated => 0,
+		context => q|a help label|
+	},
+
+	'donateButton' => {
+		message => q|The button for the donation form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'formHeader' => {
+		message => q|The top of the donation form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'formFooter' => {
+		message => q|The bottom of the donation form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'priceField' => {
+		message => q|The field in the donation form that the user types in what they wish to donate.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the donation to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 	'donate button' => {
 		message => q|Add Donation To Cart|,
 		lastUpdated => 0,
@@ -27,13 +63,13 @@ our $I18N = {
 		context => q|help for default price field|
 	},
 
-	'template' => {
-		message => q|Template|,
+	'donation template' => {
+		message => q|Donation Template|,
 		lastUpdated => 0,
 		context => q|the label for the field where you select the template for this asset|
 	},
 
-	'template help' => {
+	'donation template help' => {
 		message => q|Choose a template that should be used to display the donation.|,
 		lastUpdated => 0,
 		context => q|help for default price field|

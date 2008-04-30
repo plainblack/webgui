@@ -34,8 +34,8 @@ sub definition {
 			defaultValue	=> 'nFen0xjkZn8WkpM93C9ceQ',
 			tab				=> "display",
 			namespace		=> "Shelf", 
-			hoverHelp		=> $i18n->get('view template help'),
-			label			=> $i18n->get('view template'),
+			hoverHelp		=> $i18n->get('shelf template help'),
+			label			=> $i18n->get('shelf template'),
 		}
 	);
 	push(@{$definition}, {
