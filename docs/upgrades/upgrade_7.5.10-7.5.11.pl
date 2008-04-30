@@ -46,10 +46,31 @@ mergeProductsWithCommerce($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
+addCoupon( $session );
 addVendors($session);
 modifyThingyPossibleValues( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addCoupon {
+    my $session = shift;
+    print "\tAdding Coupons" unless $quiet;
+
+    $session->db->write(q{
+        create table FlatDiscount (
+            assetId varchar(22) binary not null,
+            revisionDate bigint,
+            templateId varchar(22) binary not null default '63ix2-hU0FchXGIWkG3tow',
+            mustSpend float not null default 0,
+            percentageDiscount int(3) not null default 0,
+            priceDiscount float not null default 0,
+            primary key (assetId,revisionDate)
+            )
+        });
+    $session->config->addToArray("assets","WebGUI::Asset::Sku::FlatDiscount");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addVendors {
@@ -99,6 +120,7 @@ sub addShelf {
     $session->config->addToArray("assetContainers","WebGUI::Asset::Wobject::Shelf");
     print "DONE!\n" unless $quiet;
 }
+
 #----------------------------------------------------------------------------
 # Add the useCaptcha field to DataForm assets
 sub addCaptchaToDataForm {
@@ -544,7 +566,7 @@ EOSQL
 #-------------------------------------------------
 sub addPaymentDrivers {
 	my $session = shift;
-	print "\tSet up the default payment dirvers.\n" unless ($quiet);
+	print "\tSet up the default payment drivers.\n" unless ($quiet);
 	# and here's our code
     $session->config->delete('paymentPlugins');
     $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::Cash');

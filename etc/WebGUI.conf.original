@@ -210,6 +210,7 @@
 
 "assets" : [
     "WebGUI::Asset::Sku::Donation",
+    "WebGUI::Asset::Sku::FlatDiscount",
 	"WebGUI::Asset::Snippet", 
 	"WebGUI::Asset::Redirect", 
 	"WebGUI::Asset::FilePile", 

@@ -2473,7 +2473,7 @@ sub www_edit {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
 	return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	return $self->getAdminConsole->render($self->getEditForm->print);
+	return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 
 #-------------------------------------------------------------------

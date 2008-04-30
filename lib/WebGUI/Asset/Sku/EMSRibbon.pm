@@ -124,6 +124,18 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 isCoupon
+
+Returns 1.
+
+=cut
+
+sub isCoupon {
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 onCompletePurchase
 
 Does bookkeeping on EMSRegistrationRibbon table.

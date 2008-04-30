@@ -121,7 +121,7 @@ sub definition {
 			fieldType		=> "yesNo",
 			defaultValue	=> 1,
 			label			=> $i18n->get("display title"),
-			hoverHelp		=> $i18n->get("display title")
+			hoverHelp		=> $i18n->get("display title help")
 			},
 		overrideTaxRate => {
 			tab				=> "shop",
@@ -316,6 +316,18 @@ sub indexContent {
 	my $indexer = $self->SUPER::indexContent;
     $indexer->addKeywords($self->get('sku'));
 	return $indexer;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isCoupon
+
+Returns a boolean indicating whether this sku represents a coupon. Some coupons may not allow themselves to be used in conjunction with other coupons. Returns 0 by default.
+
+=cut
+
+sub isCoupon {
+    return 0;
 }
 
 

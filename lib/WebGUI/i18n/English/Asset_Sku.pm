@@ -3,10 +3,28 @@ package WebGUI::i18n::English::Asset_Sku;
 use strict;
 
 our $I18N = { 
+	'sku properties title' => { 
+		message => q|Sku Properties|,
+		lastUpdated => 0, 
+		context => q|a help label|
+	},
+
 	'shop' => { 
 		message => q|Shop|,
 		lastUpdated => 0, 
 		context => q|The name of a tab that all Sku based assets have to put their commerce related settings.|
+	},
+
+	'display title' => {
+		message => q|Display Title?|,
+		lastUpdated => 0,
+		context => q|propertly label|
+	},
+
+	'display title help' => {
+		message => q|Indicate whether the title should be displayed or not.|,
+		lastUpdated => 0,
+		context => q|property label help|
 	},
 
 	'description' => {
