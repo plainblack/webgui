@@ -81,13 +81,6 @@ sub definition {
                 hoverHelp=>$i18n->get('62 description'),
                 defaultValue=>'PBtmpl0000000000000056'
             },
-            price=>{
-                label=>$i18n->get(10),
-                hoverHelp=>$i18n->get('10 description'),
-                tab => "shop",
-                fieldType=>"text",
-                defaultValue=>undef
-            },
             image1=>{
                 tab => "properties",
                 fieldType=>"image",

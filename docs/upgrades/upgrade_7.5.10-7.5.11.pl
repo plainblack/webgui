@@ -622,11 +622,40 @@ EOSQL
     $toSku->finish;
     $rmWobject->finish;
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
+
+    ##Build a variant for each Product.
+    my $productQuery = $session->db->read(<<EOSQL1);
+SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
+    FROM Product   AS p
+    JOIN assetData AS a
+        on p.assetId=a.assetId and p.revisionDate=a.revisionDate
+    JOIN sku       AS s
+        on p.assetId=s.assetId and p.revisionDate=s.revisionDate
+    WHERE p.revisionDate=(SELECT MAX(revisionDate) FROM Product)
+EOSQL1
+    while (my $productData = $productQuery->hashRef()) {
+        ##Truncate title to 30 chars for short desc
+        my $product = WebGUI::Asset::Wobject::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
+        $product->setCollateral('Product_variants', 'varSku', {
+            varSku    => $productData->{productNumber},
+            mastersku => $product->get('sku'),
+            shortdesc => substr($productData->{title}, 0, 30),
+            price     => $productData->{price},
+            weight    => 0,
+            quantity  => 0,
+        });
+    }
+    $productQuery->finish;
+
     ## Remove productNumber from Product;
-	$session->db->write("alter table Product drop column productNumber");
+	$session->db->write('alter table Product drop column productNumber');
+    ## Remove price from Product since prices are now stored in variants
+	$session->db->write('alter table Product drop column price');
+
     ## Update config file, deleting Wobject::Product and adding Sku::Product
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');
     $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
+
     unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
     return;
 }
