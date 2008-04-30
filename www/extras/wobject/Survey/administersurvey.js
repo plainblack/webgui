@@ -105,12 +105,12 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
                             container: a.Survey_answerId+"container", checked: false });
                         b.label=a.recordedAnswer;
                     }else{
+                     //   b = new YAHOO.widget.Button({ type: "checkbox", id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
                         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
                             value: a.Survey_answerId, 
                             container: a.Survey_answerId+"container", checked: false });
-                        b.label=a.answerText;
                     }
-                    b.setStyle('text-align','center'); 
+                    //b.set('label',a.answerText);
                     b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length,a.Survey_answerId]);
                     if(a.verbatim == 1){
                         verb = 1;
@@ -342,11 +342,16 @@ YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer
         max = parseInt(max);
         if(maxA == 1){
             for(var i in butts){
-                butts[i].set('checked',false);
-                document.getElementById(butts[i].hid).value = '';
+                if(butts[i] != b){
+                    butts[i].set('checked',false);
+                    document.getElementById(butts[i].hid).value = '';
+                }
             }
-            b.set('checked',true);
-            document.getElementById(b.hid).value = 1;
+            if(b.get('checked') == true){
+                document.getElementById(b.hid).value = 1;
+            }else{
+                document.getElementById(b.hid).value = '';
+            }
         } 
         else if(b.get('checked')){
             var max = parseInt(document.getElementById(qid+'max').innerHTML);

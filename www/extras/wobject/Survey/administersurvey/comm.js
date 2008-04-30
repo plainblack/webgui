@@ -7,7 +7,7 @@ Survey.Comm= new function(){
 
     this.url = '';
     this.setUrl = function(u){this.url = u;}
-    
+    var callMade = 0; 
     var request = function(sUrl,callback,postData,form, hasFile){
         if(form != undefined){
             if(hasFile){
@@ -19,15 +19,22 @@ Survey.Comm= new function(){
             }
             //console.log('setForm was true');
         }
-        YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+        if(callMade == 1){
+            alert("Waiting on previous request");
+        }else{
+            callMade = 1;
+            YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+        }
     }
 
 
     this.callback = {
         upload:function(o){
+            callMade = 0;
             Survey.Comm.callServer('','loadQuestions');
         },
         success:function(o){
+            callMade = 0;
             var response = '';
             response = YAHOO.lang.JSON.parse(o.responseText);
             if(response.type == 'displayquestions'){
@@ -40,6 +47,7 @@ Survey.Comm= new function(){
             }
         },
         failure: function(o){
+            callMade = 0;
             if(o.status == -1){
                 alert("Last request timed out, please try again");
             }else{

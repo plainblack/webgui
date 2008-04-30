@@ -3,19 +3,27 @@ if (typeof Survey == "undefined") {
 }
 
 Survey.Comm = new function(){
+    var callMade = 0;
 
     var request = function(sUrl,callback,postData){
-        YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+        if(callMade == 1){
+            alert("Waiting on previous call");
+        }else{
+            callMade = 1;
+            YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
+        }
     }
     this.callback = {
         success:function(o){
+            callMade = 0;
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },
         failure: function(o){
+            callMade = 0;
             alert("Last request failed");
             Survey.Data.loadLast();
         },
-        timeout: 1000
+        timeout: 5000
     };
     this.loadSurvey = function(p){
         var postData = "data="+p;
