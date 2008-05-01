@@ -14,6 +14,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Sku::Product;
 use File::Find;
 use File::Spec;
 
@@ -612,7 +613,7 @@ EOSQL
         $toSku->execute([
             $product->{assetId},
             $product->{revisionDate},
-            $product->{productNumber},
+            ($product->{productNumber} || $session->id->generate),
             $product->{description},
             $product->{displayTitle},
         ]);
@@ -635,9 +636,10 @@ SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
 EOSQL1
     while (my $productData = $productQuery->hashRef()) {
         ##Truncate title to 30 chars for short desc
-        my $product = WebGUI::Asset::Wobject::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
+        printf "Adding variant to %s\n", $productData->{title} unless $quiet;
+        my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
         $product->setCollateral('Product_variants', 'varSku', {
-            varSku    => $productData->{productNumber},
+            varSku    => ($productData->{productNumber} || $session->id->generate),
             mastersku => $product->get('sku'),
             shortdesc => substr($productData->{title}, 0, 30),
             price     => $productData->{price},

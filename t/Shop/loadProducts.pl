@@ -9,8 +9,15 @@
 # http://www.plainblack.com                     info@plainblack.com
 #------------------------------------------------------------------
 
-# Write a little about what this script tests.
-# 
+# This "test" script shoves products into the table so that the upgrade translation
+# process can be tested.
+#
+# Here's what we're looking for after the upgrade runs.
+# 1) Correct number of products translated
+# 2) All revisions translated
+# 3) Variants created for each Product Wobject
+# 4) If no productNumber is defined, then it makes one for you.
+# 5) Titles are truncated to 30 characters and used as the short description
 #
 
 use FindBin;
@@ -68,6 +75,36 @@ sleep 2;
 $tag = WebGUI::VersionTag->getWorking($session);
 
 my $product1a = $product1->addRevision({price => 11.11});
+
+my $properties3 = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'three',
+    price         => 20.00,
+    title         => 'no product number',
+    description   => 'third product',
+};
+
+my $product3 = $root->addChild($properties3);
+
+my $properties4 = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'four',
+    price         => 7.77,
+    title         => 'no product number',
+    description   => 'fourth product',
+};
+
+my $product4 = $root->addChild($properties4);
+
+my $properties5 = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'four',
+    price         => 7.77,
+    title         => 'extremely long title that will be truncated to only 30 chars in the variant',
+    description   => 'fourth product',
+};
+
+my $product5 = $root->addChild($properties5);
 
 $tag->commit;
 
