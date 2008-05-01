@@ -339,6 +339,18 @@ sub www_editGroup {
 		-hoverHelp => $i18n->get('85 description'),
 		-value => $g->description,
         );
+        $f->yesNo(
+		-name=>"isEditable",
+		-label=>$i18n->get('is editable'), 
+		-hoverHelp=>$i18n->get('is editable help'), 
+		-value=>$g->isEditable,
+		);
+        $f->yesNo(
+		-name=>"showInForms",
+		-label=>$i18n->get('show in forms'), 
+		-hoverHelp=>$i18n->get('show in forms help'), 
+		-value=>$g->showInForms,
+		);
         $f->interval(
 		-name=>"expireOffset",
 		-label=>$i18n->get(367), 
@@ -489,6 +501,8 @@ sub www_editGroupSave {
     $g->description($session->form->process("description"));
     $g->expireOffset($session->form->interval("expireOffset"));
 	$g->karmaThreshold($session->form->process("karmaThreshold"));
+	$g->isEditable($session->form->process("isEditable"));
+	$g->showInForms($session->form->process("showInForms"));
 	$g->ipFilter($session->form->process("ipFilter"));
 	$g->scratchFilter($session->form->process("scratchFilter"));
 	$g->expireNotify($session->form->yesNo("expireNotify"));

@@ -4,6 +4,8 @@
    searchable and add metatags for all assets.
  - fix: template variable isUncommitted is not documented in the help
  - Cleaned the pollution from the forms system.
+ - rfe:  subscribe entire user group to a collaboration message  board
+ - Added show in forms and is editable properties to group manager.
  - fix: Event is no longer editable by anyone who can add events
  - fix: Event now sets ownerUserId correctly
  - add: Calendar can now select which workflow to use for committing Events

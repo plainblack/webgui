@@ -2,6 +2,30 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'is editable' => {
+		message => q|Is Editable?|,
+		context => q|group property|,
+		lastUpdated => 0,
+	},
+
+	'show in forms' => {
+		message => q|Show In Forms?|,
+		context => q|group property|,
+		lastUpdated => 0,
+	},
+
+	'is editable help' => {
+		message => q|Should this group show up in the list of managable groups? Note, if you set this to 'No' then you will no longer be able to manage this group.|,
+		context => q|group property|,
+		lastUpdated => 0,
+	},
+
+	'show in forms help' => {
+		message => q|Should this group show up in places where you can choose a group, such as privilege fields?|,
+		context => q|group property|,
+		lastUpdated => 0,
+	},
+
 	'run on admin create user' => {
 		message => q|On Create User (Admin)|,
 		context => q|field in trigger manager|,
