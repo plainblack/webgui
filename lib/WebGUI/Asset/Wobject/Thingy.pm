@@ -1159,7 +1159,7 @@ sub www_deleteThingDataConfirm {
     my $thingId = $self->session->form->process("thingId");
     my $thingDataId = $self->session->form->process('thingDataId');
 
-    my ($groupIdEdit) = $db->quickHash("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
+    my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
     return $self->session->privilege->insufficient() unless $self->hasPrivileges($groupIdEdit);
 
     $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);

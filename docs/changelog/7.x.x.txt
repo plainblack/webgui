@@ -51,6 +51,7 @@
  - added: Ability to enable/disable Thread archiving on a per-Collaboration 
    basis
  - fixed: Thingy Thing Checkbox/Checklist/Selectbox/Selectlist limitations
+ - fixed: Thingy: Problem with delete Thing permissions
 
 
 7.5.10
