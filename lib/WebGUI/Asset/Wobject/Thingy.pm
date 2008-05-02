@@ -1221,7 +1221,7 @@ sub www_editThing {
         $thingId = $self->addThing(\%properties,0);
     }
     else{
-        %properties = $self->getThing($thingId);
+        %properties = %{$self->getThing($thingId)};
     }
 
     $tabForm = WebGUI::TabForm->new($self->session, undef, undef, $self->getUrl('func=view'));
