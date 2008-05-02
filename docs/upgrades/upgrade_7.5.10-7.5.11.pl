@@ -592,13 +592,16 @@ sub migrateOldProduct {
 	print "\t\tAdding new product variants table.\n" unless ($quiet);
     $session->db->write(<<'EOSQL');
 CREATE TABLE Product_variants (
-    varSku              VARCHAR(255) BINARY NOT NULL PRIMARY KEY,
+    variantId           VARCHAR(22)  BINARY NOT NULL PRIMARY KEY,
+    varSku              VARCHAR(255) BINARY NOT NULL UNIQUE,
+    assetId             VARCHAR(22)  BINARY NOT NULL,
     mastersku           VARCHAR(22)  BINARY NOT NULL,
     varTitle            VARCHAR(255) BINARY NOT NULL,
     shortdesc           VARCHAR(30),
     price               FLOAT,
     weight              FLOAT,
-    quantity            INT
+    quantity            INT,
+    sequenceNumber      INT
 );
 EOSQL
     ##Have to change the className's in the db, too
