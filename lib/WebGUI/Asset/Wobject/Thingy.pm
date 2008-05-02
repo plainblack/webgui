@@ -1770,6 +1770,7 @@ sub www_editThingData {
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
+    $var->{"thing_label"} = $thingProperties->{label};
 
     if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         if ($thingDataId ne "new"){
@@ -1777,8 +1778,9 @@ sub www_editThingData {
             .$thingId.';thingDataId='.$thingDataId);
         }
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
+    }
+    if($self->hasPrivileges($thingProperties->{groupIdAdd})){    
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties->{label};
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){
         $var->{"search_url"} = $session->url->append($url, 'func=search;thingId='.$thingId);
@@ -2345,6 +2347,7 @@ sub www_search {
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
+    $var->{"thing_label"} = $thingProperties->{label};
 
     if ($doSearch && $self->hasPrivileges($thingProperties->{groupIdExport})){
         $var->{"export_url"} = $session->url->append($url, 'func=export;thingId='.$thingId);
@@ -2352,9 +2355,8 @@ sub www_search {
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
         $var->{"import_url"} = $session->url->append($url, 'func=importForm;thingId='.$thingId);
     }
-    if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
+    if ($self->hasPrivileges($thingProperties->{groupIdAdd})){
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties->{label}; 
     }
     $var->{searchScreenTitle} = $thingProperties->{searchScreenTitle};    
     $var->{searchDescription} = $thingProperties->{searchDescription};
@@ -2603,15 +2605,17 @@ sub www_viewThingData {
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
+    $var->{"thing_label"} = $thingProperties->{label};
 
     if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         $var->{"edit_url"} = $session->url->append($url,'func=editThingData;thingId='
         .$thingId.';thingDataId='.$thingDataId);
         $var->{"delete_url"} = $session->url->append($url, 'func=deleteThingDataConfirm;thingId='
         .$thingId.';thingDataId='.$thingDataId);
-        $var->{"add_url"} = $session->url->append($url, 'func=editThingData;thingId='.$thingId.';thingDataId=new');
-        $var->{"thing_label"} = $thingProperties->{label};
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
+    }
+    if($self->hasPrivileges($thingProperties->{groupIdAdd})){
+        $var->{"add_url"} = $session->url->append($url, 'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){    
         $var->{"search_url"} = $session->url->append($url, 'func=search;thingId='.$thingId);

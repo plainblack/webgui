@@ -54,7 +54,7 @@
  - fixed: Thingy: Problem with delete Thing permissions
  - removed legacy wgFieldUserData table
  - fixed: Thingy: Importing data can fail with some internal field Ids
-
+ - fixed: Thingy: Problem with add_url tmpl_var permissions
 
 7.5.10
  - fix: Syntax error in GetCsMail
