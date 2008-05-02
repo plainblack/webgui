@@ -2067,7 +2067,7 @@ sub www_import {
                 my $fieldId = $insertColumns[$fieldNumber]->{fieldId};
                 if ($session->form->process("checkDuplicates_".$fieldId)){
                     #$error->info("adding $fieldId to duplicates constraint");
-                    push(@duplicatesConstraint,"field_".$fieldId." = ".$session->db->quote($insertValue));
+                    push(@duplicatesConstraint,$dbh->quote_identifer("field_".$fieldId)." = ".$session->db->quote($insertValue));
                 }
                 $fieldNumber++;
             }
