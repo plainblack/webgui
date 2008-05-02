@@ -82,8 +82,9 @@ sub www_address {
     my $output = undef;
     my $method = "www_". ( $session->form->get("method") || "view");
     my $cart = WebGUI::Shop::AddressBook->newBySession($session);
-    if (my $sub = $cart->can($method)) {
-        $output = $sub->();
+
+    if ($cart->can($method)) {
+        $output = $cart->$method();
     }
     return $output;
 }
