@@ -88,16 +88,15 @@ sub flush {
 
 =head2 get ( )
 
-Retrieve content from the filesystem cache.
+Retrieve content from the database cache.
 
 =cut
 
 sub get {
 	my $self = shift;
-	return undef if ($self->session->config->get("disableCache"));
-	# getting better performance using native dbi than webgui sql
-	my $dbh = $self->session->db->dbh;	
-	my $sth = $dbh->prepare("select content from cache where namespace=? and cachekey=? and expires>?");
+    my $session = $self->session;
+	return undef if ($session->config->get("disableCache"));
+    my $sth = $session->db->dbh->prepare("select content from cache where namespace=? and cachekey=? and expires>?");
 	$sth->execute($self->{_namespace},$self->{_key},time());
 	my $data = $sth->fetchrow_arrayref;
 	$sth->finish;
