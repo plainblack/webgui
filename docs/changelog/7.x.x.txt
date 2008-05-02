@@ -52,6 +52,7 @@
    basis
  - fixed: Thingy Thing Checkbox/Checklist/Selectbox/Selectlist limitations
  - fixed: Thingy: Problem with delete Thing permissions
+ - removed legacy wgFieldUserData table
 
 
 7.5.10

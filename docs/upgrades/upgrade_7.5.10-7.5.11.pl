@@ -50,6 +50,7 @@ addShelf( $session );
 addCoupon( $session );
 addVendors($session);
 modifyThingyPossibleValues( $session );
+removeLegacyTable($session);
 
 finish($session); # this line required
 
@@ -692,6 +693,14 @@ sub modifyThingyPossibleValues {
     my $session = shift;
     print "\tModify data type of Thingy field's possible Values property.\n" unless ($quiet);
     $session->db->write("alter table Thingy_fields modify possibleValues text");
+}
+
+#-------------------------------------------------
+sub removeLegacyTable {
+    my $session = shift;
+    print "\tRemoving legacy field table..." unless ($quiet);
+    $session->db->write("DROP TABLE `wgFieldUserData`");
+    print "Done.\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
