@@ -488,7 +488,7 @@ sub updateFromForm {
         }
     }
 
-    my $cartProperties;
+    my $cartProperties = {};
     $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $self->update( $cartProperties );
 }
