@@ -208,7 +208,8 @@ The unique id of the activity.
 sub getActivity {
 	my $self = shift;
 	my $activityId = shift;
-	return WebGUI::Workflow::Activity->new($self->session, $activityId);
+	my $activity = WebGUI::Workflow::Activity->new($self->session, $activityId);
+    return $activity;
 }
 
 #-------------------------------------------------------------------

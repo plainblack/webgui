@@ -15,6 +15,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Product;
+use WebGUI::Workflow;
 use File::Find;
 use File::Spec;
 
@@ -57,7 +58,7 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub addCoupon {
     my $session = shift;
-    print "\tAdding Coupons" unless $quiet;
+    print "\tAdding Coupons... " unless $quiet;
 
     $session->db->write(q{
         create table FlatDiscount (
@@ -109,7 +110,7 @@ sub addArchiveEnabledToCollaboration {
 #----------------------------------------------------------------------------
 sub addShelf {
     my $session = shift;
-    print "\tAdding Shelves" unless $quiet;
+    print "\tAdding Shelves... " unless $quiet;
 
     $session->db->write(q{
         create table Shelf (
@@ -326,10 +327,38 @@ sub upgradeEMS {
 		price float not null default 0.00,
 		primary key (assetId, revisionDate)
 		)");
+    
+    print "\t\tMigrating workflow activities.\n" unless ($quiet);
 	$session->config->addToArray("workflowActivities/None","WebGUI::Workflow::Activity::ExpireEmsCartItems");
-	
-	print "\t\tMigrating old EMS data.\n" unless ($quiet);
-	#$db->write("alter table EventManagementSystem_metaData rename EMSEventMetaData");
+    $db->write("delete from WorkflowActivity where workflowId=?",['EMSworkflow00000000001']); # file no longer exists so must get rid of this entry manually
+    my $workflow = WebGUI::Workflow->new($session, 'EMSworkflow00000000001');
+    if (defined $workflow) {
+        $workflow->delete;
+    }
+	unlink($session->config->getWebguiRoot.'/lib/WebGUI/Workflow/Activity/CacheEMSPrereqs.pm');
+    
+    my %oldRibbons = ();
+    my %newRibbons = ();
+    print "\t\tMigrating old EMS data.\n" unless ($quiet);
+    my $emsResults = $db->read("select assetId from asset where className='WebGUI::Asset::Wobject::EventManagementSystem'");
+    while (my ($emsId) = $emsResults->array) {
+        my $ems = WebGUI::Asset::Wobject::EventManagementSystem->new($session, $emsId);
+        my $ribbonResults = $db->read("select * from EventManagementSystem_discountPasses left join EventManagementSystem_products using (passId) left join products using (productId) where assetId=?",[$emsId]);
+    	print "\t\t\tMigrating old ribbons for $emsId.\n" unless ($quiet);
+        while (my $ribbonData = $ribbonResults->hashRef) {
+            my $ribbon = $ems->addChild({
+                className           => 'WebGUI::Asset::Sku::Ribbon',
+                title               => $ribbonData->{title},
+                description         => $ribbonData->{description},
+                sku                 => $ribbonData->{sku},
+                price               => $ribbonData->{price},
+                seatsAvailable      => $ribbonData->{maximumAttendees},
+                });
+            $oldRibbons{$ribbonData->{passId}} = $ribbon->getId;
+            $newRibbons{$ribbon->getId} = $ribbonData->{passId};
+        }
+    }
+
 
 }
 
