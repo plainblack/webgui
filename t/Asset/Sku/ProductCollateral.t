@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 14;        # Increment this number for each test you create
+plan tests => 17;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -125,6 +125,37 @@ cmp_deeply(
     $product->getCollateral('variantsJSON', -1),
     {a => 'see', b => 'dee' },
     'getCollateral: negative index works',
+);
+
+$product->setCollateral('variantsJSON', 'new', { a => 'alpha', b => 'beta'});
+
+$product->deleteCollateral('variantsJSON', 1);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',   b => 'bee' },
+        {a => 'alpha', b => 'beta' },
+    ],
+    'deleteCollateral: delete by index works',
+);
+
+$product->deleteCollateral('variantsJSON', 4);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',   b => 'bee' },
+        {a => 'alpha', b => 'beta' },
+    ],
+    'deleteCollateral: out of range index does not delete',
+);
+
+$product->deleteCollateral('variantsJSON', -1);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',   b => 'bee' },
+    ],
+    'deleteCollateral: negative index works',
 );
 
 $product->purge;

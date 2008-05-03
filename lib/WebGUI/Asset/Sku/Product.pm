@@ -164,9 +164,9 @@ The index of the data to delete from the collateral.
 =cut
 
 sub deleteCollateral {
-	my $self      = shift;
-	my $tableName = shift;
-	my $index     = shift;
+    my $self      = shift;
+    my $tableName = shift;
+    my $index     = shift;
     my $table = $self->getAllCollateral($tableName);
     return unless (abs($index) <= $#{$table});
     splice @{ $table }, $index, 1;
@@ -221,8 +221,8 @@ The name of the table you wish to retrieve the data from.
 =cut
 
 sub getAllCollateral {
-	my $self      = shift;
-	my $tableName = shift;
+    my $self      = shift;
+    my $tableName = shift;
     return $self->{_collateral}->{$tableName} if exists $self->{_collateral}->{$tableName};
     my $json = $self->get($tableName);
     return [] unless $json;
@@ -253,12 +253,12 @@ also returns an empty hashRef.
 =cut
 
 sub getCollateral {
-	my $self      = shift;
-	my $tableName = shift;
-	my $index     = shift;
-	if ($index eq "new" || $index eq "") {
-		return {};
-	}
+    my $self      = shift;
+    my $tableName = shift;
+    my $index     = shift;
+    if ($index eq "new" || $index eq "") {
+        return {};
+    }
     my $table = $self->getAllCollateral($tableName);
     ##I don't know why you'd send this a negative index,
     ##but it's valid perl.
@@ -363,23 +363,23 @@ The value of the column defined by "setName" to select a data set from.
 ### two different types of collateral data.
 
 sub moveCollateralDown {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
-	my $keyValue = shift;
-	my $setName = shift || "assetId";
+    my $self = shift;
+    my $table = shift;
+    my $keyName = shift;
+    my $keyValue = shift;
+    my $setName = shift || "assetId";
         my $setValue = shift;
-	unless (defined $setValue) {
-		$setValue = $self->get($setName);
-	}
-	$self->session->db->beginTransaction;
+    unless (defined $setValue) {
+        $setValue = $self->get($setName);
+    }
+    $self->session->db->beginTransaction;
         my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
         my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." and sequenceNumber=$seq+1");
         if ($id ne "") {
                 $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($keyValue)." and $setName=" .$self->session->db->quote($setValue));
                 $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($id)." and $setName=" .$self->session->db->quote($setValue));
          }
-	$self->session->db->commit;
+    $self->session->db->commit;
 }
 
 
@@ -415,26 +415,26 @@ The value of the column defined by "setName" to select a data set from.
 ### two different types of collateral data.
 
 sub moveCollateralUp {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
-	my $keyValue = shift;
+    my $self = shift;
+    my $table = shift;
+    my $keyName = shift;
+    my $keyValue = shift;
         my $setName = shift || "assetId";
         my $setValue = shift;
-	unless (defined $setValue) {
-		$setValue = $self->get($setName);
-	}
-	$self->session->db->beginTransaction;
+    unless (defined $setValue) {
+        $setValue = $self->get($setName);
+    }
+    $self->session->db->beginTransaction;
         my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
         my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)
-		." and sequenceNumber=$seq-1");
+        ." and sequenceNumber=$seq-1");
         if ($id ne "") {
                 $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($keyValue)." and $setName="
-			.$self->session->db->quote($setValue));
+            .$self->session->db->quote($setValue));
                 $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($id)." and $setName="
-			.$self->session->db->quote($setValue));
+            .$self->session->db->quote($setValue));
         }
-	$self->session->db->commit;
+    $self->session->db->commit;
 }
 
 #-------------------------------------------------------------------
@@ -532,7 +532,7 @@ sub reorderCollateral {
     my $setValue = shift || $self->get($setName);
     my $i = 1;
     my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
-	my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
+    my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
     while (my ($id) = $sth->array) {
         $sth2->execute([$i, $setValue, $id]);
         $i++;
@@ -555,8 +555,8 @@ The name of the table to insert the data.
 =cut
 
 sub setAllCollateral {
-	my $self       = shift;
-	my $tableName  = shift;
+    my $self       = shift;
+    my $tableName  = shift;
     my $json = to_json($self->{_collateral}->{$tableName});
     $self->update({ $tableName => $json});
     return;
@@ -586,10 +586,10 @@ the index mentioned above.
 =cut
 
 sub setCollateral {
-	my $self       = shift;
-	my $tableName  = shift;
-	my $index      = shift;
-	my $properties = shift;
+    my $self       = shift;
+    my $tableName  = shift;
+    my $index      = shift;
+    my $properties = shift;
     ##Note, since this returns a reference, it is actually updating
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
