@@ -684,7 +684,9 @@ SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
         on p.assetId=s.assetId and p.revisionDate=s.revisionDate
     WHERE p.revisionDate=(SELECT MAX(revisionDate) FROM Product)
 EOSQL1
-    while (my $productData = $productQuery->hashRef()) {
+    #while (my $productData = $productQuery->hashRef()) {
+    my $productData;
+    while ( () ) {
         ##Truncate title to 30 chars for short desc
         printf "Adding variant to %s\n", $productData->{title} unless $quiet;
         my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
@@ -703,6 +705,8 @@ EOSQL1
 	$session->db->write('alter table Product drop column productNumber');
     ## Remove price from Product since prices are now stored in variants
 	$session->db->write('alter table Product drop column price');
+    ## Add variants collateral column
+	$session->db->write('alter table Product add column variantsJSON mediumtext');
 
     ## Update config file, deleting Wobject::Product and adding Sku::Product
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');

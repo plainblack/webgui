@@ -65,71 +65,76 @@ sub definition {
     my %properties;
     tie %properties, 'Tie::IxHash';
     %properties = (
-            cacheTimeout => {
-                tab => "display",
-                fieldType => "interval",
-                defaultValue => 3600,
-                uiLevel => 8,
-                label => $i18n->get("cache timeout"),
-                hoverHelp => $i18n->get("cache timeout help")
-                },
-            templateId =>{
-                fieldType=>"template",
-                tab => "display",
-                      namespace=>"Product",
-                label=>$i18n->get(62),
-                hoverHelp=>$i18n->get('62 description'),
-                defaultValue=>'PBtmpl0000000000000056'
-            },
-            image1=>{
-                tab => "properties",
-                fieldType=>"image",
-                defaultValue=>undef,
-                maxAttachments=>1,
-                label=>$i18n->get(7),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename=")
-            },
-            image2=>{
-                tab => "properties",
-                fieldType=>"image",
-                maxAttachments=>1,
-                label=>$i18n->get(8),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
-                defaultValue=>undef
-            },
-            image3=>{
-                tab => "properties",
-                fieldType=>"image",
-                maxAttachments=>1,
-                label=>$i18n->get(9),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
-                defaultValue=>undef
-            },
-            brochure=>{
-                tab => "properties",
-                fieldType=>"file",
-                maxAttachments=>1,
-                label=>$i18n->get(13),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
-                defaultValue=>undef
-            },
-            manual=>{
-                tab => "properties",
-                fieldType=>"file",
-                maxAttachments=>1,
-                label=>$i18n->get(14),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
-                defaultValue=>undef
-            },
-            warranty=>{
-                tab => "properties",
-                fieldType=>"file",
-                maxAttachments=>1,
-                label=>$i18n->get(15),
-                deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
-                defaultValue=>undef
-            },
-        );
+        cacheTimeout => {
+            tab => "display",
+            fieldType => "interval",
+            defaultValue => 3600,
+            uiLevel => 8,
+            label => $i18n->get("cache timeout"),
+            hoverHelp => $i18n->get("cache timeout help")
+        },
+        templateId =>{
+            fieldType=>"template",
+            tab => "display",
+                  namespace=>"Product",
+            label=>$i18n->get(62),
+            hoverHelp=>$i18n->get('62 description'),
+            defaultValue=>'PBtmpl0000000000000056'
+        },
+        image1=>{
+            tab => "properties",
+            fieldType=>"image",
+            defaultValue=>undef,
+            maxAttachments=>1,
+            label=>$i18n->get(7),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image1;filename=")
+        },
+        image2=>{
+            tab => "properties",
+            fieldType=>"image",
+            maxAttachments=>1,
+            label=>$i18n->get(8),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image2;filename="),
+            defaultValue=>undef
+        },
+        image3=>{
+            tab => "properties",
+            fieldType=>"image",
+            maxAttachments=>1,
+            label=>$i18n->get(9),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=image3;filename="),
+            defaultValue=>undef
+        },
+        brochure=>{
+            tab => "properties",
+            fieldType=>"file",
+            maxAttachments=>1,
+            label=>$i18n->get(13),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=brochure;filename="),
+            defaultValue=>undef
+        },
+        manual=>{
+            tab => "properties",
+            fieldType=>"file",
+            maxAttachments=>1,
+            label=>$i18n->get(14),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
+            defaultValue=>undef
+        },
+        warranty=>{
+            tab => "properties",
+            fieldType=>"file",
+            maxAttachments=>1,
+            label=>$i18n->get(15),
+            deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=warranty;filename="),
+            defaultValue=>undef
+        },
+        variantsJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
+    );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
         autoGenerateForms=>1,
@@ -137,37 +142,35 @@ sub definition {
         tableName=>'Product',
         className=>'WebGUI::Asset::Sku::Product',
         properties=>\%properties
-        });
-        return $class->SUPER::definition($session, $definition);
+        }
+    );
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
 
-=head2 deleteCollateral ( tableName, keyName, keyValue )
+=head2 deleteCollateral ( tableName, index )
 
-Deletes a row of collateral data where keyName=keyValue.
+Deletes a row of collateral data.
 
 =head3 tableName
 
 The name of the table you wish to delete the data from.
 
-=head3 keyName
+=head3 index
 
-The name of a column in the table. Is not checked for invalid input.
-
-=head3 keyValue
-
-Criteria (value) used to find the data to delete.
+The index of the data to delete from the collateral.
 
 =cut
 
 sub deleteCollateral {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
-	my $keyValue = shift;
-        $self->session->db->write("delete from $table where $keyName=".$self->session->db->quote($keyValue));
-	$self->updateHistory("deleted collateral item ".$keyName." ".$keyValue);
+	my $self      = shift;
+	my $tableName = shift;
+	my $index     = shift;
+    my $table = $self->getAllCollateral($tableName);
+    return unless (abs($index) <= $#{$table});
+    splice @{ $table }, $index, 1;
+    $self->setAllCollateral($tableName);
 }
 
 #-------------------------------------------------------------------
@@ -206,34 +209,65 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 getCollateral ( tableName, keyName, keyValue )
+=head2 getAllCollateral ( tableName )
 
-Returns a hash reference containing a row of collateral data.
+Returns an array reference to the translated JSON data for the
+requested collateral table.
 
 =head3 tableName
 
 The name of the table you wish to retrieve the data from.
 
-=head3 keyName
+=cut
 
-A name of a column in the table. Usually the primary key column.
+sub getAllCollateral {
+	my $self      = shift;
+	my $tableName = shift;
+    return $self->{_collateral}->{$tableName} if exists $self->{_collateral}->{$tableName};
+    my $json = $self->get($tableName);
+    return [] unless $json;
+    my $table = from_json($json);
+    $self->{_collateral}->{$tableName} = $table;
+    return $table;
+}
 
-=head3 keyValue
 
-A string containing the key value. If key value is equal to "new" or null, then an empty hashRef containing only keyName=>"new" will be returned to avoid strict errors.
+#-------------------------------------------------------------------
+
+=head2 getCollateral ( tableName, keyName, keyValue )
+
+Returns a hash reference containing one row of collateral data from a particular
+table.
+
+=head3 tableName
+
+The name of the table you wish to retrieve the data from.
+
+=head3 index
+
+A string containing the index to fetch. If the index is equal to "new"
+or null, then an empty hashRef will be returned to avoid strict errors.
+If the requested index is beyond the end of the collateral array, it
+also returns an empty hashRef.
 
 =cut
 
 sub getCollateral {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
-	my $keyValue = shift;
-	if ($keyValue eq "new" || $keyValue eq "") {
-		return {$keyName=>"new"};
-	} else {
-		return $self->session->db->quickHashRef("select * from $table where $keyName=".$self->session->db->quote($keyValue));
+	my $self      = shift;
+	my $tableName = shift;
+	my $index     = shift;
+	if ($index eq "new" || $index eq "") {
+		return {};
 	}
+    my $table = $self->getAllCollateral($tableName);
+    ##I don't know why you'd send this a negative index,
+    ##but it's valid perl.
+    if (abs($index) <= $#{$table}) {
+        return $table->[$index];
+    }
+    else {
+        return {};
+    }
 }
 
 
@@ -510,91 +544,64 @@ sub reorderCollateral {
 
 #-----------------------------------------------------------------
 
-=head2 setCollateral ( tableName,keyName,properties [,useSequenceNumber,useAssetId,setName,setValue] )
+=head2 setAllCollateral ( tableName )
 
-Performs and insert/update of collateral data for any wobject's collateral data. Returns the primary key value for that row of data.
+Update the db from the object cache.
 
 =head3 tableName
 
 The name of the table to insert the data.
 
-=head3 keyName
+=cut
 
-The column name of the primary key in the table specified above.
+sub setAllCollateral {
+	my $self       = shift;
+	my $tableName  = shift;
+    my $json = to_json($self->{_collateral}->{$tableName});
+    $self->update({ $tableName => $json});
+    return;
+}
+
+#-----------------------------------------------------------------
+
+=head2 setCollateral ( tableName, keyName, properties )
+
+Performs and insert/update of collateral data for any wobject's collateral data.
+
+=head3 tableName
+
+The name of the table to insert the data.
+
+=head3 index
+
+The index of the collateral data to set.  If the index = "new", then a new entry
+will be appended to the end of the collateral array.  Otherwise, then the
+appropriate entry will be overwritten the data.
 
 =head3 properties
 
-A hash reference containing the name/value pairs to be inserted into the database where the name is the column name. Note that the primary key should be specified in this list, and if it's value is "new" or null a new row will be created.
-
-=head3 useSequenceNumber
-
-If set to "1", a new sequenceNumber will be generated and inserted into the row. Note that this means you must have a sequenceNumber column in the table. Also note that this requires the presence of the assetId column. Defaults to "1".
-
-=head3 useAssetId
-
-If set to "1", the current assetId will be inserted into the table upon creation of a new row. Note that this means the table better have a assetId column. Defaults to "1".
-
-=head3 setName
-
-If this collateral data set is not grouped by assetId, but by another column then specify that column here. The useSequenceNumber parameter will then use this column name instead of assetId to generate the sequenceNumber.
-
-=head3 setValue
-
-If you've specified a setName you may also set a value for that set.  Defaults to the value for this id from the wobject properties.
+A hash reference containing the name/value pairs to be inserted into the collateral, using
+the index mentioned above.
 
 =cut
 
 sub setCollateral {
-	my $self = shift;
-	my $table = shift;
-	my $keyName = shift;
+	my $self       = shift;
+	my $tableName  = shift;
+	my $index      = shift;
 	my $properties = shift;
-	my $useSequence = shift;
-	my $useAssetId = shift;
-	my $setName = shift || "assetId";
-	my $setValue = shift || $self->get($setName);
-	my ($key, $seq, $dbkeys, $dbvalues);
-	my $counter = 0;
-	my $sql;
-	if ($properties->{$keyName} eq "new" || $properties->{$keyName} eq "") {
-		$properties->{$keyName} = $self->session->id->generate();
-		$sql = "insert into $table (";
-		my $dbkeys = "";
-        my $dbvalues = "";
-		unless ($useSequence eq "0") {
-			unless (exists $properties->{sequenceNumber}) {
-				my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from $table where $setName=?",[$setValue]);
-				$properties->{sequenceNumber} = $seq+1;
-			}
-		}
-		unless ($useAssetId eq "0") {
-			$properties->{assetId} = $self->get("assetId");
-		}
-		foreach my $key (keys %{$properties}) {
-			if ($counter++ > 0) {
-				$dbkeys .= ',';
-				$dbvalues .= ',';
-			}
-			$dbkeys .= $key;
-			$dbvalues .= $self->session->db->quote($properties->{$key});
-		}
-		$sql .= $dbkeys.') values ('.$dbvalues.')';
-		$self->updateHistory("added collateral item ".$table." ".$properties->{$keyName});
-	}
-    else {
-		$sql = "update $table set ";
-		foreach my $key (keys %{$properties}) {
-			unless ($key eq "sequenceNumber") {
-				$sql .= ',' if ($counter++ > 0);
-				$sql .= $key."=".$self->session->db->quote($properties->{$key});
-			}
-		}
-		$sql .= " where $keyName=".$self->session->db->quote($properties->{$keyName});
-		$self->updateHistory("edited collateral item ".$table." ".$properties->{$keyName});
-	}
-  	$self->session->db->write($sql);
-	$self->reorderCollateral($table,$keyName,$setName,$setValue) if ($properties->{sequenceNumber} < 0);
-	return $properties->{$keyName};
+    ##Note, since this returns a reference, it is actually updating
+    ##the object cache directly.
+    my $table = $self->getAllCollateral($tableName);
+    if ($index eq "new") {
+        push @{ $table }, $properties;
+        $self->setAllCollateral($tableName);
+        return;
+    }
+    return unless (abs($index) <= $#{$table});
+    $table->[$index] = $properties;
+    $self->setAllCollateral($tableName);
+    return;
 }
 
 #-------------------------------------------------------------------
