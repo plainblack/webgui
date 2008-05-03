@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 23;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -158,8 +158,74 @@ cmp_deeply(
     'deleteCollateral: negative index works',
 );
 
-$product->purge;
+$product->setCollateral('variantsJSON', 'new', { a => 'alligators', b => 'bursting'});
+$product->setCollateral('variantsJSON', 'new', { a => 'ah',         b => 'bay'});
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',          b => 'bee' },
+        {a => 'alligators',   b => 'bursting' },
+        {a => 'ah',           b => 'bay' },
+    ],
+    'setup correct for moving collateral',
+);
 
+$product->moveCollateralDown('variantsJSON', 1);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',          b => 'bee' },
+        {a => 'ah',           b => 'bay' },
+        {a => 'alligators',   b => 'bursting' },
+    ],
+    'moveCollateralDown: worked',
+);
+
+$product->moveCollateralDown('variantsJSON', 3);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye',          b => 'bee' },
+        {a => 'ah',           b => 'bay' },
+        {a => 'alligators',   b => 'bursting' },
+    ],
+    'moveCollateralDown: can not move out of range collateral item',
+);
+
+$product->moveCollateralUp('variantsJSON', 1);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'ah',           b => 'bay' },
+        {a => 'aye',          b => 'bee' },
+        {a => 'alligators',   b => 'bursting' },
+    ],
+    'moveCollateralUp: worked',
+);
+
+$product->moveCollateralUp('variantsJSON', 0);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'ah',           b => 'bay' },
+        {a => 'aye',          b => 'bee' },
+        {a => 'alligators',   b => 'bursting' },
+    ],
+    'moveCollateralUp: can not move the first collateral item in the array',
+);
+
+$product->moveCollateralUp('variantsJSON', 5);
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'ah',           b => 'bay' },
+        {a => 'aye',          b => 'bee' },
+        {a => 'alligators',   b => 'bursting' },
+    ],
+    'moveCollateralUp: out of range index does not do anything',
+);
+
+$product->purge;
 
 #----------------------------------------------------------------------------
 # Cleanup

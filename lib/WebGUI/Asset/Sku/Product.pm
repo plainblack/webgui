@@ -333,29 +333,18 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralDown ( tableName, keyName, keyValue [ , setName, setValue ] )
+=head2 moveCollateralDown ( tableName, index )
 
-Moves a collateral data item down one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+Moves a collateral data item down one position.  If called on the last element of the
+collateral array then it does nothing.
 
 =head3 tableName
 
 A string indicating the table that contains the collateral data.
 
-=head3 keyName
+=head3 index
 
-A string indicating the name of the column that uniquely identifies this collateral data item.
-
-=head3 keyValue
-
-An iid that uniquely identifies this collateral data item.
-
-=head3 setName
-
-By default this method assumes that the collateral will have an assetId in the table. However, since there is not always a assetId to separate one data set from another, you may specify another field to do that.
-
-=head3 setValue
-
-The value of the column defined by "setName" to select a data set from.
+The index of the collateral data to move down.
 
 =cut
 
@@ -363,51 +352,31 @@ The value of the column defined by "setName" to select a data set from.
 ### two different types of collateral data.
 
 sub moveCollateralDown {
-    my $self = shift;
-    my $table = shift;
-    my $keyName = shift;
-    my $keyValue = shift;
-    my $setName = shift || "assetId";
-        my $setValue = shift;
-    unless (defined $setValue) {
-        $setValue = $self->get($setName);
-    }
-    $self->session->db->beginTransaction;
-        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
-        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)." and sequenceNumber=$seq+1");
-        if ($id ne "") {
-                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($keyValue)." and $setName=" .$self->session->db->quote($setValue));
-                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($id)." and $setName=" .$self->session->db->quote($setValue));
-         }
-    $self->session->db->commit;
+    my $self      = shift;
+    my $tableName = shift;
+    my $index     = shift;
+
+    my $table = $self->getAllCollateral($tableName);
+    return unless (abs($index) < $#{$table});
+    @{ $table }[$index,$index+1] = @{ $table }[$index+1,$index];
+    $self->setAllCollateral($tableName);
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralUp ( tableName, keyName, keyValue [ , setName, setValue ] )
+=head2 moveCollateralDown ( tableName, index )
 
-Moves a collateral data item up one position. This assumes that the collateral data table has a column called "assetId" that identifies the wobject, and a column called "sequenceNumber" that determines the position of the data item.
+Moves a collateral data item up one position.  If called on the first element of the
+collateral array then it does nothing.
 
 =head3 tableName
 
 A string indicating the table that contains the collateral data.
 
-=head3 keyName
+=head3 index
 
-A string indicating the name of the column that uniquely identifies this collateral data item.
-
-=head3 keyValue
-
-An id that uniquely identifies this collateral data item.
-
-=head3 setName
-
-By default this method assumes that the collateral will have a asset in the table. However, since there is not always a assetId to separate one data set from another, you may specify another field to do that.
-
-=head3 setValue
-
-The value of the column defined by "setName" to select a data set from.
+The index of the collateral data to move up.
 
 =cut
 
@@ -415,27 +384,16 @@ The value of the column defined by "setName" to select a data set from.
 ### two different types of collateral data.
 
 sub moveCollateralUp {
-    my $self = shift;
-    my $table = shift;
-    my $keyName = shift;
-    my $keyValue = shift;
-        my $setName = shift || "assetId";
-        my $setValue = shift;
-    unless (defined $setValue) {
-        $setValue = $self->get($setName);
-    }
-    $self->session->db->beginTransaction;
-        my ($seq) = $self->session->db->quickArray("select sequenceNumber from $table where $keyName=".$self->session->db->quote($keyValue)." and $setName=".$self->session->db->quote($setValue));
-        my ($id) = $self->session->db->quickArray("select $keyName from $table where $setName=".$self->session->db->quote($setValue)
-        ." and sequenceNumber=$seq-1");
-        if ($id ne "") {
-                $self->session->db->write("update $table set sequenceNumber=sequenceNumber-1 where $keyName=".$self->session->db->quote($keyValue)." and $setName="
-            .$self->session->db->quote($setValue));
-                $self->session->db->write("update $table set sequenceNumber=sequenceNumber+1 where $keyName=".$self->session->db->quote($id)." and $setName="
-            .$self->session->db->quote($setValue));
-        }
-    $self->session->db->commit;
+    my $self      = shift;
+    my $tableName = shift;
+    my $index     = shift;
+
+    my $table = $self->getAllCollateral($tableName);
+    return unless $index && (abs($index) <= $#{$table});
+    @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
+    $self->setAllCollateral($tableName);
 }
+
 
 #-------------------------------------------------------------------
 
