@@ -292,7 +292,7 @@ sub createAccountSave {
 			className=>"WebGUI::User",
 			parameters=>$self->session->user->userId,
 			priority=>1
-			});
+			})->start;
 	}
 	
 	

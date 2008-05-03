@@ -6,6 +6,9 @@
  - Cleaned the pollution from the forms system.
  - rfe:  subscribe entire user group to a collaboration message  board
  - Added show in forms and is editable properties to group manager.
+ - The concept of "realtime" workflow has been eliminated. Instead all
+   workflows are now realtime (synchronous), and roll over to be asynchronous
+   if they cannot complete succesfully and immediately.
  - fix: Event is no longer editable by anyone who can add events
  - fix: Event now sets ownerUserId correctly
  - add: Calendar can now select which workflow to use for committing Events

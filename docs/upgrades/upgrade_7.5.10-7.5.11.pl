@@ -26,6 +26,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+changeRealtimeWorkflows($session);
 addReferralHandler( $session );
 addCalendarEventWorkflow( $session );
 addPurgeOldInboxActivity( $session );
@@ -54,6 +55,22 @@ modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub changeRealtimeWorkflows {
+    my $session = shift;
+    print "\tMaking realtime workflows seamless... " unless $quiet;
+    $session->db->write(q{update WorkflowInstance set workflowId='pbworkflow000000000003' where workflowId='realtimeworkflow-00001'});
+    $session->db->write(q{update Workflow set mode='parallel' where mode='realtime'});
+    if ($session->setting->get('defaultVersionTagWorkflow') eq 'realtimeworkflow-00001') {
+        $session->setting->set("defaultVersionTagWorkflow","pbworkflow000000000003");
+    }
+    my $realtime = WebGUI::Workflow->new($session,'realtimeworkflow-00001');
+    if (defined $realtime) {
+        $realtime->delete;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addCoupon {

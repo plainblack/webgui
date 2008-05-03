@@ -400,20 +400,8 @@ sub requestCommit {
 	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-
-    # deal with realtime
-    if ($instance->getWorkflow->isRealtime) {
-        my $status = $instance->runAll;
-        if ($status eq "done") {
-            $instance->delete;
-        } else {
-            my $errorMessage = "Realtime workflow instance ".$instance->getId." returned status ".$status." where
-                'done' was expected";
-            $self->session->errorHandler->warn($errorMessage);
-            return $errorMessage;
-        }
-    }
-    return '';
+	$instance->start;
+    return undef;
 }
 
 

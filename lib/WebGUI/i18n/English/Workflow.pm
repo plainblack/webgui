@@ -62,24 +62,17 @@ our $I18N = {
         message => q|Parallel|,
     },
 
-    'realtime' => {
-        message => q|Realtime|,
-    },
-
     'mode' => {
         message => q|Mode|,
     },
 
 	'mode help' => {
-		message => q|The mode of a workflow determines the precidence of when and how a workflow is run.
-        <p><b>Parallel</b> workflows asynchronously run as many instances of the workflow as there are in existence.</p>
-        <p><b>Singleton</b> workflows asynchronously run exactly one instance of a given type at any one time, and if a
+		message => q|The mode of a workflow determines when and how a workflow is run.
+        <p><b>Parallel</b> workflows run as many instances of the workflow as there are in existence.</p>
+        <p><b>Singleton</b> workflows run exactly one instance of a given type at any one time, and if a
         new workflow of that type is created while the original is running, it will be discarded.</p>
-        <p><b>Serial</b> workflows asynchronously run one workflow instance of a given type at a time, in the order it was
-        created.</p>
-        <p><b>Realtime</b> workflows synchronously (immediately) run all activities associated with it, because of this
-        not all triggers support realtime workflows, and you can't use any asynchronous workflow activities (like
-        version tag approval) in realtime workflows.</p>|,
+        <p><b>Serial</b> workflows run one workflow instance of a given type at a time, in the order it was
+        created.</p> |,
 		context => q|the hover help for the mode field|,
 		lastUpdated => 0,
 	},

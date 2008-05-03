@@ -984,25 +984,12 @@ sub triggerWorkflow {
 
     my $self = shift;
     my $workflowId = shift;
-    my $instance = WebGUI::Workflow::Instance->create($self->session, {
+    WebGUI::Workflow::Instance->create($self->session, {
         workflowId=>$workflowId,
         className=>"WebGUI::Asset::Wobject::Thingy",
         methodName=>"new",
         parameters=>$self->getId
-        });
-
-    # deal with realtime
-    if ($instance->getWorkflow->isRealtime) {
-        my $status = $instance->runAll;
-        if ($status eq "done") {
-            $instance->delete;
-        } else {
-            my $errorMessage = "Realtime workflow instance ".$instance->getId." returned status ".$status." where
-                'done' was expected";
-            $self->session->errorHandler->warn($errorMessage);
-            return $errorMessage;
-        }
-    }
+        })->start;
     return undef;
 }
 

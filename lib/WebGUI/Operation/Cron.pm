@@ -279,13 +279,13 @@ sub www_runCronJob {
 	if ($taskId) {
 		my $task = WebGUI::Workflow::Cron->new($session, $taskId);
 		return "done" unless (defined $task);
-		my $instance = WebGUI::Workflow::Instance->create($session, {
+		WebGUI::Workflow::Instance->create($session, {
 			workflowId=>$task->get("workflowId"),
 			className=>$task->get("className"),
 			methodName=>$task->get("methodName"),
 			parameters=>$task->get("parameters"),
 			priority=>$task->get("priority"),
-			});
+			})->start(1);
 		$task->delete(1) if ($task->get("runOnce"));
 		return "done";
 	}

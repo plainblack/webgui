@@ -359,13 +359,12 @@ sub isParallel {
 
 =head2 isRealtime ( ) 
 
-Returns 1 if the mode is set to "realtime".
+Depricated. Always returns 0.
 
 =cut
 
 sub isRealtime {
-    my $self = shift;
-    return ($self->get("mode") eq "realtime") ? 1 : 0;
+    return 0;
 }
 
 

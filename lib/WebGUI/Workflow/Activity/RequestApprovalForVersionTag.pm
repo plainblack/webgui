@@ -121,7 +121,7 @@ sub execute {
 			className=>$instance->get("className"),
 			parameters=>$instance->get("parameters"),
 			priority=>$instance->get("priority")
-			});
+			})->start(1);
 		$instance->delete;
 		return $self->COMPLETE;
 	} elsif ($instance->getScratch("status") eq "approved") {

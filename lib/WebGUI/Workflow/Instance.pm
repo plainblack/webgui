@@ -58,9 +58,7 @@ The settable properties of the workflow instance. See the set() method for detai
 =cut
 
 sub create {
-	my $class = shift;
-	my $session = shift;
-	my $properties = shift;
+	my ($class, $session, $properties, $skipRealtime) = @_;
 
     # do singleton check
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
@@ -74,9 +72,8 @@ sub create {
     # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
 	my $self = $class->new($session, $instanceId);
-	$properties->{notifySpectre} = 1 unless ($properties->{notifySpectre} eq "0");
-	$properties->{newlyCreated} = 1;
-	$self->set($properties);
+	$self->set($properties,1);
+	
 	return $self;
 }
 
@@ -130,6 +127,10 @@ Deconstructor.
 
 sub DESTROY {
     my $self = shift;
+	# start the workflow in case the programmer forgot
+	unless ($self->{_started}) {
+		$self->start;
+	}
     delete $self->{_workflow};
     undef $self;
 }
@@ -268,7 +269,7 @@ sub new {
 	my $instanceId = shift;
 	my $data = $session->db->getRow("WorkflowInstance","instanceId", $instanceId);
 	return undef unless $data->{instanceId};
-	bless {_session=>$session, _id=>$instanceId, _data=>$data}, $class;
+	bless {_session=>$session, _id=>$instanceId, _data=>$data, _started=>0}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -290,11 +291,11 @@ sub run {
 	my $self = shift;
 	my $workflow = $self->getWorkflow;
 	unless (defined $workflow) {
-		$self->set({lastStatus=>"undefined", notifySpectre=>0});
+		$self->set({lastStatus=>"undefined"}, 1);
 		return "undefined";
 	}
 	unless ($workflow->get("enabled")) {
-		$self->set({lastStatus=>"disabled", notifySpectre=>0});
+		$self->set({lastStatus=>"disabled"}, 1);
 		return "disabled";
 	}
 	if ($workflow->isSerial) {
@@ -303,7 +304,7 @@ sub run {
             [$workflow->getId]
         );
 		if ($self->getId ne $firstId) { # must wait for currently running instance to complete
-			$self->set({lastStatus=>"waiting", notifySpectre=>0});
+			$self->set({lastStatus=>"waiting"}, 1);
 			return "waiting";
 		}
 	}
@@ -322,21 +323,21 @@ sub run {
         $object = eval { WebGUI::Pluggable::instanciate($class, $method, [$self->session, $params]) };
         if ($@) {
 			$self->session->errorHandler->error($@);
-			$self->set({lastStatus=>"error", notifySpectre=>0});
+			$self->set({lastStatus=>"error"}, 1);
 			return "error";
         } 
 	} 
 	$status = eval { $activity->execute($object, $self) };
 	if ($@) {
 		$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
-		$self->set({lastStatus=>"error", notifySpectre=>0});
+		$self->set({lastStatus=>"error"}, 1);
 		return "error";
 	}
 	if ($status eq "complete") {
-		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId, notifySpectre=>0});
+		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId}, 1);
 	} 
     else {
-		$self->set({lastStatus=>$status, notifySpectre=>0});
+		$self->set({lastStatus=>$status}, 1);
 	}
 	return $status;
 }
@@ -345,7 +346,7 @@ sub run {
 
 =head2 runAll ( )
 
-Runs all activities in this workflow instance, and returns the last status code, which should be "done" unless
+Depricated. Runs all activities in this workflow instance, and returns the last status code, which should be "done" unless
 something bad happens.
 
 =cut
@@ -374,7 +375,7 @@ sub session {
 
 #-------------------------------------------------------------------
 
-=head2 set ( properties )
+=head2 set ( properties, [ skipSpectreNotification ])
 
 Sets one or more of the properties of this workflow instance.
 
@@ -410,11 +411,14 @@ The unique id of the activity in the workflow that needs to be executed next. If
 
 See the run() method for a description of statuses.
 
+=head3 skipSpectreNotification
+
+A boolean, that if set to 1 will not inform Spectre of the change in settings.
+
 =cut
 
 sub set {
-	my $self = shift;
-	my $properties = shift;
+	my ($self, $properties, $skipNotify) = @_;
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{lastStatus} = $properties->{lastStatus} || $self->{_data}{lastStatus};
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
@@ -426,9 +430,9 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	if (!$self->getWorkflow->isRealtime && $properties->{notifySpectre}) {
+	unless ($skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
-		$spectre->notify("workflow/deleteInstance",$self->getId) unless ($properties->{newlyCreated});
+		$spectre->notify("workflow/deleteInstance",$self->getId);
 		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
 	}
 }
@@ -457,6 +461,47 @@ sub setScratch {
 	$self->session->db->write("replace into WorkflowInstanceScratch (instanceId, name, value) values (?,?,?)", [$self->getId, $name, $value]);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 start ( [ skipRealtime ] )
+
+Tells the workflow instance that it's ok to start executing.
+
+=head3 skipRealtime
+
+When a workflow instance is started WebGUI tries to run it immediately to see if it can be completely executed in realtime. However, if you'd like to skip this option set this boolean to 1.
+
+=cut
+
+sub start {
+	my ($self, $skipRealtime) = @_;
+	my $log = $self->session->errorHandler;
+	$self->{_started} = 1;
+	
+	# run the workflow in realtime to start.
+	unless ($skipRealtime) {
+		my $start = time();
+		my $status = "complete";
+		$log->info('Trying to execute workflow instance '.$self->getId.' in realtime.');
+		while ($status eq "complete" && ($start > time() -10)) { # how much can we run in 10 seconds
+			$status = $self->run;
+			$log->info('Completed activity for workflow instance '.$self->getId.' in realtime with return status of '.$status.'.');
+		}
+	
+		# we were able to complete the workflow in realtime
+		if ($status eq "done") {
+			$log->info('Completed workflow instance '.$self->getId.' in realtime.');
+			$self->delete;
+			return undef;
+		}		
+	}
+
+	# hand off the workflow to spectre
+	$log->info('Could not complete workflow instance '.$self->getId.' in realtime, handing off to Spectre.');
+	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
+	$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+}
 
 1;
 

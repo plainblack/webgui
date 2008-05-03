@@ -516,7 +516,7 @@ sub login {
 			className=>"WebGUI::User",
 			parameters=>$self->session->user->userId,
 			priority=>3
-	    });    
+            })->start;    
          }
       }
    }

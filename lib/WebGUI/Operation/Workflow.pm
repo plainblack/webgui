@@ -264,7 +264,6 @@ sub www_editWorkflow {
             singleton=>$i18n->get("singleton"),
             parallel=>$i18n->get("parallel"),
             serial=>$i18n->get("serial"),
-            realtime=>$i18n->get("realtime"),
         },
 		value=>$workflow->get("mode") || "parallel",
 		defaultValue=>"parallel",

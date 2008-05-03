@@ -251,6 +251,7 @@ sub _invokeWorkflowOnExportedFiles {
 	my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $self->session->setting->get('trashWorkflow') });
 	$wfInstance->setScratch(WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH(), Storable::freeze([defined($lastExportedAs)? ($lastExportedAs) : ()]));
 	$clearExportedAs and $self->session->db->write("UPDATE asset SET lastExportedAs = NULL WHERE assetId = ?", [$self->getId]);
+	$wfInstance->start(1);
 }
 
 #-------------------------------------------------------------------

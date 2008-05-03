@@ -521,7 +521,7 @@ sub www_editUserSave {
 			        className=>"WebGUI::User",
 			        parameters=>$u->userId,
 			        priority=>1
-			        });
+			        })->start;
 	        }
         }
         else {
@@ -532,7 +532,7 @@ sub www_editUserSave {
 			        className=>"WebGUI::User",
 			        parameters=>$u->userId,
 			        priority=>1
-			        });
+			        })->start;
 	        }
         }
 	# Display an error telling them the username they are trying to use is not available and suggest alternatives	

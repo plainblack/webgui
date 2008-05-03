@@ -74,6 +74,7 @@ SKIP: {
         priority    => $task->get('priority'),
         },
     );
+    $instance->start;
     my $remote = create_ikc_client(
         port    => $port,
         ip      => $ip,
