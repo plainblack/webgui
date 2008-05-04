@@ -98,13 +98,26 @@ my $product4 = $root->addChild($properties4);
 
 my $properties5 = {
     className     => 'WebGUI::Asset::Wobject::Product',
-    url           => 'four',
+    url           => 'five',
     price         => 7.77,
     title         => 'extremely long title that will be truncated to only 30 chars in the variant',
     description   => 'fourth product',
 };
 
 my $product5 = $root->addChild($properties5);
+
+my $propertiesa = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'accessory Product',
+    price         => 1.00,
+    title         => 'accessory Product',
+    description   => 'accessory Product',
+};
+
+my $producta = $root->addChild($propertiesa);
+
+$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, $root->getId, 1]);
+$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, WebGUI::Asset->getDefault($session)->getId, 2]);
 
 $tag->commit;
 

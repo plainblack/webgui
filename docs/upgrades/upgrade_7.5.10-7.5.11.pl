@@ -18,6 +18,7 @@ use WebGUI::Asset::Sku::Product;
 use WebGUI::Workflow;
 use File::Find;
 use File::Spec;
+use JSON;
 
 my $toVersion = '7.5.11';
 my $quiet; # this line required
@@ -673,7 +674,7 @@ SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
 EOSQL1
     while (my $productData = $productQuery->hashRef()) {
         ##Truncate title to 30 chars for short desc
-        printf "Adding variant to %s\n", $productData->{title} unless $quiet;
+        printf "\t\tAdding variant to %s\n", $productData->{title} unless $quiet;
         my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
         $product->setCollateral('variantsJSON', 'new', {
             varSku    => ($productData->{productNumber} || $session->id->generate),
@@ -694,12 +695,24 @@ EOSQL1
 	$session->db->write('alter table Product add column       relatedJSON mediumtext');
 	$session->db->write('alter table Product add column specificationJSON mediumtext');
     ##Get all Product assetIds
-    ##For each assetId, get each type of collateral
-    ##Convert the data to JSON and store it in Product with setCollateral (update)
-    ##To duplicate across all revision, do a get and SQL update (with no revisionDate)
+    my $assetSth = $session->db->read('select distinct(assetId) from Product');
+    my $accessorySth = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
+    while (my ($assetId) = $assetSth->array) {
+        ##For each assetId, get each type of collateral
+        ##Convert the data to JSON and store it in Product with setCollateral (update)
+        ##To duplicate across all revisions, do a get and SQL update (with no revisionDate)
+        $accessorySth->execute([$assetId]);
+        my @accessories = ();
+        while (my $acc = $accessorySth->hashRef()) {
+            push @accessories, $acc;
+        }
+        my $accJson = to_json(\@accessories);
+        $session->db->write('update Product set accessoryJSON=? where assetId=?',[$accJson, $assetId]);
+    }
+    $assetSth->finish;
 
     ##Drop collateral tables
-	#$session->db->write('drop table Product_accessory');
+	$session->db->write('drop table Product_accessory');
 	#$session->db->write('drop table Product_benefit');
 	#$session->db->write('drop table Product_feature');
 	#$session->db->write('drop table Product_related');
@@ -714,7 +727,7 @@ EOSQL1
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');
     $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
 
-    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
+    #unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
     return;
 }
 
