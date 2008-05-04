@@ -134,6 +134,11 @@ sub definition {
             autoGenerate => 0,
             defaultValue => '[]',
         },
+        accessoryJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -564,7 +569,7 @@ sub setAllCollateral {
     my $self       = shift;
     my $tableName  = shift;
     my $json = to_json($self->{_collateral}->{$tableName});
-    $self->update({ $tableName => $json});
+    $self->update({ $tableName => $json });
     return;
 }
 
