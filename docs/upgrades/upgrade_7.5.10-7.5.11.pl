@@ -636,21 +636,6 @@ sub migrateOldProduct {
 	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
 	# and here's our code
     ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
-	print "\t\tAdding new product variants table.\n" unless ($quiet);
-    $session->db->write(<<'EOSQL');
-CREATE TABLE Product_variants (
-    variantId           VARCHAR(22)  BINARY NOT NULL PRIMARY KEY,
-    varSku              VARCHAR(255) BINARY NOT NULL UNIQUE,
-    assetId             VARCHAR(22)  BINARY NOT NULL,
-    mastersku           VARCHAR(22)  BINARY NOT NULL,
-    varTitle            VARCHAR(255) BINARY NOT NULL,
-    shortdesc           VARCHAR(30),
-    price               FLOAT,
-    weight              FLOAT,
-    quantity            INT,
-    sequenceNumber      INT
-);
-EOSQL
     ##Have to change the className's in the db, too
     ## Wobject description   -> Sku description
     ## Wobject displayTitle  -> Sku displayTitle
@@ -674,6 +659,8 @@ EOSQL
     $rmWobject->finish;
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
+    ## Add variants collateral column to Sku/Product
+	$session->db->write('alter table Product add column variantsJSON mediumtext');
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
@@ -682,17 +669,14 @@ SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
         on p.assetId=a.assetId and p.revisionDate=a.revisionDate
     JOIN sku       AS s
         on p.assetId=s.assetId and p.revisionDate=s.revisionDate
-    WHERE p.revisionDate=(SELECT MAX(revisionDate) FROM Product)
+    WHERE p.revisionDate=(SELECT MAX(revisionDate) FROM Product where Product.assetId=a.assetId)
 EOSQL1
-    #while (my $productData = $productQuery->hashRef()) {
-    my $productData;
-    while ( () ) {
+    while (my $productData = $productQuery->hashRef()) {
         ##Truncate title to 30 chars for short desc
         printf "Adding variant to %s\n", $productData->{title} unless $quiet;
         my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
-        $product->setCollateral('Product_variants', 'varSku', {
+        $product->setCollateral('variantsJSON', 'new', {
             varSku    => ($productData->{productNumber} || $session->id->generate),
-            mastersku => $product->get('sku'),
             shortdesc => substr($productData->{title}, 0, 30),
             price     => $productData->{price},
             weight    => 0,
@@ -705,8 +689,6 @@ EOSQL1
 	$session->db->write('alter table Product drop column productNumber');
     ## Remove price from Product since prices are now stored in variants
 	$session->db->write('alter table Product drop column price');
-    ## Add variants collateral column
-	$session->db->write('alter table Product add column variantsJSON mediumtext');
 
     ## Update config file, deleting Wobject::Product and adding Sku::Product
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');

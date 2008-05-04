@@ -35,15 +35,14 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 23;        # Increment this number for each test you create
+plan tests => 24;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
 my $product = $root->addChild({
-        className =>"WebGUI::Asset::Sku::Product",
-        title     =>"Test Donation",
-        price     => 44.44,
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Rock Hammer",
         });
 isa_ok($product, "WebGUI::Asset::Sku::Product");
 ok(! exists $product->{_collateral}, 'object cache does not exist yet');
@@ -226,6 +225,21 @@ cmp_deeply(
 );
 
 $product->purge;
+undef $product;
+
+my $product2 = $root->addChild({
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Bible",
+        });
+
+$product2->setCollateral('variantsJSON', 'new', { s => 'scooby', d => 'doo'});
+cmp_deeply(
+    $product2->getCollateral('variantsJSON', 0),
+    { s => 'scooby', d => 'doo'},
+    'Doing a set before get works okay',
+);
+
+$product2->purge;
 
 #----------------------------------------------------------------------------
 # Cleanup

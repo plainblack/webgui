@@ -225,8 +225,13 @@ sub getAllCollateral {
     my $tableName = shift;
     return $self->{_collateral}->{$tableName} if exists $self->{_collateral}->{$tableName};
     my $json = $self->get($tableName);
-    return [] unless $json;
-    my $table = from_json($json);
+    my $table;
+    if ($json) {
+        $table = from_json($json);
+    }
+    else {
+        $table = [];
+    }
     $self->{_collateral}->{$tableName} = $table;
     return $table;
 }
