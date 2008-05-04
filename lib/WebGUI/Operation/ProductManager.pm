@@ -281,7 +281,7 @@ sub www_editProductSave {
 	
 	push(@error, $i18n->get('edit product title error')) unless $session->form->process("title");
 	push(@error, $i18n->get('edit product price error')) unless ($session->form->process("price") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
-	push(@error, $i18n->get('edit product weight error')) unless (defined $session->form->process("weight") && $session->form->process("price") =~ /^\d+(\.\d+)?$/);
+	push(@error, $i18n->get('edit product weight error')) unless (defined $session->form->process("weight") && $session->form->process("weight") =~ /^\d+(\.\d+)?$/);
 	push(@error, $i18n->get('edit product sku error')) unless ($session->form->process("sku"));
 	
 	return '<ul><li>'.join('</li><li>', @error).'</li></ul><br />'.WebGUI::Operation::execute($session,'editProduct') if (@error);	
