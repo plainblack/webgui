@@ -137,6 +137,7 @@ sub getMaxAllowedInCart {
 =head2 getPrice
 
 Returns either 0 or a percentage off the price or a flat amount off the price depending upon what's in the cart.
+
 =cut
 
 sub getPrice {
