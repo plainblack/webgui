@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 24;        # Increment this number for each test you create
+plan tests => 26;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -223,6 +223,29 @@ cmp_deeply(
     ],
     'moveCollateralUp: out of range index does not do anything',
 );
+
+$product->setCollateral('variantsJSON', 2, { a => 'aoo', b => 'boo' });
+
+cmp_deeply(
+    $product->getIndexedCollateralData('variantsJSON'),
+    [
+        {a => 'ah',  b => 'bay', collateralIndex => 0},
+        {a => 'aye', b => 'bee', collateralIndex => 1},
+        {a => 'aoo', b => 'boo', collateralIndex => 2},
+    ],
+    'getIndexedCollateralData: returns data structure with indeces',
+);
+
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'ah',  b => 'bay'},
+        {a => 'aye', b => 'bee'},
+        {a => 'aoo', b => 'boo'},
+    ],
+    'getIndexedCollateralData: does not affect asset data',
+);
+
 
 $product->purge;
 undef $product;

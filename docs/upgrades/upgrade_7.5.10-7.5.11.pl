@@ -682,8 +682,28 @@ EOSQL1
             weight    => 0,
             quantity  => 0,
         });
+        my $json = $product->get('variantsJSON');
+        $session->db->write('update Product set variantsJSON=? where assetId=?',[$json, $product->getId]);
     }
     $productQuery->finish;
+
+    ##Add the collateral columns to Product
+	$session->db->write('alter table Product add column     accessoryJSON mediumtext');
+	$session->db->write('alter table Product add column       benefitJSON mediumtext');
+	$session->db->write('alter table Product add column       featureJSON mediumtext');
+	$session->db->write('alter table Product add column       relatedJSON mediumtext');
+	$session->db->write('alter table Product add column specificationJSON mediumtext');
+    ##Get all Product assetIds
+    ##For each assetId, get each type of collateral
+    ##Convert the data to JSON and store it in Product with setCollateral (update)
+    ##To duplicate across all revision, do a get and SQL update (with no revisionDate)
+
+    ##Drop collateral tables
+	#$session->db->write('drop table Product_accessory');
+	#$session->db->write('drop table Product_benefit');
+	#$session->db->write('drop table Product_feature');
+	#$session->db->write('drop table Product_related');
+	#$session->db->write('drop table Product_specification');
 
     ## Remove productNumber from Product;
 	$session->db->write('alter table Product drop column productNumber');

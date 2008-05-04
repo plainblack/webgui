@@ -277,6 +277,49 @@ sub getCollateral {
 
 
 #-------------------------------------------------------------------
+
+=head2 getIndexedCollateralData ( tableName )
+
+Same as getAllCollateral, except that an additional field, collateralIndex,
+is added to each hash.  This makes it easy to build loops for collateral
+operations such as editing, deleting or moving.
+
+=head3 tableName
+
+The name of the table you wish to retrieve the data from.
+
+=cut
+
+sub getIndexedCollateralData {
+    my $self      = shift;
+    my $tableName = shift;
+    my $table;
+
+    if ($self->{_collateral}->{$tableName}) {
+        $table = $self->{_collateral}->{$tableName};
+    }
+    else {
+        my $json = $self->get($tableName);
+        my $table;
+        if ($json) {
+            $table = from_json($json);
+        }
+        else {
+            $table = [];
+        }
+    }
+    my $indexedTable = [];
+    for (my $index = 0; $index <= $#{ $table }; ++$index) {
+        my %row = %{ $table->[$index] };
+        $row{collateralIndex} = $index;
+        push @{ $indexedTable }, \%row;
+    }
+
+    return $indexedTable;
+}
+
+
+#-------------------------------------------------------------------
 sub getFileIconUrl {
     my $self = shift;
     my $store = $_[0];
@@ -571,16 +614,22 @@ sub setCollateral {
 sub www_addAccessory {
    my $self = shift;
    return $self->session->privilege->insufficient() unless ($self->canEdit);
-   my ($f, $accessory, @usedAccessories);
-   $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
    $f->hidden(
         -name => "func",
         -value => "addAccessorySave",
    );
-   @usedAccessories = $self->session->db->buildArray("select accessoryAssetId from Product_accessory where assetId=".$self->session->db->quote($self->getId));
+   ##Accessories are other Products.  Give the user a list of Accessories that
+   ##are not already used, nor itself.
+   ##Accessories can not be edited, only added or deleted.
+   my $table = $self->getAllCollateral('accessoryJSON');
+   my @usedAccessories = map { $_->{accessoryAssetId} } @{ $table };
    push(@usedAccessories,$self->getId);
-   $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
-    my $i18n = WebGUI::International->new($self->session,"Asset_Product");
+
+   ##Note, hashref takes care of making things unique across revisionDate
+   my $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
+
+   my $i18n = WebGUI::International->new($self->session,"Asset_Product");
    $f->selectBox(
         -name => "accessoryAccessId",
         -options => $accessory,
@@ -593,6 +642,7 @@ sub www_addAccessory {
         -hoverHelp => $i18n->get('18 description'),
    );
    $f->submit;
+
    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
 }
 
@@ -600,9 +650,10 @@ sub www_addAccessory {
 sub www_addAccessorySave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    return "" unless ($self->session->form->process("accessoryAccessId"));
-    my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_accessory where assetId=".$self->session->db->quote($self->getId()));
-    $self->session->db->write("insert into Product_accessory (assetId,accessoryAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId()).",".$self->session->db->quote($self->session->form->process("accessoryAccessId")).",".($seq+1).")");
+
+    my $accessoryAssetId = $self->session->form->process('accessoryAccessId');
+    return "" unless $accessoryAssetId;
+    $self->setCollateral('accessoryJSON', 'new', { accessoryAssetId =>  $accessoryAssetId });
     return "" unless($self->session->form->process("proceed"));
     return $self->www_addAccessory();
 }
@@ -648,11 +699,17 @@ sub www_addRelatedSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteAccessoryConfirm 
+
+Delete an asset from the accessory list, by index.
+
+=cut
+
 sub www_deleteAccessoryConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->session->db->write("delete from Product_accessory where assetId=".$self->session->db->quote($self->getId())." and accessoryAssetId=".$self->session->db->quote($self->session->form->process("aid")));
-    $self->reorderCollateral("Product_accessory","accessoryAssetId");
+    $self->deleteCollateral('accessoryJSON', $self->session->form->process("aid"));
     return "";
 }
 
@@ -929,16 +986,16 @@ sub www_editVariantSave {
 sub www_moveAccessoryDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
-    return "";
+    $self->moveCollateralDown('accessoryJSON', $self->session->form->process('aid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
 sub www_moveAccessoryUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("Product_accessory","accessoryAssetId",$self->session->form->process("aid"));
-    return "";
+    $self->moveCollateralUp('accessoryJSON', $self->session->form->process('aid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1117,23 +1174,23 @@ sub view {
     $var{specification_loop} = \@specificationloop;
 
     #---accessories 
-    $var{"addaccessory.url"} = $self->getUrl('func=addAccessory');
-    $var{"addaccessory.label"} = $i18n->get(36);
-    $sth = $self->session->db->read("select Product_accessory.accessoryAssetId from   Product_accessory
-                             where Product_accessory.assetId=".$self->session->db->quote($self->getId)." 
-                             order by Product_accessory.sequenceNumber");
-    while (my ($id) = $sth->array) {
-        $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get("url"),$i18n->get(2))
-                 . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get("url"))
-                 . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get("url"));
-        my $accessory = WebGUI::Asset->newByDynamicClass($self->session,$id);
+    $var{'addaccessory.url'} = $self->getUrl('func=addAccessory');
+    $var{'addaccessory.label'} = $i18n->get(36);
+    ##Need an index for collateral operations, and an assetId for asset instantiation.
+    #my @accessories = map { $_->{accessoryAssetId} } @{ $self->getAllCollateral('accessoryJSON') };
+    #while (my ($id) = $sth->array) {
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('accessoryJSON') } ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
+                 . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
+                 . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
+        my $accessory = WebGUI::Asset->newByDynamicClass($self->session, $collateral->{accessoryAssetId});
         push(@accessoryloop,{
-                           "accessory.URL"      => $accessory->getUrl,
-                           "accessory.title"    => $accessory->getTitle,
-                           "accessory.controls" => $segment,
+                           'accessory.URL'      => $accessory->getUrl,
+                           'accessory.title'    => $accessory->getTitle,
+                           'accessory.controls' => $segment,
                            });
     }
-    $sth->finish;
     $var{accessory_loop} = \@accessoryloop;
 
     #---related
