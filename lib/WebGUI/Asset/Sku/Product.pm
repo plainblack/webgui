@@ -144,6 +144,11 @@ sub definition {
             autoGenerate => 0,
             defaultValue => '[]',
         },
+        specificationJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -374,7 +379,10 @@ sub indexContent {
     $indexer->addKeywords(join(" ", @data));
     @data = $self->session->db->buildArray("select benefit from Product_benefit where assetId=".$self->session->db->quote($self->getId));
     $indexer->addKeywords(join(" ", @data));
-    @data = $self->session->db->buildArray("select concat(name,' ',value,' ', units) from Product_specification where assetId=".$self->session->db->quote($self->getId));
+    @data = ();
+    foreach my $collateral (@{ $self->getAllCollateral('specificationJSON') }) {
+        push @data, join(" ", @{ $collateral }{qw/name value units/});
+    }
     $indexer->addKeywords(join(" ", @data));
 }
 
@@ -473,7 +481,6 @@ sub purge {
     $sth->finish;
     $self->session->db->write("delete from Product_benefit where assetId=".$self->session->db->quote($self->getId));
     $self->session->db->write("delete from Product_feature where assetId=".$self->session->db->quote($self->getId));
-    $self->session->db->write("delete from Product_specification where assetId=".$self->session->db->quote($self->getId));
     $self->SUPER::purge();
 }
 
@@ -684,7 +691,6 @@ sub www_addRelated {
     push(@usedRelated, $self->getId);
 
     ##Note, hashref takes care of making things unique across revisionDate
-    my $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get('versionTag')).") group by assetData.assetId");
     my $related = $self->session->db->buildHashRef(
 "select asset.assetId, assetData.title
     from asset left join assetData
@@ -785,8 +791,7 @@ sub www_deleteRelatedConfirm {
 sub www_deleteSpecificationConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("Product_specification","Product_specificationId",$self->session->form->process("sid"));
-    $self->reorderCollateral("Product_specification","Product_specificationId");
+    $self->deleteCollateral("specificationJSON", $self->session->form->process("sid"));
     return "";
 }
 
@@ -890,23 +895,22 @@ sub www_editSpecification {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my ($data, $f, $hashRef);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $data = $self->getCollateral("Product_specification","Product_specificationId",$sid);
+    $data = $self->getCollateral("specificationJSON", $sid);
     $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
         -name => "sid",
-        -value => $data->{Product_specificationId},
+        -value => $sid,
     );
     $f->hidden(
         -name => "func",
         -value => "editSpecificationSave",
     );
-    $hashRef = $self->session->db->buildHashRef("select name,name from Product_specification order by name");
-    $f->combo(
+    $f->text(
         -name => "name",
         -options => $hashRef,
         -label => $i18n->get(26),
         -hoverHelp => $i18n->get('26 description'),
-        -value => [$data->{name}],
+        -value => $data->{name},
     );
     $f->text(
         -name => "value",
@@ -914,13 +918,12 @@ sub www_editSpecification {
         -hoverHelp => $i18n->get('27 description'),
         -value => $data->{value},
     );
-    $hashRef = $self->session->db->buildHashRef("select units,units from Product_specification order by units");
-    $f->combo(
+    $f->text(
         -name => "units",
         -options => $hashRef,
         -label => $i18n->get(29),
         -hoverHelp => $i18n->get('29 description'),
-        -value => [$data->{units}],
+        -value => $data->{units},
     );
     $f->yesNo(
         -name => "proceed",
@@ -935,8 +938,7 @@ sub www_editSpecification {
 sub www_editSpecificationSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("Product_specification", "Product_specificationId", {
-        Product_specificationId => $self->session->form->process("sid"),
+    $self->setCollateral("specificationJSON", $self->session->form->process("sid"), {
         name => $self->session->form->process("name","combo"),
         value => $self->session->form->process("value","combo"),
         units => $self->session->form->process("units","combo")
@@ -1078,7 +1080,7 @@ sub www_moveRelatedUp {
 sub www_moveSpecificationDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("Product_specification","Product_specificationId",$self->session->form->process("sid"));
+    $self->moveCollateralDown("specificationJSON", $self->session->form->process("sid"));
     return "";
 }
 
@@ -1086,7 +1088,7 @@ sub www_moveSpecificationDown {
 sub www_moveSpecificationUp {
     my $self = shift;   
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("Product_specification","Product_specificationId",$self->session->form->process("sid"));
+    $self->moveCollateralUp("specificationJSON", $self->session->form->process("sid"));
     return "";
 }
 
@@ -1183,19 +1185,19 @@ sub view {
    $var{benefit_loop} = \@benefitloop;
 
     #---specifications 
-    $var{"addSpecification.url"} = $self->getUrl('func=editSpecification&sid=new');
-    $var{"addSpecification.label"} = $i18n->get(35);
-    $sth = $self->session->db->read("select name,value,units,Product_specificationId from Product_specification where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-    while (%data = $sth->hash) {
-        $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$data{Product_specificationId},$self->get("url"),$i18n->get(5))
-                 . $self->session->icon->edit('func=editSpecification&sid='.$data{Product_specificationId},$self->get("url"))
-                 . $self->session->icon->moveUp('func=moveSpecificationUp&sid='.$data{Product_specificationId},$self->get("url"))
-                 . $self->session->icon->moveDown('func=moveSpecificationDown&sid='.$data{Product_specificationId},$self->get("url"));
+    $var{'addSpecification.url'} = $self->getUrl('func=editSpecification&sid=new');
+    $var{'addSpecification.label'} = $i18n->get(35);
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('specificationJSON') } ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$id,$self->get('url'),$i18n->get(5))
+                 . $self->session->icon->edit('func=editSpecification&sid='.$id,$self->get('url'))
+                 . $self->session->icon->moveUp('func=moveSpecificationUp&sid='.$id,$self->get('url'))
+                 . $self->session->icon->moveDown('func=moveSpecificationDown&sid='.$id,$self->get('url'));
         push(@specificationloop,{
-                                   "specification.controls"      => $segment,
-                                   "specification.specification" => $data{value},
-                                   "specification.units"         => $data{units},
-                                   "specification.label"         => $data{name},
+                                   'specification.controls'      => $segment,
+                                   'specification.specification' => $collateral->{value},
+                                   'specification.units'         => $collateral->{units},
+                                   'specification.label'         => $collateral->{name},
                                 });
     }
     $sth->finish;

@@ -127,10 +127,32 @@ my $propertiesr = {
     description   => 'related Product',
 };
 
-my $productr = $root->addChild($propertiesa);
+my $productr = $root->addChild($propertiesr);
 
 $session->db->write('insert into Product_related (assetId, relatedAssetId, sequenceNumber) values (?,?,?)', [$productr->getId, $product4->getId, 1]);
 $session->db->write('insert into Product_related (assetId, relatedAssetId, sequenceNumber) values (?,?,?)', [$productr->getId, $product5->getId, 2]);
+
+my $propertiess = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'specification_Product',
+    price         => 3.33,
+    title         => 'specification Product',
+    description   => 'specification Product',
+};
+
+my $products = $root->addChild($propertiess);
+
+$products->setCollateral('Product_specification', 'Product_specificationId', {
+    name => 'pitch',
+    value => '440',
+    units => 'Hertz',
+});
+
+$products->setCollateral('Product_specification', 'Product_specificationId', {
+    name => 'hue',
+    value => '75',
+    units => 'lumens',
+});
 
 $tag->commit;
 

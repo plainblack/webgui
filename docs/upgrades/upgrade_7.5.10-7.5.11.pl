@@ -689,14 +689,16 @@ EOSQL1
             quantity  => 0,
         });
         my $json = $product->get('variantsJSON');
+        #printf "\t\t\t$json\n";
         $session->db->write('update Product set variantsJSON=? where assetId=?',[$json, $product->getId]);
     }
     $productQuery->finish;
 
     ##Get all Product assetIds
     my $assetSth = $session->db->read('select distinct(assetId) from Product');
-    my $accessorySth = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
-    my $relatedSth = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
+    my $accessorySth     = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
+    my $relatedSth       = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
+    my $specificationSth = $session->db->read('select name, value, units from Product_specification where assetId=? order by sequenceNumber');
     while (my ($assetId) = $assetSth->array) {
         ##For each assetId, get each type of collateral
         ##Convert the data to JSON and store it in Product with setCollateral (update)
@@ -719,6 +721,16 @@ EOSQL1
         }
         my $relJson = to_json(\@related);
         $session->db->write('update Product set relatedJSON=? where assetId=?',[$relJson, $assetId]);
+
+        ##Specification
+        $specificationSth->execute([$assetId]);
+        my @specification = ();
+        while (my $spec = $specificationSth->hashRef()) {
+            push @specification, $spec;
+        }
+        my $specJson = to_json(\@specification);
+        $session->db->write('update Product set specificationJSON=? where assetId=?',[$specJson, $assetId]);
+
     }
     $assetSth->finish;
 
