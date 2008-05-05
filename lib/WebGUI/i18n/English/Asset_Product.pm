@@ -699,7 +699,52 @@ be useful, others may not.|,
 
 	'variants' => {
 		message => q|Variants|,
-		lastUpdated => 1210019655
+		lastUpdated => 1210019655,
+	},
+
+	'addvariant.url' => {
+		message => q|A URL to allow new variants to be added to this product.|,
+		lastUpdated => 1210029266,
+	},
+
+	'addvariant.label' => {
+		message => q|The translated label for the add variant link.|,
+		lastUpdated => 1210029266,
+	},
+
+	'variant_loop' => {
+		message => q|A loop containing all the variants for this product.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.controls' => {
+		message => q|An icon toolbar for editing, deleting, or reordering this variant.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.sku' => {
+		message => q|The SKU for this variant.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.title' => {
+		message => q|The title, or short description, for this variant.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.price' => {
+		message => q|The price for this variant.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.weight' => {
+		message => q|The weight for this variant.|,
+		lastUpdated => 1210029452,
+	},
+
+	'variant.quantity' => {
+		message => q|The quantity for this variant.|,
+		lastUpdated => 1210029452,
 	},
 
 };

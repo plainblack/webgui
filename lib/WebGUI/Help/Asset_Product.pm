@@ -43,6 +43,18 @@ our $HELP = {
             {   'name'      => 'benefit_loop',
                 'variables' => [ { 'name' => 'benefit.benefit' }, { 'name' => 'benefit.controls' } ]
             },
+            { 'name' => 'addvariant.url' },
+            { 'name' => 'addvariant.label' },
+            {   'name'      => 'variant_loop',
+                'variables' => [
+                    { 'name' => 'variant.controls' },
+                    { 'name' => 'variant.sku' },
+                    { 'name' => 'variant.title' },
+                    { 'name' => 'variant.price' },
+                    { 'name' => 'variant.weight' },
+                    { 'name' => 'variant.quantity' },
+                ]
+            },
             { 'name' => 'addspecification.url' },
             { 'name' => 'addspecification.label' },
             {   'name'      => 'specification_loop',
