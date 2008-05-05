@@ -10,6 +10,7 @@ use WebGUI::Form;
 use WebGUI::International;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::CartItem;
+use WebGUI::Shop::Credit;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 
@@ -62,6 +63,55 @@ sub addItem {
 
 #-------------------------------------------------------------------
 
+=head2 calculateShopCreditDeduction ( [ total ] )
+
+Returns the amount of the total that will be deducted by shop credit.
+
+=head3 total
+
+The amount to calculate the deduction against. Defaults to calculateTotal().
+
+=cut
+
+sub calculateShopCreditDeduction {
+    my ($self, $total) = @_;
+    # cannot use in-shop credit on recurring items
+    foreach my $item (@{$self->getItems}) {
+        if ($item->getSku->isRecurring) {
+            return $self->formatCurrency(0);
+        }
+    }
+    unless (defined $total) {
+        $total = $self->calculateTotal
+    }
+    return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session)->calculateDeduction($total));
+}
+
+#-------------------------------------------------------------------
+
+=head2 calculateShipping ()
+
+Returns the cost of shipping for the cart.
+
+=cut
+
+sub calculateShipping {
+    my $self = shift;
+    
+    # get the shipper   
+    my $shipper = eval { $self->getShipper  };
+
+    # can't calculate shipping price without a valid shipper
+    if (WebGUI::Error->caught) {
+       return $self->formatCurrency(0);
+    }
+    
+    # do calculation
+    return $self->formatCurrency($shipper->calculate($self));
+}
+
+#-------------------------------------------------------------------
+
 =head2 calculateSubtotal ()
 
 Returns the subtotal of the items in the cart.
@@ -78,6 +128,33 @@ sub calculateSubtotal {
     return $subtotal;
 }   
 
+
+#-------------------------------------------------------------------
+
+=head2 calculateTaxes ()
+
+Returns the tax amount on the items in the cart.
+
+=cut
+
+sub calculateTaxes {
+    my $self = shift;
+    my $tax = WebGUI::Shop::Tax->new($self->session);
+    return $self->formatCurrency($tax->calculate($self));
+}
+
+#-------------------------------------------------------------------
+
+=head2 calculateTotal ( )
+
+Returns the total price of everything in the cart including tax, shipping, etc.
+
+=cut
+
+sub calculateTotal {
+    my ($self) = @_;
+    return $self->calculateSubtotal + $self->calculateShipping + $self->calculateTaxes;
+}   
 
 
 #-------------------------------------------------------------------
@@ -321,19 +398,6 @@ sub getShippingAddress {
     return $self->getAddressBook->getAddress($self->get("shippingAddressId"));
 }
 
-#-------------------------------------------------------------------
-
-=head2 getTaxes ()
-
-Returns the tax amount on the items in the cart.
-
-=cut
-
-sub getTaxes {
-    my $self = shift;
-    my $tax = WebGUI::Shop::Tax->new($self->session);
-    return $self->formatCurrency($tax->calculate($self));
-}
 
 #-------------------------------------------------------------------
 
@@ -668,7 +732,7 @@ sub www_view {
     else {
         $var{hasShippingAddress} = 1;
         $var{shippingAddress} = $address->getHtmlFormatted;
-        $var{tax} = $self->getTaxes;
+        $var{tax} = $self->calculateTaxes;
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my %formOptions = ();
@@ -680,8 +744,14 @@ sub www_view {
         $var{shippingOptions} = WebGUI::Form::selectBox($session, {name=>"shipperId", options=>\%formOptions, defaultValue=>$defaultOption, value=>$self->get("shipperId")});
         $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
         $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
-    } 
-    $var{totalPrice} = $self->formatCurrency($var{subtotalPrice} + $var{shippingPrice} + $var{tax}); 
+    }
+    
+    # calculate price adjusted for in-store credit
+    $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
+    my $credit = WebGUI::Shop::Credit->new($session);
+    $var{inShopCreditAvailable} = $credit->getSum;
+    $var{inShopCreditDeduction} = $credit->calculateDeduction($var{totalPrice});
+    $var{totalPrice} = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction}); 
 
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));

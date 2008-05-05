@@ -54,6 +54,27 @@ sub adjust {
 
 #-------------------------------------------------------------------
 
+=head2 calculateDeduction ( amount )
+
+Returns the amount that a user's in-store credit could reduce a sale. Useful in calculating checkout prices.
+
+=head3 amount
+
+The amount of the sale before in-store credit is applied.
+
+=cut
+
+sub calculateDeduction {
+    my ($self, $amount) = @_;
+    my $credit = $self->getSum;
+    my $deduction = ($credit > $amount) ? $amount : $credit;
+    $deduction *= -1;
+    return sprintf("%.2f", $deduction);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getGeneralLedger ( session )
 
 A class method. Returns a WebGUI::SQL::ResultSet containing the data from the shopCredit table for all users.
@@ -92,13 +113,13 @@ Returns the amount of credit that is owed to this user.
 
 sub getSum {
     my $self = shift;
-    my $credit = $self->session->db->getScalar("select sum(amount) from shopCredit where userId=? order by dateOfAdjustment",[$self->userId]);
+    my $credit = $self->session->db->quickScalar("select sum(amount) from shopCredit where userId=?",[$self->userId]);
     return sprintf("%.2f", $credit);
 }
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, userId )
+=head2 new ( session, [ userId ] )
 
 Constructor. 
 
@@ -108,7 +129,7 @@ A reference to the current session.
 
 =head3 userId
 
-A unique id for a user that you want to adjust the credit of.
+A unique id for a user that you want to adjust the credit of. Defaults to the current user.
 
 =cut
 
@@ -118,7 +139,7 @@ sub new {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     unless (defined $userId) {
-        WebGUI::Error::InvalidParam->throw( param=>$userId, error=>"Need a userId.");
+        $userId = $session->user->userId;
     }
     my $self = register $class;
     my $id        = id $self;

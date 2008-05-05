@@ -171,7 +171,7 @@
 # List the merchant gateways you have installed and wish to be
 # available on this site.
 
-"paymentDrivers" : ["WebGUI::Shop::PayDriver::Cash"],
+"paymentDrivers" : ["WebGUI::Shop::PayDriver::Cash", "WebGUI::Shop::PayDriver::ITransact"],
 
 # List the shipping drivers you have installed and wish to be
 # available for configuration on the site.

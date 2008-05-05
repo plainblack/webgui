@@ -347,6 +347,15 @@ sub www_selectPaymentGateway {
         $session->http->setRedirect( $session->url->page('shop=cart;method=view') );
         return '';
     }
+    
+    # Complete Transaction if it's a $0 transaction.
+    my $total = $cart->calculateTotal;
+    if (($total + $cart->calculateShopCreditDeduction($total)) == 0) {
+        my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
+        $transaction->completePurchase('zero', 'success', 'success');
+        $cart->onCompletePurchase;
+        $transaction->www_thankYou($session);
+    }
 
     # All the output stuff below is just a placeholder until it's templated.
     my $output .= $i18n->echo('How would you like to pay?');

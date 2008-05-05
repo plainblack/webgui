@@ -195,6 +195,18 @@ our $I18N = {
 		context => q|a label in the address editor|
 	},
 
+	'available' => { 
+		message => q|Available|,
+		lastUpdated => 0,
+		context => q|a label in the cart|
+	},
+
+	'in shop credit' => { 
+		message => q|In-Shop Credit|,
+		lastUpdated => 0,
+		context => q|a label in the cart|
+	},
+
 	'country' => { 
 		message => q|Country|,
 		lastUpdated => 0,

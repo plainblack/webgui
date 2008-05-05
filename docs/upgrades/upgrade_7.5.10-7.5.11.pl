@@ -396,6 +396,7 @@ sub convertTransactionLog {
 		userId varchar(22) binary not null,
 		username varchar(35) not null,
 		amount float,
+        shopCreditDeduction float,
 		shippingAddressId varchar(22) binary,
         shippingAddressName varchar(35),
         shippingAddress1 varchar(35),
@@ -619,6 +620,8 @@ sub addPaymentDrivers {
 	# and here's our code
     $session->config->delete('paymentPlugins');
     $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::Cash');
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::ITransact');
+
 }
 
 #-------------------------------------------------

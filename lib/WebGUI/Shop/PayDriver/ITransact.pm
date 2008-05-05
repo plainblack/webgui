@@ -144,6 +144,30 @@ sub _generatePaymentRequestXML {
         }
     }
 
+	# taxes, shipping, etc
+	my $i18n = WebGUI::International->new($session, "Shop");
+	if ($transaction->get('taxes') > 0) {
+		push @{ $orderItems->{ Item } }, {
+			Description		=> $i18n->get('taxes'),
+			Cost			=> $transaction->get('taxes'),
+			Qty				=> 1,
+			};
+	}
+	if ($transaction->get('shippingPrice') > 0) {
+		push @{ $orderItems->{ Item } }, {
+			Description		=> $i18n->get('shipping'),
+			Cost			=> $transaction->get('shippingPrice'),
+			Qty				=> 1,
+			};
+	}
+	if ($transaction->get('shopCreditDeduction') < 0) {
+		push @{ $orderItems->{ Item } }, {
+			Description		=> $i18n->get('in shop credit'),
+			Cost			=> $transaction->get('shopCreditDeduction'),
+			Qty				=> 1,
+			};
+	}
+
     my $vendorData;
     $vendorData->{ Element  }->{ Name   } = 'transactionId';
     $vendorData->{ Element  }->{ Value  } = $transaction->getId;
@@ -428,9 +452,9 @@ sub www_pay {
     return $self->www_getCredentials( $credentialsErrors ) if $credentialsErrors;
 
     # Payment time!
-    $self->processTransaction;
+    my $transaction = $self->processTransaction;
 
-    return $session->style->userStyle('Thank you for your order');
+    return $transaction->www_thankYou($session);
 }
 
 1;

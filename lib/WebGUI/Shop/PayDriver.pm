@@ -161,7 +161,7 @@ sub definition {
             fieldType       => 'group',
             label           => $i18n->get('who can use'),
             hoverHelp       => $i18n->get('who can use help'),
-            defaultValue    => 1,
+            defaultValue    => 7,
         },
         receiptEmailTemplateId => {
             fieldType       => 'template',

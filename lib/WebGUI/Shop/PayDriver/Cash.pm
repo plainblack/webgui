@@ -128,7 +128,7 @@ sub getCartTemplateVariables {
 
     my $cartProperties = $cart->get;
     $cartProperties->{ totalPrice       } = $cart->calculateSubtotal;
-    $cartProperties->{ tax              } = $cart->getTaxes;
+    $cartProperties->{ tax              } = $cart->calculateTaxes;
 
     # Include shipping address
     my $address = eval { $cart->getShippingAddress };
@@ -236,9 +236,9 @@ sub www_pay {
     my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
 
     # Complete the transaction
-    $self->processTransaction( $billingAddress );
+    my $transaction = $self->processTransaction( $billingAddress );
 
-    return $session->style->userStyle('Thank you for ordering');
+    return $transaction->www_thankYou($session);
 }
 
 #-------------------------------------------------------------------

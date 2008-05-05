@@ -88,6 +88,9 @@ The extended status message that came back from the payment gateway when trying 
 
 sub completePurchase {
     my ($self, $transactionCode, $statusCode, $statusMessage) = @_;
+    if ($self->get('shopCreditDeduction') < 0) {
+        WebGUI::Shop::Credit->new($self->session)->adjust($self->get('shopCreditDeduction'), "Paid for transaction ".$self->getId);        
+    }
     foreach my $item (@{$self->getItems}) {
         $item->getSku->onCompletePurchase($item);
     }
@@ -313,7 +316,7 @@ A reference to a cart object. Will pull shipping method, shipping address, tax, 
 it. Alternatively you can set manually any of the following properties that are set by cart automatically:
 amount shippingAddressId shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity
 shippingState shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel shippingPrice
-taxes
+taxes shopCreditDeduction
 
 You can also use the addItem() method to manually add items to the transaction rather than passing a cart full of items.
 
@@ -352,7 +355,7 @@ sub update {
     my $id = id $self;
     if (exists $newProperties->{cart}) {
         my $cart = $newProperties->{cart};
-        $newProperties->{taxes} = $cart->getTaxes;
+        $newProperties->{taxes} = $cart->calculateTaxes;
         my $address = $cart->getShippingAddress;
         $newProperties->{shippingAddressId} = $address->getId;
         $newProperties->{shippingAddressName} = $address->get('name');
@@ -368,7 +371,9 @@ sub update {
         $newProperties->{shippingDriverId} = $shipper->getId;
         $newProperties->{shippingDriverLabel} = $shipper->get('label');
         $newProperties->{shippingPrice} = $shipper->calculate($cart);
-        $newProperties->{amount} = $cart->calculateSubtotal + $newProperties->{shippingPrice} + $newProperties->{taxes};
+        $newProperties->{amount} = $cart->calculateTotal + $newProperties->{shopCreditDeduction};
+        $newProperties->{shopCreditDeduction} = $cart->calculateShopCreditDeduction($newProperties->{amount});
+        $newProperties->{amount} += $newProperties->{shopCreditDeduction};
         foreach my $item (@{$cart->getItems}) {
             $self->addItem({item=>$item});
         }
@@ -555,6 +560,20 @@ STOP
 STOP
     # render everything to a web page
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_thankYou ()
+
+Displays the default thank you page.
+
+=cut
+
+sub www_thankYou {
+    my ($class, $session) = @_;
+    return q{Thanks for your order. Need to template this.};
 }
 
 #-------------------------------------------------------------------
