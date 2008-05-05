@@ -203,6 +203,7 @@ sub duplicate {
     }
 
     return $newAsset;
+
 }
 
 
@@ -684,6 +685,21 @@ sub www_addRelated {
 
     ##Note, hashref takes care of making things unique across revisionDate
     my $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get('versionTag')).") group by assetData.assetId");
+    my $related = $self->session->db->buildHashRef(
+"select asset.assetId, assetData.title
+    from asset left join assetData
+        on assetData.assetId=asset.assetId
+    where
+        asset.className='WebGUI::Asset::Sku::Product'
+    and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")
+    and revisionDate=(select max(revisionDate) from assetData where asset.assetId=assetData.assetId)
+    and   (
+           assetData.status='approved'
+        or assetData.tagId=".$self->session->db->quote($self->session->scratch->get('versionTag')).
+         ") group by assetData.assetId"
+    );
+
+
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     $f->selectBox(
         -name => "relatedAssetId",
