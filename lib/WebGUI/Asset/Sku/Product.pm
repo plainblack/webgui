@@ -293,6 +293,21 @@ sub getCollateral {
 
 #-------------------------------------------------------------------
 
+=head2 getConfiguredTitle ( )
+
+Returns the shortdesc of a variant that has been applied (applyOptions) to this
+Product.
+
+=cut
+
+sub getConfiguredTitle {
+    my $self = shift;
+    return $self->getOptions->{shortdesc};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getIndexedCollateralData ( tableName )
 
 Same as getAllCollateral, except that an additional field, collateralIndex,
@@ -361,9 +376,17 @@ sub getFileUrl {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getPrice ( )
+
+Only returns a price after options from a variant have been applied to this
+Product.
+
+=cut
+
 sub getPrice {
     my $self = shift;
-    return $self->get('price');
+    return $self->getOptions->{price};
 }
 
 #-------------------------------------------------------------------
@@ -371,6 +394,20 @@ sub getThumbnailUrl {
     my $self = shift;
     my $store = shift || WebGUI::Storage::Image->get($self->session, $self->get('image1'));
     return $store->getThumbnailUrl($store->getFiles->[0]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getWeight ( )
+
+Only returns a weight after options from a variant have been applied to this
+Product.
+
+=cut
+
+sub getWeight {
+    my $self = shift;
+    return $self->getOptions->{weight};
 }
 
 #-------------------------------------------------------------------
