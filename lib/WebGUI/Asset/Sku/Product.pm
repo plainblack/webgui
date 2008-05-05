@@ -201,17 +201,6 @@ sub duplicate {
             $newAsset->setCollateral($table, "${table}Id", $row);
         }
     }
-   
-    foreach my $basename ('accessory', 'related') {
-        my $table = "Product_${basename}";
-        my $tableAssetId = "${basename}AssetId";
-        my $sth = $self->session->db->read("select * from $table where assetId=?", [$self->getId]);
-        my %data;
-        tie %data, 'Tie::CPHash';
-        while (%data = $sth->hash) {
-            $self->session->db->write("insert into $table (assetId, $tableAssetId, sequenceNumber) values (?, ?, ?)", [$newAsset->getId, $data{$tableAssetId}, $data{sequenceNumber}]);
-        }
-    }
 
     return $newAsset;
 }
