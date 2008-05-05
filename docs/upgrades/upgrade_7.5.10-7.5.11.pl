@@ -699,6 +699,7 @@ EOSQL1
     my $accessorySth     = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
     my $relatedSth       = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
     my $specificationSth = $session->db->read('select name, value, units from Product_specification where assetId=? order by sequenceNumber');
+    my $featureSth       = $session->db->read('select feature from Product_feature where assetId=? order by sequenceNumber');
     while (my ($assetId) = $assetSth->array) {
         ##For each assetId, get each type of collateral
         ##Convert the data to JSON and store it in Product with setCollateral (update)
@@ -731,15 +732,24 @@ EOSQL1
         my $specJson = to_json(\@specification);
         $session->db->write('update Product set specificationJSON=? where assetId=?',[$specJson, $assetId]);
 
+        ##Feature
+        $featureSth->execute([$assetId]);
+        my @features = ();
+        while (my $feature = $featureSth->hashRef()) {
+            push @features, $feature;
+        }
+        my $specJson = to_json(\@features);
+        $session->db->write('update Product set featureJSON=? where assetId=?',[$specJson, $assetId]);
+
     }
     $assetSth->finish;
 
     ##Drop collateral tables
 	$session->db->write('drop table Product_accessory');
 	#$session->db->write('drop table Product_benefit');
-	#$session->db->write('drop table Product_feature');
+	$session->db->write('drop table Product_feature');
 	$session->db->write('drop table Product_related');
-	#$session->db->write('drop table Product_specification');
+	$session->db->write('drop table Product_specification');
 
     ## Remove productNumber from Product;
 	$session->db->write('alter table Product drop column productNumber');

@@ -149,6 +149,16 @@ sub definition {
             autoGenerate => 0,
             defaultValue => '[]',
         },
+        featureJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
+        benefitJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -366,29 +376,6 @@ sub getThumbnailUrl {
 
 #-------------------------------------------------------------------
 
-=head2 indexContent ( )
-
-Indexing product data. See WebGUI::Asset::indexContent() for additonal details. 
-
-=cut
-
-sub indexContent {
-    my $self = shift;
-    my $indexer = $self->SUPER::indexContent;
-    my @data = $self->session->db->buildArray("select feature from Product_feature where assetId=".$self->session->db->quote($self->getId));
-    $indexer->addKeywords(join(" ", @data));
-    @data = $self->session->db->buildArray("select benefit from Product_benefit where assetId=".$self->session->db->quote($self->getId));
-    $indexer->addKeywords(join(" ", @data));
-    @data = ();
-    foreach my $collateral (@{ $self->getAllCollateral('specificationJSON') }) {
-        push @data, join(" ", @{ $collateral }{qw/name value units/});
-    }
-    $indexer->addKeywords(join(" ", @data));
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 moveCollateralDown ( tableName, index )
 
 Moves a collateral data item down one position.  If called on the last element of the
@@ -480,7 +467,6 @@ sub purge {
     }
     $sth->finish;
     $self->session->db->write("delete from Product_benefit where assetId=".$self->session->db->quote($self->getId));
-    $self->session->db->write("delete from Product_feature where assetId=".$self->session->db->quote($self->getId));
     $self->SUPER::purge();
 }
 
@@ -761,8 +747,7 @@ sub www_deleteBenefitConfirm {
 sub www_deleteFeatureConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("Product_feature","Product_featureId",$self->session->form->process("fid"));
-    $self->reorderCollateral("Product_feature","Product_featureId");
+    $self->deleteCollateral("featureJSON", $self->session->form->process("fid"));
     return "";
 }
 
@@ -847,25 +832,22 @@ sub www_editFeature {
     my $self = shift;
     my $fid = shift || $self->session->form->process("fid");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my ($data, $f, $features);
-    $data = $self->getCollateral("Product_feature","Product_featureId",$fid);
+    my $data = $self->getCollateral("featureJSON", $fid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
         -name => "fid",
-        -value => $data->{Product_featureId},
+        -value => $fid,
     );
     $f->hidden(
         -name => "func",
         -value => "editFeatureSave",
     );
-    $features = $self->session->db->buildHashRef("select feature,feature from Product_feature order by feature");
-    $f->combo(
+    $f->text(
         -name => "feature",
-        -options => $features,
         -label => $i18n->get(23),
         -hoverHelp => $i18n->get('23 description'),
-        -value => [$data->{feature}],
+        -value => $data->{feature},
     );
     $f->yesNo(
         -name => "proceed",
@@ -880,9 +862,8 @@ sub www_editFeature {
 sub www_editFeatureSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("Product_feature", "Product_featureId", {
-                                              Product_featureId => $self->session->form->process("fid"),
-                                              feature => $self->session->form->process("feature","combo")
+    $self->setCollateral("featureJSON", $self->session->form->process("fid"), {
+                                              feature => $self->session->form->process("feature","text")
                                              });
     return "" unless($self->session->form->process("proceed"));
     return $self->www_editFeature("new");
@@ -893,10 +874,11 @@ sub www_editSpecification {
     my $self = shift;
     my $sid = shift || $self->session->form->process("sid");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my ($data, $f, $hashRef);
+
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $data = $self->getCollateral("specificationJSON", $sid);
-    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $data = $self->getCollateral("specificationJSON", $sid);
+    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+
     $f->hidden(
         -name => "sid",
         -value => $sid,
@@ -907,7 +889,6 @@ sub www_editSpecification {
     );
     $f->text(
         -name => "name",
-        -options => $hashRef,
         -label => $i18n->get(26),
         -hoverHelp => $i18n->get('26 description'),
         -value => $data->{name},
@@ -920,7 +901,6 @@ sub www_editSpecification {
     );
     $f->text(
         -name => "units",
-        -options => $hashRef,
         -label => $i18n->get(29),
         -hoverHelp => $i18n->get('29 description'),
         -value => $data->{units},
@@ -939,9 +919,9 @@ sub www_editSpecificationSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     $self->setCollateral("specificationJSON", $self->session->form->process("sid"), {
-        name => $self->session->form->process("name","combo"),
-        value => $self->session->form->process("value","combo"),
-        units => $self->session->form->process("units","combo")
+        name  => $self->session->form->process("name",  "text"),
+        value => $self->session->form->process("value", "text"),
+        units => $self->session->form->process("units", "text")
     });
 
     return "" unless($self->session->form->process("proceed"));
@@ -1048,7 +1028,7 @@ sub www_moveBenefitUp {
 sub www_moveFeatureDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("Product_feature","Product_featureId",$self->session->form->process("fid"));
+    $self->moveCollateralDown("featureJSON", $self->session->form->process("fid"));
     return "";
 }
 
@@ -1056,7 +1036,7 @@ sub www_moveFeatureDown {
 sub www_moveFeatureUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("Product_feature","Product_featureId",$self->session->form->process("fid"));
+    $self->moveCollateralUp("featureJSON", $self->session->form->process("fid"));
     return "";
 }
 
@@ -1150,22 +1130,21 @@ sub view {
         $var{image3}     = $self->getFileUrl($file);
    }
    
-   #---features 
-   $var{"addFeature.url"} = $self->getUrl('func=editFeature&fid=new');
-   $var{"addFeature.label"} = $i18n->get(34);
-   $sth = $self->session->db->read("select feature,Product_featureId from Product_feature where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-   while (%data = $sth->hash) {
-      $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$data{Product_featureId},$self->get("url"),$i18n->get(3))
-                 .$self->session->icon->edit('func=editFeature&fid='.$data{Product_featureId},$self->get("url"))
-                 .$self->session->icon->moveUp('func=moveFeatureUp&&fid='.$data{Product_featureId},$self->get("url"))
-                 .$self->session->icon->moveDown('func=moveFeatureDown&&fid='.$data{Product_featureId},$self->get("url"));
-      push(@featureloop,{
-                          "feature.feature"=>$data{feature},
-                          "feature.controls"=>$segment
+    #---features 
+    $var{'addFeature.url'} = $self->getUrl('func=editFeature&fid=new');
+    $var{'addFeature.label'} = $i18n->get(34);
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('featureJSON') } ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$id,$self->get('url'),$i18n->get(3))
+                 . $self->session->icon->edit('func=editFeature&fid='.$id,$self->get('url'))
+                 . $self->session->icon->moveUp('func=moveFeatureUp&&fid='.$id,$self->get('url'))
+                 . $self->session->icon->moveDown('func=moveFeatureDown&&fid='.$id,$self->get('url'));
+        push(@featureloop,{
+                          'feature.feature'  => $collateral->{feature},
+                          'feature.controls' => $segment
                          });
-   }
-   $sth->finish;
-   $var{feature_loop} = \@featureloop;
+    }
+    $var{feature_loop} = \@featureloop;
 
    #---benefits 
    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
@@ -1200,7 +1179,6 @@ sub view {
                                    'specification.label'         => $collateral->{name},
                                 });
     }
-    $sth->finish;
     $var{specification_loop} = \@specificationloop;
 
     #---accessories 

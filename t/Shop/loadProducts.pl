@@ -148,10 +148,22 @@ $products->setCollateral('Product_specification', 'Product_specificationId', {
     units => 'Hertz',
 });
 
-$products->setCollateral('Product_specification', 'Product_specificationId', {
-    name => 'hue',
-    value => '75',
-    units => 'lumens',
+my $propertiesf = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'feature_Product',
+    price         => 3.33,
+    title         => 'feature Product',
+    description   => 'feature Product',
+};
+
+my $productf = $root->addChild($propertiesf);
+
+$productf->setCollateral('Product_feature', 'Product_featureId', {
+    feature => 'leather interior',
+});
+
+$productf->setCollateral('Product_feature', 'Product_featureId', {
+    feature => '25% less code',
 });
 
 $tag->commit;
