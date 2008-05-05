@@ -481,8 +481,6 @@ sub purge {
         }
     }
     $sth->finish;
-    $self->session->db->write("delete from Product_accessory where assetId=".$self->session->db->quote($self->getId)." or accessoryAssetId=".$self->session->db->quote($self->getId));
-    $self->session->db->write("delete from Product_related where assetId=".$self->session->db->quote($self->getId)." or relatedAssetId=".$self->session->db->quote($self->getId));
     $self->session->db->write("delete from Product_benefit where assetId=".$self->session->db->quote($self->getId));
     $self->session->db->write("delete from Product_feature where assetId=".$self->session->db->quote($self->getId));
     $self->session->db->write("delete from Product_specification where assetId=".$self->session->db->quote($self->getId));
