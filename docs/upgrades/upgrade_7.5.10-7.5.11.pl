@@ -661,7 +661,12 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
-	$session->db->write('alter table Product add column variantsJSON mediumtext');
+	$session->db->write('alter table Product add column     accessoryJSON mediumtext');
+	$session->db->write('alter table Product add column       benefitJSON mediumtext');
+	$session->db->write('alter table Product add column       featureJSON mediumtext');
+	$session->db->write('alter table Product add column       relatedJSON mediumtext');
+	$session->db->write('alter table Product add column specificationJSON mediumtext');
+	$session->db->write('alter table Product add column      variantsJSON mediumtext');
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
@@ -688,19 +693,16 @@ EOSQL1
     }
     $productQuery->finish;
 
-    ##Add the collateral columns to Product
-	$session->db->write('alter table Product add column     accessoryJSON mediumtext');
-	$session->db->write('alter table Product add column       benefitJSON mediumtext');
-	$session->db->write('alter table Product add column       featureJSON mediumtext');
-	$session->db->write('alter table Product add column       relatedJSON mediumtext');
-	$session->db->write('alter table Product add column specificationJSON mediumtext');
     ##Get all Product assetIds
     my $assetSth = $session->db->read('select distinct(assetId) from Product');
     my $accessorySth = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
+    my $relatedSth = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
     while (my ($assetId) = $assetSth->array) {
         ##For each assetId, get each type of collateral
         ##Convert the data to JSON and store it in Product with setCollateral (update)
         ##To duplicate across all revisions, do a get and SQL update (with no revisionDate)
+
+        ##Accessories
         $accessorySth->execute([$assetId]);
         my @accessories = ();
         while (my $acc = $accessorySth->hashRef()) {
@@ -708,6 +710,15 @@ EOSQL1
         }
         my $accJson = to_json(\@accessories);
         $session->db->write('update Product set accessoryJSON=? where assetId=?',[$accJson, $assetId]);
+
+        ##Related
+        $relatedSth->execute([$assetId]);
+        my @related = ();
+        while (my $acc = $relatedSth->hashRef()) {
+            push @related, $acc;
+        }
+        my $relJson = to_json(\@related);
+        $session->db->write('update Product set relatedJSON=? where assetId=?',[$relJson, $assetId]);
     }
     $assetSth->finish;
 
@@ -715,7 +726,7 @@ EOSQL1
 	$session->db->write('drop table Product_accessory');
 	#$session->db->write('drop table Product_benefit');
 	#$session->db->write('drop table Product_feature');
-	#$session->db->write('drop table Product_related');
+	$session->db->write('drop table Product_related');
 	#$session->db->write('drop table Product_specification');
 
     ## Remove productNumber from Product;

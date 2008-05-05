@@ -139,6 +139,11 @@ sub definition {
             autoGenerate => 0,
             defaultValue => '[]',
         },
+        relatedJSON => {
+            ##Collateral data is stored as JSON in here
+            autoGenerate => 0,
+            defaultValue => '[]',
+        },
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -617,38 +622,49 @@ sub setCollateral {
 
 #-------------------------------------------------------------------
 sub www_addAccessory {
-   my $self = shift;
-   return $self->session->privilege->insufficient() unless ($self->canEdit);
-   my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-   $f->hidden(
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->hidden(
         -name => "func",
         -value => "addAccessorySave",
-   );
-   ##Accessories are other Products.  Give the user a list of Accessories that
-   ##are not already used, nor itself.
-   ##Accessories can not be edited, only added or deleted.
-   my $table = $self->getAllCollateral('accessoryJSON');
-   my @usedAccessories = map { $_->{accessoryAssetId} } @{ $table };
-   push(@usedAccessories,$self->getId);
+    );
+    ##Accessories are other Products.  Give the user a list of Accessories that
+    ##are not already used, nor itself.
+    ##Accessories can not be edited, only added or deleted.
+    my $table = $self->getAllCollateral('accessoryJSON');
+    my @usedAccessories = map { $_->{accessoryAssetId} } @{ $table };
+    push(@usedAccessories,$self->getId);
 
-   ##Note, hashref takes care of making things unique across revisionDate
-   my $accessory = $self->session->db->buildHashRef("select asset.assetId, assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get("versionTag")).") group by assetData.assetId");
+    my $accessory = $self->session->db->buildHashRef(
+"select asset.assetId, assetData.title
+    from asset left join assetData
+        on assetData.assetId=asset.assetId
+    where
+        asset.className='WebGUI::Asset::Sku::Product'
+    and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedAccessories).")
+    and revisionDate=(select max(revisionDate) from assetData where asset.assetId=assetData.assetId)
+    and   (
+           assetData.status='approved'
+        or assetData.tagId=".$self->session->db->quote($self->session->scratch->get('versionTag')).
+         ") group by assetData.assetId"
+    );
 
-   my $i18n = WebGUI::International->new($self->session,"Asset_Product");
-   $f->selectBox(
+    my $i18n = WebGUI::International->new($self->session,"Asset_Product");
+    $f->selectBox(
         -name => "accessoryAccessId",
         -options => $accessory,
         -label => $i18n->get(17),
         -hoverHelp => $i18n->get('17 description'),
-   );
-   $f->yesNo(
+    );
+    $f->yesNo(
         -name => "proceed",
         -label => $i18n->get(18),
         -hoverHelp => $i18n->get('18 description'),
-   );
-   $f->submit;
+    );
+    $f->submit;
 
-   return $self->getAdminConsole->render($f->print, "product accessory add/edit");
+    return $self->getAdminConsole->render($f->print, "product accessory add/edit");
 }
 
 #-------------------------------------------------------------------
@@ -667,16 +683,21 @@ sub www_addAccessorySave {
 sub www_addRelated {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my ($f, $related, @usedRelated);
-    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
         -name => "func",
         -value => "addRelatedSave",
     );
-    @usedRelated = $self->session->db->buildArray("select relatedAssetId from Product_related where assetId=".$self->session->db->quote($self->getId));
-    push(@usedRelated,$self->getId);
-    $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).")");
-     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
+    ##Relateds are other Products.  Give the user a list of Related products that
+    ##are not already used, nor itself.
+    ##Accessories can not be edited, only added or deleted.
+    my $table = $self->getAllCollateral('relatedJSON');
+    my @usedRelated = map { $_->{relatedAssetId} } @{ $table };
+    push(@usedRelated, $self->getId);
+
+    ##Note, hashref takes care of making things unique across revisionDate
+    my $related = $self->session->db->buildHashRef("select asset.assetId,assetData.title from asset left join assetData on assetData.assetId=asset.assetId where asset.className='WebGUI::Asset::Sku::Product' and asset.assetId not in (".$self->session->db->quoteAndJoin(\@usedRelated).") and (assetData.status='approved' or assetData.tagId=".$self->session->db->quote($self->session->scratch->get('versionTag')).") group by assetData.assetId");
+    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     $f->selectBox(
         -name => "relatedAssetId",
         -options => $related,
@@ -696,9 +717,9 @@ sub www_addRelated {
 sub www_addRelatedSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    return "" unless ($self->session->form->process("relatedAssetId"));
-    my ($seq) = $self->session->db->quickArray("select max(sequenceNumber) from Product_related where assetId=".$self->session->db->quote($self->getId));
-    $self->session->db->write("insert into Product_related (assetId,relatedAssetId,sequenceNumber) values (".$self->session->db->quote($self->getId).",".$self->session->db->quote($self->session->form->process("relatedAssetId")).",".($seq+1).")");
+    my $relatedAssetId = $self->session->form->process("relatedAssetId");
+    return "" unless $relatedAssetId;
+    $self->setCollateral('relatedJSON', 'new', { relatedAssetId =>  $relatedAssetId });
     return "" unless($self->session->form->process("proceed"));
     return $self->www_addRelated();
 }
@@ -753,8 +774,7 @@ sub www_deleteFileConfirm {
 sub www_deleteRelatedConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->session->db->write("delete from Product_related where assetId=".$self->session->db->quote($self->getId)." and relatedAssetId=".$self->session->db->quote($self->session->form->process("rid")));
-    $self->reorderCollateral("Product_related","relatedAssetId");
+    $self->deleteCollateral("Product_related", $self->session->form->process("rid"));
     return "";
 }
 
@@ -1039,16 +1059,16 @@ sub www_moveFeatureUp {
 sub www_moveRelatedDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("Product_related","relatedAssetId",$self->session->form->process("rid"));
-    return "";
+    $self->moveCollateralDown('relatedJSON', $self->session->form->process('rid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
 sub www_moveRelatedUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("Product_related","relatedAssetId",$self->session->form->process("rid"));
-    return "";
+    $self->moveCollateralUp('relatedJSON', $self->session->form->process('rid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1179,11 +1199,9 @@ sub view {
     $var{specification_loop} = \@specificationloop;
 
     #---accessories 
-    $var{'addaccessory.url'} = $self->getUrl('func=addAccessory');
+    $var{'addaccessory.url'}   = $self->getUrl('func=addAccessory');
     $var{'addaccessory.label'} = $i18n->get(36);
     ##Need an index for collateral operations, and an assetId for asset instantiation.
-    #my @accessories = map { $_->{accessoryAssetId} } @{ $self->getAllCollateral('accessoryJSON') };
-    #while (my ($id) = $sth->array) {
     foreach my $collateral ( @{ $self->getIndexedCollateralData('accessoryJSON') } ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
@@ -1199,25 +1217,22 @@ sub view {
     $var{accessory_loop} = \@accessoryloop;
 
     #---related
-    $var{"addrelatedproduct.url"} = $self->getUrl('func=addRelated');
-    $var{"addrelatedproduct.label"} = $i18n->get(37);
-    $sth = $self->session->db->read("select Product_related.relatedAssetId 
-                              from Product_related 
-                              where Product_related.assetId=".$self->session->db->quote($self->getId)." 
-                              order by Product_related.sequenceNumber");
-    while (my ($id) = $sth->array) {
-        $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id,$self->get("url"),$i18n->get(4))
-                 . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id,$self->get("url"))
-                 . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id,$self->get("url"));
-        my $related = WebGUI::Asset->newByDynamicClass($self->session,$id);
+    $var{'addrelatedproduct.url'}   = $self->getUrl('func=addRelated');
+    $var{'addrelatedproduct.label'} = $i18n->get(37);
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('relatedJSON')} ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
+                 . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
+                 . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
+        my $related = WebGUI::Asset->newByDynamicClass($self->session, $collateral->{relatedAssetId});
         push(@relatedloop,{
-                          "relatedproduct.URL"      => $related->getUrl,
-                          "relatedproduct.title"    => $related->getTitle,
-                          "relatedproduct.controls" => $segment,
+                          'relatedproduct.URL'      => $related->getUrl,
+                          'relatedproduct.title'    => $related->getTitle,
+                          'relatedproduct.controls' => $segment,
                           });
     }
-    $sth->finish;
     $var{relatedproduct_loop} = \@relatedloop;
+
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));

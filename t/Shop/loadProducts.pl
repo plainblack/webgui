@@ -116,8 +116,21 @@ my $propertiesa = {
 
 my $producta = $root->addChild($propertiesa);
 
-$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, $root->getId, 1]);
-$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, WebGUI::Asset->getDefault($session)->getId, 2]);
+$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, $product5->getId, 1]);
+$session->db->write('insert into Product_accessory (assetId, accessoryAssetId, sequenceNumber) values (?,?,?)', [$producta->getId, $product4->getId, 2]);
+
+my $propertiesr = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'related_Product',
+    price         => 2.00,
+    title         => 'related Product',
+    description   => 'related Product',
+};
+
+my $productr = $root->addChild($propertiesa);
+
+$session->db->write('insert into Product_related (assetId, relatedAssetId, sequenceNumber) values (?,?,?)', [$productr->getId, $product4->getId, 1]);
+$session->db->write('insert into Product_related (assetId, relatedAssetId, sequenceNumber) values (?,?,?)', [$productr->getId, $product5->getId, 2]);
 
 $tag->commit;
 
