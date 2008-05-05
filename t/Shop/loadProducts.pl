@@ -90,8 +90,7 @@ my $properties4 = {
     className     => 'WebGUI::Asset::Wobject::Product',
     url           => 'four',
     price         => 7.77,
-    title         => 'no product number',
-    description   => 'fourth product',
+    description   => 'no title',
 };
 
 my $product4 = $root->addChild($properties4);
@@ -164,6 +163,24 @@ $productf->setCollateral('Product_feature', 'Product_featureId', {
 
 $productf->setCollateral('Product_feature', 'Product_featureId', {
     feature => '25% less code',
+});
+
+my $propertiesb = {
+    className     => 'WebGUI::Asset::Wobject::Product',
+    url           => 'benefit_Product',
+    price         => 4.44,
+    title         => 'benefit Product',
+    description   => 'benefit Product',
+};
+
+my $productb = $root->addChild($propertiesb);
+
+$productb->setCollateral('Product_benefit', 'Product_benefitId', {
+    benefit => 'holds mixed nuts',
+});
+
+$productb->setCollateral('Product_benefit', 'Product_benefitId', {
+    benefit => 'automatic sodium monitoring',
 });
 
 $tag->commit;

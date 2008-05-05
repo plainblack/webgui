@@ -118,7 +118,8 @@ Renders and input tag of type checkbox.
 
 sub toHtml {
 	my $self = shift;
-	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue))) || '';
+    my $value = $self->getDefaultValue;
+    $value = defined $value ? $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($value))) : '';
 	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
 	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';
 	return '<input type="checkbox" name="'.($self->get("name")||'').'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';

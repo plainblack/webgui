@@ -97,7 +97,8 @@ Renders an input tag of type hidden.
 
 sub toHtmlAsHidden {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue))) || '';
+ 	my $value = $self->getDefaultValue;
+    $value = defined $value ? $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($value))) : '';
 	my $idText = $self->get('id') ? ' id="'.$self->get('id').'" ' : '';
 	return '<input type="hidden" name="'.($self->get("name")||'').'" value="'.$value.'" '.($self->get("extras")||'').$idText.' />'."\n";
 }

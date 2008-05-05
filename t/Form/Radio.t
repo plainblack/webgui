@@ -45,7 +45,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Radio';
 my $formType = 'Radio';
 
-my $numTests = 7 + scalar @{ $testBlock } + 1;
+my $numTests = 8 + scalar @{ $testBlock } + 1;
 
 
 plan tests => $numTests;
@@ -99,6 +99,18 @@ $html = join "\n",
 
 @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is( $forms[0]->param('radio2'), '    ', 'WRONG: whitespace value');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'radio3',
+		value => 0,
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('radio3'), 0, 'zero is a valid value');
 
 ##Test Form Output parsing
 

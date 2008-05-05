@@ -59,11 +59,17 @@ my $testBlock = [
 		expected  => 'EQUAL',
 		comment   => 'white space',
 	},
+	{
+		key => 'Hidden6',
+		testValue => 0,
+		expected  => 'EQUAL',
+		comment   => 'zero',
+	},
 ];
 
 my $formClass = 'WebGUI::Form::Hidden';
 
-my $numTests = 5 + scalar @{ $testBlock } + 1;
+my $numTests = 7 + scalar @{ $testBlock } + 1;
 
 
 plan tests => $numTests;
@@ -95,6 +101,20 @@ is($input->type, 'hidden', 'Checking input type');
 is($input->value, 'hiddenData', 'Checking default value');
 
 ##no need for secondary checking for now
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'hiddenZero',
+		value => 0,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+@inputs = $forms[0]->inputs;
+$input = $inputs[0];
+is($input->name, 'hiddenZero', 'Checking input name for zero input');
+is($input->value, 0,           'Checking value for zero input');
 
 ##Test Form Output parsing
 

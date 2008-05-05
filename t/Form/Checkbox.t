@@ -45,7 +45,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::Checkbox';
 my $formType = 'Checkbox';
 
-my $numTests = 7 + scalar @{ $testBlock } + 3;
+my $numTests = 8 + scalar @{ $testBlock } + 3;
 
 
 plan tests => $numTests;
@@ -100,6 +100,18 @@ $html = join "\n",
 
 @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is( $forms[0]->param('cbox3'), '    ', 'WRONG: whitespace value');
+
+$html = join "\n",
+	$header, 
+	$formClass->new($session, {
+		name => 'cbox0',
+		value => 0,
+		checked => 1,
+	})->toHtml,
+	$footer;
+
+@forms = HTML::Form->parse($html, 'http://www.webgui.org');
+is( $forms[0]->param('cbox0'), 0, 'zero is a valid value');
 
 ##Test Form Output parsing
 
