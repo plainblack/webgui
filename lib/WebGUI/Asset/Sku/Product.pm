@@ -310,12 +310,11 @@ sub getIndexedCollateralData {
     my $tableName = shift;
     my $table;
 
-    if ($self->{_collateral}->{$tableName}) {
+    if (exists $self->{_collateral}->{$tableName}) {
         $table = $self->{_collateral}->{$tableName};
     }
     else {
         my $json = $self->get($tableName);
-        my $table;
         if ($json) {
             $table = from_json($json);
         }
@@ -466,7 +465,6 @@ sub purge {
         }
     }
     $sth->finish;
-    $self->session->db->write("delete from Product_benefit where assetId=".$self->session->db->quote($self->getId));
     $self->SUPER::purge();
 }
 
@@ -590,7 +588,7 @@ sub setCollateral {
     ##Note, since this returns a reference, it is actually updating
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
-    if ($index eq "new") {
+    if ($index eq 'new' || $index eq '') {
         push @{ $table }, $properties;
         $self->setAllCollateral($tableName);
         return;
@@ -738,8 +736,7 @@ sub www_deleteAccessoryConfirm {
 sub www_deleteBenefitConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
-    $self->reorderCollateral("Product_benefit","Product_benefitId");
+    $self->deleteCollateral("benefitJSON", $self->session->form->process("bid"));
     return "";
 }
 
@@ -768,8 +765,16 @@ sub www_deleteFileConfirm {
 sub www_deleteRelatedConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("Product_related", $self->session->form->process("rid"));
-    return "";
+    $self->deleteCollateral('Product_related', $self->session->form->process('rid'));
+    return '';
+}
+
+#-------------------------------------------------------------------
+sub www_deleteVariantConfirm {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    $self->deleteCollateral('variantsJSON', $self->session->form->process('vid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -786,25 +791,22 @@ sub www_editBenefit {
     my $self = shift;
     my $bid = shift || $self->session->form->process("bid");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my ($data, $f, $benefits);
-    $data = $self->getCollateral("Product_benefit","Product_benefitId",$bid);
+    my $data = $self->getCollateral("benefitJSON", ,$bid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
         -name => "bid",
-        -value => $data->{Product_benefitId},
+        -value => $bid,
     );
     $f->hidden(
         -name => "func",
         -value => "editBenefitSave",
     );
-    $benefits = $self->session->db->buildHashRef("select benefit,benefit from Product_benefit order by benefit");
-    $f->combo(
+    $f->text(
         -name => "benefit",
-        -options => $benefits,
         -label => $i18n->get(51),
         -hoverHelp => $i18n->get('51 description'),
-        -value => [$data->{benefits}],
+        -value => $data->{benefits},
     );
     $f->yesNo(
         -name => "proceed",
@@ -819,12 +821,11 @@ sub www_editBenefit {
 sub www_editBenefitSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("Product_benefit", "Product_benefitId", {
-                                                  Product_benefitId => $self->session->form->process("bid"),
-                                                  benefit => $self->session->form->process("benefit","combo")
+    $self->setCollateral('benefitJSON', $self->session->form->process('bid'), {
+                                                  benefit => $self->session->form->process('benefit','text')
                                                 });
-    return "" unless($self->session->form->process("proceed"));
-    return $self->www_editBenefit("new");
+    return '' unless($self->session->form->process('proceed'));
+    return $self->www_editBenefit('new');
 }
 
 #-------------------------------------------------------------------
@@ -931,29 +932,33 @@ sub www_editSpecificationSave {
 #-------------------------------------------------------------------
 sub www_editVariant {
     my $self = shift;
-    my $sku  = shift || $self->session->form->process("varSku");
+    my $vid  = shift || $self->session->form->process("vid");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $data = $self->getCollateral("Product_variants", "varSku", $sku);
-    my $f = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
+    my $data = $self->getCollateral("variantsJSON", $vid);
+    my $f    = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
     $f->hidden(
         -name => 'func',
         -value => "editVariantSave",
+    );
+    $f->hidden(
+        -name => 'vid',
+        -value => $vid,
     );
     $f->text(
         -name      => 'varSku',
         -label     => $i18n->get('variant sku'),
         -hoverHelp => $i18n->get('variant sku description'),
-        -value     => $data->{price},
+        -value     => $data->{varSku},
     );
     $f->text(
         -name      => 'shortdesc',
         -size      => 30,
         -label     => $i18n->get('shortdesc'),
         -hoverHelp => $i18n->get('shortdesc description'),
-        -value     => $data->{price},
+        -value     => $data->{shortdesc},
     );
-    $f->integer(
+    $f->float(
         -name      => 'price',
         -label     => $i18n->get(10),
         -hoverHelp => $i18n->get('10 description'),
@@ -971,6 +976,11 @@ sub www_editVariant {
         -hoverHelp => $i18n->get('quantity description'),
         -value     => $data->{quantity},
     );
+    $f->yesNo(
+        -name      => "proceed",
+        -label     => $i18n->get('add another variant'),
+        -hoverHelp => $i18n->get('add another variant description'),
+    );
     $f->submit;
     return $self->getAdminConsole->render($f->print, 'add variant');
 }
@@ -980,16 +990,16 @@ sub www_editVariantSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     ##Mandatory variable check
-    $self->setCollateral('Product_variants', 'varSku', {
-        varSku    => $self->session->form->process('varSku', 'text'),
-        mastersku => $self->get('sku'),
+    $self->setCollateral('variantsJSON', $self->session->form->process('vid'), {
+        varSku    => $self->session->form->process('varSku',    'text'),
         shortdesc => $self->session->form->process('shortdesc', 'text'),
-        price     => $self->session->form->process('name',      'float'),
+        price     => $self->session->form->process('price',     'float'),
         weight    => $self->session->form->process('weight',    'float'),
         quantity  => $self->session->form->process('quantity',  'integer'),
     });
 
-    return $self->www_editVariant("new");
+    return $self->www_view unless($self->session->form->process('proceed'));
+    return $self->www_editVariant('new');
 }
 
 #-------------------------------------------------------------------
@@ -1012,7 +1022,7 @@ sub www_moveAccessoryUp {
 sub www_moveBenefitDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
+    $self->moveCollateralDown("benefitJSON", $self->session->form->process("bid"));
     return "";
 }
 
@@ -1020,7 +1030,7 @@ sub www_moveBenefitDown {
 sub www_moveBenefitUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("Product_benefit","Product_benefitId",$self->session->form->process("bid"));
+    $self->moveCollateralUp("benefitJSON", $self->session->form->process("bid"));
     return "";
 }
 
@@ -1073,13 +1083,29 @@ sub www_moveSpecificationUp {
 }
 
 #-------------------------------------------------------------------
+sub www_moveVariantDown {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    $self->moveCollateralDown("variantsJSON", $self->session->form->process("vid"));
+    return "";
+}
+
+#-------------------------------------------------------------------
+sub www_moveVariantUp {
+    my $self = shift;   
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
+    $self->moveCollateralUp("variantsJSON", $self->session->form->process("vid"));
+    return "";
+}
+
+#-------------------------------------------------------------------
 sub view {
     my $self = shift;
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
-    my (%data, $sth, $file, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
+    my (%data, $segment, %var, @featureloop, @benefitloop, @specificationloop, @accessoryloop, @relatedloop);
     tie %data, 'Tie::CPHash';
     my $brochure = $self->get("brochure");
     my $manual   = $self->get("manual");
@@ -1092,40 +1118,40 @@ sub view {
     #---brochure
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     if ($brochure) {
-        $file = WebGUI::Storage->get($self->session,$brochure);
+        my $file = WebGUI::Storage->get($self->session,$brochure);
         $var{"brochure.icon"}  = $self->getFileIconUrl($file);
         $var{"brochure.label"} = $i18n->get(13);
         $var{"brochure.URL"}   = $self->getFileUrl($file);
     }
     #---manual
     if ($manual) {
-        $file = WebGUI::Storage->get($self->session,$manual);
+        my $file = WebGUI::Storage->get($self->session,$manual);
         $var{"manual.icon"}  = $self->getFileIconUrl($file);
         $var{"manual.label"} = $i18n->get(14);
         $var{"manual.URL"}   = $self->getFileUrl($file);
     }
     #---warranty
     if ($warranty) {
-        $file = WebGUI::Storage->get($self->session,$warranty);
+        my $file = WebGUI::Storage->get($self->session,$warranty);
         $var{"warranty.icon"}  = $self->getFileIconUrl($file);
         $var{"warranty.label"} = $i18n->get(15);
         $var{"warranty.URL"}   = $self->getFileUrl($file);
     }
     #---image1
     if ($image1) {
-        $file = WebGUI::Storage::Image->get($self->session,$image1);
+        my $file = WebGUI::Storage::Image->get($self->session,$image1);
         $var{thumbnail1} = $self->getThumbnailUrl($file);
         $var{image1}     = $self->getFileUrl($file);
     }
     #---image2
     if ($image2) {
-        $file = WebGUI::Storage::Image->get($self->session,$image2);
+        my $file = WebGUI::Storage::Image->get($self->session,$image2);
         $var{thumbnail2} = $self->getThumbnailUrl($file);
         $var{image2}     = $self->getFileUrl($file);
     }
     #---image3
     if ($image3) {
-        $file = WebGUI::Storage::Image->get($self->session,$image3);
+        my $file = WebGUI::Storage::Image->get($self->session,$image3);
         $var{thumbnail3} = $self->getThumbnailUrl($file);
         $var{image3}     = $self->getFileUrl($file);
    }
@@ -1146,22 +1172,21 @@ sub view {
     }
     $var{feature_loop} = \@featureloop;
 
-   #---benefits 
-   $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
-   $var{"addBenefit.label"} = $i18n->get(55);
-   $sth = $self->session->db->read("select benefit,Product_benefitId from Product_benefit where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-   while (%data = $sth->hash) {
-      $segment = $self->session->icon->delete('func=deleteBenefitConfirm&bid='.$data{Product_benefitId},$self->get("url"),$i18n->get(48))
-                 .$self->session->icon->edit('func=editBenefit&bid='.$data{Product_benefitId},$self->get("url"))
-                 .$self->session->icon->moveUp('func=moveBenefitUp&bid='.$data{Product_benefitId},$self->get("url"))
-                 .$self->session->icon->moveDown('func=moveBenefitDown&bid='.$data{Product_benefitId},$self->get("url"));
-      push(@benefitloop,{
-                          "benefit.benefit"=>$data{benefit},
+    #---benefits 
+    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
+    $var{"addBenefit.label"} = $i18n->get(55);
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('benefitJSON') } ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteBenefitConfirm&bid='.$id,$self->get("url"),$i18n->get(48))
+                 . $self->session->icon->edit('func=editBenefit&bid='.$id,$self->get("url"))
+                 . $self->session->icon->moveUp('func=moveBenefitUp&bid='.$id,$self->get("url"))
+                 . $self->session->icon->moveDown('func=moveBenefitDown&bid='.$id,$self->get("url"));
+        push(@benefitloop,{
+                          "benefit.benefit"=>$collateral->{benefit},
                           "benefit.controls"=>$segment
-                         });
-   }
-   $sth->finish;
-   $var{benefit_loop} = \@benefitloop;
+        });
+    }
+    $var{benefit_loop} = \@benefitloop;
 
     #---specifications 
     $var{'addSpecification.url'} = $self->getUrl('func=editSpecification&sid=new');
@@ -1215,6 +1240,27 @@ sub view {
                           });
     }
     $var{relatedproduct_loop} = \@relatedloop;
+
+    #---variants
+    $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
+    $var{'addvariant.label'} = $i18n->get('add a variant');
+    my @variantLoop;
+    foreach my $collateral ( @{ $self->getIndexedCollateralData('variantsJSON')} ) {
+        my $id = $collateral->{collateralIndex};
+        $segment = $self->session->icon->delete('func=deleteVariantConfirm&vid='.$id,$self->get('url'),$i18n->get('delete variant confirm'))
+                 . $self->session->icon->edit('func=editVariant&vid='.$id,$self->get('url'))
+                 . $self->session->icon->moveUp('func=moveVariantUp&vid='.$id,$self->get('url'))
+                 . $self->session->icon->moveDown('func=moveVariantDown&vid='.$id,$self->get('url'));
+        push(@variantLoop,{
+                                   'variant.controls' => $segment,
+                                   'variant.sku'      => $collateral->{varSku},
+                                   'variant.title'    => $collateral->{shortdesc},
+                                   'variant.price'    => $collateral->{price},
+                                   'variant.weight'   => $collateral->{weight},
+                                   'variant.quantity' => $collateral->{quantity},
+                                });
+    }
+    $var{variant_loop} = \@variantLoop;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {

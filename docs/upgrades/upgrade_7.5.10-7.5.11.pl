@@ -636,9 +636,9 @@ sub addShippingDrivers {
 
 #-------------------------------------------------
 sub migrateOldProduct {
-	my $session = shift;
-	print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
-	# and here's our code
+    my $session = shift;
+    print "\tMigrate old Product to new SKU based Products.\n" unless ($quiet);
+    # and here's our code
     ##Grab data from Wobject table, and move it into Sku and Product, as appropriate.
     ##Have to change the className's in the db, too
     ## Wobject description   -> Sku description
@@ -664,12 +664,12 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
-	$session->db->write('alter table Product add column     accessoryJSON mediumtext');
-	$session->db->write('alter table Product add column       benefitJSON mediumtext');
-	$session->db->write('alter table Product add column       featureJSON mediumtext');
-	$session->db->write('alter table Product add column       relatedJSON mediumtext');
-	$session->db->write('alter table Product add column specificationJSON mediumtext');
-	$session->db->write('alter table Product add column      variantsJSON mediumtext');
+    $session->db->write('alter table Product add column     accessoryJSON mediumtext');
+    $session->db->write('alter table Product add column       benefitJSON mediumtext');
+    $session->db->write('alter table Product add column       featureJSON mediumtext');
+    $session->db->write('alter table Product add column       relatedJSON mediumtext');
+    $session->db->write('alter table Product add column specificationJSON mediumtext');
+    $session->db->write('alter table Product add column      variantsJSON mediumtext');
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
@@ -703,6 +703,7 @@ EOSQL1
     my $relatedSth       = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
     my $specificationSth = $session->db->read('select name, value, units from Product_specification where assetId=? order by sequenceNumber');
     my $featureSth       = $session->db->read('select feature from Product_feature where assetId=? order by sequenceNumber');
+    my $benefitSth       = $session->db->read('select benefit from Product_benefit where assetId=? order by sequenceNumber');
     while (my ($assetId) = $assetSth->array) {
         ##For each assetId, get each type of collateral
         ##Convert the data to JSON and store it in Product with setCollateral (update)
@@ -744,20 +745,29 @@ EOSQL1
         my $specJson = to_json(\@features);
         $session->db->write('update Product set featureJSON=? where assetId=?',[$specJson, $assetId]);
 
+        ##Benefit
+        $benefitSth->execute([$assetId]);
+        my @benefits = ();
+        while (my $benefit = $benefitSth->hashRef()) {
+            push @benefits, $benefit;
+        }
+        my $beneJson = to_json(\@benefits);
+        $session->db->write('update Product set benefitJSON=? where assetId=?',[$beneJson, $assetId]);
+
     }
     $assetSth->finish;
 
     ##Drop collateral tables
-	$session->db->write('drop table Product_accessory');
-	#$session->db->write('drop table Product_benefit');
-	$session->db->write('drop table Product_feature');
-	$session->db->write('drop table Product_related');
-	$session->db->write('drop table Product_specification');
+    $session->db->write('drop table Product_accessory');
+    $session->db->write('drop table Product_benefit');
+    $session->db->write('drop table Product_feature');
+    $session->db->write('drop table Product_related');
+    $session->db->write('drop table Product_specification');
 
     ## Remove productNumber from Product;
-	$session->db->write('alter table Product drop column productNumber');
+    $session->db->write('alter table Product drop column productNumber');
     ## Remove price from Product since prices are now stored in variants
-	$session->db->write('alter table Product drop column price');
+    $session->db->write('alter table Product drop column price');
 
     ## Update config file, deleting Wobject::Product and adding Sku::Product
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');

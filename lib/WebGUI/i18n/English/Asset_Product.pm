@@ -566,7 +566,7 @@ our $I18N = {
 		message => q|Are you certain you wish to delete this specification?|,
 		lastUpdated => 1031514049
 	},
-	
+
 	'deleteImage' => {
 		message => q|Delete Attached File|,
 		lastUpdated => 1031514049
@@ -675,6 +675,31 @@ be useful, others may not.|,
 	'variant sku description' => {
 		message => q|A completely unique identifier for this variant of a product.  Should be the same as used in your inventory software so you can sync them.|,
 		lastUpdated => 1209576604,
+	},
+
+	'add a variant' => {
+		message => q|Add a variant.|,
+		lastUpdated => 1210011992,
+	},
+
+	'add another variant' => {
+		message => q|Add another variant?|,
+		lastUpdated => 1210011992,
+	},
+
+	'add another variant description' => {
+		message => q|If you would like to add another variant right now, select "Yes".|,
+		lastUpdated => 1210011992,
+	},
+
+	'delete variant confirm' => {
+		message => q|Are you certain you wish to delete this variant?|,
+		lastUpdated => 1210013857,
+	},
+
+	'variants' => {
+		message => q|Variants|,
+		lastUpdated => 1210019655
 	},
 
 };
