@@ -140,7 +140,7 @@ sub processPropertiesFromFormPost {
      $self->SUPER::processPropertiesFromFormPost;
     my $firstSection = $self->getFirstSection();
     if(! $firstSection){
-        $self->insertSection( [$self->getId,$self->session->id->generate(),'',"First Section",1,1,"Tis is the first page",0,0,1,0,0,''] );
+        $self->insertSection( [$self->getId,$self->session->id->generate(),'',"First Section",1,1,"Tis is the first page",0,0,1,0,0,'',''] );
 #        $self->insertSection( [$self->getId,$self->session->id->generate(),"Last Section",9999,0,"This is the last page",0,0] );
     }
 }
@@ -202,17 +202,17 @@ sub www_submitQuestionEdit{
         $self->session->db->write("
                 update Survey_question
                 set questionText = ?, allowComment = ?, randomizeAnswers = ?, questionType = ?, randomizedWords = ?, previousAnswerWords = ?, verticalDisplay = ?, 
-                    required = ?, maxAnswers = ?, questionVariable = ?, points = ?, commentCols = ?, commentRows = ?
+                    required = ?, maxAnswers = ?, questionVariable = ?, points = ?, commentCols = ?, commentRows = ?, textInButton = ?
                 where Survey_questionId = ?",
             [
                 $$ref{'questionText'},$$ref{'allowComment'},$$ref{'randomizeAnswers'},$$ref{'questionType'},$$ref{'randomizedWords'},
                 $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'questionVariable'}, $$ref{'points'},
-                $$ref{'commentCols'},$$ref{'commentRows'},
+                $$ref{'commentCols'},$$ref{'commentRows'},$$ref{'textInButton'},
                 $$ref{'Survey_questionId'}
             ]
             );
 
-$self->session->errorHandler->warn("questionVariable was ".$$ref{'questionVariable'});
+$self->session->errorHandler->warn("textInButton was ".$$ref{'textInButton'});
         if($type ne $ref->{'questionType'}){
             $self->createDefaultAnswers($ref->{'Survey_sectionId'},$ref->{'Survey_questionId'},$ref->{'questionType'});
         }
@@ -221,10 +221,10 @@ $self->session->errorHandler->warn("questionVariable was ".$$ref{'questionVariab
         my $seqNum = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$ref->{'Survey_sectionId'}]);
         $seqNum++;
         $ref->{'Survey_questionId'} = $self->session->id->generate(); 
-        $self->session->db->write("insert into Survey_question values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        $self->session->db->write("insert into Survey_question values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [ $self->getId,$$ref{'Survey_questionId'},$$ref{'questionVariable'},$$ref{'questionText'},$seqNum,$$ref{'allowComment'},$$ref{'commentCols'},$$ref{'commentRows'},
                 $$ref{'randomizeAnswers'},$$ref{'questionType'}, $$ref{'Survey_sectionId'},$$ref{'randomizedWords'},
-                $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'points'} ]
+                $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'points'}, $$ref{'textInButton'} ]
           );
         
         $self->createDefaultAnswers($ref->{'Survey_sectionId'},$ref->{'Survey_questionId'},$ref->{'questionType'});
@@ -243,17 +243,17 @@ sub www_submitSectionEdit{
         my $id = $self->session->id->generate();
 
         $self->insertSection([$self->getId, $id, $p->{'sectionVariable'},$p->{'sectionName'},$seqNum+1,$p->{'questionsPerPage'},$p->{'sectionText'},$p->{'randomizeQuestions'},
-            $p->{'questionsOnSectionPage'}, $p->{'everyPageTitle'},$p->{'everyPageText'},$p->{'terminal'},$p->{'terminalURL'}]); 
+            $p->{'questionsOnSectionPage'}, $p->{'everyPageTitle'},$p->{'everyPageText'},$p->{'terminal'},$p->{'terminalURL'},$p->{'goto'}]); 
 
         $p->{'Survey_sectionId'} = $id;
 
     }else{
 
         $self->session->db->write("update Survey_section set sectionName = ?, questionsPerPage = ?, sectionText = ?, randomizeQuestions = ?, questionsOnSectionPage = ?,
-                everyPageTitle = ?, everyPageText = ?,terminal = ?, terminalURL = ?,sectionVariable = ?
+                everyPageTitle = ?, everyPageText = ?,terminal = ?, terminalURL = ?,sectionVariable = ?, goto = ?
             where Survey_sectionId = ?",
             [ $p->{'sectionName'}, $p->{'questionsPerPage'}, $p->{'sectionText'}, $p->{'randomizeQuestions'}, $p->{'questionsOnSectionPage'},$p->{'everyPageTitle'}, 
-                $p->{'everyPageText'}, $p->{'terminal'}, $p->{'terminalURL'}, $p->{'sectionVariable'}, 
+                $p->{'everyPageText'}, $p->{'terminal'}, $p->{'terminalURL'}, $p->{'sectionVariable'},$p->{'goto'}, 
             $p->{'Survey_sectionId'} ]
         );
 
@@ -289,12 +289,11 @@ sub www_newQuestion{
 
     my $id = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$sid]);
     if(!$id){$id = 1;}else{$id++;}
-$self->session->errorHandler->warn("MAX SeqNumber was $id");
     my $edit;
     $edit->{'type'} = 'loadQuestion';
     $edit->{'params'} = {'assetId', $self->getId, 'Survey_sectionId', $sid, 'Survey_questionId','', 'questionText','', 'sequenceNumber', $id,
             'allowComment',0, 'randomizeAnswers',0, 'questionType',1, 'required',0,'randomizedWords','','previousAnswerWords','','verticalDisplay',0,'maxAnswers','1',
-            'questionVariable','','commentCols',20,'commentRows',1 };
+            'questionVariable','','commentCols',20,'commentRows',1, 'textInButton',0 };
     return $self->www_loadSurvey($sid,$edit); 
 }
 
@@ -525,9 +524,15 @@ sub www_loadSurvey{
 sub getSpecificSection{
     my $self = shift;
     my $Id = shift;
-    return $self->session->db->quickHashRef(
+    my $responseId = shift;
+    my $section =  $self->session->db->quickHashRef(
         "select * from Survey_section where Survey_sectionId = ?",
         [ $Id ]);
+    if($responseId){
+        $section = $self->fillSectionTextVariables($responseId,$section);
+    }
+
+    return $section;
 }
 #-------------------------------------------------------------------
 sub getSpecificQuestion{
@@ -842,7 +847,7 @@ $self->session->errorHandler->warn("Last Answer for jump was for section: ".$las
     if(exists $lastAfj->{'Survey_sectionId'} and $lastAfj->{'Survey_sectionId'} eq $currentSection){
         my ($sectionId,$questionId) = $self->getJumpTo($lastAfj->{'Survey_answerId'});
         if($sectionId){
-            my $section = $self->getSpecificSection($sectionId);
+            my $section = $self->getSpecificSection($sectionId,$responseId);
             my $questions = $self->getQuestionsAndAnswers($responseId,$section,$questionId); 
             $self->setCurrentSection($responseId,$sectionId);
 $self->session->errorHandler->warn("Jump");
@@ -858,7 +863,7 @@ $self->session->errorHandler->warn("No Jump");
 $self->session->errorHandler->warn("Last Answer was for section: ".$lastA->{'Survey_sectionId'});
 
     #if we're called from submit, see if there are anymore questions in section, show them, else go to next section.  If not called, then show this section.
-    $section = $self->getSpecificSection($currentSection);
+    $section = $self->getSpecificSection($currentSection,$responseId);
     if(exists $lastA->{'Survey_sectionId'} and $lastA->{'Survey_sectionId'} eq $currentSection){
         $questionId = $self->getNextQuestionId($lastA->{'Survey_questionId'});
     }
@@ -907,7 +912,7 @@ $self->session->errorHandler->warn("2-3");
             }
         }else{
 $self->session->errorHandler->warn("3");
-            $section = $self->getSpecificSection($currentSection);
+            $section = $self->getSpecificSection($currentSection,$responseId);
             $questions = $self->getQuestionsAndAnswers($responseId,$section,$questionId);
         }
     }else{
@@ -927,7 +932,7 @@ $self->session->errorHandler->warn("5-1");
             }
 $self->session->errorHandler->warn("5-2");
             $currentSection = $self->getNextSection($currentSection);
-            $section = $self->getSpecificSection($currentSection);
+            $section = $self->getSpecificSection($currentSection,$responseId);
             $questions = $self->getQuestionsAndAnswers($responseId,$section);
         }
     }
@@ -976,8 +981,8 @@ $self->session->errorHandler->warn("-------SurveyEnd $url");
 #sends the processed template and questions structure to the client
 sub showQuestions{
     my ($self,$section,$questions) = @_;
-    my %multipleChoice = ('Multiple Choice',1,'Gender',1,'Yes/No',1,'True/False',1,'Ideology',1, 'Race',1,'Party',1,'Education',1);
-    my %scale = ('Scale',1,'Agree/Disagree',1,'Oppose/Support',1,'Importance',1, 'Likelihood',1,'Certainty',1,'Satisfaction',1,'Confidence',1,
+    my %multipleChoice = ('Multiple Choice',1,'Gender',1,'Yes/No',1,'True/False',1,'Ideology',1, 'Race',1,'Party',1,'Education',1
+        ,'Scale',1,'Agree/Disagree',1,'Oppose/Support',1,'Importance',1, 'Likelihood',1,'Certainty',1,'Satisfaction',1,'Confidence',1,
         'Effectiveness',1,'Concern',1,'Risk',1,'Threat',1,'Security',1);
     my %text = ('Text',1, 'Email',1, 'Phone Number',1, 'Text Date',1, 'Currency',1);
     my %slider = ('Slider',1, 'Dual Slider - Range',1, 'Multi Slider - Allocate',1);
@@ -992,12 +997,6 @@ sub showQuestions{
         elsif($hidden{$$q{'questionType'}}){ $q->{'hidden'} = 1; }
         elsif($multipleChoice{$$q{'questionType'}}){ 
             $q->{'multipleChoice'} = 1; 
-            if($$q{'maxAnswers'} > 1){
-                $q->{'maxMoreOne'} = 1; 
-            }
-        }
-        elsif($scale{$$q{'questionType'}}){ 
-            $q->{'scale'} = 1; 
             if($$q{'maxAnswers'} > 1){
                 $q->{'maxMoreOne'} = 1; 
             }
@@ -1030,17 +1029,23 @@ $self->session->errorHandler->warn("Sending Back");
 
     return encode_json({"type","displayquestions","section",$section,"questions",$questions,"html",$out});
 }
-
+#Answer text for inserting into quesiton text
 sub getPreviousAnswer{
     my ($self,$responseId,$var) = @_;
     $var =~ s/^\[\[//g;
     $var =~ s/\]\]$//g;
-    my $string = $self->session->db->quickScalar("select a.answerText from Survey_questionResponse qa, Survey_question q, Survey_answer a 
+    my $ref = $self->session->db->buildArrayRefOfHashRefs("select a.answerText, qa.response from Survey_questionResponse qa, Survey_question q, Survey_answer a 
         where q.questionVariable = ? and q.Survey_questionId = a.Survey_questionId and a.Survey_answerId = qa.Survey_answerId 
-        and qa.Survey_responseId = ? limit 1",[$var,$responseId]);
-$self->session->errorHandler->warn("getPreviousAnswer $responseId $var");
-    if(!$string){
+        and qa.Survey_responseId = ? and qa.response != '' and qa.response is not null limit 1",[$var,$responseId]);
+    my $string;
+    if(@$ref < 1){
         $string = "PREVIOUS ANSWSER";
+    }else{
+        if($$ref[0]{'response'}){
+            $string = $$ref[0]{'response'};
+        }else{
+            $string = $$ref[0]{'answerText'};
+        }
     }
     return $string;
 }
@@ -1063,6 +1068,15 @@ sub getRandomText{
         $self->session->db->write("update Survey_response set randomWords = ? where Survey_responseId = ?",[$temp,$responseId]);
     }
     return $rands{$var};
+}
+sub fillSectionTextVariables{
+    my $self = shift;
+    my $responseId = shift;
+    my $section = shift;
+    $section->{'sectionText'} =~ s/(\[\[[^\%]*?\]\])/$self->getPreviousAnswer($responseId,$1)/eg;
+    $section->{'sectionText'} =~ s/(\[\[\%.*?\]\])/$self->getRandomText($responseId,$1)/eg;
+$self->session->errorHandler->warn("Found $1 in ".$$section{'sectionText'});
+    return $section;
 }
 sub fillQuestionTextVariables{
     my $self = shift;
@@ -1165,10 +1179,24 @@ sub getNextRandomQuestions{
 
 sub getNextSection{
     my ($self,$sid) = @_;
-    return $self->session->db->quickScalar("select s1.Survey_sectionId from Survey_section s, Survey_section s1 
-        where s.assetId = ? and s.Survey_sectionId = ? and s1.assetId = ? and s1.sequenceNumber = s.sequenceNumber + 1",
-            [$self->getId(), $sid, $self->getId()]);
+    my $section;
+
+    my $var = $self->session->db->quickScalar("select goto from Survey_section 
+        where s.Survey_sectionId = ?", [$sid]);
+    my @array = split/\s*\,\s*/,$var;
+    my $picked = int(rand(scalar @array));
+
+    $section =  $self->session->db->quickScalar("select s1.Survey_sectionId from Survey_section s1 
+        where s1.sectionVariable = ?",[$array[$picked]]);
+
+    if(!$section){
+        $section =  $self->session->db->quickScalar("select s1.Survey_sectionId from Survey_section s, Survey_section s1 
+            where s.assetId = ? and s.Survey_sectionId = ? and s1.assetId = ? and s1.sequenceNumber = s.sequenceNumber + 1",
+                [$self->getId(), $sid, $self->getId()]);
+    }
+    return $section;
 }
+
 sub questionsAnsweredInSection{
     my ($self,$sid,$rid) = @_;
     return $self->session->db->quickScalar("select count(distinct(Survey_questionId)) 
@@ -1594,4 +1622,10 @@ sub AnswersInsert{
     $self->session->db->write("insert into Survey_answer values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",$array);
 }
 
+1;
+
+package ktest;
+use Class::InsideOut qw( public readonly private register id );
+    public     name => my %name;
+    sub new{register(shift)}
 1;
