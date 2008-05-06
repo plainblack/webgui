@@ -3,14 +3,15 @@ div.dateanswer {
 }
 div.slider-bg {
     position: relative;
-    background:url(/extras/wobject/Survey/bg-fader.gif) 5px 0 no-repeat;
-    height:28px;
-    width:228px; 
+    background:url(/extras/wobject/Survey/bg-fader-500.gif) 5px 0 no-repeat;
+    height:68px;
+    width:529px; 
 }
 div.slider-thumb {
     cursor:default;
     position: absolute;
-    top: 4px;
+    top: 30px;
+    left: 4px;
 }
 div.slider-min-thumb {
     cursor:default;
@@ -31,10 +32,33 @@ div.slider-max-thumb {
 #questions {
     display: none;
 }
-.yui-button{
+input.mcbutton{
+    font-size: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: #CCCCCC;
+    background-repeat: repeat-x;
     text-align: center;
+    display: block;
+    margin: 0.5em;
+    padding: .8em;
+    width: 60px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    color: #000000;
+    background-image: url(/extras/wobject/Survey/gradient-glossy.png);
 }
-.yui-button button{
-    text-align: center;
-    min-width: 100px;
+input.mcbutton:hover{
+    background-color: #B6D2F1;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    color: #000000;
+}
+input.mcbutton-selected{
+    background-color: #172D9D;
+    color: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    background-image: url(/extras/wobject/Survey/gradient-glossy.png);
+    background-position: 0px 0px;
 }

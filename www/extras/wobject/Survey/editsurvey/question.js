@@ -27,7 +27,7 @@ Survey.QuestionTemplate = new function(){
         else{
             html = html + "<textarea name='questionText'>"+params.questionText+"</textArea>\n";
         }
-        html = html + "<p>Question custom variable name:<input maxlength=35 size=10 type=text value='"+ params.questionVariable +"' name=questionVariable size=2></p>";
+        html = html + "<p>Question variable name:<input maxlength=35 size=10 type=text value='"+ params.questionVariable +"' name=questionVariable size=2></p>";
         html = html + "<p>Randomize answers:";
  
         html = html+ this.makeRadio('randomizeAnswers',[{text:'Yes',value:1},{text:'No',value:0}],params.randomizeAnswers);
@@ -48,6 +48,8 @@ Survey.QuestionTemplate = new function(){
                     <p>Vertical display:";
 
         html = html+ this.makeRadio('verticalDisplay',[{text:'Yes',value:1},{text:'No',value:0}],params.verticalDisplay);
+        html = html + "<p>Show text in button:";
+        html = html + this.makeRadio('textInButton',[{text:'Yes',value:1},{text:'No',value:0}],params.textInButton);
         html = html + "<p>Allow comment:";
         html = html + this.makeRadio('allowComment',[{text:'Yes',value:1},{text:'No',value:0}],params.allowComment);
         html = html + "<span id='commentParams'><p>&nbsp;&nbsp; Cols:<input type=text size=2 value='"+params.commentCols+"' name=commentCols> Rows: \
@@ -70,7 +72,7 @@ Survey.QuestionTemplate = new function(){
         }
 
         var form = new YAHOO.widget.Dialog("question", 
-            { width : "315px",
+            { width : "500px",
               fixedcenter : true,
               visible : false, 
               constraintoviewport : true,

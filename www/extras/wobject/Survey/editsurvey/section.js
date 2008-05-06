@@ -12,7 +12,7 @@ Survey.SectionTemplate = new function(){
 
         var html = "\
             <div id='section'>\
-            <div class='hd'>Please enter section formation</div>\
+            <div class='hd'>Please enter section information</div>\
             <div class='bd'>\
             <form name='form' method='POST' action='?func=submitSectionEdit'>\
             <p>Section Number: "+params.sequenceNumber + "\
@@ -30,6 +30,7 @@ Survey.SectionTemplate = new function(){
                     <input type='radio' name='randomizeQuestions' value=0 checked>No";
             }
             html = html + "<p>Section custom variable name:<input maxlength=35 size=10 type=text value='"+ params.sectionVariable +"' name=sectionVariable size=2></p>";
+            html = html + "<p>Section branch goto variable name:<input maxlength=35 size=10 type=text value='"+ params.goto +"' name=goto size=2></p>";
             html = html + "\
                 <p>Question per Page:\
                      <select name='questionsPerPage'>";
@@ -53,7 +54,7 @@ Survey.SectionTemplate = new function(){
             }
             html = html + "\
             <hr>\
-            <p>Section Text:</p> <textarea name=sectionText maxlength=2056 cols=30 rows=5>"+ params.sectionText +"</textarea>\
+            <p>Section Text:</p> <textarea name=sectionText maxlength=2056 cols=50 rows=10>"+ params.sectionText +"</textarea>\
         ";
         html = html + "<p>Title on every page: " + this.makeRadio('everyPageTitle',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageTitle);
         html = html + "<p>Text on every page: " + this.makeRadio('everyPageText',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageText);

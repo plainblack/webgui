@@ -23,7 +23,7 @@ Survey.AnswerTemplate = new function(){
                     <input type='hidden' name='Survey_answerId' value='"+params.Survey_answerId+"'>";
         html = html + "<p>Answer Text:\n<textarea name='answerText'>"+params.answerText+"</textArea>\n";
         html = html + "<p>Recorded Answer\n<textarea name='recordedAnswer'>"+params.recordedAnswer+"</textArea>\n";
-        html = html + "<p>Jump to Question:<input type=text value='"+params.gotoQuestion+"' name=gotoQuestion size=4>";
+        html = html + "<p>Jump to:<input type=text value='"+params.gotoQuestion+"' name=gotoQuestion size=4>";
         html = html + "<span id='textParams'><p>Text Answer Cols:<input type=text size=2 value='"+params.textCols+"' name=textCols> Rows: \
             <input type=text size=2 value='"+params.textRows+"' name=textRows> </p></span>";
         html = html + "<p>Is this the correct answer:\n" + 
@@ -41,7 +41,7 @@ Survey.AnswerTemplate = new function(){
         }
 
         var form = new YAHOO.widget.Dialog("answer",
-            { width : "300px",
+            { width : "500px",
               fixedcenter : true,
               visible : false,
               constraintoviewport : true,
