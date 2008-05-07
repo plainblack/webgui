@@ -29,10 +29,17 @@ save you many hours of grief.
           and delete all Events
 
  * The commerce system was completely rewritten. As such you will need
-    to tweak some settings to get commerce back up and running.
+   to tweak some settings to get commerce back up and running.
 
  * Shipping configurations are going to be lost when you upgrade. You'll
-    need to set up a shipping option if you're using the commerce system.
+   need to set up a shipping option if you're using the commerce system.
+
+ * Products in the old Commerce system have been converted to new Asset-based
+   Products in a new folder called Products.  Instead of using the ^Product()
+   macro to display a Product on a page, either place the Product directly
+   onto a page (like any other asset) or use the AssetProxy macro.  In all
+   Wobjects, Templates and Snippets, the Product macro has been replaced
+   with the AssetProxy macro.
 
 
 7.5.9
