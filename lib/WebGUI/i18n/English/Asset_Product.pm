@@ -656,8 +656,8 @@ be useful, others may not.|,
 	},
 
     'shortdesc description' => {
-        message => q|The will be displayed to the user so they can purchase this variant of your product.|,
-        lastUpdated => 1209494298,
+        message => q|The will be displayed to the user so they can purchase this variant of your product.  It will be limited to 30 characters in length|,
+        lastUpdated => 1210191460,
     },
 
     'add variant' => {

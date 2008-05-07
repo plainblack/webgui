@@ -990,7 +990,7 @@ sub www_editVariant {
     );
     $f->text(
         -name      => 'shortdesc',
-        -size      => 30,
+        -maxlength => 30,
         -label     => $i18n->get('shortdesc'),
         -hoverHelp => $i18n->get('shortdesc description'),
         -value     => $data->{shortdesc},
