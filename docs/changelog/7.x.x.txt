@@ -1,4 +1,5 @@
 7.4.36
+ - fixed: Data Form field names changed on edit
 
 7.4.35
  - fixed: security flaw on data form list view

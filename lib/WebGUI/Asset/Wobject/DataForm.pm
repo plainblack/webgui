@@ -1085,6 +1085,8 @@ sub www_editFieldSave {
     my $exists = 1;
     while ($exists) {
         $exists = $self->session->db->quickScalar('SELECT DataForm_fieldId FROM DataForm_field WHERE assetId=? AND name=?', [$self->getId, $name]);
+        last
+            if $exists && $exists == $form->process('fid');
         if ($exists) {
             $name =~ s/(\d+|)$/$1 + 1/e; # increment number at the end of the name
         }
