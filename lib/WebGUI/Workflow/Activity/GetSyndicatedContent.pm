@@ -86,7 +86,7 @@ sub execute {
         $self->session->errorHandler->info("GetSyndicatedContent workflow: Caching $url");
         my $returnValue = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($self->session, $url);
         if (!defined $returnValue) {
-            $self->session->errorHandler->error("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url, which usually indicates an improper URL, or a malformed document");
+            $self->session->errorHandler->warn("GetSyndicatedContent Workflow Activity: _get_rss_data returned undef while trying to process syndicated content url $url, which usually indicates an improper URL, or a malformed document");
             next;
         }
         # Check for timeout
