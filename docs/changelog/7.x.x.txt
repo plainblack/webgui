@@ -1,6 +1,7 @@
 7.4.36
  - fixed: Data Form field names changed on edit
  - fixed: Collaboration RSS link in header doesn't indicate title
+ - fixed: userImport.pl overwrites settings when updating users
 
 7.4.35
  - fixed: security flaw on data form list view
