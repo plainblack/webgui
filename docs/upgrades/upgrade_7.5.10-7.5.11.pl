@@ -742,8 +742,8 @@ EOSQL1
         while (my $feature = $featureSth->hashRef()) {
             push @features, $feature;
         }
-        my $specJson = to_json(\@features);
-        $session->db->write('update Product set featureJSON=? where assetId=?',[$specJson, $assetId]);
+        my $featJson = to_json(\@features);
+        $session->db->write('update Product set featureJSON=? where assetId=?',[$featJson, $assetId]);
 
         ##Benefit
         $benefitSth->execute([$assetId]);
@@ -781,6 +781,79 @@ EOSQL1
 sub mergeProductsWithCommerce {
 	my $session = shift;
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
+    my $productSth = $session->db->read('select * from products order by title');
+    my $variantSth = $session->db->prepare('select * from productVariants where productId=?');
+    my $productFolder = WebGUI::Asset->getRoot($session)->addChild({
+        className   => 'WebGUI::Asset::Wobject::Folder',
+        title       => 'Converted products from Commerce',
+        url         => 'converted_products',
+        isHidden    => 1,
+        groupIdView => 14,
+        groupIdEdit => 14,
+    });
+    while (my $productData = $productSth->hashRef) {
+        my $sku = $productFolder->addChild({
+            className   => 'WebGUI::Asset::Sku::Product',
+            title       => $productData->{title},
+            sku         => $productData->{sku},
+            description => $productData->{description},
+        }, $productData->{productId});
+
+        ##Get the parameter and options for this product
+        my $parameterSth = $session->db->read('select opt.*, param.* from productParameters as param left join productParameterOptions as opt on param.parameterId=opt.parameterId where param.productId=?', [$productData->{productId}]);
+        my $parameters; my $options;
+        while (my %row = $parameterSth->hash) {
+            $parameters->{$row{parameterId}} = {
+                name        => $row{name},
+                parameterId => $row{parameterId},
+                options     => [],
+            } unless (defined $parameters->{$row{parameterId}});
+            if ($row{value}) {
+                my $option = {
+                    value       => $row{value},
+                    optionId    => $row{optionId},
+                    parameterId => $row{parameterId},
+                    priceModifier   => $row{priceModifier},
+                    weightModifier  => $row{weightModifier},
+                    skuModifier => $row{skuModifier}
+                };
+                push(@{$parameters->{$row{parameterId}}->{options}}, $row{optionId});
+                $options->{$row{optionId}} = $option;
+            }
+        }
+
+        ##Get the variants
+        $variantSth->execute([$productData->{productId}]);
+        while (my $variantData = $variantSth->hashRef) {
+            my $shortdesc = '';
+            foreach (split(/,/,$variantData->{composition})) {
+                my ($parameterId, $optionId) = split(/\./, $_);
+                my $parameter = $parameters->{$parameterId}->{name};
+                my $value     = $options->{$optionId}->{value};
+                $shortdesc .= sprintf('%s:%s,', $parameter, $value);
+            }
+            $shortdesc =~ s/,$//; ##tidy up and clip to 30 chars
+            $shortdesc = substr $shortdesc, 0, 30;
+
+            my $variant;
+            $variant->{varSku}    = $variantData->{sku};
+            $variant->{price}     = $variantData->{price};
+            $variant->{weight}    = $variantData->{weight};
+            $variant->{quantity}  = $variantData->{available};
+            $variant->{shortdesc} = $shortdesc;
+            $sku->setCollateral('variantsJSON', 'new', $variant);
+        }
+    }
+    $productSth->finish;
+    $variantSth->finish;
+    ##Clean up tables
+    #$session->db->write('drop table products');
+    #$session->db->write('drop table productParameters');
+    #$session->db->write('drop table productParameterOptionss');
+    #$session->db->write('drop table productVariants');
+    ##Remove old code
+    #unlink '../../lib/WebGUI/Product.pm';
+    #unlink '../../lib/WebGUI/Operation/ProductManager.pm';
     return 1;
 }
 
