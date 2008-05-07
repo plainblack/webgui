@@ -821,6 +821,7 @@ sub mergeProductsWithCommerce {
                 $options->{$row{optionId}} = $option;
             }
         }
+        $parameterSth->finish;
 
         ##Get the variants
         $variantSth->execute([$productData->{productId}]);
@@ -847,13 +848,14 @@ sub mergeProductsWithCommerce {
     $productSth->finish;
     $variantSth->finish;
     ##Clean up tables
-    #$session->db->write('drop table products');
-    #$session->db->write('drop table productParameters');
-    #$session->db->write('drop table productParameterOptionss');
-    #$session->db->write('drop table productVariants');
+    $session->db->write('drop table products');
+    $session->db->write('drop table productParameters');
+    $session->db->write('drop table productParameterOptionss');
+    $session->db->write('drop table productVariants');
     ##Remove old code
     #unlink '../../lib/WebGUI/Product.pm';
     #unlink '../../lib/WebGUI/Operation/ProductManager.pm';
+    #unlink '../../lib/WebGUI/Macro/Product.pm';
     return 1;
 }
 
