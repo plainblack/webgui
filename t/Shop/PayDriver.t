@@ -68,6 +68,9 @@ cmp_deeply  (
 
 $definition = WebGUI::Shop::PayDriver->definition($session);
 
+use Data::Dumper;
+diag Dumper $definition;
+
 cmp_deeply  (
     $definition,
     [ {
@@ -89,7 +92,7 @@ cmp_deeply  (
                 fieldType       => 'group',
                 label           => ignore(),
                 hoverHelp       => ignore(),
-                defaultValue    => 1,
+                defaultValue    => 7,
             },
             receiptEmailTemplateId  => {
                 fieldType       => 'template',
