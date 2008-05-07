@@ -856,6 +856,13 @@ sub mergeProductsWithCommerce {
     #unlink '../../lib/WebGUI/Product.pm';
     #unlink '../../lib/WebGUI/Operation/ProductManager.pm';
     #unlink '../../lib/WebGUI/Macro/Product.pm';
+    ##Disable the Product macro in the config file.  You can't use the convenience method
+    #deleteFromHash since the macro name is in the value, not the key.
+    #my %macros = %{ $session->config->get('macros') };
+    #foreach (my ($key, $value) = each %macros) {
+    #    delete $macros{$key} if $value eq 'Product';
+    #}
+    #$session->config->set('macros', \%macros);
     return 1;
 }
 
