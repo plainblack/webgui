@@ -346,6 +346,12 @@ sub view {
 	my $start;
 	$self->session->asset(WebGUI::Asset->newByUrl($self->session)) unless ($self->session->asset);
 	my $current = $self->session->asset;
+
+    # no current asset is set
+    unless (defined $current) {
+        $current = WebGUI::Asset->getDefault($self->session);
+    }
+
 	if ($self->get("startType") eq "specificUrl") {
 		$start = WebGUI::Asset->newByUrl($self->session,$self->get("startPoint"));
 	} elsif ($self->get("startType") eq "relativeToRoot") {
