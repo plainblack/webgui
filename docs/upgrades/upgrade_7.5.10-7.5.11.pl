@@ -850,7 +850,7 @@ sub mergeProductsWithCommerce {
     ##Clean up tables
     $session->db->write('drop table products');
     $session->db->write('drop table productParameters');
-    $session->db->write('drop table productParameterOptionss');
+    $session->db->write('drop table productParameterOptions');
     $session->db->write('drop table productVariants');
     ##Remove old code
     #unlink '../../lib/WebGUI/Product.pm';
