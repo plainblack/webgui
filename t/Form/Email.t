@@ -43,6 +43,18 @@ my $testBlock = [
 	},
 	{
 		key => 'EMAIL3',
+		testValue => 'web-gui@nowhere.org',
+		expected  => 'EQUAL',
+		comment   => 'dashed email address'
+	},
+	{
+		key => 'EMAIL5',
+		testValue => 'web_gui@nowhere.org',
+		expected  => 'EQUAL',
+		comment   => 'underscore email address'
+	},
+	{
+		key => 'EMAIL6',
 		testValue => 'what do you want?',
 		expected  => undef,
 		comment   => 'not an email address'
