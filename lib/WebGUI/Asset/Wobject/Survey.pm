@@ -1596,12 +1596,12 @@ sub createDefaultAnswers{
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, 1,10,1,0,20,2]);
     
     }elsif($type eq 'Dual Slider - Range'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, 1,10,1,0,20,2]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, undef, undef, undef, 1,10,1,0,20,2]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, 0,10,1,0,20,2]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, undef, undef, undef, 0,10,1,0,20,2]);
     
     }elsif($type eq 'Multi Slider - Allocate'){
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, 1,10,1,0,20,2]);
-        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, undef, undef, undef, 1,10,1,0,20,2]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, 0,10,1,0,20,2]);
+        $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 2, undef, undef, undef, undef, 0,10,1,0,20,2]);
 
     }elsif($type eq 'Date'){
         $self->AnswersInsert([$self->getId(),$sid,$qid,$self->session->id->generate(), 1, undef, undef, undef, undef, undef,undef,undef,0,20,2]);
