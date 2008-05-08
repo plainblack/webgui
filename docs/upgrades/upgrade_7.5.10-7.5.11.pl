@@ -47,6 +47,7 @@ convertTransactionLog($session);
 upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
+updateUsersOfProductMacro($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
@@ -865,6 +866,49 @@ sub mergeProductsWithCommerce {
     #$session->config->set('macros', \%macros);
     return 1;
 }
+
+#-------------------------------------------------
+sub updateUsersOfProductMacro {
+	my $session = shift;
+	print "\tUpdate assets which might be using the Product macro.\n" unless ($quiet);
+    my $wobjSth = $session->db->read('select assetId, revisionDate, description from wobject order by assetId, revisionDate');
+    my $fixed   = $session->db->prepare('update wobject set description=? where  assetId=? and revisionDate=?');
+    while (my $wobject = $wobjSth->hashRef) {
+        while ($wobject->{description} =~ m/\^Product\('? ([^),']+) /xg) {
+            printf "\t\tWorking on %s\n", $wobject->{assetId};
+            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
+            printf "\t\t\tFound argument of %s\n", $identifier;
+            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
+            printf "\t\t\tsku assetId: %s\n", $assetId;
+            my $productAssetId = $assetId ? $assetId : $identifier;
+            $wobject->{description} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
+            printf "\t\t\tUpdated description to%s\n", $wobject->{description};
+            $fixed->execute([ $wobject->{description}, $wobject->{assetId}, $wobject->{revisionDate}, ]);
+        }
+    }
+    $wobjSth->finish;
+    $fixed->finish;
+
+    my $snipSth = $session->db->read('select assetId, revisionDate, snippet from snippet order by assetId, revisionDate');
+       $fixed   = $session->db->prepare('update snippet set snippet=? where  assetId=? and revisionDate=?');
+    while (my $snippet = $snipSth->hashRef) {
+        while ($snippet->{snippet} =~ m/\^Product\('? ([^),']+) /xg) {
+            printf "\t\tWorking on %s\n", $snippet->{assetId};
+            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
+            printf "\t\t\tFound argument of %s\n", $identifier;
+            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
+            printf "\t\t\tsku assetId: %s\n", $assetId;
+            my $productAssetId = $assetId ? $assetId : $identifier;
+            $snippet->{snippet} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
+            printf "\t\t\tUpdated snippet to%s\n", $snippet->{snippet};
+            $fixed->execute([ $snippet->{snippet}, $snippet->{assetId}, $snippet->{revisionDate}, ]);
+        }
+    }
+    $snipSth->finish;
+    $fixed->finish;
+    return 1;
+}
+
 
 #-------------------------------------------------
 sub insertCommercePayDriverTable {
