@@ -253,15 +253,16 @@ Survey.Form = new function() {
         for(var i in q.answers){
             var a = q.answers[i];
             var step = q.answers[i].step; 
-            var scale = sliderWidth/q.answers[i].max;
-            var Event = YAHOO.util.Event;
+            var min = parseInt(q.answers[i].min);
+            var distance = parseInt(q.answers[i].max) + (-1 * min);
+            var scale = sliderWidth/distance;
             var lang  = YAHOO.lang;
             var id = a.Survey_answerId;
             var s = YAHOO.widget.Slider.getHorizSlider(id+'slider-bg', id+'slider-thumb', 
                 0, sliderWidth, (scale*step));
+            
             s.scale = scale;
             sliders[id] = s;
-            s.max = a.max*scale; 
             s.input = a.Survey_answerId; 
             s.scale = scale;
             document.getElementById(id).value = a.min;
@@ -270,7 +271,7 @@ Survey.Form = new function() {
                 t.value = this.getRealValue();
             };
             s.getRealValue = function() {
-                return this.getValue() / this.scale; 
+                return parseInt(( (this.getValue() / total) * distance) + min ); 
             }
             s.subscribe("slideEnd", check);
         }
@@ -279,8 +280,9 @@ Survey.Form = new function() {
     this.sliderManager = function(q,t){
         var total = sliderWidth; 
         var step = q.answers[0].step; 
-        var scale = sliderWidth/q.answers[0].max;
-
+        var min = parseInt(q.answers[0].min);
+        var distance = parseInt(q.answers[0].max) + (-1 * min);
+        var scale = sliderWidth/distance;
         for(var i in q.answers){
             var a = q.answers[i];
             var Event = YAHOO.util.Event;
@@ -324,8 +326,8 @@ Survey.Form = new function() {
             Event.on(document.getElementById(s.input), "blur", manualEntry);
             
             s.getRealValue = function() { 
-
-                return Math.round(parseInt(this.getValue()) / scale); 
+                return parseInt(( (this.getValue() / total) * distance) + min ); 
+                //return Math.round(parseInt(this.getValue()) / scale); 
             }
             document.getElementById(s.input).value = s.getRealValue();
         }
@@ -376,20 +378,28 @@ Survey.Form = new function() {
             }
         } 
         else if(b.className == 'mcbutton'){
-            var max = parseInt(document.getElementById(qid+'max').innerHTML);
+            var bscount = 0;//button selected count
+            for(var i in butts){
+                if(butts[i].className == 'mcbutton-selected'){bscount++;}
+            }
+            var max = maxA - bscount;//= parseInt(document.getElementById(qid+'max').innerHTML);
             if(max == 0){
                 b.className='mcbutton';
                 //warn that options used up
             }
             else{
                 b.className='mcbutton-selected';
-                document.getElementById(qid+'max').innerHTML = parseInt(max-1);
+                //document.getElementById(qid+'max').innerHTML = parseInt(max-1);
                 document.getElementById(b.hid).value = 1;
             }
         }else{
             b.className='mcbutton';
-            var max = parseInt(document.getElementById(qid+'max').innerHTML);
-            document.getElementById(qid+'max').innerHTML = parseInt(max+1);
+            var bscount = 0;//button selected count
+            for(var i in butts){
+                if(butts[i].className == 'mcbutton-selected'){bscount++;}
+            }
+            var max = maxA - bscount;//= parseInt(document.getElementById(qid+'max').innerHTML);
+//            document.getElementById(qid+'max').innerHTML = parseInt(max+1);
             document.getElementById(b.hid).value = '';
         }
         if(qsize == 1){
