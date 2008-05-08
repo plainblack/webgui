@@ -756,6 +756,25 @@ sub www_addRelatedSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_buy
+
+Method to add a variant from this Product to the cart.  The variant is in the form
+variable vid.
+
+=cut
+
+sub www_buy {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+    ##Need to validate the index
+    my $vid = $self->session->form->process('vid');
+    my $variant = {};
+    $self->addToCart($variant);
+    return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteAccessoryConfirm 
 
 Delete an asset from the accessory list, by index.
