@@ -303,7 +303,7 @@ sub www_editProfileField {
 		-defaultValue=>"Text",
 	);
 	my @profileForms = ();
-	foreach my $form ( sort @{ $fieldType->get("types") }) {
+	foreach my $form ( sort @{ $fieldType->getTypes() }) {
 		next if $form eq 'DynamicField';
         my $w = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$form, "new", [$session]) };
         if ($@) {
