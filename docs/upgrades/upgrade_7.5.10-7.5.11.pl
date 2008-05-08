@@ -906,6 +906,25 @@ sub updateUsersOfProductMacro {
     }
     $snipSth->finish;
     $fixed->finish;
+
+    my $tempSth = $session->db->read('select assetId, revisionDate, template from template order by assetId, revisionDate');
+       $fixed   = $session->db->prepare('update template set template=? where  assetId=? and revisionDate=?');
+    while (my $template = $tempSth->hashRef) {
+        while ($template->{template} =~ m/\^Product\('? ([^),']+) /xg) {
+            printf "\t\tWorking on %s\n", $template->{assetId};
+            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
+            printf "\t\t\tFound argument of %s\n", $identifier;
+            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
+            printf "\t\t\tsku assetId: %s\n", $assetId;
+            my $productAssetId = $assetId ? $assetId : $identifier;
+            $template->{template} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
+            printf "\t\t\tUpdated template to%s\n", $template->{template};
+            $fixed->execute([ $template->{template}, $template->{assetId}, $template->{revisionDate}, ]);
+        }
+    }
+    $tempSth->finish;
+    $fixed->finish;
+
     return 1;
 }
 

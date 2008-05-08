@@ -61,6 +61,24 @@ my $lProperties1 = {
 
 my $layout1 = $root->addChild($lProperties1);
 
+my $sProperties1 = {
+    className => 'WebGUI::Asset::Snippet',
+    url       => 'oneSnippet',
+    title     => 'One Snippet',
+    snippet   => q|^Product('South Beach'); ^Product(i-mG8KKBPuPiUA0qq04byQ);|,
+};
+
+my $snippet1 = $root->addChild($sProperties1);
+
+my $tProperties1 = {
+    className => 'WebGUI::Asset::Template',
+    url       => 'oneTemplate',
+    title     => 'One Template',
+    snippet   => q|^Product('Slingshot Dragonfly'); ^Product('jqRw23vjpIDOYuhaFHoBkA');|,
+};
+
+my $template1 = $root->addChild($tProperties1);
+
 $tag->commit;
 
 diag "Done.";
