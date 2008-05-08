@@ -25,7 +25,6 @@ Survey.Form = new function() {
 
 
     this.displayQuestions = function(params){
-        
         toValidate = new Array();//clear array
         var qs = params.questions;
         var s = params.section;
@@ -188,17 +187,14 @@ Survey.Form = new function() {
                 for(var z in toValidate[i]['answers']){
                     total += Math.round(document.getElementById(z).value);
                 }
-console.log(total+" and "+ toValidate[i]['total']);
                 if(total == toValidate[i]['total']){answered = 1;}
+                else{alert("Please enter amounts that sum to 100% to proceed.");}
             }else{
                 for(var z in toValidate[i]['answers']){
                     var v = document.getElementById(z).value;
                     if(v != '' && v != undefined){
                         answered = 1;
                         break;
-                    }
-                    else{
-                        console.log(z+' was not answered');
                     }
                 }
             }
@@ -365,33 +361,33 @@ console.log(total+" and "+ toValidate[i]['total']);
         var aid = objs[5];
         max = parseInt(max);
         if(maxA == 1){
-            if(b.getAttribute('class') == 'mcbutton-selected'){
+            if(b.className == 'mcbutton-selected'){
                 document.getElementById(b.hid).value = 0;
-                b.setAttribute('class','mcbutton');
+                b.className='mcbutton';
             }else{
                 document.getElementById(b.hid).value = 1;
-                b.setAttribute('class','mcbutton-selected');
+                b.className='mcbutton-selected';
             }
             for(var i in butts){
                 if(butts[i] != b){
-                    butts[i].setAttribute('class','mcbutton');
+                    butts[i].className='mcbutton';
                     document.getElementById(butts[i].hid).value = '';
                 }
             }
         } 
-        else if(b.getAttribute('class') == 'mcbutton'){
+        else if(b.className == 'mcbutton'){
             var max = parseInt(document.getElementById(qid+'max').innerHTML);
             if(max == 0){
-                b.setAttribute('class','mcbutton');
+                b.className='mcbutton';
                 //warn that options used up
             }
             else{
-                b.setAttribute('class','mcbutton-selected');
+                b.className='mcbutton-selected';
                 document.getElementById(qid+'max').innerHTML = parseInt(max-1);
                 document.getElementById(b.hid).value = 1;
             }
         }else{
-            b.setAttribute('class','mcbutton');
+            b.className='mcbutton';
             var max = parseInt(document.getElementById(qid+'max').innerHTML);
             document.getElementById(qid+'max').innerHTML = parseInt(max+1);
             document.getElementById(b.hid).value = '';

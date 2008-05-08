@@ -54,7 +54,7 @@ Survey.SectionTemplate = new function(){
             }
             html = html + "\
             <hr>\
-            <p>Section Text:</p> <textarea name=sectionText maxlength=2056 cols=50 rows=10>"+ params.sectionText +"</textarea>\
+            <p>Section Text:</p> <textarea name=sectionText maxlength=2056 cols=65 rows=4>"+ params.sectionText +"</textarea>\
         ";
         html = html + "<p>Title on every page: " + this.makeRadio('everyPageTitle',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageTitle);
         html = html + "<p>Text on every page: " + this.makeRadio('everyPageText',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageText);
@@ -68,7 +68,7 @@ Survey.SectionTemplate = new function(){
         }
 
         var form = new YAHOO.widget.Dialog("section",
-           { width : "400px",
+           { width : "500px",
              fixedcenter : true,
              visible : false,
              constraintoviewport : true,

@@ -55,9 +55,15 @@ input.mcbutton:hover{
 }
 input.mcbutton-selected{
     background-color: #172D9D;
+    background-repeat: repeat-x;
     color: #FFFFFF;
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 10px;
+    margin: 0.5em;
+    padding: .8em;
+    width: 60px;
+    text-align: center;
+    display: block;
     font-weight: bold;
     background-image: url(/extras/wobject/Survey/gradient-glossy.png);
     background-position: 0px 0px;
