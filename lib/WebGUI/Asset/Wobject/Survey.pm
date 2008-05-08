@@ -604,7 +604,7 @@ sub getFirstSection{
 sub insertSection{
     my $self = shift;
     my $data = shift;#array ref
-    $self->session->db->write("insert into Survey_section values(?,?,?,?,?,?,?,?,?,?,?,?,?)",$data);
+    $self->session->db->write("insert into Survey_section values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",$data);
 }
 
 
@@ -782,7 +782,7 @@ $self->session->errorHandler->warn("goodReponses".Dumper @goodResponses);
             my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
             $path = $storage->getPath($filename);
         }
-$self->session->errorHandler->warn("Inserting a response ".$id->{'Survey_answerId'});
+$self->session->errorHandler->warn("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
         $self->session->db->write("insert into Survey_questionResponse 
             select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
             [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
@@ -1034,19 +1034,23 @@ sub getPreviousAnswer{
     my ($self,$responseId,$var) = @_;
     $var =~ s/^\[\[//g;
     $var =~ s/\]\]$//g;
+$self->session->errorHandler->warn("getPreviousAnswer for $var");
     my $ref = $self->session->db->buildArrayRefOfHashRefs("select a.answerText, qa.response from Survey_questionResponse qa, Survey_question q, Survey_answer a 
         where q.questionVariable = ? and q.Survey_questionId = a.Survey_questionId and a.Survey_answerId = qa.Survey_answerId 
         and qa.Survey_responseId = ? and qa.response != '' and qa.response is not null limit 1",[$var,$responseId]);
     my $string;
+use Data::Dumper;
+$self->session->errorHandler->warn("getPreviousAnswer ".Dumper $ref);
     if(@$ref < 1){
         $string = "PREVIOUS ANSWSER";
     }else{
-        if($$ref[0]{'response'}){
-            $string = $$ref[0]{'response'};
+        if($$ref[0]->{'answerText'} ne ""){
+            $string = $$ref[0]->{'answerText'};
         }else{
-            $string = $$ref[0]{'answerText'};
+            $string = $$ref[0]->{'response'};
         }
     }
+$self->session->errorHandler->warn("getPreviousAnswer returning $string");
     return $string;
 }
 sub getRandomText{
@@ -1120,31 +1124,35 @@ $self->session->errorHandler->warn(join(',',@params));
         order by RAND()
         LIMIT ?
         ",\@params);
-    for(my $i=0; $i<=$#$questions; $i++){
-        $$questions[$i]{'answers'} =  $self->session->db->buildArrayRefOfHashRefs("
-            select a.* 
-            from Survey_answer a
-            where a.Survey_questionId = ? 
-            order by a.sequenceNumber ASC
-            ",[$$questions[$i]{'Survey_questionId'}]);
-    }
 
+    $questions = $self->getAnswersForQuestions($questions);
 
-#use Data::Dumper;
-#$self->session->errorHandler->warn(Dumper $questions);
     $questions = $self->fillQuestionTextVariables($responseId,$questions);
+
     return $questions;
-
-
 }
-
+sub getAnswersForQuestions{
+    my ($self,$questions) = @_;
+    for(my $i=0; $i<=$#$questions; $i++){
+        my $sql = "select a.* 
+            from Survey_answer a
+            where a.Survey_questionId = ?";
+        if($$questions[$i]{'randomizeAnswers'} eq '0'){
+            $sql .= " order by a.sequenceNumber ASC";
+        } 
+        else{
+            $sql .= " order by RAND()";
+        }
+        $$questions[$i]{'answers'} =  $self->session->db->buildArrayRefOfHashRefs( $sql ,[$$questions[$i]{'Survey_questionId'}] );
+    }
+    return $questions;
+}
 sub getQuestionsAndAnswers{
     my ($self,$responseId,$section,$questionId) = @_;
     my $qNeeded = $section->{'questionsPerPage'};
     my $ref;
     my $seqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_question where Survey_questionId = ?",[$questionId]);
     if(!$seqNum){$seqNum = 1;}
-$self->session->errorHandler->warn("getQuestionsAndAnwers seqnum: $seqNum\tsectionid: ".$section->{'Survey_sectionId'});
     my $questions =  $self->session->db->buildArrayRefOfHashRefs("
         select q.* 
         from Survey_question q
@@ -1152,18 +1160,11 @@ $self->session->errorHandler->warn("getQuestionsAndAnwers seqnum: $seqNum\tsecti
         order by q.sequenceNumber ASC
         ",[$section->{'Survey_sectionId'},$seqNum,$seqNum+$section->{'questionsPerPage'}]);
 
-    for(my $i=0; $i<=$#$questions; $i++){
-        $$questions[$i]{'answers'} =  $self->session->db->buildArrayRefOfHashRefs("
-            select a.* 
-            from Survey_answer a
-            where a.Survey_questionId = ? 
-            order by a.sequenceNumber ASC
-            ",[$$questions[$i]{'Survey_questionId'}]);
-    }
+    $questions = $self->getAnswersForQuestions($questions);
+
     $questions = $self->fillQuestionTextVariables($responseId,$questions);
+
     return $questions;
-
-
 }
   
 sub getNextQuestionId{
@@ -1182,7 +1183,7 @@ sub getNextSection{
     my $section;
 
     my $var = $self->session->db->quickScalar("select goto from Survey_section 
-        where s.Survey_sectionId = ?", [$sid]);
+        where Survey_sectionId = ?", [$sid]);
     my @array = split/\s*\,\s*/,$var;
     my $picked = int(rand(scalar @array));
 
