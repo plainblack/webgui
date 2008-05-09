@@ -390,6 +390,19 @@ sub getPrice {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getQuantityAvailable ( )
+
+Returns the amount of a variant that are available.
+
+=cut
+
+sub getQuantityAvailable {
+    my $self = shift;
+    return $self->getOptions->{quantity};
+}
+
+#-------------------------------------------------------------------
 sub getThumbnailUrl {
     my $self = shift;
     my $store = shift || WebGUI::Storage::Image->get($self->session, $self->get('image1'));
