@@ -18,6 +18,7 @@ use WebGUI::Asset::Sku::Product;
 use WebGUI::Workflow;
 use File::Find;
 use File::Spec;
+use File::Path;
 use JSON;
 
 my $toVersion = '7.5.11';
@@ -774,7 +775,6 @@ EOSQL1
     $session->config->deleteFromArray('assets', 'WebGUI::Asset::Wobject::Product');
     $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Product');
 
-    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
     return;
 }
 
@@ -853,19 +853,44 @@ sub mergeProductsWithCommerce {
     $session->db->write('drop table productParameters');
     $session->db->write('drop table productParameterOptions');
     $session->db->write('drop table productVariants');
-    ##Remove old code
-    #unlink '../../lib/WebGUI/Product.pm';
-    #unlink '../../lib/WebGUI/Operation/ProductManager.pm';
-    #unlink '../../lib/WebGUI/Macro/Product.pm';
-    ##Disable the Product macro in the config file.  You can't use the convenience method
-    #deleteFromHash since the macro name is in the value, not the key.
-    #my %macros = %{ $session->config->get('macros') };
-    #foreach (my ($key, $value) = each %macros) {
-    #    delete $macros{$key} if $value eq 'Product';
-    #}
-    #$session->config->set('macros', \%macros);
     return 1;
 }
+
+#-------------------------------------------------
+sub removeOldCommerceCode {
+	my $session = shift;
+    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
+
+    rmtree '../../lib/WebGUI/Commerce.pm';
+    unlink '../../lib/WebGUI/Product.pm';
+    unlink '../../lib/WebGUI/Subscription.pm';
+
+    unlink '../../lib/WebGUI/Macro/Product.pm';
+    unlink '../../lib/WebGUI/Help/Macro_Product.pm';
+    unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';
+
+    unlink '../../lib/WebGUI/Operation/ProductManager.pm';
+    unlink '../../lib/WebGUI/Help/ProductManager.pm';
+    unlink '../../lib/WebGUI/i18n/English/ProductManager.pm';
+
+    unlink '../../lib/WebGUI/Operation/Commerce.pm';
+    unlink '../../lib/WebGUI/Help/Commerce.pm';
+    unlink '../../lib/WebGUI/i18n/English/Commerce.pm';
+
+    unlink '../../lib/WebGUI/Operation/Subscription.pm';
+    unlink '../../lib/WebGUI/Help/Subscription.pm';
+    unlink '../../lib/WebGUI/i18n/English/Subscription.pm';
+
+    #Disable the Product macro in the config file.  You can't use the convenience method
+    #deleteFromHash since the macro name is in the value, not the key.
+    my %macros = %{ $session->config->get('macros') };
+    foreach (my ($key, $value) = each %macros) {
+        delete $macros{$key} if $value eq 'Product';
+    }
+    $session->config->set('macros', \%macros);
+    return 1;
+}
+
 
 #-------------------------------------------------
 sub updateUsersOfProductMacro {
