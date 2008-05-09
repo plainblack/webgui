@@ -173,7 +173,7 @@ sub installCollateral {
 	);
 }
 
-END: {
+END {
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI Help HelpTest.pm/);
 }
 

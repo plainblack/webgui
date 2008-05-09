@@ -701,7 +701,7 @@ diag $assetProps->{title};
 
 isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
-END: {
+END {
     $session->config->set( 'extrasURL',    $origExtras);
     $session->config->set( 'uploadsURL',   $origUploads);
     $session->setting->set('urlExtension', $origUrlExtension);

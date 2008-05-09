@@ -243,7 +243,7 @@ is( $check, 0, 'delete worked');
 
 }
 
-END: {
+END {
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
 }

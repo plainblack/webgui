@@ -121,7 +121,7 @@ cmp_bag(
 
 }
 
-END: {
+END {
     $session->setting->set('passiveProfilingEnabled', $origPassiveProfiling);
     $session->db->write('delete from passiveProfileLog where dateOfEntry >= ?',[$startingTime-1]);
     $versionTag->rollback;

@@ -80,6 +80,6 @@ foreach my $testSession (@sessions) {
 ## Make sure that one scratch session was deleted and the other kept.
 ## Close and end all four sessions
 
-END: {
+END {
     $session->setting->set('sessionTimeout', $origSessionTimeout );
 }

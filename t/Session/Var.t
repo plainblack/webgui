@@ -195,7 +195,7 @@ is($varTest->get('userId'), 3, 'userId set via start');
 $varTest->start("", $varTest->getId);
 is($varTest->get('userId'), 1, 'calling start with null userId returns default user (visitor)');
 
-END: {
+END {
 
 	$session->env->{_env} = $origEnv;
 

@@ -285,6 +285,6 @@ cmp_deeply(
     'Check table structure',
 );
 
-END: {
+END {
     $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 }

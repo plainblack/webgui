@@ -170,7 +170,7 @@ sub linkAndText {
 
 my $icon = $session->icon->drag();
 
-END: {
+END {
 	$session->user->profileField('toolbar', $origToolbar);
 }
 

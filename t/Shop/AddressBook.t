@@ -209,7 +209,7 @@ undef $book;
 
 }
 
-END: {
+END {
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
 }
