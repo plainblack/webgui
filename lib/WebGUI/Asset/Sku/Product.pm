@@ -768,7 +768,8 @@ sub www_buy {
     return $self->session->privilege->insufficient() unless $self->canView;
     ##Need to validate the index
     my $vid = $self->session->form->process('vid');
-    my $variant = {};
+    my $variant = $self->getCollateral('variantsJSON', $vid);
+    return '' unless keys %{ $variant };
     $self->addToCart($variant);
     return '';
 }
@@ -1298,9 +1299,9 @@ sub view {
     $var{relatedproduct_loop} = \@relatedloop;
 
     #---variants
-    $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
-    $var{'addvariant.label'} = $i18n->get('add a variant');
     my @variantLoop;
+    my %variants = ();
+    tie %variants, 'Tie::IxHash';
     foreach my $collateral ( @{ $self->getIndexedCollateralData('variantsJSON')} ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteVariantConfirm&vid='.$id,$self->get('url'),$i18n->get('delete variant confirm'))
@@ -1316,7 +1317,14 @@ sub view {
                                    'variant.quantity' => $collateral->{quantity},
                                 });
     }
-    $var{variant_loop} = \@variantLoop;
+    if ($self->canEdit) {
+        $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
+        $var{'addvariant.label'} = $i18n->get('add a variant');
+        $var{variant_loop} = \@variantLoop;
+    }
+    else {
+        $var{variant_loop} = [];
+    }
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
