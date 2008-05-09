@@ -1158,7 +1158,8 @@ sub www_moveVariantUp {
 #-------------------------------------------------------------------
 sub view {
     my $self = shift;
-    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    my $session = $self->session;
+    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
@@ -1173,42 +1174,42 @@ sub view {
     my $image3 = $self->get("image3");
 
     #---brochure
-    my $i18n = WebGUI::International->new($self->session,'Asset_Product');
+    my $i18n = WebGUI::International->new($session,'Asset_Product');
     if ($brochure) {
-        my $file = WebGUI::Storage->get($self->session,$brochure);
+        my $file = WebGUI::Storage->get($session,$brochure);
         $var{"brochure.icon"}  = $self->getFileIconUrl($file);
         $var{"brochure.label"} = $i18n->get(13);
         $var{"brochure.URL"}   = $self->getFileUrl($file);
     }
     #---manual
     if ($manual) {
-        my $file = WebGUI::Storage->get($self->session,$manual);
+        my $file = WebGUI::Storage->get($session,$manual);
         $var{"manual.icon"}  = $self->getFileIconUrl($file);
         $var{"manual.label"} = $i18n->get(14);
         $var{"manual.URL"}   = $self->getFileUrl($file);
     }
     #---warranty
     if ($warranty) {
-        my $file = WebGUI::Storage->get($self->session,$warranty);
+        my $file = WebGUI::Storage->get($session,$warranty);
         $var{"warranty.icon"}  = $self->getFileIconUrl($file);
         $var{"warranty.label"} = $i18n->get(15);
         $var{"warranty.URL"}   = $self->getFileUrl($file);
     }
     #---image1
     if ($image1) {
-        my $file = WebGUI::Storage::Image->get($self->session,$image1);
+        my $file = WebGUI::Storage::Image->get($session,$image1);
         $var{thumbnail1} = $self->getThumbnailUrl($file);
         $var{image1}     = $self->getFileUrl($file);
     }
     #---image2
     if ($image2) {
-        my $file = WebGUI::Storage::Image->get($self->session,$image2);
+        my $file = WebGUI::Storage::Image->get($session,$image2);
         $var{thumbnail2} = $self->getThumbnailUrl($file);
         $var{image2}     = $self->getFileUrl($file);
     }
     #---image3
     if ($image3) {
-        my $file = WebGUI::Storage::Image->get($self->session,$image3);
+        my $file = WebGUI::Storage::Image->get($session,$image3);
         $var{thumbnail3} = $self->getThumbnailUrl($file);
         $var{image3}     = $self->getFileUrl($file);
    }
@@ -1272,7 +1273,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
-        my $accessory = WebGUI::Asset->newByDynamicClass($self->session, $collateral->{accessoryAssetId});
+        my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
         push(@accessoryloop,{
                            'accessory.URL'      => $accessory->getUrl,
                            'accessory.title'    => $accessory->getTitle,
@@ -1289,7 +1290,7 @@ sub view {
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
-        my $related = WebGUI::Asset->newByDynamicClass($self->session, $collateral->{relatedAssetId});
+        my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
         push(@relatedloop,{
                           'relatedproduct.URL'      => $related->getUrl,
                           'relatedproduct.title'    => $related->getTitle,
@@ -1316,7 +1317,20 @@ sub view {
                                    'variant.weight'   => $collateral->{weight},
                                    'variant.quantity' => $collateral->{quantity},
                                 });
+        $variants{$id} = $collateral->{shortdesc};
     }
+    $var{buyFormHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
+                        . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
+    $var{buyFormFooter} = WebGUI::Form::formFooter($session);
+    $var{buyOptions}    = WebGUI::Form::selectBox($session,
+        {
+            name    => 'vid',
+            label   => $i18n->get('add to cart'),
+            options => \%variants,
+            value   => [0],
+        },
+    );
+    $var{buyButton}     = WebGUI::Form::submit($session, { } );
     if ($self->canEdit) {
         $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant.label'} = $i18n->get('add a variant');

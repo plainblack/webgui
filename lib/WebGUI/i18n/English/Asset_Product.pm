@@ -747,6 +747,12 @@ be useful, others may not.|,
 		lastUpdated => 1210029452,
 	},
 
+	'add to cart' => {
+		message => q|Add to cart|,
+		lastUpdated => 1210351464,
+		context => q|The label for the add to cart button.|
+	},
+
 };
 
 1;
