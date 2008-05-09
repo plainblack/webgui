@@ -1330,7 +1330,7 @@ sub view {
             value   => [0],
         },
     );
-    $var{buyButton}     = WebGUI::Form::submit($session, { } );
+    $var{buyButton}     = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
     if ($self->canEdit) {
         $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant.label'} = $i18n->get('add a variant');
