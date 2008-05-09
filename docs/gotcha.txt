@@ -9,9 +9,10 @@ save you many hours of grief.
 
 7.5.11
 --------------------------------------------------------------------
- * The exporting system before this release was largely incomprehensible and
-   difficult to understand. It has been rewritten, and now requires Path::Class
-   and Exception::Class to function.
+ * You need the following new Perl Modules installed before you upgrade:
+	Archive::Any
+	Exception::Class
+	Path::Class
 
  * WebGUI versions since 7.3.0 (when the new Calendar was added) 
    have allowed users to post Events to Calendars, but the owner of
