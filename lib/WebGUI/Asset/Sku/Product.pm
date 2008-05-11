@@ -57,6 +57,28 @@ sub addRevision {
 }
 
 #-------------------------------------------------------------------
+
+=head2 addToCart ( variant )
+
+Override/extend Sku's addToCart method to handle inventory control.
+
+=head3 variant
+
+A hashref of variant information for the variant of the Product
+that is being added to the cart.  Adding the variant to the
+cart decrements the quantity by 1.
+
+=cut
+
+sub addToCart {
+    my $self     = shift;
+    my $variant  = shift;
+    $variant->{quantity} -= 1;
+    $self->setCollateral('variantsJSON', 'vid', $variant);
+    $self->SUPER::addToCart($variant);
+}
+
+#-------------------------------------------------------------------
 sub definition {
     my $class = shift;
     my $session = shift;
