@@ -462,9 +462,6 @@ The index of the collateral data to move down.
 
 =cut
 
-### NOTE: There is a redundant use of assetId in some of these statements on purpose to support
-### two different types of collateral data.
-
 sub moveCollateralDown {
     my $self      = shift;
     my $tableName = shift;
@@ -479,7 +476,7 @@ sub moveCollateralDown {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralDown ( tableName, index )
+=head2 moveCollateralUp ( tableName, index )
 
 Moves a collateral data item up one position.  If called on the first element of the
 collateral array then it does nothing.
@@ -493,9 +490,6 @@ A string indicating the table that contains the collateral data.
 The index of the collateral data to move up.
 
 =cut
-
-### NOTE: There is a redundant use of assetId in some of these statements on purpose to support
-### two different types of collateral data.
 
 sub moveCollateralUp {
     my $self      = shift;
