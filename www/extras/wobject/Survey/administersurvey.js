@@ -22,6 +22,8 @@ Survey.Form = new function() {
     var sliderWidth = 500;
 
     var sliders;
+    
+    this.submittimer;
 
 
     this.displayQuestions = function(params){
@@ -178,7 +180,7 @@ Survey.Form = new function() {
     }
 
 
-    this.formsubmit = function(){
+    this.formsubmit = function(event){
         var submit = 1;//boolean for if all was good or not
         for(var i in toValidate){
             var answered = 0;
@@ -252,10 +254,10 @@ Survey.Form = new function() {
         var total = sliderWidth; 
         for(var i in q.answers){
             var a = q.answers[i];
-            var step = q.answers[i].step; 
-            var min = parseInt(q.answers[i].min);
-            var distance = parseInt(q.answers[i].max) + (-1 * min);
-            var scale = sliderWidth/distance;
+            var step = Math.round(q.answers[i].step); 
+            var min = Math.round(parseFloat(q.answers[i].min));
+            var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
+            var scale = Math.round(sliderWidth/distance);
             var lang  = YAHOO.lang;
             var id = a.Survey_answerId;
             var s = YAHOO.widget.Slider.getHorizSlider(id+'slider-bg', id+'slider-thumb', 
@@ -271,18 +273,18 @@ Survey.Form = new function() {
                 t.value = this.getRealValue();
             };
             s.getRealValue = function() {
-                return parseInt(( (this.getValue() / total) * distance) + min ); 
+                return Math.round(parseFloat(( (this.getValue() / total) * distance) + min )); 
             }
-            s.subscribe("slideEnd", check);
+            s.subscribe("change", check);
         }
     }
     //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
     this.sliderManager = function(q,t){
         var total = sliderWidth; 
-        var step = q.answers[0].step; 
-        var min = parseInt(q.answers[0].min);
-        var distance = parseInt(q.answers[0].max) + (-1 * min);
-        var scale = sliderWidth/distance;
+        var step = Math.round(parseFloat(q.answers[0].step)); 
+        var min = Math.round(parseFloat(q.answers[0].min));
+        var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
+        var scale = Math.round(sliderWidth/distance);
         for(var i in q.answers){
             var a = q.answers[i];
             var Event = YAHOO.util.Event;
@@ -326,8 +328,7 @@ Survey.Form = new function() {
             Event.on(document.getElementById(s.input), "blur", manualEntry);
             
             s.getRealValue = function() { 
-                return parseInt(( (this.getValue() / total) * distance) + min ); 
-                //return Math.round(parseInt(this.getValue()) / scale); 
+                return Math.round(parseFloat(( (this.getValue() / total) * distance) + min )); 
             }
             document.getElementById(s.input).value = s.getRealValue();
         }
@@ -361,7 +362,9 @@ Survey.Form = new function() {
         var butts = objs[3];
         var qsize = objs[4];
         var aid = objs[5];
-        max = parseInt(max);
+        max = parseFloat(max);
+console.log('clearing');
+        clearTimeout(Survey.Form.submittimer);
         if(maxA == 1){
             if(b.className == 'mcbutton-selected'){
                 document.getElementById(b.hid).value = 0;
@@ -382,14 +385,14 @@ Survey.Form = new function() {
             for(var i in butts){
                 if(butts[i].className == 'mcbutton-selected'){bscount++;}
             }
-            var max = maxA - bscount;//= parseInt(document.getElementById(qid+'max').innerHTML);
+            var max = maxA - bscount;//= parseFloat(document.getElementById(qid+'max').innerHTML);
             if(max == 0){
                 b.className='mcbutton';
                 //warn that options used up
             }
             else{
                 b.className='mcbutton-selected';
-                //document.getElementById(qid+'max').innerHTML = parseInt(max-1);
+                //document.getElementById(qid+'max').innerHTML = parseFloat(max-1);
                 document.getElementById(b.hid).value = 1;
             }
         }else{
@@ -398,13 +401,14 @@ Survey.Form = new function() {
             for(var i in butts){
                 if(butts[i].className == 'mcbutton-selected'){bscount++;}
             }
-            var max = maxA - bscount;//= parseInt(document.getElementById(qid+'max').innerHTML);
-//            document.getElementById(qid+'max').innerHTML = parseInt(max+1);
+            var max = maxA - bscount;//= parseFloat(document.getElementById(qid+'max').innerHTML);
+//            document.getElementById(qid+'max').innerHTML = parseFloat(max+1);
             document.getElementById(b.hid).value = '';
         }
-        if(qsize == 1){
+        if(qsize == 1 && b.className == 'mcbutton-selected'){
+console.log("1 butt submit");
             if(! document.getElementById(aid+'verbatim')){
-                Survey.Form.formsubmit();
+                Survey.Form.submittimer=setTimeout("Survey.Form.formsubmit()",500);
             }
         }
     }
