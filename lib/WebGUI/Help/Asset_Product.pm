@@ -55,6 +55,10 @@ our $HELP = {
                     { 'name' => 'variant.quantity' },
                 ]
             },
+            { 'name' => 'buy_form_header' },
+            { 'name' => 'buy_form_options' },
+            { 'name' => 'buy_form_button' },
+            { 'name' => 'buy_form_footer' },
             { 'name' => 'addspecification.url' },
             { 'name' => 'addspecification.label' },
             {   'name'      => 'specification_loop',

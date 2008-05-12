@@ -753,6 +753,26 @@ be useful, others may not.|,
 		context => q|The label for the add to cart button.|
 	},
 
+	'buy_form_header' => {
+		message => q|HTML code to start the form for putting variant into a shopping cart.  |,
+		lastUpdated => 1210611784,
+	},
+
+	'buy_form_options' => {
+		message => q|A dropdown list of available variants for this product.|,
+		lastUpdated => 1210611784,
+	},
+
+	'buy_form_button' => {
+		message => q|The submit button for the form, with internationalized text.|,
+		lastUpdated => 1210611784,
+	},
+
+	'buy_form_footer' => {
+		message => q|HTML code to end the form for putting variant into a shopping cart.  |,
+		lastUpdated => 1210611784,
+	},
+
 };
 
 1;

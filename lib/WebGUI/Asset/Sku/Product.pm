@@ -1354,10 +1354,10 @@ sub view {
                                 });
         $variants{$id} = $collateral->{shortdesc};
     }
-    $var{buyFormHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
-                        . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
-    $var{buyFormFooter} = WebGUI::Form::formFooter($session);
-    $var{buyOptions}    = WebGUI::Form::selectBox($session,
+    $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
+                          . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
+    $var{buy_form_footer} = WebGUI::Form::formFooter($session);
+    $var{buy_options}     = WebGUI::Form::selectBox($session,
         {
             name    => 'vid',
             label   => $i18n->get('add to cart'),
@@ -1365,7 +1365,7 @@ sub view {
             value   => [0],
         },
     );
-    $var{buyButton}     = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+    $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
     if ($self->canEdit) {
         $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant.label'} = $i18n->get('add a variant');
