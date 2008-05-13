@@ -571,7 +571,12 @@ sub shippingOptions {
 		$self->session->db->write("update transaction set shippingOptions=? where transactionId=?",[$self->{_properties}{shippingOptions},$self->{_transactionId}]);
 	}
 
-	return decode_json($self->{_properties}{shippingOptions});
+    if ($self->{_properties}{shippingOptions}) {
+        return decode_json($self->{_properties}{shippingOptions});
+    }
+    else {
+        return {};
+    }
 }
 
 #-------------------------------------------------------------------
