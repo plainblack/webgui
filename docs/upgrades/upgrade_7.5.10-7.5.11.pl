@@ -357,17 +357,16 @@ sub upgradeEMS {
     }
 	unlink($session->config->getWebguiRoot.'/lib/WebGUI/Workflow/Activity/CacheEMSPrereqs.pm');
     
-    my %oldRibbons = ();
-    my %newRibbons = ();
     print "\t\tMigrating old EMS data.\n" unless ($quiet);
+    my (%oldRibbons, %newRibbons, %oldBadges, %newBadges, %oldTickets, %newTickets) = ();
     my $emsResults = $db->read("select assetId from asset where className='WebGUI::Asset::Wobject::EventManagementSystem'");
     while (my ($emsId) = $emsResults->array) {
         my $ems = WebGUI::Asset::Wobject::EventManagementSystem->new($session, $emsId);
-        my $ribbonResults = $db->read("select * from EventManagementSystem_discountPasses left join EventManagementSystem_products using (passId) left join products using (productId) where assetId=?",[$emsId]);
     	print "\t\t\tMigrating old ribbons for $emsId.\n" unless ($quiet);
+        my $ribbonResults = $db->read("select * from EventManagementSystem_discountPasses left join EventManagementSystem_products using (passId) left join products using (productId) where assetId=?",[$emsId]);
         while (my $ribbonData = $ribbonResults->hashRef) {
             my $ribbon = $ems->addChild({
-                className           => 'WebGUI::Asset::Sku::Ribbon',
+                className           => 'WebGUI::Asset::Sku::EMSRibbon',
                 title               => $ribbonData->{title},
                 description         => $ribbonData->{description},
                 sku                 => $ribbonData->{sku},
@@ -377,9 +376,68 @@ sub upgradeEMS {
             $oldRibbons{$ribbonData->{passId}} = $ribbon->getId;
             $newRibbons{$ribbon->getId} = $ribbonData->{passId};
         }
+    	print "\t\t\tMigrating old badges for $emsId.\n" unless ($quiet);
+        my $badgeResults = $db->read("select * from EventManagementSystem_products left join products using (productId) where assetId=? and prerequisiteId=''",[$emsId]);
+        while (my $badgeData = $badgeResults->hashRef) {
+            my $badge = $ems->addChild({
+                className           => 'WebGUI::Asset::Sku::EMSBadge',
+                title               => $badgeData->{title},
+                description         => $badgeData->{description},
+                sku                 => $badgeData->{sku},
+                price               => $badgeData->{price},
+                seatsAvailable      => $badgeData->{maximumAttendees},
+                });
+            $oldBadges{$badgeData->{productId}} = $badge->getId;
+            $newBadges{$badge->getId} = $badgeData->{productId};
+        }
+    	print "\t\t\tMigrating old tickets for $emsId.\n" unless ($quiet);
+        my %metaFields = $db->buildHash("select fieldId,label from EventManagementSystem_metaField where assetId=? order by sequenceNumber",[$emsId]);
+        my $ticketResults = $db->read("select * from EventManagementSystem_products left join products using (productId) where assetId=? and prerequisiteId<>''",[$emsId]);
+        while (my $ticketData = $ticketResults->hashRef) {
+            my %oldMetaData = $db->buildHash("select fieldId,fieldData from EventManagementSystem_metaData where productId=?",[$ticketData->{productId}]);
+            my %metaData = ();
+            foreach my $fieldId (keys %oldMetaData) {
+                $metaData{$metaFields{$fieldId}} = $oldMetaData{$fieldId};
+            }
+            my $start =  WebGUI::DateTime->new($session, $ticketData->{startDate});
+            my $end =  WebGUI::DateTime->new($session, $ticketData->{endDate});
+            my $duration = $end - $start;
+            my $ticket = $ems->addChild({
+                className           => 'WebGUI::Asset::Sku::EMSBadge',
+                title               => $ticketData->{title},
+                description         => $ticketData->{description},
+                sku                 => $ticketData->{sku},
+                price               => $ticketData->{price},
+                seatsAvailable      => $ticketData->{maximumAttendees},
+                startDate           => $start->toDatabase,
+                duration            => $duration->in_units('seconds'),
+                eventNumber         => $ticketData->{sku},
+                eventMetaData       => \%metaData,
+                });
+            $oldTickets{$ticketData->{productId}} = $ticket->getId;
+            $newTickets{$ticket->getId} = $ticketData->{productId};
+        }
+    	print "\t\t\tMigrating old registrants for $emsId.\n" unless ($quiet);
+        my $registrantResults = $db->read("select * from EventManagementSystem_badges where assetId=?",[$emsId]);
+        while (my $registrantData = $registrantResults->hashRef) {
+            $db->setRow("EMSRegistrant","badgeId",{
+                badgeId             => "new",
+                userId              => $registrantData->{userId},
+                badgeNumber         => $registrantData->{badgeId},
+                badgeAssetId        => $oldBadges{$registrantData->{badgeId}},
+                emsAssetId          => $emsId,
+                name                => $registrantData->{firstName}.' '.$registrantData->{lastName},
+                address1            => $registrantData->{address},
+                city                => $registrantData->{city},
+                state               => $registrantData->{state},
+                zipcode             => $registrantData->{zipCode},
+                country             => $registrantData->{country},
+                phoneNumber         => $registrantData->{phone},
+                email               => $registrantData->{email},
+                purchaseComplete    => 1,
+                },$registrantData->{badgeId});
+        }
     }
-
-
 }
 
 #-------------------------------------------------
