@@ -16,6 +16,16 @@ package WebGUI::Asset::Wobject::WeatherData;
 
 use strict;
 use Weather::Com::Finder;
+BEGIN {
+    # This is horrible, and needs to be removed when Weather::Com > 0.5.3 is released.
+    my $old_get_weather = \&Weather::Com::Base::get_weather;
+    *Weather::Com::Base::get_weather = sub {
+        my $self = shift;
+        $self->{LINKS} = 1;
+        return $self->$old_get_weather(@_);
+    };
+}
+
 use WebGUI::International;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Utility;
@@ -116,25 +126,35 @@ sub view {
 			next unless defined $weather;
 
             foreach my $foundLocation(@{$weather->find($location)}) {
-                my $conditions = $foundLocation->current_conditions->description;
+                my $current_conditions = $foundLocation->current_conditions;
+                my $conditions = $current_conditions->description;
                 $conditions    =~ s/\b(\w)/uc($1)/eg;
-                my $tempC      = $foundLocation->current_conditions->temperature;
+                my $tempC      = $current_conditions->temperature;
                 my $tempF;
                 $tempF = sprintf("%.0f",(((9/5)*$tempC) + 32)) if($tempC);
-                my $icon = $foundLocation->current_conditions->icon || "na";
-                
+                my $icon = $current_conditions->icon || "na";
+
                 push(@{$var{'ourLocations.loop'}}, {
-       					query 		=> $location,
-	       	            cityState 	=> $foundLocation->name || $location,
-       		            sky 		=> $conditions || 'N/A',
-       		            tempF 		=> (defined $tempF)?$tempF:'N/A',
-					    tempC 		=> (defined $tempC)?$tempC:'N/A',
-	       	            smallIcon   => $url->extras("wobject/WeatherData/small_icons/".$icon.".png"),
-                        mediumIcon  => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
-                        largeIcon   => $url->extras("wobject/WeatherData/large_icons/".$icon.".png"),
-                        iconUrl 	=> $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
-	       	            iconAlt 	=> $conditions,
-					});
+                    query       => $location,
+                    cityState   => $foundLocation->name || $location,
+                    sky         => $conditions || 'N/A',
+                    tempF       => (defined $tempF)?$tempF:'N/A',
+                    tempC       => (defined $tempC)?$tempC:'N/A',
+                    smallIcon   => $url->extras("wobject/WeatherData/small_icons/".$icon.".png"),
+                    mediumIcon  => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
+                    largeIcon   => $url->extras("wobject/WeatherData/large_icons/".$icon.".png"),
+                    iconUrl     => $url->extras("wobject/WeatherData/medium_icons/".$icon.".png"),
+                    iconAlt     => $conditions,
+                });
+                if (!$var{links_loop}) {
+                    $var{links_loop} = [];
+                    for my $lnk (@{$foundLocation->current_conditions->{WEATHER}{lnks}{link}} ) {
+                        push @{$var{links_loop}}, {
+                            link_url    => $lnk->{l},
+                            link_title  => $lnk->{t},
+                        };
+                    }
+                }
 			}
 		}
 	}
