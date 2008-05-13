@@ -1,6 +1,7 @@
 7.4.37
  - fixed: checking out in commerce system broken
  - fixed: WeatherData asset is broken
+ - fixed: Calendar multi-day events exported wrong in ical feed
 
 7.4.36
  - fixed: Data Form field names changed on edit
