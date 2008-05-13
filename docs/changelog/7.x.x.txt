@@ -1,3 +1,5 @@
+7.4.37
+
 7.4.36
  - fixed: Data Form field names changed on edit
  - fixed: Collaboration RSS link in header doesn't indicate title
