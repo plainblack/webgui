@@ -549,6 +549,7 @@ sub getIcalEnd {
     if ($self->isAllDay) {
         my $date = $self->get("endDate");
         $date =~ s/\D//g;
+        $date += 1;
         return $date;
     }
     else {
