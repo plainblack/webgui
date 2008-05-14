@@ -14,8 +14,10 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::DateTime;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::Workflow;
+use WebGUI::User;
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -437,6 +439,22 @@ sub upgradeEMS {
                 purchaseComplete    => 1,
                 },$registrantData->{badgeId});
         }
+    	print "\t\t\tMigrating old registrant tickets and registrant ribbons for $emsId.\n" unless ($quiet);
+        my $regticResults = $db->read("select * from EventManagementSystem_registrations where assetId=?",[$emsId]);
+        while (my $registrantData = $regticResults->hashRef) {
+            my $id = $oldTickets{$registrantData->{productId}};
+            if ($id ne "") {
+                $db->write("insert into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
+                    [$registrantData->{badgeId}, $id]);
+            }
+            else {
+                my $id = $oldRibbons{$registrantData->{productId}};
+                if ($id ne "") {
+                    $db->write("insert into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
+                        [$registrantData->{badgeId}, $id]);
+                }
+            }
+        }
     }
 }
 
@@ -444,10 +462,12 @@ sub upgradeEMS {
 sub convertTransactionLog {
 	my $session = shift;
 	print "\tInstalling transaction log.\n" unless ($quiet);
-	$session->db->write("alter table transaction rename oldtransaction");
-	$session->db->write("alter table transactionItem rename oldtransactionitem");
-    $session->db->write("create table transaction (
+    my $db = $session->db;
+	$db->write("alter table transaction rename oldtransaction");
+	$db->write("alter table transactionItem rename oldtransactionitem");
+    $db->write("create table transaction (
         transactionId varchar(22) binary not null primary key,
+        originatingTransactionId varchar(22) binary,
         isSuccessful bool not null default 0,
 		orderNumber int not null auto_increment unique,
 		transactionCode varchar(100),
@@ -483,9 +503,10 @@ sub convertTransactionLog {
 		paymentDriverId varchar(22) binary,
 		paymentDriverLabel varchar(35),
 		taxes float,
-		dateOfPurchase datetime
+		dateOfPurchase datetime,
+        isRecurring boolean
     )");
-	$session->db->write("create table transactionItem (
+	$db->write("create table transactionItem (
 		itemId varchar(22) binary not null primary key,
 		transactionId varchar(22) binary not null,
 		assetId varchar(22),
@@ -512,6 +533,38 @@ sub convertTransactionLog {
 	)");
     $session->setting->add('shopMyPurchasesTemplateId','');
     $session->setting->add('shopMyPurchaseDetailTemplateId','');
+    my $transactionResults = $db->read("select * from oldtransaction order by initDate");
+    while (my $oldTranny = $transactionResults->hashRef) {
+        my $date = WebGUI::DateTime->new($session, $oldTranny->{initDate});
+        $db->setRow("transaction","transactionId",{
+            transactionId       => "new",
+            isSuccessful        => (($oldTranny->{status} eq "Completed") ? 1 : 0),
+            transactionCode     => $oldTranny->{XID},
+            statusCode          => $oldTranny->{authcode},
+            statusMessage       => $oldTranny->{message},
+            userId              => $oldTranny->{userId},
+            username            => WebGUI::User->new($session, $oldTranny->{userId})->username,
+            amount              => $oldTranny->{amount},
+            shippingPrice       => $oldTranny->{shippingCost},
+            dateOfPurchase      => $date->toDatabase,
+            isRecurring         => $oldTranny->{recurring},
+            }, $oldTranny->{transactionId});
+            my $itemResults = $db->read("select * from oldtransactionitem where transactionId=?",[$oldTranny->{transactionId}]);
+            while (my $oldItem = $itemResults->hashRef) {
+                $db->setRow("transactionItem","itemId",{
+                    itemId                  => "new",
+                    transactionId           => $oldItem->{transactionId},
+                    configuredTitle         => $oldItem->{itemName},
+                    options                 => '{}',
+                    shippingTrackingNumber  => $oldTranny->{trackingNumber},
+                    shippingStatus          => $oldTranny->{shippingStatus},
+                    shippingDate            => $oldTranny->{completionDate},
+                    quantity                => $oldItem->{quantity},
+                    price                   => $oldItem->{amount},
+                    vendorId                => "defaultvendor000000000",
+                    }, $oldItem->{itemId});
+            }
+    }
 }
 
 #-------------------------------------------------

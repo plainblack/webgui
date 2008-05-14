@@ -348,6 +348,14 @@ The status code that came back from the payment gateway when trying to process t
 
 The extended status message that came back from the payment gateway when trying to process the payment.
 
+=head4 isRecurring
+
+A boolean indicating whether this is a recurring transaction or not. Defaults to 0.
+
+=head4 originatingTransactionId
+
+Most of the time this will be empty. But if this is a recurring transaction, then this will hold the id of the original transaction that started the recurrence.
+
 =cut
 
 sub update {
@@ -399,7 +407,7 @@ sub update {
     my @fields = (qw( isSuccessful transactionCode statusCode statusMessage amount shippingAddressId
         shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
         shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel
-        shippingPrice paymentAddressId paymentAddressName
+        shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
         paymentPhoneNumber paymentDriverId paymentDriverLabel taxes ));
     foreach my $field (@fields) {
