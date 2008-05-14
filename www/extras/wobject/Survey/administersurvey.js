@@ -248,7 +248,8 @@ Survey.Form = new function() {
            // Subscribe to the dual thumb slider's change and ready events to 
            // report the state. 
 //           s.subscribe('ready', updateUI); 
-           s.subscribe('change', updateUI);  
+           //s.subscribe('change', updateUI);  
+           s.subscribe('slideEnd', updateUI);  
     }
     this.sliders = function(q){
         var total = sliderWidth; 
@@ -262,7 +263,6 @@ Survey.Form = new function() {
             var id = a.Survey_answerId;
             var s = YAHOO.widget.Slider.getHorizSlider(id+'slider-bg', id+'slider-thumb', 
                 0, sliderWidth, (scale*step));
-            
             s.scale = scale;
             sliders[id] = s;
             s.input = a.Survey_answerId; 
@@ -275,7 +275,7 @@ Survey.Form = new function() {
             s.getRealValue = function() {
                 return Math.round(parseFloat(( (this.getValue() / total) * distance) + min )); 
             }
-            s.subscribe("change", check);
+            s.subscribe("slideEnd", check);
         }
     }
     //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
@@ -304,19 +304,22 @@ Survey.Form = new function() {
                     t -= this.getValue();
                     t = Math.round(t);
                     this.setValue(total-t);// + (scale*step));
+                    document.getElementById(this.input).value = Math.round(parseFloat(( ((total-t) / total) * distance) + min )); 
                 }else{ 
                     this.lastValue = this.getValue();
                     document.getElementById(this.input).value = this.getRealValue();
                 }
             };
-            s.subscribe("change", check);
+            //s.subscribe("change", check);
+            s.subscribe("slideEnd", check);
             var manualEntry = function(e){
               // set the value when the 'return' key is detected 
               if (Event.getCharCode(e) === 13 || e.type == 'blur') { 
                   var v = parseFloat(this.value, 10); 
                   v = (lang.isNumber(v)) ? v : 0; 
-                  v *= scale;
-   
+//                  v *= scale;
+console.log('start was '+v+' ' + min+ ' '+(v-min)+' / '+distance+' * '+total +' = '+(  ( ( (v-min) / distance))*total));
+                  v = ( ( (v-min) / distance))*total;
                   // convert the real value into a pixel offset 
                   for(var sl in sliders){
                     if(sliders[sl].input == this.id){
@@ -326,6 +329,7 @@ Survey.Form = new function() {
               } 
             }
             Event.on(document.getElementById(s.input), "blur", manualEntry);
+            Event.on(document.getElementById(s.input), "keypress", manualEntry);
             
             s.getRealValue = function() { 
                 return Math.round(parseFloat(( (this.getValue() / total) * distance) + min )); 
@@ -363,7 +367,7 @@ Survey.Form = new function() {
         var qsize = objs[4];
         var aid = objs[5];
         max = parseFloat(max);
-console.log('clearing');
+//console.log('clearing');
         clearTimeout(Survey.Form.submittimer);
         if(maxA == 1){
             if(b.className == 'mcbutton-selected'){
@@ -406,7 +410,7 @@ console.log('clearing');
             document.getElementById(b.hid).value = '';
         }
         if(qsize == 1 && b.className == 'mcbutton-selected'){
-console.log("1 butt submit");
+//console.log("1 butt submit");
             if(! document.getElementById(aid+'verbatim')){
                 Survey.Form.submittimer=setTimeout("Survey.Form.formsubmit()",500);
             }
