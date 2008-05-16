@@ -196,7 +196,7 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 deleteCollateral ( tableName, index )
+=head2 deleteCollateral ( tableName, keyName, keyValue )
 
 Deletes a row of collateral data.
 
@@ -204,18 +204,25 @@ Deletes a row of collateral data.
 
 The name of the table you wish to delete the data from.
 
-=head3 index
+=head3 keyName
 
-The index of the data to delete from the collateral.
+The name of a key in the collateral hash.  Typically a unique identifier for a given
+"row" of collateral data.
+
+=head3 keyValue
+
+Along with keyName, determines which "row" of collateral data to delete.
 
 =cut
 
 sub deleteCollateral {
     my $self      = shift;
     my $tableName = shift;
-    my $index     = shift;
+    my $keyName   = shift;
+    my $keyValue  = shift;
     my $table = $self->getAllCollateral($tableName);
-    return unless (abs($index) <= $#{$table});
+    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
+    return if $index == -1;
     splice @{ $table }, $index, 1;
     $self->setAllCollateral($tableName);
 }
@@ -292,24 +299,67 @@ or null, then an empty hashRef will be returned to avoid strict errors.
 If the requested index is beyond the end of the collateral array, it
 also returns an empty hashRef.
 
+=head3 keyName
+
+The name of a key in the collateral hash.  Typically a unique identifier for a given
+"row" of collateral data.
+
+=head3 keyValue
+
+Along with keyName, determines which "row" of collateral data to delete.
+If this is equal to "new", then an empty hashRef will be returned to avoid
+strict errors in the caller.  If the requested data does not exist in the
+collateral array, it also returns an empty hashRef.
+
 =cut
 
 sub getCollateral {
     my $self      = shift;
     my $tableName = shift;
-    my $index     = shift;
-    if ($index eq "new" || $index eq "") {
+    my $keyName   = shift;
+    my $keyValue  = shift;
+    if ($keyValue eq "new" || $keyValue eq "") {
         return {};
     }
     my $table = $self->getAllCollateral($tableName);
-    ##I don't know why you'd send this a negative index,
-    ##but it's valid perl.
-    if (abs($index) <= $#{$table}) {
-        return $table->[$index];
+    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
+    return {} if $index == -1;
+    return $table->[$index];
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getCollateralDataIndex ( table, keyName, keyValue )
+
+Returns the index in a set of collateral where an element of the
+data (keyName) has a certain value (keyValue).  If the criteria
+are not found, returns -1.
+
+=head3 table
+
+The collateral data to search
+
+=head3 keyName
+
+The name of a key in the collateral hash.
+
+=head3 keyValue
+
+The value that keyName should have to meet the criteria.
+
+=cut
+
+sub getCollateralDataIndex {
+    my $self     = shift;
+    my $table    = shift;
+    my $keyName  = shift;
+    my $keyValue = shift;
+    for (my $index=0; $index <= $#{ $table }; $index++) {
+        return $index
+            if (exists $table->[$index]->{$keyName} and $table->[$index]->{$keyName} eq $keyValue );
     }
-    else {
-        return {};
-    }
+    return -1;
 }
 
 
@@ -325,48 +375,6 @@ Product.
 sub getConfiguredTitle {
     my $self = shift;
     return $self->getOptions->{shortdesc};
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getIndexedCollateralData ( tableName )
-
-Same as getAllCollateral, except that an additional field, collateralIndex,
-is added to each hash.  This makes it easy to build loops for collateral
-operations such as editing, deleting or moving.
-
-=head3 tableName
-
-The name of the table you wish to retrieve the data from.
-
-=cut
-
-sub getIndexedCollateralData {
-    my $self      = shift;
-    my $tableName = shift;
-    my $table;
-
-    if (exists $self->{_collateral}->{$tableName}) {
-        $table = $self->{_collateral}->{$tableName};
-    }
-    else {
-        my $json = $self->get($tableName);
-        if ($json) {
-            $table = from_json($json);
-        }
-        else {
-            $table = [];
-        }
-    }
-    my $indexedTable = [];
-    for (my $index = 0; $index <= $#{ $table }; ++$index) {
-        my %row = %{ $table->[$index] };
-        $row{collateralIndex} = $index;
-        push @{ $indexedTable }, \%row;
-    }
-
-    return $indexedTable;
 }
 
 
@@ -447,7 +455,7 @@ sub getWeight {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralDown ( tableName, index )
+=head2 moveCollateralDown ( tableName, keyName, keyValue )
 
 Moves a collateral data item down one position.  If called on the last element of the
 collateral array then it does nothing.
@@ -456,18 +464,26 @@ collateral array then it does nothing.
 
 A string indicating the table that contains the collateral data.
 
-=head3 index
+=head3 keyName
 
-The index of the collateral data to move down.
+The name of a key in the collateral hash.  Typically a unique identifier for a given
+"row" of collateral data.
+
+=head3 keyValue
+
+Along with keyName, determines which "row" of collateral data to move.
 
 =cut
 
 sub moveCollateralDown {
     my $self      = shift;
     my $tableName = shift;
-    my $index     = shift;
+    my $keyName   = shift;
+    my $keyValue  = shift;
 
     my $table = $self->getAllCollateral($tableName);
+    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
+    return if $index == -1;
     return unless (abs($index) < $#{$table});
     @{ $table }[$index,$index+1] = @{ $table }[$index+1,$index];
     $self->setAllCollateral($tableName);
@@ -476,7 +492,7 @@ sub moveCollateralDown {
 
 #-------------------------------------------------------------------
 
-=head2 moveCollateralUp ( tableName, index )
+=head2 moveCollateralUp ( tableName, keyName, keyValue )
 
 Moves a collateral data item up one position.  If called on the first element of the
 collateral array then it does nothing.
@@ -485,18 +501,26 @@ collateral array then it does nothing.
 
 A string indicating the table that contains the collateral data.
 
-=head3 index
+=head3 keyName
 
-The index of the collateral data to move up.
+The name of a key in the collateral hash.  Typically a unique identifier for a given
+"row" of collateral data.
+
+=head3 keyValue
+
+Along with keyName, determines which "row" of collateral data to move.
 
 =cut
 
 sub moveCollateralUp {
     my $self      = shift;
     my $tableName = shift;
-    my $index     = shift;
+    my $keyName   = shift;
+    my $keyValue  = shift;
 
     my $table = $self->getAllCollateral($tableName);
+    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
+    return if $index == -1;
     return unless $index && (abs($index) <= $#{$table});
     @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
     $self->setAllCollateral($tableName);
@@ -625,44 +649,55 @@ sub setAllCollateral {
 
 #-----------------------------------------------------------------
 
-=head2 setCollateral ( tableName, keyName, properties )
+=head2 setCollateral ( tableName, keyName, keyValue, properties )
 
 Performs and insert/update of collateral data for any wobject's collateral data.
+Returns the id of the data that was set, even if a new row was added to the
+data.
 
 =head3 tableName
 
 The name of the table to insert the data.
 
-=head3 index
+=head3 keyName
 
-The index of the collateral data to set.  If the index = "new", then a new entry
-will be appended to the end of the collateral array.  Otherwise, then the
-appropriate entry will be overwritten the data.
+The name of a key in the collateral hash.  Typically a unique identifier for a given
+"row" of collateral data.
+
+=head3 keyValue
+
+Along with keyName, determines which "row" of collateral data to set.
+The index of the collateral data to set.  If the keyValue = "new", then a
+new entry will be appended to the end of the collateral array.  Otherwise,
+the appropriate entry will be overwritten with the new data.
 
 =head3 properties
 
 A hash reference containing the name/value pairs to be inserted into the collateral, using
-the index mentioned above.
+the criteria mentioned above.
 
 =cut
 
 sub setCollateral {
     my $self       = shift;
     my $tableName  = shift;
-    my $index      = shift;
+    my $keyName   = shift;
+    my $keyValue  = shift;
     my $properties = shift;
     ##Note, since this returns a reference, it is actually updating
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
-    if ($index eq 'new' || $index eq '') {
+    if ($keyValue eq 'new' || $keyValue eq '') {
+        $properties->{$keyName} = $self->session->id->generate;
         push @{ $table }, $properties;
         $self->setAllCollateral($tableName);
-        return;
+        return $properties->{$keyName};
     }
-    return unless (abs($index) <= $#{$table});
+    my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
+    return if $index == -1;
     $table->[$index] = $properties;
     $self->setAllCollateral($tableName);
-    return;
+    return $keyValue;
 }
 
 #-------------------------------------------------------------------
@@ -822,7 +857,7 @@ sub www_deleteAccessoryConfirm {
 sub www_deleteBenefitConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("benefitJSON", $self->session->form->process("bid"));
+    $self->deleteCollateral("benefitJSON", 'benefitId', $self->session->form->process("bid"));
     return "";
 }
 
@@ -875,41 +910,46 @@ sub www_deleteSpecificationConfirm {
 #-------------------------------------------------------------------
 sub www_editBenefit {
     my $self = shift;
-    my $bid = shift || $self->session->form->process("bid");
+    my $bid = shift || $self->session->form->process('bid');
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $data = $self->getCollateral("benefitJSON", ,$bid);
+    my $data = $self->getCollateral('benefitJSON', 'benefitId', $bid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
-        -name => "bid",
+        -name => 'bid',
         -value => $bid,
     );
     $f->hidden(
-        -name => "func",
-        -value => "editBenefitSave",
+        -name => 'func',
+        -value => 'editBenefitSave',
     );
     $f->text(
-        -name => "benefit",
+        -name => 'benefit',
         -label => $i18n->get(51),
         -hoverHelp => $i18n->get('51 description'),
         -value => $data->{benefits},
     );
     $f->yesNo(
-        -name => "proceed",
+        -name => 'proceed',
         -label => $i18n->get(52),
         -hoverHelp => $i18n->get('52 description'),
     );
     $f->submit;
-    return $self->getAdminConsole->render($f->print, "product benefit add/edit");
+    return $self->getAdminConsole->render($f->print, 'product benefit add/edit');
 }
 
 #-------------------------------------------------------------------
 sub www_editBenefitSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral('benefitJSON', $self->session->form->process('bid'), {
-                                                  benefit => $self->session->form->process('benefit','text')
-                                                });
+    $self->setCollateral(
+        'benefitJSON',
+        'benefitId',
+        $self->session->form->process('bid'),
+        {
+            benefit => $self->session->form->process('benefit','text')
+        },
+    );
     return '' unless($self->session->form->process('proceed'));
     return $self->www_editBenefit('new');
 }
@@ -1108,7 +1148,7 @@ sub www_moveAccessoryUp {
 sub www_moveBenefitDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("benefitJSON", $self->session->form->process("bid"));
+    $self->moveCollateralDown("benefitJSON", 'benefitId', $self->session->form->process("bid"));
     return "";
 }
 
@@ -1116,7 +1156,7 @@ sub www_moveBenefitDown {
 sub www_moveBenefitUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("benefitJSON", $self->session->form->process("bid"));
+    $self->moveCollateralUp("benefitJSON", 'benefitId', $self->session->form->process("bid"));
     return "";
 }
 

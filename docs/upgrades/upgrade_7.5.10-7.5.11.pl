@@ -814,9 +814,9 @@ EOSQL1
     my $assetSth = $session->db->read('select distinct(assetId) from Product');
     my $accessorySth     = $session->db->read('select accessoryAssetId from Product_accessory where assetId=? order by sequenceNumber');
     my $relatedSth       = $session->db->read('select relatedAssetId from Product_related where assetId=? order by sequenceNumber');
-    my $specificationSth = $session->db->read('select name, value, units from Product_specification where assetId=? order by sequenceNumber');
-    my $featureSth       = $session->db->read('select feature from Product_feature where assetId=? order by sequenceNumber');
-    my $benefitSth       = $session->db->read('select benefit from Product_benefit where assetId=? order by sequenceNumber');
+    my $specificationSth = $session->db->read('select Product_specificationId as specificationId, name, value, units from Product_specification where assetId=? order by sequenceNumber');
+    my $featureSth       = $session->db->read('select Product_featureId as featureId, feature from Product_feature where assetId=? order by sequenceNumber');
+    my $benefitSth       = $session->db->read('select Product_benefitId as benefitId, benefit from Product_benefit where assetId=? order by sequenceNumber');
     while (my ($assetId) = $assetSth->array) {
         ##For each assetId, get each type of collateral
         ##Convert the data to JSON and store it in Product with setCollateral (update)

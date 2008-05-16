@@ -47,203 +47,190 @@ my $product = $root->addChild({
 isa_ok($product, "WebGUI::Asset::Sku::Product");
 ok(! exists $product->{_collateral}, 'object cache does not exist yet');
 
-$product->setCollateral('variantsJSON', 'new', {a => 'aye', b => 'bee'});
+my $vid = $product->setCollateral('variantsJSON', 'vid', 'new', {a => 'aye', b => 'bee'});
 
 isa_ok($product->{_collateral}, 'HASH', 'object cache created for collateral');
+ok($session->id->valid($vid), 'a valid id was generated for the new collateral entry');
 
 my $json;
 $json = $product->get('variantsJSON');
 my $jsonData = from_json($json);
 cmp_deeply(
     $jsonData,
-    [ {a => 'aye', b => 'bee' } ],
+    [ {a => 'aye', b => 'bee', vid => $vid } ],
     'Correct JSON data stored when collateral is empty',
 );
 
 my $dbJson = $session->db->quickScalar('select variantsJSON from Product where assetId=?', [$product->getId]);
 is($json, $dbJson, 'db updated with correct JSON');
 
-$product->setCollateral('variantsJSON', 'new', {c => 'see', d => 'dee'});
+my $vid2 = $product->setCollateral('variantsJSON', 'vid', 'new', {c => 'see', d => 'dee'});
 
 my $collateral = $product->getAllCollateral('variantsJSON');
 isa_ok($collateral, 'ARRAY', 'getAllCollateral returns an array ref');
 cmp_deeply(
     $collateral,
     [
-        {a => 'aye', b => 'bee' },
-        {c => 'see', d => 'dee' },
+        {a => 'aye', b => 'bee', vid => $vid  },
+        {c => 'see', d => 'dee', vid => $vid2 },
     ],
     'setCollateral: new always appends to the end',
 );
 
-$product->setCollateral('variantsJSON', 2, {a => 'see', b => 'dee'});
+$product->setCollateral('variantsJSON', 'vid', 'pollyWollyDoodle', {a => 'see', b => 'dee'});
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye', b => 'bee' },
-        {c => 'see', d => 'dee' },
+        {a => 'aye', b => 'bee', vid => $vid  },
+        {c => 'see', d => 'dee', vid => $vid2 },
     ],
-    'setCollateral: out of range index does not work',
+    'setCollateral: non-existant value of key does not set data',
 );
 
-$product->setCollateral('variantsJSON', 1, {a => 'see', b => 'dee'});
+$product->setCollateral('variantsJSON', 'brooks', $vid, {a => 'see', b => 'dee'});
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye', b => 'bee' },
-        {a => 'see', b => 'dee' },
+        {a => 'aye', b => 'bee', vid => $vid  },
+        {c => 'see', d => 'dee', vid => $vid2 },
+    ],
+    'setCollateral: non-existant key with real value does not set data',
+);
+
+$product->setCollateral('variantsJSON', 'vid', $vid2, {a => 'see', b => 'dee', vid => $vid2});
+cmp_deeply(
+    $product->getAllCollateral('variantsJSON'),
+    [
+        {a => 'aye', b => 'bee', vid => $vid  },
+        {a => 'see', b => 'dee', vid => $vid2 },
     ],
     'setCollateral: set by index works',
 );
 
 cmp_deeply(
-    $product->getCollateral('variantsJSON', "new"),
+    $product->getCollateral('variantsJSON', 'vid', "new"),
     {},
-    'getCollateral: index=new returns an empty hashref',
+    'getCollateral: value=new returns an empty hashref',
+);
+
+cmp_deeply(
+    $product->getCollateral('variantsJSON', 'vid'),
+    {},
+    'getCollateral: undef value returns an empty hashref',
 );
 
 cmp_deeply(
     $product->getCollateral('variantsJSON'),
     {},
-    'getCollateral: undef index returns an empty hashref',
+    'getCollateral: undef keyName returns an empty hashref',
 );
 
 cmp_deeply(
-    $product->getCollateral('variantsJSON', 3),
+    $product->getCollateral('variantsJSON', 'vid', 'neverAValidGUID'),
     {},
-    'getCollateral: out of range index returns an empty hashref',
+    'getCollateral: non-existant value with valid key returns an empty hashRef',
 );
 
 cmp_deeply(
-    $product->getCollateral('variantsJSON', 1),
-    {a => 'see', b => 'dee' },
-    'getCollateral: get by index works',
+    $product->getCollateral('variantsJSON', 'xvid', $vid),
+    {},
+    'getCollateral: non-existant key with valid value returns an empty hashRef',
 );
 
 cmp_deeply(
-    $product->getCollateral('variantsJSON', -1),
-    {a => 'see', b => 'dee' },
-    'getCollateral: negative index works',
+    $product->getCollateral('variantsJSON', 'vid', $vid2),
+    {a => 'see', b => 'dee', 'vid' => $vid2 },
+    'getCollateral: get by keyName and value works',
 );
 
-$product->setCollateral('variantsJSON', 'new', { a => 'alpha', b => 'beta'});
+my $vid3 = $product->setCollateral('variantsJSON', 'vid', 'new', { a => 'alpha', b => 'beta'});
 
-$product->deleteCollateral('variantsJSON', 1);
+$product->deleteCollateral('variantsJSON', 'vid', $vid2);
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye',   b => 'bee' },
-        {a => 'alpha', b => 'beta' },
+        {a => 'aye',   b => 'bee',  vid => $vid  },
+        {a => 'alpha', b => 'beta', vid => $vid3 },
     ],
-    'deleteCollateral: delete by index works',
+    'deleteCollateral: delete by keyName and value works',
 );
 
-$product->deleteCollateral('variantsJSON', 4);
+$product->deleteCollateral('variantsJSON', 'vid', 'andyDufresne');
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye',   b => 'bee' },
-        {a => 'alpha', b => 'beta' },
+        {a => 'aye',   b => 'bee',  vid => $vid  },
+        {a => 'alpha', b => 'beta', vid => $vid3 },
     ],
-    'deleteCollateral: out of range index does not delete',
+    'deleteCollateral: non-existant value with valid key does not delete',
 );
 
-$product->deleteCollateral('variantsJSON', -1);
+$product->deleteCollateral('variantsJSON', 'vid', $vid3);
+my $vid4 = $product->setCollateral('variantsJSON', 'vid', 'new', { a => 'alligators', b => 'bursting'});
+my $vid5 = $product->setCollateral('variantsJSON', 'vid', 'new', { a => 'ah',         b => 'bay'});
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye',   b => 'bee' },
-    ],
-    'deleteCollateral: negative index works',
-);
-
-$product->setCollateral('variantsJSON', 'new', { a => 'alligators', b => 'bursting'});
-$product->setCollateral('variantsJSON', 'new', { a => 'ah',         b => 'bay'});
-cmp_deeply(
-    $product->getAllCollateral('variantsJSON'),
-    [
-        {a => 'aye',          b => 'bee' },
-        {a => 'alligators',   b => 'bursting' },
-        {a => 'ah',           b => 'bay' },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
     ],
     'setup correct for moving collateral',
 );
 
-$product->moveCollateralDown('variantsJSON', 1);
+$product->moveCollateralDown('variantsJSON', 'vid', $vid4);
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye',          b => 'bee' },
-        {a => 'ah',           b => 'bay' },
-        {a => 'alligators',   b => 'bursting' },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
     ],
     'moveCollateralDown: worked',
 );
 
-$product->moveCollateralDown('variantsJSON', 3);
+$product->moveCollateralDown('variantsJSON', 'vid', 'shawshankRedemption');
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'aye',          b => 'bee' },
-        {a => 'ah',           b => 'bay' },
-        {a => 'alligators',   b => 'bursting' },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
     ],
-    'moveCollateralDown: can not move out of range collateral item',
+    'moveCollateralDown: can not move non-existant collateral item',
 );
 
-$product->moveCollateralUp('variantsJSON', 1);
+$product->moveCollateralUp('variantsJSON', 'vid', $vid5);
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'ah',           b => 'bay' },
-        {a => 'aye',          b => 'bee' },
-        {a => 'alligators',   b => 'bursting' },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
     ],
     'moveCollateralUp: worked',
 );
 
-$product->moveCollateralUp('variantsJSON', 0);
+$product->moveCollateralUp('variantsJSON', 'vid', $vid5);
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'ah',           b => 'bay' },
-        {a => 'aye',          b => 'bee' },
-        {a => 'alligators',   b => 'bursting' },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
     ],
     'moveCollateralUp: can not move the first collateral item in the array',
 );
 
-$product->moveCollateralUp('variantsJSON', 5);
+$product->moveCollateralUp('variantsJSON', 'vid', 'brooksHadley');
 cmp_deeply(
     $product->getAllCollateral('variantsJSON'),
     [
-        {a => 'ah',           b => 'bay' },
-        {a => 'aye',          b => 'bee' },
-        {a => 'alligators',   b => 'bursting' },
+        {a => 'ah',           b => 'bay',      'vid' => $vid5 },
+        {a => 'aye',          b => 'bee'     , 'vid' => $vid  },
+        {a => 'alligators',   b => 'bursting', 'vid' => $vid4 },
     ],
-    'moveCollateralUp: out of range index does not do anything',
-);
-
-$product->setCollateral('variantsJSON', 2, { a => 'aoo', b => 'boo' });
-
-cmp_deeply(
-    $product->getIndexedCollateralData('variantsJSON'),
-    [
-        {a => 'ah',  b => 'bay', collateralIndex => 0},
-        {a => 'aye', b => 'bee', collateralIndex => 1},
-        {a => 'aoo', b => 'boo', collateralIndex => 2},
-    ],
-    'getIndexedCollateralData: returns data structure with indeces',
-);
-
-cmp_deeply(
-    $product->getAllCollateral('variantsJSON'),
-    [
-        {a => 'ah',  b => 'bay'},
-        {a => 'aye', b => 'bee'},
-        {a => 'aoo', b => 'boo'},
-    ],
-    'getIndexedCollateralData: does not affect asset data',
+    'moveCollateralUp: cannot move up non-existant collateral item',
 );
 
 
@@ -255,10 +242,10 @@ my $product2 = $root->addChild({
         title     => "Bible",
         });
 
-$product2->setCollateral('variantsJSON', 'new', { s => 'scooby', d => 'doo'});
+my $vid6 = $product2->setCollateral('variantsJSON', 'vid', 'new', { s => 'scooby', d => 'doo'});
 cmp_deeply(
-    $product2->getCollateral('variantsJSON', 0),
-    { s => 'scooby', d => 'doo'},
+    $product2->getCollateral('variantsJSON', 'vid', $vid6),
+    { s => 'scooby', d => 'doo', vid => $vid6, },
     'Doing a set before get works okay',
 );
 
