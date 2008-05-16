@@ -140,6 +140,11 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|An error indicating that an invalid expiration date has been entered.|
 	},
+	'expired expiration date' => {
+		message => q|The expiration date on your card has already passed.|,
+		lastUpdated => 0,
+		context => q|An error indicating that an an expired card was used.|
+	},
 	'no description' => {
 		message => q|No description|,
 		lastUpdated => 0,
