@@ -126,6 +126,12 @@ sub definition {
                 tab=>"display",
                 label=>'Alphabet',
             },
+            showOnlyVisibleAsNamed=>{
+                fieldType=>"yesNo",
+                defaultValue=>"0",
+                tab=>"display",
+                label=>'Show only visible fields as named tmpl_vars.',
+            },
 		);
 	
 	push(@{$definition}, {                
@@ -240,19 +246,22 @@ sub view {
 
 #    $error->info("time :".(time() - $start_time));
 
-	$sth = $self->session->db->read("SELECT field.fieldName, field.label, field.sequenceNumber "
+	$sth = $self->session->db->read("SELECT field.fieldName, field.label, field.sequenceNumber, field.visible "
         ."FROM userProfileField as field "
 		."left join userProfileCategory as category USING(profileCategoryId) "
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
 	while ($profileField = $sth->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label});
-		push(@profileFields, {
-					"fieldName"=>$profileField->{fieldName},
-					"label"=>$label,
-					"sequenceNumber"=>$profileField->{sequenceNumber},
-					});
+  		push(@profileFields, {
+    				"fieldName"=>$profileField->{fieldName},
+	    			"label"=>$label,
+		    		"sequenceNumber"=>$profileField->{sequenceNumber},
+                    "visible"=>$profileField->{visible},
+			    	});
 		push(@profileFieldNames, $profileField->{fieldName});
-        $var{'profileField_'.$profileField->{fieldName}.'_label'} = $label;
+        unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
+            $var{'profileField_'.$profileField->{fieldName}.'_label'} = $label;
+        }
 	}
     
 #    $error->info("selected profile fields, time :".(time() - $start_time));
@@ -350,39 +359,42 @@ sub view {
 			foreach my $profileField (@profileFields){
 				if ($profileField->{fieldName} eq "email" && $emailNotPublic){
 			    	push (@profileFieldValues, {
-				    	"profile.emailNotPublic"=>1,
+				    	"profile_emailNotPublic"=>1,
     				});
 				}else{
 					push (@profileFieldValues, {
-    					"profile.value"=>$user->{$profileField->{fieldName}},
+    					"profile_value"=>$user->{$profileField->{fieldName}},
 					});
-                    $userProperties{$profileField->{fieldName}.'_value'} = $user->{$profileField->{fieldName}};
-					my $profileFieldName = $profileField->{fieldName};
+                    my $profileFieldName = $profileField->{fieldName};
                     $profileFieldName =~ s/ /_/g;
-		    		$userProperties{"user.profile.".$profileFieldName.".value"} = $user->{$profileField->{fieldName}};
+                    $profileFieldName =~ s/\./_/g;
+                    unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
+                        $userProperties{'user_profile_'.$profileFieldName.'_value'} = $user->{$profileField->{fieldName}};
+                    }
+		    		#$userProperties{"user.profile.".$profileFieldName.".value"} = $user->{$profileField->{fieldName}};
 				}
 			}
-			$userProperties{"user.profile.emailNotPublic"} = $emailNotPublic;
-			$userProperties{"user.id"} = $user->{userId};
-			$userProperties{"user.name"} = $user->{userName};
-			$userProperties{"user.profile_loop"} = \@profileFieldValues;
+			$userProperties{"user_profile_emailNotPublic"} = $emailNotPublic;
+			$userProperties{"user_id"} = $user->{userId};
+			$userProperties{"user_name"} = $user->{userName};
+			$userProperties{"user_profile_loop"} = \@profileFieldValues;
 			push(@users,\%userProperties);
 		}else{
 			push(@users, {
-		    	"user.id"=>$user->{userId},
-			    "user.name"=>$user->{userName},
+		    	"user_id"=>$user->{userId},
+			    "user_name"=>$user->{userName},
 			});
 		}
 	}
 #    $error->info("created tmpl vars for users, time :".(time() - $start_time));
 	foreach my $profileField (@profileFields){
 	push (@profileField_loop, {
-		"profileField.label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
+		"profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
 		});
 	}
 	$var{"numberOfProfileFields"} = scalar(@profileFields);
-	$var{"profileNotPublic.message"} = $i18n->get("Profile not public");
-	$var{"emailNotPublic.message"} = $i18n->get("Email not public");
+	$var{"profileNotPublic_message"} = $i18n->get("Profile not public");
+	$var{"emailNotPublic_message"} = $i18n->get("Email not public");
 	$var{profileField_loop} = \@profileField_loop;
 	$var{user_loop} = \@users;
 	$p->appendTemplateVars(\%var);
@@ -394,13 +406,13 @@ sub view {
                                                         name=>'searchType',
                                 	            		value=>'or',
                                                         options=> {
-                                                            'or' => 'or',
-                                                        'and' => 'and',
-                                                    	}
+                                                           'or' => 'or',
+                                                           'and' => 'and',
+                                                        	}
                                             			});
 
-    $var{'searchFormQuery.label'} = $i18n->get('query');
-    $var{'searchFormQuery.form'} = WebGUI::Form::text($self->session,{
+    $var{'searchFormQuery_label'} = $i18n->get('query');
+    $var{'searchFormQuery_form'} = WebGUI::Form::text($self->session,{
                 name=>'search',
                 value=>$self->session->form->process("search"),
         });
