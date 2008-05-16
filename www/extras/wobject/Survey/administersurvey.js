@@ -190,7 +190,10 @@ Survey.Form = new function() {
                     total += Math.round(document.getElementById(z).value);
                 }
                 if(total == toValidate[i]['total']){answered = 1;}
-                else{alert("Please enter amounts that sum to 100% to proceed.");}
+                else{
+                    var amountLeft = toValidate[i]['total']-total;
+                    alert("Please allocate the remaining "+amountLeft+ ".");
+                }
             }else{
                 for(var z in toValidate[i]['answers']){
                     var v = document.getElementById(z).value;
@@ -264,7 +267,8 @@ Survey.Form = new function() {
             var s = YAHOO.widget.Slider.getHorizSlider(id+'slider-bg', id+'slider-thumb', 
                 0, sliderWidth, (scale*step));
             s.scale = scale;
-            sliders[id] = s;
+            sliders[q.Survey_questionid] = new Array();
+            sliders[q.Survey_questionid][id] = s;
             s.input = a.Survey_answerId; 
             s.scale = scale;
             document.getElementById(id).value = a.min;
@@ -292,13 +296,17 @@ Survey.Form = new function() {
             var id = a.Survey_answerId+'slider-bg';
             var s = YAHOO.widget.Slider.getHorizSlider(id, a.Survey_answerId+'slider-thumb', 
                 0, sliderWidth, scale*step);
-            sliders[a.Survey_answerId] = s;
+            s.animate = false;
+            if(sliders[q.Survey_questionId] == undefined){
+                sliders[q.Survey_questionId] = new Array();
+            }
+            sliders[q.Survey_questionId][a.Survey_answerId] = s;
             s.input = a.Survey_answerId;
             s.lastValue = 0;
             var check = function() {
                 var t = 0;
-                for(var x in sliders){
-                    t+= sliders[x].getValue();
+                for(var x in sliders[q.Survey_questionId]){
+                    t+= sliders[q.Survey_questionId][x].getValue();
                 }
                 if(t > total){
                     t -= this.getValue();
@@ -310,7 +318,7 @@ Survey.Form = new function() {
                     document.getElementById(this.input).value = this.getRealValue();
                 }
             };
-            //s.subscribe("change", check);
+            s.subscribe("change", check);
             s.subscribe("slideEnd", check);
             var manualEntry = function(e){
               // set the value when the 'return' key is detected 
@@ -318,12 +326,11 @@ Survey.Form = new function() {
                   var v = parseFloat(this.value, 10); 
                   v = (lang.isNumber(v)) ? v : 0; 
 //                  v *= scale;
-console.log('start was '+v+' ' + min+ ' '+(v-min)+' / '+distance+' * '+total +' = '+(  ( ( (v-min) / distance))*total));
                   v = ( ( (v-min) / distance))*total;
                   // convert the real value into a pixel offset 
-                  for(var sl in sliders){
-                    if(sliders[sl].input == this.id){
-                        sliders[sl].setValue(Math.round(v)); 
+                  for(var sl in sliders[q.Survey_questionId]){
+                    if(sliders[q.Survey_questionId][sl].input == this.id){
+                        sliders[q.Survey_questionId][sl].setValue(Math.round(v)); 
                     }
                   }
               } 
@@ -367,7 +374,6 @@ console.log('start was '+v+' ' + min+ ' '+(v-min)+' / '+distance+' * '+total +' 
         var qsize = objs[4];
         var aid = objs[5];
         max = parseFloat(max);
-//console.log('clearing');
         clearTimeout(Survey.Form.submittimer);
         if(maxA == 1){
             if(b.className == 'mcbutton-selected'){
@@ -410,7 +416,6 @@ console.log('start was '+v+' ' + min+ ' '+(v-min)+' / '+distance+' * '+total +' 
             document.getElementById(b.hid).value = '';
         }
         if(qsize == 1 && b.className == 'mcbutton-selected'){
-//console.log("1 butt submit");
             if(! document.getElementById(aid+'verbatim')){
                 Survey.Form.submittimer=setTimeout("Survey.Form.formsubmit()",500);
             }
