@@ -104,38 +104,43 @@ sub definition {
 
             showGroupId=>{
 		    	fieldType=>"group",  
-                defaultValue=>"",
-			    label=>$i18n->get("Group to show"),
+                defaultValue=>"7",
+			    label=>$i18n->get("Group to show label"),
+                hoverHelp=>$i18n->get('Group to show description'),
     			tab=>"display",
 			},
            	hideGroupId=>{
 	    		fieldType=>"group",  
-                defaultValue=>"",
-		    	label=>$i18n->get("Group to hide"),
-			    tab=>"display",
+                defaultValue=>"3",
+		    	label=>$i18n->get("Group to hide label"),
+			    hoverHelp=>$i18n->get('Group to hide description'),
+                tab=>"display",
 			},
 	        usersPerPage=>{
     			fieldType=>"integer",  
                 defaultValue=>"25",
 	    		tab=>"display",
-		    	label=>'Users per Page',
+		    	hoverHelp=>$i18n->get('Users per page description'),
+                label=>$i18n->get("Users per page label"),
 			},
             alphabet=>{
                 fieldType=>"text",
                 defaultValue=>"",
                 tab=>"display",
-                label=>'Alphabet',
+                label=>$i18n->get("alphabet label"),
+                hoverHelp=>$i18n->get('alphabet description'),
             },
             showOnlyVisibleAsNamed=>{
                 fieldType=>"yesNo",
                 defaultValue=>"0",
                 tab=>"display",
-                label=>'Show only visible fields as named tmpl_vars.',
+                label=>$i18n->get("showOnlyVisibleAsNamed label"),
+                hoverHelp=>$i18n->get('showOnlyVisibleAsNamed description'),
             },
 		);
 	
 	push(@{$definition}, {                
-		assetName=>"UserList",                
+		assetName=>$i18n->get('assetName'),                
 		icon=>'userlist.gif', 
 		autoGenerateForms=>1,                
 		tableName=>'UserList',
@@ -392,9 +397,9 @@ sub view {
 		"profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
 		});
 	}
-	$var{"numberOfProfileFields"} = scalar(@profileFields);
-	$var{"profileNotPublic_message"} = $i18n->get("Profile not public");
-	$var{"emailNotPublic_message"} = $i18n->get("Email not public");
+	$var{numberOfProfileFields} = scalar(@profileFields);
+	$var{profileNotPublic_message} = $i18n->get('Profile not public message');
+	$var{emailNotPublic_message} = $i18n->get('Email not public message');
 	$var{profileField_loop} = \@profileField_loop;
 	$var{user_loop} = \@users;
 	$p->appendTemplateVars(\%var);
@@ -406,18 +411,18 @@ sub view {
                                                         name=>'searchType',
                                 	            		value=>'or',
                                                         options=> {
-                                                           'or' => 'or',
-                                                           'and' => 'and',
+                                                           'or'     => $i18n->get('or label'),
+                                                           'and'    => $i18n->get('and label'),
                                                         	}
                                             			});
 
-    $var{'searchFormQuery_label'} = $i18n->get('query');
+    $var{'searchFormQuery_label'} = $i18n->get('query label');
     $var{'searchFormQuery_form'} = WebGUI::Form::text($self->session,{
                 name=>'search',
                 value=>$self->session->form->process("search"),
         });
         
-	$var{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => "Search"});
+	$var{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
     $var{searchFormFooter} = WebGUI::Form::formFooter($self->session);
     $var{alphabetSearchLoop} = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
 
