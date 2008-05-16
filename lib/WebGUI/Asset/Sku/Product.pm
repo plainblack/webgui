@@ -681,14 +681,16 @@ the criteria mentioned above.
 sub setCollateral {
     my $self       = shift;
     my $tableName  = shift;
-    my $keyName   = shift;
-    my $keyValue  = shift;
+    my $keyName    = shift;
+    my $keyValue   = shift;
     my $properties = shift;
     ##Note, since this returns a reference, it is actually updating
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
     if ($keyValue eq 'new' || $keyValue eq '') {
-        $properties->{$keyName} = $self->session->id->generate;
+        if (! exists $properties->{$keyName}) {
+            $properties->{$keyName} = $self->session->id->generate;
+        }
         push @{ $table }, $properties;
         $self->setAllCollateral($tableName);
         return $properties->{$keyName};
@@ -1140,7 +1142,7 @@ sub www_moveAccessoryDown {
 sub www_moveAccessoryUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp('accessoryJSON', $self->session->form->process('aid'));
+    $self->moveCollateralUp('accessoryJSON', 'accessoryAssetId', $self->session->form->process('aid'));
     return '';
 }
 

@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 26;        # Increment this number for each test you create
+plan tests => 27;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -250,6 +250,17 @@ cmp_deeply(
 );
 
 $product2->purge;
+
+my $product3 = $root->addChild({
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Bible",
+        });
+
+my $requestedVid = $session->id->generate();
+my $bareVid = $product3->setCollateral('variantsJSON', 'bareVid', 'new', { bareVid => $requestedVid });
+is($bareVid, $requestedVid, 'For single column collateral JSON, requested id = assigned id');
+
+$product3->purge;
 
 #----------------------------------------------------------------------------
 # Cleanup
