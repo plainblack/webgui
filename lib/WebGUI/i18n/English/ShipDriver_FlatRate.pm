@@ -21,9 +21,9 @@ our $I18N = {
 		context => q|A shipping cost added to a cart as a percentage of the total.|,
 	},
 
-	'percenageOfPrice help' => {
+	'percentageOfPrice help' => {
 		message => q|A shipping cost added to a cart as a percentage of the total cost of the cart.|,
-		lastUpdated => 1203569582,
+		lastUpdated => 1210968288,
 	},
 
 	'percentageOfWeight' => {

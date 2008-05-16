@@ -18,7 +18,7 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q{The ISO locale name for month and day labels.},
 	},
-	
+
 	'subscriberNotifyOffset label' => {
 		message 	=> q{Subscriber Notify Offset},
 		lastUpdated 	=> 0,
@@ -29,7 +29,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{The Hover Help for the Subscriber Notify Offset field},
 	},
-	
+
 	'defaultView label' => {
 		message 	=> q{Default View},
 		lastUpdated 	=> 0,
@@ -60,8 +60,8 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{A value for the Default View field.},
 	},
-	
-	
+
+
 	'defaultDate label' => {
 		message 	=> q{Default Date},
 		lastUpdated 	=> 0,
@@ -87,8 +87,8 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q{A value for the Default Date display field.},
 	},
-	
-	
+
+
 	'visitorCacheTimeout label' => {
 		message		=> q{Visitor Cache Timeout},
 		lastUpdated	=> 0,
@@ -99,8 +99,8 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q{Hover Help for the Visitor Cache Timeout field.},
 	},
-	
-	
+
+
 	'sortEventsBy label' => {
 		message		=> q{Daily Events Sort Order},
 		lastUpdated	=> 0,
@@ -121,8 +121,8 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q{A value for the Daily Events Sort Order field.},
 	},
-	
-        
+
+
         'editForm listViewPageInterval label' => {
             message     => "List View Page Interval",
             lastUpdated => 0,
@@ -133,7 +133,7 @@ our $I18N = {
             lastUpdated => 0,
             context     => 'Description of the asset property',
         },
-	
+
         'editForm icalInterval label' => {
             message     => "ICalendar Feed Interval",
             lastUpdated => 0,
@@ -144,10 +144,10 @@ our $I18N = {
             lastUpdated => 0,
             context     => 'Description of the asset property',
         },
-	
-	
-	
-	
+
+
+
+
 	'groupIdEventEdit label' => {
 		message		=> q{Who can add Events?},
 		lastUpdated	=> 0,
@@ -158,22 +158,22 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q{Hover Help for the Group to Edit Events field.},
 	},
-	
-	
-	
-	
-	
+
+
+
+
+
 	'feeds' => {
 		message		=> q{Feeds},
 		lastUpdated	=> 0,
 		context		=> q{The label for the Feeds tab.},
 	},
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	'templateIdMonth label' => {
 		message 	=> q{Month View Template},
 		lastUpdated 	=> 0,
@@ -184,7 +184,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default month template.},
 	},
-	
+
 	'templateIdWeek label' => {
 		message 	=> q{Week View Template},
 		lastUpdated 	=> 0,
@@ -195,7 +195,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Week template.},
 	},
-	
+
 	'templateIdDay label' => {
 		message 	=> q{Day View Template},
 		lastUpdated 	=> 0,
@@ -217,7 +217,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default List template.},
 	},
-	
+
 	'templateIdEvent label' => {
 		message 	=> q{Event Details Template},
 		lastUpdated 	=> 0,
@@ -228,7 +228,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Event template.},
 	},
-	
+
 	'templateIdEventEdit label' => {
 		message 	=> q{Event Edit Template},
 		lastUpdated 	=> 0,
@@ -239,7 +239,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Event Edit template.},
 	},
-	
+
 	'templateIdSearch label' => {
 		message 	=> q{Search View Template},
 		lastUpdated 	=> 0,
@@ -250,9 +250,9 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Search template.},
 	},
-	
-	
-	
+
+
+
 	'templateIdPrintMonth label' => {
 		message 	=> q{Print Month Template},
 		lastUpdated 	=> 0,
@@ -263,7 +263,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default month template.},
 	},
-	
+
 	'templateIdPrintWeek label' => {
 		message 	=> q{Print Week Template},
 		lastUpdated 	=> 0,
@@ -274,7 +274,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Week template.},
 	},
-	
+
 	'templateIdPrintDay label' => {
 		message 	=> q{Print Day Template},
 		lastUpdated 	=> 0,
@@ -285,7 +285,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Day template.},
 	},
-	
+
 	'editForm templateIdPrintList label' => {
 		message 	=> q{Print List View Template},
 		lastUpdated 	=> 0,
@@ -296,7 +296,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Print List template.},
 	},
-	
+
 	'templateIdPrintEvent label' => {
 		message 	=> q{Print Event Details Template},
 		lastUpdated 	=> 0,
@@ -307,7 +307,7 @@ our $I18N = {
 		lastUpdated 	=> 0,
 		context 	=> q{Hover Help for the default Event template.},
 	},
-	
+
 	'workflow updateFeeds' => {
 			message		=> q{Update Calendar Feeds},
 			lastUpdated	=> 0,
@@ -319,7 +319,7 @@ our $I18N = {
 			lastUpdated	=> 0,
 			context		=> q{Description of what the Calendar Update Feeds workflow activity does},
 	},	
-	
+
 	'workflow generateRecurringEvents' => {
 			message		=> q{Generate Recurring Events},
 			lastUpdated	=> 0,
@@ -652,7 +652,7 @@ our $I18N = {
             lastUpdated     => 0,
             context         => 'Body of help page',
         },
-        
+
         'helpvar newYear' => {
             message         => 'This variable is true when the current event is in a different
                                 year than the previous event.',
@@ -793,7 +793,7 @@ our $I18N = {
             lastUpdated     => 0,
             context         => 'Description of template variable',
         },
-    
+
         'helpvar dateTime start' => {
             message         => 'A set of date/time variables with the prefix "start". See "Calendar Date/Time Variables" for more information.',
             lastUpdated     => 0,
@@ -888,6 +888,19 @@ our $I18N = {
         message     => q{Search Results},
         lastUpdated => 1204668000,
     },
+
+    'editForm workflowIdCommit label' => {
+        message     => "Commit Workflow for Events",
+        lastUpdated => 0,
+        context     => 'Label for the asset property workflowIdCommit',
+    },
+
+    'editForm workflowIdCommit description' => {
+        message     => "Select a workflow to use to commit events when they are edited or created.",
+        lastUpdated => 0,
+        context     => 'Description of the asset property workflowIdCommit',
+    },
+
 
 };
 

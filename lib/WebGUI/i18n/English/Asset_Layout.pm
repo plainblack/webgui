@@ -134,9 +134,9 @@ be useful, others may not.|,
 		lastUpdated => 1164841027
 	},
 	
-	'asset order hoverhelp' => {
+	'asset order hoverHelp' => {
 		message	    => q|Choose whether you'd like new or unpositioned assets added to the top or bottom of the first content position on the page.|,
-		lastUpdated => 1164841027
+		lastUpdated => 1210967539
 	},
 
 };

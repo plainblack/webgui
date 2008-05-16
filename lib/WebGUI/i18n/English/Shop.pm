@@ -369,6 +369,24 @@ our $I18N = {
 		context => q|a button the user clicks on to set shipping information|
 	},
 
+	'shipping address' => { 
+		message => q|Shipping Address|,
+		lastUpdated => 0,
+		context => q|Label in view transaction|,
+	},
+
+	'payment address' => { 
+		message => q|Payment Address|,
+		lastUpdated => 0,
+		context => q|Label in view transaction|,
+	},
+
+	'transaction id' => { 
+		message => q|Transaction ID|,
+		lastUpdated => 0,
+		context => q|Label in view transaction|,
+	},
+
 };
 
 1;
