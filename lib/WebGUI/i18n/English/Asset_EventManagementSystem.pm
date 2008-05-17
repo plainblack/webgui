@@ -423,8 +423,8 @@ our $I18N = {
 	},
 	
 	'assetName' => {
-		message 	=> q|Event Manager (beta)|,
-		lastUpdated => 1131394072,
+		message 	=> q|Event Manager|,
+		lastUpdated => 1211045812,
 		context		=> q|name of asset|,
 	},
 

@@ -157,7 +157,7 @@ sub getKeywordsForAsset {
         return \@keywords;
     }
     else {
-        return join(" ", map({ m/\s/ ? '"' . $_ . '"' : $_ } @keywords));
+        return join(" ", map({ (m/\s/) ? '"' . $_ . '"' : $_ } @keywords));
     }
 }
 
@@ -196,7 +196,7 @@ Instead of returning an array reference of assetId's, return a paginator object.
 
 sub getMatchingAssets {
     my ($self, $options) = @_;
-    
+
     # base query
     my @clauses = ();
     my @params = ();
@@ -228,13 +228,12 @@ sub getMatchingAssets {
     }
 
     # looking for a list of keywords
-    if (exists $options->{keywords}) {
+    if (exists $options->{keywords} && scalar(@{$options->{keywords}})) {
         my @placeholders = ();
         foreach my $word (@{$options->{keywords}}){
             push @placeholders, '?';
             push @params, $word;
         }
-        next unless scalar @placeholders;
         push @clauses, 'keyword in ('.join(',', @placeholders).')';
     }
 
@@ -248,9 +247,7 @@ sub getMatchingAssets {
         $p->setDataByQuery($query, undef, undef, \@params);
         return $p;
     }
-    else {
-        return $self->session->db->buildArrayRef($query, \@params);
-    }
+    return $self->session->db->buildArrayRef($query, \@params);
 }
 
 

@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::Shelf;
 #-------------------------------------------------------------------
 
 use strict;
+use List::MoreUtils;
 use Tie::IxHash;
 use WebGUI::International;
 use base 'WebGUI::Asset::Wobject';
@@ -90,20 +91,19 @@ sub view {
 	}
 	
 	# get other child skus
-	my @childSkus = ();
-	foreach my $child (@{$self->getLineage(['children'],{includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
-		my $properties = $child->get;
-		$child->{url} = $self->getUrl;
-		push @childSkus, $child;
-	}
+	my @childSkus = @{$self->getLineage(['children'],{includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})};
 	
 	# find products based upon keywords
 	my @keywords = $self->get('keywords');
-	my $keywordBasedAsssetIds = WebGUI::Keyword->new($session)->getMatchingAssets({
+	my $keywordBasedAssetIds = WebGUI::Keyword->new($session)->getMatchingAssets({
 		matchAssetKeywords	=> $self,
 		isa					=> 'WebGUI::Asset::Sku',
 		});
-	$p->setBaseUrl($self->getUrl('func=view'));
+
+	# create paginator
+	my @products = List::MoreUtils::uniq(@childSkus, @{$keywordBasedAssetIds});
+	my $p = WebGUI::Paginator->new($session, $self->getUrl('func=view'));
+	$p->setDataByArrayRef(\@products);
 
 	# generate template variables
 	my @skus = ();

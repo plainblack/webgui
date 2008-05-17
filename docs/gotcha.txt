@@ -14,6 +14,7 @@ save you many hours of grief.
 	Exception::Class
 	Path::Class
 	Image::ExifTool
+    List::MoreUtils
 
  * WebGUI versions since 7.3.0 (when the new Calendar was added) 
    have allowed users to post Events to Calendars, but the owner of

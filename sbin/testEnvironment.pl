@@ -126,6 +126,7 @@ checkModule("Image::ExifTool","7.00");
 checkModule("Archive::Any","0.093");
 checkModule("Path::Class", '0.16');
 checkModule("Exception::Class","1.23");
+checkModule("List::MoreUtils","0.22");
 
 
 ###################################
