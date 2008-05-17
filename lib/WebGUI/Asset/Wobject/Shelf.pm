@@ -82,19 +82,26 @@ sub view {
 	my $session = $self->session;
 	
 	# get other shelves
-	my @children = ();
+	my @childShelves = ();
 	foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
 		my $properties = $child->get;
 		$child->{url} = $self->getUrl;
-		push @children, $child;
+		push @childShelves, $child;
+	}
+	
+	# get other child skus
+	my @childSkus = ();
+	foreach my $child (@{$self->getLineage(['children'],{includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
+		my $properties = $child->get;
+		$child->{url} = $self->getUrl;
+		push @childSkus, $child;
 	}
 	
 	# find products based upon keywords
 	my @keywords = $self->get('keywords');
-	my $p = WebGUI::Keyword->new($session)->getMatchingAssets({
+	my $keywordBasedAsssetIds = WebGUI::Keyword->new($session)->getMatchingAssets({
 		matchAssetKeywords	=> $self,
 		isa					=> 'WebGUI::Asset::Sku',
-		usePaginator		=> 1,
 		});
 	$p->setBaseUrl($self->getUrl('func=view'));
 
@@ -115,7 +122,7 @@ sub view {
 		}
 	}
 	my %var = (
-		shelves		=> \@children,
+		shelves		=> \@childShelves,
 		products	=> \@skus,
 		);
 	$p->appendTemplateVars(\%var);

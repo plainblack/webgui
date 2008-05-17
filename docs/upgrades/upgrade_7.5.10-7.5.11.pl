@@ -456,6 +456,15 @@ sub upgradeEMS {
             }
         }
     }
+    $db->write("drop table EventManagementSystem_badges");
+    $db->write("drop table EventManagementSystem_discountPasses");
+    $db->write("drop table EventManagementSystem_metaData");
+    $db->write("drop table EventManagementSystem_prerequisiteEvents");
+    $db->write("drop table EventManagementSystem_prerequisites");
+    $db->write("drop table EventManagementSystem_products");
+    $db->write("drop table EventManagementSystem_purchases");
+    $db->write("drop table EventManagementSystem_registrations");
+    $db->write("drop table EventManagementSystem_sessionPurchaseRef");
 }
 
 #-------------------------------------------------
@@ -565,6 +574,8 @@ sub convertTransactionLog {
                     }, $oldItem->{itemId});
             }
     }
+    $db->write("drop table oldtransaction");
+    $db->write("drop table oldtransactionitem");
 }
 
 #-------------------------------------------------

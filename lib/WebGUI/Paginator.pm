@@ -709,7 +709,7 @@ sub setDataByQuery {
 	($self->{_totalRows}) = $dbh->quickArray("select found_rows()");
 	$self->{_columnNames} = [ $sth->getColumnNames ];
 	
-    my @row;
+    my @row = ();
 	while (my $data = $sth->hashRef) {
         push(@row,$data);	
     }

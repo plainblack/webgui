@@ -234,6 +234,7 @@ sub getMatchingAssets {
             push @placeholders, '?';
             push @params, $word;
         }
+        next unless scalar @placeholders;
         push @clauses, 'keyword in ('.join(',', @placeholders).')';
     }
 
