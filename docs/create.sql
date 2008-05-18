@@ -123,9 +123,10 @@ CREATE TABLE `DataForm` (
   `revisionDate` bigint(20) NOT NULL default '0',
   `groupToViewEntries` varchar(22) NOT NULL default '7',
   `mailAttachments` int(11) default '0',
+  `useCaptcha` int(11) NOT NULL default '0',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-INSERT INTO `DataForm` VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020',0,1124395696,'7',0);
+INSERT INTO `DataForm` VALUES ('Thank you for telling your friends about WebGUI!',1,'PBtmpl0000000000000085','PBtmpl0000000000000104','PBtmpl0000000000000021','Szs5eev3OMssmnsyLRZmWA','PBtmpl0000000000000020',0,1124395696,'7',0,0);
 CREATE TABLE `DataForm_entry` (
   `DataForm_entryId` varchar(22) character set utf8 collate utf8_bin NOT NULL default '',
   `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL default '',
