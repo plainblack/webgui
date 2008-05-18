@@ -929,7 +929,7 @@ sub www_editBenefit {
         -name => 'benefit',
         -label => $i18n->get(51),
         -hoverHelp => $i18n->get('51 description'),
-        -value => $data->{benefits},
+        -value => $data->{benefit},
     );
     $f->yesNo(
         -name => 'proceed',
@@ -944,12 +944,14 @@ sub www_editBenefit {
 sub www_editBenefitSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
+    my $bid = $self->session->form->process('bid', 'text');
     $self->setCollateral(
         'benefitJSON',
         'benefitId',
-        $self->session->form->process('bid'),
+        $bid,
         {
-            benefit => $self->session->form->process('benefit','text')
+            benefit   => $self->session->form->process('benefit','text'),
+            benefitId => $bid,
         },
     );
     return '' unless($self->session->form->process('proceed'));
@@ -1288,7 +1290,7 @@ sub view {
     #---features 
     $var{'addFeature.url'} = $self->getUrl('func=editFeature&fid=new');
     $var{'addFeature.label'} = $i18n->get(34);
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('featureJSON') } ) {
+    foreach my $collateral ( @{ $self->getAllCollateral('featureJSON') } ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$id,$self->get('url'),$i18n->get(3))
                  . $self->session->icon->edit('func=editFeature&fid='.$id,$self->get('url'))
@@ -1302,10 +1304,10 @@ sub view {
     $var{feature_loop} = \@featureloop;
 
     #---benefits 
-    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&fid=new');
+    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&bid=new');
     $var{"addBenefit.label"} = $i18n->get(55);
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('benefitJSON') } ) {
-        my $id = $collateral->{collateralIndex};
+    foreach my $collateral ( @{ $self->getAllCollateral('benefitJSON') } ) {
+        my $id = $collateral->{benefitId};
         $segment = $self->session->icon->delete('func=deleteBenefitConfirm&bid='.$id,$self->get("url"),$i18n->get(48))
                  . $self->session->icon->edit('func=editBenefit&bid='.$id,$self->get("url"))
                  . $self->session->icon->moveUp('func=moveBenefitUp&bid='.$id,$self->get("url"))
@@ -1320,7 +1322,7 @@ sub view {
     #---specifications 
     $var{'addSpecification.url'} = $self->getUrl('func=editSpecification&sid=new');
     $var{'addSpecification.label'} = $i18n->get(35);
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('specificationJSON') } ) {
+    foreach my $collateral ( @{ $self->getAllCollateral('specificationJSON') } ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$id,$self->get('url'),$i18n->get(5))
                  . $self->session->icon->edit('func=editSpecification&sid='.$id,$self->get('url'))
@@ -1339,7 +1341,7 @@ sub view {
     $var{'addaccessory.url'}   = $self->getUrl('func=addAccessory');
     $var{'addaccessory.label'} = $i18n->get(36);
     ##Need an index for collateral operations, and an assetId for asset instantiation.
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('accessoryJSON') } ) {
+    foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
@@ -1356,7 +1358,7 @@ sub view {
     #---related
     $var{'addrelatedproduct.url'}   = $self->getUrl('func=addRelated');
     $var{'addrelatedproduct.label'} = $i18n->get(37);
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('relatedJSON')} ) {
+    foreach my $collateral ( @{ $self->getAllCollateral('relatedJSON')} ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
@@ -1374,7 +1376,7 @@ sub view {
     my @variantLoop;
     my %variants = ();
     tie %variants, 'Tie::IxHash';
-    foreach my $collateral ( @{ $self->getIndexedCollateralData('variantsJSON')} ) {
+    foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
         my $id = $collateral->{collateralIndex};
         $segment = $self->session->icon->delete('func=deleteVariantConfirm&vid='.$id,$self->get('url'),$i18n->get('delete variant confirm'))
                  . $self->session->icon->edit('func=editVariant&vid='.$id,$self->get('url'))
