@@ -904,8 +904,8 @@ sub www_deleteVariantConfirm {
 sub www_deleteSpecificationConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("specificationJSON", $self->session->form->process("sid"));
-    return "";
+    $self->deleteCollateral('specificationJSON', 'specificationId', $self->session->form->process('sid'));
+    return '';
 }
 
 
@@ -1010,60 +1010,67 @@ sub www_editFeatureSave {
 #-------------------------------------------------------------------
 sub www_editSpecification {
     my $self = shift;
-    my $sid = shift || $self->session->form->process("sid");
+    my $sid = shift || $self->session->form->process('sid');
     return $self->session->privilege->insufficient() unless ($self->canEdit);
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $data = $self->getCollateral("specificationJSON", $sid);
+    my $data = $self->getCollateral('specificationJSON', 'specificationId', $sid);
     my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 
     $f->hidden(
-        -name => "sid",
+        -name => 'sid',
         -value => $sid,
     );
     $f->hidden(
-        -name => "func",
-        -value => "editSpecificationSave",
+        -name => 'func',
+        -value => 'editSpecificationSave',
     );
     $f->text(
-        -name => "name",
+        -name => 'name',
         -label => $i18n->get(26),
         -hoverHelp => $i18n->get('26 description'),
         -value => $data->{name},
     );
     $f->text(
-        -name => "value",
+        -name => 'value',
         -label => $i18n->get(27),
         -hoverHelp => $i18n->get('27 description'),
         -value => $data->{value},
     );
     $f->text(
-        -name => "units",
+        -name => 'units',
         -label => $i18n->get(29),
         -hoverHelp => $i18n->get('29 description'),
         -value => $data->{units},
     );
     $f->yesNo(
-        -name => "proceed",
+        -name => 'proceed',
         -label => $i18n->get(28),
         -hoverHelp => $i18n->get('28 description'),
     );
     $f->submit;
-    return $self->getAdminConsole->render($f->print, "product specification add/edit");
+    return $self->getAdminConsole->render($f->print, 'product specification add/edit');
 }
 
 #-------------------------------------------------------------------
 sub www_editSpecificationSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("specificationJSON", $self->session->form->process("sid"), {
-        name  => $self->session->form->process("name",  "text"),
-        value => $self->session->form->process("value", "text"),
-        units => $self->session->form->process("units", "text")
-    });
+    my $sid = $self->session->form->process('sid'); 
+    $self->setCollateral(
+        'specificationJSON',
+        'specificationId',
+        $sid,
+        {
+            specificationId => $sid,
+            name            => $self->session->form->process('name',  'text'),
+            value           => $self->session->form->process('value', 'text'),
+            units           => $self->session->form->process('units', 'text'),
+        },
+    );
 
-    return "" unless($self->session->form->process("proceed"));
-    return $self->www_editSpecification("new");
+    return '' unless($self->session->form->process('proceed'));
+    return $self->www_editSpecification('new');
 }
 
 #-------------------------------------------------------------------
@@ -1207,16 +1214,16 @@ sub www_moveRelatedUp {
 sub www_moveSpecificationDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("specificationJSON", $self->session->form->process("sid"));
-    return "";
+    $self->moveCollateralDown('specificationJSON', 'specificationId', $self->session->form->process('sid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
 sub www_moveSpecificationUp {
     my $self = shift;   
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("specificationJSON", $self->session->form->process("sid"));
-    return "";
+    $self->moveCollateralUp('specificationJSON', 'specificationId', $self->session->form->process('sid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1330,7 +1337,7 @@ sub view {
     $var{'addSpecification.url'} = $self->getUrl('func=editSpecification&sid=new');
     $var{'addSpecification.label'} = $i18n->get(35);
     foreach my $collateral ( @{ $self->getAllCollateral('specificationJSON') } ) {
-        my $id = $collateral->{collateralIndex};
+        my $id = $collateral->{specificationId};
         $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$id,$self->get('url'),$i18n->get(5))
                  . $self->session->icon->edit('func=editSpecification&sid='.$id,$self->get('url'))
                  . $self->session->icon->moveUp('func=moveSpecificationUp&sid='.$id,$self->get('url'))
