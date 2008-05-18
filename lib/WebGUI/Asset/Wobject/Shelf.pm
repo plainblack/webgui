@@ -91,7 +91,7 @@ sub view {
 	}
 	
 	# get other child skus
-	my @childSkus = @{$self->getLineage(['children'],{includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})};
+	my @childSkus = @{$self->getLineage(['children'],{isa=>'WebGUI::Asset::Sku'})};
 	
 	# find products based upon keywords
 	my @keywords = $self->get('keywords');
@@ -107,8 +107,7 @@ sub view {
 
 	# generate template variables
 	my @skus = ();
-	foreach my $row (@{$p->getPageData}) {
-		my $id = $row->{assetId};
+	foreach my $id (@{$p->getPageData}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		if (defined $asset) {
 			my $sku = $asset->get;

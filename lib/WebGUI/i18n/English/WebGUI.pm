@@ -2699,8 +2699,8 @@ div.tabs {
 	},
 
 	'10' => {
-		message => q|Manage trash.|,
-		lastUpdated => 1031514049
+		message => q|Manage my trash.|,
+		lastUpdated =>1211131614 
 	},
 
 	'958' => {
@@ -3034,8 +3034,8 @@ or are under your current version tag.</p>
         },
 
 	'trash' => {
-		message => q|My Trash|,
-		lastUpdated =>1207859655,
+		message => q|Trash|,
+		lastUpdated =>1211131614,
         context => q|Title of the trash manager for the admin console.|
         },
 

@@ -308,6 +308,10 @@ A boolean indicating whether the resulting asset tree should be returned in reve
 
 An array reference containing a list of asset classes to include in the result. If this is specified then no other classes except these will be returned. The opposite of the excludeClasses rule.
 
+=head4 isa
+
+A classname where you can look for classes of a similar base class. For example, if you're looking for Donations, Subscriptions, Products and other subclasses of WebGUI::Asset::Sku, then set isa to 'WebGUI::Asset::Sku'.
+
 =head4 includeArchived
 
 A boolean indicating that we should include archived assets in the result set.
@@ -436,6 +440,10 @@ sub getLineage {
 	## class inclusions
 	if (exists $rules->{includeOnlyClasses}) {
 		$where .= ' and (asset.className in ('.$self->session->db->quoteAndJoin($rules->{includeOnlyClasses}).'))';
+	}
+	## isa
+	if (exists $rules->{isa}) {
+		$where .= ' and (asset.className like '.$self->session->db->quote($rules->{isa}.'%').')';
 	}
 	## finish up our where clause
 	if (!scalar(@whereModifiers)) {
