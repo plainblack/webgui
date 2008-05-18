@@ -387,6 +387,12 @@ our $I18N = {
 		context => q|Label in view transaction|,
 	},
 
+	'add to cart' => {
+		message => q|Add to cart|,
+		lastUpdated => 1211080800,
+		context => q|The label for the add to cart button.|
+	},
+
 };
 
 1;
