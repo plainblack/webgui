@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 29;        # Increment this number for each test you create
+plan tests => 32;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -50,6 +50,7 @@ ok(! exists $product->{_collateral}, 'object cache does not exist yet');
 my $vid = $product->setCollateral('variantsJSON', 'vid', 'new', {a => 'aye', b => 'bee'});
 
 isa_ok($product->{_collateral}, 'HASH', 'object cache created for collateral');
+isnt($vid, 'new', 'setCollateral assigns a new id to collateral without one');
 ok($session->id->valid($vid), 'a valid id was generated for the new collateral entry');
 
 my $json;
@@ -267,11 +268,14 @@ my $product4 = $root->addChild({
         title     => "Pinch a loaf",
         });
 
-my $bareVid = $product4->setCollateral('variantsJSON', 'vid', 'new', { major => 'problem' });
-isnt($bareVid, 'new', 'setCollateral assigns a new id to collateral without one');
+my $newVid;
+$newVid = $product4->setCollateral('variantsJSON', 'vid', 'new', { major => 'problem', vid => 'new' });
+isnt($newVid, 'new', 'setCollateral assigns a new id to collateral with an id of "new"...');
+ok($session->id->valid($newVid), '... and it is a valid GUID');
 
-my $newVid = $product4->setCollateral('variantsJSON', 'vid', 'new', { major => 'problem', vid => 'new' });
-isnt($newVid, 'new', 'setCollateral assigns a new id to collateral with an id of "new"');
+$newVid = $product4->setCollateral('variantsJSON', 'vid', 'new', { major => 'problem', vid => '' });
+isnt($newVid, 'new', 'setCollateral assigns a new id to collateral with an id of ""');
+ok($session->id->valid($newVid), '... and it is a valid GUID');
 
 $product4->purge;
 

@@ -808,7 +808,7 @@ EOSQL1
         ##Truncate title to 30 chars for short desc
         #printf "\t\tAdding variant to %s\n", $productData->{title} unless $quiet;
         my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
-        $product->setCollateral('variantsJSON', 'new', {
+        $product->setCollateral('variantsJSON', 'variantId', 'new', {
             varSku    => ($productData->{productNumber} || $session->id->generate),
             shortdesc => substr($productData->{title}, 0, 30),
             price     => $productData->{price},
@@ -965,7 +965,7 @@ sub mergeProductsWithCommerce {
             $variant->{weight}    = $variantData->{weight};
             $variant->{quantity}  = $variantData->{available};
             $variant->{shortdesc} = $shortdesc;
-            $sku->setCollateral('variantsJSON', 'new', $variant);
+            $sku->setCollateral('variantsJSON', 'variantId', 'new', $variant);
         }
     }
     $productSth->finish;

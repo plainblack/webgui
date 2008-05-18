@@ -671,7 +671,9 @@ sub setCollateral {
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
     if ($keyValue eq 'new' || $keyValue eq '') {
-        if (! exists $properties->{$keyName} or $properties->{$keyName} eq 'new') {
+        if (! exists $properties->{$keyName}
+           or $properties->{$keyName} eq 'new'
+           or $properties->{$keyName} eq '') {
             $properties->{$keyName} = $self->session->id->generate;
         }
         push @{ $table }, $properties;
@@ -893,7 +895,7 @@ sub www_deleteRelatedConfirm {
 sub www_deleteVariantConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral('variantsJSON', $self->session->form->process('vid'));
+    $self->deleteCollateral('variantsJSON', 'variantId', $self->session->form->process('vid'));
     return '';
 }
 
@@ -1076,11 +1078,11 @@ sub www_editVariant {
     my $vid  = shift || $self->session->form->process("vid");
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
-    my $data = $self->getCollateral("variantsJSON", $vid);
+    my $data = $self->getCollateral("variantsJSON", 'variantId', $vid);
     my $f    = WebGUI::HTMLForm->new($self->session, -action=>$self->getUrl);
     $f->hidden(
         -name => 'func',
-        -value => "editVariantSave",
+        -value => 'editVariantSave',
     );
     $f->hidden(
         -name => 'vid',
@@ -1130,14 +1132,20 @@ sub www_editVariant {
 sub www_editVariantSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    ##Mandatory variable check
-    $self->setCollateral('variantsJSON', $self->session->form->process('vid'), {
-        varSku    => $self->session->form->process('varSku',    'text'),
-        shortdesc => $self->session->form->process('shortdesc', 'text'),
-        price     => $self->session->form->process('price',     'float'),
-        weight    => $self->session->form->process('weight',    'float'),
-        quantity  => $self->session->form->process('quantity',  'integer'),
-    });
+    my $vid = $self->session->form->process('vid', 'text');
+    $self->setCollateral(
+        'variantsJSON',
+        'variantId',
+        $vid,
+        {
+            variantId => $vid,
+            varSku    => $self->session->form->process('varSku',    'text'),
+            shortdesc => $self->session->form->process('shortdesc', 'text'),
+            price     => $self->session->form->process('price',     'float'),
+            weight    => $self->session->form->process('weight',    'float'),
+            quantity  => $self->session->form->process('quantity',  'integer'),
+        }
+    );
 
     return $self->www_view unless($self->session->form->process('proceed'));
     return $self->www_editVariant('new');
@@ -1227,16 +1235,16 @@ sub www_moveSpecificationUp {
 sub www_moveVariantDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("variantsJSON", $self->session->form->process("vid"));
-    return "";
+    $self->moveCollateralDown('variantsJSON', 'variantId', $self->session->form->process('vid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
 sub www_moveVariantUp {
     my $self = shift;   
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("variantsJSON", $self->session->form->process("vid"));
-    return "";
+    $self->moveCollateralUp('variantsJSON', 'variantId', $self->session->form->process('vid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1388,7 +1396,7 @@ sub view {
     my %variants = ();
     tie %variants, 'Tie::IxHash';
     foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
-        my $id = $collateral->{collateralIndex};
+        my $id = $collateral->{variantId};
         $segment = $self->session->icon->delete('func=deleteVariantConfirm&vid='.$id,$self->get('url'),$i18n->get('delete variant confirm'))
                  . $self->session->icon->edit('func=editVariant&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveUp('func=moveVariantUp&vid='.$id,$self->get('url'))
