@@ -806,7 +806,7 @@ SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
 EOSQL1
     while (my $productData = $productQuery->hashRef()) {
         ##Truncate title to 30 chars for short desc
-        printf "\t\tAdding variant to %s\n", $productData->{title} unless $quiet;
+        #printf "\t\tAdding variant to %s\n", $productData->{title} unless $quiet;
         my $product = WebGUI::Asset::Sku::Product->new($session, $productData->{assetId}, 'WebGUI::Asset::Sku::Product', $productData->{revisionDate});
         $product->setCollateral('variantsJSON', 'new', {
             varSku    => ($productData->{productNumber} || $session->id->generate),
@@ -1022,14 +1022,14 @@ sub updateUsersOfProductMacro {
     my $fixed   = $session->db->prepare('update wobject set description=? where  assetId=? and revisionDate=?');
     while (my $wobject = $wobjSth->hashRef) {
         while ($wobject->{description} =~ m/\^Product\('? ([^),']+) /xg) {
-            printf "\t\tWorking on %s\n", $wobject->{assetId};
+            #printf "\t\tWorking on %s\n", $wobject->{assetId};
             my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            printf "\t\t\tFound argument of %s\n", $identifier;
+            #printf "\t\t\tFound argument of %s\n", $identifier;
             my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            printf "\t\t\tsku assetId: %s\n", $assetId;
+            #printf "\t\t\tsku assetId: %s\n", $assetId;
             my $productAssetId = $assetId ? $assetId : $identifier;
             $wobject->{description} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            printf "\t\t\tUpdated description to%s\n", $wobject->{description};
+            #printf "\t\t\tUpdated description to%s\n", $wobject->{description};
             $fixed->execute([ $wobject->{description}, $wobject->{assetId}, $wobject->{revisionDate}, ]);
         }
     }
@@ -1040,14 +1040,14 @@ sub updateUsersOfProductMacro {
        $fixed   = $session->db->prepare('update snippet set snippet=? where  assetId=? and revisionDate=?');
     while (my $snippet = $snipSth->hashRef) {
         while ($snippet->{snippet} =~ m/\^Product\('? ([^),']+) /xg) {
-            printf "\t\tWorking on %s\n", $snippet->{assetId};
+            #printf "\t\tWorking on %s\n", $snippet->{assetId};
             my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            printf "\t\t\tFound argument of %s\n", $identifier;
+            #printf "\t\t\tFound argument of %s\n", $identifier;
             my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            printf "\t\t\tsku assetId: %s\n", $assetId;
+            #printf "\t\t\tsku assetId: %s\n", $assetId;
             my $productAssetId = $assetId ? $assetId : $identifier;
             $snippet->{snippet} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            printf "\t\t\tUpdated snippet to%s\n", $snippet->{snippet};
+            #printf "\t\t\tUpdated snippet to%s\n", $snippet->{snippet};
             $fixed->execute([ $snippet->{snippet}, $snippet->{assetId}, $snippet->{revisionDate}, ]);
         }
     }
@@ -1058,14 +1058,14 @@ sub updateUsersOfProductMacro {
        $fixed   = $session->db->prepare('update template set template=? where  assetId=? and revisionDate=?');
     while (my $template = $tempSth->hashRef) {
         while ($template->{template} =~ m/\^Product\('? ([^),']+) /xg) {
-            printf "\t\tWorking on %s\n", $template->{assetId};
+            #printf "\t\tWorking on %s\n", $template->{assetId};
             my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            printf "\t\t\tFound argument of %s\n", $identifier;
+            #printf "\t\t\tFound argument of %s\n", $identifier;
             my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            printf "\t\t\tsku assetId: %s\n", $assetId;
+            #printf "\t\t\tsku assetId: %s\n", $assetId;
             my $productAssetId = $assetId ? $assetId : $identifier;
             $template->{template} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            printf "\t\t\tUpdated template to%s\n", $template->{template};
+            #printf "\t\t\tUpdated template to%s\n", $template->{template};
             $fixed->execute([ $template->{template}, $template->{assetId}, $template->{revisionDate}, ]);
         }
     }

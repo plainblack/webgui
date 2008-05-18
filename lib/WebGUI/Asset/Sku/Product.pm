@@ -756,7 +756,14 @@ sub www_addAccessorySave {
 
     my $accessoryAssetId = $self->session->form->process('accessoryAccessId');
     return "" unless $accessoryAssetId;
-    $self->setCollateral('accessoryJSON', 'new', { accessoryAssetId =>  $accessoryAssetId });
+    $self->setCollateral(
+        'accessoryJSON',
+        'accessoryAssetId',
+        'new',
+        {
+            accessoryAssetId =>  $accessoryAssetId
+        },
+    );
     return "" unless($self->session->form->process("proceed"));
     return $self->www_addAccessory();
 }
@@ -851,8 +858,8 @@ Delete an asset from the accessory list, by index.
 sub www_deleteAccessoryConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral('accessoryJSON', $self->session->form->process("aid"));
-    return "";
+    $self->deleteCollateral('accessoryJSON', 'accessoryAssetId', $self->session->form->process('aid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1150,7 +1157,7 @@ sub www_editVariantSave {
 sub www_moveAccessoryDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown('accessoryJSON', $self->session->form->process('aid'));
+    $self->moveCollateralDown('accessoryJSON', 'accessoryAssetId', $self->session->form->process('aid'));
     return '';
 }
 
@@ -1356,7 +1363,7 @@ sub view {
     $var{'addaccessory.label'} = $i18n->get(36);
     ##Need an index for collateral operations, and an assetId for asset instantiation.
     foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
-        my $id = $collateral->{collateralIndex};
+        my $id = $collateral->{accessoryAssetId};
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
                  . $self->session->icon->moveUp('func=moveAccessoryUp&aid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
