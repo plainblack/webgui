@@ -688,7 +688,7 @@ sub setCollateral {
     ##the object cache directly.
     my $table = $self->getAllCollateral($tableName);
     if ($keyValue eq 'new' || $keyValue eq '') {
-        if (! exists $properties->{$keyName}) {
+        if (! exists $properties->{$keyName} or $properties->{$keyName} eq 'new') {
             $properties->{$keyName} = $self->session->id->generate;
         }
         push @{ $table }, $properties;
@@ -867,8 +867,8 @@ sub www_deleteBenefitConfirm {
 sub www_deleteFeatureConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral("featureJSON", $self->session->form->process("fid"));
-    return "";
+    $self->deleteCollateral('featureJSON', 'featureId', $self->session->form->process('fid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -961,43 +961,50 @@ sub www_editBenefitSave {
 #-------------------------------------------------------------------
 sub www_editFeature {
     my $self = shift;
-    my $fid = shift || $self->session->form->process("fid");
+    my $fid = shift || $self->session->form->process('fid');
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $data = $self->getCollateral("featureJSON", $fid);
+    my $data = $self->getCollateral('featureJSON', 'featureId', $fid);
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     my $f    = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
-        -name => "fid",
+        -name  => 'fid',
         -value => $fid,
     );
     $f->hidden(
-        -name => "func",
-        -value => "editFeatureSave",
+        -name  => 'func',
+        -value => 'editFeatureSave',
     );
     $f->text(
-        -name => "feature",
-        -label => $i18n->get(23),
+        -name      => 'feature',
+        -label     => $i18n->get(23),
         -hoverHelp => $i18n->get('23 description'),
-        -value => $data->{feature},
+        -value     => $data->{feature},
     );
     $f->yesNo(
-        -name => "proceed",
-        -label => $i18n->get(24),
+        -name      => 'proceed',
+        -label     => $i18n->get(24),
         -hoverHelp => $i18n->get('24 description'),
     );
     $f->submit;
-    return $self->getAdminConsole->render($f->print, "product feature add/edit");
+    return $self->getAdminConsole->render($f->print, 'product feature add/edit');
 }
 
 #-------------------------------------------------------------------
 sub www_editFeatureSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->setCollateral("featureJSON", $self->session->form->process("fid"), {
-                                              feature => $self->session->form->process("feature","text")
-                                             });
-    return "" unless($self->session->form->process("proceed"));
-    return $self->www_editFeature("new");
+    my $fid = $self->session->form->process('fid', 'text');
+    my $newFid = $self->setCollateral(
+        'featureJSON',
+        'featureId',
+        $fid,
+        {
+            feature   => $self->session->form->process('feature','text'),
+            featureId => $fid,
+        },
+    );
+    return '' unless($self->session->form->process('proceed'));
+    return $self->www_editFeature('new');
 }
 
 #-------------------------------------------------------------------
@@ -1168,16 +1175,16 @@ sub www_moveBenefitUp {
 sub www_moveFeatureDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown("featureJSON", $self->session->form->process("fid"));
-    return "";
+    $self->moveCollateralDown('featureJSON', 'featureId', $self->session->form->process('fid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
 sub www_moveFeatureUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp("featureJSON", $self->session->form->process("fid"));
-    return "";
+    $self->moveCollateralUp('featureJSON', 'featureId', $self->session->form->process('fid'));
+    return '';
 }
 
 #-------------------------------------------------------------------
@@ -1291,11 +1298,11 @@ sub view {
     $var{'addFeature.url'} = $self->getUrl('func=editFeature&fid=new');
     $var{'addFeature.label'} = $i18n->get(34);
     foreach my $collateral ( @{ $self->getAllCollateral('featureJSON') } ) {
-        my $id = $collateral->{collateralIndex};
+        my $id = $collateral->{featureId};
         $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$id,$self->get('url'),$i18n->get(3))
                  . $self->session->icon->edit('func=editFeature&fid='.$id,$self->get('url'))
-                 . $self->session->icon->moveUp('func=moveFeatureUp&&fid='.$id,$self->get('url'))
-                 . $self->session->icon->moveDown('func=moveFeatureDown&&fid='.$id,$self->get('url'));
+                 . $self->session->icon->moveUp('func=moveFeatureUp&fid='.$id,$self->get('url'))
+                 . $self->session->icon->moveDown('func=moveFeatureDown&fid='.$id,$self->get('url'));
         push(@featureloop,{
                           'feature.feature'  => $collateral->{feature},
                           'feature.controls' => $segment
