@@ -236,16 +236,6 @@ sub duplicate {
         $self->_duplicateFile($newAsset, $file);
     }
 
-    foreach my $basename ('feature', 'benefit', 'specification') {
-        my $table = "Product_${basename}";
-        my $sth = $self->session->db->read("select * from $table where assetId=?", [$self->getId]);
-        while (my $row = $sth->hashRef) {
-            $row->{"${table}Id"} = "new";
-            $row->{"assetId"} = $newAsset->getId; 
-            $newAsset->setCollateral($table, "${table}Id", $row);
-        }
-    }
-
     return $newAsset;
 
 }
@@ -291,13 +281,6 @@ table.
 =head3 tableName
 
 The name of the table you wish to retrieve the data from.
-
-=head3 index
-
-A string containing the index to fetch. If the index is equal to "new"
-or null, then an empty hashRef will be returned to avoid strict errors.
-If the requested index is beyond the end of the collateral array, it
-also returns an empty hashRef.
 
 =head3 keyName
 
@@ -764,7 +747,7 @@ sub www_addAccessorySave {
             accessoryAssetId =>  $accessoryAssetId
         },
     );
-    return "" unless($self->session->form->process("proceed"));
+    return '' unless($self->session->form->process('proceed'));
     return $self->www_addAccessory();
 }
 
@@ -774,8 +757,8 @@ sub www_addRelated {
     return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
-        -name => "func",
-        -value => "addRelatedSave",
+        -name => 'func',
+        -value => 'addRelatedSave',
     );
     ##Relateds are other Products.  Give the user a list of Related products that
     ##are not already used, nor itself.
@@ -802,28 +785,35 @@ sub www_addRelated {
 
     my $i18n = WebGUI::International->new($self->session,'Asset_Product');
     $f->selectBox(
-        -name => "relatedAssetId",
+        -name => 'relatedAssetId',
         -options => $related,
         -label => $i18n->get(20),
         -hoverHelp => $i18n->get('20 description'),
     );
     $f->yesNo(
-        -name => "proceed",
+        -name => 'proceed',
         -label => $i18n->get(21),
         -hoverHelp => $i18n->get('21 description'),
     );
     $f->submit;
-    return $self->getAdminConsole->render($f->print,"product related add/edit");
+    return $self->getAdminConsole->render($f->print,'product related add/edit');
 }
 
 #-------------------------------------------------------------------
 sub www_addRelatedSave {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    my $relatedAssetId = $self->session->form->process("relatedAssetId");
-    return "" unless $relatedAssetId;
-    $self->setCollateral('relatedJSON', 'new', { relatedAssetId =>  $relatedAssetId });
-    return "" unless($self->session->form->process("proceed"));
+    my $relatedAssetId = $self->session->form->process('relatedAssetId');
+    return '' unless $relatedAssetId;
+    $self->setCollateral(
+        'relatedJSON',
+        'relatedAssetId',
+        'new',
+        {
+            relatedAssetId =>  $relatedAssetId,
+        },
+    );
+    return '' unless($self->session->form->process('proceed'));
     return $self->www_addRelated();
 }
 
@@ -851,7 +841,7 @@ sub www_buy {
 
 =head2 www_deleteAccessoryConfirm 
 
-Delete an asset from the accessory list, by index.
+Delete an asset from the accessory list, by id.
 
 =cut
 
@@ -895,7 +885,7 @@ sub www_deleteFileConfirm {
 sub www_deleteRelatedConfirm {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->deleteCollateral('Product_related', $self->session->form->process('rid'));
+    $self->deleteCollateral('relatedJSON', 'relatedAssetId', $self->session->form->process('rid'));
     return '';
 }
 
@@ -1205,7 +1195,7 @@ sub www_moveFeatureUp {
 sub www_moveRelatedDown {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralDown('relatedJSON', $self->session->form->process('rid'));
+    $self->moveCollateralDown('relatedJSON', 'relatedAssetId', $self->session->form->process('rid'));
     return '';
 }
 
@@ -1213,7 +1203,7 @@ sub www_moveRelatedDown {
 sub www_moveRelatedUp {
     my $self = shift;
     return $self->session->privilege->insufficient() unless ($self->canEdit);
-    $self->moveCollateralUp('relatedJSON', $self->session->form->process('rid'));
+    $self->moveCollateralUp('relatedJSON', 'relatedAssetId', $self->session->form->process('rid'));
     return '';
 }
 
@@ -1361,7 +1351,7 @@ sub view {
     #---accessories 
     $var{'addaccessory.url'}   = $self->getUrl('func=addAccessory');
     $var{'addaccessory.label'} = $i18n->get(36);
-    ##Need an index for collateral operations, and an assetId for asset instantiation.
+    ##Need an id for collateral operations, and an assetId for asset instantiation.
     foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
         my $id = $collateral->{accessoryAssetId};
         $segment = $self->session->icon->delete('func=deleteAccessoryConfirm&aid='.$id,$self->get('url'),$i18n->get(2))
@@ -1380,7 +1370,7 @@ sub view {
     $var{'addrelatedproduct.url'}   = $self->getUrl('func=addRelated');
     $var{'addrelatedproduct.label'} = $i18n->get(37);
     foreach my $collateral ( @{ $self->getAllCollateral('relatedJSON')} ) {
-        my $id = $collateral->{collateralIndex};
+        my $id = $collateral->{relatedAssetId};
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
                  . $self->session->icon->moveUp('func=moveRelatedUp&rid='.$id, $self->get('url'))
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
