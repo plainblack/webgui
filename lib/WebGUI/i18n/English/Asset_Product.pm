@@ -342,6 +342,12 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+	'specs' => {
+		message => q|Specs|,
+		lastUpdated => 1211168475,
+        context => q|Abbreviation of Specifications|,
+	},
+
 	'35' => {
 		message => q|Add a specification.|,
 		lastUpdated => 1031514049
@@ -771,6 +777,16 @@ be useful, others may not.|,
 	'buy_form_footer' => {
 		message => q|HTML code to end the form for putting variant into a shopping cart.  |,
 		lastUpdated => 1210611784,
+	},
+
+	'options' => {
+		message => q|Options|,
+		lastUpdated => 1211168603,
+	},
+
+	'other products' => {
+		message => q|Other Products|,
+		lastUpdated => 1211168991,
 	},
 
 };
