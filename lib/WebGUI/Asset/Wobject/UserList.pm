@@ -93,6 +93,16 @@ sub definition {
     my $definition = shift;
     my %properties;
     my $i18n = WebGUI::International->new($session, 'Asset_UserList');
+
+    my %sortByOptions;
+    tie %sortByOptions, 'Tie::IxHash';
+    my $fields = $session->db->read("SELECT field.fieldName, field.label FROM userProfileField as field "
+        ."left join userProfileCategory as cat USING(profileCategoryId) ORDER BY cat.sequenceNumber, field.sequenceNumber");
+    while (my $field = $fields->hashRef){
+        my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
+        $sortByOptions{$field->{fieldName}} = $label;
+    }
+
     tie %properties, 'Tie::IxHash';
     %properties = (
        	templateId =>{
@@ -136,6 +146,23 @@ sub definition {
             tab=>"display",
             label=>$i18n->get("showOnlyVisibleAsNamed label"),
             hoverHelp=>$i18n->get('showOnlyVisibleAsNamed description'),
+        },
+        sortOrder =>{
+            fieldType=>"selectBox",
+            defaultValue=>'asc',
+            tab=>'display',
+            options=>{ asc => $i18n->get('ascending'),
+                       desc => $i18n->get('descending') },
+            label=>$i18n->get('sort order'),
+            hoverHelp=>$i18n->get('sort order description'),
+        },
+        sortBy =>{
+            fieldType=>"selectBox",
+            defaultValue=>'lastName',
+            tab=>'display',
+            options=>\%sortByOptions,
+            label=>$i18n->get('sort by'),
+            hoverHelp=>$i18n->get('sort by description'),
         },
     );
 	
@@ -294,18 +321,13 @@ sub view {
 
 #	$error->info("created constraint, time :".(time() - $start_time));
 
-	my $formOrderBy = $self->session->form->process('orderBy');
-	my $orderBy = 'userName';
-	my $orderType = $self->session->form->process('orderType') || 'asc';
+	my $orderBy = $self->session->form->process('orderBy') || $self->get('sortBy') || 'users.username';
+	my $orderType = $self->session->form->process('orderType') || $self->get('sortOrder') || 'asc';
 	
-	my @orderByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
-	if ($formOrderBy){
-		if(isIn($formOrderBy,@profileFieldNames)){
-			$orderBy = $formOrderBy;
-		}elsif(isIn($formOrderBy,@orderByUserProperties)){
-			$orderBy = 'users.'.$formOrderBy;
-		}
-	}
+    my @orderByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
+    if(isIn($orderBy,@orderByUserProperties)){
+            $orderBy = 'users.'.$orderBy;
+    }
 	$sql .= " order by ".$orderBy." ".$orderType;
 
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");

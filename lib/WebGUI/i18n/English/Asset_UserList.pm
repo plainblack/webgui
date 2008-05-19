@@ -249,6 +249,37 @@ true for the 'email' profile field.|,
                 lastUpdated => 1081514049
         },
 
+        'sort by' => {
+                message => q|Sort By|,
+                lastUpdated => 1109698614,
+        },
+
+        'sort order' => {
+                message => q|Sort Order|,
+                lastUpdated => 1109698614,
+        },
+
+        'sort by description' => {
+                message => q|By default, all users are displayed in a sorted order.  Use this
+field to choose by what field they are sorted.|,
+                lastUpdated => 1119070429,
+        },
+
+        'sort order description' => {
+                message => q|Sort in ascending or descending order.|,
+                lastUpdated => 1119070429,
+        },
+
+        'ascending' => {
+                message => q|Ascending|,
+                lastUpdated => 1113673328,
+        },
+
+        'descending' => {
+                message => q|Descending|,
+                lastUpdated => 1113673330,
+        },
+
 
 };
 
