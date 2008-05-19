@@ -1,0 +1,81 @@
+package WebGUI::Help::Asset_UserList;
+
+our $HELP = {
+	'userlist template' => {
+		title => 'UserList Template',
+		body => 'UserList Template Help Body',
+		isa => [
+            {   namespace => "Asset_UserList",
+                tag => "userlist asset template variables"
+            },
+            {   namespace => "Asset_Template",
+                tag => "template variables"
+            },
+            {   namespace => "Asset",
+                tag => "asset template"
+            },
+            {   tag => 'pagination template variables',
+                namespace => 'WebGUI'
+            },
+        ],
+		variables => [
+            { 'name' => 'searchFormHeader' },
+            { 'name' => 'searchFormSubmit' },
+            { 'name' => 'searchFormFooter' },
+            { 'name' => 'searchFormTypeOr' },
+            { 'name' => 'searchFormTypeAnd' },
+            { 'name' => 'searchFormTypeSelect' },
+            { 'name' => 'searchFormQuery_form' },
+            { 'name' => 'numberOfProfileFields' },
+            {   'name'      => 'profileField_loop',
+                'variables' => [
+                    { 'name' => 'profileField_label' },
+                ],
+            },
+            {   'name'      => 'alphabetSearch_loop',
+                'variables' => [
+                    { 'name' => 'alphabetSearch_loop_label' },
+                    { 'name' => 'alphabetSearch_loop_hasResults' },
+                    { 'name' => 'alphabetSearch_loop_searchURL' },
+                ],
+            },
+            {   'name'      => 'user_loop',
+                'variables' => [
+                    { 'name' => 'user_name' },
+                    { 'name' => 'user_id' },
+                    { 'name' => 'user_profile_PROFILEFIELDNAME_value' },
+                    { 'name' => 'user_profile_emailNotPublic' },
+                    {   'name' => 'user_profile_loop', 
+                        'variables' => [
+                            { 'name' => 'profile_emailNotPublic' },
+                            { 'name' => 'profile_value' },
+                        ],
+                    },
+                ],
+            },
+        ],
+        related => []
+    },
+    
+    'userlist asset template variables' => {
+        private => 1,
+        title => 'UserList Template',
+        body => 'UserList Template Help Body',
+        isa     => [
+            {   namespace => "Asset_Wobject",
+                tag       => "wobject template variables",
+            },
+        ],
+        variables => [
+            { 'name' => 'alphabet' },
+            { 'name' => 'showGroupId' },
+            { 'name' => 'hideGroupId' },
+            { 'name' => 'usersPerPage' },
+            { 'name' => 'templateId' },
+            { 'name' => 'showOnlyVisibleAsNamed' },
+        ],
+        related => []
+    },
+};
+
+1;

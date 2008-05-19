@@ -67,9 +67,9 @@ sub getAlphabetSearchLoop {
         my $hasResults = $self->session->db->quickScalar("select if ("
             ."(select count(*) from userProfileData where lastName  like '".$letter."%')<>0, 1, 0)");
         push @alphabetLoop, {
-            label       => $htmlEncodedLetter || $letter,
-            hasResults  => $hasResults,
-            searchURL   => $searchURL,
+            alphabetSearch_loop_label       => $htmlEncodedLetter || $letter,
+            alphabetSearch_loop_hasResults  => $hasResults,
+            alphabetSearch_loop_searchURL   => $searchURL,
         }
     }
     return \@alphabetLoop;
@@ -88,56 +88,56 @@ A hash reference containing the properties of this wobject.
 =cut
 
 sub definition {
-        my $class = shift;
-        my $session = shift;
-        my $definition = shift;
-        my %properties;
-        my $i18n = WebGUI::International->new($session, 'Asset_UserList');
-    	tie %properties, 'Tie::IxHash';
-        %properties = (
-           	templateId =>{
-                fieldType=>"template",  
-                defaultValue=>'UserListTmpl0000001',
-			    namespace=>'UserList',
-    			tab=>"display",
-	    	},
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my %properties;
+    my $i18n = WebGUI::International->new($session, 'Asset_UserList');
+    tie %properties, 'Tie::IxHash';
+    %properties = (
+       	templateId =>{
+            fieldType=>"template",  
+            defaultValue=>'UserListTmpl0000001',
+		    namespace=>'UserList',
+    		tab=>"display",
+	    },
 
-            showGroupId=>{
-		    	fieldType=>"group",  
-                defaultValue=>"7",
-			    label=>$i18n->get("Group to show label"),
-                hoverHelp=>$i18n->get('Group to show description'),
-    			tab=>"display",
-			},
-           	hideGroupId=>{
-	    		fieldType=>"group",  
-                defaultValue=>"3",
-		    	label=>$i18n->get("Group to hide label"),
-			    hoverHelp=>$i18n->get('Group to hide description'),
-                tab=>"display",
-			},
-	        usersPerPage=>{
-    			fieldType=>"integer",  
-                defaultValue=>"25",
-	    		tab=>"display",
-		    	hoverHelp=>$i18n->get('Users per page description'),
-                label=>$i18n->get("Users per page label"),
-			},
-            alphabet=>{
-                fieldType=>"text",
-                defaultValue=>"",
-                tab=>"display",
-                label=>$i18n->get("alphabet label"),
-                hoverHelp=>$i18n->get('alphabet description'),
-            },
-            showOnlyVisibleAsNamed=>{
-                fieldType=>"yesNo",
-                defaultValue=>"0",
-                tab=>"display",
-                label=>$i18n->get("showOnlyVisibleAsNamed label"),
-                hoverHelp=>$i18n->get('showOnlyVisibleAsNamed description'),
-            },
-		);
+        showGroupId=>{
+		   	fieldType=>"group",  
+            defaultValue=>"7",
+		    label=>$i18n->get("Group to show label"),
+            hoverHelp=>$i18n->get('Group to show description'),
+    		tab=>"display",
+		},
+        hideGroupId=>{
+	    	fieldType=>"group",  
+            defaultValue=>"3",
+		   	label=>$i18n->get("Group to hide label"),
+		    hoverHelp=>$i18n->get('Group to hide description'),
+            tab=>"display",
+		},
+	    usersPerPage=>{
+    		fieldType=>"integer",  
+            defaultValue=>"25",
+	    	tab=>"display",
+		   	hoverHelp=>$i18n->get('Users per page description'),
+            label=>$i18n->get("Users per page label"),
+		},
+        alphabet=>{
+            fieldType=>"text",
+            defaultValue=>"",
+            tab=>"display",
+            label=>$i18n->get("alphabet label"),
+            hoverHelp=>$i18n->get('alphabet description'),
+        },
+        showOnlyVisibleAsNamed=>{
+            fieldType=>"yesNo",
+            defaultValue=>"0",
+            tab=>"display",
+            label=>$i18n->get("showOnlyVisibleAsNamed label"),
+            hoverHelp=>$i18n->get('showOnlyVisibleAsNamed description'),
+        },
+    );
 	
 	push(@{$definition}, {                
 		assetName=>$i18n->get('assetName'),                
@@ -148,23 +148,6 @@ sub definition {
 		properties=>\%properties                
 	});
     return $class->SUPER::definition($session, $definition);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ( )
-
-Returns a tab form containing the properties of this wobject.  
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
-    my $tabform = $self->SUPER::getEditForm();
-	
-	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
-
-	return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -187,8 +170,6 @@ sub isInGroup {
    my ($self, $gid, $uid, $secondRun) = @_;
    $gid = 3 unless (defined $gid);
    ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal.
-   #my $eh = $self->session->errorHandler;
-   #$eh->warn("Group Id is: $gid for ".$tgroup->name);
    return 1 if ($gid eq '7');       # everyone is in the everyone group
    return 1 if ($gid eq '1' && $uid eq '1');    # visitors are in the visitors group
    return 1 if ($gid eq '2' && $uid ne '1');    # if you're not a visitor, then you're a registered user
@@ -223,15 +204,17 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-        my $self = shift;
-        $self->SUPER::prepareView();
-        my $templateId = $self->get("templateId");
-        if ($self->session->form->process("overrideTemplateId") ne "") {
-                $templateId = $self->session->form->process("overrideTemplateId");
-        }
-        my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-        $template->prepare;
-        $self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $templateId = $self->get("templateId");
+    if ($self->session->form->process("overrideTemplateId") ne "") {
+        $templateId = $self->session->form->process("overrideTemplateId");
+    }
+    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare;
+    $self->{_viewTemplate} = $template;
+    
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -405,9 +388,9 @@ sub view {
 	$p->appendTemplateVars(\%var);
 	
 	$var{searchFormHeader} = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
-	$var{'searchFormTypeOr'} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'or'});
-	$var{'searchFormTypeAnd'} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'and'});
-	$var{'searchFormTypeSelect'} = WebGUI::Form::selectBox($self->session,{
+	$var{searchFormTypeOr} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'or'});
+	$var{searchFormTypeAnd} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'and'});
+	$var{searchFormTypeSelect} = WebGUI::Form::selectBox($self->session,{
                                                         name=>'searchType',
                                 	            		value=>'or',
                                                         options=> {
@@ -416,15 +399,15 @@ sub view {
                                                         	}
                                             			});
 
-    $var{'searchFormQuery_label'} = $i18n->get('query label');
-    $var{'searchFormQuery_form'} = WebGUI::Form::text($self->session,{
+    $var{searchFormQuery_label} = $i18n->get('query label');
+    $var{searchFormQuery_form} = WebGUI::Form::text($self->session,{
                 name=>'search',
                 value=>$self->session->form->process("search"),
         });
         
 	$var{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
     $var{searchFormFooter} = WebGUI::Form::formFooter($self->session);
-    $var{alphabetSearchLoop} = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
+    $var{alphabetSearch_loop} = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
 
 #    $error->info("global tmpl_vars created, time :".(time() - $start_time));
 	my $out = $self->processTemplate(\%var,$self->get("templateId"));
