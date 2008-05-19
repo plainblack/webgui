@@ -149,7 +149,7 @@ sub issueCredit {
     my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->get('userId'));
     $credit->adjust($self->get('price'), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
     $self->getSku->onRefund($self);
-    $self->update({shippingStatus=>'Cancelled'});
+    $self->update({orderStatus=>'Cancelled'});
 }
 
 #-------------------------------------------------------------------
@@ -251,9 +251,9 @@ shippingCode shippingPhoneNumber quantity price vendorId
 
 A tracking number that is used by the shipping method for this transaction.
 
-=head4 shippingStatus
+=head4 orderStatus
 
-The status of this item. The default is 'NotShipped'. Other statuses include: Cancelled, BackOrdered, Shipped
+The status of this item. The default is 'NotShipped'. Other statuses include: Cancelled, Backordered, Shipped
 
 =cut
 
@@ -266,9 +266,8 @@ sub update {
         $newProperties->{ options           } = $sku->getOptions;
         $newProperties->{ assetId           } = $sku->getId;       
         $newProperties->{ price             } = $sku->getPrice;       
-        $newProperties->{ configuredTitle   } = $sku->getConfiguredTitle;
-        $newProperties->{ isRecurring       } = $sku->isRecurring;
-        $newProperties->{ recurInterval     } = $sku->getRecurInterval if $sku->isRecurring;
+        $newProperties->{ configuredTitle   } = $item->get('configuredTitle');
+        $newProperties->{ quantity          } = $item->get('quantity');
         my $address = $item->getShippingAddress;
         $newProperties->{ shippingAddressId     } = $address->getId;
         $newProperties->{ shippingAddressName   } = $address->get('name');
@@ -280,9 +279,11 @@ sub update {
         $newProperties->{ shippingCountry       } = $address->get('country');
         $newProperties->{ shippingCode          } = $address->get('code');
         $newProperties->{ shippingPhoneNumber   } = $address->get('phoneNumber');
-        $newProperties->{ quantity              } = $item->get('quantity');
+        unless ($sku->isShippingRequired) {
+            $newProperties->{orderStatus} = 'Shipped';
+        }
     }
-    my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber shippingStatus
+    my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber orderStatus
         shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
         shippingCountry shippingCode shippingPhoneNumber quantity price vendorId));
     foreach my $field (@fields) {
@@ -291,9 +292,7 @@ sub update {
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
         $properties{$id}{options} = JSON->new->utf8->encode($newProperties->{options});
     }
-    if (exists $newProperties->{shippingStatus}) {
-        $properties{$id}{shippingDate} = WebGUI::DateTime->new($self->transaction->session,time())->toDatabase;
-    }
+    $properties{$id}{lastUpdated} = WebGUI::DateTime->new($self->transaction->session,time())->toDatabase;
     $self->transaction->session->db->setRow("transactionItem","itemId",$properties{$id});
 }
 

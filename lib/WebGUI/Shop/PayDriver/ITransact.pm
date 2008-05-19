@@ -124,22 +124,22 @@ sub _generatePaymentRequestXML {
     # Check if recurring payments have a unique transaction
     #### TODO: Throw the correct Exception Class
     WebGUI::Error::InvalidParam->throw( error => 'Recurring transaction mixed with other transactions' )
-        if ( (scalar @{ $items } > 1) && (grep { $_->get('isRecurring') } @{ $items }) );
+        if ( (scalar @{ $items } > 1) && (grep { $_->getSku->isRecurring } @{ $items }) );
 
-    foreach my $item (@{ $transaction->getItems }) {
+    foreach my $item (@{ $items }) {
         my $sku = $item->getSku;
 
         ####TODO: How to handle intial payment?
-        if ( $item->get('isRecurring') ) {
-            $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $sku->get('recurInterval') );
+        if ( $sku->isRecurring ) {
+            $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $sku->getRecurInterval );
             $recurringData->{ RecurReps     } = 99999;
-            $recurringData->{ RecurTotal    } = $sku->getPrice;
-            $recurringData->{ RecurDesc     } = $sku->get('title');
+            $recurringData->{ RecurTotal    } = $item->get('price');
+            $recurringData->{ RecurDesc     } = $item->get('configuredTitle');
         }
 
         push @{ $orderItems->{ Item } }, {
-            Description     => $sku->get('title'),
-            Cost            => $sku->getPrice,
+            Description     => $item->get('configuredTitle'),
+            Cost            => $item->get('price'),
             Qty             => $item->get('quantity'),
         }
     }

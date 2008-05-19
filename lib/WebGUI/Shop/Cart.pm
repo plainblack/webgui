@@ -773,9 +773,7 @@ sub www_viewItem {
     if (WebGUI::Error->caught()) {
         return $self->www_view;
     }
-    my $sku = $item->getSku;
-    $sku->applyOptions($item->get("options"));
-    return $sku->www_view;
+    return $item->getSku->www_view;
 }
 
 

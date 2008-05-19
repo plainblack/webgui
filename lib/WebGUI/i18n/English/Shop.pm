@@ -45,14 +45,68 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'tracking number' => { 
+		message => q|Tracking #|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'order status' => { 
+		message => q|Order Status|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'Shipped' => { 
+		message => q|Shipped|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'NotShipped' => { 
+		message => q|Not Shipped|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'Backordered' => { 
+		message => q|Backordered|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'Cancelled' => { 
+		message => q|Cancelled|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
 	'vendors' => { 
 		message => q|Vendors|,
 		lastUpdated => 0,
 		context => q|admin function label|
 	},
 
+	'update' => { 
+		message => q|Update|,
+		lastUpdated => 0,
+		context => q|button label|
+	},
+
+	'refund' => { 
+		message => q|Refund|,
+		lastUpdated => 0,
+		context => q|button label|
+	},
+
 	'date' => { 
 		message => q|Date|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'manage' => { 
+		message => q|Manage|,
 		lastUpdated => 0,
 		context => q|field label|
 	},
@@ -77,6 +131,18 @@ our $I18N = {
 
 	'payment method' => { 
 		message => q|Payment Method|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'shipping method' => { 
+		message => q|Shipping Method|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'shipping amount' => { 
+		message => q|Shipping Amount|,
 		lastUpdated => 0,
 		context => q|field label|
 	},
@@ -211,6 +277,12 @@ our $I18N = {
 		message => q|In-Shop Credit|,
 		lastUpdated => 0,
 		context => q|a label in the cart|
+	},
+
+	'in shop credit used' => { 
+		message => q|In-Shop Credit Used|,
+		lastUpdated => 0,
+		context => q|a label in the transaction|
 	},
 
 	'country' => { 

@@ -19,15 +19,6 @@ sub canCheckoutCart {
 }
 
 #-------------------------------------------------------------------
-sub credentialsOkay {
-    my $self = shift;
-
-    return 0 unless $self->getBillingAddress;
-
-    return 1;
-}
-
-#-------------------------------------------------------------------
 
 sub definition {
     my $class       = shift;
@@ -73,15 +64,11 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-sub getBillingAddress {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $addressId = $session->scratch->get('ShopPayDriverCash_billingAddress');
+sub getAddress {
+    my ($self, $addressId)    = @_;
     if ($addressId) {
         return $self->getCart->getAddressBook->getAddress( $addressId );
     }
-    
     # No billing address selected yet so return undef.
     return undef;
 }
@@ -154,9 +141,9 @@ sub www_displayStatus {
 
 #-------------------------------------------------------------------
 sub www_getCredentials {
-    my $self    = shift;
+    my ($self, $addressId)    = @_;
     my $session = $self->session;
-
+    $addressId = $session->form->process('addressId') if ($addressId eq "");
     # Generate the json string that defines where the address book posts the selected address
     my $callbackParams = {
         url     => $session->url->page,
@@ -178,11 +165,7 @@ sub www_getCredentials {
         . WebGUI::Form::formFooter( $session);
 
     # Get billing address
-    my $billingAddress = eval { $self->getBillingAddress };
-    if ( WebGUI::Error->caught('WebGUI::Error::ObjectNotFound') ) {
-        # The stored address id is invalid, so remove it
-        $session->scratch->delete('ShopPayDriverCash_billingAddress');
-    }
+    my $billingAddress = eval { $self->getAddress($addressId) };
    
     my $billingAddressHtml;
     if ($billingAddress) {
@@ -192,6 +175,7 @@ sub www_getCredentials {
     # Generate 'Proceed' button
     my $proceedButton = WebGUI::Form::formHeader( $session )
         . $self->getDoFormTags('pay')
+        . WebGUI::Form::hidden($session, {name=>"addressId", value=>$addressId})
         . WebGUI::Form::submit( $session, { value => 'Pay' } )
         . WebGUI::Form::formFooter( $session);
 
@@ -211,7 +195,8 @@ sub www_pay {
     return "" unless $self->canCheckoutCart;
 
     # Make sure all required credentials have been supplied
-    return $self->www_getCredentials unless $self->credentialsOkay;
+    my $billingAddress = $self->getAddress( $session->form->process('addressId') );
+    return $self->www_getCredentials unless $billingAddress;
 
     # Generate a receipt and send it if enabled.
     if ( $self->get('sendReceipt') ) {
@@ -233,7 +218,6 @@ sub www_pay {
         $receipt->queue;
     }
 
-    my $billingAddress = $self->getBillingAddress( $session->scratch->get( 'ShopPayDriverCash_billingAddressId' ) );
 
     # Complete the transaction
     my $transaction = $self->processTransaction( $billingAddress );
@@ -246,10 +230,7 @@ sub www_pay {
 sub www_setBillingAddress {
     my $self    = shift;
     my $session = $self->session;
-
-    $session->scratch->set( 'ShopPayDriverCash_billingAddress', $session->form->process('addressId') );
-
-    return $self->www_getCredentials;
+    return $self->www_getCredentials($session->form->process('addressId'));
 }
 
 1;

@@ -649,8 +649,11 @@ sub www_view {
     #render page
     my $output = q{
         <style type="text/css">
-            #transactionDetail th { vertical-align: top; margin-right: 10px; border-right: 1px solid #eeeeee; text-align: left;}
-            .smallAddress { font-size: 60%; }
+            .transactionDetail {float: left; margin-right: 25px;}
+            .transactionDetail th { vertical-align: top; margin-right: 10px; border-right: 1px solid #eeeeee; text-align: left;}
+            .smallAddress { font-size: 50%; }
+            .successfulTransaction { color: #008000; };
+            .failedTransaction { color: #800000; };
         </style>};
     unless ($print) {
         $output .= q{   
@@ -658,12 +661,35 @@ sub www_view {
             };
     }
     $output .= q{   
-        <table id="transactionDetail">
+        <table class="transactionDetail">
             <tr>
-                <th>}. $i18n->get("transaction id") .q{</th><td>}. $transaction->getId .q{</td>
+                <th>}. $i18n->get("transaction id") .q{</th><td>}. $transaction->getId . '<br />'. $transaction->get('transactionCode').q{</td>
             </tr>
             <tr>
                 <th>}. $i18n->get("order number") .q{</th><td>}. $transaction->get('orderNumber') .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("date") .q{</th><td>}. $transaction->get('dateOfPurchase') .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("username") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$transaction->get('userId')).q{">}. $transaction->get('username') .q{</a></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("price") .q{</th><td><b>}. sprintf("%.2f", $transaction->get('amount')) .q{</b></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("in shop credit used") .q{</th><td>}. sprintf("%.2f", $transaction->get('shopCreditDeduction')) .q{</td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("taxes") .q{</th><td>}. sprintf("%.2f", $transaction->get('taxes')) .q{</td>
+            </tr>
+        </table>
+        <table class="transactionDetail">
+            <tr>
+                <th>}. $i18n->get("shipping method") .q{</th><td><a href="}.$url->page('shop=ship;method=do;do=edit;driverId='.$transaction->get('shippingDriverId')).q{">}. $transaction->get('shippingDriverLabel') .q{</a></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("shipping amount") .q{</th><td>}. sprintf("%.2f", $transaction->get('shippingPrice')) .q{</td>
             </tr>
             <tr>
                 <th>}. $i18n->get("shipping address") .q{</th><td>}. $transaction->formatAddress({
@@ -678,6 +704,14 @@ sub www_view {
                         phoneNumber => $transaction->get('shippingPhoneNumber'),
                         }) .q{</td>
             </tr>
+        </table>
+        <table class="transactionDetail">
+            <tr>
+                <th>}. $i18n->get("payment method") .q{</th><td><a href="}.$url->page('shop=pay;method=do;do=edit;paymentGatewayId='.$transaction->get('paymentDriverId')).q{">}. $transaction->get('paymentDriverLabel') .q{</a></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("status message") .q{</th><td class="}.(($transaction->get("isSuccessful")) ? 'successfulTransaction' : 'failedTransaction' ).q{">}. $transaction->get('statusCode') .': '.$transaction->get('statusMessage').q{</td>
+            </tr>
             <tr>
                 <th>}. $i18n->get("payment address") .q{</th><td>}. $transaction->formatAddress({
                         name        => $transaction->get('paymentAddressName'),
@@ -691,10 +725,8 @@ sub www_view {
                         phoneNumber => $transaction->get('paymentPhoneNumber'),
                         }) .q{</td>
             </tr>
-            <tr>
-                <th>}. $i18n->get("price") .q{</th><td>}. sprintf("%.2f", $transaction->get('amount')) .q{</td>
-            </tr>
         </table>
+        <div style="clear:both;"></div>
     };
     
     # item detail
@@ -702,13 +734,14 @@ sub www_view {
        <div id="transactionItemWrapper" class=" yui-skin-sam"> <table id="transactionItems">
         <thead>
             <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Status</th>
-            <th>Address</th>
-            <th>Date</th>
-            <th>Tracking #</th>
+            <th>}.$i18n->get('date').q{</th>
+            <th>}.$i18n->get('item').q{</th>
+            <th>}.$i18n->get('price').q{</th>
+            <th>}.$i18n->get('quantity').q{</th>
+            <th>}.$i18n->get('shipping address').q{</th>
+            <th>}.$i18n->get('order status').q{</th>
+            <th>}.$i18n->get('tracking number').q{</th>
+            <th>}.$i18n->get('manage').q{</th>
             </tr>
         </thead>
         <tbody>
@@ -717,10 +750,11 @@ sub www_view {
         my $sku = $item->getSku;
         $output .= q{
             <tr>
+            <form>
+            <td>}.$item->get('lastUpdated').q{</td>
             <td><a href="}.$sku->getUrl('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
             <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
             <td>}.$item->get('quantity').q{</td>
-            <td>}.$item->get('shippingStatus').q{</td>
         };
         if ($item->get('shippingAddressId') eq $transaction->get('shippingAddressId')) {
             $output .= q{<td></td>};
@@ -740,9 +774,26 @@ sub www_view {
                             }) .q{</td>
             };
         }
+        if ($item->get('orderStatus') eq 'Cancelled') {
+            $output .= q{<td>}.$i18n->get($item->get('orderStatus')).q{</td>};
+        }
+        else {
+            $output .= q{<td>}.WebGUI::Form::selectBox($session, {
+                name        => "orderStatus",
+                value       => $item->get('orderStatus'),
+                options     => {
+                    NotShipped  => $i18n->get('NotShipped'),
+                    Shipped     => $i18n->get('Shipped'),
+                    Backordered => $i18n->get('Backordered'),
+                    },
+                }).q{</td>};
+        }
         $output .= q{
-            <td>}.$item->get('shippingDate').q{</td>
-            <td>}.$item->get('shippingTrackingNumber').q{</td>
+            <td>}.WebGUI::Form::text($session, {name=>"shippingTrackingNumber", size=>15, value=>$item->get('shippingTrackingNumber')}).q{</td>
+            <td>}.WebGUI::Form::submit($session, {value=>$i18n->get('update'), extras=>' '})
+                .WebGUI::Form::submit($session, {value=>$i18n->get('refund'), extras=>q|onclick="this.form.method.value='refundItem'"|})
+                .q{</td>
+            </form>
             </tr>  
         };
     }
@@ -752,46 +803,66 @@ sub www_view {
     };
     
     # render data table
-    $output .= <<STOP;
+    $output .= q|
     <script type="text/javascript">
     YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.EnhanceFromMarkup = new function() {
         var myColumnDefs = [
-            {key:"item",sortable:true},
-            {key:"price",sortable:true},
-            {key:"quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true},
-            {key:"status",sortable:true},
-            {key:"address"},
-            {key:"date",sortable:true,formatter:YAHOO.widget.DataTable.formatDate},
-            {key:"tracking"}
+            {key:"date",sortable:true,label:'|.$i18n->get('date').q|'},
+            {key:"item",sortable:true,label:'|.$i18n->get('item').q|'},
+            {key:"price",sortable:true,label:'|.$i18n->get('price').q|'},
+            {key:"quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true,label:'|.$i18n->get('quantity').q|'},
+            {key:"address",label:'|.$i18n->get('shipping address').q|'},
+            {key:"status",sortable:true,label:'|.$i18n->get('order status').q|'},
+            {key:"tracking",label:'|.$i18n->get('tracking number').q|'},
+            {key:"manage",label:'|.$i18n->get('manage').q|'}
         ];
-
 
         this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("transactionItems"));
         this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
         this.myDataSource.responseSchema = {
             fields: [
+                    {key:"date"},
                     {key:"item"},
                     {key:"price", parser:this.parseNumberFromCurrency},
                     {key:"quantity", parser:YAHOO.util.DataSource.parseNumber},
-                    {key:"status"},
                     {key:"address"},
-                    {key:"date", parser:YAHOO.util.DataSource.parseDate},
-                    {key:"tracking"}
+                    {key:"status"},
+                    {key:"tracking"},
+                    {key:"manage"}
             ]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("transactionItemWrapper", myColumnDefs, this.myDataSource,{});
     };
-});
-</script>
-STOP
+    });
+    </script>
+    |;
 
     # send output
     if ($print) {
         return $output;   
     }
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_viewItem ( )
+
+Displays the configured item.
+
+=cut
+
+sub www_viewItem {
+    my ($class, $session) = @_;
+    my $self = __PACKAGE__->new($session, $session->form->get("transactionId"));
+    my $item = eval { $self->getItem($session->form->get("itemId")) };
+    if (WebGUI::Error->caught()) {
+        return $class->www_view($session);
+    }
+    return $item->getSku->www_view;
 }
 
 1;

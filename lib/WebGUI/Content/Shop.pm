@@ -63,7 +63,9 @@ The content handler for this package.
 sub handler {
     my ($session) = @_;
     my $output = undef;
-    my $function = "www_".$session->form->get("shop");
+    my $shop = $session->form->get("shop");
+    return $output unless ($shop);
+    my $function = "www_".$shop;
     if ($function ne "www_" && (my $sub = __PACKAGE__->can($function))) {
         $output = $sub->($session);
     }
