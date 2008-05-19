@@ -16,6 +16,7 @@ package WebGUI::Content::Shop;
 
 use strict;
 use WebGUI::AdminConsole;
+use WebGUI::Exception::Shop;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::Pay;
@@ -66,6 +67,9 @@ sub handler {
     if ($function ne "www_" && (my $sub = __PACKAGE__->can($function))) {
         $output = $sub->($session);
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $function", method=>$function);
+    }
     return $output;
 }
 
@@ -86,6 +90,9 @@ sub www_address {
     if ($cart->can($method)) {
         $output = $cart->$method();
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
     return $output;
 }
 
@@ -104,6 +111,9 @@ sub www_admin {
     my $admin = WebGUI::Shop::Admin->new($session);
     if ($admin->can($method)) {
         $output = $admin->$method();
+    }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
     }
     return $output;
 }
@@ -124,6 +134,9 @@ sub www_cart {
     if ($cart->can($method)) {
         $output = $cart->$method();
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
     return $output;
 }
 
@@ -142,6 +155,9 @@ sub www_pay {
     my $pay = WebGUI::Shop::Pay->new($session);
     if ($method ne "www_" && $pay->can($method)) {
         $output = $pay->$method();
+    }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
     }
     return $output;
 }
@@ -162,6 +178,9 @@ sub www_ship {
     if ($method ne "www_" && $ship->can($method)) {
         $output = $ship->$method($session);
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
     return $output;
 }
 
@@ -181,6 +200,9 @@ sub www_tax {
     if ($method ne "www_" && $tax->can($method)) {
         $output = $tax->$method();
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
     return $output;
 }
 
@@ -199,6 +221,9 @@ sub www_transaction {
     if ($method ne "www_" && WebGUI::Shop::Transaction->can($method)) {
         $output = WebGUI::Shop::Transaction->$method($session);
     }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
     return $output;
 }
 
@@ -216,6 +241,9 @@ sub www_vendor {
     my $method = "www_".$session->form->get("method");
     if ($method ne "www_" && WebGUI::Shop::Vendor->can($method)) {
         $output = WebGUI::Shop::Vendor->$method($session);
+    }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
     }
     return $output;
 }

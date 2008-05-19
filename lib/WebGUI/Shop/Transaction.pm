@@ -181,6 +181,31 @@ sub denyPurchase {
 
 #-------------------------------------------------------------------
 
+=head2 formatAddress ( address )
+
+Returns a formatted address.
+
+=head3 address
+
+A hash reference with the address properties.
+
+=cut
+
+sub formatAddress {
+    my ($self, $address) = @_;
+    my $formatted = $address->{name} . "<br />" . $address->{address1} . "<br />";
+    $formatted .= $address->{address2} . "<br />" if ($address->{address2} ne "");
+    $formatted .= $address->{address3} . "<br />" if ($address->{address3} ne "");
+    $formatted .= $address->{city} . ", ";
+    $formatted .= $address->{state} . " " if ($address->{state} ne "");
+    $formatted .= $address->{code} if ($address->{code} ne "");
+    $formatted .= '<br />' . $address->{country};
+    $formatted .= '<br />' . $address->{phoneNumber};
+    return $formatted;
+}
+
+#-------------------------------------------------------------------
+
 =head2 formatCurrency ( amount )
 
 Formats a number as a float with two digits after the decimal like 0.00.
@@ -537,7 +562,7 @@ STOP
     };
     YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
 STOP
-	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=viewTransaction})
+	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=view})
         .q{;transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
     $output .= '
         }; 
@@ -573,6 +598,19 @@ STOP
 
 #-------------------------------------------------------------------
 
+=head2 www_print ()
+
+Makes transaction information printable.
+
+=cut
+
+sub www_print {
+    my ($class, $session) = @_;
+    $class->www_view($session, 1);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_thankYou ()
 
 Displays the default thank you page.
@@ -586,21 +624,41 @@ sub www_thankYou {
 
 #-------------------------------------------------------------------
 
-=head2 www_viewTransaction ()
+=head2 www_view ()
 
 Displays the admin view of an individual transaction.
 
 =cut
 
-sub www_viewTransaction {
-    my ($class, $session) = @_;
+sub www_view {
+    my ($class, $session, $print) = @_;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient() unless $admin->canManage;
     my $i18n = WebGUI::International->new($session, 'Shop');
     my ($style, $url) = $session->quick(qw(style url));
     my $transaction = $class->new($session, $session->form->get('transactionId'));
+    
+    # set up all the files that we need
+    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+
+    #render page
     my $output = q{
-        <table>
+        <style type="text/css">
+            #transactionDetail th { vertical-align: top; margin-right: 10px; border-right: 1px solid #eeeeee; text-align: left;}
+            .smallAddress { font-size: 60%; }
+        </style>};
+    unless ($print) {
+        $output .= q{   
+            <div><a href="}.$url->page('shop=transaction;method=print;transactionId='.$transaction->getId).q{">}.$i18n->get('print').q{</a></div>
+            };
+    }
+    $output .= q{   
+        <table id="transactionDetail">
             <tr>
                 <th>}. $i18n->get("transaction id") .q{</th><td>}. $transaction->getId .q{</td>
             </tr>
@@ -608,17 +666,131 @@ sub www_viewTransaction {
                 <th>}. $i18n->get("order number") .q{</th><td>}. $transaction->get('orderNumber') .q{</td>
             </tr>
             <tr>
-                <th>}. $i18n->get("shipping address") .q{</th><td>}. join(" ",$transaction->get('shippingAddressName'),$transaction->get('shippingAddress1'),$transaction->get('shippingAddress2'),$transaction->get('shippingAddress3'),$transaction->get('shippingCity'),$transaction->get('shippingState'),$transaction->get('shippingCode'),$transaction->get('shippingCountry'),$transaction->get('shippingPhoneNumber')) .q{</td>
+                <th>}. $i18n->get("shipping address") .q{</th><td>}. $transaction->formatAddress({
+                        name        => $transaction->get('shippingAddressName'),
+                        address1    => $transaction->get('shippingAddress1'),
+                        address2    => $transaction->get('shippingAddress2'),
+                        address3    => $transaction->get('shippingAddress3'),
+                        city        => $transaction->get('shippingCity'),
+                        state       => $transaction->get('shippingState'),
+                        code        => $transaction->get('shippingCode'),
+                        country     => $transaction->get('shippingCountry'),
+                        phoneNumber => $transaction->get('shippingPhoneNumber'),
+                        }) .q{</td>
             </tr>
             <tr>
-                <th>}. $i18n->get("payment address") .q{</th><td>}. join(" ",$transaction->get('paymentAddressName'),$transaction->get('paymentAddress1'),$transaction->get('paymentAddress2'),$transaction->get('paymentAddress3'),$transaction->get('paymentCity'),$transaction->get('paymentState'),$transaction->get('paymentCode'),$transaction->get('paymentCountry'),$transaction->get('paymentPhoneNumber')) .q{</td>
+                <th>}. $i18n->get("payment address") .q{</th><td>}. $transaction->formatAddress({
+                        name        => $transaction->get('paymentAddressName'),
+                        address1    => $transaction->get('paymentAddress1'),
+                        address2    => $transaction->get('paymentAddress2'),
+                        address3    => $transaction->get('paymentAddress3'),
+                        city        => $transaction->get('paymentCity'),
+                        state       => $transaction->get('paymentState'),
+                        code        => $transaction->get('paymentCode'),
+                        country     => $transaction->get('paymentCountry'),
+                        phoneNumber => $transaction->get('paymentPhoneNumber'),
+                        }) .q{</td>
             </tr>
             <tr>
-                <th>}. $i18n->get("price") .q{</th><td>}. $transaction->get('amount') .q{</td>
+                <th>}. $i18n->get("price") .q{</th><td>}. sprintf("%.2f", $transaction->get('amount')) .q{</td>
             </tr>
         </table>
     };
+    
+    # item detail
+    $output .= q{
+       <div id="transactionItemWrapper" class=" yui-skin-sam"> <table id="transactionItems">
+        <thead>
+            <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Address</th>
+            <th>Date</th>
+            <th>Tracking #</th>
+            </tr>
+        </thead>
+        <tbody>
+    };
+    foreach my $item (@{$transaction->getItems}) {
+        my $sku = $item->getSku;
+        $output .= q{
+            <tr>
+            <td><a href="}.$sku->getUrl('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
+            <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
+            <td>}.$item->get('quantity').q{</td>
+            <td>}.$item->get('shippingStatus').q{</td>
+        };
+        if ($item->get('shippingAddressId') eq $transaction->get('shippingAddressId')) {
+            $output .= q{<td></td>};
+        }
+        else {
+            $output .= q{
+                <td class="smallAddress">}. $transaction->formatAddress({
+                            name        => $item->get('shippingAddressName'),
+                            address1    => $item->get('shippingAddress1'),
+                            address2    => $item->get('shippingAddress2'),
+                            address3    => $item->get('shippingAddress3'),
+                            city        => $item->get('shippingCity'),
+                            state       => $item->get('shippingState'),
+                            code        => $item->get('shippingCode'),
+                            country     => $item->get('shippingCountry'),
+                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            }) .q{</td>
+            };
+        }
+        $output .= q{
+            <td>}.$item->get('shippingDate').q{</td>
+            <td>}.$item->get('shippingTrackingNumber').q{</td>
+            </tr>  
+        };
+    }
+    $output .= q{
+        </tbody>
+        </table></div>
+    };
+    
+    # render data table
+    $output .= <<STOP;
+    <script type="text/javascript">
+    YAHOO.util.Event.addListener(window, "load", function() {
+    YAHOO.example.EnhanceFromMarkup = new function() {
+        var myColumnDefs = [
+            {key:"item",sortable:true},
+            {key:"price",sortable:true},
+            {key:"quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true},
+            {key:"status",sortable:true},
+            {key:"address"},
+            {key:"date",sortable:true,formatter:YAHOO.widget.DataTable.formatDate},
+            {key:"tracking"}
+        ];
 
+
+        this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("transactionItems"));
+        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+        this.myDataSource.responseSchema = {
+            fields: [
+                    {key:"item"},
+                    {key:"price", parser:this.parseNumberFromCurrency},
+                    {key:"quantity", parser:YAHOO.util.DataSource.parseNumber},
+                    {key:"status"},
+                    {key:"address"},
+                    {key:"date", parser:YAHOO.util.DataSource.parseDate},
+                    {key:"tracking"}
+            ]
+        };
+
+        this.myDataTable = new YAHOO.widget.DataTable("transactionItemWrapper", myColumnDefs, this.myDataSource,{});
+    };
+});
+</script>
+STOP
+
+    # send output
+    if ($print) {
+        return $output;   
+    }
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
 }
 

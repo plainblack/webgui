@@ -118,6 +118,7 @@ sub getHtmlFormatted {
     $address .= $self->get("state") . " " if ($self->get("state") ne "");
     $address .= $self->get("code") if ($self->get("code") ne "");
     $address .= '<br />' . $self->get("country");
+    return $address;
 }
 
 #-------------------------------------------------------------------

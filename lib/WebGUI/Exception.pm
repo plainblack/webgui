@@ -24,6 +24,11 @@ use Exception::Class (
         isa             => 'WebGUI::Error',
         description     => 'This method should be overridden by subclasses.',
         },
+    'WebGUI::Error::MethodNotFound' => {
+        isa             => 'WebGUI::Error',
+        description     => q|Called a method that doesn't exist.|,
+        fields          => 'method'
+        },
     'WebGUI::Error::InvalidObject' => {
         isa             => 'WebGUI::Error::InvalidParam',
         description     => "Expected to get a reference to an object type that wasn't gotten.",
@@ -136,6 +141,18 @@ Used when an object is trying to be retrieved, but does not exist. ISA WebGUI::E
 =head3 id
 
 The id of the object to be retrieved.
+
+=head2 WebGUI::Error::MethodNotFound
+
+Tried calling a method that doesn't exist.
+
+=head3 method
+
+The method called.
+
+=head2 WebGUI::Error::OverrideMe
+
+An interface was not overriden as expected.
 
 =cut
 
