@@ -78,15 +78,15 @@ sub edit {
 	$tabform->getTab("properties")->yesNo(
                	-name=>"isHidden",
                	-value=>1,
-               	-label=>$i18n->get(886),
-               	-hoverHelp=>$i18n->get('886 description'),
+               	-label=>$i18n->get(886, 'Asset'),
+               	-hoverHelp=>$i18n->get('886 description', 'Asset'),
                	-uiLevel=>6
                	);
        	$tabform->getTab("properties")->yesNo(
                 -name=>"newWindow",
        	        -value=>0,
-               	-label=>$i18n->get(940),
-               	-hoverHelp=>$i18n->get('940 description'),
+               	-label=>$i18n->get(940, 'Asset'),
+               	-hoverHelp=>$i18n->get('940 description', 'Asset'),
                 -uiLevel=>6
        	        );
 	$tabform->addTab("security",$i18n->get(107,"Asset"),6);
@@ -109,23 +109,23 @@ sub edit {
        	$tabform->getTab("security")->selectBox(
        		-name=>"ownerUserId",
               	-options=>$users,
-       	       	-label=>$i18n->get(108),
-       	       	-hoverHelp=>$i18n->get('108 description'),
+       	       	-label=>$i18n->get(108, 'Asset'),
+       	       	-hoverHelp=>$i18n->get('108 description', 'Asset'),
        		-value=>[$self->get("ownerUserId")],
        		-subtext=>$subtext,
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdView",
-       		-label=>$i18n->get(872),
-       		-hoverHelp=>$i18n->get('872 description'),
+       		-label=>$i18n->get(872, 'Asset'),
+       		-hoverHelp=>$i18n->get('872 description', 'Asset'),
        		-value=>[$self->get("groupIdView")],
        		-uiLevel=>6
        		);
       	$tabform->getTab("security")->group(
        		-name=>"groupIdEdit",
-       		-label=>$i18n->get(871),
-       		-hoverHelp=>$i18n->get('871 description'),
+       		-label=>$i18n->get(871, 'Asset'),
+       		-hoverHelp=>$i18n->get('871 description', 'Asset'),
        		-value=>[$self->get("groupIdEdit")],
        		-excludeGroups=>[1,7],
        		-uiLevel=>6
