@@ -696,7 +696,7 @@ sub www_view {
                 <th>}. $i18n->get("username") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$transaction->get('userId')).q{">}. $transaction->get('username') .q{</a></td>
             </tr>
             <tr>
-                <th>}. $i18n->get("price") .q{</th><td><b>}. sprintf("%.2f", $transaction->get('amount')) .q{</b></td>
+                <th>}. $i18n->get("amount") .q{</th><td><b>}. sprintf("%.2f", $transaction->get('amount')) .q{</b></td>
             </tr>
             <tr>
                 <th>}. $i18n->get("in shop credit used") .q{</th><td>}. sprintf("%.2f", $transaction->get('shopCreditDeduction')) .q{</td>
@@ -846,7 +846,6 @@ sub www_view {
         </table>
     };
     
-
     # send output
     if ($print) {
         return $output;   

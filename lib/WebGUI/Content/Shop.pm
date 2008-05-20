@@ -19,6 +19,7 @@ use WebGUI::AdminConsole;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Cart;
+use WebGUI::Shop::Credit;
 use WebGUI::Shop::Pay;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
@@ -135,6 +136,28 @@ sub www_cart {
     my $cart = WebGUI::Shop::Cart->getCartBySession($session);
     if ($cart->can($method)) {
         $output = $cart->$method();
+    }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
+    return $output;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_credit ()
+
+Hand off to the credit system.
+
+=cut
+
+sub www_credit {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_".$session->form->get("method");
+    if ($method ne "www_" && WebGUI::Shop::Credit->can($method)) {
+        $output = WebGUI::Shop::Credit->$method($session);
     }
     else {
         WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);

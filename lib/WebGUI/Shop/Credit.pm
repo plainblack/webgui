@@ -5,7 +5,8 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
-
+use WebGUI::HTMLForm;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -164,6 +165,60 @@ Returns a reference to the userId.
 
 =cut
 
+
+
+#-------------------------------------------------------------------
+
+=head2 www_adjust
+
+Adjust credit for a user.
+
+=cut
+
+sub www_adjust {
+    my ($class, $session) = @_;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient() unless $admin->canManage;
+    my $form = $session->form;
+    my $credit = $class->new($session, $form->get('userId'));
+    $credit->adjust($form->get('amount'), $form->get('comment'));
+    my $i18n = WebGUI::International->new($session, "Shop");
+    my $message = sprintf $i18n->get('add credit message'), $form->get('amount'), WebGUI::User->new($session, $form->get('userId'))->username, $credit->getSum;
+    return $class->www_manage($session, $message);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_manage
+
+Displays a credit management interface.
+
+=cut
+
+sub www_manage {
+    my ($class, $session, $message) = @_;
+    my $admin = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->insufficient() unless $admin->canManage;
+    my $i18n = WebGUI::International->new($session, "Shop");
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->hidden(name=>'shop',value=>'credit');
+    $f->hidden(name=>'method',value=>'adjust');
+    $f->user(
+        name    => 'userId',
+        label   => $i18n->get('username'),
+        value   => $session->user->userId,
+        );
+    $f->float(
+        name    => 'amount',
+        label   => $i18n->get('amount'),
+        );
+    $f->text(
+        name    => 'comment',
+        label   => $i18n->get('notes'),
+        );
+    $f->submit;
+    return $admin->getAdminConsole->render($message.$f->print, $i18n->get('in shop credit'));
+}
 
 
 

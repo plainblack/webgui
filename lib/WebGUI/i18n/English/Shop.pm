@@ -105,6 +105,18 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'add credit message' => { 
+		message => q|%s was added to %s's in-shop credit account, for a total credit of %s.|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
+	'amount' => { 
+		message => q|Amount|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
 	'notes' => { 
 		message => q|Notes|,
 		lastUpdated => 0,
