@@ -65,6 +65,7 @@
  - add: Approval activities now have a better parent class and more 
         flexibility (multiple groups to approve, do on approve)
  - fixed: CS mail retrieval doesn't decode subject properly
+ - fixed: email password recovery fields effected by UI level
 
 7.5.10
  - fix: Syntax error in GetCsMail
