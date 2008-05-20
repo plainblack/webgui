@@ -201,6 +201,13 @@ sub addPurgeOldInboxActivity {
     my $session = shift;
     print "\tAdding Purge Old Inbox Messages workflow activity... " unless $quiet;
 
+    my $activity    = $session->config->get( "workflowActivities" );
+    push @{ $activity->{"None"} }, 'WebGUI::Workflow::Activity::PurgeOldInboxMessages';
+    $session->config->set( "workflowActivities", $activity );
+
+    print "DONE!\n" unless $quiet;
+}
+
 #-------------------------------------------------
 sub addingInStoreCredit {
 	my $session = shift;
@@ -213,13 +220,6 @@ sub addingInStoreCredit {
 		dateOfAdjustment datetime,
 		index userId (userId)
 		)");
-}
-
-    my $activity    = $session->config->get( "workflowActivities" );
-    push @{ $activity->{"None"} }, 'WebGUI::Workflow::Activity::PurgeOldInboxMessages';
-    $session->config->set( "workflowActivities", $activity );
-
-    print "DONE!\n" unless $quiet;
 }
 
 #-------------------------------------------------

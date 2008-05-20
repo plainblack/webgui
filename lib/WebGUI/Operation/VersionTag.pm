@@ -43,6 +43,67 @@ These methods are available from this class:
 
 #----------------------------------------------------------------------------
 
+=head2 canApproveVersionTag ( session, tag [, user] )
+
+Returns true if the user is allowed to approve this version tag. C<session>
+is a WebGUI::Session, C<tag> is a WebGUI::VersionTag, C<user> is a 
+WebGUI::User. If C<user> is not specified, users the default user from the 
+session.
+
+A user is allowed to approve a version tag if they are in the current
+C<getGroupToApprove>. If this version tag does not currently need approval,
+this returns false.
+
+=cut
+
+sub canApproveVersionTag {
+    my $session     = shift;
+    my $tag         = shift;
+    my $user        = shift || $session->user;
+    my $instance    = $tag->getWorkflowInstance;
+    my $activity    = $instance->getNextActivity;
+    
+    # Check if this person is in one of the allowed groups
+    my $groupToApprove  = $activity->can( 'getGroupToApprove' )
+                        # New way returns an array reference
+                        ? $activity->getGroupToApprove( $tag, $instance )
+                        # Old way has a single group
+                        : [ $activity->get( 'groupToApprove' ) ]
+                        ;
+
+    return 1 
+        if grep { $user->isInGroup( $_ ) } @{ $groupToApprove };
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canViewVersionTag ( session, tag [, user] )
+
+Returns true if the user is allowed to view this version tag. C<session>
+is a WebGUI::Session, C<tag> is a WebGUI::VersionTag, C<user> is a 
+WebGUI::User. If C<user> is not specified, uses the default user from the 
+session.
+
+A user is allowed to view a version tag if they are in the groupToUse
+of the version tag, or if they canView.
+
+=cut
+
+sub canViewVersionTag {
+    my $session     = shift;
+    my $tag         = shift;
+    my $user        = shift || $session->user;
+
+    if ( $user->isInGroup( $tag->get("groupToUse") ) ) {
+        return 1;
+    }
+    else { 
+        return canView( $session, $user );
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( session [, user] )
 
 Returns true if the user can administrate this operation. user defaults to 
@@ -56,9 +117,28 @@ sub canView {
     return $user->isInGroup( $session->setting->get("groupIdAdminVersionTag") );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getVersionTagOptions ( session )
+
+Gets a hash of tagId => name for all open version tags
+
+=cut
+
+sub getVersionTagOptions {
+    my $session     = shift;
+    tie my %tag, 'Tie::IxHash';
+    
+    for my $tag ( @{ WebGUI::VersionTag->getOpenTags( $session ) } ) {
+        $tag{ $tag->getId } = $tag->get('name');
+    }
+
+    return %tag;
+}
+
 #-------------------------------------------------------------------
 
-=head2 www_editVersionTag ( session ) 
+=head2 www_approveVersionTag ( session ) 
 
 Sets an approval for a version tag.
 
@@ -69,18 +149,24 @@ A reference to the current session.
 =cut
 
 sub www_approveVersionTag {
-	my $session = shift;
-	my $tag = WebGUI::VersionTag->new($session, $session->form->param("tagId"));
-	my $instance = $tag->getWorkflowInstance;
-	my $activity = $instance->getNextActivity;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup($activity->get("groupToApprove")));
-	if ($session->form->process("status", "selectBox") eq "approve") {
-		$activity->setApproved($instance);
-	} else {
-		$activity->setDenied($instance);
-	}
-	$tag->set({comments=>$session->form->process("comments", "textarea")});
-	return www_manageVersions($session);
+    my $session     = shift;
+    my $tag         = WebGUI::VersionTag->new( $session, $session->form->param("tagId") );
+
+    return $session->privilege->insufficient 
+        unless canApproveVersionTag( $session, $tag );
+
+    if ( $session->form->process("status", "selectBox") eq "approve" ) {
+        $activity->setApproved( $instance );
+    }
+    else {
+        $activity->setDenied( $instance );
+    }
+
+    $tag->set( { 
+        comments    => $session->form->process("comments", "textarea"),
+    });
+
+    return www_manageVersions($session);
 }
 
 #-------------------------------------------------------------------
@@ -476,6 +562,9 @@ sub www_manageVersions {
 
 Displays a list of the revsions associated with this tag.
 
+Optionally performs an action related to the revisions in this version
+tag, such as purging or moving to another version tag.
+
 =head3 session
 
 A reference to the current session.
@@ -483,75 +572,165 @@ A reference to the current session.
 =cut
 
 sub www_manageRevisionsInTag {
-	my $session = shift;
-	my $tagId = $session->form->get("tagId");
-	my $tag = WebGUI::VersionTag->new($session, $tagId);
-	return www_manageVersions($session) unless (defined $tag);
-        return $session->privilege->insufficient() unless ($session->user->isInGroup($tag->get("groupToUse")));
-	my $ac = WebGUI::AdminConsole->new($session,"versions");
-        my $i18n = WebGUI::International->new($session,"VersionTag");
-	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
-        $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
-        my $output = "";
-	if ($session->form->param("workflowInstanceId")) {
-		my $instance = WebGUI::Workflow::Instance->new($session, $session->form->param("workflowInstanceId"));
-		if (defined $instance) {
-			my $form = WebGUI::HTMLForm->new($session);
-			$form->submit;
-			$form->hidden(
-				name=>"tagId",
-				value=>$tagId
-				);
-			$form->hidden(
-				name=>"op",
-				value=>"approveVersionTag"
-				);
-			$form->selectBox(
-				name=>"status",
-				defaultValue=>"approve",
-				label=>$i18n->get("approve/deny"),
-				hoverHelp=>$i18n->get("approve/deny help"),
-				options=>{
-					approve=>$i18n->get("approve"),
-					deny=>$i18n->get("deny")
-					},
-				);
-			$form->textarea(
-				name=>"comments",
-				label=>$i18n->get("comments"),
-				hoverHelp=>$i18n->get("comments help")
-				);
-			$form->submit;
-			$output .= $form->print;
-		}
-	}
-	if ($tag->get("comments")) {
-		my $comments = $tag->get("comments");
-		$comments =~ s/\n/<br \/>/g;
-		$output .= $comments;
-	}
-	$output .= '<table width="100%" class="content">
-        <tr><th></th><th>'.$i18n->get(99,"Asset").'</th><th>'.$i18n->get("type","Asset").'</th><th>'.$i18n->get("revision date","Asset").'</th><th>'.$i18n->get("revised by","Asset").'</th></tr> ';
-	my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
-	$p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
-		left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
-		where assetData.tagId=?",undef, undef, [$tag->getId]);
-	foreach my $row (@{$p->getPageData}) {
-        	my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
-		my $asset = WebGUI::Asset->new($session,$id,$class,$date);
-                $output .= '<tr><td>'
-			.$session->icon->delete("func=purgeRevision;proceed=manageRevisionsInTag;tagId=".$tag->getId.";revisionDate=".$date,$asset->get("url"),$i18n->get("purge revision prompt"))
-			.$session->icon->view("func=view;revision=".$date, $asset->get("url"))
-			.'</td>
-			<td>'.$asset->getTitle.'</td>
-			<td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
-			<td>'.$session->datetime->epochToHuman($date).'</td>
-			<td>'.$by.'</td></tr>';
+    my $session = shift;
+    my $tagId   = $session->form->get("tagId");
+    my $tag     = WebGUI::VersionTag->new($session, $tagId);
+    return www_manageVersions( $session ) unless $tag;
+    
+    ### Permissions check
+    # This screen is also used to approve/deny the tag, so check that first
+    if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) {
+        return $session->privilege->insufficient;
+    }
+
+    my $ac      = WebGUI::AdminConsole->new($session,"versions");
+    my $i18n    = WebGUI::International->new($session,"VersionTag");
+    $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+    $ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
+    $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
+
+    # Process any actions
+    if ( $session->form->get('action') eq "purge" ) {
+        # Purge these revisions
+        my @assetInfo       = $session->form->get('assetInfo'); 
+        for my $assetInfo ( @assetInfo ) {
+            ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
+            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            $asset->purgeRevision;
         }
-        $output .= '</table>'.$p->getBarSimple;
-	$tag = $session->db->getRow("assetVersionTag","tagId",$tag->getId);
-        return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
+
+        # If no revisions remain, delete the version tag
+        if ( $tag->getRevisionCount <= 0 ) {
+            $tag->delete;
+            return www_manageVersions( $session );
+        }
+    }
+    elsif ( $session->form->get('action') eq "move" ) {
+        # Get the new version tag
+        my $moveToTagId = $session->form->get('moveToTagId');
+        my $moveToTag;
+        if ( $moveToTagId eq "new" ) {
+            # Create a copy of the old version tag
+            $moveToTag      = WebGUI::VersionTag->create( $session, $tag->get );
+            # But update the name
+            $moveToTag->set( { "name" => $tag->get('name') . ' ( copy )' } );
+        }
+        else {
+            $moveToTag      = WebGUI::VersionTag->new( $session, $moveToTagId );
+        }
+        
+        # Move these revisions
+        my @assetInfo       = $session->form->get('assetInfo'); 
+        for my $assetInfo ( @assetInfo ) {
+            ( my $assetId, my $revisionDate ) = split ":", $assetInfo;
+            my $asset = WebGUI::Asset->new( $session, $assetId, undef, $revisionDate );
+            $asset->setVersionTag( $moveToTag->getId );
+        }
+
+        # If no revisions remain, delete the version tag
+        if ( $tag->getRevisionCount <= 0 ) {
+            $tag->delete;
+            return www_manageVersions( $session );
+        }
+    }
+
+    my $output = "";
+    # FIXME: Do we really need the workflowInstanceId? It's a property of the VersionTag...
+    # Then we wouldn't need to click the inbox message, if we used canApproveVersionTag we'd only
+    # need to have permission to approve in order to see the right form.
+    if ($session->form->param("workflowInstanceId")) {
+            my $instance = WebGUI::Workflow::Instance->new($session, $session->form->param("workflowInstanceId"));
+            if (defined $instance) {
+                    my $form = WebGUI::HTMLForm->new($session);
+                    $form->submit;
+                    $form->hidden(
+                            name=>"tagId",
+                            value=>$tagId
+                            );
+                    $form->hidden(
+                            name=>"op",
+                            value=>"approveVersionTag"
+                            );
+                    $form->selectBox(
+                            name=>"status",
+                            defaultValue=>"approve",
+                            label=>$i18n->get("approve/deny"),
+                            hoverHelp=>$i18n->get("approve/deny help"),
+                            options=>{
+                                    approve=>$i18n->get("approve"),
+                                    deny=>$i18n->get("deny")
+                                    },
+                            );
+                    $form->textarea(
+                            name=>"comments",
+                            label=>$i18n->get("comments"),
+                            hoverHelp=>$i18n->get("comments help")
+                            );
+                    $form->submit;
+                    $output .= $form->print;
+            }
+    }
+    if ($tag->get("comments")) {
+            my $comments = $tag->get("comments");
+            $comments =~ s/\n/<br \/>/g;
+            $output .= $comments;
+    }
+    
+    # The options for tags to move to
+    tie my %moveToTagOptions, 'Tie::IxHash', (
+        "new"       => $i18n->get( "manageRevisionsInTag moveTo new" ),
+        ( getVersionTagOptions( $session ) ),
+    );
+
+    # Output the revisions
+    $output 
+        .= WebGUI::Form::formHeader( $session, {} )
+        . WebGUI::Form::hidden( $session, { name => 'op', value=> 'manageRevisionsInTag' } )
+        . WebGUI::Form::hidden( $session, { name => 'tagId', value => $tag->getId } )
+        . '<table width="100%" class="content">'
+        . '<tr>'
+        . '<td colspan="5">'
+        . $i18n->get("manageRevisionsInTag with selected")
+        . '<button name="action" value="purge" class="red">' . $i18n->get('manageRevisionsInTag purge') . '</button>'
+        . '<button name="action" value="move">' . $i18n->get("manageRevisionsInTag move") . '</button>'
+        . WebGUI::Form::SelectBox( $session, {
+            name        => 'moveToTagId',
+            options     => \%moveToTagOptions,
+        } )
+        . '</td>'
+        . '</tr>'
+        . '<tr>'
+        . '<th></th>'
+        . '<th>'.$i18n->get(99,"Asset").'</th>'
+        . '<th>'.$i18n->get("type","Asset").'</th>'
+        . '<th>'.$i18n->get("revision date","Asset").'</th>'
+        . '<th>'.$i18n->get("revised by","Asset").'</th>'
+        . '</tr> '
+        ;
+    my $p = WebGUI::Paginator->new($session,$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId));
+    $p->setDataByQuery("select assetData.revisionDate, users.username, asset.assetId, asset.className from assetData 
+            left join asset on assetData.assetId=asset.assetId left join users on assetData.revisedBy=users.userId
+            where assetData.tagId=?",undef, undef, [$tag->getId]);
+    foreach my $row (@{$p->getPageData}) {
+            my ($date,$by,$id, $class) = ($row->{revisionDate}, $row->{username}, $row->{assetId}, $row->{className});
+            my $asset = WebGUI::Asset->new($session,$id,$class,$date);
+            # A checkbox for delete and move actions
+            my $checkbox    = WebGUI::Form::checkbox( $session, {
+                name        => 'assetInfo',
+                value       => join( ":", $id, $date ),
+            });
+            $output .= '<tr><td>'
+                    . $checkbox
+                    .$session->icon->view("func=view;revision=".$date, $asset->get("url"))
+                    .'</td>
+                    <td>'.$asset->getTitle.'</td>
+                    <td><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" />'.$asset->getName.'</td>
+                    <td>'.$session->datetime->epochToHuman($date).'</td>
+                    <td>'.$by.'</td></tr>';
+    }
+    $output .= '</table>'.$p->getBarSimple.WebGUI::Form::formFooter( $session );
+    $tag = $session->db->getRow("assetVersionTag","tagId",$tag->getId);
+    return $ac->render($output,$i18n->get("revisions in tag").": ".$tag->{name});
 }
 
 

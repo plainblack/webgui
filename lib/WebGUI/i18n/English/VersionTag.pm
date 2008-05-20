@@ -338,6 +338,49 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+
+        'manageRevisionsInTag moveTo new' => {
+            message     => q{-> New Version Tag},
+            lastUpdated => 0,
+            context     => q{Option to move revisions to a new version tag},
+        },
+
+        'manageRevisionsInTag with selected' => {
+            message     => q{With Selected: },
+            lastUpdated => 0,
+            context     => q{Lead-in for actions to perform after selecting revisions},
+        },
+
+        'manageRevisionsInTag purge' => {
+            message     => q{Purge},
+            lastUpdated => 0,
+            context     => q{Label for button to purge revisions},
+        },
+
+        'manageRevisionsInTag move' => {
+            message     => q{Move To:},
+            lastUpdated => 0,
+            context     => q{Label for button to move revisions},
+        },
+
+        'continue with workflow' => {
+            message     => q{-- Continue with this workflow},
+            lastUpdated => 0,
+            context     => q{Label to disable branching in workflow},
+        },
+
+        'do on approve' => {
+            message     => q{Do On Approve},
+            lastUpdated => 0,
+            context     => q{Label for activity property},
+        },
+
+        'do on approve help' => {
+            message     => q{The workflow to perform when the version tag is approved by this activity.},
+            lastUpdated => 0,
+            context     => q{Help for activity property},
+        },
+    
 	'topicName' => {
 		message => q|Version Control|,
 		lastUpdated => 1148360141,

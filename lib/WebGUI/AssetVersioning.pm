@@ -92,11 +92,17 @@ sub addRevision {
 
     my $autoCommitId     = $self->getAutoCommitWorkflowId() unless ($options->{skipAutoCommitWorkflows});
 
-    my $workingTag      
-        = ($autoCommitId) 
-            ? WebGUI::VersionTag->create($self->session, {groupToUse=>'12', workflowId=>$autoCommitId}) 
-            : WebGUI::VersionTag->getWorking($self->session)
-            ;
+    my $workingTag;
+    if ( $autoCommitId ) {
+        $workingTag  
+            = WebGUI::VersionTag->create( $self->session, { 
+                groupToUse  => '12',            # Turn Admin On (for lack of something better)
+                workflowId  => $autoCommitId,
+            } ); 
+    }
+    else {
+        $workingTag = WebGUI::VersionTag->getWorking($self->session);
+    }
     
     #Create a dummy revision to be updated with real data later
     $self->session->db->beginTransaction;

@@ -60,6 +60,10 @@
  - fixed: Thingy: Problem with add_url tmpl_var permissions
  - fixed: WeatherData asset is broken
  - fixed: Calendar multi-day events exported wrong in ical feed
+ - add: Move revisions from one version tag to another
+ - add: Delete multiple revisions from a version tag at the same time
+ - add: Approval activities now have a better parent class and more 
+        flexibility (multiple groups to approve, do on approve)
 
 7.5.10
  - fix: Syntax error in GetCsMail

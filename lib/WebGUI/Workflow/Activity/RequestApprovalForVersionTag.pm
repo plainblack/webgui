@@ -28,7 +28,8 @@ Package WebGUI::Workflow::Activity::RequestApprovalForVersionTag
 
 =head1 DESCRIPTION
 
-Ask someone for approval of a version tag. If they approve then the workflow continues. If not, it is cancelled.
+Ask someone for approval of a version tag. If they approve then the workflow 
+continues. If not, it is cancelled.
 
 =head1 SYNOPSIS
 
@@ -49,97 +50,250 @@ See WebGUI::Workflow::Activity::defintion() for details.
 =cut 
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "VersionTag");
-	push(@{$definition}, {
-		name=>$i18n->get("request approval for version tag"),
-		properties=> { 
-			groupToApprove => {
-				fieldType=>"group",
-				defaultValue=>["4"],
-				label=>$i18n->get("group to approve"),
-				hoverHelp=>$i18n->get("group to approve help")
-				},
-			message => {
-				fieldType=>"textarea",
-				defaultValue => "",
-				label=> $i18n->get("approval message"),
-				hoverHelp => $i18n->get("approval message help")
-				},
-			doOnDeny => {
-				fieldType=>"workflow",
-				defaultValue=>"pbworkflow000000000006",
-				label=>$i18n->get("do on deny"),
-				type=>"WebGUI::VersionTag",
-				hoverHelp => $i18n->get("do on deny help")
-				}
-			}
-		});
-	return $class->SUPER::definition($session,$definition);
+    my $class       = shift;
+    my $session     = shift;
+    my $definition  = shift;
+    my $i18n        = WebGUI::International->new($session, "VersionTag");
+    push @{$definition}, {
+        name        => $i18n->get("request approval for version tag"),
+        properties  => { 
+            groupToApprove => {
+                fieldType       => "group",
+                defaultValue    => ["4"],       # Content managers
+                label           => $i18n->get("group to approve"),
+                hoverHelp       => $i18n->get("group to approve help"),
+            },
+            message => {
+                fieldType       => "textarea",
+                defaultValue    => "",
+                label           => $i18n->get("approval message"),
+                hoverHelp       => $i18n->get("approval message help"),
+            },
+            doOnDeny => {
+                fieldType       => "workflow",
+                defaultValue    => "pbworkflow000000000006",    # Unlock version tag and notify owner 
+                label           => $i18n->get("do on deny"),
+                type            => "WebGUI::VersionTag",
+                hoverHelp       => $i18n->get("do on deny help"),
+                none            => 1,
+                noneLabel       => $i18n->get('continue with workflow'),
+            },
+            doOnApprove => {
+                fieldType       => "workflow",
+                defaultValue    => "",          # Continue with workflow
+                label           => $i18n->get("do on approve"),
+                type            => "WebGUI::VersionTag",
+                hoverHelp       => $i18n->get("do on approve help"),
+                none            => 1,
+                noneLabel       => $i18n->get('continue with workflow'),
+            },
+        },
+    };
+    return $class->SUPER::definition($session,$definition);
+}
+
+#----------------------------------------------------------------------------
+
+=head2 doOnApprove ( versionTag, instance )
+
+Does what is necessary when the tag gets approved. C<versionTag> is the 
+WebGUI::VersionTag we're working with. C<instance> is the workflow instance
+we're a part of.
+
+Returns the notification code to be given to SPECTRE.
+
+=cut
+
+sub doOnApprove {
+    my $self        = shift;
+    my $versionTag  = shift;
+    my $instance    = shift;
+
+    # Make the new workflow, if necessary
+    if ( $self->get("doOnApprove") ) {
+        my $newInstance 
+            = WebGUI::Workflow::Instance->create($self->session, {
+                workflowId  => $self->get("doOnApprove"),
+                methodName  => $instance->get("methodName"),
+                className   => $instance->get("className"),
+                parameters  => $instance->get("parameters"),
+                priority    => $instance->get("priority"),
+            })->start(1);
+        $instance->delete;
+    }
+    
+    # We're done here
+    return $self->COMPLETE;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 doOnDeny ( versionTag, instance )
+
+Does what is necessary when the tag gets denied. C<versionTag> is the 
+WebGUI::VersionTag we're working with. C<instance> is the workflow instance
+we're a part of.
+
+Returns the notification code to be given to SPECTRE.
+
+=cut
+
+sub doOnDeny {
+    my $self        = shift;
+    my $versionTag  = shift;
+    my $instance    = shift;
+
+    # Make the new workflow, if necessary
+    if ( $self->get("doOnDeny") ) {
+        my $newInstance 
+            = WebGUI::Workflow::Instance->create($self->session, {
+                workflowId  => $self->get("doOnDeny"),
+                methodName  => $instance->get("methodName"),
+                className   => $instance->get("className"),
+                parameters  => $instance->get("parameters"),
+                priority    => $instance->get("priority"),
+            })->start(1);
+        $instance->delete;
+    }
+    
+    # We're done here
+    return $self->COMPLETE;
 }
 
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
-=head2 execute (  )
+=head2 execute ( versionTag, instance )
 
 See WebGUI::Workflow::Activity::execute() for details.
 
 =cut
 
 sub execute {
-	my $self = shift;
-	my $versionTag = shift;
-	my $instance = shift;
-	my $i18n = WebGUI::International->new($self->session, "VersionTag");
-	my $inbox = WebGUI::Inbox->new($self->session);
-	if ($instance->getScratch("status") eq "") {
-		my $u = WebGUI::User->new($self->session, $versionTag->get("committedBy"));
-		if ($u->isInGroup($self->get("groupToApprove"))) {
-			return $self->COMPLETE;
- 		} else {
-			my $message = $inbox->addMessage({
-				subject=>$i18n->get("approve/deny").": ".$versionTag->get("name"),
-				message=>join("\n\n",$self->get("message"),
-					$self->session->url->getSiteURL().$self->session->url->page("op=manageRevisionsInTag;workflowInstanceId=".$instance->getId.";tagId=".$versionTag->getId),
-					$versionTag->get("comments")),
-				groupId=>$self->get("groupToApprove"),
-				status=>'pending'
-				});
-			$instance->setScratch("status","notified");
-			$instance->setScratch("messageId",$message->getId);
-			return $self->WAITING;
- 		}
-	} elsif ($instance->getScratch("status") eq "denied") {
-		my $message = $inbox->getMessage($instance->getScratch("messageId"));
-		$message->setCompleted;
-		my $newInstance = WebGUI::Workflow::Instance->create($self->session, {
-			workflowId=>$self->get("doOnDeny"),
-			methodName=>$instance->get("methodName"),
-			className=>$instance->get("className"),
-			parameters=>$instance->get("parameters"),
-			priority=>$instance->get("priority")
-			})->start(1);
-		$instance->delete;
-		return $self->COMPLETE;
-	} elsif ($instance->getScratch("status") eq "approved") {
-		my $message = $inbox->getMessage($instance->getScratch("messageId"));
-		$message->setCompleted;
-		$instance->deleteScratch("messageId");
-		$instance->deleteScratch("status");
-		return $self->COMPLETE;
-	}
-	return $self->WAITING;
+    my $self        = shift;
+    my $versionTag  = shift;
+    my $instance    = shift;
+    my $i18n        = WebGUI::International->new( $self->session, "VersionTag" );
+    my $inbox       = WebGUI::Inbox->new( $self->session );
+
+    # First time through, send the message(s)
+    if ( $instance->getScratch("status") eq "" ) {
+        my $committedBy     = WebGUI::User->new( $self->session, $versionTag->get("committedBy") );
+        my $groupIds        = $self->getGroupToApprove;
+
+        # If user is in an approval group, they're auto-approved
+        for my $groupId ( @{ $groupIds } ) {
+            if ( $committedBy->isInGroup( $groupId ) ) {
+                return $self->doOnApprove( $versionTag, $instance );
+            } 
+        }
+
+        # If not yet approved, send out the message
+        $self->sendMessage( $versionTag, $instance );
+
+        # Update approval status
+        $instance->setScratch( "status", "notified" );
+        
+        return $self->WAITING;
+    } 
+    # Second and subsequent times, check status
+    # Tag is denied
+    elsif ( $instance->getScratch("status") eq "denied" ) {
+        # Clean up after ourselves
+        $self->setMessageCompleted( $instance );
+        $instance->deleteScratch( "status" );
+        
+        # We're done here
+        return $self->doOnDeny( $versionTag, $instance );
+    } 
+    # Tag is approved
+    elsif ( $instance->getScratch("status") eq "approved" ) {
+        # Clean up after ourselves
+        $self->setMessageCompleted( $instance );
+        $instance->deleteScratch( "status" );
+        
+        # We're done here
+        return $self->doOnApprove( $versionTag, $instance );
+    }
+
+    # If we haven't done anything, spin the wheel again
+    return $self->WAITING;
 }
 
+#----------------------------------------------------------------------------
 
-#-------------------------------------------------------------------
+=head2 getGroupToApprove ( versionTag, instance )
 
-=head2 setApproved ( insstance )
+Returns an array reference of group IDs that could approve this tag. Only 
+ONE of the members of these group(s) needs to approve the version tag to 
+make it past this activity.
 
-Marks this approved so that the workflow engine knows it can continue on as approved.
+C<versionTag> is the version tag we're working with. C<instance> is the 
+workflow instance we're part of
+
+=cut
+
+sub getGroupToApprove {
+    my $self        = shift;
+    return [ $self->get('groupToApprove') ];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 sendMessage ( versionTag, instance )
+
+Send out approval messages to the necessary groups. Keep track of the 
+message IDs so that we can refer to them later.
+
+=cut
+
+sub sendMessage {
+    my $self            = shift;
+    my $versionTag      = shift;
+    my $instance        = shift;
+    my $inbox           = WebGUI::Inbox->new( $self->session );
+    my $i18n            = WebGUI::International->new( $self->session, "VersionTag" );
+    my $messageIds      = $instance->getScratch( "messageId" );
+
+    # FIXME: Do we need the workflowInstanceId here? See the check for 
+    # it in WebGUI::Operation::VersionTag sub www_manageRevisionsInTag
+
+    my $approvalUrl
+        = $self->session->url->getSiteURL
+        . $self->session->url->page(
+            "op=manageRevisionsInTag;workflowInstanceId=" . $instance->getId
+            . ";tagId=" . $versionTag->getId
+        );
+    my $messageText 
+        = join "\n\n",
+            $self->get("message"),
+            $approvalUrl,
+            $versionTag->get("comments"),
+        ;
+
+    for my $groupId ( @{ $self->getGroupToApprove } ) {
+        my $message 
+            = $inbox->addMessage({
+                subject => $i18n->get("approve/deny") . ": " . $versionTag->get("name"),
+                message => $messageText,
+                groupId => $groupId,
+                status  => 'pending',
+            });
+        $messageIds = join ",", $messageIds, $message->getId;
+    }
+
+    # Keep track of message Ids so we can complete them 
+    $instance->setScratch( "messageId", $messageIds );
+
+    return;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 setApproved ( instance )
+
+Marks this approved so that the workflow engine knows it can continue on as 
+approved.
 
 =head3 instance
 
@@ -148,16 +302,17 @@ A reference to the instance that you wish to set this approved.
 =cut
 
 sub setApproved {
-	my $self = shift;
-	my $instance = shift;
-	$instance->setScratch("status","approved");
+    my $self        = shift;
+    my $instance    = shift;
+    $instance->setScratch( "status", "approved" );
 }	
 
-#-------------------------------------------------------------------
+#----------------------------------------------------------------------------
 
-=head2 setDenied ( insstance )
+=head2 setDenied ( instance )
 
-Marks this approved so that the workflow engine knows it can continue on as denied.
+Marks this approved so that the workflow engine knows it can continue on as 
+denied.
 
 =head3 instance
 
@@ -166,12 +321,36 @@ A reference to the instance that you wish to set this denied.
 =cut
 
 sub setDenied {
-	my $self = shift;
-	my $instance = shift;
-	$instance->setScratch("status","denied");
+    my $self        = shift;
+    my $instance    = shift;
+    $instance->setScratch( "status", "denied" );
 }	
+
+#----------------------------------------------------------------------------
+
+=head2 setMessageCompleted ( instance )
+
+Sets all the messages sent by this activity to completed. C<instance> is the
+workflow instance we're part of.
+
+=cut
+
+sub setMessageCompleted {
+    my $self        = shift;
+    my $instance    = shift;
+    my $inbox       = WebGUI::Inbox->new( $self->session );
+
+    # Set all messages to completed
+    for my $messageId ( split /,/, $instance->getScratch("messageId") ) { 
+        my $message = $inbox->getMessage( $messageId );
+        $message->setCompleted;
+    }
+
+    $instance->deleteScratch( "messageId" );
+
+    return;
+}
 
 
 1;
-
 

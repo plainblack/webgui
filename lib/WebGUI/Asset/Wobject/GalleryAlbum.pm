@@ -448,7 +448,8 @@ return undef.
 sub getThumbnailUrl {
     my $self        = shift;
     my $asset       = undef;
-
+    
+    # Try to get the asset
     if ( $self->get("assetIdThumbnail") ) {
         $asset      = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("assetIdThumbnail") );
     }
@@ -459,6 +460,13 @@ sub getThumbnailUrl {
         return undef;
     }
 
+    # It is possible to get here and still not have an asset in cases of
+    # "pending" assets, so just return
+    if ( !$asset ) {
+        return undef;
+    }
+    
+    # Get the URL for the asset's thumbnail
     if ( $asset->can("getThumbnailUrl") ) {
         return $asset->getThumbnailUrl;
     }

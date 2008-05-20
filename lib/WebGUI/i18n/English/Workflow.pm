@@ -250,6 +250,12 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+        'form control none label' => {
+            message     => q{None},
+            context     => q{Default label to select "None" for a workflow},
+            lastUpdated => 0,
+        },
+
 	'topicName' => {
 		message => q|Workflow|,
 		context => q|The title of the workflow interface.|,

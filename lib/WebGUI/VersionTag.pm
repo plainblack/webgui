@@ -125,9 +125,12 @@ sub commit {
 
 #-------------------------------------------------------------------
 
-=head2 get ( name ) 
+=head2 get ( [ name ] ) 
 
-Returns the value for a given property.  An incomplete list of properties is below:
+Returns the value for a given property. If C<name> is not specified, returns
+all the properties.
+
+An incomplete list of properties is below:
 
 =head3 name
 
@@ -170,9 +173,15 @@ Some text about this version tag, what it's for, why it was committed, why it wa
 =cut
 
 sub get {
-	my $self = shift;
-	my $name = shift;
-	return $self->{_data}{$name};
+    my $self    = shift;
+    my $name    = shift;
+
+    if ( $name ) {
+        return $self->{_data}{$name};
+    }
+    else {
+        return \%{ $self->{_data} },
+    }
 }
 
 #-------------------------------------------------------------------

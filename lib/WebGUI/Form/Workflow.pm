@@ -100,6 +100,9 @@ sub definition {
 		none=>{
 			defaulValue=>0
 			},
+                noneLabel   => { 
+                    defaultValue        => $i18n->get("form control none label"),
+                },
         includeRealtime => {
             defaultValue => 0
             },
@@ -153,11 +156,16 @@ Renders a template picker control.
 =cut
 
 sub toHtml {
-	my $self = shift;
-	my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"), $self->get("includeRealtime"));
-	$workflowList->{""} = "None" if ($self->get("none"));
-	$self->set("options", $workflowList);
-	return $self->SUPER::toHtml();
+    my $self = shift;
+    my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"), $self->get("includeRealtime"));
+    
+    if ( $self->get("none") ) {
+        my $noneLabel   = $self->get("noneLabel");
+        $workflowList->{""} = $noneLabel;
+    }
+
+    $self->set("options", $workflowList);
+    return $self->SUPER::toHtml();
 }
 
 #-------------------------------------------------------------------
@@ -169,13 +177,13 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-	my $self = shift;
-        my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
-        my $buttons;
-	# This edit button will not work with multiple workflows.
-        $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
-	$self->set("subtext",$buttons . $self->get("subtext"));
-	return $self->SUPER::toHtmlWithWrapper;
+    my $self = shift;
+    my $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl) if $self->session->asset;
+    my $buttons;
+    # This edit button will not work with multiple workflows.
+    $buttons .= $self->session->icon->manage("op=manageWorkflows".$returnUrl);
+    $self->set("subtext",$buttons . $self->get("subtext"));
+    return $self->SUPER::toHtmlWithWrapper;
 }
 
 
