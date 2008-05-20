@@ -253,6 +253,7 @@ sub prepareView {
 sub view {
 
 	my $self = shift;
+    my $form = $self->session->form;
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
 	my (%var, @users, @profileField_loop, @profileFields,@profileFieldNames);
 	my ($defaultPublicProfile, $defaultPublicEmail, $user, $sth, $sql, $profileField);
@@ -276,6 +277,14 @@ sub view {
 		push(@profileFieldNames, $profileField->{fieldName});
         unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
             $var{'profileField_'.$profileField->{fieldName}.'_label'} = $label;
+            my $sortByURL = '?orderBy='.$profileField->{fieldName};
+            if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $profileField->{fieldName}){
+                $sortByURL .= ';orderType=desc';
+            }
+            else{
+                $sortByURL .= ';orderType=asc';
+            }
+            $var{'profileField_'.$profileField->{fieldName}.'_sortByURL'} = $sortByURL;
         }
 	}
     
@@ -292,9 +301,11 @@ sub view {
 	my $constraint;
 	if ($self->session->form->process('search')){
 		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "%'.$self->session->form->process('search').'%"'} @profileFields).")";	
-	}elsif ($self->session->form->process('searchExact')){
+	}
+    elsif ($self->session->form->process('searchExact')){
         $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "'.$self->session->form->process('searchExact').'"'} @profileFields).")";
-    }else{
+    }
+    else{
     	my @profileSearchFields = ();
 	    my @profileSearchExactFields = ();
     	foreach my $profileField (@profileFields){
@@ -371,7 +382,8 @@ sub view {
 			    	push (@profileFieldValues, {
 				    	"profile_emailNotPublic"=>1,
     				});
-				}else{
+				}
+                else{
 					push (@profileFieldValues, {
     					"profile_value"=>$user->{$profileField->{fieldName}},
 					});
@@ -389,7 +401,8 @@ sub view {
 			$userProperties{"user_name"} = $user->{userName};
 			$userProperties{"user_profile_loop"} = \@profileFieldValues;
 			push(@users,\%userProperties);
-		}else{
+		}
+        else{
 			push(@users, {
 		    	"user_id"=>$user->{userId},
 			    "user_name"=>$user->{userName},
@@ -400,6 +413,7 @@ sub view {
 	foreach my $profileField (@profileFields){
 	push (@profileField_loop, {
 		"profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
+        "profileField_sortByURL"=>'?orderBy='.$profileField->{fieldName},
 		});
 	}
 	$var{numberOfProfileFields} = scalar(@profileFields);

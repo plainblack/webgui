@@ -240,12 +240,32 @@ true for the 'email' profile field.|,
         },
 
         'profileField_loop' => {
-                message => q|A loop contining profile fields|,
+                message => q|A loop containing profile fields|,
                 lastUpdated => 1081514049
         },
 
         'profileField_label' => {
-                message => q|The label for a profile field|,
+                message => q|The label for this profile field|,
+                lastUpdated => 1081514049
+        },
+        
+
+        'profileField_sortByURL' => {
+                message => q|The URL to sort the UserList by this profile field. The default sort order
+is ascending. After clicking the sort by link for a profile field the sort order will be reversed.|,
+                lastUpdated => 1081514049
+        },
+
+        'profileField_PROFILEFIELDNAME_label' => {
+                message => q|The label for the profile field with fieldName PROFILEFIELDNAME. Example &lt;tmpl_var
+profileField_lastName_label&gt;. This tmpl_var exists outside of the profileField_loop.|,
+                lastUpdated => 1081514049
+        },
+
+        'profileField_PROFILEFIELDNAME_sortByURL' => {
+                message => q|The URL to sort the UserList by PROFILEFIELDNAME. Example &lt;tmpl_var
+profileField_lastName_sortByURL&gt;. This tmpl_var exists outside of the profileField_loop. The default sort order
+is ascending. After clicking the sort by link for a profile field the sort order will be reversed.|,
                 lastUpdated => 1081514049
         },
 

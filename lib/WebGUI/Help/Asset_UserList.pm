@@ -27,9 +27,12 @@ our $HELP = {
             { 'name' => 'searchFormTypeSelect' },
             { 'name' => 'searchFormQuery_form' },
             { 'name' => 'numberOfProfileFields' },
+            { 'name' => 'profileField_PROFILEFIELDNAME_label' },
+            { 'name' => 'profileField_PROFILEFIELDNAME_sortByURL' },
             {   'name'      => 'profileField_loop',
                 'variables' => [
                     { 'name' => 'profileField_label' },
+                    { 'name' => 'profileField_sortByURL' },
                 ],
             },
             {   'name'      => 'alphabetSearch_loop',
