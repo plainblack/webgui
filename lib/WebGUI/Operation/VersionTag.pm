@@ -154,6 +154,8 @@ sub www_approveVersionTag {
 
     return $session->privilege->insufficient 
         unless canApproveVersionTag( $session, $tag );
+    
+    my $activity    = $tag->getWorkflowInstance->getNextActivity;
 
     if ( $session->form->process("status", "selectBox") eq "approve" ) {
         $activity->setApproved( $instance );
