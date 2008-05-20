@@ -500,10 +500,6 @@ Translates a URL into an appropriate path and filename for exporting. For
 example, given C<'/foo/bar/baz'>, will return C<'/foo/bar/baz/index.html'>
 provided the value of indexFile as given to exportAsHtml was C<'index.html'>.
 
-=head3 url 
-
-URL of the asset we need an export path for
-
 =head3 index
 
 index filename passed from L</exportAsHtml>
