@@ -64,6 +64,7 @@
  - add: Delete multiple revisions from a version tag at the same time
  - add: Approval activities now have a better parent class and more 
         flexibility (multiple groups to approve, do on approve)
+ - fixed: CS mail retrieval doesn't decode subject properly
 
 7.5.10
  - fix: Syntax error in GetCsMail
