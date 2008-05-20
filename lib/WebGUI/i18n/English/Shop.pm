@@ -105,6 +105,12 @@ our $I18N = {
 		context => q|field label|
 	},
 
+	'notes' => { 
+		message => q|Notes|,
+		lastUpdated => 0,
+		context => q|field label|
+	},
+
 	'manage' => { 
 		message => q|Manage|,
 		lastUpdated => 0,

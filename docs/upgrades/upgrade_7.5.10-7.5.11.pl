@@ -513,7 +513,8 @@ sub convertTransactionLog {
 		paymentDriverLabel varchar(35),
 		taxes float,
 		dateOfPurchase datetime,
-        isRecurring boolean
+        isRecurring boolean,
+        notes mediumtext
     )");
 	$db->write("create table transactionItem (
 		itemId varchar(22) binary not null primary key,

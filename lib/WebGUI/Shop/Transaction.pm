@@ -381,6 +381,10 @@ A boolean indicating whether this is a recurring transaction or not. Defaults to
 
 Most of the time this will be empty. But if this is a recurring transaction, then this will hold the id of the original transaction that started the recurrence.
 
+=head4 notes
+
+A text field containing notes about this transaction.
+
 =cut
 
 sub update {
@@ -431,7 +435,7 @@ sub update {
     }
     my @fields = (qw( isSuccessful transactionCode statusCode statusMessage amount shippingAddressId
         shippingAddressName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
-        shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel
+        shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel notes
         shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
         paymentPhoneNumber paymentDriverId paymentDriverLabel taxes ));
@@ -611,6 +615,28 @@ sub www_print {
 
 #-------------------------------------------------------------------
 
+=head2 www_refundItem ( )
+
+Refunds a specific item from a transaction and then issues shop credit.
+
+=cut
+
+sub www_refundItem {
+    my ($class, $session) = @_;
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
+    my $self = $class->new($session, $session->form->get("transactionId"));
+    my $form = $session->form;
+    my $item = eval { $self->getItem($form->get("itemId")) };
+    if (WebGUI::Error->caught()) {
+        $session->errorHandler->error("Can't get item ".$form->get("itemId"));
+        return $class->www_view($session);
+    }
+    $item->issueCredit;
+    return $class->www_view($session);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_thankYou ()
 
 Displays the default thank you page.
@@ -638,22 +664,17 @@ sub www_view {
     my ($style, $url) = $session->quick(qw(style url));
     my $transaction = $class->new($session, $session->form->get('transactionId'));
     
-    # set up all the files that we need
-    $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
-    $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
-
     #render page
     my $output = q{
         <style type="text/css">
+            .transactionItems thead th { font-size: 10pt; background-color: #efefef;  margin: 5px; }
+            .transactionItems tbody td { font-size: 10pt;  margin: 5px;}
             .transactionDetail {float: left; margin-right: 25px;}
-            .transactionDetail th { vertical-align: top; margin-right: 10px; border-right: 1px solid #eeeeee; text-align: left;}
-            .smallAddress { font-size: 50%; }
-            .successfulTransaction { color: #008000; };
-            .failedTransaction { color: #800000; };
+            .transactionDetail th { font-size: 10pt; vertical-align: top; margin-right: 10px; border-right: 1px solid #eeeeee; text-align: left;}
+            .transactionDetail td { font-size: 10pt; }
+            .smallAddress { font-size: 8pt; }
+            .successfulTransaction { color: #008000; }
+            .failedTransaction { color: #800000; }
         </style>};
     unless ($print) {
         $output .= q{   
@@ -683,6 +704,24 @@ sub www_view {
             <tr>
                 <th>}. $i18n->get("taxes") .q{</th><td>}. sprintf("%.2f", $transaction->get('taxes')) .q{</td>
             </tr>
+    };
+    unless ($print) {
+        $output .= q{
+            <tr>
+                <th>}. $i18n->get("notes") .q{</th><td>}
+                .WebGUI::Form::formHeader($session)
+                .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
+                .WebGUI::Form::hidden($session, {name=>"method",value=>"update"})
+                .WebGUI::Form::hidden($session, {name=>"transactionId",value=>$transaction->getId})
+                .WebGUI::Form::textarea($session, {name=>"notes", value=>$transaction->get('notes')})
+                .'<br />'
+                .WebGUI::Form::submit($session, {value=>$i18n->get('update'), extras=>' '})
+                .WebGUI::Form::formFooter($session)
+                .q{</td>
+            </tr>
+        };
+    }
+    $output .= q{
         </table>
         <table class="transactionDetail">
             <tr>
@@ -704,8 +743,6 @@ sub www_view {
                         phoneNumber => $transaction->get('shippingPhoneNumber'),
                         }) .q{</td>
             </tr>
-        </table>
-        <table class="transactionDetail">
             <tr>
                 <th>}. $i18n->get("payment method") .q{</th><td><a href="}.$url->page('shop=pay;method=do;do=edit;paymentGatewayId='.$transaction->get('paymentDriverId')).q{">}. $transaction->get('paymentDriverLabel') .q{</a></td>
             </tr>
@@ -731,7 +768,7 @@ sub www_view {
     
     # item detail
     $output .= q{
-       <div id="transactionItemWrapper" class=" yui-skin-sam"> <table id="transactionItems">
+     <table class="transactionItems">
         <thead>
             <tr>
             <th>}.$i18n->get('date').q{</th>
@@ -748,9 +785,13 @@ sub www_view {
     };
     foreach my $item (@{$transaction->getItems}) {
         my $sku = $item->getSku;
-        $output .= q{
+        $output .= WebGUI::Form::formHeader($session)
+            .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
+            .WebGUI::Form::hidden($session, {name=>"method",value=>"updateItem"})
+            .WebGUI::Form::hidden($session, {name=>"transactionId",value=>$transaction->getId})
+            .WebGUI::Form::hidden($session, {name=>"itemId",value=>$item->getId})
+            .q{
             <tr>
-            <form>
             <td>}.$item->get('lastUpdated').q{</td>
             <td><a href="}.$sku->getUrl('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
             <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
@@ -775,7 +816,7 @@ sub www_view {
             };
         }
         if ($item->get('orderStatus') eq 'Cancelled') {
-            $output .= q{<td>}.$i18n->get($item->get('orderStatus')).q{</td>};
+            $output .= q{<td>}.$i18n->get($item->get('orderStatus')).q{</td><td></td><td></td>};
         }
         else {
             $output .= q{<td>}.WebGUI::Form::selectBox($session, {
@@ -786,58 +827,25 @@ sub www_view {
                     Shipped     => $i18n->get('Shipped'),
                     Backordered => $i18n->get('Backordered'),
                     },
-                }).q{</td>};
+                })
+                .q{</td>}
+                .q{<td>}
+                .WebGUI::Form::text($session, {name=>"shippingTrackingNumber", size=>15, value=>$item->get('shippingTrackingNumber')})
+                .q{</td><td>}
+                .WebGUI::Form::submit($session, {value=>$i18n->get('update'), extras=>' '})
+                .WebGUI::Form::submit($session, {value=>$i18n->get('refund'), extras=>q|onclick="this.form.method.value='refundItem'"|})
+                .q{</td>};
         }
         $output .= q{
-            <td>}.WebGUI::Form::text($session, {name=>"shippingTrackingNumber", size=>15, value=>$item->get('shippingTrackingNumber')}).q{</td>
-            <td>}.WebGUI::Form::submit($session, {value=>$i18n->get('update'), extras=>' '})
-                .WebGUI::Form::submit($session, {value=>$i18n->get('refund'), extras=>q|onclick="this.form.method.value='refundItem'"|})
-                .q{</td>
+                </tr>
             </form>
-            </tr>  
         };
     }
     $output .= q{
         </tbody>
-        </table></div>
+        </table>
     };
     
-    # render data table
-    $output .= q|
-    <script type="text/javascript">
-    YAHOO.util.Event.addListener(window, "load", function() {
-    YAHOO.example.EnhanceFromMarkup = new function() {
-        var myColumnDefs = [
-            {key:"date",sortable:true,label:'|.$i18n->get('date').q|'},
-            {key:"item",sortable:true,label:'|.$i18n->get('item').q|'},
-            {key:"price",sortable:true,label:'|.$i18n->get('price').q|'},
-            {key:"quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true,label:'|.$i18n->get('quantity').q|'},
-            {key:"address",label:'|.$i18n->get('shipping address').q|'},
-            {key:"status",sortable:true,label:'|.$i18n->get('order status').q|'},
-            {key:"tracking",label:'|.$i18n->get('tracking number').q|'},
-            {key:"manage",label:'|.$i18n->get('manage').q|'}
-        ];
-
-        this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("transactionItems"));
-        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
-        this.myDataSource.responseSchema = {
-            fields: [
-                    {key:"date"},
-                    {key:"item"},
-                    {key:"price", parser:this.parseNumberFromCurrency},
-                    {key:"quantity", parser:YAHOO.util.DataSource.parseNumber},
-                    {key:"address"},
-                    {key:"status"},
-                    {key:"tracking"},
-                    {key:"manage"}
-            ]
-        };
-
-        this.myDataTable = new YAHOO.widget.DataTable("transactionItemWrapper", myColumnDefs, this.myDataSource,{});
-    };
-    });
-    </script>
-    |;
 
     # send output
     if ($print) {
@@ -857,12 +865,57 @@ Displays the configured item.
 
 sub www_viewItem {
     my ($class, $session) = @_;
-    my $self = __PACKAGE__->new($session, $session->form->get("transactionId"));
+    my $self = $class->new($session, $session->form->get("transactionId"));
     my $item = eval { $self->getItem($session->form->get("itemId")) };
     if (WebGUI::Error->caught()) {
+        $session->errorHandler->error("Can't get item ".$session->form->get("itemId"));
         return $class->www_view($session);
     }
     return $item->getSku->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_update ( )
+
+Sets the properties for the transaction, specifically "notes".
+
+=cut
+
+sub www_update {
+    my ($class, $session) = @_;
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
+    my $self = $class->new($session, $session->form->get("transactionId"));
+    my $form = $session->form;
+    $self->update({
+        notes  => $form->get('notes'),
+        });
+    return $class->www_view($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_updateItem ( )
+
+Sets the order status and tracking number.
+
+=cut
+
+sub www_updateItem {
+    my ($class, $session) = @_;
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage);
+    my $self = $class->new($session, $session->form->get("transactionId"));
+    my $form = $session->form;
+    my $item = eval { $self->getItem($form->get("itemId")) };
+    if (WebGUI::Error->caught()) {
+        $session->errorHandler->error("Can't get item ".$form->get("itemId"));
+        return $class->www_view($session);
+    }
+    $item->update({
+        orderStatus             => $form->get('orderStatus'),
+        shippingTrackingNumber  => $form->get('shippingTrackingNumber'),
+        });
+    return $class->www_view($session);
 }
 
 1;

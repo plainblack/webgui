@@ -147,7 +147,7 @@ Returns the money from this item to the user in the form of in-store credit.
 sub issueCredit {
     my $self = shift;
     my $credit = WebGUI::Shop::Credit->new($self->transaction->session, $self->transaction->get('userId'));
-    $credit->adjust($self->get('price'), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
+    $credit->adjust(($self->get('price') * $self->get('quantity')), "Issued credit on sku ".$self->get('assetId')." for transaction item ".$self->getId." on transaction ".$self->transaction->getId);
     $self->getSku->onRefund($self);
     $self->update({orderStatus=>'Cancelled'});
 }
