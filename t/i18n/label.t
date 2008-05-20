@@ -84,12 +84,12 @@ my $i18n = WebGUI::International->new($session);
 
 foreach my $label ( @libLabels ) {
 	ok(0,
-	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
+	sprintf "sub label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
 
 foreach my $label ( @objLabels ) {
 	ok($i18n->get(@{ $label }{qw(label namespace )} ),
-	sprintf "label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
+	sprintf "obj label: %s->%s inside %s", @{ $label }{'namespace', 'label', 'file', });
 }
 
 sub label_finder_pm {
