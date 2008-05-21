@@ -1015,21 +1015,23 @@ sub emailResetPassword {
                value => "$passwordRecoveryToken",
                );
 
-       $f->password(
-               name=>"newpassword",
-               label=> $i18n->get('new password label', 'AuthWebGUI'),
-               hoverHelp=> $i18n->get('new password help', 'AuthWebGUI'),
-                );
+    $f->password(
+        name        => "newpassword",
+        label       => $i18n->get('new password label', 'AuthWebGUI'),
+        hoverHelp   => $i18n->get('new password help', 'AuthWebGUI'),
+        uiLevel     => 0,
+    );
 
-       $f->password(
-               name=>"newpwdverify",
-               label => $i18n->get('new password verify', 'AuthWebGUI'),
-               hoverHelp=> $i18n->get('new password verify help', 'AuthWebGUI'),
-               );
+    $f->password(
+        name        => "newpwdverify",
+        label       => $i18n->get('new password verify', 'AuthWebGUI'),
+        hoverHelp   => $i18n->get('new password verify help', 'AuthWebGUI'),
+        uiLevel     => 0,
+    );
 
-       $f->submit(
-               value => 'submit'
-               );
+    $f->submit(
+        value => 'submit'
+    );
 
 
 

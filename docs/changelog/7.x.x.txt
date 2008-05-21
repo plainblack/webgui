@@ -1,5 +1,6 @@
 7.4.38
  - fixed: CS mail retrieval doesn't decode subject properly
+ - fixed: email password recovery fields effected by UI level
 
 7.4.37
  - fixed: checking out in commerce system broken
