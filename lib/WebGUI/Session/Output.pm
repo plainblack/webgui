@@ -89,12 +89,16 @@ sub print {
 	my $content = shift;
 	my $skipMacros = shift;
 	WebGUI::Macro::process($self->session, \$content) unless $skipMacros;
-	my $handle = $self->{_handle};
-	if (defined $handle) {
-		print $handle $content;
-	} else {
-		print $content;
-	}
+    my $handle = $self->{_handle};
+    if (defined $handle) {
+        print $handle $content;
+    }
+    elsif ($self->session->request) {
+        $self->session->request->print($content);
+    }
+    else {
+        print $content;
+    }
 }
 
 #-------------------------------------------------------------------
