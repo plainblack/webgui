@@ -18,6 +18,7 @@ use WebGUI::DateTime;
 use WebGUI::Asset::Sku::Product;
 use WebGUI::Workflow;
 use WebGUI::User;
+use WebGUI::Utility;
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -58,6 +59,7 @@ addCoupon( $session );
 addVendors($session);
 modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
+migrateSubscriptions( $session );
 
 finish($session); # this line required
 
@@ -1107,6 +1109,223 @@ sub removeLegacyTable {
     print "Done.\n" unless $quiet;
 }
 
+
+
+#-------------------------------------------------
+sub migrateSubscriptions {
+    my $session = shift;
+    print "\tMigrating subscriptions to the new commerce system..." unless ($quiet);
+
+    # Check if codes are tied to multiple subscriptions.
+    my ($hasDoubles) = $session->db->buildArray(
+        'select count(*) as cnt from subscriptionCodeSubscriptions group by code order by cnt desc'
+    );
+    print "\n\t\t!!WARNING: There are subscription codes that link to multiple subscriptions!!"
+        ." Please refer to gotcha.txt!\n" if $hasDoubles > 1;
+
+    # Rename old subscription table so we can reuse it for the Sku
+    $session->db->write('alter table subscription rename to Subscription_OLD');
+
+    # Create the new subscription table
+    $session->db->write(<<EOSQL);
+        create table Subscription (
+            assetId                 varchar(22) binary  not null,
+            revisionDate            bigint(20)          not null,
+            templateId              varchar(22)         not null    default '',
+            thankYouMessage         mediumtext,
+            price                   float               not null    default 0.00,
+            subscriptionGroup       varchar(22)         not null    default 2,
+            duration                varchar(12)         not null    default 'Monthly',
+            executeOnSubscription   varchar(255),
+            karma                   int(6)                          default 0,
+
+            PRIMARY KEY (assetId, revisionDate)
+        );
+EOSQL
+
+    # Create the new subsction code table
+    $session->db->write(<<EOSQL2);
+        create table Subscription_code (
+            code                    varchar(64)         not null,
+            batchId                 varchar(22)         not null,
+            status                  varchar(10)         not null    default 'Unused',
+            dateUsed                bigint(20),
+            usedBy                  varchar(22),
+
+            PRIMARY KEY (code)
+        );
+EOSQL2
+
+    # Create the new subscription code batch table
+    $session->db->write(<<EOSQL3);
+        create table Subscription_codeBatch (
+            batchId                 varchar(22)         not null,
+            name                    varchar(255),
+            description             mediumtext,
+            subscriptionId          varchar(22)         not null,
+            expirationDate          bigint(20)          not null,
+            dateCreated             bigint(20)          not null,
+
+            PRIMARY KEY (batchId)
+        );
+EOSQL3
+
+    # Add a folder to the import node for the migrated subscriptions
+    my $subscriptionsFolder = WebGUI::Asset->getImportNode( $session )->addChild({
+        className   => 'WebGUI::Asset::Wobject::Folder',
+        menuTitle   => 'Migrated subscriptions',
+        title       => 'Migrated subscriptions',
+        ownerUserId => 3,
+    });
+
+    # Migrate all subscriptions
+    print "\t\tConverting subscriptions to assets:\n";
+    my $subscriptions = $session->db->read( 'select * from Subscription_OLD' );
+    while (my $subscription = $subscriptions->hashRef) {
+        # Don't migrate deleted subscriptions
+        next if $subscription->{ deleted };
+
+        # Add a new subscription sku
+        my $sku = $subscriptionsFolder->addChild(
+            {
+                className               => 'WebGUI::Asset::Sku::Subscription',
+                ownerUserId             => 3,
+                url                     => 'subscriptions/'.$subscription->{ description },
+                menuTitle               => $subscription->{ description             },
+                title                   => $subscription->{ description             },
+                price                   => $subscription->{ price                   },
+                description             => $subscription->{ description             },
+                subscriptionGroup       => $subscription->{ subscriptionGroup       },
+                duration                => $subscription->{ duration                },
+                executeOnSubscription   => $subscription->{ executeOnSubscription   },
+                karma                   => $subscription->{ karma                   },
+                templateId              => 'eqb9sWjFEVq0yHunGV8IGw',
+                overrideTaxRate         => $subscription->{ useSalesTax } ? 0 : 1,
+                taxRateOverride         => 0,
+            },
+            $subscription->{ subscriptionId },
+        );
+
+        # Log and print migration data
+        my $message = "Migrated subscription '$subscription->{ description }' ($subscription->{ subscriptionId }) "
+            . " to '" . $sku->getUrl . "' (" . $sku->getId . ")";
+        $session->errorHandler->warn( $message );
+        print "\t\t--> $message\n";
+    }
+    $subscriptions->finish;
+
+    # Subscriptions are migrated, now migrate the subscription codes
+    # First find batches with multiple subscriptions per code
+    my @multiBatches = $session->db->buildArray(
+        'select distinct batchId from subscriptionCode where code in '
+        .' (select code from subscriptionCodeSubscriptions group by code having count(subscriptionId) > 1)'
+    );
+
+    # Migrate subscription codes batch by batch
+    print "\t\tMigrating subscription codes.\n";
+    my @batches = $session->db->buildArray('select distinct batchId from subscriptionCodeBatch');
+    foreach my $batchId ( @batches ) {
+        my $subscriptionId;
+
+        # Fetch batch properties and the number of code. Discard used or expired codes.
+        my ($numberOfCodes, $codeLength, $expirationDate, $dateCreated, $name, $description) =
+            $session->db->quickArray( 
+                'select count(*), length(t1.code), (t1.dateCreated + t1.expires), '
+                .' t1.dateCreated, t2.name, t2.description '
+                .' from subscriptionCode as t1, subscriptionCodeBatch as t2 '
+                .' where t1.batchId=t2.batchId and t1.batchId=? '
+                .' and t1.status=\'Unused\' '
+                .' and from_unixtime(t1.dateCreated + t1.expires) > now() '
+                .' group by t1.batchId',
+                [
+                    $batchId,
+                ]
+            );
+
+        # Skip expired or fully used batches;
+        next unless $numberOfCodes;
+
+        # Check if the codes in this batch link to multiple subscriptions
+        if ( isIn( $batchId, @multiBatches ) ) {
+            my $message = "\t\tBatch $batchId has codes linking to multiple subscriptions:\n";
+
+            # Find the subscriptions the code in this batch are attached to
+            my @subscriptions = $session->db->buildArray(
+                'select distinct subscriptionId from subscriptionCodeSubscriptions where code in '
+                .' (select distinct code from subscriptionCode where batchId=?)', 
+                [
+                    $batchId,
+                ]
+            );
+        
+            # Migrate the codes for the first subscription in the list (this is done below)
+            $subscriptionId = shift @subscriptions;
+
+            my $subscription = WebGUI::Asset::Sku::Subscription->new($session, $subscriptionId);
+            $message .= "\t\t--> Keeping codes for subscription "
+                . "'" . $subscription->get('title') . "' (" . $subscription->getUrl . ") \n";
+
+            # And generate new codes for the remaining subscriptions
+            foreach my $assetId ( @subscriptions ) { 
+                my $subscription = WebGUI::Asset::Sku::Subscription->new($session, $assetId);
+
+                $message .= "\t\t--> Generating new codes for subscription "
+                    . "'" . $subscription->get('title') . "' (" . $subscription->getUrl . "): \n";
+
+                my $batchId = $subscription->generateSubscriptionCodeBatch(
+                    $numberOfCodes,
+                    $codeLength,
+                    $expirationDate,
+                    $name,
+                    $description
+                );
+                
+                $message .= "\t\t\t" . join( "\n\t\t\t", keys %{ $subscription->getCodesInBatch( $batchId ) } ). "\n";
+            }
+
+            # Log and print migration info
+            $session->errorHandler->warn( $message );
+            print $message;
+        }
+        else {
+            $subscriptionId = $session->db->quickScalar(
+                'select distinct subscriptionId from subscriptionCodeSubscriptions '
+                .' where code in (select code from subscriptionCode where batchId=?)',
+                [
+                    $batchId,
+                ]
+            );
+        }
+
+        # Migrate the batch itself
+        $session->db->write(
+            'insert into Subscription_codeBatch '
+            . '         (batchId, name, description, subscriptionId, expirationDate, dateCreated) '
+            . ' values  (?      , ?   , ?          , ?             , ?             , ?          ) ',
+            [
+                $batchId,
+                $name,
+                $description,
+                $subscriptionId,
+                $expirationDate,
+                $dateCreated,
+            ]
+        );
+
+        # Migrate the codes
+        $session->db->write(
+            'insert into Subscription_code (batchId, code, status, dateUsed, usedBy) '
+            .' select batchId, code, status, dateUsed, usedBy from subscriptionCode where batchId=?',
+            [
+                $batchId,
+            ]
+        );
+    }
+
+    print "\tDone.\n";
+}
+
+
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------
@@ -1115,6 +1334,7 @@ sub addPackage {
     my $session     = shift;
     my $file        = shift;
 
+print "Importing package: $file...";
     # Make a storage location for the package
     my $storage     = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
@@ -1124,6 +1344,8 @@ sub addPackage {
 
     # Make the package not a package anymore
     $package->update({ isPackage => 0 });
+
+print "Done\n";
 }
 
 #-------------------------------------------------

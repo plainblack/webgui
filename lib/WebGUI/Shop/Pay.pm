@@ -168,6 +168,38 @@ sub getPaymentGateways {
 
 #-------------------------------------------------------------------
 
+=head2 getRecurringPeriodValues ( period )
+
+A utility method that returns the internationalized name for period.
+
+=head3 period
+
+The period you want the name for.
+
+=cut
+
+sub getRecurringPeriodValues {
+	my $self    = shift;
+	my $session = $self->session;
+
+	my $i18n = WebGUI::International->new($session, 'Commerce');
+	tie my %periods, "Tie::IxHash";	
+	%periods = (
+		Weekly		=> $i18n->get('weekly'),
+		BiWeekly	=> $i18n->get('biweekly'),
+		FourWeekly	=> $i18n->get('fourweekly'),
+		Monthly		=> $i18n->get('monthly'),
+		Quarterly	=> $i18n->get('quarterly'),
+		HalfYearly	=> $i18n->get('halfyearly'),
+		Yearly		=> $i18n->get('yearly'),
+		);
+	
+	return \%periods;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( $session )
 
 Constructor.
