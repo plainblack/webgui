@@ -181,6 +181,37 @@ sub denyPurchase {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate ( [ overrideProperties ] )
+
+Creates a new transaction with identical properties to the to this transaction .
+
+=head3 overrideProperties
+
+An optional hash ref containing transaction properties you want to override.
+
+=cut
+
+sub duplicate {
+    my $self                = shift;
+    my $overrideProperties  = shift || {};
+    my $session             = $self->session;
+
+    # Fetch the properties for the duplicate transaction and apply the overrides
+    my $transactionProperties = { %{ $self->get }, %{ $overrideProperties } };
+    
+    # Create a new transactions with the duplicated properties
+    my $newTransaction = WebGUI::Shop::Transaction->create( $session, $transactionProperties );
+
+    # Copy the items in the subscription
+    foreach my $item ( @{ $self->getItems } ) {
+        $newTransaction->addItem( $item->get );
+    }
+
+    return $newTransaction;
+}
+
+#-------------------------------------------------------------------
+
 =head2 formatAddress ( address )
 
 Returns a formatted address.
@@ -225,7 +256,7 @@ sub formatCurrency {
 
 =head2 get ( [ property ] )
 
-Returns a duplicated hash reference of this objectÕs data.
+Returns a duplicated hash reference of this object's data.
 
 =head3 property
 
@@ -323,6 +354,54 @@ sub new {
     $session{ $id }   = $session;
     $properties{ $id } = $transaction;
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 newByGatewayId ( session, gatewayId, payDriverId )
+
+Constructor.  Instanciates a transaction based upon a paymentDriverId and a payment gateway issued id.
+
+=head3 session
+
+A reference to the current session.
+
+=head3 gatewayId
+
+The id the payment gateway has assigned to this transaction. More specifically the value stored in the
+transactionCode field.
+
+=head3 payDriverId
+
+The id of the payment driver instance that has processed the transaction.
+
+=cut
+
+sub newByGatewayId {
+    my $class       = shift;
+    my $session     = shift;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $gatewayId   = shift || WebGUI::Error::InvalidParam->throw(error=>"Need a gatewayId.");
+    my $payDriverId = shift || WebGUI::Error::InvalidParam->throw(error=>"Need a payDriverId.");
+
+    # Find the transactionId belonging to the gatewayId/payDriverId combo.
+    my $transactionId = $session->db->quickScalar(
+        'select transactionId from transaction where transactionCode=? and paymentDriverId=?',
+        [
+            $gatewayId,
+            $payDriverId,
+        ]
+    );
+
+    # Throw an error if there is no such gatewayId/payDriverId combo.
+    unless ( $transactionId ) {
+        WebGUI::Error::ObjectNotFound->throw(error=>"No such transaction.", id=>$transactionId);
+    }
+
+    # We have a transactionId so instanciate it and return the object
+    return $class->new( $session, $transactionId );
 }
 
 #-------------------------------------------------------------------

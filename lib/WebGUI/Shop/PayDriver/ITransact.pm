@@ -31,10 +31,142 @@ sub _monthYear {
 }
 
 #-------------------------------------------------------------------
-sub cancelRecurringPayment {
+sub _generateCancelRecurXml {
+    my $self        = shift;
+    my $transaction = shift;
 
+    # Construct xml
+    my $vendorIdentification;
+    $vendorIdentification->{ VendorId           } = $self->get('vendorId');
+    $vendorIdentification->{ VendorPassword     } = $self->get('password');
+    $vendorIdentification->{ HomePage           } = $self->session->setting->get("companyURL");
+    
+    my $recurUpdate;
+    $recurUpdate->{ OperationXID    } = $transaction->get('gatewayId');
+    $recurUpdate->{ RemReps         } = 0;
+   
+    my $xmlStructure = {
+        GatewayInterface => {
+            VendorIdentification    => $vendorIdentification,
+            RecurUpdate             => $recurUpdate,
+        }
+    };
+
+    my $xml = 
+        '<?xml version="1.0" standalone="yes"?>'
+        . XMLout( $xmlStructure,
+            NoAttr      => 1,
+            KeepRoot    => 1,
+            KeyAttr     => [],
+        );
+
+    return $xml;
 }
 
+#-------------------------------------------------------------------
+
+=head2 doXmlRequest ( xml [ isAdministrative ] )
+
+Post an xml request to the ITransact backend. Returns a LWP::UserAgent response object.
+
+=head3 xml
+
+The xml string. Must contain a valid xml header.
+
+=head3 isGatewayInterface
+
+Determines what kind of request the xml is. For GatewayRequests set this value to 1. For SaleRequests set to 0 or
+undef.
+
+=cut
+
+sub doXmlRequest {
+    my $self                = shift;
+    my $xml                 = shift;
+    my $isGatewayInterface  = shift;
+
+    # Figure out which cgi script we should post the XML to.
+    my $xmlTransactionScript    = $isGatewayInterface
+                                ? 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans2.cgi'
+                                : 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans.cgi'
+                                ;
+    # Set up LWP
+    my $userAgent = LWP::UserAgent->new;
+	$userAgent->env_proxy;
+	$userAgent->agent("WebGUI");
+    
+    # Create a request and stuff the xml in it
+    my $request = HTTP::Request->new( POST => $xmlTransactionScript );
+	$request->content_type( 'application/x-www-form-urlencoded' );
+	$request->content( 'xml='.$xml );
+
+    # Do the request
+    my $response = $userAgent->request($request);
+                            
+    return $response;
+}
+
+#-------------------------------------------------------------------
+
+=head2 cancelRecurringPayment ( transaction )
+
+Cancels a recurring transaction. Returns an array containing ( isSuccess, gatewayStatus, gatewayError).
+
+=head3 transaction
+
+The instanciated recurring transaction object.
+
+=cut
+
+sub cancelRecurringPayment {
+    my $self        = shift;
+    my $transaction = shift;
+    my $session     = $self->session;
+    #### TODO: Throw exception
+
+    # Get the payment definition XML
+    my $xml = $self->_generateCancelRecurXml( $transaction );
+    $session->errorHandler->info("XML Request: $xml");
+
+    # Post the xml to ITransact 
+    my $response = $self->doXmlRequest( $xml, 1 );
+
+    # Process response
+	if ($response->is_success) {
+		# We got some XML back from iTransact, now parse it.
+        $session->errorHandler->info('Starting request');
+        my $transactionResult = XMLin( $response->content );
+		unless (defined $transactionResult->{ RecurUpdateResponse }) {
+			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
+            $session->errorHandler->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
+            return( 
+                0, 
+                $transactionResult->{ Status }, 
+                $transactionResult->{ ErrorMessage } . ' Category: ' . $transactionResult->{ ErrorCategory } 
+            );
+		} else {
+            # RecurUpdateResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean
+            # that the cancellation has succeeded. It only has if Status is set to OK and the remaining terms is 0.
+            $session->errorHandler->info( "RecurUpdateResponse: result: [" . $response->content . "]" );
+            my $transactionData = $transactionResult->{ RecurUpdateResponse };
+
+            my $status          = $transactionData->{ Status            };
+            my $errorMessage    = $transactionData->{ ErrorMessage      };
+            my $errorCategory   = $transactionData->{ ErrorCategory     };
+            my $remainingTerms  = $transactionData->{ RecurDetails      }->{ RemReps    };
+            
+            # Uppercase the status b/c the documentation is not clear on the case.
+            my $isSuccess       = uc( $status ) eq 'OK' && $remainingTerms == 0;
+       
+            return ( $isSuccess, $status, "$errorMessage Category: $errorCategory" );
+		}
+	} else {
+		# Connection Error
+        $session->errorHandler->info("Connection error");
+
+        return ( 0, undef, 'ConnectionError', $response->status_line );
+	}
+}
 
 #-------------------------------------------------------------------
 sub definition {
@@ -129,30 +261,35 @@ sub _generatePaymentRequestXML {
     foreach my $item (@{ $items }) {
         my $sku = $item->getSku;
 
-        ####TODO: How to handle intial payment?
+        # Since recur recipes are based on intervals defined in days, the first term will payed NOW. Since the
+        # subscription start NOW too, we never need an initial amount for recurring payments.
         if ( $sku->isRecurring ) {
             $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $sku->getRecurInterval );
             $recurringData->{ RecurReps     } = 99999;
-            $recurringData->{ RecurTotal    } = $item->get('price');
+            $recurringData->{ RecurTotal    } = 
+                $item->get('price') + $transaction->get('taxes') + $transaction->get('shippingPrice');
             $recurringData->{ RecurDesc     } = $item->get('configuredTitle');
         }
-
-        push @{ $orderItems->{ Item } }, {
-            Description     => $item->get('configuredTitle'),
-            Cost            => $item->get('price'),
-            Qty             => $item->get('quantity'),
+        else {
+            push @{ $orderItems->{ Item } }, {
+                Description     => $item->get('configuredTitle'),
+                Cost            => $item->get('price'),
+                Qty             => $item->get('quantity'),
+            }
         }
     }
 
 	# taxes, shipping, etc
 	my $i18n = WebGUI::International->new($session, "Shop");
-	if ($transaction->get('taxes') > 0) {
+    #### TODO: Don't add this if the transaction is recurring
+	if ( $transaction->get('taxes') > 0 ) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('taxes'),
 			Cost			=> $transaction->get('taxes'),
 			Qty				=> 1,
 			};
 	}
+    #### TODO: Don't add this if the transaction is recurring
 	if ($transaction->get('shippingPrice') > 0) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('shipping'),
@@ -334,30 +471,34 @@ sub processPayment {
 }
 
 #-------------------------------------------------------------------
-sub www_confirmRecurringTransaction {
+sub www_processRecurringTransactionPostback {
 	my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
 	
-    # Fetch transaction
-    my $gatewayId       = $form->process( 'orig_xid' );
-# Somehow, the lines below aren't used for nothing, but were in the original code...
-#	my $transaction     = WebGUI::Shop::Transaction->getByGatewayTransactionId( $session, $gatewayId, $self );
-#	my $itemProperties  = $transaction->getItems->[0];
-	
-    # Convert the passed timestamps to epochs
-	my $startEpoch      = $session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->process("start_date"))));
-	my $currentEpoch    = $session->datetime->setToEpoch(sprintf("%4d-%02d-%02d %02d:%02d:%02d", unpack('a4a2a2a2a2a2', $form->process("when"))));
-	
-    # Update record
-    $session->db->setRow( 'ITransact_recurringStatus', 'gatewayId', {
-        gatewayId       => $gatewayId,
-        initDate        => $startEpoch,
-        lastTransaction => $currentEpoch,
-        status          => $form->process( 'status'         ),
-        errorMessage    => $form->process( 'error_message'  ),
-        recipe          => $form->process( 'recipe_name'    ),
+    # Get posted data of interest
+    my $originatingXid  = $form->process( 'orig_xid' );
+    my $status          = $form->process( 'status' );
+    my $xid             = $form->process( 'xid' );
+    my $errorMessage    = $form->process( 'error_message' );
+
+    # Fetch the original transaction
+    my $baseTransaction = WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId );
+
+    # Create a new transaction for this term
+    my $transaction     = $baseTransaction->duplicate( {
+        originatingTransactionId    => $baseTransaction->getId,  
     });
+
+    # Check the transaction status and act accordingly
+    if ( uc $status eq 'OK' ) {
+        # The term was succesfully payed
+        $transaction->completePurchase( $xid, $status, $errorMessage );
+    }
+    else {
+        # The term has not been payed succesfully
+        $transaction->denyPurchase( $xid, $status, $errorMessage );
+    }
 }
 
 #-------------------------------------------------------------------
