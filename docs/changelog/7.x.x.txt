@@ -1,3 +1,5 @@
+7.4.39
+
 7.4.38
  - fixed: CS mail retrieval doesn't decode subject properly
  - fixed: email password recovery fields effected by UI level
