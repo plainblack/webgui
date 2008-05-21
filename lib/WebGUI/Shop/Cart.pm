@@ -398,6 +398,30 @@ sub getShippingAddress {
     return $self->getAddressBook->getAddress($self->get("shippingAddressId"));
 }
 
+#-------------------------------------------------------------------
+
+=head2 hasMixedItems ()
+
+Returns 1 if there are too many recurring items, or there are mixed recurring and non-recurring items in the cart.
+
+=cut
+
+sub hasMixedItems {
+    my $self = shift;
+    my $recurring = 0;
+    my $nonrecurring = 0;
+    foreach my $item (@{$self->getItems}) {
+        if ($item->getSku->isRecurring) {
+            $recurring += $item->get('quantity');
+        }
+        else {
+            $nonrecurring += $item->get('quantity');
+        }
+        return 1 if ($recurring > 0 && $nonrecurring > 0);
+        return 1 if ($recurring > 1);
+    }
+    return 0;
+}
 
 #-------------------------------------------------------------------
 
@@ -471,6 +495,9 @@ sub readyForCheckout {
 
     # Check if the cart has items
     return 0 unless scalar @{ $self->getItems };
+    
+    # fail if there are multiple recurring items or if
+    return 0 if ($self->hasMixedItems);
 
     # All checks passed so return true
     return 1;
@@ -551,7 +578,10 @@ sub updateFromForm {
             }
         }
     }
-
+    if ($self->hasMixedItems) {
+         my $i18n = WebGUI::International->new($self->session, "Shop");
+        $error{id $self} = $i18n->get('mixed items warning');
+    }
     my $cartProperties = {};
     $cartProperties->{ shipperId    } = $form->process( 'shipperId' ) if $form->process( 'shipperId' );
     $self->update( $cartProperties );

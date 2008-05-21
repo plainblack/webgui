@@ -218,13 +218,13 @@ sub getOptions {
 
 =head2 getMaxAllowedInCart ( )
 
-Returns getQuantityAvailable(). Should be overriden by subclasses that have a specific value. Subclasses that are unique should return 1. Subclasses that have an inventory count should return the amount in inventory.
+Returns getQuantityAvailable() or 1 if isRecurring() return 1. Should be overriden by subclasses that have a specific value. Subclasses that are unique should return 1. Subclasses that have an inventory count should return the amount in inventory.
 
 =cut
 
 sub getMaxAllowedInCart {
 	my $self = shift;
-    return $self->getQuantityAvailable;
+    return $self->isRecurring || $self->getQuantityAvailable;
 }
 
 #-------------------------------------------------------------------

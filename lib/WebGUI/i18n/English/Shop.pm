@@ -3,6 +3,12 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'mixed items warning' => {
+		message 	=> q|You are not able to check out with both recurring and non-recurring items in your cart. You may have either one recurring item, or as many non-recurring items as you want in your cart at checkout time. If you need to purchase both, then please purchase them under separate transactions.|,
+		lastUpdated	=> 0,
+		context		=> q|a warning message displayed in the cart|,
+	},
+	
 	'print' => {
 		message 	=> q|Print|,
 		lastUpdated	=> 0,
