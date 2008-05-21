@@ -29,12 +29,12 @@ Survey.Comm= new function(){
 
 
     this.callback = {
-        window.scrollTo(0, 0); 
         upload:function(o){
             callMade = 0;
             Survey.Comm.callServer('','loadQuestions');
         },
         success:function(o){
+            window.scrollTo(0,0); 
             callMade = 0;
             var response = '';
             response = YAHOO.lang.JSON.parse(o.responseText);
@@ -55,7 +55,6 @@ Survey.Comm= new function(){
                 alert("Last request failed "+o.statusText);
             }
         },
-        timeout: 15000
     };
 
     this.callServer = function(data,functionName,form,hasFile){
