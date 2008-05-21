@@ -23,7 +23,7 @@ Survey.Form = new function() {
 
     var sliders;
     
-    this.submittimer;
+//    this.submittimer;
 
 
     this.displayQuestions = function(params){
@@ -374,7 +374,7 @@ Survey.Form = new function() {
         var qsize = objs[4];
         var aid = objs[5];
         max = parseFloat(max);
-        clearTimeout(Survey.Form.submittimer);
+//        clearTimeout(Survey.Form.submittimer);
         if(maxA == 1){
             if(b.className == 'mcbutton-selected'){
                 document.getElementById(b.hid).value = 0;
@@ -415,11 +415,13 @@ Survey.Form = new function() {
 //            document.getElementById(qid+'max').innerHTML = parseFloat(max+1);
             document.getElementById(b.hid).value = '';
         }
+/*
         if(qsize == 1 && b.className == 'mcbutton-selected'){
             if(! document.getElementById(aid+'verbatim')){
                 Survey.Form.submittimer=setTimeout("Survey.Form.formsubmit()",500);
             }
         }
+*/
     }
 }();
 

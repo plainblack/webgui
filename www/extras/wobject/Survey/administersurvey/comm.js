@@ -29,6 +29,7 @@ Survey.Comm= new function(){
 
 
     this.callback = {
+        window.scrollTo(0, 0); 
         upload:function(o){
             callMade = 0;
             Survey.Comm.callServer('','loadQuestions');
