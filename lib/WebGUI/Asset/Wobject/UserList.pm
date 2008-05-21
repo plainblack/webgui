@@ -251,8 +251,8 @@ sub view {
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
 	my (%var, @users, @profileField_loop, @profileFields);
 	my ($defaultPublicProfile, $defaultPublicEmail, $user, $sth, $sql, $profileField);
-    my $error = $self->session->errorHandler;
-    my $start_time = time();
+#    my $error = $self->session->errorHandler;
+#    my $start_time = time();
 
     my $currentUrlWithoutSort = $self->getUrl();
     foreach ($form->param) {
@@ -270,27 +270,46 @@ sub view {
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
 	while ($profileField = $sth->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label});
-        my $sortByURL = $url->append($currentUrlWithoutSort,'orderBy='.$url->escape($profileField->{fieldName}));
-        if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $profileField->{fieldName}){
+        my $fieldName = $profileField->{fieldName};
+        my $sortByURL = $url->append($currentUrlWithoutSort,'orderBy='.$url->escape($fieldName));
+        if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $fieldName){
             $sortByURL = $url->append($sortByURL,'orderType=desc');
         }
         else{
             $sortByURL = $url->append($sortByURL,'orderType=asc');
         }
   		push(@profileFields, {
-    				"fieldName"=>$profileField->{fieldName},
+    				"fieldName"=>$fieldName,
 	    			"label"=>$label,
 		    		"sequenceNumber"=>$profileField->{sequenceNumber},
                     "visible"=>$profileField->{visible},
 			    	});
         push (@profileField_loop, {
-            "profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
+            "profileField_label"=>$label,
             "profileField_sortByURL"=>$sortByURL,
         });
         unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
-            $var{'profileField_'.$profileField->{fieldName}.'_label'} = $label;
-            $var{'profileField_'.$profileField->{fieldName}.'_sortByURL'} = $sortByURL;
+            $var{'profileField_'.$fieldName.'_label'} = $label;
+            $var{'profileField_'.$fieldName.'_sortByURL'} = $sortByURL;
         }
+        # create field specific templ_vars for search
+        $var{'search_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
+            -name   => 'search_'.$fieldName,
+            -value  => $form->process('search_'.$fieldName),
+        }); 
+        $var{'searchExact_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
+            -name   => 'searchExact_'.$fieldName,
+            -value  => $form->process('searchExact_'.$fieldName),
+        });
+        $var{'includeInSearch_'.$fieldName.'_hidden'} =  WebGUI::Form::Hidden($self->session, {
+            -name   => 'includeInSearch_'.$fieldName,
+            -value  => '1',
+        });
+        $var{'includeInSearch_'.$fieldName.'_checkBox'} = WebGUI::Form::Checkbox($self->session, {
+            -name   => 'includeInSearch_'.$fieldName,
+            -value  => '1',
+            -checked=> $form->process('includeInSearch_'.$fieldName),
+        });
 	}
     
 #    $error->info("selected profile fields, time :".(time() - $start_time));
@@ -304,17 +323,44 @@ sub view {
 	
 #    $error->info("creating constraint, time :".(time() - $start_time));
 	my $constraint;
+    my @profileSearchFields = ();
+    my $searchType = $form->process('searchType') || 'or';
 	if ($form->process('search')){
-        # Normal search with one query in one or more fields
-		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "%'.$form->process('search').'%"'} @profileFields).")";	
+        # Normal search with one query takes precedence over other search options
+        if($form->process('limitSearch')){
+            # Normal search with one query in a limited number of fields
+            foreach my $profileField (@profileFields){
+                if ($form->process('includeInSearch_'.$profileField->{fieldName})){    
+                    push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
+                    .' like "%'.$form->process('search').'%"');
+                }
+            }
+        }
+        else{
+            # Normal search with one query in all fields
+    		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
+            .' like "%'.$form->process('search').'%"'} @profileFields).")";	
+        }
 	}
     elsif ($form->process('searchExact')){
-        # Exact search with one query in one or more fields
-        $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "'.$form->process('searchExact').'"'} @profileFields).")";
+        # Exact search with one query
+        if($form->process('limitSearch')){
+            # Exact search with one query in a limited number of fields
+            foreach my $profileField (@profileFields){
+                if ($form->process('includeInSearch_'.$profileField->{fieldName})){
+                    push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
+                    .' like "'.$form->process('search').'"');
+                }
+            }
+        }
+        else{
+            # Exact search with one query in all fields
+            $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
+            .' like "'.$form->process('searchExact').'"'} @profileFields).")";
+        }
     }
     else{
         # Mixed normal and exact search with different queries for each field.
-    	my @profileSearchFields = ();
     	foreach my $profileField (@profileFields){
             # Exact search has precedence over normal search
             if ($form->process('searchExact_'.$profileField->{fieldName})){
@@ -326,11 +372,10 @@ sub view {
                     .' like "%'.$form->process('search_'.$profileField->{fieldName}).'%"');
             }
 	    }
-    	my $searchType = $form->process('searchType') || 'or';
-        if (scalar(@profileSearchFields) > 0){
-            $constraint = '('.join(' '.$searchType.' ',@profileSearchFields).')';
-        }
 	}
+    if (scalar(@profileSearchFields) > 0){
+        $constraint = '('.join(' '.$searchType.' ',@profileSearchFields).')';
+    }
 	$sql .= " and ".$constraint if ($constraint);
 
 #	$error->info("created constraint, time :".(time() - $start_time));
@@ -413,31 +458,34 @@ sub view {
 		}
 	}
 #    $error->info("created tmpl vars for users, time :".(time() - $start_time));
-	$var{numberOfProfileFields} = scalar(@profileFields);
-	$var{profileField_loop} = \@profileField_loop;
-	$var{user_loop} = \@users;
-	$p->appendTemplateVars(\%var);
-	
-	$var{searchFormHeader} = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
-	$var{searchFormTypeOr} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'or'});
-	$var{searchFormTypeAnd} = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'and'});
-	$var{searchFormTypeSelect} = WebGUI::Form::selectBox($self->session,{
-                                                        name=>'searchType',
-                                	            		value=>'or',
-                                                        options=> {
-                                                           'or'     => $i18n->get('or label'),
-                                                           'and'    => $i18n->get('and label'),
-                                                        	}
-                                            			});
+    $p->appendTemplateVars(\%var);
 
-    $var{searchFormQuery_form} = WebGUI::Form::text($self->session,{
-                name=>'search',
-                value=>$form->process("search"),
-        });
+	$var{numberOfProfileFields} = scalar(@profileFields);
+
+	$var{profileField_loop}     = \@profileField_loop;
+	$var{user_loop}             = \@users;
+    $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
+
+	$var{searchFormHeader}      = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
+    $var{searchFormSubmit}      = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
+    $var{searchFormFooter}      = WebGUI::Form::formFooter($self->session);
+
+    $var{limitSearch}           = WebGUI::Form::hidden($self->session, {name=>'limitSearch', value=>'1'});
+	$var{searchFormTypeOr}      = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'or'});
+	$var{searchFormTypeAnd}     = WebGUI::Form::hidden($self->session, {name=>'searchType', value=>'and'});
+	$var{searchFormTypeSelect}  = WebGUI::Form::selectBox($self->session,{
+        name    =>  'searchType',
+        value   =>  $form->process('searchType') || 'or',
+        options =>  {
+            'or'    =>  $i18n->get('or label'),
+            'and'   =>  $i18n->get('and label'),
+        }
+    });
+    $var{searchFormQuery_form}  = WebGUI::Form::text($self->session,{
+        name    =>  'search',
+        value   =>  $form->process("search"),
+    });
         
-	$var{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
-    $var{searchFormFooter} = WebGUI::Form::formFooter($self->session);
-    $var{alphabetSearch_loop} = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
 
 #    $error->info("global tmpl_vars created, time :".(time() - $start_time));
 	my $out = $self->processTemplate(\%var,$self->get("templateId"));

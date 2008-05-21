@@ -171,6 +171,11 @@ seperated values|,
                 lastUpdated => 1081514049
         },
 
+        'searchFormTypeSelect label' => {
+                message => q|Select search type|,
+                lastUpdated => 1081514049
+        },
+
         'searchFormQuery_form' => {
                 message => q|A text input for the search query.|,
                 lastUpdated => 1081514049
