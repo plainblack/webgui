@@ -110,6 +110,10 @@ seperated values|,
                 message => q|Profile not public|,
                 lastUpdated => 1081514049
         },
+        'No users message' => {
+                message => q|No users found|,
+                lastUpdated => 1081514049
+        },
 
         'Email not public message' => {
                 message => q|Email not public|,

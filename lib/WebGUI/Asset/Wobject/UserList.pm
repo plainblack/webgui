@@ -18,8 +18,6 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 Copyright 2004-2008 United Knowledge
 
-See the doc/license-UserList.txt file for licensing information.
-
 http://www.unitedknowledge.nl
 developmentinfo@unitedknowledge.nl
 
@@ -36,12 +34,7 @@ The wobject also checks the publicProfile and publicEmail setting for each user.
 
 =head1 SYNOPSIS
 
-my $wobject = WebGUI::Wobject::UserList->new(\%properties);
-
-$text = $wobject->name;
-
-$html = $wobject->www_edit;
-$html = $wobject->www_view;
+use WebGUI::Asset::Wobject::UserList;
 
 =cut
 
@@ -254,11 +247,20 @@ sub view {
 
 	my $self = shift;
     my $form = $self->session->form;
+    my $url = $self->session->url;
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
-	my (%var, @users, @profileField_loop, @profileFields,@profileFieldNames);
+	my (%var, @users, @profileField_loop, @profileFields);
 	my ($defaultPublicProfile, $defaultPublicEmail, $user, $sth, $sql, $profileField);
     my $error = $self->session->errorHandler;
     my $start_time = time();
+
+    my $currentUrlWithoutSort = $self->getUrl();
+    foreach ($form->param) {
+        unless (WebGUI::Utility::isIn($_,qw(orderBy orderType op func)) || $_ =~ /identifier/i || $_ =~ /password/i) {
+            $currentUrlWithoutSort = $url->append($currentUrlWithoutSort, $url->escape($_)
+            .'='.$url->escape($form->process($_)));
+        }
+    }
 
 #    $error->info("time :".(time() - $start_time));
 
@@ -268,22 +270,25 @@ sub view {
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
 	while ($profileField = $sth->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label});
+        my $sortByURL = $url->append($currentUrlWithoutSort,'orderBy='.$url->escape($profileField->{fieldName}));
+        if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $profileField->{fieldName}){
+            $sortByURL = $url->append($sortByURL,'orderType=desc');
+        }
+        else{
+            $sortByURL = $url->append($sortByURL,'orderType=asc');
+        }
   		push(@profileFields, {
     				"fieldName"=>$profileField->{fieldName},
 	    			"label"=>$label,
 		    		"sequenceNumber"=>$profileField->{sequenceNumber},
                     "visible"=>$profileField->{visible},
 			    	});
-		push(@profileFieldNames, $profileField->{fieldName});
+        push (@profileField_loop, {
+            "profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
+            "profileField_sortByURL"=>$sortByURL,
+        });
         unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
             $var{'profileField_'.$profileField->{fieldName}.'_label'} = $label;
-            my $sortByURL = '?orderBy='.$profileField->{fieldName};
-            if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $profileField->{fieldName}){
-                $sortByURL .= ';orderType=desc';
-            }
-            else{
-                $sortByURL .= ';orderType=asc';
-            }
             $var{'profileField_'.$profileField->{fieldName}.'_sortByURL'} = $sortByURL;
         }
 	}
@@ -299,41 +304,39 @@ sub view {
 	
 #    $error->info("creating constraint, time :".(time() - $start_time));
 	my $constraint;
-	if ($self->session->form->process('search')){
-		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "%'.$self->session->form->process('search').'%"'} @profileFields).")";	
+	if ($form->process('search')){
+        # Normal search with one query in one or more fields
+		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "%'.$form->process('search').'%"'} @profileFields).")";	
 	}
-    elsif ($self->session->form->process('searchExact')){
-        $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "'.$self->session->form->process('searchExact').'"'} @profileFields).")";
+    elsif ($form->process('searchExact')){
+        # Exact search with one query in one or more fields
+        $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}.' like "'.$form->process('searchExact').'"'} @profileFields).")";
     }
     else{
+        # Mixed normal and exact search with different queries for each field.
     	my @profileSearchFields = ();
-	    my @profileSearchExactFields = ();
     	foreach my $profileField (@profileFields){
-            if ($self->session->form->process('search_'.$profileField->{fieldName})){
-                push(@profileSearchFields,$profileField);
+            # Exact search has precedence over normal search
+            if ($form->process('searchExact_'.$profileField->{fieldName})){
+                push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
+                    .' like "'.$form->process('searchExact_'.$profileField->{fieldName}).'"');
             }
-            if ($self->session->form->process('searchExact_'.$profileField->{fieldName})){
-                push(@profileSearchExactFields,$profileField);
+            elsif ($form->process('search_'.$profileField->{fieldName})){
+                push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
+                    .' like "%'.$form->process('search_'.$profileField->{fieldName}).'%"');
             }
 	    }
-    	my $searchType = $self->session->form->process('searchType') || 'or';
-	    if (scalar(@profileSearchFields) > 0){
-		    $constraint = "(".join(' '.$searchType.' ', map {'userProfileData.'.$_->{fieldName}.' like "%'
-            .$self->session->form->process('search_'.$_->{fieldName}).'%"'} @profileSearchFields).")";
-    		foreach my $profileSearchField (@profileSearchFields){
-	    	}
-    	}
-	    if (scalar(@profileSearchExactFields) > 0){
-            $constraint = "(".join(' '.$searchType.' ', map {'userProfileData.'.$_->{fieldName}.' like"'
-            .$self->session->form->process('searchExact_'.$_->{fieldName}).'"'} @profileSearchExactFields).")";
+    	my $searchType = $form->process('searchType') || 'or';
+        if (scalar(@profileSearchFields) > 0){
+            $constraint = '('.join(' '.$searchType.' ',@profileSearchFields).')';
         }
 	}
 	$sql .= " and ".$constraint if ($constraint);
 
 #	$error->info("created constraint, time :".(time() - $start_time));
 
-	my $orderBy = $self->session->form->process('orderBy') || $self->get('sortBy') || 'users.username';
-	my $orderType = $self->session->form->process('orderType') || $self->get('sortOrder') || 'asc';
+	my $orderBy = $form->process('orderBy') || $self->get('sortBy') || 'users.username';
+	my $orderType = $form->process('orderType') || $self->get('sortOrder') || 'asc';
 	
     my @orderByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
     if(isIn($orderBy,@orderByUserProperties)){
@@ -344,12 +347,12 @@ sub view {
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
 	($defaultPublicEmail) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicEmail'");
 
-	my $paginatePage = $self->session->form->param('pn') || 1;
+	my $paginatePage = $form->param('pn') || 1;
 	my $currentUrl = $self->getUrl();
-	foreach ($self->session->form->param) {
+	foreach ($form->param) {
         unless ($_ eq "pn" || $_ eq "op" || $_ eq "func" || $_ =~ /identifier/i || $_ =~ /password/i) {
-            $currentUrl = $self->session->url->append($currentUrl, $self->session->url->escape($_)
-            .'='.$self->session->url->escape($self->session->form->process($_)));
+            $currentUrl = $url->append($currentUrl, $url->escape($_)
+            .'='.$url->escape($form->process($_)));
         }
     }
 
@@ -410,15 +413,7 @@ sub view {
 		}
 	}
 #    $error->info("created tmpl vars for users, time :".(time() - $start_time));
-	foreach my $profileField (@profileFields){
-	push (@profileField_loop, {
-		"profileField_label"=>WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label}),
-        "profileField_sortByURL"=>'?orderBy='.$profileField->{fieldName},
-		});
-	}
 	$var{numberOfProfileFields} = scalar(@profileFields);
-	$var{profileNotPublic_message} = $i18n->get('Profile not public message');
-	$var{emailNotPublic_message} = $i18n->get('Email not public message');
 	$var{profileField_loop} = \@profileField_loop;
 	$var{user_loop} = \@users;
 	$p->appendTemplateVars(\%var);
@@ -435,10 +430,9 @@ sub view {
                                                         	}
                                             			});
 
-    $var{searchFormQuery_label} = $i18n->get('query label');
     $var{searchFormQuery_form} = WebGUI::Form::text($self->session,{
                 name=>'search',
-                value=>$self->session->form->process("search"),
+                value=>$form->process("search"),
         });
         
 	$var{searchFormSubmit} = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
@@ -447,7 +441,6 @@ sub view {
 
 #    $error->info("global tmpl_vars created, time :".(time() - $start_time));
 	my $out = $self->processTemplate(\%var,$self->get("templateId"));
-	$out = $self->processStyle($out) if ($self->session->form->process("func") eq "list");
 #    $error->info("done, going to return output, time :".(time() - $start_time));
 	return $out;
 }
