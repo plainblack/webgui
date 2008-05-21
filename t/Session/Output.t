@@ -35,33 +35,31 @@ my $recentVersion = $^V gt v5.8;
 SKIP: {
 	skip "You have an old perl", $skip_tests unless $recentVersion;
 
-	my $stdoutBuffer;
-	close STDOUT;
-	open STDOUT, '>', \$stdoutBuffer or die "Unable to tie STDOUT to a variable: $!\n";
-
 	my $otherHandleBuffer;
 	open my $otherHandle, '>', \$otherHandleBuffer or die "Unable to create second filehandle: $!\n";
 
-	$output->setHandle(undef);
+    my $request = $session->request;
+
+    $output->setHandle(undef);
 	is($output->{_handle}, undef, 'setHandle: handle cleared');
 
 	$output->print('Hello STDOUT');
-	is($stdoutBuffer, 'Hello STDOUT', 'print with no handle goes to STDOUT');
+	is($request->get_output, 'Hello STDOUT', 'print with no handle goes to STDOUT');
 
 	$output->print(' more stuff');
-	is($stdoutBuffer, 'Hello STDOUT more stuff', 'print: tied variables accumulate');
+	is($request->get_output, 'Hello STDOUT more stuff', 'print: tied variables accumulate');
 
 	$session->user({userId => 3});
 	$output->print('^#;');
-	like($stdoutBuffer, qr/3\Z/, 'print: macro processing');
+	like($request->get_output, qr/3\Z/, 'print: macro processing');
 
 	$output->print('^#;', 1);
-	like($stdoutBuffer, qr/\^#;\Z/, 'print: macro processing skipped');
+	like($request->get_output, qr/\^#;\Z/, 'print: macro processing skipped');
 
 	$output->setHandle($otherHandle);
 	$output->print('New content');
 	is($otherHandleBuffer, 'New content', 'print: set to explicit handle');
-	unlike($stdoutBuffer, qr/New content\Z/, 'print: no leakage back to STDOUT');
+	unlike($request->get_output, qr/New content\Z/, 'print: no leakage back to STDOUT');
 
 }
 

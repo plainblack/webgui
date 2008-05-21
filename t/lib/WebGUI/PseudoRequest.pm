@@ -169,6 +169,35 @@ sub setup_param {
 	$self->{param} = $value;
 }
 
+#----------------------------------------------------------------------------
+
+sub clear_output {
+    my $self = shift;
+    $self->{output} = '';
+}
+
+sub get_output {
+    my $self = shift;
+    return $self->{output};
+}
+
+sub print {
+    my $self = shift;
+    $self->{output} ||= '';
+    for my $p (@_) {
+        $self->{output} .= $p;
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 protocol ( $value )
+
+Getter and setter for protocol.  If $value is passed in, it will set the protocol of
+the object to that.  Returns the protocol value stored in the object.
+
+=cut
+
 sub protocol {
 	my $self = shift;
 	my $value = shift;
