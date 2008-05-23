@@ -151,6 +151,7 @@ A reference to the current session.
 sub www_approveVersionTag {
     my $session     = shift;
     my $tag         = WebGUI::VersionTag->new( $session, $session->form->param("tagId") );
+    my $instance    = $tag->getWorkflowInstance;
 
     return $session->privilege->insufficient 
         unless canApproveVersionTag( $session, $tag );
@@ -581,7 +582,7 @@ sub www_manageRevisionsInTag {
     
     ### Permissions check
     # This screen is also used to approve/deny the tag, so check that first
-    if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) {
+    if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag )) {
         return $session->privilege->insufficient;
     }
 
