@@ -11,8 +11,9 @@ use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Operation::Shared;
 use WebGUI::International;
-
-our @ISA = qw(WebGUI::Asset::Wobject);
+use WebGUI::Pluggable;
+use WebGUI::Form::Image;
+use base 'WebGUI::Asset::Wobject';
 
 =head1 LEGAL
 
@@ -48,17 +49,16 @@ Returns an array ref that contains tmpl_vars for the Alphabet Search.
 
 sub getAlphabetSearchLoop {
     my $self = shift;
-    my $fieldName = shift;
+    my $fieldName = shift || 'lastName';
     my $alphabet = shift;
     my (@alphabet, @alphabetLoop);
     $alphabet ||= "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
     @alphabet = split(/,/,$alphabet);
     foreach my $letter (@alphabet){
         my $htmlEncodedLetter = encode_entities($letter);
-        #print "adding letter ".$letter.",htmlEncodedLetter: $htmlEncodedLetter<br>"; 
         my $searchURL = "?searchExact_".$fieldName."=".$letter."%25"; 
         my $hasResults = $self->session->db->quickScalar("select if ("
-            ."(select count(*) from userProfileData where lastName  like '".$letter."%')<>0, 1, 0)");
+            ."(select count(*) from userProfileData where ".$fieldName."  like '".$letter."%')<>0, 1, 0)");
         push @alphabetLoop, {
             alphabetSearch_loop_label       => $htmlEncodedLetter || $letter,
             alphabetSearch_loop_hasResults  => $hasResults,
@@ -87,13 +87,13 @@ sub definition {
     my %properties;
     my $i18n = WebGUI::International->new($session, 'Asset_UserList');
 
-    my %sortByOptions;
-    tie %sortByOptions, 'Tie::IxHash';
+    my %profileFields;
+    tie %profileFields, 'Tie::IxHash';
     my $fields = $session->db->read("SELECT field.fieldName, field.label FROM userProfileField as field "
         ."left join userProfileCategory as cat USING(profileCategoryId) ORDER BY cat.sequenceNumber, field.sequenceNumber");
     while (my $field = $fields->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
-        $sortByOptions{$field->{fieldName}} = $label;
+        $profileFields{$field->{fieldName}} = $label;
     }
 
     tie %properties, 'Tie::IxHash';
@@ -128,10 +128,18 @@ sub definition {
 		},
         alphabet=>{
             fieldType=>"text",
-            defaultValue=>"",
+            defaultValue=>"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z",
             tab=>"display",
             label=>$i18n->get("alphabet label"),
             hoverHelp=>$i18n->get('alphabet description'),
+        },
+        alphabetSearchField=>{
+            fieldType=>"selectBox",
+            defaultValue=>"lastName",
+            tab=>"display",
+            options=>\%profileFields,
+            label=>$i18n->get("alphabetSearchField label"),
+            hoverHelp=>$i18n->get('alphabetSearchField description'),
         },
         showOnlyVisibleAsNamed=>{
             fieldType=>"yesNo",
@@ -153,7 +161,7 @@ sub definition {
             fieldType=>"selectBox",
             defaultValue=>'lastName',
             tab=>'display',
-            options=>\%sortByOptions,
+            options=>\%profileFields,
             label=>$i18n->get('sort by'),
             hoverHelp=>$i18n->get('sort by description'),
         },
@@ -251,38 +259,36 @@ sub view {
 	my $i18n = WebGUI::International->new($self->session, "Asset_UserList");
 	my (%var, @users, @profileField_loop, @profileFields);
 	my ($defaultPublicProfile, $defaultPublicEmail, $user, $sth, $sql, $profileField);
-#    my $error = $self->session->errorHandler;
-#    my $start_time = time();
 
     my $currentUrlWithoutSort = $self->getUrl();
     foreach ($form->param) {
-        unless (WebGUI::Utility::isIn($_,qw(orderBy orderType op func)) || $_ =~ /identifier/i || $_ =~ /password/i) {
+        unless (WebGUI::Utility::isIn($_,qw(sortBy sortOrder op func)) || $_ =~ /identifier/i || $_ =~ /password/i) {
             $currentUrlWithoutSort = $url->append($currentUrlWithoutSort, $url->escape($_)
             .'='.$url->escape($form->process($_)));
         }
     }
 
-#    $error->info("time :".(time() - $start_time));
-
-	$sth = $self->session->db->read("SELECT field.fieldName, field.label, field.sequenceNumber, field.visible "
+	$sth = $self->session->db->read(
+        "SELECT field.fieldName, field.label, field.sequenceNumber, field.visible, field.fieldType "
         ."FROM userProfileField as field "
 		."left join userProfileCategory as category USING(profileCategoryId) "
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
 	while ($profileField = $sth->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label});
         my $fieldName = $profileField->{fieldName};
-        my $sortByURL = $url->append($currentUrlWithoutSort,'orderBy='.$url->escape($fieldName));
-        if ($form->process('orderType') eq 'asc' && $form->process('orderBy') eq $fieldName){
-            $sortByURL = $url->append($sortByURL,'orderType=desc');
+        my $sortByURL = $url->append($currentUrlWithoutSort,'sortBy='.$url->escape($fieldName));
+        if ($form->process('sortOrder') eq 'asc' && $form->process('sortBy') eq $fieldName){
+            $sortByURL = $url->append($sortByURL,'sortOrder=desc');
         }
         else{
-            $sortByURL = $url->append($sortByURL,'orderType=asc');
+            $sortByURL = $url->append($sortByURL,'sortOrder=asc');
         }
   		push(@profileFields, {
     				"fieldName"=>$fieldName,
 	    			"label"=>$label,
 		    		"sequenceNumber"=>$profileField->{sequenceNumber},
                     "visible"=>$profileField->{visible},
+                    "fieldType"=>$profileField->{fieldType},
 			    	});
         push (@profileField_loop, {
             "profileField_label"=>$label,
@@ -312,7 +318,6 @@ sub view {
         });
 	}
     
-#    $error->info("selected profile fields, time :".(time() - $start_time));
 	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile, userProfileData.publicEmail ";
 	
 	foreach my $profileField (@profileFields){
@@ -321,14 +326,13 @@ sub view {
 	$sql .= "	from users";
 	$sql .= " left join userProfileData using(userId) where users.userId != '1'";
 	
-#    $error->info("creating constraint, time :".(time() - $start_time));
 	my $constraint;
     my @profileSearchFields = ();
     my $searchType = $form->process('searchType') || 'or';
 	if ($form->process('search')){
-        # Normal search with one query takes precedence over other search options
+        # Normal search with one keyword takes precedence over other search options
         if($form->process('limitSearch')){
-            # Normal search with one query in a limited number of fields
+            # Normal search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){    
                     push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
@@ -337,15 +341,15 @@ sub view {
             }
         }
         else{
-            # Normal search with one query in all fields
+            # Normal search with one keyword in all fields
     		$constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
             .' like "%'.$form->process('search').'%"'} @profileFields).")";	
         }
 	}
     elsif ($form->process('searchExact')){
-        # Exact search with one query
+        # Exact search with one keyword
         if($form->process('limitSearch')){
-            # Exact search with one query in a limited number of fields
+            # Exact search with one keyword in a limited number of fields
             foreach my $profileField (@profileFields){
                 if ($form->process('includeInSearch_'.$profileField->{fieldName})){
                     push(@profileSearchFields,'userProfileData.'.$profileField->{fieldName}
@@ -354,7 +358,7 @@ sub view {
             }
         }
         else{
-            # Exact search with one query in all fields
+            # Exact search with one keyword in all fields
             $constraint = "(".join(' or ', map {'userProfileData.'.$_->{fieldName}
             .' like "'.$form->process('searchExact').'"'} @profileFields).")";
         }
@@ -378,16 +382,14 @@ sub view {
     }
 	$sql .= " and ".$constraint if ($constraint);
 
-#	$error->info("created constraint, time :".(time() - $start_time));
-
-	my $orderBy = $form->process('orderBy') || $self->get('sortBy') || 'users.username';
-	my $orderType = $form->process('orderType') || $self->get('sortOrder') || 'asc';
+	my $sortBy = $form->process('sortBy') || $self->get('sortBy') || 'users.username';
+	my $sortOrder = $form->process('sortOrder') || $self->get('sortOrder') || 'asc';
 	
-    my @orderByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
-    if(isIn($orderBy,@orderByUserProperties)){
-            $orderBy = 'users.'.$orderBy;
+    my @sortByUserProperties = ('dateCreated', 'lastUpdated', 'karma', 'userId');
+    if(isIn($sortBy,@sortByUserProperties)){
+            $sortBy = 'users.'.$sortBy;
     }
-	$sql .= " order by ".$orderBy." ".$orderType;
+	$sql .= " order by ".$sortBy." ".$sortOrder;
 
 	($defaultPublicProfile) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicProfile'");
 	($defaultPublicEmail) = $self->session->db->quickArray("SELECT dataDefault FROM userProfileField WHERE fieldName='publicEmail'");
@@ -403,9 +405,7 @@ sub view {
 
 	my $p = WebGUI::Paginator->new($self->session,$currentUrl,$self->getValue("usersPerPage"), undef, $paginatePage);
 
-#    $error->info("reading from database, time :".(time() - $start_time));
 	$sth = $self->session->db->read($sql);
-#    $error->info("users read from database, time :".(time() - $start_time));
 	my @visibleUsers;
 	while (my $user = $sth->hashRef){
 		my $showGroupId = $self->get("showGroupId");
@@ -415,10 +415,8 @@ sub view {
 			}
 		}
 	}
-#    $error->info("applied group constraints, time :".(time() - $start_time));
 	$p->setDataByArrayRef(\@visibleUsers);
 	my $users = $p->getPageData($paginatePage);
-#    $error->info("set data by page, time :".(time() - $start_time));
 	foreach my $user (@$users){
 	    if ($user->{publicProfile} eq "1" || ($user->{publicProfile} eq "" && $defaultPublicProfile eq "1")){
 		    my (@profileFieldValues);
@@ -432,16 +430,16 @@ sub view {
     				});
 				}
                 else{
-					push (@profileFieldValues, {
-    					"profile_value"=>$user->{$profileField->{fieldName}},
-					});
                     my $profileFieldName = $profileField->{fieldName};
                     $profileFieldName =~ s/ /_/g;
                     $profileFieldName =~ s/\./_/g;
+                    my $value = $user->{$profileField->{fieldName}};
+					push (@profileFieldValues, {
+    					"profile_value"=>$value,
+					});
                     unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
-                        $userProperties{'user_profile_'.$profileFieldName.'_value'} = $user->{$profileField->{fieldName}};
+                        $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;
                     }
-		    		#$userProperties{"user.profile.".$profileFieldName.".value"} = $user->{$profileField->{fieldName}};
 				}
 			}
 			$userProperties{"user_profile_emailNotPublic"} = $emailNotPublic;
@@ -457,14 +455,13 @@ sub view {
 			});
 		}
 	}
-#    $error->info("created tmpl vars for users, time :".(time() - $start_time));
     $p->appendTemplateVars(\%var);
 
 	$var{numberOfProfileFields} = scalar(@profileFields);
 
 	$var{profileField_loop}     = \@profileField_loop;
 	$var{user_loop}             = \@users;
-    $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop("lastName",$self->get("alphabet"));
+    $var{alphabetSearch_loop}   = $self->getAlphabetSearchLoop($self->get("alphabetSearchField"),$self->get("alphabet"));
 
 	$var{searchFormHeader}      = WebGUI::Form::formHeader($self->session,{action => $self->getUrl});
     $var{searchFormSubmit}      = WebGUI::Form::submit($self->session,{value => $i18n->get('submit search label')});
@@ -487,10 +484,207 @@ sub view {
     });
         
 
-#    $error->info("global tmpl_vars created, time :".(time() - $start_time));
 	my $out = $self->processTemplate(\%var,$self->get("templateId"));
-#    $error->info("done, going to return output, time :".(time() - $start_time));
 	return $out;
 }
+# Everything below here is to make it easier to install your custom
+#  wobject, but has nothing to do with wobjects in general
+# -------------------------------------------------------------------
+#  cd /data/WebGUI/lib
+#  perl -MWebGUI::Asset::Wobject::NewWobject -e install www.example.com.conf [ /path/to/WebGUI ]
+#        - or -
+#  perl -MWebGUI::Asset::Wobject::NewWobject -e uninstall www.example.com.conf [ /path/to/WebGUI ]
+# -------------------------------------------------------------------
+
+
+use base 'Exporter';
+our @EXPORT = qw(install uninstall);
+use WebGUI::Session;
+
+#-------------------------------------------------------------------
+sub install {
+        my $config = $ARGV[0];
+        my $home = $ARGV[1] || "/data/WebGUI";
+        die "usage: perl -MWebGUI::Asset::Wobject::UserList -e install www.example.com.conf\n" unless ($home &&
+$config);
+        print "Installing asset.\n";
+        my $session = WebGUI::Session->open($home, $config);
+        $session->config->addToArray("assets","WebGUI::Asset::Wobject::NewWobject");
+        $session->db->write("create table UserList (
+            assetId varchar(22) not null,
+            revisionDate bigint(20),
+            templateId varchar(22),
+            showGroupId varchar(22),
+            hideGroupId varchar(22),
+            usersPerPage int(11),
+            alphabet text,
+            alphabetSearchField varchar(128),
+            showOnlyVisibleAsNamed int(11),
+            sortBy varchar(128),
+            sortOrder varchar(4),
+        PRIMARY KEY  (`assetId`,`revisionDate`)
+        )");
+    my $import = WebGUI::Asset->getImportNode($session);
+
+        $import->addChild({
+
+                className=>"WebGUI::Asset::Template",
+
+                template=>q|
+<tmpl_if session.var.adminOn>
+        <p><tmpl_var controls></p>
+</tmpl_if>
+
+<tmpl_if displayTitle>
+<h1><tmpl_var title></h1>
+</tmpl_if>
+<tmpl_if description>
+<tmpl_var description><p />
+</tmpl_if>
+
+<tmpl_if alphabetSearch_loop>
+<tmpl_loop alphabetSearch_loop>
+<tmpl_if alphabetSearch_loop_hasResults>
+<a href="<tmpl_var alphabetSearch_loop_searchURL>"><tmpl_var alphabetSearch_loop_label></a>
+<tmpl_else>
+<tmpl_var alphabetSearch_loop_label>
+</tmpl_if><tmpl_unless __LAST__> &#124; </tmpl_unless>
+</tmpl_loop>
+</tmpl_if><br />
+<br />
+
+Search with one keyword in one or more fields that the user can select <br />
+<tmpl_var searchFormHeader>
+<tmpl_var limitSearch>
+<tmpl_var searchFormQuery_form><br />
+<tmpl_var includeInSearch_lastName_checkBox> <tmpl_var profileField_lastName_label> <br />
+<tmpl_var includeInSearch_email_checkBox> <tmpl_var profileField_email_label> <br />
+<tmpl_var searchFormSubmit>
+<tmpl_var searchFormFooter><br />
+<br />
+
+Search with one keyword in one or more fields that are defined by hidden form fields<br />
+<tmpl_var searchFormHeader>
+<tmpl_var searchFormQuery_form>
+<tmpl_var limitSearch>
+<tmpl_var includeInSearch_lastName_hidden>
+<tmpl_var includeInSearch_email_hidden>
+<tmpl_var searchFormSubmit>
+<tmpl_var searchFormFooter><br />
+<br />
+
+Search with multiple keywords<br />
+<tmpl_var searchFormHeader>
+^International('searchFormTypeSelect label','Asset_UserList');<tmpl_var searchFormTypeSelect><br />
+<tmpl_var profileField_lastName_label>: <tmpl_var search_lastName_text><br />
+<tmpl_var profileField_email_label> (exact): <tmpl_var searchExact_email_text><br />
+<tmpl_var searchFormSubmit>
+<tmpl_var searchFormFooter><br />
+<br />
+
+<table cellpadding="1" cellspacing="1" border="0" width="100%">
+<tr>
+<tmpl_if session.var.adminOn>
+<td class="tableData">Id</td>
+</tmpl_if>
+
+<td class="tableData">Username</td>
+
+<td class="tableData">
+<a href="<tmpl_var profileField_firstName_sortByURL>"><tmpl_var profileField_firstName_label></td>
+<td class="tableData">
+<a href="<tmpl_var profileField_lastName_sortByURL>"><tmpl_var profileField_lastName_label></td>
+<td class="tableData">
+<a href="<tmpl_var profileField_email_sortByURL>"><tmpl_var profileField_email_label></td>
+
+</tr>
+<tmpl_if user_loop>
+<tmpl_loop user_loop>
+<tr>
+
+<tmpl_if session.var.adminOn>
+<td class="tableData">   <tmpl_var user_id></td>
+</tmpl_if>
+<td class="tableData">   <tmpl_var user_name></td>
+
+<td class="tableData">   <tmpl_var user_profile_fistName_value></td>
+<td class="tableData">   <tmpl_var user_profile_lastName_value></td>
+
+<td class="tableData">
+<tmpl_if profile_emailNotPublic>
+^International('Email not public message','Asset_UserList');
+<tmpl_else>  
+<tmpl_var user_profile_email_value>     
+</tmpl_if>
+</td>
+
+
+</tr>
+</tmpl_loop>
+<tmpl_else>
+<tr><td>^International('No users message','Asset_UserList');</td></tr>
+</tmpl_if>
+
+</table>
+<tmpl_if multiplePages>
+<div class="pagination">
+<tmpl_var previousPage>  &middot; <tmpl_var pageList> &middot; <tmpl_var nextPage>
+</div>
+</tmpl_if>
+|,
+
+                ownerUserId=>'3',
+
+                groupIdView=>'7',
+
+                groupIdEdit=>'12',
+
+                title=>"Default UserList",
+
+                menuTitle=>"Default UserList",
+
+                url=>"templates/userlist",
+
+                namespace=>"UserList"
+
+                },'UserListTmpl0000001');
+
+        my $versionTag = WebGUI::VersionTag->getWorking($session);
+        $versionTag->set({name=>"Install UserList Template"});
+        $versionTag->commit;
+
+        $session->var->end;
+        $session->close;
+        print "Done. Please restart Apache.\n";
+}
+#-------------------------------------------------------------------
+sub uninstall {
+        my $config = $ARGV[0];
+        my $home = $ARGV[1] || "/data/WebGUI";
+        die "usage: perl -MWebGUI::Asset::Wobject::UserList -e uninstall www.example.com.conf\n" unless ($home &&
+$config);
+        print "Uninstalling asset.\n";
+        my $session = WebGUI::Session->open($home, $config);
+        $session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::UserList");
+        my $rs = $session->db->read("select assetId from asset where
+className='WebGUI::Asset::Wobject::UserList'");
+        while (my ($id) = $rs->array) {
+                my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::UserList");
+                $asset->purge if defined $asset;
+        }
+
+        $rs = $session->db->read("select distinct(assetId) from template where namespace='UserList'");
+
+        while (my ($id) = $rs->array) {
+        my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Template");
+                $asset->purge if defined $asset;
+        }
+
+    $session->db->write("drop table UserList");
+    $session->var->end;
+        $session->close;
+        print "Done. Please restart Apache.\n";
+}
+
 
 1;

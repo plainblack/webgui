@@ -106,6 +106,21 @@ seperated values|,
                 lastUpdated => 1081514049
         },
 
+        'alphabetSearchField' => {
+                message => q|The field in which the alphabet search will be done.|,
+                lastUpdated => 1081514049
+        },
+
+        'alphabetSearchField label' => {
+                message => q|Alphabet Search Field|,
+                lastUpdated => 1081514049
+        },
+
+        'alphabetSearchField description' => {
+                message => q|Select the profile field in which  the alphabet search will be done.|,
+                lastUpdated => 1081514049
+        },
+
         'Profile not public message' => {
                 message => q|Profile not public|,
                 lastUpdated => 1081514049
