@@ -66,6 +66,24 @@ sub _buildObj {
 
 #-------------------------------------------------------------------
 
+=head2 cancelRecurringPayment ( transaction )
+
+Cancels a recurring transaction. Returns an array containing ( isSuccess, gatewayStatus, gatewayError). Needs to be overridden by subclasses capable of dealing with recurring payments.
+
+=head3 transaction
+
+The instanciated recurring transaction object.
+
+=cut
+
+sub cancelRecurringPayment {
+    my $self        = shift;
+    my $transaction = shift;
+    WebGUI::Error::OverrideMe->throw();
+}    
+    
+#-------------------------------------------------------------------
+
 =head2 className (  )
 
 Accessor for the className of the object.  This is the name of the driver that is used

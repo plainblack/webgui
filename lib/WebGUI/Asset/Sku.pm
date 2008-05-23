@@ -17,6 +17,8 @@ package WebGUI::Asset::Sku;
 use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
+use WebGUI::International;
+use WebGUI::Mail::Send;
 use WebGUI::Shop::Cart;
 
 
@@ -402,6 +404,32 @@ sub onAdjustQuantityInCart {
 
 #-------------------------------------------------------------------
 
+=head2 onCancelRecurring ( item )
+
+Called when a user or a store admin stops a recurring payment from recurring. This allows for any accounting work that needs to be accounted for happens. By default sends an email to shop managers to let them know that the recurrence has been stopped.
+
+=head3 item
+
+Receives a reference to the WebGUI::Shop::TransactionItem so it can determine things like itemId and quantity if it needs them for book keeping purposes.
+
+=cut
+
+sub onCancelRecurring {
+	my ($self, $item) = @_;
+	my $session = $self->session;
+	my $i18n = WebGUI::International->new($session, "Shop");
+	my $mail = WebGUI::Mail::Send->new($session, {
+		toGroup	=> $self->session->setting->get('groupIdAdminCommerce'),
+		subject	=> $i18n->get('shop notice'),
+		});
+	my $message = sprintf $i18n->get('cancel recurring message','Asset_Sku'), $item->transaction->get('orderNumber'), $item->get('configuredTitle'), $item->transaction->get('username');
+	$mail->addText($message);
+	$mail->queue;
+	return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 onCompletePurchase ( item )
 
 Called just after payment has been made. It allows for privileges to be given, or bookkeeping
@@ -422,7 +450,7 @@ sub onCompletePurchase {
 
 =head2 onRefund ( item )
 
-Called by a transaction upon issuing a refund for this item. Extend to do extra book keeping or restocking.
+Called by a transaction upon issuing a refund for this item. Extend to do extra book keeping or restocking. If this is a recurring item, then onCancelRecurring() will also be called.
 
 =head3 item
 
@@ -432,6 +460,7 @@ The WebGUI::Shop::TransactionItem being refunded.
 
 sub onRefund {
 	my ($self, $item) = @_;
+	$self->onCancelRecurring($item);
 	return undef;
 }
 

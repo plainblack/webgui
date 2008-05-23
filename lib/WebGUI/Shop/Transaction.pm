@@ -13,6 +13,7 @@ use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::TransactionItem;
+use WebGUI::Shop::Pay;
 
 =head1 NAME
 
@@ -64,6 +65,21 @@ sub addItem {
     my ($self, $cartItem) = @_;
     my $item = WebGUI::Shop::TransactionItem->create( $self, $cartItem);
     return $item;
+}
+
+#-------------------------------------------------------------------
+
+=head2 cancelRecurring ( )
+
+Cancel a recurring transaction, and calls onCancelRecurring in whatever sku is attached to this transaction.
+
+=cut
+
+sub cancelRecurring {
+    my ($self) = @_;
+    $self->getPaymentGateway->cancelRecurringPayment($self);
+    my ($item) = $self->getItems;
+    $item->getSku->onCancelRecurring($item);
 }
 
 #-------------------------------------------------------------------
@@ -320,6 +336,21 @@ sub getItems {
     }
     return \@itemsObjects;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getPaymentGateway ()
+
+Returns a reference to the payment gateway attached to this transaction.
+
+=cut
+
+sub getPaymentGateway {
+    my ($self) = @_;
+    my $pay = WebGUI::Shop::Pay->new($self->session);
+    return $pay->getPaymentGateway($self->get('paymentDriverId'));
+}
+
 
 #-------------------------------------------------------------------
 
