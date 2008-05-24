@@ -1433,11 +1433,8 @@ sub view {
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant_label'} = $i18n->get('add a variant');
-        $var{variant_loop} = \@variantLoop;
     }
-    else {
-        $var{variant_loop} = [];
-    }
+    $var{variant_loop} = \@variantLoop;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
