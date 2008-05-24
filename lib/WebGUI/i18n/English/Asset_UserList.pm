@@ -196,6 +196,37 @@ seperated values|,
                 lastUpdated => 1081514049
         },
 
+        'search_PROFILEFIELDNAME_text' => {
+                message => q|A text input to do a normal search in profile field PROFILEFIELDNAME. Example:
+&lt;tmpl_var search_lastName_text&gt;.|,
+                lastUpdated => 1081514049
+        },
+
+        'searchExact_PROFILEFIELDNAME_text' => {
+                message => q|A text input to do an exact search in profile field PROFILEFIELDNAME. Example:
+&lt;tmpl_var searchExact_email_text&gt;.|,
+                lastUpdated => 1081514049
+        },
+
+        'limitSearch' => {
+                message => q|A hidden form element to indicate that the search is limited to certain profile
+fields. Use includeInSearch_PROFILEFIELDNAME_hidden or includeInSearch_PROFILEFIELDNAME_checkBox tmpl_vars to
+select which fields the search is limited to.|,
+                lastUpdated => 1081514049
+        },
+
+        'includeInSearch_PROFILEFIELDNAME_hidden' => {
+                message => q|A hidden form element to indicate that profile field PROFILEFIELDNAME will be
+searched. This will only have an effect if the limitSearch tmpl_var is part of the search form.|,
+                lastUpdated => 1081514049
+        },
+
+        'includeInSearch_PROFILEFIELDNAME_checkBox' => {
+                message => q|A checkBox that the user can use to choose whether profile field PROFILEFIELDNAME will
+be searched or not. This will only have an effect if the limitSearch tmpl_var is part of the search form.|,
+                lastUpdated => 1081514049
+        },
+
         'numberOfProfileFields' => {
                 message => q|The number of profile fields.|,
                 lastUpdated => 1081514049

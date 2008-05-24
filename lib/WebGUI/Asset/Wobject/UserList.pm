@@ -290,10 +290,12 @@ sub view {
                     "visible"=>$profileField->{visible},
                     "fieldType"=>$profileField->{fieldType},
 			    	});
-        push (@profileField_loop, {
-            "profileField_label"=>$label,
-            "profileField_sortByURL"=>$sortByURL,
-        });
+        if($profileField->{visible}){
+            push (@profileField_loop, {
+                "profileField_label"=>$label,
+                "profileField_sortByURL"=>$sortByURL,
+            });
+        }
         unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
             $var{'profileField_'.$fieldName.'_label'} = $label;
             $var{'profileField_'.$fieldName.'_sortByURL'} = $sortByURL;
@@ -434,9 +436,11 @@ sub view {
                     $profileFieldName =~ s/ /_/g;
                     $profileFieldName =~ s/\./_/g;
                     my $value = $user->{$profileField->{fieldName}};
-					push (@profileFieldValues, {
-    					"profile_value"=>$value,
-					});
+                    if($profileField->{visible}){
+    					push (@profileFieldValues, {
+        					"profile_value"=>$value,
+		    			});
+                    }
                     unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
                         $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;
                     }
