@@ -52,6 +52,7 @@ upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 updateUsersOfProductMacro($session);
+deleteOldProductTemplates($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
@@ -1075,6 +1076,19 @@ sub updateUsersOfProductMacro {
     $tempSth->finish;
     $fixed->finish;
 
+    return 1;
+}
+
+
+#-------------------------------------------------
+sub deleteOldProductTemplates {
+	my $session = shift;
+	print "\tDeleting all Product Templates, except for the Default Product Template.\n" unless ($quiet);
+    $session->db->write("update Product set templateId='PBtmpl0000000000000056.tmpl'");
+    foreach my $templateId (qw/PBtmpl0000000000000095 PBtmpl0000000000000110 PBtmpl0000000000000119/) {
+        my $template = WebGUI::Asset->newByDynamicClass($session, $templateId);
+        $template->purge;
+    }
     return 1;
 }
 

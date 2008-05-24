@@ -44,6 +44,13 @@ save you many hours of grief.
    Wobjects, Templates and Snippets, the Product macro has been replaced
    with the AssetProxy macro.
 
+ * The Product template variables now use the new WebGUI standard of not
+   using dots in their names.  For example, brochure.icon is now brochure_icon
+
+ * All Product Templates that shipped with earlier versions of WebGUI have
+   been deleted, except for the Default Product Macro.  During the upgrade,
+   all products have been updated to use the Default Product Macro.
+
 
 7.5.9
 --------------------------------------------------------------------
