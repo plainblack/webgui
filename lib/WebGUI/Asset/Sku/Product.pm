@@ -1448,7 +1448,7 @@ sub view {
                                    'variant_controls' => $segment,
                                    'variant_sku'      => $collateral->{varSku},
                                    'variant_title'    => $collateral->{shortdesc},
-                                   'variant_price'    => $collateral->{price},
+                                   'variant_price'    => sprintf("%.2f", $collateral->{price}),
                                    'variant_weight'   => $collateral->{weight},
                                    'variant_quantity' => $collateral->{quantity},
                                 });

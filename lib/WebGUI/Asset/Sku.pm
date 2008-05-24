@@ -169,7 +169,7 @@ Returns a reference to the current session's cart.
 
 sub getCart {
 	my $self = shift;
-	return WebGUI::Shop::Cart->getCartBySession($self->session);
+	return WebGUI::Shop::Cart->newBySession($self->session);
 }
 
 #-------------------------------------------------------------------

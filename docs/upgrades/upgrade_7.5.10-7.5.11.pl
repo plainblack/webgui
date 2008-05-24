@@ -686,6 +686,8 @@ sub migrateToNewCart {
     $session->db->write("drop table shoppingCart");
     $session->setting->add('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw');
 	$session->config->addToHash("macros","ViewCart","ViewCart");
+	$session->config->addToHash("macros","CartItemCount","CartItemCount");
+	$session->config->addToHash("macros","MiniCart","MiniCart");
 }
 
 #-------------------------------------------------

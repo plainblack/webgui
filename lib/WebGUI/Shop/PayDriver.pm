@@ -281,7 +281,7 @@ Returns the WebGUI::Shop::Cart object for the current session.
 sub getCart {
     my $self = shift;
 
-    my $cart = WebGUI::Shop::Cart->getCartBySession( $self->session );
+    my $cart = WebGUI::Shop::Cart->newBySession( $self->session );
 
     return $cart;
 }

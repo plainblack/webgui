@@ -1,4 +1,4 @@
-package WebGUI::Help::Asset_FlatDiscount;
+package WebGUI::Help::Skeleton;
 
 use strict; 
 

@@ -356,7 +356,7 @@ sub www_selectPaymentGateway {
     my $self    = shift;
     my $session = $self->session;
   
-    my $cart    = WebGUI::Shop::Cart->getCartBySession( $session );
+    my $cart    = WebGUI::Shop::Cart->newBySession( $session );
     my $i18n    = WebGUI::International->new( $session, 'Shop' );
 
     # Make sure the user is logged in.
