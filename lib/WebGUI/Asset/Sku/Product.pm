@@ -74,7 +74,7 @@ sub addToCart {
     my $self     = shift;
     my $variant  = shift;
     $variant->{quantity} -= 1;
-    $self->setCollateral('variantsJSON', 'vid', $variant);
+    $self->setCollateral('variantsJSON', 'variantId', $variant);
     $self->SUPER::addToCart($variant);
 }
 
@@ -833,7 +833,7 @@ sub www_buy {
     return $self->session->privilege->insufficient() unless $self->canView;
     ##Need to validate the index
     my $vid = $self->session->form->process('vid');
-    my $variant = $self->getCollateral('variantsJSON', $vid);
+    my $variant = $self->getCollateral('variantsJSON', 'variantId', $vid);
     return '' unless keys %{ $variant };
     $self->addToCart($variant);
     return '';
