@@ -73,6 +73,7 @@ cart decrements the quantity by 1.
 sub addToCart {
     my $self     = shift;
     my $variant  = shift;
+    my $i18n     = WebGUI::International->new($self->session, 'Asset_Product');
     $variant->{quantity} -= 1;
     $self->setCollateral('variantsJSON', 'variantId', $variant);
     $self->SUPER::addToCart($variant);
@@ -390,6 +391,21 @@ sub getFileUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getMaxAllowedInCart ( )
+
+Returns the quantity after options from a variant have been applied to this
+Product via applyOptions.  For WebGUI::Shop::CartItem, this is handled by
+getSku automatically.
+
+=cut
+
+sub getMaxAllowedInCart {
+    my $self = shift;
+    return $self->getOptions->{quantity};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getPrice ( )
 
 Only returns a price after options from a variant have been applied to this
@@ -507,6 +523,29 @@ sub moveCollateralUp {
     return unless $index && (abs($index) <= $#{$table});
     @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
     $self->setAllCollateral($tableName);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 onAdjustQuantityInCart ( item, amount )
+
+Override the default Sku to handle checking inventory
+
+=head3 item
+
+The WebGUI::Shop::CartItem that is having its quantity adjusted.
+
+=head3 amount
+
+The amount adjusted.  Could be positive or negative.
+
+=cut
+
+sub onAdjustQuantityInCart {
+    my $self   = shift;
+    my $item   = shift;
+    my $amount = shift;
 }
 
 
@@ -1413,10 +1452,10 @@ sub view {
                                    'variant_weight'   => $collateral->{weight},
                                    'variant_quantity' => $collateral->{quantity},
                                 });
-        $variants{$id} = $collateral->{shortdesc};
+        $variants{$id} = $collateral->{shortdesc} if $collateral->{quantity} > 0;
     }
-    if (scalar @variantLoop) {
-        ##Don't display the form unless you have variants to sell.
+    if (scalar keys %variants) {
+        ##Don't display the form unless you have available variants to sell.
         $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
                               . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
         $var{buy_form_footer} = WebGUI::Form::formFooter($session);
