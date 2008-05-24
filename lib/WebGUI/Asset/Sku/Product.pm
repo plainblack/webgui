@@ -1415,18 +1415,21 @@ sub view {
                                 });
         $variants{$id} = $collateral->{shortdesc};
     }
-    $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
-                          . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
-    $var{buy_form_footer} = WebGUI::Form::formFooter($session);
-    $var{buy_options}     = WebGUI::Form::selectBox($session,
-        {
-            name    => 'vid',
-            label   => $i18n->get('add to cart'),
-            options => \%variants,
-            value   => [0],
-        },
-    );
-    $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+    if (scalar @variantLoop) {
+        ##Don't display the form unless you have variants to sell.
+        $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
+                              . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
+        $var{buy_form_footer} = WebGUI::Form::formFooter($session);
+        $var{buy_options}     = WebGUI::Form::selectBox($session,
+            {
+                name    => 'vid',
+                label   => $i18n->get('add to cart'),
+                options => \%variants,
+                value   => [0],
+            },
+        );
+        $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+    }
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant_label'} = $i18n->get('add a variant');
