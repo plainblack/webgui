@@ -258,16 +258,46 @@ sub getTaxRates {
 =head2 importTaxData ( $filePath )
 
 Import tax information from the specified file in CSV format.  The
-first line of the file should contain the name of the columns, in
-any order.  The first line may not contain comments in it, or
-before it.
+first line of the file should contain only the name of the columns, in
+any order.  It may not contain any comments.
+
+These are the column names, each is required:
+
+=over 4
+
+=item *
+
+country
+
+=item *
+
+state
+
+=item *
+
+city
+
+=item *
+
+code
+
+=item *
+
+taxRate
+
+=back
 
 The following lines will contain tax information.  Blank
 lines and anything following a '#' sign will be ignored from
 the second line of the file, on to the end.
 
 Returns 1 if the import has taken place.  This is to help you know
-if old data has been deleted and new has been inserted.
+if old data has been deleted and new has been inserted.  If an error is
+detected, it will throw exceptions.
+
+=head3 $filePath
+
+The path to a file with data to import into the Product system.
 
 =cut
 
