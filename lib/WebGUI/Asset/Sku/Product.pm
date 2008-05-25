@@ -393,7 +393,7 @@ sub getFileUrl {
 
 =head2 getMaxAllowedInCart ( )
 
-Returns the quantity after options from a variant have been applied to this
+Returns the quantity available after options from a variant have been applied to this
 Product via applyOptions.  For WebGUI::Shop::CartItem, this is handled by
 getSku automatically.
 
@@ -401,7 +401,7 @@ getSku automatically.
 
 sub getMaxAllowedInCart {
     my $self = shift;
-    return $self->getOptions->{quantity};
+    return $self->getQuantityAvailable;
 }
 
 #-------------------------------------------------------------------
@@ -440,7 +440,7 @@ sub getProductImportNode {
 
 =head2 getQuantityAvailable ( )
 
-Returns the amount of a variant that are available.
+Returns the quantity of a variant that are available.
 
 =cut
 
@@ -546,9 +546,42 @@ sub moveCollateralUp {
 
 #-------------------------------------------------------------------
 
+=head2 onRefund ( item )
+
+Override the default Sku method to return items to inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
+
+This method calls the same method from the parent.
+
+=head3 item
+
+The WebGUI::Shop::CartItem that will be refunded.
+
+=cut
+
+sub onRefund {
+    my $self   = shift;
+    my $item   = shift;
+    $self->SUPER::onRefund($item);
+    my $amount = $item->get('quantity');
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 onAdjustQuantityInCart ( item, amount )
 
-Override the default Sku to handle checking inventory
+Override the default Sku method to handle checking inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
 
 =head3 item
 
@@ -564,6 +597,41 @@ sub onAdjustQuantityInCart {
     my $self   = shift;
     my $item   = shift;
     my $amount = shift;
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 onRemoveFromCart ( item )
+
+Override the default Sku method to return items to inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
+
+=head3 item
+
+The WebGUI::Shop::CartItem that was removed from the cart.
+
+=cut
+
+sub onRemoveFromCart {
+    my $self   = shift;
+    my $item   = shift;
+    my $amount = $item->get('quantity');
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
 }
 
 
@@ -1466,7 +1534,7 @@ sub view {
                                    'variant_controls' => $segment,
                                    'variant_sku'      => $collateral->{varSku},
                                    'variant_title'    => $collateral->{shortdesc},
-                                   'variant_price'    => sprintf("%.2f", $collateral->{price}),
+                                   'variant_price'    => sprintf('%.2f', $collateral->{price}),
                                    'variant_weight'   => $collateral->{weight},
                                    'variant_quantity' => $collateral->{quantity},
                                 });
