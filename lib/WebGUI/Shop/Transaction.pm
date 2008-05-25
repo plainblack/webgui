@@ -80,6 +80,8 @@ sub cancelRecurring {
     $self->getPaymentGateway->cancelRecurringPayment($self);
     my ($item) = $self->getItems;
     $item->getSku->onCancelRecurring($item);
+    my $recurringId = ($self->get('originatingTransactionId') || $self->getId);
+    $self->session->db->write("update transaction set isRecurring=0 where transactionId=? or originatingTransactionId=?",[$recurringId,$recurringId]);
 }
 
 #-------------------------------------------------------------------
@@ -557,6 +559,22 @@ sub update {
 
 #-------------------------------------------------------------------
 
+=head2 www_cancelRecurring ( )
+
+Cancels a recurring transaction.
+
+=cut
+
+sub www_cancelRecurring {
+    my ($class, $session) = @_;
+    my $self = $class->new($session, $session->form->get("transactionId"));
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage || $session->user->userId eq $self->get('userId'));
+    $self->cancelRecurring;
+    return $class->www_view($session);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_getTransactionsAsJson ()
 
 Retrieves a list of transactions for the www_manage() method.
@@ -788,8 +806,13 @@ sub www_view {
         </style>};
     unless ($print) {
         $output .= q{   
-            <div><a href="}.$url->page('shop=transaction;method=print;transactionId='.$transaction->getId).q{">}.$i18n->get('print').q{</a></div>
+            <div><a href="}.$url->page('shop=transaction;method=print;transactionId='.$transaction->getId).q{">}.$i18n->get('print').q{</a>
             };
+        if ($transaction->get('isRecurring')) {
+            $output .= q{   
+                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a></div>
+                };
+        }
     }
     $output .= q{   
         <table class="transactionDetail">

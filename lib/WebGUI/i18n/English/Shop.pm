@@ -15,6 +15,12 @@ our $I18N = {
 		context		=> q|a warning message displayed in the cart|,
 	},
 	
+	'cancel recurring transaction' => {
+		message 	=> q|Cancel Recurring Transaction|,
+		lastUpdated	=> 0,
+		context		=> q|a link label|,
+	},
+	
 	'print' => {
 		message 	=> q|Print|,
 		lastUpdated	=> 0,
