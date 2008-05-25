@@ -420,6 +420,24 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 getProductImportNode ( session )
+
+Constructor. Returns the product import node object. This is where the product import system will create new products.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getProductImportNode {
+    my $class = shift;
+    my $session = shift;
+    return WebGUI::Asset->newByDynamicClass($session, 'PBproductimportnode001');
+}
+
+#-------------------------------------------------------------------
+
 =head2 getQuantityAvailable ( )
 
 Returns the amount of a variant that are available.

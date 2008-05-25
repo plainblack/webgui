@@ -912,14 +912,15 @@ sub mergeProductsWithCommerce {
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
     my $productSth = $session->db->read('select * from products order by title');
     my $variantSth = $session->db->prepare('select * from productVariants where productId=?');
-    my $productFolder = WebGUI::Asset->getRoot($session)->addChild({
+    my $productFolder = WebGUI::Asset->getImportNode($session)->addChild({
         className   => 'WebGUI::Asset::Wobject::Folder',
-        title       => 'Converted products from Commerce',
-        url         => 'converted_products',
+        title       => 'Products',
+        url         => 'import/products',
         isHidden    => 1,
         groupIdView => 14,
         groupIdEdit => 14,
-    });
+    },'PBproductimportnode001');
+    $session->db->write("update asset set isSystem=1 where assetId=?",[$productFolder->getId]);
     while (my $productData = $productSth->hashRef) {
         my $sku = $productFolder->addChild({
             className   => 'WebGUI::Asset::Sku::Product',
