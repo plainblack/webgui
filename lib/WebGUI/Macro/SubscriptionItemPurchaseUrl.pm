@@ -22,8 +22,17 @@ The ID of the subscription item to purchase.
 =cut
 
 sub process {
-	my $session = shift;
-	return $session->url->page('op=purchaseSubscription;sid='.shift);
+	my $session         = shift;
+    my $subscriptionId  = shift;
+
+    # Fetch subscription asset
+    my $subscription = WebGUI::Asset->newByDynamicClass( $session, $subscriptionId );
+    return "Could not find subscription with id: [$subscriptionId]" unless $subscription;
+    return "Only Subscription assets can be used with this macro."
+        unless $subscription->get('className') =~ m{^WebGUI::Asset::Sku::Subscription};
+
+    # Construct and output the purchase url for this subscription
+	return $subscription->getUrl('func=purchaseSubscription');
 }
 
 1;
