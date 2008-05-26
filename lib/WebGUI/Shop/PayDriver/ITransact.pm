@@ -594,8 +594,10 @@ sub www_pay {
 
     # Payment time!
     my $transaction = $self->processTransaction;
-
-    return $transaction->thankYou();
+	if ($transaction->get('isSuccessful')) {
+	    return $transaction->thankYou();		
+	}
+	return $self->displayPaymentError($transaction);
 }
 
 1;

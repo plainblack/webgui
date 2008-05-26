@@ -8,6 +8,7 @@ use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
 use WebGUI::International;
+use WebGUI::Inbox;
 use WebGUI::Paginator;
 use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
@@ -356,6 +357,27 @@ sub getPaymentGateway {
 
 #-------------------------------------------------------------------
 
+=head2 getTransactionIdsForUser (session, [ userId ])
+
+Returns an array reference of transactionIds for a given user ordered by date descending. Class method.
+
+=head3 userId
+
+The id of the user to fetch transactions for. Defaults to the current user.
+
+=cut
+
+sub getTransactionIdsForUser {
+    my ($class, $session, $userId) = @_;
+    unless (defined $userId) {
+        $userId = $session->user->userId;
+    }
+    return $session->db->buildArrayRef("select transactionId from transaction where userId=? order by dateOfPurchase desc",[$userId]);
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, transactionId )
 
 Constructor.  Instanciates a transaction based upon a transactionId.
@@ -436,8 +458,6 @@ sub newByGatewayId {
     # We have a transactionId so instanciate it and return the object
     return $class->new( $session, $transactionId );
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -744,6 +764,34 @@ STOP
     return $admin->getAdminConsole->render($output, $i18n->get('transactions'));
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_manageMy ()
+
+Makes transaction information printable.
+
+=cut
+
+sub www_manageMy {
+    my ($class, $session) = @_;
+    my %var = ();
+    my $url = $session->url;
+
+    # build list
+    foreach my $id (@{$class->getTransactionIdsForUser($session)}) {
+        my $transaction = $class->new($session, $id);
+        push @{$var{transactions}}, {
+            %{$transaction->get},
+            viewDetailUrl   => $url->page('shop=transaction;method=viewMy;transactionId='.$id),
+            amount          => sprintf("%.2f", $transaction->get('amount')),
+            };
+    }
+
+    # render
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopMyPurchasesTemplateId"));
+    return $session->style->userStyle($template->process(\%var));    
+}
 
 #-------------------------------------------------------------------
 
