@@ -222,7 +222,7 @@ sub www_pay {
     # Complete the transaction
     my $transaction = $self->processTransaction( $billingAddress );
 
-    return $transaction->www_thankYou($session);
+    return $transaction->thankYou();
 }
 
 #-------------------------------------------------------------------

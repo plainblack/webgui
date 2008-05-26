@@ -3,6 +3,12 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'thank you message' => {
+		message 	=> q|Thank you for your order! Please print this page as your receipt.|,
+		lastUpdated	=> 0,
+		context		=> q|notice after purchase|,
+	},
+	
 	'shop notice' => {
 		message 	=> q|Shop Notice|,
 		lastUpdated	=> 0,

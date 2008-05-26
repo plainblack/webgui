@@ -545,7 +545,7 @@ sub convertTransactionLog {
         index vendorId (vendorId)
 	)");
     $session->setting->add('shopMyPurchasesTemplateId','');
-    $session->setting->add('shopMyPurchaseDetailTemplateId','');
+    $session->setting->add('shopMyPurchasesDetailTemplateId','g8W53Pd71uHB9pxaXhWf_A');
     my $transactionResults = $db->read("select * from oldtransaction order by initDate");
     while (my $oldTranny = $transactionResults->hashRef) {
         my $date = WebGUI::DateTime->new($session, $oldTranny->{initDate});

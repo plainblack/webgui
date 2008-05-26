@@ -437,6 +437,23 @@ sub newByGatewayId {
     return $class->new( $session, $transactionId );
 }
 
+
+
+#-------------------------------------------------------------------
+
+=head2 thankYou ()
+
+Displays the default thank you page.
+
+=cut
+
+sub thankYou {
+    my ($self) = @_;
+    my $i18n = WebGUI::International->new($self->session,'Shop');
+    return $self->www_viewMy($self->session, $self, $i18n->get('thank you message'));
+}
+
+
 #-------------------------------------------------------------------
 
 =head2 update ( properties )
@@ -765,19 +782,6 @@ sub www_refundItem {
 
 #-------------------------------------------------------------------
 
-=head2 www_thankYou ()
-
-Displays the default thank you page.
-
-=cut
-
-sub www_thankYou {
-    my ($class, $session) = @_;
-    return q{Thanks for your order. Need to template this.};
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_view ()
 
 Displays the admin view of an individual transaction.
@@ -1004,6 +1008,86 @@ sub www_viewItem {
         return $class->www_view($session);
     }
     return $item->getSku->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewMy ()
+
+Displays transaction detail for a user's purchase.
+
+=cut
+
+sub www_viewMy {
+    my ($class, $session, $transaction, $notice) = @_;
+    unless (defined $transaction) {
+        $transaction = $class->new($session, $session->form->get('transactionId'));
+    }
+    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    my ($style, $url) = $session->quick(qw(style url));
+    my %var = (
+        %{$transaction->get},
+        notice                  => $notice,
+        cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId),
+        amount                  => sprintf("%.2f", $transaction->get('amount')),
+        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
+        taxes                   => sprintf("%.2f", $transaction->get('taxes')),
+        shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
+        shippingAddress         => $transaction->formatAddress({
+                                        name        => $transaction->get('shippingAddressName'),
+                                        address1    => $transaction->get('shippingAddress1'),
+                                        address2    => $transaction->get('shippingAddress2'),
+                                        address3    => $transaction->get('shippingAddress3'),
+                                        city        => $transaction->get('shippingCity'),
+                                        state       => $transaction->get('shippingState'),
+                                        code        => $transaction->get('shippingCode'),
+                                        country     => $transaction->get('shippingCountry'),
+                                        phoneNumber => $transaction->get('shippingPhoneNumber'),
+                                        }),
+        paymentAddress          =>  $transaction->formatAddress({
+                                        name        => $transaction->get('paymentAddressName'),
+                                        address1    => $transaction->get('paymentAddress1'),
+                                        address2    => $transaction->get('paymentAddress2'),
+                                        address3    => $transaction->get('paymentAddress3'),
+                                        city        => $transaction->get('paymentCity'),
+                                        state       => $transaction->get('paymentState'),
+                                        code        => $transaction->get('paymentCode'),
+                                        country     => $transaction->get('paymentCountry'),
+                                        phoneNumber => $transaction->get('paymentPhoneNumber'),
+                                        }),
+        );
+    
+    # items
+    my @items = ();
+    foreach my $item (@{$transaction->getItems}) {
+        my $address = '';
+        if ($transaction->get('shippingAddressId') ne $item->get('shippingAddressId')) {
+            $address = $transaction->formatAddress({
+                            name        => $item->get('shippingAddressName'),
+                            address1    => $item->get('shippingAddress1'),
+                            address2    => $item->get('shippingAddress2'),
+                            address3    => $item->get('shippingAddress3'),
+                            city        => $item->get('shippingCity'),
+                            state       => $item->get('shippingState'),
+                            code        => $item->get('shippingCode'),
+                            country     => $item->get('shippingCountry'),
+                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            });
+        }
+        push @items, {
+            %{$item->get},
+            viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
+            price               => sprintf("%.2f", $item->get('price')),
+            itemShippingAddress => $address,
+            orderStatus         => $i18n->get($item->get('orderStatus')),
+        };
+    }
+    $var{items} = \@items;
+
+    # render
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopMyPurchasesDetailTemplateId"));
+    return $style->userStyle($template->process(\%var));
 }
 
 #-------------------------------------------------------------------

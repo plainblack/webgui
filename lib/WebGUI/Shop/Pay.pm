@@ -386,7 +386,7 @@ sub www_selectPaymentGateway {
         my $transaction = WebGUI::Shop::Transaction->create($session, {cart => $cart});
         $transaction->completePurchase('zero', 'success', 'success');
         $cart->onCompletePurchase;
-        $transaction->www_thankYou($session);
+        $transaction->thankYou();
     }
 
     # All the output stuff below is just a placeholder until it's templated.

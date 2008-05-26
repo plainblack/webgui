@@ -56,7 +56,7 @@ sub process {
 	}
 	my %var = (
 		items			=> \@items,
-		totalPrice		=> sprintf(".2f",$totalPrice),
+		totalPrice		=> sprintf("%.2f",$totalPrice),
 		totalItems		=> $totalItems,
 		);
 	my $template = WebGUI::Asset::Template->new($session, $templateId || 'EBlxJpZQ9o-8VBOaGQbChA');
