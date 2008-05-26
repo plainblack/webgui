@@ -1,4 +1,4 @@
-package WebGUI::Macro::ViewCart;
+package WebGUI::Macro::CartItemCount;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
@@ -11,41 +11,32 @@ package WebGUI::Macro::ViewCart;
 #-------------------------------------------------------------------
 
 use strict;
-use WebGUI::International;
+use WebGUI::Shop::Cart;
 
 =head1 NAME
 
-Package WebGUI::Macro::ViewCart
+Package WebGUI::Macro::CartItemCount
 
 =head1 DESCRIPTION
 
-Displays a view cart link and image.
+Returns an integer of the number of items currently in the cart.
 
-=head2 process( $session, [ linktext ] )
+=head2 process( $session )
 
 Renders the macro.
-
-=head3 linktext
-
-Defaults to "View Cart". "linkonly" will return only the URL to the cart.
 
 =cut
 
 
 #-------------------------------------------------------------------
 sub process {
-	my ($session, $text) = @_;
-    my $url = $session->url->page("shop=cart");
-    if ($text eq "linkonly") {
-		return $url;
+	my ($session) = @_;
+	my $cart = WebGUI::Shop::Cart->newBySession($session);
+	my $count = 0;
+	foreach my $item (@{$cart->getItems}) {
+		$count += $item->get('quantity');
 	}
-	elsif ($text) {
-		# us text specified
-	}
-	else {
-        $text = WebGUI::International->new($session,"Shop")->get("view cart");
-    }
-    return '<a href="'.$url.'"><img src="'.$session->url->extras('/macro/ViewCart/cart.gif').'" alt="'.$text.'" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$url.'">'.$text.'</a>';
+	return $count;
 }
 
 1;

@@ -595,7 +595,7 @@ sub www_pay {
     # Payment time!
     my $transaction = $self->processTransaction;
 
-    return $transaction->www_thankYou($session);
+    return $transaction->thankYou();
 }
 
 1;

@@ -52,6 +52,7 @@ upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 updateUsersOfProductMacro($session);
+deleteOldProductTemplates($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
 addShelf( $session );
@@ -544,7 +545,7 @@ sub convertTransactionLog {
         index vendorId (vendorId)
 	)");
     $session->setting->add('shopMyPurchasesTemplateId','');
-    $session->setting->add('shopMyPurchaseDetailTemplateId','');
+    $session->setting->add('shopMyPurchasesDetailTemplateId','g8W53Pd71uHB9pxaXhWf_A');
     my $transactionResults = $db->read("select * from oldtransaction order by initDate");
     while (my $oldTranny = $transactionResults->hashRef) {
         my $date = WebGUI::DateTime->new($session, $oldTranny->{initDate});
@@ -685,6 +686,8 @@ sub migrateToNewCart {
     $session->db->write("drop table shoppingCart");
     $session->setting->add('shopCartTemplateId','aIpCmr9Hi__vgdZnDTz1jw');
 	$session->config->addToHash("macros","ViewCart","ViewCart");
+	$session->config->addToHash("macros","CartItemCount","CartItemCount");
+	$session->config->addToHash("macros","MiniCart","MiniCart");
 }
 
 #-------------------------------------------------
@@ -909,14 +912,15 @@ sub mergeProductsWithCommerce {
 	print "\tMerge old Commerce Products to new SKU based Products.\n" unless ($quiet);
     my $productSth = $session->db->read('select * from products order by title');
     my $variantSth = $session->db->prepare('select * from productVariants where productId=?');
-    my $productFolder = WebGUI::Asset->getRoot($session)->addChild({
+    my $productFolder = WebGUI::Asset->getImportNode($session)->addChild({
         className   => 'WebGUI::Asset::Wobject::Folder',
-        title       => 'Converted products from Commerce',
-        url         => 'converted_products',
+        title       => 'Products',
+        url         => 'import/products',
         isHidden    => 1,
         groupIdView => 14,
         groupIdEdit => 14,
-    });
+    },'PBproductimportnode001');
+    $session->db->write("update asset set isSystem=1 where assetId=?",[$productFolder->getId]);
     while (my $productData = $productSth->hashRef) {
         my $sku = $productFolder->addChild({
             className   => 'WebGUI::Asset::Sku::Product',
@@ -1075,6 +1079,19 @@ sub updateUsersOfProductMacro {
     $tempSth->finish;
     $fixed->finish;
 
+    return 1;
+}
+
+
+#-------------------------------------------------
+sub deleteOldProductTemplates {
+	my $session = shift;
+	print "\tDeleting all Product Templates, except for the Default Product Template.\n" unless ($quiet);
+    $session->db->write("update Product set templateId='PBtmpl0000000000000056.tmpl'");
+    foreach my $templateId (qw/PBtmpl0000000000000095 PBtmpl0000000000000110 PBtmpl0000000000000119/) {
+        my $template = WebGUI::Asset->newByDynamicClass($session, $templateId);
+        $template->purge;
+    }
     return 1;
 }
 

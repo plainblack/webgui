@@ -272,28 +272,6 @@ sub getAddressBook {
 
 #-------------------------------------------------------------------
 
-=head2 getCartBySession ( session )
-
-Class method that figures out if the user has a cart in their session. If they do it returns it. If they don't it creates it and returns it.
-
-=head3 session
-
-A reference to the current session.
-
-=cut
-
-sub getCartBySession {
-    my ($class, $session) = @_;
-    unless (defined $session && $session->isa("WebGUI::Session")) {
-        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
-    }
-    my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
-    return $class->new($session, $cartId) if (defined $cartId);
-    return $class->create($session);
-}
-
-#-------------------------------------------------------------------
-
 =head2 getId ()
 
 Returns the unique id for this cart.
@@ -456,6 +434,28 @@ sub new {
     $session{ $id }   = $session;
     $properties{ $id } = $cart;
     return $self;
+}
+
+#-------------------------------------------------------------------
+
+=head2 newBySession ( session )
+
+Class method that figures out if the user has a cart in their session. If they do it returns it. If they don't it creates it and returns it.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub newBySession {
+    my ($class, $session) = @_;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
+    return $class->new($session, $cartId) if (defined $cartId);
+    return $class->create($session);
 }
 
 #-------------------------------------------------------------------

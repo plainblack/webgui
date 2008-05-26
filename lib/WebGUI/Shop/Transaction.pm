@@ -13,6 +13,7 @@ use WebGUI::Shop::Admin;
 use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::TransactionItem;
+use WebGUI::Shop::Pay;
 
 =head1 NAME
 
@@ -64,6 +65,23 @@ sub addItem {
     my ($self, $cartItem) = @_;
     my $item = WebGUI::Shop::TransactionItem->create( $self, $cartItem);
     return $item;
+}
+
+#-------------------------------------------------------------------
+
+=head2 cancelRecurring ( )
+
+Cancel a recurring transaction, and calls onCancelRecurring in whatever sku is attached to this transaction.
+
+=cut
+
+sub cancelRecurring {
+    my ($self) = @_;
+    $self->getPaymentGateway->cancelRecurringPayment($self);
+    my ($item) = $self->getItems;
+    $item->getSku->onCancelRecurring($item);
+    my $recurringId = ($self->get('originatingTransactionId') || $self->getId);
+    $self->session->db->write("update transaction set isRecurring=0 where transactionId=? or originatingTransactionId=?",[$recurringId,$recurringId]);
 }
 
 #-------------------------------------------------------------------
@@ -323,6 +341,21 @@ sub getItems {
 
 #-------------------------------------------------------------------
 
+=head2 getPaymentGateway ()
+
+Returns a reference to the payment gateway attached to this transaction.
+
+=cut
+
+sub getPaymentGateway {
+    my ($self) = @_;
+    my $pay = WebGUI::Shop::Pay->new($self->session);
+    return $pay->getPaymentGateway($self->get('paymentDriverId'));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, transactionId )
 
 Constructor.  Instanciates a transaction based upon a transactionId.
@@ -403,6 +436,23 @@ sub newByGatewayId {
     # We have a transactionId so instanciate it and return the object
     return $class->new( $session, $transactionId );
 }
+
+
+
+#-------------------------------------------------------------------
+
+=head2 thankYou ()
+
+Displays the default thank you page.
+
+=cut
+
+sub thankYou {
+    my ($self) = @_;
+    my $i18n = WebGUI::International->new($self->session,'Shop');
+    return $self->www_viewMy($self->session, $self, $i18n->get('thank you message'));
+}
+
 
 #-------------------------------------------------------------------
 
@@ -522,6 +572,22 @@ sub update {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("transaction","transactionId",$properties{$id});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_cancelRecurring ( )
+
+Cancels a recurring transaction.
+
+=cut
+
+sub www_cancelRecurring {
+    my ($class, $session) = @_;
+    my $self = $class->new($session, $session->form->get("transactionId"));
+    return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage || $session->user->userId eq $self->get('userId'));
+    $self->cancelRecurring;
+    return $class->www_view($session);
 }
 
 #-------------------------------------------------------------------
@@ -716,19 +782,6 @@ sub www_refundItem {
 
 #-------------------------------------------------------------------
 
-=head2 www_thankYou ()
-
-Displays the default thank you page.
-
-=cut
-
-sub www_thankYou {
-    my ($class, $session) = @_;
-    return q{Thanks for your order. Need to template this.};
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_view ()
 
 Displays the admin view of an individual transaction.
@@ -757,8 +810,13 @@ sub www_view {
         </style>};
     unless ($print) {
         $output .= q{   
-            <div><a href="}.$url->page('shop=transaction;method=print;transactionId='.$transaction->getId).q{">}.$i18n->get('print').q{</a></div>
+            <div><a href="}.$url->page('shop=transaction;method=print;transactionId='.$transaction->getId).q{">}.$i18n->get('print').q{</a>
             };
+        if ($transaction->get('isRecurring')) {
+            $output .= q{   
+                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a></div>
+                };
+        }
     }
     $output .= q{   
         <table class="transactionDetail">
@@ -950,6 +1008,86 @@ sub www_viewItem {
         return $class->www_view($session);
     }
     return $item->getSku->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewMy ()
+
+Displays transaction detail for a user's purchase.
+
+=cut
+
+sub www_viewMy {
+    my ($class, $session, $transaction, $notice) = @_;
+    unless (defined $transaction) {
+        $transaction = $class->new($session, $session->form->get('transactionId'));
+    }
+    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    my ($style, $url) = $session->quick(qw(style url));
+    my %var = (
+        %{$transaction->get},
+        notice                  => $notice,
+        cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId),
+        amount                  => sprintf("%.2f", $transaction->get('amount')),
+        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
+        taxes                   => sprintf("%.2f", $transaction->get('taxes')),
+        shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
+        shippingAddress         => $transaction->formatAddress({
+                                        name        => $transaction->get('shippingAddressName'),
+                                        address1    => $transaction->get('shippingAddress1'),
+                                        address2    => $transaction->get('shippingAddress2'),
+                                        address3    => $transaction->get('shippingAddress3'),
+                                        city        => $transaction->get('shippingCity'),
+                                        state       => $transaction->get('shippingState'),
+                                        code        => $transaction->get('shippingCode'),
+                                        country     => $transaction->get('shippingCountry'),
+                                        phoneNumber => $transaction->get('shippingPhoneNumber'),
+                                        }),
+        paymentAddress          =>  $transaction->formatAddress({
+                                        name        => $transaction->get('paymentAddressName'),
+                                        address1    => $transaction->get('paymentAddress1'),
+                                        address2    => $transaction->get('paymentAddress2'),
+                                        address3    => $transaction->get('paymentAddress3'),
+                                        city        => $transaction->get('paymentCity'),
+                                        state       => $transaction->get('paymentState'),
+                                        code        => $transaction->get('paymentCode'),
+                                        country     => $transaction->get('paymentCountry'),
+                                        phoneNumber => $transaction->get('paymentPhoneNumber'),
+                                        }),
+        );
+    
+    # items
+    my @items = ();
+    foreach my $item (@{$transaction->getItems}) {
+        my $address = '';
+        if ($transaction->get('shippingAddressId') ne $item->get('shippingAddressId')) {
+            $address = $transaction->formatAddress({
+                            name        => $item->get('shippingAddressName'),
+                            address1    => $item->get('shippingAddress1'),
+                            address2    => $item->get('shippingAddress2'),
+                            address3    => $item->get('shippingAddress3'),
+                            city        => $item->get('shippingCity'),
+                            state       => $item->get('shippingState'),
+                            code        => $item->get('shippingCode'),
+                            country     => $item->get('shippingCountry'),
+                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            });
+        }
+        push @items, {
+            %{$item->get},
+            viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
+            price               => sprintf("%.2f", $item->get('price')),
+            itemShippingAddress => $address,
+            orderStatus         => $i18n->get($item->get('orderStatus')),
+        };
+    }
+    $var{items} = \@items;
+
+    # render
+    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopMyPurchasesDetailTemplateId"));
+    return $style->userStyle($template->process(\%var));
 }
 
 #-------------------------------------------------------------------

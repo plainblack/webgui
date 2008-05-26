@@ -9,6 +9,12 @@ our $I18N = {
 		context => q|a help label|
 	},
 
+	'cancel recurring message' => {
+		message 	=> q|Recurring transaction %s with an item named %s for a user named %s has been cancelled.|,
+		lastUpdated	=> 0,
+		context		=> q|a notification email sent to shop owners|,
+	},
+	
 	'shop' => { 
 		message => q|Shop|,
 		lastUpdated => 0, 

@@ -411,7 +411,7 @@ sub www_buildBadge {
 		manageEventMetaFieldsUrl 	=> $self->getUrl('func=manageEventMetaFields'),
 		);
 	my @otherBadges =();
-	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+	my $cart = WebGUI::Shop::Cart->newBySession($session);
 	foreach my $item (@{$cart->getItems}) {
 		my $id = $item->get('options')->{badgeId};
 		next if ($id eq $badgeId);
@@ -755,7 +755,7 @@ sub www_getRegistrantAsJson {
 	}
 
 	# see what's in the cart
-	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+	my $cart = WebGUI::Shop::Cart->newBySession($session);
 	foreach my $item (@{$cart->getItems}) {
 		# not related to this badge, so skip it
 		next unless $item->get('options')->{badgeId} eq $badgeId;
@@ -1478,7 +1478,7 @@ sub www_removeItemFromBadge {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my $form = $session->form;
-	my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+	my $cart = WebGUI::Shop::Cart->newBySession($session);
 	my $item = $cart->getItem($form->get('itemId'));
     $item->remove;
 	return $self->www_getRegistrantAsJson();	

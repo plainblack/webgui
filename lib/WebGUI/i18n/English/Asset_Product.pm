@@ -22,47 +22,47 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-	'brochure.icon' => {
+	'brochure_icon' => {
 		message => q|The URL to the icon for the brochure.|,
-		lastUpdated => 1149655398,
+		lastUpdated => 1211659018,
 	},
 
-	'brochure.url' => {
+	'brochure_url' => {
 		message => q|The URL to download the brochure.|,
 		lastUpdated => 1149655398,
 	},
 
-	'brochure.label' => {
+	'brochure_label' => {
 		message => q|The translated label for the brochure URL.|,
 		lastUpdated => 1149655398,
 	},
 
-	'manual.icon' => {
+	'manual_icon' => {
 		message => q|The URL to the icon for the manual.|,
 		lastUpdated => 1149655398,
 	},
 
-	'manual.url' => {
+	'manual_url' => {
 		message => q|The URL to download the manual.|,
 		lastUpdated => 1149655398,
 	},
 
-	'manual.label' => {
+	'manual_label' => {
 		message => q|The translated label for the manual URL.|,
 		lastUpdated => 1149655398,
 	},
 
-	'warranty.icon' => {
+	'warranty_icon' => {
 		message => q|The URL to the icon for the warranty.|,
 		lastUpdated => 1149655398,
 	},
 
-	'warranty.url' => {
+	'warranty_url' => {
 		message => q|The URL to download the warranty.|,
 		lastUpdated => 1149655398,
 	},
 
-	'warranty.label' => {
+	'warranty_label' => {
 		message => q|The label for the warranty URL.|,
 		lastUpdated => 1149655398,
 	},
@@ -97,12 +97,12 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'addfeature.url' => {
+	'addfeature_url' => {
 		message => q|The URL to add a feature to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addfeature.label' => {
+	'addfeature_label' => {
 		message => q|The translated label for the add feature link.|,
 		lastUpdated => 1149655398,
 	},
@@ -112,22 +112,22 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'feature.controls' => {
+	'feature_controls' => {
 		message => q|The WebGUI management controls for this feature.|,
 		lastUpdated => 1149655398,
 	},
 
-	'feature.feature' => {
+	'feature_feature' => {
 		message => q|The text of the feature itself.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addbenefit.url' => {
+	'addbenefit_url' => {
 		message => q|The URL to add a benefit to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addbenefit.label' => {
+	'addbenefit_label' => {
 		message => q|The translated label for the add benefit link.|,
 		lastUpdated => 1149655398,
 	},
@@ -137,22 +137,22 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'benefit.benefit' => {
+	'benefit_benefit' => {
 		message => q|The benefit text itself.|,
 		lastUpdated => 1149655398,
 	},
 
-	'benefit.controls' => {
+	'benefit_controls' => {
 		message => q|The WebGUI management controls for this benefit.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addspecification.url' => {
+	'addspecification_url' => {
 		message => q|The URL to add a specification to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addspecification.label' => {
+	'addspecification_label' => {
 		message => q|The translated label for the add specification link.|,
 		lastUpdated => 1149655398,
 	},
@@ -162,32 +162,32 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'specification.controls' => {
+	'specification_controls' => {
 		message => q|The WebGUI management controls for this specification.|,
 		lastUpdated => 1149655398,
 	},
 
-	'specification.specification' => {
+	'specification_specification' => {
 		message => q|The text of the specification itself.|,
 		lastUpdated => 1149655398,
 	},
 
-	'specification.units' => {
+	'specification_units' => {
 		message => q|The units for this specification. ex: meters|,
 		lastUpdated => 1149655398,
 	},
 
-	'specification.label' => {
+	'specification_label' => {
 		message => q|The label for this specification. ex: height|,
 		lastUpdated => 1149655398,
 	},
 
-	'addaccessory.url' => {
+	'addaccessory_url' => {
 		message => q|The URL to add an accessory to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addaccessory.label' => {
+	'addaccessory_label' => {
 		message => q|The translated label for the add accessory link.|,
 		lastUpdated => 1149655398,
 	},
@@ -197,47 +197,47 @@ our $I18N = {
 		lastUpdated => 1149655398,
 	},
 
-	'accessory.url' => {
+	'accessory_url' => {
 		message => q|The URL to the linked accessory.|,
 		lastUpdated => 1149655398,
 	},
 
-	'accessory.title' => {
+	'accessory_title' => {
 		message => q|The title of the linked accessory.|,
 		lastUpdated => 1149655398,
 	},
 
-	'accessory.controls' => {
+	'accessory_controls' => {
 		message => q|The WebGUI management controls for this accessory.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addRelatedProduct.url' => {
+	'addRelatedProduct_url' => {
 		message => q|The URL to add a related product to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'addRelatedProduct.label' => {
+	'addRelatedProduct_label' => {
 		message => q|The translated label for the add related product link.|,
 		lastUpdated => 1149655398,
 	},
 
-	'relatedproduct.loop' => {
+	'relatedproduct_loop' => {
 		message => q|This loop contains all of the products related to this product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'relatedproduct.url' => {
+	'relatedproduct_url' => {
 		message => q|The URL to the related product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'relatedproduct.title' => {
+	'relatedproduct_title' => {
 		message => q|The title of the related product.|,
 		lastUpdated => 1149655398,
 	},
 
-	'relatedproduct.controls' => {
+	'relatedproduct_controls' => {
 		message => q|The WebGUI management controls for this related product.|,
 		lastUpdated => 1149655398,
 	},
@@ -388,55 +388,55 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-        '51 description' => {
-                message => q|You may enter a new benefit, or select from one you've already entered.|,
-                lastUpdated => 1120337226,
-        },
+    '51 description' => {
+        message => q|You may enter a new benefit, or select from one you've already entered.|,
+        lastUpdated => 1120337226,
+    },
 
-        '52 description' => {
-                message => q|If you'd like to add another benefit right away, select "Yes".|,
-                lastUpdated => 1120337226,
-        },
+    '52 description' => {
+        message => q|If you'd like to add another benefit right away, select "Yes".|,
+        lastUpdated => 1120337226,
+    },
 
-        '62 description' => {
-                message => q|Select a layout for this product.|,
-                lastUpdated => 1120332527,
-        },
+    '62 description' => {
+        message => q|Select a layout for this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '10 description' => {
-                message => q|The price of this variant.|,
-                lastUpdated => 1209496419,
-        },
+    '10 description' => {
+        message => q|The price of this variant.|,
+        lastUpdated => 1209496419,
+    },
 
-        '7 description' => {
-                message => q|An image of this product.|,
-                lastUpdated => 1120332527,
-        },
+    '7 description' => {
+        message => q|An image of this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '8 description' => {
-                message => q|An image of this product.|,
-                lastUpdated => 1120332527,
-        },
+    '8 description' => {
+        message => q|An image of this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '9 description' => {
-                message => q|An image of this product.|,
-                lastUpdated => 1120332527,
-        },
+    '9 description' => {
+        message => q|An image of this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '13 description' => {
-                message => q|The brochure for this product.|,
-                lastUpdated => 1120332527,
-        },
+    '13 description' => {
+        message => q|The brochure for this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '14 description' => {
-                message => q|The product, user, or service manual for this product.|,
-                lastUpdated => 1120332527,
-        },
+    '14 description' => {
+        message => q|The product, user, or service manual for this product.|,
+        lastUpdated => 1120332527,
+    },
 
-        '15 description' => {
-                message => q|The warranty for this product.|,
-                lastUpdated => 1120332527,
-        },
+    '15 description' => {
+        message => q|The warranty for this product.|,
+        lastUpdated => 1120332527,
+    },
 
 	'36' => {
 		message => q|Add an accessory.|,
@@ -458,30 +458,30 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-        '23 description' => {
-                message => q|You may enter a new feature, or select one you entered for another product in the system.|,
-                lastUpdated => 1120335791,
-        },
+    '23 description' => {
+        message => q|You may enter a new feature, or select one you entered for another product in the system.|,
+        lastUpdated => 1120335791,
+    },
 
-        '24 description' => {
-                message => q|If you'd like to add another feature right away, select "Yes".|,
-                lastUpdated => 1120335791,
-        },
+    '24 description' => {
+        message => q|If you'd like to add another feature right away, select "Yes".|,
+        lastUpdated => 1120335791,
+    },
 
 	'58' => {
 		message => q|Edit Product Template|,
 		lastUpdated => 1031514049
 	},
 
-        '20 description' => {
-                message => q|Choose from the list of products you've already entered.|,
-                lastUpdated => 1120337083,
-        },
+    '20 description' => {
+        message => q|Choose from the list of products you've already entered.|,
+        lastUpdated => 1120337083,
+    },
 
-        '21 description' => {
-                message => q|Select "Yes" if you have another related product to add.|,
-                lastUpdated => 1120337083,
-        },
+    '21 description' => {
+        message => q|Select "Yes" if you have another related product to add.|,
+        lastUpdated => 1120337083,
+    },
 
 	'15' => {
 		message => q|Warranty|,
@@ -518,40 +518,40 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
-        '17 description' => {
-                message => q|Choose from the list of products you've already entered.|,
-                lastUpdated => 1120336412,
-        },
+    '17 description' => {
+        message => q|Choose from the list of products you've already entered.|,
+        lastUpdated => 1120336412,
+    },
 
-        '18 description' => {
-                message => q|Select "Yes" if you have another accessory to add.|,
-                lastUpdated => 1120336412,
-        },
+    '18 description' => {
+        message => q|Select "Yes" if you have another accessory to add.|,
+        lastUpdated => 1120336412,
+    },
 
 	'37' => {
 		message => q|Add a related product.|,
 		lastUpdated => 1031514049
 	},
 
-        '26 description' => {
-                message => q|The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.|,
-                lastUpdated => 1120336437,
-        },
+    '26 description' => {
+        message => q|The type of specification. For instance, height, weight,   or color. You may select one you've entered for another product, or type in a new specification.|,
+        lastUpdated => 1120336437,
+    },
 
-        '27 description' => {
-                message => q|The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".|,
-                lastUpdated => 1120336120,
-        },
+    '27 description' => {
+        message => q|The actual specification value. For instance, if you chose height as the Label, then you'd enter a numeric value like "18".|,
+        lastUpdated => 1120336120,
+    },
 
-        '29 description' => {
-                message => q|The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".|,
-                lastUpdated => 1120336120,
-        },
+    '29 description' => {
+        message => q|The unit of measurement for this specification. For instance, if you chose height for your label, perhaps the units would be "meters".|,
+        lastUpdated => 1120336120,
+    },
 
-        '28 description' => {
-                message => q|If you'd like to add another specification, select "Yes".|,
-                lastUpdated => 1120336120,
-        },
+    '28 description' => {
+        message => q|If you'd like to add another specification, select "Yes".|,
+        lastUpdated => 1120336120,
+    },
 
 	'19' => {
 		message => q|Add Related Product|,
@@ -708,12 +708,12 @@ be useful, others may not.|,
 		lastUpdated => 1210019655,
 	},
 
-	'addvariant.url' => {
+	'addvariant_url' => {
 		message => q|A URL to allow new variants to be added to this product.|,
 		lastUpdated => 1210029266,
 	},
 
-	'addvariant.label' => {
+	'addvariant_label' => {
 		message => q|The translated label for the add variant link.|,
 		lastUpdated => 1210029266,
 	},
@@ -723,32 +723,32 @@ be useful, others may not.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.controls' => {
+	'variant_controls' => {
 		message => q|An icon toolbar for editing, deleting, or reordering this variant.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.sku' => {
+	'variant_sku' => {
 		message => q|The SKU for this variant.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.title' => {
+	'variant_title' => {
 		message => q|The title, or short description, for this variant.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.price' => {
+	'variant_price' => {
 		message => q|The price for this variant.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.weight' => {
+	'variant_weight' => {
 		message => q|The weight for this variant.|,
 		lastUpdated => 1210029452,
 	},
 
-	'variant.quantity' => {
+	'variant_quantity' => {
 		message => q|The quantity for this variant.|,
 		lastUpdated => 1210029452,
 	},

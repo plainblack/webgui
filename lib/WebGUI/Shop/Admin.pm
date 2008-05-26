@@ -143,16 +143,16 @@ sub www_editSettings {
         hoverHelp   => $i18n->get("edit address template help"),
         );
     $form->template(
-        name        => "myPurchasesTemplateId",
-        value       => $setting->get("myPurchasesTemplateId"),
+        name        => "shopMyPurchasesTemplateId",
+        value       => $setting->get("shopMyPurchasesTemplateId"),
         namespace   => "Shop/MyPurchases",
         label       => $i18n->get("my purchases template"),
         hoverHelp   => $i18n->get("my purchases template help"),
         );
     $form->template(
-        name        => "myPurchasesDetailTemplateId",
-        value       => $setting->get("myPurchasesDetailTemplateId"),
-        namespace   => "Shop/MyPurchases/Detail",
+        name        => "shopMyPurchasesDetailTemplateId",
+        value       => $setting->get("shopMyPurchasesDetailTemplateId"),
+        namespace   => "Shop/MyPurchasesDetail",
         label       => $i18n->get("my purchases detail template"),
         hoverHelp   => $i18n->get("my purchases detail template help"),
         );
@@ -172,6 +172,8 @@ sub www_editSettingsSave {
     my $self = shift;
     return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
     my ($setting, $form) = $self->session->quick(qw(setting form));
+    $setting->set("shopMyPurchasesDetailTemplateId", $form->get("shopMyPurchasesDetailTemplateId", "template"));
+    $setting->set("shopMyPurchasesTemplateId", $form->get("shopMyPurchasesTemplateId", "template"));
     $setting->set("shopCartTemplateId", $form->get("shopCartTemplateId", "template"));
     $setting->set("shopAddressBookTemplateId", $form->get("shopAddressBookTemplateId", "template"));
     $setting->set("shopAddressTemplateId", $form->get("shopAddressTemplateId", "template"));

@@ -73,8 +73,9 @@ cart decrements the quantity by 1.
 sub addToCart {
     my $self     = shift;
     my $variant  = shift;
+    my $i18n     = WebGUI::International->new($self->session, 'Asset_Product');
     $variant->{quantity} -= 1;
-    $self->setCollateral('variantsJSON', 'vid', $variant);
+    $self->setCollateral('variantsJSON', 'variantId', $variant);
     $self->SUPER::addToCart($variant);
 }
 
@@ -390,6 +391,21 @@ sub getFileUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getMaxAllowedInCart ( )
+
+Returns the quantity available after options from a variant have been applied to this
+Product via applyOptions.  For WebGUI::Shop::CartItem, this is handled by
+getSku automatically.
+
+=cut
+
+sub getMaxAllowedInCart {
+    my $self = shift;
+    return $self->getQuantityAvailable;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getPrice ( )
 
 Only returns a price after options from a variant have been applied to this
@@ -404,9 +420,27 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 getProductImportNode ( session )
+
+Constructor. Returns the product import node object. This is where the product import system will create new products.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getProductImportNode {
+    my $class = shift;
+    my $session = shift;
+    return WebGUI::Asset->newByDynamicClass($session, 'PBproductimportnode001');
+}
+
+#-------------------------------------------------------------------
+
 =head2 getQuantityAvailable ( )
 
-Returns the amount of a variant that are available.
+Returns the quantity of a variant that are available.
 
 =cut
 
@@ -507,6 +541,97 @@ sub moveCollateralUp {
     return unless $index && (abs($index) <= $#{$table});
     @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
     $self->setAllCollateral($tableName);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 onRefund ( item )
+
+Override the default Sku method to return items to inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
+
+This method calls the same method from the parent.
+
+=head3 item
+
+The WebGUI::Shop::CartItem that will be refunded.
+
+=cut
+
+sub onRefund {
+    my $self   = shift;
+    my $item   = shift;
+    $self->SUPER::onRefund($item);
+    my $amount = $item->get('quantity');
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 onAdjustQuantityInCart ( item, amount )
+
+Override the default Sku method to handle checking inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
+
+=head3 item
+
+The WebGUI::Shop::CartItem that is having its quantity adjusted.
+
+=head3 amount
+
+The amount adjusted.  Could be positive or negative.
+
+=cut
+
+sub onAdjustQuantityInCart {
+    my $self   = shift;
+    my $item   = shift;
+    my $amount = shift;
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 onRemoveFromCart ( item )
+
+Override the default Sku method to return items to inventory.  Note that this method
+requires that options from a variant have been applied to it via applyOptions.
+Updates both the options and the collateral.
+
+=head3 item
+
+The WebGUI::Shop::CartItem that was removed from the cart.
+
+=cut
+
+sub onRemoveFromCart {
+    my $self   = shift;
+    my $item   = shift;
+    my $amount = $item->get('quantity');
+    ##Update myself, as options
+    $self->getOptions->{quantity} += $amount;
+    ##Update my collateral
+    my $vid = $self->getOptions->{variantId};
+    my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
+    $collateral->{quantity} += $amount;
+    $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
 }
 
 
@@ -833,9 +958,12 @@ sub www_buy {
     return $self->session->privilege->insufficient() unless $self->canView;
     ##Need to validate the index
     my $vid = $self->session->form->process('vid');
-    my $variant = $self->getCollateral('variantsJSON', $vid);
+    my $variant = $self->getCollateral('variantsJSON', 'variantId', $vid);
     return '' unless keys %{ $variant };
-    $self->addToCart($variant);
+    my $error = $self->addToCart($variant);
+    if ($error) {
+        $self->view($error);
+    }
     return '';
 }
 
@@ -1250,6 +1378,7 @@ sub www_moveVariantUp {
 #-------------------------------------------------------------------
 sub view {
     my $self = shift;
+    my $error = shift;
     my $session = $self->session;
     if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
@@ -1269,23 +1398,23 @@ sub view {
     my $i18n = WebGUI::International->new($session,'Asset_Product');
     if ($brochure) {
         my $file = WebGUI::Storage->get($session,$brochure);
-        $var{"brochure.icon"}  = $self->getFileIconUrl($file);
-        $var{"brochure.label"} = $i18n->get(13);
-        $var{"brochure.URL"}   = $self->getFileUrl($file);
+        $var{"brochure_icon"}  = $self->getFileIconUrl($file);
+        $var{"brochure_label"} = $i18n->get(13);
+        $var{"brochure_URL"}   = $self->getFileUrl($file);
     }
     #---manual
     if ($manual) {
         my $file = WebGUI::Storage->get($session,$manual);
-        $var{"manual.icon"}  = $self->getFileIconUrl($file);
-        $var{"manual.label"} = $i18n->get(14);
-        $var{"manual.URL"}   = $self->getFileUrl($file);
+        $var{"manual_icon"}  = $self->getFileIconUrl($file);
+        $var{"manual_label"} = $i18n->get(14);
+        $var{"manual_URL"}   = $self->getFileUrl($file);
     }
     #---warranty
     if ($warranty) {
         my $file = WebGUI::Storage->get($session,$warranty);
-        $var{"warranty.icon"}  = $self->getFileIconUrl($file);
-        $var{"warranty.label"} = $i18n->get(15);
-        $var{"warranty.URL"}   = $self->getFileUrl($file);
+        $var{"warranty_icon"}  = $self->getFileIconUrl($file);
+        $var{"warranty_label"} = $i18n->get(15);
+        $var{"warranty_URL"}   = $self->getFileUrl($file);
     }
     #---image1
     if ($image1) {
@@ -1307,8 +1436,8 @@ sub view {
    }
    
     #---features 
-    $var{'addFeature.url'} = $self->getUrl('func=editFeature&fid=new');
-    $var{'addFeature.label'} = $i18n->get(34);
+    $var{'addFeature_url'} = $self->getUrl('func=editFeature&fid=new');
+    $var{'addFeature_label'} = $i18n->get(34);
     foreach my $collateral ( @{ $self->getAllCollateral('featureJSON') } ) {
         my $id = $collateral->{featureId};
         $segment = $self->session->icon->delete('func=deleteFeatureConfirm&fid='.$id,$self->get('url'),$i18n->get(3))
@@ -1316,15 +1445,15 @@ sub view {
                  . $self->session->icon->moveUp('func=moveFeatureUp&fid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveFeatureDown&fid='.$id,$self->get('url'));
         push(@featureloop,{
-                          'feature.feature'  => $collateral->{feature},
-                          'feature.controls' => $segment
+                          'feature_feature'  => $collateral->{feature},
+                          'feature_controls' => $segment
                          });
     }
     $var{feature_loop} = \@featureloop;
 
     #---benefits 
-    $var{"addBenefit.url"} = $self->getUrl('func=editBenefit&bid=new');
-    $var{"addBenefit.label"} = $i18n->get(55);
+    $var{"addBenefit_url"} = $self->getUrl('func=editBenefit&bid=new');
+    $var{"addBenefit_label"} = $i18n->get(55);
     foreach my $collateral ( @{ $self->getAllCollateral('benefitJSON') } ) {
         my $id = $collateral->{benefitId};
         $segment = $self->session->icon->delete('func=deleteBenefitConfirm&bid='.$id,$self->get("url"),$i18n->get(48))
@@ -1332,15 +1461,15 @@ sub view {
                  . $self->session->icon->moveUp('func=moveBenefitUp&bid='.$id,$self->get("url"))
                  . $self->session->icon->moveDown('func=moveBenefitDown&bid='.$id,$self->get("url"));
         push(@benefitloop,{
-                          "benefit.benefit"=>$collateral->{benefit},
-                          "benefit.controls"=>$segment
+                          "benefit_benefit"=>$collateral->{benefit},
+                          "benefit_controls"=>$segment
         });
     }
     $var{benefit_loop} = \@benefitloop;
 
     #---specifications 
-    $var{'addSpecification.url'} = $self->getUrl('func=editSpecification&sid=new');
-    $var{'addSpecification.label'} = $i18n->get(35);
+    $var{'addSpecification_url'} = $self->getUrl('func=editSpecification&sid=new');
+    $var{'addSpecification_label'} = $i18n->get(35);
     foreach my $collateral ( @{ $self->getAllCollateral('specificationJSON') } ) {
         my $id = $collateral->{specificationId};
         $segment = $self->session->icon->delete('func=deleteSpecificationConfirm&sid='.$id,$self->get('url'),$i18n->get(5))
@@ -1348,17 +1477,17 @@ sub view {
                  . $self->session->icon->moveUp('func=moveSpecificationUp&sid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveSpecificationDown&sid='.$id,$self->get('url'));
         push(@specificationloop,{
-                                   'specification.controls'      => $segment,
-                                   'specification.specification' => $collateral->{value},
-                                   'specification.units'         => $collateral->{units},
-                                   'specification.label'         => $collateral->{name},
+                                   'specification_controls'      => $segment,
+                                   'specification_specification' => $collateral->{value},
+                                   'specification_units'         => $collateral->{units},
+                                   'specification_label'         => $collateral->{name},
                                 });
     }
     $var{specification_loop} = \@specificationloop;
 
     #---accessories 
-    $var{'addaccessory.url'}   = $self->getUrl('func=addAccessory');
-    $var{'addaccessory.label'} = $i18n->get(36);
+    $var{'addaccessory_url'}   = $self->getUrl('func=addAccessory');
+    $var{'addaccessory_label'} = $i18n->get(36);
     ##Need an id for collateral operations, and an assetId for asset instantiation.
     foreach my $collateral ( @{ $self->getAllCollateral('accessoryJSON') } ) {
         my $id = $collateral->{accessoryAssetId};
@@ -1367,16 +1496,16 @@ sub view {
                  . $self->session->icon->moveDown('func=moveAccessoryDown&aid='.$id,$self->get('url'));
         my $accessory = WebGUI::Asset->newByDynamicClass($session, $collateral->{accessoryAssetId});
         push(@accessoryloop,{
-                           'accessory.URL'      => $accessory->getUrl,
-                           'accessory.title'    => $accessory->getTitle,
-                           'accessory.controls' => $segment,
+                           'accessory_URL'      => $accessory->getUrl,
+                           'accessory_title'    => $accessory->getTitle,
+                           'accessory_controls' => $segment,
                            });
     }
     $var{accessory_loop} = \@accessoryloop;
 
     #---related
-    $var{'addrelatedproduct.url'}   = $self->getUrl('func=addRelated');
-    $var{'addrelatedproduct.label'} = $i18n->get(37);
+    $var{'addrelatedproduct_url'}   = $self->getUrl('func=addRelated');
+    $var{'addrelatedproduct_label'} = $i18n->get(37);
     foreach my $collateral ( @{ $self->getAllCollateral('relatedJSON')} ) {
         my $id = $collateral->{relatedAssetId};
         $segment = $self->session->icon->delete('func=deleteRelatedConfirm&rid='.$id, $self->get('url'),$i18n->get(4))
@@ -1384,9 +1513,9 @@ sub view {
                  . $self->session->icon->moveDown('func=moveRelatedDown&rid='.$id, $self->get('url'));
         my $related = WebGUI::Asset->newByDynamicClass($session, $collateral->{relatedAssetId});
         push(@relatedloop,{
-                          'relatedproduct.URL'      => $related->getUrl,
-                          'relatedproduct.title'    => $related->getTitle,
-                          'relatedproduct.controls' => $segment,
+                          'relatedproduct_URL'      => $related->getUrl,
+                          'relatedproduct_title'    => $related->getTitle,
+                          'relatedproduct_controls' => $segment,
                           });
     }
     $var{relatedproduct_loop} = \@relatedloop;
@@ -1402,35 +1531,35 @@ sub view {
                  . $self->session->icon->moveUp('func=moveVariantUp&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveVariantDown&vid='.$id,$self->get('url'));
         push(@variantLoop,{
-                                   'variant.controls' => $segment,
-                                   'variant.sku'      => $collateral->{varSku},
-                                   'variant.title'    => $collateral->{shortdesc},
-                                   'variant.price'    => $collateral->{price},
-                                   'variant.weight'   => $collateral->{weight},
-                                   'variant.quantity' => $collateral->{quantity},
+                                   'variant_controls' => $segment,
+                                   'variant_sku'      => $collateral->{varSku},
+                                   'variant_title'    => $collateral->{shortdesc},
+                                   'variant_price'    => sprintf('%.2f', $collateral->{price}),
+                                   'variant_weight'   => $collateral->{weight},
+                                   'variant_quantity' => $collateral->{quantity},
                                 });
-        $variants{$id} = $collateral->{shortdesc};
+        $variants{$id} = $collateral->{shortdesc} if $collateral->{quantity} > 0;
     }
-    $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
-                          . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
-    $var{buy_form_footer} = WebGUI::Form::formFooter($session);
-    $var{buy_options}     = WebGUI::Form::selectBox($session,
-        {
-            name    => 'vid',
-            label   => $i18n->get('add to cart'),
-            options => \%variants,
-            value   => [0],
-        },
-    );
-    $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+    if (scalar keys %variants) {
+        ##Don't display the form unless you have available variants to sell.
+        $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
+                              . WebGUI::Form::hidden($session, { name=>'func', value=>'buy', } );
+        $var{buy_form_footer} = WebGUI::Form::formFooter($session);
+        $var{buy_options}     = WebGUI::Form::selectBox($session,
+            {
+                name    => 'vid',
+                label   => $i18n->get('add to cart'),
+                options => \%variants,
+                value   => [0],
+            },
+        );
+        $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+    }
     if ($self->canEdit) {
-        $var{'addvariant.url'}   = $self->getUrl('func=editVariant');
-        $var{'addvariant.label'} = $i18n->get('add a variant');
-        $var{variant_loop} = \@variantLoop;
+        $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
+        $var{'addvariant_label'} = $i18n->get('add a variant');
     }
-    else {
-        $var{variant_loop} = [];
-    }
+    $var{variant_loop} = \@variantLoop;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {

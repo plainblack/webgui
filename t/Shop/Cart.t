@@ -37,7 +37,7 @@ plan tests => 20;        # Increment this number for each test you create
 #----------------------------------------------------------------------------
 # put your tests here
 
-throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->getCartBySession(); }, 
+throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->newBySession(); }, 
     'WebGUI::Error::InvalidObject', 
     {
         error       => 'Need a session.',
@@ -47,7 +47,7 @@ throws_deeply ( sub { my $cart = WebGUI::Shop::Cart->getCartBySession(); },
     'newBySession takes an exception to not giving it a session variable'
 );
 
-my $cart = WebGUI::Shop::Cart->getCartBySession($session);
+my $cart = WebGUI::Shop::Cart->newBySession($session);
 
 isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");
