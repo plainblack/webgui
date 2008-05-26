@@ -61,6 +61,7 @@ addVendors($session);
 modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
 migrateSubscriptions( $session );
+addAssetManager( $session );
 
 finish($session); # this line required
 
@@ -78,6 +79,26 @@ sub changeRealtimeWorkflows {
         $realtime->delete;
     }
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the Asset Manager content handler to the list
+# Must go before the Operation content handler (since we use ?op=assetManager)
+sub addAssetManager {
+    my $session     = shift;
+    print "\tAdding new Asset Manager ..." unless $quiet;
+
+    my $config = $session->config;
+    my @handlers = ();
+    foreach my $element (@{$config->get("contentHandlers")}) {
+        if ($element eq "WebGUI::Content::Operation") {
+            push @handlers, "WebGUI::Content::AssetManager";
+        }
+        push @handlers, $element;
+    }
+    $config->set("contentHandlers", \@handlers);
+
+    print "DONE! \n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
