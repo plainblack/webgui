@@ -462,10 +462,6 @@ sub www_getTaxesAsJson {
     }
     push(@placeholders, $sortKey, $sortDir, $startIndex, $numberOfResults);
     $sql .= ' order by ? ? limit ?,?';
-    $session->errorHandler->warn("numberOfResults   : $numberOfResults");
-    $session->errorHandler->warn("startIndex: $startIndex");
-    $session->errorHandler->warn("sortKey   : $sortKey");
-    $session->errorHandler->warn("sortDir   : $sortDir");
     my %results = ();
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
