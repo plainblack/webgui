@@ -519,12 +519,19 @@ A reference to a WebGUI::Shop::Address object that should be attached as payment
 
 sub processTransaction {
     my ($self, $paymentAddress) = @_;
+
     my $cart = $self->getCart;
-    my $transaction = WebGUI::Shop::Transaction->create($self->session,{
-        paymentMethod   => $self,
-        paymentAddress  => $paymentAddress,
-        cart            => $cart,
-    });
+
+    # Setup tranasction properties
+    my $transactionProperties;
+    $transactionProperties->{ paymentMethod     } = $self;
+    $transactionProperties->{ cart              } = $cart;
+    $transactionProperties->{ paymentAddress    } = $paymentAddress if defined $paymentAddress;
+
+    # Create a transaction...
+    my $transaction = WebGUI::Shop::Transaction->create( $self->session, $transactionProperties );
+
+    # And handle the payment for it
     my ($success, $transactionCode, $statusCode, $statusMessage) = $self->processPayment( $transaction );
     if ($success) {
         $transaction->completePurchase($transactionCode, $statusCode, $statusMessage);

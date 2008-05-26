@@ -2,33 +2,9 @@ package WebGUI::Shop::PayDriver::ITransact;
 
 use strict;
 use XML::Simple;
+use Data::Dumper;
 
 use base qw/WebGUI::Shop::PayDriver/;
-
-sub _monthYear {
-    my $session = shift;
-    my $form    = $session->form;
-
-	tie my %months, "Tie::IxHash";
-	tie my %years,  "Tie::IxHash";
-	%months = map { sprintf( '%02d', $_ ) => sprintf( '%02d', $_ ) } 1 .. 12;
-	%years  = map { $_ => $_ } 2004 .. 2099;
-
-    my $monthYear = 
-        WebGUI::Form::selectBox( $session, {
-            name    => 'expMonth', 
-            options => \%months, 
-            value   => [ $form->process("expMonth") ]
-        })
-        . " / "
-        . WebGUI::Form::selectBox( $session, {
-            name    => 'expYear',
-            options => \%years, 
-            value   => [ $form->process("expYear") ]
-        });
-
-    return $monthYear;
-}
 
 #-------------------------------------------------------------------
 sub _generateCancelRecurXml {
@@ -62,6 +38,52 @@ sub _generateCancelRecurXml {
 
     return $xml;
 }
+
+#-------------------------------------------------------------------
+sub _monthYear {
+    my $session = shift;
+    my $form    = $session->form;
+
+	tie my %months, "Tie::IxHash";
+	tie my %years,  "Tie::IxHash";
+	%months = map { sprintf( '%02d', $_ ) => sprintf( '%02d', $_ ) } 1 .. 12;
+	%years  = map { $_ => $_ } 2004 .. 2099;
+
+    my $monthYear = 
+        WebGUI::Form::selectBox( $session, {
+            name    => 'expMonth', 
+            options => \%months, 
+            value   => [ $form->process("expMonth") ]
+        })
+        . " / "
+        . WebGUI::Form::selectBox( $session, {
+            name    => 'expYear',
+            options => \%years, 
+            value   => [ $form->process("expYear") ]
+        });
+
+    return $monthYear;
+}
+
+#-------------------------------------------------------------------
+sub _resolveRecurRecipe {
+    my $self        = shift;
+    my $duration    = shift;
+
+	my %resolve = (
+		Weekly		=> 'weekly',
+		BiWeekly	=> 'biweekly',
+		FourWeekly	=> 'fourweekly',
+		Monthly		=> 'monthly',
+		Quarterly	=> 'quarterly',
+		HalfYearly	=> 'halfyearly',
+		Yearly		=> 'yearly',
+		);
+	
+    # TODO: Throw exception
+	return $resolve{ $duration };
+}
+
 
 #-------------------------------------------------------------------
 
@@ -264,24 +286,23 @@ sub _generatePaymentRequestXML {
         # Since recur recipes are based on intervals defined in days, the first term will payed NOW. Since the
         # subscription start NOW too, we never need an initial amount for recurring payments.
         if ( $sku->isRecurring ) {
-            $recurringData->{ RecurRecipe   } = $self->resolveRecurRecipe( $sku->getRecurInterval );
+            $recurringData->{ RecurRecipe   } = $self->_resolveRecurRecipe( $sku->getRecurInterval );
             $recurringData->{ RecurReps     } = 99999;
             $recurringData->{ RecurTotal    } = 
                 $item->get('price') + $transaction->get('taxes') + $transaction->get('shippingPrice');
             $recurringData->{ RecurDesc     } = $item->get('configuredTitle');
         }
-        else {
+#       else {
             push @{ $orderItems->{ Item } }, {
                 Description     => $item->get('configuredTitle'),
                 Cost            => $item->get('price'),
                 Qty             => $item->get('quantity'),
             }
-        }
+#        }
     }
 
 	# taxes, shipping, etc
 	my $i18n = WebGUI::International->new($session, "Shop");
-    #### TODO: Don't add this if the transaction is recurring
 	if ( $transaction->get('taxes') > 0 ) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('taxes'),
@@ -289,7 +310,6 @@ sub _generatePaymentRequestXML {
 			Qty				=> 1,
 			};
 	}
-    #### TODO: Don't add this if the transaction is recurring
 	if ($transaction->get('shippingPrice') > 0) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('shipping'),
@@ -316,7 +336,7 @@ sub _generatePaymentRequestXML {
     $transactionData->{ HomePage        } = $self->session->setting->get("companyURL");
     $transactionData->{ RecurringData   } = $recurringData if $recurringData;
     $transactionData->{ EmailText       } = $emailText if $emailText;
-    $transactionData->{ OrderItems      } = $orderItems;
+    $transactionData->{ OrderItems      } = $orderItems if $orderItems;
 
     # --- The XML structure ---
     my $xmlStructure = {
@@ -407,6 +427,17 @@ sub processCredentials {
 	return \@error;
 }
 
+#-------------------------------------------------------------------
+
+=head2 handlesRecurring
+
+Tells the commerce system that this payment plugin can handle recurring payments.
+
+=cut
+
+sub handlesRecurring {
+    return 1;
+}
 
 #-------------------------------------------------------------------
 sub processPayment {
@@ -422,7 +453,7 @@ sub processPayment {
     my $userAgent = LWP::UserAgent->new;
 	$userAgent->env_proxy;
 	$userAgent->agent("WebGUI ");
-    
+
     # Create a request and stuff the xml in it
     $session->errorHandler->info('Starting request');
     my $xmlTransactionScript = 'https://secure.paymentclearing.com/cgi-bin/rc/xmltrans.cgi';
@@ -460,7 +491,7 @@ sub processPayment {
             my $gatewayCode     = $transactionData->{ XID               };
             my $isSuccess       = $status eq 'OK';
        
-            return ( $isSuccess, $gatewayCode, $status, "$errorMessage Category: $errorCategory" );
+            return ( $isSuccess, $gatewayCode, $status, "" );
 		}
 	} else {
 		# Connection Error
@@ -477,10 +508,10 @@ sub www_processRecurringTransactionPostback {
     my $form    = $session->form;
 	
     # Get posted data of interest
-    my $originatingXid  = $form->process( 'orig_xid' );
-    my $status          = $form->process( 'status' );
-    my $xid             = $form->process( 'xid' );
-    my $errorMessage    = $form->process( 'error_message' );
+    my $originatingXid  = $form->process( 'orig_xid'        );
+    my $status          = $form->process( 'status'          );
+    my $xid             = $form->process( 'xid'             );
+    my $errorMessage    = $form->process( 'error_message'   );
 
     # Fetch the original transaction
     my $baseTransaction = WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId );
@@ -499,6 +530,8 @@ sub www_processRecurringTransactionPostback {
         # The term has not been payed succesfully
         $transaction->denyPurchase( $xid, $status, $errorMessage );
     }
+
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -588,7 +621,7 @@ sub www_pay {
 
     # Check whether the user filled in the checkout form and process those.
     my $credentialsErrors = $self->processCredentials;
-    
+
     # Go back to checkout form if credentials are not ok
     return $self->www_getCredentials( $credentialsErrors ) if $credentialsErrors;
 
