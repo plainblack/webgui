@@ -398,7 +398,7 @@ sub search {
 	if ($rules->{classes}) {
 		my @phrases = ();
 		foreach my $class (@{$rules->{classes}}) {
-			next unless defined $class;
+			next unless $class;
 			push(@params, $class);
 			push(@phrases, "className=?");
 		}
