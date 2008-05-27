@@ -1176,7 +1176,7 @@ sub migrateSubscriptions {
         'select count(*) as cnt from subscriptionCodeSubscriptions group by code order by cnt desc'
     );
     print "\n\t\t!!WARNING: There are subscription codes that link to multiple subscriptions!!"
-        ." Please refer to gotcha.txt!\n" if $hasDoubles > 1;
+        ." Please refer to gotcha.txt!\n" if $hasDoubles > 1 && !$quiet;
 
     # Rename old subscription table so we can reuse it for the Sku
     $session->db->write('alter table subscription rename to Subscription_OLD');
@@ -1234,7 +1234,7 @@ EOSQL3
     });
 
     # Migrate all subscriptions
-    print "\t\tConverting subscriptions to assets:\n";
+    print "\t\tConverting subscriptions to assets:\n" unless $quiet;
     my $subscriptions = $session->db->read( 'select * from Subscription_OLD' );
     while (my $subscription = $subscriptions->hashRef) {
         # Don't migrate deleted subscriptions
@@ -1277,7 +1277,7 @@ EOSQL3
     );
 
     # Migrate subscription codes batch by batch
-    print "\t\tMigrating subscription codes.\n";
+    print "\t\tMigrating subscription codes.\n" unless $quiet;
     my @batches = $session->db->buildArray('select distinct batchId from subscriptionCodeBatch');
     foreach my $batchId ( @batches ) {
         my $subscriptionId;
@@ -1340,7 +1340,7 @@ EOSQL3
 
             # Log and print migration info
             $session->errorHandler->warn( $message );
-            print $message;
+            print $message unless $quiet;
         }
         else {
             $subscriptionId = $session->db->quickScalar(
@@ -1377,7 +1377,7 @@ EOSQL3
         );
     }
 
-    print "\tDone.\n";
+    print "\tDone.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -1396,7 +1396,7 @@ sub addPackage {
     my $session     = shift;
     my $file        = shift;
 
-print "Importing package: $file...";
+    print "Importing package: $file..." unless $quiet;
     # Make a storage location for the package
     my $storage     = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
@@ -1407,7 +1407,7 @@ print "Importing package: $file...";
     # Make the package not a package anymore
     $package->update({ isPackage => 0 });
 
-print "Done\n";
+    print "Done\n" unless $quiet;
 }
 
 #-------------------------------------------------
