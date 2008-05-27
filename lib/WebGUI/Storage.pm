@@ -21,7 +21,6 @@ use File::Copy qw(cp);
 use FileHandle;
 use File::Find;
 use File::Path;
-use POSIX;
 use Storable qw(nstore retrieve);
 use strict;
 use warnings;
