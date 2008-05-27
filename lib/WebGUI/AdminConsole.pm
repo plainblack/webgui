@@ -399,7 +399,7 @@ sub getAdminFunction {
 			},
 			icon    => "shop.gif",
 			url      => $self->session->url->page("shop=admin"),
-            group   => $session->setting->get('groupIdAdminCommerce'),
+            group   => $self->session->setting->get('groupIdAdminCommerce'),
 		},
 		"cache" => {
             title => {
