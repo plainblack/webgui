@@ -24,6 +24,7 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::Asset::Sku::Product;
 
 #----------------------------------------------------------------------------
 # Init
@@ -52,6 +53,8 @@ SKIP: {
     # import
     #
     #######################################################################
+
+    my $importNode = WebGUI::Asset::Sku::Product->getProductImportNode($session);
 
     eval { WebGUI::Shop::Products::importProducts($session); };
     $e = Exception::Class->caught();

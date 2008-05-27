@@ -96,7 +96,7 @@ sub importProducts {
     my @headers = WebGUI::Text::splitCSV($headers);
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
         unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-sku-title-weight')
-           and (scalar @headers == 5);
+           and (scalar @headers == 7);
     my @productData = ();
     my $line = 1;
     while (my $productRow = <$table>) {
@@ -104,13 +104,29 @@ sub importProducts {
         $productRow =~ s/\s*#.+$//;
         next unless $productRow;
         local $_;
-        my @productRow = map { tr/|/,/; $_; } WebGUI::Text::splitCSV($productRow);
+        my @productRow = WebGUI::Text::splitCSV($productRow);
         WebGUI::Error::InvalidFile->throw(error => qq{Error found in the CSV file}, brokenFile => $filePath, brokenLine => $line)
-            unless scalar @productRow == 5;
+            unless scalar @productRow == 7;
         push @productData, [ @productRow ];
     }
     ##Okay, if we got this far, then the data looks fine.
     return unless scalar @productData;
+    my $fetchProductId = $session->db->prepare('select assetId from Product where mastersku=? order by revisionDate DESC limit 1');
+    foreach my $productRow (@productData) {
+        my %productRow;
+        ##Order the data according to the headers, in whatever order they exist.
+        @productRow { @headers } = @{ $productRow };
+        $fetchProductId->execute([$productRow->{mastersku}]);
+        my ($assetId) = $fetchProductId->hashRef->{assetId};
+        ##If the assetId exists, we update data for it
+        if ($assetId) {
+            my $product = WebGUI::Asset->newPending($session, $assetId);
+            ##Error handling for locked assets
+        }
+        else {
+            ##Insert a new product;
+        }
+    }
     return 1;
 }
 
