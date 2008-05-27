@@ -1,6 +1,7 @@
 7.4.39
  - fixed: Creating a shortcut creates a version tag even with autocommit turned on
  - fixed: email password recovery submit button effected by UI level
+ - fixed: Syndicated content fills results with empty entries up to max headlines count
 
 7.4.38
  - fixed: CS mail retrieval doesn't decode subject properly
