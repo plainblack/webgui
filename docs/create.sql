@@ -8,6 +8,16 @@ CREATE TABLE `Article` (
   `storageId` varchar(22) character set utf8 collate utf8_bin default NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `zArticle` (
+  `linkTitle` varchar(255) default NULL,
+  `linkURL` text,
+  `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL default '',
+  `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL default '',
+  `revisionDate` bigint(20) NOT NULL default '0',
+  `cacheTimeout` int(11) NOT NULL default '3600',
+  `storageId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  PRIMARY KEY  (`assetId`,`revisionDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `Article` VALUES (NULL,NULL,'NK8bqlwVRILJknqeCDPBHg','PBtmpl0000000000000002',1147642515,3600,'0jTuDoyTcQK6ju8cs8a4ew'),(NULL,NULL,'bX5rYxb6tZ9docY6sUhBlw','PBtmpl0000000000000002',1147642514,3600,'r3QdZwvuVK9o9kLb7mpHGQ'),(NULL,NULL,'OhdaFLE7sXOzo_SIP2ZUgA','PBtmpl0000000000000002',1147642513,3600,'GY5wyiuNmZZyLdgFt3zluQ'),(NULL,NULL,'IWFxZDyGhQ3-SLZhELa3qw','PBtmpl0000000000000002',1147642514,3600,'BS9OtDY_8oUnmzStD-wPmg'),(NULL,NULL,'6QuS-0rosuZTdTv11fobig','PBtmpl0000000000000002',1147642515,3600,'qDIYM6Jcmkk_LmWZIqqJ7w'),(NULL,NULL,'ix1p0AbwKAz8QWB-T-HHfg','PBtmpl0000000000000002',1147642516,3600,'gU8kZk0nV6SqcwKqSiojQQ'),(NULL,NULL,'iCYOjohB9SKvAPr6bXElKA','PBtmpl0000000000000002',1147642516,3600,'eTxnooflqjFWIwkyfE0nPQ'),(NULL,NULL,'4Yfz9hqBqM8OYMGuQK8oLw','PBtmpl0000000000000002',1147642516,3600,'x4_4U_yb-MAGELG0jxAqpQ'),(NULL,NULL,'Wl8WZ43g2rK5AYr9o4zY7w','PBtmpl0000000000000002',1147642516,3600,'QlXRvOaqkv9X2kY-eAQXKA'),(NULL,NULL,'LBuiKzg2mWwmOPS9AgV3bg','PBtmpl0000000000000002',1147642517,3600,'UYaT3bhIk9HXmX1io5MdlQ'),(NULL,NULL,'jTNggl7AoVSUc_ZzrvuCmw','PBtmpl0000000000000002',1147642517,3600,'NWhmkoojuu9dA4_zv3a4pg'),(NULL,'http://','FOvmwGC0GtZo5VTxJIL3OA','PBtmpl0000000000000002',1207068851,3600,'WOkKCSUedPrlPkYwsTgEEA');
 CREATE TABLE `Calendar` (
   `assetId` varchar(22) NOT NULL,
@@ -1502,6 +1512,54 @@ CREATE TABLE `databaseLink` (
   `allowMacroAccess` int(11) NOT NULL default '0',
   `additionalParameters` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`databaseLinkId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `fluxRule` (
+  `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `label` varchar(255) NOT NULL default 'Undefined',
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `createdBy` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `dateCreated` datetime NOT NULL,
+  `stickyAccess` tinyint(1) NOT NULL default '0',
+  `onFirstTrueWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onFirstFalseWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onFirstAccessWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onFirstDenyWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onAccessWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `onDenyWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `combinedExpression` mediumtext default NULL,
+  PRIMARY KEY  (`fluxRuleId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `fluxRuleUserData` (
+  `fluxRuleUserDataId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `dateFirstTrue` datetime default NULL,
+  `dateFirstFalse` datetime default NULL,
+  `dateFirstAccess` datetime default NULL,
+  `dateFirstDeny` datetime default NULL,
+  `dateMostRecentAccess` datetime default NULL,
+  `dateMostRecentDeny` datetime default NULL,
+  PRIMARY KEY  (`fluxRuleUserDataId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `fluxExpression` (
+  `fluxExpressionId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `label` varchar(255) NOT NULL default 'Undefined',
+  `sequenceNumber` int(11) NOT NULL default '0',
+  `createdBy` varchar(22) character set utf8 collate utf8_bin NOT NULL,
+  `dateCreated` datetime NOT NULL,
+  `operand1` varchar(255) NOT NULL,
+  `operand1Args` mediumtext default NULL,
+  `operand1AssetId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `operand1PostProcess` varchar(255) default NULL,
+  `operand1PostProcessArgs` mediumtext default NULL,
+  `operand2` varchar(255) NOT NULL,
+  `operand2Args` mediumtext default NULL,
+  `operand2AssetId` varchar(22) character set utf8 collate utf8_bin default NULL,
+  `operand2PostProcess` varchar(255) default NULL,
+  `operand2PostProcessArgs` mediumtext default NULL,
+  `operator` varchar(255) NOT NULL,
+  PRIMARY KEY  (`fluxExpressionId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 CREATE TABLE `friendInvitations` (
   `inviteId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
