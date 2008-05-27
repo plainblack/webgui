@@ -34,17 +34,32 @@ Describes how to format the results of the SQL statement.  For each
 term in in a select-type statement, a numeric macro (^0, ^1, etc.)can
 be used to position its output in the format.
 
+=head3 databaseLinkId
+
+The id of the databaseLink to use. Default is the WebGUI database which has id '0'. 
+The databaseLink must allow macro access, otherwise an error will be returned. 
+
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-	my ($output, @data, $rownum, $temp);
-	my ($statement, $format) = @_;
-	my $i18n = WebGUI::International->new($session,'Macro_SQL');
+	my ($output, @data, $rownum, $temp, $dbh);
+	my ($statement, $format, $databaseLinkId) = @_;
+    my $i18n = WebGUI::International->new($session,'Macro_SQL');
+
+    $databaseLinkId ||= '0'; 
+    my $dbLink = WebGUI::DatabaseLink->new($session, $databaseLinkId);
+    if($dbLink->macroAccessIsAllowed()){
+        $dbh = $dbLink->db;
+    }
+    else{
+        return $i18n->get('database access not allowed');
+    }
+
 	$format = '^0;' if ($format eq "");
 	if ($statement =~ /^\s*select/i || $statement =~ /^\s*show/i || $statement =~ /^\s*describe/i) {
-		my $sth = $session->dbSlave->unconditionalRead($statement);
+		my $sth = $dbh->unconditionalRead($statement);
 		unless ($sth->errorCode < 1) { 
 			return sprintf $i18n->get('sql error'), $sth->errorMessage;
 		} else {

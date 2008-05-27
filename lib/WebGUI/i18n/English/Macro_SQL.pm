@@ -18,6 +18,11 @@ our $I18N = {
 		lastUpdated => 1135105919,
 	},
 
+    'database access not allowed' => {
+        message => q|The database does not allow access from Macro's.|,
+        lastUpdated => 1135105919,
+    },
+
 };
 
 1;

@@ -56,8 +56,10 @@ sub _submenu {
 	my $dlid = $session->form->process("dlid");
 	if (($session->form->process("op") eq "editDatabaseLink" && $dlid ne "new") || $session->form->process("op") eq "deleteDatabaseLink") {
         $ac->addSubmenuItem($session->url->page('op=editDatabaseLink;dlid='.$dlid), $i18n->get(983));
-        $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$dlid), $i18n->get(984));
-        $ac->addConfirmedSubmenuItem($session->url->page("op=deleteDatabaseLinkConfirm;dlid=".$dlid), $i18n->get(985), $i18n->get(988));
+        unless ($dlid eq "0"){
+            $ac->addSubmenuItem($session->url->page('op=copyDatabaseLink;dlid='.$dlid), $i18n->get(984));
+            $ac->addConfirmedSubmenuItem($session->url->page("op=deleteDatabaseLinkConfirm;dlid=".$dlid), $i18n->get(985), $i18n->get(988));
+        }
         $ac->addSubmenuItem($session->url->page('op=listDatabaseLinks'), $i18n->get(986));
 	}
         return $ac->render($workarea, $title);
@@ -158,10 +160,9 @@ sub www_editDatabaseLink {
 	if ($session->form->process("dlid") eq "new") {
 		# Default values are SELECT, DESCRIBE and SHOW
 		$db{allowedKeywords} = "select\ndescribe\nshow";		
-	} elsif ($session->form->process("dlid") eq "0") {
-		
-	} else {
-               	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
+	} 
+    else {
+       	%db = %{WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->get}; 
 	}
 	my $i18n = WebGUI::International->new($session);
 	$f = WebGUI::HTMLForm->new($session,
@@ -181,12 +182,22 @@ sub www_editDatabaseLink {
 		-label => $i18n->get(991),
 		-hoverHelp => $i18n->get('991 description'),
 	);
-        $f->text(
-		-name => "title",
+    if ($session->form->process("dlid") eq "0"){
+        $f->readOnly(
 		-label => $i18n->get(992),
 		-hoverHelp => $i18n->get('992 description'),
 		-value => $db{title},
         );
+    }
+    else{
+        $f->text(
+        -name => "title",
+        -label => $i18n->get(992),
+        -hoverHelp => $i18n->get('992 description'),
+        -value => $db{title},
+        );
+    }
+    unless ($session->form->process("dlid") eq "0"){
         $f->text(
 		-name => "DSN",
 		-label => $i18n->get(993),
@@ -205,12 +216,13 @@ sub www_editDatabaseLink {
 		-hoverHelp => $i18n->get('995 description'),
 		-value => $db{identifier},
         );
-	$f->textarea(
+	    $f->textarea(
 		-name => "allowedKeywords",
 		-label => $i18n->get('allowed keywords'),
 		-hoverHelp => $i18n->get('allowed keywords description'),
 		-value => $db{allowedKeywords},
-	);
+    	);
+    }
     $f->yesNo(
 		-name => "allowMacroAccess",
 		-label => $i18n->get('allow access from macros'),
@@ -218,13 +230,15 @@ sub www_editDatabaseLink {
         -defaultValue=>0,
 		-value => $db{allowMacroAccess},
 	);
-    $f->textarea(
+    unless ($session->form->process("dlid") eq "0"){
+        $f->textarea(
 		-name => "additionalParameters",
 		-label => $i18n->get('additional parameters'),
 		-hoverHelp => $i18n->get('additional parameters help'),
         -defaultValue=>'',
 		-value => $db{additionalParameters},
-	);
+	    );
+    }
 	$f->submit;
 	$output .= $f->print;
         return _submenu($session,$output,"990");
@@ -244,25 +258,33 @@ Returns the user the Link Database Links screen.
 sub www_editDatabaseLinkSave {
 	my ($allowedKeywords);
 	my $session = shift;
-        return $session->privilege->insufficient unless canView($session);
+    my $params;
+    return $session->privilege->insufficient unless canView($session);
 	
 	# Convert enters to a single \n.
-	($allowedKeywords = $session->form->process("allowedKeywords")) =~ s/\s+/\n/g;
-	my $params = {
-		title=>$session->form->process("title"),
-		username=>$session->form->process("dbusername"),
-		identifier=>$session->form->process("dbidentifier"),
-		DSN=>$session->form->process("DSN"),
-		allowedKeywords=>$allowedKeywords,
-		allowMacroAccess=>$session->form->process("allowMacroAccess"),
-		additionalParameters=>$session->form->process("additionalParameters"),
-    };
+    if ($session->form->process("dlid") eq "0"){
+        $params = {
+            allowMacroAccess=>$session->form->process("allowMacroAccess"),
+        };
+    }
+    else{
+        ($allowedKeywords = $session->form->process("allowedKeywords")) =~ s/\s+/\n/g;
+    	$params = {
+	    	title=>$session->form->process("title"),
+		    username=>$session->form->process("dbusername"),
+    		identifier=>$session->form->process("dbidentifier"),
+	    	DSN=>$session->form->process("DSN"),
+		    allowedKeywords=>$allowedKeywords,
+    		allowMacroAccess=>$session->form->process("allowMacroAccess"),
+	    	additionalParameters=>$session->form->process("additionalParameters"),
+        };
+    }
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
 	} else {
 		WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->set($params);
 	}
-        return www_listDatabaseLinks($session);
+    return www_listDatabaseLinks($session);
 }
 
 #-------------------------------------------------------------------
@@ -288,6 +310,9 @@ sub www_listDatabaseLinks {
 				.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
 				.$session->icon->copy('op=copyDatabaseLink;dlid='.$id);
 		}
+        elsif ($id eq '0') {
+            $output .= $session->icon->edit('op=editDatabaseLink;dlid='.$id);
+        }
 		$output	.= '</td>';
                 $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
         }

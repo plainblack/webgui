@@ -67,6 +67,7 @@
  - fixed: CS mail retrieval doesn't decode subject properly
  - fixed: email password recovery fields effected by UI level
  - Complete rewrite of the Asset Manager
+ - added: Database link access for SQL Macro (Yung Han Khoe)
 
 7.5.10
  - fix: Syntax error in GetCsMail

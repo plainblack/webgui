@@ -61,6 +61,7 @@ addVendors($session);
 modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
 migrateSubscriptions( $session );
+addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
 
 finish($session); # this line required
@@ -1363,6 +1364,13 @@ EOSQL3
     print "\tDone.\n";
 }
 
+#----------------------------------------------------------------------------
+sub addDBLinkAccessToSQLMacro {
+    my $session = shift;
+    print "\tAdding DBLink access to SQL Macro ..." unless ($quiet);
+    $session->db->write("insert into databaseLink (databaseLinkId, allowMacroAccess) values ('0','1')");
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
