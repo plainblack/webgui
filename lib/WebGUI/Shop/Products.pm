@@ -27,6 +27,26 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 exportProducts ( $session )
+
+Export all products from the WebGUI system in a CSV file.  For details
+about the file format, see importProducts.
+
+Returns a temporary WebGUI::Storage object containing the file.  The
+file will be named siteProductData.csv.
+
+=cut
+
+sub exportProducts {
+    my $session  = shift;
+    my $productData = '';
+    my $storage = WebGUI::Storage->createTemp($session);
+    $storage->addFileFromScalar('siteProductData.csv', $productData);
+    return $storage;
+}
+
+#-------------------------------------------------------------------
+
 =head2 importProducts ( $session, $filePath )
 
 Import products into the WebGUI system.  If the master sku of a product
