@@ -121,12 +121,18 @@ sub www_editSettings {
     $form->submit;
     $form->hidden(name=>"shop", value=>"admin");
     $form->hidden(name=>"method", value=>"editSettingsSave");
+    $form->group(
+        name        => "groupIdAdminCommerce",
+        value       => $setting->get("groupIdAdminCommerce"),
+        label       => $i18n->get('who can manage'),
+        hoverHelp   => $i18n->get('who can manage help'),
+        );
     $form->template(
         name        => "shopCartTemplateId",
         value       => $setting->get("shopCartTemplateId"),
-        label       => $i18n->get("shopping cart template"),
+        label       => $i18n->get("cart template"),
         namespace   => "Shop/Cart",
-        hoverHelp   => $i18n->get("shopping cart template help"),
+        hoverHelp   => $i18n->get("cart template help"),
         );
     $form->template(
         name        => "shopAddressBookTemplateId",
@@ -172,11 +178,11 @@ sub www_editSettingsSave {
     my $self = shift;
     return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
     my ($setting, $form) = $self->session->quick(qw(setting form));
-    $setting->set("shopMyPurchasesDetailTemplateId", $form->get("shopMyPurchasesDetailTemplateId", "template"));
-    $setting->set("shopMyPurchasesTemplateId", $form->get("shopMyPurchasesTemplateId", "template"));
-    $setting->set("shopCartTemplateId", $form->get("shopCartTemplateId", "template"));
-    $setting->set("shopAddressBookTemplateId", $form->get("shopAddressBookTemplateId", "template"));
-    $setting->set("shopAddressTemplateId", $form->get("shopAddressTemplateId", "template"));
+    foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
+        shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
+        $setting->set($template, $form->get($template, "template"));
+    }
+    $setting->set("groupIdAdminCommerce", $form->get("groupIdAdminCommerce", "group"));
     return $self->www_editSettings();   
 }
 

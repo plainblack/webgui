@@ -383,6 +383,32 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 getRecurInterval
+
+Returns the duration of this subscription in a format used by the commerce system.
+
+=cut
+
+sub getRecurInterval {
+    my $self    = shift;
+
+    return $self->get('duration');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRecurring
+
+Tells the commerce system this Sku is recurring.
+
+=cut
+
+sub isRecurring {
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 onCompletePurchase
 
 Applies the first term of the subscription. This method is called when the payment is successful.

@@ -1048,6 +1048,42 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
     },
 
+    'search' => {
+        message     => q{Search},
+        lastUpdated => 0,
+        context     => "Label for the Search function of the asset manager",
+    },
+
+    'with selected' => {
+        message     => q{With Selected: },
+        lastUpdated => 0,
+        context     => q{Introduction to the action buttons.},
+    },
+
+
+    'update' => {
+        message     => q{Update},
+        lastUpdated => 0,
+        context     => q{Label for the update action. Currently only affects rank.},
+    },
+
+    'page indicator' => {
+        message     => q{Showing page %s of %s},
+        lastUpdated => 0,
+        context     => q{Which page we're on. First field is the current page. Second field is the total number of pages},
+    },
+
+    'no results' => {
+        message     => q{No Results Found!},
+        lastUpdated => 0,
+        context     => q{Message when no assets match search criteria},
+    },
+
+    'menu label' => {
+        message     => q{More},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
 };
 
 1;

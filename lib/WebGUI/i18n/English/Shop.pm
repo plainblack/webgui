@@ -4,7 +4,7 @@ use strict;
 
 our $I18N = { 
 	'thank you message' => {
-		message 	=> q|Thank you for your order! Please print this page as your receipt.|,
+		message 	=> q|Thank you for your order! Please save this as your receipt.|,
 		lastUpdated	=> 0,
 		context		=> q|notice after purchase|,
 	},
@@ -44,13 +44,7 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|a help title|,
 	},
-	
-	'edit address template' => {
-		message 	=> q|Edit Address Template|,
-		lastUpdated	=> 0,
-		context		=> q|a help title|,
-	},
-	
+		
 	'cart template' => {
 		message 	=> q|Cart Template|,
 		lastUpdated	=> 0,
@@ -256,21 +250,27 @@ our $I18N = {
 	},
 	
 	'cart template help' => {
-		message 	=> q|The following variables are available in the shopping cart template.|,
+		message 	=> q|This template determines what the shopping cart looks like.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
 	
 	'address book template help' => {
-		message 	=> q|The following variables are available for templating the Address Book.|,
+		message 	=> q|This template determines what the address book will look like.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
 	
-	'address book template help' => {
-		message 	=> q|The following variables are available from in the address book template.|,
+	'who can manage help' => {
+		message 	=> q|The group that has management rights over commerce.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
+	},
+	
+	'who can manage' => {
+		message 	=> q|Who can manage?|,
+		lastUpdated	=> 0,
+		context		=> q|a setting|,
 	},
 	
 	'address loop help' => {
@@ -305,12 +305,6 @@ our $I18N = {
 	
 	'addButton help' => {
 		message 	=> q|A button that will allow the user to add a new address.|,
-		lastUpdated	=> 0,
-		context		=> q|a help description|,
-	},
-	
-	'edit address template help' => {
-		message 	=> q|The following variables are available in the edit address template.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -387,6 +381,12 @@ our $I18N = {
 		context		=> q|a link label|,
 	},
 	
+	'my purchases' => { 
+		message => q|My Purchases|,
+		lastUpdated => 0,
+		context => q|a screen heading|
+	},
+
 	'my purchases template' => { 
 		message => q|My Purchases Template|,
 		lastUpdated => 0,
@@ -543,28 +543,10 @@ our $I18N = {
 		context => q|button in shipping manager|
 	},
 
-	'shopping cart template' => { 
-		message => q|Cart Template|,
-		lastUpdated => 0,
-		context => q|commerce setting|
-	},
-
-	'shopping cart template help' => { 
-		message => q|Choose the template that you want used to render the shopping cart.|,
-		lastUpdated => 0,
-		context => q|commerce setting help|
-	},
-
 	'address book template' => { 
 		message => q|Address Book Template|,
 		lastUpdated => 0,
 		context => q|commerce setting|
-	},
-
-	'address book template help' => { 
-		message => q|Choose the template you want used to render the address book.|,
-		lastUpdated => 0,
-		context => q|commerce setting help|
 	},
 
 	'edit address template' => { 
@@ -574,7 +556,7 @@ our $I18N = {
 	},
 
 	'edit address template help' => { 
-		message => q|Choose the template you want used to render the address edit form.|,
+		message => q|This template determines what the address editor will look like.|,
 		lastUpdated => 0,
 		context => q|commerce setting help|
 	},

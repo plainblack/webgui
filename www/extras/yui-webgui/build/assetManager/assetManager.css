@@ -1,0 +1,139 @@
+
+/*** Asset manager Stylesheet ***/
+
+/* Override retarded admin console styles */
+li, td, a, a:link, a:hover, a:visited, a:active, #assetManager {
+    font-size:          10pt;
+    font-family:        "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+}
+
+a:link, a:visited, a:active {
+    color:              blue;
+}
+
+a:hover {
+    color:              purple;
+}
+
+/** Page stats **/
+#pageStats {
+    float:              right;
+    text-align:         right;
+}
+
+#pageLinks {
+    float:              right;
+    text-align:         right;
+}
+
+/** Crumbtrail **/
+#crumbtrail ol {
+    float:              left;
+}
+
+#crumbtrail li {
+    list-style:         none;
+    float:              left;
+    padding-left:       0.5em;
+}
+
+/* fix more menu */
+#crumbtrail li li {
+    float:              none;
+}
+
+/** More menus **/
+.moreMenu {
+    position:           relative;
+}
+
+.moreMenu ul {
+    display:            none;
+    position:           absolute;
+    top:                1em;
+    left:               0;
+    width:              12em;
+    margin:             0;
+    padding:            0;
+    background-color:   white;
+    border:             1px solid blue;
+    z-index:            1000;
+}
+
+.moreMenu li {
+    list-style:         none;
+    background-color:   white;
+}
+
+.moreMenu li a {
+    display:            block;
+    padding:            0.25em;
+    z-index:            1100;
+    text-align:         left;
+    width:              10em;
+}
+
+/** Asset Manager table **/
+.assetManager {
+    clear:              both;
+    width:              100%;
+}
+
+.assetManager th {
+    border:             solid #666;
+    border-width:       0 1px 2px 0;
+    background-color:   #eee;
+}
+
+.assetManager th, .assetManager td {
+    padding:            0 0.8em;
+}
+
+#assetManager th, #assetManager td, .assetManager {
+    font-size:          0.8em;
+}
+
+.assetManager .center, .assetManager th {
+    text-align:         center;
+}
+
+.assetManager .right {
+    text-align:         right;
+}
+
+.hasChildren {
+    font-family:        "Courier New", monospace;
+}
+
+.assetManager .rank {
+    text-align:         right;
+}
+
+.assetManager a:link, .assetManager a:visited, .assetManager a:active, .assetManager a:hover {
+    font-size:          8pt;
+}
+
+.assetManager tr.alt td {
+    background-color:   #ddd;
+}
+
+.assetManager tr.highlight td {
+    background-color:   #CCF;
+}
+
+/** Actions **/
+.actions    {
+    float:              left;
+}
+
+/** The function panes **/
+.functionPane {
+    width:              28%; 
+    float:              left; 
+    padding-right:      30px; 
+    font-size:          14px;
+}
+
+.functionPane a {
+    vertical-align:     bottom;
+}

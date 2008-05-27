@@ -368,9 +368,9 @@
         "RootTitle" : "RootTitle", 
         "Spacer" : "Spacer", 
         "Thumbnail" : "Thumbnail", 
-        "u" : "u_companyUrl"
+        "u" : "u_companyUrl",
         "User" : "User", 
-        "ViewCart" : "ViewCart",
+        "ViewCart" : "ViewCart"
 	},
 
 #Specify any LDAP aliases for synchronizing user profiles to LDAP	

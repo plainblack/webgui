@@ -3,34 +3,34 @@ package WebGUI::i18n::English::PayDriver;
 use strict; 
 
 our $I18N = {
-	'thank you for your order' => { 
-		message => q|Thank You For Your Order|,
-		lastUpdated => 0,
-		context => q|commerce setting|
+	'receipt subject' => {
+		message 	=> q|Receipt for Order #|,
+		lastUpdated	=> 0,
+		context		=> q|notice after purchase|,
 	},
-
+	
 	'a sale has been made' => { 
-		message => q|A Sale Has Been Made|,
+		message => q|A sale has been made. Order #|,
 		lastUpdated => 0,
 		context => q|commerce setting|
-	},
-
-	'sale notification template' => { 
-		message => q|Sale Notification Template|,
-		lastUpdated => 0,
-		context => q|commerce setting|
-	},
-
-	'sale notification template help' => { 
-		message => q|Which template should be used to generate the email that notifies this store owner about a new sale.|,
-		lastUpdated => 0,
-		context => q|commerce setting help|
 	},
 
 	'sale notification group' => { 
 		message => q|Sale Notification Group|,
 		lastUpdated => 0,
 		context => q|commerce setting|
+	},
+
+	'error processing payment' => { 
+		message => q|Error Processing Payment|,
+		lastUpdated => 0,
+		context => q|the title of the error screen|
+	},
+
+	'error processing payment message' => { 
+		message => q|There has been an error processing your payment. Usually this is caused by typing errors. However, there may be a connectivity problem, or your account may not have the funds required to complete this transaction. The error message we received is below. Use your browser's back button to go back and correct mistakes. If this problem persists please contact us.|,
+		lastUpdated => 0,
+		context => q|the description on the error screen|
 	},
 
 	'sale notification group help' => { 

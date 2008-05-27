@@ -950,13 +950,13 @@ sub www_edit {
 
         # Raw HTML here to provide proper value for the image
         $file->{ form_promote }
-            = qq{<button type="submit" name="promote" value="$file->{assetId}">}
+            = qq{<button type="submit" name="promote" class="promote" value="$file->{assetId}">}
             . $session->icon->moveUp( undef, undef, "disabled" )
             . qq{</button>}
             ;
 
         $file->{ form_demote }
-            = qq{<button type="submit" name="demote" value="$file->{assetId}">}
+            = qq{<button type="submit" name="demote" class="demote" value="$file->{assetId}">}
             . $session->icon->moveDown( undef, undef, "disabled" )
             . qq{</button>}
             ;

@@ -30,7 +30,10 @@ WebGUI.Form.toggleAllCheckboxesInForm
             if (checkboxesName && input.name != checkboxesName) 
                 continue;
 
+            // Change the state
             input.checked = state;
+            // Run the appropriate scripts
+            input.onchange();
         }
 
         // Update the saved state

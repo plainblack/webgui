@@ -53,10 +53,13 @@ sub handler {
     $request->push_handlers(PerlResponseHandler => sub {
         my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
         foreach my $handler (@{$config->get("contentHandlers")}) {
-            my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] ) };
+            my $output = WebGUI::Pluggable::run($handler, "handler", [ $session ] );
             if ( my $e = WebGUI::Error->caught ) {
                 $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
                 $session->errorHandler->debug($e->package.":".$e->line." - ".$e->trace);
+            }
+            elsif ( $@ ) {
+                $session->errorHandler->error( $@ );
             }
             else {
                 if ($output eq "chunked") {

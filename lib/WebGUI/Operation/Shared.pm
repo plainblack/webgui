@@ -65,9 +65,7 @@ TODO: DOCUMENT ME
 		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewInbox').'">'.$i18n->get(354).'</a>';
 		push(@array,\%hash);
 	}
-	unless ($op eq "redeemSubscriptionCode") {
-		push(@array, {'options.display' => '<a href="'.$session->url->page('op=redeemSubscriptionCode').'">'.$i18n->get('redeem code', 'Subscription').'</a>'});
-	}
+		push(@array, {'options.display' => '<a href="'.$session->url->page('shop=transaction;method=manageMy').'">'.$i18n->get('my purchases', 'Shop').'</a>'});
 	
     if ($session->setting->get('userInvitationsEnabled')) {
         push @array, {

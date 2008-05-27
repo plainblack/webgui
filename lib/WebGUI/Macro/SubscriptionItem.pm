@@ -28,12 +28,33 @@ be used from the Macro/SubscriptionItem namespace.
 =cut
 
 sub process {
-	my $session = shift;
-	my ($subscriptionId, $templateId, %var);
-	($subscriptionId, $templateId) = @_;
-	%var = $session->db->quickHash('select * from subscription where subscriptionId='.$session->db->quote($subscriptionId));
-	$var{url} = $session->url->page('op=purchaseSubscription;sid='.$subscriptionId);
-	return WebGUI::Asset::Template->new($session,$templateId || "PBtmpl0000000000000046")->process(\%var);
+	my $session         = shift;
+    my $subscriptionId  = shift;
+    my $templateId      = shift || 'PBtmpl0000000000000046';
+
+    # Fetch subscription asset
+    my $subscription = WebGUI::Asset->newByDynamicClass( $session, $subscriptionId );
+    return "Could not find subscription with id: [$subscriptionId]" unless $subscription;
+    return "Only Subscription assets can be used with this macro."
+        unless $subscription->get('className') =~ m{^WebGUI::Asset::Sku::Subscription};
+
+    # Setup template vars
+    my $var;
+    $var->{ subscriptionId      } = $subscription->getId;
+    $var->{ name                } = $subscription->get('title');
+    $var->{ price               } = $subscription->getPrice;
+    $var->{ description         } = $subscription->get('description');
+    $var->{ subscriptionGroup   } = $subscription->get('subscriptionGroup');
+    $var->{ duration            } = $subscription->get('duration');
+    $var->{ karma               } = $subscription->get('karma');
+    $var->{ useSalesTax         } = $subscription->get('useSalesTax');
+    $var->{ url                 } = $subscription->getUrl('func=purchaseSubscription');
+
+    # Fetch template 
+    my $template = WebGUI::Asset::Template->new( $session, $templateId );
+    return "Could not instantiate template with id:[$templateId]" unless $template;
+
+	return $template->process( $var );
 }
 
 1;

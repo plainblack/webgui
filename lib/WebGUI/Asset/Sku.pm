@@ -18,7 +18,7 @@ use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset';
 use WebGUI::International;
-use WebGUI::Mail::Send;
+use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
 
 
@@ -418,13 +418,13 @@ sub onCancelRecurring {
 	my ($self, $item) = @_;
 	my $session = $self->session;
 	my $i18n = WebGUI::International->new($session, "Shop");
-	my $mail = WebGUI::Mail::Send->new($session, {
+	my $inbox = WebGUI::Inbox->new($session);
+	my $message = sprintf $i18n->get('cancel recurring message','Asset_Sku'), $item->transaction->get('orderNumber'), $item->get('configuredTitle'), $item->transaction->get('username');
+	$inbox->addMessage({
 		toGroup	=> $self->session->setting->get('groupIdAdminCommerce'),
 		subject	=> $i18n->get('shop notice'),
+		message => $message,
 		});
-	my $message = sprintf $i18n->get('cancel recurring message','Asset_Sku'), $item->transaction->get('orderNumber'), $item->get('configuredTitle'), $item->transaction->get('username');
-	$mail->addText($message);
-	$mail->queue;
 	return undef;
 }
 
