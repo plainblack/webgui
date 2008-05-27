@@ -70,7 +70,6 @@ quantity
 
 =back
 
-
 The following lines will contain product information.  Blank
 lines and anything following a '#' sign will be ignored from
 the second line of the file, on to the end.
@@ -96,7 +95,7 @@ sub importProducts {
     chomp $headers;
     my @headers = WebGUI::Text::splitCSV($headers);
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
-        unless (join(q{-}, sort @headers) eq 'city-code-country-state-taxRate')
+        unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-sku-title-weight')
            and (scalar @headers == 5);
     my @productData = ();
     my $line = 1;
