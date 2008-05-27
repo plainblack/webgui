@@ -155,7 +155,8 @@ sub www_approveVersionTag {
     return $session->privilege->insufficient 
         unless canApproveVersionTag( $session, $tag );
     
-    my $activity    = $tag->getWorkflowInstance->getNextActivity;
+    my $instance    = $tag->getWorkflowInstance;
+    my $activity    = $instance->getNextActivity;
 
     if ( $session->form->process("status", "selectBox") eq "approve" ) {
         $activity->setApproved( $instance );
@@ -581,7 +582,7 @@ sub www_manageRevisionsInTag {
     
     ### Permissions check
     # This screen is also used to approve/deny the tag, so check that first
-    if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) {
+    if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) ) {
         return $session->privilege->insufficient;
     }
 
