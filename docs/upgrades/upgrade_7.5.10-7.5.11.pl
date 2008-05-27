@@ -1039,6 +1039,12 @@ sub removeOldCommerceCode {
     unlink '../../lib/WebGUI/Help/Subscription.pm';
     unlink '../../lib/WebGUI/i18n/English/Subscription.pm';
 
+    unlink '../../www/extras/adminConsole/subscriptions.gif';
+    unlink '../../www/extras/adminConsole/small/subscriptions.gif';
+    unlink '../../www/extras/adminConsole/productManager.gif';
+    unlink '../../www/extras/adminConsole/small/productManager.gif';
+
+
     #Disable the Product macro in the config file.  You can't use the convenience method
     #deleteFromHash since the macro name is in the value, not the key.
     my %macros = %{ $config->get('macros') };
