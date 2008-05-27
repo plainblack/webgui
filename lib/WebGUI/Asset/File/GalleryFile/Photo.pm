@@ -224,9 +224,12 @@ sub getTemplateVars {
 
     ### Download resolutions
     for my $resolution ( @{ $self->getResolutions } ) {
+        my $downloadUrl = $self->getStorageLocation->getPathFrag( $resolution );
         push @{ $var->{ resolutions_loop } }, { 
-            url_download => $self->getStorageLocation->getPathFrag($resolution) 
+            resolution      => $resolution,
+            url_download    => $downloadUrl,
         };
+        $var->{ "resolution_" . $resolution } = $downloadUrl;
     }
 
     ### Format exif vars
@@ -392,7 +395,7 @@ sub updateExifDataFromFile {
     }
 
     # Remove other, pointless keys
-    for my $key ( qw( Directory ) ) {
+    for my $key ( qw( Directory NativeDigest ) ) {
         delete $info->{ $key };
     }
 

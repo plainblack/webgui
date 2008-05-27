@@ -338,9 +338,45 @@ Gets the Gallery asset this GalleryFile is a member of.
 
 sub getGallery {
     my $self        = shift;
-    my $gallery     = $self->getParent->getParent;
-    return $gallery if $gallery->isa("WebGUI::Asset::Wobject::Gallery");
-    return undef;
+
+    # We're using getLinage instead of getParent->getParent because of the 
+    # overridden getParent, below. 
+    # We need to be able to get the Gallery WITHOUT having to get the GalleryAlbum
+    my $gallery 
+        = $self->getLineage( ['ancestors'], { 
+            includeOnlyClasses      => [ 'WebGUI::Asset::Wobject::Gallery' ],
+            returnObjects           => 1,
+            invertTree              => 1,
+        } )->[ 0 ];
+
+    return $gallery;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getParent ( )
+
+Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is 
+"pending", return that anyway.
+
+=cut
+
+sub getParent {
+    my $self        = shift;
+    if ( my $album = $self->getParent ) {
+        return $album;
+    }
+    # Only get the pending version if we're allowed to see this photo in its pending status
+    elsif ( $self->getGallery->canEdit || $self->get( 'ownerUserId' ) eq $self->session->user->userId ) {
+        my $album
+            = $self->getLineage( ['ancestors'], {
+                includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
+                returnObjects       => 1,
+                statusToInclude     => [ 'pending', 'approved' ],
+                invertTree          => 1,
+            } )->[ 0 ];
+        return $album;
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -375,6 +411,11 @@ sub getTemplateVars {
 
     $var->{ fileUrl             } = $self->getFileUrl;
     $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
+
+    # Set a flag for pending files
+    if ( $self->get( "status" ) eq "pending" ) {
+        $var->{ 'isPending' } = 1;
+    }
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
     for my $key ( qw( synopsis ) ) {
