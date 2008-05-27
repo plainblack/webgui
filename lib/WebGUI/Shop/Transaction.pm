@@ -862,9 +862,10 @@ sub www_view {
             };
         if ($transaction->get('isRecurring')) {
             $output .= q{   
-                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a></div>
+                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a>
                 };
         }
+        $output .= q{</div>};
     }
     $output .= q{   
         <table class="transactionDetail">
