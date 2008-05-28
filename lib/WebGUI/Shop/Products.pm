@@ -39,7 +39,8 @@ file will be named siteProductData.csv.
 
 sub exportProducts {
     my $session  = shift;
-    my $productData = '';
+    my @columns = qw{sku title shortdescription price weight quantity};
+    my $productData = WebGUI::Text::joinCSV('mastersku', @columns) . "\n";
     my $storage = WebGUI::Storage->createTemp($session);
     $storage->addFileFromScalar('siteProductData.csv', $productData);
     return $storage;
