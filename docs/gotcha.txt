@@ -57,6 +57,18 @@ save you many hours of grief.
    been deleted, except for the Default Product Macro.  During the upgrade,
    all products have been updated to use the Default Product Macro.
 
+ * Subscriptions have been converted to assets. These assets will be placed in 
+   the import node in the folder 'Migrated Subscriptions'. 
+   
+ * It used to be possible to link subscription codes to multiple subscriptions. 
+   This is no longer the case. Subscription code that are not yet expired or used
+   and link to multiple subscriptions will be migrated in the following manner:
+     1) The subscription codes will remain valid for one of the subscriptions they
+        linked to.
+     2) For the other subscriptions connected to these codes new subscription codes 
+        will be generated. The upgrade script print all the new codes in the case.
+        The new codes will also be logged in the webgui log file.
+
 
 7.5.9
 --------------------------------------------------------------------
