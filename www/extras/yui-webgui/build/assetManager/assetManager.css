@@ -15,17 +15,6 @@ a:hover {
     color:              purple;
 }
 
-/** Page stats **/
-#pageStats {
-    float:              right;
-    text-align:         right;
-}
-
-#pageLinks {
-    float:              right;
-    text-align:         right;
-}
-
 /** Crumbtrail **/
 #crumbtrail ol {
     float:              left;
@@ -74,51 +63,32 @@ a:hover {
 }
 
 /** Asset Manager table **/
-.assetManager {
-    clear:              both;
-    width:              100%;
-}
-
-.assetManager th {
-    border:             solid #666;
-    border-width:       0 1px 2px 0;
-    background-color:   #eee;
-}
-
-.assetManager th, .assetManager td {
-    padding:            0 0.8em;
-}
-
-#assetManager th, #assetManager td, .assetManager {
-    font-size:          0.8em;
-}
-
-.assetManager .center, .assetManager th {
-    text-align:         center;
-}
-
-.assetManager .right {
-    text-align:         right;
-}
 
 .hasChildren {
     font-family:        "Courier New", monospace;
 }
 
-.assetManager .rank {
-    text-align:         right;
+tr.highlight td {
+    background-color:   #FED;
 }
 
-.assetManager a:link, .assetManager a:visited, .assetManager a:active, .assetManager a:hover {
-    font-size:          8pt;
+#dataTableContainer {
+    clear:              both;
 }
 
-.assetManager tr.alt td {
-    background-color:   #ddd;
+#dataTableContainer td, #dataTableContainer td a:link,
+#dataTableContainer td a:visited, #dataTableContainer td a:hover,
+#dataTableContainer td a:active {
+    font-size:          0.9em;
 }
 
-.assetManager tr.highlight td {
-    background-color:   #CCF;
+#dataTableContainer table {
+    width:              100%;
+}
+
+#pagination {
+    clear:              both;
+    text-align:         right; 
 }
 
 /** Actions **/

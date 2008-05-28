@@ -11,6 +11,8 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
     WebGUI.AssetManager = {};
 }
 
+// The extras folder
+WebGUI.AssetManager.extrasUrl   = '/extras/';
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.addHighlightToRow ( child )
@@ -41,6 +43,106 @@ WebGUI.AssetManager.findRow
 };
 
 /*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatActions ( )
+    Format the Edit and More links for the row
+*/
+WebGUI.AssetManager.formatActions 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML 
+        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit">Edit</a>'
+        + ' | More '
+        ;
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatAssetIdCheckbox ( )
+    Format the checkbox for the asset ID.
+*/
+WebGUI.AssetManager.formatAssetIdCheckbox 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<input type="checkbox" name="assetId" value="' + oRecord.getData("assetId") + '"'
+        + 'onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" />';
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatAssetSize ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatAssetSize
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = oRecord.getData( "assetSize" );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatClassName ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatClassName
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
+        + oRecord.getData( "className" );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatLockedBy ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatLockedBy
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var extras  = WebGUI.AssetManager.extrasUrl;
+    elCell.innerHTML 
+        = oRecord.getData( 'lockedBy' )
+        ? '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+            + '<img src="' + extras + '/assetManager/locked.gif" alt="locked by ' + oRecord.getData( 'lockedBy' ) + '" '
+            + 'title="locked by ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
+            + '</a>'
+        : '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="unlocked" '
+            + 'title="unlocked" border="0" />'
+            + '</a>'
+        ;
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatRank ( )
+    Format the input for the rank box
+*/
+WebGUI.AssetManager.formatRank
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
+    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '"_rank" '
+        + 'value="' + rank + '" size="3" '
+        + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatRevisionDate ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatRevisionDate
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
+    elCell.innerHTML    = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
+                        + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
+                        + ':' + revisionDate.getMinutes()
+                        ;
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatTitle ( )
+    Format the link for the title
+*/
+WebGUI.AssetManager.formatTitle
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<span class="hasChildren">' 
+        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
+        + '</span> <a href="' + oRecord.getData( 'url' ) + '?op=assetManager;method=manage">'
+        + oRecord.getData( 'title' )
+        + '</a>'
+        ;
+};
+
+/*---------------------------------------------------------------------------
     WebGUI.AssetManager.hideMoreMenu ( event, element )
     Hide the more menu located inside element after a short delay.
 */
@@ -60,8 +162,6 @@ WebGUI.AssetManager.initManager
 = function () {
 
     WebGUI.AssetManager.initMoreMenus();
-
-    // Start the data source
 
 };
 
