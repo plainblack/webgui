@@ -575,7 +575,7 @@ ENDJS
         = [ 
             { key: 'assetId', label: "", formatter: WebGUI.AssetManager.formatAssetIdCheckbox },
             { key: 'lineage', label: ") . $i18n->get( 'rank' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatRank },
-            { key: 'actions', label: "" },
+            { key: 'actions', label: "", formatter: WebGUI.AssetManager.formatActions },
             { key: 'title', label: ") . $i18n->get( 99 ) . q(", formatter: WebGUI.AssetManager.formatTitle, sortable: true },
             { key: 'className', label: ") . $i18n->get( 'type' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatClassName },
             { key: 'revisionDate', label: ") . $i18n->get( 'revision date' ) . q(", formatter: WebGUI.AssetManager.formatRevisionDate, sortable: true },
