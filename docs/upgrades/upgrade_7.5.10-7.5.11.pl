@@ -64,6 +64,7 @@ migrateSubscriptions( $session );
 updateUsersOfCommerceMacros($session);
 addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
+migratePaymentPlugins( $session );
 
 finish($session); # this line required
 
@@ -1384,6 +1385,33 @@ sub addDBLinkAccessToSQLMacro {
     print "\tAdding DBLink access to SQL Macro ..." unless ($quiet);
     $session->db->write("insert into databaseLink (databaseLinkId, allowMacroAccess) values ('0','1')");
     print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub migratePaymentPlugins {
+    my $session = shift;
+    print "\tMigrating WebGUI default commerce plugins..." unless $quiet;
+
+    foreach my $namespace (qw{ Cash ITransact }) {
+        my $properties = $session->db->buildHashRef(
+            'select fieldName, fieldValue from commerceSettings where type=\'Payment\' and namespace=?',
+            [
+                $namespace,
+            ]
+        );
+
+        $properties->{ groupToUse } = $properties->{ whoCanUse };
+
+        my $plugin = eval { 
+            WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
+                $session, 
+                $properties->{ label },
+                $properties
+            ])
+        };
+    }
+
+    print "Done\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

@@ -183,10 +183,10 @@ sub definition {
         },
         receiptEmailTemplateId => {
             fieldType       => 'template',
-            namespace       => "Shop/EmailReceipt",
+            namespace       => "Shop/ReceiptEmail",
             label           => $i18n->get("receipt email template"),
             hoverHelp       => $i18n->get("receipt email template help"),
-            defaultValue    => '',
+            defaultValue    => 'BMzuE91-XB8E-XGll1zpvA',
         },
         saleNotificationGroupId => {
             fieldType       => 'group',
@@ -406,6 +406,51 @@ sub getName {
     my $definition  = $class->definition($session);
 
     return $definition->[0]->{name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSelectAddressButton ( returnMethod, [ buttonLabel ] )
+
+Generates a button for selecting an address.
+
+=head3 returnMethod
+
+The name of the www_ method the selected addressId should be returned to. Without the 'www_' part.
+
+=head3 buttonLabel
+
+The label for the button, defaults to the internationalized version of 'Choose billing address'.
+
+=cut
+
+sub getSelectAddressButton {
+    my $self            = shift;
+    my $returnMethod    = shift;
+    my $buttonLabel     = shift || 'Choose billing address';
+    my $session         = $self->session;
+
+    # Generate the json string that defines where the address book posts the selected address
+    my $callbackParams = {
+        url     => $session->url->page,
+        params  => [
+            { name => 'shop',               value => 'pay'          },
+            { name => 'method',             value => 'do'           },
+            { name => 'do',                 value => $returnMethod  },
+            { name => 'paymentGatewayId',   value => $self->getId   },
+        ],
+    };
+    my $callbackJson = JSON::to_json( $callbackParams );
+
+    # Generate 'Choose billing address' button
+    my $addressButton = WebGUI::Form::formHeader( $session )
+        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address'      } )
+        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view'         } )
+        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson  } )
+        . WebGUI::Form::submit( $session, { value => $buttonLabel                       } )
+        . WebGUI::Form::formFooter( $session );
+
+    return $addressButton;
 }
 
 #-------------------------------------------------------------------

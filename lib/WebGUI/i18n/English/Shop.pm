@@ -843,6 +843,54 @@ our $I18N = {
 		context => q|The label for the add to cart button.|
 	},
 
+'weekly' => {
+        message => q|Week|,
+        lastUpdated => 0,
+        context => q|Period name for a weekly subscription.|
+    },
+
+    
+    'biweekly' => {
+        message => q|Two weeks|,
+        lastUpdated => 0,
+        context => q|Period name for a biweekly subscription.|
+    },
+
+
+    'fourweekly' => {
+        message => q|Four weeks|,
+        lastUpdated => 0,
+        context => q|Period name for a four weekly subscription.|
+    },
+
+
+    'monthly' => {
+        message => q|Month|,
+        lastUpdated => 0,
+        context => q|Period name for a monthly subscription.|
+    },
+
+
+    'quarterly' => {
+        message => q|Three months|,
+        lastUpdated => 0,
+        context => q|Period name for a Quarterly subscription.|
+    },
+
+
+    'halfyearly' => {
+        message => q|Half year|,
+        lastUpdated => 0,
+        context => q|Period name for a semi yearly subscription.|
+    },
+
+    
+    'yearly' => {
+        message => q|Year|,
+        lastUpdated => 0,
+        context => q|Period name for a yearly subscription.|
+    },
+
 };
 
 1;

@@ -182,7 +182,7 @@ sub getRecurringPeriodValues {
 	my $self    = shift;
 	my $session = $self->session;
 
-	my $i18n = WebGUI::International->new($session, 'Commerce');
+	my $i18n = WebGUI::International->new($session, 'Shop');
 	tie my %periods, "Tie::IxHash";	
 	%periods = (
 		Weekly		=> $i18n->get('weekly'),
