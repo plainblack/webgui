@@ -3731,15 +3731,6 @@ LongTruncOk=1</p>
     },
         
 
-    'settings groupIdAdminCommerce label' => {
-        message     => q{Commerce},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminCommerce hoverHelp' => {
-        message     => q{Group to manage Commerce settings.},
-        lastUpdated => 0,
-    },
-        
 
     'settings groupIdAdminCron label' => {
         message     => q{Cron},
@@ -3821,16 +3812,6 @@ LongTruncOk=1</p>
     },
         
 
-    'settings groupIdAdminProductManager label' => {
-        message     => q{Products},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminProductManager hoverHelp' => {
-        message     => q{Group to manage products},
-        lastUpdated => 0,
-    },
-        
-
     'settings groupIdAdminProfileSettings label' => {
         message     => q{User Profiling},
         lastUpdated => 0,
@@ -3870,27 +3851,6 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
         
-
-    'settings groupIdAdminSubscription label' => {
-        message     => q{Subscriptions},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminSubscription hoverHelp' => {
-        message     => q{Group to manage subscriptions.},
-        lastUpdated => 0,
-    },
-        
-
-    'settings groupIdAdminTransactionLog label' => {
-        message     => q{Transactions},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminTransactionLog hoverHelp' => {
-        message     => q{Group to manage transactions.},
-        lastUpdated => 0,
-    },
-        
-
     'settings groupIdAdminUser label' => {
         message     => q{Users},
         lastUpdated => 0,

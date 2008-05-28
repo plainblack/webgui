@@ -1013,6 +1013,11 @@ sub removeOldCommerceCode {
 	my $session = shift;
     	print "\tRemoving old commerce code.\n" unless ($quiet);
 
+    my $setting = $session->setting;
+    $setting->remove('groupIdAdminCommerce'); 
+    $setting->remove('groupIdAdminProductManager'); 
+    $setting->remove('groupIdAdminSubscription'); 
+    $setting->remove('groupIdAdminTransactionLog'); 
     my $config = $session->config;
     unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
 
@@ -1020,7 +1025,17 @@ sub removeOldCommerceCode {
     unlink '../../lib/WebGUI/Commerce.pm';
     unlink '../../lib/WebGUI/Product.pm';
     unlink '../../lib/WebGUI/Subscription.pm';
-
+    unlink '../../lib/WebGUI/Operation/TransactionLog.pm';
+unlink '../../lib/WebGUI/i18n/English/CommercePaymentCash.pm';
+unlink '../../lib/WebGUI/i18n/English/CommercePaymentCheck.pm';
+unlink '../../lib/WebGUI/i18n/English/CommercePaymentITransact.pm';
+unlink '../../lib/WebGUI/i18n/English/CommerceShippingByPrice.pm';
+unlink '../../lib/WebGUI/i18n/English/CommerceShippingByWeight.pm';
+unlink '../../lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm';
+unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm';
+unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm';
+unlink '../../lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm';
+$session->db->write("delete from WorkflowActivity where className='WebGUI::Workflow::Activity::ProcessRecurringPayments'");
     unlink '../../lib/WebGUI/Macro/Product.pm';
     unlink '../../lib/WebGUI/Help/Macro_Product.pm';
     unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';

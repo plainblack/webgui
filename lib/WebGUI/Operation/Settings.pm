@@ -470,7 +470,6 @@ sub definition {
         groupIdAdminActiveSessions
         groupIdAdminAdSpace
         groupIdAdminCache
-        groupIdAdminCommerce
         groupIdAdminCron
         groupIdAdminDatabaseLink
         groupIdAdminGraphics
@@ -479,13 +478,10 @@ sub definition {
         groupIdAdminHelp
         groupIdAdminLDAPLink
         groupIdAdminLoginHistory
-        groupIdAdminProductManager
         groupIdAdminProfileSettings
         groupIdAdminReplacements
         groupIdAdminSpectre
         groupIdAdminStatistics
-        groupIdAdminSubscription
-        groupIdAdminTransactionLog
         groupIdAdminUser
         groupIdAdminUserAdd
         groupIdAdminVersionTag
