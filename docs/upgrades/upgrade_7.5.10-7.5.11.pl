@@ -66,6 +66,7 @@ addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
 removeSqlForm($session);
 migratePaymentPlugins( $session );
+removeRecurringPaymentActivity( $session );
 
 finish($session); # this line required
 
@@ -1438,6 +1439,21 @@ sub migratePaymentPlugins {
     }
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub removeRecurringPaymentActivity {
+    my $session = shift;
+    print "\tRemoving the recurring payment workflow activity...";
+
+    my $activities = $session->config->get( 'workflowActivities' );
+
+    my $none = $activities->{ None };
+    $activities->{ None } = [ grep { !/^WebGUI::Workflow::Activity::ProcessRecurringPayments$/ } @{ $none } ];
+    
+    $session->config->set( 'workflowActivities', $activities );
+
+    print "Done.\n";
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
