@@ -300,7 +300,7 @@ sub getAllProducts {
             return undef;
         }
         return WebGUI::Asset->newPending($session, $assetId);
-    }
+    };
 }
 
 
