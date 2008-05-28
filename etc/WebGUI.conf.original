@@ -237,7 +237,6 @@
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
 	"WebGUI::Asset::Wobject::Shelf", 
-	"WebGUI::Asset::Wobject::SQLForm",
 	"WebGUI::Asset::Wobject::Thingy"
     ],
 

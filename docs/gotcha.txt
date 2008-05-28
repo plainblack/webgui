@@ -16,6 +16,12 @@ save you many hours of grief.
 	Image::ExifTool
     List::MoreUtils
 
+ * SQL Form is no longer part of the official distribution of WebGUI,
+   but is still being actively maintained by third-parties. However, if you
+   don't want to use SQL Form any longer, make sure you delete all SQL Forms
+   from your site prior to the upgrade *and* purge them from your trash. Then
+   the upgrade will automatically uninstall the SQL Form from your site.
+
  * WebGUI versions since 7.3.0 (when the new Calendar was added) 
    have allowed users to post Events to Calendars, but the owner of
    the Event has been saved as Admin (user ID 3). Also, anyone who

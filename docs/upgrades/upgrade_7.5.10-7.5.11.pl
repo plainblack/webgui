@@ -64,10 +64,36 @@ migrateSubscriptions( $session );
 updateUsersOfCommerceMacros($session);
 addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
+removeSqlForm($session);
 migratePaymentPlugins( $session );
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub removeSqlForm {
+    my $session = shift;
+    print "\tOptionally removing SQL Form...\n" unless $quiet;
+    my $db = $session->db;
+    unless ($db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::SQLForm'")) {
+        print "\t\tNot using it, so we're uninstalling it.\n" unless $quiet;
+        $session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::SQLForm");
+        my @ids = $db->buildArray("select distinct assetId from template where namespace like 'SQLForm%'");
+        push @ids, qw(GnrXtoFFeXia3vDQuSHojw k8vxD4fuKKf5cGwNTw0sLw);
+        foreach my $id (@ids) {
+            my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+            if (defined $asset) {
+                $asset->purge;
+            }
+        }
+        foreach my $table (qw(SQLForm_fieldDefinitions SQLForm SQLForm_fieldTypes SQLForm_regexes)) {
+            $db->write("drop table $table");
+        }
+    } 
+    else {
+        print "\t\tThis site uses SQL Form, so we won't uninstall it.\n" unless $quiet;
+    }
+}
+   
 #----------------------------------------------------------------------------
 sub changeRealtimeWorkflows {
     my $session = shift;
