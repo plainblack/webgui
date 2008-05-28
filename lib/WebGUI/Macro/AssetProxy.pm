@@ -23,26 +23,33 @@ Package WebGUI::Macro::AssetProxy
 
 Macro for displaying the output of an Asset in another location.
 
-=head2 process ( url )
+=head2 process ( url | assetId, [ type ] )
 
-=head3 url
+=head3 url | assetId
 
-The URL of the Asset whose output will be returned.  If no Asset with that URL
-can be found, an internationalized error message will be returned instead.
+My specify either the asset url or the asset id. If no Asset with that URL or id can be found, an internationalized error message will be returned instead.
 
-No editing controls (toolbar) will be displayed in the Asset output, even if
-Admin is turned on.
+No editing controls (toolbar) will be displayed in the Asset output, even if Admin is turned on.
 
 The Not Found Page may not be Asset Proxied.
+
+=head3 type
+
+Defaults to 'url'. But if you want to use an assetId as the first parameter, then this parameter must be 'assetId'.
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
-    my $session = shift;
-    my $url = shift;
+    my ($session, $identifier, $type) = @_;
 	my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
-	my $asset = WebGUI::Asset->newByUrl($session,$url);
+	my $asset;
+    if ($type eq 'assetId') {
+        $asset = WebGUI::Asset->newByDynamicClass($session, $identifier);
+    }
+    else {
+        $asset = WebGUI::Asset->newByUrl($session,$identifier);
+    }
 	#Sorry, you cannot proxy the notfound page.
 	if (defined $asset && $asset->getId ne $session->setting->get("notFoundPage")) {
 		if ($asset->canView) {
@@ -53,7 +60,8 @@ sub process {
 			return $output;
 		}
 		return undef;
-	} else {
+	} 
+    else {
 		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
 		return $i18n->get('invalid url');
 	}

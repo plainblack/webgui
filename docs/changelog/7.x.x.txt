@@ -1,5 +1,7 @@
 7.5.11
  - rfe: Not being limited to single-worded Tags 
+ - AssetProxy macro can now use asset id as a parameter like so:
+   ^AssetProxy(abcdefghijklmnopqrstuv,assetId);
  - Exposed keywords API to all assets through edit screen. Now keywords are
    searchable and add metatags for all assets.
  - fix: template variable isUncommitted is not documented in the help
@@ -237,20 +239,6 @@
  - add: Photos now track views
  - fix: Multiple Gallery template fixes.
 
-7.4.24
- - fix: https and extra / in urls (perlDreamer Consulting, LLC.)
-    http://www.webgui.org/bugs/tracker/https-and-extra-/-in-urls
-
-7.4.23
- - fix: CalendarUpdateFeeds workflow causes errors in log
- - autocommit for packages is handled by web method, not API method
- - fix: importing packages generates orphaned duplicates of all attached storage locations
- - fix: error rolling back version tags if a parent has a later revision date than its child
- - show fields in tabs on DataForm default email template
- - fix: don't show Admin mode toggle when not in adminModeSubnets
- - fix regression: Site starter style displays incorrectly in IE
- - really show fields in tabs on DataForm default email template
-
 7.5.1
  - fix: Extra head tags of unplaced assets included twice
  - improve rebuildLineage.pl behavior.  protect against assets that are too deep and don't destroy search index.
@@ -327,6 +315,7 @@
  - fix: Event Related Links are now proper collateral in their own table
    instead of a silly HTML area
  - fix: rating archived posts causes error
+
 
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP
