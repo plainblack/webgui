@@ -1060,6 +1060,40 @@ sub getImportNode {
 
 #-------------------------------------------------------------------
 
+=head2 getIsa ( $session )
+
+A class method to return an iterator for getting all Assets by class (and all sub-classes)
+as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
+will close the database handle that it uses and return undef.
+
+It should be used like this:
+
+my $productIterator = WebGUI::Asset::Product->getIsa($session);
+while (my $product = $productIterator->()) {
+  ##Do something useful with $product
+}
+
+=cut
+
+sub getIsa {
+    my $class    = shift;
+    my $session  = shift;
+    my $def = $class->definition($session);
+    my $tableName = $def->[0]->{tableName};
+    my $sth = $session->db->read("select distinct(assetId) from $tableName");
+    return sub {
+        my ($assetId) = $sth->array;
+        if (!$assetId) {
+            $sth->finish;
+            return undef;
+        }
+        return WebGUI::Asset->newPending($session, $assetId);
+    };
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getMedia ( session )
 
 Constructor. Returns the media folder.

@@ -41,25 +41,6 @@ my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
 isa_ok($node, 'WebGUI::Asset::Wobject::Folder', 'getProductImportNode returns a Folder');
 is($node->getId, 'PBproductimportnode001', 'Product Import Node has the correct GUID');
 
-my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
-
-my $getAProduct = WebGUI::Asset::Sku::Product->getAllProducts($session);
-isa_ok($getAProduct, 'CODE', 'getAllProducts returns a sub ref');
-my $counter = 0;
-my $productIds = [];
-while( my $product = $getAProduct->()) {
-    ++$counter;
-    push @{ $productIds }, $product->getId;
-}
-is($counter, 3, 'getAllProducts: returned only 3 Products');
-cmp_bag($productIds, [$product1->getId, $product2->getId, $product3->getId], 'getAllProduct returned the correct 3 products');
-
-$product1->purge;
-$product2->purge;
-$product3->purge;
-
 #----------------------------------------------------------------------------
 # Cleanup
 END {

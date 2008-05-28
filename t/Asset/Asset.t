@@ -19,6 +19,8 @@ use WebGUI::Asset;
 use WebGUI::User;
 use WebGUI::Asset::Wobject::Navigation;
 use WebGUI::Asset::Wobject::Folder;
+use WebGUI::Asset::Sku;
+use WebGUI::Asset::Sku::Product;
 use WebGUI::AssetVersioning;
 use WebGUI::VersionTag;
 
@@ -144,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 89 
+plan tests => 94 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -700,6 +702,42 @@ $assetProps->{title} = $funkyTitle;
 diag $assetProps->{title};
 
 isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
+
+################################################################
+#
+# getIsa
+#
+################################################################
+my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+
+my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+isa_ok($getAProduct, 'CODE', 'getIsa returns a sub ref');
+my $counter = 0;
+my $productIds = [];
+while( my $product = $getAProduct->()) {
+    ++$counter;
+    push @{ $productIds }, $product->getId;
+}
+is($counter, 3, 'getIsa: returned only 3 Products');
+cmp_bag($productIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products');
+
+my $getASku = WebGUI::Asset::Sku->getIsa($session);
+$counter = 0;
+my $skuIds = [];
+while( my $sku = $getASku->()) {
+    ++$counter;
+    push @{ $skuIds }, $sku->getId;
+}
+is($counter, 3, 'getIsa: returned only 3 Products for a parent class');
+cmp_bag($skuIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products for a parent class');
+
+$product1->purge;
+$product2->purge;
+$product3->purge;
+
 
 END {
     $session->config->set( 'extrasURL',    $origExtras);

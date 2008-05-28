@@ -274,38 +274,6 @@ sub getAllCollateral {
 
 #-------------------------------------------------------------------
 
-=head2 getAllProducts ( $session )
-
-A class method to return an iterator for getting all Products (and Product sub-classes)
-as Asset objects, one at a time.  The iterator will return undef when you've reached
-the end of the list of products.
-
-It should be used like this:
-
-my $productIterator = WebGUI::Asset::Product->getAllProducts($session);
-while (my $product = $productIterator->()) {
-  ##Do something useful with $product
-}
-
-=cut
-
-sub getAllProducts {
-    my $class    = shift;
-    my $session  = shift;
-    my $sth = $session->db->read('select distinct(assetId) from Product');
-    return sub {
-        my ($assetId) = $sth->array;
-        if (!$assetId) {
-            $sth->finish;
-            return undef;
-        }
-        return WebGUI::Asset->newPending($session, $assetId);
-    };
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getCollateral ( tableName, keyName, keyValue )
 
 Returns a hash reference containing one row of collateral data from a particular
