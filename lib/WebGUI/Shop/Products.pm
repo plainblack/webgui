@@ -41,6 +41,15 @@ sub exportProducts {
     my $session  = shift;
     my @columns = qw{sku title shortdescription price weight quantity};
     my $productData = WebGUI::Text::joinCSV('mastersku', @columns) . "\n";
+    @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
+    while (my $product = WebGUI::Asset::Sku::Product->getAllProducts($session)) {
+        my $mastersku = $product->get('sku');
+        my $collateri = $product->getAllCollateral();
+        foreach my $collateral (@{ $collateri }) {
+            my @productFields = @{ $collateral }{ @columns };
+            $productData .= WebGUI::Test::joinCSV($mastersku, @productFields);
+        }
+    }
     my $storage = WebGUI::Storage->createTemp($session);
     $storage->addFileFromScalar('siteProductData.csv', $productData);
     return $storage;
