@@ -1436,6 +1436,14 @@ sub migratePaymentPlugins {
                 $properties
             ])
         };
+
+        if ( $namespace eq 'ITransact' && $properties->{ vendorId } ) {
+            print "\n\t\t!!CAUTION!!: The postback url for ITransact has changed. Please log in to your virtual "
+                ."terminal and change the postback url to:\n\n\t\t"
+                .'https://'.$session->config->get("sitename")->[0]
+                .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$plugin->getId."\n\t";
+        }
+
     }
 
     print "Done\n" unless $quiet;

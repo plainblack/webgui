@@ -440,6 +440,33 @@ sub getButton {
 }
 
 #-------------------------------------------------------------------
+sub getEditForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'CommercePaymentITransact');
+
+    my $f       = $self->SUPER::getEditForm( @_ );
+    $f->readOnly(
+        -value  => '<br />'
+    );
+    $f->readOnly(
+            -value => '<a target="_blank" href="https://secure.paymentclearing.com/support/login.html">'.$i18n->get('show terminal').'</a>'
+    ) if $self->get('vendorId');
+    $f->readOnly(
+        -value  => '<br />'
+    );
+    $f->readOnly(
+        -value  => 
+            $i18n->get('extra info')
+            .'<br />'
+            .'<b>https://'.$session->config->get("sitename")->[0]
+            .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>'
+    );
+
+    return $f;
+}
+
+#-------------------------------------------------------------------
 
 =head2 handlesRecurring
 

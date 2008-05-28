@@ -69,6 +69,13 @@ save you many hours of grief.
         will be generated. The upgrade script print all the new codes in the case.
         The new codes will also be logged in the webgui log file.
 
+ * With the new shop system the Payment plugins have been changed too. The default
+   WebGUI Payment Plugins are automatically migrated for you, but custom plugins 
+   will have to be adapted to use the new WebGUI::Shop API.
+
+ * If you are using the ITransact payment plugin you'll have to change the postback
+   url. The new value is printed by the upgrade script and can also be found in
+   the edit screen of the ITransact plugin.
 
 7.5.9
 --------------------------------------------------------------------

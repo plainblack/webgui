@@ -344,23 +344,6 @@ sub getEditForm {
     my $definition = $self->definition($self->session);
     my $form = WebGUI::HTMLForm->new($self->session);
     $form->submit;
-#    $form->hidden(
-#        -name   => 'shop',
-#        -value  => 'pay',
-#    );
-#    $form->hidden(
-#        -name   => 'method',
-#        -value  => 'do',
-#    );
-#    $form->hidden(
-#        -name   => 'do',
-#        -value  => 'editSave',
-#    );
-#
-#    $form->hidden(
-#        name  => 'paymentGatewayId',
-#        value => $self->getId,
-#    );
     
     $self->getDoFormTags('editSave', $form);
     $form->hidden(
