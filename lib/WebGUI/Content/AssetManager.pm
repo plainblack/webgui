@@ -2,6 +2,7 @@ package WebGUI::Content::AssetManager;
 
 use strict;
 
+use JSON qw( from_json to_json );
 use URI;
 use WebGUI::Form;
 use WebGUI::Paginator;
@@ -97,19 +98,19 @@ sub getManagerPaginator {
     my $orderByColumn       = $session->form->get( 'orderByColumn' ) 
                             || "lineage"
                             ;
-    my $orderByDirection    = $session->form->get( 'orderByDirection' ) eq "DESC"
+    my $orderByDirection    = lc $session->form->get( 'orderByDirection' ) eq "desc"
                             ? "DESC"
                             : "ASC"
                             ;
 
-    my $p           
-        = WebGUI::Paginator->new( $session, 
-            '?op=assetManager;method=manage;orderByColumn=' . $orderByColumn 
-            . ';orderByDirection=' . $orderByDirection 
-        );
+    my $recordOffset        = $session->form->get( 'recordOffset' ) || 1;
+    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 15;
+    my $currentPage         = int ( $recordOffset / $rowsPerPage ) + 1;
+
+    my $p           = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
 
     my $orderBy     = $session->db->dbh->quote_identifier( $orderByColumn ) . ' ' . $orderByDirection;
-    $p->setDataByArrayRef( $asset->getLineage( ['children'] ), { orderByClause => $orderBy } );
+    $p->setDataByArrayRef( $asset->getLineage( ['children'], { orderByClause => $orderBy } ) );
     
     return $p;
 }
@@ -214,49 +215,6 @@ sub getMoreMenu {
 
 #----------------------------------------------------------------------------
 
-=head2 getOrderLink ( session, column, label )
-
-Gets a link to order the results based on a column. Uses some magick
-to ensure proper working no matter where we are.
-
-=cut
-
-sub getOrderLink {
-    my $session         = shift;
-    my $column          = shift;
-    my $label           = shift;
-    
-    my $columnParam     = "orderByColumn";
-    my $directionParam  = "orderByDirection";
-
-    my $url             = URI->new( $session->env->get( "REQUEST_URI" ) );
-    my $query           = $url->query;
-    # Split query string into param => value hash
-    my %query           = map { /(.+)=(.+)/; $1 => $2 } split /[;&]/, $query;
-    
-    # Delete unnecessary keys
-    delete $query{ 'assetId' };
-
-    # Add necessary keys
-    $query{ $columnParam } = $column;
-
-    if ( $session->form->get( $columnParam ) eq $column && $session->form->get( $directionParam ) eq "ASC" ) {
-        $query{ $directionParam } = "DESC";
-    }
-    else {
-        $query{ $directionParam } = "ASC";
-    }
-
-    $url->query_form( %query );
-    
-    return q{<a href="} . $url->as_string . q{">}
-            . $label
-            . q{</a>}
-            ;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 handler ( session )
 
 Handle the session, if we can. Otherwise pass it on.
@@ -264,10 +222,6 @@ Handle the session, if we can. Otherwise pass it on.
 Check permissions
 
 =cut
-
-# BAD things about procedural that would be fixed with class methods
-# 1) I must use stringy eval to call my method, instead of $class->$method( args )
-# 2) I must validate that method using a list of known methods instead of $class->can( $method )
 
 sub handler {
     my ( $session ) = @_;
@@ -282,12 +236,11 @@ sub handler {
                     ;
         
         # Validate the method name
-        if ( !grep { $_ eq $method } qw( www_manage www_search ) ) {
+        if ( !__PACKAGE__->can( $method ) ) {
             return "Invalid method";
         }
         else {
-            # I hate hate hate stringy eval
-            return eval "$method" . '($session)';
+            return __PACKAGE__->can( $method )->( $session );
         }
     }
     else {
@@ -297,13 +250,61 @@ sub handler {
 
 #----------------------------------------------------------------------------
 
+=head2 www_ajaxGetManagerPage ( session )
+
+Get a page of Asset Manager data, ajax style. Returns a JSON array to be
+formatted in a WebGUI.AssetManager data table.
+
+=cut
+
+sub www_ajaxGetManagerPage {
+    my $session         = shift;
+    my $i18n            = WebGUI::International->new( $session, "Asset" );
+    my $assetInfo       = {};
+    my $p               = getManagerPaginator( $session );
+
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        
+        # Populate the required fields to fill in
+        my %fields      = (
+            assetId         => $asset->getId,
+            url             => $asset->getUrl,
+            lineage         => $asset->get( "lineage" ),
+            title           => $asset->get( "title" ),
+            revisionDate    => $asset->get( "revisionDate" ),
+            childCount      => $asset->getChildCount,
+            assetSize       => $asset->get( 'assetSize' ),
+            lockedBy        => $asset->lockedBy,
+            canEditIfLocked => $asset->canEditIfLocked,
+        );
+
+        $fields{ className } = {};
+        # The asset icon
+        my $icon    = [ grep { $_->{ icon } } @{ $asset->definition( $session ) } ]->[ 0 ]->{ icon };
+        $fields{ icon } = $session->url->extras( '/assets/small/' . $icon );
+
+        # The asset type (i18n name)
+        my $type    = [ grep { $_->{ assetName } } @{ $asset->definition( $session ) } ]->[ 0 ]->{ assetName };
+        $fields{ className } = $type;
+
+        push @{ $assetInfo->{ assets } }, \%fields;
+    }
+
+    $assetInfo->{ totalAssets   } = $p->getRowCount;
+    $assetInfo->{ sort          } = $session->form->get( 'orderByColumn' );
+    $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
+    
+    $session->http->setMimeType( 'application/json' );
+    return to_json( $assetInfo );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_manage ( session )
 
 Show the main screen of the asset manager, paginated. Also load the 
 JavaScript that will take over if the browser has the cojones.
-
-# BAD things about procedural that would be fixed with class methods
-# 3) The "appendSideLinks" method would be better as simply "getAdminStyle" and would do more
 
 =cut
 
@@ -360,12 +361,21 @@ sub www_manage {
     }
 
     # Show the page
+    $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/yahoo/yahoo.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/dom/dom.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/event/event.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/element/element-beta-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
-    $session->style->setRawHeadTags( <<'ENDHTML' );
+    my $extras      = $session->url->extras;
+    $session->style->setRawHeadTags( <<ENDHTML );
     <script type="text/javascript">
+        WebGUI.AssetManager.extrasUrl   = '$extras';
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
@@ -390,129 +400,23 @@ ENDHTML
     $output .= '</ol>';
     
     ### The page of assets
-    $output         .= q{<form>}
+    $output         .= q{<div class="yui-skin-sam">}
+                    . q{<form>}
                     . q{<input type="hidden" name="op" value="assetManager" />}
                     . q{<input type="hidden" name="method" value="manage" />}
-                    . q{<table class="assetManager" border="0" id="assetManager">}
-                    . q{<thead>}
-                    . q{<tr>}
-                    . q{<th class="center"><input type="checkbox" onclick="WebGUI.Form.toggleAllCheckboxesInForm( this.form, 'assetId' )" /></th>} # Checkbox column
-                    . q{<th class="center">} . getOrderLink( $session, "lineage", $i18n->get( "rank" ) ) . q{</th>}              # Rank column
-                    . q{<th class="center">&nbsp;</th>}            # Edit / More
-                    . q{<th>} . getOrderLink( $session, "title", $i18n->get( "99" ) ) . q{</th>}             # Title
-                    . q{<th>} . getOrderLink( $session, "className", $i18n->get( "type" ) ) . q{</th>}              # Type
-                    . q{<th class="center">} . getOrderLink( $session, "revisionDate", $i18n->get( "last updated" ) ) . q{</th>}      # Revision Date
-                    . q{<th class="center">} . getOrderLink( $session, "assetSize", $i18n->get( "size" ) ) . q{</th>}              # Size
-                    . q{<th class="center">} . getOrderLink( $session, "lockedBy", $i18n->get( "locked" ) ) . q{</th>}            # Lock
-                    . q{</tr>}
-                    . q{</thead}
-                    . q{<tbody>}
-                    ;
-
-    # The markup for a single asset
-    my $row_markup  = q{<tr %s ondblclick="WebGUI.AssetManager.toggleRow( this )">}
-                    . q{<td class="center"><input type="checkbox" name="assetId" value="%s" onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" /></td>}
-                    . q{<td class="center"><input type="text" class="rank" name="%s_rank" size="3" value="%s" onchange="WebGUI.AssetManager.selectRow( this )" /></td>}
-                    . q{<td class="center">%s %s</td>}
-                    . q{<td><span class="hasChildren">%s</span><a href="%s?op=assetManager;method=manage">%s</a></td>}
-                    . q{<td><img src="%s" /> %s</td>}
-                    . q{<td class="center">%s</td>}
-                    . q{<td class="right">%s</td>}
-                    . q{<td class="center"><a href="%s?func=manageRevisions">%s</a></td>}
-                    . q{</tr>}
-                    ;
-    
-    # The field keys to fill in the placeholders
-    my @row_fields  = qw(
-                    alt
-                    assetId
-                    assetId rank
-                    editLink moreMenu
-                    hasChildren url title
-                    iconUrl type
-                    revisionDate
-                    size
-                    url lockIcon
-    );
-
-    my $p               = getManagerPaginator( $session, {
-        orderByColumn       => $session->form->get( 'orderByColumn' ),
-        orderByDirection    => $session->form->get( 'orderByDirection' ),
-    } );
-    my $count           = 0;
-    for my $assetId ( @{ $p->getPageData } ) {
-        $count++;
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        
-        # Populate the required fields to fill in
-        my %fields      = (
-            alt             => ( $count % 3 == 0 ? 'class="alt"' : '' ),
-            assetId         => $asset->getId,
-            url             => $asset->getUrl,
-            title           => $asset->get( "title" ),
-            revisionDate    => $session->datetime->epochToHuman( $asset->get( "revisionDate" ) ),
-            hasChildren     => ( $asset->hasChildren ? "+&nbsp;" : "&nbsp;&nbsp;" ),
-            rank            => $asset->getRank,
-            size            => formatBytes( $asset->get( 'assetSize' ) ),
-        );
-
-        # The asset icon
-        my $icon    = [ grep { $_->{ icon } } @{ $asset->definition( $session ) } ]->[ 0 ]->{ icon };
-        $fields{ iconUrl    } = $session->url->extras( '/assets/small/' . $icon );
-
-        # The asset type (i18n name)
-        my $type    = [ grep { $_->{ assetName } } @{ $asset->definition( $session ) } ]->[ 0 ]->{ assetName };
-        $fields{ type       } = $type;
-
-        # The lock
-        if ( $asset->lockedBy ) { # lockedBy in case someone overrides isLocked (like the Collab System Thread )	
-            $fields{ lockIcon } 
-                = sprintf '<img src="%s" alt="locked by %s" title="locked by %s" style="border: 0px;" />',
-                $session->url->extras( 'assetManager/locked.gif' ),
-                WebGUI::HTML::format( $asset->lockedBy->username, "text" ),
-                WebGUI::HTML::format( $asset->lockedBy->username, "text" ),
-                ;
-        } 
-        else {
-            $fields{ lockIcon } 
-                = sprintf '<img src="%s" alt="unlocked" title="unlocked" style="border: 0px;" />',
-                $session->url->extras( 'assetManager/unlocked.gif' ),
-                ;
-        }
-
-        # The edit link
-        if ( !$asset->lockedBy || $asset->canEditIfLocked ) {
-            $fields{ editLink } 
-                = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a> |',
-                $asset->getUrl( 'func=edit;proceed=manageAssets' )
-                ;
-        }
-
-        # The More menu
-        $fields{ moreMenu } = getMoreMenu( $asset, $i18n->get( 'menu label' ) );
-
-        $output .= sprintf $row_markup, @fields{ @row_fields };
-    }
-
-    $output     .= q{</tbody>}
-                . q{</table>}
-                . q{<p class="actions">} . $i18n->get( 'with selected' )
-                . q{<button name="action" value="update">} . $i18n->get( "update" ) . q{</button>}
-                . q{<button name="action" value="trash">} . $i18n->get( "delete" ) . q{</button>}
-                . q{<button name="action" value="cut">} . $i18n->get( 'cut' ) . q{</button>}
-                . q{<button name="action" value="copy">} . $i18n->get( "copy" ) . q{</button>}
-                . q{<button name="action" value="duplicate">} . $i18n->get( "duplicate" ) . q{</button>}
-                . q{</p>}
-                . q{</form>}
-                ;
-
-    ### Page links
-    $output         .= q{<div id="pageLinks">} . $p->getBarAdvanced . q{</div>};
-
-    ### Page description
-    $output         .= sprintf q{<div id="pageStats">} . $i18n->get( 'page indicator' ) . q{</div>},
-                    $p->getPageNumber,
-                    $p->getNumberOfPages,
+                    . q{<div id="dataTableContainer">}
+                    . q{</div>} 
+                    . q{<p class="actions">} . $i18n->get( 'with selected' )
+                    . q{<button name="action" value="update">} . $i18n->get( "update" ) . q{</button>}
+                    . q{<button name="action" value="trash">} . $i18n->get( "delete" ) . q{</button>}
+                    . q{<button name="action" value="cut">} . $i18n->get( 'cut' ) . q{</button>}
+                    . q{<button name="action" value="copy">} . $i18n->get( "copy" ) . q{</button>}
+                    . q{<button name="action" value="duplicate">} . $i18n->get( "duplicate" ) . q{</button>}
+                    . q{</p>}
+                    . q{</form>}
+                    . q{<div id="pagination"> } 
+                    . q{</div>}
+                    . q{</div>}
                     ;
     
     ### Clearing div
@@ -590,6 +494,156 @@ ENDHTML
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
     $output         .= q{</div>};
+
+    ### Write the JavaScript that will take over
+    $output         .= <<'ENDJS';
+<script type='text/javascript'>
+YAHOO.util.Event.onDOMReady(function () {
+    // Start the data source
+    WebGUI.AssetManager.DataSource
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
+    WebGUI.AssetManager.DataSource.responseType
+        = YAHOO.util.DataSource.TYPE_JSON;
+    WebGUI.AssetManager.DataSource.responseSchema
+        = {
+            resultsList: 'assets',
+            totalRecords: 'totalAssets',
+            fields: [
+                { key: 'assetId' },
+                { key: 'lineage' },
+                { key: 'actions' },
+                { key: 'title' },
+                { key: 'className' },
+                { key: 'revisionDate' },
+                { key: 'assetSize' },
+                { key: 'lockedBy' },
+                { key: 'icon' },
+                { key: 'url' },
+                { key: 'childCount' }
+            ]
+        };
+
+    var assetPaginator = new YAHOO.widget.Paginator({
+        containers         : ['pagination'],
+        pageLinks          : 7,
+        rowsPerPage        : 15,
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
+    });
+
+    function buildQueryString( state, dt ) {
+        var query = ";recordOffset=" + state.pagination.recordOffset 
+                + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
+                + ';rowsPerPage=' + state.pagination.rowsPerPage
+                + ';orderByColumn=' + state.sorting.key
+                ;
+            return query;
+        };
+
+    // Custom function to handle pagination requests
+    var handlePagination = function (state,dt) {
+        var sortedBy  = dt.get('sortedBy');
+
+        // Define the new state
+        var newState = {
+            startIndex: state.recordOffset, 
+            sorting: {
+                key: sortedBy.key,
+                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
+            },
+            pagination : { // Pagination values
+                recordOffset: state.recordOffset, // Default to first page when sorting
+                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
+            }
+        };
+
+        // Create callback object for the request
+        var oCallback = {
+            success: dt.onDataReturnSetRows,
+            failure: dt.onDataReturnSetRows,
+            scope: dt,
+            argument: newState // Pass in new state as data payload for callback function to use
+        };
+        
+        // Send the request
+        dt.getDataSource().sendRequest(buildQueryString(newState), oCallback);
+    };
+
+ENDJS
+
+    $output .= q(
+    WebGUI.AssetManager.ColumnDefs
+        = [ 
+            { key: 'assetId', label: "", formatter: WebGUI.AssetManager.formatAssetIdCheckbox },
+            { key: 'lineage', label: ") . $i18n->get( 'rank' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatRank },
+            { key: 'actions', label: "" },
+            { key: 'title', label: ") . $i18n->get( 99 ) . q(", formatter: WebGUI.AssetManager.formatTitle, sortable: true },
+            { key: 'className', label: ") . $i18n->get( 'type' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatClassName },
+            { key: 'revisionDate', label: ") . $i18n->get( 'revision date' ) . q(", formatter: WebGUI.AssetManager.formatRevisionDate, sortable: true },
+            { key: 'assetSize', label: ") . $i18n->get( 'size' ) . q(", formatter: WebGUI.AssetManager.formatAssetSize, sortable: true },
+            { key: 'lockedBy', label: ") . $i18n->get( 'locked' ) . q(", formatter: WebGUI.AssetManager.formatLockedBy },
+            { key: 'icon' },
+            { key: 'url' },
+            { key: 'childCount' }
+        ];
+    );
+
+    $output .= <<'ENDJS';
+    WebGUI.AssetManager.DataTable 
+        = new YAHOO.widget.DataTable( 'dataTableContainer', 
+            WebGUI.AssetManager.ColumnDefs, 
+            WebGUI.AssetManager.DataSource, 
+            {
+                initialRequest          : ';recordOffset=0',
+                generateRequest         : buildQueryString,
+                paginationEventHandler  : handlePagination,
+                paginator               : assetPaginator,
+                sortedBy                : { key : "lineage", dir : YAHOO.widget.DataTable.CLASS_ASC } 
+            }
+        );
+
+    // Hide columns
+    WebGUI.AssetManager.DataTable.hideColumn( 'icon' );
+    WebGUI.AssetManager.DataTable.hideColumn( 'url' );
+    WebGUI.AssetManager.DataTable.hideColumn( 'childCount' );
+
+    // Override function for custom server-side sorting
+    WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
+        // Default ascending
+        var sDir = "asc";
+        
+        // If already sorted, sort in opposite direction
+        if(oColumn.key === this.get("sortedBy").key) {
+            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ?
+                    "desc" : "asc";
+        }
+
+        // Define the new state
+        var newState = {
+            startIndex: 0,
+            sorting: { // Sort values
+                key: oColumn.key,
+                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC
+            },
+            pagination : { // Pagination values
+                recordOffset: 0, // Default to first page when sorting
+                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting
+            }
+        };
+
+        // Create callback object for the request
+        var oCallback = {
+            success: this.onDataReturnSetRows,
+            failure: this.onDataReturnSetRows,
+            scope: this,
+            argument: newState // Pass in new state as data payload for callback function to use
+        };
+        
+        // Send the request
+        this.getDataSource().sendRequest(buildQueryString(newState), oCallback);
+    };
+} );
+</script>
+ENDJS
 
     return $ac->render( $output );
 }
