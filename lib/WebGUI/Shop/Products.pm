@@ -44,7 +44,7 @@ sub exportProducts {
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
     while (my $product = WebGUI::Asset::Sku::Product->getAllProducts($session)) {
         my $mastersku = $product->get('sku');
-        my $collateri = $product->getAllCollateral();
+        my $collateri = $product->getAllCollateral('variantsJSON');
         foreach my $collateral (@{ $collateri }) {
             my @productFields = @{ $collateral }{ @columns };
             $productData .= WebGUI::Test::joinCSV($mastersku, @productFields);
@@ -142,19 +142,39 @@ sub importProducts {
     ##Okay, if we got this far, then the data looks fine.
     return unless scalar @productData;
     my $fetchProductId = $session->db->prepare('select assetId from Product where mastersku=? order by revisionDate DESC limit 1');
-    foreach my $productRow (@productData) {
+    my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+    PRODUCT: foreach my $productRow (@productData) {
         my %productRow;
         ##Order the data according to the headers, in whatever order they exist.
-        @productRow { @headers } = @{ $productRow };
+        @productRow{ @headers } = @{ $productRow };
         $fetchProductId->execute([$productRow->{mastersku}]);
         my ($assetId) = $fetchProductId->hashRef->{assetId};
         ##If the assetId exists, we update data for it
         if ($assetId) {
             my $product = WebGUI::Asset->newPending($session, $assetId);
+            if ($productRow{title} ne $product->getTitle) {
+                $product->update({ title => $product->fixTitle($productRow{title}) });
+            }
             ##Error handling for locked assets
+            next PRODUCT if $product->isLocked;
+            my $collaterals = $product->getAllCollateral('variantsJSON');
+            my $collateralSet = 0;
+            ROW: foreach my $collateral (@{ $collaterals }) {
+                next ROW unless $collateral->{sku} eq $productRow->{sku};
+                @{ $collateral}{@headers} = @productRow{ @headers };
+                $product->setCollateral('variantsJSON', 'variantId', $collateral->{variantId}, $collateral);
+                $collateralSet=1;
+            }
+            if (!$collateralSet) {
+                ##It must be a new variant
+                $product->setCollateral('variantsJSON', 'variantId', 'new', \%productRow);
+            }
         }
         else {
             ##Insert a new product;
+            my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
+            $newProduct->update({ title => $newProduct->fixTitle($productRow{title}) });
+            $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productRow);
         }
     }
     return 1;
