@@ -13,6 +13,7 @@ use WebGUI::Operation::Shared;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Form::Image;
+use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
 
 =head1 LEGAL
@@ -66,6 +67,48 @@ sub getAlphabetSearchLoop {
         }
     }
     return \@alphabetLoop;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getFieldValue ( value, field )
+
+Processes the field value for date(Time) fields and Other Thing fields.
+
+=head3 value
+
+The value as stored in the database.
+
+=head3 field
+
+A reference to a hash containing the fields properties.
+
+=cut
+
+sub getFieldValue {
+
+    my $self = shift;
+    my $value = shift;
+    my $field = shift;
+    my $dateFormat = shift || "%z";
+    my $dateTimeFormat = shift;
+    my $processedValue = $value;
+
+    if ($field->{fieldType} eq "date"){
+        $processedValue = $self->session->datetime->epochToHuman($value,$dateFormat);
+    }
+    elsif ($field->{fieldType} eq "dateTime"){
+        $processedValue = $self->session->datetime->epochToHuman($value,$dateTimeFormat);
+    }
+    elsif (WebGUI::Utility::isIn(ucfirst $field->{fieldType},qw(File Image))) {
+        $processedValue = WebGUI::Form::DynamicField->new($self->session,
+            fieldType=>$field->{fieldType},
+            value=>$value
+        )->getValueAsHtml();
+    }
+
+    return $processedValue;
+
 }
 
 #-------------------------------------------------------------------
@@ -514,10 +557,17 @@ sub view {
                     $profileFieldName =~ s/ /_/g;
                     $profileFieldName =~ s/\./_/g;
                     my $value = $user->{$profileField->{fieldName}};
+                    my %profileFieldValues;
+                    if (WebGUI::Utility::isIn(ucfirst $profileField->{fieldType},qw(File Image)) && $value ne ''){
+                        my $file = $self->getFieldValue($value,{
+                                fieldType=>$profileField->{fieldType}
+                            });
+                        $profileFieldValues{profile_file} = $file;
+                        $userProperties{'user_profile_'.$profileFieldName.'_file'} = $file;
+                    }
+                    $profileFieldValues{profile_value} = $value;
                     if($profileField->{visible}){
-    					push (@profileFieldValues, {
-        					"profile_value"=>$value,
-		    			});
+    					push (@profileFieldValues, \%profileFieldValues);
                     }
                     unless($self->get("showOnlyVisibleAsNamed") && $profileField->{visible} != 1){
                         $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;

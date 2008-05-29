@@ -54,11 +54,13 @@ our $HELP = {
                     { 'name' => 'user_name' },
                     { 'name' => 'user_id' },
                     { 'name' => 'user_profile_PROFILEFIELDNAME_value' },
+                    { 'name' => 'user_profile_PROFILEFIELDNAME_file' },
                     { 'name' => 'user_profile_emailNotPublic' },
                     {   'name' => 'user_profile_loop', 
                         'variables' => [
                             { 'name' => 'profile_emailNotPublic' },
                             { 'name' => 'profile_value' },
+                            { 'name' => 'profile_file' },
                         ],
                     },
                 ],

@@ -300,6 +300,13 @@ profile. Example &lt;tmpl_var user_profile_firstName_value&gt;|,
                 lastUpdated => 1081514049
         },
 
+        'user_profile_PROFILEFIELDNAME_file' => {
+                message => q|The file for the profile field with the name PROFILEFIELDNAME in the users user
+profile. Example &lt;tmpl_var user_profile_firstName_file&gt;. This is available if the profile field is a file or
+an image.|,
+                lastUpdated => 1081514049
+        },
+
         'user_profile_emailNotPublic' => {
                 message => q|A conditional that is true if the users email address is not public.|,
                 lastUpdated => 1081514049
@@ -318,6 +325,11 @@ true for the 'email' profile field.|,
 
         'profile_value' => {
                 message => q|The value of the profile field for this user.|,
+                lastUpdated => 1081514049
+        },
+
+        'profile_value' => {
+                message => q|The file for this profile field, available if the profile field is an image or file.|,
                 lastUpdated => 1081514049
         },
 
