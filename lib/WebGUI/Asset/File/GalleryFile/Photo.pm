@@ -236,7 +236,8 @@ sub getTemplateVars {
 
     ### Download resolutions
     for my $resolution ( @{ $self->getResolutions } ) {
-        ( my $label ) = $resolution =~ /\.[^.]+$/; # Remove the trailing extention
+        my $label       = $resolution;
+        $label          =~ s/\.[^.]+$//;
         my $downloadUrl = $self->getStorageLocation->getUrl( $resolution );
         push @{ $var->{ resolutions_loop } }, { 
             resolution      => $label,
