@@ -1,4 +1,4 @@
-# Tests CRUD operations on WebGUI::Flux::Rule
+# Tests basic CRUD operations on WebGUI::Flux::Rule
 #
 # N.B. Perform Devel::Cover test via:
 # cover -delete -silent && perl -MDevel::Cover=-ignore,.,-select,lib/WebGUI/Flux/Rule t/Flux/Rule/Rule.t && cover
@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;

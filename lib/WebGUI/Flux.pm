@@ -37,9 +37,9 @@ my @rules;
 
 #-------------------------------------------------------------------
 
-=head2 new ( session )
+=head2 count_rules ( session )
 
-Constructor.
+Return the number of defined Rules
 
 =head3 session
 
@@ -47,7 +47,7 @@ A reference to the current session.
 
 =cut
 
-sub new {
+sub count_rules {
     my ( $class, $session ) = @_;
     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
         WebGUI::Error::InvalidObject->throw(
@@ -57,22 +57,6 @@ sub new {
             error    => 'Need a Session.'
         );
     }
-    
-    my $self = register $class;
-    $session{ id $self } = $session;
-    return $self;
-}
-
-#-------------------------------------------------------------------
-
-=head2 count_rules ( )
-
-Return the number of defined Rules
-
-=cut
-
-sub count_rules {
-    my ( $class ) = @_;
     return $rule_count;
 }
 
@@ -85,7 +69,15 @@ Returns all defined Rules
 =cut
 
 sub get_rules {
-    my ( $class ) = @_;
+     my ( $class, $session ) = @_;
+     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
+        WebGUI::Error::InvalidObject->throw(
+
+            expected => 'WebGUI::Session',
+            got      => ( ref $session ),
+            error    => 'Need a Session.'
+        );
+    }
     return \@rules;
 }
 
