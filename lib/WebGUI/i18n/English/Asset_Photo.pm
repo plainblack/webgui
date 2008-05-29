@@ -637,8 +637,8 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
-    'helpvar resolution_' => {
-        message     => q{A URL direct to a known resolution. "800" resolution would be "resolution_800".}
+    'helpvar resolutions_' => {
+        message     => q{A URL direct to a known resolution. "800" resolution would be "resolutions_800".},
         lastUpdated => 0,
         context     => q{Description of template variable},
     },
