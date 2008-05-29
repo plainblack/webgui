@@ -39,6 +39,10 @@ our $HELP = {
         ],
         variables => [
             {
+                name        => 'isPending',
+                description => 'helpvar isPending',
+            },
+            {
                 name        => 'canComment',
                 description => 'helpvar canComment',
             },
@@ -98,7 +102,15 @@ our $HELP = {
                         name        => 'url_download',
                         description => 'helpvar resolutions_loop url_download',
                     },
+                    {
+                        name        => 'resolution',
+                        description => 'helpvar resolutions_loop resolution',
+                    },
                 ],
+            },
+            {
+                name        => 'resolutions_',
+                description => 'helpvar resolutions_',
             },
             {
                 name        => 'exif_',

@@ -13,6 +13,10 @@ our $HELP = {
         ],
         variables   => [
             {
+                name        => 'isPending',
+                description => 'helpvar isPending',
+            },
+            {
                 name        => 'canAddFile',
                 description => 'helpvar canAddFile',
             },

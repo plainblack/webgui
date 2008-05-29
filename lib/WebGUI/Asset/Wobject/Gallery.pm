@@ -557,10 +557,25 @@ sub getAlbumIds {
     
     my $orderBy     = $options->{ orderBy }      || "lineage ASC";
 
+    # Deal with "pending" albums.
+    my %pendingRules;
+    if ( $self->canEdit ) {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    }
+    else {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        $pendingRules{ whereClause } = q{
+            ( 
+                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+            )
+        };
+    }
+    
     my $assets 
         = $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
             orderByClause       => $orderBy,
+            ( %pendingRules ),
         });
 
     return $assets;
@@ -873,7 +888,7 @@ sub view_listAlbums {
     $p->appendTemplateVars( $var );
 
     for my $assetId ( @{ $p->getPageData } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $session, $assetId );
         push @{ $var->{albums} }, $asset->getTemplateVars;
     }
     

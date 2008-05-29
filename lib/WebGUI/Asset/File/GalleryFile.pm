@@ -208,6 +208,21 @@ sub canEdit {
 
 #----------------------------------------------------------------------------
 
+=head2 canEditIfLocked ( [userId] )
+
+Override this to allow editing when locked under a different version tag.
+
+=cut
+
+sub canEditIfLocked {
+    my $self        = shift;
+    my $userId      = shift;
+
+    return $self->canEdit( $userId );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( [userId] )
 
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
@@ -330,6 +345,42 @@ sub getCommentPaginator {
 
 #----------------------------------------------------------------------------
 
+=head2 getCurrentRevisionDate ( session, assetId )
+
+Override this to allow instanciation of "pending" GalleryFiles for those who
+are authorized to see them.
+
+=cut
+
+sub getCurrentRevisionDate {
+    my $class       = shift;
+    my $session     = shift;
+    my $assetId     = shift;
+
+    # Get the highest revision date, instanciate the asset, and see if 
+    # the permissions are enough to return the revisionDate.
+    my $revisionDate
+        = $session->db->quickScalar( 
+            "SELECT MAX(revisionDate) FROM GalleryFile WHERE assetId=?",
+            [ $assetId ]
+        );
+
+    return undef unless $revisionDate;
+
+    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+
+    return undef unless $asset;
+
+    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+        return $revisionDate;
+    }
+    else {
+        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getGallery ( )
 
 Gets the Gallery asset this GalleryFile is a member of. 
@@ -338,18 +389,10 @@ Gets the Gallery asset this GalleryFile is a member of.
 
 sub getGallery {
     my $self        = shift;
-
-    # We're using getLinage instead of getParent->getParent because of the 
-    # overridden getParent, below. 
-    # We need to be able to get the Gallery WITHOUT having to get the GalleryAlbum
-    my $gallery 
-        = $self->getLineage( ['ancestors'], { 
-            includeOnlyClasses      => [ 'WebGUI::Asset::Wobject::Gallery' ],
-            returnObjects           => 1,
-            invertTree              => 1,
-        } )->[ 0 ];
-
-    return $gallery;
+    
+    # We must use getParent->getParent because brand-new assets do not
+    # have a lineage, but they do get assigned a parent.
+    return $self->getParent->getParent;
 }
 
 #----------------------------------------------------------------------------
@@ -363,7 +406,7 @@ Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is
 
 sub getParent {
     my $self        = shift;
-    if ( my $album = $self->getParent ) {
+    if ( my $album = $self->SUPER::getParent ) {
         return $album;
     }
     # Only get the pending version if we're allowed to see this photo in its pending status

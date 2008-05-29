@@ -176,7 +176,19 @@ sub getExifData {
     my $self        = shift;
 
     return unless $self->get('exifData');    
-    return decode_json( $self->get('exifData') );
+
+    # Our processing and eliminating of bad / unparsable keys
+    # isn't perfect, so handle errors gracefully
+    my $exif    = eval { decode_json( $self->get('exifData') ) };
+    if ( $@ ) {
+        $self->session->errorHandler->warn( 
+            "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
+            . "' (" . $self->getId . "): " . $@
+        );
+        return;
+    }
+    
+    return $exif;
 }
 
 #----------------------------------------------------------------------------
@@ -394,8 +406,8 @@ sub updateExifDataFromFile {
         }
     }
 
-    # Remove other, pointless keys
-    for my $key ( qw( Directory NativeDigest ) ) {
+    # Remove other, pointless, possibly harmful keys
+    for my $key ( qw( Directory NativeDigest CameraID CameraType ) ) {
         delete $info->{ $key };
     }
 
@@ -505,6 +517,8 @@ sub www_edit {
             name        => "title",
             value       => ( $form->get("title") || $self->get("title") ),
         });
+    
+    $self->getGallery;
 
     $var->{ form_synopsis }
         = WebGUI::Form::HTMLArea( $session, {

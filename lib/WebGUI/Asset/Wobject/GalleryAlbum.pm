@@ -295,6 +295,21 @@ sub canEdit {
 
 #----------------------------------------------------------------------------
 
+=head2 canEditIfLocked ( [userId] )
+
+Override this to allow editing when locked under a different version tag.
+
+=cut
+
+sub canEditIfLocked {
+    my $self        = shift;
+    my $userId      = shift;
+
+    return $self->canEdit( $userId );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( [userId] )
 
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
@@ -346,6 +361,42 @@ Returns the workflowId of the Gallery's approval workflow.
 sub getAutoCommitWorkflowId {
     my $self        = shift;
     return $self->getParent->get("workflowIdCommit");
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getCurrentRevisionDate ( session, assetId )
+
+Override this to allow instanciation of "pending" GalleryAlbums for those who
+are authorized to see them.
+
+=cut
+
+sub getCurrentRevisionDate {
+    my $class       = shift;
+    my $session     = shift;
+    my $assetId     = shift;
+
+    # Get the highest revision date, instanciate the asset, and see if 
+    # the permissions are enough to return the revisionDate.
+    my $revisionDate
+        = $session->db->quickScalar( 
+            "SELECT MAX(revisionDate) FROM GalleryAlbum WHERE assetId=?",
+            [ $assetId ]
+        );
+
+    return undef unless $revisionDate;
+
+    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+
+    return undef unless $asset;
+
+    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+        return $revisionDate;
+    }
+    else {
+        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+    }
 }
 
 #----------------------------------------------------------------------------
