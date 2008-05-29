@@ -550,8 +550,8 @@ sub processPayment {
     # Process response
 	if ($response->is_success) {
 		# We got some XML back from iTransact, now parse it.
-        $session->errorHandler->info('Starting request');
-        my $transactionResult = XMLin( $response->content );
+        my $transactionResult = XMLin( $response->content,  SuppressEmpty => '' );
+
 #### TODO: More checking: price, address, etc
 		unless (defined $transactionResult->{ TransactionData }) {
 			# GatewayFailureResponse: This means the xml is invalid or has the wrong mime type
@@ -574,7 +574,9 @@ sub processPayment {
             my $gatewayCode     = $transactionData->{ XID               };
             my $isSuccess       = $status eq 'OK';
        
-            return ( $isSuccess, $gatewayCode, $status, "" );
+            my $message = ($errorCategory) ? " $errorMessage Category: $errorCategory" : $errorMessage;
+
+            return ( $isSuccess, $gatewayCode, $status, $message );
 		}
 	} else {
 		# Connection Error
@@ -597,7 +599,7 @@ sub www_getCredentials {
     my $addressId   = $session->form->process('addressId');
     my $addressData = {};
     if ( $addressId ) {
-        $addressData    = eval{ $self->getCart->getAddressBook->getAddress( $addressId )->get() } || {};
+        $addressData    = eval{ $self->getAddress( $addressId )->get() } || {};
     }
                    
     my $output;
@@ -690,9 +692,9 @@ sub www_getCredentials {
 
 #-------------------------------------------------------------------
 sub www_pay {
-    my $self        = shift;
-    my $session     = $self->session;
-    my $addressId   = $session->form->process( 'addressId' ) || undef;
+    my $self    = shift;
+    my $session = $self->session;
+    my $address = $self->getAddress( $session->form->process( 'addressId' ) );
 
     # Check whether the user filled in the checkout form and process those.
     my $credentialsErrors = $self->processCredentials;
@@ -701,7 +703,7 @@ sub www_pay {
     return $self->www_getCredentials( $credentialsErrors ) if $credentialsErrors;
 
     # Payment time!
-    my $transaction = $self->processTransaction( $addressId );
+    my $transaction = $self->processTransaction( $address );
 	if ($transaction->get('isSuccessful')) {
 	    return $transaction->thankYou();
 	}

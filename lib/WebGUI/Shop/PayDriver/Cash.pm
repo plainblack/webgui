@@ -38,16 +38,6 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-sub getAddress {
-    my ($self, $addressId)    = @_;
-    if ($addressId) {
-        return $self->getCart->getAddressBook->getAddress( $addressId );
-    }
-    # No billing address selected yet so return undef.
-    return undef;
-}
-
-#-------------------------------------------------------------------
 
 sub getButton {
     my $self    = shift;

@@ -268,6 +268,29 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getAddress ( addressId )
+
+Returns an instantiated WebGUI::Shop::Address object for the passed address id.
+
+=head3 addressId
+
+The id of the adress to instantiate.
+
+=cut
+
+sub getAddress {
+    my $self        = shift;
+    my $addressId   = shift;
+
+    if ($addressId) {
+        return $self->getCart->getAddressBook->getAddress( $addressId );
+    }
+
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getButton ( )
 
 Returns the form that will take the user to check out.
