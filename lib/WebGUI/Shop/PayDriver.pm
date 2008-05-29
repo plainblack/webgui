@@ -578,6 +578,7 @@ sub processTransaction {
     $transactionProperties->{ paymentMethod     } = $self;
     $transactionProperties->{ cart              } = $cart;
     $transactionProperties->{ paymentAddress    } = $paymentAddress if defined $paymentAddress;
+    $transactionProperties->{ isRecurring       } = $cart->requiresRecurringPayment;
 
     # Create a transaction...
     my $transaction = WebGUI::Shop::Transaction->create( $self->session, $transactionProperties );
@@ -678,25 +679,25 @@ sub sendNotifications {
     $var{items} = \@items;
 
     # render
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("receiptEmailTemplateId"));
+    my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
 
     # purchase receipt
-    $inbox->addMessage(
+    $inbox->addMessage( {
         message     => $template->process(\%var),
         subject     => $i18n->get('receipt subject').' '.$transaction->get('orderNumber'),
         userId      => $transaction->get('userId'),
         status      => 'completed',
-        );
+    } );
     
     # shop owner notification
     $var{viewDetailUrl} = $url->page('shop=transaction;method=view;transactionId='.$transaction->getId,1);
-    $inbox->addMessage(
+    $inbox->addMessage( {
         message     => $template->process(\%var),
         subject     => $i18n->get('a sale has been made').' '.$transaction->get('orderNumber'),
         groupId     => $self->get('saleNotificationGroupId'),
         status      => 'unread',
-        );
+    } );
 }
 
 #-------------------------------------------------------------------

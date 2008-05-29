@@ -18,7 +18,7 @@ sub _generateCancelRecurXml {
     $vendorIdentification->{ HomePage           } = $self->session->setting->get("companyURL");
     
     my $recurUpdate;
-    $recurUpdate->{ OperationXID    } = $transaction->get('gatewayId');
+    $recurUpdate->{ OperationXID    } = $transaction->get('transactionCode');
     $recurUpdate->{ RemReps         } = 0;
    
     my $xmlStructure = {
@@ -247,8 +247,9 @@ sub cancelRecurringPayment {
             $session->errorHandler->info( "GatewayFailureResponse: result: [" . $response->content . "]" );
             return( 
                 0, 
-                $transactionResult->{ Status }, 
-                $transactionResult->{ ErrorMessage } . ' Category: ' . $transactionResult->{ ErrorCategory } 
+                "Status: "      . $transactionResult->{ Status }
+                ." Message: "   . $transactionResult->{ ErrorMessage } 
+                ." Category: "  . $transactionResult->{ ErrorCategory } 
             );
 		} else {
             # RecurUpdateResponse: We have succesfully sent the XML and it was correct. Note that this doesn't mean
@@ -264,7 +265,7 @@ sub cancelRecurringPayment {
             # Uppercase the status b/c the documentation is not clear on the case.
             my $isSuccess       = uc( $status ) eq 'OK' && $remainingTerms == 0;
        
-            return ( $isSuccess, $status, "$errorMessage Category: $errorCategory" );
+            return ( $isSuccess, "Status: $status Message: $errorMessage Category: $errorCategory" );
 		}
 	} else {
 		# Connection Error

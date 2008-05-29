@@ -1420,6 +1420,7 @@ sub migratePaymentPlugins {
     print "\tMigrating WebGUI default commerce plugins..." unless $quiet;
 
     foreach my $namespace (qw{ Cash ITransact }) {
+        # Get properties from old plugin
         my $properties = $session->db->buildHashRef(
             'select fieldName, fieldValue from commerceSettings where type=\'Payment\' and namespace=?',
             [
@@ -1427,8 +1428,11 @@ sub migratePaymentPlugins {
             ]
         );
 
-        $properties->{ groupToUse } = $properties->{ whoCanUse };
+        # And set new properties
+        $properties->{ groupToUse               } = $properties->{ whoCanUse };
+        $properties->{ receiptEmailTemplateId   } = 'BMzuE91-XB8E-XGll1zpvA';
 
+        # Create paydriver instance
         my $plugin = eval { 
             WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
                 $session, 
@@ -1437,13 +1441,13 @@ sub migratePaymentPlugins {
             ])
         };
 
+        # Print warning message for ITransact users that they must change their postback url
         if ( $namespace eq 'ITransact' && $properties->{ vendorId } ) {
             print "\n\t\t!!CAUTION!!: The postback url for ITransact has changed. Please log in to your virtual "
                 ."terminal and change the postback url to:\n\n\t\t"
                 .'https://'.$session->config->get("sitename")->[0]
                 .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$plugin->getId."\n\t";
         }
-
     }
 
     print "Done\n" unless $quiet;
