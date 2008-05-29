@@ -135,8 +135,23 @@ seperated values|,
                 lastUpdated => 1081514049
         },
 
+        'id label' => {
+                message => q|Id|,
+                lastUpdated => 1081514049
+        },
+
+        'username label' => {
+                message => q|Username|,
+                lastUpdated => 1081514049
+        },
+
         'query label' => {
                 message => q|Query|,
+                lastUpdated => 1081514049
+        },
+
+        'search in label' => {
+                message => q|Search in:|,
                 lastUpdated => 1081514049
         },
 
@@ -202,9 +217,21 @@ seperated values|,
                 lastUpdated => 1081514049
         },
 
+        'search_PROFILEFIELDNAME_form' => {
+                message => q|The form element tied to this field to do a normal search in profile field PROFILEFIELDNAME. Example:
+&lt;tmpl_var search_timeZone_form&gt; will be a select box.|,
+                lastUpdated => 1081514049
+        },
+
         'searchExact_PROFILEFIELDNAME_text' => {
                 message => q|A text input to do an exact search in profile field PROFILEFIELDNAME. Example:
 &lt;tmpl_var searchExact_email_text&gt;.|,
+                lastUpdated => 1081514049
+        },
+
+        'searchExact_PROFILEFIELDNAME_form' => {
+                message => q|The form element tied to this field to do an exact search in profile field PROFILEFIELDNAME. Example:
+&lt;tmpl_var searchExact_email_form&gt;.|,
                 lastUpdated => 1081514049
         },
 

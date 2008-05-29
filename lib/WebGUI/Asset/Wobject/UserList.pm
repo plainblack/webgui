@@ -70,6 +70,72 @@ sub getAlphabetSearchLoop {
 
 #-------------------------------------------------------------------
 
+=head2 getFormElement ( data )
+
+Returns the form element tied to this field.
+
+=head3 data
+
+A hashref containing the properties of this field.
+
+=cut
+
+sub getFormElement {
+
+    my $self = shift;
+    my $data = shift;
+    my %param;
+
+    $param{name} = $data->{name};
+    my $name = $param{name};
+    $param{value}  = $data->{value} || WebGUI::Operation::Shared::secureEval($self->session,$data->{dataDefault});
+    $param{fieldType} = $data->{fieldType};
+
+    if ($data->{fieldType} eq "Checkbox") {
+        $param{value} = ($data->{defaultValue} =~ /checked/xi) ? 1 : "";
+    }
+
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
+        my @defaultValues;
+        if ($self->session->form->param($name)) {
+                    @defaultValues = $self->session->form->selectList($name);
+                } else {
+                    foreach (split(/\n/x, $data->{value})) {
+                            s/\s+$//x; # remove trailing spaces
+                                push(@defaultValues, $_);
+                    }
+                }
+        $param{value} = \@defaultValues;
+    }
+
+    if ($data->{possibleValues}){
+        my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
+        unless (ref $values eq 'HASH') {
+            if ($self->get('possibleValues') =~ /\S/) {
+                $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field "
+                .$self->getId);
+            }
+            $values = {};
+        }
+        $param{options} = $values;
+    }
+
+    if ($data->{fieldType} eq "YesNo") {
+        if ($data->{defaultValue} =~ /yes/xi) {
+                    $param{value} = 1;
+                } elsif ($data->{defaultValue} =~ /no/xi) {
+                    $param{value} = 0;
+                }
+    }
+
+    my $formElement =  eval { WebGUI::Pluggable::instanciate("WebGUI::Form::". ucfirst $param{fieldType}, "new",
+[$self->session, \%param ])};
+    return $formElement->toHtml();
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( properties )
 
 Defines wobject properties for UserList instances.
@@ -269,7 +335,8 @@ sub view {
     }
 
 	$sth = $self->session->db->read(
-        "SELECT field.fieldName, field.label, field.sequenceNumber, field.visible, field.fieldType "
+        "SELECT field.fieldName, field.label, field.sequenceNumber, field.visible, field.fieldType, "
+        ."field.dataDefault, field.possibleValues "
         ."FROM userProfileField as field "
 		."left join userProfileCategory as category USING(profileCategoryId) "
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
@@ -301,18 +368,29 @@ sub view {
             $var{'profileField_'.$fieldName.'_sortByURL'} = $sortByURL;
         }
         # create field specific templ_vars for search
+        my %formElementProperties = %{$profileField};
+
+        $formElementProperties{value} = $form->process('search_'.$fieldName);
+        $formElementProperties{name} = 'search_'.$fieldName;
+        $var{'search_'.$fieldName.'_form'} = $self->getFormElement(\%formElementProperties);
         $var{'search_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
             -name   => 'search_'.$fieldName,
             -value  => $form->process('search_'.$fieldName),
         }); 
+
+        $formElementProperties{value} = $form->process('search_Exact'.$fieldName);
+        $formElementProperties{name} = 'searchExact_'.$fieldName;
+        $var{'searchExact_'.$fieldName.'_form'} = $self->getFormElement(\%formElementProperties);
         $var{'searchExact_'.$fieldName.'_text'} = WebGUI::Form::Text($self->session, {
             -name   => 'searchExact_'.$fieldName,
             -value  => $form->process('searchExact_'.$fieldName),
         });
+
         $var{'includeInSearch_'.$fieldName.'_hidden'} =  WebGUI::Form::Hidden($self->session, {
             -name   => 'includeInSearch_'.$fieldName,
             -value  => '1',
         });
+
         $var{'includeInSearch_'.$fieldName.'_checkBox'} = WebGUI::Form::Checkbox($self->session, {
             -name   => 'includeInSearch_'.$fieldName,
             -value  => '1',
@@ -526,6 +604,8 @@ $config);
             showOnlyVisibleAsNamed int(11),
             sortBy varchar(128),
             sortOrder varchar(4),
+            overridePublicEmail int(11),
+            overridePublicProfile int(11),
         PRIMARY KEY  (`assetId`,`revisionDate`)
         )");
     my $import = WebGUI::Asset->getImportNode($session);
