@@ -89,6 +89,10 @@ sub removeSqlForm {
         foreach my $table (qw(SQLForm_fieldDefinitions SQLForm SQLForm_fieldTypes SQLForm_regexes)) {
             $db->write("drop table $table");
         }
+        unlink '../../lib/WebGUI/Asset/Wobject/SQLForm.pm';
+        unlink '../../lib/WebGUI/Help/Asset_SQLForm.pm';
+        unlink '../../lib/WebGUI/i18n/English/Asset_SQLForm.pm';
+        unlink '../../t/Asset/Wobject/SQLForm.t';
     } 
     else {
         print "\t\tThis site uses SQL Form, so we won't uninstall it.\n" unless $quiet;
