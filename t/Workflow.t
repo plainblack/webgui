@@ -41,7 +41,7 @@ ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in e
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
 ok(isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow in enabled list');
-$session->errorHandler->warn('Interesting');
+$session->log->warn('Interesting');
 $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
 

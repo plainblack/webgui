@@ -146,7 +146,7 @@ Intercept logging request and capture them in buffer variables for testing
 =cut
 
 sub interceptLogging {
-    my $logger = $SESSION->errorHandler->getLogger;
+    my $logger = $SESSION->log->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
 
     $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
@@ -314,7 +314,7 @@ sub root {
 Returns the WebGUI::Session object that was created by the test.  This session object
 will automatically be destroyed if the test finishes without dying.
 
-The errorHandler/logger for this session has been overridden so that you can test
+The logger for this session has been overridden so that you can test
 that WebGUI is logging errors.  That means that errors will not be put into
 your webgui.log file (or whereever log.conf says to put it).  This will probably
 be moved into a utility sub so that the interception can be enabled, and then
