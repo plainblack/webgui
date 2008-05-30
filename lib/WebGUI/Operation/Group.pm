@@ -588,6 +588,7 @@ sub www_emailGroup {
 	return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my ($output,$f);
 	my $i18n = WebGUI::International->new($session);
+    my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	$f = WebGUI::HTMLForm->new($session);
 	$f->hidden(
 		-name => "op",
@@ -597,6 +598,14 @@ sub www_emailGroup {
 		-name => "gid",
 		-value => $session->form->process("gid")
 	);
+        $f->readOnly(
+        -label => $i18n->get(379),
+        -value => $group->getId,
+    );
+    $f->readOnly(
+        -label => $i18n->get(84),
+        -value => $group->name,
+    );
 	$f->email(
 		-name=>"from",
 		-value=>$session->setting->get("companyEmail"),
@@ -696,17 +705,29 @@ sub www_listGroups {
 #-------------------------------------------------------------------
 sub www_manageGroupsInGroup {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
-        my $f = WebGUI::HTMLForm->new($session);
+    my $i18n = WebGUI::International->new($session);
+    my $group = WebGUI::Group->new($session,$session->form->process("gid"));
+    return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+
+    my $f = WebGUI::HTMLForm->new($session);
 	$f->submit;
         $f->hidden(
 		-name => "op",
 		-value => "addGroupsToGroupSave"
 	);
-        $f->hidden(
+    $f->hidden(
 		-name => "gid",
 		-value => $session->form->process("gid")
 	);
+    $f->readOnly(
+        -label => $i18n->get(379),
+        -value => $group->getId,
+    );
+    $f->readOnly(
+        -label => $i18n->get(84),
+        -value => $group->name,
+    );
+
 	my @groups;
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	my $groupsIn = $group->getGroupsIn(1);
@@ -730,7 +751,7 @@ sub www_manageGroupsInGroup {
 #-------------------------------------------------------------------
 sub www_manageUsersInGroup {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
+    return $session->privilege->adminOnly() unless (canEditGroup($session,$session->form->process("gid")));
 	my $i18n = WebGUI::International->new($session);
 	my $output = WebGUI::Form::formHeader($session,)
 		.WebGUI::Form::hidden($session,{
@@ -778,6 +799,15 @@ sub www_manageUsersInGroup {
 		-value => "addUsersToGroupSave"
 	);
 	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
+    $f->readOnly(
+        -label => $i18n->get(379),
+        -value => $group->getId,
+    );
+    $f->readOnly(
+        -label => $i18n->get(84),
+        -value => $group->name,
+    );
+
 	my $existingUsers = $group->getUsers;
 	push(@{$existingUsers},"1");
 	my %users;

@@ -6,6 +6,8 @@
  - Depricated $session->errorHandler in favor of $session->log.
  - AssetProxy macro can now use asset id as a parameter like so:
    ^AssetProxy(abcdefghijklmnopqrstuv,assetId);
+ - AssetProxy macro now only shows an 'invalid url' error when Admin mode is
+   on. An error is always sent to the log (Yung Han Khoe).
  - Exposed keywords API to all assets through edit screen. Now keywords are
    searchable and add metatags for all assets.
  - fix: template variable isUncommitted is not documented in the help
@@ -79,6 +81,7 @@
  - Added better handling of Pending albums and photos
  - added: Database link access for SQL Macro (Yung Han Khoe)
  - Added UserList wobject (United Knowledge and Yung Han Khoe)
+ - All group operations now show group id and name (Yung Han Khoe)
 
 7.5.10
  - fix: Syntax error in GetCsMail
