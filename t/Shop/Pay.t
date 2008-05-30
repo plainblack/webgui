@@ -150,7 +150,8 @@ is($newDriver->label, 'JAL', 'label passed correctly to paydriver');
 my $drivers = $pay->getDrivers();
 
 my $defaultPayDrivers = {
-    'WebGUI::Shop::PayDriver::Cash'     => 'Cash',
+    'WebGUI::Shop::PayDriver::Cash'      => 'Cash',
+    'WebGUI::Shop::PayDriver::ITransact' => 'Itransact',
 };
 
 cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
