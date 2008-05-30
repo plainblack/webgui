@@ -27,6 +27,23 @@ specific information. Rules can also depend on other Rules, meaning that we end 
 Flux Graph of interconnected Rules. Workflow triggers are built-in, and Flux is designed to
 be modular with many plug-in points, making the system truly extensible.
 
+
+As per the standard WebGUI API:
+
+=over 4
+
+=item * use create() to instantiate a new object and immediately persist it to the database
+
+=item * use new() to instantiate an existing object (retrieved from the db by id)
+
+=item * use $obj->get('field') to retrieve properties
+
+=item * use $obj->update() to update properties (immediately persisted to db)
+
+=item * use delete() to remove the object from persistent storage
+
+=back
+
 =head1 SYNOPSIS
 
  use WebGUI::Flux::Rule;
@@ -70,22 +87,21 @@ Readonly my @MUTABLE_PROPERTIES => qw(
 
 #-------------------------------------------------------------------
 
-=head2 addExpression ( expression )
+=head2 addExpression ( properties )
 
 Adds an expression to the Flux Rule.  Returns a reference to the WebGUI::Flux::Expression
 object that was created.  It does not trap exceptions, so any problems with creating
 the object will be passed to the caller.
 
-=head2 expression
+=head2 properties
 
-A hash reference containing expression information.
+A hash reference containing properties that you would pass to C<WebGUI::Flux::Expression->create()>
 
 =cut
 
 sub addExpression {
-    my ( $self, $expression ) = @_;
-    my $expressionObj = WebGUI::Flux::Expression->create( $self, $expression );
-    return $expressionObj;
+    my ( $self, $properties_ref ) = @_;
+    return WebGUI::Flux::Expression->create( $self, $properties_ref );
 }
 
 #-------------------------------------------------------------------
@@ -93,7 +109,7 @@ sub addExpression {
 =head2 create ( session, rule )
 
 Constructor. Creates a new Flux Rule and returns it.
-Refer to C<new> if instead you want To instantiate an existing rule.
+Refer to C<new()> if instead you want To instantiate an existing rule.
 
 =head3 session
 
@@ -106,29 +122,29 @@ A hash reference containing the properties to set on the Rule.
 =cut
 
 sub create {
-    my ( $class, $session, $rule_ref ) = @_;
+    my ( $class, $session, $properties_ref ) = @_;
 
     # Check arguments..
-    if ( !defined $session || !$session->isa("WebGUI::Session") ) {
+    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
         WebGUI::Error::InvalidObject->throw(
-            expected => "WebGUI::Session",
+            expected => 'WebGUI::Session',
             got      => ( ref $session ),
-            error    => "Need a session."
+            error    => 'Need a session.'
         );
     }
-    if ( defined $rule_ref && ref $rule_ref ne "HASH" ) {
-        WebGUI::Error::InvalidParam->throw( param => $rule_ref, error => "Invalid hash reference." );
+    if ( defined $properties_ref && ref $properties_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidParam->throw( param => $properties_ref, error => 'Invalid hash reference.' );
     }
 
-    # Ok for $rule_ref to be missing
-    $rule_ref = defined $rule_ref ? $rule_ref : {};
+    # Ok for $properties_ref to be missing
+    $properties_ref = defined $properties_ref ? $properties_ref : {};
 
     # Create a bare-minimum entry in the db..
-    my $id = $session->db->setRow( "fluxRule", "fluxRuleId", { fluxRuleId => "new", %RULE_DEFAULTS } );
+    my $id = $session->db->setRow( 'fluxRule', 'fluxRuleId', { fluxRuleId => 'new', %RULE_DEFAULTS } );
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $rule = $class->new( $session, $id );
-    $rule->update($rule_ref);
+    $rule->update($properties_ref);
 
     return $rule;
 }
@@ -146,7 +162,7 @@ sub delete {
     foreach my $expression ( @{ $self->getExpressions } ) {
         $expression->delete;
     }
-    $self->session->db->deleteRow( "fluxRule", "fluxRuleId", $self->getId );
+    $self->session->db->deleteRow( 'fluxRule', 'fluxRuleId', $self->getId );
     undef $self;
     return undef;
 }
@@ -178,7 +194,7 @@ Returns a duplicated hash reference of this object’s data.
 =head3 property
 
 Any field − returns the value of a field rather than the hash reference.  See the 
-C<update> method.
+L<update> method.
 
 =cut
 
@@ -206,7 +222,7 @@ An expression object's unique id.
 sub getExpression {
     my ( $self, $expressionId ) = @_;
     my $id = ref $self;
-    unless ( exists $expressionCache{$id}{$expressionId} ) {
+    if ( !exists $expressionCache{$id}{$expressionId} ) {
         $expressionCache{$id}{$expressionId} = WebGUI::Flux::Expression->new( $self, $expressionId );
     }
     return $expressionCache{$id}{$expressionId};
@@ -223,10 +239,10 @@ Returns an array reference of expression objects that are in this Rule.
 sub getExpressions {
     my ($self) = @_;
     my @expressionObjects = ();
-    my $expressions = $self->session->db->read( "select fluxExpressionId from fluxExpression where fluxRuleId=?",
+    my $expressions = $self->session->db->read( 'select fluxExpressionId from fluxExpression where fluxRuleId=?',
         [ $self->getId ] );
     while ( my ($expressionId) = $expressions->array ) {
-        push( @expressionObjects, $self->getExpression($expressionId) );
+        push @expressionObjects, $self->getExpression($expressionId);
     }
     return \@expressionObjects;
 }
@@ -241,7 +257,7 @@ Returns the unique id for this Rule.
 
 sub getId {
     my ($self) = @_;
-    return $self->get("fluxRuleId");
+    return $self->get('fluxRuleId');
 }
 
 #-------------------------------------------------------------------
@@ -257,7 +273,7 @@ A reference to the current session.
 
 =head3 id
 
-The unique id of an Flux Rule to instantiate.
+The unique id of a Flux Rule to instantiate.
 
 =cut
 
@@ -265,19 +281,21 @@ sub new {
     my ( $class, $session, $ruleId ) = @_;
 
     # Check arguments..
-    if ( !defined $session || !$session->isa("WebGUI::Session") ) {
+    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
         WebGUI::Error::InvalidObject->throw(
-            expected => "WebGUI::Session",
+            expected => 'WebGUI::Session',
             got      => ( ref $session ),
-            error    => "Need a session."
+            error    => 'Need a session.'
         );
     }
     if ( !defined $ruleId ) {
-        WebGUI::Error::InvalidParam->throw( error => "Need a fluxRuleId." );
+        WebGUI::Error::InvalidParam->throw( error => 'Need a fluxRuleId.' );
     }
+
+    # Retreive row from db..
     my $rule = $session->db->quickHashRef( 'select * from fluxRule where fluxRuleId=?', [$ruleId] );
-    if ( !exists $rule->{fluxRuleId} || $rule->{fluxRuleId} eq "" ) {
-        WebGUI::Error::ObjectNotFound->throw( error => "No such Flux Rule.", id => $ruleId );
+    if ( !exists $rule->{fluxRuleId} || $rule->{fluxRuleId} eq q{} ) {
+        WebGUI::Error::ObjectNotFound->throw( error => 'No such Flux Rule.', id => $ruleId );
     }
 
     # Register Class::InsideOut object..
@@ -315,6 +333,8 @@ The combined expression
 
 =cut
 
+# TODO: Add Workflows to POD documentation above
+
 sub update {
     my ( $self, $newProp_ref ) = @_;
     my $id = id $self;
@@ -322,7 +342,7 @@ sub update {
         $property{$id}{$field}
             = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
     }
-    return $self->session->db->setRow( "fluxRule", "fluxRuleId", $property{$id} );
+    return $self->session->db->setRow( 'fluxRule', 'fluxRuleId', $property{$id} );
 }
 
 ##-------------------------------------------------------------------

@@ -12,6 +12,7 @@ use Data::Dumper;
 use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Flux::Rule;
 
 #----------------------------------------------------------------------------
 # Init
@@ -19,71 +20,122 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 4;
-plan tests => $tests;
+plan tests => 18;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-Readonly my $admin_user_id => 3;
-my ( $rule1, $rule2 );
-
 use_ok('WebGUI::Flux');
-use_ok('WebGUI::Flux::Rule');
 
-# Rule-related methods (with single Rule)
+#######################################################################
+#
+# getRules
+#
+#######################################################################
+# Errors
 {
-    is( WebGUI::Flux->count_rules($session), 0, 'initially no rules defined' );
-    cmp_deeply( WebGUI::Flux->get_rules($session), [], 'initially no rules defined' );
-
-    $rule1 = WebGUI::Flux::Rule->new(
-        $session,
-        {   name          => "Test Rule: 1",
-            owner_id    => $admin_user_id,
-            sticky_access => 0,
-        }
+    eval { my $rule = WebGUI::Flux::getRules(); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a session object' );
+    cmp_deeply(
+        $e,
+        methods(
+            error    => 'Need a session.',
+            expected => 'WebGUI::Session',
+            got      => '',
+        ),
+        'takes exception to not giving it a session object',
     );
-
-    is( WebGUI::Flux->count_rules($session), 1, 'after adding rule1, count is 1' );
-    cmp_deeply( WebGUI::Flux->get_rules($session), [$rule1], 'rule1 is the only rule defined' );
-
-    $rule1->delete();
-
-    is( WebGUI::Flux->count_rules($session), 0, 'no rules defined after delete' );
-    cmp_deeply( WebGUI::Flux->get_rules($session), [], 'no rules defined after delete' );
 }
 
-# Rule-related methods (with multiple Rules)
+# Single Rule
 {
-    $rule1 = WebGUI::Flux::Rule->new(
-        $session,
-        {   name          => "Test Rule: 1",
-            owner_id    => $admin_user_id,
-            sticky_access => 0,
-        }
-    );
-    $rule2 = WebGUI::Flux::Rule->new(
-        $session,
-        {   name          => "Test Rule: 2",
-            owner_id    => $admin_user_id,
-            sticky_access => 0,
-        }
-    );
+    cmp_deeply( WebGUI::Flux->getRules($session), [], 'initially no rules defined' );
 
-    is( WebGUI::Flux->count_rules($session), 2, 'after adding rule1 and rule2, count is 1' );
-    cmp_deeply( WebGUI::Flux->get_rules($session), [$rule1], 'rule1 and rule2 are the only rules defined' );
-
+    # Create a test Rule (with all defaults)
+    my $rule1 = WebGUI::Flux::Rule->create($session);
+    cmp_deeply( WebGUI::Flux->getRules($session), [$rule1], 'rule1 is the only rule defined' );
     $rule1->delete();
-    is( WebGUI::Flux->count_rules($session), 1, 'after deleting rule1, count is 1' );
-    cmp_deeply( WebGUI::Flux->get_rules($session), [$rule2], 'after deleting rule1, only rule2 defined' );
+    undef $rule1;
+    cmp_deeply( WebGUI::Flux->getRules($session), [], 'no rules defined after delete' );
+}
+
+# Multiple Rules
+{   
+    my $rule1 = WebGUI::Flux::Rule->create($session);
+    my $rule2 = WebGUI::Flux::Rule->create($session);
+    cmp_deeply( WebGUI::Flux->getRules($session), [$rule1, $rule2], '2 rules defined' );
+    $rule1->delete();
+    cmp_deeply( WebGUI::Flux->getRules($session), [$rule2], 'rule2 is the only rule after deletion' );
+    $rule2->delete();
+    cmp_deeply( WebGUI::Flux->getRules($session), [], 'no rules left after second delete' );
+}
+
+#######################################################################
+#
+# getRule
+#
+#######################################################################
+# Errors
+{
+    eval { my $rule = WebGUI::Flux->getRule(); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a session object' );
+    cmp_deeply(
+        $e,
+        methods(
+            error    => 'Need a session.',
+            expected => 'WebGUI::Session',
+            got      => '',
+        ),
+        'takes exception to not giving it a session object',
+    );
+}
+{    
+    eval { my $rule = WebGUI::Flux->getRule($session); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a fluxRuleId' );
+    cmp_deeply(
+        $e,
+        methods(
+            error    => 'Need a fluxRuleId.',
+            param      => undef,
+        ),
+        'takes exception to not giving it a fluxRuleId object',
+    );
+}
+{   
+    eval { my $rule = WebGUI::Flux->getRule( $session, 'neverAGUID' ); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::ObjectNotFound', 'takes exception to not giving it an existing fluxRuleId' );
+    cmp_deeply(
+        $e,
+        methods(
+            error => 'No such Flux Rule.',
+            id    => 'neverAGUID',
+        ),
+        'takes exception to not giving it a rule Id',
+    );
+}
+
+{
+    my $rule1 = WebGUI::Flux::Rule->create($session);
+    my $rule1Id = $rule1->getId();
+    my $duplicateOfRule1 = WebGUI::Flux->getRule($session, $rule1Id);
+    cmp_deeply( $duplicateOfRule1, $rule1, 'rule1 is returned' );
+    
+    # N.B. WebGUI::Flux uses a simple Rule cache that becomes stale if you delete a Rule, e.g.
+    $rule1->delete();
+    my $secondDuplicateOfRule1 = WebGUI::Flux->getRule($session, $rule1Id); # Stale, should throw exception
+    cmp_deeply( $secondDuplicateOfRule1, $rule1, 'rule1 still returned from cache after deletion' );
+    
+    # But getRules bypasses cache, e.g.
+    cmp_deeply( WebGUI::Flux->getRules($session), [], 'no rules defined after delete' );
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
-    # Cleanup rules (also removes dependent expressions)
-    foreach my $r ( $rule1, $rule2 ) {
-        ( defined $r and ref $r eq 'WebGUI::Flux::Rule' ) and $r->delete;
-    }
+    $session->db->write('delete from fluxRule');
+    $session->db->write('delete from fluxExpression');
 }
