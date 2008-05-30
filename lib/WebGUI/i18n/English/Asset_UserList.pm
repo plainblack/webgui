@@ -89,6 +89,29 @@ will be available as named tmpl_vars|,
                 lastUpdated => 1081514049
         },
 
+        'overridePublicEmail label' => {
+                message => q|Override Email Public|,
+                lastUpdated => 1081514049
+        },
+
+        'overridePublicEmail description' => {
+                message => q|If set to Yes then the 'Make email address public' setting in the user profile
+settings will be ignored. The User List will always show email addresses.|,
+                lastUpdated => 1081514049
+        },
+
+        'overridePublicProfile label' => {
+                message => q|Override Profile Public|,
+                lastUpdated => 1081514049
+        },
+
+        'overridePublicProfile description' => {
+                message => q|If set to Yes then the 'Make profile public' setting in the user profile settings will
+be ignored. The User List will show every users profile.|,
+                lastUpdated => 1081514049
+        },
+
+
         'alphabet' => {
                 message => q|The alphabet that is used for the alphabet search. This is a string of comma
 seperated values|,

@@ -232,6 +232,20 @@ sub definition {
             label=>$i18n->get('sort by'),
             hoverHelp=>$i18n->get('sort by description'),
         },
+        overridePublicEmail=>{
+            fieldType=>"yesNo",
+            defaultValue=>"0",
+            tab=>"display",
+            label=>$i18n->get("overridePublicEmail label"),
+            hoverHelp=>$i18n->get('overridePublicEmail description'),
+        },
+        overridePublicProfile=>{
+            fieldType=>"yesNo",
+            defaultValue=>"0",
+            tab=>"display",
+            label=>$i18n->get("overridePublicProfile label"),
+            hoverHelp=>$i18n->get('overridePublicProfile description'),
+        },
     );
 	
 	push(@{$definition}, {                
@@ -499,11 +513,15 @@ sub view {
 	$p->setDataByArrayRef(\@visibleUsers);
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
-	    if ($user->{publicProfile} eq "1" || ($user->{publicProfile} eq "" && $defaultPublicProfile eq "1")){
+	    if ($self->get('overridePublicProfile') || $user->{publicProfile} eq "1" || ($user->{publicProfile} eq "" && $defaultPublicProfile eq "1")){
 		    my (@profileFieldValues);
 			my %userProperties;
 			my $emailNotPublic;
-			$emailNotPublic = 1 if ($user->{publicEmail} eq "0" || ($user->{publicEmail} eq "" && $defaultPublicEmail ne "1"));
+            if ($user->{publicEmail} eq "0" || ($user->{publicEmail} eq "" && $defaultPublicEmail ne "1")){
+                unless ($self->get('overridePublicEmail')){
+                    $emailNotPublic = 1;
+                }
+            }
 			foreach my $profileField (@profileFields){
 				if ($profileField->{fieldName} eq "email" && $emailNotPublic){
 			    	push (@profileFieldValues, {
