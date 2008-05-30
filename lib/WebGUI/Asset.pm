@@ -462,6 +462,14 @@ sub definition {
                         fieldType=>'yesNo',
                         defaultValue=>1,
                     },
+                    inheritUrlFromParent=>{
+                        tab=>'meta',
+                        label=>$i18n->get('does asset inherit URL from parent'),
+                        hoverHelp=>$i18n->get('does asset inherit URL from parent description'),
+                        uiLevel=>9,
+                        fieldType=>'yesNo',
+                        defaultValue=>0,
+                    },
 				    status=>{
 					    noFormPost=>1,
 					    fieldType=>'hidden',
@@ -1971,6 +1979,11 @@ sub update {
     }
 
     # check the definition of all properties against what was given to us
+
+    # get a DB object for the two tight inner loops below, and the description
+    my $db = $self->session->db;
+    my $assetDataDescription = $db->buildHashRef('describe assetData');
+
 	foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
 
@@ -1987,11 +2000,46 @@ sub update {
             # database field for it exists. if not, setting it will break, so
             # skip it. this facilitates updating from previous versions.
             if($property eq 'isExportable') {
-                my $db = $self->session->db;
-                my $assetDataDescription = $db->buildHashRef('describe assetData');
                 unless(grep { $_ =~ /^isExportable/ } keys %{$assetDataDescription}) {
                     next;
                 }
+            }
+
+            # similarly, if this is the new-to-7.5 inheritUrlFromParent field,
+            # do the same.
+            elsif($property eq 'inheritUrlFromParent') {
+                unless(grep { $_ =~ /^inheritUrlFromParent/ } keys %{$assetDataDescription}) {
+                    next;
+                }
+
+                next unless $properties->{inheritUrlFromParent} == 1;
+
+                # if we're still here, we have the property in the DB. so process it.
+                # only prepend the URL once
+                my $parentUrl = $self->getParent->getUrl;
+
+                # handle either being passed a new URL or updating the current one
+                my $currentUrl;
+                if(exists $properties->{url}) {
+                    $currentUrl = $properties->{url};
+                }
+                else {
+                    $currentUrl = $self->getUrl;
+                }
+
+                # if there's only one / then leave it alone.
+                unless($currentUrl =~ tr{/}{} == 1) {
+                    $currentUrl =~ s{/[^/]+$}{};
+                }
+                
+                # prepend if it's not a match
+                my $newUrl = $currentUrl;
+                if($currentUrl ne $parentUrl) {
+                    $newUrl = $parentUrl . '/' . $currentUrl;
+                }
+
+                # replace the non-prepended value in the properties hash with this value
+                $self->{_properties}{url} = $newUrl;
             }
 
             # use the update value
@@ -2266,6 +2314,11 @@ sub www_editSave {
         }
     }
     
+    # handle inheritsUrlFromParent field
+    #if($self->session->form->process('inheritsUrlFromParent') == 1) {
+    #    $object->update( { url => $self->getUrl . '/' . $object->getUrl } );
+    #}
+
     $object->updateHistory("edited");
 
     # Handle Save & Commit button

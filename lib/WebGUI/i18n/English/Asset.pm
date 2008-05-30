@@ -1048,6 +1048,16 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
     },
 
+    'does asset inherit URL from parent' => {
+        message => q|Prepend URL from parent?|,
+        lastUpdated => 1212183809,
+    },
+
+    'does asset inherit URL from parent description' => {
+        message => q|<p>Will this asset have its URL prepended with its parent URL?</p>|,
+        lastUpdated => 1212183809,
+    },
+
     'search' => {
         message     => q{Search},
         lastUpdated => 0,

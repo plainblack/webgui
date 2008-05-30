@@ -1,4 +1,6 @@
 7.5.11
+ - add: Assets can now inherit their parent's URL, prepended. Check the
+   meta tab.
  - rfe: Not being limited to single-worded Tags 
  - SQL Form no longer ships with WebGUI. Use Thingy instead. However, out of
    respect for those using it, we only uninstall it if you have no sites using

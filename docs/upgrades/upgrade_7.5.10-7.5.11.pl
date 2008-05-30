@@ -68,6 +68,7 @@ removeSqlForm($session);
 migratePaymentPlugins( $session );
 removeRecurringPaymentActivity( $session );
 addUserListWobject( $session );
+addInheritUrlFromParent( $session );
 
 finish($session); # this line required
 
@@ -1499,6 +1500,15 @@ sub addUserListWobject {
     )");
     $session->config->addToArray("assets","WebGUI::Asset::Wobject::UserList");
 
+}
+
+#----------------------------------------------------------------------------
+# Add the inheritUrlFromParent property for all assets
+sub addInheritUrlFromParent {
+    my $session = shift;
+    print "\tAdding inheritUrlFromParent flag for all assets..." unless $quiet;
+    $session->db->write('alter table assetData add column inheritUrlFromParent int(11) not null default 0');
+    print "DONE!\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

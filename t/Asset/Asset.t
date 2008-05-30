@@ -146,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 94 
+plan tests => 97 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -738,6 +738,57 @@ $product1->purge;
 $product2->purge;
 $product3->purge;
 
+################################################################
+#
+# inheritUrlFromParent
+#
+################################################################
+
+my $versionTag4 = WebGUI::VersionTag->getWorking($session);
+$versionTag4->set( { name => 'inheritUrlFromParent tests' } );
+
+$properties = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent01',
+    title       => 'inheritUrlFromParent01',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent01',
+};
+
+my $iufpAsset = $defaultAsset->addChild($properties, $properties->{id});
+$iufpAsset->commit;
+
+$properties2 = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent02',
+    title       => 'inheritUrlFromParent02',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent02',
+};
+
+
+my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
+$iufpAsset2->update( { inheritUrlFromParent => 1 } );
+is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+
+# works for setting, now try disabling. Should not change the URL.
+$iufpAsset2->update( { inheritUrlFromParent => 0 } );
+is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'setting inheritUrlFromParent to 0 works');
+
+# works for setting and disabling, now ensure it recurses
+
+my $properties3 = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent03',
+    title       => 'inheritUrlFromParent03',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent03',
+};
+my $iufpAsset3 = $iufpAsset2->addChild($properties3, $properties3->{id});
+$iufpAsset2->update( { inheritUrlFromParent => 1 } );
+$iufpAsset3->update( { inheritUrlFromParent => 1 } );
+is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', 'inheritUrlFromParent recurses properly');
+
 
 END {
     $session->config->set( 'extrasURL',    $origExtras);
@@ -756,7 +807,7 @@ END {
     else {
         $session->config->delete('assetUiLevel');
     }
-    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, ) {
+    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, $versionTag4, ) {
         $vTag->rollback;
     }
     foreach my $user (values %testUsers) {
