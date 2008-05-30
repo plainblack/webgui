@@ -1071,11 +1071,14 @@ $session->db->write("delete from WorkflowActivity where className='WebGUI::Workf
     unlink '../../lib/WebGUI/Macro/Product.pm';
     unlink '../../lib/WebGUI/Help/Macro_Product.pm';
     unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';
+    unlink '../../t/Macro/Product.t';
 
     unlink '../../lib/WebGUI/Macro/SubscriptionItem.pm';
     unlink '../../lib/WebGUI/Macro/SubscriptionItemPurchaseUrl.pm';
     unlink '../../lib/WebGUI/Help/Macro_SubscriptionItem.pm';
     unlink '../../lib/WebGUI/i18n/English/Macro_SubscriptionItem.pm';
+    unlink '../../t/Macro/SubscriptionItem.t';
+    unlink '../../t/Macro/SubscriptionItemPurchaseUrl.t';
 
     unlink '../../lib/WebGUI/Operation/ProductManager.pm';
     unlink '../../lib/WebGUI/Help/ProductManager.pm';
