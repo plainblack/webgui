@@ -305,7 +305,7 @@ while(<FILE>) {
 			$u->status($user{status});
 			my $cmd = "WebGUI::Auth::".$authMethod;
         		my $load = "use ".$cmd;
-        		$session->errorHandler->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
+        		$session->log->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
         		eval($load);
     			my $auth = eval{$cmd->new($session, $authMethod,$u->userId)};
 			$auth->saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});

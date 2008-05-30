@@ -3,6 +3,7 @@
  - SQL Form no longer ships with WebGUI. Use Thingy instead. However, out of
    respect for those using it, we only uninstall it if you have no sites using
    it.
+ - Depricated $session->errorHandler in favor of $session->log.
  - AssetProxy macro can now use asset id as a parameter like so:
    ^AssetProxy(abcdefghijklmnopqrstuv,assetId);
  - Exposed keywords API to all assets through edit screen. Now keywords are
