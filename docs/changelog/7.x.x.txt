@@ -1,4 +1,5 @@
 7.5.11
+ - add: United Knowledge Player added. This player allows you to display a photo   collection as a slideshow. A demo can be found in /extras/ukplayer/slideshow.   html. (Arjan Widlak, United Knowledge)
  - add: Assets can now inherit their parent's URL, prepended. Check the
    meta tab.
  - rfe: Not being limited to single-worded Tags 
