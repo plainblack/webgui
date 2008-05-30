@@ -62,8 +62,15 @@ sub process {
 		return undef;
 	} 
     else {
-		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
-		return $i18n->get('invalid url');
+        $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
+            .'. The macro was called through this url: '.$session->asset->get('url'));
+        if ($session->var->get("adminOn")){
+    		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
+	    	return $i18n->get('invalid url');
+        }
+        else{
+            return '';
+        }
 	}
 }
 
