@@ -78,6 +78,7 @@
  - Added more variables for Photo Resolutions
  - Added better handling of Pending albums and photos
  - added: Database link access for SQL Macro (Yung Han Khoe)
+ - Added UserList wobject (United Knowledge and Yung Han Khoe)
 
 7.5.10
  - fix: Syntax error in GetCsMail

@@ -67,6 +67,7 @@ addAssetManager( $session );
 removeSqlForm($session);
 migratePaymentPlugins( $session );
 removeRecurringPaymentActivity( $session );
+addUserListWobject( $session );
 
 finish($session); # this line required
 
@@ -1473,6 +1474,31 @@ sub removeRecurringPaymentActivity {
     $session->config->set( 'workflowActivities', $activities );
 
     print "Done.\n";
+}
+
+#----------------------------------------------------------------------------
+
+sub addUserListWobject {
+    my $session = shift;
+    print "\tInstall UserList wobject.\n" unless ($quiet);
+    $session->db->write("create table UserList (
+            assetId varchar(22) not null,
+            revisionDate bigint(20),
+            templateId varchar(22),
+            showGroupId varchar(22),
+            hideGroupId varchar(22),
+            usersPerPage int(11),
+            alphabet text,
+            alphabetSearchField varchar(128),
+            showOnlyVisibleAsNamed int(11),
+            sortBy varchar(128),
+            sortOrder varchar(4),
+            overridePublicEmail int(11),
+            overridePublicProfile int(11),
+        PRIMARY KEY  (`assetId`,`revisionDate`)
+    )");
+    $session->config->addToArray("assets","WebGUI::Asset::Wobject::UserList");
+
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
