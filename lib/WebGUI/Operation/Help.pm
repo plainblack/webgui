@@ -214,33 +214,6 @@ sub _getHelpFilesList {
 
 #-------------------------------------------------------------------
 
-=head2 _getHelpName ( $session, $file )
-
-To support the table of contents, all WebGUI help files have a corresponding
-entry in the i18n file for the name of the chapter.  This utility routine
-will fetch the correct i18n name for the chapter.
-
-=cut
-
-sub _getHelpName {
-	my $session = shift;
-	my $file = shift;
-	my $helpName;
-	if ($file =~ /^Asset_/) {
-		$helpName = 'assetName';
-	}
-	elsif ($file =~ /^Macro_/) {
-		$helpName = 'macroName';
-	}
-	else {
-		$helpName = 'topicName';
-	}
-	my $i18n = WebGUI::International->new($session);
-	return $i18n->get($helpName,$file);
-}
-
-#-------------------------------------------------------------------
-
 =head2 _related ( $session, $related )
 
 Utility routine for returning a list of topics related the the current help
