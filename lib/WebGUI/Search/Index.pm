@@ -74,13 +74,14 @@ Add more text to the keywords index for this asset.
 
 =head3 text
 
-A string of text. You may optionally also put HTML here, and it will be automatically filtered.
+A string (or array of strings) of text. You may optionally also put HTML here, and it will be automatically filtered.
 
 =cut
 
 sub addKeywords {
 	my $self = shift;
-	my $text = shift;
+	my $text = join(" ", @_);
+
 	$text = WebGUI::HTML::filter($text, "all");
 	#-------------------- added by zxp for chinese word segment
 	utf8::decode($text);

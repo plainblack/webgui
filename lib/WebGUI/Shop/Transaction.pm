@@ -386,6 +386,44 @@ sub getTransactionIdsForUser {
     return $session->db->buildArrayRef("select transactionId from transaction where userId=? order by dateOfPurchase desc",[$userId]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 isFirst ( )
+
+Returns 1 if this is the first of a set of recurring transactions.
+
+=cut
+
+sub isFirst {
+    my $self = shift;
+	return ($self->get('originatingTransactionId') eq '');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRecurring ( )
+
+Returns 1 if this is a recurring transaction.
+
+=cut
+
+sub isRecurring {
+    my $self = shift;
+	return $self->get('isRecurring');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isSuccessful ( )
+
+Returns 1 if this transaction had a successful payment applied to it.
+
+=cut
+
+sub isSuccessful {
+    my $self = shift;
+	return $self->get('isSuccessful');
+}
 
 #-------------------------------------------------------------------
 
