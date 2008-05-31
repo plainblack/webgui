@@ -60,6 +60,7 @@ addCoupon( $session );
 addVendors($session);
 modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
+addVersionStartEndDates($session);
 migrateSubscriptions( $session );
 updateUsersOfCommerceMacros($session);
 addDBLinkAccessToSQLMacro($session);
@@ -1199,7 +1200,113 @@ sub removeLegacyTable {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addVersionStartEndDates {
+    my $session = shift;
+    print "\tAdding Start and End times to Version Tags..." unless ($quiet);
+    $session->db->write("alter table assetVersionTag add startTime datetime default NULL");
+    $session->db->write("alter table assetVersionTag add endTime datetime default NULL");
+    
+    #Add default start and end times to existing version tags
+    my $now        = $session->datetime->time();
+    my $startTime  = WebGUI::DateTime->new($session,$now)->toDatabase;
+    my $endTime    = WebGUI::DateTime->new($session,'2036-01-01 00:00:00')->toDatabase;
+    $session->db->write("update assetVersionTag set startTime=?, endTime=?",[$startTime,$endTime]);
+    
+    my $activity    = $session->config->get( "workflowActivities" );
+    push @{ $activity->{"WebGUI::VersionTag"} }, 'WebGUI::Workflow::Activity::WaitUntil';
+    $session->config->set( "workflowActivities", $activity );
+    
+    #Update the Workflows
+    tie my %commitWithApproval, 'Tie::IxHash';
+    %commitWithApproval = (
+        pbwfactivity0000000017 => {
+        	className  =>"WebGUI::Workflow::Activity::RequestApprovalForVersionTag",
+                properties => {
+                groupToApprove => '4',
+                message        => 'A new version tag awaits your approval.',
+                doOnDeny       => 'pbworkflow000000000006',
+                title          => 'Get Approval from Content Managers'
+            },
+        },
+        vtagactivity0000000001 => {
+            className  =>"WebGUI::Workflow::Activity::WaitUntil",
+            properties => {
+                type        => 'startTime',
+                title       => 'Wait Until',
+            	description => 'This workflow waits until the value chosen in the "Wait Until" field has passed and then continues'
+            }
+        },
+        pbwfactivity0000000016 => {
+            className  => "WebGUI::Workflow::Activity::CommitVersionTag",
+            properties => {
+                title  => 'Commit Assets'
+            }
+        },
+        pbwfactivity0000000018 => {
+            className  => "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
+            properties => {
+                title   => 'Notify Committer of Approval',
+                message => 'Your version tag was approved.',
+                who     => 'committer',
+            }
+        }
+    );
 
+    #Commit without approval workflow
+    tie my %commitWithoutApproval, 'Tie::IxHash';
+    %commitWithoutApproval = (
+        vtagactivity0000000002 => {
+            className  =>"WebGUI::Workflow::Activity::WaitUntil",
+            properties => {
+                type        => 'startTime',
+                title       => 'Wait Until',
+                description => 'This workflow waits until the value chosen in the "Wait Until" field has passed and then continues'
+            }
+        },
+        pbwfactivity0000000006 => {
+        	className  => "WebGUI::Workflow::Activity::CommitVersionTag",
+            properties => {
+                title      => 'Commit Assets',
+                trashAfter => '2592000',
+            }
+        },
+    );
+
+    #Build a hash of the two workflows - kinda ugly but insures we preserve order
+    my $workflows = {
+        "pbworkflow000000000005"=>\%commitWithApproval,
+        "pbworkflow000000000003"=>\%commitWithoutApproval
+    };
+
+
+    foreach my $workflowId (keys %{$workflows}) {
+       #instantiate the workflow
+        my $workflow = WebGUI::Workflow->new($session, $workflowId);
+    
+        #Skip it if the workflow activity doesn't exist for some reason
+        next unless (defined $workflow);
+	
+        #delete all the existing activities in the workflow
+        my $activities = $workflow->getActivities;
+        foreach my $activity (@{$activities}) {
+            $workflow->deleteActivity ($activity->get("activityId"));
+        }
+	
+        #Re-add the activities in the proper order
+        my $activityHashRef = $workflows->{$workflowId};
+        foreach my $activityId (keys %{$activityHashRef}) {
+            my $activity = $workflow->addActivity($activityHashRef->{$activityId}->{className},$activityId);
+        	my $properties = $activityHashRef->{$activityId}->{properties};
+            foreach my $property (keys %{$properties}) {
+                $activity->set($property,$properties->{$property});
+            }
+        }
+    }
+    
+    print "Done.\n" unless $quiet;
+    
+}
 
 #-------------------------------------------------
 sub migrateSubscriptions {
