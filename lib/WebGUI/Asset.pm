@@ -2314,11 +2314,6 @@ sub www_editSave {
         }
     }
     
-    # handle inheritsUrlFromParent field
-    #if($self->session->form->process('inheritsUrlFromParent') == 1) {
-    #    $object->update( { url => $self->getUrl . '/' . $object->getUrl } );
-    #}
-
     $object->updateHistory("edited");
 
     # Handle Save & Commit button
