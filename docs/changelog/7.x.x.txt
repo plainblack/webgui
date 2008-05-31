@@ -85,6 +85,8 @@
  - added: Database link access for SQL Macro (Yung Han Khoe)
  - Added UserList wobject (United Knowledge and Yung Han Khoe)
  - All group operations now show group id and name (Yung Han Khoe)
+ - Added: On the commit screen of version tags, you can now set a Start/End Time for when the tag should appear.
+ - Added: WaitUntil workflow activity associated with version tags that waits until the start or end time of a version tag has been reached before continuing the workflow
 
 7.5.10
  - fix: Syntax error in GetCsMail
