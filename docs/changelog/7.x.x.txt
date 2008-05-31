@@ -1,4 +1,8 @@
 7.5.11
+ - fix: widget dialogues weren't opening correctly inside a widgetized
+   view of a widget
+ - fix: snippets were exporting as index.html or such. pass them through
+   unchanged.
  - add: United Knowledge Player added. This player allows you to display a photo   collection as a slideshow. A demo can be found in /extras/ukplayer/slideshow.   html. (Arjan Widlak, United Knowledge)
  - add: Assets can now inherit their parent's URL, prepended. Check the
    meta tab.
