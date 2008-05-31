@@ -77,6 +77,10 @@ save you many hours of grief.
    url. The new value is printed by the upgrade script and can also be found in
    the edit screen of the ITransact plugin.
 
+ * The Commit With Approval and Commit Without Approval workflows have been
+   rebuilt.  If you have changed these default workflows and wish to retain your
+   changes, be sure to back them up before you install 7.5.11
+
 7.5.9
 --------------------------------------------------------------------
  * WebGUI 7.5.6 uses a Unicode database connection, but this can cause problems
