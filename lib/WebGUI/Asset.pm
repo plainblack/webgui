@@ -1980,7 +1980,7 @@ sub update {
 
     # check the definition of all properties against what was given to us
 
-    # get a DB object for the two tight inner loops below, and the description
+    # get a DB object for the two conditionals below, and the description
     my $db = $self->session->db;
     my $assetDataDescription = $db->buildHashRef('describe assetData');
 
