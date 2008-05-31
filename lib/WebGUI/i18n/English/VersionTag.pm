@@ -339,52 +339,103 @@ our $I18N = {
 	},
 
 
-        'manageRevisionsInTag moveTo new' => {
-            message     => q{-> New Version Tag},
-            lastUpdated => 0,
-            context     => q{Option to move revisions to a new version tag},
-        },
+    'manageRevisionsInTag moveTo new' => {
+        message     => q{-> New Version Tag},
+        lastUpdated => 0,
+        context     => q{Option to move revisions to a new version tag},
+    },
 
-        'manageRevisionsInTag with selected' => {
-            message     => q{With Selected: },
-            lastUpdated => 0,
-            context     => q{Lead-in for actions to perform after selecting revisions},
-        },
+    'manageRevisionsInTag with selected' => {
+        message     => q{With Selected: },
+        lastUpdated => 0,
+        context     => q{Lead-in for actions to perform after selecting revisions},
+    },
 
-        'manageRevisionsInTag purge' => {
-            message     => q{Purge},
-            lastUpdated => 0,
-            context     => q{Label for button to purge revisions},
-        },
+    'manageRevisionsInTag purge' => {
+        message     => q{Purge},
+        lastUpdated => 0,
+        context     => q{Label for button to purge revisions},
+    },
 
-        'manageRevisionsInTag move' => {
-            message     => q{Move To:},
-            lastUpdated => 0,
-            context     => q{Label for button to move revisions},
-        },
+    'manageRevisionsInTag move' => {
+        message     => q{Move To:},
+        lastUpdated => 0,
+        context     => q{Label for button to move revisions},
+    },
+    
+    'manageRevisionsInTag update' => {
+        message     => q{Update},
+        lastUpdated => 0,
+        context     => q{Label for button to update revisions},
+    },
 
-        'continue with workflow' => {
-            message     => q{-- Continue with this workflow},
-            lastUpdated => 0,
-            context     => q{Label to disable branching in workflow},
-        },
+    'continue with workflow' => {
+        message     => q{-- Continue with this workflow},
+        lastUpdated => 0,
+        context     => q{Label to disable branching in workflow},
+    },
 
-        'do on approve' => {
-            message     => q{Do On Approve},
-            lastUpdated => 0,
-            context     => q{Label for activity property},
-        },
+    'do on approve' => {
+        message     => q{Do On Approve},
+        lastUpdated => 0,
+        context     => q{Label for activity property},
+    },
 
-        'do on approve help' => {
-            message     => q{The workflow to perform when the version tag is approved by this activity.},
-            lastUpdated => 0,
-            context     => q{Help for activity property},
-        },
+    'do on approve help' => {
+        message     => q{The workflow to perform when the version tag is approved by this activity.},
+        lastUpdated => 0,
+        context     => q{Help for activity property},
+    },
     
 	'topicName' => {
 		message => q|Version Control|,
 		lastUpdated => 1148360141,
 	},
+    
+    'wait until' => {
+        message     => q|Wait Until|,
+        lastUpdated => 1148360141,
+    },
+    
+    'wait until label' => {
+        message     => q|Wait Until|,
+        lastUpdated => 1148360141,
+    },
+    
+    'wait until hoverhelp' => {
+        message     => q|Choose the version tag field to use for determining how long to wait before continuing on with this workflow.  Choosing Start Time will indicate that you would like to wait until the Start Time of the version tag to continue on with the workflow. Choosing End Time will indicate that you wish to wait until the End Time of the version tag to conitinue.|,
+        lastUpdated => 1148360141,
+    },
+    
+    'version start time' => {
+        message     => q|Version Start Time|,
+        lastUpdated => 1148360141,
+    },
+    
+    'version end time' => {
+        message     => q|Version End Time|,
+        lastUpdated => 1148360141,
+    },
+    
+    'startTime label' => {
+        message     => q|Start Time|,
+        lastUpdated => 1148360141,      
+    },
+    
+    'startTime hoverHelp' => {
+        message    => q|Enter the time you would like this version tag to show up on your website.  Please note you must have workflow configured properly for this to work correctly|,
+        lastUpdate => 1148360141,
+    },
+    
+    'endTime hoverHelp' => {
+        message    => q|Enter the time you would like this version tag to stop showing up on your website.  Please note you must have workflow configured properly for this to work correctly|,
+        lastUpdate => 1148360141,
+    },
+    
+    'endTime label' => {
+        message     => q|End Time|,
+        lastUpdated => 1148360141,      
+    },
 
 };
 
