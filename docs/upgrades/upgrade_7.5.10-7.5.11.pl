@@ -68,10 +68,62 @@ addAssetManager( $session );
 removeSqlForm($session);
 migratePaymentPlugins( $session );
 removeRecurringPaymentActivity( $session );
+addLoginMessage( $session );
+addNewApprovalActivities( $session );
 addUserListWobject( $session );
 addInheritUrlFromParent( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+# Add two new approval activities
+sub addNewApprovalActivities {
+    my $session     = shift;
+    print "\tAdding new approval activities... " unless $quiet;
+
+    my $activities  = $session->config->get( "workflowActivities" );
+    push @{ $activities->{ 'WebGUI::VersionTag' } }, 
+        'WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup',
+        'WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage',
+        ;
+
+    $session->config->set( "workflowActivities", $activities );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the necessary settings and profile fields for the new login message
+sub addLoginMessage {
+    my $session     = shift;
+    print "\tAdding Login Message... " unless $quiet;
+
+    # Add some settings
+    my %settings    = ( 
+        showMessageOnLogin      => '0',
+        showMessageOnLoginTimes => '0',
+        showMessageOnLoginBody  => '',
+    );
+    for my $setting ( keys %settings ) {
+        $session->setting->add( $setting, $settings{ $setting } );
+    }
+
+    # Add a profile field
+    WebGUI::ProfileField->create( $session, 
+        'showMessageOnLoginSeen',
+        {
+            fieldType       => 'integer',
+            dataDefault     => '0',
+            visible         => '0',
+            editable        => '0',
+            protected       => '1',
+            required        => '0',
+            label           => 'WebGUI::International::get("showMessageOnLoginSeen","Auth");',
+        },
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub removeSqlForm {

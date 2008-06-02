@@ -450,6 +450,37 @@ sub definition {
         label           => $i18n->get("manage friends template", "Friends"),
         hoverHelp       => $i18n->get("manage friends template help", "Friends"),
         });
+    push @fields, {
+        tab             => "user",
+        name            => "showMessageOnLogin",
+        fieldType       => "yesNo",
+        defaultValue    => 0,
+        label           => $i18n->get( 'showMessageOnLogin label' ),
+        hoverHelp       => $i18n->get( 'showMessageOnLogin description' ),
+    };
+    push @fields, {
+        tab             => "user",
+        name            => "showMessageOnLoginTimes",
+        fieldType       => "integer",
+        defaultValue    => 1,
+        label           => $i18n->get( 'showMessageOnLoginTimes label' ),
+        hoverHelp       => $i18n->get( 'showMessageOnLoginTimes description' ),
+    };
+    push @fields, { 
+        tab             => "user",
+        name            => 'showMessageOnLoginReset',
+        fieldType       => 'yesNo',
+        defaultValue    => 0,
+        label           => $i18n->get( 'showMessageOnLoginReset label' ),
+        hoverHelp       => $i18n->get( 'showMessageOnLoginReset description' ),
+    };
+    push @fields, {
+        tab             => "user",
+        name            => 'showMessageOnLoginBody',
+        fieldType       => 'HTMLArea',
+        label           => $i18n->get( 'showMessageOnLoginBody label' ),
+        hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
+    };
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {
@@ -593,28 +624,39 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 =cut
 
 sub www_saveSettings {
-	my $session     = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
-	my $i18n        = WebGUI::International->new($session, "WebGUI");
-	my $setting     = $session->setting;
-	my $form        = $session->form;
+    my $session     = shift;
+    return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    my $i18n        = WebGUI::International->new($session, "WebGUI");
+    my $setting     = $session->setting;
+    my $form        = $session->form;
     my @errors;     # Errors trying to save the form
 
-	my $definitions = definition($session, $i18n);
-	foreach my $definition (@{$definitions}) {
-		$setting->set($definition->{name}, $form->process($definition->{name}, $definition->{fieldType}, undef, $definition));
-	}
+    my $definitions = definition($session, $i18n);
+    foreach my $definition (@{$definitions}) {
+        next if ( $definition->{ noFormPost } );
+        $setting->set($definition->{name}, $form->process($definition->{name}, $definition->{fieldType}, undef, $definition));
+    }
 
-	foreach (@{$session->config->get("authMethods")}) {
-		my $authInstance    = WebGUI::Operation::Auth::getInstance($session,$_,1);
+    foreach (@{$session->config->get("authMethods")}) {
+        my $authInstance    = WebGUI::Operation::Auth::getInstance($session,$_,1);
 
-		my $authErrors          = $authInstance->editUserSettingsFormSave;
+        my $authErrors          = $authInstance->editUserSettingsFormSave;
         if ($authErrors) {
             push @errors, @{ $authErrors };
         }
-	}
+    }
 
-	return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });
+    ### Handle special settings
+    # Reset login message seen numbers
+    if ( $session->form->get( 'showMessageOnLoginReset' ) ) {
+        $session->db->write( 
+            "UPDATE userProfileData SET showMessageOnLoginSeen=0"
+        );
+        # Delete the user cache
+        WebGUI::Cache->new( $session, [ "user" ] )->deleteChunk( [ "user" ] );
+    }
+
+    return www_editSettings($session, { errors => \@errors, message => $i18n->get("editSettings done") });
 }
 
 1;

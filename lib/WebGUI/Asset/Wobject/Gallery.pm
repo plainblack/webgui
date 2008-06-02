@@ -994,7 +994,15 @@ sub www_search {
     # NOTE: Search form is added as part of getTemplateVars()
 
     # Get search results, if necessary.
-    if ($form->get("submit")) {
+    my $doSearch    
+        = ( 
+            $form->get( 'basicSearch' ) || $form->get( 'keywords' )
+            || $form->get( 'title' ) || $form->get( 'description' )
+            || $form->get( 'userId' ) || $form->get( 'className' )
+            || $form->get( 'creationDate_after' ) || $form->get( 'creationDate_before' )
+        );
+
+    if ( $doSearch ) {
         # Keywords to search on
         my $keywords        = join " ", $form->get('basicSearch'),
                                         $form->get('keywords'),
@@ -1032,7 +1040,7 @@ sub www_search {
         # Build a URL for the pagination
         my $url     
             = $self->getUrl( 
-                'func=search;submit=1;'
+                'func=search;'
                 . 'basicSearch=' . $form->get('basicSearch') . ';'
                 . 'keywords=' . $form->get('keywords') . ';'
                 . 'title=' . $form->get('title') . ';'

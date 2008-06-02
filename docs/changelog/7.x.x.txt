@@ -91,6 +91,9 @@
  - All group operations now show group id and name (Yung Han Khoe)
  - Added: On the commit screen of version tags, you can now set a Start/End Time for when the tag should appear.
  - Added: WaitUntil workflow activity associated with version tags that waits until the start or end time of a version tag has been reached before continuing the workflow
+ - added: Show a Message when users login
+ - added: Two new approval activities, ByCommitterGroup and ByLineage
+ - fixed: Gallery Search form doesn't work right in IE6
 
 7.5.10
  - fix: Syntax error in GetCsMail

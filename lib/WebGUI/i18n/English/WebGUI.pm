@@ -3959,6 +3959,55 @@ LongTruncOk=1</p>
         message     => q{Attachments},
         lastUpdated => 1202274234,
     },
+
+        'showMessageOnLogin label' => {
+            message     => q{Show Message On Login?},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLogin description' => {
+            message     => q{If yes, show a message after a user logs in.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginTimes label' => {
+            message     => q{Show Message Number of Times},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginTimes description' => {
+            message     => q{The number of times a user sees the message, one per login},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginReset label' => {
+            message     => q{Reset All Users Number of Times Seen},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginReset description' => {
+            message     => q{If "yes", will force all users to see the login message again},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginBody label' => {
+            message     => q{Message on Login Body},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginBody description' => {
+            message     => q{The body of the message to show on login. Macros are allowed.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
 };
 
 1;

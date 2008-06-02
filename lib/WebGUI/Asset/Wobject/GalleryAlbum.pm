@@ -411,7 +411,21 @@ sub getFileIds {
     my $self        = shift;
     my $gallery     = $self->getParent;
 
-    return $self->getLineage( ['descendants'], { } );
+    # Deal with "pending" files.
+    my %pendingRules;
+    if ( $self->canEdit ) {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    }
+    else {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        $pendingRules{ whereClause } = q{
+            ( 
+                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+            )
+        };
+    }
+    
+    return $self->getLineage( ['descendants'], { (%pendingRules) } );
 }
 
 #----------------------------------------------------------------------------
