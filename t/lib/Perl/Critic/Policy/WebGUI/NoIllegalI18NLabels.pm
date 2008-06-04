@@ -13,18 +13,19 @@ use base 'Perl::Critic::Policy';
 
 =head1 Perl::Critic::Policy::WebGUI::NoIllegalI18NLabels
 
-Scan WebGUI modules for i18n calls and make sure that each
-call has a corresponding i18n table entry.
+Scan WebGUI modules for i18n calls and make sure that each call has a
+corresponding i18n table entry.  It will not check i18n calls that have
+variables for either the namespace or the label to look up.
 
-Running this policy requires setting up some environmental
-variables to that it can get a proper WebGUI session, and access
-the test library.
+Running this policy from the command line requires setting up some
+environmental variables to that it can get a proper WebGUI session,
+and access the test library.
 
 env WEBGUI_CONFIG=/data/WebGUI/etc/my.conf PERL5LIB=/data/WebGUI/t/lib perlcritic -single-policy NoIllegalI18N
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 Readonly::Scalar my $DESC => q{i18n calls that do not have corresponding i18n table entries};
 
@@ -78,6 +79,7 @@ sub violates {
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
         my $namespace = $arguments[1]->[0];
+        return unless $namespace;  ##This can be a namespace in a variable.
         $namespace = $namespace->string || 'WebGUI';
         $self->{_i18n_objects}->{$symbol_name} = $namespace;
         return;
