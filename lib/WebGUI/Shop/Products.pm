@@ -42,12 +42,14 @@ sub exportProducts {
     my @columns = qw{sku title shortdescription price weight quantity};
     my $productData = WebGUI::Text::joinCSV('mastersku', @columns) . "\n";
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
-    while (my $product = WebGUI::Asset::Sku::Product->getAllProducts($session)) {
+    my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+    while (my $product = $getAProduct->()) {
         my $mastersku = $product->get('sku');
         my $collateri = $product->getAllCollateral('variantsJSON');
         foreach my $collateral (@{ $collateri }) {
             my @productFields = @{ $collateral }{ @columns };
-            $productData .= WebGUI::Test::joinCSV($mastersku, @productFields);
+            $productData .= WebGUI::Text::joinCSV($mastersku, @productFields);
+            $productData .= "\n";
         }
     }
     my $storage = WebGUI::Storage->createTemp($session);

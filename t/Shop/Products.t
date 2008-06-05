@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 22;
+my $tests = 25;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -188,6 +188,17 @@ SKIP: {
         ],
         'collateral set correctly for shirt'
     );
+
+    #######################################################################
+    #
+    # export
+    #
+    #######################################################################
+
+    my $products = WebGUI::Shop::Products::exportProducts($session);
+    isa_ok($products, 'WebGUI::Storage', 'exportProducts returns a Storage object');
+    is(scalar @{ $products->getFiles }, 1, 'The storage contains just 1 file...');
+    is(scalar $products->getFiles->[0], 'siteProductData.csv', '...with the correct filename');
 
 }
 
