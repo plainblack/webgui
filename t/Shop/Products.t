@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 14;
+my $tests = 22;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -134,9 +134,68 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
+    my $pass = WebGUI::Shop::Products::importProducts(
+        $session,
+        WebGUI::Test->getTestCollateralPath('productTables/goodProductTable.csv'),
+    );
+    ok($pass, 'Products imported');
+
+    my $count = $session->db->quickScalar('select count(*) from Product');
+    is($count, 2, 'two products were imported');
+
+    my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
+    isa_ok($soda, 'WebGUI::Asset::Sku::Product');
+    is($soda->getTitle(), 'Sweet Soda-bottled in Oregon', 'Title set correctly for soda');
+    my $sodaCollateral = $soda->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $sodaCollateral,
+        [
+            {
+                sku       => 'soda-sweet',
+                shortdesc => 'Sweet Soda',
+                price     => 0.95,
+                weight    => 0.95,
+                quantity  => 500,
+                variantId => ignore(),
+            },
+        ],
+        'collateral set correctly for soda'
+    );
+
+    my $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
+    isa_ok($shirt, 'WebGUI::Asset::Sku::Product');
+    is($shirt->getTitle(), 'Colored T-Shirts', 'Title set correctly for t-shirt');
+    my $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $shirtCollateral,
+        [
+            {
+                sku       => 'red-t-shirt',
+                shortdesc => 'Red T-Shirt',
+                price     => '5.00',
+                weight    => '1.33',
+                quantity  => '1000',
+                variantId => ignore(),
+            },
+            {
+                sku       => 'blue-t-shirt',
+                shortdesc => 'Blue T-Shirt',
+                price     => '5.25',
+                weight    => '1.33',
+                quantity  => '2000',
+                variantId => ignore(),
+            },
+        ],
+        'collateral set correctly for shirt'
+    );
+
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+    while (my $product = $getAProduct->()) {
+        $product->purge;
+    }
 }

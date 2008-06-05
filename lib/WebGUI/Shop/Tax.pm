@@ -529,10 +529,10 @@ sub www_manage {
     my $i18n=WebGUI::International->new($session, 'Tax');
 
     my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('export'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('export','Shop'), extras=>q{style="float: left;"} })
                    . WebGUI::Form::formFooter($session);
     my $importForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=importTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('import'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('import','Shop'), extras=>q{style="float: left;"} })
                    . q{<input type="file" name="importFile" size="10" />}
                    . WebGUI::Form::formFooter($session);
 

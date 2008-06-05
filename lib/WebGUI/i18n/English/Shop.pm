@@ -8,379 +8,379 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|notice after purchase|,
 	},
-	
+
 	'shop notice' => {
 		message 	=> q|Shop Notice|,
 		lastUpdated	=> 0,
 		context		=> q|an email subject heading for generic shop notification emails|,
 	},
-	
+
 	'mixed items warning' => {
 		message 	=> q|You are not able to check out with both recurring and non-recurring items in your cart. You may have either one recurring item, or as many non-recurring items as you want in your cart at checkout time. If you need to purchase both, then please purchase them under separate transactions.|,
 		lastUpdated	=> 0,
 		context		=> q|a warning message displayed in the cart|,
 	},
-	
+
 	'cancel recurring transaction' => {
 		message 	=> q|Cancel Recurring Transaction|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'print' => {
 		message 	=> q|Print|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'minicart template' => {
 		message 	=> q|MiniCart Template|,
 		lastUpdated	=> 0,
 		context		=> q|a help title|,
 	},
-	
+
 	'address book template' => {
 		message 	=> q|Address Book Template|,
 		lastUpdated	=> 0,
 		context		=> q|a help title|,
 	},
-		
+
 	'cart template' => {
 		message 	=> q|Cart Template|,
 		lastUpdated	=> 0,
 		context		=> q|a help title|,
 	},
-	
+
 	'address book template' => {
 		message 	=> q|Address Book Template|,
 		lastUpdated	=> 0,
 		context		=> q|a help title|,
 	},
-	
+
 	'quantity help' => {
 		message 	=> q|The number of this item that is purchased.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'item name help' => {
 		message 	=> q|The name or title of the product.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'price help' => {
 		message 	=> q|The amount this items costs to purchase.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'configuredTitle help' => {
 		message 	=> q|The name of the item as configured for purchase.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'dateAdded help' => {
 		message 	=> q|The date and time this item was added to the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'isUnique help' => {
 		message 	=> q|A condition indicating whether this item is unique and therefore can only have a quantity of 1.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'quantityField help' => {
 		message 	=> q|The field where the user may specify the quantity of the item they wish to purchase.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'isShippable help' => {
 		message 	=> q|A condition indicating whether the item can have a shipping address attached to it.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'extendedPrice help' => {
 		message 	=> q|The result of price multipled by quantity.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'removeButton help' => {
 		message 	=> q|Clicking this button will remove the item from the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'item shipToButton help' => {
 		message 	=> q|Clicking this button will set an alternate address as the destination of this item.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'shippingAddress help' => {
 		message 	=> q|The HTML formatted address to ship to.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'error help' => {
 		message 	=> q|If there are any problems the error message will be displayed here.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'formHeader help' => {
 		message 	=> q|The top of the form.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'formFooter help' => {
 		message 	=> q|The bottom of the form.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'checkoutButton help' => {
 		message 	=> q|The button the user pushes to choose a payment method.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'continueShoppingButton help' => {
 		message 	=> q|Clicking this button will take the user back to the site.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'updateButton help' => {
 		message 	=> q|Clicking this button will apply the changes you made to the cart and recalculate all the prices.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'chooseShippingButton help' => {
 		message 	=> q|Clicking this button will let the user pick a shipping address from the address book.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'shipToButton help' => {
 		message 	=> q|Does the same as the chooseShippingButton.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'subtotalPrice help' => {
 		message 	=> q|The price of all the items in the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'shippingPrice help' => {
 		message 	=> q|The price of shipping on all the items in the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'tax help' => {
 		message 	=> q|The price of tax on all the items in the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'hasShippingAddress help' => {
 		message 	=> q|A condition indicating whether the the user has already specified a shipping address. Shipping address is always required in order to calculate taxes.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'shippingOptions help' => {
 		message 	=> q|A select list containing all the configured shipping options for this order.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'inShopCreditAvailable help' => {
 		message 	=> q|The amount of in-shop credit the user has.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'inShopCreditDeduction help' => {
 		message 	=> q|The amount of in-shop credit that has been applied to this order.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'totalPrice help' => {
 		message 	=> q|The total checkout price of the cart as it stands currently.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'totalItems help' => {
 		message 	=> q|The total number of items in the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'item url help' => {
 		message 	=> q|The url to view this item as configured.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'items loop help' => {
 		message 	=> q|A loop containing the variables of each item in the cart.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'minicart template help' => {
 		message 	=> q|The following variables are available in the template for the MiniCart macro.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'cart template help' => {
 		message 	=> q|This template determines what the shopping cart looks like.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address book template help' => {
 		message 	=> q|This template determines what the address book will look like.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'who can manage help' => {
 		message 	=> q|The group that has management rights over commerce.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'who can manage' => {
 		message 	=> q|Who can manage?|,
 		lastUpdated	=> 0,
 		context		=> q|a setting|,
 	},
-	
+
 	'address loop help' => {
 		message 	=> q|A loop containing the list of addresses in this book and their management tools.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address help' => {
 		message 	=> q|An HTML formatted address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'editButton help' => {
 		message 	=> q|A button that will allow the user to edit an existing address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'deleteButton help' => {
 		message 	=> q|A button that will allow the user to delete an existing address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'useButton help' => {
 		message 	=> q|A button that will allow the user to select an existing address for use on a form.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'addButton help' => {
 		message 	=> q|A button that will allow the user to add a new address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'saveButton help' => {
 		message 	=> q|The default save button for the form.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address1Field help' => {
 		message 	=> q|The field for the main address line.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address2Field help' => {
 		message 	=> q|The field for the secondary address line.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address3Field help' => {
 		message 	=> q|The field for the tertiary address line.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address labelField help' => {
 		message 	=> q|A field to contain the address label like 'home' or 'work'.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'address nameField help' => {
 		message 	=> q|A field to contain the name of the person/company for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'cityField help' => {
 		message 	=> q|A field to contain the city for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'stateField help' => {
 		message 	=> q|A field to contain the state or province for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'countryField help' => {
 		message 	=> q|A field to contain the country for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'codeField help' => {
 		message 	=> q|A field to contain the zip code or postal code for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'phoneNumberField help' => {
 		message 	=> q|A field to contain the phone number for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
-	
+
 	'view cart' => {
 		message 	=> q|View Cart|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'my purchases' => { 
 		message => q|My Purchases|,
 		lastUpdated => 0,
@@ -587,6 +587,12 @@ our $I18N = {
 
 	'shop settings' => { 
 		message => q|Shop Settings|,
+		lastUpdated => 0,
+		context => q|admin function label|
+	},
+
+	'products' => { 
+		message => q|Products|,
 		lastUpdated => 0,
 		context => q|admin function label|
 	},
@@ -849,7 +855,7 @@ our $I18N = {
         context => q|Period name for a weekly subscription.|
     },
 
-    
+
     'biweekly' => {
         message => q|Two weeks|,
         lastUpdated => 0,
@@ -884,13 +890,24 @@ our $I18N = {
         context => q|Period name for a semi yearly subscription.|
     },
 
-    
+
     'yearly' => {
         message => q|Year|,
         lastUpdated => 0,
         context => q|Period name for a yearly subscription.|
     },
 
+    'import' => {
+        message => q|Import|,
+        lastUpdated => 1212550974,
+        context => q|Label for bringing data into the Shop (Tax, Product, etc.)|
+    },
+
+	'export' => {
+		message => q|Export|,
+		lastUpdated => 1212550978,
+		context => q|Label for taking data out of the Shop (Tax, Product, etc.)|,
+	},
 };
 
 1;
