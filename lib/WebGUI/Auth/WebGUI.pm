@@ -710,12 +710,17 @@ sub recoverPassword {
  
 sub emailRecoverPassword {
     my $self    = shift;
-
+    my $error   = shift;
     my $i18n    = WebGUI::International->new($self->session);
+
     my $output 
-        = "<h1>" . $i18n->get('recover password banner', 'AuthWebGUI') . " </h1> <br /> <br /> "
+        = "<h1>" . $i18n->get('recover password banner', 'AuthWebGUI') . " </h1> "
         . "<h3>" . $i18n->get('email recover password start message', 'AuthWebGUI') ."</h3>"
         ;
+    
+    if ( $error ) {
+        $output .= '<p class="error">' . $error . '</p>';
+    }
 
     my $f = WebGUI::HTMLForm->new($self->session);
 
@@ -867,8 +872,14 @@ sub profileRecoverPasswordFinish {
 
 	# Exactly one result.
 	my $userId = $userIds[0];
-	my ($password, $passwordConfirm) = ($self->session->form->process('authWebGUI.identifier'), $self->session->form->process('authWebGUI.identifierConfirm'));
 
+        # Make sure the userId is not disabled
+        my $user = WebGUI::User->new($self->session, $userId);
+        if ( $user->status ne "Active" ) {
+            return $self->recoverPassword( $i18n2->get( 'password recovery disabled' ) );
+        }
+
+	my ($password, $passwordConfirm) = ($self->session->form->process('authWebGUI.identifier'), $self->session->form->process('authWebGUI.identifierConfirm'));
 	unless (defined $password and defined $passwordConfirm) {
 		my $vars = {};
 		$vars->{title} = $i18n->get(71);
@@ -917,7 +928,7 @@ sub profileRecoverPasswordFinish {
 	}
 
 	if ($self->_isValidPassword($password, $passwordConfirm)) {
-		$self->user(WebGUI::User->new($self->session, $userId));
+		$self->user( $user );
 		$self->saveParams($userId, $self->authMethod,
 				  { identifier => Digest::MD5::md5_base64($password),
 				    passwordLastUpdated => $self->session->datetime->time });
@@ -931,43 +942,49 @@ sub profileRecoverPasswordFinish {
 #-------------------------------------------------------------------
 
 sub emailRecoverPasswordFinish {
-       my $self = shift;
-       return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    my $self = shift;
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
 
-       my $i18n = WebGUI::International->new($self->session);
-       my $session = $self->session;
-       my ($form) = $session->quick(qw/form/);
-       my $email = $form->param('email');
-       my $username = $form->param('username');
-       my $user;
-       
-#      get user from email
-       $user = WebGUI::User->newByEmail($session, $email) if $email;
-#      get user from  username
-       if ($username) {
-               $user = WebGUI::User->newByUsername($session, $username) unless $user; 
-       }
-#      return error unless we get a valid user.
-       
-       unless ($user) {
-               return $i18n->get('recover password not found', 'AuthWebGUI');
-       }
+    my $i18n        = WebGUI::International->new($self->session);
+    my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
+    my $session     = $self->session;
+    my ($form)      = $session->quick(qw/form/);
+    my $email       = $form->param('email');
+    my $username    = $form->param('username');
+    my $user;
 
-#      generate information necessry to proceed
-       my $recoveryGuid = $session->id->generate();
-       my $url = $session->url->getSiteURL;
-       my $userId = $user->userId; #get the user guid
-       $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
+    # get user from email
+    $user = WebGUI::User->newByEmail($session, $email) if $email;
+    # get user from username
+    if ($username) {
+       $user = WebGUI::User->newByUsername($session, $username) unless $user; 
+    }
 
-       my $authsettings = $self->getParams($userId);
-       $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
+    # return error unless we get a valid user.\
+    unless ($user) {
+       return $self->recoverPassword( $i18n->get('recover password not found', 'AuthWebGUI') );
+    }
 
-       $self->saveParams($userId, 'WebGUI', $authsettings);
-       
-       my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>'WebGUI password recovery'});
-       $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
-       $mail->send;
-       return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message1', 'AuthWebGUI'). $email . $i18n->get('email recover password finish message2', 'AuthWebGUI') . "</h3>";
+    # Make sure the user is Active
+    if ( $user->status ne "Active" ) {
+        return $self->recoverPassword( $i18n2->get( 'password recovery disabled' ) );
+    }
+
+    # generate information necessry to proceed
+    my $recoveryGuid = $session->id->generate();
+    my $url = $session->url->getSiteURL;
+    my $userId = $user->userId; #get the user guid
+    $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
+
+    my $authsettings = $self->getParams($userId);
+    $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
+
+    $self->saveParams($userId, 'WebGUI', $authsettings);
+
+    my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>'WebGUI password recovery'});
+    $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
+    $mail->send;
+    return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message1', 'AuthWebGUI'). $email . $i18n->get('email recover password finish message2', 'AuthWebGUI') . "</h3>";
 }
 
 #-------------------------------------------------------------------

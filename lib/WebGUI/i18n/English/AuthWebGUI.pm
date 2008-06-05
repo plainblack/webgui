@@ -639,6 +639,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'password recovery disabled' => {
+        message     => q{Your account has been disabled. You cannot recover your password until it is activated.},
+        lastUpdated => 0,
+        context     => q{Error message when a user tries to recover password for a disabled account},
+    },
 };
 
 1;
