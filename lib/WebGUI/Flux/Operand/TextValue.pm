@@ -1,0 +1,43 @@
+package WebGUI::Flux::Operand::TextValue;
+use strict;
+use warnings;
+
+use base 'WebGUI::Flux::Operand';
+
+=head1 NAME
+
+Package WebGUI::Flux::Operand::TextValue
+
+=head1 DESCRIPTION
+
+Text Value
+
+See WebGUI::Flux::Operand base class for more information.
+
+=cut
+
+#-------------------------------------------------------------------
+
+sub execute {
+    my ($arg_ref) = @_;
+
+    return $arg_ref->{args}{value};
+}
+
+#-------------------------------------------------------------------
+
+=head3 getArgs
+
+This Operand requies the following arguments
+
+=head4 value
+
+The simple string to be returned
+
+=cut
+
+sub getArgs {
+    return { value => { type => 'string'} };
+}
+
+1;

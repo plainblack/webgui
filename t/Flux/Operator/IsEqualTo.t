@@ -29,26 +29,26 @@ use_ok('WebGUI::Flux::Operator');
 {
 
     # Numeric operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 23 ), 1, 'identical numeric operands' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 66 ), 0, 'different numeric operands' );
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 23 ), q{23 == 23} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 66 ), q{23 == 66} );
 
     # String operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', "a", "a" ), 1, 'identical string operands' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', "a", "az" ), 0, 'different string operands' );
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'a', 'a' ), q{'a' == 'a'} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'a', 'az' ), q{'a' == 'az'} );
+
     # Mixed Numeric/String operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23' ), 1, 'identical mixed string/numeric operands' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '24' ), 0, 'different mixed string/numeric operands' );
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23' ), q{23 == '23'} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '24' ), q{23 == '23'} );
+
     # Whitespace that should be automatically trimmed
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23 ' ), 1, 'identical mixed string/numeric operands with whitespace' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, ' 23' ), 1, 'identical mixed string/numeric operands with whitespace' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '24 ' ), 0, 'different mixed string/numeric operands with whitespace' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, ' 24' ), 0, 'different mixed string/numeric operands with whitespace' );
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23 ' ), q{23 == '23 '} );
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, ' 23' ), q{23 == ' 23'} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '24 ' ), q{23 == '24 '} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, ' 24' ), q{23 == ' 24'} );
+
     # Garbage strings
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23abc' ), 0, q{23 == "23abc"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 'abc23' ), 0, q{23 == "abc23"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, '23abc' ), q{23 == '23abc'} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 23, 'abc23' ), q{23 == 'abc23'} );
 }
 
 #----------------------------------------------------------------------------

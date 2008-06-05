@@ -19,8 +19,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 7;
-plan tests => $tests;
+plan tests => 7;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -44,12 +43,12 @@ use_ok('WebGUI::Flux::Operator');
 {
     eval { WebGUI::Flux::Operator->compareUsing('IsQuantumSuperpositionOf', 'a', 'b'); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'compareUsing takes exception to invalid Operator' );
+    isa_ok( $e, 'WebGUI::Error::Flux::OperatorEvalFailed', 'compareUsing takes exception to invalid Operator' );
     cmp_deeply(
         $e,
         methods(
-            error => 'Invalid WebGUI::Flux::Operator.',
-            param => 'IsQuantumSuperpositionOf',
+            error => re(qr/^Unable to run compare on WebGUI::Flux::Operator::IsQuantumSuperpositionOf:/),
+            operator => 'IsQuantumSuperpositionOf',
         ),
         'compareUsing takes exception to invalid Operator',
     );
@@ -58,8 +57,8 @@ use_ok('WebGUI::Flux::Operator');
 {
 
     # Try out compareUsing(), using IsEqualTo as our guinea pig
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'cat', 'cat' ), 1, 'identical operands' );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'cat', 'dog'), 0, 'different operands' );
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'cat', 'cat' ), 'identical operands' );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsEqualTo', 'cat', 'dog'), 'different operands' );
 }
 
 #----------------------------------------------------------------------------

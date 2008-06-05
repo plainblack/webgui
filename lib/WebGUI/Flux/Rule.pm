@@ -332,6 +332,12 @@ The combined expression
 
 sub update {
     my ( $self, $newProp_ref ) = @_;
+    
+    # Check arguments..
+    if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidParam->throw( param => $newProp_ref, error => 'Invalid hash reference.' );
+    }
+    
     my $id = id $self;
     foreach my $field (@MUTABLE_PROPERTIES) {
         $property{$id}{$field}

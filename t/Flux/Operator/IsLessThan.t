@@ -29,27 +29,26 @@ use_ok('WebGUI::Flux::Operator');
 {
 
     # Numeric operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 24 ), 1, q{23 < 24} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 23 ), 0, q{23 < 23} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 22 ), 0, q{23 < 22} );
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 24 ), q{23 < 24} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 23 ), q{23 < 23} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, 22 ), q{23 < 22} );
+
     # String operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "c" ), 1, q{"a" < "b"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "b" ), 0, q{"a" < "a"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "a" ), 0, q{"b" < "a"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "a", "abc" ), 1, q{"a" < "abc"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "abc", "a" ), 0, q{"a" < "abc"} );
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "c" ), q{"a" < "b"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "b" ), q{"a" < "a"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "b", "a" ), q{"b" < "a"} );
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "a", "abc" ), q{"a" < "abc"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', "abc", "a" ), q{"a" < "abc"} );
+
     # Mixed Numeric/String operands
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '24' ), 1, q{23 < "24"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '23' ), 0, q{23 < "23"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '22' ), 0, q{23 < "22"} );
-    
-    
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '24' ), q{23 < "24"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '23' ), q{23 < "23"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '22' ), q{23 < "22"} );
+
     # Whitespace that should be automatically trimmed
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '24 ' ), 1, q{23 < "24 "} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, ' 23' ), 0, q{23 < " 23"} );
-    is( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '22 ' ), 0, q{23 < "22 "} );
+    ok( WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '24 ' ), q{23 < "24 "} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, ' 23' ), q{23 < " 23"} );
+    ok( !WebGUI::Flux::Operator->compareUsing( 'IsLessThan', 23, '22 ' ), q{23 < "22 "} );
 }
 
 #----------------------------------------------------------------------------

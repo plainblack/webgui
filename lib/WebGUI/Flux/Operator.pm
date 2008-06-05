@@ -4,6 +4,7 @@ use warnings;
 
 use WebGUI::Pluggable;
 use English qw( -no_match_vars );
+use WebGUI::Exception::Flux;
 
 =head1 NAME
 
@@ -76,6 +77,7 @@ sub compareUsing {
     }
     
     # Trim whitespace from operands..
+    # TODO: maybe this should be up to individual Operator modules?
     $a =~ s/^\s+//;
     $a =~ s/\s+$//;
     $b =~ s/^\s+//;
@@ -84,14 +86,13 @@ sub compareUsing {
     # Compare operands using the requested operator 
     my $result = eval { WebGUI::Pluggable::run("WebGUI::Flux::Operator::$operator", 'compare', [$a, $b]); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::InvalidParam->throw(
-            param => $operator,
-            error => 'Invalid WebGUI::Flux::Operator.',
+         WebGUI::Error::Flux::OperatorEvalFailed->throw(
+            operator => $operator,
+            error => $EVAL_ERROR,
         );
     }
 
-    # Coerce undef, emptry string etc.. to pure boolean [1,0] before returning
-    return $result ? 1 : 0;
+    return $result;
 }
 
 1;
