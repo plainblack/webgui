@@ -4,11 +4,6 @@ use strict;
 use warnings;
 
 use Class::InsideOut qw{ :std };
-
-#use JSON;
-#use WebGUI::Asset::Template;
-#use WebGUI::Form;
-#use WebGUI::International;
 use WebGUI::Flux::Expression;
 use Readonly;
 
@@ -72,7 +67,7 @@ private expressionCache => my %expressionCache;    # (hash) cache of WebGUI::Flu
 
 # Default values used in create() method
 Readonly my %RULE_DEFAULTS => (
-    name => 'Undefined',
+    name   => 'Undefined',
     sticky => 0,
 );
 

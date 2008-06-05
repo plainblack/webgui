@@ -1,7 +1,6 @@
 # Tests CRUD operations on WebGUI::Flux::Expression
 #
-# N.B. Perform Devel::Cover test via:
-# cover -delete -silent && perl -MDevel::Cover=-ignore,.,-select,lib/WebGUI/Flux/Expression t/Flux/Expression.t && cover
+#
 
 use strict;
 use warnings;

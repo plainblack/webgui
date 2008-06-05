@@ -1,7 +1,6 @@
 # Tests CRUD operations on WebGUI::Flux::Rule
 #
-# N.B. Perform Devel::Cover test via:
-# cover -delete -silent && perl -MDevel::Cover=-ignore,.,-select,lib/WebGUI/Flux/Rule t/Flux/Rule.t && cover
+#
 
 use strict;
 use warnings;
@@ -48,7 +47,7 @@ use_ok('WebGUI::Flux::Rule');
         methods(
             error    => 'Need a session.',
             expected => 'WebGUI::Session',
-            got      => '',
+            got      => q{},
         ),
         'new takes exception to not giving it a session object',
     );

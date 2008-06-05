@@ -4,7 +4,7 @@ use warnings;
 
 use Class::InsideOut qw{ :std };
 use Readonly;
-use List::MoreUtils qw(any );
+use JSON;
 
 =head1 NAME
 
@@ -12,22 +12,29 @@ Package WebGUI::Flux::Expression::Builder
 
 =head1 DESCRIPTION
 
-Expression::Builder:
-• parse() when receiving JSON request from browser
-• getOperand1(), opeand1Complete() etc.. to check stages of completion
-• getNextStep() to figure out what to ask from the browser next
-• www_nextStep() to serialise response into JSON
-• if user requests "Save"
-∘ use parse() to check that Exp is complete
-∘ call Expression->create() with fully-formed request:
-‣  Flux::Expression->create($session, {op1=>'..'})
+This module drives the GUI for building individual Expressions. As such, it is
+not required until we implement GUI building.
 
-operand1: {
+Each request from the user's browser contains a (partially) complete 
+JSON-encoded Expression. This module parses the encoded Expression into an 
+object that knows what stage of the Expression building process the user is 
+up to. It is used to generate the next options to be returned to the user.
+
+When it receives a complete JSON-encoded Expression, this module calls
+Flux::Expression->create() to persist the Expression to the database.
+
+=head1 SYNOPSIS
+
+ # Possible usage:
+ 
+ my $JSON = <<'END_JSON';
+ {
+    operand1: {
         xtype: 'UserProfile',
         args: {
-            field_id: $user_profile_birthday_field_id
+            profileField: 'Birthday'
         },
-        post_processor: {
+        postProcessor: {
             xtype: 'WhenComparedToNowInUnitsOf',
             args: {
                 units: 'd',
@@ -44,8 +51,22 @@ operand1: {
             value: 0
         }
     }
-
-=head1 SYNOPSIS
+ }
+ END_JSON
+ 
+ my $builder = Flux::Expression::Builder->parse($session, $JSON);
+ if ($builder->isComplete()) {
+     my $expression = Flux::Expression->create($session, {
+         operand1 => $builder->getOperand1(),
+         operand1PostProcessor => $builder->getOperand1PostProcessor(),
+         operand2 => $builder->getOperand2(),
+         operand2PostProcessor => $builder->getOperand2PostProcessor(),
+         operator => $builder->getOperator(),
+     });
+ } else {
+     my $nextStep = $builder->getNextStep();
+     # .. return as JSON-encoded HTML response body
+ } 
 
 =head1 METHODS
 

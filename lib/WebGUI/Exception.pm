@@ -39,6 +39,11 @@ use Exception::Class (
         description     => "Expected to get a param we didn't get.",
         fields          => ["param"],
         },
+    'WebGUI::Error::InvalidParamCount' => {
+        isa             => 'WebGUI::Error',
+        description     => "Wrong number of params supplied.",
+        fields          => ["expected","got"],
+        },
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
         description     => "The object you were try to retrieve does not exist.",
