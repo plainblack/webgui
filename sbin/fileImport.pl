@@ -24,6 +24,7 @@ use File::stat;
 use FileHandle;
 use Getopt::Long;
 use POSIX;
+use Pod::Usage;
 use strict;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
@@ -70,103 +71,9 @@ GetOptions(
 	'ignoreExtInName'  => \$ignoreExtInName
 );
 
-
-if ($configFile eq "" || $pathToFiles eq "" || $parentAssetId eq "") {
-	printHelp();
-	exit 4;
-};
-
-if ($help) {
-	printHelp();
-	exit 1;
-}
-
-sub printHelp {
-	print <<STOP;
-
-
-Usage: perl $0 --pathToFiles=<pathToImportFiles> --configfile=<webguiConfig> --parentAssetId=<assetId>
-
-	--configFile		WebGUI config file.
-
-	--pathToFiles		Folder containing files to import.
-
-	--parentAssetId		The asset ID of the asset you wish
-				to attach these files to.
-
-
-Options:
-
-	--groupToEdit		The group ID of the group that should
-				have the privileges to edit these
-				files. Defaults to '4' (Content Managers).
-
-	--groupToView		The group ID of the group that should
-				have the privileges to view these
-				files. Defaults to '7' (Everybody).
-
-	--help			Display this help message and exit.
-
-	--owner			The user ID of the user that should
-				have the privileges to modify these
-				files. Defaults to '3' (Admin).
-
-	--override		This utility is designed to be run as
-				a privileged user on Linux style systems.
-				If you wish to run this utility without
-				being the super user, then use this flag,
-				but note that it may not work as
-				intended.
-
-	--quiet			Disable output unless there's an error.
-
-	--webUser		The user that your web server runs as.
-				Defaults to 'apache'.
-
-	--skipOlderThan		An interval defined in second to skip file older than.
-				Defaults "nothing skip".
-
-	--findByExt		Import only files files with an extension matching 
-				one of the exensions.
-				Defaults "import all files".
-
-	--recursive		Import the files recursivelly from the folder --pathToFiles
-				Defaults "don't run recursivelly"
-
-	--overwrite		Overwrite any matching file URL with the new file rather
-				than creating a new Asset for the file.
-				Instanciate the existing asset and replace the file.
-
-	--ignoreExtInName	Title and menuTitle database fields should not contain the
-				extension of the filename.
-
-
-EXIT STATUS
-
-  The following exit values are returned:
-
-  0
-	Successful execution.
-
-  1
-	For Windows User, stop the script if not super user.
-
-  2
-	A folder can't be open for reading.
-
-  3
-	In recursive mode, if two files has the same name and are selected to be imported. Return this error.
-
-  4
-	Error during invocation of the command.
-
-  5
-	The parent Asset Id doesn't exists.
-
-
-
-STOP
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage( exitval => 4)
+  if ($configFile eq "" || $pathToFiles eq "" || $parentAssetId eq "");
 
 my $slash = ($^O =~ /^Win/i) ? "\\" : "/";
 
@@ -405,3 +312,134 @@ sub skipFilter {
 	return 0;
 }
 
+__END__
+
+=head1 NAME
+
+fileImport - Import files into WebGUI's Asset Manager.
+
+=head1 SYNOPSIS
+
+ fileImport --configFile config.conf --pathToFiles path
+            --parentAssetID id
+            [--groupToEdit group]
+            [--groupToView group]
+            [--owner id]
+            [--findByExt ext1,ext2,...]
+            [--ignoreExtInName]
+            [--webUser username]
+            [--recursive]
+            [--overwrite]
+            [--override]
+            [--quiet]
+
+ fileImport --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script imports files into WebGUI's Asset Manager
+attached to a specified parent Asset, helping bulk uploads of content.
+
+This utility is designed to be run as a superuser on Linux systems,
+since it needs to be able to put files into WebGUI's data directories
+and change ownership of files. If you want to run this utility without
+superuser privileges, use the C<--override> option described below.
+
+=over
+
+=item C<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item C<--pathToFiles path>
+
+Path to a folder containing the files to import. This parameter is required.
+
+=item C<--parentAssetId id>
+
+Attach the imported files to the Asset C<id> in WebGUI's Asset Manager.
+This parameter is required.
+
+=item C<--groupToEdit id>
+
+Make members of WebGUI's group identified by C<id> be able to edit
+the uploaded files. If left unspecified, it defaults to Group ID 4,
+(Content Managers).
+
+=item C<--groupToView id>
+
+Make members of WebGUI's group identified by C<id> be able to view
+the uploaded files. If left unspecified, it defaults to Group ID 7,
+(Everybody).
+
+=item C<--owner id>
+
+Make WebGUI's user identified by C<id> own the uploaded files. If
+left unspecified, it defaults to User ID 3 (Admin).
+
+=item C<--webUser username>
+
+The system user that your web server runs as. If left unspecified
+it will default to C<www-data>.
+
+=item C<--override>
+
+This flag will allow you to run this utility without being the super user,
+but note that it may not work as intended.
+
+=item C<--skipOlderThan interval>
+
+Skip files older than C<interval> seconds. If left unspecified, it
+will default to skip no files.
+
+=item C<--findByExt patterns>
+
+Import only those files with matching file extensions. C<patterns>
+is a list of comma-separated extensions to match. If left unspecified,
+it will default to import all files.
+
+=item C<--recursive>
+
+Import files recursively. If left unspecified, only files in the
+folder will be imported, without following subfolders.
+
+=item C<--overwrite>
+
+Overwrite any matching file URL with the new file rather than
+creating a new Asset for the file. Instantiate the existing asset
+and replace the file.
+
+=item C<--ignoreExtInName>
+
+Do not include the filename extension in the Title and menuTitle
+database fields.
+
+=item C<--quiet>
+
+Disable all output unless there's an error.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 EXIT VALUES
+
+The following exit values are returned upon completion:
+
+  0  Successful execution.
+  1  Stop the script if not super user.
+  2  A folder can't be opened for reading.
+  3  Two files had the same name and were selected to be imported
+     during recursive mode.
+  4  Missing required parameter.
+  5  Specified parent AssetId does not exist.
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

@@ -1,13 +1,18 @@
 use lib "../lib";
 use strict;
 use Getopt::Long;
+use Pod::Usage;
 use WebGUI::Config;
 
 local $| = 1; #disable output buffering
 GetOptions(
     'configFile=s' => \(my $configFile),
-    'configFile=s' => \(my $configFile),
+    'help'         => \(my $help),
 );
+
+pod2usage( verbose => 2 ) if $help;
+pod2usage() if $configFile eq '';
+
 my $config = WebGUI::Config->new("..",$configFile);
 use File::Find;
 
@@ -28,3 +33,42 @@ File::Find::find({wanted => sub {
     }
 }}, $uploadsPath);
 
+__END__
+
+=head1 NAME
+
+purgeWGAccess - Clean up unneeded .wgaccess files from WebGUI repository
+
+=head1 SYNOPSIS
+
+ purgeWGAccess --configFile config.conf
+
+ purgeWGAccess --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script removes unneeded .wgaccess files from
+a specific site's upload directory. The script finds all the
+.wgaccess files recursively starting from the upload path for
+the WebGUI site specified in the given configuration file and
+removes it.
+
+=over
+
+=item C<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

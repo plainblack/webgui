@@ -18,6 +18,7 @@ BEGIN {
 use strict;
 use Digest::MD5;
 use Getopt::Long;
+use Pod::Usage;
 use WebGUI::DateTime;
 use WebGUI::Group;
 use WebGUI::Session;
@@ -45,8 +46,8 @@ my $replaceGroups;
 my $canChangePass;
 
 GetOptions(
-	'usersfile=s'=>\$usersFile,
-	'configfile=s'=>\$configFile,
+	'usersFile=s'=>\$usersFile,
+	'configFile=s'=>\$configFile,
 	'help'=>\$help,
 	'authMethod:s'=>\$authMethod,
 	'delimiter:s'=>\$delimiter,
@@ -64,130 +65,8 @@ GetOptions(
 	'canChangePass'=>\$canChangePass
 );
 
-
-
-
-
-unless ($usersFile && $configFile && !$help) {
-	print <<STOP;
-
-
-Usage: perl $0 --usersfile=<pathToFile> --configfile=<webguiConfig>
-
-	--usersFile	File (and path) containing import information.
-
-	--configFile	WebGUI config file (with no path info). 
-
-
-Options:
-
-	--authMethod	The authentication method to be used for
-			each user. Defaults to 'WebGUI'. Can be
-			overridden in the import file.
-
-	--canChangePass	If this flag is set users will be able to change
-			their passwords.  Otherwise not.
-
-	--delimiter	The string that separates each field in the
-			import file. Defaults to tab.
-
-	--expireOffset	The the amount of time before the user will
-			be expired from the groups they are added
-			to. Defaults to the expire offset set in
-			the group definition within WebGUI. May be
-			overridden in the import file.
-
-	--expireUnits	Valid values are "seconds", "minutes",
-			"hours", "days", "weeks", "months", "years",
-			"epoch", or "fixed". Defaults to "seconds". This is 
-			the units of the expire offset. If set to
-			"epoch" the system will assume that the
-			expire offset is an epoch date rather than
-			an interval.  If set to "fixed" the 
-			system will assume that the expireDate is
-			a fixed date.
-
-	--groups	A comma separated list of group ids that
-			each user in the import file will be set
-			to. Can be overridden in the import file.
-
-	--help		Display this help message.
-
-	--identifier	Alias for --password.  
-
-	--ldapUrl	The URL used to connect to the LDAP server
-			for authentication. Can be overridden in
-			the import file.
-
-	--override      This utility is designed to be run as
-                        a privileged user on Linux style systems.
-                        If you wish to run this utility without
-                        being the super user, then use this flag,
-                        but note that it may not work as
-                        intended.
-
-	--password	The default password to use when none is 
-			specified with the user. Defaults to 
-			'123qwe'. Can be overridden in the import
-			file.
-
-	--quiet         Disable output unless there's an error.
-
-	--status	The user's account status. Defaults to
-			'Active'. Other valid value is 'Deactivated'.
-	
-	--update	looks up all the users from the file in the database
-				and updates all the given fields for each user that 
-				exists in the database. users that are in the file
-				and not in the database are ignored.
-				
-	--updateAdd	looks up the users from the file in the database
-				and updates all the given fields for each user that
-				exists in the database. users who do not exist in the
-				database are added as new users.
-				
-	--replaceGroups	when updating, if the user already belongs to some group
-					this flag will delete all the user's existing groups and
-					and the new groups to him/her
-
-
-User File Format:
-
-	-Tab delimited fields (unless overridden with --delimiter).
-
-	-First row contains field names.
-
-	-Valid field names:
-	
-		username password authMethod status
-		ldapUrl connectDN groups expireOffset
-
-	-In addition to the field names above, you may use any 
-	valid profile field name.
-	
-	-The special field name 'groups' should contain a comma 
-	separated list of group ids.
-
-
-Special Cases:
-
-	-If no username is specified it will default to 
-	'firstName.lastName'.
-
-	-If firstName and lastName or username are not specified, 
-	the user will be skipped.
-
-	-Invalid field names will be ignored.
-
-	-Blank lines will be ignored.
-
-	-If userId is specified for an import record, that userId
-        be used instead of generating one.
-
-STOP
-	exit;
-}
-
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless ($usersFile && $configFile);
 
 if (!($^O =~ /^Win/i) && $> != 0 && !$override) {
         print "You must be the super user to use this utility.\n";
@@ -359,3 +238,189 @@ sub calculateExpireOffset {
 	return $session->datetime->intervalToSeconds($offset, $units)
 }
 
+__END__
+
+=head1 NAME
+
+userImport - Bulk load users into WebGUI database
+
+=head1 SYNOPSIS
+
+ userImport --configFile config.conf --usersFile pathname
+            [--authMethod method]
+            [--canChangePasswd]
+            [--delimiter string]
+            [--expireOffset integer [--expireUnits string]]
+            [--groups groupid,...]
+            [--ldapUrl uri]
+            [--password text]
+            [--status status]
+            [--override]
+            [--quiet]
+            [--update | --updateAdd]
+            [--replaceGroups]
+
+ userImport --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script reads user information from a text file
+and loads them into the specified WebGUI database. Default user
+parameters can be specified through command line options, taking
+overriding values from the file.
+
+This utility is designed to be run as a superuser on Linux systems,
+since it needs to be able to put files into WebGUI's data directories
+and change ownership of files. If you want to run this utility without
+superuser privileges, use the C<--override> option described below.
+
+The user information is given in a simple TAB-delimited text file,
+that describes both the field names and field data for each user. You
+can change de actual delimiter with the C<--delimiter> option (see below).
+
+The first line of the file contains the field names whose values are
+going to be loaded. From then on, all non-blank lines in the file must have
+the same number of fields. All-blank lines are ignored. The valid field
+names are:
+
+=over
+
+=item C<username>
+=item C<password>
+=item C<authMethod>
+=item C<status>
+=item C<ldapUrl>
+=item C<connectDN>
+=item C<groups>
+=item C<expireOffset>
+=item Any valid User Profile field name available in WebGUI's database,
+      e.g. C<firstName>, C<lastName>, C<mail>, etc.
+
+=back
+
+If you use the field C<groups>, each following line  should contain a comma
+separated list of WebGUI Group Ids; note that this could be a problem
+if you chose to use comma as a delimiter for fields.
+
+If no username is specified it will default to C<firstName.lastName>. If
+no C<username> is specified, nor C<firstName> and C<lastName>, then the
+user will B<not> be loaded.
+
+If you specify the C<userId> field for import on any record, that C<userId>
+will be used instead of generating a new one automatically. If you do this,
+be careful not to insert duplicates!
+
+If you use an invalid field name, its values will be ignored.
+
+=over
+
+=item C<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item C<--usersFile pathname>
+
+Pathname to the file containing users information for bulk loading.
+
+=item C<--authMethod method>
+
+Specify the default authentication method to set for each loaded user.
+It can be overridden in the import file for specific users.
+If left unspecified, it defaults to C<WebGUI>.
+
+=item C<--canChangePass>
+
+Set loaded users to be able to change their passwords. If left
+unspecified, loaded users will B<NOT> be able to change their
+passwords until and administrator grants them the privilege.
+
+=item C<--delimiter string>
+
+Specify the string delimiting fields in the import file. If left
+unspecified, it defaults to a single TAB (ASCII 9).
+
+=item C<--expireOffset integer>
+
+Specify the default amount of time before the loaded user will be
+expired from the groups they are added to. The units are specified
+by C<--expireUnits> (see below). It can be overridden in the import
+file for specific users. If left unspecified, it defaults to the
+expire offset set in the group definition within WebGUI.
+
+=item C<--expireUnits unidades>
+
+Specify the units for C<--expireOffset> (see above). Valid values
+are C<seconds>, C<minutes>, C<hours>, C<days>, C<weeks>, C<months>,
+C<years>, C<epoch>, or C<fixed>. If set to C<epoch> the system will
+assume that the expire offset should be taken as an epoch date
+(absolute number of seconds since January 1, 1970) rather than an
+interval. If set to C<fixed> the system will assume that the
+C<--expireOffset> is a fixed date. If left unspecified, it defaults
+to C<seconds>.
+
+=item C<--groups groupid,...>
+
+Specify a comma separated list of WebGUI Group Ids that each loaded
+user will be set to. It can be overridden in the import file for
+specific users.
+
+=item C<--ldapUrl uri>
+
+Specify the URI used to connect to the LDAP server for authentication.
+The URI must conform to what L<Net::LDAP> uses for connecting.
+It can be overridden in the import file for specific users.
+
+=item C<--password string>
+=item C<--identifier string>
+
+Specify the default password to use for loaded users. It can (and should)
+be overriden in the import file for specific users. If left unspecified,
+it defaults to C<123qwe>.
+
+=item C<--status status>
+
+Specify the default account status for loaded users. Valid values are
+C<Active> and C<Deactivated>. If left unspecified, it defaults to
+C<Active>.
+
+=item C<--update>
+
+Search WebGUI's database for each user listed in the import file, and
+update its information using the provided fields. Users in the import
+file that are B<not> found in the database are B<ignored>. See
+C<--updateAdd> below if you want to add the extra users.
+
+=item C<--updateAdd>
+
+Search WebGUI's database for each user listed in the import file, and
+update its information using the provided fields. Users in the import
+file that are B<not> found in the database are B<added>. See
+C<--update> above if you do not want to add the extra users.
+
+=item C<--replaceGroups>
+
+If the user being updated with C<--update> or C<--updateAdd> already
+belongs to some other groups, remove the user from them.
+
+=item C<--override>
+
+This flag will allow you to run this utility without being the super user,
+but note that it may not work as intended.
+
+=item C<--quiet>
+
+Disable all output unless there's an error.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

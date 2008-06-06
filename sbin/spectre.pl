@@ -8,6 +8,7 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+use Pod::Usage;
 use strict;
 use warnings;
 use lib '../lib';
@@ -37,38 +38,8 @@ GetOptions(
 	'test' => \$test
 	);
 
-if ($help || !($ping||$shutdown||$daemon||$run||$test||$status)) {
-	print <<STOP;
-
-	S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling Contraptions for 
-	Triggering Relentless Executions. It triggers WebGUI's workflow and scheduling
-	functions.
-
-	Usage: perl spectre.pl [ options ]
-
-
-	Options:
-
-	--daemon	Starts the Spectre server.
-
-	--debug		If specified at startup, Spectre will provide verbose
-			debug to standard out so that you can see exactly what
-			it's doing.
-
-	--ping		Checks to see if Spectre is alive.
-
-	--run		Starts Spectre without forking it as a daemon.
-
-	--shutdown	Stops the running Spectre server.
-
-	--status	Returns a report about the internals of Spectre.
-
-	--test		Tests the connection between Spectre and WebGUI. Both Spectre
-			and WebGUI must be running to use this function.
-
-STOP
-	exit;
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
 require File::Spec;
 my $config = WebGUI::Config->new(File::Spec->rel2abs(".."),"spectre.conf",1);
@@ -76,8 +47,9 @@ unless (defined $config) {
 	print <<STOP;
 
 
-Cannot open  the Spectre config file. Check that ../etc/spectre.conf exists,
-and that it has the proper privileges to be read by the Spectre server.
+Cannot open the Spectre config file.
+Check that /etc/webgui/spectre.conf exists, and that it has the proper
+privileges to be read by the Spectre server.
 
 
 STOP
@@ -153,3 +125,94 @@ sub getStatusReport {
 	return $result;
 }
 
+__END__
+
+=head1 NAME
+
+spectre - WebGUI's workflow and scheduling.
+
+=head1 SYNOPSIS
+
+ spectre {--daemon|--run} [--debug]
+
+ spectre --shutdown
+
+ spectre --ping
+
+ spectre --status
+
+ spectre --test
+
+ spectre --help
+
+=head1 DESCRIPTION
+
+S.P.E.C.T.R.E. is the Supervisor of Perplexing Event-handling
+Contraptions for Triggering Relentless Executions. It triggers
+WebGUI's workflow and scheduling functions.
+
+Spectre's configuration file, C<spectre.conf>, is located under
+the WebGUI filesystem hierarchy.
+
+=over
+
+=item C<--daemon>
+
+Starts the Spectre server forking as a background daemon. This
+can be done by hand, but it is usually handled by a startup
+script.
+
+=item C<--run>
+
+Starts Spectre in the foreground without forking as a daemon.
+
+=item C<--debug>
+
+If this option is specified at startup either in C<--daemon>
+or C<--run> mode, Spectre will provide verbose debug to standard
+output so that you can see exactly what it's doing.
+
+=item C<--shutdown>
+
+Stops the running Spectre server.
+
+=item C<--ping>
+
+Pings Spectre to see if it is alive. If Spectre is alive, you'll get
+confirmation with a message like
+
+    Spectre is alive!
+
+If Spectre doesn't seem to be alive, you'll get a message like
+
+    Spectre is not responding.
+    Unable to connect to <IP-address>:<Port>
+
+where C<IP-address> is the IP address and C<Port> is the port number
+where Spectre should be listening for connections on according to
+C<spectre.conf>.
+
+=item C<--status>
+
+Shows a summary of Spectre's internal status. The summary contains
+a tally of suspended, waiting and running WebGUI Workflows.
+
+=item C<--test>
+
+Tests whether Spectre can connect to WebGUI. Both Spectre
+and the Apache server running WebGUI must be running for this
+option to work. It will test the connection between every site
+and Spectre, by looking for configuration files in WebGUI's
+configuration directory, showing success or failure in each case.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

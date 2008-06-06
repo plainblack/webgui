@@ -19,6 +19,7 @@ BEGIN {
 $| = 1;
 
 use Getopt::Long;
+use Pod::Usage;
 use strict;
 use WebGUI::Session;
 use WebGUI::Utility;
@@ -33,37 +34,8 @@ GetOptions(
         'quiet'=>\$quiet,
 );
 
-
-if ($help || $configFile eq ""){
-        print <<STOP;
-
-
-Usage: perl $0 --configfile=<webguiConfig>
-
-This utility will rebuild your WebGUI Lineage Tree. The lineage tree is an
-index that is used to make WebGUI run faster. It will also detect and fix
-orphan data, and detect cirular relationships in your tree.
-
-WARNING: Use this tool only if you know what you're doing. It should only
-be used if somehow your lineage tree has become corrupt (very rare) or if
-you have done some massive reorganization of your asset tree and you want
-to fill in the gaps between the ranks of your assets. A side effect of
-using this utility can be that your assets may no longer be in the same rank
-as they once were, which means that they may appear out of order in your
-navigation.
-
-        --configFile	WebGUI config file.
-
-Options:
-
-        --help		Display this help message and exit.
-
-	--quiet		Disable output unless there's an error.
-
-STOP
-	exit;
-}
-
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless (defined($configFile) && $configFile ne '');
 
 print "Starting..." unless ($quiet);
 my $session = WebGUI::Session->open($webguiRoot,$configFile);
@@ -153,3 +125,53 @@ sub printChange {
 	print sprintf("%-25s",$assetId).sprintf("%-51s",$oldLineage).$newLineage."\n" unless ($quiet);
 }
 
+__END__
+
+=head1 NAME
+
+rebuildLineage - Rebuild WebGUI Lineage Tree.
+
+=head1 SYNOPSIS
+
+ rebuildLineage --configFile config.conf
+
+ rebuildLineage --help
+
+=head1 DESCRIPTION
+
+WebGUI's Lineage Tree is an index that helps WebGUI run faster, if
+built propely. This utility will rebuild your WebGUI Lineage Tree,
+detect and fix orphaned data, and circular relationships (loops)
+in the tree.
+
+B<WARNING>: Use this tool only if you know what you're doing. It should
+only be used if somehow your lineage tree has become corrupt (very rare)
+or if you have done some massive reorganization of your asset tree and
+you want to fill in the gaps between the ranks of your assets. A side
+effect of using this utility can be that your assets may no longer be
+in the same rank as they once were, which means that they may appear
+out of order in your navigation.
+
+=over
+
+=item C<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item C<--quiet>
+
+Disable all output unless there's an error.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

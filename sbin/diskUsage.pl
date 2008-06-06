@@ -10,6 +10,7 @@
 
 use lib "../lib";
 use Getopt::Long;
+use Pod::Usage;
 use strict;
 use WebGUI::Session;
 use WebGUI::Asset;
@@ -36,47 +37,8 @@ GetOptions(
     'help!'	  =>\$help,	
 );
 
-if ($help || !$configFile) {
-
-	print <<__EOH;
-
-usage perl $0
-
-Description:	This utility is modeled after the *nix 'du' utility.
-
-		It displays the amount of disk space used by an asset and
-		it's descendants.
-
-Options:
-
-	--assetId	AssetId to use as starting point for calculating
-			disk usage.  Defaults to the WebGUI default page
-			defined in the sites settings.
-	
-	--assetUrl	Relative asset URL to use as starting point for
-			calculating (i.e., /home) disk usage.  Defaults to the
-			WebGUI default page defined in the sites settings.
-	
-	--blockSize	Numeric value to change the unit of measure for
-			the amount of disk space used.  Defaults to 1
-			(bytes)
-			
-	--help		Display this help message
-	
-	--norecurse	Returns the disk space used by the starting asset only.
-	
-	--quiet		Display nothing but the amount of disk space used.
-			This value will respect the blockSize and recurse
-			parameters when calculating it's output.
-			
-	--summary	Display only the total amount of disk space used in a
-			human readable format.
-	
-	--configFile	WebGUI config file to use.  This parameter is required.
-	
-__EOH
-	exit;
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless $configFile;
 
 my $session = start();
 du();
@@ -158,4 +120,82 @@ sub du {
 	}
 }
 
+__END__
 
+=head1 NAME
+
+diskUsage - Display amount of disk space used by a WebGUI asset
+            an its desecendants.
+
+=head1 SYNOPSIS
+
+
+ diskUsage --configFile config.conf
+           [--assetId id]
+	   [--assetUrl url]
+           [--blockSize bytes]
+	   [--norecurse]
+	   [--quiet]
+	   [--summary]
+
+ diskUsage --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script displays the amount of disk space used by
+an asset and it's descendants. It has been modeled after the *nix 'du'
+utility.
+
+=over
+
+=item C<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item C<--assetId id>
+
+Calculate disk usage starting from WebGUI's Asset identified by C<id>.
+If this parameter is not supplied, calculations will start from
+WebGUI's default page as defined in the Site settings.
+
+=item C<--assetUrl url>
+
+Calculate disk usage starting from the particular URL given by C<url>,
+which must be relative to the server (e.g. C</home> instead of
+C<http://your.server/home>). If this parameter is not supplied, calculations
+will start from WebGUI's default page as defined in the Site settings.
+
+=item C<--blockSize bytes>
+
+Use C<bytes> as scaling factor to change the units in which disk space
+will be reported. If this parameter is not supplied, it defaults to C<1>,
+hence the results will be expressed in bytes. If you want to have kb,
+use C<--blockSize 1024>.
+
+=item C<--norecurse>
+
+Prevent recursive calculation of disk space. This effectively computes
+the used disk space for the starting Asset only, without including
+its descendants.
+
+=item C<--quiet>
+
+Just display the total amount of disk space as a raw value.
+
+=item C<--summary>
+
+Just display the total amount of disk space in a human readable format.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

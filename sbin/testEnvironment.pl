@@ -19,9 +19,8 @@ BEGIN {
 use strict;
 use CPAN;
 use Getopt::Long;
+use Pod::Usage;
 
-
-print "\nWebGUI is checking your system environment:\n\n";
 
 my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
 
@@ -30,21 +29,9 @@ GetOptions(
 	'help'=>\$help
 );
 
-if ($help){
-        print <<STOP;
+pod2usage( verbose => 2 ) if $help;
 
-
-Usage: perl $0 
-
-Options:
-	
-   --help         Display this help message and exit.
-   --simpleReport Print a status report to stdout and do not upgrade any perl modules
-
-
-STOP
-        exit;
-}
+print "\nWebGUI is checking your system environment:\n\n";
 
 $prereq = 1;
 
@@ -395,5 +382,46 @@ sub prompt {
         return $answer;
 }
 
+__END__
 
+=head1 NAME
 
+testEnvironment - Test Perl environment for proper WebGUI support.
+
+=head1 SYNOPSIS
+
+ testEnvironment --simpleReport
+
+ testEnvironment --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script tests the current Perl environment to make
+sure all of WebGUI's dependencies are satisfied. It also checks for
+proper installation of WebGUI's libraries.
+
+If any of the required Perl modules is not available or outdated, the
+script will ask if it should attempt installation using CPAN. This will
+only be possible if the script is being run as a superuser.
+
+The script will attempt to find out the latest available version from
+L<http://update.webgui.org>, and compare with the currently installed one.
+
+=over
+
+=item C<--simpleReport>
+
+Prints the status report to standard output, but does not attempt
+to upgrade any outdated or missing Perl modules.
+
+=item C<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut
