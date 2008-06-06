@@ -4,7 +4,6 @@ use warnings;
 
 use WebGUI::Pluggable;
 use English qw( -no_match_vars );
-use WebGUI::Exception::Flux;
 use List::MoreUtils qw(any );
 
 =head1 NAME
@@ -81,7 +80,7 @@ sub executeUsing {
         WebGUI::Error::InvalidParam->throw( param => $arg_ref, error => 'Invalid hash reference.' );
     }
     # Compulsory fields..
-    if ( any { !exists $arg_ref->{$_} } qw(user rule) ) {
+    if ( any { !exists $arg_ref->{$_} } qw(user rule args) ) {
         WebGUI::Error::InvalidParam->throw(
             param => $arg_ref,
             error => 'Missing required field in properties hash reference.'
@@ -93,14 +92,17 @@ sub executeUsing {
     if ($EVAL_ERROR) {
          WebGUI::Error::Pluggable::LoadFailed->throw(
             error => $EVAL_ERROR,
+            module => "WebGUI::Flux::Operand::$operand",
         );
     }
     
     # Get the Operand's Args definition..
     my $operand_args_ref = eval { WebGUI::Pluggable::run("WebGUI::Flux::Operand::$operand", 'getArgs'); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::Flux::OperandEvalFailed->throw(
+         WebGUI::Error::Pluggable::RunFailed->throw(
             error => $EVAL_ERROR,
+            module => "WebGUI::Flux::Operand::$operand",
+            subroutine => 'getArgs',
         );
     }
     
@@ -115,9 +117,11 @@ sub executeUsing {
     # Good to go. Execute the Operand..
     my $result = eval { WebGUI::Pluggable::run("WebGUI::Flux::Operand::$operand", 'execute', [$arg_ref]); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::Flux::OperandEvalFailed->throw(
-            operand => $operand,
+         WebGUI::Error::Pluggable::RunFailed->throw(
             error => $EVAL_ERROR,
+            module => "WebGUI::Flux::Operand::$operand",
+            subroutine => 'execute',
+            params => [$arg_ref],
         );
     }
     

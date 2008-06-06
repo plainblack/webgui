@@ -3,20 +3,20 @@ package WebGUI::Exception::Flux;
 use strict;
 use warnings;
 use WebGUI::Exception;
-use Exception::Class (
-
-    'WebGUI::Error::Flux::OperandEvalFailed' => {
-        isa         => 'WebGUI::Error',
-        description => "Eval of Flux Operand failed.",
-        fields      => ["operand"],
-    },
-    
-    'WebGUI::Error::Flux::OperatorEvalFailed' => {
-        isa         => 'WebGUI::Error',
-        description => "Eval of Flux Operator failed.",
-        fields      => ["operator"],
-    },
-);
+#use Exception::Class (
+#
+#    'WebGUI::Error::Flux::OperandEvalFailed' => {
+#        isa         => 'WebGUI::Error',
+#        description => "Eval of Flux Operand failed.",
+#        fields      => ["operand"],
+#    },
+#    
+#    'WebGUI::Error::Flux::OperatorEvalFailed' => {
+#        isa         => 'WebGUI::Error',
+#        description => "Eval of Flux Operator failed.",
+#        fields      => ["operator"],
+#    },
+#);
 
 =head1 NAME
 

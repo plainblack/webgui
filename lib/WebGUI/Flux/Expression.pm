@@ -67,10 +67,10 @@ Readonly my @MUTABLE_PROPERTIES => qw(
     name
     operand1             operand1Args
     operand1AssetId
-    operand1PostProcess  operand1PostProcessArgs
+    operand1Modifier     operand1ModifierArgs
     operand2             operand2Args
     operand2AssetId
-    operand2PostProcess  operand2PostProcessArgs
+    operand2Modifier     operand2ModifierArgs
     operator
 );
 

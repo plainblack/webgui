@@ -34,13 +34,13 @@ CREATE TABLE `fluxExpression` (
   `operand1` varchar(255) NOT NULL,
   `operand1Args` mediumtext default NULL,
   `operand1AssetId` varchar(22) character set utf8 collate utf8_bin default NULL,
-  `operand1PostProcess` varchar(255) default NULL,
-  `operand1PostProcessArgs` mediumtext default NULL,
+  `operand1Modifier` varchar(255) default NULL,
+  `operand1ModifierArgs` mediumtext default NULL,
   `operand2` varchar(255) NOT NULL,
   `operand2Args` mediumtext default NULL,
   `operand2AssetId` varchar(22) character set utf8 collate utf8_bin default NULL,
-  `operand2PostProcess` varchar(255) default NULL,
-  `operand2PostProcessArgs` mediumtext default NULL,
+  `operand2Modifier` varchar(255) default NULL,
+  `operand2ModifierArgs` mediumtext default NULL,
   `operator` varchar(255) NOT NULL,
   PRIMARY KEY  (`fluxExpressionId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -69,6 +69,7 @@ Second operand
 sub compareUsing {
     my ( $class, $operator, $a, $b ) = @_;
 
+    # Check arguments..
     if ( @_ != 4 ) {
         WebGUI::Error::InvalidParamCount->throw(
             got      => scalar(@_),
@@ -83,12 +84,23 @@ sub compareUsing {
     $b =~ s/^\s+//;
     $b =~ s/\s+$//;
 
+    # Try loading the Operator..
+    eval { WebGUI::Pluggable::load("WebGUI::Flux::Operator::$operator"); };
+    if ($EVAL_ERROR) {
+         WebGUI::Error::Pluggable::LoadFailed->throw(
+            error => $EVAL_ERROR,
+            module => "WebGUI::Flux::Operator::$operator",
+        );
+    }
+    
     # Compare operands using the requested operator 
     my $result = eval { WebGUI::Pluggable::run("WebGUI::Flux::Operator::$operator", 'compare', [$a, $b]); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::Flux::OperatorEvalFailed->throw(
-            operator => $operator,
+        WebGUI::Error::Pluggable::RunFailed->throw(
             error => $EVAL_ERROR,
+            module => "WebGUI::Flux::Operator::$operator",
+            subroutine => 'compare',
+            params => [$a, $b],
         );
     }
 

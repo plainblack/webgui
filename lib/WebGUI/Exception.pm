@@ -59,6 +59,11 @@ use Exception::Class (
         description     => "WebGUI::Pluggable failed to load module.",
         fields          => ['module'],
         },
+    'WebGUI::Error::Pluggable::RunFailed' => {
+        isa             => 'WebGUI::Error',
+        description     => "WebGUI::Pluggable failed to run subroutine.",
+        fields          => ['module', 'subroutine', 'params'],
+        },
 );
 
 

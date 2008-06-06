@@ -43,12 +43,12 @@ use_ok('WebGUI::Flux::Operator');
 {
     eval { WebGUI::Flux::Operator->compareUsing('IsQuantumSuperpositionOf', 'a', 'b'); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Flux::OperatorEvalFailed', 'compareUsing takes exception to invalid Operator' );
+    isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'compareUsing takes exception to invalid Operator' );
     cmp_deeply(
         $e,
         methods(
-            error => re(qr/^Unable to run compare on WebGUI::Flux::Operator::IsQuantumSuperpositionOf:/),
-            operator => 'IsQuantumSuperpositionOf',
+            error => re(qr/^Could not load WebGUI::Flux::Operator::IsQuantumSuperpositionOf/),
+            module => 'WebGUI::Flux::Operator::IsQuantumSuperpositionOf',
         ),
         'compareUsing takes exception to invalid Operator',
     );

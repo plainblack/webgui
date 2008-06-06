@@ -58,9 +58,9 @@ Flux::Expression->create() to persist the Expression to the database.
  if ($builder->isComplete()) {
      my $expression = Flux::Expression->create($session, {
          operand1 => $builder->getOperand1(),
-         operand1PostProcessor => $builder->getOperand1PostProcessor(),
+         operand1Modifier => $builder->getOperand1Modifier(),
          operand2 => $builder->getOperand2(),
-         operand2PostProcessor => $builder->getOperand2PostProcessor(),
+         operand2Modifier => $builder->getOperand2Modifier(),
          operator => $builder->getOperator(),
      });
  } else {

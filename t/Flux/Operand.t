@@ -66,7 +66,7 @@ my $dummy_rule_object = 'ignored';
 }
 {
     eval {
-        WebGUI::Flux::Operand->executeUsing( 'Qbit', { user => $dummy_user_object, rule => $dummy_rule_object, } );
+        WebGUI::Flux::Operand->executeUsing( 'Qbit', { user => $dummy_user_object, rule => $dummy_rule_object, args => {}} );
     };
     my $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'executeUsing takes exception to invalid Operand' );
