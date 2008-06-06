@@ -55,6 +55,8 @@ our $HELP = {
                     { 'name' => 'variant_quantity' },
                 ]
             },
+            { 'name' => 'in_stock' },
+            { 'name' => 'no_stock_message' },
             { 'name' => 'buy_form_header' },
             { 'name' => 'buy_form_options' },
             { 'name' => 'buy_form_button' },

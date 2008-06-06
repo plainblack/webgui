@@ -765,7 +765,7 @@ be useful, others may not.|,
 	},
 
 	'buy_form_options' => {
-		message => q|A dropdown list of available variants for this product.|,
+		message => q|A dropdown list of available variants for this product.  Only products with a quantity greater than zero are listed.|,
 		lastUpdated => 1210611784,
 	},
 
@@ -777,6 +777,22 @@ be useful, others may not.|,
 	'buy_form_footer' => {
 		message => q|HTML code to end the form for putting variant into a shopping cart.  |,
 		lastUpdated => 1210611784,
+	},
+
+	'in_stock' => {
+		message => q|A boolean which says whether or not there are available variants of this product for sale|,
+		lastUpdated => 1212787075,
+	},
+
+	'no_stock_message' => {
+		message => q|An internationalized message saying that there are no variants of this product available for sale.|,
+		lastUpdated => 1210611784,
+	},
+
+	'out of stock' => {
+		message => q|Out of stock|,
+		lastUpdated => 1210611784,
+        context => q|Message displayed to the user when there is no inventory available for sale for a product.|,
 	},
 
 	'options' => {

@@ -1554,6 +1554,11 @@ sub view {
             },
         );
         $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+        $var{inStock} = 1;
+    }
+    else {
+        $var{in_stock} = 0;
+        $var{no_stock_message} = $i18n->get('out of stock');
     }
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
