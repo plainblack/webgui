@@ -48,7 +48,7 @@ unless (defined $config) {
 
 
 Cannot open the Spectre config file.
-Check that /etc/webgui/spectre.conf exists, and that it has the proper
+Check that spectre.conf exists, and that it has the proper
 privileges to be read by the Spectre server.
 
 
