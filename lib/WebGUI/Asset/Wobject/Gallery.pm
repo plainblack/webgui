@@ -1069,7 +1069,10 @@ sub www_search {
         $p->appendTemplateVars( $var );
         for my $result ( @{ $p->getPageData } ) {
             my $asset   = WebGUI::Asset->newByDynamicClass( $self->session, $result->{assetId} );
-            push @{ $var->{search_results} }, $asset->getTemplateVars;
+            push @{ $var->{search_results} }, {
+                %{ $asset->getTemplateVars },
+                isAlbum     => $asset->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ),
+            };
         }
     }
 

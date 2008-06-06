@@ -693,6 +693,12 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message when trying to add albums to uncommitted Gallery assets},
     },
+
+    'helpvar isAlbum' => {
+        message     => q{This variable is true if the current result is a GalleryAlbum.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
 };
 
 1;

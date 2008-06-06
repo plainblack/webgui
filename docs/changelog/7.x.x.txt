@@ -97,6 +97,8 @@
  - fixed: Password Recovery now only works for Active users and does not allow
    deactivated users to log in
  - fixed: Gallery Search now correctly limits by class name
+ - added: A template variable to distinguish between Files and Albums in the Gallery
+   Search
 
 7.5.10
  - fix: Syntax error in GetCsMail
