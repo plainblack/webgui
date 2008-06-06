@@ -96,6 +96,7 @@
  - fixed: Gallery Search form doesn't work right in IE6
  - fixed: Password Recovery now only works for Active users and does not allow
    deactivated users to log in
+ - fixed: Gallery Search now correctly limits by class name
 
 7.5.10
  - fix: Syntax error in GetCsMail

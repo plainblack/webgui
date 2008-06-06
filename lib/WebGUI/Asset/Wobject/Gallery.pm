@@ -1029,6 +1029,7 @@ sub www_search {
                         ;
         }
 
+        # Classes
         my $joinClass   = [
             'WebGUI::Asset::Wobject::GalleryAlbum',
             'WebGUI::Asset::File::GalleryFile::Photo',
@@ -1036,6 +1037,8 @@ sub www_search {
         if ( $form->get("className") ) {
             $joinClass  = [ $form->get('className') ];
         }
+        $where      .= q{ AND assetIndex.className IN ( } . $db->quoteAndJoin( $joinClass ) . q{ ) };
+        
 
         # Build a URL for the pagination
         my $url     
@@ -1045,11 +1048,13 @@ sub www_search {
                 . 'keywords=' . $form->get('keywords') . ';'
                 . 'title=' . $form->get('title') . ';'
                 . 'description=' . $form->get('description') . ';'
-                . 'className=' . $form->get('className') . ';'
                 . 'creationDate_after=' . $form->get('creationDate_after') . ';'
                 . 'creationDate_before=' . $form->get('creationDate_before') . ';'
                 . 'userId=' . $form->get("userId") . ';'
             );
+        for my $class ( @$joinClass ) {
+            $url    .= 'className=' . $class . ';';
+        }
 
         my $p
             = $self->getSearchPaginator( { 
