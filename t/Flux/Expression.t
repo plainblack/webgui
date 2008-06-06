@@ -23,7 +23,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 27;
+plan tests => 26;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -109,10 +109,10 @@ $session->db->write('delete from fluxExpression');
     my $rule = WebGUI::Flux::Rule->create($session);
     eval { my $expression = WebGUI::Flux::Expression->create( $rule, 'not a hash ref' ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'create takes exception to an invalid hash ref' );
+    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'create takes exception to an invalid hash ref' );
     cmp_deeply(
         $e,
-        methods( error => 'Invalid hash reference.', ),
+        methods( param => 'not a hash ref', ),
         'create takes exception to an invalid hash ref',
     );
 }
@@ -120,12 +120,7 @@ $session->db->write('delete from fluxExpression');
     my $rule = WebGUI::Flux::Rule->create($session);
     eval { my $expression = WebGUI::Flux::Expression->create( $rule, { requiredFields => 'missing' } ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'create takes exception to missing required fields in hash ref' );
-    cmp_deeply(
-        $e,
-        methods( error => 'Missing required field in properties hash reference.', ),
-        'create takes exception to missing required fields in hash ref',
-    );
+    isa_ok( $e, 'WebGUI::Error::NamedParamMissing', 'create takes exception to missing required fields in hash ref' );
 }
 {
 

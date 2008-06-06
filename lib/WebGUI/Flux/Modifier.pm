@@ -68,64 +68,65 @@ Second modifier
 =cut
 
 sub applyUsing {
-    my ( $class, $modifier, $arg_ref) = @_;
+    my ( $class, $modifier, $arg_ref ) = @_;
 
     # Check arguments..
     if ( @_ != 3 ) {
         WebGUI::Error::InvalidParamCount->throw(
             got      => scalar(@_),
             expected => 3,
+            error => 'invalid param count',
         );
-    }    
+    }
     if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw( param => $arg_ref, error => 'Invalid hash reference.' );
+        WebGUI::Error::InvalidNamedParamHashRef->throw( param => $arg_ref, error => 'invalid named param hash ref.'  );
     }
-    # Compulsory fields..
-    if ( any { !exists $arg_ref->{$_} } qw(user rule args operand) ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'Missing required field in properties hash reference.'
-        );
+    foreach my $field qw(user rule args operand) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
     }
-    
+
     # Try loading the Modifier..
     eval { WebGUI::Pluggable::load("WebGUI::Flux::Modifier::$modifier"); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::Pluggable::LoadFailed->throw(
-            error => $EVAL_ERROR,
+        WebGUI::Error::Pluggable::LoadFailed->throw(
+            error  => $EVAL_ERROR,
             module => "WebGUI::Flux::Modifier::$modifier",
         );
     }
-    
+
     # Get the Modifier's Args definition..
-    my $modifier_args_ref = eval { WebGUI::Pluggable::run("WebGUI::Flux::Modifier::$modifier", 'getArgs'); };
+    my $modifier_args_ref = eval { WebGUI::Pluggable::run( "WebGUI::Flux::Modifier::$modifier", 'getArgs' ); };
     if ($EVAL_ERROR) {
-          WebGUI::Error::Pluggable::RunFailed->throw(
-            error => $EVAL_ERROR,
-            module => "WebGUI::Flux::Modifier::$modifier",
+        WebGUI::Error::Pluggable::RunFailed->throw(
+            error      => $EVAL_ERROR,
+            module     => "WebGUI::Flux::Modifier::$modifier",
             subroutine => 'getArgs',
         );
     }
-    
+
     # Make sure that all of the Modifier's defined Args have been supplied..
-    if ( any { !exists $arg_ref->{args}{$_} } keys %{$modifier_args_ref} ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'Missing required field in modifier args hash reference.'
-        );
+    foreach my $field (keys %{$modifier_args_ref}) {
+        if ( !exists $arg_ref->{args}{$field} ) {
+             WebGUI::Error::InvalidParam->throw(
+                param => $field,
+                error => 'Missing required Modifier arg.',
+            );
+        }
     }
     
     # Good to go. Execute the Modifier..
-    my $result = eval { WebGUI::Pluggable::run("WebGUI::Flux::Modifier::$modifier", 'execute', [$arg_ref]); };
+    my $result = eval { WebGUI::Pluggable::run( "WebGUI::Flux::Modifier::$modifier", 'execute', [$arg_ref] ); };
     if ($EVAL_ERROR) {
-         WebGUI::Error::Pluggable::RunFailed->throw(
-            error => $EVAL_ERROR,
-            module => "WebGUI::Flux::Modifier::$modifier",
+        WebGUI::Error::Pluggable::RunFailed->throw(
+            error      => $EVAL_ERROR,
+            module     => "WebGUI::Flux::Modifier::$modifier",
             subroutine => 'execute',
-            params => [$arg_ref],
+            params     => [$arg_ref],
         );
     }
-    
+
     return $result;
 }
 

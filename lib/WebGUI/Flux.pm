@@ -84,7 +84,7 @@ Returns an array reference of Rules
 =cut
 
 sub getRules {
-    my ($class, $session)      = @_;
+    my ( $class, $session ) = @_;
 
     # Check arguments..
     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
@@ -99,9 +99,9 @@ sub getRules {
     my @ruleObjects = ();
     my $rules       = $session->db->read('select fluxRuleId from fluxRule');
     while ( my ($fluxRuleId) = $rules->array ) {
-        push @ruleObjects, $class->getRule($session, $fluxRuleId);
+        push @ruleObjects, $class->getRule( $session, $fluxRuleId );
     }
-    
+
     return \@ruleObjects;
 }
 

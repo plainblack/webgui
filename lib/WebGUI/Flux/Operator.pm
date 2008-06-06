@@ -74,6 +74,7 @@ sub compareUsing {
         WebGUI::Error::InvalidParamCount->throw(
             got      => scalar(@_),
             expected => 4,
+            error => 'invalid param count',
         );
     }
     

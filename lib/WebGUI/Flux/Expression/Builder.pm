@@ -5,6 +5,7 @@ use warnings;
 use Class::InsideOut qw{ :std };
 use Readonly;
 use JSON;
+use WebGUI::Exception::Flux;
 
 =head1 NAME
 

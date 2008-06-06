@@ -3,20 +3,39 @@ package WebGUI::Exception::Flux;
 use strict;
 use warnings;
 use WebGUI::Exception;
-#use Exception::Class (
-#
-#    'WebGUI::Error::Flux::OperandEvalFailed' => {
-#        isa         => 'WebGUI::Error',
-#        description => "Eval of Flux Operand failed.",
-#        fields      => ["operand"],
-#    },
-#    
-#    'WebGUI::Error::Flux::OperatorEvalFailed' => {
-#        isa         => 'WebGUI::Error',
-#        description => "Eval of Flux Operator failed.",
-#        fields      => ["operator"],
-#    },
-#);
+use Exception::Class (
+    'WebGUI::Error::NotImplemented' => {
+        isa             => 'WebGUI::Error',
+        description     => 'Feature not implemented yet.',
+        fields          => ['module'],
+        },
+     'WebGUI::Error::Pluggable::LoadFailed' => {
+        isa             => 'WebGUI::Error',
+        description     => 'WebGUI::Pluggable failed to load module.',
+        fields          => ['module'],
+        },
+    'WebGUI::Error::Pluggable::RunFailed' => {
+        isa             => 'WebGUI::Error',
+        description     => 'WebGUI::Pluggable failed to run subroutine.',
+        fields          => ['module', 'subroutine', 'params'],
+        },
+    'WebGUI::Error::InvalidNamedParamHashRef' => {
+        isa             => 'WebGUI::Error::InvalidParam',
+        description     => 'Expected to get a hash reference of named subroutine parameters.',
+        fields          => ['param'],
+        },
+    'WebGUI::Error::NamedParamMissing' => {
+        isa             => 'WebGUI::Error::InvalidParam',
+        description     => 'A named subroutine parameter was missing.',
+        fields          => ['param'],
+        },
+    'WebGUI::Error::InvalidParamCount' => {
+        isa             => 'WebGUI::Error',
+        description     => 'Wrong number of subroutine parameters supplied.',
+        fields          => ['expected','got'],
+        },
+        
+);
 
 =head1 NAME
 

@@ -39,11 +39,6 @@ use Exception::Class (
         description     => "Expected to get a param we didn't get.",
         fields          => ["param"],
         },
-    'WebGUI::Error::InvalidParamCount' => {
-        isa             => 'WebGUI::Error',
-        description     => "Wrong number of params supplied.",
-        fields          => ["expected","got"],
-        },
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
         description     => "The object you were try to retrieve does not exist.",
@@ -53,16 +48,6 @@ use Exception::Class (
         isa             => 'WebGUI::Error',
         description     => "The file you have provided has errors.",
         fields          => [qw{ brokenFile brokenLine }],
-        },
-     'WebGUI::Error::Pluggable::LoadFailed' => {
-        isa             => 'WebGUI::Error',
-        description     => "WebGUI::Pluggable failed to load module.",
-        fields          => ['module'],
-        },
-    'WebGUI::Error::Pluggable::RunFailed' => {
-        isa             => 'WebGUI::Error',
-        description     => "WebGUI::Pluggable failed to run subroutine.",
-        fields          => ['module', 'subroutine', 'params'],
         },
 );
 

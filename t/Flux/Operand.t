@@ -19,7 +19,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 12;
+plan tests => 11;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -44,11 +44,10 @@ my $dummy_rule_object = 'ignored';
 {
     eval { WebGUI::Flux::Operand->executeUsing( 'Qbit', 'NotAHashRef' ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'executeUsing takes exception to missing hash ref' );
+    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'executeUsing takes exception to missing hash ref' );
     cmp_deeply(
         $e,
         methods(
-            error => 'Invalid hash reference.',
             param => 'NotAHashRef',
         ),
         'executeUsing takes exception to missing hash ref',
@@ -57,12 +56,7 @@ my $dummy_rule_object = 'ignored';
 {
     eval { WebGUI::Flux::Operand->executeUsing( 'Qbit', {} ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'executeUsing takes exception to missing fields' );
-    cmp_deeply(
-        $e,
-        methods( error => 'Missing required field in properties hash reference.', ),
-        'executeUsing takes exception to missing fields',
-    );
+    isa_ok( $e, 'WebGUI::Error::NamedParamMissing', 'executeUsing takes exception to missing fields' );
 }
 {
     eval {
@@ -88,7 +82,7 @@ my $dummy_rule_object = 'ignored';
         'executeUsing takes exception to missing field from Operand arg list' );
     cmp_deeply(
         $e,
-        methods( error => 'Missing required field in operand args hash reference.', ),
+        methods( error => 'Missing required Operand arg.', ),
         'executeUsing takes exception to missing field from Operand arg list',
     );
 }

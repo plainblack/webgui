@@ -5,6 +5,10 @@ use warnings;
 use Class::InsideOut qw{ :std };
 use Readonly;
 use List::MoreUtils qw(any );
+use JSON;
+use WebGUI::Exception::Flux;
+use WebGUI::Flux::Operand;
+use WebGUI::Flux::Operator;
 
 =head1 NAME
 
@@ -58,9 +62,7 @@ readonly rule    => my %rule;
 private property => my %property;
 
 # Default values used in create() method
-Readonly my %EXPRESSION_DEFAULTS => (
-    name     => 'Undefined',
-);
+Readonly my %EXPRESSION_DEFAULTS => ( name => 'Undefined', );
 
 # Properties/db fields that can be updated via update() method
 Readonly my @MUTABLE_PROPERTIES => qw(
@@ -114,17 +116,16 @@ sub create {
             param    => $rule
         );
     }
-    if ( !defined $properties_ref || ref $properties_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw(
+    if ( defined $properties_ref && ref $properties_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
             param => $properties_ref,
-            error => 'Invalid hash reference.'
+            error => 'invalid properties hash ref.'
         );
     }
-    if ( any { !exists $properties_ref->{$_} } qw(operand1 operand2 operator) ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $properties_ref,
-            error => 'Missing required field in properties hash reference.'
-        );
+    foreach my $field qw(operand1 operand2 operator) {
+        if ( !exists $properties_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
     }
 
     # Create a bare-minimum entry in the db..
@@ -288,19 +289,65 @@ The Flux Rule that this expression belongs to.
 
 sub update {
     my ( $self, $newProp_ref ) = @_;
-    
+
     # Check arguments..
     if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw( param => $newProp_ref, error => 'Invalid hash reference.' );
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $newProp_ref,
+            error => 'invalid properties hash ref.'
+        );
     }
-    
+
     my $id = id $self;
     foreach my $field (@MUTABLE_PROPERTIES) {
         $property{$id}{$field}
             = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
     }
     $property{$id}{fluxRuleId} = $self->rule->getId();
+
     return $self->rule->session->db->setRow( 'fluxExpression', 'fluxExpressionId', $property{$id} );
 }
 
+#-------------------------------------------------------------------
+
+=head2 evaluate ( )
+
+Evaluates this Flux Expression
+
+=cut
+
+sub evaluate {
+    my ( $self, $arg_ref ) = @_;
+
+    # Check arguments..
+    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $arg_ref,
+            error => 'invalid named param hash ref.'
+        );
+    }
+    foreach my $field qw(user) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
+    }
+
+    # Assemble all the ingredients..
+    my $id   = id $self;
+    my $rule = $rule{$id};
+    my $user = $arg_ref->{user};
+
+    my $operand1     = $property{$id}{operand1};
+    my $operand1Args = from_json( $property{$id}{operand1Args} );    # deserialise JSON-encoded args
+    my $operand2     = $property{$id}{operand2};
+    my $operand2Args = from_json( $property{$id}{operand2Args} );    # deserialise JSON-encoded args
+    my $operator     = $property{$id}{operator};
+
+    my $operand1_val = WebGUI::Flux::Operand->executeUsing( $operand1,
+        { user => $user, rule => $rule, args => $operand1Args } );
+    my $operand2_val = WebGUI::Flux::Operand->executeUsing( $operand2,
+        { user => $user, rule => $rule, args => $operand2Args } );
+
+    return WebGUI::Flux::Operator->compareUsing( $operator, $operand1_val, $operand2_val );
+}
 1;

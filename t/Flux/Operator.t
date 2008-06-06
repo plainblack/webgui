@@ -33,7 +33,6 @@ use_ok('WebGUI::Flux::Operator');
     cmp_deeply(
         $e,
         methods(
-            description => 'Wrong number of params supplied.',
             expected    => 4,
             got         => 1,
         ),

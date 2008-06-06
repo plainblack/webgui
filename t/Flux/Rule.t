@@ -22,12 +22,15 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 33;
+plan tests => 39;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Flux::Rule');
+$session->user( { userId => 1 } );
+my $user   = $session->user();
+my $userId = $user->userId();
 
 #######################################################################
 #
@@ -92,14 +95,10 @@ use_ok('WebGUI::Flux::Rule');
     );
 }
 {
-    eval { my $rule = WebGUI::Flux::Rule->create( $session, "not a hash ref" ); };
+    eval { my $rule = WebGUI::Flux::Rule->create( $session, 'not a hash ref' ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'create takes exception to an invalid hash ref' );
-    cmp_deeply(
-        $e,
-        methods( error => 'Invalid hash reference.', ),
-        'create takes exception to an invalid hash ref',
-    );
+    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'create takes exception to an invalid hash ref' );
+    cmp_deeply( $e, methods( param => 'not a hash ref', ), 'create takes exception to an invalid hash ref', );
 }
 {
 
@@ -229,41 +228,110 @@ use_ok('WebGUI::Flux::Rule');
     # Start with a clean slate
     $session->db->write('delete from fluxRule');
     $session->db->write('delete from fluxExpression');
-    
-    my $rule1     = WebGUI::Flux::Rule->create($session);
+
+    my $rule1 = WebGUI::Flux::Rule->create($session);
     $rule1->addExpression(
-        {   name => 'Rule 1 Expression #1',
+        {   name     => 'Rule 1 Expression #1',
             operand1 => 'DUMMY_OPERAND_1',
             operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
         }
     );
-    my $rule2     = WebGUI::Flux::Rule->create($session);
+    my $rule2 = WebGUI::Flux::Rule->create($session);
     $rule2->addExpression(
-        {   name => 'Rule 2 Expression #1',
+        {   name     => 'Rule 2 Expression #1',
             operand1 => 'DUMMY_OPERAND_1',
             operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
         }
     );
     $rule2->addExpression(
-        {   name => 'Rule 2 Expression #2',
+        {   name     => 'Rule 2 Expression #2',
             operand1 => 'DUMMY_OPERAND_1',
             operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
         }
     );
-    is( $session->db->quickScalar('select count(*) from fluxRule'), 2, '2 Rules to delete' );
+    is( $session->db->quickScalar('select count(*) from fluxRule'),       2, '2 Rules to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 3, '3 Expressions to delete' );
-    
+
     # Delete Rule1 and its associated Expressions
     $rule1->delete();
-    is( $session->db->quickScalar('select count(*) from fluxRule'), 1, '1 Rules left to delete' );
+    is( $session->db->quickScalar('select count(*) from fluxRule'),       1, '1 Rules left to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 2, '2 Expressions left to delete' );
-    
+
     $rule2->delete();
-    is( $session->db->quickScalar('select count(*) from fluxRule'), 0, 'No Rules left to delete' );
+    is( $session->db->quickScalar('select count(*) from fluxRule'),       0, 'No Rules left to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 0, 'No Expressions left to delete' );
+}
+
+#######################################################################
+#
+# evaluate()
+#
+#######################################################################
+{
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    my $ruleId = $rule->getId();
+
+    ok( $rule->evaluate( { user => $user } ), 'empty rule allows access by default' );
+    is( _secondsFromNow(
+            WebGUI::DateTime->new(
+                $session->db->quickScalar(
+                    'select dateRuleFirstChecked from fluxRuleUserData where fluxRuleId=? and userId=?',
+                    [ $ruleId, $userId ]
+                )
+            )
+        ),
+        0,
+        'dateRuleFirstChecked updated'
+    );
+    is( _secondsFromNow(
+            WebGUI::DateTime->new(
+                $session->db->quickScalar(
+                    'select dateRuleFirstTrue from fluxRuleUserData where fluxRuleId=? and userId=?',
+                    [ $ruleId, $userId ]
+                )
+            )
+        ),
+        0,
+        'dateRuleFirstTrue updated'
+    );
+    is( $session->db->quickScalar(
+            'select dateRuleFirstFalse from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ]
+        ),
+        undef,
+        'dateRuleFirstFalse not updated'
+    );
+    # TODO: check access-related fields, once access-related logic implemented
+
+    # Add a single expression to the rule
+    $rule->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
+        }
+    );
+    ok( $rule->evaluate( { user => $user } ), q{"test value" == "test value"} );
+
+    # add a second expression to the Rule
+    $rule->addExpression(
+        {   operand1     => 'NumericValue',
+            operand1Args => '{"value":  120}',
+            operand2     => 'NumericValue',
+            operand2Args => '{"value":  121}',
+            operator     => 'IsLessThan',
+        }
+    );
+    ok( $rule->evaluate( { user => $user } ), q{120 < 121} );
+}
+
+sub _secondsFromNow {
+    my $dt = shift;
+    return WebGUI::DateTime->now()->subtract_datetime($dt)->in_units('seconds');
 }
 
 END {

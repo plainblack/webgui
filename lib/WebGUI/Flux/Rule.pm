@@ -4,8 +4,11 @@ use strict;
 use warnings;
 
 use Class::InsideOut qw{ :std };
+use WebGUI::Exception::Flux;
 use WebGUI::Flux::Expression;
 use Readonly;
+use List::MoreUtils qw(any);
+use WebGUI::DateTime;
 
 =head1 NAME
 
@@ -128,7 +131,10 @@ sub create {
         );
     }
     if ( defined $properties_ref && ref $properties_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw( param => $properties_ref, error => 'Invalid hash reference.' );
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $properties_ref,
+            error => 'invalid properties hash ref.'
+        );
     }
 
     # Ok for $properties_ref to be missing
@@ -332,12 +338,12 @@ The combined expression
 
 sub update {
     my ( $self, $newProp_ref ) = @_;
-    
+
     # Check arguments..
     if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
         WebGUI::Error::InvalidParam->throw( param => $newProp_ref, error => 'Invalid hash reference.' );
     }
-    
+
     my $id = id $self;
     foreach my $field (@MUTABLE_PROPERTIES) {
         $property{$id}{$field}
@@ -523,5 +529,99 @@ sub update {
 #    return $session->style->userStyle($template->process(\%var));
 #}
 
+#-------------------------------------------------------------------
+
+=head2 evaluate ( )
+
+Evaluates the Flux Rule
+
+=cut
+
+sub evaluate {
+    my ( $self, $arg_ref ) = @_;
+
+    #TODO: ACCESS
+    my $access = 1;
+    
+    # Check arguments..
+    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $arg_ref,
+            error => 'invalid named param hash ref.'
+        );
+    }
+    foreach my $field qw(user) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
+    }
+
+    my $id                 = id $self;
+    my $combinedExpression = $property{$id}{combinedExpression};
+    my $is_sticky          = $property{$id}{sticky};
+
+    # Check for entry in fluxRuleUserData table
+    my $userId = $arg_ref->{user}->userId();
+    my $ruleId = $self->getId();
+
+    my %userData = %{
+        $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ] )
+        };
+
+    # Check if we can apply the sticky optimisation
+    if ( $is_sticky && defined $userData{dateRuleFirstTrue} ) {
+        WebGUI::Error::NotImplemented->throw( error => 'STICKY NOT IMPLEMENTED YET.' );
+
+        # $self->session->log->debug('Sticky optimisation');
+        return 1;
+    }
+
+    my $was_successful;
+    if ( !$combinedExpression ) {
+        # No combined expression defined so just AND them all together
+        if ( any { !$_->evaluate($arg_ref) } @{ $self->getExpressions() } ) {
+            $was_successful = 0;
+        }
+        else {
+            $was_successful = 1;
+        }
+    }
+    else {
+        # TODO: Implement Combined Expression support
+        WebGUI::Error::NotImplemented->throw( error => 'Combined Expression code not implemented yet.' );
+    }
+
+    #    WebGUI::Error::NotImplemented->throw( error => $fluxRuleUserDataId );
+    my $dt = WebGUI::DateTime->new(time)->toDatabase();
+    my %rowUpdates;
+    $rowUpdates{fluxRuleUserDataId} = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
+    $rowUpdates{dateRuleFirstChecked} = exists $userData{dateRuleFirstChecked} ? $userData{dateRuleFirstChecked} : $dt;
+    if ($was_successful) {
+        $rowUpdates{dateRuleFirstTrue} = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
+    } else {
+        $rowUpdates{dateRuleFirstFalse} = exists $userData{dateRuleFirstFalse} ? $userData{dateRuleFirstFalse} : $dt;
+    }
+    if ($access) {
+        $rowUpdates{dateAccessFirstAttempted} = exists $userData{dateAccessFirstAttempted} ? $userData{dateAccessFirstAttempted} : $dt;
+    
+        if ($was_successful) {
+            $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
+            $rowUpdates{dateAccessFirstTrue} = exists $userData{dateAccessFirstTrue} ? $userData{dateAccessFirstTrue} : $dt;
+        } else {
+            $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
+            $rowUpdates{dateAccessFirstFalse} = exists $userData{dateAccessFirstFalse} ? $userData{dateAccessFirstFalse} : $dt;
+        }
+    }
+    # If this is a new row, also need to set fluxRuleId and userId
+    if ($rowUpdates{fluxRuleUserDataId} eq 'new') {
+        $rowUpdates{fluxRuleId} = $ruleId;
+        $rowUpdates{userId} = $userId;
+    }
+    use Data::Dumper;
+    if (scalar keys %rowUpdates > 0) {
+        $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
+    }
+}
 1;
 

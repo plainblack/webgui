@@ -5,6 +5,7 @@ use warnings;
 use WebGUI::Pluggable;
 use English qw( -no_match_vars );
 use List::MoreUtils qw(any );
+use WebGUI::Exception::Flux;
 
 =head1 NAME
 
@@ -74,17 +75,16 @@ sub executeUsing {
         WebGUI::Error::InvalidParamCount->throw(
             got      => scalar(@_),
             expected => 3,
+            error => 'invalid param count',
         );
     }    
     if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw( param => $arg_ref, error => 'Invalid hash reference.' );
+        WebGUI::Error::InvalidNamedParamHashRef->throw( param => $arg_ref, error => 'invalid named param hash ref.'  );
     }
-    # Compulsory fields..
-    if ( any { !exists $arg_ref->{$_} } qw(user rule args) ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'Missing required field in properties hash reference.'
-        );
+    foreach my $field qw(user rule args) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
     }
     
     # Try loading the Operand..
@@ -107,11 +107,13 @@ sub executeUsing {
     }
     
     # Make sure that all of the Operand's defined Args have been supplied..
-    if ( any { !exists $arg_ref->{args}{$_} } keys %{$operand_args_ref} ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'Missing required field in operand args hash reference.'
-        );
+    foreach my $field (keys %{$operand_args_ref}) {
+        if ( !exists $arg_ref->{args}{$field} ) {
+             WebGUI::Error::InvalidParam->throw(
+                param => $field,
+                error => 'Missing required Operand arg.',
+            );
+        }
     }
     
     # Good to go. Execute the Operand..
