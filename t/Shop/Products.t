@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 25;
+my $tests = 27;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -199,6 +199,11 @@ SKIP: {
     isa_ok($products, 'WebGUI::Storage', 'exportProducts returns a Storage object');
     is(scalar @{ $products->getFiles }, 1, 'The storage contains just 1 file...');
     is(scalar $products->getFiles->[0], 'siteProductData.csv', '...with the correct filename');
+    my $productData = $products->getFileContentsAsScalar($products->getFiles->[0]);
+    my @productData = split /\n/, $productData;
+    is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
+    is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
+    diag $productData;
 
 }
 

@@ -39,16 +39,17 @@ file will be named siteProductData.csv.
 
 sub exportProducts {
     my $session  = shift;
-    my @columns = qw{sku title shortdescription price weight quantity};
-    my $productData = WebGUI::Text::joinCSV('mastersku', @columns) . "\n";
+    my @columns = qw{sku shortdescription price weight quantity};
+    my $productData = WebGUI::Text::joinCSV(qw{mastersku title}, @columns) . "\n";
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
     my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
     while (my $product = $getAProduct->()) {
         my $mastersku = $product->get('sku');
+        my $title     = $product->getTitle;
         my $collateri = $product->getAllCollateral('variantsJSON');
         foreach my $collateral (@{ $collateri }) {
             my @productFields = @{ $collateral }{ @columns };
-            $productData .= WebGUI::Text::joinCSV($mastersku, @productFields);
+            $productData .= WebGUI::Text::joinCSV($mastersku, $title, @productFields);
             $productData .= "\n";
         }
     }
