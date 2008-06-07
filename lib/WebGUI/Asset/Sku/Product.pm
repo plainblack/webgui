@@ -1530,16 +1530,21 @@ sub view {
                  . $self->session->icon->edit('func=editVariant&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveUp('func=moveVariantUp&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveVariantDown&vid='.$id,$self->get('url'));
+        my $price = sprintf('%.2f', $collateral->{price});
+        my $desc  = $collateral->{shortdesc};
         push(@variantLoop,{
                                    'variant_controls' => $segment,
                                    'variant_sku'      => $collateral->{varSku},
-                                   'variant_title'    => $collateral->{shortdesc},
-                                   'variant_price'    => sprintf('%.2f', $collateral->{price}),
+                                   'variant_title'    => $desc,
+                                   'variant_price'    => $price,
                                    'variant_weight'   => $collateral->{weight},
                                    'variant_quantity' => $collateral->{quantity},
                                 });
-        $variants{$id} = $collateral->{shortdesc} if $collateral->{quantity} > 0;
+        if ($collateral->{quantity} > 0) {
+            $variants{$id} = join ", ", $desc, $price;
+        }
     }
+
     if (scalar keys %variants) {
         ##Don't display the form unless you have available variants to sell.
         $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
@@ -1560,6 +1565,7 @@ sub view {
         $var{in_stock} = 0;
         $var{no_stock_message} = $i18n->get('out of stock');
     }
+
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant_label'} = $i18n->get('add a variant');
