@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 36;
+my $tests = 41;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -225,15 +225,15 @@ SKIP: {
 
     #######################################################################
     #
-    # export, part 2
+    # import, part 2
     #
     #######################################################################
 
-    my $pass = WebGUI::Shop::Products::importProducts(
+    $pass = WebGUI::Shop::Products::importProducts(
         $session,
         WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
     );
-    ok($pass, 'Products imported');
+    ok($pass, 'Products imported for the second time');
 
     my $count = $session->db->quickScalar('select count(*) from Product');
     is($count, 3, 'three products were imported');
@@ -296,6 +296,73 @@ SKIP: {
             },
         ],
         'collateral set correctly for classical record'
+    );
+
+    #######################################################################
+    #
+    # import, part 3
+    #
+    #######################################################################
+
+    $pass = WebGUI::Shop::Products::importProducts(
+        $session,
+        WebGUI::Test->getTestCollateralPath('productTables/thirdProductTable.csv'),
+    );
+    ok($pass, 'Products imported for the third time');
+
+    my $count = $session->db->quickScalar('select count(*) from Product');
+    is($count, 3, 'still have 3 products, nothing new added');
+
+    my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
+    is($soda->getTitle(), 'Sweet Soda-totally organic', 'Title updated correctly for soda');
+    $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
+    my $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $shirtCollateral,
+        [
+            {
+                sku       => 'red-t-shirt',
+                shortdesc => 'Red T-Shirt',
+                price     => '5.00',
+                weight    => '1.33',
+                quantity  => '500',
+                variantId => ignore(),
+            },
+            {
+                sku       => 'blue-t-shirt',
+                shortdesc => 'Blue T-Shirt',
+                price     => '5.25',
+                weight    => '1.33',
+                quantity  => '2000',
+                variantId => ignore(),
+            },
+        ],
+        'collateral updated correctly for shirt'
+    );
+
+    my $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
+    my $recordCollateral = $record->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $recordCollateral,
+        [
+            {
+                sku       => 'track-16',
+                shortdesc => 'Track 16',
+                price     => '3.25',
+                weight    => '0.00',
+                quantity  => 50,
+                variantId => ignore(),
+            },
+            {
+                sku       => 'track-9',
+                shortdesc => 'Track 9',
+                price     => '3.25',
+                weight    => '0.00',
+                quantity  => 55,
+                variantId => ignore(),
+            },
+        ],
+        'collateral added correctly for classical record'
     );
 
 
