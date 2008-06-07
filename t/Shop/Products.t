@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 27;
+my $tests = 36;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -203,7 +203,101 @@ SKIP: {
     my @productData = split /\n/, $productData;
     is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
     is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
-    diag $productData;
+    my @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
+    my ($sodas, $shirts);
+    foreach my $productData (@productData) {
+        if ($productData->[0] eq 'soda') {
+            push @{ $sodas }, $productData;
+        }
+        elsif ($productData->[0] eq 't-shirt') {
+            push @{ $shirts }, $productData;
+        }
+    }
+    is(scalar @{ $sodas },  1, 'just 1 soda');
+    is(scalar @{ $shirts }, 2, '2 shirts');
+
+    cmp_deeply(
+        $sodas,
+        [ ['soda', 'Sweet Soda-bottled in Oregon',
+           'soda-sweet', 'Sweet Soda', 0.95, 0.95, 500] ],
+        'soda data is okay'
+    );
+
+    #######################################################################
+    #
+    # export, part 2
+    #
+    #######################################################################
+
+    my $pass = WebGUI::Shop::Products::importProducts(
+        $session,
+        WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
+    );
+    ok($pass, 'Products imported');
+
+    my $count = $session->db->quickScalar('select count(*) from Product');
+    is($count, 3, 'three products were imported');
+
+    my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
+    my $sodaCollateral = $soda->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $sodaCollateral,
+        [
+            {
+                sku       => 'soda-sweet',
+                shortdesc => 'Sweet Soda',
+                price     => '1.00',
+                weight    => 0.85,
+                quantity  => 500,
+                variantId => ignore(),
+            },
+        ],
+        'collateral updated correctly for soda'
+    );
+
+    $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
+    my $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $shirtCollateral,
+        [
+            {
+                sku       => 'red-t-shirt',
+                shortdesc => 'Red T-Shirt',
+                price     => '5.00',
+                weight    => '1.33',
+                quantity  => '500',
+                variantId => ignore(),
+            },
+            {
+                sku       => 'blue-t-shirt',
+                shortdesc => 'Blue T-Shirt',
+                price     => '5.25',
+                weight    => '1.33',
+                quantity  => '2000',
+                variantId => ignore(),
+            },
+        ],
+        'collateral updated correctly for shirt'
+    );
+
+    my $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
+    isa_ok($record, 'WebGUI::Asset::Sku::Product');
+    my $recordCollateral = $record->getAllCollateral('variantsJSON');
+    cmp_deeply(
+        $recordCollateral,
+        [
+            {
+                sku       => 'track-16',
+                shortdesc => 'Track 16',
+                price     => '3.25',
+                weight    => '0.00',
+                quantity  => 50,
+                variantId => ignore(),
+            },
+        ],
+        'collateral set correctly for classical record'
+    );
+
 
 }
 

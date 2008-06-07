@@ -123,6 +123,7 @@ sub importProducts {
         unless -r $filePath;
     open my $table, '<', $filePath or
         WebGUI::Error->throw(error => qq{Unable to open $filePath for reading: $!\n});
+
     my $headers;
     $headers = <$table>;
     chomp $headers;
@@ -130,6 +131,7 @@ sub importProducts {
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
         unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-sku-title-weight')
            and (scalar @headers == 7);
+
     my @productData = ();
     my $line = 1;
     while (my $productRow = <$table>) {
@@ -142,41 +144,52 @@ sub importProducts {
             unless scalar @productRow == 7;
         push @productData, [ @productRow ];
     }
-    ##Okay, if we got this far, then the data looks fine.
+
     return unless scalar @productData;
+
+    ##Okay, if we got this far, then the data looks fine.
     my $fetchProductId = $session->db->prepare('select p.assetId from Product as p join sku as s on p.assetId=s.assetId and p.revisionDate=s.revisionDate where s.sku=? order by p.revisionDate DESC limit 1');
     my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
     @headers = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @headers;
+    my @collateralFields = grep { $_ ne 'title' and $_ ne 'mastersku' } @headers;
     PRODUCT: foreach my $productRow (@productData) {
         my %productRow;
         ##Order the data according to the headers, in whatever order they exist.
         @productRow{ @headers } = @{ $productRow };
+        ##Isolate just the collateral from the other product information
+        my %productCollateral;
+        @productCollateral{ @collateralFields } = @productRow{ @collateralFields };
+
         $fetchProductId->execute([$productRow{mastersku}]);
         my $asset = $fetchProductId->hashRef;
+
         ##If the assetId exists, we update data for it
         if ($asset->{assetId}) {
             $session->log->warn("Modifying an existing product: $productRow{sku} = $asset->{assetId}\n");
             my $assetId = $asset->{assetId};
             my $product = WebGUI::Asset->newPending($session, $assetId);
+
+            ##Error handling for locked assets
+            if ($product->isLocked) {
+                $session->log->warn("Product is locked");
+                next PRODUCT if $product->isLocked;
+            }
+
             if ($productRow{title} ne $product->getTitle) {
                 $product->update({ title => $product->fixTitle($productRow{title}) });
             }
-            ##Error handling for locked assets
-            $session->log->warn("Product is locked") if $product->isLocked;
-            delete $productRow{ title     };
-            delete $productRow{ mastersku };
-            next PRODUCT if $product->isLocked;
+
             my $collaterals = $product->getAllCollateral('variantsJSON');
             my $collateralSet = 0;
             ROW: foreach my $collateral (@{ $collaterals }) {
                 next ROW unless $collateral->{sku} eq $productRow{sku};
-                @{ $collateral}{@headers} = @productRow{ @headers };
+                @{ $collateral}{ @collateralFields } = @productCollateral{ @collateralFields };  ##preserve the variant Id field, assign all others
                 $product->setCollateral('variantsJSON', 'variantId', $collateral->{variantId}, $collateral);
                 $collateralSet=1;
             }
             if (!$collateralSet) {
                 ##It must be a new variant
-                $product->setCollateral('variantsJSON', 'variantId', 'new', \%productRow);
+                $product->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
             }
         }
         else {
@@ -187,9 +200,7 @@ sub importProducts {
                 title => $newProduct->fixTitle($productRow{title}),
                 sku   => $productRow{mastersku},
             });
-            delete $productRow{ title     };
-            delete $productRow{ mastersku };
-            $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productRow);
+            $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
             $newProduct->commit;
         }
     }
