@@ -200,8 +200,9 @@ sub www_products {
     my $session = shift;
     my $output = undef;
     my $method = "www_".$session->form->get("method");
+    my $products = WebGUI::Shop::Products->new($session);
     if ($method ne "www_" && WebGUI::Shop::Products->can($method)) {
-        $output = $WebGUI::Shop::Products->$method($session);
+        $output = $products->$method();
     }
     else {
         WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);

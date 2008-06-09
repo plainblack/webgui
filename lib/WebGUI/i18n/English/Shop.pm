@@ -908,6 +908,13 @@ our $I18N = {
 		lastUpdated => 1212550978,
 		context => q|Label for taking data out of the Shop (Tax, Product, etc.)|,
 	},
+
+    'import successful' => {
+        message => q|Your products have been imported.|,
+        lastUpdated => 1213047491,
+        context => q|Message telling the user the their products have been imported successfully.|
+    },
+
 };
 
 1;

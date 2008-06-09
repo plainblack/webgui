@@ -2,6 +2,8 @@ package WebGUI::Shop::Products;
 
 use strict;
 
+use Class::InsideOut qw{ :std };
+
 use WebGUI::Text;
 use WebGUI::Storage;
 use WebGUI::Exception::Shop;
@@ -25,9 +27,11 @@ These subroutines are available from this package:
 
 =cut
 
+readonly session => my %session;
+
 #-------------------------------------------------------------------
 
-=head2 exportProducts ( $session )
+=head2 exportProducts ( )
 
 Export all products from the WebGUI system in a CSV file.  For details
 about the file format, see importProducts.
@@ -38,7 +42,8 @@ file will be named siteProductData.csv.
 =cut
 
 sub exportProducts {
-    my $session  = shift;
+    my $self    = shift;
+    my $session = $self->session;
     my @columns = qw{sku shortdescription price weight quantity};
     my $productData = WebGUI::Text::joinCSV(qw{mastersku title}, @columns) . "\n";
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
@@ -60,7 +65,7 @@ sub exportProducts {
 
 #-------------------------------------------------------------------
 
-=head2 importProducts ( $session, $filePath )
+=head2 importProducts ( $filePath )
 
 Import products into the WebGUI system.  If the master sku of a product
 exists in the system, it will be updated.  If master skus do not exist,
@@ -113,8 +118,9 @@ if old data has been deleted and new has been inserted.
 =cut
 
 sub importProducts {
-    my $session  = shift;
+    my $self     = shift;
     my $filePath = shift;
+    my $session  = $self->session;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide the path to a file})
         unless $filePath;
     WebGUI::Error::InvalidFile->throw(error => qq{File could not be found}, brokenFile => $filePath)
@@ -209,6 +215,24 @@ sub importProducts {
 
 #-------------------------------------------------------------------
 
+=head2 new ( $session )
+
+Constructor for the WebGUI::Shop::Products.  Returns a WebGUI::Shop::Products object.
+
+=cut
+
+sub new {
+    my $class   = shift;
+    my $session = shift;
+    my $self    = {};
+    bless $self, $class;
+    register $self;
+    $session{ id $self } = $session;
+    return $self;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_exportProducts (  )
 
 Export all product SKUs as a CSV file.  Returns a WebGUI::Storage
@@ -223,7 +247,7 @@ sub www_exportProducts {
     return $session->privilege->insufficient
         unless $admin->canManage;
     my $storage = $self->exportProducts();
-    $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
+    $session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));
     return "redirect";
 }
 
@@ -237,29 +261,53 @@ or alter existing products.
 =cut
 
 sub www_importProducts {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient
         unless $admin->canManage;
     my $storage = WebGUI::Storage->create($session);
     my $productFile = $storage->addFileFromFormPost('importFile', 1);
-    $self->importProducts($storage->getPath($productFile)) if $productFile;
-    return $self->www_manage;
+    eval {
+        $self->importProducts($storage->getPath($productFile)) if $productFile;
+    };
+    my ($exception, $status_message);
+    if ($exception = Exception::Class->caught('WebGUI::Error::InvalidFile')) {
+        $status_message = sprintf 'A problem was found with your file: %s, %s',
+            $exception->brokenFile,
+            $exception->error;
+        if ($exception->brokenLine) {
+            $status_message .= sprintf ' on line %d', $exception->brokenLine;
+        }
+    }
+    elsif ($exception = Exception::Class->caught()) {
+        $status_message = sprintf 'A problem happened during the import: %s', $exception->error;
+    }
+    else {
+        my $i18n = WebGUI::International->new($session, 'Shop');
+        $status_message = $i18n->get('import successful');
+    }
+    return $self->www_manage($status_message);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_manage (  )
+=head2 www_manage ( $status_message )
 
 User interface to synchronize product data.  Provides an interface for
 exporting all products on the site, and importing sets of products.
 
+=head3 $status_message
+
+An status message generated when import or export is called that needs to be
+displayed back to the user.
+
 =cut
 
 sub www_manage {
-    my $self = shift;
-    my $session = $self->session;
+    my $self          = shift;
+    my $status_message = shift;
+    my $session       = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient
         unless $admin->canManage;
@@ -277,7 +325,14 @@ sub www_manage {
                    . q{<input type="file" name="importFile" size="10" />}
                    . WebGUI::Form::formFooter($session);
 
-    my $output =sprintf <<EODIV,  $exportForm, $importForm;
+    my $output;
+    if ($status_message) {
+        $output = sprintf <<EODIV,  $status_message; 
+<div id="status_message">%s</div>
+EODIV
+    }
+
+    $output .= sprintf <<EODIV,  $exportForm, $importForm;
     <div id="importExport">%s%s</div>
 EODIV
 

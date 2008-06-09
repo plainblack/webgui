@@ -44,6 +44,8 @@ my $loaded = use_ok('WebGUI::Shop::Products');
 my $storage;
 my ($e, $failure);
 
+my $products = WebGUI::Shop::Products->new($session);
+
 SKIP: {
 
     skip 'Unable to load module WebGUI::Shop::Products', $tests unless $loaded;
@@ -56,12 +58,12 @@ SKIP: {
 
     my $importNode = WebGUI::Asset::Sku::Product->getProductImportNode($session);
 
-    eval { WebGUI::Shop::Products::importProducts($session); };
+    eval { $products->importProducts(); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'importProducts: error handling for an undefined path to file');
     is($e->error, 'Must provide the path to a file', 'importProducts: error handling for an undefined path to file');
 
-    eval { WebGUI::Shop::Products::importProducts($session, '/path/to/nowhere'); };
+    eval { $products->importProducts('/path/to/nowhere'); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that does not exist in the filesystem');
     is($e->error, 'File could not be found', 'importProducts: error handling for file that does not exist in the filesystem');
@@ -82,7 +84,7 @@ SKIP: {
         my $originalChmod = (stat $productsFile)[2];
         chmod oct(0000), $productsFile;
 
-        eval { WebGUI::Shop::Products::importProducts($session, $productsFile); };
+        eval { $products->importProducts($productsFile); };
         $e = Exception::Class->caught();
         isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that cannot be read');
         is($e->error, 'File is not readable', 'importProducts: error handling for file that that cannot be read');
@@ -99,8 +101,7 @@ SKIP: {
     }
 
     eval {
-        $failure = WebGUI::Shop::Products::importProducts(
-            $session,
+        $failure = $products->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/missingHeaders.csv'),
         );
     };
@@ -117,8 +118,7 @@ SKIP: {
     );
 
     eval {
-        $failure = WebGUI::Shop::Products::importProducts(
-            $session,
+        $failure = $products->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/badHeaders.csv'),
         );
     };
@@ -134,8 +134,7 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
-    my $pass = WebGUI::Shop::Products::importProducts(
-        $session,
+    my $pass = $products->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/goodProductTable.csv'),
     );
     ok($pass, 'Products imported');
@@ -195,15 +194,15 @@ SKIP: {
     #
     #######################################################################
 
-    my $products = WebGUI::Shop::Products::exportProducts($session);
-    isa_ok($products, 'WebGUI::Storage', 'exportProducts returns a Storage object');
-    is(scalar @{ $products->getFiles }, 1, 'The storage contains just 1 file...');
-    is(scalar $products->getFiles->[0], 'siteProductData.csv', '...with the correct filename');
-    my $productData = $products->getFileContentsAsScalar($products->getFiles->[0]);
+    my $productsOut = $products->exportProducts();
+    isa_ok($productsOut, 'WebGUI::Storage', 'exportProducts returns a Storage object');
+    is(scalar @{ $productsOut->getFiles }, 1, 'The storage contains just 1 file...');
+    is(scalar $productsOut->getFiles->[0], 'siteProductData.csv', '...with the correct filename');
+    my $productData = $productsOut->getFileContentsAsScalar($productsOut->getFiles->[0]);
     my @productData = split /\n/, $productData;
     is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
     is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
-    my @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
+    @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
     my ($sodas, $shirts);
     foreach my $productData (@productData) {
         if ($productData->[0] eq 'soda') {
@@ -229,17 +228,16 @@ SKIP: {
     #
     #######################################################################
 
-    $pass = WebGUI::Shop::Products::importProducts(
-        $session,
+    $pass = $products->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
     );
     ok($pass, 'Products imported for the second time');
 
-    my $count = $session->db->quickScalar('select count(*) from Product');
+    $count = $session->db->quickScalar('select count(*) from Product');
     is($count, 3, 'three products were imported');
 
-    my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
-    my $sodaCollateral = $soda->getAllCollateral('variantsJSON');
+    $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
+    $sodaCollateral = $soda->getAllCollateral('variantsJSON');
     cmp_deeply(
         $sodaCollateral,
         [
@@ -256,7 +254,7 @@ SKIP: {
     );
 
     $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
-    my $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
+    $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
     cmp_deeply(
         $shirtCollateral,
         [
@@ -304,19 +302,18 @@ SKIP: {
     #
     #######################################################################
 
-    $pass = WebGUI::Shop::Products::importProducts(
-        $session,
+    $pass = $products->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/thirdProductTable.csv'),
     );
     ok($pass, 'Products imported for the third time');
 
-    my $count = $session->db->quickScalar('select count(*) from Product');
+    $count = $session->db->quickScalar('select count(*) from Product');
     is($count, 3, 'still have 3 products, nothing new added');
 
-    my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
+    $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
     is($soda->getTitle(), 'Sweet Soda-totally organic', 'Title updated correctly for soda');
     $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
-    my $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
+    $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
     cmp_deeply(
         $shirtCollateral,
         [
@@ -340,8 +337,8 @@ SKIP: {
         'collateral updated correctly for shirt'
     );
 
-    my $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
-    my $recordCollateral = $record->getAllCollateral('variantsJSON');
+    $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
+    $recordCollateral = $record->getAllCollateral('variantsJSON');
     cmp_deeply(
         $recordCollateral,
         [
