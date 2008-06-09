@@ -100,6 +100,7 @@
  - added: A template variable to distinguish between Files and Albums in the Gallery
    Search
  - added: A thumbnail for Photo edit screen
+ - added: Configure the amount of files shown per page in the Gallery
 
 7.5.10
  - fix: Syntax error in GetCsMail

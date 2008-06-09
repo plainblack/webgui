@@ -307,6 +307,13 @@ sub definition {
             label           => $i18n->get("workflowIdCommit label"),
             hoverHelp       => $i18n->get("workflowIdCommit description"),
         },
+        defaultFilesPerPage => {
+            tab             => 'display',
+            fieldType       => 'integer',
+            defaultValue    => 24,
+            label           => $i18n->get( 'defaultFilesPerPage label' ),
+            hoverHelp       => $i18n->get( 'defaultFilesPerPage description' ),
+        },
     );
 
     push @{$definition}, {

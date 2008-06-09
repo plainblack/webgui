@@ -440,8 +440,9 @@ url to the current page that will be given to the paginator.
 sub getFilePaginator {
     my $self        = shift;
     my $url         = shift     || $self->getUrl;
+    my $perPage     = $self->getParent->get( 'defaultFilesPerPage' );
 
-    my $p           = WebGUI::Paginator->new( $self->session, $url );
+    my $p           = WebGUI::Paginator->new( $self->session, $url, $perPage );
     $p->setDataByArrayRef( $self->getFileIds );
 
     return $p;

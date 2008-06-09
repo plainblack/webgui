@@ -78,8 +78,23 @@ addLoginMessage( $session );
 addNewApprovalActivities( $session );
 addUserListWobject( $session );
 addInheritUrlFromParent( $session );
+addDefaultFilesPerPage( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+# Add default files per page to the Gallery
+sub addDefaultFilesPerPage {
+    my $session     = shift;
+    print "\tAdding Default Files Per Page to Gallery... " unless $quiet;
+    $session->db->write( 
+        "ALTER TABLE Gallery ADD COLUMN defaultFilesPerPage INT"
+    );
+    $session->db->write(
+        "UPDATE Gallery SET defaultFilesPerPage=24"
+    );
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add two new approval activities

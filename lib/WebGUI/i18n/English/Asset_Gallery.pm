@@ -699,6 +699,18 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Description of template variable},
     },
+
+    'defaultFilesPerPage label' => {
+        message     => q{Default Files Per Page},
+        lastUpdated => 0,
+        context     => q{Asset property label},
+    },
+
+    'defaultFilesPerPage description' => {
+        message     => q{The number of files to show per page of the album view.},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
 };
 
 1;
