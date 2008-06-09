@@ -273,8 +273,7 @@ sub www_importProducts {
     };
     my ($exception, $status_message);
     if ($exception = Exception::Class->caught('WebGUI::Error::InvalidFile')) {
-        $status_message = sprintf 'A problem was found with your file: %s, %s',
-            $exception->brokenFile,
+        $status_message = sprintf 'A problem was found with your file: %s',
             $exception->error;
         if ($exception->brokenLine) {
             $status_message .= sprintf ' on line %d', $exception->brokenLine;
@@ -286,6 +285,21 @@ sub www_importProducts {
     else {
         my $i18n = WebGUI::International->new($session, 'Shop');
         $status_message = $i18n->get('import successful');
+        ##Copy and paste from Asset.pm, www_editSave
+        if ($self->session->setting->get("autoRequestCommit")) {
+            # Make sure version tag hasn't already been committed by another process
+            my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");
+
+            if ($versionTag && $self->session->setting->get("skipCommitComments")) {
+                $versionTag->requestCommit;
+            }
+            elsif ($versionTag) {
+                $self->session->http->setRedirect(  
+                    $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
+                );
+                return undef;
+            }
+        }
     }
     return $self->www_manage($status_message);
 }
