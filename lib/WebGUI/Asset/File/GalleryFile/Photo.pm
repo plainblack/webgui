@@ -166,6 +166,40 @@ sub getDownloadFileUrl {
 
 #----------------------------------------------------------------------------
 
+=head2 getEditFormUploadControl
+
+Returns the HTML to render the upload box and link to delete the existing 
+file, if necessary.
+
+=cut
+
+sub getEditFormUploadControl {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session, 'Asset_File');
+    my $html        = '';
+
+    if ($self->get("filename") ne "") {
+        $html .= WebGUI::Form::readOnly( $session, {
+            label       => $i18n->get('current file'),
+            hoverHelp   => $i18n->get('current file description'),
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+        });
+    }
+
+    # Control to upload a new file
+    $html .= WebGUI::Form::file( $session, {
+        name        => 'newFile',
+        label       => $i18n->get('new file'),
+        hoverHelp   => $i18n->get('new file description'),
+    });
+
+    return $html;
+}
+
+
+#----------------------------------------------------------------------------
+
 =head2 getExifData ( )
 
 Gets a hash reference of Exif data about this Photo.

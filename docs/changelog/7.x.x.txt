@@ -99,6 +99,7 @@
  - fixed: Gallery Search now correctly limits by class name
  - added: A template variable to distinguish between Files and Albums in the Gallery
    Search
+ - added: A thumbnail for Photo edit screen
 
 7.5.10
  - fix: Syntax error in GetCsMail
