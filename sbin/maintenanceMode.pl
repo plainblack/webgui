@@ -57,27 +57,27 @@ maintenanceMode --help
 
 =head1 DESCRIPTION
 
-This utility script will set or unset WebGUI's C<specialState>
+This utility script will set or unset WebGUI's B<specialState>
 setting to signal the beginning or end of Maintenance Mode.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--start>
+=item B<--start>
 
-Set C<specialState> to signal the beginning of maintenance mode.
+Set B<specialState> to signal the beginning of maintenance mode.
 This is the default behaviour.
 
-=item C<--stop>
+=item B<--stop>
 
-Unset C<specialState> to signal the end of maintenance mode.
+Unset B<specialState> to signal the end of maintenance mode.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

@@ -143,22 +143,22 @@ for image transformations.
 
 =over
 
-=item C<--path path>
+=item B<--path path>
 
-Specifies the absolute C<path> to WebGUI's uploads directory.
+Specifies the absolute B<path> to WebGUI's uploads directory.
 This parameter is required.
 
-=item C<--size thumbSize>
+=item B<--size thumbSize>
 
 Specify the size in pixels of the largest dimension of the thumbanils.
 If left unspecified, it defaults to 50 pixels.
 
-=item C<--missing>
+=item B<--missing>
 
 Use this option to create thumbnails only for those images that are
 missing thumbnails.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

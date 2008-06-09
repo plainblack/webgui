@@ -343,84 +343,84 @@ attached to a specified parent Asset, helping bulk uploads of content.
 This utility is designed to be run as a superuser on Linux systems,
 since it needs to be able to put files into WebGUI's data directories
 and change ownership of files. If you want to run this utility without
-superuser privileges, use the C<--override> option described below.
+superuser privileges, use the B<--override> option described below.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--pathToFiles path>
+=item B<--pathToFiles path>
 
 Path to a folder containing the files to import. This parameter is required.
 
-=item C<--parentAssetId id>
+=item B<--parentAssetId id>
 
-Attach the imported files to the Asset C<id> in WebGUI's Asset Manager.
+Attach the imported files to the Asset B<id> in WebGUI's Asset Manager.
 This parameter is required.
 
-=item C<--groupToEdit id>
+=item B<--groupToEdit id>
 
-Make members of WebGUI's group identified by C<id> be able to edit
+Make members of WebGUI's group identified by B<id> be able to edit
 the uploaded files. If left unspecified, it defaults to Group ID 4,
 (Content Managers).
 
-=item C<--groupToView id>
+=item B<--groupToView id>
 
-Make members of WebGUI's group identified by C<id> be able to view
+Make members of WebGUI's group identified by B<id> be able to view
 the uploaded files. If left unspecified, it defaults to Group ID 7,
 (Everybody).
 
-=item C<--owner id>
+=item B<--owner id>
 
-Make WebGUI's user identified by C<id> own the uploaded files. If
+Make WebGUI's user identified by B<id> own the uploaded files. If
 left unspecified, it defaults to User ID 3 (Admin).
 
-=item C<--webUser username>
+=item B<--webUser username>
 
 The system user that your web server runs as. If left unspecified
-it will default to C<www-data>.
+it will default to B<www-data>.
 
-=item C<--override>
+=item B<--override>
 
 This flag will allow you to run this utility without being the super user,
 but note that it may not work as intended.
 
-=item C<--skipOlderThan interval>
+=item B<--skipOlderThan interval>
 
-Skip files older than C<interval> seconds. If left unspecified, it
+Skip files older than B<interval> seconds. If left unspecified, it
 will default to skip no files.
 
-=item C<--findByExt patterns>
+=item B<--findByExt patterns>
 
-Import only those files with matching file extensions. C<patterns>
+Import only those files with matching file extensions. B<patterns>
 is a list of comma-separated extensions to match. If left unspecified,
 it will default to import all files.
 
-=item C<--recursive>
+=item B<--recursive>
 
 Import files recursively. If left unspecified, only files in the
 folder will be imported, without following subfolders.
 
-=item C<--overwrite>
+=item B<--overwrite>
 
 Overwrite any matching file URL with the new file rather than
 creating a new Asset for the file. Instantiate the existing asset
 and replace the file.
 
-=item C<--ignoreExtInName>
+=item B<--ignoreExtInName>
 
 Do not include the filename extension in the Title and menuTitle
 database fields.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

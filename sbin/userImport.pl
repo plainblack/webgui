@@ -272,11 +272,11 @@ overriding values from the file.
 This utility is designed to be run as a superuser on Linux systems,
 since it needs to be able to put files into WebGUI's data directories
 and change ownership of files. If you want to run this utility without
-superuser privileges, use the C<--override> option described below.
+superuser privileges, use the B<--override> option described below.
 
 The user information is given in a simple TAB-delimited text file,
 that describes both the field names and field data for each user. You
-can change de actual delimiter with the C<--delimiter> option (see below).
+can change de actual delimiter with the B<--delimiter> option (see below).
 
 The first line of the file contains the field names whose values are
 going to be loaded. From then on, all non-blank lines in the file must have
@@ -285,28 +285,28 @@ names are:
 
 =over
 
-=item C<username>
-=item C<password>
-=item C<authMethod>
-=item C<status>
-=item C<ldapUrl>
-=item C<connectDN>
-=item C<groups>
-=item C<expireOffset>
+=item B<username>
+=item B<password>
+=item B<authMethod>
+=item B<status>
+=item B<ldapUrl>
+=item B<connectDN>
+=item B<groups>
+=item B<expireOffset>
 =item Any valid User Profile field name available in WebGUI's database,
-      e.g. C<firstName>, C<lastName>, C<mail>, etc.
+      e.g. B<firstName>, B<lastName>, B<mail>, etc.
 
 =back
 
-If you use the field C<groups>, each following line  should contain a comma
+If you use the field B<groups>, each following line  should contain a comma
 separated list of WebGUI Group Ids; note that this could be a problem
 if you chose to use comma as a delimiter for fields.
 
-If no username is specified it will default to C<firstName.lastName>. If
-no C<username> is specified, nor C<firstName> and C<lastName>, then the
+If no username is specified it will default to B<firstName.lastName>. If
+no B<username> is specified, nor B<firstName> and B<lastName>, then the
 user will B<not> be loaded.
 
-If you specify the C<userId> field for import on any record, that C<userId>
+If you specify the B<userId> field for import on any record, that B<userId>
 will be used instead of generating a new one automatically. If you do this,
 be careful not to insert duplicates!
 
@@ -314,106 +314,106 @@ If you use an invalid field name, its values will be ignored.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--usersFile pathname>
+=item B<--usersFile pathname>
 
 Pathname to the file containing users information for bulk loading.
 
-=item C<--authMethod method>
+=item B<--authMethod method>
 
 Specify the default authentication method to set for each loaded user.
 It can be overridden in the import file for specific users.
-If left unspecified, it defaults to C<WebGUI>.
+If left unspecified, it defaults to B<WebGUI>.
 
-=item C<--canChangePass>
+=item B<--canChangePass>
 
 Set loaded users to be able to change their passwords. If left
 unspecified, loaded users will B<NOT> be able to change their
 passwords until and administrator grants them the privilege.
 
-=item C<--delimiter string>
+=item B<--delimiter string>
 
 Specify the string delimiting fields in the import file. If left
 unspecified, it defaults to a single TAB (ASCII 9).
 
-=item C<--expireOffset integer>
+=item B<--expireOffset integer>
 
 Specify the default amount of time before the loaded user will be
 expired from the groups they are added to. The units are specified
-by C<--expireUnits> (see below). It can be overridden in the import
+by B<--expireUnits> (see below). It can be overridden in the import
 file for specific users. If left unspecified, it defaults to the
 expire offset set in the group definition within WebGUI.
 
-=item C<--expireUnits unidades>
+=item B<--expireUnits unidades>
 
-Specify the units for C<--expireOffset> (see above). Valid values
-are C<seconds>, C<minutes>, C<hours>, C<days>, C<weeks>, C<months>,
-C<years>, C<epoch>, or C<fixed>. If set to C<epoch> the system will
+Specify the units for B<--expireOffset> (see above). Valid values
+are B<seconds>, B<minutes>, B<hours>, B<days>, B<weeks>, B<months>,
+B<years>, B<epoch>, or B<fixed>. If set to B<epoch> the system will
 assume that the expire offset should be taken as an epoch date
 (absolute number of seconds since January 1, 1970) rather than an
-interval. If set to C<fixed> the system will assume that the
-C<--expireOffset> is a fixed date. If left unspecified, it defaults
-to C<seconds>.
+interval. If set to B<fixed> the system will assume that the
+B<--expireOffset> is a fixed date. If left unspecified, it defaults
+to B<seconds>.
 
-=item C<--groups groupid,...>
+=item B<--groups groupid,...>
 
 Specify a comma separated list of WebGUI Group Ids that each loaded
 user will be set to. It can be overridden in the import file for
 specific users.
 
-=item C<--ldapUrl uri>
+=item B<--ldapUrl uri>
 
 Specify the URI used to connect to the LDAP server for authentication.
 The URI must conform to what L<Net::LDAP> uses for connecting.
 It can be overridden in the import file for specific users.
 
-=item C<--password string>
-=item C<--identifier string>
+=item B<--password string>
+=item B<--identifier string>
 
 Specify the default password to use for loaded users. It can (and should)
 be overriden in the import file for specific users. If left unspecified,
-it defaults to C<123qwe>.
+it defaults to B<123qwe>.
 
-=item C<--status status>
+=item B<--status status>
 
 Specify the default account status for loaded users. Valid values are
-C<Active> and C<Deactivated>. If left unspecified, it defaults to
-C<Active>.
+B<Active> and B<Deactivated>. If left unspecified, it defaults to
+B<Active>.
 
-=item C<--update>
+=item B<--update>
 
 Search WebGUI's database for each user listed in the import file, and
 update its information using the provided fields. Users in the import
 file that are B<not> found in the database are B<ignored>. See
-C<--updateAdd> below if you want to add the extra users.
+B<--updateAdd> below if you want to add the extra users.
 
-=item C<--updateAdd>
+=item B<--updateAdd>
 
 Search WebGUI's database for each user listed in the import file, and
 update its information using the provided fields. Users in the import
 file that are B<not> found in the database are B<added>. See
-C<--update> above if you do not want to add the extra users.
+B<--update> above if you do not want to add the extra users.
 
-=item C<--replaceGroups>
+=item B<--replaceGroups>
 
-If the user being updated with C<--update> or C<--updateAdd> already
+If the user being updated with B<--update> or B<--updateAdd> already
 belongs to some other groups, remove the user from them.
 
-=item C<--override>
+=item B<--override>
 
 This flag will allow you to run this utility without being the super user,
 but note that it may not work as intended.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

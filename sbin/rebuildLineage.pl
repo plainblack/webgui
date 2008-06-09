@@ -154,17 +154,17 @@ out of order in your navigation.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

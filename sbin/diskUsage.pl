@@ -148,47 +148,47 @@ utility.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--assetId id>
+=item B<--assetId id>
 
-Calculate disk usage starting from WebGUI's Asset identified by C<id>.
+Calculate disk usage starting from WebGUI's Asset identified by B<id>.
 If this parameter is not supplied, calculations will start from
 WebGUI's default page as defined in the Site settings.
 
-=item C<--assetUrl url>
+=item B<--assetUrl url>
 
-Calculate disk usage starting from the particular URL given by C<url>,
-which must be relative to the server (e.g. C</home> instead of
-C<http://your.server/home>). If this parameter is not supplied, calculations
+Calculate disk usage starting from the particular URL given by B<url>,
+which must be relative to the server (e.g. B</home> instead of
+B<http://your.server/home>). If this parameter is not supplied, calculations
 will start from WebGUI's default page as defined in the Site settings.
 
-=item C<--blockSize bytes>
+=item B<--blockSize bytes>
 
-Use C<bytes> as scaling factor to change the units in which disk space
-will be reported. If this parameter is not supplied, it defaults to C<1>,
+Use B<bytes> as scaling factor to change the units in which disk space
+will be reported. If this parameter is not supplied, it defaults to B<1>,
 hence the results will be expressed in bytes. If you want to have kb,
-use C<--blockSize 1024>.
+use B<--blockSize 1024>.
 
-=item C<--norecurse>
+=item B<--norecurse>
 
 Prevent recursive calculation of disk space. This effectively computes
 the used disk space for the starting Asset only, without including
 its descendants.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Just display the total amount of disk space as a raw value.
 
-=item C<--summary>
+=item B<--summary>
 
 Just display the total amount of disk space in a human readable format.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

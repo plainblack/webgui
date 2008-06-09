@@ -133,6 +133,6 @@ The WebGUI config file to use.
 =head1 DESCRIPTION
 
 This script migrates a Folder into a gallery album. It
-uses C<WebGUI::Utility::Gallery> for its major features.
+uses B<WebGUI::Utility::Gallery> for its major features.
 
 

@@ -409,12 +409,12 @@ L<http://update.webgui.org>, and compare with the currently installed one.
 
 =over
 
-=item C<--simpleReport>
+=item B<--simpleReport>
 
 Prints the status report to standard output, but does not attempt
 to upgrade any outdated or missing Perl modules.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

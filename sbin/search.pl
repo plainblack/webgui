@@ -159,40 +159,40 @@ build the index only for new content, and perform searches.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--indexsite>
+=item B<--indexsite>
 
 Reindexes the entire site specified in the config file. This process
 may take a while (even hours) depending on the amount of content the
 site has. Server performance will suffer somewhat during the
-indexing process. This option requires a C<--configFile> to be
+indexing process. This option requires a B<--configFile> to be
 specified.
 
-=item C<--updatesite>
+=item B<--updatesite>
 
 Indexes content that has not be indexed for the site specified in
 the config file, keeping the indexes for already indexed content
-intact. This is useful if the C<--indexsite> had to be stopped
-partway through. This option requires a C<--configFile> to be
+intact. This is useful if the B<--indexsite> had to be stopped
+partway through. This option requires a B<--configFile> to be
 specified.
 
-=item C<--search text>
+=item B<--search text>
 
 Searches the site specified in the config file for a given keyword or
-phrase, returning the results. This option requires a C<--configFile>
+phrase, returning the results. This option requires a B<--configFile>
 to be specified.
 
-=item C<--indexall>
+=item B<--indexall>
 
 Reindexes B<all> the sites. Note that this can take many hours and
 will affect performance of the server during the indexing process.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

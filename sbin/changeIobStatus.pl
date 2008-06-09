@@ -129,47 +129,47 @@ already marked out.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--currentStatus status>
+=item B<--currentStatus status>
 
 Check users in the IOB having B<status> status. If left unspecified,
 it will default to C<In>.
 
-=item C<--newStatus status>
+=item B<--newStatus status>
 
 Change users status in the IOB to B<status> status. If left unspecified,
 it will default to C<Out>.
 
-=item C<--userMessage msg>
+=item B<--userMessage msg>
 
 Text of the message to be sent to the user after changing the status.
 If left unspecified it will default to
 
     You were logged out of the In/Out Board automatically.
 
-=item C<--userMessageFile pathname>
+=item B<--userMessageFile pathname>
 
 Pathname to a file whose contents will be sent to the user after changing
 the status. Using this option overrides whatever messages is set
-with C<--userMessage> (see above).
+with B<--userMessage> (see above).
 
-=item C<--whatsHappening text>
+=item B<--whatsHappening text>
 
 The message attached to the InOut Board when changing status. If left
 unspecified it defaults to
 
     Automatically signed out.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

@@ -106,39 +106,39 @@ the generated content.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<--assetId id>
+=item B<--assetId id>
 
-Generate content for WebGUI's Asset identified by C<id>. Either this
-parameter or C<--url> must be supplied.
+Generate content for WebGUI's Asset identified by B<id>. Either this
+parameter or B<--url> must be supplied.
 
-=item C<--url url>
+=item B<--url url>
 
-Generate content for WebGUI's Asset located at C<url>, which must be
-relative to the server (e.g. C</home> instead of C<http://your.server/home>).
-Either this parameter or C<--assetID> must be supplied.
+Generate content for WebGUI's Asset located at B<url>, which must be
+relative to the server (e.g. B</home> instead of B<http://your.server/home>).
+Either this parameter or B<--assetID> must be supplied.
 
-=item C<--styleId id>
+=item B<--styleId id>
 
-Use the WebGUI style specified by the AssetID C<id>. If left unspecified,
+Use the WebGUI style specified by the AssetID B<id>. If left unspecified,
 it defaults to using the Asset's default style.
 
-=item C<--toFile pathname>
+=item B<--toFile pathname>
 
 Send generated content to the specified filename. If left unspecified,
 content is sent to standard output.
 
-=item C<--userId id>
+=item B<--userId id>
 
 Set a specific WebGUI user to act as content viewer. If left unspecified,
-defaults to C<1> (Visitor).
+defaults to B<1> (Visitor).
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

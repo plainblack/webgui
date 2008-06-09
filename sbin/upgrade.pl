@@ -384,7 +384,7 @@ WebGUI libraries and programs.
 This utility is designed to be run as a superuser on Linux systems,
 since it needs to be able to access several system directories
 and change ownership of files. If you want to run this utility without
-superuser privileges, use the C<--override> option described below.
+superuser privileges, use the B<--override> option described below.
 
 =head1 WARNING
 
@@ -400,60 +400,60 @@ upgrade.
 
 =over
 
-=item C<--doit>
+=item B<--doit>
 
 You B<MUST> include this flag in the command line or the script
 will refuse to run. This is to force you to read this documentation
 at least once and be sure that you B<REALLY> want to perform the
 upgrade.
 
-=item C<--backupDir path>
+=item B<--backupDir path>
 
 Specify a path where database backups should be created during the
-upgrade procedure. If left unspecified, it defaults to C</var/backups>.
+upgrade procedure. If left unspecified, it defaults to B</var/backups>.
 
-=item C<--history>
+=item B<--history>
 
 Displays the upgrade history for each of your sites. Running with this
 flag will B<NOT> perform the upgrade.
 
-=item C<--mysql pathname>
+=item B<--mysql pathname>
 
 The full pathname to your mysql client executable. If left unspecified,
-it defaults to C</usr/bin/mysql>.
+it defaults to B</usr/bin/mysql>.
 
-=item C<--mysqldump pathname>
+=item B<--mysqldump pathname>
 
 The full pathname to your mysqldump executable. If left unspecified,
-it defaults to C</usr/bin/mysqldump>.
+it defaults to B</usr/bin/mysqldump>.
 
-=item C<--override>
+=item B<--override>
 
 This flag will allow you to run this utility without being the super user,
 but note that it may not work as intended.
 
-=item C<--skipBackup>
+=item B<--skipBackup>
 
 Use this if you B<DO NOT> want database backups to be performed
 during the upgrade procedure.
 
-=item C<--skipDelete>
+=item B<--skipDelete>
 
 The upgrade procedure normally deletes WebGUI's cache and temporary files
 created as part of the upgrade. This cleanup is very important during
 large upgrades, but can make the procedure quite slow. This option
 skips the deletion of these files.
 
-=item C<--skipMaintenance>
+=item B<--skipMaintenance>
 
 The upgrade procedure normally puts up a simple maintenance page on all
 the sites while running, but this option will skip that step.
 
-=item C<--quiet>
+=item B<--quiet>
 
 Disable all output unless there's an error.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

@@ -82,8 +82,8 @@ testCodebase - Test WebGUI's code base.
 =head1 DESCRIPTION
 
 This WebGUI utility script tests all of WebGUI's installed code base
-using a particular confiuration file. It uses C<prove> to run all
-the WebGUI supplied test routines, located in the C<t> subdirectory
+using a particular confiuration file. It uses B<prove> to run all
+the WebGUI supplied test routines, located in the B<t> subdirectory
 of the WebGUI root.
 
 You should B<NOT> use a production config file for testing, since some
@@ -91,32 +91,32 @@ of the test may be destructive.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory. Be
 aware that some of the tests may be destructive. This parameter is required.
 
-=item C<--coverage>
+=item B<--coverage>
 
 Turns on additional L<Devel::Cover> based coverage tests. Note that
 this can take a long time to run.
 
-=item C<--noLongTests>
+=item B<--noLongTests>
 
 Prevent long tests from being run
 
-=item C<--perlBase path>
+=item B<--perlBase path>
 
 Specify a path to an alternative Perl installation you wish to use for the
 tests. If left unspecified, it defaults to the Perl installation in the
 current PATH.
 
-=item C<--verbose>
+=item B<--verbose>
 
 Turns on additional information during tests.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 

@@ -110,28 +110,28 @@ migrateCollabToGallery --help
 =head1 DESCRIPTION
 
 This WebGUI utility script migrates a collaboration system's threads
-into gallery albums. It uses C<WebGUI::Utility::Gallery> for its major
+into gallery albums. It uses B<WebGUI::Utility::Gallery> for its major
 features.
 
 =over
 
-=item C<--configFile config.conf>
+=item B<--configFile config.conf>
 
 The WebGUI config file to use. Only the file name needs to be specified,
 since it will be looked up inside WebGUI's configuration directory.
 This parameter is required.
 
-=item C<collab>
+=item B<collab>
 
 A WebGUI's Collaboration System URL or Asset ID. If an URL is given,
 it must be an absolute URL beginning with a slash.
 
-=item C<gallery>
+=item B<gallery>
 
 A WebGUI's Gallery URL or Asset ID. If an URL is given, it must be
 an absolute URL beginning with a slash.
 
-=item C<--help>
+=item B<--help>
 
 Shows this documentation, then exits.
 
