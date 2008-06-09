@@ -74,6 +74,7 @@ Readonly my @MUTABLE_PROPERTIES => qw(
     operand2AssetId
     operand2Modifier     operand2ModifierArgs
     operator
+    sequenceNumber
 );
 
 #-------------------------------------------------------------------
@@ -149,6 +150,10 @@ Removes this expression from the Rule.
 
 sub delete {
     my $self = shift;
+    
+    # Reset the Rule's combined expression
+    $self->rule->resetCombinedExpression();
+    
     $self->rule->session->db->deleteRow( 'fluxExpression', 'fluxExpressionId', $self->getId );
     undef $self;
     return undef;
@@ -297,6 +302,9 @@ sub update {
             error => 'invalid properties hash ref.'
         );
     }
+    
+    # Reset the Rule's combined expression
+    $self->rule->resetCombinedExpression();
 
     my $id = id $self;
     foreach my $field (@MUTABLE_PROPERTIES) {

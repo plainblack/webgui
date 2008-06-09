@@ -9,6 +9,8 @@ use WebGUI::Flux::Expression;
 use Readonly;
 use List::MoreUtils qw(any);
 use WebGUI::DateTime;
+use English qw( -no_match_vars );
+use Regexp::Common;    # not bundled in WRE
 
 =head1 NAME
 
@@ -83,6 +85,20 @@ Readonly my @MUTABLE_PROPERTIES => qw(
     combinedExpression
 );
 
+# Regex used to 'whitelist' combined expression tokens
+Readonly my $TOKEN_WHITELIST => qr{
+        \( |        # left parens, or 
+        \) |        # right parens, or
+        \b          # word boundary followed by..
+         (?:       
+            and |   # AND token
+            or |   # OR token
+            not |   # NOT token
+            e(\d+)  # expression token (capture the number)
+         )
+        \b          # ..followed by word boundary
+  }ix;
+
 #-------------------------------------------------------------------
 
 =head2 addExpression ( properties )
@@ -148,6 +164,21 @@ sub create {
     $rule->update($properties_ref);
 
     return $rule;
+}
+
+#-------------------------------------------------------------------
+
+=head2 resetCombinedExpression ( )
+
+Any change to a Rule's expressions should result in a call to this method
+to reset the combined expression. This might be improved at a later date to
+make it handle expression changes intelligently.
+
+=cut
+
+sub resetCombinedExpression {
+    my ($self) = @_;
+    $self->update( { combinedExpression => undef } );
 }
 
 #-------------------------------------------------------------------
@@ -231,6 +262,22 @@ sub getExpression {
 
 #-------------------------------------------------------------------
 
+=head2 getExpressionCount ( )
+
+Returns the number of Expressions in this Rule.
+
+=cut
+
+sub getExpressionCount {
+    my ($self) = @_;
+    my @expressionObjects = ();
+    my $count = $self->session->db->quickScalar( 'select count(*) from fluxExpression where fluxRuleId=?',
+        [ $self->getId ] );
+    return $count;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getExpressions ( )
 
 Returns an array reference of expression objects that are in this Rule.
@@ -240,7 +287,9 @@ Returns an array reference of expression objects that are in this Rule.
 sub getExpressions {
     my ($self) = @_;
     my @expressionObjects = ();
-    my $expressions = $self->session->db->read( 'select fluxExpressionId from fluxExpression where fluxRuleId=?',
+    my $expressions
+        = $self->session->db->read(
+        'select fluxExpressionId from fluxExpression where fluxRuleId=? order by sequenceNumber',
         [ $self->getId ] );
     while ( my ($expressionId) = $expressions->array ) {
         push @expressionObjects, $self->getExpression($expressionId);
@@ -342,6 +391,16 @@ sub update {
     # Check arguments..
     if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
         WebGUI::Error::InvalidParam->throw( param => $newProp_ref, error => 'Invalid hash reference.' );
+    }
+
+    # Special filtering for combinedExpression..
+    if ( defined $newProp_ref->{combinedExpression} ) {
+
+        # Check for validity (throws an exception if not)
+        checkCombinedExpression( $newProp_ref->{combinedExpression}, $self->getExpressionCount() );
+
+        # Convert to lower-case
+        $newProp_ref->{combinedExpression} = lc $newProp_ref->{combinedExpression};
     }
 
     my $id = id $self;
@@ -542,7 +601,7 @@ sub evaluate {
 
     #TODO: ACCESS
     my $access = 1;
-    
+
     # Check arguments..
     if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
         WebGUI::Error::InvalidNamedParamHashRef->throw(
@@ -556,9 +615,9 @@ sub evaluate {
         }
     }
 
-    my $id                 = id $self;
-    my $combinedExpression = $property{$id}{combinedExpression};
-    my $is_sticky          = $property{$id}{sticky};
+    my $id                  = id $self;
+    my $combined_expression = $property{$id}{combinedExpression};
+    my $is_sticky           = $property{$id}{sticky};
 
     # Check for entry in fluxRuleUserData table
     my $userId = $arg_ref->{user}->userId();
@@ -577,8 +636,11 @@ sub evaluate {
         return 1;
     }
 
+    # Now we need to see if the Rule passes or not..
     my $was_successful;
-    if ( !$combinedExpression ) {
+    
+    if ( !$combined_expression ) {
+
         # No combined expression defined so just AND them all together
         if ( any { !$_->evaluate($arg_ref) } @{ $self->getExpressions() } ) {
             $was_successful = 0;
@@ -588,40 +650,152 @@ sub evaluate {
         }
     }
     else {
-        # TODO: Implement Combined Expression support
-        WebGUI::Error::NotImplemented->throw( error => 'Combined Expression code not implemented yet.' );
-    }
-
-    #    WebGUI::Error::NotImplemented->throw( error => $fluxRuleUserDataId );
-    my $dt = WebGUI::DateTime->new(time)->toDatabase();
-    my %rowUpdates;
-    $rowUpdates{fluxRuleUserDataId} = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
-    $rowUpdates{dateRuleFirstChecked} = exists $userData{dateRuleFirstChecked} ? $userData{dateRuleFirstChecked} : $dt;
-    if ($was_successful) {
-        $rowUpdates{dateRuleFirstTrue} = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
-    } else {
-        $rowUpdates{dateRuleFirstFalse} = exists $userData{dateRuleFirstFalse} ? $userData{dateRuleFirstFalse} : $dt;
-    }
-    if ($access) {
-        $rowUpdates{dateAccessFirstAttempted} = exists $userData{dateAccessFirstAttempted} ? $userData{dateAccessFirstAttempted} : $dt;
-    
-        if ($was_successful) {
-            $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
-            $rowUpdates{dateAccessFirstTrue} = exists $userData{dateAccessFirstTrue} ? $userData{dateAccessFirstTrue} : $dt;
-        } else {
-            $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
-            $rowUpdates{dateAccessFirstFalse} = exists $userData{dateAccessFirstFalse} ? $userData{dateAccessFirstFalse} : $dt;
+        # Combined expression in use, so first parse it..
+        my $parsed_combined_expression = _parseCombinedExpression($combined_expression);
+        
+        # ..and also create a lexical array of expressions (1-indexed, used by eval string) 
+        my @expressions                = @{ $self->getExpressions() };
+        unshift @expressions, 'dummy entry'; # add a dummy entry to the front to make it 1-indexed
+        
+        # eval the parsed combined expression and rely on Perl for error-catching
+        {
+            no warnings 'all';  # silence perl
+            $was_successful = eval("($parsed_combined_expression)");
+        }
+        if ($EVAL_ERROR) {
+            WebGUI::Error::Flux::InvalidCombinedExpression->throw(
+                error                    => $EVAL_ERROR,
+                combinedExpression       => $combined_expression,
+                parsedCombinedExpression => $parsed_combined_expression,
+            );
         }
     }
-    # If this is a new row, also need to set fluxRuleId and userId
-    if ($rowUpdates{fluxRuleUserDataId} eq 'new') {
-        $rowUpdates{fluxRuleId} = $ruleId;
-        $rowUpdates{userId} = $userId;
+
+    # Finally, update the fluxRuleUserData table
+    {
+        my $dt = WebGUI::DateTime->new(time)->toDatabase();
+        my %rowUpdates;
+        $rowUpdates{fluxRuleUserDataId} = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
+        $rowUpdates{dateRuleFirstChecked}
+            = exists $userData{dateRuleFirstChecked} ? $userData{dateRuleFirstChecked} : $dt;
+        if ($was_successful) {
+            $rowUpdates{dateRuleFirstTrue} = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
+        }
+        else {
+            $rowUpdates{dateRuleFirstFalse}
+                = exists $userData{dateRuleFirstFalse} ? $userData{dateRuleFirstFalse} : $dt;
+        }
+        if ($access) {
+            $rowUpdates{dateAccessFirstAttempted}
+                = exists $userData{dateAccessFirstAttempted} ? $userData{dateAccessFirstAttempted} : $dt;
+    
+            if ($was_successful) {
+                $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
+                $rowUpdates{dateAccessFirstTrue}
+                    = exists $userData{dateAccessFirstTrue} ? $userData{dateAccessFirstTrue} : $dt;
+            }
+            else {
+                $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
+                $rowUpdates{dateAccessFirstFalse}
+                    = exists $userData{dateAccessFirstFalse} ? $userData{dateAccessFirstFalse} : $dt;
+            }
+        }
+    
+        # If this is a new row, also need to set fluxRuleId and userId
+        if ( $rowUpdates{fluxRuleUserDataId} eq 'new' ) {
+            $rowUpdates{fluxRuleId} = $ruleId;
+            $rowUpdates{userId}     = $userId;
+        }
+        
+        if ( scalar keys %rowUpdates > 0 ) {
+            $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
+        }
     }
-    use Data::Dumper;
-    if (scalar keys %rowUpdates > 0) {
-        $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
+    
+    return $was_successful;
+}
+
+#-------------------------------------------------------------------
+
+=head2 checkCombinedExpression ( )
+
+Do some basic sanity checking and whitelisting on the combined expression. 
+All we really care is that the expression is not dangerous (since it is passed to eval).
+We don't go to any great lengths to check validity since it is easier to let perl do it and 
+just catch any errors from eval. 
+
+=cut
+
+sub checkCombinedExpression {
+    my ( $combined_expression, $expression_count ) = @_;
+
+    # Check arguments..
+    if ( @_ != 2 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => 2,
+            error    => 'invalid param count',
+        );
     }
+
+    # Undefined combined expression is valid
+    return 1 if !defined $combined_expression;
+
+    # Split combined expression up at whitespace and check tokens
+    foreach my $token ( split /\s+/, $combined_expression ) {
+
+        # Check that the combined expression passes our whitelist
+        if ( $token !~ m/$TOKEN_WHITELIST/ ) {
+            WebGUI::Error::Flux::InvalidCombinedExpression->throw(
+                error              => "Invalid token in Combined Expression: $token",
+                combinedExpression => $combined_expression,
+            );
+        }
+
+        # Furthermore, check the expression number (captured via regexp) is valid..
+        if ( defined $1 && ( $1 == 0 || $1 > $expression_count ) ) {
+            WebGUI::Error::Flux::InvalidCombinedExpression->throw(
+                error              => "Token does not refer to valid Expression in Combined Expression: $token",
+                combinedExpression => $combined_expression,
+            );
+        }
+    }
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _parseCombinedExpression ( )
+
+Parses a combined expression into a form that can be passed to eval.
+The parsed string is very tightly coupled to our internal code. In particular,
+we assume the existence of an array called @expressions that contains the result
+of @{$self->getExpressions()} (first element at index 1 for convenience). 
+The parsed string indexes this array and calls evaluate($arg_ref) on each element 
+(where again, $arg_ref is assumed to exist).
+
+An expression of the form: 'e1 and e2' gets converted into:
+'$expressions[1]->evaluate($arg_ref) and $expressions[2]->evaluate($arg_ref)'
+
+The reason this regexp is separated out into a subroutine of its own at all is
+so that we can test it.
+
+=cut
+
+sub _parseCombinedExpression {
+    my ($combined_expression) = @_;
+
+    # Check arguments..
+    if ( @_ != 1 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => 1,
+            error    => 'invalid param count',
+        );
+    }
+
+    # Apply the magic regex
+    $combined_expression =~ s/e(\d+)/\$expressions[$1]->evaluate(\$arg_ref)/gx;
+    return $combined_expression;
 }
 1;
-

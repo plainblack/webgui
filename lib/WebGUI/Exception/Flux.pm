@@ -5,36 +5,41 @@ use warnings;
 use WebGUI::Exception;
 use Exception::Class (
     'WebGUI::Error::NotImplemented' => {
-        isa             => 'WebGUI::Error',
-        description     => 'Feature not implemented yet.',
-        fields          => ['module'],
-        },
-     'WebGUI::Error::Pluggable::LoadFailed' => {
-        isa             => 'WebGUI::Error',
-        description     => 'WebGUI::Pluggable failed to load module.',
-        fields          => ['module'],
-        },
+        isa         => 'WebGUI::Error',
+        description => 'Feature not implemented yet.',
+        fields      => ['module'],
+    },
+    'WebGUI::Error::Pluggable::LoadFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'WebGUI::Pluggable failed to load module.',
+        fields      => ['module'],
+    },
     'WebGUI::Error::Pluggable::RunFailed' => {
-        isa             => 'WebGUI::Error',
-        description     => 'WebGUI::Pluggable failed to run subroutine.',
-        fields          => ['module', 'subroutine', 'params'],
-        },
+        isa         => 'WebGUI::Error',
+        description => 'WebGUI::Pluggable failed to run subroutine.',
+        fields      => [ 'module', 'subroutine', 'params' ],
+    },
     'WebGUI::Error::InvalidNamedParamHashRef' => {
-        isa             => 'WebGUI::Error::InvalidParam',
-        description     => 'Expected to get a hash reference of named subroutine parameters.',
-        fields          => ['param'],
-        },
+        isa         => 'WebGUI::Error::InvalidParam',
+        description => 'Expected to get a hash reference of named subroutine parameters.',
+        fields      => ['param'],
+    },
     'WebGUI::Error::NamedParamMissing' => {
-        isa             => 'WebGUI::Error::InvalidParam',
-        description     => 'A named subroutine parameter was missing.',
-        fields          => ['param'],
-        },
+        isa         => 'WebGUI::Error::InvalidParam',
+        description => 'A named subroutine parameter was missing.',
+        fields      => ['param'],
+    },
     'WebGUI::Error::InvalidParamCount' => {
-        isa             => 'WebGUI::Error',
-        description     => 'Wrong number of subroutine parameters supplied.',
-        fields          => ['expected','got'],
-        },
-        
+        isa         => 'WebGUI::Error',
+        description => 'Wrong number of subroutine parameters supplied.',
+        fields      => [ 'expected', 'got' ],
+    },
+    'WebGUI::Error::Flux::InvalidCombinedExpression' => {
+        isa         => 'WebGUI::Error',
+        description => 'Invalid Flux Rule Combined Expression.',
+        fields      => [ 'combinedExpression', 'parsedCombinedExpression' ],
+    },
+
 );
 
 =head1 NAME

@@ -31,6 +31,7 @@ CREATE TABLE `fluxExpression` (
   `fluxExpressionId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `name` varchar(255) NOT NULL default 'Undefined',
+  `sequenceNumber` int(11) NOT NULL default '1',
   `operand1` varchar(255) NOT NULL,
   `operand1Args` mediumtext default NULL,
   `operand1AssetId` varchar(22) character set utf8 collate utf8_bin default NULL,

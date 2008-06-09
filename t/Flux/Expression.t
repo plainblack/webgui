@@ -23,12 +23,14 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 26;
+plan tests => 28;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Flux::Expression');
+
+# TODO: SequenceNumber
 
 #######################################################################
 #
@@ -180,6 +182,7 @@ $session->db->write('delete from fluxExpression');
             operator => 'DUMMY_OPERATOR',
         }
     );
+    
     Readonly my %newValues => (
         name     => 'New Name',
         operand1 => 'DUNNY_OPERAND_1',
@@ -194,6 +197,12 @@ $session->db->write('delete from fluxExpression');
     my $clonedExpression = WebGUI::Flux::Expression->new( $rule, $expression->getId() );
     cmp_deeply( $clonedExpression, $expression, 'update persists to the db, too' );
     # N.B. update() also gets tested indirectly by create() (above)
+    
+    # Check that Rule's combined expression gets reset as a side-effect of updating an expression
+    $rule->update({combinedExpression => 'E1'});
+    is($rule->get('combinedExpression'), 'e1', 'Set combined expression (automatically converted to lc)');
+    $expression->update( \%newValues );
+    is($rule->get('combinedExpression'), undef, 'Combined expression correctly reset by update');
 }
 
 #######################################################################

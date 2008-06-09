@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 39;
+plan tests => 68;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -31,6 +31,10 @@ use_ok('WebGUI::Flux::Rule');
 $session->user( { userId => 1 } );
 my $user   = $session->user();
 my $userId = $user->userId();
+
+# Start with a clean slate
+$session->db->write('delete from fluxRule');
+$session->db->write('delete from fluxExpression');
 
 #######################################################################
 #
@@ -149,7 +153,7 @@ my $userId = $user->userId();
 
 #######################################################################
 #
-# getExpressiones
+# getExpressiones / getExpressionCount
 #
 #######################################################################
 {
@@ -175,6 +179,8 @@ my $userId = $user->userId();
         [ $expression1, $expression2 ],
         'getExpressiones returns all expression objects for this Rule'
     );
+
+    is( $rule->getExpressionCount(), 2, 'getExpressionCount counts correctly' );
 }
 #######################################################################
 #
@@ -186,7 +192,7 @@ my $userId = $user->userId();
     $rule->update(
         {   name               => 'New Name',
             sticky             => 1,
-            combinedExpression => 'abc'
+            combinedExpression => undef,
         }
     );
 
@@ -196,7 +202,7 @@ my $userId = $user->userId();
             {   fluxRuleId         => ignore,
                 name               => 'New Name',
                 sticky             => 1,
-                combinedExpression => 'abc',
+                combinedExpression => undef,
             }
         ),
         'update updates the object properties cache'
@@ -267,7 +273,7 @@ my $userId = $user->userId();
 
 #######################################################################
 #
-# evaluate()
+# evaluate() and combinedExpression
 #
 #######################################################################
 {
@@ -304,6 +310,7 @@ my $userId = $user->userId();
         undef,
         'dateRuleFirstFalse not updated'
     );
+
     # TODO: check access-related fields, once access-related logic implemented
 
     # Add a single expression to the rule
@@ -316,6 +323,12 @@ my $userId = $user->userId();
         }
     );
     ok( $rule->evaluate( { user => $user } ), q{"test value" == "test value"} );
+    
+    # Try out some Combined Expressions
+    $rule->update( { combinedExpression => 'E1' } );
+    ok( $rule->evaluate( { user => $user } ), q{same with explicit combined expression 'E1'} );
+    $rule->update( { combinedExpression => 'not E1' } );
+    ok( !$rule->evaluate( { user => $user } ), q{false with explicit combined expression 'not E1'} );
 
     # add a second expression to the Rule
     $rule->addExpression(
@@ -324,11 +337,126 @@ my $userId = $user->userId();
             operand2     => 'NumericValue',
             operand2Args => '{"value":  121}',
             operator     => 'IsLessThan',
+            sequenceNumber => 2,
         }
     );
-    ok( $rule->evaluate( { user => $user } ), q{120 < 121} );
+    ok( $rule->evaluate( { user => $user } ), q{true with two expressions and no cE} );
+    $rule->update( { combinedExpression => 'E1 and E2' } );
+    ok( $rule->evaluate( { user => $user } ), q{true with explicit combined expression 'E1 and E2'} );
+    $rule->update( { combinedExpression => 'not(not E1 or not E2)' } );
+    ok( $rule->evaluate( { user => $user } ), q{true with explicit combined expression 'not(not E1 or not E2)'} );
+    $rule->update( { combinedExpression => '(not E1 or not E2)' } );
+    ok( !$rule->evaluate( { user => $user } ), q{false with explicit combined expression '(not E1 or not E2)'} );
+    $rule->update( { combinedExpression => 'E1' } );
+    ok( $rule->evaluate( { user => $user } ), q{true with cE that doesn't mention E2 'E1'} );
+    
+    # add a third expression and a combined expression    
+    $rule->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "apples"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "oranges"}',
+            operator     => 'IsEqualTo',
+            sequenceNumber => 3,
+        }
+    );
+    ok( !$rule->evaluate( { user => $user } ), q{false with no cE bc E3 is false} );
+    $rule->update( { combinedExpression => 'E1 AND E2' } );
+    ok( $rule->evaluate( { user => $user } ), q{true with cE that doesn't mention E3} );
+    $rule->update( { combinedExpression => 'E1 AND E2 AND NOT E3' } );
+    ok( $rule->evaluate( { user => $user } ), q{true with cE 'E1 AND E2 AND NOT E3'} );
+    
+    # try some invalid combinedExpressions
+    $rule->update( { combinedExpression => '(' } );
+    {
+        eval { $rule->evaluate( { user => $user } ) };
+        my $e = Exception::Class->caught();
+        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE '('} );
+    }
+    $rule->update( { combinedExpression => 'E1 E2' } );
+    {
+        eval { $rule->evaluate( { user => $user } ) };
+        my $e = Exception::Class->caught();
+        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 E2'} );
+    }
+    $rule->update( { combinedExpression => 'AND' } );
+    {
+        eval { $rule->evaluate( { user => $user } ) };
+        my $e = Exception::Class->caught();
+        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'AND'} );
+    }
+    $rule->update( { combinedExpression => 'E1 AND E2 )' } );
+    {
+        eval { $rule->evaluate( { user => $user } ) };
+        my $e = Exception::Class->caught();
+        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 AND E2 )'} );
+    }
+    
 }
 
+#######################################################################
+#
+# checkCombinedExpression
+#
+#######################################################################
+{
+    eval { WebGUI::Flux::Rule::checkCombinedExpression(); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'takes exception to invalid param count' );
+    cmp_deeply( $e, methods( expected => 2, got => 0 ), 'takes exception to invalid param count', );
+}
+{
+    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'E0', 0 ); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E0' is invalid} );
+}
+{
+    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'E1', 0 ); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E1' with 0 expressions is invalid} );
+}
+{
+    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'blah', 0 ); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'blah' is invalid} );
+}
+{
+    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'ANDNOTOR', 0 ); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'ANDNOTOR' is invalid} );
+}
+{
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( q{},         0 ), q{empty expression is valid} );
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( 'E1',        1 ), q{'E1' with 1 exp is valid} );
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( 'E1 and E2', 2 ), q{'E1 and E2' with 2 exps is valid} );
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( 'E1 AND E2', 2 ), q{'E1 AND E2' with 2 exps is valid} );
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( '(', 2 ),
+        q{'(' is valid (we rely on eval to catch this elsewhere)}
+    );
+    ok( WebGUI::Flux::Rule::checkCombinedExpression( 'E1 E2', 2 ),
+        q{'E1 E2' is valid (we rely on eval to catch this elsewhere)}
+    );
+}
+
+#######################################################################
+#
+# _parseCombinedExpression
+#
+#######################################################################
+{
+    eval { WebGUI::Flux::Rule::_parseCombinedExpression(); };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'takes exception to invalid param count' );
+    cmp_deeply( $e, methods( expected => 1, got => 0 ), 'takes exception to invalid param count', );
+}
+{
+    is( WebGUI::Flux::Rule::_parseCombinedExpression('e1 and e2'),
+        '$expressions[1]->evaluate($arg_ref) and $expressions[2]->evaluate($arg_ref)',
+        'combined expression parsed correctly into internal form'
+    );
+}
+
+#-------------------------------------------------------------------
 sub _secondsFromNow {
     my $dt = shift;
     return WebGUI::DateTime->now()->subtract_datetime($dt)->in_units('seconds');
