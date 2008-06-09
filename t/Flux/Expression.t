@@ -20,6 +20,11 @@ use WebGUI::Flux::Rule;
 # Init
 my $session = WebGUI::Test->session;
 
+# Start with a clean slate
+$session->db->write('delete from fluxRule');
+$session->db->write('delete from fluxExpression');
+$session->db->write('delete from fluxRuleUserData');
+
 #----------------------------------------------------------------------------
 # Tests
 

@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 68;
+plan tests => 69;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -35,6 +35,7 @@ my $userId = $user->userId();
 # Start with a clean slate
 $session->db->write('delete from fluxRule');
 $session->db->write('delete from fluxExpression');
+$session->db->write('delete from fluxRuleUserData');
 
 #######################################################################
 #
@@ -280,7 +281,7 @@ $session->db->write('delete from fluxExpression');
     my $rule   = WebGUI::Flux::Rule->create($session);
     my $ruleId = $rule->getId();
 
-    ok( $rule->evaluate( { user => $user } ), 'empty rule allows access by default' );
+    ok( $rule->evaluateFor( $user ), 'empty rule allows access by default' );
     is( _secondsFromNow(
             WebGUI::DateTime->new(
                 $session->db->quickScalar(
@@ -322,76 +323,82 @@ $session->db->write('delete from fluxExpression');
             operator     => 'IsEqualTo',
         }
     );
-    ok( $rule->evaluate( { user => $user } ), q{"test value" == "test value"} );
-    
+    ok( $rule->evaluateFor( $user ), q{"test value" == "test value"} );
+
     # Try out some Combined Expressions
     $rule->update( { combinedExpression => 'E1' } );
-    ok( $rule->evaluate( { user => $user } ), q{same with explicit combined expression 'E1'} );
+    ok( $rule->evaluateFor( $user ), q{same with explicit combined expression 'E1'} );
     $rule->update( { combinedExpression => 'not E1' } );
-    ok( !$rule->evaluate( { user => $user } ), q{false with explicit combined expression 'not E1'} );
+    ok( !$rule->evaluateFor( $user ), q{false with explicit combined expression 'not E1'} );
 
     # add a second expression to the Rule
     $rule->addExpression(
-        {   operand1     => 'NumericValue',
-            operand1Args => '{"value":  120}',
-            operand2     => 'NumericValue',
-            operand2Args => '{"value":  121}',
-            operator     => 'IsLessThan',
+        {   operand1       => 'NumericValue',
+            operand1Args   => '{"value":  120}',
+            operand2       => 'NumericValue',
+            operand2Args   => '{"value":  121}',
+            operator       => 'IsLessThan',
             sequenceNumber => 2,
         }
     );
-    ok( $rule->evaluate( { user => $user } ), q{true with two expressions and no cE} );
+    ok( $rule->evaluateFor( $user ), q{true with two expressions and no cE} );
     $rule->update( { combinedExpression => 'E1 and E2' } );
-    ok( $rule->evaluate( { user => $user } ), q{true with explicit combined expression 'E1 and E2'} );
+    ok( $rule->evaluateFor( $user ), q{true with explicit combined expression 'E1 and E2'} );
     $rule->update( { combinedExpression => 'not(not E1 or not E2)' } );
-    ok( $rule->evaluate( { user => $user } ), q{true with explicit combined expression 'not(not E1 or not E2)'} );
+    ok( $rule->evaluateFor( $user ), q{true with explicit combined expression 'not(not E1 or not E2)'} );
     $rule->update( { combinedExpression => '(not E1 or not E2)' } );
-    ok( !$rule->evaluate( { user => $user } ), q{false with explicit combined expression '(not E1 or not E2)'} );
+    ok( !$rule->evaluateFor( $user ), q{false with explicit combined expression '(not E1 or not E2)'} );
     $rule->update( { combinedExpression => 'E1' } );
-    ok( $rule->evaluate( { user => $user } ), q{true with cE that doesn't mention E2 'E1'} );
-    
-    # add a third expression and a combined expression    
+    ok( $rule->evaluateFor( $user ), q{true with cE that doesn't mention E2 'E1'} );
+
+    # add a third expression and a combined expression
     $rule->addExpression(
-        {   operand1     => 'TextValue',
-            operand1Args => '{"value":  "apples"}',
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "oranges"}',
-            operator     => 'IsEqualTo',
+        {   operand1       => 'TextValue',
+            operand1Args   => '{"value":  "apples"}',
+            operand2       => 'TextValue',
+            operand2Args   => '{"value":  "oranges"}',
+            operator       => 'IsEqualTo',
             sequenceNumber => 3,
         }
     );
-    ok( !$rule->evaluate( { user => $user } ), q{false with no cE bc E3 is false} );
+    ok( !$rule->evaluateFor( $user ), q{false with no cE bc E3 is false} );
     $rule->update( { combinedExpression => 'E1 AND E2' } );
-    ok( $rule->evaluate( { user => $user } ), q{true with cE that doesn't mention E3} );
+    ok( $rule->evaluateFor( $user ), q{true with cE that doesn't mention E3} );
     $rule->update( { combinedExpression => 'E1 AND E2 AND NOT E3' } );
-    ok( $rule->evaluate( { user => $user } ), q{true with cE 'E1 AND E2 AND NOT E3'} );
-    
+    ok( $rule->evaluateFor( $user ), q{true with cE 'E1 AND E2 AND NOT E3'} );
+    $rule->update( { combinedExpression => 'E1 AND E1 AND E1' } );
+    ok( $rule->evaluateFor( $user ), q{true with cE 'E1 AND E1 AND E1'} );
+
     # try some invalid combinedExpressions
     $rule->update( { combinedExpression => '(' } );
     {
-        eval { $rule->evaluate( { user => $user } ) };
+        eval { $rule->evaluateFor( $user ) };
         my $e = Exception::Class->caught();
         isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE '('} );
     }
     $rule->update( { combinedExpression => 'E1 E2' } );
     {
-        eval { $rule->evaluate( { user => $user } ) };
+        eval { $rule->evaluateFor( $user ) };
         my $e = Exception::Class->caught();
         isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 E2'} );
     }
     $rule->update( { combinedExpression => 'AND' } );
     {
-        eval { $rule->evaluate( { user => $user } ) };
+        eval { $rule->evaluateFor( $user ) };
         my $e = Exception::Class->caught();
         isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'AND'} );
     }
     $rule->update( { combinedExpression => 'E1 AND E2 )' } );
     {
-        eval { $rule->evaluate( { user => $user } ) };
+        eval { $rule->evaluateFor( $user ) };
         my $e = Exception::Class->caught();
-        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 AND E2 )'} );
+        isa_ok(
+            $e,
+            'WebGUI::Error::Flux::InvalidCombinedExpression',
+            q{evaluate takes exception to cE 'E1 AND E2 )'}
+        );
     }
-    
+
 }
 
 #######################################################################
@@ -451,7 +458,7 @@ $session->db->write('delete from fluxExpression');
 }
 {
     is( WebGUI::Flux::Rule::_parseCombinedExpression('e1 and e2'),
-        '$expressions[1]->evaluate($arg_ref) and $expressions[2]->evaluate($arg_ref)',
+        '$expressions[1]->evaluate() and $expressions[2]->evaluate()',
         'combined expression parsed correctly into internal form'
     );
 }

@@ -325,26 +325,20 @@ Evaluates this Flux Expression
 =cut
 
 sub evaluate {
-    my ( $self, $arg_ref ) = @_;
+    my ( $self ) = @_;
 
     # Check arguments..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
+    if ( @_ != 1 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => 1,
+            error    => 'invalid param count',
         );
-    }
-    foreach my $field qw(user) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
     }
 
     # Assemble all the ingredients..
     my $id   = id $self;
     my $rule = $rule{$id};
-    my $user = $arg_ref->{user};
-
     my $operand1     = $property{$id}{operand1};
     my $operand1Args = from_json( $property{$id}{operand1Args} );    # deserialise JSON-encoded args
     my $operand2     = $property{$id}{operand2};
@@ -352,9 +346,9 @@ sub evaluate {
     my $operator     = $property{$id}{operator};
 
     my $operand1_val = WebGUI::Flux::Operand->executeUsing( $operand1,
-        { user => $user, rule => $rule, args => $operand1Args } );
+        { rule => $rule, args => $operand1Args } );
     my $operand2_val = WebGUI::Flux::Operand->executeUsing( $operand2,
-        { user => $user, rule => $rule, args => $operand2Args } );
+        { rule => $rule, args => $operand2Args } );
 
     return WebGUI::Flux::Operator->compareUsing( $operator, $operand1_val, $operand2_val );
 }

@@ -75,13 +75,13 @@ sub executeUsing {
         WebGUI::Error::InvalidParamCount->throw(
             got      => scalar(@_),
             expected => 3,
-            error => 'invalid param count',
+            error => 'invalid param count.',
         );
     }    
     if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
         WebGUI::Error::InvalidNamedParamHashRef->throw( param => $arg_ref, error => 'invalid named param hash ref.'  );
     }
-    foreach my $field qw(user rule args) {
+    foreach my $field qw(rule args) {
         if ( !exists $arg_ref->{$field} ) {
             WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
         }
@@ -118,6 +118,9 @@ sub executeUsing {
     
     # Good to go. Execute the Operand..
     my $result = eval { WebGUI::Pluggable::run("WebGUI::Flux::Operand::$operand", 'execute', [$arg_ref]); };
+    if (my $e = Exception::Class->caught()) {
+        $e->rethrow() if ref $e; # Re-throw Exception::Class errors for other code to catch
+    }
     if ($EVAL_ERROR) {
          WebGUI::Error::Pluggable::RunFailed->throw(
             error => $EVAL_ERROR,

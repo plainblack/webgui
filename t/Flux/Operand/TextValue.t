@@ -24,7 +24,7 @@ plan tests => 2;
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok('WebGUI::Flux::Operand');
+use_ok('WebGUI::Flux::Operand::TextValue');
 my $dummy_user_object = 'ignored';
 my $dummy_rule_object = 'ignored';
 

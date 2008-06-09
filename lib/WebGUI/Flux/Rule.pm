@@ -66,9 +66,12 @@ These subroutines are available from this package:
 =cut
 
 # InsideOut object properties
-readonly session        => my %session;            # WebGUI::Session object
-private property        => my %property;           # Hash of object properties
-private expressionCache => my %expressionCache;    # (hash) cache of WebGUI::Flux::Expression objects
+readonly session           => my %session;                # WebGUI::Session object
+private property           => my %property;               # Hash of object properties
+private expressionCache    => my %expressionCache;        # (hash) cache of WebGUI::Flux::Expression objects
+readonly evaluatingFor     => my %evaluatingFor;          # Set to a WebGUI::User when Rule is being evaluated
+public resolvedRuleCache   => my %resolvedRuleCache;      # (hash) cache of resolved WebGUI::Rules
+public unresolvedRuleCache => my %unresolvedRuleCache;    # (hash) cache of currently unresolved WebGUI::Rules
 
 # Default values used in create() method
 Readonly my %RULE_DEFAULTS => (
@@ -353,8 +356,10 @@ sub new {
 
     # Initialise object properties..
     my $id = id $self;
-    $session{$id}  = $session;
-    $property{$id} = $rule;
+    $session{$id}             = $session;
+    $property{$id}            = $rule;
+    $resolvedRuleCache{$id}   = {};                        # cache initially empty
+    $unresolvedRuleCache{$id} = { $ruleId => $ruleId };    # this rule initially unresolved
 
     return $self;
 }
@@ -590,77 +595,108 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 evaluate ( )
+=head2 evaluate ( user )
 
-Evaluates the Flux Rule
+Evaluates the Flux Rule for the given user
 
+=head3 user
+
+The user who the Rule is being evaluated against
+ 
 =cut
 
-sub evaluate {
-    my ( $self, $arg_ref ) = @_;
+sub evaluateFor {
+    my ( $self, $user, $options_ref ) = @_;
 
-    #TODO: ACCESS
-    my $access = 1;
+    my $id = id $self;
 
     # Check arguments..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
+    if ( @_ < 2 || @_ > 3 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => '2 or 3',
+            error    => 'invalid param count.' . scalar(@_) . Dumper(@_),
         );
     }
-    foreach my $field qw(user) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
+    if ( !defined $self || ref $self ne 'WebGUI::Flux::Rule' ) {
+        WebGUI::Error::InvalidObject->throw(
+            expected => 'WebGUI::Flux::Rule',
+            got      => $self,
+            error    => 'need a flux rule.'
+        );
+    }
+    if ( !defined $user || ref $user ne 'WebGUI::User' ) {
+        WebGUI::Error::InvalidObject->throw(
+            expected => 'WebGUI::User',
+            got      => $user,
+            error    => 'need a user.'
+        );
     }
 
-    my $id                  = id $self;
-    my $combined_expression = $property{$id}{combinedExpression};
-    my $is_sticky           = $property{$id}{sticky};
+    # TODO: fix this
+    my $access = 1;
+    if ( defined $options_ref && $options_ref->{indirect} ) {
+        $access = 0;
+    }
+    my $clear_cache_afterwards = $access;
+
+    # Take note that we are now evaluating for a user
+    $evaluatingFor{$id} = $user;
 
     # Check for entry in fluxRuleUserData table
-    my $userId = $arg_ref->{user}->userId();
-    my $ruleId = $self->getId();
-
     my %userData = %{
         $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
-            [ $ruleId, $userId ] )
+            [ $self->getId(), $user->userId() ] )
         };
 
     # Check if we can apply the sticky optimisation
+    my $is_sticky = $property{$id}{sticky};
     if ( $is_sticky && defined $userData{dateRuleFirstTrue} ) {
         WebGUI::Error::NotImplemented->throw( error => 'STICKY NOT IMPLEMENTED YET.' );
 
-        # $self->session->log->debug('Sticky optimisation');
+        delete $evaluatingFor{$id};
         return 1;
     }
 
     # Now we need to see if the Rule passes or not..
     my $was_successful;
-    
+    my $combined_expression = $property{$id}{combinedExpression};
     if ( !$combined_expression ) {
 
         # No combined expression defined so just AND them all together
-        if ( any { !$_->evaluate($arg_ref) } @{ $self->getExpressions() } ) {
-            $was_successful = 0;
+        $was_successful = 1;
+        EVALUATE:
+        foreach my $exp ( @{ $self->getExpressions() } ) {
+            if ( !$exp->evaluate() ) {
+                $was_successful = 0;
+                last EVALUATE;
+            }
         }
-        else {
-            $was_successful = 1;
-        }
+
+        # TODO: Figure out why the following code breaks in FluxRule.t
+#        if ( any { !$_->evaluate() } @{ $self->getExpressions() } ) {
+#            $was_successful = 0;
+#        }
+#        else {
+#            $was_successful = 1;
+#        }
     }
     else {
+
         # Combined expression in use, so first parse it..
         my $parsed_combined_expression = _parseCombinedExpression($combined_expression);
-        
-        # ..and also create a lexical array of expressions (1-indexed, used by eval string) 
-        my @expressions                = @{ $self->getExpressions() };
-        unshift @expressions, 'dummy entry'; # add a dummy entry to the front to make it 1-indexed
-        
+
+        # ..and also create a lexical array of expressions (1-indexed, used by eval string)
+        my @expressions = @{ $self->getExpressions() };
+        unshift @expressions, 'dummy entry';    # add a dummy entry to the front to make it 1-indexed
+
         # eval the parsed combined expression and rely on Perl for error-catching
         {
-            no warnings 'all';  # silence perl
+            no warnings 'all';                  # silence perl
             $was_successful = eval("($parsed_combined_expression)");
+        }
+        if ( my $e = Exception::Class->caught() ) {
+            $e->rethrow() if ref $e;            # Re-throw Exception::Class errors for other code to catch
         }
         if ($EVAL_ERROR) {
             WebGUI::Error::Flux::InvalidCombinedExpression->throw(
@@ -675,11 +711,13 @@ sub evaluate {
     {
         my $dt = WebGUI::DateTime->new(time)->toDatabase();
         my %rowUpdates;
-        $rowUpdates{fluxRuleUserDataId} = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
+        $rowUpdates{fluxRuleUserDataId}
+            = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
         $rowUpdates{dateRuleFirstChecked}
             = exists $userData{dateRuleFirstChecked} ? $userData{dateRuleFirstChecked} : $dt;
         if ($was_successful) {
-            $rowUpdates{dateRuleFirstTrue} = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
+            $rowUpdates{dateRuleFirstTrue}
+                = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
         }
         else {
             $rowUpdates{dateRuleFirstFalse}
@@ -688,7 +726,7 @@ sub evaluate {
         if ($access) {
             $rowUpdates{dateAccessFirstAttempted}
                 = exists $userData{dateAccessFirstAttempted} ? $userData{dateAccessFirstAttempted} : $dt;
-    
+
             if ($was_successful) {
                 $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
                 $rowUpdates{dateAccessFirstTrue}
@@ -700,18 +738,25 @@ sub evaluate {
                     = exists $userData{dateAccessFirstFalse} ? $userData{dateAccessFirstFalse} : $dt;
             }
         }
-    
+
         # If this is a new row, also need to set fluxRuleId and userId
         if ( $rowUpdates{fluxRuleUserDataId} eq 'new' ) {
-            $rowUpdates{fluxRuleId} = $ruleId;
-            $rowUpdates{userId}     = $userId;
+            $rowUpdates{fluxRuleId} = $self->getId();
+            $rowUpdates{userId}     = $user->userId();
         }
-        
+
         if ( scalar keys %rowUpdates > 0 ) {
             $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
         }
     }
-    
+
+    # We've finished evaluating now
+    delete $evaluatingFor{$id};
+    if ($clear_cache_afterwards) {
+        $resolvedRuleCache{$id} = {};
+        $unresolvedRuleCache{$id} = { $self->getId() => $self->getId() };
+    }
+
     return $was_successful;
 }
 
@@ -771,11 +816,10 @@ Parses a combined expression into a form that can be passed to eval.
 The parsed string is very tightly coupled to our internal code. In particular,
 we assume the existence of an array called @expressions that contains the result
 of @{$self->getExpressions()} (first element at index 1 for convenience). 
-The parsed string indexes this array and calls evaluate($arg_ref) on each element 
-(where again, $arg_ref is assumed to exist).
+The parsed string indexes this array and calls evaluate() on each element .
 
 An expression of the form: 'e1 and e2' gets converted into:
-'$expressions[1]->evaluate($arg_ref) and $expressions[2]->evaluate($arg_ref)'
+'$expressions[1]->evaluate() and $expressions[2]->evaluate()'
 
 The reason this regexp is separated out into a subroutine of its own at all is
 so that we can test it.
@@ -795,7 +839,7 @@ sub _parseCombinedExpression {
     }
 
     # Apply the magic regex
-    $combined_expression =~ s/e(\d+)/\$expressions[$1]->evaluate(\$arg_ref)/gx;
+    $combined_expression =~ s/e(\d+)/\$expressions[$1]->evaluate()/gx;
     return $combined_expression;
 }
 1;
