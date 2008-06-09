@@ -319,9 +319,9 @@ displayed back to the user.
 =cut
 
 sub www_manage {
-    my $self          = shift;
+    my $self           = shift;
     my $status_message = shift;
-    my $session       = $self->session;
+    my $session        = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient
         unless $admin->canManage;
@@ -346,8 +346,9 @@ sub www_manage {
 EODIV
     }
 
-    $output .= sprintf <<EODIV,  $exportForm, $importForm;
+    $output .= sprintf <<EODIV, $exportForm, $importForm, $session->url->append(WebGUI::Asset::Sku::Product->getProductImportNode($session)->getUrl, 'op=assetManager'), $i18n->get('view products');
     <div id="importExport">%s%s</div>
+    <p><a href="%s">%s</a></p>
 EODIV
 
     return $admin->getAdminConsole->render($output, $i18n->get('products'));

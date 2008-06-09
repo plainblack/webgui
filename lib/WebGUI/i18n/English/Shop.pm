@@ -915,6 +915,12 @@ our $I18N = {
         context => q|Message telling the user the their products have been imported successfully.|
     },
 
+    'view products' => {
+        message => q|View all imported products|,
+        lastUpdated => 1213047491,
+        context => q|Label for a shortcut to the import products folder|
+    },
+
 };
 
 1;
