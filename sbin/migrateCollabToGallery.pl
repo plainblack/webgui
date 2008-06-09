@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -84,7 +90,7 @@ sub start {
         pod2usage("$0: Must specify a --configFile");
     }
 
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     
     my $versionTag = WebGUI::VersionTag->getWorking($session);

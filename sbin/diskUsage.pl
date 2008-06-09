@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use Getopt::Long;
 use Pod::Usage;
 use strict;
@@ -46,7 +52,7 @@ finish($session);
 
 #-------------------------------------------------
 sub start {
-        my $session = WebGUI::Session->open("../",$configFile);
+        my $session = WebGUI::Session->open($webguiRoot,$configFile);
         $session->user({userId=>3});
         return $session;
 }

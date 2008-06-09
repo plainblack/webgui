@@ -149,7 +149,7 @@ if ($history) {
 	print "\nDisplaying upgrade history for each site.\n";
 	foreach my $file (keys %config) {
 		print "\n".$file."\n";
-		my $session = WebGUI::Session->open("../..",$file);
+		my $session = WebGUI::Session->open($webguiRoot,$file);
 		my $sth = $session->db->read("select * from webguiVersion order by dateApplied asc, webguiVersion asc");
 		while (my $data = $sth->hashRef) {
 			print "\t".sprintf("%-8s  %-15s  %-15s",
@@ -237,7 +237,7 @@ foreach my $filename (keys %config) {
 		$notRun = 0;
                 sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
-	my $session = WebGUI::Session->open("../..",$filename);
+	my $session = WebGUI::Session->open($webguiRoot,$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
 	$session->setting->remove('specialState');
 	$session->close();

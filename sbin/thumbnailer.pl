@@ -8,6 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 #-----------------------------------------
 # A little utility to generate WebGUI
 # thumbnails. 
@@ -32,7 +39,6 @@ BEGIN {
     }
 }
 
-use lib "../lib";
 use WebGUI::Utility;
 
 my $thumbnailSize;

@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -23,7 +29,7 @@ GetOptions(
 pod2usage( verbose => 2 ) if $help;
 pod2usage() if $configFile eq '';
 
-my $config = WebGUI::Config->new("..",$configFile);
+my $config = WebGUI::Config->new($webguiRoot,$configFile);
 use File::Find;
 
 print "\tRemoving unnecessary .wgaccess files.\n";

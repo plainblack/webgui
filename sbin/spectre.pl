@@ -8,10 +8,16 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use Pod::Usage;
 use strict;
 use warnings;
-use lib '../lib';
 use Getopt::Long;
 use POE::Component::IKC::ClientLite;
 use Spectre::Admin;
@@ -42,7 +48,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
 require File::Spec;
-my $config = WebGUI::Config->new(File::Spec->rel2abs(".."),"spectre.conf",1);
+my $config = WebGUI::Config->new($webguiRoot,"spectre.conf",1);
 unless (defined $config) {
 	print <<STOP;
 
