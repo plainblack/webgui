@@ -1,7 +1,13 @@
 use lib "../lib";
 use strict;
+use Pod::Usage;
 use Getopt::Long;
 use WebGUI::Session;
+
+# Get parameters here, including $help
+
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless $help;  # Change condition!
 
 my $session = start();
 # Do your work here
@@ -44,3 +50,39 @@ sub finish {
     $session->close;
 }
 
+__END__
+
+
+=head1 NAME
+
+utility - A template for WebGUI utility scripts
+
+=head1 SYNOPSIS
+
+ utility --configFile config.conf ...
+
+ utility --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script helps you...
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut
