@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Pod::Usage;
 use Getopt::Long;
@@ -33,7 +39,7 @@ sub start {
     GetOptions(
         'configFile=s' => \$configFile,
     );
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     
     ## If your script is adding or changing content you need these lines, otherwise leave them commented
