@@ -11,7 +11,7 @@
 our ($webguiRoot);
 
 BEGIN {
-    $webguiRoot = "..";
+    $webguiRoot = "../..";
     unshift (@INC, $webguiRoot."/lib");
 }
 
