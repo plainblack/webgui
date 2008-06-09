@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::CommercePaymentITransact;
+package WebGUI::i18n::English::PayDriver_ITransact;
 use strict;
 
 our $I18N = {

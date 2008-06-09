@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::CommercePaymentCash;
+package WebGUI::i18n::English::PayDriver_Cash;
 use strict;
 
 our $I18N = {
