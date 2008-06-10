@@ -951,34 +951,16 @@ our $I18N = {
         context => q|Label for a shortcut to the import products folder|
     },
 
-    'address1' => {
-        message => q|address1|,
-        lastUpdated => 1213121298,
-        context => q|Name of a template variable for the edit address template|,
-    },
-
     'address1 help' => {
         message => q|The first address line.|,
         lastUpdated => 1213121298,
         context => q|Description of a template variable for the edit address template|,
     },
 
-    'address2' => {
-        message => q|address2|,
-        lastUpdated => 1213121298,
-        context => q|Name of a template variable for the edit address template|,
-    },
-
     'address2 help' => {
         message => q|The second address line.|,
         lastUpdated => 1213121298,
         context => q|Description of a template variable for the edit address template|,
-    },
-
-    'address3' => {
-        message => q|address3|,
-        lastUpdated => 1213121298,
-        context => q|Name of a template variable for the edit address template|,
     },
 
     'address3 help' => {
@@ -991,12 +973,6 @@ our $I18N = {
         message => q|A loop containing all addresses in this address book|,
         lastUpdated => 1213121298,
         context => q|Description of a template variable for the edit address template|,
-    },
-
-    'email receipt template' => {
-        message => q|Email Receipt Template|,
-        lastUpdated => 1213121298,
-        context => q|Title of the Email Receipt Template help page|,
     },
 
 };
