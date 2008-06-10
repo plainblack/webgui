@@ -362,7 +362,7 @@ sub upgradeEMS {
 	print "\tUpgrading Event Manager\n" unless ($quiet);
 	my $db = $session->db;
 	print "\t\tGetting rid of old templates.\n" unless ($quiet);
-	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
+	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_product EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
 		my $templates = $db->read("select assetId from template where namespace=?",[$namespace]);
 		while (my ($id) = $templates->array) {
 			my $asset = WebGUI::Asset->new($session, $id,'WebGUI::Asset::Template');
