@@ -1603,6 +1603,8 @@ EOSQL3
             ]
         );
     }
+    print "\t\tAdding subscriptions to the config file:\n" unless $quiet;
+    $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Subscription');
 
     print "\tDone.\n" unless $quiet;
 }

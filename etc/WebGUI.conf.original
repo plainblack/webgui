@@ -209,6 +209,8 @@
 # Add Content menus.
 
 "assets" : [
+    "WebGUI::Asset::Sku::Product",
+    "WebGUI::Asset::Sku::Subscription",
     "WebGUI::Asset::Sku::Donation",
     "WebGUI::Asset::Sku::FlatDiscount",
 	"WebGUI::Asset::Snippet", 
