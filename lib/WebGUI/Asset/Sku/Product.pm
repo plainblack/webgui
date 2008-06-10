@@ -681,14 +681,20 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
-sub purgeRevision    {
+=head2 purgeRevision ( )
+
+See WebGUI::Asset::purgeRevision() for details.
+
+=cut
+
+sub purgeRevision {
     my $self = shift;
-    WebGUI::Storage->get($self->session,$self->get("image1"))->delete if    ($self->get("image1"));
-    WebGUI::Storage->get($self->session,$self->get("image2"))->delete if    ($self->get("image2"));
-    WebGUI::Storage->get($self->session,$self->get("image3"))->delete if    ($self->get("image3"));
-    WebGUI::Storage->get($self->session,$self->get("brochure"))->delete if    ($self->get("brochure"));
-    WebGUI::Storage->get($self->session,$self->get("manual"))->delete if    ($self->get("manual"));
-    WebGUI::Storage->get($self->session,$self->get("warranty"))->delete if    ($self->get("warranty"));
+    WebGUI::Storage->get($self->session, $self->get("image1"))->delete   if ($self->get("image1"));
+    WebGUI::Storage->get($self->session, $self->get("image2"))->delete   if ($self->get("image2"));
+    WebGUI::Storage->get($self->session, $self->get("image3"))->delete   if ($self->get("image3"));
+    WebGUI::Storage->get($self->session, $self->get("brochure"))->delete if ($self->get("brochure"));
+    WebGUI::Storage->get($self->session, $self->get("manual"))->delete   if ($self->get("manual"));
+    WebGUI::Storage->get($self->session, $self->get("warranty"))->delete if ($self->get("warranty"));
     return $self->SUPER::purgeRevision;
 }
 
