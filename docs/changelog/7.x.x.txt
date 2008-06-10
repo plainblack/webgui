@@ -1,5 +1,6 @@
 7.5.11
- - Replaced Cool Menus nav with a YUI nav, which works and looks better.
+ - Replaced Cool Menus nav with a YUI Menu, which works and looks better.
+ - Replaced dtree javascript with YUI TreeView.
  - fix: widget dialogues weren't opening correctly inside a widgetized
    view of a widget
  - fix: snippets were exporting as index.html or such. pass them through
