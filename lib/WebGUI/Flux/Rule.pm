@@ -64,12 +64,13 @@ These subroutines are available from this package:
 =cut
 
 # InsideOut object properties
-readonly session           => my %session;                # WebGUI::Session object
-private property           => my %property;               # Hash of object properties
-private expressionCache    => my %expressionCache;        # (hash) cache of WebGUI::Flux::Expression objects
-readonly evaluatingFor     => my %evaluatingFor;          # Set to a WebGUI::User when Rule is being evaluated
-public resolvedRuleCache   => my %resolvedRuleCache;      # (hash) cache of resolved WebGUI::Rules
-public unresolvedRuleCache => my %unresolvedRuleCache;    # (hash) cache of currently unresolved WebGUI::Rules
+readonly session              => my %session;                 # WebGUI::Session object
+private property              => my %property;                # Hash of object properties
+private expressionCache       => my %expressionCache;         # (hash) cache of WebGUI::Flux::Expression objects
+readonly evaluatingForUser    => my %evaluatingForUser;       # Set to a WebGUI::User when Rule is being evaluated
+readonly evaluatingForAssetId => my %evaluatingForAssetId;    # Set to an assetId when Rule is being evaluated
+public resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
+public unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
 
 # Default values used in create() method
 Readonly my %RULE_DEFAULTS => (
@@ -599,17 +600,22 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 evaluateFor ( user )
+=head2 evaluateFor ( options )
 
 Evaluates the Flux Rule for the given user
 
-=head3 user
+=head3 options
 
-The user who the Rule is being evaluated against
+A hash ref of options.
 
-=head3 options_ref
+=head4 user
 
-A hash ref of named properties, possible values are:
+A WebGUI::User object corresponding to the user who the Rule is being evaluated against (required)
+
+=head4 assetId
+
+The assetId of the asset/wobject for which the Rule is being evaluated for (optional) 
+
 
 =head4 indirect
 
@@ -620,33 +626,44 @@ fields relating to 'access' should not be set.
 =cut
 
 sub evaluateFor {
-    my ( $self, $user, $options_ref ) = @_;
+    my ( $self, $arg_ref ) = @_;
 
-    # Check arguments..
-    if ( @_ < 2 || @_ > 3 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => '2 or 3',
-            error    => 'invalid param count.' . scalar(@_) . Dumper(@_),
+    # Check args
+    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $arg_ref,
+            error => 'invalid named param hash ref.'
         );
     }
-    if ( !defined $user || ref $user ne 'WebGUI::User' ) {
+    foreach my $field qw(user) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
+    }
+    if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
         WebGUI::Error::InvalidObject->throw(
+            param    => $arg_ref->{user},
+            error    => 'named param missing.',
             expected => 'WebGUI::User',
-            got      => $user,
-            error    => 'need a user.'
+            got      => ref $arg_ref->{user},
         );
     }
 
     # Determine if Rule is being evaluated directly or indirectly..
     my $is_indirect
-        = ( defined $options_ref && $options_ref->{indirect} )
-        ? 1
+        = ( exists $arg_ref->{indirect} )
+        ? $arg_ref->{indirect}
         : 0;
 
     # Take note of which user we're evaluating the Rule for..
-    my $id = id $self;
-    $evaluatingFor{$id} = $user;
+    my $user = $arg_ref->{user};
+    my $id   = id $self;
+    $evaluatingForUser{$id} = $user;
+
+    # Take note of which asset we're evaluating the Rule for (if set)..
+    if ( exists $arg_ref->{assetId} ) {
+        $evaluatingForAssetId{$id} = $arg_ref->{assetId};
+    }
 
     # Rule with no expressions defaults to true
     if ( $self->getExpressionCount() == 0 ) {
@@ -684,7 +701,7 @@ by setting the environment variable: LIST_MOREUTILS_PP
 =cut 
 
         $was_successful = 1;
-        EVALUATE:
+    EVALUATE:
         foreach my $exp ( @{ $self->getExpressions() } ) {
             if ( !$exp->evaluate() ) {
                 $was_successful = 0;
@@ -738,6 +755,7 @@ The boolean status of the Rule evaluation
 Whether Rule evaluation was direct/indirect 
  
 =cut
+
 sub _finishEvaluating {
     my ( $self, $was_successful, $is_indirect ) = @_;
 
@@ -745,7 +763,8 @@ sub _finishEvaluating {
     $self->_updateUserDataTable( $was_successful, $is_indirect );
 
     my $id = id $self;
-    delete $evaluatingFor{$id};
+    delete $evaluatingForUser{$id};
+    delete $evaluatingForAssetId{$id};
     if ( !$is_indirect ) {
         $resolvedRuleCache{$id} = {};
         $unresolvedRuleCache{$id} = { $self->getId() => $self->getId() };
@@ -871,7 +890,7 @@ sub _updateUserDataTable {
         );
     }
 
-    my $user = $evaluatingFor{ id $self};
+    my $user = $evaluatingForUser{ id $self};
 
     # Check for entry in fluxRuleUserData table
     my %userData = %{

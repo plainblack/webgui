@@ -22,12 +22,12 @@ See WebGUI::Flux::Operand base class for more information.
 
 #-------------------------------------------------------------------
 
-sub execute {
-    my ($arg_ref) = @_;
+sub evaluate {
+    my ($self) = @_;
 
     # Assemble the ingredients..
-    my $thisRule            = $arg_ref->{rule};
-    my $requestedFluxRuleId = $arg_ref->{args}{fluxRuleId};
+    my $thisRule            = $self->rule();
+    my $requestedFluxRuleId = $self->args()->{fluxRuleId};
 
     # Immediately return the known result if the requested Rule has already been resolved
     my $resolvedRuleCache_ref = $thisRule->resolvedRuleCache();
@@ -67,29 +67,20 @@ sub execute {
     $requestedRule->unresolvedRuleCache($unresolvedRuleCache_ref);
 
     $_depth_counter++;
-    my $was_successful = $requestedRule->evaluateFor( $thisRule->evaluatingFor(), { indirect => 1, } );
+    my $was_successful = $requestedRule->evaluateFor(
+        { user => $thisRule->evaluatingForUser(), indirect => 1, assetId => $thisRule->evaluatingForAssetId() } );
 
     # Requested Rule is now resolved..
-    delete $unresolvedRuleCache_ref->{$requestedFluxRuleId};          # so remove it from unresolved cache
-    $resolvedRuleCache_ref->{$requestedFluxRuleId} = $was_successful; # .. and add to resolved cache
+    delete $unresolvedRuleCache_ref->{$requestedFluxRuleId};    # so remove it from unresolved cache
+    $resolvedRuleCache_ref->{$requestedFluxRuleId} = $was_successful;    # .. and add to resolved cache
 
     return $was_successful;
 }
 
 #-------------------------------------------------------------------
 
-=head3 getArgs
-
-This Operand requies the following arguments
-
-=head4 value
-
-The simple string to be returned
-
-=cut
-
-sub getArgs {
-    return { fluxRuleId => { type => 'fluxRuleId' } };
+sub definition {
+    return { args => { fluxRuleId => 1 } };
 }
 
 1;

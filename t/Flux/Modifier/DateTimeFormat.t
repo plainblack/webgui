@@ -12,6 +12,7 @@ use Data::Dumper;
 use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Flux::Rule;
 
 #----------------------------------------------------------------------------
 # Init
@@ -25,8 +26,7 @@ plan tests => 3;
 # put your tests here
 
 use_ok('WebGUI::Flux::Modifier');
-my $dummy_user_object = 'ignored';
-my $dummy_rule_object = 'ignored';
+my $rule   = WebGUI::Flux::Rule->create($session);
 
 # Not much to test since WebGUI::Flux::Modifier does all the heavy lifting (and that's tested in Modifier.t)
 {
@@ -38,12 +38,10 @@ my $dummy_rule_object = 'ignored';
         minute => 12,
         second => 47,
         time_zone => 'Australia/Melbourne',
-        
     );
-    is( WebGUI::Flux::Modifier->applyUsing(
+    is( WebGUI::Flux::Modifier->evaluateUsing(
             'DateTimeFormat',
-            {   user    => $dummy_user_object,
-                rule    => $dummy_rule_object,
+            {   rule    => $rule,
                 operand => $dt,
                 args    => { pattern => '%x %X', time_zone => 'Australia/Melbourne' }
             }
@@ -51,10 +49,9 @@ my $dummy_rule_object = 'ignored';
         'Oct 16, 1984 4:12:47 PM',
         'correctly formatted date in same timezone'
     );
-    is( WebGUI::Flux::Modifier->applyUsing(
+    is( WebGUI::Flux::Modifier->evaluateUsing(
             'DateTimeFormat',
-            {   user    => $dummy_user_object,
-                rule    => $dummy_rule_object,
+            {   rule    => $rule,
                 operand => $dt,
                 args    => { pattern => '%x %X', time_zone => 'America/Chicago' }
             }
@@ -67,5 +64,5 @@ my $dummy_rule_object = 'ignored';
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
+    $session->db->write('delete from fluxRule');
 }

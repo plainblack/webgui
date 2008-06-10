@@ -18,38 +18,31 @@ See WebGUI::Flux::Modifier base class for more information.
 
 #-------------------------------------------------------------------
 
-sub execute {
-    my ($arg_ref) = @_;
+sub evaluate {
+    my ($self) = @_;
 
-    my $units     = $arg_ref->{args}{units};
-    my $time_zone = $arg_ref->{args}{time_zone};
-    my $dt        = $arg_ref->{operand};
+    # Assemble the ingredients..
+    my $units = $self->args()->{units};
+    my $time_zone
+        = ( $self->args()->{time_zone} eq 'user' )
+        ? $self->user()->profileField("timeZone")
+        : $self->args()->{time_zone};
+    my $dt = $self->operand();
 
-    # Convert everything to UTC prior to maths
-    $dt->set_time_zone('UTC');
-    my $now = DateTime->now( time_zone => 'UTC' );
+    # Convert everything to requested timezone prior to maths
+    # Obviously, anything non-UTC could produce unintuitive results
+    $dt->set_time_zone($time_zone);
+    my $now = DateTime->now( time_zone => $time_zone );
 
     my $dur = $now->subtract_datetime($dt);
+
     return $dur->in_units($units);
 }
 
 #-------------------------------------------------------------------
 
-=head3 getArgs
-
-This Modifier requies the following arguments
-
-=head4 value
-
-The simple string to be returned
-
-=cut
-
-sub getArgs {
-    return {
-        units     => { type => 'string' },
-        time_zone => { type => 'string' },
-    };
+sub definition {
+    return { args => { units => 1, time_zone => 1 } };
 }
 
 1;

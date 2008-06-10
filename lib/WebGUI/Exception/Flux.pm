@@ -44,6 +44,36 @@ use Exception::Class (
         description => 'Circular Rule loop detected (infinite loops not allowed).',
         fields      => [ 'sourceFluxRuleId', 'targetFluxRuleId', 'depth' ],
     },
+    'WebGUI::Error::Flux::Operand::DefinitionError' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected with the definition of the WebGUI::Flux::Operand).',
+        fields => ['module'],
+    },
+    'WebGUI::Error::Flux::Operand::EvaluateFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected when attempting to evaluate the WebGUI::Flux::Operand).',
+        fields => ['module'],
+    },
+    'WebGUI::Error::Flux::Operator::DefinitionError' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected with the definition of the WebGUI::Flux::Operator).',
+        fields => ['module'],
+    },
+    'WebGUI::Error::Flux::Operator::EvaluateFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected when attempting to evaluate the WebGUI::Flux::Operator).',
+        fields => ['module'],
+    },
+    'WebGUI::Error::Flux::Modifier::DefinitionError' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected with the definition of the WebGUI::Flux::Modifier).',
+        fields => ['module'],
+    },
+    'WebGUI::Error::Flux::Modifier::EvaluateFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'A problem was detected when attempting to evaluate the WebGUI::Flux::Modifier).',
+        fields => ['module'],
+    },
 
 );
 

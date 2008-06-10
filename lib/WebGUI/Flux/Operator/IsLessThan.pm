@@ -4,7 +4,6 @@ use warnings;
 
 use base 'WebGUI::Flux::Operator';
 use Scalar::Util qw(looks_like_number);
-use Carp;
 
 =head1 NAME
 
@@ -20,8 +19,11 @@ See WebGUI::Flux::Operator base class for more information.
 
 #-------------------------------------------------------------------
 
-sub compare {
-    my ( $a, $b ) = @_;
+sub evaluate {
+    my ( $self) = @_;
+    
+    my $a = $self->operand1();
+    my $b = $self->operand2();
     
     if ( looks_like_number($a) && looks_like_number($b) ) {
         return $a < $b;

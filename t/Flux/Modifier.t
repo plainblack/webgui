@@ -13,6 +13,7 @@ use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use DateTime;
+use WebGUI::Flux::Rule;
 
 #----------------------------------------------------------------------------
 # Init
@@ -26,74 +27,73 @@ plan tests => 11;
 # put your tests here
 
 use_ok('WebGUI::Flux::Modifier');
-my $dummy_user_object = 'ignored';
-my $dummy_rule_object = 'ignored';
+my $rule = WebGUI::Flux::Rule->create($session);
 
 {
-    eval { WebGUI::Flux::Modifier->applyUsing(); };
+    eval { WebGUI::Flux::Modifier->evaluateUsing(); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'applyUsing takes exception to wrong number of args' );
+    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'evaluateUsing takes exception to wrong number of args' );
     cmp_deeply(
         $e,
         methods(
             expected => 3,
             got      => 1,
         ),
-        'applyUsing takes exception to wrong number of args',
+        'evaluateUsing takes exception to wrong number of args',
     );
 }
 {
-    eval { WebGUI::Flux::Modifier->applyUsing( 'Qbit', 'NotAHashRef' ); };
+    eval { WebGUI::Flux::Modifier->evaluateUsing( 'Qbit', 'NotAHashRef' ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'applyUsing takes exception to missing hash ref' );
+    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'evaluateUsing takes exception to missing hash ref' );
     cmp_deeply(
         $e,
         methods(
             param => 'NotAHashRef',
         ),
-        'applyUsing takes exception to missing hash ref',
+        'evaluateUsing takes exception to missing hash ref',
     );
 }
 {
-    eval { WebGUI::Flux::Modifier->applyUsing( 'Qbit', {} ); };
+    eval { WebGUI::Flux::Modifier->evaluateUsing( 'Qbit', {} ); };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::NamedParamMissing', 'applyUsing takes exception to missing fields' );
+    isa_ok( $e, 'WebGUI::Error::NamedParamMissing', 'evaluateUsing takes exception to missing fields' );
 }
 {
     eval {
-        WebGUI::Flux::Modifier->applyUsing( 'Qbit',
-            { user => $dummy_user_object, rule => $dummy_rule_object, operand => 0, args => {}, } );
+        WebGUI::Flux::Modifier->evaluateUsing( 'Qbit',
+            { rule => $rule, operand => undef, args => {}} );
     };
     my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'applyUsing takes exception to invalid Modifier' );
+    isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'evaluateUsing takes exception to invalid Modifier' );
     cmp_deeply(
         $e,
         methods( error => re(qr/^Could not load WebGUI::Flux::Modifier::Qbit/), ),
-        'applyUsing takes exception to invalid Modifier',
+        'evaluateUsing takes exception to invalid Modifier',
     );
 }
 {
     eval {
-        WebGUI::Flux::Modifier->applyUsing( 'DateTimeFormat',
-            { user => $dummy_user_object, rule => $dummy_rule_object, operand => 0, args => {}, } );
+        WebGUI::Flux::Modifier->evaluateUsing( 'DateTimeFormat',
+            { rule => $rule, operand => undef, args => {}} );
     };
     my $e = Exception::Class->caught();
 
     # N.B. Throws an exception b/c DateTimeFormat requires 'value' field in its args list
     isa_ok(
         $e, 'WebGUI::Error::InvalidParam',
-        'applyUsing takes exception to missing field from Modifier arg list'
+        'evaluateUsing takes exception to missing field from Modifier arg list'
     );
     cmp_deeply(
         $e,
         methods( error => 'Missing required Modifier arg.', ),
-        'applyUsing takes exception to missing field from Modifier arg list',
+        'evaluateUsing takes exception to missing field from Modifier arg list',
     );
 }
 
 {
 
-    # Try out applyUsing(), using DateTimeFormat as our guinea pig
+    # Try out evaluateUsing(), using DateTimeFormat as our guinea pig
     my $dt = DateTime->new(
         year   => 1984,
         month  => 10,
@@ -104,10 +104,9 @@ my $dummy_rule_object = 'ignored';
         time_zone => 'Australia/Melbourne',
         
     );
-    is( WebGUI::Flux::Modifier->applyUsing(
+    is( WebGUI::Flux::Modifier->evaluateUsing(
             'DateTimeFormat',
-            {   user    => $dummy_user_object,
-                rule    => $dummy_rule_object,
+            {   rule    => $rule,
                 operand => $dt,
                 args    => { pattern => '%x %X', time_zone => 'Australia/Melbourne' }
             }

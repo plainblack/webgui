@@ -12,6 +12,7 @@ use Data::Dumper;
 use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Flux::Rule;
 
 #----------------------------------------------------------------------------
 # Init
@@ -25,28 +26,28 @@ plan tests => 3;
 # put your tests here
 
 use_ok('WebGUI::Flux::Operand::NumericValue');
-my $dummy_user_object = 'ignored';
-my $dummy_rule_object = 'ignored';
+$session->user( { userId => 1 } );
+my $user   = $session->user();
 
-# Not much to test since WebGUI::Flux::Operand does all the heavy lifting (and that's tested in Operand.t)
 
 # TODO: If we need this "Numeric" at all (as distinct from String), which I'm not convinced we do,
 # then we should be testing that the returned value is a perl number and not a perl string
+
 {
-    is( WebGUI::Flux::Operand->executeUsing(
+    # Test the raw output of this Operand via -Operand>evaluateUsing
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    is( WebGUI::Flux::Operand->evaluateUsing(
             'NumericValue',
-            {   user => $dummy_user_object,
-                rule => $dummy_rule_object,
+            {   rule => $rule,
                 args => { value => 3 }
             }
         ),
         3,
         q{3 == 3}
     );
-    is( WebGUI::Flux::Operand->executeUsing(
+    is( WebGUI::Flux::Operand->evaluateUsing(
             'NumericValue',
-            {   user => $dummy_user_object,
-                rule => $dummy_rule_object,
+            {   rule => $rule,
                 args => { value => 123 }
             }
         ),
@@ -58,5 +59,7 @@ my $dummy_rule_object = 'ignored';
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
+    $session->db->write('delete from fluxRule');
+    $session->db->write('delete from fluxExpression');
+    $session->db->write('delete from fluxRuleUserData');
 }

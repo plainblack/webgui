@@ -18,32 +18,23 @@ See WebGUI::Flux::Modifier base class for more information.
 
 #-------------------------------------------------------------------
 
-sub execute {
-    my ($arg_ref) = @_;
+sub evaluate {
+    my ($self) = @_;
 
-    my $pattern  = $arg_ref->{args}{pattern};
-    my $time_zone = $arg_ref->{args}{time_zone};
-    my $dt       = $arg_ref->{operand}->set_time_zone($time_zone);
+    # Assemble the ingredients..
+    my $pattern     = $self->args()->{pattern};
+    my $time_zone
+        = ( $self->args()->{time_zone} eq 'user' )
+        ? $self->user()->profileField("timeZone")
+        : $self->args()->{time_zone};
+    my $dt       = $self->operand()->set_time_zone($time_zone);
     return $dt->strftime($pattern);
 }
 
 #-------------------------------------------------------------------
 
-=head3 getArgs
-
-This Modifier requies the following arguments
-
-=head4 value
-
-The simple string to be returned
-
-=cut
-
-sub getArgs {
-    return {
-        pattern  => { type => 'string' },
-        time_zone => { type => 'string' },
-    };
+sub definition {
+    return { args => { pattern => 1, time_zone => 1 } };
 }
 
 1;

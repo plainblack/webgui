@@ -9,6 +9,7 @@ use JSON;
 use WebGUI::Exception::Flux;
 use WebGUI::Flux::Operand;
 use WebGUI::Flux::Operator;
+use WebGUI::Flux::Modifier;
 
 =head1 NAME
 
@@ -350,17 +351,41 @@ sub evaluate {
     }
 
     # Assemble all the ingredients..
-    my $id           = id $self;
-    my $rule         = $rule{$id};
-    my $operand1     = $property{$id}{operand1};
-    my $operand1Args = from_json( $property{$id}{operand1Args} );    # deserialise JSON-encoded args
-    my $operand2     = $property{$id}{operand2};
-    my $operand2Args = from_json( $property{$id}{operand2Args} );    # deserialise JSON-encoded args
-    my $operator     = $property{$id}{operator};
+    my $id               = id $self;
+    my $rule             = $rule{$id};
+    my $operand1         = $property{$id}{operand1};
+    my $operand1Args     = from_json( $property{$id}{operand1Args} );    # deserialise JSON-encoded args
+    my $operand1Modifier = $property{$id}{operand1Modifier};
+    my $operand2         = $property{$id}{operand2};
+    my $operand2Args     = from_json( $property{$id}{operand2Args} );    # deserialise JSON-encoded args
+    my $operand2Modifier = $property{$id}{operand2Modifier};
+    my $operator         = $property{$id}{operator};
 
-    my $operand1_val = WebGUI::Flux::Operand->executeUsing( $operand1, { rule => $rule, args => $operand1Args } );
-    my $operand2_val = WebGUI::Flux::Operand->executeUsing( $operand2, { rule => $rule, args => $operand2Args } );
+    # Evaluate operand1..
+    my $operand1_val = WebGUI::Flux::Operand->evaluateUsing( $operand1, { rule => $rule, args => $operand1Args } );
+    
+    if ($operand1Modifier) {
 
-    return WebGUI::Flux::Operator->compareUsing( $operator, $operand1_val, $operand2_val );
+        # Modifier is optional so only try it if it's defined..
+        my $operand1ModifierArgs
+            = from_json( $property{$id}{operand1ModifierArgs} );         # deserialise JSON-encoded args
+        $operand1_val = WebGUI::Flux::Modifier->evaluateUsing( $operand1Modifier,
+            { rule => $rule, operand => $operand1_val, args => $operand1ModifierArgs } );
+    }
+
+    # Evaluate operand2..
+    my $operand2_val = WebGUI::Flux::Operand->evaluateUsing( $operand2, { rule => $rule, args => $operand2Args } );
+    if ($operand2Modifier) {
+
+        # Modifier is optional so only try it if it's defined..
+        my $operand2ModifierArgs
+            = from_json( $property{$id}{operand2ModifierArgs} );         # deserialise JSON-encoded args
+        $operand2_val = WebGUI::Flux::Modifier->evaluateUsing( $operand2Modifier,
+            { rule => $rule, operand => $operand2_val, args => $operand2ModifierArgs } );
+    }
+
+    # Evaluate operator, passing in the two operands
+    return WebGUI::Flux::Operator->evaluateUsing( $operator,
+        { rule => $rule, operand1 => $operand1_val, operand2 => $operand2_val } );
 }
 1;

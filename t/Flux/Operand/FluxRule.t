@@ -55,11 +55,11 @@ my $user = $session->user();
         }
     );
 
-    ok( $dependent_rule->evaluateFor($user), q{Dependent rule true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Dependent rule true} );
     $simple_rule->update( { combinedExpression => 'not E1' } );
-    ok( !$dependent_rule->evaluateFor($user), q{Dependent rule false when simple rule toggled} );
+    ok( !$dependent_rule->evaluateFor( { user => $user, }), q{Dependent rule false when simple rule toggled} );
     $dependent_rule->update( { combinedExpression => 'not E1' } );
-    ok( $dependent_rule->evaluateFor($user), q{Double-negative is true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Double-negative is true} );
 
     # make $simple_rule circular by pointing it back at dependent_rule
     $simple_rule->addExpression(
@@ -71,7 +71,7 @@ my $user = $session->user();
         }
     );
     {
-        eval { $dependent_rule->evaluateFor($user) };
+        eval { $dependent_rule->evaluateFor( { user => $user, }) };
         my $e = Exception::Class->caught();
         isa_ok(
             $e,
@@ -92,7 +92,7 @@ my $user = $session->user();
         }
     );
     {
-        eval { $self_circular_rule->evaluateFor($user) };
+        eval { $self_circular_rule->evaluateFor( { user => $user, }) };
         my $e = Exception::Class->caught();
         isa_ok(
             $e,
@@ -137,9 +137,9 @@ my $user = $session->user();
         }
     );
 
-    ok( $dependent_rule->evaluateFor($user), q{Twice-dependent rule true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Twice-dependent rule true} );
     $dependent_rule->update( { combinedExpression => 'not(not E1 or not E2)' } );
-    ok( $dependent_rule->evaluateFor($user), q{Twice-dependent rule works with a cE too} );
+    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Twice-dependent rule works with a cE too} );
 
     # TODO: improve the above test to check that the resolvedRuleCache was actually used
 }

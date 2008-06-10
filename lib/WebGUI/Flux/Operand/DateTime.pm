@@ -1,16 +1,17 @@
-package WebGUI::Flux::Operand::TextValue;
+package WebGUI::Flux::Operand::DateTime;
 use strict;
 use warnings;
 
 use base 'WebGUI::Flux::Operand';
+use WebGUI::DateTime;
 
 =head1 NAME
 
-Package WebGUI::Flux::Operand::TextValue
+Package WebGUI::Flux::Operand::DateTime
 
 =head1 DESCRIPTION
 
-Text Value
+DateTime Value
 
 See WebGUI::Flux::Operand base class for more information.
 
@@ -21,7 +22,7 @@ See WebGUI::Flux::Operand base class for more information.
 sub evaluate {
     my ($self) = @_;
 
-    return $self->args()->{value};
+    return WebGUI::DateTime->new($self->args()->{value});
 }
 
 #-------------------------------------------------------------------

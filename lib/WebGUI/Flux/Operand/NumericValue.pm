@@ -18,26 +18,16 @@ See WebGUI::Flux::Operand base class for more information.
 
 #-------------------------------------------------------------------
 
-sub execute {
-    my ($arg_ref) = @_;
+sub evaluate {
+    my ($self) = @_;
 
-    return $arg_ref->{args}{value};
+    return $self->args()->{value};
 }
 
 #-------------------------------------------------------------------
 
-=head3 getArgs
-
-This Operand requies the following arguments
-
-=head4 value
-
-The number to be returned
-
-=cut
-
-sub getArgs {
-    return { value => { type => 'number'} };
+sub definition {
+    return { args => { value => 1 } };
 }
 
 1;

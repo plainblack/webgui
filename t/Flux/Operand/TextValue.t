@@ -12,6 +12,7 @@ use Data::Dumper;
 use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Flux::Rule;
 
 #----------------------------------------------------------------------------
 # Init
@@ -19,30 +20,60 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 2;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Flux::Operand::TextValue');
-my $dummy_user_object = 'ignored';
-my $dummy_rule_object = 'ignored';
+$session->user( { userId => 1 } );
+my $user   = $session->user();
 
-# Not much to test since WebGUI::Flux::Operand does all the heavy lifting (and that's tested in Operand.t)
+
 {
-    is( WebGUI::Flux::Operand->executeUsing(
+    # Test the raw output of this Operand via -Operand>evaluateUsing
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    is( WebGUI::Flux::Operand->evaluateUsing(
             'TextValue',
-            {   user => $dummy_user_object,
-                rule => $dummy_rule_object,
+            {
+                rule => $rule,
                 args => { value => 'test value' }
             }
         ),
         'test value'
     );
 }
+{
+    # Test through higher-level rule->evaluateFor
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    $rule->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
+        }
+    );
+    ok( $rule->evaluateFor( { user => $user, } ), q{"test value" == "test value"} );
+}
+{
+    # Repeat with a false expression
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    $rule->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "applea"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "oranges"}',
+            operator     => 'IsEqualTo',
+        }
+    );
+    ok( !$rule->evaluateFor( { user => $user, } ), q{"apples" != "oranges"} );
+}
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
+    $session->db->write('delete from fluxRule');
+    $session->db->write('delete from fluxExpression');
+    $session->db->write('delete from fluxRuleUserData');
 }
