@@ -55,7 +55,12 @@ save you many hours of grief.
 
  * All Product Templates that shipped with earlier versions of WebGUI have
    been deleted, except for the Default Product Macro.  During the upgrade,
-   all products have been updated to use the Default Product Macro.
+   all products have been updated to use the Default Product Macro.  If you want
+   to keep these, you will need to make a copy of them before the upgrade.
+
+ * All Commerce Templates that shipped with earlier versions of WebGUI have
+   been deleted.  If you want to keep these, you will need to make a copy of
+   them before the upgrade.
 
  * Subscriptions have been converted to assets. These assets will be placed in 
    the import node in the folder 'Migrated Subscriptions'. 

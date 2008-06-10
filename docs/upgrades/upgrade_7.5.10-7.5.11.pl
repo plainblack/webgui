@@ -45,7 +45,6 @@ addingInStoreCredit($session);
 insertCommerceTaxTable($session);
 migrateOldTaxTable($session);
 insertCommerceShipDriverTable($session);
-removeOldCommerceCode($session);
 migrateToNewCart($session);
 createSkuAsset($session);
 createDonationAsset($session);
@@ -79,6 +78,7 @@ addNewApprovalActivities( $session );
 addUserListWobject( $session );
 addInheritUrlFromParent( $session );
 addDefaultFilesPerPage( $session );
+removeOldCommerceCode($session);
 
 finish($session); # this line required
 
@@ -1134,16 +1134,16 @@ sub removeOldCommerceCode {
     unlink '../../lib/WebGUI/Product.pm';
     unlink '../../lib/WebGUI/Subscription.pm';
     unlink '../../lib/WebGUI/Operation/TransactionLog.pm';
-unlink '../../lib/WebGUI/i18n/English/CommercePaymentCash.pm';
-unlink '../../lib/WebGUI/i18n/English/CommercePaymentCheck.pm';
-unlink '../../lib/WebGUI/i18n/English/CommercePaymentITransact.pm';
-unlink '../../lib/WebGUI/i18n/English/CommerceShippingByPrice.pm';
-unlink '../../lib/WebGUI/i18n/English/CommerceShippingByWeight.pm';
-unlink '../../lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm';
-unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm';
-unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm';
-unlink '../../lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm';
-$session->db->write("delete from WorkflowActivity where className='WebGUI::Workflow::Activity::ProcessRecurringPayments'");
+    unlink '../../lib/WebGUI/i18n/English/CommercePaymentCash.pm';
+    unlink '../../lib/WebGUI/i18n/English/CommercePaymentCheck.pm';
+    unlink '../../lib/WebGUI/i18n/English/CommercePaymentITransact.pm';
+    unlink '../../lib/WebGUI/i18n/English/CommerceShippingByPrice.pm';
+    unlink '../../lib/WebGUI/i18n/English/CommerceShippingByWeight.pm';
+    unlink '../../lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm';
+    unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm';
+    unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm';
+    unlink '../../lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm';
+    $session->db->write("delete from WorkflowActivity where className='WebGUI::Workflow::Activity::ProcessRecurringPayments'");
     unlink '../../lib/WebGUI/Macro/Product.pm';
     unlink '../../lib/WebGUI/Help/Macro_Product.pm';
     unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';
@@ -1173,6 +1173,15 @@ $session->db->write("delete from WorkflowActivity where className='WebGUI::Workf
     unlink '../../www/extras/adminConsole/productManager.gif';
     unlink '../../www/extras/adminConsole/small/productManager.gif';
 
+    ##Delete unused templates
+    my $templates = $session->db->read("select distinct(assetId) from template where namespace like 'Commerce%'",[]);
+    while (my $hash = $templates->hashRef) {
+        my $template = WebGUI::Asset->newByDynamicClass($session, $hash->{assetId});
+        $template->purge;
+    }
+
+    ##Drop commerce specific tables;
+    $session->db->write('drop table commerceSettings');
 
     #Disable the Product macro in the config file.  You can't use the convenience method
     #deleteFromHash since the macro name is in the value, not the key.
