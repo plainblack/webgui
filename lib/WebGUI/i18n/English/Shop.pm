@@ -39,12 +39,6 @@ our $I18N = {
 		context		=> q|a help title|,
 	},
 
-	'address book template' => {
-		message 	=> q|Address Book Template|,
-		lastUpdated	=> 0,
-		context		=> q|a help title|,
-	},
-
 	'cart template' => {
 		message 	=> q|Cart Template|,
 		lastUpdated	=> 0,
@@ -345,10 +339,22 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
+	'name help' => {
+		message 	=> q|The name of the person at this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the name template variable in the address book|,
+	},
+
 	'cityField help' => {
 		message 	=> q|A field to contain the city for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
+	},
+
+	'city help' => {
+		message 	=> q|The city for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the city template variable.|,
 	},
 
 	'stateField help' => {
@@ -357,10 +363,22 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
+	'state help' => {
+		message 	=> q|The state or province for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the address book template variable|,
+	},
+
 	'countryField help' => {
 		message 	=> q|A field to contain the country for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
+	},
+
+	'country help' => {
+		message 	=> q|The country for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the address book template variable, country.|,
 	},
 
 	'codeField help' => {
@@ -369,10 +387,22 @@ our $I18N = {
 		context		=> q|a help description|,
 	},
 
+	'code help' => {
+		message 	=> q|The postal, or zip code, for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the address book template variable, code.|,
+	},
+
 	'phoneNumberField help' => {
 		message 	=> q|A field to contain the phone number for this address.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
+	},
+
+	'phoneNumber help' => {
+		message 	=> q|A phone number for this address.|,
+		lastUpdated	=> 0,
+		context		=> q|Help for the address book template variable, phoneNumber.|,
 	},
 
 	'view cart' => {
@@ -919,6 +949,54 @@ our $I18N = {
         message => q|View all imported products|,
         lastUpdated => 1213047491,
         context => q|Label for a shortcut to the import products folder|
+    },
+
+    'address1' => {
+        message => q|address1|,
+        lastUpdated => 1213121298,
+        context => q|Name of a template variable for the edit address template|,
+    },
+
+    'address1 help' => {
+        message => q|The first address line.|,
+        lastUpdated => 1213121298,
+        context => q|Description of a template variable for the edit address template|,
+    },
+
+    'address2' => {
+        message => q|address2|,
+        lastUpdated => 1213121298,
+        context => q|Name of a template variable for the edit address template|,
+    },
+
+    'address2 help' => {
+        message => q|The second address line.|,
+        lastUpdated => 1213121298,
+        context => q|Description of a template variable for the edit address template|,
+    },
+
+    'address3' => {
+        message => q|address3|,
+        lastUpdated => 1213121298,
+        context => q|Name of a template variable for the edit address template|,
+    },
+
+    'address3 help' => {
+        message => q|The third address line|,
+        lastUpdated => 1213121298,
+        context => q|Description of a template variable for the edit address template|,
+    },
+
+    'addresses loop help' => {
+        message => q|A loop containing all addresses in this address book|,
+        lastUpdated => 1213121298,
+        context => q|Description of a template variable for the edit address template|,
+    },
+
+    'email receipt template' => {
+        message => q|Email Receipt Template|,
+        lastUpdated => 1213121298,
+        context => q|Title of the Email Receipt Template help page|,
     },
 
 };
