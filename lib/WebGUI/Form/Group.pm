@@ -133,7 +133,7 @@ Formats as a name.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $group = WebGUI::Group->new($self->session, $self->getValue);
+    my $group = WebGUI::Group->new($self->session, $self->getDefaultValue);
     if (defined $group) {
         return $group->name;
     }

@@ -169,7 +169,7 @@ sub getValueAsHtml {
 	} 
     else {
 		# MySQL format
-		my $value = $self->getValue;
+		my $value = $self->getDefaultValue;
         return $value;
 	}
 }

@@ -119,7 +119,7 @@ Shows either Yes or No.
 sub getValueAsHtml {
     my $self = shift;
     my $i18n = WebGUI::International->new($self->session);
-    if ($self->getValue) {
+    if ($self->getDefaultValue) {
         return $i18n->get(138);
     }
     return $i18n->get(139);

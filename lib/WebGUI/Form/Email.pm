@@ -81,7 +81,7 @@ Formats as an email link.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $email = $self->getValue;
+    my $email = $self->getDefaultValue;
     return '<a href="mailto:'.$email.'">'.$email.'</a>';
 }
 

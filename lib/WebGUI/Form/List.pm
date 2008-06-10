@@ -261,7 +261,7 @@ Return all the options
 sub getValueAsHtml {
 	my ($self) = @_;
     my $options = $self->getOptions;
-    return join ", ", map { $options->{$_} } $self->getValue();
+    return join ", ", map { $options->{$_} } $self->getDefaultValue;
 }
 
 #-------------------------------------------------------------------

@@ -436,7 +436,7 @@ Returns the value rendered suitably in HTML. This is useful for forms that are r
 
 sub getValueAsHtml {
     my $self = shift;
-    return $self->getValue(@_);
+    return $self->getDefaultValue(@_);
 }
 
 #-------------------------------------------------------------------
