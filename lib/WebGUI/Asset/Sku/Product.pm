@@ -65,8 +65,8 @@ Override/extend Sku's addToCart method to handle inventory control.
 =head3 variant
 
 A hashref of variant information for the variant of the Product
-that is being added to the cart.  Adding the variant to the
-cart decrements the quantity by 1.
+that is being added to the cart.  Inventory management is handled
+by the cart, which calls onAdjustQuantity.
 
 =cut
 
@@ -74,8 +74,6 @@ sub addToCart {
     my $self     = shift;
     my $variant  = shift;
     my $i18n     = WebGUI::International->new($self->session, 'Asset_Product');
-    $variant->{quantity} -= 1;
-    $self->setCollateral('variantsJSON', 'variantId', $variant);
     $self->SUPER::addToCart($variant);
 }
 
@@ -308,7 +306,8 @@ sub getCollateral {
     my $table = $self->getAllCollateral($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return {} if $index == -1;
-    return $table->[$index];
+    my %copy = %{ $table->[$index] };
+    return \%copy;
 }
 
 
@@ -598,11 +597,11 @@ sub onAdjustQuantityInCart {
     my $item   = shift;
     my $amount = shift;
     ##Update myself, as options
-    $self->getOptions->{quantity} += $amount;
+    $self->getOptions->{quantity} -= $amount;
     ##Update my collateral
     my $vid = $self->getOptions->{variantId};
     my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
-    $collateral->{quantity} += $amount;
+    $collateral->{quantity} -= $amount;
     $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
 }
 

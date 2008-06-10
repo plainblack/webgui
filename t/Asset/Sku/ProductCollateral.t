@@ -35,7 +35,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 32;        # Increment this number for each test you create
+plan tests => 33;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -278,6 +278,18 @@ isnt($newVid, 'new', 'setCollateral assigns a new id to collateral with an id of
 ok($session->id->valid($newVid), '... and it is a valid GUID');
 
 $product4->purge;
+
+my $product5 = $root->addChild({
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Working in the laundry",
+        });
+
+$newVid = $product5->setCollateral('variantsJSON', 'vid', 'new', { check => 'no leaks', vid => 'new' });
+my $leak = $product5->getCollateral('variantsJSON', 'vid', $newVid);
+$leak->{check} = 'leaky';
+is( $product5->getCollateral('variantsJSON', 'vid', $newVid)->{check}, 'no leaks', 'getCollateral returns a safe copy');
+
+$product5->purge;
 
 #----------------------------------------------------------------------------
 # Cleanup
