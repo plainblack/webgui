@@ -1,4 +1,5 @@
 7.5.11
+ - Replaced Cool Menus nav with a YUI nav, which works and looks better.
  - fix: widget dialogues weren't opening correctly inside a widgetized
    view of a widget
  - fix: snippets were exporting as index.html or such. pass them through
