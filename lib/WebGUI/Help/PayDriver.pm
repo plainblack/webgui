@@ -107,6 +107,22 @@ our $HELP = {
                         name        => 'shippingAddressPhoneNumber',
                         description => 'item shippingAddressPhoneNumber',
                     },
+                    {
+                        name        => 'lastUpdated',
+                        description => 'item lastUpdated',
+                    },
+                    {
+                        name        => 'quantity',
+                        description => 'item quantity',
+                    },
+                    {
+                        name        => 'price',
+                        description => 'item price',
+                    },
+                    {
+                        name        => 'vendorId',
+                        description => 'item vendorId',
+                    },
                 ],
             },
             {
@@ -213,10 +229,6 @@ our $HELP = {
             },
         ],
         related     => [  
-            {
-                tag         => 'address book template',
-                namespace     => 'Shop',
-            },
         ],
     },
 

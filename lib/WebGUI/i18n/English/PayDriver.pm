@@ -377,7 +377,7 @@ our $I18N = {
     },
 
     'orderStatus' => {
-        message => q|The status of this item, Shipped, Canceled, Backordered or NotShipped.|,
+        message => q|The internationalized status of this item, Shipped, Canceled, Backordered or Not Shipped.|,
         lastUpdated => 1213135307,
         context => q|Template variable for email receipt template|,
     },
@@ -469,6 +469,30 @@ our $I18N = {
     'item shippingAddressPhoneNumber' => {
         message => q|The phone number from the shipping address.|,
         lastUpdated => 1213133715,
+        context => q|Template variable for email receipt template|,
+    },
+
+    'item lastUpdated' => {
+        message => q|The date this transaction item was last updated.|,
+        lastUpdated => 1213133715,
+        context => q|Template variable for email receipt template|,
+    },
+
+    'item quantity' => {
+        message => q|The quantity of the SKU that was purchased.|,
+        lastUpdated => 1213133715,
+        context => q|Template variable for email receipt template|,
+    },
+
+    'item price' => {
+        message => q|The unformatted price of this SKU.|,
+        lastUpdated => 1213137846,
+        context => q|Template variable for email receipt template|,
+    },
+
+    'item vendorId' => {
+        message => q|The ID of the vendor of this item.|,
+        lastUpdated => 1213137846,
         context => q|Template variable for email receipt template|,
     },
 
