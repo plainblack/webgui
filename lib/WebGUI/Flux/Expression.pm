@@ -129,9 +129,22 @@ sub create {
         }
     }
 
+    # Work out the next highest sequence number
+    my $sequenceNumber
+        = $rule->session->db->quickScalar( 'select max(sequenceNumber) from fluxExpression where fluxRuleId=?',
+        [ $rule->getId() ] );
+    $sequenceNumber = $sequenceNumber ? $sequenceNumber + 1 : 1;
+
     # Create a bare-minimum entry in the db..
-    my $id = $rule->session->db->setRow( 'fluxExpression', 'fluxExpressionId',
-        { fluxExpressionId => 'new', fluxRuleId => $rule->getId(), %EXPRESSION_DEFAULTS } );
+    my $id = $rule->session->db->setRow(
+        'fluxExpression',
+        'fluxExpressionId',
+        {   %EXPRESSION_DEFAULTS,
+            fluxExpressionId => 'new',
+            fluxRuleId       => $rule->getId(),
+            sequenceNumber   => $sequenceNumber
+        }
+    );
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $expression = $class->new( $rule, $id );
@@ -150,10 +163,10 @@ Removes this expression from the Rule.
 
 sub delete {
     my $self = shift;
-    
+
     # Reset the Rule's combined expression
     $self->rule->resetCombinedExpression();
-    
+
     $self->rule->session->db->deleteRow( 'fluxExpression', 'fluxExpressionId', $self->getId );
     undef $self;
     return undef;
@@ -302,7 +315,7 @@ sub update {
             error => 'invalid properties hash ref.'
         );
     }
-    
+
     # Reset the Rule's combined expression
     $self->rule->resetCombinedExpression();
 
@@ -325,7 +338,7 @@ Evaluates this Flux Expression
 =cut
 
 sub evaluate {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # Check arguments..
     if ( @_ != 1 ) {
@@ -337,18 +350,16 @@ sub evaluate {
     }
 
     # Assemble all the ingredients..
-    my $id   = id $self;
-    my $rule = $rule{$id};
+    my $id           = id $self;
+    my $rule         = $rule{$id};
     my $operand1     = $property{$id}{operand1};
     my $operand1Args = from_json( $property{$id}{operand1Args} );    # deserialise JSON-encoded args
     my $operand2     = $property{$id}{operand2};
     my $operand2Args = from_json( $property{$id}{operand2Args} );    # deserialise JSON-encoded args
     my $operator     = $property{$id}{operator};
 
-    my $operand1_val = WebGUI::Flux::Operand->executeUsing( $operand1,
-        { rule => $rule, args => $operand1Args } );
-    my $operand2_val = WebGUI::Flux::Operand->executeUsing( $operand2,
-        { rule => $rule, args => $operand2Args } );
+    my $operand1_val = WebGUI::Flux::Operand->executeUsing( $operand1, { rule => $rule, args => $operand1Args } );
+    my $operand2_val = WebGUI::Flux::Operand->executeUsing( $operand2, { rule => $rule, args => $operand2Args } );
 
     return WebGUI::Flux::Operator->compareUsing( $operator, $operand1_val, $operand2_val );
 }

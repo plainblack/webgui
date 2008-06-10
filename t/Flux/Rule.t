@@ -338,7 +338,6 @@ $session->db->write('delete from fluxRuleUserData');
             operand2       => 'NumericValue',
             operand2Args   => '{"value":  121}',
             operator       => 'IsLessThan',
-            sequenceNumber => 2,
         }
     );
     ok( $rule->evaluateFor( $user ), q{true with two expressions and no cE} );
@@ -358,7 +357,6 @@ $session->db->write('delete from fluxRuleUserData');
             operand2       => 'TextValue',
             operand2Args   => '{"value":  "oranges"}',
             operator       => 'IsEqualTo',
-            sequenceNumber => 3,
         }
     );
     ok( !$rule->evaluateFor( $user ), q{false with no cE bc E3 is false} );
@@ -472,4 +470,5 @@ sub _secondsFromNow {
 END {
     $session->db->write('delete from fluxRule');
     $session->db->write('delete from fluxExpression');
+    $session->db->write('delete from fluxRuleUserData');
 }

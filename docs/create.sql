@@ -1516,6 +1516,7 @@ CREATE TABLE `databaseLink` (
 CREATE TABLE `fluxRule` (
   `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `name` varchar(255) NOT NULL default 'Undefined',
+  `sequenceNumber` int(11) NOT NULL default '1',
   `sticky` tinyint(1) NOT NULL default '0',
   `onRuleFirstTrueWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
   `onRuleFirstFalseWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,

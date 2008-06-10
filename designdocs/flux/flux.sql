@@ -1,6 +1,7 @@
 CREATE TABLE `fluxRule` (
   `fluxRuleId` varchar(22) character set utf8 collate utf8_bin NOT NULL,
   `name` varchar(255) NOT NULL,
+  `sequenceNumber` int(11) NOT NULL default '1',
   `sticky` tinyint(1) NOT NULL,
   `onRuleFirstTrueWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,
   `onRuleFirstFalseWorkflowId` varchar(22) character set utf8 collate utf8_bin default NULL,

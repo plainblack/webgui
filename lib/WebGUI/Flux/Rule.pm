@@ -7,10 +7,8 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Exception::Flux;
 use WebGUI::Flux::Expression;
 use Readonly;
-use List::MoreUtils qw(any);
 use WebGUI::DateTime;
 use English qw( -no_match_vars );
-use Regexp::Common;    # not bundled in WRE
 
 =head1 NAME
 
@@ -85,7 +83,7 @@ Readonly my @MUTABLE_PROPERTIES => qw(
     onRuleFirstTrueWorkflowId   onRuleFirstFalseWorkflowId
     onAccessFirstTrueWorkflowId onAccessFirstFalseWorkflowId
     onAccessTrueWorkflowId      onAccessFalseWorkflowId
-    combinedExpression
+    combinedExpression          sequenceNumber
 );
 
 # Regex used to 'whitelist' combined expression tokens
@@ -159,8 +157,13 @@ sub create {
     # Ok for $properties_ref to be missing
     $properties_ref = defined $properties_ref ? $properties_ref : {};
 
+    # Work out the next highest sequence number
+    my $sequenceNumber = $session->db->quickScalar('select max(sequenceNumber) from fluxRule');
+    $sequenceNumber = $sequenceNumber ? $sequenceNumber + 1 : 1;
+
     # Create a bare-minimum entry in the db..
-    my $id = $session->db->setRow( 'fluxRule', 'fluxRuleId', { fluxRuleId => 'new', %RULE_DEFAULTS } );
+    my $id = $session->db->setRow( 'fluxRule', 'fluxRuleId',
+        { %RULE_DEFAULTS, fluxRuleId => 'new', sequenceNumber => $sequenceNumber } );
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $rule = $class->new( $session, $id );
@@ -182,6 +185,7 @@ make it handle expression changes intelligently.
 sub resetCombinedExpression {
     my ($self) = @_;
     $self->update( { combinedExpression => undef } );
+    return;
 }
 
 #-------------------------------------------------------------------
@@ -595,20 +599,28 @@ sub update {
 
 #-------------------------------------------------------------------
 
-=head2 evaluate ( user )
+=head2 evaluateFor ( user )
 
 Evaluates the Flux Rule for the given user
 
 =head3 user
 
 The user who the Rule is being evaluated against
+
+=head3 options_ref
+
+A hash ref of named properties, possible values are:
+
+=head4 indirect
+
+Indicates that this Rule is being evaluated as a result of another Rule
+being evaluated (or some other circumstance) in which case fluxRuleUserData
+fields relating to 'access' should not be set. 
  
 =cut
 
 sub evaluateFor {
     my ( $self, $user, $options_ref ) = @_;
-
-    my $id = id $self;
 
     # Check arguments..
     if ( @_ < 2 || @_ > 3 ) {
@@ -616,13 +628,6 @@ sub evaluateFor {
             got      => scalar(@_),
             expected => '2 or 3',
             error    => 'invalid param count.' . scalar(@_) . Dumper(@_),
-        );
-    }
-    if ( !defined $self || ref $self ne 'WebGUI::Flux::Rule' ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Flux::Rule',
-            got      => $self,
-            error    => 'need a flux rule.'
         );
     }
     if ( !defined $user || ref $user ne 'WebGUI::User' ) {
@@ -633,37 +638,51 @@ sub evaluateFor {
         );
     }
 
-    # TODO: fix this
-    my $access = 1;
-    if ( defined $options_ref && $options_ref->{indirect} ) {
-        $access = 0;
-    }
-    my $clear_cache_afterwards = $access;
+    # Determine if Rule is being evaluated directly or indirectly..
+    my $is_indirect
+        = ( defined $options_ref && $options_ref->{indirect} )
+        ? 1
+        : 0;
 
-    # Take note that we are now evaluating for a user
+    # Take note of which user we're evaluating the Rule for..
+    my $id = id $self;
     $evaluatingFor{$id} = $user;
 
-    # Check for entry in fluxRuleUserData table
-    my %userData = %{
-        $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
-            [ $self->getId(), $user->userId() ] )
-        };
-
-    # Check if we can apply the sticky optimisation
-    my $is_sticky = $property{$id}{sticky};
-    if ( $is_sticky && defined $userData{dateRuleFirstTrue} ) {
-        WebGUI::Error::NotImplemented->throw( error => 'STICKY NOT IMPLEMENTED YET.' );
-
-        delete $evaluatingFor{$id};
-        return 1;
+    # Rule with no expressions defaults to true
+    if ( $self->getExpressionCount() == 0 ) {
+        return $self->_finishEvaluating( 1, $is_indirect );
     }
 
-    # Now we need to see if the Rule passes or not..
+    # Check if we can apply the sticky optimisation..
+    if ( $property{$id}{sticky} ) {
+        my $dateRuleFirstTrue
+            = $self->session->db->quickScalar(
+            'select dateRuleFirstTrue from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $self->getId(), $user->userId() ] );
+
+        if ($dateRuleFirstTrue) {
+            WebGUI::Error::NotImplemented->throw( error => 'STICKY NOT IMPLEMENTED YET.' );
+
+            return $self->_finishEvaluating( 1, $is_indirect );
+        }
+    }
+
+    # Shucks, looks like we need to actually evaluate the Rule..
     my $was_successful;
     my $combined_expression = $property{$id}{combinedExpression};
     if ( !$combined_expression ) {
 
         # No combined expression defined so just AND them all together
+
+=for Workaround
+The most elegant way to do it would be:
+ $was_successful = all { $_->evaluate() } @{ $self->getExpressions() };
+However in some weird cases (covered by test suite) it's seg faulting.
+You can still use it if you turn off the XS version of List::MoreUtils
+by setting the environment variable: LIST_MOREUTILS_PP
+
+=cut 
+
         $was_successful = 1;
         EVALUATE:
         foreach my $exp ( @{ $self->getExpressions() } ) {
@@ -672,14 +691,6 @@ sub evaluateFor {
                 last EVALUATE;
             }
         }
-
-        # TODO: Figure out why the following code breaks in FluxRule.t
-#        if ( any { !$_->evaluate() } @{ $self->getExpressions() } ) {
-#            $was_successful = 0;
-#        }
-#        else {
-#            $was_successful = 1;
-#        }
     }
     else {
 
@@ -690,7 +701,7 @@ sub evaluateFor {
         my @expressions = @{ $self->getExpressions() };
         unshift @expressions, 'dummy entry';    # add a dummy entry to the front to make it 1-indexed
 
-        # eval the parsed combined expression and rely on Perl for error-catching
+        # ..and finally eval the parsed combined expression and rely on Perl for error-catching
         {
             no warnings 'all';                  # silence perl
             $was_successful = eval("($parsed_combined_expression)");
@@ -707,56 +718,38 @@ sub evaluateFor {
         }
     }
 
-    # Finally, update the fluxRuleUserData table
-    {
-        my $dt = WebGUI::DateTime->new(time)->toDatabase();
-        my %rowUpdates;
-        $rowUpdates{fluxRuleUserDataId}
-            = exists $userData{fluxRuleUserDataId} ? $userData{fluxRuleUserDataId} : 'new';
-        $rowUpdates{dateRuleFirstChecked}
-            = exists $userData{dateRuleFirstChecked} ? $userData{dateRuleFirstChecked} : $dt;
-        if ($was_successful) {
-            $rowUpdates{dateRuleFirstTrue}
-                = exists $userData{dateRuleFirstTrue} ? $userData{dateRuleFirstTrue} : $dt;
-        }
-        else {
-            $rowUpdates{dateRuleFirstFalse}
-                = exists $userData{dateRuleFirstFalse} ? $userData{dateRuleFirstFalse} : $dt;
-        }
-        if ($access) {
-            $rowUpdates{dateAccessFirstAttempted}
-                = exists $userData{dateAccessFirstAttempted} ? $userData{dateAccessFirstAttempted} : $dt;
-
-            if ($was_successful) {
-                $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
-                $rowUpdates{dateAccessFirstTrue}
-                    = exists $userData{dateAccessFirstTrue} ? $userData{dateAccessFirstTrue} : $dt;
-            }
-            else {
-                $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
-                $rowUpdates{dateAccessFirstFalse}
-                    = exists $userData{dateAccessFirstFalse} ? $userData{dateAccessFirstFalse} : $dt;
-            }
-        }
-
-        # If this is a new row, also need to set fluxRuleId and userId
-        if ( $rowUpdates{fluxRuleUserDataId} eq 'new' ) {
-            $rowUpdates{fluxRuleId} = $self->getId();
-            $rowUpdates{userId}     = $user->userId();
-        }
-
-        if ( scalar keys %rowUpdates > 0 ) {
-            $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
-        }
-    }
-
     # We've finished evaluating now
+    return $self->_finishEvaluating( $was_successful, $is_indirect );
+}
+
+#-------------------------------------------------------------------
+
+=head2 _finishEvaluating ( user )
+
+Clean up after evaluating (update fluxRuleUserData table and
+reset caches).
+
+=head3 was_successful
+
+The boolean status of the Rule evaluation
+
+=head3 is_indirect
+
+Whether Rule evaluation was direct/indirect 
+ 
+=cut
+sub _finishEvaluating {
+    my ( $self, $was_successful, $is_indirect ) = @_;
+
+    # Update the fluxRuleUserData table
+    $self->_updateUserDataTable( $was_successful, $is_indirect );
+
+    my $id = id $self;
     delete $evaluatingFor{$id};
-    if ($clear_cache_afterwards) {
+    if ( !$is_indirect ) {
         $resolvedRuleCache{$id} = {};
         $unresolvedRuleCache{$id} = { $self->getId() => $self->getId() };
     }
-
     return $was_successful;
 }
 
@@ -843,3 +836,103 @@ sub _parseCombinedExpression {
     return $combined_expression;
 }
 1;
+
+#-------------------------------------------------------------------
+
+=head2 _updateUserDataTable ( )
+
+Updates the rule/user row in the fluxRuleUserData table after a Rule is
+evaluated. Uses the boolean outcome of the Rule (was_successful) and a
+flag indicating whether the Rule was directly/indirectly evaluated to
+determine which fields need to be updated (dateRuleFirstTrue, 
+dateAccessFirstTrue, etc..) 
+
+Returns the number of rows modified
+
+=head3 was_successful
+
+The boolean status of the Rule evaluation
+
+=head3 is_indirect
+
+Whether Rule evaluation was direct/indirect 
+
+=cut
+
+sub _updateUserDataTable {
+    my ( $self, $was_successful, $is_indirect ) = @_;
+
+    # Check arguments..
+    if ( @_ != 3 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => 3,
+            error    => 'invalid param count',
+        );
+    }
+
+    my $user = $evaluatingFor{ id $self};
+
+    # Check for entry in fluxRuleUserData table
+    my %userData = %{
+        $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $self->getId(), $user->userId() ] )
+        };
+
+    my $dt = WebGUI::DateTime->new(time)->toDatabase();
+    my %rowUpdates;
+    $rowUpdates{fluxRuleUserDataId}
+        = exists $userData{fluxRuleUserDataId}
+        ? $userData{fluxRuleUserDataId}
+        : 'new';
+    $rowUpdates{dateRuleFirstChecked}
+        = exists $userData{dateRuleFirstChecked}
+        ? $userData{dateRuleFirstChecked}
+        : $dt;
+
+    if ($was_successful) {
+        $rowUpdates{dateRuleFirstTrue}
+            = exists $userData{dateRuleFirstTrue}
+            ? $userData{dateRuleFirstTrue}
+            : $dt;
+    }
+    else {
+        $rowUpdates{dateRuleFirstFalse}
+            = exists $userData{dateRuleFirstFalse}
+            ? $userData{dateRuleFirstFalse}
+            : $dt;
+    }
+    if ( !$is_indirect ) {
+        $rowUpdates{dateAccessFirstAttempted}
+            = exists $userData{dateAccessFirstAttempted}
+            ? $userData{dateAccessFirstAttempted}
+            : $dt;
+
+        if ($was_successful) {
+            $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
+            $rowUpdates{dateAccessFirstTrue}
+                = exists $userData{dateAccessFirstTrue}
+                ? $userData{dateAccessFirstTrue}
+                : $dt;
+        }
+        else {
+            $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
+            $rowUpdates{dateAccessFirstFalse}
+                = exists $userData{dateAccessFirstFalse}
+                ? $userData{dateAccessFirstFalse}
+                : $dt;
+        }
+    }
+
+    # If this is a new row, also need to set fluxRuleId and userId..
+    if ( $rowUpdates{fluxRuleUserDataId} eq 'new' ) {
+        $rowUpdates{fluxRuleId} = $self->getId();
+        $rowUpdates{userId}     = $user->userId();
+    }
+
+    # Only write to the db if we have updates to make..
+    if ( scalar keys %rowUpdates > 0 ) {
+        return $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
+    }
+    return 0;    # 0 rows modified
+}

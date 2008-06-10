@@ -28,14 +28,12 @@ $session->db->write('delete from fluxRuleUserData');
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 28;
+plan tests => 30;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Flux::Expression');
-
-# TODO: SequenceNumber
 
 #######################################################################
 #
@@ -154,6 +152,16 @@ $session->db->write('delete from fluxExpression');
 
     # Check Expression defaults
     is( $expression->get('name'), 'Undefined', 'default value for name is "Undefined"' );
+    is( $expression->get('sequenceNumber'), 1,           'sequenceNumber starts at 1' );
+    
+    # Add a second Expression (to test sequenceNumber)
+    my $expression2 = $rule->addExpression(
+        {   operand1 => 'DUMMY_OPERAND_1',
+            operand2 => 'DUMMY_OPERAND_2',
+            operator => 'DUMMY_OPERATOR',
+        }
+    );
+    is( $expression2->get('sequenceNumber'), 2,           'second sequenceNumber is 2' );
 }
 
 #######################################################################
