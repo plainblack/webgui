@@ -1220,7 +1220,7 @@ sub www_editVariant {
         -name      => 'varSku',
         -label     => $i18n->get('variant sku'),
         -hoverHelp => $i18n->get('variant sku description'),
-        -value     => $data->{varSku},
+        -value     => $data->{sku},
     );
     $f->text(
         -name      => 'shortdesc',
