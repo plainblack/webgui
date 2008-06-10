@@ -147,70 +147,79 @@ sub getSearchPaginator {
 
 #----------------------------------------------------------------------------
 
-=head2 getMoreMenu ( asset, label )
+=head2 getMoreMenu ( session, label )
 
 Gets the "More" menu with the specified label.
 
 =cut
 
 sub getMoreMenu {
-    my $asset           = shift;
+    my $session         = shift;
     my $label           = shift || "More";
-    my $userUiLevel     = $asset->session->user->profileField("uiLevel");
-    my $toolbarUiLevel  = $asset->session->config->get("assetToolbarUiLevel");
-    my $i18n            = WebGUI::International->new( $asset->session, "Asset" );
+    my $userUiLevel     = $session->user->profileField("uiLevel");
+    my $toolbarUiLevel  = $session->config->get("assetToolbarUiLevel");
+    my $i18n            = WebGUI::International->new( $session, "Asset" );
 
     ### The More menu
-    my @more_fields = ();       # The fields to fill in the more menu
-    my $more_markup = q{<span class="moreMenu"><a href="#">} . $label . q{</a>}
-                    . q{<ul>}
-                    ;
+    my @more_fields     = ();
     # These links are shown based on UI level
     if ( $userUiLevel >= $toolbarUiLevel->{ "changeUrl" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=changeUrl;proceed=manageAssets' ), $i18n->get( 'change url' );
+        push @more_fields, {
+            url     => '<url>?func=changeUrl;proceed=manageAssets', 
+            label   => $i18n->get( 'change url' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "editBranch" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=editBranch' ), $i18n->get( 'edit branch' );
+        push @more_fields, {
+            url     => '<url>?func=editBranch', 
+            label   => $i18n->get( 'edit branch' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "shortcut" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=createShortcut;proceed=manageAssets' ), $i18n->get( 'create shortcut' );
+        push @more_fields, {
+            url     => '<url>?func=createShortcut;proceed=manageAssets', 
+            label   => $i18n->get( 'create shortcut' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "revisions" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=manageRevisions' ), $i18n->get( 'revisions' );
+        push @more_fields, {
+            url     => '<url>?func=manageRevisions',
+            label   => $i18n->get( 'revisions' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "view" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl, $i18n->get( 'view' );
+        push @more_fields, {
+            url     => '<url>',
+            label   => $i18n->get( 'view' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "edit" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=edit;proceed=manageAssets' ), $i18n->get( 'edit' );
+        push @more_fields, {
+            url     => '<url>?func=edit;proceed=manageAssets',
+            label   => $i18n->get( 'edit' ),
+        };
     }
 
     if ( $userUiLevel >= $toolbarUiLevel->{ "lock" } ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=lock;proceed=manageAssets' ), $i18n->get( 'lock' );
+        push @more_fields, {
+            url     => '<url>?func=lock;proceed=manageAssets',
+            label   => $i18n->get( 'lock' ),
+        };
     }
 
-    if ( $asset->session->config->get("exportPath") && $userUiLevel >= $toolbarUiLevel->{"export"} ) {
-        $more_markup    .= q{<li><a href="%s">%s</a></li>};
-        push @more_fields, $asset->getUrl( 'func=export' ), $i18n->get( 'Export Page' ); 
+    if ( $session->config->get("exportPath") && $userUiLevel >= $toolbarUiLevel->{"export"} ) {
+        push @more_fields, {
+            url     => '<url>?func=export',
+            label   => $i18n->get( 'Export Page' ),
+        };
     }
 
-    $more_markup    .= q{</ul>} 
-                    . q{</span>}
-                    ;
-
-    return sprintf $more_markup, @more_fields;
+    return to_json \@more_fields;
 }
 
 #----------------------------------------------------------------------------
@@ -362,6 +371,7 @@ sub www_manage {
 
     # Show the page
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo/yahoo.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/dom/dom.js' ) );
@@ -370,6 +380,8 @@ sub www_manage {
     $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
     my $extras      = $session->url->extras;
@@ -382,7 +394,7 @@ ENDHTML
     my $output          = '<div id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
-    my $crumb_markup    = '<li> &gt; <a href="%s">%s</a></li>';
+    my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
     my $ancestors       = $currentAsset->getLineage( ['ancestors'], { returnObjects => 1 } );
 
     $output             .=  '<ol id="crumbtrail">';
@@ -394,13 +406,14 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf '<li> &gt; %s</li>',
-            getMoreMenu( $currentAsset, $currentAsset->get( "menuTitle" ) ),
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s')">%s</a></li>},
+            $currentAsset->getUrl,
+            $currentAsset->get( "menuTitle" ),
             ;
     $output .= '</ol>';
     
     ### The page of assets
-    $output         .= q{<div class="yui-skin-sam">}
+    $output         .= q{<div class="yui-skin-sam" id="assetManager" >}
                     . q{<form>}
                     . q{<input type="hidden" name="op" value="assetManager" />}
                     . q{<input type="hidden" name="method" value="manage" />}
@@ -496,8 +509,12 @@ ENDHTML
     $output         .= q{</div>};
 
     ### Write the JavaScript that will take over
+    $output         .= '<script type="text/javascript">'
+                    . 'WebGUI.AssetManager.MoreMenuItems = ' . getMoreMenu( $session ) . ';'
+                    ;
+
     $output         .= <<'ENDJS';
-<script type='text/javascript'>
+// Initialize the datatable and datasource
 YAHOO.util.Event.onDOMReady(function () {
     // Start the data source
     WebGUI.AssetManager.DataSource
@@ -580,10 +597,7 @@ ENDJS
             { key: 'className', label: ") . $i18n->get( 'type' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatClassName },
             { key: 'revisionDate', label: ") . $i18n->get( 'revision date' ) . q(", formatter: WebGUI.AssetManager.formatRevisionDate, sortable: true },
             { key: 'assetSize', label: ") . $i18n->get( 'size' ) . q(", formatter: WebGUI.AssetManager.formatAssetSize, sortable: true },
-            { key: 'lockedBy', label: ") . $i18n->get( 'locked' ) . q(", formatter: WebGUI.AssetManager.formatLockedBy },
-            { key: 'icon' },
-            { key: 'url' },
-            { key: 'childCount' }
+            { key: 'lockedBy', label: ") . $i18n->get( 'locked' ) . q(", formatter: WebGUI.AssetManager.formatLockedBy }
         ];
     );
 
@@ -600,11 +614,6 @@ ENDJS
                 sortedBy                : { key : "lineage", dir : YAHOO.widget.DataTable.CLASS_ASC } 
             }
         );
-
-    // Hide columns
-    WebGUI.AssetManager.DataTable.hideColumn( 'icon' );
-    WebGUI.AssetManager.DataTable.hideColumn( 'url' );
-    WebGUI.AssetManager.DataTable.hideColumn( 'childCount' );
 
     // Override function for custom server-side sorting
     WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {

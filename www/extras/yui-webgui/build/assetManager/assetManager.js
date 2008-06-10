@@ -13,6 +13,8 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
 
 // The extras folder
 WebGUI.AssetManager.extrasUrl   = '/extras/';
+// Keep track of the open more menus
+WebGUI.AssetManager.MoreMenusDisplayed = {};
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.addHighlightToRow ( child )
@@ -50,8 +52,37 @@ WebGUI.AssetManager.formatActions
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML 
         = '<a href="' + oRecord.getData( 'url' ) + '?func=edit">Edit</a>'
-        + ' | More '
+        + ' | '
         ;
+    var more    = document.createElement( 'a' );
+    elCell.appendChild( more );
+    more.appendChild( document.createTextNode( 'More' ) );
+    more.href   = '#';
+
+    // Build a more menu
+    var rawItems    = WebGUI.AssetManager.MoreMenuItems;
+    var menuItems   = [];
+    for ( var i = 0; i < rawItems.length; i++ ) {
+        var itemUrl     = rawItems[i].url.match( /<url>/ )
+                        ? rawItems[i].url.replace( "<url>", oRecord.getData( 'url' ) )
+                        : oRecord.getData( 'url' ) + rawItems[i].url
+                        ;
+        menuItems.push( '<li><a href="' + itemUrl + '">' + rawItems[i].label  + "</a></li>" );
+    }
+
+    var options = {
+        "zindex"                    : 100,
+        "clicktohide"               : true,
+        "constraintoviewport"       : true,
+        "position"                  : "dynamic",
+        "xy"                        : [ more.clientLeft, more.clientTop ],
+        "itemdata"                  : menuItems
+    };
+
+    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
+    menu.render( document.getElementById( 'assetManager' ) );
+    YAHOO.util.Event.addListener( more, "click", menu.show, null, menu );
+
 };
 
 /*---------------------------------------------------------------------------
@@ -143,44 +174,12 @@ WebGUI.AssetManager.formatTitle
 };
 
 /*---------------------------------------------------------------------------
-    WebGUI.AssetManager.hideMoreMenu ( event, element )
-    Hide the more menu located inside element after a short delay.
-*/
-WebGUI.AssetManager.hideMoreMenu
-= function ( event, element ) {
-    var ul  = element.getElementsByTagName( "ul" )[0];
-    // Store the timeout in the element itself (bad, yes)
-    element.menuTimeout
-        = setTimeout( function () { ul.style.display = "none"; }, 100 );
-};
-
-/*---------------------------------------------------------------------------
     WebGUI.AssetManager.initManager ( )
     Initialize the www_manage page
 */
 WebGUI.AssetManager.initManager
 = function () {
 
-    WebGUI.AssetManager.initMoreMenus();
-
-};
-
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.initMoreMenus ( )
-    Initialize the more menus in an asset manager page
-*/
-WebGUI.AssetManager.initMoreMenus
-= function () {
-    // Initialize the more menus
-    var moreMenus   = YAHOO.util.Dom.getElementsByClassName( "moreMenu" );
-    for ( var i = 0; i < moreMenus.length; i++ ) {
-        var a   = moreMenus[ i ].getElementsByTagName( "a" );
-        for ( var h = 0; h < a.length; h++ ) {
-            YAHOO.util.Event.addListener( a[ h ], "mouseover", WebGUI.AssetManager.showMoreMenu, moreMenus[ i ] );
-            YAHOO.util.Event.addListener( a[ h ], "mouseout", WebGUI.AssetManager.hideMoreMenu, moreMenus[ i ] );
-        }
-    }
 };
 
 /*---------------------------------------------------------------------------
@@ -189,9 +188,6 @@ WebGUI.AssetManager.initMoreMenus
 */
 WebGUI.AssetManager.initSearch 
 = function () {
-
-    WebGUI.AssetManager.initMoreMenus();
-
 
 };
 
@@ -229,16 +225,34 @@ WebGUI.AssetManager.selectRow
 };
 
 /*---------------------------------------------------------------------------
-    WebGUI.AssetManager.showMoreMenu ( event, element )
+    WebGUI.AssetManager.showMoreMenu ( event, url )
     Show the more menu located inside element.
 */
 WebGUI.AssetManager.showMoreMenu
-= function ( event, element ) {
-    if ( element.menuTimeout ) {
-        clearTimeout( element.menuTimeout );
+= function ( event, url ) {
+    var rawItems    = WebGUI.AssetManager.MoreMenuItems;
+    var menuItems   = [];
+    for ( var i = 0; i < rawItems.length; i++ ) {
+        var itemUrl     = rawItems[i].url.match( /<url>/ )
+                        ? rawItems[i].url.replace( "<url>", url )
+                        : url + rawItems[i].url
+                        ;
+        menuItems.push( '<li><a href="' + itemUrl + '">' + rawItems[i].label  + "</a></li>" );
     }
-    var ul  = element.getElementsByTagName( "ul" )[0];
-    ul.style.display    = "block";
+
+    var options = {
+        "zindex"                    : 1000,
+        "clicktohide"               : true,
+        "constraintoviewport"       : true,
+        "xy"                        : [ event.clientX, event.clientY ],
+        "itemdata"                  : menuItems
+    };
+
+    var menu    = new YAHOO.widget.Menu( "moreMenu", options );
+    menu.render( document.getElementById( 'assetManager' ) );
+
+    menu.show();
+    menu.focus();
 };
 
 /*---------------------------------------------------------------------------
