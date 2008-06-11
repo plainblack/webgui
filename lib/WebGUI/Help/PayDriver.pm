@@ -61,10 +61,6 @@ our $HELP = {
                         namespace   => 'Shop',
                     },
                     {
-                        name        => 'viewItemUrl',
-                        namespace   => 'Shop',
-                    },
-                    {
                         name        => 'orderStatus',
                         namespace   => 'Shop',
                     },

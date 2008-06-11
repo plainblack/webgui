@@ -550,9 +550,6 @@ our $HELP = {
                         name        => 'itemShippingAddress',
                     },
                     {
-                        name        => 'viewItemUrl',
-                    },
-                    {
                         name        => 'orderStatus',
                     },
                     {
