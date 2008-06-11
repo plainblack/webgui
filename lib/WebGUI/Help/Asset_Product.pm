@@ -61,6 +61,8 @@ our $HELP = {
             { 'name' => 'buy_form_options' },
             { 'name' => 'buy_form_button' },
             { 'name' => 'buy_form_footer' },
+			{ 'name' => "hasAddedToCart" , required=>1 },
+			{ 'name' => "thankYouMessage", description=>"thank you message help" },
             { 'name' => 'addspecification_url' },
             { 'name' => 'addspecification_label' },
             {   'name'      => 'specification_loop',

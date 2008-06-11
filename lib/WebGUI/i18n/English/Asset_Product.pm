@@ -805,6 +805,30 @@ be useful, others may not.|,
 		lastUpdated => 1211168991,
 	},
 
+	'default thank you message' => {
+		message => q|Thank you for your purchase.|,
+		lastUpdated => 0,
+		context => q|the default message that will go in the thank you message field|
+	},
+
+	'thank you message' => {
+		message => q|Thank You Message|,
+		lastUpdated => 0,
+		context => q|the label for the field where you type in a message thanking the user for their purchase|
+	},
+
+	'thank you message help' => {
+		message => q|Write a thank you message to your user for buying something from your site.  Be sincere, or they may cancel their purchase and get it from Amazon instead.|,
+		lastUpdated => 0,
+		context => q|help for default price field|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the product to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 };
 
 1;

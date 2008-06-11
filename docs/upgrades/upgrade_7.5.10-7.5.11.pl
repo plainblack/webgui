@@ -928,6 +928,7 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
+    $session->db->write('alter table Product add column   thankYouMessage mediumtext');
     $session->db->write('alter table Product add column     accessoryJSON mediumtext');
     $session->db->write('alter table Product add column       benefitJSON mediumtext');
     $session->db->write('alter table Product add column       featureJSON mediumtext');
@@ -1396,7 +1397,7 @@ sub addVersionStartEndDates {
 #-------------------------------------------------
 sub migrateSubscriptions {
     my $session = shift;
-    print "\tMigrating subscriptions to the new commerce system..." unless ($quiet);
+    print "\tMigrating subscriptions to the new commerce system...\n" unless ($quiet);
 
     # Check if codes are tied to multiple subscriptions.
     my ($hasDoubles) = $session->db->buildArray(

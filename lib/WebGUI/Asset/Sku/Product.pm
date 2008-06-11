@@ -102,6 +102,13 @@ sub definition {
             hoverHelp=>$i18n->get('62 description'),
             defaultValue=>'PBtmpl0000000000000056'
         },
+        thankYouMessage => {
+            tab             => "properties",
+            defaultValue    => $i18n->get("default thank you message"),
+            fieldType       => "HTMLArea",
+            label           => $i18n->get("thank you message"),
+            hoverHelp       => $i18n->get("thank you message help"),
+        },
         image1=>{
             tab => "properties",
             fieldType=>"image",
@@ -969,7 +976,8 @@ sub www_buy {
     if ($error) {
         $self->view($error);
     }
-    return '';
+    $self->{_hasAddedToCart} = 1;
+    return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1576,6 +1584,7 @@ sub view {
         $var{'addvariant_label'} = $i18n->get('add a variant');
     }
     $var{variant_loop} = \@variantLoop;
+    $var{hasAddedToCart} = $self->{_hasAddedToCart};
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
