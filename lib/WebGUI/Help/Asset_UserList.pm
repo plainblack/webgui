@@ -3,7 +3,7 @@ package WebGUI::Help::Asset_UserList;
 our $HELP = {
 	'userlist template' => {
 		title => 'UserList Template',
-		body => 'UserList Template Help Body',
+		body => '',
 		isa => [
             {   namespace => "Asset_UserList",
                 tag => "userlist asset template variables"
@@ -72,7 +72,7 @@ our $HELP = {
     'userlist asset template variables' => {
         private => 1,
         title => 'UserList Template',
-        body => 'UserList Template Help Body',
+        body => '',
         isa     => [
             {   namespace => "Asset_Wobject",
                 tag       => "wobject template variables",

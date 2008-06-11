@@ -351,7 +351,7 @@ true for the 'email' profile field.|,
                 lastUpdated => 1081514049
         },
 
-        'profile_value' => {
+        'profile_file' => {
                 message => q|The file for this profile field, available if the profile field is an image or file.|,
                 lastUpdated => 1081514049
         },
