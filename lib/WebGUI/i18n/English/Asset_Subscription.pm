@@ -412,6 +412,54 @@ The form in which the user can enter his subscription code.<br />|,
 		context => q|help for the thank you message field|,
 	},
 
+	'subscription template' => {
+		message => q|Subscription Template|,
+		lastUpdated => 0,
+		context => q|Title for the subscription template help page|,
+	},
+
+	'formHeader' => {
+		message => q|The top of the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'formFooter' => {
+		message => q|The bottom of the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'purchaseButton' => {
+		message => q|The button for the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the subscription to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'codeControls' => {
+		message => q|A series of links for creating subscription code batches and listing subscription codes and code batches.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'redeemCodeLabel' => {
+		message => q|An internationalized label for the link to redeem a subscription code.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'redeemCodeUrl' => {
+		message => q|The URL to redeem a subscription code.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 };
 
 1;
