@@ -218,7 +218,7 @@ sub getAdminFunction {
 				namespace   => "Asset",
 			},
 			icon    => "assets.gif",
-			func    => "manageAssets",
+			op      => "assetManager",
 			group   => "12",
 		},
 		"versions" => {
