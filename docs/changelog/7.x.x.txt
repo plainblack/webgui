@@ -105,6 +105,7 @@
  - added: Configure the amount of files shown per page in the Gallery
  - fix: Patch for Style.pm to identify which template failed to instantiate
  - fix: Admin Console templates have the same title
+ - fix: File Titles not displaying in folder
 
 7.5.10
  - fix: Syntax error in GetCsMail
