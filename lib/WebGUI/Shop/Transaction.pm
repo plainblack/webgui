@@ -822,7 +822,8 @@ STOP
 
 =head2 www_manageMy ()
 
-Makes transaction information printable.
+Display a quick list of the user's transactions, with links for more detailed information about
+each one in the list.
 
 =cut
 
@@ -838,7 +839,7 @@ sub www_manageMy {
             %{$transaction->get},
             viewDetailUrl   => $url->page('shop=transaction;method=viewMy;transactionId='.$id),
             amount          => sprintf("%.2f", $transaction->get('amount')),
-            };
+        };
     }
 
     # render

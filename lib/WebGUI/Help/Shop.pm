@@ -4,6 +4,7 @@ use strict;
 
 
 our $HELP = { 
+
 	'minicart template' => {	
 		title 		=> 'minicart template', 
 		body 		=> 'minicart template help',	
@@ -50,6 +51,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'cart template' => {	
 		title 		=> 'cart template', 
 		body 		=> 'cart template help',	
@@ -202,6 +204,7 @@ our $HELP = {
 			},
 		],
 	},
+
 	'address book template' => {	
 		title 		=> 'address book template', 
 		body 		=> 'address book template help',	
@@ -377,6 +380,363 @@ our $HELP = {
 			},
 		],
 	},
+
+    'manage my purchases template' => {    
+        title     => 'manage my purchases template', 
+        body      => 'manage my purchases template help',    
+        isa       => [],
+        fields    => [],
+        variables => [
+            {
+                name        => 'viewDetailURL',
+            },
+            {
+                name        => 'amount',
+            },
+            {
+                name        => 'transactionId',
+            },
+            {
+                name        => 'originatingTransactionId',
+            },
+            {
+                name        => 'isSuccessful',
+            },
+            {
+                name        => 'orderNumber',
+            },
+            {
+                name        => 'transactionCode',
+            },
+            {
+                name        => 'statusCode',
+            },
+            {
+                name        => 'statusMessage',
+            },
+            {
+                name        => 'userId',
+            },
+            {
+                name        => 'username',
+            },
+            {
+                name        => 'shopCreditDeduction',
+            },
+            {
+                name        => 'shippingAddressId',
+            },
+            {
+                name        => 'shippingAddressName',
+            },
+            {
+                name        => 'shippingAddress1',
+            },
+            {
+                name        => 'shippingAddress2',
+            },
+            {
+                name        => 'shippingAddress3',
+            },
+            {
+                name        => 'shippingAddressCity',
+            },
+            {
+                name        => 'shippingAddressState',
+            },
+            {
+                name        => 'shippingAddressCountry',
+            },
+            {
+                name        => 'shippingAddressCode',
+            },
+            {
+                name        => 'shippingAddressPhoneNumber',
+            },
+            {
+                name        => 'shippingDriverId',
+            },
+            {
+                name        => 'shippingDriverLabel',
+            },
+            {
+                name        => 'paymentAddressId',
+            },
+            {
+                name        => 'paymentAddress1',
+            },
+            {
+                name        => 'paymentAddress2',
+            },
+            {
+                name        => 'paymentAddress3',
+            },
+            {
+                name        => 'paymentAddressCity',
+            },
+            {
+                name        => 'paymentAddressState',
+            },
+            {
+                name        => 'paymentAddressCountry',
+            },
+            {
+                name        => 'paymentAddressCode',
+            },
+            {
+                name        => 'paymentAddressPhoneNumber',
+            },
+            {
+                name        => 'dateOfPurchase',
+            },
+            {
+                name        => 'isRecurring',
+            },
+            {
+                name        => 'notes',
+            },
+        ],
+        related     => [  
+        ],
+    },
+
+    'view my purchases template' => {    
+        title     => 'view my purchases template', 
+        body      => 'view my purchases template help',    
+        isa       => [],
+        fields    => [],
+        variables => [
+            {
+                name        => 'notice',
+                required    => 1,
+            },
+            {
+                name        => 'cancelRecurringUrl',
+                required    => 1,
+            },
+            {
+                name        => 'amount',
+                description => 'amount help',
+            },
+            {
+                name        => 'taxes',
+                description => 'taxes help',
+            },
+            {
+                name        => "inShopCreditDeduction",
+                description => "inShopCreditDeduction help",
+            },
+            {
+                name        => 'shippingPrice',
+                description => 'shippingPrice help',
+            },
+            {
+                name        => 'shippingAddress',
+                description => "shippingAddress help",
+            },
+            {
+                name        => 'paymentAddress',
+            },
+            {
+                name        => 'items',
+                variables   => [
+                    {
+                        name        => 'viewItemUrl',
+                    },
+                    {
+                        name        => 'price',
+                    },
+                    {
+                        name        => 'itemShippingAddress',
+                    },
+                    {
+                        name        => 'viewItemUrl',
+                    },
+                    {
+                        name        => 'orderStatus',
+                    },
+                    {
+                        name        => 'itemId',
+                    },
+                    {
+                        name        => 'transactionId',
+                        description => 'item transactionId',
+                    },
+                    {
+                        name        => 'assetId',
+                        description => 'item assetId',
+                    },
+                    {
+                        name        => 'configuredTitle',
+                    },
+                    {
+                        name        => 'options',
+                        description => 'item options',
+                    },
+                    {
+                        name        => 'shippingAddressId',
+                        description => 'item shippingAddressId',
+                    },
+                    {
+                        name        => 'shippingName',
+                        description => 'item shippingName',
+                    },
+                    {
+                        name        => 'shippingAddress1',
+                        description => 'item shippingAddress1',
+                    },
+                    {
+                        name        => 'shippingAddress2',
+                        description => 'item shippingAddress2',
+                    },
+                    {
+                        name        => 'shippingAddress3',
+                        description => 'item shippingAddress3',
+                    },
+                    {
+                        name        => 'shippingAddressCity',
+                        description => 'item shippingAddressCity',
+                    },
+                    {
+                        name        => 'shippingAddressState',
+                        description => 'item shippingAddressState',
+                    },
+                    {
+                        name        => 'shippingAddressCountry',
+                        description => 'item shippingAddressCountry',
+                    },
+                    {
+                        name        => 'shippingAddressCode',
+                        description => 'item shippingAddressCode',
+                    },
+                    {
+                        name        => 'shippingAddressPhoneNumber',
+                        description => 'item shippingAddressPhoneNumber',
+                    },
+                    {
+                        name        => 'lastUpdated',
+                        description => 'item lastUpdated',
+                    },
+                    {
+                        name        => 'quantity',
+                        description => 'item quantity',
+                    },
+                    {
+                        name        => 'price',
+                        description => 'item price',
+                    },
+                    {
+                        name        => 'vendorId',
+                        description => 'item vendorId',
+                    },
+                ],
+            },
+            {
+                name        => 'transactionId',
+            },
+            {
+                name        => 'originatingTransactionId',
+            },
+            {
+                name        => 'isSuccessful',
+            },
+            {
+                name        => 'orderNumber',
+            },
+            {
+                name        => 'transactionCode',
+            },
+            {
+                name        => 'statusCode',
+            },
+            {
+                name        => 'statusMessage',
+            },
+            {
+                name        => 'userId',
+            },
+            {
+                name        => 'username',
+            },
+            {
+                name        => 'shopCreditDeduction',
+            },
+            {
+                name        => 'shippingAddressId',
+            },
+            {
+                name        => 'shippingAddressName',
+            },
+            {
+                name        => 'shippingAddress1',
+            },
+            {
+                name        => 'shippingAddress2',
+            },
+            {
+                name        => 'shippingAddress3',
+            },
+            {
+                name        => 'shippingAddressCity',
+            },
+            {
+                name        => 'shippingAddressState',
+            },
+            {
+                name        => 'shippingAddressCountry',
+            },
+            {
+                name        => 'shippingAddressCode',
+            },
+            {
+                name        => 'shippingAddressPhoneNumber',
+            },
+            {
+                name        => 'shippingDriverId',
+            },
+            {
+                name        => 'shippingDriverLabel',
+            },
+            {
+                name        => 'paymentAddressId',
+            },
+            {
+                name        => 'paymentAddress1',
+            },
+            {
+                name        => 'paymentAddress2',
+            },
+            {
+                name        => 'paymentAddress3',
+            },
+            {
+                name        => 'paymentAddressCity',
+            },
+            {
+                name        => 'paymentAddressState',
+            },
+            {
+                name        => 'paymentAddressCountry',
+            },
+            {
+                name        => 'paymentAddressCode',
+            },
+            {
+                name        => 'paymentAddressPhoneNumber',
+            },
+            {
+                name        => 'dateOfPurchase',
+            },
+            {
+                name        => 'isRecurring',
+            },
+            {
+                name        => 'notes',
+            },
+        ],
+        related     => [  
+        ],
+    },
 
 };
 
