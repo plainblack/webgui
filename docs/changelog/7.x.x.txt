@@ -103,6 +103,7 @@
    Search
  - added: A thumbnail for Photo edit screen
  - added: Configure the amount of files shown per page in the Gallery
+ - fix: Patch for Style.pm to identify which template failed to instantiate
 
 7.5.10
  - fix: Syntax error in GetCsMail
