@@ -132,6 +132,11 @@ sub getValue {
 	return WebGUI::HTML::cleanSegment($self->SUPER::getValue(@_));
 }
 
+sub getValueAsHtml {
+    my $self = shift;
+    return $self->WebGUI::Form::Control::getValueAsHtml(@_);
+}
+
 
 #-------------------------------------------------------------------
 

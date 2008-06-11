@@ -172,6 +172,12 @@ sub toHtml {
 	return $out;
 }
 
+sub getValueAsHtml {
+    my $self = shift;
+    my $value = $self->SUPER::getValueAsHtml(@_);
+    $value = WebGUI::HTML::filter($value, 'text');
+    return $value;
+}
 
 
 1;
