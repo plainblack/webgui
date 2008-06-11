@@ -272,10 +272,22 @@ sub www_createShortcut {
 		templateId=>'PBtmpl0000000000000140'
 	});
 
+    if (! $isOnDashboard) {
+        $child->cut;
+    }
+    if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+            $self->session->http->setRedirect($self->getUrl(
+                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
+            ));
+            return 1;
+        }
+    }
 	if ($isOnDashboard) {
 		return $self->getParent->www_view;
 	} else {
-		$child->cut;
 		$self->session->asset($self->getContainer);
 		return $self->session->asset->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 		return $self->session->asset->www_view;
