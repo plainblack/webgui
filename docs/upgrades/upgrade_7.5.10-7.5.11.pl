@@ -78,6 +78,7 @@ addNewApprovalActivities( $session );
 addUserListWobject( $session );
 addInheritUrlFromParent( $session );
 addDefaultFilesPerPage( $session );
+fixAdminConsoleTemplateTitles( $session );
 removeOldCommerceCode($session);
 
 finish($session); # this line required
@@ -1703,6 +1704,15 @@ sub addInheritUrlFromParent {
     my $session = shift;
     print "\tAdding inheritUrlFromParent flag for all assets..." unless $quiet;
     $session->db->write('alter table assetData add column inheritUrlFromParent int(11) not null default 0');
+    print "DONE!\n" unless $quiet;
+}
+   
+#----------------------------------------------------------------------------
+sub fixAdminConsoleTemplateTitles {
+    my $session = shift;
+    print "\tMaking unique title for admin console templates... " unless $quiet;
+    my $ac = WebGUI::Asset->newByDynamicClass($session, 'PBtmpl0000000000000137');
+    $ac->update({title => 'Admin Console Style'});
     print "DONE!\n" unless $quiet;
 }
 
