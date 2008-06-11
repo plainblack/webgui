@@ -1047,7 +1047,8 @@ sub emailResetPassword {
     );
 
     $f->submit(
-        value => 'submit'
+        value       => 'submit',
+        uiLevel     => 0,
     );
 
 

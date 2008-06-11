@@ -1,4 +1,5 @@
 7.5.11
+ - fixed: email password recovery submit button effected by UI level
  - fixed: Creating a shortcut creates a version tag even with autocommit turned on
  - fixed: userImport.pl overwrites settings when updating users
  - fixed: Collaboration RSS link in header doesn't indicate title
