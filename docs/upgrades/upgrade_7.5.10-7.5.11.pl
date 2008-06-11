@@ -80,8 +80,104 @@ addInheritUrlFromParent( $session );
 addDefaultFilesPerPage( $session );
 fixAdminConsoleTemplateTitles( $session );
 removeOldCommerceCode($session);
+convertDataForm( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub convertDataForm {
+    my $session = shift;
+    print "\tConverting DataForm configuration and data to JSON..." unless $quiet;
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN storeData INT(1) DEFAULT 1 },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN fieldConfiguration TEXT },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN tabConfiguration TEXT },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` ADD COLUMN entryData TEXT },
+    );
+    my @dataforms = $session->db->buildArray("SELECT `assetId` FROM `asset` WHERE className='WebGUI::Asset::Wobject::DataForm'");
+    for my $assetId (@dataforms) {
+        my $dataForm = WebGUI::Asset->newPending($session, $assetId);
+        my @tabConfigs;
+        my $tabs = $session->db->read("SELECT * FROM DataForm_tab WHERE assetId=? ORDER BY sequenceNumber", [$assetId]);
+        while (my $tabData = $tabs->hashRef) {
+            my $newConfig = {
+                label   => $tabData->{label},
+                subtext => $tabData->{subtext},
+                tabId   => $tabData->{DataForm_tabId},
+            };
+            push @tabConfigs, $newConfig;
+        }
+        $tabs->finish;
+        my $tabJSON = encode_json( \@tabConfigs );
+
+        my @fieldConfigs;
+        my %fieldMapping;
+
+        my $fields = $session->db->read("SELECT * FROM `DataForm_field` WHERE assetId=? ORDER BY sequenceNumber", [$assetId]);
+        while (my $fieldData = $fields->hashRef) {
+            my $newConfig = {
+                name            => $fieldData->{name},
+                status          => $fieldData->{status},
+                type            => "\u$fieldData->{type}",
+                possibleValues  => $fieldData->{possibleValues},
+                defaultValue    => $fieldData->{defaultValue},
+                width           => $fieldData->{width},
+                subtext         => $fieldData->{subtext},
+                rows            => $fieldData->{rows},
+                isMailField     => $fieldData->{isMailField},
+                label           => $fieldData->{label},
+                tabId           => $fieldData->{DataForm_tabId} || undef,
+                vertical        => $fieldData->{vertical},
+                extras          => $fieldData->{extras},
+            };
+            $fieldMapping{ $fieldData->{DataForm_fieldId} } = $newConfig->{name};
+            push @fieldConfigs, $newConfig;
+        }
+        $fields->finish;
+        my $fieldJSON = encode_json( \@fieldConfigs );
+        my $entries = $session->db->read("SELECT * FROM `DataForm_entry` WHERE assetId=?", [$assetId]);
+        while (my $entryData = $entries->hashRef) {
+            my $newEntryFieldData = {};
+            my $entryFields = $session->db->read("SELECT * FROM `DataForm_entryData` WHERE assetId=? AND DataForm_entryId=?", [$assetId, $entryData->{DataForm_entryId}]);
+            while (my $entryFieldData = $entryFields->hashRef) {
+                $newEntryFieldData->{ $fieldMapping{ $entryFieldData->{DataForm_fieldId} } } = $entryData->{value};
+            }
+            $entryFields->finish;
+            my $entryJSON = encode_json($newEntryFieldData);
+            $session->db->write("UPDATE `DataForm_entry` SET entryData=? WHERE assetId=? AND DataForm_entryId=?", [$entryJSON, $assetId, $entryData->{DataForm_entryId}]);
+        }
+        $entries->finish;
+        $dataForm->addRevision({fieldConfiguration => $fieldJSON, tabConfiguration => $tabJSON});
+    }
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` ADD COLUMN newDate DATETIME },
+    );
+    $session->db->write(
+        q{ UPDATE `DataForm_entry` SET newDate = FROM_UNIXTIME(submissionDate) },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` DROP COLUMN submissionDate },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` CHANGE COLUMN newDate submissionDate DATETIME },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_tab` },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_field` },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_entryData` },
+    );
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add default files per page to the Gallery

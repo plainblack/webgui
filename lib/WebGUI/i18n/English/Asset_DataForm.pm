@@ -980,6 +980,16 @@ be useful, others may not.|,
             context     => q{Description of asset property},
         },
 
+        'store data' => {
+            message     => 'Store Data',
+            lastUpdated => 0,
+        },
+
+        'store data description' => {
+            message     => 'Whether to store submitted data',
+            lastUpdated => 0,
+        },
+
         'helpvar useCaptcha' => {
             message     => q{This variable is true when the CAPTCHA should be shown.},
             lastUpdated => 0,
