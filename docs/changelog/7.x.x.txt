@@ -1,4 +1,5 @@
 7.5.11
+ - fixed: userImport.pl overwrites settings when updating users
  - fixed: Collaboration RSS link in header doesn't indicate title
  - fixed: edit branch can't update URLs on most assets
  - Replaced Cool Menus nav with a YUI Menu, which works and looks better.

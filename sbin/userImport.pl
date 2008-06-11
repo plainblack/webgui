@@ -10,9 +10,9 @@
 
 our ($webguiRoot);
 
-BEGIN { 
+BEGIN {
 	$webguiRoot = "..";
-	unshift (@INC, $webguiRoot."/lib"); 
+	unshift (@INC, $webguiRoot."/lib");
 }
 
 use strict;
@@ -81,130 +81,112 @@ $session->user({userId=>3});
 open(FILE,"<".$usersFile);
 print "OK\n" unless ($quiet);
 
-my $first = 1;
 my $lineNumber = 0;
 my @field;
 my @profileFields = $session->db->buildArray("select fieldName from userProfileField");
-while(<FILE>) {
-	$lineNumber++;
-  	chomp;
-  	my @row = split($delimiter,$_);
-  	my $i=0;
-	if ($first) {
-		# parse field headers
-                foreach (@row) {
-                        chomp;
-                        $field[$i] = $_;
-                        $i++;
-                }
-		$first = 0;
+while(my $line = <FILE>) {
+    $lineNumber++;
+    chomp $line;
+    next
+        if $line eq '';
+    my @row = split($delimiter, $line);
+    use Data::Dumper ();
+    chomp @row;
+    if ($lineNumber == 1) {
+        @field = @row;
+        next;
+    }
+    # parse fields
+    my %user;
+    foreach my $item (@row) {
+        $item =~ s/\s+$//;
+    }
+    @user{@field} = @row;
+    if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
+        $user{username} = $user{firstName}.".".$user{lastName};
+    }
+    elsif ($user{username} eq '') {
+        print "Skipping line ${lineNumber}: No username.\n" unless ($quiet);
+        next;
+    }
 
-	} else {
-		# parse fields
-		my %user = ();
-  		foreach (@row) {
-    			chomp;
-    			$user{$field[$i]} = $_;
-			$user{$field[$i]} =~ s/\s+$//g; #remove trailing whitespace from each field
-    			$i++;
-  		}
-
-		if ($user{username} eq "" && $user{firstName} ne "" && $user{lastName} ne "") {
-			$user{username} = $user{firstName}.".".$user{lastName};
-		}
-                if ($user{password} eq "") {
-                        $user{identifier} = $defaultIdentifier;
-                } else {
-                        $user{identifier} = $user{password};
-                }
-		$user{identifier} = Digest::MD5::md5_base64($user{identifier});
-		$user{ldapUrl} = $ldapUrl if ($user{ldapUrl} eq "");
-		$user{authMethod} = $authMethod if ($user{authMethod} eq "");
-		$user{groups} = $groups if ($user{groups} eq "");
-		$user{status} = $status if ($user{status} eq "");
-		$user{expireOffset} = $expireOffset if ($user{expireOffset} eq "");
-		$user{expireOffset} = calculateExpireOffset($user{expireOffset},$expireUnits);
-        if ($user{birthdate}) {
-            $user{birthdate} = WebGUI::DateTime->new($user{birthdate}." 00:00:00")->epoch();
+    $user{identifier} ||= $user{password}
+        if $user{password};
+    $user{ldapUrl} ||= $ldapUrl
+        if $ldapUrl;
+    $user{authMethod} ||= $authMethod
+        if $authMethod;
+    $user{groups} ||= $groups
+        if $groups;
+    $user{status} ||= $status
+        if $status;
+    $user{expireOffset} ||= $expireOffset
+        if $expireOffset;
+    $user{expireOffset} = calculateExpireOffset($user{expireOffset},$expireUnits)
+        if $user{expireOffset};
+    $user{birthdate} = WebGUI::DateTime->new($user{birthdate}." 00:00:00")->epoch()
+        if $user{birthdate};
+    $user{changePassword} ||= $canChangePass
+        if $user{changePassword} == '';
+    # process user
+    my $u;
+    my ($userId) = $session->db->quickArray("select userid from users where username=?",[$user{username}]);
+    if (($update || $updateAdd) && $userId) {
+        # Allowed to update, and user exists
+        print "Updating user '$user{username}'\n" unless ($quiet);
+        $u = WebGUI::User->new($session, $userId);
+        if ($replaceGroups && $user{groups}) {
+            my $groups = $u->getGroups;
+            $u->deleteFromGroups(@$groups);
         }
-               if ($user{changePassword} eq "") {
-                       if ($canChangePass) {
-                               $user{changePassword} = 1;
-                       } else {
-                               $user{changePassword} = 0;
-                       }
-               }
-		# process user
-               my $u;
-               my $queryHandler;
-               my ($duplicate) = $session->db->quickArray("select userid from users where username=?",[$user{username}]);
-               if ($user{username} eq "") { 
-			print "Skipping line $lineNumber.\n" unless ($quiet); 
-		} else {
-                       # update only
-                       if ($update) {
-                               if ($duplicate) {
-                                       print "Updating user $user{username}\n" unless ($quiet);
-                                       $u = WebGUI::User->new($session, $duplicate);
-                                       if ($replaceGroups and ($user{groups} ne "")) {
-                                               $queryHandler = $session->db->prepare("delete from groupings where userid=?",[$duplicate]);
-                                               if ($queryHandler) { $queryHandler->execute(); }
-                                       }
-                                       my ($pw) = $session->db->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=? and users.userId=authentication.userId and authentication.fieldName='identifier'",[$user{username}]);
-                                       $user{identifier} = $pw;
-                               } else { 
-					print "User $user{username} not found. Skipping.\n" unless ($quiet); 
-				}
-                       } elsif ($updateAdd) {     # update and add users 
-                               if ($duplicate) {
-                                       print "Updating user $user{username}\n" unless ($quiet);
-                                       $u = WebGUI::User->new($session, $duplicate);
-                                       if ($replaceGroups and ($user{groups} ne "")) {
-                                               $queryHandler = $session->db->prepare("delete from groupings where userid=?",[$duplicate]);
-                                               if ($queryHandler) { $queryHandler->execute(); }
-                                       }
-                                       my ($pw) = $session->db->quickArray("select authentication.fieldData from authentication,users where authentication.authMethod='WebGUI' and users.username=? and users.userId=authentication.userId and authentication.fieldName='identifier'",[$user{username}]);
-                                       $user{identifier} = $pw;
-                               } else { 
-					$u = WebGUI::User->new($session, "new"); 
-					print "Adding user $user{username}\n" unless ($quiet); 
-				}
-                       } else {    # add users only 
-                               if ($duplicate) { 
-					print "User $user{username} already exists. Skipping.\n" unless ($quiet); 
-                               	} else { 
-					$u = WebGUI::User->new($session, "new"); 
-					print "Adding user $user{username}\n" unless ($quiet); 
-				}
-                       }
-               }
-               if ($u) {
- 			$u->username($user{username});
-			$u->authMethod($user{authMethod});
-			$u->status($user{status});
-			my $cmd = "WebGUI::Auth::".$authMethod;
-        		my $load = "use ".$cmd;
-        		$session->log->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
-        		eval($load);
-    			my $auth = eval{$cmd->new($session, $authMethod,$u->userId)};
-			$auth->saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}});
-			$auth->saveParams($u->userId,"LDAP",{
-				ldapUrl=>$user{ldapUrl},
-				connectDN=>$user{connectDN}
-				});
-			$auth->saveParams($u->userId,"WebGUI",{changePassword=>$user{changePassword}});
-			foreach (keys %user) {
-				if (isIn($_, @profileFields)) {
-					$u->profileField($_,$user{$_});
-				}
-			}
-			if ($user{groups} ne "") {
-				my @groups = split(/,/,$user{groups});
-				$u->addToGroups(\@groups,$user{expireOffset});
-			}
-		}
-  		
-	}
+    }
+    elsif ($update) {
+        # Can only update, user doesn't exist
+        print "User '$user{username}' not found. Skipping.\n" unless ($quiet);
+        next;
+    }
+    elsif ($userId) {
+        print "User '$user{username}' already exists. Skipping.\n" unless ($quiet);
+        next;
+    }
+    else {
+        # Allowed to add, user doesn't exist
+        print "Adding user '$user{username}'\n" unless ($quiet);
+        $u = WebGUI::User->new($session, "new");
+        $user{identifier} ||= $defaultIdentifier
+    }
+    $user{identifier} = Digest::MD5::md5_base64($user{identifier})
+        if ($user{identifier});
+    if ($u) {
+        $u->username($user{username});
+        $u->authMethod($user{authMethod})
+            if $user{authMethod};
+        $u->status($user{status})
+            if $user{status};
+        my $class = "WebGUI::Auth::".$authMethod;
+        (my $mod = "$class.pm") =~ s{::|'}{/}g;
+        if (! eval { require $mod; 1 } ) {
+            $session->log->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
+            exit;
+        }
+        my $auth = $class->new($session, $authMethod,$u->userId);
+        $auth->saveParams($u->userId,"WebGUI",{identifier=>$user{identifier}})
+            if $user{identifier};
+        $auth->saveParams($u->userId,"LDAP",{ldapUrl=>$user{ldapUrl}})
+            if $user{ldapUrl};
+        $auth->saveParams($u->userId,"LDAP",{connectDN=>$user{connectDN}})
+            if $user{connectDN};
+        $auth->saveParams($u->userId,"WebGUI",{changePassword=>$user{changePassword}});
+        foreach my $field (keys %user) {
+            if (isIn($field, @profileFields)) {
+                $u->profileField($field,$user{$field});
+            }
+        }
+        if ($user{groups}) {
+            my @groups = split(/,/,$user{groups});
+            $u->addToGroups(\@groups,$user{expireOffset});
+        }
+    }
 }
 print "Cleaning up..." unless ($quiet);
 close(FILE);
@@ -217,25 +199,27 @@ print "OK\n" unless ($quiet);
 # calculateExpireOffset(expireOffset,expireUnits)
 # return: offsetInSeconds
 sub calculateExpireOffset {
-	my ($offset, $units) = @_;
-	return undef if ($offset < 1);
-	if ($units eq "epoch") {
-		my $seconds = ($offset);
-		if ($seconds < 1) {
-			return undef;
-		} else {
-			return $seconds;
-		}
-	}
-        if ($units eq "fixed") {
-                my $seconds = (($offset - $session->datetime->time()));
-                if ($seconds < 1) {
-                        return undef;
-                } else {
-                        return int($seconds);
-                }
+    my ($offset, $units) = @_;
+    return undef if ($offset < 1);
+    if ($units eq "epoch") {
+        my $seconds = ($offset);
+        if ($seconds < 1) {
+            return undef;
         }
-	return $session->datetime->intervalToSeconds($offset, $units)
+        else {
+            return $seconds;
+        }
+    }
+    if ($units eq "fixed") {
+        my $seconds = (($offset - $session->datetime->time()));
+        if ($seconds < 1) {
+            return undef;
+        }
+        else {
+            return int($seconds);
+        }
+    }
+    return $session->datetime->intervalToSeconds($offset, $units)
 }
 
 __END__
