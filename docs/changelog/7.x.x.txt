@@ -1,4 +1,5 @@
 7.5.11
+ - fixed: edit branch can't update URLs on most assets
  - Replaced Cool Menus nav with a YUI Menu, which works and looks better.
  - Replaced dtree javascript with YUI TreeView.
  - fix: widget dialogues weren't opening correctly inside a widgetized
