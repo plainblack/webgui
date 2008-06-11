@@ -485,7 +485,9 @@ sub _create_interleaved_items {
     }
     @$items = sort { $b->{date} <=> $a->{date} } @$items;
     # limit to $maxHeadlines
-    @$items = @$items[0 .. ($maxHeadlines - 1)];
+    if (@$items > $maxHeadlines) {
+        splice @$items, $maxHeadlines;
+    }
 }
 
 #-------------------------------------------------------------------
