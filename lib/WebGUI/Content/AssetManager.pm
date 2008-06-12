@@ -838,7 +838,7 @@ ENDHTML
                 }
 
                 # The More menu
-                $fields{ moreMenu } = getMoreMenu( $asset, $i18n->get( "menu label" ) );
+                $fields{ moreMenu } = getMoreMenu( $session, $i18n->get( "menu label" ) );
 
                 $output .= sprintf $row_markup, @fields{ @row_fields };
             }
