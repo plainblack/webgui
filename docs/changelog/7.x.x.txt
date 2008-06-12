@@ -115,6 +115,7 @@
  - fix: List View Reporting Wrong Dates
  - fix: too small of a field for content profiling
  - fix: Wrong class assignment in "News" template
+ - fix: malformed css in default wiki page
 
 7.5.10
  - fix: Syntax error in GetCsMail
