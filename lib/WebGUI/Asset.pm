@@ -2244,7 +2244,7 @@ sub www_changeUrlConfirm {
 	}
 
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getUrl('op=manageAssets'));
+		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
 	}

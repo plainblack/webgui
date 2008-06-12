@@ -312,7 +312,7 @@ sub getToolbar {
 		return '<script type="text/javascript">
                 var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
                 contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
-                contextMenu.addLink("'.$self->getUrl("op=manageAssets").'","'.$i18n->get("manage").'");
+                contextMenu.addLink("'.$self->getUrl("op=assetManager").'","'.$i18n->get("manage").'");
                 contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
                 contextMenu.print();
                 </script>'.$toolbar;

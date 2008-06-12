@@ -176,7 +176,7 @@ sub toHtmlWithWrapper {
                         $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
                 }
                 my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));
-                $buttons .= $self->session->icon->manage("op=manageAssets",$template->getParent->get("url"));
+                $buttons .= $self->session->icon->manage("op=assetManager",$template->getParent->get("url"));
 		$self->set("subtext",$buttons . $self->get("subtext"));
 	}
 	return $self->SUPER::toHtmlWithWrapper;
