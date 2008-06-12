@@ -2437,6 +2437,7 @@ true.
 sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
+
 =head2 www_widgetView ( )
 
 Returns the view() method of the asset object suitable for widgetizing.
