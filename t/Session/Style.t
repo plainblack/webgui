@@ -181,7 +181,7 @@ $style->sent(0);
 is($style->sent, 0, 'process: setup sent to 0');
 
 is($style->process('body.content', 'notATemplateId'),
-"WebGUI was unable to instantiate your style template.body.content",
+"WebGUI was unable to instantiate your style template with the id: notATemplateId.body.content",
 'process:  invalid templateId returns error message to client');
 
 is($style->sent, 1, 'process: sets sent to 1');
@@ -404,7 +404,7 @@ like($style->process, qr/ASSET PRINTABLE STYLE TEMPLATE/,
 
 $session->asset($snippet);
 is($style->process('test output'), 
-	"WebGUI was unable to instantiate your style template.test output",
+	"WebGUI was unable to instantiate your style template with the id: .test output",
 	'process:  no valid printableStyleTemplateFound in asset branch returns error');
 
 ####################################################
