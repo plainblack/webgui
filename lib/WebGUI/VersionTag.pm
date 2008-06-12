@@ -511,7 +511,7 @@ sub set {
     #This is necessary for upgrade prior to 7.5.11 in order to ensure that this field exists.
     #The if() blocks should be removd once the next branch point is reached.
     my $assetVersionTagDesc = $self->session->db->buildHashRef('describe assetVersionTag');
-    if(grep { $_ =~ /^startTime/ } keys %{$assetVersionTagDesc}) {
+    if(exists $assetVersionTagDesc->{startTime}) {
         #If startTime is there, so is endTime.  No need for the additional check.
         $self->{_data}{'startTime' } = $properties->{startTime} || $self->{_data}{startTime} || $startTime;
         $self->{_data}{'endTime'   } = $properties->{endTime} || $self->{_data}{endTime} || $endTime;
