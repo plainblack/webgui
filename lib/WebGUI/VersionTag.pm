@@ -516,9 +516,6 @@ sub set {
         $self->{_data}{'startTime' } = $properties->{startTime} || $self->{_data}{startTime} || $startTime;
         $self->{_data}{'endTime'   } = $properties->{endTime} || $self->{_data}{endTime} || $endTime;
     }
-    else {
-        $self->session->errorHandler->warn("Didn't find startTime");
-    }
 	if (exists $properties->{comments}) {
 		$self->{_data}{comments}=$self->session->datetime->epochToHuman.' - '.$self->session->user->username
                                 ."\n"
