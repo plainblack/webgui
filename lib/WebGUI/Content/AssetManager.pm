@@ -567,8 +567,6 @@ ENDJS
     );
 
     $output .= <<'ENDJS';
-
-    YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
 </script>
 ENDJS
 
@@ -593,11 +591,6 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
-    $session->style->setRawHeadTags( <<'ENDHTML' );
-    <script type="text/javascript">
-        YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initSearch );
-    </script>
-ENDHTML
 
     ### Show the form
     $output     .= q{<form><p>}
