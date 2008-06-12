@@ -444,7 +444,7 @@ sub getButton {
 sub getEditForm {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'CommercePaymentITransact');
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
 
     my $f       = $self->SUPER::getEditForm( @_ );
     $f->readOnly(
@@ -484,7 +484,7 @@ sub processCredentials {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
-	my $i18n    = WebGUI::International->new($session,'CommercePaymentITransact');
+	my $i18n    = WebGUI::International->new($session,'PayDriver_ITransact');
     my @error;
 
     # Check address data
@@ -593,7 +593,7 @@ sub www_getCredentials {
     my $errors      = shift;
     my $session     = $self->session;
     my $form        = $session->form;
-    my $i18n        = WebGUI::International->new($self->session, 'CommercePaymentITransact');
+    my $i18n        = WebGUI::International->new($self->session, 'PayDriver_ITransact');
 	my $u           = WebGUI::User->new($self->session,$self->session->user->userId);
 
     # Process address from address book if passed

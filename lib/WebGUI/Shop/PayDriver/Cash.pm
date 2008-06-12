@@ -30,7 +30,7 @@ sub definition {
     tie my %fields, 'Tie::IxHash';
 
     push @{ $definition }, {
-        name        => $i18n->echo('Cash'),
+        name        => $i18n->get('label'),
         properties  => \%fields,
     };
 

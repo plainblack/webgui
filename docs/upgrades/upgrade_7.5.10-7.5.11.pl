@@ -1229,7 +1229,6 @@ sub removeOldCommerceCode {
     	print "\tRemoving old commerce code.\n" unless ($quiet);
 
     my $setting = $session->setting;
-    $setting->remove('groupIdAdminCommerce'); 
     $setting->remove('groupIdAdminProductManager'); 
     $setting->remove('groupIdAdminSubscription'); 
     $setting->remove('groupIdAdminTransactionLog'); 
@@ -1740,13 +1739,13 @@ sub migratePaymentPlugins {
         $properties->{ receiptEmailTemplateId   } = 'BMzuE91-XB8E-XGll1zpvA';
 
         # Create paydriver instance
-        my $plugin = eval { 
+        my $plugin =  
          WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
                 $session, 
-                $properties->{ label },
+                $properties->{ label } || $namespace || 'Credit Card',
                 $properties
             ])
-        };
+        ;
 
         # Print warning message for ITransact users that they must change their postback url
         if ( $namespace eq 'ITransact' && $properties->{ vendorId } ) {
