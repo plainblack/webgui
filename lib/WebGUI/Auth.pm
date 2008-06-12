@@ -194,20 +194,23 @@ sub createAccount {
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
         my $id           = $field->getId;
         my $label        = $field->getLabel;
-        my $defaultValue = undef;
         
         # Get the default email from the invitation
+        my $formField;
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
             my $code = $self->session->form->get('code')
                     || $self->session->form->get('uniqueUserInvitationCode');
-            $defaultValue 
+            my $defaultValue 
                 = $self->session->db->quickScalar(
                     'SELECT email FROM userInvitations WHERE inviteId=?',
                     [$code]
                 );
             $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+            $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
         }
-        my $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
+        else {
+            $formField   = $field->formField();
+        }
         my $required    = $field->isRequired;
 
         # Old-style field loop.
