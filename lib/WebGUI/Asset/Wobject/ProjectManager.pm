@@ -1178,6 +1178,27 @@ sub www_editTask {
    my $config    = $session->config;
    my $i18n      = $self->i18n;
    my $user      = $session->user;
+   my $style     = $session->style;
+   
+   my $extras            = $config->get("extrasURL");
+   my $assetExtras       = $config->get("extrasURL")."/wobject/ProjectManager";	
+   
+    $style->setScript($assetExtras."/projectDisplay.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+	$style->setScript($assetExtras."/taskEdit.js",{ 
+                          type=>"text/javascript" 
+                      }
+    );
+    
+    $var->{'form.header'} = qq{
+      <script src="$extras/yui/build/yahoo/yahoo-min.js" type="text/javascript"></script>
+      <script src="$extras/yui/build/event/event-min.js" type="text/javascript"></script>
+      <script src="$extras/yui/build/connection/connection-min.js" type="text/javascript"></script>
+      <script src="$assetExtras/projectDisplay.js" type="text/javascript"></script>
+      <script src="$assetExtras/taskEdit.js" type="text/javascript"></script>
+    };
    
    #Set variables from form data
    my $projectId = $form->get("projectId");
@@ -1198,7 +1219,7 @@ sub www_editTask {
    my $disabledIfMilestone = ($taskType ne 'milestone')? "" : " disabled";
    
    #Build the form header
-   $var->{'form.header'} = WebGUI::Form::formHeader($session,{
+   $var->{'form.header'} .= WebGUI::Form::formHeader($session,{
 				action=>$self->getUrl,
 				extras=>q|name="editTaskForm"|
 				});
@@ -1260,8 +1281,8 @@ sub www_editTask {
 							  });
    
    my $durationEvents = qq|onchange="durationChanged(this.form, '', true)"  onblur="if (this.value == 0) durationChanged(this.form, '', true)"|;
-   my $startDateEvents = qq|onfocus="doCalendar(this.id)" onblur="startDateChanged(this.form, '', true)"|;
-   my $endDateEvents = qq|onfocus="doCalendar(this.id)" onblur="endDateChanged(this.form, '', true)"|;
+   my $startDateEvents = qq|onblur="startDateChanged(this.form, '', true)"|;
+   my $endDateEvents = qq|onblur="endDateChanged(this.form, '', true)"|;
 
    $var->{'form.duration'} = WebGUI::Form::float($session,{
 				-name => "duration",
@@ -1554,7 +1575,7 @@ sub www_viewProject {
     
 	
 	#Set page styles
-	$style->setLink($assetExtras."/subModal.css", { 
+	$style->setLink($assetExtras."/modal.css", { 
                         rel=>"stylesheet", 
                         type=>"text/css", 
                     }
@@ -1564,12 +1585,7 @@ sub www_viewProject {
                         type=>"text/css",
                     }
     );
-	$style->setLink($extras."/calendar/calendar-win2k-1.css",{
-                        rel=>"stylesheet",
-                        type=>"text/css",
-                    }
-    );
-	$style->setLink($assetExtras."/cMenu.css",{
+    $style->setLink($assetExtras."/cMenu.css",{
                         rel=>"stylesheet",
                         type=>"text/css",
                     }
@@ -1580,30 +1596,45 @@ sub www_viewProject {
                           type=>"text/javascript",
                       }
     );
-	$style->setScript($extras."/js/at/AjaxRequest.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-	$style->setScript($extras."/js/modal/modal.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-	$style->setScript($extras."/calendar/calendar.js",{ 
+	#$style->setScript($extras."/js/at/AjaxRequest.js",{ 
+    #                      type=>"text/javascript" 
+    #                  }
+    #);
+    
+	$style->setScript($assetExtras."/modal.js",{ 
                           type=>"text/javascript" 
                       }
     );
 	$style->setScript($extras."/contextMenu/contextMenu.js",{ 
                           type=>"text/javascript" 
-                      }
+                     }
     );
-	$style->setScript($extras."/calendar/lang/calendar-en.js",{ 
-                          type=>"text/javascript" 
-                      }
+	
+    $self->session->style->setScript(
+      $self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+      { type=>'text/javascript' }
     );
-	$style->setScript($extras."/calendar/calendar-setup.js",{ 
-                          type=>"text/javascript" 
-                      }
+    
+    $self->session->style->setScript(
+      $self->session->url->extras('yui/build/event/event-min.js'),
+      { type=>'text/javascript' }
     );
+   
+    $self->session->style->setScript(
+      $self->session->url->extras('yui/build/connection/connection-min.js'),
+      { type=>'text/javascript' }
+    );
+    
+    $self->session->style->setScript(
+      $self->session->url->extras('yui/build/container/container-min.js'),
+      { type=>'text/javascript' }
+    );
+    
+    #$self->session->style->setScript(
+    #  $self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),
+    #  { type=>'text/javascript' }
+    #);
+
 	$style->setScript($assetExtras."/projectDisplay.js",{ 
                           type=>"text/javascript" 
                       }
@@ -1651,6 +1682,7 @@ sub www_viewProject {
     
     #Build Task Data
 	my @taskList = ();
+    
 	my $count = 0;
 	foreach my $row (@{$data}) {
 	   my $hash      = {};
@@ -1669,15 +1701,15 @@ sub www_viewProject {
 	   	  
 	   if($canEditTasks) {
 		   my $suffix = '_'.$id;
-
+           
 		   $hash->{'task.start'} = WebGUI::Form::text($session,{
-                         -name=>'start'.$suffix,
-			 -value=>$startDate,
-			 -size=>"10",
-			 -maxlength=>"10",
-			 -extras=>qq<onfocus="doCalendar(this.id);" class="taskdate" onblur="startDateChanged(this.form, '$suffix', false);">
-                        });
-		  
+                name=>'start'.$suffix,
+			    value=>$startDate,
+			    size=>"10",
+			    maxlength=>"10",
+			    extras=>qq<class="taskdate" onchange="startDateChanged(this.form, '$suffix', false);">
+            });
+          
 		  $hash->{'task.start'} .= WebGUI::Form::hidden($session,{
 			-name=>'orig_start'.$suffix,
 			-value=>$startDate,
@@ -1695,13 +1727,14 @@ sub www_viewProject {
 			});
 
 		  $hash->{'task.end'} = WebGUI::Form::text($session,{
-		                                               -name=>'end'.$suffix,
-								     -value=>$endDate,
-								     -size=>"10",
-								     -maxlength=>"10",
-								     -extras=>qq|class="taskdate" onfocus="doCalendar(this.id);" onblur="endDateChanged(this.form, '$suffix', false);"|
-		                                            });
-		  $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
+            -name=>'end'.$suffix,
+			-value=>$endDate,
+			-size=>"10",
+		    -maxlength=>"10",
+			-extras=>qq|class="taskdate" onblur="endDateChanged(this.form, '$suffix', false);"|
+		  });
+		  
+          $hash->{'task.end'} .= WebGUI::Form::hidden($session,{
 			-name=>'orig_end'.$suffix,
 			-value=>$endDate,
 			});
@@ -1720,6 +1753,10 @@ sub www_viewProject {
 				-value=>$duration, 
 				-extras=>qq|class="taskduration" onchange="durationChanged(this.form, '$suffix', false);" |
 				});
+              $hash->{'task.duration'} .= WebGUI::Form::hidden($session,{
+                -name=>'orig_duration'.$suffix,
+                -value=>$duration,
+			    });
 			 
 	      }
 	      $hash->{'task.lagTime'} = WebGUI::Form::hidden($session,{
@@ -1784,8 +1821,9 @@ sub www_viewProject {
 
 	if($canEditTasks) {
 		$var->{'task.add.label'      } = $i18n->get("add task label");
+        $var->{'task.add.projectId'  } = $projectId;
 		$var->{'task.add.url'        } = $self->getUrl("func=editTask;projectId=$projectId;taskId=new");
-		$var->{'task.canAdd'         } = "true";
+        $var->{'task.canAdd'         } = "true";
 	}
 
 
