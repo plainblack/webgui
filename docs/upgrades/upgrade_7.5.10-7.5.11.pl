@@ -1763,7 +1763,7 @@ sub migratePaymentPlugins {
 #----------------------------------------------------------------------------
 sub removeRecurringPaymentActivity {
     my $session = shift;
-    print "\tRemoving the recurring payment workflow activity...";
+    print "\tRemoving the recurring payment workflow activity..." unless $quiet;
 
     my $activities = $session->config->get( 'workflowActivities' );
 
@@ -1772,7 +1772,7 @@ sub removeRecurringPaymentActivity {
     
     $session->config->set( 'workflowActivities', $activities );
 
-    print "Done.\n";
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
