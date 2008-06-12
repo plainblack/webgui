@@ -112,6 +112,7 @@
  - fix: Patch for Style.pm to identify which template failed to instantiate
  - fix: Admin Console templates have the same title
  - fix: File Titles not displaying in folder
+ - fix: List View Reporting Wrong Dates
 
 7.5.10
  - fix: Syntax error in GetCsMail
