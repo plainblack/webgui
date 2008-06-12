@@ -81,6 +81,8 @@ $posts[0][0]->getStorageLocation->addFileFromFilesystem(
     WebGUI::Test->getTestCollateralPath('lamp.jpg')
 );
 
+$versionTags[-1]->commit;
+
 # Thread fields mapped to album fields that should be migrated
 my %threadFields = (
     content         => "description",
@@ -147,7 +149,9 @@ ok(
     "addAlbumFromThread croaks if second argument is not a Thread asset",
 );
 
+push @versionTags, WebGUI::VersionTag->getWorking( $session );
 $utility->addAlbumFromThread( $gallery, $threads[0] );
+$versionTags[-1]->commit;
 
 is(
     scalar @{ $gallery->getAlbumIds }, 1,
@@ -155,6 +159,8 @@ is(
 );
 
 $album = WebGUI::Asset->newByDynamicClass( $session, $gallery->getAlbumIds->[0] );
+use Data::Dumper;
+diag( Dumper $gallery->getAlbumIds );
 
 is(
     $album->get('revisionDate'), $threads[0]->get('revisionDate'),
@@ -251,7 +257,9 @@ ok(
     "addAlbumFromCollaboration croaks if second argument is not a Collaboration asset",
 );
 
+push @versionTags, WebGUI::VersionTag->getWorking( $session );
 $utility->addAlbumFromCollaboration( $gallery, $collab );
+$versionTags[-1]->commit;
 
 is(
     scalar @{ $gallery->getAlbumIds }, scalar @threads,
