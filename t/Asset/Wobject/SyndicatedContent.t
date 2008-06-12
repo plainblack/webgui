@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 19; # increment this value for each test you create
+use Test::More tests => 20; # increment this value for each test you create
 use WebGUI::Asset::Wobject::SyndicatedContent;
 
 my $session = WebGUI::Test->session;
@@ -120,9 +120,8 @@ my $url = $syndicated_content->_createRSSURLs(\%var);
 ok($url,"A URL was created for RSS feed");
 
 # processTemplate, this is where we run into trouble...
-my $processed_template = $syndicated_content->processTemplate(\%var,undef,$template);
+my $processed_template = eval {$syndicated_content->processTemplate(\%var,undef,$template) };
 ok($processed_template, "A response was received from processTemplate.");
-
 
 END {
 	# Clean up after thy self
