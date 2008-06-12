@@ -217,6 +217,15 @@ An integer indicating whether to return just the field's form input, or the fiel
 
 A WebGUI::User object reference to use instead of the currently logged in user.
 
+=head3 skipDefault
+
+If true, this causes the default value set up for the form field to be ignored.
+
+=head3 assignedValue
+
+If assignedValue is defined, it will be used to override the default value set up for the
+form.
+
 =cut
 
 sub formField {

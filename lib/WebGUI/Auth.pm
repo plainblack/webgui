@@ -189,13 +189,17 @@ sub createAccount {
 		my $id           = $field->getId;
 		my $label        = $field->getLabel;
         my $emailAddress = '';
+        my $formField;
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
            my $code = $self->session->form->get('code')
                    || $self->session->form->get('uniqueUserInvitationCode');
            ($emailAddress) = $self->session->db->quickArray('select email from userInvitations where inviteId=?',[$code]);
            $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+            $formField = $field->formField(undef, undef, undef, undef, $emailAddress); ##Manually set the field
         }
-        my $formField = $field->formField(undef, undef, undef, undef, $emailAddress); ##Manually set the field
+        else {
+            $formField = $field->formField();
+        }
 		my $required = $field->isRequired;
 
 		# Old-style field loop.
