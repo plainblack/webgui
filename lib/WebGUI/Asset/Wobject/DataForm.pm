@@ -55,7 +55,7 @@ sub _createForm {
     my $data = shift;
     my $value = shift;
     # copy select entries
-    my %param = map { $_ => $data->{$_} } qw(name height width extras vertical defaultValue);
+    my %param = map { $_ => $data->{$_} } qw(name height width extras vertical defaultValue options);
     $param{value} = $value;
     $param{size} = $param{width};
 
@@ -63,6 +63,9 @@ sub _createForm {
 
     if ($data->{type} eq "checkbox") {
         $param{defaultValue} = ($param{defaultValue} =~ /checked/i);
+    }
+    elsif ( isIn($data->{type}, qw(selectList selectBox checkList radioList)) ) {
+        delete $param{size};
     }
     my $control = eval {
         WebGUI::Pluggable::instanciate("WebGUI::Form::\u$data->{type}", "new", [ $self->session, \%param ]);

@@ -129,7 +129,7 @@ sub convertDataForm {
                 name            => $fieldData->{name},
                 status          => $fieldData->{status},
                 type            => "\u$fieldData->{type}",
-                possibleValues  => $fieldData->{possibleValues},
+                options         => $fieldData->{possibleValues},
                 defaultValue    => $fieldData->{defaultValue},
                 width           => $fieldData->{width},
                 subtext         => $fieldData->{subtext},
