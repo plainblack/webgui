@@ -22,9 +22,11 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::DateTime;
 use WebGUI::Asset::Sku::Product;
+use WebGUI::Asset::Wobject::EventManagementSystem;
 use WebGUI::Workflow;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Pluggable;
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -628,7 +630,7 @@ sub upgradeEMS {
             $newBadges{$badge->getId} = $badgeData->{productId};
         }
     	print "\t\t\tMigrating old tickets for $emsId.\n" unless ($quiet);
-        my %metaFields = $db->buildHash("select fieldId,label from EventManagementSystem_metaField where assetId=? order by sequenceNumber",[$emsId]);
+        my %metaFields = $db->buildHash("select fieldId,label from EMSEventMetaField where assetId=? order by sequenceNumber",[$emsId]);
         my $ticketResults = $db->read("select * from EventManagementSystem_products left join products using (productId) where assetId=? and prerequisiteId<>''",[$emsId]);
         while (my $ticketData = $ticketResults->hashRef) {
             my %oldMetaData = $db->buildHash("select fieldId,fieldData from EventManagementSystem_metaData where productId=?",[$ticketData->{productId}]);
@@ -654,14 +656,33 @@ sub upgradeEMS {
             $oldTickets{$ticketData->{productId}} = $ticket->getId;
             $newTickets{$ticket->getId} = $ticketData->{productId};
         }
+    	print "\t\t\tMigrating old registrant tickets and registrant ribbons for $emsId.\n" unless ($quiet);
+        my %oldBadgeRegistrants = ();
+        my $regticResults = $db->read("select * from EventManagementSystem_registrations left join EventManagementSystem_products using (productId) where EventManagementSystem_registrations.assetId=?",[$emsId]);
+        while (my $registrantData = $regticResults->hashRef) {
+            my $id = $oldTickets{$registrantData->{productId}};
+            if ( $registrantData->{prerequisiteId} eq "") {
+                $oldBadgeRegistrants{$registrantData->{badgeId}} = $registrantData->{productId};
+            }
+            elsif ($id ne "") {
+                $db->write("insert into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
+                    [$registrantData->{badgeId}, $id]);
+            }
+            else {
+                my $id = $oldRibbons{$registrantData->{productId}};
+                if ($id ne "") {
+                    $db->write("insert into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
+                        [$registrantData->{badgeId}, $id]);
+                }
+            }
+        }
     	print "\t\t\tMigrating old registrants for $emsId.\n" unless ($quiet);
         my $registrantResults = $db->read("select * from EventManagementSystem_badges where assetId=?",[$emsId]);
         while (my $registrantData = $registrantResults->hashRef) {
             $db->setRow("EMSRegistrant","badgeId",{
                 badgeId             => "new",
                 userId              => $registrantData->{userId},
-                badgeNumber         => $registrantData->{badgeId},
-                badgeAssetId        => $oldBadges{$registrantData->{badgeId}},
+                badgeAssetId        => $oldBadges{$oldBadgeRegistrants{$registrantData->{badgeId}}},
                 emsAssetId          => $emsId,
                 name                => $registrantData->{firstName}.' '.$registrantData->{lastName},
                 address1            => $registrantData->{address},
@@ -673,22 +694,6 @@ sub upgradeEMS {
                 email               => $registrantData->{email},
                 purchaseComplete    => 1,
                 },$registrantData->{badgeId});
-        }
-    	print "\t\t\tMigrating old registrant tickets and registrant ribbons for $emsId.\n" unless ($quiet);
-        my $regticResults = $db->read("select * from EventManagementSystem_registrations where assetId=?",[$emsId]);
-        while (my $registrantData = $regticResults->hashRef) {
-            my $id = $oldTickets{$registrantData->{productId}};
-            if ($id ne "") {
-                $db->write("insert into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
-                    [$registrantData->{badgeId}, $id]);
-            }
-            else {
-                my $id = $oldRibbons{$registrantData->{productId}};
-                if ($id ne "") {
-                    $db->write("insert into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
-                        [$registrantData->{badgeId}, $id]);
-                }
-            }
         }
     }
     $db->write("drop table EventManagementSystem_badges");
@@ -1736,7 +1741,7 @@ sub migratePaymentPlugins {
 
         # Create paydriver instance
         my $plugin = eval { 
-            WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
+         WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
                 $session, 
                 $properties->{ label },
                 $properties
