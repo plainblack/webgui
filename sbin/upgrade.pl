@@ -302,7 +302,7 @@ The upgrade process failed and has stopped so you can either restore
 from backup, or attempt to fix the problem and continue.
 
 STOP
-	exit;
+    exit 1;
 }
 
 
