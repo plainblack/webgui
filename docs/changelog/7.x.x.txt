@@ -118,6 +118,8 @@
  - fix: malformed css in default wiki page
  - fix: cleared up description for Image Resolutions and Max Space in gallery
  - fix: User profiling default broken
+ - Gallery Edit Album screen now works much better
+ - fix: Cross Publish cancel button now works
 
 7.5.10
  - fix: Syntax error in GetCsMail
