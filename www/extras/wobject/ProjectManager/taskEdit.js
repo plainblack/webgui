@@ -55,7 +55,23 @@ function taskEdit_updateResources(resources) {
 	taskEdit_updateExclude("taskEdit_resourceList_addGroup_a", 'group', resources);
 
 	taskEdit_pending = [];
-	AjaxRequest.get({
+	
+	var callback = {
+		success : function(req) {
+			div.innerHTML = req.responseText;
+			taskEdit_doPending();
+		},
+		failure : function(req) {
+			// ToDo: Need better error handling
+			div.innerHTML = savedInnerHTML;
+			taskEdit_doPending();
+		}
+    }
+	
+    var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
+   
+	/*
+	 AjaxRequest.get({
 		'url' : url,
 		'onSuccess' : function(req) {
 			div.innerHTML = req.responseText;
@@ -67,6 +83,7 @@ function taskEdit_updateResources(resources) {
 			taskEdit_doPending();
 		}
 	});
+	*/
 }
 
 function taskEdit_doPending() {
