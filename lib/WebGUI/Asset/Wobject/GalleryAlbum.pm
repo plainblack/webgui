@@ -1042,7 +1042,7 @@ sub www_edit {
             . qq{</button>}
             ;
         
-        my $deleteConfirm = $i18n->get( 'template delete message' );
+        my $deleteConfirm = $i18n->get( 'template delete message', 'Asset_Photo' );
         $file->{ form_delete }
             = qq!<button onclick="if ( confirm('$deleteConfirm') ) { this.setAttribute('innerHTML','$file->{assetId}'); return true; } else { return false };" type="submit" name="delete" class="delete" value="$file->{assetId}">!
             . $session->icon->delete( undef, undef, "disabled" )
