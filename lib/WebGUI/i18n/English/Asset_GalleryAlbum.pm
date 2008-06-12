@@ -490,6 +490,30 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar form_promote' => {
+        message     => q{A button to promote the image in the ranking. Use these to move images in the order.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_demote' => {
+        message     => q{A button to demote the image in the ranking. Use these to move images in the order.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_delete' => {
+        message     => q{A button to delete the image.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_synopsis' => {
+        message     => q{An HTML Area for the image thumbnail.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;

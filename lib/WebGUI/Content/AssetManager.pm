@@ -162,6 +162,8 @@ sub getMoreMenu {
 
     ### The More menu
     my @more_fields     = ();
+    # FIXME: Add a show callback with the record as first argument. If it
+    # returns true, the URL will be shown.
     # These links are shown based on UI level
     if ( $userUiLevel >= $toolbarUiLevel->{ "changeUrl" } ) {
         push @more_fields, {
@@ -391,7 +393,7 @@ sub www_manage {
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = '<div id="assetManager">' . getHeader( $session );
+    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
@@ -413,7 +415,7 @@ ENDHTML
     $output .= '</ol>';
     
     ### The page of assets
-    $output         .= q{<div class="yui-skin-sam" id="assetManager" >}
+    $output         .= q{<div>}
                     . q{<form>}
                     . q{<input type="hidden" name="op" value="assetManager" />}
                     . q{<input type="hidden" name="method" value="manage" />}
@@ -514,8 +516,6 @@ ENDHTML
                     ;
 
     $output         .= <<'ENDJS';
-// Initialize the datatable and datasource
-YAHOO.util.Event.onDOMReady(function () {
     // Start the data source
     WebGUI.AssetManager.DataSource
         = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
@@ -540,14 +540,8 @@ YAHOO.util.Event.onDOMReady(function () {
             ]
         };
 
-    var assetPaginator = new YAHOO.widget.Paginator({
-        containers         : ['pagination'],
-        pageLinks          : 7,
-        rowsPerPage        : 15,
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
-    });
-
-    function buildQueryString( state, dt ) {
+    WebGUI.AssetManager.BuildQueryString
+    = function ( state, dt ) {
         var query = ";recordOffset=" + state.pagination.recordOffset 
                 + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
                 + ';rowsPerPage=' + state.pagination.rowsPerPage
@@ -555,35 +549,6 @@ YAHOO.util.Event.onDOMReady(function () {
                 ;
             return query;
         };
-
-    // Custom function to handle pagination requests
-    var handlePagination = function (state,dt) {
-        var sortedBy  = dt.get('sortedBy');
-
-        // Define the new state
-        var newState = {
-            startIndex: state.recordOffset, 
-            sorting: {
-                key: sortedBy.key,
-                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
-            },
-            pagination : { // Pagination values
-                recordOffset: state.recordOffset, // Default to first page when sorting
-                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: dt.onDataReturnSetRows,
-            failure: dt.onDataReturnSetRows,
-            scope: dt,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        dt.getDataSource().sendRequest(buildQueryString(newState), oCallback);
-    };
 
 ENDJS
 
@@ -602,55 +567,8 @@ ENDJS
     );
 
     $output .= <<'ENDJS';
-    WebGUI.AssetManager.DataTable 
-        = new YAHOO.widget.DataTable( 'dataTableContainer', 
-            WebGUI.AssetManager.ColumnDefs, 
-            WebGUI.AssetManager.DataSource, 
-            {
-                initialRequest          : ';recordOffset=0',
-                generateRequest         : buildQueryString,
-                paginationEventHandler  : handlePagination,
-                paginator               : assetPaginator,
-                sortedBy                : { key : "lineage", dir : YAHOO.widget.DataTable.CLASS_ASC } 
-            }
-        );
 
-    // Override function for custom server-side sorting
-    WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
-        // Default ascending
-        var sDir = "asc";
-        
-        // If already sorted, sort in opposite direction
-        if(oColumn.key === this.get("sortedBy").key) {
-            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ?
-                    "desc" : "asc";
-        }
-
-        // Define the new state
-        var newState = {
-            startIndex: 0,
-            sorting: { // Sort values
-                key: oColumn.key,
-                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC
-            },
-            pagination : { // Pagination values
-                recordOffset: 0, // Default to first page when sorting
-                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: this.onDataReturnSetRows,
-            failure: this.onDataReturnSetRows,
-            scope: this,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        this.getDataSource().sendRequest(buildQueryString(newState), oCallback);
-    };
-} );
+    YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
 </script>
 ENDJS
 
@@ -669,7 +587,7 @@ sub www_search {
     my $session     = shift;
     my $ac          = WebGUI::AdminConsole->new( $session, "assets" ); 
     my $i18n        = WebGUI::International->new( $session, "Asset" );
-    my $output      = '<div id="assetManager">' . getHeader( $session );
+    my $output      = '<div id="assetSearch">' . getHeader( $session );
     
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
@@ -749,11 +667,11 @@ ENDHTML
                 $output     .= q{<input type="hidden" name="class" value="} . $class . q{" />};
             }
 
-            $output         .= q{<table class="assetManager" border="0">}
+            $output         .= q{<table class="assetSearch" border="0">}
                             . q{<thead>}
                             . q{<tr>}
                             . q{<th class="center"><input type="checkbox" onclick="WebGUI.Form.toggleAllCheckboxesInForm( this.form, 'assetId' )" /></th>} # Checkbox column
-                            . q{<th class="center">&nbsp;</th>}            # Edit / More
+                            . q{<th class="center">&nbsp;</th>}            # Edit 
                             . q{<th>} . $i18n->get( '99' ) . q{</th>}             # Title
                             . q{<th>} . $i18n->get( "type" ) . q{</th>}              # Type
                             . q{<th class="center">} . $i18n->get( "last updated" ) . q{</th>}      # Revision Date
@@ -767,7 +685,7 @@ ENDHTML
             # The markup for a single asset
             my $row_markup  = q{<tr %s ondblclick="WebGUI.AssetManager.toggleRow( this )">}
                             . q{<td class="center"><input type="checkbox" name="assetId" value="%s" onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" /></td>}
-                            . q{<td class="center">%s %s</td>}
+                            . q{<td class="center">%s</td>}
                             . q{<td>%s</td>}
                             . q{<td><img src="%s" /> %s</td>}
                             . q{<td class="center">%s</td>}
@@ -780,7 +698,7 @@ ENDHTML
             my @row_fields  = qw(
                             alt
                             assetId
-                            editLink moreMenu
+                            editLink 
                             title
                             iconUrl type
                             revisionDate
@@ -795,7 +713,7 @@ ENDHTML
                 
                 # Populate the required fields to fill in
                 my %fields      = (
-                    alt             => ( $count % 3 == 0 ? 'class="alt"' : '' ),
+                    alt             => ( $count % 2 == 0 ? 'class="alt"' : '' ),
                     assetId         => $asset->getId,
                     url             => $asset->getUrl,
                     title           => $asset->get( "title" ),
@@ -832,13 +750,10 @@ ENDHTML
                 # The edit link
                 if ( !$asset->lockedBy || $asset->canEditIfLocked ) {
                     $fields{ editLink } 
-                        = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a> |',
+                        = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a>',
                         $asset->getUrl( 'func=edit' )
                         ;
                 }
-
-                # The More menu
-                $fields{ moreMenu } = getMoreMenu( $session, $i18n->get( "menu label" ) );
 
                 $output .= sprintf $row_markup, @fields{ @row_fields };
             }

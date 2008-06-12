@@ -935,6 +935,16 @@ sub www_edit {
             $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
         }
     }
+    elsif ( $form->get("delete") ) {
+        my $assetId     = $form->get("delete");
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( $asset ) {
+            $asset->purge;
+        }
+        else {
+            $session->errorHandler->error( "Couldn't delete asset '$assetId' because we couldn't instanciate it.");
+        }
+    }
 
     # Generate the form
     if ($form->get("func") eq "add") {
@@ -972,6 +982,7 @@ sub www_edit {
             = WebGUI::Form::submit( $session, {
                 name        => "cancel",
                 value       => $i18n->get("cancel"),
+                extras      => 'onclick="history.go(-1)"',
             });
     }
     $var->{ form_start } 
@@ -1016,21 +1027,31 @@ sub www_edit {
 
         # Raw HTML here to provide proper value for the image
         $file->{ form_promote }
-            = qq{<button type="submit" name="promote" class="promote" value="$file->{assetId}">}
+            = qq{<button type="submit" name="promote" class="promote" value="$file->{assetId}" onclick="this.setAttribute('innerHTML','$file->{assetId}')">}
             . $session->icon->moveUp( undef, undef, "disabled" )
             . qq{</button>}
             ;
 
         $file->{ form_demote }
-            = qq{<button type="submit" name="demote" class="demote" value="$file->{assetId}">}
+            = qq{<button type="submit" name="demote" class="demote" value="$file->{assetId}" onclick="this.setAttribute('innerHTML','$file->{assetId}')">}
             . $session->icon->moveDown( undef, undef, "disabled" )
             . qq{</button>}
             ;
         
+        my $deleteConfirm = $i18n->get( 'template delete message' );
+        $file->{ form_delete }
+            = qq!<button onclick="if ( confirm('$deleteConfirm') ) { this.setAttribute('innerHTML','$file->{assetId}'); return true; } else { return false };" type="submit" name="delete" class="delete" value="$file->{assetId}">!
+            . $session->icon->delete( undef, undef, "disabled" )
+            . qq{</button>}
+            ;
+
         $file->{ form_synopsis }
-            = WebGUI::Form::text( $session, {
+            = WebGUI::Form::HTMLArea( $session, {
                 name        => "fileSynopsis_$file->{assetId}",
                 value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
+                richEditId  => $self->getParent->get( 'richEditIdFile' ),
+                height      => 150,
+                width       => 400,
             });
     }
 

@@ -107,3 +107,58 @@ tr.highlight td {
 .functionPane a {
     vertical-align:     bottom;
 }
+
+
+/** Asset Search table 
+   NOTE: These will be removed when the search uses the Asset Data Table API **/
+.assetSearch {
+    clear:              both;
+    width:              100%;
+}
+
+.assetSearch th {
+    border:             solid #666;
+    border-width:       0 1px 2px 0;
+    background-color:   #eee;
+}
+
+.assetSearch th, .assetSearch td {
+    padding:            0 0.8em;
+}
+
+#assetSearch th, #assetSearch td, .assetManager {
+    font-size:          0.8em;
+}
+
+.assetSearch .center, .assetSearch th {
+    text-align:         center;
+}
+
+.assetSearch .right {
+    text-align:         right;
+}
+
+.assetSearch a:link, .assetSearch a:visited, .assetSearch a:active, .assetSearch a:hover {
+    font-size:          8pt;
+ }
+ 
+.assetSearch tr.alt td {
+    background-color:   #ddd;
+ }
+ 
+.assetSearch tr.highlight td {
+    background-color:   #CCF;
+}
+
+/** Page stats **/
+#pageStats {
+    float:              right;
+    text-align:         right;
+}
+
+#pageLinks {
+    float:              right;
+    text-align:         right;
+}
+
+
