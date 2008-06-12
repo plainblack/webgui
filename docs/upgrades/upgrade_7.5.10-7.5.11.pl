@@ -79,6 +79,7 @@ addUserListWobject( $session );
 addInheritUrlFromParent( $session );
 addDefaultFilesPerPage( $session );
 fixAdminConsoleTemplateTitles( $session );
+makeLongerAssetMetadataValues( $session );
 removeOldCommerceCode($session);
 convertDataForm( $session );
 
@@ -1809,6 +1810,20 @@ sub fixAdminConsoleTemplateTitles {
     print "\tMaking unique title for admin console templates... " unless $quiet;
     my $ac = WebGUI::Asset->newByDynamicClass($session, 'PBtmpl0000000000000137');
     $ac->update({title => 'Admin Console Style'});
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Make longer asset metadata values
+sub makeLongerAssetMetadataValues {
+    my $session     = shift;
+    print "\tLengthening asset metadata values to 255 characters... " unless $quiet;
+    $session->db->write(
+        q{ ALTER TABLE `metaData_properties` CHANGE COLUMN defaultValue defaultValue VARCHAR(255) },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `metaData_values` CHANGE COLUMN value value VARCHAR(255) },
+    );
     print "DONE!\n" unless $quiet;
 }
 
