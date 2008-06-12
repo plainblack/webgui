@@ -17,13 +17,15 @@ our $HELP = {
 		fields => [	
 		],
 		variables => [
-			{	name => "formHeader" , required=>1},
-			{	name => "formFooter" , required=>1 },
-			{	name => "addToCartButton" , required=>1 },
-			{	name => "mustSpend", description=>"must spend help" },
-			{	name => "percentageDiscount", description=>"percentage discount help" },
-			{	name => "priceDiscount", description=>"price discount help" },
-			{	name => "templateId", description=>"template help" },
+			{ name => "formHeader" , required=>1},
+			{ name => "formFooter" , required=>1 },
+			{ name => "addToCartButton" , required=>1 },
+			{ name => "mustSpend", description=>"must spend help" },
+			{ name => "percentageDiscount", description=>"percentage discount help" },
+			{ name => "priceDiscount", description=>"price discount help" },
+			{ name => "templateId", description=>"template help" },
+			{ name => "hasAddedToCart" , required=>1 },
+			{ name => "thankYouMessage", description=>"thank you message help" },
 		],
 		related => [  
 		],

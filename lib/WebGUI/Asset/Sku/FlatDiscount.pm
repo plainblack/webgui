@@ -57,6 +57,7 @@ sub addToCart {
 		$found =1 if (ref($item->getSku) eq ref($self));
 	}
 	unless ($found) {
+        $self->{_hasAddedToCart} = 1;
 		$self->SUPER::addToCart($options);
 	}
 }
@@ -106,6 +107,13 @@ sub definition {
 			label           => $i18n->get("price discount"),
 			hoverHelp       => $i18n->get("price discount help"),
 			},
+        thankYouMessage => {
+            tab             => "properties",
+			defaultValue    => $i18n->get("default thank you message"),
+			fieldType       => "HTMLArea",
+			label           => $i18n->get("thank you message"),
+			hoverHelp       => $i18n->get("thank you message help"),
+            },
 	    );
 	push(@{$definition}, {
 		assetName           => $i18n->get('assetName'),
@@ -205,6 +213,7 @@ sub view {
             . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
         formFooter      => WebGUI::Form::formFooter($session),
         addToCartButton => WebGUI::Form::submit( $session, { value => $i18n->get("add to cart") }),
+        hasAddedToCart  => $self->{_hasAddedToCart},
         );
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
