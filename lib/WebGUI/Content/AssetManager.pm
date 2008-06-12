@@ -540,6 +540,11 @@ ENDHTML
             ]
         };
 
+    WebGUI.AssetManager.DefaultSortedBy = { 
+        "key"       : "lineage",
+        "dir"       : YAHOO.widget.DataTable.CLASS_ASC
+    };
+    
     WebGUI.AssetManager.BuildQueryString
     = function ( state, dt ) {
         var query = ";recordOffset=" + state.pagination.recordOffset 

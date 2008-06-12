@@ -217,7 +217,7 @@ WebGUI.AssetManager.initManager
         };
         
         // Send the request
-        dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState), oCallback);
+        dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
     };
 
     // Initialize the data table
@@ -267,7 +267,7 @@ WebGUI.AssetManager.initManager
         };
         
         // Send the request
-        this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState), oCallback);
+        this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, this), oCallback);
     };
 
 };
