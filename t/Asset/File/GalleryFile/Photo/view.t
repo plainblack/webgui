@@ -86,9 +86,9 @@ my $testTemplateVars    = {
     fileUrl             => $photo->getFileUrl,
     thumbnailUrl        => $photo->getThumbnailUrl,
     numberOfComments    => scalar @{ $photo->getCommentIds },
-    resolutions_loop    => ignore(), # Tested elsewhere
     exifLoop            => ignore(), # Tested elsewhere
-    
+    isPending           => ( $photo->get("status") eq "pending" ),
+
     # Gallery stuff
     url_search          => $gallery->getUrl('func=search'),
     url_listFilesForCurrentUser    => $gallery->getUrl('func=listFilesForUser'),
@@ -109,6 +109,18 @@ for my $tag ( keys %{ $photo->getExifData } ) {
 }
 # Add search vars
 $gallery->appendTemplateVarsSearchForm( $testTemplateVars );
+
+# Add resolution vars
+for my $resolution ( @{ $photo->getResolutions } ) {
+    my $label       = $resolution;
+    $label          =~ s/\.[^.]+$//;
+    my $downloadUrl = $photo->getStorageLocation->getUrl( $resolution );
+    push @{ $testTemplateVars->{ resolutions_loop } }, { 
+        resolution      => $label,
+        url_download    => $downloadUrl,
+    };
+    $testTemplateVars->{ "resolution_" . $resolution } = $downloadUrl;
+}
 
 # Fix vars that are time-sensitive
 $testTemplateVars->{ searchForm_creationDate_before }
