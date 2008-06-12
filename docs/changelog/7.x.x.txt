@@ -114,6 +114,7 @@
  - fix: File Titles not displaying in folder
  - fix: List View Reporting Wrong Dates
  - fix: too small of a field for content profiling
+ - fix: Wrong class assignment in "News" template
 
 7.5.10
  - fix: Syntax error in GetCsMail
