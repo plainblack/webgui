@@ -198,6 +198,16 @@ our $HELP = {
         title       => 'help edit title',
         body        => 'help edit body',
         variables => [
+            {
+                name        => 'errors',
+                description => 'helpvar errors',
+                variables   => [
+                    { 
+                        name        => 'error',
+                        description => 'helpvar error',
+                    },
+                ],
+            },
             { 
                 name        => 'isNewPhoto',
                 description => 'helpvar isNewPhoto',

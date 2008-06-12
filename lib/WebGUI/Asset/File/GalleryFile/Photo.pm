@@ -506,6 +506,15 @@ sub www_edit {
         url_addArchive      => $self->getParent->getUrl('func=addArchive'),
         url_album           => $self->getParent->getUrl('func=album'),
     };
+    
+    # Process errors if any
+    if ( $session->stow->get( 'editFormErrors' ) ) {
+        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
+            push @{ $var->{ errors } }, {
+                error       => $error,
+            };
+        }
+    }
 
     if ( $form->get('func') eq "add" ) {
         $var->{ isNewPhoto }    = 1;

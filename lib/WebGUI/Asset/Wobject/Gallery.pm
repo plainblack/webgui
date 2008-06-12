@@ -812,6 +812,46 @@ sub getUserFilePaginator {
 
 #----------------------------------------------------------------------------
 
+=head2 hasSpaceAvailable ( spaceWanted [, userId ] )
+
+Returns true if the user has at least the specified bytes of C<spaceWanted>
+available to use in this Gallery.
+
+=cut
+
+sub hasSpaceAvailable {
+    my $self        = shift;
+    my $spaceWanted = shift;
+    my $userId      = shift || $self->session->user->userId;
+    
+    # If we don't care, just return
+    return 1 if ( $self->get( "maxSpacePerUser" ) == 0 );
+
+    my $db          = $self->session->db;
+
+    # Compile the amount of disk space used
+    my $maxSpace    = $self->get( "maxSpacePerUser" ) * ( 1_024 ** 2 ); # maxSpacePerUser is in MB
+    my $spaceUsed   = 0;
+    my $fileIds
+        = $self->getLineage( [ 'descendants' ], { 
+            joinClass       => 'WebGUI::Asset::File::GalleryFile',
+            whereClause     => 'ownerUserId = ' . $db->quote( $userId ),
+        } );
+
+    for my $assetId ( @{ $fileIds } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $assetId );
+        next unless $asset;
+        $spaceUsed += $asset->get( 'assetSize' );
+
+        return 0 if ( $spaceUsed + $spaceWanted >= $maxSpace );
+    }
+
+    # We must have enough space
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.

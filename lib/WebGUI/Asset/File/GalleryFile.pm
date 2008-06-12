@@ -653,8 +653,14 @@ sub processCommentEditForm {
 
 sub processPropertiesFromFormPost {
     my $self    = shift;
+    my $i18n    = __PACKAGE__->i18n( $self->session );
     my $form    = $self->session->form;
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+
+    # Make sure we have the disk space for this
+    if ( !$self->getGallery->hasSpaceAvailable( $self->get( 'assetSize' ) ) ) {
+        push @{ $errors }, $i18n->get( "error no space" );
+    }
 
     # Return if errors
     return $errors if @$errors;
@@ -667,6 +673,11 @@ sub processPropertiesFromFormPost {
             assetIdThumbnail        => $self->getId,
         } );
     }
+
+    # Fix URLs
+    $self->update( { 
+        url     => $self->getParent->get( "url" ) . '/' . $self->session->url->urlize( $self->get( "menuTitle" ) ) 
+    } );
 
     $self->requestAutoCommit;
 

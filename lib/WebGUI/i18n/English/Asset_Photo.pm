@@ -649,6 +649,12 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'error no space' => {
+        message     => q{You do not have enough disk space to upload this file.},
+        lastUpdated => 0,
+        context     => q{Error when user is out of disk space.},
+    },
+
 };
 
 1;

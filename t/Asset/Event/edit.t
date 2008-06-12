@@ -34,6 +34,8 @@ my %oldSettings;
 # userFunctionStyleId 
 $oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
+$oldSettings{ defaultVersionTagWorkflow } = $session->setting->get( 'defaultVersionTagWorkflow' );
+$session->setting->set( 'defaultVersionTagWorkflow', 'pbworkflow000000000003' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
@@ -54,7 +56,7 @@ my $calendar    = $node->addChild( {
     className           => 'WebGUI::Asset::Wobject::Calendar',
     groupIdEventEdit    => '2',     # Registered Users
     groupIdEdit         => '3',     # Admins
-    workflowIdCommit    => 'realtimeworkflow-00001', # Commit content immediately
+    workflowIdCommit    => 'pbworkflow000000000003', # Commit Without approval
 } );
 
 # Remember this event url when we want to edit it later
