@@ -46,7 +46,7 @@ sub getButton {
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->echo('Cash') })
+        . WebGUI::Form::submit($session, {value => $i18n->get('cash') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
