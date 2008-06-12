@@ -419,6 +419,7 @@ our $HELP = {
             },
             {
                 name        => 'username',
+                description => 'username help',
             },
             {
                 name        => 'shopCreditDeduction',
@@ -545,6 +546,7 @@ our $HELP = {
                     },
                     {
                         name        => 'price',
+                        description => 'price help',
                     },
                     {
                         name        => 'itemShippingAddress',
@@ -654,6 +656,7 @@ our $HELP = {
             },
             {
                 name        => 'username',
+                description => 'username help',
             },
             {
                 name        => 'shopCreditDeduction',

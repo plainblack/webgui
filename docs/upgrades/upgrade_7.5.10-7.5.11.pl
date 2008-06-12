@@ -341,7 +341,12 @@ sub addVendors {
         create table vendor (
             vendorId varchar(22) binary not null primary key,
             dateCreated datetime,
-            name varchar(255)
+            name varchar(255),
+            userId varchar(22) binary not null default '3',
+            preferredPaymentType varchar(255),
+            paymentInformation text,
+            paymentAddressId varchar(22) binary,
+            index userId (userId)
         )
         });
     $session->db->write(q{
@@ -608,6 +613,7 @@ sub upgradeEMS {
             my $ribbon = $ems->addChild({
                 className           => 'WebGUI::Asset::Sku::EMSRibbon',
                 title               => $ribbonData->{title},
+                url                 => $ribbonData->{title},
                 description         => $ribbonData->{description},
                 sku                 => $ribbonData->{sku},
                 price               => $ribbonData->{price},
@@ -622,6 +628,7 @@ sub upgradeEMS {
             my $badge = $ems->addChild({
                 className           => 'WebGUI::Asset::Sku::EMSBadge',
                 title               => $badgeData->{title},
+                url                 => $badgeData->{title},
                 description         => $badgeData->{description},
                 sku                 => $badgeData->{sku},
                 price               => $badgeData->{price},
@@ -645,6 +652,7 @@ sub upgradeEMS {
             my $ticket = $ems->addChild({
                 className           => 'WebGUI::Asset::Sku::EMSBadge',
                 title               => $ticketData->{title},
+                url                 => $ticketData->{title},
                 description         => $ticketData->{description},
                 sku                 => $ticketData->{sku},
                 price               => $ticketData->{price},
@@ -666,13 +674,13 @@ sub upgradeEMS {
                 $oldBadgeRegistrants{$registrantData->{badgeId}} = $registrantData->{productId};
             }
             elsif ($id ne "") {
-                $db->write("insert into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
+                $db->write("replace into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
                     [$registrantData->{badgeId}, $id]);
             }
             else {
                 my $id = $oldRibbons{$registrantData->{productId}};
                 if ($id ne "") {
-                    $db->write("insert into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
+                    $db->write("replace into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
                         [$registrantData->{badgeId}, $id]);
                 }
             }
@@ -722,7 +730,7 @@ sub convertTransactionLog {
 		orderNumber int not null auto_increment unique,
 		transactionCode varchar(100),
 		statusCode varchar(35),
-		statusMessage varchar(100),
+		statusMessage varchar(255),
 		userId varchar(22) binary not null,
 		username varchar(35) not null,
 		amount float,
@@ -787,6 +795,7 @@ sub convertTransactionLog {
     my $transactionResults = $db->read("select * from oldtransaction order by initDate");
     while (my $oldTranny = $transactionResults->hashRef) {
         my $date = WebGUI::DateTime->new($session, $oldTranny->{initDate});
+        my $u = WebGUI::User->new($session, $oldTranny->{userId});
         $db->setRow("transaction","transactionId",{
             transactionId       => "new",
             isSuccessful        => (($oldTranny->{status} eq "Completed") ? 1 : 0),
@@ -797,11 +806,27 @@ sub convertTransactionLog {
             username            => WebGUI::User->new($session, $oldTranny->{userId})->username,
             amount              => $oldTranny->{amount},
             shippingPrice       => $oldTranny->{shippingCost},
+            shippingAddress1    => $u->profileField('homeAddress'),
+            shippingCity        => $u->profileField('homeCity'),
+            shippingState       => $u->profileField('homeState'),
+            shippingCode        => $u->profileField('homeZip'),
+            shippingCountry     => $u->profileField('homeCountry'),
+            shippingAddressName => $u->profileField('firstName').' '.$u->profileField('lastName'),
+            shippingPhoneNumber => $u->profileField('homePhone'),
+            paymentAddress1     => $u->profileField('homeAddress'),
+            paymentCity         => $u->profileField('homeCity'),
+            paymentState        => $u->profileField('homeState'),
+            paymentCode         => $u->profileField('homeZip'),
+            paymentCountry      => $u->profileField('homeCountry'),
+            paymentAddressName  => $u->profileField('firstName').' '.$u->profileField('lastName'),
+            paymentPhoneNumber  => $u->profileField('homePhone'),
             dateOfPurchase      => $date->toDatabase,
             isRecurring         => $oldTranny->{recurring},
             }, $oldTranny->{transactionId});
             my $itemResults = $db->read("select * from oldtransactionitem where transactionId=?",[$oldTranny->{transactionId}]);
             while (my $oldItem = $itemResults->hashRef) {
+                my $status = $oldItem->{shippingStatus};
+                $status = 'NotShipped' if $status eq 'NotSent';
                 $db->setRow("transactionItem","itemId",{
                     itemId                  => "new",
                     transactionId           => $oldItem->{transactionId},
@@ -809,7 +834,7 @@ sub convertTransactionLog {
                     options                 => '{}',
                     shippingTrackingNumber  => $oldTranny->{trackingNumber},
                     orderStatus             => $oldTranny->{shippingStatus},
-                    lastUpdated             => $oldTranny->{completionDate},
+                    lastUpdated             => $date->toDatabase,
                     quantity                => $oldItem->{quantity},
                     price                   => $oldItem->{amount},
                     vendorId                => "defaultvendor000000000",
@@ -1164,6 +1189,7 @@ sub mergeProductsWithCommerce {
         my $sku = $productFolder->addChild({
             className   => 'WebGUI::Asset::Sku::Product',
             title       => $productData->{title},
+            url         => $productData->{title},
             sku         => $productData->{sku},
             description => $productData->{description},
         }, $productData->{productId});

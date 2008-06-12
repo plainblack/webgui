@@ -1053,7 +1053,7 @@ our $I18N = {
         context => q|Template variable for email receipt template|,
     },
 
-    'username' => {
+    'username help' => {
         message => q|The name of the user who performed this transaction, to save you a username lookup.|,
         lastUpdated => 1213132212,
         context => q|Template variable for email receipt template|,
@@ -1227,7 +1227,7 @@ our $I18N = {
         context => q|Template variable for email receipt template|,
     },
 
-    'price' => {
+    'price help' => {
         message => q|The price of this item, formatted to two decimal places.|,
         lastUpdated => 1213135218,
         context => q|Template variable for email receipt template|,

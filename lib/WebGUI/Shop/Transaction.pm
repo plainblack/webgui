@@ -1024,7 +1024,6 @@ sub www_view {
         <tbody>
     };
     foreach my $item (@{$transaction->getItems}) {
-        my $sku = $item->getSku;
         $output .= WebGUI::Form::formHeader($session)
             .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
             .WebGUI::Form::hidden($session, {name=>"method",value=>"updateItem"})
@@ -1033,7 +1032,7 @@ sub www_view {
             .q{
             <tr>
             <td>}.$item->get('lastUpdated').q{</td>
-            <td><a href="}.$sku->getUrl('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
+            <td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
             <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
             <td>}.$item->get('quantity').q{</td>
         };

@@ -132,8 +132,12 @@ Returns an instanciated WebGUI::Asset::Sku object for this item.
 sub getSku {
     my ($self) = @_;
     my $asset = WebGUI::Asset->newByDynamicClass($self->transaction->session, $self->get("assetId"));
-    $asset->applyOptions($self->get("options"));
-    return $asset;
+    if (defined $asset) {
+        $asset->applyOptions($self->get("options"));
+        return $asset;
+    }
+    WebGUI::Error::ObjectNotFound->throw(error=>'SKU Asset '.$self->get('assetId').' could not be instanciated. Perhaps it no longer exists.', id=>$self->get('assetId'));
+    return undef;
 }
 
 #-------------------------------------------------------------------

@@ -276,8 +276,8 @@ STOP
 sub checkVersion {
     $_[0] =~ /(\d+)\.(\d+)\.(\d+)/;
     my $goal = 7;
-    my $feature = 4;
-    my $fix = 21;
+    my $feature = 3;
+    my $fix = 22;
     if ($1 > $goal) {
         return 1;
     }
