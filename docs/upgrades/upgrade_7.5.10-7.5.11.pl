@@ -1202,6 +1202,7 @@ sub mergeProductsWithCommerce {
                 $shortdesc .= sprintf('%s:%s,', $parameter, $value);
             }
             $shortdesc =~ s/,$//; ##tidy up and clip to 30 chars
+            $shortdesc = $productData->{title} unless $shortdesc;
             $shortdesc = substr $shortdesc, 0, 30;
 
             my $variant;
