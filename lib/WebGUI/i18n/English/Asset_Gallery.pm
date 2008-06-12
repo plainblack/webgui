@@ -51,7 +51,7 @@ our $I18N = {
         context     => '',
     },
     "imageViewSize description" => {
-        message     => "The size for images in the gallery. Will default to the Image Size 
+        message     => "The size (in pixels) for images in the gallery. Will default to the Image Size 
                         in the site settings.",
         lastUpdated => 0,
         context     => '',
@@ -62,7 +62,7 @@ our $I18N = {
         context     => '',
     },
     "imageThumbnailSize description" => {
-        message     => "The size for thumbnails of images in the gallery. Will default to the 
+        message     => "The size (in pixels) for thumbnails of images in the gallery. Will default to the 
                         Thumbnail Size in the site settings.",
         lastUpdated => 0,
         context     => '',
