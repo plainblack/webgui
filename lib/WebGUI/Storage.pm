@@ -996,6 +996,7 @@ sub untar {
     my $originalDir = Cwd::cwd();
     chdir $temp->getPath;
     local $Archive::Tar::CHOWN = 0;
+    local $Archive::Tar::CHMOD = 0;
     Archive::Tar->extract_archive($self->getPath($filename),1);
     $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
     my @files;
