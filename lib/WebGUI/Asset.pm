@@ -2494,19 +2494,37 @@ sub prepareWidgetView {
 Output the markup required for the widget view. Includes markup to handle the
 widget macro in the iframe holding the widgetized asset. This does the following: 
 
-=item retrieves the content for this asset using its L</view> method
+=over 4
 
-=item processes macros in that content
+=item *
 
-=item serializes the processed content in JSON
+retrieves the content for this asset using its L</view> method
 
-=item writes the JSON to a storage location
+=item *
 
-=item refers the user to download this JSON
+processes macros in that content
 
-=item references the appropriate JS files for the templating engine and the widget macro
+=item *
 
-=item invokes the templating engine on this JSON
+serializes the processed content in JSON
+
+=item *
+
+writes the JSON to a storage location
+
+=item *
+
+refers the user to download this JSON
+
+=item *
+
+references the appropriate JS files for the templating engine and the widget macro
+
+=item *
+
+invokes the templating engine on this JSON
+
+=back
 
 =head3 width
 

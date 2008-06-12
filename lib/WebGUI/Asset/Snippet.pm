@@ -117,7 +117,7 @@ as-is.
 
 =head3 index
 
-index filename passed from L</exportAsHtml>
+index filename passed from exportAsHtml
 
 =cut
 
