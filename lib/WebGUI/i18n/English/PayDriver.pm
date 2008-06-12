@@ -100,6 +100,12 @@ our $I18N = {
         context => q|Help body for the email receipt template|,
     },
 
+    'payment methods' => {
+        message => q|Payment Methods.|,
+        lastUpdated => 1213313375,
+        context => q|Help body for the email receipt template|,
+    },
+
 };
 
 1;
