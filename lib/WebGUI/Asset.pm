@@ -1298,7 +1298,7 @@ sub getToolbar {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");';
 	}
 	if ($userUiLevel >= $uiLevels->{"manage"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("op=manageAssets").'","'.$i18n->get("manage").'");';
+		$output .= 'contextMenu.addLink("'.$self->getUrl("op=assetManager").'","'.$i18n->get("manage").'");';
 	}
 	$output .= 'contextMenu.print();
                 //]]>
