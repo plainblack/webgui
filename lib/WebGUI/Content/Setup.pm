@@ -394,6 +394,57 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         if ($form->get("contactUs")) {
             my $page = addPage($home, "Contact Us");
             my $i18n = WebGUI::International->new($session, "Asset_DataForm");
+            my @fieldConfig = (
+                {
+                    name=>"from",
+                    label=>"Your Email Address",
+                    status=>"required",
+                    isMailField=>1,
+                    width=>0,
+                    type=>"email",
+                },
+                {
+                    name=>"to",
+                    label=>$i18n->get(11),
+                    status=>"hidden",
+                    isMailField=>1,
+                    width=>0,
+                    type=>"email",
+                    defaultValue=>$session->setting->get("companyEmail"),
+                },
+                {
+                    name=>"cc",
+                    label=>$i18n->get(12),
+                    status=>"hidden",
+                    isMailField=>1,
+                    width=>0,
+                    type=>"email",
+                },
+                {
+                    name=>"bcc",
+                    label=>$i18n->get(13),
+                    status=>"hidden",
+                    isMailField=>1,
+                    width=>0,
+                    type=>"email",
+                },
+                {
+                    name=>"subject",
+                    label=>$i18n->get(14),
+                    status=>"hidden",
+                    isMailField=>1,
+                    width=>0,
+                    type=>"text",
+                    defaultValue=>$i18n->get(2),
+                },
+                {
+                    name                => "comments",
+                    label               => "Comments",
+                    status              => "required",
+                    type                => "textarea",
+                    subtext             => "Tell us how we can assist you.",
+                },
+            );
             my $dataForm = addAsset($page, {
                 title               => "Contact Us",
                 isHidden            => 1,
@@ -401,74 +452,8 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 description         => "We welcome your feedback.",
                 acknowledgement     => "Thanks for for your interest in ^c;. We'll review your message shortly.",
                 mailData            => 1,
+                fieldConfiguration  => JSON::encode_json(\@fieldConfig),
                 });
-		    $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-			    DataForm_fieldId=>"new",
-			    DataForm_tabId=>0,
-			    name=>"from",
-			    label=>"Your Email Address",
-			    status=>"required",
-			    isMailField=>1,
-			    width=>0,
-			    type=>"email"
-			    });
-		    $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-			    DataForm_fieldId=>"new",
-			    DataForm_tabId=>0,
-			    name=>"to",
-			    label=>$i18n->get(11),
-			    status=>"hidden",
-			    isMailField=>1,
-			    width=>0,
-			    type=>"email",
-			    defaultValue=>$session->setting->get("companyEmail")
-			    });
-		    $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-			    DataForm_fieldId=>"new",
-			    DataForm_tabId=>0,
-			    name=>"cc",
-			    label=>$i18n->get(12),
-			    status=>"hidden",
-			    isMailField=>1,
-			    width=>0,
-			    type=>"email"
-			    });
-		    $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-			    DataForm_fieldId=>"new",
-			    DataForm_tabId=>0,
-			    name=>"bcc",
-			    label=>$i18n->get(13),
-			    status=>"hidden",
-			    isMailField=>1,
-			    width=>0,
-			    type=>"email"
-			    });
-		    $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-			    DataForm_fieldId=>"new",
-			    DataForm_tabId=>0,
-			    name=>"subject",
-			    label=>$i18n->get(14),
-			    status=>"hidden",
-			    isMailField=>1,
-			    width=>0,
-			    type=>"text",
-			    defaultValue=>"Contact Us",
-			    });
-            $dataForm->setCollateral("DataForm_field","DataForm_fieldId",{
-                DataForm_fieldId    =>"new",
-                width               => "",
-                name                => "comments",
-                label               => "Comments",
-                DataForm_tabId      => 0,
-                status              => "required",
-                type                => "textarea",
-                possibleValues      => undef,
-                defaultValue        => undef,
-                subtext             => "Tell us how we can assist you.",
-                rows                => undef,
-                vertical            => undef,
-                extras              => undef,
-                }, "1","1", undef);
         }
 
         # add search
