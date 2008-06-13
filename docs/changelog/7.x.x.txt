@@ -1,4 +1,6 @@
 7.5.13
+ - fixed: Unable to template user profile viewing and editing screens.
+ - fixed: Product Variants not saving SKU
 
 7.5.12
  - skipping this release
