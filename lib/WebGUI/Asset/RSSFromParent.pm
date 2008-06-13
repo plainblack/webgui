@@ -96,6 +96,7 @@ sub www_view {
 	my $self = shift;
 	return '' unless $self->session->asset->getId eq $self->getId;
 	return '' unless $self->getParent->isa('WebGUI::Asset::RSSCapable');
+        return '' unless $self->getParent->canView; # Go to parent for auth
 	my $parent = $self->getParent;
 	my $template = WebGUI::Asset::Template->new($self->session, $parent->get('rssCapableRssTemplateId'));
 	$template->prepare;
