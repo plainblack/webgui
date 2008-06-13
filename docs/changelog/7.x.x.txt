@@ -1,6 +1,7 @@
 7.5.13
 
 7.5.12
+ - skipping this release
 
 7.5.11
  - fixed: email password recovery submit button effected by UI level
