@@ -74,7 +74,7 @@ sub addUrlAndContentHandlers {
     "WebGUI::Content::NotFound"
     ]);
     $config->delete("passthruUrls");
-    unlink "../../lib/WebGUI/Setup.pm";
+    unlink ($webguiRoot . "/lib/WebGUI/Setup.pm");
     print "DONE!\n" unless $quiet;
 }
 

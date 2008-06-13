@@ -266,10 +266,10 @@ sub removeSqlForm {
         foreach my $table (qw(SQLForm_fieldDefinitions SQLForm SQLForm_fieldTypes SQLForm_regexes)) {
             $db->write("drop table $table");
         }
-        unlink '../../lib/WebGUI/Asset/Wobject/SQLForm.pm';
-        unlink '../../lib/WebGUI/Help/Asset_SQLForm.pm';
-        unlink '../../lib/WebGUI/i18n/English/Asset_SQLForm.pm';
-        unlink '../../t/Asset/Wobject/SQLForm.t';
+        unlink ( $webguiRoot . '/lib/WebGUI/Asset/Wobject/SQLForm.pm' );
+        unlink ( $webguiRoot . '/lib/WebGUI/Help/Asset_SQLForm.pm' );
+        unlink ( $webguiRoot . '/lib/WebGUI/i18n/English/Asset_SQLForm.pm' );
+        unlink ( $webguiRoot . '/t/Asset/Wobject/SQLForm.t' );
     } 
     else {
         print "\t\tThis site uses SQL Form, so we won't uninstall it.\n" unless $quiet;
@@ -468,7 +468,7 @@ sub upgradeEMS {
 	print "\tUpgrading Event Manager\n" unless ($quiet);
 	my $db = $session->db;
 	print "\t\tDeleting unused files in the extras directory.\n" unless ($quiet);
-    rmtree '../../www/extras/wobject/EventManagementSystem';
+    rmtree ( $webguiRoot . '/www/extras/wobject/EventManagementSystem' );
 
 	print "\t\tGetting rid of old templates.\n" unless ($quiet);
 	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_product EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
@@ -1261,51 +1261,51 @@ sub removeOldCommerceCode {
     $setting->remove('groupIdAdminSubscription'); 
     $setting->remove('groupIdAdminTransactionLog'); 
     my $config = $session->config;
-    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Asset/Wobject/Product.pm') ;
 
-    rmtree '../../lib/WebGUI/Commerce';
-    unlink '../../lib/WebGUI/Commerce.pm';
-    unlink '../../lib/WebGUI/Product.pm';
-    unlink '../../lib/WebGUI/Subscription.pm';
-    unlink '../../lib/WebGUI/Operation/TransactionLog.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommercePaymentCash.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommercePaymentCheck.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommercePaymentITransact.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommerceShippingByPrice.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommerceShippingByWeight.pm';
-    unlink '../../lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm';
-    unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm';
-    unlink '../../lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm';
-    unlink '../../lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm';
+    rmtree ($webguiRoot . '/lib/WebGUI/Commerce') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/TransactionLog.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentCash.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentCheck.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentITransact.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingByPrice.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingByWeight.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm') ;
     $session->db->write("delete from WorkflowActivity where className='WebGUI::Workflow::Activity::ProcessRecurringPayments'");
-    unlink '../../lib/WebGUI/Macro/Product.pm';
-    unlink '../../lib/WebGUI/Help/Macro_Product.pm';
-    unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';
-    unlink '../../t/Macro/Product.t';
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Macro_Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Macro_Product.pm') ;
+    unlink ($webguiRoot . '/t/Macro/Product.t') ;
 
-    unlink '../../lib/WebGUI/Macro/SubscriptionItem.pm';
-    unlink '../../lib/WebGUI/Macro/SubscriptionItemPurchaseUrl.pm';
-    unlink '../../lib/WebGUI/Help/Macro_SubscriptionItem.pm';
-    unlink '../../lib/WebGUI/i18n/English/Macro_SubscriptionItem.pm';
-    unlink '../../t/Macro/SubscriptionItem.t';
-    unlink '../../t/Macro/SubscriptionItemPurchaseUrl.t';
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/SubscriptionItemPurchaseUrl.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Macro_SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Macro_SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/t/Macro/SubscriptionItem.t') ;
+    unlink ($webguiRoot . '/t/Macro/SubscriptionItemPurchaseUrl.t') ;
 
-    unlink '../../lib/WebGUI/Operation/ProductManager.pm';
-    unlink '../../lib/WebGUI/Help/ProductManager.pm';
-    unlink '../../lib/WebGUI/i18n/English/ProductManager.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/ProductManager.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/ProductManager.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/ProductManager.pm') ;
 
-    unlink '../../lib/WebGUI/Operation/Commerce.pm';
-    unlink '../../lib/WebGUI/Help/Commerce.pm';
-    unlink '../../lib/WebGUI/i18n/English/Commerce.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Commerce.pm') ;
 
-    unlink '../../lib/WebGUI/Operation/Subscription.pm';
-    unlink '../../lib/WebGUI/Help/Subscription.pm';
-    unlink '../../lib/WebGUI/i18n/English/Subscription.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Subscription.pm') ;
 
-    unlink '../../www/extras/adminConsole/subscriptions.gif';
-    unlink '../../www/extras/adminConsole/small/subscriptions.gif';
-    unlink '../../www/extras/adminConsole/productManager.gif';
-    unlink '../../www/extras/adminConsole/small/productManager.gif';
+    unlink ($webguiRoot . '/www/extras/adminConsole/subscriptions.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/small/subscriptions.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/productManager.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/small/productManager.gif') ;
 
     ##Delete unused templates
     my $templates = $session->db->read("select distinct(assetId) from template where namespace like 'Commerce%'",[]);
