@@ -73,14 +73,19 @@ sub violates {
         return unless $class eq 'WebGUI::International';
 
         my $symbol_name = _get_symbol_name($class);
+        return unless $symbol_name;
 
         ##It's an i18n object, see if a default namespace was passed in.
         my $arg_list = $elem->snext_sibling;
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
-        my $namespace = $arguments[1]->[0];
-        return unless $namespace;  ##This can be a namespace in a variable.
-        $namespace = $namespace->string || 'WebGUI';
+        my $namespace;
+        if ($arguments[1]) {
+            $namespace = $arguments[1]->[0]->string;
+        }
+        else {
+            $namespace = 'WebGUI';
+        }
         $self->{_i18n_objects}->{$symbol_name} = $namespace;
         return;
     }
