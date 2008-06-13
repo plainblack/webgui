@@ -318,22 +318,22 @@ If you wish to set the Default Value for any other field.  Create the field with
     },
 
 	'profile.message' => {
-        message => |Messages from the system, in case of errors or further work on the user's part.|,
+        message => q|Messages from the system, in case of errors or further work on the user's part.|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.header' => {
-        message => |HTML code to begin the form|,
+        message => q|HTML code to begin the form|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.footer' => {
-        message => |HTML code to end the form|,
+        message => q|HTML code to end the form|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.hidden' => {
-        message => |HTML code for directing the form's action|,
+        message => q|HTML code for directing the form's action|,
         lastUpdated => 1213326336,
     },
 
