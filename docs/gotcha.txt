@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.13
+--------------------------------------------------------------------
+ * RSSFromParent now uses the parent asset's canView method to 
+   determine if the user is allowed to see the RSS feed.
+   The upshot of this is that a user must be able to view the 
+   Collaboration System in order to view its RSS feed.
+   Previously, RSSFromParent did no view restrictions, allowing 
+   anyone with the right URL to see an RSS feed, even if they do not
+   have permission to view the Collaboration System it came from.
+
+
 7.5.11
 --------------------------------------------------------------------
  * You need the following new Perl Modules installed before you upgrade:
