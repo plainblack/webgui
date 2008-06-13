@@ -474,6 +474,7 @@
 "contentHandlers" : [
     "WebGUI::Content::Prefetch",
     "WebGUI::Content::Maintenance",
+    "WebGUI::Content::AssetManager",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",

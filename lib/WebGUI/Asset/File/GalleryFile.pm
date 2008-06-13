@@ -674,11 +674,6 @@ sub processPropertiesFromFormPost {
         } );
     }
 
-    # Fix URLs
-    $self->update( { 
-        url     => $self->getParent->get( "url" ) . '/' . $self->session->url->urlize( $self->get( "menuTitle" ) ) 
-    } );
-
     $self->requestAutoCommit;
 
     return;
