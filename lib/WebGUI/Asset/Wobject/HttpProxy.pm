@@ -305,47 +305,36 @@ sub view {
 			
 			
 			my $request;	# Create the request
-			if($requestMethod=~/GET/i) {  
-				my $params	= $self->session->form->paramsHashRef();
-				for my $key (keys %{$params}) {
-					my $value = $params->{$key};
-					next unless ($key =~ s/^HttpProxy_//); # Skip non-proxied params
-					if (ref $value eq "ARRAY") {
-						# Param value is an array reference
-						# Add all values to URL
-						for my $subvalue (@$value) {
-							$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$subvalue");
-						}
-					} else {
-						$proxiedUrl = $self->appendToUrl($proxiedUrl,"$key=$value");
-					}
-				}
-				### DEBUG
-				#require Data::Dumper;
-				#$self->session->errorHandler->warn("DEBUG: ".Data::Dumper::Dumper($params));
-				#$self->session->errorHandler->warn("URL: $proxiedUrl");
-				
-				$request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
-			} else { # It's a POST
-		
-				my $contentType = 'application/x-www-form-urlencoded'; # default Content Type header
-				
-				# Create a %formdata hash to pass key/value pairs to the POST request
-				foreach my $input_name ($self->session->request->param) {
-					$input_name =~ s/^HttpProxy_// or next;
-					
-					my (@upload) = grep{defined} $self->session->request->upload('HttpProxy_'.$input_name);
-					if (@upload) { # Found uploaded file
-						my $upload = $upload[0];
-						$formdata{$input_name}=[$upload->tempname, $self->session->form->process('HttpProxy_'.$input_name)];
-						$contentType = 'form-data'; # Different Content Type header for file upload
-					} else {
-						$formdata{$input_name}=[($self->session->form->process('HttpProxy_'.$input_name))];
-					}
-				}
-				# Create POST request
-				$request = HTTP::Request::Common::POST($proxiedUrl, \%formdata, Content_Type => $contentType);
-			}
+            my @submitParams;
+            my $contentType;
+            foreach my $input_name ($self->session->request->param) {
+                (my $param_name = $input_name) =~ s/^HttpProxy_// or next;
+                my @values = $self->session->request->param($input_name);
+                my @uploads = $self->session->request->upload($input_name);
+                while (my $value = shift @values) {
+                    my $upload = shift @uploads;
+                    if ($upload) {
+                        push @submitParams, $param_name => [$upload->tempname,  $value];
+                        $contentType = 'form-data';
+                    }
+                    else {
+                        push @submitParams, $param_name => $value;
+                    }
+                }
+            }
+            if ($requestMethod =~ /GET/i) {
+                my $url = $proxiedUrl;
+                while ( my $key = shift @submitParams) {
+                    my $value = shift @submitParams;
+                    $url = $self->appendToUrl($url, "$key=$value");
+                }
+                $request = HTTP::Request::Common::GET($url);
+                $request = HTTP::Request->new(GET => $proxiedUrl, $header) || return "wrong url"; # Create GET request
+            }
+            else {
+                $contentType ||= 'application/x-www-form-urlencoded'; # default Content Type header
+                $request = HTTP::Request::Common::POST($proxiedUrl, \@submitParams, Content_Type => $contentType);
+            }
 			$jar->add_cookie_header($request);
 			
 			

@@ -6,6 +6,7 @@
  - fixed: Wrong class assignment in "News" template
  - fixed: malformed css in default wiki page
  - fix: User profiling default broken
+ - fixed: HTTP Proxy errors when posting files through proxy
 
 7.4.39
  - fixed: Creating a shortcut creates a version tag even with autocommit turned on
