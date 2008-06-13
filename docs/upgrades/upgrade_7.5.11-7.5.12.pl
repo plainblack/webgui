@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addSelectableProfileTemplates($session); 
 
 finish($session); # this line required
 
@@ -41,6 +42,12 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addSelectableProfileTemplates {
+    my $session = shift;
+    $session->setting->add('viewUserProfileTemplate', 'PBtmpl0000000000000052');
+    $session->setting->add('editUserProfileTemplate', 'PBtmpl0000000000000051');
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

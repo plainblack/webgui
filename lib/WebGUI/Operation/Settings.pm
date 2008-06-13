@@ -481,6 +481,22 @@ sub definition {
         label           => $i18n->get( 'showMessageOnLoginBody label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
     };
+    push @fields, {
+        tab             => "user",
+        name            => 'viewUserProfileTemplate',
+        fieldType       => 'Template',
+        namespace       => 'Operation/Profile/View',
+        label           => $i18n->get( 'user profile view template' ),
+        hoverHelp       => $i18n->get( 'user profile view template description' ),
+    };
+    push @fields, {
+        tab             => "user",
+        name            => 'editUserProfileTemplate',
+        fieldType       => 'Template',
+        namespace       => 'Operation/Profile/Edit',
+        label           => $i18n->get( 'user profile edit template' ),
+        hoverHelp       => $i18n->get( 'user profile edit template description' ),
+    };
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {

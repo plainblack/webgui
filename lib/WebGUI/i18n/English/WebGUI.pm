@@ -3520,6 +3520,26 @@ LongTruncOk=1</p>
         lastUpdated => 1181969398,
     },
 
+	'user profile view template' => {
+		message => q|User Profile Viewing Template|,
+		lastUpdated => 1213323171,
+	},
+
+    'user profile view template description' => {
+        message => q|The template used show the user their user profile.|,
+        lastUpdated => 1213323173,
+    },
+
+	'user profile edit template' => {
+		message => q|User Profile Editing Template|,
+		lastUpdated => 1213323171,
+	},
+
+    'user profile edit template description' => {
+        message => q|The template used show to build a form so the user can edit their template.|,
+        lastUpdated => 1213323173,
+    },
+
     'send private message' => {
 		message => q|Send Private Message|,
 		lastUpdated => 1181019679,

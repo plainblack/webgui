@@ -260,7 +260,83 @@ If you wish to set the Default Value for any other field.  Create the field with
 	'requiredForPasswordRecovery hoverHelp' => {
                 message => "Require users to enter this field for password recovery.  Only users that enter all such fields correctly and uniquely to them will be able to perform password recovery.",
                 lastUpdated => 1165401097
-        },
+    },
+
+	'view profile template title' => {
+        message => 'View Profile Template',
+        lastUpdated => 1213326336,
+    },
+
+	'view profile template body' => {
+        message => 'This template is used to show the user their User Profile.',
+        lastUpdated => 1213326336,
+    },
+
+	'displayTitle' => {
+        message => q|An internationalized title containing the user's name.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.elements' => {
+        message => q|A loop containing all profile field elements.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.category' => {
+        message => q|The name of the current category.  This variable will only exist for the first profile field in each category.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.label' => {
+        message => q|The label for this profile field.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.value' => {
+        message => q|The value of this profile field.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.accountOptions' => {
+        message => q|A loop containing options for other account actions, such as editing a profile, viewing a profile, changing your account, and so on.|,
+        lastUpdated => 1213326336,
+    },
+
+	'account.options' => {
+        message => q|A link to an account option with label.|,
+        lastUpdated => 1213326336,
+    },
+
+	'edit profile template title' => {
+        message => 'Edit Profile Template',
+        lastUpdated => 1213326336,
+    },
+
+	'edit profile template body' => {
+        message => 'This template builds a form for the user to edit their User Profile.',
+        lastUpdated => 1213326336,
+    },
+
+	'profile.message' => {
+        message => |Messages from the system, in case of errors or further work on the user's part.|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.form.header' => {
+        message => |HTML code to begin the form|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.form.footer' => {
+        message => |HTML code to end the form|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.form.hidden' => {
+        message => |HTML code for directing the form's action|,
+        lastUpdated => 1213326336,
+    },
+
 };
 
 1;
