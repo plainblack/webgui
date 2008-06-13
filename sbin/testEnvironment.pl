@@ -114,8 +114,6 @@ checkModule("Archive::Any",                 "0.093"      );
 checkModule("Path::Class",                  '0.16'       );
 checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
-checkModule("Perl::Critic",                 "1.080",   1 );
-checkModule("Test::Perl::Critic",           "1.01",    1 );
 
 
 ###################################
