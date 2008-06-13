@@ -63,13 +63,13 @@ our $I18N = {
 		context => q|help for default price field|
 	},
 
-	'donation template' => {
+	'donate template' => {
 		message => q|Donation Template|,
 		lastUpdated => 0,
 		context => q|the label for the field where you select the template for this asset|
 	},
 
-	'donation template help' => {
+	'donate template help' => {
 		message => q|Choose a template that should be used to display the donation.|,
 		lastUpdated => 0,
 		context => q|help for default price field|

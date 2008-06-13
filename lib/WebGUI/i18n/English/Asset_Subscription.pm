@@ -412,6 +412,30 @@ The form in which the user can enter his subscription code.<br />|,
 		context => q|help for the thank you message field|,
 	},
 
+	'template' => {
+		message => q|Subscription template|,
+		lastUpdated => 0,
+		context => q|Asset property|,
+	},
+
+	'template help' => {
+		message => q|Choose the template you wish to use to display this subscription|,
+		lastUpdated => 0,
+		context => q|Asset property hover help|,
+	},
+
+	'batch name' => {
+		message => q|Batch Name|,
+		lastUpdated => 0,
+		context => q|create subscription code form|,
+	},
+
+	'batch name description' => {
+		message => q|Select a name for this batch of subscription codes.|,
+		lastUpdated => 0,
+		context => q|hover help for batch name|,
+	},
+
 	'subscription template' => {
 		message => q|Subscription Template|,
 		lastUpdated => 0,

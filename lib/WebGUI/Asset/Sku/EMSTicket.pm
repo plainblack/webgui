@@ -99,8 +99,8 @@ sub definition {
 			tab             => "properties",
 			fieldType       => "dateTime",
 			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("event start date"),
-			hoverHelp       => $i18n->get("start date help"),
+			label           => $i18n->get("add/edit event start date"),
+			hoverHelp       => $i18n->get("add/edit event start date help"),
 			},
 		duration => {
 			tab             => "properties",

@@ -6,7 +6,7 @@ use strict;
 our $HELP = { 
 	'template' => {	
 
-		title => 'donation template', 
+		title => 'donation template help', 
 		body => '',	
 		isa => [
 			{
