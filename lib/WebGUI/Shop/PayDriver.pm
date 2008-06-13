@@ -756,7 +756,7 @@ sub www_edit {
     my $form = $self->getEditForm;
     $form->submit;
   
-    return $admin->getAdminConsole->render($form->print, $i18n->echo("payment methods"));
+    return $admin->getAdminConsole->render($form->print, $i18n->get('payment methods'));
 }
 
 #-------------------------------------------------------------------

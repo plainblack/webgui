@@ -425,29 +425,29 @@ sub definition {
     %fields = (
         vendorId        => {
            fieldType    => 'text',
-           label        => $i18n->echo('vendorId'),
-           hoverHelp    => $i18n->echo('vendorId help'),
+           label        => $i18n->get('vendorId'),
+           hoverHelp    => $i18n->get('vendorId help'),
         },
         password        => {
             fieldType   => 'password',
-            label       => $i18n->echo('password'),
-            hoverHelp   => $i18n->echo('password help'),
+            label       => $i18n->get('password'),
+            hoverHelp   => $i18n->get('password help'),
         },
         useCVV2         => {
             fieldType   => 'yesNo',
-            label       => $i18n->echo('use cvv2'),
-            hoverHelp   => $i18n->echo('use cvv2 help'),
+            label       => $i18n->get('use cvv2'),
+            hoverHelp   => $i18n->get('use cvv2 help'),
         },
         emailMessage    => {
             fieldType   => 'textarea',
-            label       => $i18n->echo('emailMessage'),
-            hoverHelp   => $i18n->echo('emailMessage help'),
+            label       => $i18n->get('emailMessage'),
+            hoverHelp   => $i18n->get('emailMessage help'),
         },
         # readonly stuff from old plugin here?
     );
  
     push @{ $definition }, {
-        name        => $i18n->echo('Itransact'),
+        name        => $i18n->get('Itransact'),
         properties  => \%fields,
     };
 
@@ -509,11 +509,11 @@ plugin.
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITansact');
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->echo('ITransact') })
+        . WebGUI::Form::submit($session, {value => $i18n->get('ITransact') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
@@ -733,8 +733,7 @@ sub www_getCredentials {
 
     # Process form errors
     if ( $errors ) {
-    #### TODO: i18n
-        $output .= $i18n->echo('The following errors occurred:')
+        $output .= $i18n->get('error occurred message')
             . '<ul><li>' . join( '</li><li>', @{ $errors } ) . '</li></ul>';
     }
     

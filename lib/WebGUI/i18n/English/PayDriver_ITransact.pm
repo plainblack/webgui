@@ -2,21 +2,31 @@ package WebGUI::i18n::English::PayDriver_ITransact;
 use strict;
 
 our $I18N = {
+    'error occurred message' => {
+        message => q|The following errors occurred:|,
+        lastUpdated => 0,
+        context => q|The message that tell the user that there were some errors in their submitted credentials.|,
+    },
+    'ITransact' => {
+        message => q|ITransact|,
+        lastUpdated => 0,
+        context => q|The name of the ITransact plugin|,
+    },
 	'label' => {
-                message => q|Credit Card|,
-                lastUpdated => 0,
-                context => q|Default ITransact payment gateway label|
-        },
+        message => q|Credit Card|,
+        lastUpdated => 0,
+        context => q|Default ITransact payment gateway label|
+    },
     'phone' => {
-                message => q|Telephone Number|,
-                lastUpdated => 0,
-                context => q|Form label in the checkout form of the iTransact module.|
-        },
-        'country' => {
-                message => q|Country|,
-                lastUpdated => 0,
-                context => q|Form label in the checkout form of the iTransact module.|
-        },
+        message => q|Telephone Number|,
+        lastUpdated => 0,
+        context => q|Form label in the checkout form of the iTransact module.|
+    },
+    'country' => {
+        message => q|Country|,
+        lastUpdated => 0,
+        context => q|Form label in the checkout form of the iTransact module.|
+    },
 	'firstName' => {
 		message => q|First name|,
 		lastUpdated => 0,
@@ -73,20 +83,44 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Form label in the configuration form of the iTransact module.|
 	},
+	'vendorId help' => {
+		message => q|Fill in the  username or vendor id you got from ITransact.|,
+		lastUpdated => 0,
+		context => q|Hover help for vendor id in the configuration form of the iTransact module.|
+	},
+
 	'use cvv2' => {
 		message => q|Use CVV2|,
 		lastUpdated => 0,
 		context => q|Form label in the configuration form of the iTransact module.|
 	},
+	'use cvv2 help' => {
+		message => q|Set this option to yes if you want to use CVV2.|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+
 	'emailMessage' => {
 		message => q|Email message|,
 		lastUpdated => 0,
 		context => q|Form label in the configuration form of the iTransact module.|
 	},
+   	'emailMessage help' => {
+		message => q|The message that will be appended to the email user will receive from ITransact.|,
+		lastUpdated => 0,
+		context => q|Hover help for the email message field in the configuration form of the iTransact module.|
+	},
+ 
+
 	'password' => {
 		message => q|Password|,
 		lastUpdated => 0,
 		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
 	},
 
 	'module name' => {
