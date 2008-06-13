@@ -28,21 +28,25 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+fixShop($session);
 addSelectableProfileTemplates($session); 
-# upgrade functions go here
 
 finish($session); # this line required
 
 
-#----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
 
+#----------------------------------------------------------------------------
+sub fixShop {
+    my $session = shift;
+    print "\tFixing Shop properties" unless $quiet;
+    my $db = $session->db;
+    $db->write("update EventManagementSystem set registrationStaffGroupId='3' where registrationStaffGroupId=''");
+    my ($driverId) = $db->quickScalar("select paymentGatewayId from paymentGateway where className='WebGUI::Shop::PayDriver::ITransact'");
+    $db->write("update transaction set paymentDriverId=?",[$driverId]);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub addSelectableProfileTemplates {
     my $session = shift;
     my $tmpl = $session->setting->get('viewUserProfileTemplate') || 'PBtmpl0000000000000052';

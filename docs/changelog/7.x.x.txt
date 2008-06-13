@@ -5,12 +5,15 @@
  - fixed: Syndicated Content asset makes template engine choke
  - fixed: Security issue in CS RSS feeds
  - fixed: Asset Manager breaks when an asset is locked
+ - fixed: EMS - Data error when trying to list badges
+ - fixed: EMS - Not able to refund tickets
  - fixed: Asset Manager is slow to load
  - fixed: project management application unable to add or edit tasks.
  - fixed: dashboard not working due to using legacy ajax handlers
  - fixed: Calendar form element no longer shows up behind admin console.
  - fixed: Asset Manager can now change ranks again
  - fixed: Cannot manage revisions in version tags.
+
 
 7.5.12
  - skipping this release

@@ -20,6 +20,7 @@ use Tie::IxHash;
 use WebGUI::HTMLForm;
 use JSON;
 use Digest::MD5;
+use WebGUI::Exception;
 use WebGUI::Workflow::Instance;
 use WebGUI::Cache;
 use WebGUI::International;
@@ -845,7 +846,7 @@ sub www_getRegistrantsAsJson {
     if ($keywords ne "") {
         $db->buildSearchQuery(\$sql, \@params, $keywords, [qw{badgeNumber name address1 address2 address3 city state country email notes zipcode phoneNumber organization}])
     }
-	
+
 	# limit
 	$sql .= ' limit ?,?';
 	push(@params, $startIndex, $numberOfResults);
@@ -858,6 +859,10 @@ sub www_getRegistrantsAsJson {
     $results{'totalRecords'} = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
 	while (my $badgeInfo = $badges->hashRef) {
 		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
+		unless (defined $badge) {
+			$session->log->error('badge '.$badgeInfo->{badgeAssetId}.' does not exist.');
+			next;
+		}
 		$badgeInfo->{title} = $badge->getTitle;
 		$badgeInfo->{sku} = $badge->get('sku');
 		$badgeInfo->{assetId} = $badge->getId;
@@ -1456,7 +1461,11 @@ sub www_refundItem {
     return $session->privilege->insufficient() unless $self->canView;
 	my @itemIds = $session->form->param("transactionItemId");
 	foreach my $id (@itemIds) {
-		my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction($session, $id);
+		my $item = eval{WebGUI::Shop::TransactionItem->newByDynamicTransaction($session, $id)};
+		if (WebGUI::Error->caught('WebGUI::Error::InvalidParam')) {
+			$session->log->warn('Got "'.$@.'" which probably means we are working on a registrant that was migrated, and cannot be refunded.');
+			$self->www_manageRegistrant();
+		}
 		if (defined $item) {
 			$item->issueCredit;
 		}
