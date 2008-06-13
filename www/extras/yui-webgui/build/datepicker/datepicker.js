@@ -74,6 +74,7 @@ YAHOO.WebGUI.Form.DatePicker = {
     handleShow: function(e) {
         var pos = YAHOO.util.Dom.getRegion(this.inputBox);
         YAHOO.util.Dom.setXY(this.calendar.oDomContainer, [pos.left, pos.bottom]);
+        YAHOO.util.Dom.setStyle(this.calendar.oDomContainer,'z-index',100);
         YAHOO.util.Dom.setStyle(this.timediv, 'display', ( this.useTime ? 'block' : 'none'));
     },
     handleHide: function(e) {
