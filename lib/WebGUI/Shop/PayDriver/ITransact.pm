@@ -7,6 +7,17 @@ use Data::Dumper;
 use base qw/WebGUI::Shop::PayDriver/;
 
 #-------------------------------------------------------------------
+
+=head2 _generateCancelRecurXml ( transaction )
+
+Generates the XML that cancels a recurring payment. Includes the xml header.
+
+=head3 transaction
+
+The instantiated WebGUI::Shop::Transaction object for the transaction the recurring payment should be stopped.
+
+=cut
+
 sub _generateCancelRecurXml {
     my $self        = shift;
     my $transaction = shift;
@@ -40,6 +51,17 @@ sub _generateCancelRecurXml {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _generatePaymentRequestXML ( transaction )
+
+Generates the XML that will perform the payment transaction.
+
+=head3 transaction
+
+The instantiated WebGUI::Shop::Transaction object for the transaction that should be payed.
+
+=cut
+
 sub _generatePaymentRequestXML {
     my $self            = shift;
     my $transaction     = shift;
@@ -166,6 +188,13 @@ sub _generatePaymentRequestXML {
 }
 
 #-------------------------------------------------------------------
+
+=head _monthYear ()
+
+Returns the HTML for month/year combo box as is used for the credit card expiration date in the checkout form.
+
+=cut
+
 sub _monthYear {
     my $session = shift;
     my $form    = $session->form;
@@ -192,6 +221,19 @@ sub _monthYear {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _resolveRecurRecipe ( duration )
+
+Returns the ITransact recipe name tied to one of the allowed recurring payment term durations as used within the
+commerce system.
+
+=head3 duration
+
+The idenntifier for the term of the recurring transaction. May be either 'Weekly', 'BiWeekly', 'FourWeekly',
+'Monthly', 'BiMonthly', 'Quarterly', 'HalfYearly' or 'Yearly'.
+
+=cut
+
 sub _resolveRecurRecipe {
     my $self        = shift;
     my $duration    = shift;
@@ -209,8 +251,6 @@ sub _resolveRecurRecipe {
     # TODO: Throw exception
 	return $resolve{ $duration };
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -276,6 +316,22 @@ sub cancelRecurringPayment {
 }
 
 #-------------------------------------------------------------------
+
+=head2 checkRecurringTransaction ( xid, expectedAmount )
+
+Does a request to ITransact to check the amount tied to a transaction. This is maily used to check whether a
+postback result is an actual post back from ITransact and not a falsified post back by a malicious user.
+
+=head3 xid
+
+The id ITranscat to the transaction. Make sure not to use the orig_xid.
+
+=head3 expectedAmount
+
+The amount the transaction should be.
+
+=cut
+
 sub checkRecurringTransaction {
     my $self            = shift;
     my $xid             = shift;
@@ -343,6 +399,21 @@ sub checkRecurringTransaction {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition ( session, definition )
+
+The defintion method of the plugin. See WebGUI::Shop::PayDriver->definition for more information.
+
+=head3 session
+
+An instantiated WebGUI::Session object.
+
+=head3 definition
+
+Arrayref. Used to let every subclass add its properties to the definition.
+
+=cut
+
 sub definition {
     my $class       = shift;
     my $session     = shift;
@@ -427,6 +498,14 @@ sub doXmlRequest {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getButton ( )
+
+Return the HTML for a button inside a form that, when clicked, will take the user to the checkout screen for this
+plugin.
+
+=cut
+
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
@@ -441,6 +520,13 @@ sub getButton {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Adds account setup information to the edit form for this plugin. Returns an instantiated WebGUI::HTMLForm obejct.
+
+=cut
+
 sub getEditForm {
     my $self    = shift;
     my $session = $self->session;
@@ -480,6 +566,15 @@ sub handlesRecurring {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processCredentials ( )
+
+Checks and processes the data submitted by the user to the checkout form. Returns an array ref containing error messages if an
+error occurred. If everything is okay, undef will be returned. Since this method stores the redentials in this
+object instance you must execute this method before attempting a payment request.
+
+=cut
+
 sub processCredentials {
     my $self    = shift;
     my $session = $self->session;
@@ -536,6 +631,26 @@ sub processCredentials {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processPayment ( transaction )
+
+Sends a payment request to ITransact, parses the result and depending on the outcome returns either:
+
+On a succesfull request:
+
+    (1, GatewayCode, Status, Message)
+
+On a failed request:
+
+    (0, GatewayCode, Status, Message)
+
+Note that in the former case Message can be empty, while in the latter case GatewayCode may not be available (for
+instance on a connection error) and wil be undef.
+
+See also WebGUI::Shop::PayDriver->processPayment.
+
+=cut
+
 sub processPayment {
     my $self        = shift;
     my $transaction = shift;
@@ -588,6 +703,17 @@ sub processPayment {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getCredentials ( errors )
+
+Displays the checkout form where users who want to pay can enter their address and credit card data.
+
+=head3 errors
+
+Arrayref containing error messages for errors that the user made in entering his data.
+
+=cut
+
 sub www_getCredentials {
     my $self        = shift;
     my $errors      = shift;
@@ -692,6 +818,16 @@ sub www_getCredentials {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_pay
+
+The actual payment.
+
+Checks the credentials, returns the credentials input screen with errors if there are any. Otherwise tries to do
+the actual payment.
+
+=cut
+
 sub www_pay {
     my $self    = shift;
     my $session = $self->session;
@@ -714,6 +850,14 @@ sub www_pay {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_processRecurringTransactionPostback ( )
+
+This is the method that the postback from ITransact should go to. It processes the post back form data and verifies
+it is a legit request.
+
+=cut
+
 sub www_processRecurringTransactionPostback {
 	my $self    = shift;
     my $session = $self->session;

@@ -352,6 +352,17 @@ sub getConfiguredTitle {
 
 #-------------------------------------------------------------------
 
+=head2 getExpirationOffset ( duration )
+
+Returns the number of seconds tied to one of the allowed intervals used by the commerce system.
+
+=head3 duration
+
+The identifier of the interval. Can be either 'Weekly', 'BiWeekly', 'FourWeekly', 'Monthly', 'Quarterly',
+'HalfYearly' or 'Yearly'. Defaults to the duration of the subscription.
+
+=cut
+
 sub getExpirationOffset {
     my $self        = shift;
 	my $duration    = shift || $self->get('duration');
@@ -570,13 +581,14 @@ sub www_createSubscriptionCodeBatch {
 	return $self->getAdminConsoleWithSubmenu->render( $errorMessage.$f->print, $i18n->get('create batch menu') );
 }
 
+#-------------------------------------------------------------------
+
 =head2 www_createSubscriptionCodeBatchSave ( )
 
 Method that accepts the form parameters to create a batch of subscription codes.  
 
 =cut
 
-#-------------------------------------------------------------------
 sub www_createSubscriptionCodeBatchSave {
     my $self    = shift;
 	my $session = $self->session;
