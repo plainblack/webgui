@@ -7,28 +7,9 @@ function initPopUp() {
    var elms = document.getElementsByTagName('a');
    for (i = 0; i < elms.length; i++) {
       if (elms[i].className.indexOf("submodal") == 0) { 
-		 YAHOO.util.Event.addListener(elms[i], "click", showEditWindow);
+		 YAHOO.util.Event.addListener(elms[i], "click", showPopWin);
 	  }
 	}
-}
-
-function showEditWindow(e) {
-   var link = YAHOO.util.Event.getTarget(e);
-   
-   if(link == "") {
-      alert ("Could not get target from event.  Pop up failed. Please refresh the page and try again.");
-      return;
-   }
-   
-   var id  = link.id;
-   var url = getWebguiProperty("pageURL");
-   url += "?func=editTask";
-   url += ";projectId="+getProjectFromId(id);
-   url += ";taskId="+getTaskFromId(id);
-   
-   window.open(url, "task", 'status=1,scrollbars=0,toolbar=0,location=0,menubar=0,directories=0,resizable=1,height=600,width=400');
-
-   return false;
 }
 
 function getProjectFromId(id) {
@@ -41,6 +22,21 @@ function getTaskFromId(id) {
    return parts[1];
 }
 
+function getInsertAtFromId(id) {
+   var parts = id.split("~~");
+   if(parts.length < 3) return null;
+   var pos = parts[2];
+   if(pos == "") return null;
+   return pos;
+}
+
+function hidePopWin() {
+   var taskDialog = document.getElementById("popupInner");
+   var parent = taskDialog.parentNode;
+   parent.removeChild(taskDialog);
+   initPopUp();
+}
+
 
 function showPopWin( e ) {
    
@@ -51,8 +47,14 @@ function showPopWin( e ) {
       return;
    }
    
-   var urlpart = link.href.split("?");
-   
+   var id       = link.id;
+   var url      = getWebguiProperty("pageURL");
+   var dataPart = "func=editTask&projectId=" + getProjectFromId(id) + "&taskId=" + getTaskFromId(id);
+   var insertAt = getInsertAtFromId(id);
+   if(insertAt) {
+      dataPart += "&insertAt="+insertAt;
+   }
+
    this.success  = true;
    this.taskDialog = null;
    
@@ -60,60 +62,36 @@ function showPopWin( e ) {
       success : doDialog,
       failure : function(req) { this.success = false; }
    }
+   
+   if(this.success == false) {
+      alert("Could not retrieve task form due to a connection error.  Pop up failed.  Please refresh the page and try again.");
+   }
     
       
-   var status = YAHOO.util.Connect.asyncRequest('POST',urlpart[0],callback,urlpart[1]);
+   var status = YAHOO.util.Connect.asyncRequest('POST',url,callback,dataPart);
    
 }
 
 function doDialog (req) {
    var contentArea = document.getElementById("contentArea");
-   alert(contentArea);
    contentArea.innerHTML = "" + contentArea.innerHTML + req.responseText;
-   this.taskDialog = document.getElementById("taskDialog");
+   var taskDialog = document.getElementById("popupInner");
    
    // Instantiate the Dialog
-   var dialog = new YAHOO.widget.Dialog(this.taskDialog, {
+   var dialog = new YAHOO.widget.Dialog(taskDialog, {
       width : "400px",
-      fixedcenter : true,
-      visible : false, 
-      constraintoviewport : true,
-      modal : true,
-      buttons : [
-         { text:"Submit", handler:this.handleSubmit, isDefault:true },
-         { text:"Cancel", handler:this.handleCancel } ]
-      }
-   );
-   
-   // Wire up the success and failure handlers
-   dialog.callback = {
-      success: handleSuccess,
-      failure: handleFailure
-   };
+      fixedcenter : false,
+      visible : true, 
+      constraintoviewport : false,
+      modal : false,
+      x : 200,
+      y : 200
+   });
    
    // Render the Dialog
    dialog.render();
 }
 
-function handleSubmit(e) {
-   document.editTaskForm.submit();
-};
-   
-function handleCancel(e) {
-   document.editTaskForm.cancel();
-};
-   
-function handleSuccess(e) {
-   //var response = o.responseText;
-   //response = response.split("<!")[0];
-   //document.getElementById("resp").innerHTML = response;
-   alert("SUCCESS!!");
-};
-   
-function handleFailure(e) {
-   alert("Submission failed: " + o.status);
-};
-
-
+YAHOO.util.Event.onDOMReady(initPopUp);
 
 

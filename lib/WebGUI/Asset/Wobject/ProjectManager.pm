@@ -1178,27 +1178,6 @@ sub www_editTask {
    my $config    = $session->config;
    my $i18n      = $self->i18n;
    my $user      = $session->user;
-   my $style     = $session->style;
-   
-   my $extras            = $config->get("extrasURL");
-   my $assetExtras       = $config->get("extrasURL")."/wobject/ProjectManager";	
-   
-    $style->setScript($assetExtras."/projectDisplay.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-	$style->setScript($assetExtras."/taskEdit.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
-    
-    $var->{'form.header'} = qq{
-      <script src="$extras/yui/build/yahoo/yahoo-min.js" type="text/javascript"></script>
-      <script src="$extras/yui/build/event/event-min.js" type="text/javascript"></script>
-      <script src="$extras/yui/build/connection/connection-min.js" type="text/javascript"></script>
-      <script src="$assetExtras/projectDisplay.js" type="text/javascript"></script>
-      <script src="$assetExtras/taskEdit.js" type="text/javascript"></script>
-    };
    
    #Set variables from form data
    my $projectId = $form->get("projectId");
@@ -1575,7 +1554,7 @@ sub www_viewProject {
     
 	
 	#Set page styles
-	$style->setLink($assetExtras."/modal.css", { 
+	$style->setLink($assetExtras."/subModal.css", { 
                         rel=>"stylesheet", 
                         type=>"text/css", 
                     }
@@ -1596,15 +1575,7 @@ sub www_viewProject {
                           type=>"text/javascript",
                       }
     );
-	#$style->setScript($extras."/js/at/AjaxRequest.js",{ 
-    #                      type=>"text/javascript" 
-    #                  }
-    #);
     
-	$style->setScript($assetExtras."/modal.js",{ 
-                          type=>"text/javascript" 
-                      }
-    );
 	$style->setScript($extras."/contextMenu/contextMenu.js",{ 
                           type=>"text/javascript" 
                      }
@@ -1619,6 +1590,11 @@ sub www_viewProject {
       $self->session->url->extras('yui/build/event/event-min.js'),
       { type=>'text/javascript' }
     );
+    
+    $self->session->style->setScript(
+      $self->session->url->extras('yui/build/dom/dom-min.js'),
+      { type=>'text/javascript' }
+    );
    
     $self->session->style->setScript(
       $self->session->url->extras('yui/build/connection/connection-min.js'),
@@ -1628,6 +1604,11 @@ sub www_viewProject {
     $self->session->style->setScript(
       $self->session->url->extras('yui/build/container/container-min.js'),
       { type=>'text/javascript' }
+    );
+    
+    $style->setScript($assetExtras."/modal.js",{ 
+                          type=>"text/javascript" 
+                      }
     );
     
     #$self->session->style->setScript(

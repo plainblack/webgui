@@ -4,6 +4,7 @@
  - fixed: Shop Payment Methods
  - fixed: Asset Manager breaks when an asset is locked
  - fixed: Asset Manager is slow to load
+ - fixed: project management application unable to add or edit tasks.
 
 7.5.12
  - skipping this release
