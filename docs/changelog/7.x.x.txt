@@ -8,6 +8,7 @@
  - fixed: Asset Manager is slow to load
  - fixed: project management application unable to add or edit tasks.
  - fixed: dashboard not working due to using legacy ajax handlers
+ - fixed: Calendar form element no longer shows up behind admin console.
 
 7.5.12
  - skipping this release
