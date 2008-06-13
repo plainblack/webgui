@@ -2,6 +2,7 @@
  - fixed: Unable to template user profile viewing and editing screens.
  - fixed: Product Variants not saving SKU
  - fixed: Shop Payment Methods
+ - fixed: Syndicated Content asset makes template engine choke
  - fixed: Asset Manager breaks when an asset is locked
  - fixed: Asset Manager is slow to load
  - fixed: project management application unable to add or edit tasks.

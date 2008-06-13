@@ -283,6 +283,7 @@ sub _find_record {
 }
 
 #-------------------------------------------------------------------
+# First, get rid of things we don't want.
 # Copy the guid field to the link field if the guid looks like a link.
 # This is a kludge that gets around the fact that some folks use the link
 # field as the link to the story while others use it as the link
@@ -300,25 +301,29 @@ sub _normalize_items {
         my $max_words = 10;
 
         for my $item (@{$_[0]}) {
-                if ($item->{guid} && ($item->{guid} =~ /^http:\/\//i)) {
-                        $item->{link} = $item->{guid};
-                }
-                if (!$item->{title}) {
-                        my @description_words = split(/\s/, $item->{description});
-                        if (@description_words <= $max_words) {
-                                $item->{title} = $item->{description};
-                        } else {
-                                $item->{title} = join(' ', @description_words[0..$max_words-1]) . 
-                                  ' ...';
-                        }
-                }
+            # Get rid of any keys in the items that we do not want
+            my @wantedKeys  = qw( title link description pubDate );
+            %{ $item }  = map { $_ => $item->{ $_ } } @wantedKeys;
+                                    
+            if ($item->{guid} && ($item->{guid} =~ /^http:\/\//i)) {
+                    $item->{link} = $item->{guid};
+            }
+            if (!$item->{title}) {
+                    my @description_words = split(/\s/, $item->{description});
+                    if (@description_words <= $max_words) {
+                            $item->{title} = $item->{description};
+                    } else {
+                            $item->{title} = join(' ', @description_words[0..$max_words-1]) . 
+                              ' ...';
+                    }
+            }
 
-                # IE doesn't recognize &apos;
-                $item->{title} =~ s/&apos;/\'/g;
-                $item->{description} =~ s/&apos;/\'/g;
-                $item->{category} = [$item->{category}]
-                    if ref $item->{category} ne 'ARRAY';  
-		appendChoppedDescriptionTemplateVars($item);
+            # IE doesn't recognize &apos;
+            $item->{title} =~ s/&apos;/\'/g;
+            $item->{description} =~ s/&apos;/\'/g;
+            $item->{category} = [$item->{category}]
+                if ref $item->{category} ne 'ARRAY';  
+            appendChoppedDescriptionTemplateVars($item);
         }
 }
 
@@ -570,7 +575,7 @@ sub _get_items {
 
 		#Sort feeds in order by channel title.
 		#@rss_feeds=sort{$a->{channel}->{title} cmp $b->{channel}->{title}} @rss_feeds;
-				
+
                 if ($displayMode eq 'grouped') {
 		    _create_grouped_items($items,\@rss_feeds,$maxHeadlines,$hasTermsRegex);
 		} else {

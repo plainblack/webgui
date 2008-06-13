@@ -49,8 +49,9 @@ isa_ok($syndicated_content, 'WebGUI::Asset::Wobject::SyndicatedContent');
 my $newSyndicatedContentSettings = {
 	cacheTimeout => 124,
 	templateId   => "PBtmpl0000000000000065", 
-	rssUrl       => "http://morningmonologue.wordpress.com/feed/", # broken
+	#rssUrl       => "http://morningmonologue.wordpress.com/feed/", # broken
 	#rssUrl       => "http://motivationalmuse.wordpress.com/feed/", #working feed
+        rssUrl      => 'https://svn.webgui.org/svnweb/plainblack/rss/WebGUI/',
 };
 
 # update the new values for this instance
@@ -96,7 +97,7 @@ my $hasTermsRegex = "" ; #$syndicated_content->_make_regex( $syndicated_content-
 
 my $rss_info = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($session,$newSyndicatedContentSettings->{'rssUrl'});
 ok(ref($rss_info) eq 'HASH',  "Hashref returned from _get_rss_data");
-push(@rss_feeds, $rss_info) ;
+push(@rss_feeds, $rss_info);
 
 my $xml_list = WebGUI::Asset::Wobject::SyndicatedContent::_create_interleaved_items($items, \@rss_feeds  , $max_headlines, $hasTermsRegex);
 ok($xml_list , "Got results back from XML " );
