@@ -48,6 +48,7 @@ pod2usage( verbose => 2 ) if $help;
 pod2usage() unless ($ping||$shutdown||$daemon||$run||$test||$status);
 
 require File::Spec;
+# Convert to absolute since we'll be changing directory
 my $config = WebGUI::Config->new(File::Spec->rel2abs($webguiRoot),"spectre.conf",1);
 unless (defined $config) {
 	print <<STOP;
