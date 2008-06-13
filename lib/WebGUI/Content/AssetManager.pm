@@ -104,7 +104,7 @@ sub getManagerPaginator {
                             ;
 
     my $recordOffset        = $session->form->get( 'recordOffset' ) || 1;
-    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 15;
+    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 25;
     my $currentPage         = int ( $recordOffset / $rowsPerPage ) + 1;
 
     my $p           = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
