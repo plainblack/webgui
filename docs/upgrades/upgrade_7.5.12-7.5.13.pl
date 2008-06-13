@@ -22,12 +22,13 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 
 
-my $toVersion = '7.5.12';
+my $toVersion = '7.5.13';
 my $quiet; # this line required
 
 
 my $session = start(); # this line required
 
+addSelectableProfileTemplates($session); 
 # upgrade functions go here
 
 finish($session); # this line required
@@ -41,6 +42,17 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addSelectableProfileTemplates {
+    my $session = shift;
+    my $tmpl = $session->setting->get('viewUserProfileTemplate') || 'PBtmpl0000000000000052';
+    $session->setting->remove('viewUserProfileTemplate');
+    $session->setting->add('viewUserProfileTemplate', $tmpl);
+    $tmpl = $session->setting->get('editUserProfileTemplate') || 'PBtmpl0000000000000051';
+    $session->setting->remove('editUserProfileTemplate');
+    $session->setting->add('editUserProfileTemplate', $tmpl);
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
