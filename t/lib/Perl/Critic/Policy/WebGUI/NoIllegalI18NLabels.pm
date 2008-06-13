@@ -23,6 +23,26 @@ and access the test library.
 
 env WEBGUI_CONFIG=/data/WebGUI/etc/my.conf PERL5LIB=/data/WebGUI/t/lib perlcritic -single-policy NoIllegalI18N
 
+=head2 TODO
+
+=over 4
+
+=item +
+
+Handle inline calls like International->new('','')->get('','');
+like in Form/Asset.pm, line 107.
+
+=item +
+
+Handle scoping, like in Content/Setup.pm and other places.
+
+=item +
+
+Handle the case when variables are concatenated to form either a key or a namespace, such
+as in Auth::LDAP, line 542
+
+=back
+
 =cut
 
 our $VERSION = '0.2';
