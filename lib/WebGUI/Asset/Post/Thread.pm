@@ -570,14 +570,14 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
+sub postProcess {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;	
 	if ($self->getParent->canEdit) {
 		my $karmaScale = $self->session->form->process("karmaScale","integer") || $self->getParent->get("defaultKarmaScale");
 		my $karmaRank = $self->get("karma")/$karmaScale;
 		$self->update({karmaScale=>$karmaScale, karmaRank=>$karmaRank});
 	}
+	$self->SUPER::postProcess;
 }
 
 
