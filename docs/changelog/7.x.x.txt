@@ -1,3 +1,5 @@
+7.5.12
+
 7.5.11
  - fixed: email password recovery submit button effected by UI level
  - fixed: Creating a shortcut creates a version tag even with autocommit turned on
