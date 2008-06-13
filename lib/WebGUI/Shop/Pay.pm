@@ -333,7 +333,7 @@ sub www_manage {
             .WebGUI::Form::formFooter($session)
 
             # Append payment gateway label
-            .' '. $paymentGateway->get("label") 
+            .' '. $paymentGateway->label()
         .'</div>';        
     }
 
