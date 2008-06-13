@@ -62,14 +62,15 @@ sub _createForm {
 
     WebGUI::Macro::process($self->session, \( $param{defaultValue} ));
 
+    my $type = "\u$data->{type}";
     if ($data->{type} eq "checkbox") {
         $param{defaultValue} = ($param{defaultValue} =~ /checked/i);
     }
-    elsif ( isIn($data->{type}, qw(selectList selectBox checkList radioList)) ) {
+    elsif ( isIn($type, qw(SelectList SelectBox CheckList RadioList)) ) {
         delete $param{size};
     }
     my $control = eval {
-        WebGUI::Pluggable::instanciate("WebGUI::Form::\u$data->{type}", "new", [ $self->session, \%param ]);
+        WebGUI::Pluggable::instanciate("WebGUI::Form::$type", "new", [ $self->session, \%param ]);
     };
     return $control;
 }
@@ -1022,8 +1023,8 @@ sub www_editField {
         name        => "type",
         label       => $i18n->get(23),
         hoverHelp   => $i18n->get('23 description'),
-        value       => $field->{type} || "text",
-        types       => [qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList selectBox file)],
+        value       => "\u$field->{type}" || "Text",
+        types       => [qw(DateTime TimeField Float Zipcode Text Textarea HTMLArea Url Date Email Phone Integer YesNo SelectList RadioList CheckList SelectBox File)],
     );
     $f->integer(
         name        => "width",
