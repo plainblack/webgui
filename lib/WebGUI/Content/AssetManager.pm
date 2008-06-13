@@ -286,7 +286,7 @@ sub www_ajaxGetManagerPage {
             revisionDate    => $asset->get( "revisionDate" ),
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
-            lockedBy        => $asset->lockedBy,
+            lockedBy        => $asset->get( 'isLockedBy' ),
             canEditIfLocked => $asset->canEditIfLocked,
         );
 
@@ -375,13 +375,11 @@ sub www_manage {
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $session->style->setScript( $session->url->extras( 'yui/build/yahoo/yahoo.js' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/dom/dom.js' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/event/event.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/element/element-beta-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );

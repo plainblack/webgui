@@ -1,6 +1,8 @@
 7.5.13
  - fixed: Unable to template user profile viewing and editing screens.
  - fixed: Product Variants not saving SKU
+ - fixed: Asset Manager breaks when an asset is locked
+ - fixed: Asset Manager is slow to load
 
 7.5.12
  - skipping this release
