@@ -309,7 +309,7 @@ sub www_manage {
         .WebGUI::Form::hidden($session,     { name  => "shop",      value   => "pay" })
         .WebGUI::Form::hidden($session,     { name  => "method",    value   => "addPaymentGateway" })
         .WebGUI::Form::selectBox($session,  { name  => "className", options => $self->getDrivers })
-        .WebGUI::Form::submit($session,     { value => $i18n->echo("add payment method") })
+        .WebGUI::Form::submit($session,     { value => $i18n->get("add payment method") })
         .WebGUI::Form::formFooter($session);
 
     # Add a row with edit/delete buttons for each payment gateway.
@@ -320,7 +320,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "shop",                value => "pay" })
             .WebGUI::Form::hidden($session, { name   => "method",              value => "deletePaymentGateway" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",    value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->echo("delete"), extras => 'class="backwardButton"' }) 
+            .WebGUI::Form::submit($session, { value  => $i18n->get("delete"),  extras => 'class="backwardButton"' }) 
             .WebGUI::Form::formFooter($session)
 
             # Edit button for current payment gateway
@@ -329,7 +329,7 @@ sub www_manage {
             .WebGUI::Form::hidden($session, { name   => "method",            value => "do" })
             .WebGUI::Form::hidden($session, { name   => "do",                value => "edit" })
             .WebGUI::Form::hidden($session, { name   => "paymentGatewayId",  value => $paymentGateway->getId })
-            .WebGUI::Form::submit($session, { value  => $i18n->echo("edit"), extras => 'class="normalButton"' })
+            .WebGUI::Form::submit($session, { value  => $i18n->get("edit"),  extras => 'class="normalButton"' })
             .WebGUI::Form::formFooter($session)
 
             # Append payment gateway label
@@ -339,7 +339,7 @@ sub www_manage {
 
     # Wrap in admin console
     my $console = $admin->getAdminConsole;
-    return $console->render($output, $i18n->echo("payment methods"));
+    return $console->render($output, $i18n->get("payment methods"));
 }
 
 #-------------------------------------------------------------------
@@ -369,8 +369,7 @@ sub www_selectPaymentGateway {
 
         # If the redirect fails make sure people can still go to the login screen by giving them a link
         return $session->style->userStyle(
-            $i18n->echo('You must log in to check out. To login click <a href="'
-            . $session->url->page('op=auth;method=init') . '">here</a>.')
+            sprintf $i18n->get('login message'), $session->url->page('op=auth;method=init')
         );
     }
 
@@ -390,7 +389,7 @@ sub www_selectPaymentGateway {
     }
 
     # All the output stuff below is just a placeholder until it's templated.
-    my $output .= $i18n->echo('How would you like to pay?');
+    my $output .= $i18n->get('choose payment gateway message');
     foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
         $output .= $payOption->{button} . '<br />';
     }

@@ -1395,6 +1395,24 @@ our $I18N = {
         context => q|Template variable for email receipt template|,
     },
 
+    'add payment method' => {
+        message => q|Add a payment method|,
+        lastUpdated => 0,
+        context => q|The label of the button that will add a new payment method|,
+    },
+
+    'login message' => {
+        message => q|You must log in to check out. To login click <a href="%s"> here</a>.|,
+        lastUpdated => 0,
+        context => q|Fallback message that vistors will see if they try to check out and the redirect to the login page is not working for some reason.|,
+    },
+
+    'choose payment gateway message' => {
+        message => q|How would you like to pay?|,
+        lastUpdated => 42,
+        context => q|Message asking the user to choose one of the available payment options.|,
+    },
+
 };
 
 1;
