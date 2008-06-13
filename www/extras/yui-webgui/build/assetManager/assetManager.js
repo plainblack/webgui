@@ -145,7 +145,7 @@ WebGUI.AssetManager.formatLockedBy
 WebGUI.AssetManager.formatRank
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
-    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '"_rank" '
+    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
         + 'value="' + rank + '" size="3" '
         + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
 };
