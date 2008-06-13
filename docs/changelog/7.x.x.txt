@@ -10,6 +10,7 @@
  - fixed: dashboard not working due to using legacy ajax handlers
  - fixed: Calendar form element no longer shows up behind admin console.
  - fixed: Asset Manager can now change ranks again
+ - fixed: Cannot manage revisions in version tags.
 
 7.5.12
  - skipping this release

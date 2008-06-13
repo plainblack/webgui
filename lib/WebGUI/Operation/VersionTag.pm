@@ -60,7 +60,9 @@ sub canApproveVersionTag {
     my $tag         = shift;
     my $user        = shift || $session->user;
     my $instance    = $tag->getWorkflowInstance;
+    return 0 unless $instance;
     my $activity    = $instance->getNextActivity;
+    return 0 unless $activity;
     
     # Check if this person is in one of the allowed groups
     my $groupToApprove  = $activity->can( 'getGroupToApprove' )
