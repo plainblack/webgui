@@ -16,6 +16,7 @@
  - fixed: Date picker shows time after moving through months
  - fixed: Cannot Instantiate Template
  - fixed: Adding Donation Asset breaks style template
+ - fixed: Adding Flat Discount Coupon causes "Problem w/ Request" error
 
 7.5.12
  - skipping this release

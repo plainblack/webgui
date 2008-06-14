@@ -30,7 +30,7 @@ my $session = start(); # this line required
 
 fixShop($session);
 addSelectableProfileTemplates($session); 
-
+addCouponThankYouMessage($session);
 finish($session); # this line required
 
 
@@ -55,6 +55,13 @@ sub addSelectableProfileTemplates {
     $tmpl = $session->setting->get('editUserProfileTemplate') || 'PBtmpl0000000000000051';
     $session->setting->remove('editUserProfileTemplate');
     $session->setting->add('editUserProfileTemplate', $tmpl);
+}
+
+#----------------------------------------------------------------------------
+sub addCouponThankYouMessage {
+    my $session = shift;
+    print "\Adding Thank You Message to Coupon table... " unless $quiet;
+    $session->db->write('alter table FlatDiscount add column thankYouMessage mediumtext');
 }
 
 
