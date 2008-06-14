@@ -14,7 +14,7 @@
  - fixed: Asset Manager can now change ranks again
  - fixed: Cannot manage revisions in version tags.
  - fixed: Date picker shows time after moving through months
-
+ - fixed: Cannot Instantiate Template
 
 7.5.12
  - skipping this release

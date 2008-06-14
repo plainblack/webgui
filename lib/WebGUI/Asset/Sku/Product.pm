@@ -57,27 +57,6 @@ sub addRevision {
 }
 
 #-------------------------------------------------------------------
-
-=head2 addToCart ( variant )
-
-Override/extend Sku's addToCart method to handle inventory control.
-
-=head3 variant
-
-A hashref of variant information for the variant of the Product
-that is being added to the cart.  Inventory management is handled
-by the cart, which calls onAdjustQuantity.
-
-=cut
-
-sub addToCart {
-    my $self     = shift;
-    my $variant  = shift;
-    my $i18n     = WebGUI::International->new($self->session, 'Asset_Product');
-    $self->SUPER::addToCart($variant);
-}
-
-#-------------------------------------------------------------------
 sub definition {
     my $class = shift;
     my $session = shift;
@@ -972,10 +951,7 @@ sub www_buy {
     my $vid = $self->session->form->process('vid');
     my $variant = $self->getCollateral('variantsJSON', 'variantId', $vid);
     return '' unless keys %{ $variant };
-    my $error = $self->addToCart($variant);
-    if ($error) {
-        $self->view($error);
-    }
+    $self->addToCart($variant);
     $self->{_hasAddedToCart} = 1;
     return $self->www_view;
 }
