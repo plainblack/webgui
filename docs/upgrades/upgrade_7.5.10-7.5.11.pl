@@ -1603,6 +1603,7 @@ EOSQL3
             {
                 className               => 'WebGUI::Asset::Sku::Subscription',
                 ownerUserId             => 3,
+                isHidden                => 1,
                 url                     => 'subscriptions/'.$subscription->{ description },
                 menuTitle               => $subscription->{ description             },
                 title                   => $subscription->{ description             },
