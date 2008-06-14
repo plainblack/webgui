@@ -15,6 +15,7 @@
  - fixed: Cannot manage revisions in version tags.
  - fixed: Date picker shows time after moving through months
  - fixed: Cannot Instantiate Template
+ - fixed: Adding Donation Asset breaks style template
 
 7.5.12
  - skipping this release
