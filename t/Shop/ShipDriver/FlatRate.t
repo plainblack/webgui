@@ -252,5 +252,4 @@ undef $driver;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from shipper');
 }

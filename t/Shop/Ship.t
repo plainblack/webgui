@@ -160,7 +160,10 @@ $driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1,
 $shippers = $ship->getShippers();
 is(scalar @{$shippers}, 3, 'getShippers: got both shippers');
 
+use Data::Dumper;
+diag Dumper $shippers;
 my @shipperNames = map { $_->get("label") } @{ $shippers };
+diag Dumper \@shipperNames;
 cmp_bag(
     \@shipperNames,
     [q{Jake's Jailbird Airmail},q{Tommy's cut-rate shipping},q{Free Shipping}, ],
