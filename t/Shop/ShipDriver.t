@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 35;
+my $tests = 36;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -341,12 +341,13 @@ cmp_deeply(
 #
 #######################################################################
 
-#$driver->delete;
-#
-#my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->shipperId]);
-#is($count, 0, 'delete deleted the object');
-#
-#undef $driver;
+my $driverId = $driver->getId;
+$driver->delete;
+
+my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
+is($count, 0, 'delete deleted the object');
+
+undef $driver;
 
 
 }
@@ -354,5 +355,4 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    #$session->db->write('delete from shipper');
 }
