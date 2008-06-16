@@ -515,8 +515,8 @@ our $I18N = {
 
 	'amount' => { 
 		message => q|Amount|,
-		lastUpdated => 0,
-		context => q|field label|
+		lastUpdated => 1213632324,
+		context => q|field label for money|
 	},
 
 	'notes' => { 
