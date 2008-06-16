@@ -248,6 +248,7 @@ sub definition {
             },
             label           => $i18n->get('defaultView'),
             hoverHelp       => $i18n->get('defaultView description'),
+            tab             => 'display',
         },
         acknowledgement => {
             fieldType       => "HTMLArea",
@@ -285,8 +286,11 @@ sub definition {
             hoverHelp       => $i18n->get('group to view entries description'),
         },
         useCaptcha  => {
+            tab             => 'properties',
             fieldType       => "yesNo",
             defaultValue    => 0,
+            label           => $i18n->get('editForm useCaptcha label'),
+            hoverHelp       => $i18n->get('editForm useCaptcha description'),
         },
         fieldConfiguration => {
             fieldType       => 'hidden',
