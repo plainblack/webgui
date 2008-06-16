@@ -9,9 +9,9 @@ our $I18N = {
         context     => q{Label for activity property},
     },
     'committerGroupId description' => {
-        message     => q{The group that needs approval from this activity. If the committer is not
+        message     => q{The group that needs approval to use this activity. If the committer is not
                         a member of this group, the workflow will continue with the next activity. },
-        lastUpdated => 0,
+        lastUpdated => 1213631384,
         context     => q{Description of activity property},
     },
     topicName => {

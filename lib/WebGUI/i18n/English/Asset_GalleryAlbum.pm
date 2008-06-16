@@ -491,14 +491,14 @@ our $I18N = {
     },
 
     'helpvar form_promote' => {
-        message     => q{A button to promote the image in the ranking. Use these to move images in the order.},
-        lastUpdated => 0,
+        message     => q{A button to move the image up in the ranking. Use this to change the order of the images.},
+        lastUpdated => 1213631348,
         context     => q{Description of template variable},
     },
 
     'helpvar form_demote' => {
-        message     => q{A button to demote the image in the ranking. Use these to move images in the order.},
-        lastUpdated => 0,
+        message     => q{A button to move the image down in the ranking. Use this to change the order of the images.},
+        lastUpdated => 1213631346,
         context     => q{Description of template variable},
     },
 
