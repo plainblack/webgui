@@ -406,11 +406,11 @@ sub www_addTax {
         unless $admin->canManage;
     my $params;
     my ($form)    = $session->quick('form');
-    $params->{country} = $form->get('country');
-    $params->{state}   = $form->get('state');
-    $params->{city}    = $form->get('city');
-    $params->{code}    = $form->get('code');
-    $params->{taxRate} = $form->get('taxRate');
+    $params->{country} = $form->get('country', 'text');
+    $params->{state}   = $form->get('state',   'text');
+    $params->{city}    = $form->get('city',    'text');
+    $params->{code}    = $form->get('code',    'text');
+    $params->{taxRate} = $form->get('taxRate', 'integer');
     $self->add($params);
     return $self->www_manage;
 }
@@ -538,24 +538,29 @@ sub www_manage {
 
     my $addForm = WebGUI::HTMLForm->new($session,action=>$url->page('shop=tax;method=addTax'));
     $addForm->text(
-        label => $i18n->get('country'),
-        name  => 'country',
+        label     => $i18n->get('country'),
+        hoverHelp => $i18n->get('country help'),
+        name      => 'country',
     );
     $addForm->text(
-        label => $i18n->get('state'),
-        name  => 'state',
+        label     => $i18n->get('state'),
+        hoverHelp => $i18n->get('state help'),
+        name      => 'state',
     );
     $addForm->text(
-        label => $i18n->get('city'),
-        name  => 'city',
+        label     => $i18n->get('city'),
+        hoverHelp => $i18n->get('city help'),
+        name      => 'city',
     );
     $addForm->text(
-        label => $i18n->get('code'),
-        name  => 'code',
+        label     => $i18n->get('code'),
+        hoverHelp => $i18n->get('code help'),
+        name      => 'code',
     );
-    $addForm->text(
-        label => $i18n->get('tax rate'),
-        name  => 'taxRate',
+    $addForm->integer(
+        label     => $i18n->get('tax rate'),
+        hoverHelp => $i18n->get('tax rate help'),
+        name      => 'taxRate',
     );
     $addForm->submit(
         value => $i18n->get('add a tax'),
