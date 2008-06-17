@@ -914,8 +914,9 @@ sub www_edit {
         return $self->www_view;
     }
     # Promote the file
-    elsif ( $form->get("promote") ) {
-        my $assetId     = $form->get("promote");
+    elsif ( grep { $_ =~ /^promote-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^promote-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^promote-//;
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         if ( $asset ) {
             $asset->promote;
@@ -925,8 +926,9 @@ sub www_edit {
         }
     }
     # Demote the file
-    elsif ( $form->get("demote") ) {
-        my $assetId     = $form->get("demote");
+    elsif ( grep { $_ =~ /^demote-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^demote-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^demote-//;
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         if ( $asset ) {
             $asset->demote;
@@ -935,8 +937,9 @@ sub www_edit {
             $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
         }
     }
-    elsif ( $form->get("delete") ) {
-        my $assetId     = $form->get("delete");
+    elsif ( grep { $_ =~ /^delete-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^delete-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^delete-//;
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         if ( $asset ) {
             $asset->purge;
@@ -989,8 +992,9 @@ sub www_edit {
         .= WebGUI::Form::hidden( $session, {
             name        => "proceed",
             value       => "showConfirmation",
-        });
-    
+        })
+        ;
+
     $var->{ form_end    }
         = WebGUI::Form::formFooter( $session );
 
@@ -1027,21 +1031,22 @@ sub www_edit {
 
         # Raw HTML here to provide proper value for the image
         $file->{ form_promote }
-            = qq{<button type="submit" name="promote" class="promote" value="$file->{assetId}" onclick="this.setAttribute('innerHTML','$file->{assetId}')">}
+            = qq{<button type="submit" name="promote-$file->{assetId}" class="promote">}
             . $session->icon->moveUp( undef, undef, "disabled" )
             . qq{</button>}
             ;
 
         $file->{ form_demote }
-            = qq{<button type="submit" name="demote" class="demote" value="$file->{assetId}" onclick="this.setAttribute('innerHTML','$file->{assetId}')">}
+            = qq{<button type="submit" name="demote-$file->{assetId}" class="demote">}
             . $session->icon->moveDown( undef, undef, "disabled" )
             . qq{</button>}
             ;
         
-        my $deleteConfirm = $i18n->get( 'template delete message', 'Asset_Photo' );
+        my $deleteConfirm   = $i18n->get( 'template delete message', 'Asset_Photo' );
+        my $deleteLabel     = $i18n->get( 'Delete', 'Icon' );
         $file->{ form_delete }
-            = qq!<button onclick="if ( confirm('$deleteConfirm') ) { this.setAttribute('innerHTML','$file->{assetId}'); return true; } else { return false };" type="submit" name="delete" class="delete" value="$file->{assetId}">!
-            . $session->icon->delete( undef, undef, "disabled" )
+            = qq{<button onclick="return confirm('$deleteConfirm')" type="submit" name="delete-$file->{assetId}" class="delete">}
+            . qq{<img src="/extras/toolbar/bullet/delete.gif" style="vertical-align:middle;border: 0px;" alt="$deleteLabel" title="$deleteLabel" />}
             . qq{</button>}
             ;
 
@@ -1051,7 +1056,7 @@ sub www_edit {
                 value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
                 richEditId  => $self->getParent->get( 'richEditIdFile' ),
                 height      => 150,
-                width       => 400,
+                width       => 300,
             });
     }
 

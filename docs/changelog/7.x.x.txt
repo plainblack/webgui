@@ -18,6 +18,7 @@
  - fixed: Adding Donation Asset breaks style template
  - fixed: Adding Flat Discount Coupon causes "Problem w/ Request" error
  - fixed: No label for yes/no radio buttons
+ - fixed: Gallery Edit Album buttons did not work properly in IE
 
 7.5.12
  - skipping this release
