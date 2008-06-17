@@ -1030,24 +1030,21 @@ sub www_edit {
             } );
 
         # Raw HTML here to provide proper value for the image
+        my $promoteLabel    = $i18n->get( 'Move Up', 'Icon' );
         $file->{ form_promote }
-            = qq{<button type="submit" name="promote-$file->{assetId}" class="promote">}
-            . $session->icon->moveUp( undef, undef, "disabled" )
-            . qq{</button>}
+            = qq{<input type="submit" name="promote-$file->{assetId}" class="promote" value="$promoteLabel" />}
             ;
 
+        my $demoteLabel     = $i18n->get( 'Move Down', 'Icon' );
         $file->{ form_demote }
-            = qq{<button type="submit" name="demote-$file->{assetId}" class="demote">}
-            . $session->icon->moveDown( undef, undef, "disabled" )
-            . qq{</button>}
+            = qq{<input type="submit" name="demote-$file->{assetId}" class="demote" value="$demoteLabel" />}
             ;
-        
+
         my $deleteConfirm   = $i18n->get( 'template delete message', 'Asset_Photo' );
         my $deleteLabel     = $i18n->get( 'Delete', 'Icon' );
         $file->{ form_delete }
-            = qq{<button onclick="return confirm('$deleteConfirm')" type="submit" name="delete-$file->{assetId}" class="delete">}
-            . qq{<img src="/extras/toolbar/bullet/delete.gif" style="vertical-align:middle;border: 0px;" alt="$deleteLabel" title="$deleteLabel" />}
-            . qq{</button>}
+            = qq{<input type="submit" name="delete-$file->{assetId}" class="delete" value="$deleteLabel" }
+            . qq{ onclick="return confirm('$deleteConfirm')" />}
             ;
 
         $file->{ form_synopsis }
