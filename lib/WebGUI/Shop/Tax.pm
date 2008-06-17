@@ -496,21 +496,40 @@ sub www_importTax {
         unless $admin->canManage;
     my $storage = WebGUI::Storage->create($session);
     my $taxFile = $storage->addFileFromFormPost('importFile', 1);
-    $self->importTaxData($storage->getPath($taxFile)) if $taxFile;
-    return $self->www_manage;
+    eval {
+        $self->importTaxData($storage->getPath($taxFile)) if $taxFile;
+    };
+    my ($exception, $status_message);
+    if ($exception = Exception::Class->caught('WebGUI::Error::InvalidFile')) {
+        $status_message = sprintf 'A problem was found with your file: %s',
+            $exception->error;
+        if ($exception->brokenLine) {
+            $status_message .= sprintf ' on line %d', $exception->brokenLine;
+        }
+    }
+    elsif ($exception = Exception::Class->caught()) {
+        $status_message = sprintf 'A problem happened during the import: %s', $exception->error;
+    }
+    return $self->www_manage($status_message);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_manage (  )
+=head2 www_manage ( $status_message )
 
 User interface to manage taxes.  Provides a list of current taxes, and forms for adding
 new tax info, exporting and importing sets of taxes, and deleting individual tax data.
 
+=head3 $status_message
+
+A message to display to the user.  This is usually a problem that was found during
+import.
+
 =cut
 
 sub www_manage {
-    my $self = shift;
+    my $self           = shift;
+    my $status_message = shift;
     my $session = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient
@@ -565,8 +584,16 @@ sub www_manage {
     $addForm->submit(
         value => $i18n->get('add a tax'),
     );
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
-<div class=" yui-skin-sam">
+    my $output;
+    if ($status_message) {
+        $output = <<EOSM;
+<div class="error">
+$status_message
+</div>
+EOSM
+    }
+    $output .=sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
+<div class="yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
