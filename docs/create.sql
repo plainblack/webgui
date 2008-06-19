@@ -125,7 +125,6 @@ CREATE TABLE `DataForm` (
   `revisionDate` bigint(20) NOT NULL default '0',
   `groupToViewEntries` varchar(22) NOT NULL default '7',
   `mailAttachments` int(11) default '0',
-  `useCaptcha` int(1) default '0',
   `storeData` int(1) default '1',
   `fieldConfiguration` text,
   `tabConfiguration` text,
