@@ -450,6 +450,38 @@ sub getFilePaginator {
 
 #----------------------------------------------------------------------------
 
+=head2 getNextAlbum ( ) 
+
+Get the next album from the Gallery. Returns an instance of a GalleryAlbum,
+or undef if there is no next album.
+
+=cut
+
+sub getNextAlbum {
+    my $self        = shift;
+    my $nextId      = $self->getParent->getNextAlbumId( $self->getId );
+    return undef unless $nextId;
+    return WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousAlbum ( ) 
+
+Get the previous album from the Gallery. Returns an instance of a GalleryAlbum,
+or undef if there is no previous album.
+
+=cut
+
+sub getPreviousAlbum {
+    my $self        = shift;
+    my $previousId  = $self->getParent->getPreviousAlbumId( $self->getId );
+    return undef unless $previousId;
+    return WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getTemplateVars ( )
 
 Gets template vars common to all views.
@@ -491,6 +523,17 @@ sub getTemplateVars {
     $var->{ url_viewRss             } = $self->getUrl("func=viewRss");
     $var->{ url_slideshow           } = $self->getUrl("func=slideshow");
     $var->{ url_thumbnails          } = $self->getUrl("func=thumbnails");
+    
+    if ( my $nextAlbum  = $self->getNextAlbum ) {
+        $var->{ nextAlbum_url           } = $nextAlbum->getUrl;
+        $var->{ nextAlbum_title         } = $nextAlbum->get( "title" );
+        $var->{ nextAlbum_thumbnailUrl  } = $nextAlbum->getThumbnailUrl;
+    }
+    if ( my $prevAlbum  = $self->getPreviousAlbum ) {
+        $var->{ previousAlbum_url           } = $prevAlbum->getUrl;
+        $var->{ previousAlbum_title         } = $prevAlbum->get( "title" );
+        $var->{ previousAlbum_thumbnailUrl  } = $prevAlbum->getThumbnailUrl;
+    }
 
     $var->{ fileCount               } = $self->getChildCount;
     $var->{ ownerUsername           } = $owner->username;

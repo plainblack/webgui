@@ -76,6 +76,30 @@ our $HELP = {
                 name        => 'url_thumbnails',
                 description => 'helpvar url_thumbnails',
             },
+            { 
+                name        => 'nextAlbum_url',
+                description => 'helpvar nextAlbum_url',
+            },
+            {
+                name        => 'nextAlbum_title',
+                description => 'helpvar nextAlbum_title',
+            },
+            {
+                name        => 'nextAlbum_thumbnailUrl',
+                description => 'helpvar nextAlbum_thumbnailUrl',
+            },
+            {
+                name        => 'previousAlbum_url',
+                description => 'helpvar previousAlbum_url',
+            },
+            {
+                name        => 'previousAlbum_title',
+                description => 'helpvar previousAlbum_title',
+            },
+            {
+                name        => 'previousAlbum_thumbnailUrl',
+                description => 'helpvar previousAlbum_thumbnailUrl',
+            },
             {
                 name        => 'fileCount',
                 description => 'helpvar fileCount',

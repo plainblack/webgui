@@ -554,7 +554,9 @@ sub canView {
 Gets an array reference of all the album IDs under this Gallery. C<options> 
 is a hash reference with the following keys.
 
- orderBy            => An SQL ORDER BY clause to sort the albums
+ orderBy            => An SQL ORDER BY clause to sort the albums. 
+                    By default, uses the viewListOrderBy and viewListOrderDirection keys from
+                    the asset properties.
 
 =cut
 
@@ -562,7 +564,12 @@ sub getAlbumIds {
     my $self        = shift;
     my $options     = shift;
     
-    my $orderBy     = $options->{ orderBy }      || "lineage ASC";
+    my $orderBy     = $options->{ orderBy }
+                    ? $options->{ orderBy }
+                    : $self->get( 'viewListOrderBy' )
+                    ? join( " ", $self->get( 'viewListOrderBy' ), $self->get( 'viewListOrderDirection' ) )
+                    : "lineage ASC"
+                    ;
 
     # Deal with "pending" albums.
     my %pendingRules;
@@ -664,6 +671,58 @@ assets in this gallery.
 sub getImageResolutions {
     my $self        = shift;
     return [ split /\n/, $self->get("imageResolutions") ];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextAlbumId ( albumId )
+
+Gets the next albumId from the list of albumIds. C<albumId> is the base 
+albumId we want to find the next album for.
+
+Returns C<undef> if there is no next albumId.
+
+=cut
+
+sub getNextAlbumId {
+    my $self        = shift;
+    my $albumId     = shift;
+    my $allAlbumIds = $self->getAlbumIds;
+
+    while ( my $checkId = shift @{ $allAlbumIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allAlbumIds };
+
+        if ( $albumId eq $checkId ) {
+            return shift @{ $allAlbumIds };
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousAlbumId ( albumId )
+
+Gets the previous albumId from the list of albumIds. C<albumId> is the base 
+albumId we want to find the previous album for.
+
+Returns C<undef> if there is no previous albumId.
+
+=cut
+
+sub getPreviousAlbumId {
+    my $self        = shift;
+    my $albumId     = shift;
+    my $allAlbumIds = $self->getAlbumIds; 
+
+    while ( my $checkId = pop @{ $allAlbumIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allAlbumIds };
+
+        if ( $albumId eq $checkId ) {
+            return pop @{ $allAlbumIds };
+        }
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -925,12 +984,9 @@ sub view_listAlbums {
     my $var         = $self->getTemplateVars;
     my $form        = $self->session->form;
 
-    my $orderBy     = $self->get('viewListOrderBy') 
-                    . q{ } . $self->get('viewListOrderDirection');
     my $p
         = $self->getAlbumPaginator( { 
             perpage     => ( $form->get('perpage') || 20 ),
-            orderBy     => $orderBy,
         } );
     $p->appendTemplateVars( $var );
 

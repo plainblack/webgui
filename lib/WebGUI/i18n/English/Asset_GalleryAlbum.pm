@@ -514,6 +514,42 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar nextAlbum_url' => {
+        message     => q{The URL to the next album in the list, in the order that is shown on the Gallery List Albums view. If there is no next album, this variable will not exist.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_url' => {
+        message     => q{The URL to the previous album in the list, in the order that is shown on the Gallery List Albums view. If there is no previous album, this variable will not exist.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar nextAlbum_title' => {
+        message     => q{The title for the next album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar nextAlbum_thumbnailUrl' => {
+        message     => q{The URL to the thumbnail image for the next album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_title' => {
+        message     => q{The title for the previous album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_thumbnailUrl' => {
+        message     => q{The URL to the thumbnail image for the previous album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;
