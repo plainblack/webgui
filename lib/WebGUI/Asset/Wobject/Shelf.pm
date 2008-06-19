@@ -112,8 +112,8 @@ sub view {
 		if (defined $asset) {
 			my $sku = $asset->get;
 			$sku->{url} = $asset->getUrl;
-			$sku->{thumbnailUrl} = $asset->getThumbnailUrl;
-			$sku->{price} = sprintf("%.2f", $asset->getPrice);
+            $sku->{thumbnailUrl} = $asset->getThumbnailUrl;
+            $sku->{price} = sprintf("%.2f", $asset->getPrice);
 			push @skus, $sku;
 		}
 		else {

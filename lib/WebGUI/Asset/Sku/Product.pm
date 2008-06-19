@@ -400,7 +400,14 @@ Product.
 
 sub getPrice {
     my $self = shift;
-    return $self->getOptions->{price};
+    if (! keys %{ $self->getOptions} ) {
+        my $variants = $self->getAllCollateral('variantsJSON');
+        return '' unless @{ $variants };
+        return $variants->[0]->{price};
+    }
+    else {
+        return $self->getOptions->{price};
+    }
 }
 
 #-------------------------------------------------------------------
@@ -437,8 +444,14 @@ sub getQuantityAvailable {
 #-------------------------------------------------------------------
 sub getThumbnailUrl {
     my $self = shift;
-    my $store = shift || WebGUI::Storage::Image->get($self->session, $self->get('image1'));
-    return $store->getThumbnailUrl($store->getFiles->[0]);
+    my $store = shift;
+    if (! defined $store and $self->get('image1')) {
+        $store = WebGUI::Storage::Image->get($self->session, $self->get('image1'));
+        return $store->getThumbnailUrl($store->getFiles->[0]);
+    }
+    else {
+        return '';
+    }
 }
 
 #-------------------------------------------------------------------

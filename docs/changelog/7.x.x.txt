@@ -24,6 +24,7 @@
  - added: Next and Previous GalleryAlbum links in the GalleryAlbum views
  - fixed: Shop: Variants in dropdown and on page
  - fixed: OLD subscription table still hanging around?
+ - fixed: Shelf
 
 7.5.12
  - skipping this release
