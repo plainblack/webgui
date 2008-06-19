@@ -454,7 +454,7 @@ sub definition {
         tab             => "user",
         name            => "showMessageOnLogin",
         fieldType       => "yesNo",
-        defaultValue    => 0,
+        defaultValue    => $setting->get('showMessageOnLoginTimes'),
         label           => $i18n->get( 'showMessageOnLogin label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLogin description' ),
     };
@@ -462,7 +462,7 @@ sub definition {
         tab             => "user",
         name            => "showMessageOnLoginTimes",
         fieldType       => "integer",
-        defaultValue    => 1,
+        defaultValue    => $setting->get('showMessageOnLoginTimes'),
         label           => $i18n->get( 'showMessageOnLoginTimes label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLoginTimes description' ),
     };
@@ -480,6 +480,7 @@ sub definition {
         fieldType       => 'HTMLArea',
         label           => $i18n->get( 'showMessageOnLoginBody label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
+        defaultValue    => $setting->get('showMessageOnLoginBody'),
     };
     push @fields, {
         tab             => "user",
