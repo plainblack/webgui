@@ -22,6 +22,7 @@
  - fixed: Cannot embed YouTube videos in IE6/7. Fixed by adding an "Allow Media"
    switch to the RichEdit asset.
  - added: Next and Previous GalleryAlbum links in the GalleryAlbum views
+ - fixed: Shop: Variants in dropdown and on page
 
 7.5.12
  - skipping this release

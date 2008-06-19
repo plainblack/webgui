@@ -1547,8 +1547,8 @@ sub view {
                 value   => [0],
             },
         );
-        $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
-        $var{inStock} = 1;
+        $var{buy_button} = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+        $var{in_stock} = 1;
     }
     else {
         $var{in_stock} = 0;
@@ -1558,6 +1558,7 @@ sub view {
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant_label'} = $i18n->get('add a variant');
+        $var{'canEdit'}          = 1;
     }
     $var{variant_loop} = \@variantLoop;
     $var{hasAddedToCart} = $self->{_hasAddedToCart};

@@ -829,6 +829,12 @@ be useful, others may not.|,
 		context => q|template variable|
 	},
 
+	'canEdit' => {
+		message => q|A boolean that is true if the user can edit this Product.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 };
 
 1;

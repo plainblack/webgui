@@ -18,6 +18,7 @@ our $HELP = {
         ],
         fields    => [],
         variables => [
+            { 'name' => 'canEdit' },
             { 'name' => 'brochure_icon' },
             { 'name' => 'brochure_url' },
             { 'name' => 'brochure_label' },
