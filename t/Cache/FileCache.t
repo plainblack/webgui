@@ -101,8 +101,6 @@ SKIP: {
     ok(! -e $cacher->getNamespaceRoot, 'purge removes the namespace folder');
 
     undef $cacher;
-    rmtree('/tmp/WebGUICache');
-    ok(! -e '/tmp/WebGUICache', 'Able to delete the webgui cache dir with rmtree');
 
 }
 
