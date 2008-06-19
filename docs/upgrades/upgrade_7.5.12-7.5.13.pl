@@ -31,9 +31,22 @@ my $session = start(); # this line required
 fixShop($session);
 addSelectableProfileTemplates($session); 
 addCouponThankYouMessage($session);
+addRichEditMedia( $session );
 finish($session); # this line required
 
 
+#----------------------------------------------------------------------------
+# Add the "allowMedia" field to Rich Edit assets
+sub addRichEditMedia {
+    my $session     = shift;
+    print "\tAdding Media switch to Rich Edit..." unless $quiet;
+    
+    $session->db->write( 
+        q{ ALTER TABLE RichEdit ADD COLUMN allowMedia INT },
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub fixShop {

@@ -19,6 +19,8 @@
  - fixed: Adding Flat Discount Coupon causes "Problem w/ Request" error
  - fixed: No label for yes/no radio buttons
  - fixed: Gallery Edit Album buttons did not work properly in IE
+ - fixed: Cannot embed YouTube videos in IE6/7. Fixed by adding an "Allow Media"
+   switch to the RichEdit asset.
 
 7.5.12
  - skipping this release

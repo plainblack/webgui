@@ -457,6 +457,20 @@ option is set to Yes, then all whitespace entered into the form will be preserve
         lastUpdated => 1206653834,
     },
 
+    'editForm allowMedia label' => {
+        message     => q{Allow Media},
+        lastUpdated => 0,
+        context     => q{Label for asset property to allow multimedia items such as Flash},
+    },
+
+    'editForm allowMedia description' => {
+        message     => q{Setting this to "yes" will allow Flash and other media to be embedded through
+                        the rich editor. Note: Setting to "No" will not explicitly forbid Flash, but it
+                        is not guaranteed to work.},
+        lastUpdated => 0,
+        context     => q{Description of asset property.},
+    },
+
 };
 
 1;
