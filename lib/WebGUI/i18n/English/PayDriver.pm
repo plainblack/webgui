@@ -58,8 +58,8 @@ our $I18N = {
 	},
 
 	'label help' => {
-		message => q|The name by which this pagyment gateway is displayed.|,
-		lastUpdated => 0,
+		message => q|The name by which this payment gateway is displayed.|,
+		lastUpdated => 1213891193,
 		context => q|Hover help for the label option.|
 	},
 
