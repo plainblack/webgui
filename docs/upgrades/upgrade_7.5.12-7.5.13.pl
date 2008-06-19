@@ -32,6 +32,7 @@ fixShop($session);
 addSelectableProfileTemplates($session); 
 addCouponThankYouMessage($session);
 addRichEditMedia( $session );
+cleanUpOldSubscriptionTable( $session);
 finish($session); # this line required
 
 
@@ -60,6 +61,15 @@ sub fixShop {
 }
 
 #----------------------------------------------------------------------------
+sub cleanUpOldSubscriptionTable {
+    my $session = shift;
+    print "\tClean up the old subscription table.\n" unless $quiet;
+    my $db = $session->db;
+    $db->write("DROP TABLE Subscription_OLD");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub addSelectableProfileTemplates {
     my $session = shift;
     print "\tAdd selectable user profile templates.\n" unless $quiet;
@@ -69,6 +79,7 @@ sub addSelectableProfileTemplates {
     $tmpl = $session->setting->get('editUserProfileTemplate') || 'PBtmpl0000000000000051';
     $session->setting->remove('editUserProfileTemplate');
     $session->setting->add('editUserProfileTemplate', $tmpl);
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -76,6 +87,7 @@ sub addCouponThankYouMessage {
     my $session = shift;
     print "\tAdding Thank You Message to Coupon table...\n" unless $quiet;
     $session->db->write('alter table FlatDiscount add column thankYouMessage mediumtext');
+    print "DONE!\n" unless $quiet;
 }
 
 
