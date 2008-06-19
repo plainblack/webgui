@@ -38,7 +38,7 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub fixShop {
     my $session = shift;
-    print "\tFixing Shop properties." unless $quiet;
+    print "\tFixing Shop properties.\n" unless $quiet;
     my $db = $session->db;
     $db->write("update EventManagementSystem set registrationStaffGroupId='3' where registrationStaffGroupId=''");
     my ($driverId) = $db->quickScalar("select paymentGatewayId from paymentGateway where className='WebGUI::Shop::PayDriver::ITransact'");
@@ -49,7 +49,7 @@ sub fixShop {
 #----------------------------------------------------------------------------
 sub addSelectableProfileTemplates {
     my $session = shift;
-    print "\tAdd selectable user profile templates." unless $quiet;
+    print "\tAdd selectable user profile templates.\n" unless $quiet;
     my $tmpl = $session->setting->get('viewUserProfileTemplate') || 'PBtmpl0000000000000052';
     $session->setting->remove('viewUserProfileTemplate');
     $session->setting->add('viewUserProfileTemplate', $tmpl);
@@ -61,7 +61,7 @@ sub addSelectableProfileTemplates {
 #----------------------------------------------------------------------------
 sub addCouponThankYouMessage {
     my $session = shift;
-    print "\tAdding Thank You Message to Coupon table... " unless $quiet;
+    print "\tAdding Thank You Message to Coupon table...\n" unless $quiet;
     $session->db->write('alter table FlatDiscount add column thankYouMessage mediumtext');
 }
 

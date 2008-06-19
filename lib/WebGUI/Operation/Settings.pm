@@ -484,18 +484,20 @@ sub definition {
     push @fields, {
         tab             => "user",
         name            => 'viewUserProfileTemplate',
-        fieldType       => 'Template',
+        fieldType       => 'template',
         namespace       => 'Operation/Profile/View',
         label           => $i18n->get( 'user profile view template' ),
         hoverHelp       => $i18n->get( 'user profile view template description' ),
+        defaultValue    => $setting->get('viewUserProfileTemplate'),
     };
     push @fields, {
         tab             => "user",
         name            => 'editUserProfileTemplate',
-        fieldType       => 'Template',
+        fieldType       => 'template',
         namespace       => 'Operation/Profile/Edit',
         label           => $i18n->get( 'user profile edit template' ),
         hoverHelp       => $i18n->get( 'user profile edit template description' ),
+        defaultValue    => $setting->get('editUserProfileTemplate'),
     };
 	# auth settings 
    	my $options;
