@@ -5,6 +5,7 @@ use strict;
 use Test::Builder;
 use WebGUI::Exception;
 use Sub::Uplevel qw( uplevel );
+use Exporter qw(import);
 
 our @EXPORT = qw( throws_deeply );
 
