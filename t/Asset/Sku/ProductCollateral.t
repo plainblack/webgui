@@ -41,9 +41,9 @@ plan tests => 33;        # Increment this number for each test you create
 # put your tests here
 my $root = WebGUI::Asset->getRoot($session);
 my $product = $root->addChild({
-        className => "WebGUI::Asset::Sku::Product",
-        title     => "Rock Hammer",
-        });
+    className => "WebGUI::Asset::Sku::Product",
+    title     => "Rock Hammer",
+});
 isa_ok($product, "WebGUI::Asset::Sku::Product");
 ok(! exists $product->{_collateral}, 'object cache does not exist yet');
 

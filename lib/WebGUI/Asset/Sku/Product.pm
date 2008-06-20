@@ -442,12 +442,32 @@ sub getQuantityAvailable {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getThumbnailUrl ( [$store] )
+
+Return a URL to the thumbnail for an image stored in this Product by creating
+a WebGUI::Storage::Image object and calling its getThumbnailUrl method.
+
+=head3 $store
+
+This should be a WebGUI::Storage::Image object.  If it is not defined,
+then by default getThumbnailUrl will attempt to look up the URL for
+the 'image1' property.
+
+If image1 is not defined for this Product and a separate storage object is not
+sent in, it will return the empty string.
+
+=cut
+
 sub getThumbnailUrl {
     my $self = shift;
     my $store = shift;
-    if (! defined $store and $self->get('image1')) {
+    if (defined $store) {
+        return $store->getThumbnailUrl($store->getFiles->[0]); 
+    }
+    elsif ($self->get('image1')) {
         $store = WebGUI::Storage::Image->get($self->session, $self->get('image1'));
-        return $store->getThumbnailUrl($store->getFiles->[0]);
+        return $store->getThumbnailUrl($store->getFiles->[0]); 
     }
     else {
         return '';
