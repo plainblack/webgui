@@ -190,7 +190,7 @@ our $I18N = {
 	},
 
 	'hasShippingAddress help' => {
-		message 	=> q|A condition indicating whether the the user has already specified a shipping address. Shipping address is always required in order to calculate taxes.|,
+		message 	=> q|A condition indicating whether the user has already specified a shipping address. Shipping address is always required in order to calculate taxes.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},

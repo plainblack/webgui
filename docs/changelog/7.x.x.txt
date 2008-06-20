@@ -3,6 +3,7 @@
  - fixed: Non-admin users can now add Gallery assets
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
+ - fixed: Shop->hasShippingAddress help grammatical error
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly
