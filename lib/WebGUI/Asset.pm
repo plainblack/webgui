@@ -2287,6 +2287,7 @@ sub www_editSave {
         $object = $self->addChild({className=>$self->session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
+        $object->{_properties}{url} = undef;
     } 
     else {
         if ($self->canEditIfLocked) {
