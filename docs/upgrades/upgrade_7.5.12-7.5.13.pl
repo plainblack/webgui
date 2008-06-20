@@ -42,6 +42,15 @@ sub addRichEditMedia {
     my $session     = shift;
     print "\tAdding Media switch to Rich Edit..." unless $quiet;
     
+    # Make sure it wasn't added by previous upgrade
+    my $sth = $session->db->read('DESCRIBE `RichEdit`');
+    while (my ($col) = $sth->array) {
+        if ( $col eq 'allowMedia' ) {
+            print "Already done, skipping.\n" unless $quiet;
+            return;
+        }
+    }
+     
     $session->db->write( 
         q{ ALTER TABLE RichEdit ADD COLUMN allowMedia INT },
     );

@@ -3,6 +3,7 @@
  - fixed: Non-admin users can now add Gallery assets
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
+ - fixed: allowMedia addition to Rich Editor no longer causes upgrade problems
  - fixed: Shop->hasShippingAddress help grammatical error
  - fixed: can now turn off inheritUrlFromParent and the code is now more
    robust, moved from Asset->update to Asset->fixUrl.
