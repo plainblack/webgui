@@ -280,6 +280,8 @@ sub exportAsHtml {
     unless ( $self->canView($userId) ) {
         $returnCode = 0;
         $message    = "can't view asset at URL " . $self->getUrl;
+        $exportSession->var->end;
+        $exportSession->close;
         return ($returnCode, $message);
     }
 
