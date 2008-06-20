@@ -6,6 +6,7 @@
  - fixed: Shop->hasShippingAddress help grammatical error
  - fixed: can now turn off inheritUrlFromParent and the code is now more
    robust, moved from Asset->update to Asset->fixUrl.
+ - fixed: Time tracker can't post time once it's been posted.
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly
