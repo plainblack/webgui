@@ -17,6 +17,15 @@ save you many hours of grief.
    anyone with the right URL to see an RSS feed, even if they do not
    have permission to view the Collaboration System it came from.
 
+ * The 7.5.11 upgrade contained a bug that didn't import existing
+   Data Form entries properly.  The script has been corrected, so if
+   you didn't already upgrade to 7.5.11, there is nothing to worry
+   about.  If you already upgraded, the information can be restored
+   from a backup. See
+   http://www.webgui.org/bugs/tracker/data-form-listing-existing-entries-wrong-missing-data
+   for information on how to retrieve this information without having
+   to revert entirely to a past backup.
+
 
 7.5.11
 --------------------------------------------------------------------

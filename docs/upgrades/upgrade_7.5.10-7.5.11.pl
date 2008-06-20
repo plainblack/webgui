@@ -150,7 +150,7 @@ sub convertDataForm {
             my $newEntryFieldData = {};
             my $entryFields = $session->db->read("SELECT * FROM `DataForm_entryData` WHERE assetId=? AND DataForm_entryId=?", [$assetId, $entryData->{DataForm_entryId}]);
             while (my $entryFieldData = $entryFields->hashRef) {
-                $newEntryFieldData->{ $fieldMapping{ $entryFieldData->{DataForm_fieldId} } } = $entryData->{value};
+                $newEntryFieldData->{ $fieldMapping{ $entryFieldData->{DataForm_fieldId} } } = $entryFieldData->{value};
             }
             $entryFields->finish;
             my $entryJSON = encode_json($newEntryFieldData);
