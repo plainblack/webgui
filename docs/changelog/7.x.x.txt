@@ -1,4 +1,5 @@
 7.5.14
+ - fixed: Non-admin users can now add Gallery assets
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly
