@@ -18,6 +18,7 @@ use strict;
 use JSON;
 use WebGUI::Storage;
 use Scalar::Util qw(blessed);
+use Encode qw(decode);
 
 =head1 NAME
 
@@ -66,6 +67,7 @@ sub exportPackage {
 	my $storage = WebGUI::Storage->createTemp($self->session);
 	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
 		my $data = $asset->exportAssetData;
+        _decodeToUTF8($data);
 		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON->new->pretty->utf8->encode($data));
 		foreach my $storageId (@{$data->{storage}}) {
 			my $assetStorage = WebGUI::Storage->get($self->session, $storageId);
@@ -76,6 +78,31 @@ sub exportPackage {
 	$filename =~ s/\//_/g;
 	return $storage->tar($filename);
 }	
+
+
+#-------------------------------------------------------------------
+# Recurse through a data structure and decode UTF8 octets to Perl's
+# internal format.  This lets the JSON module serialize it properly
+
+sub _decodeToUTF8 {
+    my $struct = \($_[0]);
+    if (ref $$struct eq 'HASH') {
+        for (values %$$struct) {
+            _decodeToUTF8($_);
+        }
+    }
+    elsif (ref $$struct eq 'ARRAY') {
+        for (@$$struct) {
+            _decodeToUTF8($_);
+        }
+    }
+    elsif (ref $$struct eq 'SCALAR') {
+        $$$struct = decode('utf8', $$$struct);
+    }
+    else {
+        $$struct = decode('utf8', $$struct);
+    }
+}
 
 #-------------------------------------------------------------------
 
