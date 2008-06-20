@@ -440,19 +440,37 @@ sub getTabOrder {
 #-------------------------------------------------------------------
 sub deleteAttachedFiles {
     my $self = shift;
-    my @fields = shift;
-    @fields = @{ $self->getFieldOrder }
-        unless @fields;
+    my %params = @_;
+    my $entryData = $params{entryData};
+    my $entryId = $params{entryId};
 
+    my $fields = $self->getFieldOrder;
     my $fieldConfig = $self->getFieldConfig;
-    my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
-    foreach my $entry (@$entries) {
-        my $entryData = decode_json($entry->{entryData});
-        for my $field ( @fields ) {
+
+    if ($entryId) {
+        my $entry = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
+        $entryData = decode_json($entry->{entryData});
+    }
+    if ($entryData) {
+        for my $field ( @$fields ) {
             my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
             if ($form->can('getStorageLocation')) {
                 my $storage = $form->getStorageLocation;
                 $storage->delete;
+            }
+        }
+    }
+    else {
+        my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
+        foreach my $entry (@$entries) {
+            my $entryData = decode_json($entry->{entryData});
+            $self->deleteEntryFiles($entryData);
+            for my $field ( @$fields ) {
+                my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
+                if ($form->can('getStorageLocation')) {
+                    my $storage = $form->getStorageLocation;
+                    $storage->delete;
+                }
             }
         }
     }
@@ -461,9 +479,7 @@ sub deleteAttachedFiles {
 #-------------------------------------------------------------------
 sub getAttachedFiles {
     my $self = shift;
-    my $entryId = shift;
-    my $entry = $self->getCollateral('DataForm_entry', 'DataForm_entryId', $entryId);
-    my $entryData = decode_json($entry->{entryData});
+    my $entryData = shift;
     my $fieldConfig = $self->getFieldConfig;
     my @paths;
     for my $field ( values %{$fieldConfig} ) {
@@ -641,7 +657,7 @@ sub getRecordTemplateVars {
         }
         my $hidden = ($field->{status} eq 'hidden' && !$self->session->var->isAdminOn) || ($field->{isMailField} && !$self->get('mailData'));
         my $form = $self->_createForm($field, $value);
-        my $value = $form->getValueAsHtml;
+        $value = $form->getValueAsHtml;
         my %fieldProperties = (
             "form"          => $form->toHtml,
             "name"          => $field->{name},
@@ -773,28 +789,16 @@ sub purge {
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my ($to, $subject, $from, $bcc, $cc);
-	foreach my $row (@{$var->{field_loop}}) {
-		if ($row->{"field.name"} eq "to") {
-			$to = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "from") {
-			$from = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "cc") {
-			$cc = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "bcc") {
-			$bcc = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "subject") {
-			$subject = $row->{"field.value"};
-		} elsif ($row->{"field.type"} eq "textArea") {
-			$row->{"field.value"} =~ s/\n/<br\/>/;
-		} elsif ($row->{"field.type"} eq "textarea") {
-			$row->{"field.value"} = WebGUI::HTML::format($row->{"field.value"},'mixed');
-		}
-	}
+    my $entryData = shift;
+    my $to = $entryData->{to};
+    my $subject = $entryData->{subject};
+    my $from = $entryData->{from};
+    my $bcc = $entryData->{bcc};
+    my $cc = $entryData->{cc};
     my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
-	WebGUI::Macro::process($self->session,\$message);
-	my @attachments = $self->get('mailAttachments') ?
-	    @{$self->getAttachedFiles($var->{entryId})}
+    WebGUI::Macro::process($self->session,\$message);
+    my @attachments = $self->get('mailAttachments')
+        ? @{ $self->getAttachedFiles($entryData) }
 		: ();
 	if ($to =~ /\@/) {
 		my $mail = WebGUI::Mail::Send->create($self->session,{
@@ -923,7 +927,7 @@ sub www_deleteEntry {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
     my $entryId = $self->session->form->process("entryId");
-	$self->deleteAttachedFiles($entryId);
+	$self->deleteAttachedFiles(entryId => $entryId);
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 	$self->session->stow->set("mode","list");
 	return $self->www_view;
@@ -1386,13 +1390,13 @@ sub www_process {
     }
 
     $var->{error_loop} = \@errors;
-    $var = $self->getRecordTemplateVars($var);
+    $var = $self->getRecordTemplateVars($var, $entryData);
     if (@errors) {
         $self->prepareView($var);
         return $self->processStyle($self->view);
     }
     if ($self->get("mailData") && !$entryId) {
-        $self->sendEmail($var);
+        $self->sendEmail($var, $entryData);
     }
     if ($self->get('storeData')) {
         my $entryJSON = encode_json($entryData);
