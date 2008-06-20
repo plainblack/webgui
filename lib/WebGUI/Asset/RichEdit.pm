@@ -557,11 +557,15 @@ sub getRichEditor {
 
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
+    $self->session->style->setScript( $self->session->url->extras( "yui/build/yahoo-dom-event/yahoo-dom-event.js" ), { type => "text/javascript" } );
     my $out = "<script type=\"text/javascript\">\n";
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out .= "tinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . ");\n</script>";
+    $out    .= "YAHOO.util.Event.addListener( window, 'load', function () { \n"
+            . "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
+            . "} );\n"
+            . "</script>";
 }
 
 
