@@ -159,17 +159,17 @@ is($item->get("price"), 33,  "set and get price");
 
 $item->update({
     shippingTrackingNumber  => 'adfs',
-    shippingStatus          => 'BackOrdered',
+    orderStatus          => 'BackOrdered',
 });
 
 is($item->get("shippingTrackingNumber"), 'adfs', "update and get shipping tracking number");
-is($item->get("shippingStatus"), 'BackOrdered', "update and get shipping status");
+is($item->get("orderStatus"), 'BackOrdered', "update and get shipping status");
 
 # make sure shipping date is updated when shipping status is changed
 like($item->get("shippingDate"), qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/, "shipping date is set");
 my $dateNow = $item->get('shippingDate');
 sleep(1);
-$item->update({shippingStatus=>'Cancelled'});
+$item->update({orderStatus=>'Cancelled'});
 isnt($item->get('shippingDate'), $dateNow, 'shipping date is updated');
 
 # make sure new() works

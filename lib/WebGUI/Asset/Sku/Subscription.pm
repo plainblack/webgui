@@ -465,7 +465,7 @@ sub redeemCode {
     my $self    = shift;
     my $code    = shift;
     my $session = $self->session;
-    my $i18n    = my $i18n = WebGUI::International->new($session, "Asset_Subscription");
+    my $i18n    = WebGUI::International->new($session, "Asset_Subscription");
 
     my $properties = $self->getCode( $code );
 
@@ -509,9 +509,13 @@ sub view {
             '<a href="'.$self->getUrl('func=listSubscriptionCodes')       .'">'.$i18n->get('manage codes').'</a>',
             '<a href="'.$self->getUrl('func=listSubscriptionCodeBatches') .'">'.$i18n->get('manage batches').'</a>',
             )),
-        redeemCodeLabel     => $i18n->get('redeem code'),
-        redeemCodeUrl       => $self->getUrl('func=redeemSubscriptionCode'),
     );
+    my $hasCodes = $self->session->db->quickScalar('select count(*) from Subscription_code as t1, Subscription_codeBatch as t2 where t1.batchId = t2.batchId and t2.subscriptionId=?', [$self->getId]);
+    if ($hasCodes) {
+        $var{redeemCodeLabel} = $i18n->get('redeem code');
+        $var{redeemCodeUrl}   = $self->getUrl('func=redeemSubscriptionCode');
+
+    }
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 

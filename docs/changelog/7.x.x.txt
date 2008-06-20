@@ -25,6 +25,7 @@
  - fixed: Shop: Variants in dropdown and on page
  - fixed: OLD subscription table still hanging around?
  - fixed: Shelf
+ - fixed: Subscriptions and redemption
 
 7.5.12
  - skipping this release

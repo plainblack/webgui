@@ -473,14 +473,14 @@ The form in which the user can enter his subscription code.<br />|,
 	},
 
 	'redeemCodeLabel' => {
-		message => q|An internationalized label for the link to redeem a subscription code.|,
-		lastUpdated => 0,
+		message => q|An internationalized label for the link to redeem a subscription code.  If there are no subscription codes, this will be blank|,
+		lastUpdated => 1213936319,
 		context => q|template variable|
 	},
 
 	'redeemCodeUrl' => {
-		message => q|The URL to redeem a subscription code.|,
-		lastUpdated => 0,
+		message => q|The URL to redeem a subscription code.  If there are no subscription codes, this will be blank.|,
+		lastUpdated => 1213936341,
 		context => q|template variable|
 	},
 
