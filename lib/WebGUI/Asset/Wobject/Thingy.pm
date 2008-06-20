@@ -1856,17 +1856,22 @@ sub www_editThingDataSave {
     }
     return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
-    %thingData = (
-        thingDataId=>$thingDataId,
-        updatedById=>$session->user->userId,
-        updatedByName=>$session->user->username,
-        lastUpDated=>time(),
-    );
     if ($thingDataId eq "new"){
         $thingData{dateCreated} = time();
         $thingData{createdById} = $session->user->userId;
         $thingData{ipAddress} = $session->env->getIp;
     }
+    else {
+        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+            ." where thingDataId = ?",[$thingDataId]);
+    }
+
+    %thingData = ( %thingData, 
+        thingDataId=>$thingDataId,
+        updatedById=>$session->user->userId,
+        updatedByName=>$session->user->username,
+        lastUpDated=>time(),
+    );
     
     $fields = $session->db->read('select * from Thingy_fields where assetId = '.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by sequenceNumber');
     while (my $field = $fields->hashRef) {
@@ -1875,7 +1880,12 @@ sub www_editThingDataSave {
         if ($field->{status} eq "required" || $field->{status} eq "editable"){
             my $fieldType = $field->{fieldType};
             $fieldType = "" if ($fieldType =~ m/^otherThing/x);
-            $fieldValue = $session->form->process($fieldName,$fieldType,$field->{defaultValue});
+            # Modify the defaultValue for certain field types. For most types we want to use
+            # the default in the database, for these we want the last known value for this thingData
+            if ( $fieldType eq "File" || $fieldType eq "Image" ) {
+                $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
+            }
+            $fieldValue = $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
         }
         if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
             push (@errors,{
