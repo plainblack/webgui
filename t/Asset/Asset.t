@@ -146,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 97 
+plan tests => 98 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -766,14 +766,18 @@ $properties2 = {
     url         => 'inheriturlfromparent02',
 };
 
-
 my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
+$iufpAsset2->commit;
 is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
 
 # works for setting, now try disabling. Should not change the URL.
 $iufpAsset2->update( { inheritUrlFromParent => 0 } );
+$iufpAsset2->commit;
 is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'setting inheritUrlFromParent to 0 works');
+
+# also make sure that it is actually disabled
+is($iufpAsset2->get('inheritUrlFromParent'), 0, "disabling inheritUrlFromParent actually works");
 
 # works for setting and disabling, now ensure it recurses
 
@@ -785,8 +789,11 @@ my $properties3 = {
     url         => 'inheriturlfromparent03',
 };
 my $iufpAsset3 = $iufpAsset2->addChild($properties3, $properties3->{id});
+$iufpAsset3->commit;
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
+$iufpAsset2->commit;
 $iufpAsset3->update( { inheritUrlFromParent => 1 } );
+$iufpAsset3->commit;
 is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', 'inheritUrlFromParent recurses properly');
 
 

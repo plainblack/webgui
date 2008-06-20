@@ -4,6 +4,8 @@
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
  - fixed: Shop->hasShippingAddress help grammatical error
+ - fixed: can now turn off inheritUrlFromParent and the code is now more
+   robust, moved from Asset->update to Asset->fixUrl.
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly

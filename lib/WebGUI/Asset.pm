@@ -598,6 +598,16 @@ sub fixUrl {
 	}
 	$url = $self->session->url->urlize($url);
 
+    # if we're inheriting the URL from our parent, set that appropriately
+    if($self->get('inheritUrlFromParent')) {
+        my @parts = split(m{/},$url);
+
+        # don't do anything unless we need to
+        if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
+            $url = $self->getParent->getUrl . '/' . $parts[-1];
+        }
+    }
+
 	# fix urls used by uploads and extras
 	# and those beginning with http
 	my @badUrls = (
@@ -2006,38 +2016,6 @@ sub update {
                 next;
             }
 
-            # similarly, if this is the new-to-7.5 inheritUrlFromParent field,
-            # do the same.
-            if($property eq 'inheritUrlFromParent') {
-                next unless $properties->{inheritUrlFromParent} == 1;
-
-                # if we're still here, we have the property in the DB. so process it.
-                # only prepend the URL once
-                my $parentUrl = $self->getParent->getUrl;
-
-                # handle either being passed a new URL or updating the current one
-                my $currentUrl;
-                if(exists $properties->{url}) {
-                    $currentUrl = $properties->{url};
-                }
-                else {
-                    $currentUrl = $self->getUrl;
-                }
-
-                # if there's only one / then leave it alone.
-                unless($currentUrl =~ tr{/}{} == 1) {
-                    $currentUrl =~ s{/[^/]+$}{};
-                }
-                
-                # prepend if it's not a match
-                my $newUrl = $currentUrl;
-                if($currentUrl ne $parentUrl) {
-                    $newUrl = $parentUrl . '/' . $currentUrl;
-                }
-
-                # replace the non-prepended value in the properties hash with this value
-                $self->{_properties}{url} = $newUrl;
-            }
 
             # use the update value
 			my $value = $properties->{$property};
@@ -2568,7 +2546,7 @@ sub outputWidgetMarkup {
     my $storage         = WebGUI::Storage->get($session, $assetId);
     my $content         = $self->view;
     WebGUI::Macro::process($session, \$content);
-    my $jsonContent     = objToJson( { "asset$assetId" => { content => $content } } );
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
     my $jsonUrl         = $storage->getUrl("$assetId.js");
 
