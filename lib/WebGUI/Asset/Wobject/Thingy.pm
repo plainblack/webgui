@@ -641,8 +641,10 @@ sub getFieldValue {
                 .' where thingDataId = ?',[$value]);
         }
     }
-    elsif ($field->{fieldType} eq "file") {
-        $processedValue = WebGUI::Form::File->new($self->session,{value=>$value})->getValueAsHtml();
+    else {
+        $processedValue 
+            = WebGUI::Form::DynamicField->new( $self->session,  %$field, defaultValue => $value  )
+            ->getValueAsHtml;
     }
 
     return $processedValue;

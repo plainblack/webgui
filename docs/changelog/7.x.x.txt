@@ -5,6 +5,7 @@
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
  - fixed: allowMedia addition to Rich Editor no longer causes upgrade problems
  - fixed: Shop->hasShippingAddress help grammatical error
+ - fixed: Thingy now shows appropriate display values for all field types
  - fixed: can now turn off inheritUrlFromParent and the code is now more
    robust, moved from Asset->update to Asset->fixUrl.
  - fixed: Time tracker can't post time once it's been posted.
