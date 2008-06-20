@@ -84,7 +84,7 @@ fixAdminConsoleTemplateTitles( $session );
 makeLongerAssetMetadataValues( $session );
 removeOldCommerceCode($session);
 convertDataForm( $session );
-ensureCorrectDefaults( $session );
+#ensureCorrectDefaults( $session );
 
 finish($session); # this line required
 
@@ -650,7 +650,7 @@ sub upgradeEMS {
             my $end =  WebGUI::DateTime->new($session, $ticketData->{endDate});
             my $duration = $end - $start;
             my $ticket = $ems->addChild({
-                className           => 'WebGUI::Asset::Sku::EMSBadge',
+                className           => 'WebGUI::Asset::Sku::EMSTicket',
                 title               => $ticketData->{title},
                 url                 => $ticketData->{title},
                 description         => $ticketData->{description},
