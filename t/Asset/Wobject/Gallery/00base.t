@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test the creation and deletion of gallery assets
 
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
@@ -42,7 +42,7 @@ my $gallery
 $versionTag->commit;
 
 is(
-    blessed $gallery, "WebGUI::Asset::Wobject::Gallery",
+    Scalar::Util::blessed($gallery), "WebGUI::Asset::Wobject::Gallery",
     "Gallery is a WebGUI::Asset::Wobject::Gallery object",
 );
 

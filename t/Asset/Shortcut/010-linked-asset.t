@@ -62,7 +62,7 @@ ok(
 );
 
 is(
-    blessed $original, blessed $snippet,
+    Scalar::Util::blessed($original), Scalar::Util::blessed($snippet),
     "Original asset class is correct",
 );
 

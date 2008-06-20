@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/../../../../lib";
 
 ## The goal of this test is to test the creation and deletion of photo assets
 
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
@@ -71,7 +71,7 @@ $photo
 $versionTag->commit;
 
 is(
-    blessed $photo, "WebGUI::Asset::File::GalleryFile::Photo",
+    Scalar::Util::blessed($photo), "WebGUI::Asset::File::GalleryFile::Photo",
     "Photo is a WebGUI::Asset::File::GalleryFile::Photo object",
 );
 
@@ -81,7 +81,7 @@ isa_ok(
 
 
 is(
-    blessed $photo->getGallery, "WebGUI::Asset::Wobject::Gallery",
+    Scalar::Util::blessed($photo->getGallery), "WebGUI::Asset::Wobject::Gallery",
     "Photo->getGallery gets the gallery containing this photo",
 );
 

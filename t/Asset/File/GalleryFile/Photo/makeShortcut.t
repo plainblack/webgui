@@ -15,7 +15,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../../../../lib";
 
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
