@@ -1981,10 +1981,13 @@ sub update {
     # check the definition of all properties against what was given to us
 
     # get a DB object for the two conditionals below, and the description
-    my $db = $self->session->db;
-    my $assetDataDescription = $db->buildHashRef('describe assetData');
+    my %assetDataFields;
+    my $sth = $self->session->db->read('DESCRIBE `assetData`');
+    while (my ($col) = $sth->array) {
+        $assetDataFields{$col} = 1;
+    }
 
-	foreach my $definition (reverse @{$self->definition($self->session)}) {
+    foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
 
         # deal with all the properties in this part of the definition
@@ -1999,19 +2002,13 @@ sub update {
             # if this is the new-to-7.5 isExportable field, check if the
             # database field for it exists. if not, setting it will break, so
             # skip it. this facilitates updating from previous versions.
-            if($property eq 'isExportable') {
-                unless(grep { $_ =~ /^isExportable/ } keys %{$assetDataDescription}) {
-                    next;
-                }
+            if ($definition->{tableName} eq 'assetData' && !exists $assetDataFields{$property}) {
+                next;
             }
 
             # similarly, if this is the new-to-7.5 inheritUrlFromParent field,
             # do the same.
-            elsif($property eq 'inheritUrlFromParent') {
-                unless(grep { $_ =~ /^inheritUrlFromParent/ } keys %{$assetDataDescription}) {
-                    next;
-                }
-
+            if($property eq 'inheritUrlFromParent') {
                 next unless $properties->{inheritUrlFromParent} == 1;
 
                 # if we're still here, we have the property in the DB. so process it.
@@ -2044,7 +2041,6 @@ sub update {
 
             # use the update value
 			my $value = $properties->{$property};
-
             # use the current value because the update value was undef
             unless (defined $value) {
                 $value = $self->get($property);
