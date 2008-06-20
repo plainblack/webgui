@@ -251,8 +251,10 @@ sub www_editTimeEntrySave {
 	
 	# Clobber other entries.  We can't just do this beforehand
 	# because otherwise setCollateral will fail.
-	$db->write("DELETE FROM TT_timeEntry WHERE reportId = ? AND entryId NOT IN (".join(', ', ('?') x @entryIds).")", [$reportId, @entryIds]);
-
+	if(scalar(@entryIds) > 0) {
+		$db->write("DELETE FROM TT_timeEntry WHERE reportId = ? AND entryId NOT IN (".join(', ', ('?') x @entryIds).")", [$reportId, @entryIds]);
+	}
+	
 	# Update Project Management App if integrated
 	if ($self->getValue("pmIntegration")) {
 		foreach my $projectId (keys %deltaHours) {
@@ -701,12 +703,11 @@ sub www_buildTimeTable {
 				});
 	
 	my $reportComplete = $report->{reportComplete};
-	$viewVar->{'form.isComplete'} = WebGUI::Form::checkbox($session, {
+	$var->{'form.isComplete'} = WebGUI::Form::checkbox($session, {
 	              -name=>"isComplete",
 				  -value=>1,
 				  -checked=>$reportComplete
-				});			
-
+				});
 	#Build Entries Loop
 	my $entries = $db->buildArrayRefOfHashRefs("select * from TT_timeEntry where reportId=? order by taskDate",[$reportId]);
 	my $rowCount = 1;
@@ -742,12 +743,12 @@ sub _buildRow {
 	my ($session,$dt,$eh,$form,$db,$user) = $self->getSessionVars("datetime","errorHandler","form","db","user");
 	my $i18n = WebGUI::International->new($session,'Asset_TimeTracking');
 	
-	my $entry = $_[0] || {};
-	my $rowCount = $_[1];
-	my $daysInWeek = $_[2];
-	my $projectList = $_[3];
-	my $taskList = $_[4];
-	my $var = $_[5] || {};
+	my $entry          = $_[0] || {};
+	my $rowCount       = $_[1];
+	my $daysInWeek     = $_[2];
+	my $projectList    = $_[3];
+	my $taskList       = $_[4];
+	my $var            = $_[5] || {};
 	my $reportComplete = $_[6] || 0;
 	
 	my $entryId = $entry->{entryId} || "new";

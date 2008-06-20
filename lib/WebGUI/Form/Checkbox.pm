@@ -64,7 +64,7 @@ sub definition {
 			defaultValue=> 0
 			},
 		defaultValue=>{
-			defaultValue=>1
+			defaultValue=>undef
 			},
 		});
         return $class->SUPER::definition($session, $definition);

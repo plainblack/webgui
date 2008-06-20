@@ -161,8 +161,7 @@ sub process {
 	die __PACKAGE__."::process requires an href" unless ref $args eq 'HASH';
 
 	my ($name, $type, $default, $params) = @$args{qw( name type default params )};
-
-	$params->{name} = $name;	
+	$params->{name} = $name;
 	if (wantarray) {	
 		my @values = $self->$type($params);
 		if (scalar(@values) < 1 && ref $default eq "ARRAY") {
