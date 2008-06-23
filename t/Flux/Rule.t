@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 69;
+plan tests => 71;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -238,34 +238,42 @@ $session->db->write('delete from fluxRuleUserData');
 
     my $rule1 = WebGUI::Flux::Rule->create($session);
     $rule1->addExpression(
-        {   name     => 'Rule 1 Expression #1',
-            operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
-            operator => 'DUMMY_OPERATOR',
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
         }
     );
     my $rule2 = WebGUI::Flux::Rule->create($session);
     $rule2->addExpression(
-        {   name     => 'Rule 2 Expression #1',
-            operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
-            operator => 'DUMMY_OPERATOR',
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
         }
     );
     $rule2->addExpression(
-        {   name     => 'Rule 2 Expression #2',
-            operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
-            operator => 'DUMMY_OPERATOR',
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
         }
     );
     is( $session->db->quickScalar('select count(*) from fluxRule'),       2, '2 Rules to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 3, '3 Expressions to delete' );
+    
+    # Evaluate rule so that fluxRuleUserDate row created
+    $rule1->evaluateFor( { user => $user, } );
+    is( $session->db->quickScalar('select count(*) from fluxRuleUserData where fluxRuleId = ?', [$rule1->getId()]),       1, '1 Associated fluxRuleUserData row' );
 
     # Delete Rule1 and its associated Expressions
     $rule1->delete();
     is( $session->db->quickScalar('select count(*) from fluxRule'),       1, '1 Rules left to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 2, '2 Expressions left to delete' );
+    is( $session->db->quickScalar('select count(*) from fluxRuleUserData where fluxRuleId = ?', [$rule1->getId()]),       0, 'Associated fluxRuleUserData row deleted' );
 
     $rule2->delete();
     is( $session->db->quickScalar('select count(*) from fluxRule'),       0, 'No Rules left to delete' );

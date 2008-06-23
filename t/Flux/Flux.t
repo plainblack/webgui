@@ -34,6 +34,11 @@ plan tests => 18;
 
 use_ok('WebGUI::Flux');
 
+# Start with a clean slate
+$session->db->write('delete from fluxRule');
+$session->db->write('delete from fluxRuleUserData');
+$session->db->write('delete from fluxExpression');
+
 #######################################################################
 #
 # getRules
@@ -41,7 +46,7 @@ use_ok('WebGUI::Flux');
 #######################################################################
 # Errors
 {
-    eval { my $rule = WebGUI::Flux::getRules(); };
+    eval { my $rule = WebGUI::Flux->getRules(); };
     my $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a session object' );
     cmp_deeply(
@@ -140,9 +145,100 @@ use_ok('WebGUI::Flux');
     cmp_deeply( WebGUI::Flux->getRules($session), [], 'no rules defined after delete' );
 }
 
+#######################################################################
+#
+# getGraph
+#
+#######################################################################
+{
+    my $rule1    = WebGUI::Flux::Rule->create($session);
+    my $rule1_id = $rule1->getId();
+    $rule1->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
+            name         => 'Test First Thing',
+        }
+    );
+    $rule1->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
+            name         => 'Test Second Thing',
+        }
+    );
+    $rule1->update( { name => 'Simple Rule', combinedExpression => 'e1 or e2' } );
+
+    my $rule2    = WebGUI::Flux::Rule->create($session);
+    my $rule2_id = $rule2->getId();
+    $rule2->addExpression(
+        {   operand1     => 'FluxRule',
+            operand1Args => qq[{"fluxRuleId":  "$rule1_id"}],
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "1"}',
+            operator     => 'IsEqualTo',
+            name         => 'Check Simple Rule',
+        }
+    );
+    $rule2->addExpression(
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "test value"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
+            name         => 'Test Something Else',
+        }
+    );
+    $rule2->update( { name => 'Dependent Rule' } );
+
+    my $rule3 = WebGUI::Flux::Rule->create($session);
+    $rule3->addExpression(
+        {   operand1     => 'FluxRule',
+            operand1Args => qq[{"fluxRuleId":  "$rule1_id"}],
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "1"}',
+            operator     => 'IsEqualTo',
+            name         => 'Check Simple Rule',
+        }
+    );
+    $rule3->addExpression(
+        {   operand1     => 'FluxRule',
+            operand1Args => qq[{"fluxRuleId":  "$rule2_id"}],
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "1"}',
+            operator     => 'IsEqualTo',
+            name         => 'Check Dependent Rule',
+        }
+    );
+    $rule3->update( { name => 'Yet Another Rule' } );
+    
+    my $rule4 = WebGUI::Flux::Rule->create($session);
+    my $rule4_id = $rule4->getId();
+    $rule4->update( { name => 'My empty Rule' } );
+
+    my $rule5 = WebGUI::Flux::Rule->create($session);
+    $rule5->addExpression( # This time put the FluxRule into operand2
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "1"}',
+            operand2     => 'FluxRule',
+            operand2Args => qq[{"fluxRuleId":  "$rule4_id"}],
+            operator     => 'IsEqualTo',
+            name         => 'Check the empty Rule',
+        }
+    );
+    $rule5->update( { name => 'Another Rule' } );
+
+    WebGUI::Flux->generateGraph($session);
+}
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $session->db->write('delete from fluxRule');
+    $session->db->write('delete from fluxRuleUserData');
     $session->db->write('delete from fluxExpression');
 }

@@ -202,7 +202,8 @@ sub delete {
     foreach my $expression ( @{ $self->getExpressions } ) {
         $expression->delete;
     }
-    $self->session->db->deleteRow( 'fluxRule', 'fluxRuleId', $self->getId );
+    $self->session->db->write('delete from fluxRuleUserData where fluxRuleId = ?', [$self->getId()]);
+    $self->session->db->deleteRow( 'fluxRule', 'fluxRuleId', $self->getId() );
     undef $self;
     return undef;
 }

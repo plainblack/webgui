@@ -3,6 +3,10 @@ package WebGUI::Flux;
 use strict;
 use warnings;
 
+use GraphViz;
+use JSON;
+use Readonly;
+
 =head1 NAME
 
 Package WebGUI::Flux
@@ -103,6 +107,121 @@ sub getRules {
     }
 
     return \@ruleObjects;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getGraph ( )
+
+Generates the Flux Graph using GraphViz. This is currently just a proof-of-concept.
+The image is stored at /uploads/FluxGraph.png and overwritten every time this method is called.
+
+Currently only simple GraphViz features are used to generate the graph. Later we will
+probably take advantage of html-like processing capabilities to improve the output.
+
+GraphViz must be installed for this to work.
+
+=cut
+
+sub generateGraph {
+    my ( $class, $session ) = @_;
+
+    # Check arguments..
+    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
+        WebGUI::Error::InvalidObject->throw(
+            expected => 'WebGUI::Session',
+            got      => ( ref $session ),
+            error    => 'Need a session.'
+        );
+    }
+
+    # Create the GraphViz object used to generate the image
+    my $g = GraphViz->new( bgcolor => 'beige', fontsize => 10 );
+    Readonly my $PATH => $session->config->get("uploadsPath") . '/FluxGraph.png';
+
+    # Generate the image by iterating over all defined Rules..
+    my @edges;    # collection of vertices to add at the end after nodes have been added
+    Readonly my $INDENT => '  ';
+
+    # GraphViz can print html entities
+    Readonly my $BULLET => '&bull;';
+    Readonly my $RARR   => '&rarr;';
+    Readonly my $LDQUOT => '&ldquo;';
+    Readonly my $RDQUOT => '&rdquo;';
+
+    Readonly my $FONTSIZE => 11;
+
+    foreach my $rule ( @{ $class->getRules($session) } ) {
+
+        # Start building up a descriptive label for the node..
+        my $label = $LDQUOT . $rule->get('name') . $RDQUOT . "\n";
+        $label .= $rule->get('sticky') ? "(sticky)\n" : "\n";
+
+        my $count = $rule->getExpressionCount();
+        if ( $count == 0 ) {
+            $label .= 'This Rule has no Expressions';
+        }
+        else {
+            $label .= 'Expression:\l';
+
+            # Add information about all the Expressions associated with this Rule..
+            foreach my $e ( @{ $rule->getExpressions() } ) {
+                $label .= "$INDENT e" . $e->get('sequenceNumber') . " $RARR " . $e->get('name') . '\l';
+
+                # Check both operands for Rule dependencies..
+                foreach my $operand qw(operand1 operand2) {
+                    if ( $e->get($operand) eq 'FluxRule' ) {
+
+                        my $args = from_json( $e->get( $operand . 'Args' ) );    # deserialise JSON-encoded args
+                        my $dependendRuleId = $args->{fluxRuleId};
+
+                        # Add this dependency to the list of vertices to add at the end
+                        push @edges,
+                            [
+                            $rule->getId() => $dependendRuleId,
+                            taillabel      => 'e' . $e->get('sequenceNumber') . '    ',
+                            labelfontcolor => 'brown',
+                            labelfontsize  => $FONTSIZE,
+                            color          => 'brown'
+                            ];
+                    }
+                }
+
+            }
+
+            # Add the Combined Expresssion to the output (generating the default if necessary)
+            $label .= 'Combined: \l';
+            $label .= $LDQUOT;
+            if ( defined $rule->get('combinedExpression') ) {
+                $label .= $rule->get('combinedExpression');
+            }
+            else {
+                $label .= join ' and ', map {"e$_"} ( 1 .. $count );
+            }
+            $label .= $RDQUOT;
+
+        }
+        $g->add_node(
+            $rule->getId(),
+            label     => $label,
+            fontsize  => $FONTSIZE,
+            shape     => 'ellipse',
+            style     => 'filled',
+            color     => 'chocolate',
+            fillcolor => 'burlywood',
+        );
+
+    }
+    
+    # Now add the vertices..
+    foreach my $edge (@edges) {
+        $g->add_edge( @{$edge} );
+    }
+
+    # Render the image to a file
+    $g->as_png($PATH);
+
+    return $PATH;
 }
 
 1;
