@@ -14,6 +14,8 @@ use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Flux::Expression;
+use WebGUI::Workflow;
+use WebGUI::Group;
 
 #----------------------------------------------------------------------------
 # Init
@@ -22,7 +24,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 71;
+plan tests => 80;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -264,16 +266,28 @@ $session->db->write('delete from fluxRuleUserData');
     );
     is( $session->db->quickScalar('select count(*) from fluxRule'),       2, '2 Rules to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 3, '3 Expressions to delete' );
-    
+
     # Evaluate rule so that fluxRuleUserDate row created
     $rule1->evaluateFor( { user => $user, } );
-    is( $session->db->quickScalar('select count(*) from fluxRuleUserData where fluxRuleId = ?', [$rule1->getId()]),       1, '1 Associated fluxRuleUserData row' );
+    is( $session->db->quickScalar(
+            'select count(*) from fluxRuleUserData where fluxRuleId = ?',
+            [ $rule1->getId() ]
+        ),
+        1,
+        '1 Associated fluxRuleUserData row'
+    );
 
     # Delete Rule1 and its associated Expressions
     $rule1->delete();
     is( $session->db->quickScalar('select count(*) from fluxRule'),       1, '1 Rules left to delete' );
     is( $session->db->quickScalar('select count(*) from fluxExpression'), 2, '2 Expressions left to delete' );
-    is( $session->db->quickScalar('select count(*) from fluxRuleUserData where fluxRuleId = ?', [$rule1->getId()]),       0, 'Associated fluxRuleUserData row deleted' );
+    is( $session->db->quickScalar(
+            'select count(*) from fluxRuleUserData where fluxRuleId = ?',
+            [ $rule1->getId() ]
+        ),
+        0,
+        'Associated fluxRuleUserData row deleted'
+    );
 
     $rule2->delete();
     is( $session->db->quickScalar('select count(*) from fluxRule'),       0, 'No Rules left to delete' );
@@ -320,8 +334,6 @@ $session->db->write('delete from fluxRuleUserData');
         'dateRuleFirstFalse not updated'
     );
 
-    # TODO: check access-related fields, once access-related logic implemented
-
     # Add a single expression to the rule
     $rule->addExpression(
         {   operand1     => 'TextValue',
@@ -339,8 +351,8 @@ $session->db->write('delete from fluxRuleUserData');
     $rule->update( { combinedExpression => 'not E1' } );
     ok( !$rule->evaluateFor( { user => $user, } ), q{false with explicit combined expression 'not E1'} );
 
-    # add a second expression to the Rule with a Modifier 
-    
+    # add a second expression to the Rule with a Modifier
+
     # Create a sample DateTime string, usually this would come from the db
     # and hence always be in UTC
     my $dt = DateTime->new(
@@ -354,34 +366,36 @@ $session->db->write('delete from fluxRuleUserData');
     );
     my $dbDateTime = WebGUI::DateTime->new( $dt->epoch() )->toDatabase();
     $rule->addExpression(
-        {   operand1     => 'DateTime',
-            operand1Args => qq[{"value":  "$dbDateTime"}],
-            operand1Modifier => 'DateTimeFormat',
+        {   operand1             => 'DateTime',
+            operand1Args         => qq[{"value":  "$dbDateTime"}],
+            operand1Modifier     => 'DateTimeFormat',
             operand1ModifierArgs => qq[{"pattern": "%x %X", "time_zone": "UTC"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "Oct 16, 1984 4:12:47 PM"}',
-            operator     => 'IsEqualTo',
+            operand2             => 'TextValue',
+            operand2Args         => '{"value":  "Oct 16, 1984 4:12:47 PM"}',
+            operator             => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{true with two expressions and no cE} );
     $rule->update( { combinedExpression => 'E1 and E2' } );
     ok( $rule->evaluateFor( { user => $user, } ), q{true with explicit combined expression 'E1 and E2'} );
     $rule->update( { combinedExpression => 'not(not E1 or not E2)' } );
-    ok( $rule->evaluateFor( { user => $user, } ), q{true with explicit combined expression 'not(not E1 or not E2)'} );
+    ok( $rule->evaluateFor( { user => $user, } ),
+        q{true with explicit combined expression 'not(not E1 or not E2)'} );
     $rule->update( { combinedExpression => '(not E1 or not E2)' } );
-    ok( !$rule->evaluateFor( { user => $user, } ), q{false with explicit combined expression '(not E1 or not E2)'} );
+    ok( !$rule->evaluateFor( { user => $user, } ),
+        q{false with explicit combined expression '(not E1 or not E2)'} );
     $rule->update( { combinedExpression => 'E1' } );
     ok( $rule->evaluateFor( { user => $user, } ), q{true with cE that doesn't mention E2 'E1'} );
 
     # add a third (false) expression with a combined expression
     $rule->addExpression(
-        {   operand1       => 'NumericValue',
-            operand1Args   => '{"value":  10}',
-            operand2       => 'NumericValue',
-            operand2Args   => '{"value":  5}',
-            operator       => 'IsLessThan',
+        {   operand1     => 'NumericValue',
+            operand1Args => '{"value":  10}',
+            operand2     => 'NumericValue',
+            operand2Args => '{"value":  5}',
+            operator     => 'IsLessThan',
         }
-    );    
+    );
     ok( !$rule->evaluateFor( { user => $user, } ), q{false with no cE bc E3 is false} );
     $rule->update( { combinedExpression => 'E1 AND E2' } );
     ok( $rule->evaluateFor( { user => $user, } ), q{true with cE that doesn't mention E3} );
@@ -419,6 +433,86 @@ $session->db->write('delete from fluxRuleUserData');
             q{evaluate takes exception to cE 'E1 AND E2 )'}
         );
     }
+}
+
+# Workflows
+my $test_group = WebGUI::Group->new( $session, 'new' );
+my $test_workflow = WebGUI::Workflow->create(
+    $session,
+    {   title       => 'Flux Test Workflow',
+        description => 'Flux Test Workflow',
+        enabled     => 1,
+    }
+);
+use WebGUI::Workflow::Activity::AddUserToGroup;
+{
+
+    # Use the AddUserToGroup Workflow as a Guinea pig to test onRuleFirstTrueWorkflowId..   
+    my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
+    $activity->set( 'groupId', $test_group->getId() );
+    ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
+    is_deeply( $test_workflow->getInstances, [], 'workflow has no instances (yet)' );
+
+    # Create a rule that will run AddUserToGroup on execution
+    my $rule = WebGUI::Flux::Rule->create($session);
+    $rule->update( { onRuleFirstTrueWorkflowId => $test_workflow->getId() } );
+    $rule->evaluateFor( { user => $user, } );
+
+    # Workflow should have completed in real-time and user should be a member of the new group
+    ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
+    
+    # Clean up
+    $activity->delete();
+}
+{
+    # Try again with onAccessTrueWorkflowId..
+    $test_group->delete();
+    $test_group = WebGUI::Group->new( $session, 'new' );
+    
+    my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
+    $activity->set( 'groupId', $test_group->getId() );
+    ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
+    is_deeply( $test_workflow->getInstances, [], 'workflow has no instances (yet)' );
+
+    # Create a rule that will run AddUserToGroup on execution
+    my $rule = WebGUI::Flux::Rule->create($session);
+    $rule->update( { onAccessTrueWorkflowId => $test_workflow->getId() } );
+    $rule->evaluateFor( { user => $user, } );
+
+    # Workflow should have completed in real-time and user should be a member of the new group
+    ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
+    
+    # Clean up
+    $activity->delete();
+}
+{
+    # Try again with onAccessFirstFalseWorkflowId..
+    $test_group->delete();
+    $test_group = WebGUI::Group->new( $session, 'new' );
+    
+    my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
+    $activity->set( 'groupId', $test_group->getId() );
+    ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
+    is_deeply( $test_workflow->getInstances, [], 'workflow has no instances (yet)' );
+
+    # Create a rule that will run AddUserToGroup on execution
+    my $rule = WebGUI::Flux::Rule->create($session);
+    $rule->addExpression( # Add an expression that will fail, kaaboom!
+        {   operand1     => 'TextValue',
+            operand1Args => '{"value":  "apples"}',
+            operand2     => 'TextValue',
+            operand2Args => '{"value":  "oranges"}',
+            operator     => 'IsEqualTo',
+        }
+    );
+    $rule->update( { onAccessFirstFalseWorkflowId => $test_workflow->getId() } );
+    $rule->evaluateFor( { user => $user, } );
+
+    # Workflow should have completed in real-time and user should be a member of the new group
+    ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
+    
+    # Clean up
+    $activity->delete();
 }
 
 #######################################################################
@@ -493,4 +587,6 @@ END {
     $session->db->write('delete from fluxRule');
     $session->db->write('delete from fluxExpression');
     $session->db->write('delete from fluxRuleUserData');
+    $test_group->delete();
+    $test_workflow->delete();
 }

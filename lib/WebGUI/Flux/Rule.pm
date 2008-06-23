@@ -9,6 +9,7 @@ use WebGUI::Flux::Expression;
 use Readonly;
 use WebGUI::DateTime;
 use English qw( -no_match_vars );
+use WebGUI::Workflow::Instance;
 
 =head1 NAME
 
@@ -202,28 +203,10 @@ sub delete {
     foreach my $expression ( @{ $self->getExpressions } ) {
         $expression->delete;
     }
-    $self->session->db->write('delete from fluxRuleUserData where fluxRuleId = ?', [$self->getId()]);
+    $self->session->db->write( 'delete from fluxRuleUserData where fluxRuleId = ?', [ $self->getId() ] );
     $self->session->db->deleteRow( 'fluxRule', 'fluxRuleId', $self->getId() );
     undef $self;
     return undef;
-}
-
-#-------------------------------------------------------------------
-
-=head2 formatCallbackForm ( callback )
-
-Returns an HTML hidden form field with the callback JSON block properly escaped.
-
-=head3 callback
-
-A JSON string that holds the callback information.
-
-=cut
-
-sub formatCallbackForm {
-    my ( $self, $callback ) = @_;
-    $callback =~ s/"/'/g;
-    return '<input type="hidden" name="callback" value="' . $callback . '" />';
 }
 
 #-------------------------------------------------------------------
@@ -388,13 +371,39 @@ The name of the Rule
 
 Whether authorisation on the Rule is sticky
 
+=head4 onRuleFirstTrueWorkflowId   
+
+Workflow to run when Rule first False
+
+=head4 onRuleFirstFalseWorkflowId
+
+Workflow to run when Rule first False
+
+=head4 onAccessFirstTrueWorkflowId 
+
+Workflow to run when Access first False
+
+=head4 onAccessFirstFalseWorkflowId
+
+Workflow to run when Access first False
+
+=head4 onAccessTrueWorkflowId      
+
+Workflow to run when Access True
+
+=head4 onAccessFalseWorkflowId
+
+Workflow to run when Access False
+
+=head4 sequenceNumber
+
+The Rule's order (defines its 'E' number)
+    
 =head4 combinedExpression
 
 The combined expression
 
 =cut
-
-# TODO: Add Workflows to POD documentation above
 
 sub update {
     my ( $self, $newProp_ref ) = @_;
@@ -421,183 +430,6 @@ sub update {
     }
     return $self->session->db->setRow( 'fluxRule', 'fluxRuleId', $property{$id} );
 }
-
-##-------------------------------------------------------------------
-#
-#=head2 www_deleteExpression ( )
-#
-#Deletes an expression from the Rule.
-#
-#=cut
-#
-#sub www_deleteExpression {
-#    my $self = shift;
-#    $self->getExpression($self->session->form->get("fluxExpressionId"))->delete;
-#    return $self->www_view;
-#}
-#
-##-------------------------------------------------------------------
-#
-#=head2 www_editExpression ()
-#
-#Allows a user to edit an expression in their Flux Rule.
-#
-#=cut
-#
-#sub www_editExpression {
-#    my ($self, $error) = @_;
-#    my $session = $self->session;
-#    my $form = $session->form;
-#    my $expression = eval{$self->getExpression($form->get("fluxExpressionId"))};
-#    if (WebGUI::Error->caught) {
-#        $expression = undef;
-#    }
-#    my %base = ();
-#    if (defined $expression) {
-#        %base = %{$expression->get};
-#    }
-#    my %var = (
-#        %base,
-#        error               => $error,
-#        formHeader          => WebGUI::Form::formHeader($session)
-#                                .WebGUI::Form::hidden($session, {name=>"flux", value=>"expression"})
-#                                .$self->formatCallbackForm($form->get('callback'))
-#                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editExpressionSave"})
-#                                .WebGUI::Form::hidden($session, {name=>"fluxExpressionId", value=>$form->get("fluxExpressionId")}),
-#        saveButton          => WebGUI::Form::submit($session),
-#        formFooter          => WebGUI::Form::formFooter($session),
-#        expression1Field       => WebGUI::Form::text($session, {name=>"expression1", maxlength=>35, defaultValue=>($form->get("expression1") || ((defined $expression) ? $expression->get('expression1') : undef))}),
-#        expression2Field       => WebGUI::Form::text($session, {name=>"expression2", maxlength=>35, defaultValue=>($form->get("expression2") || ((defined $expression) ? $expression->get('expression2') : undef))}),
-#        expression3Field       => WebGUI::Form::text($session, {name=>"expression3", maxlength=>35, defaultValue=>($form->get("expression3") || ((defined $expression) ? $expression->get('expression3') : undef))}),
-#        labelField          => WebGUI::Form::text($session, {name=>"label", maxlength=>35, defaultValue=>($form->get("label") || ((defined $expression) ? $expression->get('label') : undef))}),
-#        nameField           => WebGUI::Form::text($session, {name=>"name", maxlength=>35, defaultValue=>($form->get("name") || ((defined $expression) ? $expression->get('name') : undef))}),
-#        cityField           => WebGUI::Form::text($session, {name=>"city", maxlength=>35, defaultValue=>($form->get("city") || ((defined $expression) ? $expression->get('city') : undef))}),
-#        stateField          => WebGUI::Form::text($session, {name=>"state", maxlength=>35, defaultValue=>($form->get("state") || ((defined $expression) ? $expression->get('state') : undef))}),
-#        countryField        => WebGUI::Form::country($session, {name=>"country", defaultValue=>($form->get("country") || ((defined $expression) ? $expression->get('country') : undef))}),
-#        codeField           => WebGUI::Form::zipcode($session, {name=>"code", defaultValue=>($form->get("code") || ((defined $expression) ? $expression->get('code') : undef))}),
-#        phoneNumberField    => WebGUI::Form::phone($session, {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $expression) ? $expression->get('phoneNumber') : undef))}),
-#    );
-#    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("fluxExpressionTemplateId"));
-#    $template->prepare;
-#    return $session->style->userStyle($template->process(\%var));
-#}
-#
-#
-#
-##-------------------------------------------------------------------
-#
-#=head2 www_editExpressionSave ()
-#
-#Saves the expression. If there is a problem generates www_editExpression() with an error message. Otherwise returns www_view().
-#
-#=cut
-#
-#sub www_editExpressionSave {
-#    my $self = shift;
-#    my $form = $self->session->form;
-#    my $i18n = WebGUI::International->new($self->session,"Flux");
-#    if ($form->get("label") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('label')));
-#    }
-#    if ($form->get("name") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('name')));
-#    }
-#    if ($form->get("expression1") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('expression')));
-#    }
-#    if ($form->get("city") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('city')));
-#    }
-#    if ($form->get("code") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('code')));
-#    }
-#    if ($form->get("country") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('country')));
-#    }
-#    if ($form->get("phoneNumber") eq "") {
-#        return $self->www_editExpression(sprintf($i18n->get('is a required field'), $i18n->get('phone number')));
-#    }
-#    my %expressionData = (
-#        label           => $form->get("label"),
-#        name            => $form->get("name"),
-#        expression1        => $form->get("expression1"),
-#        expression2        => $form->get("expression2"),
-#        expression3        => $form->get("expression3"),
-#        city            => $form->get("city"),
-#        state           => $form->get("state"),
-#        code            => $form->get("code","zipcode"),
-#        country         => $form->get("country","country"),
-#        phoneNumber     => $form->get("phoneNumber","phone"),
-#        );
-#    if ($form->get('fluxExpressionId') eq '') {
-#        $self->addExpression(\%expressionData);
-#    }
-#    else {
-#        $self->getExpression($form->get('fluxExpressionId'))->update(\%expressionData);
-#    }
-#    return $self->www_view;
-#}
-#
-#
-##-------------------------------------------------------------------
-#
-#=head2 www_view
-#
-#Displays the current user's Flux Rule.
-#
-#=cut
-#
-#sub www_view {
-#    my $self = shift;
-#    my $session = $self->session;
-#    my $form = $session->form;
-#    my $callback = $form->get('callback');
-#    $callback =~ s/'/"/g;
-#    $callback = JSON->new->utf8->decode($callback);
-#    my $callbackForm = '';
-#    foreach my $param (@{$callback->{params}}) {
-#        $callbackForm .= WebGUI::Form::hidden($session, {name=>$param->{name}, value=>$param->{value}});
-#    }
-#    my $i18n = WebGUI::International->new($session, "Flux");
-#    my @expressions = ();
-#    foreach my $expression (@{$self->getExpressions}) {
-#        push(@expressions, {
-#            %{$expression->get},
-#            expression         => $expression->getHtmlFormatted,
-#            deleteButton    => WebGUI::Form::formHeader($session)
-#                                .WebGUI::Form::hidden($session, {name=>"flux", value=>"expression"})
-#                                .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteExpression"})
-#                                .WebGUI::Form::hidden($session, {name=>"fluxExpressionId", value=>$expression->getId})
-#                                .$self->formatCallbackForm($form->get('callback'))
-#                                .WebGUI::Form::submit($session, {value=>$i18n->get("delete")})
-#                                .WebGUI::Form::formFooter($session),
-#            editButton      => WebGUI::Form::formHeader($session)
-#                                .WebGUI::Form::hidden($session, {name=>"flux", value=>"expression"})
-#                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editExpression"})
-#                                .WebGUI::Form::hidden($session, {name=>"fluxExpressionId", value=>$expression->getId})
-#                                .$self->formatCallbackForm($form->get('callback'))
-#                                .WebGUI::Form::submit($session, {value=>$i18n->get("edit")})
-#                                .WebGUI::Form::formFooter($session),
-#            useButton       => WebGUI::Form::formHeader($session,{action=>$callback->{url}})
-#                                .$callbackForm
-#                                .WebGUI::Form::hidden($session, {name=>"fluxExpressionId", value=>$expression->getId})
-#                                .WebGUI::Form::submit($session, {value=>$i18n->get("use this expression")})
-#                                .WebGUI::Form::formFooter($session),
-#            });
-#    }
-#    my %var = (
-#        expressions => \@expressions,
-#        addButton => WebGUI::Form::formHeader($session)
-#                    .WebGUI::Form::hidden($session, {name=>"flux", value=>"expression"})
-#                    .WebGUI::Form::hidden($session, {name=>"method", value=>"editExpression"})
-#                    .$self->formatCallbackForm($form->get('callback'))
-#                    .WebGUI::Form::submit($session, {value=>$i18n->get("add a new expression")})
-#                    .WebGUI::Form::formFooter($session),
-#        );
-#    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("fluxRuleTemplateId"));
-#    $template->prepare;
-#    return $session->style->userStyle($template->process(\%var));
-#}
 
 #-------------------------------------------------------------------
 
@@ -679,7 +511,7 @@ sub evaluateFor {
             [ $self->getId(), $user->userId() ] );
 
         if ($dateRuleFirstTrue) {
-            WebGUI::Error::NotImplemented->throw( error => 'STICKY NOT IMPLEMENTED YET.' );
+            WebGUI::Error::NotImplemented->throw( error => 'STICKY OPTIMISATION NOT TESTED YET.' );
 
             return $self->_finishEvaluating( 1, $is_indirect );
         }
@@ -761,7 +593,7 @@ sub _finishEvaluating {
     my ( $self, $was_successful, $is_indirect ) = @_;
 
     # Update the fluxRuleUserData table
-    $self->_updateUserDataTable( $was_successful, $is_indirect );
+    $self->_updateDataAndTriggerWorkflows( $was_successful, $is_indirect );
 
     my $id = id $self;
     delete $evaluatingForUser{$id};
@@ -770,6 +602,7 @@ sub _finishEvaluating {
         $resolvedRuleCache{$id} = {};
         $unresolvedRuleCache{$id} = { $self->getId() => $self->getId() };
     }
+
     return $was_successful;
 }
 
@@ -859,15 +692,15 @@ sub _parseCombinedExpression {
 
 #-------------------------------------------------------------------
 
-=head2 _updateUserDataTable ( )
+=head2 _updateDataAndTriggerWorkflows ( )
 
 Updates the rule/user row in the fluxRuleUserData table after a Rule is
 evaluated. Uses the boolean outcome of the Rule (was_successful) and a
 flag indicating whether the Rule was directly/indirectly evaluated to
 determine which fields need to be updated (dateRuleFirstTrue, 
-dateAccessFirstTrue, etc..) 
+dateAccessFirstTrue, etc..).
 
-Returns the number of rows modified
+Also triggers any related Workflows.
 
 =head3 was_successful
 
@@ -879,7 +712,7 @@ Whether Rule evaluation was direct/indirect
 
 =cut
 
-sub _updateUserDataTable {
+sub _updateDataAndTriggerWorkflows {
     my ( $self, $was_successful, $is_indirect ) = @_;
 
     # Check arguments..
@@ -891,68 +724,95 @@ sub _updateUserDataTable {
         );
     }
 
-    my $user = $evaluatingForUser{ id $self};
-
     # Check for entry in fluxRuleUserData table
+    my $user     = $evaluatingForUser{ id $self};
     my %userData = %{
         $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
             [ $self->getId(), $user->userId() ] )
         };
 
+    # Most updates will involve setting datetime fields to now()
     my $dt = WebGUI::DateTime->new(time)->toDatabase();
-    my %rowUpdates;
-    $rowUpdates{fluxRuleUserDataId}
-        = exists $userData{fluxRuleUserDataId}
-        ? $userData{fluxRuleUserDataId}
-        : 'new';
-    $rowUpdates{dateRuleFirstChecked}
-        = exists $userData{dateRuleFirstChecked}
-        ? $userData{dateRuleFirstChecked}
-        : $dt;
 
-    if ($was_successful) {
-        $rowUpdates{dateRuleFirstTrue}
-            = exists $userData{dateRuleFirstTrue}
-            ? $userData{dateRuleFirstTrue}
-            : $dt;
+    # Along the way, keep track of..
+    my $db_write_required = 0;    # whether we need to write to the db
+    my %field_updates;            # what fields need to be updated
+    my %trigger_workflow;         # what workflows need to be triggered
+
+    # Has rule ever been checked for this user?
+    if ( !exists $userData{fluxRuleUserDataId} ) {
+        $db_write_required = 1;
+
+        # Create the basis of our new fluxRuleUserData row..
+        $field_updates{fluxRuleUserDataId}   = 'new';
+        $field_updates{fluxRuleId}           = $self->getId();
+        $field_updates{userId}               = $user->userId();
+        $field_updates{dateRuleFirstChecked} = $dt;
     }
-    else {
-        $rowUpdates{dateRuleFirstFalse}
-            = exists $userData{dateRuleFirstFalse}
-            ? $userData{dateRuleFirstFalse}
-            : $dt;
+
+    # First time Rule true or false?
+    if ( !exists $userData{dateRuleFirstTrue} && $was_successful ) {
+        $db_write_required                = 1;
+        $field_updates{dateRuleFirstTrue} = $dt;
+        $trigger_workflow{RuleFirstTrue}  = 1;
     }
+    if ( !exists $userData{dateRuleFirstFalse} && !$was_successful ) {
+        $db_write_required                 = 1;
+        $field_updates{dateRuleFirstFalse} = $dt;
+        $trigger_workflow{RuleFirstFalse}  = 1;
+    }
+
+    # Direct access attempt?
+    if ( !$is_indirect && $was_successful ) {
+        $db_write_required                         = 1;
+        $field_updates{dateAccessMostRecentlyTrue} = $dt;
+        $trigger_workflow{AccessTrue}              = 1;
+    }
+    if ( !$is_indirect && !$was_successful ) {
+        $db_write_required                          = 1;
+        $field_updates{dateAccessMostRecentlyFalse} = $dt;
+        $trigger_workflow{AccessFalse}              = 1;
+    }
+
+    # First direct access attempt?
+    if ( !exists $userData{dateAccessFirstAttempted} && !$is_indirect ) {
+        $db_write_required = 1;
+        $field_updates{dateAccessFirstAttempted} = $dt;
+    }
+
+    # First time direct access true/false?
     if ( !$is_indirect ) {
-        $rowUpdates{dateAccessFirstAttempted}
-            = exists $userData{dateAccessFirstAttempted}
-            ? $userData{dateAccessFirstAttempted}
-            : $dt;
-
-        if ($was_successful) {
-            $rowUpdates{dateAccessMostRecentlyTrue} = $dt;
-            $rowUpdates{dateAccessFirstTrue}
-                = exists $userData{dateAccessFirstTrue}
-                ? $userData{dateAccessFirstTrue}
-                : $dt;
+        if ( !exists $userData{dateAccessFirstTrue} && $was_successful ) {
+            $db_write_required                  = 1;
+            $field_updates{dateAccessFirstTrue} = $dt;
+            $trigger_workflow{AccessFirstTrue}  = 1;
         }
-        else {
-            $rowUpdates{dateAccessMostRecentlyFalse} = $dt;
-            $rowUpdates{dateAccessFirstFalse}
-                = exists $userData{dateAccessFirstFalse}
-                ? $userData{dateAccessFirstFalse}
-                : $dt;
+        if ( !exists $userData{dateAccessFirstFalse} && !$was_successful ) {
+            $db_write_required                   = 1;
+            $field_updates{dateAccessFirstFalse} = $dt;
+            $trigger_workflow{AccessFirstFalse}  = 1;
         }
-    }
-
-    # If this is a new row, also need to set fluxRuleId and userId..
-    if ( $rowUpdates{fluxRuleUserDataId} eq 'new' ) {
-        $rowUpdates{fluxRuleId} = $self->getId();
-        $rowUpdates{userId}     = $user->userId();
     }
 
     # Only write to the db if we have updates to make..
-    if ( scalar keys %rowUpdates > 0 ) {
-        return $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%rowUpdates );
+    if ($db_write_required) {
+        $self->session->db->setRow( 'fluxRuleUserData', 'fluxRuleUserDataId', \%field_updates );
     }
-    return 0;    # 0 rows modified
+
+    # Trigger any workflows that are needed..
+    foreach my $w ( keys %trigger_workflow ) {
+        my $full_workflow_name = 'on' . $w . 'WorkflowId';
+        if ( my $workflowId = $self->get($full_workflow_name) ) {
+
+            my $workflow = WebGUI::Workflow::Instance->create(
+                $self->session,
+                {   workflowId => $workflowId,
+                    className  => "WebGUI::User",
+                    methodName => "new",
+                    parameters => $evaluatingForUser{ id $self}->userId(),
+                }
+            );
+            $workflow->start();
+        }
+    }
 }
