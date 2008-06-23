@@ -10,6 +10,7 @@
    robust, moved from Asset->update to Asset->fixUrl.
  - fixed: Time tracker can't post time once it's been posted.
  - fixed: Shop: Product asset- image not showing
+ - fixed: User List- Missing Hover Help (Yung Han Khoe)
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly

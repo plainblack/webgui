@@ -25,6 +25,16 @@ our $I18N = {
                 message => q|The ID of the template used to display the UserList Asset.|,
                 lastUpdated => 1168897708,
         },
+
+        'template label' => {
+                message => q|UserList Template|,
+                lastUpdated => 1168897708,
+        },
+
+        'template description' => {
+                message => q|Choose a template for this UserList.|,
+                lastUpdated => 1168897708,
+        },
     
         'showGroupId' => {
                 message => q|Only users that are in this group will be shown.|,

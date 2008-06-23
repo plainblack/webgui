@@ -170,6 +170,8 @@ sub definition {
             defaultValue=>'UserListTmpl0000001',
 		    namespace=>'UserList',
     		tab=>"display",
+            hoverHelp=>$i18n->get("template description"),
+            label=>$i18n->get("template label"),
 	    },
 
         showGroupId=>{
