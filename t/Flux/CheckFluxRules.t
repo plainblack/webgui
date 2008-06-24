@@ -24,7 +24,7 @@ WebGUI::Error->Trace(1); # Turn on tracing of uncaught Exception::Class exceptio
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 3;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -39,7 +39,9 @@ $session->db->write('delete from fluxExpression');
 # Test Group
 my $group = WebGUI::Group->new( $session, 'new' );
 my $user1 = WebGUI::User->new( $session, 'new' );
+$user1->profileField('firstName', 'Alphonse');
 my $user2 = WebGUI::User->new( $session, 'new' );
+$user2->profileField('firstName', 'Mario');
 $group->addUsers([$user1->userId(), $user2->userId()]);
 
 # Workflow and Activity
@@ -56,10 +58,10 @@ $activity->set( 'groupId', $group->getId() );
 {
     my $rule = WebGUI::Flux::Rule->create($session);
     $rule->addExpression( # Add an expression that will fail, kaaboom!
-        {   operand1     => 'TextValue',
-            operand1Args => '{"value":  "apples"}',
+        {   operand1     => 'UserProfileField',
+            operand1Args => '{"field":  "firstName"}',
             operand2     => 'TextValue',
-            operand2Args => '{"value":  "oranges"}',
+            operand2Args => '{"value":  "Alphonse"}',
             operator     => 'IsEqualTo',
         }
     );
@@ -70,7 +72,10 @@ $activity->set( 'groupId', $group->getId() );
         0,
         'Initially no fluxRuleUserData row'
     );
+    
+    # Run the activity
     $activity->execute();
+    
     is( $session->db->quickScalar(
             'select count(*) from fluxRuleUserData where fluxRuleId = ?',
             [ $rule->getId() ]
@@ -78,9 +83,15 @@ $activity->set( 'groupId', $group->getId() );
         3,
         'Afterwards, 3 fluxRuleUserData rows (2 test users + admin)'
     );
+    
+    is( $session->db->quickScalar(
+            'select count(*) from fluxRuleUserData where fluxRuleId = ? and dateRuleFirstTrue is not null',
+            [ $rule->getId() ]
+        ),
+        1,
+        'Only Alphonse came back true'
+    );
 }
-
-# TODO: Once we have a user-profile based Operand, do more detailed checking of users post-activity execution
 
 #----------------------------------------------------------------------------
 # Cleanup

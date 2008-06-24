@@ -1,4 +1,4 @@
-# Tests WebGUI::Flux::Operand::NumericValue
+# Tests WebGUI::Flux::Operand::TruthValue
 #
 #
 
@@ -25,34 +25,32 @@ plan tests => 3;
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok('WebGUI::Flux::Operand::NumericValue');
+use_ok('WebGUI::Flux::Operand::TruthValue');
 $session->user( { userId => 1 } );
 my $user   = $session->user();
 
 
-# Not much to test here since NumericValue is really just the same as TextValue
+# Not much to test here since TruthValue is really just the same as TextValue
 # (the only difference is in the UI which we don't test)
 
 {
     # Test the raw output of this Operand via -Operand>evaluateUsing
     my $rule   = WebGUI::Flux::Rule->create($session);
-    is( WebGUI::Flux::Operand->evaluateUsing(
-            'NumericValue',
+    ok( WebGUI::Flux::Operand->evaluateUsing(
+            'TruthValue',
             {   rule => $rule,
-                args => { value => 3 }
+                args => { value => 1 }
             }
         ),
-        3,
-        q{3 == 3}
+        q{1 is boolean True (n...naw!)}
     );
-    is( WebGUI::Flux::Operand->evaluateUsing(
-            'NumericValue',
+    ok( !WebGUI::Flux::Operand->evaluateUsing(
+            'TruthValue',
             {   rule => $rule,
-                args => { value => 123 }
+                args => { value => 0 }
             }
         ),
-        '123',
-        q{123 == '123'}
+        q{0 is boolean False (say it ain't so!)}
     );
 }
 

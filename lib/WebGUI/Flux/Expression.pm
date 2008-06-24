@@ -194,26 +194,6 @@ sub get {
     return \%copyOfHashRef;
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 getHtmlFormatted ()
-#
-#Returns an HTML formatted expression for display.
-#
-#=cut
-#
-#sub getHtmlFormatted {
-#    my $self = shift;
-#    my $expression = $self->get("name") . "<br />" . $self->get("expression1") . "<br />";
-#    $expression .= $self->get("expression2") . "<br />" if ($self->get("expression2") ne "");
-#    $expression .= $self->get("expression3") . "<br />" if ($self->get("expression3") ne "");
-#    $expression .= $self->get("city") . ", ";
-#    $expression .= $self->get("state") . " " if ($self->get("state") ne "");
-#    $expression .= $self->get("code") if ($self->get("code") ne "");
-#    $expression .= '<br />' . $self->get("country");
-#    return $expression;
-#}
-
 #-------------------------------------------------------------------
 
 =head2 getId () 
@@ -302,9 +282,55 @@ The name of the Expression
 
 The Flux Rule that this expression belongs to.
 
-=cut
+=head4 operand1
 
-# TODO: Add other fields to POD documentation above
+The first operand
+
+=head4 operand1Args
+
+JSON-encoded args for the first operand
+
+=head4 operand1AssetId
+
+The assetId of the Wobject that the first operand is bound to  (optional)
+
+=head4 operand1Modifier
+
+First operand Modifier (optional)
+     
+=head4 operand1ModifierArgs
+
+First operand Modifier JSON-encoded args (optional)
+
+=head4 operand2
+
+The second operand
+
+=head4 operand2Args
+
+JSON-encoded args for the second operand
+
+=head4 operand2AssetId
+
+The assetId of the Wobject that the second operand is bound to  (optional)
+
+=head4 operand2Modifier
+
+Second operand Modifier (optional)
+     
+=head4 operand2ModifierArgs
+
+Second operand Modifier JSON-encoded args (optional)
+
+=head4 operator
+
+The operator
+
+=head4 sequenceNumber
+
+The Expression's sequence number (defines its 'e' number)
+    
+=cut
 
 sub update {
     my ( $self, $newProp_ref ) = @_;

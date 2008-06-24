@@ -179,12 +179,18 @@ sub evaluateUsing {
         );
     }
     
-    # Trim whitespace from operands..
-    # TODO: maybe this should be up to individual Operator modules?
-    $arg_ref->{operand1} =~ s/^\s+//;
-    $arg_ref->{operand1}=~ s/\s+$//;
-    $arg_ref->{operand2} =~ s/^\s+//;
-    $arg_ref->{operand2}=~ s/\s+$//;
+    # Do a little bit of pre-processing on the operands
+    foreach my $operand qw(operand1 operand2) {
+        
+        # Stringify undefs (to shut up warnings about unitialized strings)
+        if (!defined $arg_ref->{$operand}) {
+            $arg_ref->{$operand} = q{};
+        }
+        
+        # Trim whitespace
+        $arg_ref->{$operand} =~ s/^\s+|\s+$//g;
+    }
+    
 
      # The Operator module we are going to dynamically instantiate and evaluate
     my $operatorModule = "WebGUI::Flux::Operator::$operator";

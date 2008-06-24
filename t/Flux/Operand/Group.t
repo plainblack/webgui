@@ -1,4 +1,4 @@
-# Tests WebGUI::Flux::Operand::NumericValue
+# Tests WebGUI::Flux::Operand::FluxRule
 #
 #
 
@@ -25,35 +25,24 @@ plan tests => 3;
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok('WebGUI::Flux::Operand::NumericValue');
-$session->user( { userId => 1 } );
-my $user   = $session->user();
-
-
-# Not much to test here since NumericValue is really just the same as TextValue
-# (the only difference is in the UI which we don't test)
+use_ok('WebGUI::Flux::Operand::Group');
+my $user = WebGUI::User->new( $session, 'new' );
+my $group = WebGUI::Group->new( $session, 'new');
+my $groupId = $group->getId();
 
 {
-    # Test the raw output of this Operand via -Operand>evaluateUsing
-    my $rule   = WebGUI::Flux::Rule->create($session);
-    is( WebGUI::Flux::Operand->evaluateUsing(
-            'NumericValue',
-            {   rule => $rule,
-                args => { value => 3 }
-            }
-        ),
-        3,
-        q{3 == 3}
+    my $rule    = WebGUI::Flux::Rule->create($session);
+    $rule->addExpression(
+        {   operand1     => 'Group',
+            operand1Args => qq[{"groupId":  "$groupId"}],
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
+            operator     => 'IsEqualTo',
+        }
     );
-    is( WebGUI::Flux::Operand->evaluateUsing(
-            'NumericValue',
-            {   rule => $rule,
-                args => { value => 123 }
-            }
-        ),
-        '123',
-        q{123 == '123'}
-    );
+    ok( !$rule->evaluateFor( { user => $user, }), q{Mr User is not yet in our group} );
+    $user->addToGroups([$groupId]);
+    ok( $rule->evaluateFor( { user => $user, }), q{Now he's in!} );
 }
 
 #----------------------------------------------------------------------------
@@ -62,4 +51,6 @@ END {
     $session->db->write('delete from fluxRule');
     $session->db->write('delete from fluxExpression');
     $session->db->write('delete from fluxRuleUserData');
+    $user->delete() if $user;
+    $group->delete() if $group;
 }
