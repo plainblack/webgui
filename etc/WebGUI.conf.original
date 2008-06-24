@@ -239,7 +239,8 @@
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
 	"WebGUI::Asset::Wobject::Shelf", 
-	"WebGUI::Asset::Wobject::Thingy"
+	"WebGUI::Asset::Wobject::Thingy",
+    "WebGUI::Asset::Wobject::UserList"
     ],
 
 # Specify the list assets that are used for utility purposes only
