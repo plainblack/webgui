@@ -183,10 +183,10 @@ sub definition {
         },
         receiptEmailTemplateId => {
             fieldType       => 'template',
-            namespace       => "Shop/ReceiptEmail",
+            namespace       => "Shop/EmailReceipt",
             label           => $i18n->get("receipt email template"),
             hoverHelp       => $i18n->get("receipt email template help"),
-            defaultValue    => 'BMzuE91-XB8E-XGll1zpvA',
+            defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
         },
         saleNotificationGroupId => {
             fieldType       => 'group',
