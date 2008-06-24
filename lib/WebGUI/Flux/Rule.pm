@@ -449,7 +449,6 @@ A WebGUI::User object corresponding to the user who the Rule is being evaluated 
 
 The assetId of the asset/wobject for which the Rule is being evaluated for (optional) 
 
-
 =head4 indirect
 
 Indicates that this Rule is being evaluated as a result of another Rule
