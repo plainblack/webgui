@@ -21,7 +21,6 @@ use WebGUI::International;
 use WebGUI::VersionTag;
 use WebGUI::HTMLForm;
 use WebGUI::Paginator;
-use WebGUI::Operation::Spectre;
 
 =head1 NAME
 
@@ -61,7 +60,9 @@ sub canApproveVersionTag {
     my $tag         = shift;
     my $user        = shift || $session->user;
     my $instance    = $tag->getWorkflowInstance;
+    return 0 unless $instance;
     my $activity    = $instance->getNextActivity;
+    return 0 unless $activity;
     
     # Check if this person is in one of the allowed groups
     my $groupToApprove  = $activity->can( 'getGroupToApprove' )
@@ -303,20 +304,7 @@ sub www_commitVersionTag {
         return www_manageVersions( $session );
     }
     
-    # Make sure we can connect to SPECTRE
-    my $remote  = WebGUI::Operation::Spectre::getASpectre($session);
     my $i18n    = WebGUI::International->new($session, "VersionTag");
-    if (!defined $remote) {
-       $session->errorHandler->warn('Unable to connect to spectre.  Canceling the commit');
-       my $output = sprintf qq{<h1>%s</h1>\n<p>%s</p><p><a href="%s">%s</a>},
-           $i18n->get('broken spectre title', 'WebGUI'),
-           $i18n->get('broken spectre body',  'WebGUI'),
-           $session->url->getBackToSiteURL(),
-           $i18n->get('493', 'WebGUI');
-       return $session->style->userStyle($output);
-    }
-    $remote->disconnect;
-    
     # Build the page
     my $output  = '';
 
@@ -324,23 +312,35 @@ sub www_commitVersionTag {
     my $f = WebGUI::HTMLForm->new($session);
     $f->submit;
     $f->readOnly(
-            label=>$i18n->get("version tag name"),
-            hoverHelp=>$i18n->get("version tag name description commit"),
-            value=>$tag->get("name")
-            );
+        label     => $i18n->get("version tag name"),
+        hoverHelp => $i18n->get("version tag name description commit"),
+        value     => $tag->get("name")
+    );
     $f->hidden(
-            name=>"tagId",
-            value=>$session->form->param("tagId")
-            );
+        name  =>"tagId",
+        value =>$session->form->param("tagId")
+    );
     $f->hidden(
-            name=>"op",
-            value=>"commitVersionTagConfirm"
-            );
+        name  =>"op",
+        value =>"commitVersionTagConfirm"
+    );
     $f->textarea(
-            name=>"comments",
-            label=>$i18n->get("comments"),
-            hoverHelp=>$i18n->get("comments description commit")
-            );
+        name      => "comments",
+        label     => $i18n->get("comments"),
+        hoverHelp => $i18n->get("comments description commit")
+    );
+    $f->dateTime(
+        name      => "startTime",
+        label     => $i18n->get("startTime label"),
+        hoverHelp => $i18n->get("startTime hoverHelp")
+    );
+    $f->dateTime(
+        name      => "endTime",
+        label     => $i18n->get("endTime label"),
+        value     => WebGUI::DateTime->new($session,'2036-01-01 00:00:00')->epoch,
+        hoverHelp => $i18n->get("endTime hoverHelp")
+    );
+    
     $f->submit;
     $output .= $f->print;
     
@@ -409,7 +409,15 @@ sub www_commitVersionTagConfirm {
 		my $tag = WebGUI::VersionTag->new($session, $tagId);
 		if (defined $tag && $session->user->isInGroup($tag->get("groupToUse"))) {
 			my $i18n = WebGUI::International->new($session, "VersionTag");
-			$tag->set({comments=>$session->form->process("comments", "textarea")});
+			
+            my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
+            my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
+            
+            $tag->set({
+                comments  => $session->form->process("comments", "textarea"),
+                startTime => $startTime,
+                endTime   => $endTime
+            });
             my $message = $tag->requestCommit;
             my $error = "";
             if ($message) {
@@ -636,6 +644,15 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
+    elsif ( $session->form->get('action') eq "update" ) {
+        my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
+        my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
+        
+        $tag->set({
+            startTime => $startTime,
+            endTime   => $endTime
+        });
+    }
 
     my $output = "";
     # FIXME: Do we really need the workflowInstanceId? It's a property of the VersionTag...
@@ -679,6 +696,9 @@ sub www_manageRevisionsInTag {
             $output .= $comments;
     }
     
+    #Add the ability to change the start/end date
+     
+    
     # The options for tags to move to
     tie my %moveToTagOptions, 'Tie::IxHash', (
         "new"       => $i18n->get( "manageRevisionsInTag moveTo new" ),
@@ -691,6 +711,23 @@ sub www_manageRevisionsInTag {
         . WebGUI::Form::hidden( $session, { name => 'op', value=> 'manageRevisionsInTag' } )
         . WebGUI::Form::hidden( $session, { name => 'tagId', value => $tag->getId } )
         . '<table width="100%" class="content">'
+        . '<tr>'
+        . '<td colspan="5">'
+        . $i18n->get('startTime label').':&nbsp;'
+        . WebGUI::Form::dateTime($session, {
+            name  =>"startTime",
+            value => WebGUI::DateTime->new($session,$tag->get("startTime"))->epoch,
+        })
+        . '<br />'.$i18n->get('endTime label').':&nbsp;'
+        . WebGUI::Form::dateTime($session,{
+            name  =>"endTime",
+            value => WebGUI::DateTime->new($session,$tag->get("endTime"))->epoch,
+        })
+        . '<br />'
+        . '<button name="action" value="update">' . $i18n->get('manageRevisionsInTag update') . '</button>'
+        . '</td>'
+        . '</tr>'
+        . '<tr><td colspan="5">&nbsp;</td></tr>'
         . '<tr>'
         . '<td colspan="5">'
         . $i18n->get("manageRevisionsInTag with selected")

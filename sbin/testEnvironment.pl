@@ -19,9 +19,8 @@ BEGIN {
 use strict;
 use CPAN;
 use Getopt::Long;
+use Pod::Usage;
 
-
-print "\nWebGUI is checking your system environment:\n\n";
 
 my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
 
@@ -30,21 +29,9 @@ GetOptions(
 	'help'=>\$help
 );
 
-if ($help){
-        print <<STOP;
+pod2usage( verbose => 2 ) if $help;
 
-
-Usage: perl $0 
-
-Options:
-	
-   --help         Display this help message and exit.
-   --simpleReport Print a status report to stdout and do not upgrade any perl modules
-
-
-STOP
-        exit;
-}
+print "\nWebGUI is checking your system environment:\n\n";
 
 $prereq = 1;
 
@@ -67,66 +54,66 @@ if ($] >= 5.006) {
 }
 
 
-checkModule("LWP",5.80);
-checkModule("HTTP::Request",1.40);
-checkModule("HTTP::Headers",1.61);
-checkModule("Test::More",0.61,1);
-checkModule("Test::MockObject",1.02,1);
-checkModule("Test::Deep",0.095,1);
-checkModule("Pod::Coverage",0.17,2);
-checkModule("Text::Balanced",1.95,1);
-checkModule("Digest::MD5",2.20);
-checkModule("DBI",1.40);
-checkModule("DBD::mysql",3.0002);
-checkModule("HTML::Parser",3.36);
-checkModule("Archive::Tar",1.05);
-checkModule("Archive::Zip",1.16);
-checkModule("IO::Zlib",1.01);
-checkModule("Compress::Zlib",1.34);
-checkModule("Net::SMTP",2.24);
-checkModule("MIME::Tools",5.419);
-checkModule("Net::POP3",2.28);
-checkModule("Tie::IxHash",1.21);
-checkModule("Tie::CPHash",1.001);
-checkModule("XML::Simple",2.09);
-checkModule("SOAP::Lite",0.60);
-checkModule("DateTime",0.2901);
-checkModule("Time::HiRes",1.38);
-checkModule("DateTime::Format::Strptime",1.0601);
-checkModule("DateTime::Format::Mail",0.2901);
-checkModule("Image::Magick","6.0",2);
-checkModule("Graphics::Magick","1.1.7",2);
-checkModule("Log::Log4perl",0.51);
-checkModule("Net::LDAP",0.25);
-checkModule("HTML::Highlight",0.20);
-checkModule("HTML::TagFilter",0.07);
-checkModule("HTML::Template",2.9);
-checkModule("HTML::Template::Expr",0.05,2);
-checkModule("XML::RSSLite",0.11);
-checkModule("JSON",2.04);
-checkModule("Config::JSON","1.1.2");
-checkModule("Text::CSV_XS","0.26");
-checkModule("Net::Subnets",0.21);
-checkModule("Finance::Quote",1.08);
-checkModule("POE",0.3202);
-checkModule("POE::Component::IKC::Server",0.18);
-checkModule("POE::Component::Client::HTTP", 0.77);
-checkModule("Data::Structure::Util",0.11);
-checkModule("Apache2::Request",2.06);
-checkModule("URI::Escape","3.28");
-checkModule("POSIX");
-checkModule("List::Util");
-checkModule("Color::Calc");
-checkModule("Text::Aspell",0.01,2);
-checkModule("Locale::US");
-checkModule("Weather::Com::Finder","0.5.1");
-checkModule("Class::InsideOut","1.06");
-checkModule("HTML::TagCloud","0.34");
-checkModule("Image::ExifTool","7.00");
-checkModule("Archive::Any","0.093");
-checkModule("Path::Class", '0.16');
-checkModule("Exception::Class","1.23");
-checkModule("List::MoreUtils","0.22");
+checkModule("LWP",                          5.80         );
+checkModule("HTTP::Request",                1.40         );
+checkModule("HTTP::Headers",                1.61         );
+checkModule("Test::More",                   0.61,      1 );
+checkModule("Test::MockObject",             1.02,      1 );
+checkModule("Test::Deep",                   0.095,     1 );
+checkModule("Pod::Coverage",                0.17,      2 );
+checkModule("Text::Balanced",               1.95,      1 );
+checkModule("Digest::MD5",                  2.20         );
+checkModule("DBI",                          1.40         );
+checkModule("DBD::mysql",                   3.0002       );
+checkModule("HTML::Parser",                 3.36         );
+checkModule("Archive::Tar",                 1.05         );
+checkModule("Archive::Zip",                 1.16         );
+checkModule("IO::Zlib",                     1.01         );
+checkModule("Compress::Zlib",               1.34         );
+checkModule("Net::SMTP",                    2.24         );
+checkModule("MIME::Tools",                  5.419        );
+checkModule("Net::POP3",                    2.28         );
+checkModule("Tie::IxHash",                  1.21         );
+checkModule("Tie::CPHash",                  1.001        );
+checkModule("XML::Simple",                  2.09         );
+checkModule("SOAP::Lite",                   0.60         );
+checkModule("DateTime",                     0.2901       );
+checkModule("Time::HiRes",                  1.38         );
+checkModule("DateTime::Format::Strptime",   1.0601       );
+checkModule("DateTime::Format::Mail",       0.2901       );
+checkModule("Image::Magick",                "6.0",     2 );
+checkModule("Graphics::Magick",             "1.1.7",   2 );
+checkModule("Log::Log4perl",                0.51         );
+checkModule("Net::LDAP",                    0.25         );
+checkModule("HTML::Highlight",              0.20         );
+checkModule("HTML::TagFilter",              0.07         );
+checkModule("HTML::Template",               2.9          );
+checkModule("HTML::Template::Expr",         0.05,      2 );
+checkModule("XML::RSSLite",                 0.11         );
+checkModule("JSON",                         2.04         );
+checkModule("Config::JSON",                 "1.1.2"      );
+checkModule("Text::CSV_XS",                 "0.26"       );
+checkModule("Net::Subnets",                 0.21         );
+checkModule("Finance::Quote",               1.08         );
+checkModule("POE",                          0.3202       );
+checkModule("POE::Component::IKC::Server",  0.18         );
+checkModule("POE::Component::Client::HTTP", 0.77         );
+checkModule("Data::Structure::Util",        0.11         );
+checkModule("Apache2::Request",             2.06         );
+checkModule("URI::Escape",                  "3.28"       );
+checkModule("POSIX"                                      );
+checkModule("List::Util"                                 );
+checkModule("Color::Calc"                                );
+checkModule("Text::Aspell",                 0.01,2       );
+checkModule("Locale::US"                                 );
+checkModule("Weather::Com::Finder",         "0.5.1"      );
+checkModule("Class::InsideOut",             "1.06"       );
+checkModule("HTML::TagCloud",               "0.34"       );
+checkModule("Image::ExifTool",              "7.00"       );
+checkModule("Archive::Any",                 "0.093"      );
+checkModule("Path::Class",                  '0.16'       );
+checkModule("Exception::Class",             "1.23"       );
+checkModule("List::MoreUtils",              "0.22"       );
 
 
 ###################################
@@ -393,5 +380,46 @@ sub prompt {
         return $answer;
 }
 
+__END__
 
+=head1 NAME
 
+testEnvironment - Test Perl environment for proper WebGUI support.
+
+=head1 SYNOPSIS
+
+ testEnvironment --simpleReport
+
+ testEnvironment --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script tests the current Perl environment to make
+sure all of WebGUI's dependencies are satisfied. It also checks for
+proper installation of WebGUI's libraries.
+
+If any of the required Perl modules is not available or outdated, the
+script will ask if it should attempt installation using CPAN. This will
+only be possible if the script is being run as a superuser.
+
+The script will attempt to find out the latest available version from
+L<http://update.webgui.org>, and compare with the currently installed one.
+
+=over
+
+=item B<--simpleReport>
+
+Prints the status report to standard output, but does not attempt
+to upgrade any outdated or missing Perl modules.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

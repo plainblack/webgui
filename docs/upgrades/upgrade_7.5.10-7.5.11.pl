@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "../..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
@@ -16,9 +22,11 @@ use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::DateTime;
 use WebGUI::Asset::Sku::Product;
+use WebGUI::Asset::Wobject::EventManagementSystem;
 use WebGUI::Workflow;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Pluggable;
 use File::Find;
 use File::Spec;
 use File::Path;
@@ -51,7 +59,6 @@ convertTransactionLog($session);
 upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
-updateUsersOfProductMacro($session);
 deleteOldProductTemplates($session);
 addCaptchaToDataForm( $session );
 addArchiveEnabledToCollaboration( $session );
@@ -60,11 +67,215 @@ addCoupon( $session );
 addVendors($session);
 modifyThingyPossibleValues( $session );
 removeLegacyTable($session);
+addVersionStartEndDates($session);
 migrateSubscriptions( $session );
+updateUsersOfCommerceMacros($session);
+addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
+removeSqlForm($session);
+migratePaymentPlugins( $session );
+removeRecurringPaymentActivity( $session );
+addLoginMessage( $session );
+addNewApprovalActivities( $session );
+addUserListWobject( $session );
+addInheritUrlFromParent( $session );
+addDefaultFilesPerPage( $session );
+fixAdminConsoleTemplateTitles( $session );
+makeLongerAssetMetadataValues( $session );
+removeOldCommerceCode($session);
+convertDataForm( $session );
+#ensureCorrectDefaults( $session );
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub convertDataForm {
+    my $session = shift;
+    print "\tConverting DataForm configuration and data to JSON..." unless $quiet;
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN storeData INT(1) DEFAULT 1 },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN fieldConfiguration TEXT },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm` ADD COLUMN tabConfiguration TEXT },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` ADD COLUMN entryData TEXT },
+    );
+    my @dataforms = $session->db->buildArray("SELECT `assetId` FROM `asset` WHERE className='WebGUI::Asset::Wobject::DataForm'");
+    for my $assetId (@dataforms) {
+        my $dataForm = WebGUI::Asset->newPending($session, $assetId);
+        my @tabConfigs;
+        my $tabs = $session->db->read("SELECT * FROM DataForm_tab WHERE assetId=? ORDER BY sequenceNumber", [$assetId]);
+        while (my $tabData = $tabs->hashRef) {
+            my $newConfig = {
+                label   => $tabData->{label},
+                subtext => $tabData->{subtext},
+                tabId   => $tabData->{DataForm_tabId},
+            };
+            push @tabConfigs, $newConfig;
+        }
+        $tabs->finish;
+        my $tabJSON = encode_json( \@tabConfigs );
+
+        my @fieldConfigs;
+        my %fieldMapping;
+
+        my $fields = $session->db->read("SELECT * FROM `DataForm_field` WHERE assetId=? ORDER BY sequenceNumber", [$assetId]);
+        while (my $fieldData = $fields->hashRef) {
+            my $newConfig = {
+                name            => $fieldData->{name},
+                status          => $fieldData->{status},
+                type            => "\u$fieldData->{type}",
+                options         => $fieldData->{possibleValues},
+                defaultValue    => $fieldData->{defaultValue},
+                width           => $fieldData->{width},
+                subtext         => $fieldData->{subtext},
+                rows            => $fieldData->{rows},
+                isMailField     => $fieldData->{isMailField},
+                label           => $fieldData->{label},
+                tabId           => $fieldData->{DataForm_tabId} || undef,
+                vertical        => $fieldData->{vertical},
+                extras          => $fieldData->{extras},
+            };
+            $fieldMapping{ $fieldData->{DataForm_fieldId} } = $newConfig->{name};
+            push @fieldConfigs, $newConfig;
+        }
+        $fields->finish;
+        my $fieldJSON = encode_json( \@fieldConfigs );
+        my $entries = $session->db->read("SELECT * FROM `DataForm_entry` WHERE assetId=?", [$assetId]);
+        while (my $entryData = $entries->hashRef) {
+            my $newEntryFieldData = {};
+            my $entryFields = $session->db->read("SELECT * FROM `DataForm_entryData` WHERE assetId=? AND DataForm_entryId=?", [$assetId, $entryData->{DataForm_entryId}]);
+            while (my $entryFieldData = $entryFields->hashRef) {
+                $newEntryFieldData->{ $fieldMapping{ $entryFieldData->{DataForm_fieldId} } } = $entryFieldData->{value};
+            }
+            $entryFields->finish;
+            my $entryJSON = encode_json($newEntryFieldData);
+            $session->db->write("UPDATE `DataForm_entry` SET entryData=? WHERE assetId=? AND DataForm_entryId=?", [$entryJSON, $assetId, $entryData->{DataForm_entryId}]);
+        }
+        $entries->finish;
+        $dataForm->addRevision({fieldConfiguration => $fieldJSON, tabConfiguration => $tabJSON});
+    }
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` ADD COLUMN newDate DATETIME },
+    );
+    $session->db->write(
+        q{ UPDATE `DataForm_entry` SET newDate = FROM_UNIXTIME(submissionDate) },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` DROP COLUMN submissionDate },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `DataForm_entry` CHANGE COLUMN newDate submissionDate DATETIME },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_tab` },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_field` },
+    );
+    $session->db->write(
+        q{ DROP TABLE `DataForm_entryData` },
+    );
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add default files per page to the Gallery
+sub addDefaultFilesPerPage {
+    my $session     = shift;
+    print "\tAdding Default Files Per Page to Gallery... " unless $quiet;
+    $session->db->write( 
+        "ALTER TABLE Gallery ADD COLUMN defaultFilesPerPage INT"
+    );
+    $session->db->write(
+        "UPDATE Gallery SET defaultFilesPerPage=24"
+    );
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add two new approval activities
+sub addNewApprovalActivities {
+    my $session     = shift;
+    print "\tAdding new approval activities... " unless $quiet;
+
+    my $activities  = $session->config->get( "workflowActivities" );
+    push @{ $activities->{ 'WebGUI::VersionTag' } }, 
+        'WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup',
+        'WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage',
+        ;
+
+    $session->config->set( "workflowActivities", $activities );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the necessary settings and profile fields for the new login message
+sub addLoginMessage {
+    my $session     = shift;
+    print "\tAdding Login Message... " unless $quiet;
+
+    # Add some settings
+    my %settings    = ( 
+        showMessageOnLogin      => '0',
+        showMessageOnLoginTimes => '0',
+        showMessageOnLoginBody  => '',
+    );
+    for my $setting ( keys %settings ) {
+        $session->setting->add( $setting, $settings{ $setting } );
+    }
+
+    # Add a profile field
+    WebGUI::ProfileField->create( $session, 
+        'showMessageOnLoginSeen',
+        {
+            fieldType       => 'integer',
+            dataDefault     => '0',
+            visible         => '0',
+            editable        => '0',
+            protected       => '1',
+            required        => '0',
+            label           => 'WebGUI::International::get("showMessageOnLoginSeen","Auth");',
+        },
+    );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub removeSqlForm {
+    my $session = shift;
+    print "\tOptionally removing SQL Form...\n" unless $quiet;
+    my $db = $session->db;
+    unless ($db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::SQLForm'")) {
+        print "\t\tNot using it, so we're uninstalling it.\n" unless $quiet;
+        $session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::SQLForm");
+        my @ids = $db->buildArray("select distinct assetId from template where namespace like 'SQLForm%'");
+        push @ids, qw(GnrXtoFFeXia3vDQuSHojw k8vxD4fuKKf5cGwNTw0sLw);
+        foreach my $id (@ids) {
+            my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+            if (defined $asset) {
+                $asset->purge;
+            }
+        }
+        foreach my $table (qw(SQLForm_fieldDefinitions SQLForm SQLForm_fieldTypes SQLForm_regexes)) {
+            $db->write("drop table $table");
+        }
+        unlink ( $webguiRoot . '/lib/WebGUI/Asset/Wobject/SQLForm.pm' );
+        unlink ( $webguiRoot . '/lib/WebGUI/Help/Asset_SQLForm.pm' );
+        unlink ( $webguiRoot . '/lib/WebGUI/i18n/English/Asset_SQLForm.pm' );
+        unlink ( $webguiRoot . '/t/Asset/Wobject/SQLForm.t' );
+    } 
+    else {
+        print "\t\tThis site uses SQL Form, so we won't uninstall it.\n" unless $quiet;
+    }
+}
+   
 #----------------------------------------------------------------------------
 sub changeRealtimeWorkflows {
     my $session = shift;
@@ -130,7 +341,12 @@ sub addVendors {
         create table vendor (
             vendorId varchar(22) binary not null primary key,
             dateCreated datetime,
-            name varchar(255)
+            name varchar(255),
+            userId varchar(22) binary not null default '3',
+            preferredPaymentType varchar(255),
+            paymentInformation text,
+            paymentAddressId varchar(22) binary,
+            index userId (userId)
         )
         });
     $session->db->write(q{
@@ -251,8 +467,11 @@ sub upgradeEMS {
 	my $session = shift;
 	print "\tUpgrading Event Manager\n" unless ($quiet);
 	my $db = $session->db;
+	print "\t\tDeleting unused files in the extras directory.\n" unless ($quiet);
+    rmtree ( $webguiRoot . '/www/extras/wobject/EventManagementSystem' );
+
 	print "\t\tGetting rid of old templates.\n" unless ($quiet);
-	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
+	foreach my $namespace (qw(EventManagementSystem EventManagementSystem_checkout EventManagementSystem_managePurchas EventManagementSystem_product EventManagementSystem_viewPurchase EventManagementSystem_search emsbadgeprint emsticketprint)) {
 		my $templates = $db->read("select assetId from template where namespace=?",[$namespace]);
 		while (my ($id) = $templates->array) {
 			my $asset = WebGUI::Asset->new($session, $id,'WebGUI::Asset::Template');
@@ -394,6 +613,7 @@ sub upgradeEMS {
             my $ribbon = $ems->addChild({
                 className           => 'WebGUI::Asset::Sku::EMSRibbon',
                 title               => $ribbonData->{title},
+                url                 => $ribbonData->{title},
                 description         => $ribbonData->{description},
                 sku                 => $ribbonData->{sku},
                 price               => $ribbonData->{price},
@@ -408,6 +628,7 @@ sub upgradeEMS {
             my $badge = $ems->addChild({
                 className           => 'WebGUI::Asset::Sku::EMSBadge',
                 title               => $badgeData->{title},
+                url                 => $badgeData->{title},
                 description         => $badgeData->{description},
                 sku                 => $badgeData->{sku},
                 price               => $badgeData->{price},
@@ -417,7 +638,7 @@ sub upgradeEMS {
             $newBadges{$badge->getId} = $badgeData->{productId};
         }
     	print "\t\t\tMigrating old tickets for $emsId.\n" unless ($quiet);
-        my %metaFields = $db->buildHash("select fieldId,label from EventManagementSystem_metaField where assetId=? order by sequenceNumber",[$emsId]);
+        my %metaFields = $db->buildHash("select fieldId,label from EMSEventMetaField where assetId=? order by sequenceNumber",[$emsId]);
         my $ticketResults = $db->read("select * from EventManagementSystem_products left join products using (productId) where assetId=? and prerequisiteId<>''",[$emsId]);
         while (my $ticketData = $ticketResults->hashRef) {
             my %oldMetaData = $db->buildHash("select fieldId,fieldData from EventManagementSystem_metaData where productId=?",[$ticketData->{productId}]);
@@ -429,8 +650,9 @@ sub upgradeEMS {
             my $end =  WebGUI::DateTime->new($session, $ticketData->{endDate});
             my $duration = $end - $start;
             my $ticket = $ems->addChild({
-                className           => 'WebGUI::Asset::Sku::EMSBadge',
+                className           => 'WebGUI::Asset::Sku::EMSTicket',
                 title               => $ticketData->{title},
+                url                 => $ticketData->{title},
                 description         => $ticketData->{description},
                 sku                 => $ticketData->{sku},
                 price               => $ticketData->{price},
@@ -443,14 +665,33 @@ sub upgradeEMS {
             $oldTickets{$ticketData->{productId}} = $ticket->getId;
             $newTickets{$ticket->getId} = $ticketData->{productId};
         }
+    	print "\t\t\tMigrating old registrant tickets and registrant ribbons for $emsId.\n" unless ($quiet);
+        my %oldBadgeRegistrants = ();
+        my $regticResults = $db->read("select * from EventManagementSystem_registrations left join EventManagementSystem_products using (productId) where EventManagementSystem_registrations.assetId=?",[$emsId]);
+        while (my $registrantData = $regticResults->hashRef) {
+            my $id = $oldTickets{$registrantData->{productId}};
+            if ( $registrantData->{prerequisiteId} eq "") {
+                $oldBadgeRegistrants{$registrantData->{badgeId}} = $registrantData->{productId};
+            }
+            elsif ($id ne "") {
+                $db->write("replace into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
+                    [$registrantData->{badgeId}, $id]);
+            }
+            else {
+                my $id = $oldRibbons{$registrantData->{productId}};
+                if ($id ne "") {
+                    $db->write("replace into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
+                        [$registrantData->{badgeId}, $id]);
+                }
+            }
+        }
     	print "\t\t\tMigrating old registrants for $emsId.\n" unless ($quiet);
         my $registrantResults = $db->read("select * from EventManagementSystem_badges where assetId=?",[$emsId]);
         while (my $registrantData = $registrantResults->hashRef) {
             $db->setRow("EMSRegistrant","badgeId",{
                 badgeId             => "new",
                 userId              => $registrantData->{userId},
-                badgeNumber         => $registrantData->{badgeId},
-                badgeAssetId        => $oldBadges{$registrantData->{badgeId}},
+                badgeAssetId        => $oldBadges{$oldBadgeRegistrants{$registrantData->{badgeId}}},
                 emsAssetId          => $emsId,
                 name                => $registrantData->{firstName}.' '.$registrantData->{lastName},
                 address1            => $registrantData->{address},
@@ -462,22 +703,6 @@ sub upgradeEMS {
                 email               => $registrantData->{email},
                 purchaseComplete    => 1,
                 },$registrantData->{badgeId});
-        }
-    	print "\t\t\tMigrating old registrant tickets and registrant ribbons for $emsId.\n" unless ($quiet);
-        my $regticResults = $db->read("select * from EventManagementSystem_registrations where assetId=?",[$emsId]);
-        while (my $registrantData = $regticResults->hashRef) {
-            my $id = $oldTickets{$registrantData->{productId}};
-            if ($id ne "") {
-                $db->write("insert into EMSRegistrantTicket (badgeId,ticketAssetId,purchaseComplete) values (?,?,1)",
-                    [$registrantData->{badgeId}, $id]);
-            }
-            else {
-                my $id = $oldRibbons{$registrantData->{productId}};
-                if ($id ne "") {
-                    $db->write("insert into EMSRegistrantRibbon (badgeId,ribbonAssetId) values (?,?)",
-                        [$registrantData->{badgeId}, $id]);
-                }
-            }
         }
     }
     $db->write("drop table EventManagementSystem_badges");
@@ -505,7 +730,7 @@ sub convertTransactionLog {
 		orderNumber int not null auto_increment unique,
 		transactionCode varchar(100),
 		statusCode varchar(35),
-		statusMessage varchar(100),
+		statusMessage varchar(255),
 		userId varchar(22) binary not null,
 		username varchar(35) not null,
 		amount float,
@@ -570,6 +795,7 @@ sub convertTransactionLog {
     my $transactionResults = $db->read("select * from oldtransaction order by initDate");
     while (my $oldTranny = $transactionResults->hashRef) {
         my $date = WebGUI::DateTime->new($session, $oldTranny->{initDate});
+        my $u = WebGUI::User->new($session, $oldTranny->{userId});
         $db->setRow("transaction","transactionId",{
             transactionId       => "new",
             isSuccessful        => (($oldTranny->{status} eq "Completed") ? 1 : 0),
@@ -580,11 +806,27 @@ sub convertTransactionLog {
             username            => WebGUI::User->new($session, $oldTranny->{userId})->username,
             amount              => $oldTranny->{amount},
             shippingPrice       => $oldTranny->{shippingCost},
+            shippingAddress1    => $u->profileField('homeAddress'),
+            shippingCity        => $u->profileField('homeCity'),
+            shippingState       => $u->profileField('homeState'),
+            shippingCode        => $u->profileField('homeZip'),
+            shippingCountry     => $u->profileField('homeCountry'),
+            shippingAddressName => $u->profileField('firstName').' '.$u->profileField('lastName'),
+            shippingPhoneNumber => $u->profileField('homePhone'),
+            paymentAddress1     => $u->profileField('homeAddress'),
+            paymentCity         => $u->profileField('homeCity'),
+            paymentState        => $u->profileField('homeState'),
+            paymentCode         => $u->profileField('homeZip'),
+            paymentCountry      => $u->profileField('homeCountry'),
+            paymentAddressName  => $u->profileField('firstName').' '.$u->profileField('lastName'),
+            paymentPhoneNumber  => $u->profileField('homePhone'),
             dateOfPurchase      => $date->toDatabase,
             isRecurring         => $oldTranny->{recurring},
             }, $oldTranny->{transactionId});
             my $itemResults = $db->read("select * from oldtransactionitem where transactionId=?",[$oldTranny->{transactionId}]);
             while (my $oldItem = $itemResults->hashRef) {
+                my $status = $oldItem->{shippingStatus};
+                $status = 'NotShipped' if $status eq 'NotSent';
                 $db->setRow("transactionItem","itemId",{
                     itemId                  => "new",
                     transactionId           => $oldItem->{transactionId},
@@ -592,7 +834,7 @@ sub convertTransactionLog {
                     options                 => '{}',
                     shippingTrackingNumber  => $oldTranny->{trackingNumber},
                     orderStatus             => $oldTranny->{shippingStatus},
-                    lastUpdated             => $oldTranny->{completionDate},
+                    lastUpdated             => $date->toDatabase,
                     quantity                => $oldItem->{quantity},
                     price                   => $oldItem->{amount},
                     vendorId                => "defaultvendor000000000",
@@ -815,6 +1057,7 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
+    $session->db->write('alter table Product add column   thankYouMessage mediumtext');
     $session->db->write('alter table Product add column     accessoryJSON mediumtext');
     $session->db->write('alter table Product add column       benefitJSON mediumtext');
     $session->db->write('alter table Product add column       featureJSON mediumtext');
@@ -946,6 +1189,7 @@ sub mergeProductsWithCommerce {
         my $sku = $productFolder->addChild({
             className   => 'WebGUI::Asset::Sku::Product',
             title       => $productData->{title},
+            url         => $productData->{title},
             sku         => $productData->{sku},
             description => $productData->{description},
         }, $productData->{productId});
@@ -985,6 +1229,7 @@ sub mergeProductsWithCommerce {
                 $shortdesc .= sprintf('%s:%s,', $parameter, $value);
             }
             $shortdesc =~ s/,$//; ##tidy up and clip to 30 chars
+            $shortdesc = $productData->{title} unless $shortdesc;
             $shortdesc = substr $shortdesc, 0, 30;
 
             my $variant;
@@ -1009,96 +1254,120 @@ sub mergeProductsWithCommerce {
 #-------------------------------------------------
 sub removeOldCommerceCode {
 	my $session = shift;
-    unlink '../../lib/WebGUI/Asset/Wobject/Product.pm';
+    	print "\tRemoving old commerce code.\n" unless ($quiet);
 
-    rmtree '../../lib/WebGUI/Commerce.pm';
-    unlink '../../lib/WebGUI/Product.pm';
-    unlink '../../lib/WebGUI/Subscription.pm';
+    my $setting = $session->setting;
+    $setting->remove('groupIdAdminProductManager'); 
+    $setting->remove('groupIdAdminSubscription'); 
+    $setting->remove('groupIdAdminTransactionLog'); 
+    my $config = $session->config;
+    unlink ($webguiRoot . '/lib/WebGUI/Asset/Wobject/Product.pm') ;
 
-    unlink '../../lib/WebGUI/Macro/Product.pm';
-    unlink '../../lib/WebGUI/Help/Macro_Product.pm';
-    unlink '../../lib/WebGUI/i18n/English/Macro_Product.pm';
+    rmtree ($webguiRoot . '/lib/WebGUI/Commerce') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/TransactionLog.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentCash.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentCheck.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommercePaymentITransact.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingByPrice.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingByWeight.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/CommerceShippingPerTransaction.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Workflow_Activity_CacheEMSPrereqs.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Workflow_Activity_ProcessRecurringPayments.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Workflow/Activity/ProcessRecurringPayments.pm') ;
+    $session->db->write("delete from WorkflowActivity where className='WebGUI::Workflow::Activity::ProcessRecurringPayments'");
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Macro_Product.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Macro_Product.pm') ;
+    unlink ($webguiRoot . '/t/Macro/Product.t') ;
 
-    unlink '../../lib/WebGUI/Operation/ProductManager.pm';
-    unlink '../../lib/WebGUI/Help/ProductManager.pm';
-    unlink '../../lib/WebGUI/i18n/English/ProductManager.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Macro/SubscriptionItemPurchaseUrl.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Macro_SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Macro_SubscriptionItem.pm') ;
+    unlink ($webguiRoot . '/t/Macro/SubscriptionItem.t') ;
+    unlink ($webguiRoot . '/t/Macro/SubscriptionItemPurchaseUrl.t') ;
 
-    unlink '../../lib/WebGUI/Operation/Commerce.pm';
-    unlink '../../lib/WebGUI/Help/Commerce.pm';
-    unlink '../../lib/WebGUI/i18n/English/Commerce.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/ProductManager.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/ProductManager.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/ProductManager.pm') ;
 
-    unlink '../../lib/WebGUI/Operation/Subscription.pm';
-    unlink '../../lib/WebGUI/Help/Subscription.pm';
-    unlink '../../lib/WebGUI/i18n/English/Subscription.pm';
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Commerce.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Commerce.pm') ;
+
+    unlink ($webguiRoot . '/lib/WebGUI/Operation/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/Help/Subscription.pm') ;
+    unlink ($webguiRoot . '/lib/WebGUI/i18n/English/Subscription.pm') ;
+
+    unlink ($webguiRoot . '/www/extras/adminConsole/subscriptions.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/small/subscriptions.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/productManager.gif') ;
+    unlink ($webguiRoot . '/www/extras/adminConsole/small/productManager.gif') ;
+
+    ##Delete unused templates
+    my $templates = $session->db->read("select distinct(assetId) from template where namespace like 'Commerce%'",[]);
+    while (my $hash = $templates->hashRef) {
+        my $template = WebGUI::Asset->newByDynamicClass($session, $hash->{assetId});
+        $template->purge;
+    }
+
+    ##Drop commerce specific tables;
+    $session->db->write('drop table commerceSettings');
 
     #Disable the Product macro in the config file.  You can't use the convenience method
     #deleteFromHash since the macro name is in the value, not the key.
-    my %macros = %{ $session->config->get('macros') };
+    my %macros = %{ $config->get('macros') };
     foreach (my ($key, $value) = each %macros) {
         delete $macros{$key} if $value eq 'Product';
+        delete $macros{$key} if $value eq 'SubscriptionItem';
+        delete $macros{$key} if $value eq 'SubscriptionItemPurchaseUrl';
     }
-    $session->config->set('macros', \%macros);
+    $config->set('macros', \%macros);
+    $config->deleteFromArray('assets','WebGUI::Asset::Wobject::Product');
     return 1;
 }
 
 
 #-------------------------------------------------
-sub updateUsersOfProductMacro {
+sub updateUsersOfCommerceMacros {
 	my $session = shift;
-	print "\tUpdate assets which might be using the Product macro.\n" unless ($quiet);
-    my $wobjSth = $session->db->read('select assetId, revisionDate, description from wobject order by assetId, revisionDate');
-    my $fixed   = $session->db->prepare('update wobject set description=? where  assetId=? and revisionDate=?');
-    while (my $wobject = $wobjSth->hashRef) {
-        while ($wobject->{description} =~ m/\^Product\('? ([^),']+) /xg) {
-            #printf "\t\tWorking on %s\n", $wobject->{assetId};
-            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            #printf "\t\t\tFound argument of %s\n", $identifier;
-            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            #printf "\t\t\tsku assetId: %s\n", $assetId;
-            my $productAssetId = $assetId ? $assetId : $identifier;
-            $wobject->{description} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            #printf "\t\t\tUpdated description to%s\n", $wobject->{description};
-            $fixed->execute([ $wobject->{description}, $wobject->{assetId}, $wobject->{revisionDate}, ]);
-        }
-    }
-    $wobjSth->finish;
-    $fixed->finish;
+	print "\tUpdate assets which might be using the Product and SubscriptionItem macros.\n" unless ($quiet);
+    my $db = $session->db;
+    my %tables = (
+        wobject     => 'description',
+        snippet     => 'snippet',
+        template    => 'template',
+        Post        => 'content',
+        );
 
-    my $snipSth = $session->db->read('select assetId, revisionDate, snippet from snippet order by assetId, revisionDate');
-       $fixed   = $session->db->prepare('update snippet set snippet=? where  assetId=? and revisionDate=?');
-    while (my $snippet = $snipSth->hashRef) {
-        while ($snippet->{snippet} =~ m/\^Product\('? ([^),']+) /xg) {
-            #printf "\t\tWorking on %s\n", $snippet->{assetId};
-            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            #printf "\t\t\tFound argument of %s\n", $identifier;
-            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            #printf "\t\t\tsku assetId: %s\n", $assetId;
-            my $productAssetId = $assetId ? $assetId : $identifier;
-            $snippet->{snippet} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            #printf "\t\t\tUpdated snippet to%s\n", $snippet->{snippet};
-            $fixed->execute([ $snippet->{snippet}, $snippet->{assetId}, $snippet->{revisionDate}, ]);
+    foreach my $table (keys %tables) {
+        print "\t\tUpdating ".$table."s.\n" unless ($quiet);
+        my $sth = $db->read('select assetId, revisionDate, '.$tables{$table}.' from '.$table.' order by assetId, revisionDate');
+        while (my ($id, $rev, $content) = $sth->array) {
+            my $fixed = $content;
+            # handle normal subscription item
+            $fixed =~ s{\^SubscriptionItem\(([A-Za-z0-9_-]{22})\);}{^AssetProxy($1,assetId);}xg;
+            # handle one with an optional template id attached
+            $fixed =~ s{\^SubscriptionItem\(([A-Za-z0-9_-]{22}),[A-Za-z0-9_-]{22}\);}{^AssetProxy($1,assetId);}xg;
+            # handle product macros
+            while ($fixed =~ m/\^Product\('? ([^),']+) /xg) {
+                #printf "\t\tWorking on %s\n", $id;
+                my $identifier = $1;  ##If this is a product sku, need to look up by productId;
+                #printf "\t\t\tFound argument of %s\n", $identifier;
+                my $assetId = $db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
+                #printf "\t\t\tsku assetId: %s\n", $id;
+                my $productAssetId = $assetId ? $assetId : $identifier;
+                $fixed =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId,assetId)/x;
+                #printf "\t\t\tUpdated ".$tables{$table}." to%s\n", $fixed;
+            }
+            if ($fixed ne $content) {
+                $db->write('update '.$table.' set '.$tables{$table}.'=? where  assetId=? and revisionDate=?', [$fixed, $id, $rev]);
+            }
         }
     }
-    $snipSth->finish;
-    $fixed->finish;
-
-    my $tempSth = $session->db->read('select assetId, revisionDate, template from template order by assetId, revisionDate');
-       $fixed   = $session->db->prepare('update template set template=? where  assetId=? and revisionDate=?');
-    while (my $template = $tempSth->hashRef) {
-        while ($template->{template} =~ m/\^Product\('? ([^),']+) /xg) {
-            #printf "\t\tWorking on %s\n", $template->{assetId};
-            my $identifier = $1;  ##If this is a product sku, need to look up by productId;
-            #printf "\t\t\tFound argument of %s\n", $identifier;
-            my $assetId = $session->db->quickScalar('select distinct(assetId) from sku where sku=?',[$identifier]);
-            #printf "\t\t\tsku assetId: %s\n", $assetId;
-            my $productAssetId = $assetId ? $assetId : $identifier;
-            $template->{template} =~ s/\^Product\( [^)]+ \)/^AssetProxy($productAssetId)/x;
-            #printf "\t\t\tUpdated template to%s\n", $template->{template};
-            $fixed->execute([ $template->{template}, $template->{assetId}, $template->{revisionDate}, ]);
-        }
-    }
-    $tempSth->finish;
-    $fixed->finish;
 
     return 1;
 }
@@ -1147,19 +1416,125 @@ sub removeLegacyTable {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addVersionStartEndDates {
+    my $session = shift;
+    print "\tAdding Start and End times to Version Tags..." unless ($quiet);
+    $session->db->write("alter table assetVersionTag add startTime datetime default NULL");
+    $session->db->write("alter table assetVersionTag add endTime datetime default NULL");
+    
+    #Add default start and end times to existing version tags
+    my $now        = $session->datetime->time();
+    my $startTime  = WebGUI::DateTime->new($session,$now)->toDatabase;
+    my $endTime    = WebGUI::DateTime->new($session,'2036-01-01 00:00:00')->toDatabase;
+    $session->db->write("update assetVersionTag set startTime=?, endTime=?",[$startTime,$endTime]);
+    
+    my $activity    = $session->config->get( "workflowActivities" );
+    push @{ $activity->{"WebGUI::VersionTag"} }, 'WebGUI::Workflow::Activity::WaitUntil';
+    $session->config->set( "workflowActivities", $activity );
+    
+    #Update the Workflows
+    tie my %commitWithApproval, 'Tie::IxHash';
+    %commitWithApproval = (
+        pbwfactivity0000000017 => {
+        	className  =>"WebGUI::Workflow::Activity::RequestApprovalForVersionTag",
+                properties => {
+                groupToApprove => '4',
+                message        => 'A new version tag awaits your approval.',
+                doOnDeny       => 'pbworkflow000000000006',
+                title          => 'Get Approval from Content Managers'
+            },
+        },
+        vtagactivity0000000001 => {
+            className  =>"WebGUI::Workflow::Activity::WaitUntil",
+            properties => {
+                type        => 'startTime',
+                title       => 'Wait Until',
+            	description => 'This workflow waits until the value chosen in the "Wait Until" field has passed and then continues'
+            }
+        },
+        pbwfactivity0000000016 => {
+            className  => "WebGUI::Workflow::Activity::CommitVersionTag",
+            properties => {
+                title  => 'Commit Assets'
+            }
+        },
+        pbwfactivity0000000018 => {
+            className  => "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
+            properties => {
+                title   => 'Notify Committer of Approval',
+                message => 'Your version tag was approved.',
+                who     => 'committer',
+            }
+        }
+    );
 
+    #Commit without approval workflow
+    tie my %commitWithoutApproval, 'Tie::IxHash';
+    %commitWithoutApproval = (
+        vtagactivity0000000002 => {
+            className  =>"WebGUI::Workflow::Activity::WaitUntil",
+            properties => {
+                type        => 'startTime',
+                title       => 'Wait Until',
+                description => 'This workflow waits until the value chosen in the "Wait Until" field has passed and then continues'
+            }
+        },
+        pbwfactivity0000000006 => {
+        	className  => "WebGUI::Workflow::Activity::CommitVersionTag",
+            properties => {
+                title      => 'Commit Assets',
+                trashAfter => '2592000',
+            }
+        },
+    );
+
+    #Build a hash of the two workflows - kinda ugly but insures we preserve order
+    my $workflows = {
+        "pbworkflow000000000005"=>\%commitWithApproval,
+        "pbworkflow000000000003"=>\%commitWithoutApproval
+    };
+
+
+    foreach my $workflowId (keys %{$workflows}) {
+       #instantiate the workflow
+        my $workflow = WebGUI::Workflow->new($session, $workflowId);
+    
+        #Skip it if the workflow activity doesn't exist for some reason
+        next unless (defined $workflow);
+	
+        #delete all the existing activities in the workflow
+        my $activities = $workflow->getActivities;
+        foreach my $activity (@{$activities}) {
+            $workflow->deleteActivity ($activity->get("activityId"));
+        }
+	
+        #Re-add the activities in the proper order
+        my $activityHashRef = $workflows->{$workflowId};
+        foreach my $activityId (keys %{$activityHashRef}) {
+            my $activity = $workflow->addActivity($activityHashRef->{$activityId}->{className},$activityId);
+        	my $properties = $activityHashRef->{$activityId}->{properties};
+            foreach my $property (keys %{$properties}) {
+                $activity->set($property,$properties->{$property});
+            }
+        }
+    }
+    
+    print "Done.\n" unless $quiet;
+    
+}
 
 #-------------------------------------------------
 sub migrateSubscriptions {
     my $session = shift;
-    print "\tMigrating subscriptions to the new commerce system..." unless ($quiet);
+    print "\tMigrating subscriptions to the new commerce system...\n" unless ($quiet);
 
     # Check if codes are tied to multiple subscriptions.
     my ($hasDoubles) = $session->db->buildArray(
         'select count(*) as cnt from subscriptionCodeSubscriptions group by code order by cnt desc'
     );
     print "\n\t\t!!WARNING: There are subscription codes that link to multiple subscriptions!!"
-        ." Please refer to gotcha.txt!\n" if $hasDoubles > 1;
+        ." Please refer to gotcha.txt!\n" if $hasDoubles > 1 && !$quiet;
 
     # Rename old subscription table so we can reuse it for the Sku
     $session->db->write('alter table subscription rename to Subscription_OLD');
@@ -1217,7 +1592,7 @@ EOSQL3
     });
 
     # Migrate all subscriptions
-    print "\t\tConverting subscriptions to assets:\n";
+    print "\t\tConverting subscriptions to assets:\n" unless $quiet;
     my $subscriptions = $session->db->read( 'select * from Subscription_OLD' );
     while (my $subscription = $subscriptions->hashRef) {
         # Don't migrate deleted subscriptions
@@ -1228,6 +1603,7 @@ EOSQL3
             {
                 className               => 'WebGUI::Asset::Sku::Subscription',
                 ownerUserId             => 3,
+                isHidden                => 1,
                 url                     => 'subscriptions/'.$subscription->{ description },
                 menuTitle               => $subscription->{ description             },
                 title                   => $subscription->{ description             },
@@ -1260,7 +1636,7 @@ EOSQL3
     );
 
     # Migrate subscription codes batch by batch
-    print "\t\tMigrating subscription codes.\n";
+    print "\t\tMigrating subscription codes.\n" unless $quiet;
     my @batches = $session->db->buildArray('select distinct batchId from subscriptionCodeBatch');
     foreach my $batchId ( @batches ) {
         my $subscriptionId;
@@ -1323,7 +1699,7 @@ EOSQL3
 
             # Log and print migration info
             $session->errorHandler->warn( $message );
-            print $message;
+            print $message unless $quiet;
         }
         else {
             $subscriptionId = $session->db->quickScalar(
@@ -1359,10 +1735,1204 @@ EOSQL3
             ]
         );
     }
+    print "\t\tAdding subscriptions to the config file:\n" unless $quiet;
+    $session->config->addToArray('assets', 'WebGUI::Asset::Sku::Subscription');
 
-    print "\tDone.\n";
+    print "\tDone.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addDBLinkAccessToSQLMacro {
+    my $session = shift;
+    print "\tAdding DBLink access to SQL Macro ..." unless ($quiet);
+    $session->db->write("insert into databaseLink (databaseLinkId, allowMacroAccess) values ('0','1')");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub migratePaymentPlugins {
+    my $session = shift;
+    print "\tMigrating WebGUI default commerce plugins..." unless $quiet;
+
+    foreach my $namespace (qw{ Cash ITransact }) {
+        # Get properties from old plugin
+        my $properties = $session->db->buildHashRef(
+            'select fieldName, fieldValue from commerceSettings where type=\'Payment\' and namespace=?',
+            [
+                $namespace,
+            ]
+        );
+
+        # And set new properties
+        $properties->{ groupToUse               } = $properties->{ whoCanUse };
+        $properties->{ receiptEmailTemplateId   } = 'BMzuE91-XB8E-XGll1zpvA';
+
+        # Create paydriver instance
+        my $plugin =  
+         WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
+                $session, 
+                $properties->{ label } || $namespace || 'Credit Card',
+                $properties
+            ])
+        ;
+
+        # Print warning message for ITransact users that they must change their postback url
+        if ( $namespace eq 'ITransact' && $properties->{ vendorId } ) {
+            print "\n\t\t!!CAUTION!!: The postback url for ITransact has changed. Please log in to your virtual "
+                ."terminal and change the postback url to:\n\n\t\t"
+                .'https://'.$session->config->get("sitename")->[0]
+                .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$plugin->getId."\n\t";
+        }
+    }
+
+    print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub removeRecurringPaymentActivity {
+    my $session = shift;
+    print "\tRemoving the recurring payment workflow activity..." unless $quiet;
+
+    my $activities = $session->config->get( 'workflowActivities' );
+
+    my $none = $activities->{ None };
+    $activities->{ None } = [ grep { !/^WebGUI::Workflow::Activity::ProcessRecurringPayments$/ } @{ $none } ];
+    
+    $session->config->set( 'workflowActivities', $activities );
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+
+sub addUserListWobject {
+    my $session = shift;
+    print "\tInstall UserList wobject.\n" unless ($quiet);
+    $session->db->write("create table UserList (
+            assetId varchar(22) not null,
+            revisionDate bigint(20),
+            templateId varchar(22),
+            showGroupId varchar(22),
+            hideGroupId varchar(22),
+            usersPerPage int(11),
+            alphabet text,
+            alphabetSearchField varchar(128),
+            showOnlyVisibleAsNamed int(11),
+            sortBy varchar(128),
+            sortOrder varchar(4),
+            overridePublicEmail int(11),
+            overridePublicProfile int(11),
+        PRIMARY KEY  (`assetId`,`revisionDate`)
+    )");
+    $session->config->addToArray("assets","WebGUI::Asset::Wobject::UserList");
+
+}
+
+#----------------------------------------------------------------------------
+# Add the inheritUrlFromParent property for all assets
+sub addInheritUrlFromParent {
+    my $session = shift;
+    print "\tAdding inheritUrlFromParent flag for all assets..." unless $quiet;
+    $session->db->write('alter table assetData add column inheritUrlFromParent int(11) not null default 0');
+    print "DONE!\n" unless $quiet;
+}
+   
+#----------------------------------------------------------------------------
+sub fixAdminConsoleTemplateTitles {
+    my $session = shift;
+    print "\tMaking unique title for admin console templates... " unless $quiet;
+    my $ac = WebGUI::Asset->newByDynamicClass($session, 'PBtmpl0000000000000137');
+    $ac->update({title => 'Admin Console Style'});
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Make longer asset metadata values
+sub makeLongerAssetMetadataValues {
+    my $session     = shift;
+    print "\tLengthening asset metadata values to 255 characters... " unless $quiet;
+    $session->db->write(
+        q{ ALTER TABLE `metaData_properties` CHANGE COLUMN defaultValue defaultValue VARCHAR(255) },
+    );
+    $session->db->write(
+        q{ ALTER TABLE `metaData_values` CHANGE COLUMN value value VARCHAR(255) },
+    );
+    print "DONE!\n" unless $quiet;
+}
+
+sub ensureCorrectDefaults {
+    my $session = shift;
+    print "\tEnsuring correct database defaults..." unless $quiet;
+    my $sql = <<'END_SQL';
+
+ALTER TABLE `Article`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600',
+  MODIFY `storageId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `Calendar`
+  MODIFY `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
+  MODIFY `visitorCacheTimeout` int(11) unsigned DEFAULT NULL,
+  MODIFY `workflowIdCommit` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `Collaboration`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `postGroupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `canStartThreadGroupId` varchar(22) NOT NULL DEFAULT '2',
+  MODIFY `karmaPerPost` int(11) NOT NULL DEFAULT '0',
+  MODIFY `collaborationTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `threadTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `postFormTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `searchTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `notificationTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `sortBy` varchar(35) NOT NULL DEFAULT 'assetData.revisionDate',
+  MODIFY `sortOrder` varchar(4) NOT NULL DEFAULT 'desc',
+  MODIFY `usePreview` int(11) NOT NULL DEFAULT '1',
+  MODIFY `addEditStampToPosts` int(11) NOT NULL DEFAULT '0',
+  MODIFY `editTimeout` int(11) NOT NULL DEFAULT '3600',
+  MODIFY `attachmentsPerPost` int(11) NOT NULL DEFAULT '0',
+  MODIFY `filterCode` varchar(30) NOT NULL DEFAULT 'javascript',
+  MODIFY `useContentFilter` int(11) NOT NULL DEFAULT '1',
+  MODIFY `threads` int(11) NOT NULL DEFAULT '0',
+  MODIFY `views` int(11) NOT NULL DEFAULT '0',
+  MODIFY `replies` int(11) NOT NULL DEFAULT '0',
+  MODIFY `rating` int(11) NOT NULL DEFAULT '0',
+  MODIFY `lastPostId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `archiveAfter` int(11) NOT NULL DEFAULT '31536000',
+  MODIFY `postsPerPage` int(11) NOT NULL DEFAULT '10',
+  MODIFY `threadsPerPage` int(11) NOT NULL DEFAULT '30',
+  MODIFY `subscriptionGroupId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `allowReplies` int(11) NOT NULL DEFAULT '0',
+  MODIFY `displayLastReply` int(11) NOT NULL DEFAULT '0',
+  MODIFY `richEditor` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
+  MODIFY `karmaRatingMultiplier` int(11) NOT NULL DEFAULT '0',
+  MODIFY `karmaSpentToRate` int(11) NOT NULL DEFAULT '0',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `avatarsEnabled` int(11) NOT NULL DEFAULT '0',
+  MODIFY `approvalWorkflow` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
+  MODIFY `threadApprovalWorkflow` varchar(22) NOT NULL DEFAULT 'pbworkflow000000000003',
+  MODIFY `defaultKarmaScale` int(11) NOT NULL DEFAULT '1',
+  MODIFY `getMail` int(11) NOT NULL DEFAULT '0',
+  MODIFY `getMailInterval` int(11) NOT NULL DEFAULT '300',
+  MODIFY `getMailCronId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
+  MODIFY `autoSubscribeToThread` int(11) NOT NULL DEFAULT '1',
+  MODIFY `requireSubscriptionForEmailPosting` int(11) NOT NULL DEFAULT '1',
+  MODIFY `thumbnailSize` int(11) NOT NULL DEFAULT '0',
+  MODIFY `maxImageSize` int(11) NOT NULL DEFAULT '0',
+  MODIFY `enablePostMetaData` int(11) NOT NULL DEFAULT '0',
+  MODIFY `useCaptcha` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Dashboard`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `adminsGroupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '4',
+  MODIFY `usersGroupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'DashboardViewTmpl00001',
+  MODIFY `isInitialized` tinyint(3) unsigned NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `DataForm`
+  MODIFY `mailData` int(11) NOT NULL DEFAULT '1',
+  MODIFY `emailTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `acknowlegementTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `listTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `defaultView` int(11) NOT NULL DEFAULT '0',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `groupToViewEntries` varchar(22) NOT NULL DEFAULT '7'
+;
+
+ALTER TABLE `DataForm_entry`
+  MODIFY `DataForm_entryId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `EMSBadge`
+  MODIFY `price` float NOT NULL DEFAULT '0',
+  MODIFY `seatsAvailable` int(11) NOT NULL DEFAULT '100'
+;
+
+ALTER TABLE `EMSEventMetaField`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `EMSRegistrant`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `transactionItemId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `EMSRegistrantRibbon`
+  MODIFY `transactionItemId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `EMSRegistrantTicket`
+  MODIFY `transactionItemId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `EMSRibbon`
+  MODIFY `percentageDiscount` float NOT NULL DEFAULT '10',
+  MODIFY `price` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `EMSTicket`
+  MODIFY `price` float NOT NULL DEFAULT '0',
+  MODIFY `seatsAvailable` int(11) NOT NULL DEFAULT '100',
+  MODIFY `duration` float NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `EMSToken`
+  MODIFY `price` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Event`
+  MODIFY `timeZone` varchar(255) character set utf8 collate utf8_bin DEFAULT 'America/Chicago'
+;
+
+ALTER TABLE `EventManagementSystem`
+  MODIFY `groupToApproveEvents` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `timezone` varchar(30) NOT NULL DEFAULT 'America/Chicago',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2rC4ErZ3c77OJzJm7O5s3w',
+  MODIFY `badgeBuilderTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'BMybD3cEnmXVk2wQ_qEsRQ',
+  MODIFY `lookupRegistrantTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'OOyMH33plAy6oCj_QWrxtg',
+  MODIFY `printBadgeTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PsFn7dJt4wMwBa8hiE3hOA',
+  MODIFY `printTicketTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'yBwydfooiLvhEFawJb0VTQ'
+;
+
+ALTER TABLE `FileAsset`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `storageId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `filename` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `FlatDiscount`
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '63ix2-hU0FchXGIWkG3tow',
+  MODIFY `mustSpend` float NOT NULL DEFAULT '0',
+  MODIFY `percentageDiscount` int(3) NOT NULL DEFAULT '0',
+  MODIFY `priceDiscount` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Folder`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600',
+  MODIFY `sortAlphabetically` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Gallery`
+  MODIFY `groupIdAddComment` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `groupIdAddFile` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `richEditIdComment` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdAddArchive` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdDeleteAlbum` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdDeleteFile` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdEditAlbum` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdEditFile` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdListAlbums` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdListAlbumsRss` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdListFilesForUser` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdListFilesForUserRss` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdMakeShortcut` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdSearch` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdViewSlideshow` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdViewThumbnails` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdViewAlbum` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdViewAlbumRss` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdViewFile` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `workflowIdCommit` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `templateIdEditComment` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `richEditIdAlbum` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `richEditIdFile` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `GalleryAlbum`
+  MODIFY `assetIdThumbnail` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `GalleryFile_comment`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `HttpProxy`
+  MODIFY `cookieJarStorageId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '0',
+  MODIFY `useAmpersand` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `ITransact_recurringStatus`
+  MODIFY `gatewayId` varchar(128) NOT NULL DEFAULT '',
+  MODIFY `initDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `lastTransaction` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `status` varchar(10) NOT NULL DEFAULT '',
+  MODIFY `recipe` varchar(15) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `ImageAsset`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `thumbnailSize` int(11) NOT NULL DEFAULT '50',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `InOutBoard`
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `reportViewerGroup` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `inOutGroup` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `inOutTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'IOB0000000000000000001',
+  MODIFY `reportTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'IOB0000000000000000002',
+  MODIFY `paginateAfter` int(11) NOT NULL DEFAULT '50',
+  MODIFY `reportPaginateAfter` int(11) NOT NULL DEFAULT '50'
+;
+
+ALTER TABLE `Layout`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Matrix`
+  MODIFY `detailTemplateId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `compareTemplateId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `searchTemplateId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `ratingDetailTemplateId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `maxComparisons` int(11) NOT NULL DEFAULT '10',
+  MODIFY `maxComparisonsPrivileged` int(11) NOT NULL DEFAULT '10',
+  MODIFY `privilegedGroup` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `groupToRate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `ratingTimeout` int(11) NOT NULL DEFAULT '31536000',
+  MODIFY `ratingTimeoutPrivileged` int(11) NOT NULL DEFAULT '31536000',
+  MODIFY `groupToAdd` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `Matrix_field`
+  MODIFY `fieldId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `category` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `Matrix_listing`
+  MODIFY `listingId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `maintainerId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `forumId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `views` int(11) NOT NULL DEFAULT '0',
+  MODIFY `compares` int(11) NOT NULL DEFAULT '0',
+  MODIFY `clicks` int(11) NOT NULL DEFAULT '0',
+  MODIFY `status` varchar(30) NOT NULL DEFAULT 'pending',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `approvalMessageId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `storageId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `Matrix_listingData`
+  MODIFY `listingId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `fieldId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `Matrix_rating`
+  MODIFY `timeStamp` int(11) NOT NULL DEFAULT '0',
+  MODIFY `rating` int(11) NOT NULL DEFAULT '1',
+  MODIFY `listingId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `Matrix_ratingSummary`
+  MODIFY `listingId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `category` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `MessageBoard`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `visitorCacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `MultiSearch`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'MultiSearchTmpl0000001',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `Navigation`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `descendantEndPoint` int(11) NOT NULL DEFAULT '55',
+  MODIFY `showSystemPages` int(11) NOT NULL DEFAULT '0',
+  MODIFY `showHiddenPages` int(11) NOT NULL DEFAULT '0',
+  MODIFY `showUnprivilegedPages` int(11) NOT NULL DEFAULT '0',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `ancestorEndPoint` int(11) NOT NULL DEFAULT '55',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Newsletter`
+  MODIFY `newsletterTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'newsletter000000000001',
+  MODIFY `mySubscriptionsTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'newslettersubscrip0001'
+;
+
+ALTER TABLE `Newsletter_subscriptions`
+  MODIFY `lastTimeSent` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `PM_project`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `projectManager` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `percentComplete` float NOT NULL DEFAULT '0',
+  MODIFY `parentId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `projectObserver` varchar(22) character set utf8 collate utf8_bin DEFAULT '7'
+;
+
+ALTER TABLE `PM_task`
+  MODIFY `parentId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1',
+  MODIFY `taskType` enum('timed','progressive','milestone') NOT NULL DEFAULT 'timed'
+;
+
+ALTER TABLE `PM_wobject`
+  MODIFY `projectDashboardTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0001',
+  MODIFY `projectDisplayTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0002',
+  MODIFY `ganttChartTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0003',
+  MODIFY `editTaskTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0004',
+  MODIFY `groupToAdd` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `resourcePopupTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0005',
+  MODIFY `resourceListTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'ProjectManagerTMPL0006'
+;
+
+ALTER TABLE `Photo_rating`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `Poll`
+  MODIFY `active` int(11) NOT NULL DEFAULT '1',
+  MODIFY `graphWidth` int(11) NOT NULL DEFAULT '150',
+  MODIFY `karmaPerVote` int(11) NOT NULL DEFAULT '0',
+  MODIFY `randomizeAnswers` int(11) NOT NULL DEFAULT '0',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Poll_answer`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `Post`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `threadId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `views` int(11) NOT NULL DEFAULT '0',
+  MODIFY `contentType` varchar(35) NOT NULL DEFAULT 'mixed',
+  MODIFY `storageId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `rating` int(11) NOT NULL DEFAULT '0',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Post_rating`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `ipAddress` varchar(15) NOT NULL DEFAULT '',
+  MODIFY `rating` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Product`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `RSSCapable`
+  MODIFY `rssCapableRssEnabled` int(11) NOT NULL DEFAULT '1',
+  MODIFY `rssCapableRssTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PBtmpl0000000000000142',
+  MODIFY `rssCapableRssFromParentId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `RichEdit`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `askAboutRichEdit` int(11) NOT NULL DEFAULT '0',
+  MODIFY `preformatted` int(11) NOT NULL DEFAULT '0',
+  MODIFY `editorWidth` int(11) NOT NULL DEFAULT '0',
+  MODIFY `editorHeight` int(11) NOT NULL DEFAULT '0',
+  MODIFY `sourceEditorWidth` int(11) NOT NULL DEFAULT '0',
+  MODIFY `sourceEditorHeight` int(11) NOT NULL DEFAULT '0',
+  MODIFY `useBr` int(11) NOT NULL DEFAULT '0',
+  MODIFY `nowrap` int(11) NOT NULL DEFAULT '0',
+  MODIFY `removeLineBreaks` int(11) NOT NULL DEFAULT '0',
+  MODIFY `npwrap` int(11) NOT NULL DEFAULT '0',
+  MODIFY `directionality` char(3) NOT NULL DEFAULT 'ltr',
+  MODIFY `toolbarLocation` varchar(6) NOT NULL DEFAULT 'bottom',
+  MODIFY `enableContextMenu` int(11) NOT NULL DEFAULT '0',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `inlinePopups` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `SQLForm_fieldOrder`
+  MODIFY `assetId` varchar(22) NOT NULL DEFAULT '',
+  MODIFY `fieldId` varchar(22) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `SQLReport`
+  MODIFY `paginateAfter` int(11) NOT NULL DEFAULT '50',
+  MODIFY `debugMode` int(11) NOT NULL DEFAULT '0',
+  MODIFY `databaseLinkId1` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `databaseLinkId2` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `databaseLinkId3` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `databaseLinkId4` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `databaseLinkId5` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Shelf`
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'nFen0xjkZn8WkpM93C9ceQ'
+;
+
+ALTER TABLE `Shortcut`
+  MODIFY `overrideTitle` int(11) NOT NULL DEFAULT '0',
+  MODIFY `overrideDescription` int(11) NOT NULL DEFAULT '0',
+  MODIFY `overrideTemplate` int(11) NOT NULL DEFAULT '0',
+  MODIFY `overrideDisplayTitle` int(11) NOT NULL DEFAULT '0',
+  MODIFY `overrideTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `shortcutByCriteria` int(11) NOT NULL DEFAULT '0',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `shortcutToAssetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `disableContentLock` int(11) NOT NULL DEFAULT '0',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `showReloadIcon` tinyint(3) unsigned NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Shortcut_overrides`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `fieldName` varchar(255) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `StockData`
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'StockListTMPL000000001',
+  MODIFY `displayTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'StockListTMPL000000002'
+;
+
+ALTER TABLE `Subscription`
+  MODIFY `templateId` varchar(22) NOT NULL DEFAULT '',
+  MODIFY `price` float NOT NULL DEFAULT '0',
+  MODIFY `subscriptionGroup` varchar(22) NOT NULL DEFAULT '2',
+  MODIFY `duration` varchar(12) NOT NULL DEFAULT 'Monthly'
+;
+
+ALTER TABLE `Subscription_OLD`
+  MODIFY `subscriptionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `subscriptionGroup` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `duration` varchar(12) NOT NULL DEFAULT 'Monthly'
+;
+
+ALTER TABLE `Subscription_code`
+  MODIFY `status` varchar(10) NOT NULL DEFAULT 'Unused'
+;
+
+ALTER TABLE `Survey`
+  MODIFY `groupToTakeSurvey` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `groupToViewReports` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `anonymous` char(1) NOT NULL DEFAULT '0',
+  MODIFY `questionsPerPage` int(11) NOT NULL DEFAULT '1',
+  MODIFY `responseTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `overviewTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `maxResponsesPerUser` int(11) NOT NULL DEFAULT '1',
+  MODIFY `questionsPerResponse` int(11) NOT NULL DEFAULT '9999999',
+  MODIFY `gradebookTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Survey_answer`
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_questionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_answerId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1',
+  MODIFY `gotoQuestion` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `isCorrect` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Survey_question`
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_questionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1',
+  MODIFY `allowComment` int(11) NOT NULL DEFAULT '0',
+  MODIFY `randomizeAnswers` int(11) NOT NULL DEFAULT '0',
+  MODIFY `Survey_sectionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `Survey_questionResponse`
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_questionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_answerId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_responseId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `dateOfResponse` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Survey_response`
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_responseId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `startDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `endDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `isComplete` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Survey_section`
+  MODIFY `Survey_id` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `Survey_sectionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `SyndicatedContent`
+  MODIFY `maxHeadlines` int(11) NOT NULL DEFAULT '0',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `displayMode` varchar(20) NOT NULL DEFAULT 'interleaved',
+  MODIFY `hasTerms` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `TT_projectList`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `TT_projectResourceList`
+  MODIFY `resourceId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `TT_report`
+  MODIFY `reportComplete` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `TT_wobject`
+  MODIFY `userViewTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000001',
+  MODIFY `managerViewTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000002',
+  MODIFY `timeRowTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'TimeTrackingTMPL000003',
+  MODIFY `pmAssetId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `groupToManage` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `pmIntegration` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Thingy_things`
+  MODIFY `thingsPerPage` int(11) NOT NULL DEFAULT '25'
+;
+
+ALTER TABLE `Thread`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `replies` int(11) NOT NULL DEFAULT '0',
+  MODIFY `lastPostId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `isLocked` int(11) NOT NULL DEFAULT '0',
+  MODIFY `isSticky` int(11) NOT NULL DEFAULT '0',
+  MODIFY `subscriptionGroupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `karma` int(11) NOT NULL DEFAULT '0',
+  MODIFY `karmaScale` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `Thread_read`
+  MODIFY `threadId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `UserList`
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `WSClient`
+  MODIFY `uri` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `proxy` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `preprocessMacros` int(11) NOT NULL DEFAULT '0',
+  MODIFY `paginateAfter` int(11) NOT NULL DEFAULT '50',
+  MODIFY `debugMode` int(11) NOT NULL DEFAULT '0',
+  MODIFY `execute_by_default` tinyint(4) NOT NULL DEFAULT '1',
+  MODIFY `decodeUtf8` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  MODIFY `sharedCache` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  MODIFY `cacheTTL` smallint(5) unsigned NOT NULL DEFAULT '60',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `WeatherData`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) unsigned NOT NULL DEFAULT '0',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WeatherDataTmpl0000001'
+;
+
+ALTER TABLE `WikiMaster`
+  MODIFY `groupToEditPages` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '2',
+  MODIFY `groupToAdminister` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `richEditor` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PBrichedit000000000002',
+  MODIFY `frontPageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiFrontTmpl000000001',
+  MODIFY `pageTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiPageTmpl0000000001',
+  MODIFY `pageEditTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiPageEditTmpl000001',
+  MODIFY `recentChangesTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiRCTmpl000000000001',
+  MODIFY `mostPopularTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiMPTmpl000000000001',
+  MODIFY `pageHistoryTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiPHTmpl000000000001',
+  MODIFY `searchTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiSearchTmpl00000001',
+  MODIFY `recentChangesCount` int(11) NOT NULL DEFAULT '50',
+  MODIFY `recentChangesCountFront` int(11) NOT NULL DEFAULT '10',
+  MODIFY `mostPopularCount` int(11) NOT NULL DEFAULT '50',
+  MODIFY `mostPopularCountFront` int(11) NOT NULL DEFAULT '10',
+  MODIFY `thumbnailSize` int(11) NOT NULL DEFAULT '0',
+  MODIFY `maxImageSize` int(11) NOT NULL DEFAULT '0',
+  MODIFY `approvalWorkflow` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'pbworkflow000000000003',
+  MODIFY `byKeywordTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'WikiKeyword00000000001',
+  MODIFY `allowAttachments` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `WikiPage`
+  MODIFY `views` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `isProtected` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `Workflow`
+  MODIFY `title` varchar(255) NOT NULL DEFAULT 'Untitled',
+  MODIFY `enabled` int(11) NOT NULL DEFAULT '0',
+  MODIFY `type` varchar(255) NOT NULL DEFAULT 'None',
+  MODIFY `mode` varchar(20) NOT NULL DEFAULT 'parallel'
+;
+
+ALTER TABLE `WorkflowActivity`
+  MODIFY `title` varchar(255) NOT NULL DEFAULT 'Untitled',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `WorkflowInstance`
+  MODIFY `priority` int(11) NOT NULL DEFAULT '2'
+;
+
+ALTER TABLE `WorkflowSchedule`
+  MODIFY `title` varchar(255) NOT NULL DEFAULT 'Untitled',
+  MODIFY `enabled` int(11) NOT NULL DEFAULT '0',
+  MODIFY `runOnce` int(11) NOT NULL DEFAULT '0',
+  MODIFY `minuteOfHour` varchar(25) NOT NULL DEFAULT '0',
+  MODIFY `hourOfDay` varchar(25) NOT NULL DEFAULT '*',
+  MODIFY `dayOfMonth` varchar(25) NOT NULL DEFAULT '*',
+  MODIFY `monthOfYear` varchar(25) NOT NULL DEFAULT '*',
+  MODIFY `dayOfWeek` varchar(25) NOT NULL DEFAULT '*',
+  MODIFY `priority` int(11) NOT NULL DEFAULT '2'
+;
+
+ALTER TABLE `ZipArchiveAsset`
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `showPage` varchar(255) NOT NULL DEFAULT 'index.html'
+;
+
+ALTER TABLE `adSpace`
+  MODIFY `costPerImpression` decimal(11,2) NOT NULL DEFAULT '0.00',
+  MODIFY `minimumImpressions` int(11) NOT NULL DEFAULT '1000',
+  MODIFY `costPerClick` decimal(11,2) NOT NULL DEFAULT '0.00',
+  MODIFY `minimumClicks` int(11) NOT NULL DEFAULT '1000',
+  MODIFY `width` int(11) NOT NULL DEFAULT '468',
+  MODIFY `height` int(11) NOT NULL DEFAULT '60',
+  MODIFY `groupToPurchase` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3'
+;
+
+ALTER TABLE `addressBook`
+  MODIFY `sessionId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `advertisement`
+  MODIFY `isActive` int(11) NOT NULL DEFAULT '0',
+  MODIFY `type` varchar(15) NOT NULL DEFAULT 'text',
+  MODIFY `storageId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `borderColor` varchar(7) NOT NULL DEFAULT '#000000',
+  MODIFY `textColor` varchar(7) NOT NULL DEFAULT '#000000',
+  MODIFY `backgroundColor` varchar(7) NOT NULL DEFAULT '#ffffff',
+  MODIFY `clicks` int(11) NOT NULL DEFAULT '0',
+  MODIFY `clicksBought` int(11) NOT NULL DEFAULT '0',
+  MODIFY `impressions` int(11) NOT NULL DEFAULT '0',
+  MODIFY `impressionsBought` int(11) NOT NULL DEFAULT '0',
+  MODIFY `priority` int(11) NOT NULL DEFAULT '0',
+  MODIFY `nextInPriority` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `asset`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `parentId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `lineage` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `state` varchar(35) NOT NULL DEFAULT '',
+  MODIFY `className` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `creationDate` bigint(20) NOT NULL DEFAULT '997995720',
+  MODIFY `createdBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `stateChanged` varchar(22) NOT NULL DEFAULT '997995720',
+  MODIFY `stateChangedBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '3',
+  MODIFY `isLockedBy` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `isSystem` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `assetData`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `revisedBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `tagId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `status` varchar(35) NOT NULL DEFAULT 'pending',
+  MODIFY `title` varchar(255) NOT NULL DEFAULT 'untitled',
+  MODIFY `menuTitle` varchar(255) NOT NULL DEFAULT 'untitled',
+  MODIFY `url` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `ownerUserId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `groupIdView` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `groupIdEdit` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `newWindow` int(11) NOT NULL DEFAULT '0',
+  MODIFY `isHidden` int(11) NOT NULL DEFAULT '0',
+  MODIFY `isPackage` int(11) NOT NULL DEFAULT '0',
+  MODIFY `isPrototype` int(11) NOT NULL DEFAULT '0',
+  MODIFY `encryptPage` int(11) NOT NULL DEFAULT '0',
+  MODIFY `assetSize` int(11) NOT NULL DEFAULT '0',
+  MODIFY `skipNotification` int(11) NOT NULL DEFAULT '0',
+  MODIFY `isExportable` int(11) NOT NULL DEFAULT '1',
+  MODIFY `inheritUrlFromParent` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `assetHistory`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `dateStamp` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `assetIndex`
+  MODIFY `ownerUserId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `groupIdView` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `groupIdEdit` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `isPublic` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `assetVersionTag`
+  MODIFY `tagId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `name` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `isCommitted` int(11) NOT NULL DEFAULT '0',
+  MODIFY `creationDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `createdBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `commitDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `committedBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `isLocked` int(11) NOT NULL DEFAULT '0',
+  MODIFY `lockedBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `groupToUse` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `workflowId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `workflowInstanceId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `authentication`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `authMethod` varchar(30) NOT NULL DEFAULT '',
+  MODIFY `fieldName` varchar(128) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `cart`
+  MODIFY `shippingAddressId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `shipperId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `couponId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `cartItem`
+  MODIFY `shippingAddressId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `quantity` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `databaseLink`
+  MODIFY `databaseLinkId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `allowMacroAccess` int(11) NOT NULL DEFAULT '0',
+  MODIFY `additionalParameters` varchar(255) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `donation`
+  MODIFY `defaultPrice` float NOT NULL DEFAULT '100'
+;
+
+ALTER TABLE `groupGroupings`
+  MODIFY `groupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `groupings`
+  MODIFY `groupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `expireDate` bigint(20) NOT NULL DEFAULT '2114402400',
+  MODIFY `groupAdmin` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `groups`
+  MODIFY `groupId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `expireOffset` int(11) NOT NULL DEFAULT '314496000',
+  MODIFY `karmaThreshold` int(11) NOT NULL DEFAULT '1000000000',
+  MODIFY `dateCreated` int(11) NOT NULL DEFAULT '997938000',
+  MODIFY `lastUpdated` int(11) NOT NULL DEFAULT '997938000',
+  MODIFY `deleteOffset` int(11) NOT NULL DEFAULT '14',
+  MODIFY `expireNotifyOffset` int(11) NOT NULL DEFAULT '-14',
+  MODIFY `expireNotify` int(11) NOT NULL DEFAULT '0',
+  MODIFY `autoAdd` int(11) NOT NULL DEFAULT '0',
+  MODIFY `autoDelete` int(11) NOT NULL DEFAULT '0',
+  MODIFY `databaseLinkId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `groupCacheTimeout` int(11) NOT NULL DEFAULT '3600',
+  MODIFY `isEditable` int(11) NOT NULL DEFAULT '1',
+  MODIFY `showInForms` int(11) NOT NULL DEFAULT '1',
+  MODIFY `ldapLinkId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `imageColor`
+  MODIFY `name` varchar(255) NOT NULL DEFAULT 'untitled',
+  MODIFY `fillTriplet` char(7) NOT NULL DEFAULT '#000000',
+  MODIFY `fillAlpha` char(2) NOT NULL DEFAULT '00',
+  MODIFY `strokeTriplet` char(7) NOT NULL DEFAULT '#000000',
+  MODIFY `strokeAlpha` char(2) NOT NULL DEFAULT '00'
+;
+
+ALTER TABLE `imagePalette`
+  MODIFY `name` varchar(255) NOT NULL DEFAULT 'untitled'
+;
+
+ALTER TABLE `inbox`
+  MODIFY `status` varchar(15) NOT NULL DEFAULT 'pending',
+  MODIFY `completedBy` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `groupId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `subject` varchar(255) NOT NULL DEFAULT 'No Subject',
+  MODIFY `sentBy` varchar(22) NOT NULL DEFAULT '3'
+;
+
+ALTER TABLE `incrementer`
+  MODIFY `incrementerId` varchar(50) NOT NULL DEFAULT '',
+  MODIFY `nextValue` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `karmaLog`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `amount` int(11) NOT NULL DEFAULT '1'
+;
+
+ALTER TABLE `ldapLink`
+  MODIFY `ldapLinkId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `ldapLinkName` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `ldapUrl` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `connectDn` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `identifier` varchar(255) NOT NULL DEFAULT '',
+  MODIFY `ldapAccountTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `ldapCreateAccountTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `ldapLoginTemplate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `mailQueue`
+  MODIFY `toGroup` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `metaData_properties`
+  MODIFY `fieldId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `fieldName` varchar(100) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `metaData_values`
+  MODIFY `fieldId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `passiveProfileAOI`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `fieldId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `value` varchar(100) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `passiveProfileLog`
+  MODIFY `passiveProfileLogId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `sessionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `dateOfEntry` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `redirect`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `replacements`
+  MODIFY `replacementId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `search`
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `searchRoot` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PBasset000000000000001',
+  MODIFY `templateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'PBtmpl0000000000000200',
+  MODIFY `useContainers` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `settings`
+  MODIFY `name` varchar(255) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `shopCredit`
+  MODIFY `amount` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `sku`
+  MODIFY `vendorId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'defaultvendor000000000',
+  MODIFY `displayTitle` tinyint(1) NOT NULL DEFAULT '1',
+  MODIFY `overrideTaxRate` tinyint(1) NOT NULL DEFAULT '0',
+  MODIFY `taxRateOverride` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `snippet`
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `processAsTemplate` int(11) NOT NULL DEFAULT '0',
+  MODIFY `mimeType` varchar(50) NOT NULL DEFAULT 'text/html',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `cacheTimeout` int(11) NOT NULL DEFAULT '3600'
+;
+
+ALTER TABLE `storageTranslation`
+  MODIFY `guidValue` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `hexValue` varchar(32) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `subscriptionCode`
+  MODIFY `batchId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `code` varchar(64) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `status` varchar(10) NOT NULL DEFAULT 'Unused',
+  MODIFY `dateCreated` int(11) NOT NULL DEFAULT '0',
+  MODIFY `dateUsed` int(11) NOT NULL DEFAULT '0',
+  MODIFY `expires` int(11) NOT NULL DEFAULT '0',
+  MODIFY `usedBy` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `subscriptionCodeBatch`
+  MODIFY `batchId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `subscriptionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `subscriptionCodeSubscriptions`
+  MODIFY `code` varchar(64) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `subscriptionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `tax`
+  MODIFY `taxRate` float NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `template`
+  MODIFY `namespace` varchar(35) NOT NULL DEFAULT 'Page',
+  MODIFY `isEditable` int(11) NOT NULL DEFAULT '1',
+  MODIFY `showInForms` int(11) NOT NULL DEFAULT '1',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0',
+  MODIFY `parser` varchar(255) NOT NULL DEFAULT 'WebGUI::Asset::Template::HTMLTemplate'
+;
+
+ALTER TABLE `transaction`
+  MODIFY `originatingTransactionId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `isSuccessful` tinyint(1) NOT NULL DEFAULT '0',
+  MODIFY `shippingAddressId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `shippingDriverId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `paymentAddressId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `paymentDriverId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `transactionItem`
+  MODIFY `shippingAddressId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `orderStatus` varchar(35) NOT NULL DEFAULT 'NotShipped',
+  MODIFY `quantity` int(11) NOT NULL DEFAULT '1',
+  MODIFY `vendorId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT 'defaultvendor000000000'
+;
+
+ALTER TABLE `userInvitations`
+  MODIFY `newUserId` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `userLoginLog`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `userProfileCategory`
+  MODIFY `profileCategoryId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `label` varchar(255) NOT NULL DEFAULT 'Undefined',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1',
+  MODIFY `visible` int(11) NOT NULL DEFAULT '1',
+  MODIFY `editable` int(11) NOT NULL DEFAULT '1',
+  MODIFY `protected` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `userProfileData`
+  MODIFY `photo` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL,
+  MODIFY `avatar` varchar(22) character set utf8 collate utf8_bin DEFAULT NULL
+;
+
+ALTER TABLE `userProfileField`
+  MODIFY `fieldName` varchar(128) NOT NULL DEFAULT '',
+  MODIFY `label` varchar(255) NOT NULL DEFAULT 'Undefined',
+  MODIFY `visible` int(11) NOT NULL DEFAULT '0',
+  MODIFY `required` int(11) NOT NULL DEFAULT '0',
+  MODIFY `fieldType` varchar(128) NOT NULL DEFAULT 'text',
+  MODIFY `sequenceNumber` int(11) NOT NULL DEFAULT '1',
+  MODIFY `profileCategoryId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `protected` int(11) NOT NULL DEFAULT '0',
+  MODIFY `editable` int(11) NOT NULL DEFAULT '1',
+  MODIFY `showAtRegistration` int(11) NOT NULL DEFAULT '0',
+  MODIFY `requiredForPasswordRecovery` int(11) NOT NULL DEFAULT '0'
+;
+
+ALTER TABLE `userSession`
+  MODIFY `sessionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `adminOn` int(11) NOT NULL DEFAULT '0',
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `userSessionScratch`
+  MODIFY `sessionId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `name` varchar(255) NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `users`
+  MODIFY `userId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `authMethod` varchar(30) NOT NULL DEFAULT 'WebGUI',
+  MODIFY `dateCreated` int(11) NOT NULL DEFAULT '1019867418',
+  MODIFY `lastUpdated` int(11) NOT NULL DEFAULT '1019867418',
+  MODIFY `karma` int(11) NOT NULL DEFAULT '0',
+  MODIFY `status` varchar(35) NOT NULL DEFAULT 'Active',
+  MODIFY `referringAffiliate` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `friendsGroup` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT ''
+;
+
+ALTER TABLE `wobject`
+  MODIFY `displayTitle` int(11) NOT NULL DEFAULT '1',
+  MODIFY `assetId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `styleTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `printableStyleTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL DEFAULT '',
+  MODIFY `revisionDate` bigint(20) NOT NULL DEFAULT '0'
+;
+END_SQL
+    my @stmts = split /;/, $sql; # this isn't safe in general, but I know it will be fine here.
+    for my $stmt (@stmts) {
+        $stmt =~ s/^\s+//;
+        $stmt =~ s/\s+$//;
+        next unless $stmt;
+        $session->db->write($stmt);
+    }
+    print " Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
@@ -1372,7 +2942,7 @@ sub addPackage {
     my $session     = shift;
     my $file        = shift;
 
-print "Importing package: $file...";
+    print "Importing package: $file..." unless $quiet;
     # Make a storage location for the package
     my $storage     = WebGUI::Storage->createTemp( $session );
     $storage->addFileFromFilesystem( $file );
@@ -1383,7 +2953,7 @@ print "Importing package: $file...";
     # Make the package not a package anymore
     $package->update({ isPackage => 0 });
 
-print "Done\n";
+    print "Done\n" unless $quiet;
 }
 
 #-------------------------------------------------
@@ -1394,7 +2964,7 @@ sub start {
         'configFile=s'=>\$configFile,
         'quiet'=>\$quiet
     );
-    my $session = WebGUI::Session->open("../..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Upgrade to ".$toVersion});

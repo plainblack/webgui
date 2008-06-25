@@ -33,30 +33,32 @@ YAHOO.WebGUI.Form.DatePicker = {
         this.calendar.render();
     },
     handleRender: function(e) {
-        this.timediv = document.createElement('div');
-        YAHOO.util.Dom.setStyle(this.timediv, 'text-align', 'center');
-        this.calendar.oDomContainer.appendChild(this.timediv);
-        this.timediv.appendChild(document.createTextNode('Time: '));
-        this.hourEl = document.createElement('input');
-        this.hourEl.value = '00';
-        this.hourEl.setAttribute('size', 2);
-        this.hourEl.setAttribute('maxlength', 2);
-        this.timediv.appendChild(this.hourEl);
-        this.timediv.appendChild(document.createTextNode(' : '));
-        this.minuteEl = document.createElement('input');
-        this.minuteEl.value = '00';
-        this.minuteEl.setAttribute('size', 2);
-        this.minuteEl.setAttribute('maxlength', 2);
-        this.timediv.appendChild(this.minuteEl);
-        this.secEl = document.createElement('input');
-        this.secEl.value = '00';
-        this.secEl.setAttribute('size', 2);
-        this.secEl.setAttribute('maxlength', 2);
-        YAHOO.util.Dom.setStyle(this.secEl, 'display', 'none');
-        this.timediv.appendChild(this.secEl);
-        this.calendar.oDomContainer.appendChild(this.timediv);
-        YAHOO.util.Event.on(this.hourEl, 'change', this.handleTimebox, [this.hourEl, 'hour'], this);
-        YAHOO.util.Event.on(this.minuteEl, 'change', this.handleTimebox, [this.minuteEl, 'minute'], this);
+        if ( this.useTime ) {
+            this.timediv = document.createElement('div');
+            YAHOO.util.Dom.setStyle(this.timediv, 'text-align', 'center');
+            this.calendar.oDomContainer.appendChild(this.timediv);
+            this.timediv.appendChild(document.createTextNode('Time: '));
+            this.hourEl = document.createElement('input');
+            this.hourEl.value = '00';
+            this.hourEl.setAttribute('size', 2);
+            this.hourEl.setAttribute('maxlength', 2);
+            this.timediv.appendChild(this.hourEl);
+            this.timediv.appendChild(document.createTextNode(' : '));
+            this.minuteEl = document.createElement('input');
+            this.minuteEl.value = '00';
+            this.minuteEl.setAttribute('size', 2);
+            this.minuteEl.setAttribute('maxlength', 2);
+            this.timediv.appendChild(this.minuteEl);
+            this.secEl = document.createElement('input');
+            this.secEl.value = '00';
+            this.secEl.setAttribute('size', 2);
+            this.secEl.setAttribute('maxlength', 2);
+            YAHOO.util.Dom.setStyle(this.secEl, 'display', 'none');
+            this.timediv.appendChild(this.secEl);
+            this.calendar.oDomContainer.appendChild(this.timediv);
+            YAHOO.util.Event.on(this.hourEl, 'change', this.handleTimebox, [this.hourEl, 'hour'], this);
+            YAHOO.util.Event.on(this.minuteEl, 'change', this.handleTimebox, [this.minuteEl, 'minute'], this);
+        }
     },
     handleTimebox: function(e, obj) {
         var input = obj[0];
@@ -74,6 +76,7 @@ YAHOO.WebGUI.Form.DatePicker = {
     handleShow: function(e) {
         var pos = YAHOO.util.Dom.getRegion(this.inputBox);
         YAHOO.util.Dom.setXY(this.calendar.oDomContainer, [pos.left, pos.bottom]);
+        YAHOO.util.Dom.setStyle(this.calendar.oDomContainer,'z-index',100);
         YAHOO.util.Dom.setStyle(this.timediv, 'display', ( this.useTime ? 'block' : 'none'));
     },
     handleHide: function(e) {

@@ -13,6 +13,10 @@ our $HELP = {
         ],
         variables   => [
             {
+                name        => 'isPending',
+                description => 'helpvar isPending',
+            },
+            {
                 name        => 'canAddFile',
                 description => 'helpvar canAddFile',
             },
@@ -71,6 +75,30 @@ our $HELP = {
             {
                 name        => 'url_thumbnails',
                 description => 'helpvar url_thumbnails',
+            },
+            { 
+                name        => 'nextAlbum_url',
+                description => 'helpvar nextAlbum_url',
+            },
+            {
+                name        => 'nextAlbum_title',
+                description => 'helpvar nextAlbum_title',
+            },
+            {
+                name        => 'nextAlbum_thumbnailUrl',
+                description => 'helpvar nextAlbum_thumbnailUrl',
+            },
+            {
+                name        => 'previousAlbum_url',
+                description => 'helpvar previousAlbum_url',
+            },
+            {
+                name        => 'previousAlbum_title',
+                description => 'helpvar previousAlbum_title',
+            },
+            {
+                name        => 'previousAlbum_thumbnailUrl',
+                description => 'helpvar previousAlbum_thumbnailUrl',
             },
             {
                 name        => 'fileCount',
@@ -290,6 +318,22 @@ our $HELP = {
                     {
                         name        => 'isAlbumThumbnail',
                         description => 'helpvar isAlbumThumbnail',
+                    },
+                    {
+                        name        => 'form_promote',
+                        description => 'helpvar form_promote',
+                    },
+                    {
+                        name        => 'form_demote',
+                        description => 'helpvar form_demote',
+                    },
+                    {
+                        name        => 'form_synopsis',
+                        description => 'helpvar form_synopsis',
+                    },
+                    {
+                        name        => 'form_delete',
+                        description => 'helpvar form_delete',
                     },
                 ],
             },

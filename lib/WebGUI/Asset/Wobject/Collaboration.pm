@@ -1170,7 +1170,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
-	$self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>'RSS' });
+	$self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
 }

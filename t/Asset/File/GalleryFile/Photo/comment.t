@@ -19,7 +19,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ plan tests => 32;
 #----------------------------------------------------------------------------
 # Test with no comments
 is(
-    blessed $photo->getCommentPaginator, "WebGUI::Paginator",
+    Scalar::Util::blessed($photo->getCommentPaginator), "WebGUI::Paginator",
     "Photo with no comments still provides comments paginator",
 );
 

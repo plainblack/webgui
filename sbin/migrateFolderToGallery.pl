@@ -1,5 +1,20 @@
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -75,7 +90,7 @@ sub start {
         pod2usage("$0: Must specify a --configFile");
     }
 
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     
     my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -133,6 +148,6 @@ The WebGUI config file to use.
 =head1 DESCRIPTION
 
 This script migrates a Folder into a gallery album. It
-uses C<WebGUI::Utility::Gallery> for its major features.
+uses B<WebGUI::Utility::Gallery> for its major features.
 
 

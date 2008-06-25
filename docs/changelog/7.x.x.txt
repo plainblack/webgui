@@ -1,5 +1,78 @@
+7.5.14
+ - fixed: ems 2.0: tickets get created as badges also
+ - fixed: Non-admin users can now add Gallery assets
+ - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
+ - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
+ - fixed: allowMedia addition to Rich Editor no longer causes upgrade problems
+ - fixed: Shop->hasShippingAddress help grammatical error
+ - fixed: Thingy now shows appropriate display values for all field types
+ - fixed: can now turn off inheritUrlFromParent and the code is now more
+   robust, moved from Asset->update to Asset->fixUrl.
+ - fixed: Time tracker can't post time once it's been posted.
+ - fixed: Shop: Product asset- image not showing
+ - fixed: User List- Missing Hover Help (Yung Han Khoe)
+ - fixed: UserList wobject not in new content menu (Yung Han Khoe)
+
+7.5.13
+ - fixed: storage locations for some assets in packages not imported correctly
+ - fixed: DataForm doesn't send emails correctly
+ - fixed: CS posts don't have correct URLs generated
+ - fixed: Unable to template user profile viewing and editing screens.
+ - fixed: Product Variants not saving SKU
+ - fixed: Shop Payment Methods
+ - fixed: Syndicated Content asset makes template engine choke
+ - fixed: Security issue in CS RSS feeds
+ - fixed: Asset Manager breaks when an asset is locked
+ - fixed: EMS - Data error when trying to list badges
+ - fixed: EMS - Not able to refund tickets
+ - fixed: Asset Manager is slow to load
+ - fixed: project management application unable to add or edit tasks.
+ - fixed: dashboard not working due to using legacy ajax handlers
+ - fixed: Calendar form element no longer shows up behind admin console.
+ - fixed: Asset Manager can now change ranks again
+ - fixed: Cannot manage revisions in version tags.
+ - fixed: Date picker shows time after moving through months
+ - fixed: Cannot Instantiate Template
+ - fixed: Adding Donation Asset breaks style template
+ - fixed: Adding Flat Discount Coupon causes "Problem w/ Request" error
+ - fixed: No label for yes/no radio buttons
+ - fixed: Gallery Edit Album buttons did not work properly in IE
+ - fixed: Cannot embed YouTube videos in IE6/7. Fixed by adding an "Allow Media"
+   switch to the RichEdit asset.
+ - added: Next and Previous GalleryAlbum links in the GalleryAlbum views
+ - fixed: Shop: Variants in dropdown and on page
+ - fixed: OLD subscription table still hanging around?
+ - fixed: Shelf
+ - fixed: Subscriptions and redemption
+
+7.5.12
+ - skipping this release
+
 7.5.11
+ - fixed: email password recovery submit button effected by UI level
+ - fixed: Creating a shortcut creates a version tag even with autocommit turned on
+ - fixed: Syndicated content fills results with empty entries up to max headlines count
+ - fixed: userImport.pl overwrites settings when updating users
+ - fixed: Collaboration RSS link in header doesn't indicate title
+ - fixed: edit branch can't update URLs on most assets
+ - Replaced Cool Menus nav with a YUI Menu, which works and looks better.
+ - Replaced dtree javascript with YUI TreeView.
+ - fix: widget dialogues weren't opening correctly inside a widgetized
+   view of a widget
+ - fix: snippets were exporting as index.html or such. pass them through
+   unchanged.
+ - add: United Knowledge Player added. This player allows you to display a photo   collection as a slideshow. A demo can be found in /extras/ukplayer/slideshow.   html. (Arjan Widlak, United Knowledge)
+ - add: Assets can now inherit their parent's URL, prepended. Check the
+   meta tab.
  - rfe: Not being limited to single-worded Tags 
+ - SQL Form no longer ships with WebGUI. Use Thingy instead. However, out of
+   respect for those using it, we only uninstall it if you have no sites using
+   it.
+ - Depricated $session->errorHandler in favor of $session->log.
+ - AssetProxy macro can now use asset id as a parameter like so:
+   ^AssetProxy(abcdefghijklmnopqrstuv,assetId);
+ - AssetProxy macro now only shows an 'invalid url' error when Admin mode is
+   on. An error is always sent to the log (Yung Han Khoe).
  - Exposed keywords API to all assets through edit screen. Now keywords are
    searchable and add metatags for all assets.
  - fix: template variable isUncommitted is not documented in the help
@@ -67,6 +140,36 @@
  - fixed: CS mail retrieval doesn't decode subject properly
  - fixed: email password recovery fields effected by UI level
  - Complete rewrite of the Asset Manager
+ - added more keys to the list of bad EXIF keys.
+ - fixed issue where bad EXIF keys would kill the entire album
+ - Added more variables for Photo Resolutions
+ - Added better handling of Pending albums and photos
+ - added: Database link access for SQL Macro (Yung Han Khoe)
+ - Added UserList wobject (United Knowledge and Yung Han Khoe)
+ - All group operations now show group id and name (Yung Han Khoe)
+ - Added: On the commit screen of version tags, you can now set a Start/End Time for when the tag should appear.
+ - Added: WaitUntil workflow activity associated with version tags that waits until the start or end time of a version tag has been reached before continuing the workflow
+ - added: Show a Message when users login
+ - added: Two new approval activities, ByCommitterGroup and ByLineage
+ - fixed: Gallery Search form doesn't work right in IE6
+ - fixed: Password Recovery now only works for Active users and does not allow
+   deactivated users to log in
+ - fixed: Gallery Search now correctly limits by class name
+ - added: A template variable to distinguish between Files and Albums in the Gallery
+   Search
+ - added: A thumbnail for Photo edit screen
+ - added: Configure the amount of files shown per page in the Gallery
+ - fix: Patch for Style.pm to identify which template failed to instantiate
+ - fix: Admin Console templates have the same title
+ - fix: File Titles not displaying in folder
+ - fix: List View Reporting Wrong Dates
+ - fix: too small of a field for content profiling
+ - fix: Wrong class assignment in "News" template
+ - fix: malformed css in default wiki page
+ - fix: cleared up description for Image Resolutions and Max Space in gallery
+ - fix: User profiling default broken
+ - Gallery Edit Album screen now works much better
+ - fix: Cross Publish cancel button now works
 
 7.5.10
  - fix: Syntax error in GetCsMail
@@ -236,20 +339,6 @@
  - add: Photos now track views
  - fix: Multiple Gallery template fixes.
 
-7.4.24
- - fix: https and extra / in urls (perlDreamer Consulting, LLC.)
-    http://www.webgui.org/bugs/tracker/https-and-extra-/-in-urls
-
-7.4.23
- - fix: CalendarUpdateFeeds workflow causes errors in log
- - autocommit for packages is handled by web method, not API method
- - fix: importing packages generates orphaned duplicates of all attached storage locations
- - fix: error rolling back version tags if a parent has a later revision date than its child
- - show fields in tabs on DataForm default email template
- - fix: don't show Admin mode toggle when not in adminModeSubnets
- - fix regression: Site starter style displays incorrectly in IE
- - really show fields in tabs on DataForm default email template
-
 7.5.1
  - fix: Extra head tags of unplaced assets included twice
  - improve rebuildLineage.pl behavior.  protect against assets that are too deep and don't destroy search index.
@@ -326,6 +415,7 @@
  - fix: Event Related Links are now proper collateral in their own table
    instead of a silly HTML area
  - fix: rating archived posts causes error
+
 
 7.4.21
  - fix: Mails sent from WebGUI now wrap at 78 characters, as the SMTP

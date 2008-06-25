@@ -62,8 +62,8 @@ sub definition {
 			fieldType       => "template",
             namespace       => "Donation",
 			defaultValue    => "vrKXEtluIhbmAS9xmPukDA",
-			label           => $i18n->get("template"),
-			hoverHelp       => $i18n->get("template help"),
+			label           => $i18n->get("donate template"),
+			hoverHelp       => $i18n->get("donate template help"),
 			},
         thankYouMessage => {
             tab             => "properties",

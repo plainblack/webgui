@@ -197,7 +197,7 @@ sub getValue {
 			return $id;
 		}
 	}
-	return undef;
+	return $value;
 }
 
 #-------------------------------------------------------------------
@@ -210,7 +210,7 @@ Displays the file as a link.
 
 sub getValueAsHtml {
 	my ($self) = @_;
-    my $value = $self->getValue;
+    my $value = $self->getDefaultValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage->get($self->session,$value);
 	my $file = shift @{ $location->getFiles };

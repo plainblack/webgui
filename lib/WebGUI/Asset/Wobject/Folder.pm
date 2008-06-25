@@ -189,7 +189,7 @@ sub view {
 				id=>$child->getId,
 				canView => $child->canView(),
 				title=>$child->get("title"),
-				title=>$child->get("menuTitle"),
+				menuTitle=>$child->get("menuTitle"),
 				synopsis=>$child->get("synopsis") || '',
 				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
 				"date.epoch"=>$child->get("revisionDate"),

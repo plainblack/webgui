@@ -72,17 +72,28 @@ sub addItem {
 
 =head2 cancelRecurring ( )
 
-Cancel a recurring transaction, and calls onCancelRecurring in whatever sku is attached to this transaction.
+Cancel a recurring transaction, and calls onCancelRecurring in whatever sku is attached to this transaction. If the
+cancelation fails, returns an error message.
 
 =cut
 
 sub cancelRecurring {
     my ($self) = @_;
-    $self->getPaymentGateway->cancelRecurringPayment($self);
-    my ($item) = $self->getItems;
+    my ($success, $message) = $self->getPaymentGateway->cancelRecurringPayment($self);
+
+    # Handle failed cancelation.
+    unless ($success) {
+        return 
+            "Canceling recurring transaction failed. The following response was received from the payment gateway:<br/>"
+            . $message;
+    }
+
+    my ($item) = @{ $self->getItems };
     $item->getSku->onCancelRecurring($item);
     my $recurringId = ($self->get('originatingTransactionId') || $self->getId);
     $self->session->db->write("update transaction set isRecurring=0 where transactionId=? or originatingTransactionId=?",[$recurringId,$recurringId]);
+
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -375,6 +386,44 @@ sub getTransactionIdsForUser {
     return $session->db->buildArrayRef("select transactionId from transaction where userId=? order by dateOfPurchase desc",[$userId]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 isFirst ( )
+
+Returns 1 if this is the first of a set of recurring transactions.
+
+=cut
+
+sub isFirst {
+    my $self = shift;
+	return ($self->get('originatingTransactionId') eq '');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRecurring ( )
+
+Returns 1 if this is a recurring transaction.
+
+=cut
+
+sub isRecurring {
+    my $self = shift;
+	return $self->get('isRecurring');
+}
+
+#-------------------------------------------------------------------
+
+=head2 isSuccessful ( )
+
+Returns 1 if this transaction had a successful payment applied to it.
+
+=cut
+
+sub isSuccessful {
+    my $self = shift;
+	return $self->get('isSuccessful');
+}
 
 #-------------------------------------------------------------------
 
@@ -606,7 +655,11 @@ sub www_cancelRecurring {
     my ($class, $session) = @_;
     my $self = $class->new($session, $session->form->get("transactionId"));
     return $session->privilege->insufficient unless (WebGUI::Shop::Admin->new($session)->canManage || $session->user->userId eq $self->get('userId'));
-    $self->cancelRecurring;
+    my $error = $self->cancelRecurring;
+
+    # TODO: Needs to be templated or included in www_view.
+    return $error if $error;
+
     return $class->www_view($session);
 }
 
@@ -769,7 +822,8 @@ STOP
 
 =head2 www_manageMy ()
 
-Makes transaction information printable.
+Display a quick list of the user's transactions, with links for more detailed information about
+each one in the list.
 
 =cut
 
@@ -785,7 +839,7 @@ sub www_manageMy {
             %{$transaction->get},
             viewDetailUrl   => $url->page('shop=transaction;method=viewMy;transactionId='.$id),
             amount          => sprintf("%.2f", $transaction->get('amount')),
-            };
+        };
     }
 
     # render
@@ -862,9 +916,10 @@ sub www_view {
             };
         if ($transaction->get('isRecurring')) {
             $output .= q{   
-                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a></div>
+                &bull; <a href="}.$url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId).q{">}.$i18n->get('cancel recurring transaction').q{</a>
                 };
         }
+        $output .= q{</div>};
     }
     $output .= q{   
         <table class="transactionDetail">
@@ -969,7 +1024,6 @@ sub www_view {
         <tbody>
     };
     foreach my $item (@{$transaction->getItems}) {
-        my $sku = $item->getSku;
         $output .= WebGUI::Form::formHeader($session)
             .WebGUI::Form::hidden($session, {name=>"shop",value=>"transaction"})
             .WebGUI::Form::hidden($session, {name=>"method",value=>"updateItem"})
@@ -978,7 +1032,7 @@ sub www_view {
             .q{
             <tr>
             <td>}.$item->get('lastUpdated').q{</td>
-            <td><a href="}.$sku->getUrl('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
+            <td><a href="}.$url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId).q{">}.$item->get('configuredTitle').q{</a></td>
             <td>}.$transaction->formatCurrency($item->get('price')).q{</td>
             <td>}.$item->get('quantity').q{</td>
         };

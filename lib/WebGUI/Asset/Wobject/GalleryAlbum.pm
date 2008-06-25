@@ -295,6 +295,21 @@ sub canEdit {
 
 #----------------------------------------------------------------------------
 
+=head2 canEditIfLocked ( [userId] )
+
+Override this to allow editing when locked under a different version tag.
+
+=cut
+
+sub canEditIfLocked {
+    my $self        = shift;
+    my $userId      = shift;
+
+    return $self->canEdit( $userId );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( [userId] )
 
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
@@ -350,6 +365,42 @@ sub getAutoCommitWorkflowId {
 
 #----------------------------------------------------------------------------
 
+=head2 getCurrentRevisionDate ( session, assetId )
+
+Override this to allow instanciation of "pending" GalleryAlbums for those who
+are authorized to see them.
+
+=cut
+
+sub getCurrentRevisionDate {
+    my $class       = shift;
+    my $session     = shift;
+    my $assetId     = shift;
+
+    # Get the highest revision date, instanciate the asset, and see if 
+    # the permissions are enough to return the revisionDate.
+    my $revisionDate
+        = $session->db->quickScalar( 
+            "SELECT MAX(revisionDate) FROM GalleryAlbum WHERE assetId=?",
+            [ $assetId ]
+        );
+
+    return undef unless $revisionDate;
+
+    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+
+    return undef unless $asset;
+
+    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+        return $revisionDate;
+    }
+    else {
+        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getFileIds ( )
 
 Gets an array reference of asset IDs for all the files in this album.
@@ -360,7 +411,21 @@ sub getFileIds {
     my $self        = shift;
     my $gallery     = $self->getParent;
 
-    return $self->getLineage( ['descendants'], { } );
+    # Deal with "pending" files.
+    my %pendingRules;
+    if ( $self->canEdit ) {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    }
+    else {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        $pendingRules{ whereClause } = q{
+            ( 
+                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+            )
+        };
+    }
+    
+    return $self->getLineage( ['descendants'], { (%pendingRules) } );
 }
 
 #----------------------------------------------------------------------------
@@ -375,11 +440,44 @@ url to the current page that will be given to the paginator.
 sub getFilePaginator {
     my $self        = shift;
     my $url         = shift     || $self->getUrl;
+    my $perPage     = $self->getParent->get( 'defaultFilesPerPage' );
 
-    my $p           = WebGUI::Paginator->new( $self->session, $url );
+    my $p           = WebGUI::Paginator->new( $self->session, $url, $perPage );
     $p->setDataByArrayRef( $self->getFileIds );
 
     return $p;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextAlbum ( ) 
+
+Get the next album from the Gallery. Returns an instance of a GalleryAlbum,
+or undef if there is no next album.
+
+=cut
+
+sub getNextAlbum {
+    my $self        = shift;
+    my $nextId      = $self->getParent->getNextAlbumId( $self->getId );
+    return undef unless $nextId;
+    return WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousAlbum ( ) 
+
+Get the previous album from the Gallery. Returns an instance of a GalleryAlbum,
+or undef if there is no previous album.
+
+=cut
+
+sub getPreviousAlbum {
+    my $self        = shift;
+    my $previousId  = $self->getParent->getPreviousAlbumId( $self->getId );
+    return undef unless $previousId;
+    return WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
 }
 
 #----------------------------------------------------------------------------
@@ -425,6 +523,17 @@ sub getTemplateVars {
     $var->{ url_viewRss             } = $self->getUrl("func=viewRss");
     $var->{ url_slideshow           } = $self->getUrl("func=slideshow");
     $var->{ url_thumbnails          } = $self->getUrl("func=thumbnails");
+    
+    if ( my $nextAlbum  = $self->getNextAlbum ) {
+        $var->{ nextAlbum_url           } = $nextAlbum->getUrl;
+        $var->{ nextAlbum_title         } = $nextAlbum->get( "title" );
+        $var->{ nextAlbum_thumbnailUrl  } = $nextAlbum->getThumbnailUrl;
+    }
+    if ( my $prevAlbum  = $self->getPreviousAlbum ) {
+        $var->{ previousAlbum_url           } = $prevAlbum->getUrl;
+        $var->{ previousAlbum_title         } = $prevAlbum->get( "title" );
+        $var->{ previousAlbum_thumbnailUrl  } = $prevAlbum->getThumbnailUrl;
+    }
 
     $var->{ fileCount               } = $self->getChildCount;
     $var->{ ownerUsername           } = $owner->username;
@@ -848,8 +957,9 @@ sub www_edit {
         return $self->www_view;
     }
     # Promote the file
-    elsif ( $form->get("promote") ) {
-        my $assetId     = $form->get("promote");
+    elsif ( grep { $_ =~ /^promote-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^promote-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^promote-//;
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         if ( $asset ) {
             $asset->promote;
@@ -859,14 +969,26 @@ sub www_edit {
         }
     }
     # Demote the file
-    elsif ( $form->get("demote") ) {
-        my $assetId     = $form->get("demote");
+    elsif ( grep { $_ =~ /^demote-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^demote-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^demote-//;
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         if ( $asset ) {
             $asset->demote;
         }
         else {
             $session->errorHandler->error("Couldn't demote asset '$assetId' because we couldn't instantiate it.");
+        }
+    }
+    elsif ( grep { $_ =~ /^delete-(.{22})$/ } $form->param ) {
+        my $assetId     = ( grep { $_ =~ /^delete-(.{22})$/ } $form->param )[0];
+        $assetId        =~ s/^delete-//;
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( $asset ) {
+            $asset->purge;
+        }
+        else {
+            $session->errorHandler->error( "Couldn't delete asset '$assetId' because we couldn't instanciate it.");
         }
     }
 
@@ -906,14 +1028,16 @@ sub www_edit {
             = WebGUI::Form::submit( $session, {
                 name        => "cancel",
                 value       => $i18n->get("cancel"),
+                extras      => 'onclick="history.go(-1)"',
             });
     }
     $var->{ form_start } 
         .= WebGUI::Form::hidden( $session, {
             name        => "proceed",
             value       => "showConfirmation",
-        });
-    
+        })
+        ;
+
     $var->{ form_end    }
         = WebGUI::Form::formFooter( $session );
 
@@ -949,22 +1073,30 @@ sub www_edit {
             } );
 
         # Raw HTML here to provide proper value for the image
+        my $promoteLabel    = $i18n->get( 'Move Up', 'Icon' );
         $file->{ form_promote }
-            = qq{<button type="submit" name="promote" class="promote" value="$file->{assetId}">}
-            . $session->icon->moveUp( undef, undef, "disabled" )
-            . qq{</button>}
+            = qq{<input type="submit" name="promote-$file->{assetId}" class="promote" value="$promoteLabel" />}
             ;
 
+        my $demoteLabel     = $i18n->get( 'Move Down', 'Icon' );
         $file->{ form_demote }
-            = qq{<button type="submit" name="demote" class="demote" value="$file->{assetId}">}
-            . $session->icon->moveDown( undef, undef, "disabled" )
-            . qq{</button>}
+            = qq{<input type="submit" name="demote-$file->{assetId}" class="demote" value="$demoteLabel" />}
             ;
-        
+
+        my $deleteConfirm   = $i18n->get( 'template delete message', 'Asset_Photo' );
+        my $deleteLabel     = $i18n->get( 'Delete', 'Icon' );
+        $file->{ form_delete }
+            = qq{<input type="submit" name="delete-$file->{assetId}" class="delete" value="$deleteLabel" }
+            . qq{ onclick="return confirm('$deleteConfirm')" />}
+            ;
+
         $file->{ form_synopsis }
-            = WebGUI::Form::text( $session, {
+            = WebGUI::Form::HTMLArea( $session, {
                 name        => "fileSynopsis_$file->{assetId}",
                 value       => $form->get( "fileSynopsis_$file->{assetId}" ) || $file->{ synopsis },
+                richEditId  => $self->getParent->get( 'richEditIdFile' ),
+                height      => 150,
+                width       => 300,
             });
     }
 

@@ -59,7 +59,7 @@ Returns a reference to the admin console with all submenu items already added.
 
 sub getAdminConsole {
     my $self = shift;
-    my $ac = WebGUI::AdminConsole->new($self->session);
+    my $ac = WebGUI::AdminConsole->new($self->session, 'shop');
     my $i18n = WebGUI::International->new($self->session, "Shop");
     my $url = $self->session->url;
     $ac->addSubmenuItem($url->page("shop=admin"), $i18n->get("shop settings"));
@@ -69,6 +69,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($url->page("shop=transaction;method=manage"), $i18n->get("transactions"));
     $ac->addSubmenuItem($url->page("shop=vendor;method=manage"), $i18n->get("vendors"));
     $ac->addSubmenuItem($url->page("shop=credit;method=manage"), $i18n->get("in shop credit"));
+    $ac->addSubmenuItem($url->page("shop=products;method=manage"), $i18n->get("products"));
     return $ac;
 }
 

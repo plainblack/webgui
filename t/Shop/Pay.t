@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 18;
+my $tests = 19;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -42,6 +42,8 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Pay');
 
 my $storage;
+my $newDriver;
+my $anotherDriver;
 
 SKIP: {
 
@@ -133,7 +135,7 @@ my $options = {
     enabled => 1,
     label   => 'Cold, stone hard cash',
 };
-my $newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', $options);
+$newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', $options);
 isa_ok($newDriver, 'WebGUI::Shop::PayDriver::Cash', 'added a new, configured Cash driver');
 is($newDriver->label, 'JAL', 'label passed correctly to paydriver');
 
@@ -150,7 +152,8 @@ is($newDriver->label, 'JAL', 'label passed correctly to paydriver');
 my $drivers = $pay->getDrivers();
 
 my $defaultPayDrivers = {
-    'WebGUI::Shop::PayDriver::Cash'     => 'Cash',
+    'WebGUI::Shop::PayDriver::Cash'      => 'Cash',
+    'WebGUI::Shop::PayDriver::ITransact' => 'Itransact',
 };
 
 cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
@@ -209,15 +212,14 @@ my $otherOptions = {
     enabled     => 1,
     label       => 'Even harder cash',
 };
-my $anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'Pomade', $otherOptions);
+$anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'Pomade', $otherOptions);
 
 my $gateways = $pay->getPaymentGateways;
-my @returnedIds = map {$_->getId} @{ $gateways };
+my @returnedIds = map {$_->label} @{ $gateways };
 cmp_bag(
     \@returnedIds,
     [ 
-        $newDriver->getId,
-        $anotherDriver->getId,
+        qw/Cash ITransact Pomade JAL/
     ],
     'getPaymentGateways returns all create payment drivers',
 );
@@ -242,5 +244,8 @@ cmp_bag(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from paymentGateway');
+    defined $newDriver and $newDriver->delete;
+    defined $newDriver and $anotherDriver->delete;
+    my $count = $session->db->quickScalar('select count(*) from paymentGateway');
+    is($count, 2, 'WebGUI ships with two drivers by default');
 }

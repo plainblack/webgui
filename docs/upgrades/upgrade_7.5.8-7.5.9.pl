@@ -8,7 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use lib "../../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "../..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use WebGUI::Session;
@@ -23,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addRichEditInlinePopup($session);
+addRichEditMedia( $session );
 updateRichEditorButtons($session);
 setPMFloatingDuration($session);
 
@@ -51,6 +58,19 @@ sub addRichEditInlinePopup {
     print "\tAdding inline popup column to Rich editor... " unless $quiet;
     $session->db->write("ALTER TABLE `RichEdit` ADD COLUMN `inlinePopups` INT(11) NOT NULL DEFAULT 0");
     print "Done!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the "allowMedia" field to Rich Edit assets
+sub addRichEditMedia {
+    my $session     = shift;
+    print "\tAdding Media switch to Rich Edit..." unless $quiet;
+    
+    $session->db->write( 
+        q{ ALTER TABLE RichEdit ADD COLUMN allowMedia INT },
+    );
+
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -107,7 +127,7 @@ sub start {
         'configFile=s'=>\$configFile,
         'quiet'=>\$quiet
     );
-    my $session = WebGUI::Session->open("../..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Upgrade to ".$toVersion});

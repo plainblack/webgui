@@ -307,6 +307,13 @@ sub definition {
             label           => $i18n->get("workflowIdCommit label"),
             hoverHelp       => $i18n->get("workflowIdCommit description"),
         },
+        defaultFilesPerPage => {
+            tab             => 'display',
+            fieldType       => 'integer',
+            defaultValue    => 24,
+            label           => $i18n->get( 'defaultFilesPerPage label' ),
+            hoverHelp       => $i18n->get( 'defaultFilesPerPage description' ),
+        },
     );
 
     push @{$definition}, {
@@ -501,10 +508,10 @@ sub canEdit {
 
     my $form        = $self->session->form;
 
-    if ( $form->get('func') eq "add" ) {
+    if ( $form->get('func') eq "add" && $form->get( 'class' )->isa( "WebGUI::Asset::Wobject::GalleryAlbum" ) ) {
         return $self->canAddFile( $userId );
     }
-    elsif ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" ) {
+    elsif ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ) ) {
         return $self->canAddFile( $userId );
     }
     else {
@@ -547,7 +554,9 @@ sub canView {
 Gets an array reference of all the album IDs under this Gallery. C<options> 
 is a hash reference with the following keys.
 
- orderBy            => An SQL ORDER BY clause to sort the albums
+ orderBy            => An SQL ORDER BY clause to sort the albums. 
+                    By default, uses the viewListOrderBy and viewListOrderDirection keys from
+                    the asset properties.
 
 =cut
 
@@ -555,12 +564,32 @@ sub getAlbumIds {
     my $self        = shift;
     my $options     = shift;
     
-    my $orderBy     = $options->{ orderBy }      || "lineage ASC";
+    my $orderBy     = $options->{ orderBy }
+                    ? $options->{ orderBy }
+                    : $self->get( 'viewListOrderBy' )
+                    ? join( " ", $self->get( 'viewListOrderBy' ), $self->get( 'viewListOrderDirection' ) )
+                    : "lineage ASC"
+                    ;
 
+    # Deal with "pending" albums.
+    my %pendingRules;
+    if ( $self->canEdit ) {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    }
+    else {
+        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        $pendingRules{ whereClause } = q{
+            ( 
+                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+            )
+        };
+    }
+    
     my $assets 
         = $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::Wobject::GalleryAlbum'],
             orderByClause       => $orderBy,
+            ( %pendingRules ),
         });
 
     return $assets;
@@ -642,6 +671,58 @@ assets in this gallery.
 sub getImageResolutions {
     my $self        = shift;
     return [ split /\n/, $self->get("imageResolutions") ];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getNextAlbumId ( albumId )
+
+Gets the next albumId from the list of albumIds. C<albumId> is the base 
+albumId we want to find the next album for.
+
+Returns C<undef> if there is no next albumId.
+
+=cut
+
+sub getNextAlbumId {
+    my $self        = shift;
+    my $albumId     = shift;
+    my $allAlbumIds = $self->getAlbumIds;
+
+    while ( my $checkId = shift @{ $allAlbumIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allAlbumIds };
+
+        if ( $albumId eq $checkId ) {
+            return shift @{ $allAlbumIds };
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getPreviousAlbumId ( albumId )
+
+Gets the previous albumId from the list of albumIds. C<albumId> is the base 
+albumId we want to find the previous album for.
+
+Returns C<undef> if there is no previous albumId.
+
+=cut
+
+sub getPreviousAlbumId {
+    my $self        = shift;
+    my $albumId     = shift;
+    my $allAlbumIds = $self->getAlbumIds; 
+
+    while ( my $checkId = pop @{ $allAlbumIds } ) {
+        # If this is the last albumId
+        return undef unless @{ $allAlbumIds };
+
+        if ( $albumId eq $checkId ) {
+            return pop @{ $allAlbumIds };
+        }
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -790,6 +871,46 @@ sub getUserFilePaginator {
 
 #----------------------------------------------------------------------------
 
+=head2 hasSpaceAvailable ( spaceWanted [, userId ] )
+
+Returns true if the user has at least the specified bytes of C<spaceWanted>
+available to use in this Gallery.
+
+=cut
+
+sub hasSpaceAvailable {
+    my $self        = shift;
+    my $spaceWanted = shift;
+    my $userId      = shift || $self->session->user->userId;
+    
+    # If we don't care, just return
+    return 1 if ( $self->get( "maxSpacePerUser" ) == 0 );
+
+    my $db          = $self->session->db;
+
+    # Compile the amount of disk space used
+    my $maxSpace    = $self->get( "maxSpacePerUser" ) * ( 1_024 ** 2 ); # maxSpacePerUser is in MB
+    my $spaceUsed   = 0;
+    my $fileIds
+        = $self->getLineage( [ 'descendants' ], { 
+            joinClass       => 'WebGUI::Asset::File::GalleryFile',
+            whereClause     => 'ownerUserId = ' . $db->quote( $userId ),
+        } );
+
+    for my $assetId ( @{ $fileIds } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $assetId );
+        next unless $asset;
+        $spaceUsed += $asset->get( 'assetSize' );
+
+        return 0 if ( $spaceUsed + $spaceWanted >= $maxSpace );
+    }
+
+    # We must have enough space
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -863,17 +984,14 @@ sub view_listAlbums {
     my $var         = $self->getTemplateVars;
     my $form        = $self->session->form;
 
-    my $orderBy     = $self->get('viewListOrderBy') 
-                    . q{ } . $self->get('viewListOrderDirection');
     my $p
         = $self->getAlbumPaginator( { 
             perpage     => ( $form->get('perpage') || 20 ),
-            orderBy     => $orderBy,
         } );
     $p->appendTemplateVars( $var );
 
     for my $assetId ( @{ $p->getPageData } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $session, $assetId );
         push @{ $var->{albums} }, $asset->getTemplateVars;
     }
     
@@ -979,7 +1097,15 @@ sub www_search {
     # NOTE: Search form is added as part of getTemplateVars()
 
     # Get search results, if necessary.
-    if ($form->get("submit")) {
+    my $doSearch    
+        = ( 
+            $form->get( 'basicSearch' ) || $form->get( 'keywords' )
+            || $form->get( 'title' ) || $form->get( 'description' )
+            || $form->get( 'userId' ) || $form->get( 'className' )
+            || $form->get( 'creationDate_after' ) || $form->get( 'creationDate_before' )
+        );
+
+    if ( $doSearch ) {
         # Keywords to search on
         my $keywords        = join " ", $form->get('basicSearch'),
                                         $form->get('keywords'),
@@ -1006,6 +1132,7 @@ sub www_search {
                         ;
         }
 
+        # Classes
         my $joinClass   = [
             'WebGUI::Asset::Wobject::GalleryAlbum',
             'WebGUI::Asset::File::GalleryFile::Photo',
@@ -1013,20 +1140,24 @@ sub www_search {
         if ( $form->get("className") ) {
             $joinClass  = [ $form->get('className') ];
         }
+        $where      .= q{ AND assetIndex.className IN ( } . $db->quoteAndJoin( $joinClass ) . q{ ) };
+        
 
         # Build a URL for the pagination
         my $url     
             = $self->getUrl( 
-                'func=search;submit=1;'
+                'func=search;'
                 . 'basicSearch=' . $form->get('basicSearch') . ';'
                 . 'keywords=' . $form->get('keywords') . ';'
                 . 'title=' . $form->get('title') . ';'
                 . 'description=' . $form->get('description') . ';'
-                . 'className=' . $form->get('className') . ';'
                 . 'creationDate_after=' . $form->get('creationDate_after') . ';'
                 . 'creationDate_before=' . $form->get('creationDate_before') . ';'
                 . 'userId=' . $form->get("userId") . ';'
             );
+        for my $class ( @$joinClass ) {
+            $url    .= 'className=' . $class . ';';
+        }
 
         my $p
             = $self->getSearchPaginator( { 
@@ -1041,7 +1172,10 @@ sub www_search {
         $p->appendTemplateVars( $var );
         for my $result ( @{ $p->getPageData } ) {
             my $asset   = WebGUI::Asset->newByDynamicClass( $self->session, $result->{assetId} );
-            push @{ $var->{search_results} }, $asset->getTemplateVars;
+            push @{ $var->{search_results} }, {
+                %{ $asset->getTemplateVars },
+                isAlbum     => $asset->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ),
+            };
         }
     }
 

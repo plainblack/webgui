@@ -218,7 +218,7 @@ sub getAdminFunction {
 				namespace   => "Asset",
 			},
 			icon    => "assets.gif",
-			func    => "manageAssets",
+			op      => "assetManager",
 			group   => "12",
 		},
 		"versions" => {
@@ -392,32 +392,14 @@ sub getAdminFunction {
 			op      => "viewActiveSessions",
             class   => 'WebGUI::Operation::ActiveSessions',
 		},
-		"commerce" => {
+		"shop" => {
 			title => {
 				id          => "shop",
 				namespace   => "Shop",
 			},
-			icon    => "commerce.gif",
+			icon    => "shop.gif",
 			url      => $self->session->url->page("shop=admin"),
-            group   => "3",
-		},
-		"subscriptions" => {
-			title => {
-				id          => "manage subscriptions",
-				namespace   => "Subscription",
-			},
-			icon    => "subscriptions.gif",
-			op      => "listSubscriptions",
-            class   => 'WebGUI::Operation::Subscription',
-		},
-		"productManager" => {
-			title => {
-				id          => "manage products",
-				namespace   => "ProductManager",
-			},
-			icon    => "productManager.gif",
-			op      => "listProducts",
-            class   => 'WebGUI::Operation::ProductManager',
+            group   => $self->session->setting->get('groupIdAdminCommerce'),
 		},
 		"cache" => {
             title => {

@@ -58,8 +58,8 @@ our $I18N = {
 	},
 
 	'label help' => {
-		message => q|The name by which this pagyment gateway is displayed.|,
-		lastUpdated => 0,
+		message => q|The name by which this payment gateway is displayed.|,
+		lastUpdated => 1213891193,
 		context => q|Hover help for the label option.|
 	},
 
@@ -86,6 +86,24 @@ our $I18N = {
         message => q|Specifies which group is allowed to use this payment gateway.|,
         lastUpdated => 0,
         context => q|Hover help for the group to use option.|,
+    },
+
+    'email receipt template' => {
+        message => q|Email Receipt Template|,
+        lastUpdated => 1213121298,
+        context => q|Title of the Email Receipt Template help page|,
+    },
+
+    'email receipt template help' => {
+        message => q|This template is for email receipts sent to the user.|,
+        lastUpdated => 1213121298,
+        context => q|Help body for the email receipt template|,
+    },
+
+    'payment methods' => {
+        message => q|Payment Methods.|,
+        lastUpdated => 1213313375,
+        context => q|Help body for the email receipt template|,
     },
 
 };

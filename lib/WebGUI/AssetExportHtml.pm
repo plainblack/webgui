@@ -205,6 +205,7 @@ sub exportAsHtml {
     my $indexFileName       = $args->{indexFileName};
     my $extrasUploadAction  = $args->{extrasUploadAction};
     my $rootUrlAction       = $args->{rootUrlAction};
+    my $exportUrl           = $args->{exportUrl};
 
     # if we're doing symlinking of the root URL, then the current default asset
     # is the root of the tree. take down that asset ID so we can pass it to
@@ -279,11 +280,17 @@ sub exportAsHtml {
     unless ( $self->canView($userId) ) {
         $returnCode = 0;
         $message    = "can't view asset at URL " . $self->getUrl;
+        $exportSession->var->end;
+        $exportSession->close;
         return ($returnCode, $message);
     }
 
+
     my $exportedCount = 0;
     foreach my $assetId ( @{$assetIds} ) {
+        # set a scratch variable for widgets to know we're exporting
+        $exportSession->scratch->set('exportUrl', $exportUrl);
+
         my $asset       = WebGUI::Asset->newByDynamicClass($exportSession, $assetId);
         my $fullPath    = $asset->exportGetUrlAsPath; 
 
@@ -499,6 +506,10 @@ sub exportGetDescendants {
 Translates a URL into an appropriate path and filename for exporting. For
 example, given C<'/foo/bar/baz'>, will return C<'/foo/bar/baz/index.html'>
 provided the value of indexFile as given to exportAsHtml was C<'index.html'>.
+
+=head3 url 
+
+URL of the asset we need an export path for
 
 =head3 index
 
@@ -815,6 +826,11 @@ sub www_export {
         -name           => "index",
         -value          => "index.html"
     );
+    $f->text(
+        -label          => 'Export site root URL',
+        -name           => 'exportUrl',
+        -value          => '',
+    );
 
     # TODO: maybe add copy options to these boxes alongside symlink
     $f->selectBox(
@@ -858,7 +874,7 @@ sub www_exportStatus {
     return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(13));
     my $i18n        = WebGUI::International->new($self->session, "Asset");
     my $iframeUrl   = $self->getUrl('func=exportGenerate');
-    foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction/) {
+    foreach my $formVar (qw/index depth userId extrasUploadsAction rootUrlAction exportUrl/) {
         $iframeUrl  = $self->session->url->append($iframeUrl, $formVar . '=' . $self->session->form->process($formVar));
     }
 
@@ -893,6 +909,7 @@ sub www_exportGenerate {
         extrasUploadAction  => $self->session->form->process('extrasUploadsAction'),
         rootUrlAction       => $self->session->form->process('rootUrlAction'),
         depth               => $self->session->form->process('depth'),
+        exportUrl           => $self->session->form->process('exportUrl'),
     });
     if (!$success) {
         $self->session->output->print($description, 1);

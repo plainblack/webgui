@@ -117,7 +117,7 @@ Formats as a name.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $user = WebGUI::User->new($self->session, $self->getValue);
+    my $user = WebGUI::User->new($self->session, $self->getDefaultValue);
     if (defined $user) {
         return $user->username;
     }

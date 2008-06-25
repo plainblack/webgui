@@ -16,12 +16,11 @@ package WebGUI::Storage;
 
 use Archive::Tar;
 use Carp qw( croak );
-use Cwd;
+use Cwd ();
 use File::Copy qw(cp);
 use FileHandle;
 use File::Find;
 use File::Path;
-use POSIX;
 use Storable qw(nstore retrieve);
 use strict;
 use warnings;
@@ -353,24 +352,20 @@ Optionally pass in the list of filenames to copy from the specified storage loca
 =cut
 
 sub copy {
-	my $self = shift;
-	my $newStorage = shift || WebGUI::Storage->create($self->session);
-	my $filelist = shift || $self->getFiles(1);
-	foreach my $file (@{$filelist}) {	
-        	my $source = FileHandle->new($self->getPath($file),"r");
-        	if (defined $source) {
-                	binmode($source);
-                	my $dest = FileHandle->new(">".$newStorage->getPath($file));
-                	if (defined $dest) {
-                        	binmode($dest);
-                        	cp($source,$dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
-                        	$dest->close;
-                        $newStorage->_changeOwner($newStorage->getPath($file));
-                	}
-                	$source->close;
-        	}
-	}
-	return $newStorage;
+    my $self = shift;
+    my $newStorage = shift || WebGUI::Storage->create($self->session);
+    my $filelist = shift || $self->getFiles(1);
+    foreach my $file (@{$filelist}) {
+        open my $source, '<', $self->getPath($file) or next;
+        open my $dest, '>', $newStorage->getPath($file) or next;
+        binmode $source;
+        binmode $dest;
+        cp($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
+        close $dest;
+        close $source;
+        $newStorage->_changeOwner($newStorage->getPath($file));
+    }
+    return $newStorage;
 }
 
 #-------------------------------------------------------------------
@@ -421,7 +416,6 @@ sub create {
     my $db              = $session->db;
     my $caseInsensitive = $config->get("caseInsensitiveOS");
     
-    #$session->errorHandler->warn($caseInsensitive.": $id\n".Carp::longmess()."\n");
     #For case insensitive operating systems, convert guid to hex
     if ($caseInsensitive) {
         my $hexId = $session->id->toHex($id);
@@ -731,20 +725,18 @@ Whether or not to return all files, including ones with initial periods.
 =cut
 
 sub getFiles {
-	my $self = shift;
-	my $showAll = shift;
-	my @list;
-	if (opendir (DIR,$self->getPath)) {
-        	my @files = readdir(DIR);
-        	closedir(DIR);
-        	foreach my $file (@files) {
-                	if ($showAll || $file !~ m/^\./) { # don't show files starting with a dot, unless we're supposed to show all files.
-				push(@list,$file);
-			}
-                }
-		return \@list;
+    my $self = shift;
+    my $showAll = shift;
+    my @list;
+    if ( opendir my $dir, $self->getPath ) {
+        @list = readdir $dir;
+        closedir $dir;
+        if (!$showAll) {
+            # if not showing all, filter out files beginning with a period
+            @list = grep { $_ !~ /^\./ } @list;
         }
-	return [];
+    }
+    return \@list;
 }
 
 #-------------------------------------------------------------------
@@ -971,7 +963,7 @@ sub tar {
     my $self = shift;
     my $filename = shift;
     my $temp = shift || WebGUI::Storage->createTemp($self->session);
-    my $originalDir = cwd;
+    my $originalDir = Cwd::cwd();
     chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
     my @files = ();
     find(sub { push(@files, $File::Find::name)}, ".");
@@ -1001,9 +993,10 @@ sub untar {
     my $filename    = shift;
     my $temp        = shift || WebGUI::Storage->createTemp($self->session);
 
-    my $originalDir = cwd;
+    my $originalDir = Cwd::cwd();
     chdir $temp->getPath;
     local $Archive::Tar::CHOWN = 0;
+    local $Archive::Tar::CHMOD = 0;
     Archive::Tar->extract_archive($self->getPath($filename),1);
     $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
     my @files;

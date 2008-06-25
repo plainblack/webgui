@@ -16,6 +16,7 @@ use WebGUI::Test;
 use WebGUI::Macro::Slash_gatewayUrl;
 use WebGUI::Session;
 use WebGUI::International;
+use WebGUI::DatabaseLink;
 use Data::Dumper;
 
 use Test::More; # increment this value for each test you create
@@ -25,6 +26,9 @@ my $session = WebGUI::Test->session;
 my $url = WebGUI::Macro::Slash_gatewayUrl::process($session);
 
 my $i18n = WebGUI::International->new($session, 'Macro_SQL');
+
+my $WebGUIdbLink = WebGUI::DatabaseLink->new($session, '0');
+my $originalMacroAccessValue = $WebGUIdbLink->macroAccessIsAllowed();
 
 $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
 $session->db->dbh->do('CREATE TABLE testTable (zero int(8), one int(8), two int(8), three int(8), four int(8), five int(8), six int(8), seven int(8), eight int(8), nine int(8), ten int(8), eleven int(8) ) TYPE=InnoDB');
@@ -116,11 +120,21 @@ my @testSets = (
 my $numTests = scalar @testSets;
 
 ++$numTests; ##For the load check;
+++$numTests; ##For the allow macro access test;
 
 plan tests => $numTests;
 
 my $macro = 'WebGUI::Macro::SQL';
 my $loaded = use_ok($macro);
+
+$WebGUIdbLink->set({allowMacroAccess=>0});
+
+# run one test to test allowMacroAccess
+my $output = WebGUI::Macro::SQL::process($session, 'select count(*) from users', 'There are ^0; users');
+is($output, $i18n->get('database access not allowed'), 'Test allow access from macros setting.');
+
+# set allowMacroAccess to 1 to allow other tests to run
+$WebGUIdbLink->set({allowMacroAccess=>1});
 
 SKIP: {
 
@@ -132,6 +146,10 @@ foreach my $testSet (@testSets) {
 }
 
 }
+
+# reset allowMacroAccess to original value
+$WebGUIdbLink->set({allowMacroAccess=>$originalMacroAccessValue});
+
 
 END {
 	$session->db->dbh->do('DROP TABLE testTable');

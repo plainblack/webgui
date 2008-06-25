@@ -208,7 +208,7 @@ if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventP
         	}
 		$output = $style->process(\%var);
 	} else {
-		$output = "WebGUI was unable to instantiate your style template.".$var{'body.content'};
+		$output = sprintf "WebGUI was unable to instantiate your style template with the id: %s.%s", $templateId, $var{'body.content'};
 	}
 	WebGUI::Macro::process($self->session,\$output);
 	$self->sent(1);

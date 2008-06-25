@@ -322,88 +322,81 @@ function dragable_dragOver(obj,position) {
 
 //called on mouse up, If an element is being dragged, this method does the right thing.
 function dragable_dragStop(e) {    
-        dragging=false;            
-        if (z) {
-            
-            if (endTD !=null && startTD!=null) {
-            	    fObj2 = dragable_getObjectByClass(startTD,"availableDashlet");  
+    dragging=false;            
+    if (z) {
+        if (endTD !=null && startTD!=null) {
+            fObj2 = dragable_getObjectByClass(startTD,"availableDashlet");  
+            dragable_moveContent(startTD,endTD,endTDPos);
+            if (fObj2) {
+                var replId = startTD.id;
+                replId = replId.replace(/^td/gi,'');
+                //alert(replId);
+                var replUrl = available_dashlets[replId];
+                //alert(replUrl);
+                contentDiv = document.getElementById("ct" + replId + "_div");
+			
+                var callback = {
+                    success : function(req) {
+                        var myArr528 = req.responseText.split(/beginDebug/mg,1);
+                        contentDiv.innerHTML = myArr528[0];
+                    },
+                    failure : function(req) {
+                        alert("Toggle Edit Form failed.  Problem with connection.  Please refresh the page and try again.");
+                    }
+                }
+    
+                var url    = replUrl + "?func=ajaxInlineView";
+                var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
+            }
+            startTD=null;        
+                
+            if (dragable_isBlank(endTD)) {
+                divName = endTD.id;
+            }
+            else {
+                divName=endTD.id + "_div";
+                document.getElementById(divName).className="dragable";
+            }
+            dragable_postNewContentMap();    
+        }                        
 
-      dragable_moveContent(startTD,endTD,endTDPos);
-
-                    if (fObj2) {
-                    	var replId = startTD.id;
-                    	replId = replId.replace(/^td/gi,'');
-  //  	alert(replId);
-    	var replUrl = available_dashlets[replId];
- // 		alert(replUrl);
-  			contentDiv = document.getElementById("ct" + replId + "_div");
-				var hoopla = AjaxRequest.get(
-					{
-						'url':replUrl
-						,'parameters':{
-							'func':"ajaxInlineView"
-						}
-						,'onSuccess':function(req){
-							var myArr528 = req.responseText.split(/beginDebug/mg,1);
-							contentDiv.innerHTML = myArr528[0];
-						}
-					}
-				);
-
-   //   tdn6p_3ZAFRtB9WiyKnrwryg
-   // 	ctn6p_3ZAFRtB9WiyKnrwryg_div
+        for(i=0;i<dragableList.length;i++) {
+            dragableList[i].style.top='0px';
+            dragableList[i].style.left='0px';
+            dragableList[i].className="dragable";    
+        }
+        
+        //this is a ie hack for a render bug
+        for(i=0;i<draggableObjectList.length;i++) {
+            if (draggableObjectList[i]) {                                    
+                draggableObjectList[i].style.top='1px';
+                draggableObjectList[i].style.left='1px';                    
+                draggableObjectList[i].style.top='0px';
+                draggableObjectList[i].style.left='0px';                    
+            }
+        }
     }
-                startTD=null;        
-                
-                if (dragable_isBlank(endTD)) {
-                    divName = endTD.id;
-                }else {
-                    divName=endTD.id + "_div";
-                    document.getElementById(divName).className="dragable";
-               //     document.getElementById(divName).style.opacity = null;
-   //                 document.getElementById(divName).style.filter = null;
-                }
-                dragable_postNewContentMap();
-                
-
-            }                        
-
-            for(i=0;i<dragableList.length;i++) {
-                dragableList[i].style.top='0px';
-                dragableList[i].style.left='0px';
-                dragableList[i].className="dragable";    
-            }
         
-            //this is a ie hack for a render bug
-            for(i=0;i<draggableObjectList.length;i++) {
-                if (draggableObjectList[i]) {                                    
-                    draggableObjectList[i].style.top='1px';
-                    draggableObjectList[i].style.left='1px';                    
-                    draggableObjectList[i].style.top='0px';
-                    draggableObjectList[i].style.left='0px';                    
-                }
-            }
-        }
+    startTD=null;
         
-        startTD=null;
-        
-        if (endTD != null) {
-            endTD.position = null;
-            endTD=null;
-        }
-        
+    if (endTD != null) {
+        endTD.position = null;
+        endTD=null;
+    }    
 }
 
 function dragable_postNewContentMap() {
-		AjaxRequest.get(
-    {
-      'url':pageURL
-      ,'method':'POST'
-      ,'map':dragable_getContentMap()
-      ,'func':'setContentPositions'
- //     ,'onSuccess':function(req){ alert(req.responseText); }
+	var callback = {
+        success : function(req) {  },
+        failure : function(req) {
+            alert("Post New Content Map Failed.  Problem with connection.  Please refresh the page and try again.");
+        }
     }
-  );
+    
+    var url       = pageURL;
+    var dataParts = "func=setContentPositions&map=" + dragable_getContentMap();
+    var status = YAHOO.util.Connect.asyncRequest('POST',url,callback,dataParts);
+        
 }
 
 //gets the element children of a dom object
@@ -437,8 +430,6 @@ function dragable_deleteContent(e,from,postNewContentMap) {
 	from = dragable_getObjectByClass(from,"dragable");
 	from = document.getElementById(from.id.substr(0,from.id.indexOf("_div")));
 	dragable_moveContent(from,document.getElementById('position1').rows[document.getElementById('position1').rows.length - 1],"bottom");
-//	e.preventDefault();
-//	e.stopPropagation();
 	 if (postNewContentMap) {dragable_postNewContentMap();} // This will help avoid meaningless web server hits.
 }
 
@@ -522,44 +513,51 @@ function dashboard_toggleEditForm(event,shortcutId,shortcutUrl) {
 	var parentDiv = document.getElementById("td" + shortcutId + "_div");
 	var contentDiv = document.getElementById("ct" + shortcutId + "_div");
 	parentDiv.insertBefore(formDiv,contentDiv);
-	var hooha = AjaxRequest.get(
-		{
-			'url':shortcutUrl
-			,'parameters':{
-				'func':"getUserPrefsForm"
+	
+    var callback = {
+        success : function(req) {
+            var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
+			var myScript = myHtml.split(/\<script\>/mg)[1];
+			if (myScript) {
+				myScript = myScript.split(/\<\/script\>/mg)[0];
+				eval(myScript);
 			}
-			,'onSuccess':function(req){
-				var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
-				var myScript = myHtml.split(/\<script\>/mg)[1];
-				if (myScript) {
-					myScript = myScript.split(/\<\/script\>/mg)[0];
-					eval(myScript);
-				}
-				formDiv.innerHTML = myHtml;
-			}
-		}
-	);
+			formDiv.innerHTML = myHtml;
+        },
+        failure : function(req) {
+            alert("Toggle Edit Form failed.  Problem with connection.  Please refresh the page and try again.");
+        }
+    }
+    
+    var url    = shortcutUrl + "?func=getUserPrefsForm";
+    var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
+    
 }
 
 function dashboard_reloadDashlet(event,shortcutId,shortcutUrl) {
 	// Reload the content div.
 	contentDiv = document.getElementById("ct" + shortcutId + "_div");
-	var hooha = AjaxRequest.get(
-		{
-			'url':shortcutUrl
-			,'parameters':{
-				'func':"ajaxInlineView"
+    
+    var callback = {
+        success : function(req) {
+            var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
+			var myScript = myHtml.split(/\<script\>/mg)[1];
+			if (myScript) {
+				myScript = myScript.split(/\<\/script\>/mg)[0];
+				eval(myScript);
 			}
-			,'onSuccess':function(req){
-				var myHtml = req.responseText.split(/beginDebug/mg,1)[0];
-				var myScript = myHtml.split(/\<script\>/mg)[1];
-				if (myScript) {
-					myScript = myScript.split(/\<\/script\>/mg)[0];
-					eval(myScript);
-				}
-				contentDiv.innerHTML = myHtml;
-			}
-		}
-	);
+			contentDiv.innerHTML = myHtml;
+        },
+        failure : function(req) {
+            alert("Reload Dashlet failed.  Problem with connection.  Please refresh the page and try again.");
+        }
+    }
+    
+    var url    = shortcutUrl + "?func=ajaxInlineView";
+    var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
 }
+
+function makeActive(o) { o.style.display = "inline"; }
+
+function makeInactive(o) { o.style.display = "none"; }
 

@@ -16,6 +16,7 @@ BEGIN {
 }
 
 use Getopt::Long;
+use Pod::Usage;
 use strict;
 use WebGUI::Session;
 use WebGUI::User;
@@ -43,52 +44,8 @@ GetOptions(
 	'newStatus:s'=>\$newStatus
 );
 
-
-
-
-
-unless ($configFile && !$help) {
-	print <<STOP;
-
-
-Usage: perl $0 --configfile=<webguiConfig>
-
-	--configFile	WebGUI config file (with no path info). 
-
-Description:	This utility allows you to automate the switching of status
-		for users in the IOB. For instance, you may wish to
-		automatically mark out all users each night that haven't
-		already marked out.
-
-Options:
-
-	--currentStatus	The status to check for. Defaults to "$currentStatus".
-
-	--help		Display this help message.
-
-	--newStatus	The status to set the user to. Defaults to 
-			"$newStatus".
-
-	--quiet         Disable output unless there's an error.
-
-	--userMessage	A message to be sent to the user upon getting their
-			status changed. Defaults to "$userMessage".
-
-	--userMessageFile	A path to a filename to override the
-			--userMessage with. This option will read the
-			contents of the file and send that as the
-			message.
-
-	--whatsHappening	The message attached to the IOB when 
-			changing status. Defaults to 
-			"$whatsHappening".
-
-STOP
-	exit;
-}
-
-
-
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless $configFile;
 
 print "Starting up...\n" unless ($quiet);
 my $session = WebGUI::Session->open($webguiRoot,$configFile);
@@ -146,3 +103,80 @@ $session->var->end;
 $session->close;
 print "OK\n" unless ($quiet);
 
+__END__
+
+=head1 NAME
+
+changeIobStatus - Automate WebGUI's InOut Board User status switching.
+
+=head1 SYNOPSIS
+
+ changeIobStatus --configFile config.conf
+                 [--currentStatus status]
+                 [--newStatus status]
+                 [--userMessage text|--userMessageFile pathname]
+                 [--whatsHappening text]
+                 [--quiet]
+
+ changeIobStatus --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script helps you switch one or more user status
+in the InOut Board (IOB). For instance, you might want to run it
+from cron each night to automatically mark out all users that haven't
+already marked out.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<--currentStatus status>
+
+Check users in the IOB having B<status> status. If left unspecified,
+it will default to C<In>.
+
+=item B<--newStatus status>
+
+Change users status in the IOB to B<status> status. If left unspecified,
+it will default to C<Out>.
+
+=item B<--userMessage msg>
+
+Text of the message to be sent to the user after changing the status.
+If left unspecified it will default to
+
+    You were logged out of the In/Out Board automatically.
+
+=item B<--userMessageFile pathname>
+
+Pathname to a file whose contents will be sent to the user after changing
+the status. Using this option overrides whatever messages is set
+with B<--userMessage> (see above).
+
+=item B<--whatsHappening text>
+
+The message attached to the InOut Board when changing status. If left
+unspecified it defaults to
+
+    Automatically signed out.
+
+=item B<--quiet>
+
+Disable all output unless there's an error.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

@@ -31,6 +31,10 @@ use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;
 
+# Profile field name for the number of times the showMessageOnLogin has been
+# seen.
+my $LOGIN_MESSAGE_SEEN  = 'showMessageOnLoginSeen';
+
 =head1 NAME
 
 Package WebGUI::Auth
@@ -190,20 +194,23 @@ sub createAccount {
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
         my $id           = $field->getId;
         my $label        = $field->getLabel;
-        my $defaultValue = undef;
         
         # Get the default email from the invitation
+        my $formField;
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
             my $code = $self->session->form->get('code')
                     || $self->session->form->get('uniqueUserInvitationCode');
-            $defaultValue 
+            my $defaultValue 
                 = $self->session->db->quickScalar(
                     'SELECT email FROM userInvitations WHERE inviteId=?',
                     [$code]
                 );
             $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
+            $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
         }
-        my $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
+        else {
+            $formField   = $field->formField();
+        }
         my $required    = $field->isRequired;
 
         # Old-style field loop.
@@ -296,16 +303,20 @@ sub createAccountSave {
 	}
 	
 	
-	# If we have a redirectAfterLogin, redirect the user
-        if ($self->session->form->get('returnUrl')) {
+	# If we have something to do after login, do it
+        if ( $self->session->setting->get( 'showMessageOnLogin' ) ) {
+            return $self->showMessageOnLogin;
+        }
+        elsif ($self->session->form->get('returnUrl')) {
 		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
 	  	$self->session->scratch->delete("redirectAfterLogin");
         }
 	elsif ($self->session->scratch->get("redirectAfterLogin")) {
 		my $url = $self->session->scratch->delete("redirectAfterLogin");
 		$self->session->http->setRedirect($url);
-        return undef;
-	} else {
+            return undef;
+	} 
+        else {
 		$self->session->http->setStatus(201,"Account Registration Successful");
 	}
 
@@ -694,21 +705,29 @@ sub login {
 		$self->session->http->setRedirect($currentUrl);
 	}
 
-        # Set the proper redirect
-        if ($self->session->form->get('returnUrl')) {
-		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
-	  	$self->session->scratch->delete("redirectAfterLogin");
-        }
-	elsif ($self->session->scratch->get("redirectAfterLogin")) {
-		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
-	  	$self->session->scratch->delete("redirectAfterLogin");
-	}
-	
+        # Run on login
 	my $command = $self->session->config->get("runOnLogin");
 	if ($command ne "") {
 		WebGUI::Macro::process($self->session,\$command);
 		my $error = qx($command);
 		$self->session->errorHandler->warn($error) if $error;
+	}
+	
+
+        # Set the proper redirect
+        if ( $self->session->setting->get( 'showMessageOnLogin' ) 
+            && $self->user->profileField( $LOGIN_MESSAGE_SEEN ) 
+                < $self->session->setting->get( 'showMessageOnLoginTimes' ) 
+        ) {
+            return $self->showMessageOnLogin;
+        }
+        elsif ( $self->session->form->get('returnUrl') ) {
+		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+	  	$self->session->scratch->delete("redirectAfterLogin");
+        }
+	elsif ( $self->session->scratch->get("redirectAfterLogin") ) {
+		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
+	  	$self->session->scratch->delete("redirectAfterLogin");
 	}
 	
 	return undef;
@@ -774,7 +793,7 @@ sub new {
 	$self->{profile} = ();
 	$self->{warning} = "";
 	my $call = shift;
-	my @callable = ('init', @{$call});
+	my @callable = ('init', 'showMessageOnLogin', @{$call});
 	$self->{callable} = \@callable;
 	bless $self, $class;
 	return $self;
@@ -848,6 +867,45 @@ sub saveParams {
 		$self->session->db->write("delete from authentication where userId=".$self->session->db->quote($uid)." and authMethod=".$self->session->db->quote($authMethod)." and fieldName=".$self->session->db->quote($_));
 		$self->session->db->write("insert into authentication (userId,authMethod,fieldData,fieldName) values (".$self->session->db->quote($uid).",".$self->session->db->quote($authMethod).",".$self->session->db->quote($data->{$_}).",".$self->session->db->quote($_).")");
 	}
+}
+
+#----------------------------------------------------------------------------
+
+=head2 showMessageOnLogin ( )
+
+Show the requested message after the user logs in. Add another tally to the 
+number of times the message has been displayed. Show a link to the next
+stage for the user.
+
+=cut
+
+sub showMessageOnLogin {
+    my $self        = shift;
+    my $i18n        = WebGUI::International->new( $self->session, 'Auth' );
+
+    # Increment the number of time seen.
+    $self->user->profileField( $LOGIN_MESSAGE_SEEN, 
+        $self->user->profileField( $LOGIN_MESSAGE_SEEN ) + 1
+    );
+
+    # Show the message, processing for macros
+    my $output  =  $self->session->setting->get( 'showMessageOnLoginBody' );
+    WebGUI::Macro::process( $self->session, \$output );
+
+    # Add the link to continue
+    my $redirectUrl =  $self->session->form->get( 'returnUrl' )
+                    || $self->session->scratch->get( 'redirectAfterLogin' )
+                    || $self->session->url->getSiteURL
+                    ;
+
+    $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
+                .  '</a></p>'
+                ;
+
+    # No matter what, we won't be redirecting after this
+    $self->session->scratch->delete( 'redirectAfterLogin' );
+
+    return $output;
 }
 
 #-------------------------------------------------------------------

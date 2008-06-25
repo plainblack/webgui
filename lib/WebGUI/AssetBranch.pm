@@ -282,6 +282,7 @@ sub www_editBranchSave {
 			} else {
 				$data{url} .= $descendant->get("url");
 			}
+            $wobjectData{url} = $data{url};
 		}
         my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
         next

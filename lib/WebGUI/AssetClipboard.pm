@@ -272,10 +272,22 @@ sub www_createShortcut {
 		templateId=>'PBtmpl0000000000000140'
 	});
 
+    if (! $isOnDashboard) {
+        $child->cut;
+    }
+    if ($self->session->setting->get("autoRequestCommit")) {
+        if ($self->session->setting->get("skipCommitComments")) {
+            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
+        } else {
+            $self->session->http->setRedirect($self->getUrl(
+                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
+            ));
+            return 1;
+        }
+    }
 	if ($isOnDashboard) {
 		return $self->getParent->www_view;
 	} else {
-		$child->cut;
 		$self->session->asset($self->getContainer);
 		return $self->session->asset->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 		return $self->session->asset->www_view;
@@ -414,7 +426,7 @@ $self->session->style->setLink($self->session->url->extras('assetManager/assetMa
                                 name=>'assetId',
                                 value=>$child->getId
                                 })
-                        ."','" . $plus . "<a href=\"".$child->getUrl("op=manageAssets")."\">" . $title
+                        ."','" . $plus . "<a href=\"".$child->getUrl("op=assetManager")."\">" . $title
                         ."</a>','<p style=\"display:inline;vertical-align:middle;\"><img src=\"".$child->getIcon(1)."\" style=\"border-style:none;vertical-align:middle;\" alt=\"".$child->getName."\" /></p> ".$child->getName
                         ."','".$self->session->datetime->epochToHuman($child->get("revisionDate"))
                         ."','".formatBytes($child->get("assetSize"))."');\n";

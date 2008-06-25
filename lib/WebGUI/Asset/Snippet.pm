@@ -109,6 +109,44 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 exportGetUrlAsPath ( index )
+
+Translates a URL into an appropriate path and filename for exporting.
+Overridden here to return a filename corresponding to the URL of this asset
+as-is.
+
+=head3 index
+
+index filename passed from exportAsHtml
+
+=cut
+
+sub exportGetUrlAsPath {
+    my $self            = shift;
+
+    # we don't use this, but get it anyway
+    my $index           = shift || 'index.html';
+
+    my $config          = $self->session->config;
+
+    # make sure that the export path is valid
+    WebGUI::Asset->exportCheckPath($self->session);
+
+    # if we're still here, it's valid. get it.
+    my $exportPath      = $config->get('exportPath');
+
+    # get the asset's URL as a URI::URL object for easy parsing of components
+    my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
+    my @pathComponents  = $url->path_components;
+    shift @pathComponents; # first item is the empty string
+    my $filename        = pop @pathComponents;
+
+    # return a path with the filename part of the URL. No fancy twiddling needed.
+    return Path::Class::File->new($exportPath, @pathComponents, $filename);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getToolbar ( )
 
 Returns a toolbar with a set of icons that hyperlink to functions that delete, edit, promote, demote, cut, and copy.

@@ -302,11 +302,36 @@ function cMenu_draw(){
 	var output = "";
 	output += '<div id="cMenu_' + this.id + '_menu" class="cMenu_skin">';
 	for (i=0;i<this.linkUrls.length;i++) {
+        var urlparts  = this.linkUrls[i].split("?");
+        var dataparts = urlparts[1].split(";");
+        var projectId = "";
+        var taskId    = "";
+        var insertAt  = "";
+        for (var j = 0; j < dataparts.length; j++) {
+          var keyval = dataparts[j].split("=");
+          var key = keyval[0];
+          var val = keyval[1];
+          if(key == "projectId") {
+            projectId = val;
+          }
+          else if(key == "taskId") {
+            taskId = val;
+          }
+          else if(key == "insertAt") {
+            insertAt = val;
+          }
+        }
+        
         var clazz = "submodal-400-300";
-		if(this.linkUrls[i].indexOf("delete") != -1) {
-		   clazz=""
+		var id    = projectId + "~~" + taskId + "~~" + insertAt;
+        var url   = "#";
+        if(this.linkUrls[i].indexOf("delete") != -1) {
+		   clazz = "";
+           url   = this.linkUrls[i];
+           id    = "";
 		}
-		output += "<a href=\"" + this.linkUrls[i] + "\" class=\"" + clazz + "\">" + this.linkLabels[i] + "</a><br />";
+        
+		output += "<a href=\"" + url + "\" class=\"" + clazz + "\" id=\"" + id +"\">" + this.linkLabels[i] + "</a><br />";
 	}
 	output += '</div>';
 	if (this.type == "image") {

@@ -56,7 +56,7 @@ my $gallery
     = $node->addChild( {
         className           => 'WebGUI::Asset::Wobject::Gallery',
         groupIdAddFile      => '2',     # Registered Users
-        workflowIdCommit    => 'realtimeworkflow-00001', # Commit Content Immediately
+        workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
     } );
 
 $versionTags[-1]->commit;

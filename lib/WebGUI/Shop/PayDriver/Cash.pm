@@ -8,6 +8,13 @@ use WebGUI::Exception;
 use base qw/WebGUI::Shop::PayDriver/;
 
 #-------------------------------------------------------------------
+
+=head2 canCheckOutCart ( )
+
+Returns whether the cart can be checked out by this plugin.
+
+=cut
+
 sub canCheckoutCart {
     my $self    = shift;
     my $cart    = $self->getCart;
@@ -20,6 +27,12 @@ sub canCheckoutCart {
 
 #-------------------------------------------------------------------
 
+=head2 definition ( session, definition )
+
+See WebGUI::Shop::PayDriver->definition.
+
+=cut
+
 sub definition {
     my $class       = shift;
     my $session     = shift;
@@ -30,7 +43,7 @@ sub definition {
     tie my %fields, 'Tie::IxHash';
 
     push @{ $definition }, {
-        name        => $i18n->echo('Cash'),
+        name        => $i18n->get('label'),
         properties  => \%fields,
     };
 
@@ -38,16 +51,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
-sub getAddress {
-    my ($self, $addressId)    = @_;
-    if ($addressId) {
-        return $self->getCart->getAddressBook->getAddress( $addressId );
-    }
-    # No billing address selected yet so return undef.
-    return undef;
-}
 
-#-------------------------------------------------------------------
+=head2 getButton ( )
+
+Returns the HTML for a form containing a button that, when clicked, will take the user to the checkout screen of
+this plugin.
+
+=cut
 
 sub getButton {
     my $self    = shift;
@@ -56,14 +66,19 @@ sub getButton {
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->echo('Cash') })
+        . WebGUI::Form::submit($session, {value => $i18n->get('cash') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
 }
 
-
 #-------------------------------------------------------------------
+
+=head2 processPayment ( )
+
+Returns (1, undef, 1, 'Success'), meaning that the payments whith this plugin always are successful.
+
+=cut
 
 sub processPayment {
     return (1, undef, 1, 'Success');
@@ -76,6 +91,17 @@ sub www_displayStatus {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getCredentials ( [ addressId ] )
+
+Displays the checkout form for this plugin.
+
+=head3 addressId
+
+Optionally supply this variable which will set the payment address to this addressId.
+
+=cut
+
 sub www_getCredentials {
     my ($self, $addressId)    = @_;
     my $session = $self->session;
@@ -120,6 +146,12 @@ sub www_getCredentials {
 
 #-------------------------------------------------------------------
 
+=head2 www_pay ( )
+
+Checks credentials, and completes the transaction if those are correct.
+
+=cut
+
 sub www_pay {
     my $self    = shift;
     my $session = $self->session;
@@ -140,6 +172,12 @@ sub www_pay {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_setBillingAddress {
+
+Stores the selected billing address in this instance.
+
+=cut
 
 sub www_setBillingAddress {
     my $self    = shift;

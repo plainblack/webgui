@@ -462,6 +462,14 @@ sub definition {
                         fieldType=>'yesNo',
                         defaultValue=>1,
                     },
+                    inheritUrlFromParent=>{
+                        tab=>'meta',
+                        label=>$i18n->get('does asset inherit URL from parent'),
+                        hoverHelp=>$i18n->get('does asset inherit URL from parent description'),
+                        uiLevel=>9,
+                        fieldType=>'yesNo',
+                        defaultValue=>0,
+                    },
 				    status=>{
 					    noFormPost=>1,
 					    fieldType=>'hidden',
@@ -589,6 +597,16 @@ sub fixUrl {
 		$url .= '/'.$self->getValue("menuTitle");
 	}
 	$url = $self->session->url->urlize($url);
+
+    # if we're inheriting the URL from our parent, set that appropriately
+    if($self->get('inheritUrlFromParent')) {
+        my @parts = split(m{/},$url);
+
+        # don't do anything unless we need to
+        if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
+            $url = $self->getParent->getUrl . '/' . $parts[-1];
+        }
+    }
 
 	# fix urls used by uploads and extras
 	# and those beginning with http
@@ -1060,6 +1078,40 @@ sub getImportNode {
 
 #-------------------------------------------------------------------
 
+=head2 getIsa ( $session )
+
+A class method to return an iterator for getting all Assets by class (and all sub-classes)
+as Asset objects, one at a time.  When the end of the assets is reached, then the iterator
+will close the database handle that it uses and return undef.
+
+It should be used like this:
+
+my $productIterator = WebGUI::Asset::Product->getIsa($session);
+while (my $product = $productIterator->()) {
+  ##Do something useful with $product
+}
+
+=cut
+
+sub getIsa {
+    my $class    = shift;
+    my $session  = shift;
+    my $def = $class->definition($session);
+    my $tableName = $def->[0]->{tableName};
+    my $sth = $session->db->read("select distinct(assetId) from $tableName");
+    return sub {
+        my ($assetId) = $sth->array;
+        if (!$assetId) {
+            $sth->finish;
+            return undef;
+        }
+        return WebGUI::Asset->newPending($session, $assetId);
+    };
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getMedia ( session )
 
 Constructor. Returns the media folder.
@@ -1256,7 +1308,7 @@ sub getToolbar {
 		$output .= 'contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");';
 	}
 	if ($userUiLevel >= $uiLevels->{"manage"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("op=manageAssets").'","'.$i18n->get("manage").'");';
+		$output .= 'contextMenu.addLink("'.$self->getUrl("op=assetManager").'","'.$i18n->get("manage").'");';
 	}
 	$output .= 'contextMenu.print();
                 //]]>
@@ -1439,16 +1491,14 @@ sub new {
     my $session         = shift;
     my $assetId         = shift;
     my $className       = shift;
-    my $revisionDate    = shift || $class->getCurrentRevisionDate($session, $assetId);
+    my $revisionDate    = shift;
 
     unless (defined $assetId) {
         $session->errorHandler->error("Asset constructor new() requires an assetId.");
         return undef;
     }
 
-    return undef unless ($revisionDate);
-
-    unless ($class ne 'WebGUI::Asset' or defined $className) {
+    if ($class eq 'WebGUI::Asset' && !$className) {
         ($className) = $session->db->quickArray("select className from asset where assetId=?", [$assetId]);
         unless ($className) {
             $session->errorHandler->error("Couldn't instantiate asset: ".$assetId. ": couldn't find class name");
@@ -1460,7 +1510,14 @@ sub new {
         $class = $class->loadModule($session, $className);        
         return undef unless (defined $class);
     }
-
+    
+    if ( !$revisionDate ) {
+        $revisionDate   = $className
+                        ? $className->getCurrentRevisionDate( $session, $assetId )
+                        : $class->getCurrentRevisionDate( $session, $assetId );
+        return undef unless $revisionDate;
+    }
+    
     my $cache = WebGUI::Cache->new($session, ["asset",$assetId,$revisionDate]);
     my $properties = $cache->get;
     if (exists $properties->{assetId}) {
@@ -1932,7 +1989,15 @@ sub update {
     }
 
     # check the definition of all properties against what was given to us
-	foreach my $definition (reverse @{$self->definition($self->session)}) {
+
+    # get a DB object for the two conditionals below, and the description
+    my %assetDataFields;
+    my $sth = $self->session->db->read('DESCRIBE `assetData`');
+    while (my ($col) = $sth->array) {
+        $assetDataFields{$col} = 1;
+    }
+
+    foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
 
         # deal with all the properties in this part of the definition
@@ -1947,17 +2012,13 @@ sub update {
             # if this is the new-to-7.5 isExportable field, check if the
             # database field for it exists. if not, setting it will break, so
             # skip it. this facilitates updating from previous versions.
-            if($property eq 'isExportable') {
-                my $db = $self->session->db;
-                my $assetDataDescription = $db->buildHashRef('describe assetData');
-                unless(grep { $_ =~ /^isExportable/ } keys %{$assetDataDescription}) {
-                    next;
-                }
+            if ($definition->{tableName} eq 'assetData' && !exists $assetDataFields{$property}) {
+                next;
             }
+
 
             # use the update value
 			my $value = $properties->{$property};
-
             # use the current value because the update value was undef
             unless (defined $value) {
                 $value = $self->get($property);
@@ -2157,7 +2218,7 @@ sub www_changeUrlConfirm {
 	}
 
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getUrl('op=manageAssets'));
+		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
 	}
@@ -2204,6 +2265,7 @@ sub www_editSave {
         $object = $self->addChild({className=>$self->session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
+        $object->{_properties}{url} = undef;
     } 
     else {
         if ($self->canEditIfLocked) {
@@ -2364,7 +2426,9 @@ sub www_widgetView {
 
     return $session->privilege->noAccess() unless $self->canView;
 
-    my $templateId = $session->form->process('templateId');
+    my $templateId  = $session->form->process('templateId');
+    my $width       = $session->form->process('width');
+    my $height      = $session->form->process('height');
 
     if($templateId eq 'none') {
         $self->prepareView;
@@ -2372,8 +2436,7 @@ sub www_widgetView {
     else {
         $self->prepareWidgetView($templateId);
     }
-        $self->_outputWidgetJs;
-        return $self->view;
+        return $self->outputWidgetMarkup($width, $height, $templateId);
 }
 
 #-------------------------------------------------------------------
@@ -2392,22 +2455,135 @@ sub prepareWidgetView {
     my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
     my $session         = $self->session;
     my $extras          = $session->config->get('extrasURL');
-    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
-    my $widgetJs        = $extras . '/widgetLinkTargets.js';
 
     $template->prepare;
 
     $self->{_viewTemplate} = $template;
 }
 
-sub _outputWidgetJs {
+
+#-------------------------------------------------------------------
+
+=head2 outputWidgetMarkup ( width, height, templateId )
+
+Output the markup required for the widget view. Includes markup to handle the
+widget macro in the iframe holding the widgetized asset. This does the following: 
+
+=over 4
+
+=item *
+
+retrieves the content for this asset using its L</view> method
+
+=item *
+
+processes macros in that content
+
+=item *
+
+serializes the processed content in JSON
+
+=item *
+
+writes the JSON to a storage location
+
+=item *
+
+refers the user to download this JSON
+
+=item *
+
+references the appropriate JS files for the templating engine and the widget macro
+
+=item *
+
+invokes the templating engine on this JSON
+
+=back
+
+=head3 width
+
+The width of the iframe. Required for making widget-in-widget function properly.
+
+=head3 height
+
+The height of the iframe. Required for making widget-in-widget function properly.
+
+=head3 templateId
+
+The templateId for this widgetized asset to use. Required for making
+widget-in-widget function properly.
+
+=cut
+
+sub outputWidgetMarkup {
+    # get our parameters.
     my $self            = shift;
+    my $width           = shift;
+    my $height          = shift;
+    my $templateId      = shift;
+
+    # construct / retrieve the values we'll use later.
+    my $assetId         = $self->getId;
     my $session         = $self->session;
-    my $extras          = $session->config->get('extrasURL');
+    my $conf            = $session->config;
+    my $extras          = $conf->get('extrasURL');
+
+    # the widgetized version of content that has the widget macro in it is
+    # executing in an iframe. this iframe doesn't have a style object.
+    # therefore, the macro won't be able to output the stylesheet and JS
+    # information it needs to do its work. because of this, we need to output
+    # that content manually. construct the filesystem paths for those files.
+    my $containerCss    = $extras . '/yui/build/container/assets/container.css';
+    my $containerJs     = $extras . '/yui/build/container/container-min.js';
     my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
-    my $widgetJs        = $extras . '/widgetLinkTargets.js';
-    $session->output->print("<script type='text/javascript' src='" . $yahooDomJs . "'></script>");
-    $session->output->print("<script type='text/javascript' src='" . $widgetJs   . "'></script>");
+    my $wgWidgetJs      = $extras . '/wgwidget.js';
+    my $ttJs            = $extras . '/tt.js';
+    
+    # the templating engine requires its source data to be in json format.
+    # write this out to disk and then serve the URL to the user. in this case,
+    # we'll be serializing the content of the asset which is being widgetized. 
+    my $storage         = WebGUI::Storage->get($session, $assetId);
+    my $content         = $self->view;
+    WebGUI::Macro::process($session, \$content);
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
+    $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
+    my $jsonUrl         = $storage->getUrl("$assetId.js");
+
+    # WebGUI.widgetBox.initButton() needs the full URL of the asset being
+    # widgetized, and also the full URL of the JS file that does most of the
+    # work.
+    my $fullUrl         = "http://" . $conf->get("sitename")->[0] . $self->getUrl;
+    my $wgWidgetPath    = 'http://' . $conf->get('sitename')->[0] . $extras . '/wgwidget.js';
+
+    # finally, given all of the above, construct our output. WebGUI outputs
+    # fully valid XHTML 1.0 Strict, and there's no reason this should be any
+    # different.
+    my $output          = <<OUTPUT;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="$containerCss" />
+        <script type="text/javascript" src="$jsonUrl"></script>
+        <script type="text/javascript" src="$ttJs"></script>
+        <script type='text/javascript' src='$yahooDomJs'></script>
+        <script type='text/javascript' src='$containerJs'></script>
+        <script type='text/javascript' src='$wgWidgetJs'></script>
+        <script type='text/javascript'>
+            function setupPage() {
+                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
+                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+            }
+            YAHOO.util.Event.addListener(window, 'load', setupPage);
+        </script>
+    </head>
+    <body id="widget$assetId">
+        \${asset$assetId.content}
+    </body>
+</html>
+OUTPUT
+    return $output;
 }
 
 1;

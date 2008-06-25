@@ -406,11 +406,11 @@ sub www_addTax {
         unless $admin->canManage;
     my $params;
     my ($form)    = $session->quick('form');
-    $params->{country} = $form->get('country');
-    $params->{state}   = $form->get('state');
-    $params->{city}    = $form->get('city');
-    $params->{code}    = $form->get('code');
-    $params->{taxRate} = $form->get('taxRate');
+    $params->{country} = $form->get('country', 'text');
+    $params->{state}   = $form->get('state',   'text');
+    $params->{city}    = $form->get('city',    'text');
+    $params->{code}    = $form->get('code',    'text');
+    $params->{taxRate} = $form->get('taxRate', 'integer');
     $self->add($params);
     return $self->www_manage;
 }
@@ -496,21 +496,40 @@ sub www_importTax {
         unless $admin->canManage;
     my $storage = WebGUI::Storage->create($session);
     my $taxFile = $storage->addFileFromFormPost('importFile', 1);
-    $self->importTaxData($storage->getPath($taxFile)) if $taxFile;
-    return $self->www_manage;
+    eval {
+        $self->importTaxData($storage->getPath($taxFile)) if $taxFile;
+    };
+    my ($exception, $status_message);
+    if ($exception = Exception::Class->caught('WebGUI::Error::InvalidFile')) {
+        $status_message = sprintf 'A problem was found with your file: %s',
+            $exception->error;
+        if ($exception->brokenLine) {
+            $status_message .= sprintf ' on line %d', $exception->brokenLine;
+        }
+    }
+    elsif ($exception = Exception::Class->caught()) {
+        $status_message = sprintf 'A problem happened during the import: %s', $exception->error;
+    }
+    return $self->www_manage($status_message);
 }
 
 #-------------------------------------------------------------------
 
-=head2 www_manage (  )
+=head2 www_manage ( $status_message )
 
 User interface to manage taxes.  Provides a list of current taxes, and forms for adding
 new tax info, exporting and importing sets of taxes, and deleting individual tax data.
 
+=head3 $status_message
+
+A message to display to the user.  This is usually a problem that was found during
+import.
+
 =cut
 
 sub www_manage {
-    my $self = shift;
+    my $self           = shift;
+    my $status_message = shift;
     my $session = $self->session;
     my $admin = WebGUI::Shop::Admin->new($session);
     return $session->privilege->insufficient
@@ -529,39 +548,52 @@ sub www_manage {
     my $i18n=WebGUI::International->new($session, 'Tax');
 
     my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('export'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('export','Shop'), extras=>q{style="float: left;"} })
                    . WebGUI::Form::formFooter($session);
     my $importForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=importTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('import'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('import','Shop'), extras=>q{style="float: left;"} })
                    . q{<input type="file" name="importFile" size="10" />}
                    . WebGUI::Form::formFooter($session);
 
     my $addForm = WebGUI::HTMLForm->new($session,action=>$url->page('shop=tax;method=addTax'));
     $addForm->text(
-        label => $i18n->get('country'),
-        name  => 'country',
+        label     => $i18n->get('country'),
+        hoverHelp => $i18n->get('country help'),
+        name      => 'country',
     );
     $addForm->text(
-        label => $i18n->get('state'),
-        name  => 'state',
+        label     => $i18n->get('state'),
+        hoverHelp => $i18n->get('state help'),
+        name      => 'state',
     );
     $addForm->text(
-        label => $i18n->get('city'),
-        name  => 'city',
+        label     => $i18n->get('city'),
+        hoverHelp => $i18n->get('city help'),
+        name      => 'city',
     );
     $addForm->text(
-        label => $i18n->get('code'),
-        name  => 'code',
+        label     => $i18n->get('code'),
+        hoverHelp => $i18n->get('code help'),
+        name      => 'code',
     );
-    $addForm->text(
-        label => $i18n->get('tax rate'),
-        name  => 'taxRate',
+    $addForm->integer(
+        label     => $i18n->get('tax rate'),
+        hoverHelp => $i18n->get('tax rate help'),
+        name      => 'taxRate',
     );
     $addForm->submit(
         value => $i18n->get('add a tax'),
     );
-    my $output =sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
-<div class=" yui-skin-sam">
+    my $output;
+    if ($status_message) {
+        $output = <<EOSM;
+<div class="error">
+$status_message
+</div>
+EOSM
+    }
+    $output .=sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
+<div class="yui-skin-sam">
     <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>

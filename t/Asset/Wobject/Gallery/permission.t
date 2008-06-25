@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/../../../lib";
 
 ## The goal of this test is to test permissions inside Gallerys
 
-use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Test::Maker::Permission;

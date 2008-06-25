@@ -93,6 +93,30 @@ our $I18N = {
         context 	=> q|template variable description|
 	},
 
+	'thank you message' => {
+		message => q|Thank you message|,
+		lastUpdated => 0,
+		context => q|help for default price field|
+	},
+
+	'thank you message help' => {
+		message => q|Write a "thank you message", this could also just be a notice that something was added to the cart.|,
+		lastUpdated => 0,
+		context => q|help for default price field|
+	},
+
+	'default thank you message' => {
+		message => q|The coupon has been added to the cart.|,
+		lastUpdated => 0,
+		context => q|help for default price field|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the product to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 };
 
 1;

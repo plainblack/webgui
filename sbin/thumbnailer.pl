@@ -8,6 +8,13 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 #-----------------------------------------
 # A little utility to generate WebGUI
 # thumbnails. 
@@ -17,6 +24,7 @@ use Carp qw(croak);
 use File::stat;
 use File::Find ();
 use Getopt::Long;
+use Pod::Usage;
 
 my $graphicsPackage;
 BEGIN {
@@ -31,7 +39,6 @@ BEGIN {
     }
 }
 
-use lib "../lib";
 use WebGUI::Utility;
 
 my $thumbnailSize;
@@ -46,20 +53,8 @@ my $ok = GetOptions(
 	'path=s'=>\$path
 );
 
-if ($help || !($path && $ok) ) {
-  print <<USAGE;
-Usage: perl $0 --path=/path/to/files [--size=thumbnailSize] [--missing]
-
---path is the complete path to your uploads directory
-
---size=thumbSize allows you to override the default thumbnail size of 50.
-
---missing says to only create thumbnails for images that are missing thumbnails.
-
-USAGE
-
-exit 0;
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless $path;
 
 $thumbnailSize ||= 50; ##set default
 
@@ -124,3 +119,59 @@ sub getType {
         my ($extension) = $fileName =~ m/(\w+)$/;
         return lc($extension);
 }
+
+__END__
+
+=head1 NAME
+
+thumbnailer - Create thumbnails for WebGUI's uploaded graphic files
+
+=head1 SYNOPSIS
+
+ thumbnailer --path path
+             [--size thumbnailSize]
+	     [--missing]
+
+ thumbnailer --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script generates thumbnails for WebGUI's uploaded
+graphic files. The script finds all the graphic files recursively
+starting from the specified path; it will skip those files that already
+have thumbnails, and create PNG thumbnails for the rest.
+
+Files with JPG, JPEG, GIF, PNG, TIF, TIFF and BMP extensions are
+regarded as graphic files.
+
+The thumbnails are created using L<Graphics::Magick> or L<Image::Magick>
+for image transformations.
+
+=over
+
+=item B<--path path>
+
+Specifies the absolute B<path> to WebGUI's uploads directory.
+This parameter is required.
+
+=item B<--size thumbSize>
+
+Specify the size in pixels of the largest dimension of the thumbanils.
+If left unspecified, it defaults to 50 pixels.
+
+=item B<--missing>
+
+Use this option to create thumbnails only for those images that are
+missing thumbnails.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

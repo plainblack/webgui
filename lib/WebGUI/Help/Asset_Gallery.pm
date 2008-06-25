@@ -154,6 +154,12 @@ our $HELP = {
             {
                 name        => 'search_results',
                 description => 'helpvar search_results',
+                variables   => [
+                    {
+                        name        => 'isAlbum',
+                        description => 'helpvar isAlbum',
+                    },
+                ],
             },
         ],
         # All classes that can be found by a Gallery search go in here

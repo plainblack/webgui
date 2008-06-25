@@ -58,7 +58,7 @@ sub addRevision {
     my $self        = shift;
     my $newSelf = $self->SUPER::addRevision(@_);
 
-    if ($self->getRevisionCount > 1 && $self->get("storageId")) {
+    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
         my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
         $newSelf->update({storageId => $newStorage->getId});
     }

@@ -19,6 +19,7 @@ BEGIN {
 use DBI;
 use FileHandle;
 use Getopt::Long;
+use Pod::Usage;
 use strict qw(subs vars);
 use WebGUI::Session;
 use WebGUI::Asset;
@@ -39,35 +40,8 @@ GetOptions(
 	'url=s'=>\$url
 );
 
-if ($help || $configFile eq '' || !($assetId||$url)) {
-	print <<STOP;
-
-
-Usage: perl $0 --configFile=<webguiConfig> --url=home
-
-Options:
-
-	--configFile    WebGUI config file (with no path info).
-
-
-	--assetId       Set the asset to be generated.
-
-        --help		Displays this message.
-
-	--styleId	Set an alternate style for the page.
-			Defaults to asset's default style.
-
-	--toFile	Set the path and filename to write the
-			content to instead of standard out.
-
-	--url		The URL of the asset to be generated.
-
-	--userId	Set the user that should view the page.
-			Defaults to "1" (Visitor).
-
-STOP
-	exit;
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage() if ($configFile eq '' || !($assetId||$url) );
 
 # Open WebGUI session
 my $session = WebGUI::Session->open($webguiRoot,$configFile);
@@ -104,3 +78,74 @@ $session->close;
 
 exit;
 
+__END__
+
+=head1 NAME
+
+generateContent - Generate content for a specified Asset
+
+=head1 SYNOPSIS
+
+ generateContent --configFile config.conf {--url home|--assetID id}
+                 [--styleId id]
+                 [--toFile pathname]
+                 [--userId id]
+
+ generateContent --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script generates content for an Asset specified
+either by its URL or its Asset ID. The content is sent to standard
+output or to a filename.
+
+A particular WebGUI UserId can be specified as a viewer, in order
+to check whether the content is correctly generated or not, being
+possible to specify any of the available WebGUI styles to format
+the generated content.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<--assetId id>
+
+Generate content for WebGUI's Asset identified by B<id>. Either this
+parameter or B<--url> must be supplied.
+
+=item B<--url url>
+
+Generate content for WebGUI's Asset located at B<url>, which must be
+relative to the server (e.g. B</home> instead of B<http://your.server/home>).
+Either this parameter or B<--assetID> must be supplied.
+
+=item B<--styleId id>
+
+Use the WebGUI style specified by the AssetID B<id>. If left unspecified,
+it defaults to using the Asset's default style.
+
+=item B<--toFile pathname>
+
+Send generated content to the specified filename. If left unspecified,
+content is sent to standard output.
+
+=item B<--userId id>
+
+Set a specific WebGUI user to act as content viewer. If left unspecified,
+defaults to B<1> (Visitor).
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

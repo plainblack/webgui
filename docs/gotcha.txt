@@ -7,6 +7,26 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.13
+--------------------------------------------------------------------
+ * RSSFromParent now uses the parent asset's canView method to 
+   determine if the user is allowed to see the RSS feed.
+   The upshot of this is that a user must be able to view the 
+   Collaboration System in order to view its RSS feed.
+   Previously, RSSFromParent did no view restrictions, allowing 
+   anyone with the right URL to see an RSS feed, even if they do not
+   have permission to view the Collaboration System it came from.
+
+ * The 7.5.11 upgrade contained a bug that didn't import existing
+   Data Form entries properly.  The script has been corrected, so if
+   you didn't already upgrade to 7.5.11, there is nothing to worry
+   about.  If you already upgraded, the information can be restored
+   from a backup. See
+   http://www.webgui.org/bugs/tracker/data-form-listing-existing-entries-wrong-missing-data
+   for information on how to retrieve this information without having
+   to revert entirely to a past backup.
+
+
 7.5.11
 --------------------------------------------------------------------
  * You need the following new Perl Modules installed before you upgrade:
@@ -15,6 +35,12 @@ save you many hours of grief.
 	Path::Class
 	Image::ExifTool
     List::MoreUtils
+
+ * SQL Form is no longer part of the official distribution of WebGUI,
+   but is still being actively maintained by third-parties. However, if you
+   don't want to use SQL Form any longer, make sure you delete all SQL Forms
+   from your site prior to the upgrade *and* purge them from your trash. Then
+   the upgrade will automatically uninstall the SQL Form from your site.
 
  * WebGUI versions since 7.3.0 (when the new Calendar was added) 
    have allowed users to post Events to Calendars, but the owner of
@@ -49,8 +75,36 @@ save you many hours of grief.
 
  * All Product Templates that shipped with earlier versions of WebGUI have
    been deleted, except for the Default Product Macro.  During the upgrade,
-   all products have been updated to use the Default Product Macro.
+   all products have been updated to use the Default Product Macro.  If you want
+   to keep these, you will need to make a copy of them before the upgrade.
 
+ * All Commerce Templates that shipped with earlier versions of WebGUI have
+   been deleted.  If you want to keep these, you will need to make a copy of
+   them before the upgrade.
+
+ * Subscriptions have been converted to assets. These assets will be placed in 
+   the import node in the folder 'Migrated Subscriptions'. 
+   
+ * It used to be possible to link subscription codes to multiple subscriptions. 
+   This is no longer the case. Subscription code that are not yet expired or used
+   and link to multiple subscriptions will be migrated in the following manner:
+     1) The subscription codes will remain valid for one of the subscriptions they
+        linked to.
+     2) For the other subscriptions connected to these codes new subscription codes 
+        will be generated. The upgrade script print all the new codes in the case.
+        The new codes will also be logged in the webgui log file.
+
+ * With the new shop system the Payment plugins have been changed too. The default
+   WebGUI Payment Plugins are automatically migrated for you, but custom plugins 
+   will have to be adapted to use the new WebGUI::Shop API.
+
+ * If you are using the ITransact payment plugin you'll have to change the postback
+   url. The new value is printed by the upgrade script and can also be found in
+   the edit screen of the ITransact plugin.
+
+ * The Commit With Approval and Commit Without Approval workflows have been
+   rebuilt.  If you have changed these default workflows and wish to retain your
+   changes, be sure to back them up before you install 7.5.11
 
 7.5.9
 --------------------------------------------------------------------

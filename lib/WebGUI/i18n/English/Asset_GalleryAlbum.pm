@@ -484,6 +484,72 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar isPending' => {
+        message     => q{A flag to set if the GalleryAlbum is not yet approved. Users who can edit the GalleryAlbum are allowed to see them before they are approved.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_promote' => {
+        message     => q{A button to move the image up in the ranking. Use this to change the order of the images.},
+        lastUpdated => 1213631348,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_demote' => {
+        message     => q{A button to move the image down in the ranking. Use this to change the order of the images.},
+        lastUpdated => 1213631346,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_delete' => {
+        message     => q{A button to delete the image.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar form_synopsis' => {
+        message     => q{An HTML Area for the image thumbnail.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar nextAlbum_url' => {
+        message     => q{The URL to the next album in the list, in the order that is shown on the Gallery List Albums view. If there is no next album, this variable will not exist.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_url' => {
+        message     => q{The URL to the previous album in the list, in the order that is shown on the Gallery List Albums view. If there is no previous album, this variable will not exist.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar nextAlbum_title' => {
+        message     => q{The title for the next album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar nextAlbum_thumbnailUrl' => {
+        message     => q{The URL to the thumbnail image for the next album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_title' => {
+        message     => q{The title for the previous album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar previousAlbum_thumbnailUrl' => {
+        message     => q{The URL to the thumbnail image for the previous album in the list.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
 };
 
 1;

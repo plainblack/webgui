@@ -15,7 +15,6 @@ use lib "$FindBin::Bin/../../../../lib";
 ## The goal of this test is to test the EXIF functionality of WebGUI's photo
 # asset
 
-use Scalar::Util qw( blessed );
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 

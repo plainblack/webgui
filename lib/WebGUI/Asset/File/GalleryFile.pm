@@ -208,6 +208,21 @@ sub canEdit {
 
 #----------------------------------------------------------------------------
 
+=head2 canEditIfLocked ( [userId] )
+
+Override this to allow editing when locked under a different version tag.
+
+=cut
+
+sub canEditIfLocked {
+    my $self        = shift;
+    my $userId      = shift;
+
+    return $self->canEdit( $userId );
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( [userId] )
 
 Returns true if the user can view this asset. C<userId> is a WebGUI user ID.
@@ -330,6 +345,42 @@ sub getCommentPaginator {
 
 #----------------------------------------------------------------------------
 
+=head2 getCurrentRevisionDate ( session, assetId )
+
+Override this to allow instanciation of "pending" GalleryFiles for those who
+are authorized to see them.
+
+=cut
+
+sub getCurrentRevisionDate {
+    my $class       = shift;
+    my $session     = shift;
+    my $assetId     = shift;
+
+    # Get the highest revision date, instanciate the asset, and see if 
+    # the permissions are enough to return the revisionDate.
+    my $revisionDate
+        = $session->db->quickScalar( 
+            "SELECT MAX(revisionDate) FROM GalleryFile WHERE assetId=?",
+            [ $assetId ]
+        );
+
+    return undef unless $revisionDate;
+
+    my $asset   = WebGUI::Asset->new( $session, $assetId, $class, $revisionDate );
+
+    return undef unless $asset;
+
+    if ( $asset->get( 'status' ) eq "approved" || $asset->canEdit ) {
+        return $revisionDate;
+    }
+    else {
+        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 getGallery ( )
 
 Gets the Gallery asset this GalleryFile is a member of. 
@@ -338,9 +389,37 @@ Gets the Gallery asset this GalleryFile is a member of.
 
 sub getGallery {
     my $self        = shift;
-    my $gallery     = $self->getParent->getParent;
-    return $gallery if $gallery->isa("WebGUI::Asset::Wobject::Gallery");
-    return undef;
+    
+    # We must use getParent->getParent because brand-new assets do not
+    # have a lineage, but they do get assigned a parent.
+    return $self->getParent->getParent;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getParent ( )
+
+Get the parent GalleryAlbum. If the only revision of the GalleryAlbum is 
+"pending", return that anyway.
+
+=cut
+
+sub getParent {
+    my $self        = shift;
+    if ( my $album = $self->SUPER::getParent ) {
+        return $album;
+    }
+    # Only get the pending version if we're allowed to see this photo in its pending status
+    elsif ( $self->getGallery->canEdit || $self->get( 'ownerUserId' ) eq $self->session->user->userId ) {
+        my $album
+            = $self->getLineage( ['ancestors'], {
+                includeOnlyClasses  => [ 'WebGUI::Asset::Wobject::GalleryAlbum' ],
+                returnObjects       => 1,
+                statusToInclude     => [ 'pending', 'approved' ],
+                invertTree          => 1,
+            } )->[ 0 ];
+        return $album;
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -375,6 +454,11 @@ sub getTemplateVars {
 
     $var->{ fileUrl             } = $self->getFileUrl;
     $var->{ thumbnailUrl        } = $self->getThumbnailUrl;
+
+    # Set a flag for pending files
+    if ( $self->get( "status" ) eq "pending" ) {
+        $var->{ 'isPending' } = 1;
+    }
 
     # Fix 'undef' vars since HTML::Template does inheritence on them
     for my $key ( qw( synopsis ) ) {
@@ -569,8 +653,14 @@ sub processCommentEditForm {
 
 sub processPropertiesFromFormPost {
     my $self    = shift;
+    my $i18n    = __PACKAGE__->i18n( $self->session );
     my $form    = $self->session->form;
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
+
+    # Make sure we have the disk space for this
+    if ( !$self->getGallery->hasSpaceAvailable( $self->get( 'assetSize' ) ) ) {
+        push @{ $errors }, $i18n->get( "error no space" );
+    }
 
     # Return if errors
     return $errors if @$errors;

@@ -11,6 +11,10 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
     WebGUI.AssetManager = {};
 }
 
+// The extras folder
+WebGUI.AssetManager.extrasUrl   = '/extras/';
+// Keep track of the open more menus
+WebGUI.AssetManager.MoreMenusDisplayed = {};
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.addHighlightToRow ( child )
@@ -41,15 +45,136 @@ WebGUI.AssetManager.findRow
 };
 
 /*---------------------------------------------------------------------------
-    WebGUI.AssetManager.hideMoreMenu ( event, element )
-    Hide the more menu located inside element after a short delay.
+    WebGUI.AssetManager.formatActions ( )
+    Format the Edit and More links for the row
 */
-WebGUI.AssetManager.hideMoreMenu
-= function ( event, element ) {
-    var ul  = element.getElementsByTagName( "ul" )[0];
-    // Store the timeout in the element itself (bad, yes)
-    element.menuTimeout
-        = setTimeout( function () { ul.style.display = "none"; }, 100 );
+WebGUI.AssetManager.formatActions 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML 
+        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit">Edit</a>'
+        + ' | '
+        ;
+    var more    = document.createElement( 'a' );
+    elCell.appendChild( more );
+    more.appendChild( document.createTextNode( 'More' ) );
+    more.href   = '#';
+
+    // Delete the old menu
+    if ( document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) ) ) {
+        var oldMenu = document.getElementById( 'moreMenu' + oRecord.getData( 'assetId' ) );
+        oldMenu.parentNode.removeChild( oldMenu );
+    }
+
+    // Build a more menu
+    var rawItems    = WebGUI.AssetManager.MoreMenuItems;
+    var menuItems   = [];
+    for ( var i = 0; i < rawItems.length; i++ ) {
+        var itemUrl     = rawItems[i].url.match( /<url>/ )
+                        ? rawItems[i].url.replace( "<url>", oRecord.getData( 'url' ) )
+                        : oRecord.getData( 'url' ) + rawItems[i].url
+                        ;
+        menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
+    }
+
+    var options = {
+        "zindex"                    : 1000,
+        "clicktohide"               : true,
+        "position"                  : "dynamic",
+        "context"                   : [ more, "tl", "bl" ],
+        "itemdata"                  : menuItems
+    };
+
+    var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
+    YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
+    YAHOO.util.Event.addListener( more, "click", function () { menu.show(); menu.focus(); }, null, menu );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatAssetIdCheckbox ( )
+    Format the checkbox for the asset ID.
+*/
+WebGUI.AssetManager.formatAssetIdCheckbox 
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<input type="checkbox" name="assetId" value="' + oRecord.getData("assetId") + '"'
+        + 'onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" />';
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatAssetSize ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatAssetSize
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = oRecord.getData( "assetSize" );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatClassName ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatClassName
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
+        + oRecord.getData( "className" );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatLockedBy ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatLockedBy
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var extras  = WebGUI.AssetManager.extrasUrl;
+    elCell.innerHTML 
+        = oRecord.getData( 'lockedBy' )
+        ? '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+            + '<img src="' + extras + '/assetManager/locked.gif" alt="locked by ' + oRecord.getData( 'lockedBy' ) + '" '
+            + 'title="locked by ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
+            + '</a>'
+        : '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="unlocked" '
+            + 'title="unlocked" border="0" />'
+            + '</a>'
+        ;
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatRank ( )
+    Format the input for the rank box
+*/
+WebGUI.AssetManager.formatRank
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
+    elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
+        + 'value="' + rank + '" size="3" '
+        + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatRevisionDate ( )
+    Format the asset class name
+*/
+WebGUI.AssetManager.formatRevisionDate
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
+    elCell.innerHTML    = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
+                        + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
+                        + ':' + revisionDate.getMinutes()
+                        ;
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.formatTitle ( )
+    Format the link for the title
+*/
+WebGUI.AssetManager.formatTitle
+= function ( elCell, oRecord, oColumn, orderNumber ) {
+    elCell.innerHTML = '<span class="hasChildren">' 
+        + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
+        + '</span> <a href="' + oRecord.getData( 'url' ) + '?op=assetManager;method=manage">'
+        + oRecord.getData( 'title' )
+        + '</a>'
+        ;
 };
 
 /*---------------------------------------------------------------------------
@@ -57,41 +182,93 @@ WebGUI.AssetManager.hideMoreMenu
     Initialize the www_manage page
 */
 WebGUI.AssetManager.initManager
-= function () {
+= function (o) {
+    var assetPaginator = new YAHOO.widget.Paginator({
+        containers         : ['pagination'],
+        pageLinks          : 7,
+        rowsPerPage        : 15,
+        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
+    });
 
-    WebGUI.AssetManager.initMoreMenus();
 
-    // Start the data source
+    // Custom function to handle pagination requests
+    var handlePagination = function (state,dt) {
+        var sortedBy  = dt.get('sortedBy');
 
-};
+        // Define the new state
+        var newState = {
+            startIndex: state.recordOffset, 
+            sorting: {
+                key: sortedBy.key,
+                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
+            },
+            pagination : { // Pagination values
+                recordOffset: state.recordOffset, // Default to first page when sorting
+                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
+            }
+        };
 
+        // Create callback object for the request
+        var oCallback = {
+            success: dt.onDataReturnSetRows,
+            failure: dt.onDataReturnSetRows,
+            scope: dt,
+            argument: newState // Pass in new state as data payload for callback function to use
+        };
+        
+        // Send the request
+        dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
+    };
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.initMoreMenus ( )
-    Initialize the more menus in an asset manager page
-*/
-WebGUI.AssetManager.initMoreMenus
-= function () {
-    // Initialize the more menus
-    var moreMenus   = YAHOO.util.Dom.getElementsByClassName( "moreMenu" );
-    for ( var i = 0; i < moreMenus.length; i++ ) {
-        var a   = moreMenus[ i ].getElementsByTagName( "a" );
-        for ( var h = 0; h < a.length; h++ ) {
-            YAHOO.util.Event.addListener( a[ h ], "mouseover", WebGUI.AssetManager.showMoreMenu, moreMenus[ i ] );
-            YAHOO.util.Event.addListener( a[ h ], "mouseout", WebGUI.AssetManager.hideMoreMenu, moreMenus[ i ] );
+    // Initialize the data table
+    WebGUI.AssetManager.DataTable 
+        = new YAHOO.widget.DataTable( 'dataTableContainer', 
+            WebGUI.AssetManager.ColumnDefs, 
+            WebGUI.AssetManager.DataSource, 
+            {
+                initialRequest          : ';recordOffset=0',
+                generateRequest         : WebGUI.AssetManager.BuildQueryString,
+                paginationEventHandler  : handlePagination,
+                paginator               : assetPaginator,
+                sortedBy                : WebGUI.AssetManager.DefaultSortedBy
+            }
+        );
+
+    // Override function for custom server-side sorting
+    WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
+        // Default ascending
+        var sDir = "asc";
+        
+        // If already sorted, sort in opposite direction
+        if(oColumn.key === this.get("sortedBy").key) {
+            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ?
+                    "desc" : "asc";
         }
-    }
-};
 
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.initSearch ( )
-    Initialize the www_search page
-*/
-WebGUI.AssetManager.initSearch 
-= function () {
+        // Define the new state
+        var newState = {
+            startIndex: 0,
+            sorting: { // Sort values
+                key: oColumn.key,
+                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC
+            },
+            pagination : { // Pagination values
+                recordOffset: 0, // Default to first page when sorting
+                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting
+            }
+        };
 
-    WebGUI.AssetManager.initMoreMenus();
-
+        // Create callback object for the request
+        var oCallback = {
+            success: this.onDataReturnSetRows,
+            failure: this.onDataReturnSetRows,
+            scope: this,
+            argument: newState // Pass in new state as data payload for callback function to use
+        };
+        
+        // Send the request
+        this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, this), oCallback);
+    };
 
 };
 
@@ -126,19 +303,6 @@ WebGUI.AssetManager.selectRow
             break;
         }
     }
-};
-
-/*---------------------------------------------------------------------------
-    WebGUI.AssetManager.showMoreMenu ( event, element )
-    Show the more menu located inside element.
-*/
-WebGUI.AssetManager.showMoreMenu
-= function ( event, element ) {
-    if ( element.menuTimeout ) {
-        clearTimeout( element.menuTimeout );
-    }
-    var ul  = element.getElementsByTagName( "ul" )[0];
-    ul.style.display    = "block";
 };
 
 /*---------------------------------------------------------------------------

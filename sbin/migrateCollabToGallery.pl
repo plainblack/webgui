@@ -1,5 +1,20 @@
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
-use lib "../lib";
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -68,14 +83,14 @@ sub start {
 
     # Show usage
     if ($help) {
-        pod2usage(1);
+        pod2usage( verbose => 2);
     }
     
     unless ($configFile) {
         pod2usage("$0: Must specify a --configFile");
     }
 
-    my $session = WebGUI::Session->open("..",$configFile);
+    my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     
     my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -95,42 +110,50 @@ sub finish {
     $session->close;
 }
 
+__END__
 
 =head1 NAME
 
-migrateCollabToGallery.pl -- Migrate a collaboration system into a Gallery
+migrateCollabToGallery -- Migrate a collaboration system into a Gallery
 
 =head1 SYNOPSIS
 
-migrateCollabToGallery.pl --configFile=<config> <collab> <gallery>
+migrateCollabToGallery --configFile config.conf collab gallery
 
-=head1 ARGUMENTS
-
-=over
-
-=item collab 
-
-A collaboration system URL or asset ID. The URL must be an absolute URL, and
-so must begin with a "/".
-
-=item gallery 
-
-A Gallery URL or asset ID. The URL must be an absolute URL, and so much begin
-with a "/".
-
-=back
-
-=head1 OPTIONS
-
-=over
-
-=item configFile
-
-The WebGUI config file to use.
-
-=back
+migrateCollabToGallery --help
 
 =head1 DESCRIPTION
 
-This script migrates a collaboration system's threads into gallery albums. It
-uses C<WebGUI::Utility::Gallery> for its major features.
+This WebGUI utility script migrates a collaboration system's threads
+into gallery albums. It uses B<WebGUI::Utility::Gallery> for its major
+features.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<collab>
+
+A WebGUI's Collaboration System URL or Asset ID. If an URL is given,
+it must be an absolute URL beginning with a slash.
+
+=item B<gallery>
+
+A WebGUI's Gallery URL or Asset ID. If an URL is given, it must be
+an absolute URL beginning with a slash.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

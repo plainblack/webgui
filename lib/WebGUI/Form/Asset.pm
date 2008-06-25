@@ -117,7 +117,7 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getValue);
+    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getDefaultValue);
     if (defined $asset) {
         return '<a href="'.$asset->getUrl.'">'.$asset->getTitle.'</a>';
     }

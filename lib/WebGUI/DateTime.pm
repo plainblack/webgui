@@ -466,29 +466,6 @@ sub truncate {
 
 #######################################################################
 
-=head2 set
-
-Handle copying all WebGUI::DateTime specific data. This is an object method.
-
-This method overrides the set in DateTime to keep WebGUI::DateTime specific
-information being passed between object instances. Some DateTime operations
-create a new object.
-
-=cut
-
-sub set {
-    my $self    = shift;
-    my $session = $self->session;
-
-    my $copy = $self->SUPER::set(@_);
-
-    $copy->session($session);
-    return $copy;
-}
-
-
-#######################################################################
-
 =head2 session
 
 gets/sets the session variable in the object.  

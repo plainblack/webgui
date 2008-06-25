@@ -234,9 +234,10 @@ cmp_deeply(
 #
 #######################################################################
 
+my $driverId = $driver->getId;
 $driver->delete;
 
-my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driver->getId]);
+my $count = $session->db->quickScalar('select count(*) from shipper where shipperId=?',[$driverId]);
 is($count, 0, 'delete deleted the object');
 
 undef $driver;
@@ -252,5 +253,4 @@ undef $driver;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from shipper');
 }

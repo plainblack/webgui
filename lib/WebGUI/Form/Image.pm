@@ -181,7 +181,7 @@ Displays the image using an img tag.
 
 sub getValueAsHtml {
 	my ($self) = @_;
-    my $value = $self->getValue;
+    my $value = $self->getDefaultValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage::Image->get($self->session, $value);
 	my $file = shift @{ $location->getFiles };

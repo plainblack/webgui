@@ -6,20 +6,10 @@ var dunits, hoursPerDay, taskLength;
 var extrasPath, errorMsgs;
 var taskArray;
 
+//--------------------------------------------------------------------------------------	
 function parseFloatOrNA(str) {
    if (str == 'N/A') return 0.0;
    else return parseFloat(str);
-}
-
-function doCalendar(fieldId) {
-   Calendar.setup({ 
-                     inputField : fieldId, 
-                     ifFormat : "%Y-%m-%d", 
-                     showsTime : false, 
-                     step : 1,
-                     timeFormat : "12",
-                     firstDay : false
-                  }); 
 }
 
 //--------------------------------------------------------------------------------------	
@@ -95,6 +85,7 @@ function getCheckedOfNodeList(list) {
 	return null;
 }
 
+//--------------------------------------------------------------------------------------
 function setCheckedOfNodeList(list, value) {
 	for (var i = 0; i < list.length; i++) {
 		list[i].checked = (list[i].value == value);
@@ -104,7 +95,7 @@ function setCheckedOfNodeList(list, value) {
 
 // TODO: convert this whole bunch of stuff to do with task element groups
 // to an actual prototype/class?
-
+//--------------------------------------------------------------------------------------
 function getTaskElements(form, suffix) {
    var te = new Object();
    var keys = ['start', 'end', 'duration', 'lagTime', 'dependants', 'origStart', 'origEnd',
@@ -114,59 +105,107 @@ function getTaskElements(form, suffix) {
    return te;
 }
 
+//--------------------------------------------------------------------------------------
 function getTaskType(te) {
    var taskTypeElt = te.taskType;
    if (taskTypeElt.type == 'hidden') return taskTypeElt.value;
    else return getCheckedOfNodeList(taskTypeElt);
 }
 
+//--------------------------------------------------------------------------------------
 function setTaskType(te, value) {
    var taskTypeElt = te.taskType;
    if (taskTypeElt.type == 'hidden') taskTypeElt.value = value;
    else setCheckedOfNodeList(taskTypeElt, value);
 }
 
-function isTimed(te) { return getTaskType(te) == 'timed'; }
-function isUntimed(te) { return !isTimed(te); }
+//--------------------------------------------------------------------------------------
+function isTimed(te) {
+   return getTaskType(te) == 'timed';
+}
 
+//--------------------------------------------------------------------------------------
+function isUntimed(te) {
+   return !isTimed(te);
+}
+
+//--------------------------------------------------------------------------------------
 function fracDaysOfDuration(dur) {
    if (dunits == 'hrs') return dur / hoursPerDay;
    else return dur;
 }
 
+//--------------------------------------------------------------------------------------
 function durationOfFracDays(days) {
    if (dunits == 'hrs') return days * hoursPerDay;
    else return days;
 }
 
-function getDuration(te) { return fracDaysOfDuration(parseFloat(te.duration.value)); }
-function setDuration(te, days) { te.duration.value = durationOfFracDays(days); }
+//--------------------------------------------------------------------------------------
+function getDuration(te) {
+   return fracDaysOfDuration(parseFloat(te.duration.value));
+}
 
+//--------------------------------------------------------------------------------------
+function setDuration(te, days) {
+   te.duration.value = durationOfFracDays(days);
+}
+
+//--------------------------------------------------------------------------------------
 function getDateByKey(te, key) {
    var split = te[key].value.split('-');
    return new Date(split[0], split[1]-1, split[2], 0, 0, 1, 0);
 }
-function getStartDate(te) { return getDateByKey(te, 'start'); }
-function getEndDate(te) { return getDateByKey(te, 'end'); }
 
-function setDateByKey(te, key, date) { te[key].value = intlDate(date); }
-function setStartDate(te, date) { setDateByKey(te, 'start', date); }
-function setEndDate(te, date) { setDateByKey(te, 'end', date); }
+//--------------------------------------------------------------------------------------
+function getStartDate(te) {
+   return getDateByKey(te, 'start');
+}
 
-function setStartFromEndDate(te) { setStartDate(te, datePlusDays(getEndDate(te), -Math.floor(getTotalDuration(te)))); }
-function setEndFromStartDate(te) { setEndDate(te, datePlusDays(getStartDate(te), Math.floor(getTotalDuration(te)))); }
+//--------------------------------------------------------------------------------------
+function getEndDate(te) {
+   return getDateByKey(te, 'end');
+}
 
+//--------------------------------------------------------------------------------------
+function setDateByKey(te, key, date) {
+   te[key].value = intlDate(date);
+}
+
+//--------------------------------------------------------------------------------------
+function setStartDate(te, date) {
+   setDateByKey(te, 'start', date);
+}
+
+//--------------------------------------------------------------------------------------
+function setEndDate(te, date) {
+   setDateByKey(te, 'end', date);
+}
+
+//--------------------------------------------------------------------------------------
+function setStartFromEndDate(te) {
+   setStartDate(te, datePlusDays(getEndDate(te), -Math.floor(getTotalDuration(te))));
+}
+
+//--------------------------------------------------------------------------------------
+function setEndFromStartDate(te) {
+   setEndDate(te, datePlusDays(getStartDate(te), Math.floor(getTotalDuration(te))));
+}
+
+//--------------------------------------------------------------------------------------
 function setOrigDates(te) {
    te.orig_start.value = te.start.value;
    te.orig_end.value = te.end.value;
 }
 
+//--------------------------------------------------------------------------------------
 function datePlusDays(date, days) {
    var ret = new Date();
    ret.setTime(date.getTime() + days * dayMS);
    return ret;
 }
 
+//--------------------------------------------------------------------------------------
 function getTotalDuration(te) {
    return fracDaysOfDuration(parseFloat(te.duration.value) +
 			     parseFloatOrNA(te.lagTime.value));
@@ -288,6 +327,7 @@ function durationChanged(form, suffix, isTaskForm, gotDelay) {
    }
 }
 
+//--------------------------------------------------------------------------------------
 function checkPredecessorCollision(te, isTaskForm) {
    var predecessor = te.dependants.value;
    if (predecessor == "") return;
@@ -299,11 +339,12 @@ function checkPredecessorCollision(te, isTaskForm) {
    }
 }
 
+//--------------------------------------------------------------------------------------
 function dateChanged(form, suffix, isTaskForm, setWhichWay, gotDelay) {
    if (!isTaskForm && !gotDelay)
       return window.setTimeout(function() {
 	 dateChanged(form, suffix, isTaskForm, setWhichWay, true); }, 1);
-
+    
    var te = getTaskElements(form, suffix);
    maybeDefaultTaskValues(te);
    setWhichWay(te);
@@ -315,11 +356,65 @@ function dateChanged(form, suffix, isTaskForm, setWhichWay, gotDelay) {
       updateDependantDates();
       paintGanttChart();
    }
+
 }
 
-function startDateChanged(form, suffix, isTaskForm) { dateChanged(form, suffix, isTaskForm, setEndFromStartDate); }
-function endDateChanged(form, suffix, isTaskForm) { dateChanged(form, suffix, isTaskForm, setStartFromEndDate); }
+//--------------------------------------------------------------------------------------
+function startDateChanged(form, suffix, isTaskForm) {
+   var te = getTaskElements(form,suffix);
+      
+   if(isValidDate(te.start.value)) {
+      dateChanged(form, suffix, isTaskForm, setEndFromStartDate);
+   }
+   else {
+      alert("Dates must be valid and in the form yyyy-mm-dd");
+      te.start.value = te.orig_start.value;
+   }
+}
 
+//--------------------------------------------------------------------------------------
+function endDateChanged(form, suffix, isTaskForm) {
+   var te = getTaskElements(form,suffix);
+   
+   if(isValidDate(te.end.value)) {
+      dateChanged(form, suffix, isTaskForm, setStartFromEndDate);
+   }
+   else {
+      alert("Dates must be valid and in the form yyyy-mm-dd");
+      te.start.value = te.orig_start.value;
+   }
+}
+
+//--------------------------------------------------------------------------------------
+function isValidDate(dt) {
+   var datePat = /^(\d{4})-(\d{2})-(\d{2})$/;
+   //match the date pattern
+   if(!dt.match(datePat)){
+      return false;
+   }
+   
+   var split = dt.split('-');
+   var yyyy = split[0];
+   var mm   = split[1];
+   var dd   = split[2];
+      
+   // if month out of range
+   if ( mm < 0 || mm > 11 ) {
+      return false;
+   }
+   
+   // get last day in month
+   var d = (11 == mm) ? new Date(yyyy + 1, 0, 0) : new Date(yyyy, mm + 1, 0);
+
+   // if date out of range
+   if ( dd < 1 || dd > d.getDate() ) {
+      return false
+   }   
+   
+   return true;
+}
+
+//--------------------------------------------------------------------------------------
 function predecessorChanged(form, suffix, isTaskForm, gotDelay) {
    if (!isTaskForm && !gotDelay)
       return window.setTimeout(function() {
@@ -433,9 +528,15 @@ function pad(date) {
 
 //--------------------------------------------------------------------------------------	
 function paintGanttChart () {
-   var status = AjaxRequest.submit(document.forms['editAll'],{
-                                      'onSuccess':function(req){ document.getElementById('gantt').innerHTML = req.responseText; }
-                                   });
+   
+   var callback = {
+      success : function(req) { document.getElementById('gantt').innerHTML = req.responseText; },
+      failure : function(req) { alert("Could not load gantt chart.  Problems with connection.  Please refresh the page and try again."); }
+   }
+   
+   var postData = YAHOO.util.Connect.setForm(document.forms['editAll']);
+   
+   var status = YAHOO.util.Connect.asyncRequest('POST',getWebguiProperty("pageURL"),callback,postData);
    
    var mwidth = document.getElementById("projectTableWidth").name + "px";
    var swidth = document.getElementById("projectScrollPercentWidth").name + "%";

@@ -19,6 +19,8 @@ use WebGUI::Asset;
 use WebGUI::User;
 use WebGUI::Asset::Wobject::Navigation;
 use WebGUI::Asset::Wobject::Folder;
+use WebGUI::Asset::Sku;
+use WebGUI::Asset::Sku::Product;
 use WebGUI::AssetVersioning;
 use WebGUI::VersionTag;
 
@@ -144,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 89 
+plan tests => 98 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -701,6 +703,100 @@ diag $assetProps->{title};
 
 isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
+################################################################
+#
+# getIsa
+#
+################################################################
+my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
+
+my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+isa_ok($getAProduct, 'CODE', 'getIsa returns a sub ref');
+my $counter = 0;
+my $productIds = [];
+while( my $product = $getAProduct->()) {
+    ++$counter;
+    push @{ $productIds }, $product->getId;
+}
+is($counter, 3, 'getIsa: returned only 3 Products');
+cmp_bag($productIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products');
+
+my $getASku = WebGUI::Asset::Sku->getIsa($session);
+$counter = 0;
+my $skuIds = [];
+while( my $sku = $getASku->()) {
+    ++$counter;
+    push @{ $skuIds }, $sku->getId;
+}
+is($counter, 3, 'getIsa: returned only 3 Products for a parent class');
+cmp_bag($skuIds, [$product1->getId, $product2->getId, $product3->getId], 'getIsa returned the correct 3 products for a parent class');
+
+$product1->purge;
+$product2->purge;
+$product3->purge;
+
+################################################################
+#
+# inheritUrlFromParent
+#
+################################################################
+
+my $versionTag4 = WebGUI::VersionTag->getWorking($session);
+$versionTag4->set( { name => 'inheritUrlFromParent tests' } );
+
+$properties = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent01',
+    title       => 'inheritUrlFromParent01',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent01',
+};
+
+my $iufpAsset = $defaultAsset->addChild($properties, $properties->{id});
+$iufpAsset->commit;
+
+$properties2 = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent02',
+    title       => 'inheritUrlFromParent02',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent02',
+};
+
+my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
+$iufpAsset2->update( { inheritUrlFromParent => 1 } );
+$iufpAsset2->commit;
+is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+
+# works for setting, now try disabling. Should not change the URL.
+$iufpAsset2->update( { inheritUrlFromParent => 0 } );
+$iufpAsset2->commit;
+is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'setting inheritUrlFromParent to 0 works');
+
+# also make sure that it is actually disabled
+is($iufpAsset2->get('inheritUrlFromParent'), 0, "disabling inheritUrlFromParent actually works");
+
+# works for setting and disabling, now ensure it recurses
+
+my $properties3 = {
+    #              '1234567890123456789012'
+    id          => 'inheritUrlFromParent03',
+    title       => 'inheritUrlFromParent03',
+    className   => 'WebGUI::Asset::Wobject::Layout',
+    url         => 'inheriturlfromparent03',
+};
+my $iufpAsset3 = $iufpAsset2->addChild($properties3, $properties3->{id});
+$iufpAsset3->commit;
+$iufpAsset2->update( { inheritUrlFromParent => 1 } );
+$iufpAsset2->commit;
+$iufpAsset3->update( { inheritUrlFromParent => 1 } );
+$iufpAsset3->commit;
+is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheriturlfromparent03', 'inheritUrlFromParent recurses properly');
+
+
 END {
     $session->config->set( 'extrasURL',    $origExtras);
     $session->config->set( 'uploadsURL',   $origUploads);
@@ -718,7 +814,7 @@ END {
     else {
         $session->config->delete('assetUiLevel');
     }
-    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, ) {
+    foreach my $vTag ($versionTag, $versionTag2, $versionTag3, $versionTag4, ) {
         $vTag->rollback;
     }
     foreach my $user (values %testUsers) {

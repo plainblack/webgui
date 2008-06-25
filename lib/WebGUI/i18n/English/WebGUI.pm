@@ -3520,6 +3520,26 @@ LongTruncOk=1</p>
         lastUpdated => 1181969398,
     },
 
+	'user profile view template' => {
+		message => q|User Profile Viewing Template|,
+		lastUpdated => 1213323171,
+	},
+
+    'user profile view template description' => {
+        message => q|The template used show the user their user profile.|,
+        lastUpdated => 1213323173,
+    },
+
+	'user profile edit template' => {
+		message => q|User Profile Editing Template|,
+		lastUpdated => 1213323171,
+	},
+
+    'user profile edit template description' => {
+        message => q|The template used show to build a form so the user can edit their template.|,
+        lastUpdated => 1213323173,
+    },
+
     'send private message' => {
 		message => q|Send Private Message|,
 		lastUpdated => 1181019679,
@@ -3731,15 +3751,6 @@ LongTruncOk=1</p>
     },
         
 
-    'settings groupIdAdminCommerce label' => {
-        message     => q{Commerce},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminCommerce hoverHelp' => {
-        message     => q{Group to manage Commerce settings.},
-        lastUpdated => 0,
-    },
-        
 
     'settings groupIdAdminCron label' => {
         message     => q{Cron},
@@ -3821,16 +3832,6 @@ LongTruncOk=1</p>
     },
         
 
-    'settings groupIdAdminProductManager label' => {
-        message     => q{Products},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminProductManager hoverHelp' => {
-        message     => q{Group to manage products},
-        lastUpdated => 0,
-    },
-        
-
     'settings groupIdAdminProfileSettings label' => {
         message     => q{User Profiling},
         lastUpdated => 0,
@@ -3870,27 +3871,6 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
         
-
-    'settings groupIdAdminSubscription label' => {
-        message     => q{Subscriptions},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminSubscription hoverHelp' => {
-        message     => q{Group to manage subscriptions.},
-        lastUpdated => 0,
-    },
-        
-
-    'settings groupIdAdminTransactionLog label' => {
-        message     => q{Transactions},
-        lastUpdated => 0,
-    },
-    'settings groupIdAdminTransactionLog hoverHelp' => {
-        message     => q{Group to manage transactions.},
-        lastUpdated => 0,
-    },
-        
-
     'settings groupIdAdminUser label' => {
         message     => q{Users},
         lastUpdated => 0,
@@ -3975,16 +3955,6 @@ LongTruncOk=1</p>
         lastUpdated => 1193196211,
     },
 
-    'broken spectre title' => {
-        message     => q{Cannot connect to Spectre},
-        lastUpdated => 1202274234,
-    },
-
-    'broken spectre body' => {
-        message     => q{Your commit is canceled because WebGUI cannot connect to Spectre.  Please fix your Spectre problem and attempt to commit again.},
-        lastUpdated => 1202274246,
-    },
-    
     'SelectRichEditor formName' => {
         message     => q{Rich Editor},
         lastUpdated => 1202274234,
@@ -3999,6 +3969,55 @@ LongTruncOk=1</p>
         message     => q{Attachments},
         lastUpdated => 1202274234,
     },
+
+        'showMessageOnLogin label' => {
+            message     => q{Show Message On Login?},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLogin description' => {
+            message     => q{If yes, show a message after a user logs in.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginTimes label' => {
+            message     => q{Show Message Number of Times},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginTimes description' => {
+            message     => q{The number of times a user sees the message, one per login},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginReset label' => {
+            message     => q{Reset All Users Number of Times Seen},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginReset description' => {
+            message     => q{If "yes", will force all users to see the login message again},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
+        'showMessageOnLoginBody label' => {
+            message     => q{Message on Login Body},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+        
+        'showMessageOnLoginBody description' => {
+            message     => q{The body of the message to show on login. Macros are allowed.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+        
 };
 
 1;

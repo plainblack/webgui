@@ -41,7 +41,7 @@ our $I18N = {
         context     => '',
     },
     "imageResolutions description" => {
-        message     => "The sizes of images available for download.",
+        message     => "The sizes of images (in pixels) available for download. Images will be altered to 72 DPI before proportionally constrained to the specified number of pixels. In other words, this number is the maximum height or width that the image will have.",
         lastUpdated => 0,
         context     => '',
     },
@@ -51,7 +51,7 @@ our $I18N = {
         context     => '',
     },
     "imageViewSize description" => {
-        message     => "The size for images in the gallery. Will default to the Image Size 
+        message     => "The size (in pixels) for images in the gallery. Will default to the Image Size 
                         in the site settings.",
         lastUpdated => 0,
         context     => '',
@@ -62,7 +62,7 @@ our $I18N = {
         context     => '',
     },
     "imageThumbnailSize description" => {
-        message     => "The size for thumbnails of images in the gallery. Will default to the 
+        message     => "The size (in pixels) for thumbnails of images in the gallery. Will default to the 
                         Thumbnail Size in the site settings.",
         lastUpdated => 0,
         context     => '',
@@ -73,7 +73,7 @@ our $I18N = {
         context     => '',
     },
     "maxSpacePerUser description" => {
-        message     => "The maximum amount of disk space a user is allowed to use in this Gallery.",
+        message     => "The maximum amount of disk space (in megabytes) a user is allowed to use in this Gallery.",
         lastUpdated => 0,
         context     => '',
     },
@@ -692,6 +692,24 @@ our $I18N = {
         message     => q{<h1>Error!</h1><p>You must commit this Gallery before adding albums</p>},
         lastUpdated => 0,
         context     => q{Error message when trying to add albums to uncommitted Gallery assets},
+    },
+
+    'helpvar isAlbum' => {
+        message     => q{This variable is true if the current result is a GalleryAlbum.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'defaultFilesPerPage label' => {
+        message     => q{Default Files Per Page},
+        lastUpdated => 0,
+        context     => q{Asset property label},
+    },
+
+    'defaultFilesPerPage description' => {
+        message     => q{The number of files to show per page of the album view.},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
     },
 };
 

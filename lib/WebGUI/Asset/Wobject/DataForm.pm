@@ -14,7 +14,7 @@ http://www.plainblack.com                     info@plainblack.com
 
 =cut
 
-use strict qw(vars subs);
+use strict;
 use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::Form;
@@ -26,7 +26,12 @@ use WebGUI::Macro;
 use WebGUI::Inbox;
 use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
-use WebGUI::Utility;
+use WebGUI::Utility qw(isIn);
+use WebGUI::Pluggable;
+use WebGUI::DateTime;
+use WebGUI::User;
+use WebGUI::Group;
+use JSON qw(encode_json decode_json);
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -46,106 +51,136 @@ These methods are available from this class:
 
 
 #-------------------------------------------------------------------
-sub _createField {
-	my $self = shift;
-	my $data = $_[0];
-	my %param;
-	$param{name} = $data->{name};
-	$param{name} = "field_".$data->{sequenceNumber} if ($param{name} eq ""); # Empty fieldname not allowed
-	my $name = $param{name};
-	$name =~ s/\^.*?\;//gs ; # remove macro's from user input
-	$param{value}  = $data->{value};
-	$param{size}   = $data->{width};
-	$param{height} = $data->{rows};
-	$param{width}  = $data->{width};
-	$param{extras} = $data->{extras};
-	$param{vertical} = $data->{vertical};
-		
-	if ($data->{type} eq "checkbox") {
-		$param{value} = ($data->{defaultValue} =~ /checked/i) ? 1 : "";
-	}
-	if (isIn($data->{type},qw(selectList checkList selectBox))) {
-		my @defaultValues;
-		if ($self->session->form->param($name)) {
-                	@defaultValues = $self->session->form->selectList($name);
-                } else {
-                	foreach (split(/\n/, $data->{value})) {
-                        	s/\s+$//; # remove trailing spaces
-                                push(@defaultValues, $_);
-                	}
-                }
-		$param{value} = \@defaultValues;
-	}
-	if (isIn($data->{type},qw(selectList selectBox checkList radioList))) {
-		delete $param{size};
-		my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/, $data->{possibleValues})) {
-                	s/\s+$//; # remove trailing spaces
-                        $options{$_} = $_;
-                }
-		$param{options} = \%options;
-	} 
-	if ($data->{type} eq "yesNo") {
-		if ($data->{defaultValue} =~ /yes/i) {
-                	$param{value} = 1;
-                } elsif ($data->{defaultValue} =~ /no/i) {
-                	$param{value} = 0;
-                }
-	}
-	my $cmd = "WebGUI::Form::".$data->{type};
-	return &$cmd($self->session, \%param);
+sub _createForm {
+    my $self = shift;
+    my $data = shift;
+    my $value = shift;
+    # copy select entries
+    my %param = map { $_ => $data->{$_} } qw(name height width extras vertical defaultValue options);
+    $param{value} = $value;
+    $param{size} = $param{width};
+
+    WebGUI::Macro::process($self->session, \( $param{defaultValue} ));
+
+    my $type = "\u$data->{type}";
+    if ($data->{type} eq "checkbox") {
+        $param{defaultValue} = ($param{defaultValue} =~ /checked/i);
+    }
+    elsif ( isIn($type, qw(SelectList SelectBox CheckList RadioList)) ) {
+        delete $param{size};
+    }
+    my $control = eval {
+        WebGUI::Pluggable::instanciate("WebGUI::Form::$type", "new", [ $self->session, \%param ]);
+    };
+    return $control;
 }
 
 #-------------------------------------------------------------------
 sub _fieldAdminIcons {
-	my $self = shift;
-	my $fid = shift;
-	my $tid = shift;
-	my $cantDelete = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	my $output;
-	$output = $self->session->icon->delete('func=deleteFieldConfirm;fid='.$fid.';tid='.$tid,$self->get("url"),$i18n->get(19)) unless ($cantDelete);
-	$output .= $self->session->icon->edit('func=editField;fid='.$fid.';tid='.$tid,$self->get("url"))
-		.$self->session->icon->moveUp('func=moveFieldUp;fid='.$fid.';tid='.$tid,$self->get("url"))
-		.$self->session->icon->moveDown('func=moveFieldDown;fid='.$fid.';tid='.$tid,$self->get("url"));
-	return $output;
+    my $self = shift;
+    my $fieldName = shift;
+    my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $output;
+    $output = $self->session->icon->delete('func=deleteFieldConfirm;fieldName='.$fieldName,$self->get("url"),$i18n->get(19))
+        unless $self->getFieldConfig($fieldName)->{isMailField};
+    $output .= $self->session->icon->edit('func=editField;fieldName='.$fieldName,$self->get("url"))
+        . $self->session->icon->moveUp('func=moveFieldUp;fieldName='.$fieldName,$self->get("url"))
+        . $self->session->icon->moveDown('func=moveFieldDown;fieldName='.$fieldName,$self->get("url"));
+    return $output;
 }
 #-------------------------------------------------------------------
 sub _tabAdminIcons {
-	my $self = shift;
-	my $tid = shift;
-	my $cantDelete = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	my $output;
-	$output = $self->session->icon->delete('func=deleteTabConfirm;tid='.$tid,$self->get("url"),$i18n->get(100)) unless ($cantDelete);
-	$output .= $self->session->icon->edit('func=editTab;tid='.$tid,$self->get("url"))
-		.$self->session->icon->moveLeft('func=moveTabLeft;tid='.$tid,$self->get("url"))
-		.$self->session->icon->moveRight('func=moveTabRight;tid='.$tid,$self->get("url"));
-	return $output;
+    my $self = shift;
+    my $tabId = shift;
+    my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $output
+        = $self->session->icon->delete('func=deleteTabConfirm;tabId='.$tabId,$self->get("url"),$i18n->get(100))
+        . $self->session->icon->edit('func=editTab;tabId='.$tabId,$self->get("url"))
+        . $self->session->icon->moveLeft('func=moveTabLeft;tabId='.$tabId,$self->get("url"))
+        . $self->session->icon->moveRight('func=moveTabRight;tabId='.$tabId,$self->get("url"));
+    return $output;
 }
-
-
-#-------------------------------------------------------------------
-sub _tonull { 
-	return $_[1] eq "0" ? (undef, undef) : @_ ;
-}
-
 
 #-------------------------------------------------------------------
 sub _createTabInit {
 	my $self = shift;
-	my $id = shift;
-	my @tabCount = $self->session->db->quickArray("select count(DataForm_tabId) from DataForm_tab where assetId=".$self->session->db->quote($id));
-	my $output = '<script type="text/javascript">var numberOfTabs = '.$tabCount[0].'; initTabs();</script>';
+    my $tabCount = @{ $self->getTabOrder };
+    my $output = '<script type="text/javascript">var numberOfTabs = '.$tabCount.'; initTabs();</script>';
 	return $output;
 }
 
 #-------------------------------------------------------------------
 
 sub defaultViewForm {
-        my $self = shift;
-        return ($self->get("defaultView") == 0);
+    my $self = shift;
+    return ($self->get("defaultView") == 0);
+}
+
+sub deleteField {
+    my $self = shift;
+    my $fieldName = shift;
+    my $fieldOrder = $self->getFieldOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$fieldOrder; $currentPos++) {
+        last
+            if $fieldName eq $fieldOrder->[$currentPos];
+    }
+    splice @$fieldOrder, $currentPos, 1;
+    delete $self->getFieldConfig->{$fieldName};
+    $self->_saveFieldConfig;
+    return 1;
+}
+
+sub deleteTab {
+    my $self = shift;
+    my $tabId = shift;
+    my $tabOrder = $self->getTabOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$tabOrder; $currentPos++) {
+        last
+            if $tabId eq $tabOrder->[$currentPos];
+    }
+    splice @$tabOrder, $currentPos, 1;
+    delete $self->getTabConfig->{$tabId};
+    for my $field (grep { $_->{tabId} eq $tabId } values %{ $self->getFieldConfig }) {
+        $field->{tabId} = undef;
+    }
+    $self->_saveTabConfig;
+    return 1;
+}
+
+sub renameField {
+    my $self = shift;
+    my $oldName = shift;
+    my $newName = shift;
+    my $fieldOrder = $self->getFieldOrder;
+    my $currentPos;
+    for my $fieldName (@$fieldOrder) {
+        if ($fieldName eq $oldName) {
+            $fieldName = $newName;
+        }
+    }
+    $self->getFieldConfig->{$newName} = $self->getFieldConfig->{$oldName};
+    delete $self->getFieldConfig->{$oldName};
+    $self->getFieldConfig->{$newName}{name} = $newName;
+}
+
+sub _saveFieldConfig {
+    my $self = shift;
+    my @config = map {
+        $self->getFieldConfig($_)
+    } @{ $self->getFieldOrder };
+    my $data = encode_json(\@config);
+    $self->update({fieldConfiguration => $data});
+}
+
+sub _saveTabConfig {
+    my $self = shift;
+    my @config = map {
+        $self->getTabConfig($_)
+    } @{ $self->getTabOrder };
+    my $data = encode_json(\@config);
+    $self->update({tabConfiguration => $data});
 }
 
 #-------------------------------------------------------------------
@@ -161,230 +196,301 @@ An array of hashes to prepend to the list
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_DataForm");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-                tableName=>'DataForm',
-		icon=>'dataForm.gif',
-                className=>'WebGUI::Asset::Wobject::DataForm',
-                properties=>{
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000141',
-                        },
-			acknowledgement=>{
-				fieldType=>"textarea",
-				defaultValue=>undef
-                        },
-			emailTemplateId=>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000085',
-                        },
-			acknowlegementTemplateId=>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000104',
-                        },
-			listTemplateId=>{
-				defaultValue=>'PBtmpl0000000000000021',
-				fieldType=>"template"
-                        },
-			mailData=>{
-				defaultValue=>0,
-				fieldType=>"yesNo"
-                        },
-			mailAttachments=>{
-				defaultValue=>0,
-				fieldType=>'yesNo',
-                        },
-			defaultView=>{
-				defaultValue=>0,
-				fieldType=>"integer"
-                        },
-			groupToViewEntries=>{
-				defaultValue=>7,
-				fieldType=>"group"
-                        },
-                        useCaptcha  => {
-                            fieldType       => "yesNo",
-                            defaultValue    => 0,
-                        },
-                    }
-		});
-        return $class->SUPER::definition($session, $definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,"Asset_DataForm");
+    my %properties;
+    tie %properties, 'Tie::IxHash';
+    %properties = (
+        templateId => {
+            fieldType       => 'template',
+            defaultValue    => 'PBtmpl0000000000000141',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => $i18n->get(82),
+            hoverHelp       => $i18n->get('82 description'),
+            afterEdit       => 'func=edit',
+        },
+        emailTemplateId => {
+            fieldType       => "template",
+            defaultValue    => 'PBtmpl0000000000000085',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => $i18n->get(80),
+            hoverHelp       => $i18n->get('80 description'),
+            afterEdit       => 'func=edit',
+        },
+        acknowlegementTemplateId => {
+            fieldType       => "template",
+            defaultValue    => 'PBtmpl0000000000000104',
+            namespace       => 'DataForm',
+            tab             => 'display',
+            label           => $i18n->get(81),
+            hoverHelp       => $i18n->get('81 description'),
+            afterEdit       => 'func=edit',
+        },
+        listTemplateId => {
+            fieldType       => "template",
+            defaultValue    => 'PBtmpl0000000000000021',
+            namespace       => 'DataForm/List',
+            tab             => 'display',
+            label           => $i18n->get(87),
+            hoverHelp       => $i18n->get('87 description'),
+            afterEdit       => 'func=edit',
+        },
+        defaultView => {
+            fieldType       => "radioList",
+            defaultValue    => 0,
+            options         => {
+                0 => $i18n->get('data form'),
+                1 => $i18n->get('data list'),
+            },
+            label           => $i18n->get('defaultView'),
+            hoverHelp       => $i18n->get('defaultView description'),
+            tab             => 'display',
+        },
+        acknowledgement => {
+            fieldType       => "HTMLArea",
+            defaultValue    => undef,
+            tab             => 'properties',
+            label           => $i18n->get(16),
+            hoverHelp       => $i18n->get('16 description'),
+        },
+        mailData => {
+            fieldType       => "yesNo",
+            defaultValue    => 0,
+            tab             => 'display',
+            label           => $i18n->get(74),
+            hoverHelp       => $i18n->get('74 description'),
+        },
+        storeData => {
+            fieldType       => "yesNo",
+            defaultValue    => 1,
+            tab             => 'display',
+            label           => $i18n->get('store data'),
+            hoverHelp       => $i18n->get('store data description'),
+        },
+        mailAttachments => {
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+            tab             => 'properties',
+            label           => $i18n->get("mail attachments"),
+            hoverHelp       => $i18n->get("mail attachments description"),
+        },
+        groupToViewEntries => {
+            fieldType       => "group",
+            defaultValue    => 7,
+            tab             => 'security',
+            label           => $i18n->get('group to view entries'),
+            hoverHelp       => $i18n->get('group to view entries description'),
+        },
+        useCaptcha  => {
+            tab             => 'properties',
+            fieldType       => "yesNo",
+            defaultValue    => 0,
+            label           => $i18n->get('editForm useCaptcha label'),
+            hoverHelp       => $i18n->get('editForm useCaptcha description'),
+        },
+        fieldConfiguration => {
+            fieldType       => 'hidden',
+        },
+        tabConfiguration => {
+            fieldType       => 'hidden',
+        },
+    );
+    my @defFieldConfig = (
+        {
+            name=>"from",
+            label=>$i18n->get(10),
+            status=>"editable",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"to",
+            label=>$i18n->get(11),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+            defaultValue=>$session->setting->get("companyEmail"),
+        },
+        {
+            name=>"cc",
+            label=>$i18n->get(12),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"bcc",
+            label=>$i18n->get(13),
+            status=>"hidden",
+            isMailField=>1,
+            width=>0,
+            type=>"email",
+        },
+        {
+            name=>"subject",
+            label=>$i18n->get(14),
+            status=>"editable",
+            isMailField=>1,
+            width=>0,
+            type=>"text",
+            defaultValue=>$i18n->get(2),
+        },
+    );
+    $properties{fieldConfiguration}{defaultValue} = JSON::encode_json(\@defFieldConfig);
+    push @$definition, {
+        assetName           => $i18n->get('assetName'),
+        uiLevel             => 5,
+        tableName           => 'DataForm',
+        icon                => 'dataForm.gif',
+        className           => __PACKAGE__,
+        properties          => \%properties,
+        autoGenerateForms   => 1,
+    };
+    return $class->SUPER::definition($session, $definition);
 }
+
+sub _cacheFieldConfig {
+    my $self = shift;
+    if (!$self->{_fieldConfig}) {
+        my $jsonData = $self->get("fieldConfiguration");
+        my $fieldData;
+        if ($jsonData && eval { $jsonData = decode_json($jsonData) ; 1 }) {
+            # jsonData is an array in the order the fields should be
+            $self->{_fieldConfig} = {
+                map { $_->{name}, $_ } @{ $jsonData }
+            };
+            $self->{_fieldOrder} = [
+                map { $_->{name} } @{ $jsonData }
+            ];
+        }
+        else {
+            $self->{_fieldConfig} = {};
+            $self->{_fieldOrder} = [];
+        }
+    }
+    return 1;
+}
+
+sub _cacheTabConfig {
+    my $self = shift;
+    if (!$self->{_tabConfig}) {
+        my $jsonData = $self->get("tabConfiguration");
+        my $fieldData;
+        if ($jsonData && eval { $jsonData = decode_json($jsonData) ; 1 }) {
+            # jsonData is an array in the order the fields should be
+            $self->{_tabConfig} = {
+                map { $_->{tabId}, $_ } @{ $jsonData }
+            };
+            $self->{_tabOrder} = [
+                map { $_->{tabId} } @{ $jsonData }
+            ];
+        }
+        else {
+            $self->{_tabConfig} = {};
+            $self->{_tabOrder} = [];
+        }
+    }
+    return 1;
+}
+
+sub getFieldConfig {
+    my $self = shift;
+    my $field = shift;
+    $self->_cacheFieldConfig;
+    if ($field) {
+        return $self->{_fieldConfig}{$field};
+    }
+    else {
+        return $self->{_fieldConfig};
+    }
+}
+
+sub getFieldOrder {
+    my $self = shift;
+    $self->_cacheFieldConfig;
+    return $self->{_fieldOrder};
+}
+
+sub getTabConfig {
+    my $self = shift;
+    my $tabId = shift;
+    $self->_cacheTabConfig;
+    if ($tabId) {
+        return $self->{_tabConfig}{$tabId};
+    }
+    else {
+        return $self->{_tabConfig};
+    }
+}
+
+sub getTabOrder {
+    my $self = shift;
+    $self->_cacheTabConfig;
+    return $self->{_tabOrder};
+}
+
 
 #-------------------------------------------------------------------
 sub deleteAttachedFiles {
-	my $self = shift;
-	my $fieldId = shift || '%';
-	
-	my $storageIds = $self->session->db->buildArrayRef("select value from DataForm_entryData as a, DataForm_field as b where a.DataForm_fieldId = b.DataForm_fieldId and
-						      b.type='file' and a.assetId=? and a.DataForm_fieldId=?",[$self->getId,$fieldId]);
-	foreach my $id (@$storageIds) {
-		my $file = WebGUI::Storage->get($self->session,$id);
-		$file->delete if defined $file;
-		$self->session->db->write("update DataForm_entryData set value='' where DataForm_fieldId=?",[$fieldId]);
-	}
-}
+    my $self = shift;
+    my %params = @_;
+    my $entryData = $params{entryData};
+    my $entryId = $params{entryId};
 
-#-------------------------------------------------------------------
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	my (%dataField, %dataTab, $sthField, $sthTab, $newTabId);
-	tie %dataTab, 'Tie::CPHash';
-	tie %dataField, 'Tie::CPHash';
+    my $fields = $self->getFieldOrder;
+    my $fieldConfig = $self->getFieldConfig;
 
-	$sthTab = $self->session->db->read("select * from DataForm_tab where assetId=?", [$self->getId]);
-	while (%dataTab = $sthTab->hash) {
-		$sthField = $self->session->db->read("select * from DataForm_field where assetId=? AND DataForm_tabId=?", [$self->getId, $dataTab{DataForm_tabId}]);
-		$dataTab{DataForm_tabId} = "new";
-		$newTabId = $newAsset->setCollateral("DataForm_tab","DataForm_tabId",\%dataTab);
-		while (%dataField = $sthField->hash) {
-			$dataField{DataForm_fieldId} = "new";
-			$dataField{DataForm_tabId} = $newTabId;
-			$newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
-		}
-	}
-
-	$sthField = $self->session->db->read("select * from DataForm_field where assetId=? AND DataForm_tabId='0'", [$self->getId]);
-	while (%dataField = $sthField->hash) {
-		$dataField{DataForm_fieldId} = "new";
-		$newAsset->setCollateral("DataForm_field","DataForm_fieldId",\%dataField);
-	}
-
-	return $newAsset;
+    if ($entryId) {
+        my $entry = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
+        $entryData = decode_json($entry->{entryData});
+    }
+    if ($entryData) {
+        for my $field ( @$fields ) {
+            my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
+            if ($form->can('getStorageLocation')) {
+                my $storage = $form->getStorageLocation;
+                $storage->delete;
+            }
+        }
+    }
+    else {
+        my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
+        foreach my $entry (@$entries) {
+            my $entryData = decode_json($entry->{entryData});
+            $self->deleteEntryFiles($entryData);
+            for my $field ( @$fields ) {
+                my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
+                if ($form->can('getStorageLocation')) {
+                    my $storage = $form->getStorageLocation;
+                    $storage->delete;
+                }
+            }
+        }
+    }
 }
 
 #-------------------------------------------------------------------
 sub getAttachedFiles {
-	my $self = shift;
-	my $properties = shift;
-
-	my ($returnType, @storageIds, @paths, $filename, $fileIcon, $fileUrl);
-	$returnType = $properties->{returnType};
-
-	push(@storageIds, $properties->{storageId}) if $properties->{storageId};
-
-	if ($returnType eq 'attachments') {
-                my $entryId = $properties->{entryId};
-                push(@storageIds, $self->session->db->buildArray("select value from DataForm_entryData as a, DataForm_field as b where a.DataForm_fieldId = b.DataForm_fieldId and
-                                                                  b.type='file' and a.DataForm_entryId=? and a.assetId=?",[$entryId,$self->getId]));
-	}
-
-	foreach my $storageId (@storageIds) {
-		my $storage = WebGUI::Storage->get($self->session, $storageId);
-		next unless defined $storage;
-		
-		$filename = $storage->getFiles->[0];
-		$fileIcon = $storage->getFileIconUrl($filename);
-		$fileUrl  = $storage->getUrl($filename);
-		push(@paths, $storage->getPath($filename));
-	}	
-
-	if ($returnType eq 'link') {
-		 return sprintf("<img src='%s' class='DataformRecordFileIcon' /><a href='%s' class='DataformRecordFileLink'>%s</a>",$fileIcon,$fileUrl,$filename);
+    my $self = shift;
+    my $entryData = shift;
+    my $fieldConfig = $self->getFieldConfig;
+    my @paths;
+    for my $field ( values %{$fieldConfig} ) {
+        my $form = $self->_createForm($field, $entryData->{$field->{name}});
+        if ($form->can('getStorageLocation')) {
+            my $storage = $form->getStorageLocation;
+            push @paths, $storage->getPath($storage->getFiles->[0]);
         }
-	return \@paths;
+    }
+    return \@paths;
 }
-
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-	my $tabform = $self->SUPER::getEditForm;
-	$tabform->getTab("display")->template(
-		-name=>"templateId",
-      		-value=>$self->getValue("templateId"),
-      		-namespace=>"DataForm",
-                -label=>$i18n->get(82),
-                -hoverHelp=>$i18n->get('82 description'),
-		-afterEdit=>'func=edit',
-		-defaultValue=>"PBtmpl0000000000000141"
-   		);
-        $tabform->getTab("display")->template(
-                -name=>"emailTemplateId",
-                -value=>$self->getValue("emailTemplateId"),
-                -namespace=>"DataForm",
-                -label=>$i18n->get(80),
-                -hoverHelp=>$i18n->get('80 description'),
-                -afterEdit=>'func=edit'
-                );
-        $tabform->getTab("display")->template(
-                -name=>"acknowlegementTemplateId",
-                -value=>$self->getValue("acknowlegementTemplateId"),
-                -namespace=>"DataForm",
-                -label=>$i18n->get(81),
-                -hoverHelp=>$i18n->get('81 description'),
-                -afterEdit=>'func=edit'
-                );
-        $tabform->getTab("display")->template(
-                -name=>"listTemplateId",
-                -value=>$self->getValue("listTemplateId"),
-                -namespace=>"DataForm/List",
-                -label=>$i18n->get(87),
-                -hoverHelp=>$i18n->get('87 description'),
-                -afterEdit=>'func=edit'
-                );
-	$tabform->getTab("display")->radioList(
-		-name=>"defaultView",
-                -options=>{ 0 => $i18n->get('data form'),
-                            1 => $i18n->get('data list'),},
-		-label=>$i18n->get('defaultView'),
-		-hoverHelp=>$i18n->get('defaultView description'),
-		-value=>$self->getValue("defaultView"),
-		);
-	$tabform->getTab("properties")->HTMLArea(
-		-name=>"acknowledgement",
-		-label=>$i18n->get(16),
-		-hoverHelp=>$i18n->get('16 description'),
-		-value=>($self->get("acknowledgement") || $i18n->get(3))
-		);
-	$tabform->getTab("properties")->yesNo(
-		-name=>"mailData",
-		-label=>$i18n->get(74),
-		-hoverHelp=>$i18n->get('74 description'),
-		-value=>$self->getValue("mailData")
-		);
-
-	$tabform->getTab("properties")->yesNo(
-		-name=>"mailAttachments",
-		-label=>$i18n->get("mail attachments"),
-		-hoverHelp=>$i18n->get("mail attachments description"),
-		-value=>$self->getValue("mailAttachments"),
-		);
-
-        $tabform->getTab("properties")->yesNo(
-            -name       => "useCaptcha",
-            -label      => $i18n->get( "editForm useCaptcha label" ),
-            -hoverHelp  => $i18n->get( "editForm useCaptcha description" ),
-            -value      => $self->getValue( "useCaptcha" ),
-        );
-
-	$tabform->getTab("security")->group(
-		-name=>"groupToViewEntries",
-		-label=>$i18n->get('group to view entries'),
-		-hoverHelp=>$i18n->get('group to view entries description'),
-		-value=>$self->getValue("groupToViewEntries")
-		);
-
-	if ($self->getId eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
-        	$tabform->getTab("properties")->whatNext(
-			-options=>{
-				editField=>$i18n->get(76),
-				""=>$i18n->get(745)
-				},
-			-value=>"editField"
-			);
-	}
-	
-	return $tabform;
-}
-
 
 #-------------------------------------------------------------------
 sub getListTemplateVars {
@@ -393,72 +499,71 @@ sub getListTemplateVars {
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	$var->{"back.url"} = $self->getFormUrl;
 	$var->{"back.label"} = $i18n->get('go to form');
-	my @fieldLoop;
-	my $fields = $self->session->db->read("select DataForm_fieldId,name,label,isMailField,type from DataForm_field
-			where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-	while (my $field = $fields->hashRef) {
-		push(@fieldLoop,{
-			"field.name"=>$field->{name},
-			"field.id"=>$field->{DataForm_fieldId},
-			"field.label"=>$field->{label},
-			"field.isMailField"=>$field->{isMailField},
-			"field.type"=>$field->{type},
-			});
-	}
-	$fields->finish;
-	$var->{field_loop} = \@fieldLoop;
-	my @recordLoop;
-	my $entries = $self->session->db->read("select ipAddress,username,userid,submissionDate,DataForm_entryId from DataForm_entry 
-		where assetId=".$self->session->db->quote($self->getId)." order by submissionDate desc");
-	while (my $record = $entries->hashRef) {
-		my @dataLoop;
-		my $dloop = $self->session->db->read("select b.name, b.label, b.isMailField, b.type, a.value from DataForm_entryData a left join DataForm_field b
-			on a.DataForm_fieldId=b.DataForm_fieldId where a.DataForm_entryId=".$self->session->db->quote($record->{DataForm_entryId})."
-			order by b.sequenceNumber");
-		while (my $data = $dloop->hashRef) {
-			my $value = $data->{value};
-			$value = $self->getAttachedFiles({returnType=>'link',storageId=>$value}) if ($value && $data->{type} eq 'file');
-			push(@dataLoop,{
-				"record.data.name"=>$data->{name},
-				"record.data.label"=>$data->{label},
-				"record.data.value"=>$value,
-				"record.data.isMailField"=>$data->{isMailField},
-                "record_data_type" => $data->{type},
-				});
-		}
-		$dloop->finish;
-		push(@recordLoop,{
-			"record.ipAddress"=>$record->{ipAddress},
-			"record.edit.url"=>$self->getFormUrl("func=view;entryId=".$record->{DataForm_entryId}),
-			"record.edit.icon"=>$self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->get('url')),
-			"record.delete.url"=>$self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
-			"record.delete.icon"=>$self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->get('url'), $i18n->get('Delete entry confirmation')),
-			"record.username"=>$record->{username},
-			"record.userId"=>$record->{userId},
-			"record.submissionDate.epoch"=>$record->{submissionDate},
-			"record.submissionDate.human"=>$self->session->datetime->epochToHuman($record->{submissionDate}),
-			"record.entryId"=>$record->{DataForm_entryId},
-			"record.data_loop"=>\@dataLoop
-			});
-	}
-	$entries->finish;
-	$var->{record_loop} = \@recordLoop;	
-	return $var;
+    my $fieldConfig = $self->getFieldConfig;
+    my @fieldLoop = map {
+        +{
+            'field.name'        => $fieldConfig->{$_}{name},
+            'field.label'       => $fieldConfig->{$_}{label},
+            'field.isMailField' => $fieldConfig->{$_}{isMailField},
+            'field.type'        => $fieldConfig->{$_}{type},
+        }
+    } @{ $self->getFieldOrder };
+    $var->{field_loop} = \@fieldLoop;
+    my @recordLoop;
+    my $entries = $self->session->db->read(
+        "SELECT `ipAddress`, `username`, `userId`, `submissionDate`, `DataForm_entryId`, `entryData`
+        FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC", [$self->getId]);
+    while (my $record = $entries->hashRef) {
+        my $recordData;
+        if (!eval { $recordData = decode_json($record->{entryData}) ; 1 }) {
+            $self->session->errorHandler->warn('DataForm ' . $self->getId . ' entry ' . $record->{DataForm_entryId} . ' contains invalid data');
+            next;
+        }
+        my @dataLoop;
+        for my $fieldName ( @{ $self->getFieldOrder } ) {
+            my $field = $fieldConfig->{$fieldName};
+            my $form = $self->_createForm($field, $recordData->{$fieldName});
+            push @dataLoop, {
+                "record.data.name"          => $field->{name},
+                "record.data.label"         => $field->{label},
+                "record.data.value"         => $form->getValueAsHtml,
+                "record.data.isMailField"   => $field->{isMailField},
+                "record_data_type"          => $field->{type},
+            };
+        }
+        my $date = WebGUI::DateTime->new($self->session, $record->{submissionDate});
+        push @recordLoop, {
+            "record.ipAddress"              => $recordData->{ipAddress},
+            "record.edit.url"               => $self->getFormUrl("func=view;entryId=".$record->{DataForm_entryId}),
+            "record.edit.icon"              => $self->session->icon->edit("func=view;entryId=".$record->{DataForm_entryId}, $self->get('url')),
+            "record.delete.url"             => $self->getUrl("func=deleteEntry;entryId=".$record->{DataForm_entryId}),
+            "record.delete.icon"            => $self->session->icon->delete("func=deleteEntry;entryId=".$record->{Asset_DataForm_entryId}, $self->get('url'), $i18n->get('Delete entry confirmation')),
+            "record.username"               => $record->{username},
+            "record.userId"                 => $record->{userId},
+            "record.submissionDate.epoch"   => $date->epoch,
+            "record.submissionDate.human"   => $date->cloneToUserTimeZone->webguiDate,
+            "record.entryId"                => $record->{DataForm_entryId},
+            "record.data_loop"              => \@dataLoop
+        };
+    }
+    $entries->finish;
+    $var->{record_loop} = \@recordLoop;
+    return $var;
 }
 
 #-------------------------------------------------------------------
 
 sub getFormUrl {
-        my $self = shift;
-        my $params = shift;
-        my $url = $self->getUrl;
-        unless ($self->defaultViewForm) {
-                $url = $self->session->url->append($url, 'mode=form');
-        }
-        if ($params) {
-                $url = $self->session->url->append($url, $params);
-        }
-        return $url;
+    my $self = shift;
+    my $params = shift;
+    my $url = $self->getUrl;
+    unless ($self->defaultViewForm) {
+        $url = $self->session->url->append($url, 'mode=form');
+    }
+    if ($params) {
+        $url = $self->session->url->append($url, $params);
+    }
+    return $url;
 }
 
 #-------------------------------------------------------------------
@@ -476,19 +581,21 @@ Name value pairs of URL paramters in the form of:
 =cut
 
 sub getListUrl {
-        my $self = shift;
-        my $params = shift;
-        my $url = $self->getUrl;
-        if ($self->defaultViewForm) {
-                $url = $self->session->url->append($url, 'mode=list');
-        }
-        if ($params) {
-                $url = $self->session->url->append($url, $params);
-        }
-        return $url;
+    my $self = shift;
+    my $params = shift;
+    my $url = $self->getUrl;
+    if ($self->defaultViewForm) {
+        $url = $self->session->url->append($url, 'mode=list');
+    }
+    if ($params) {
+        $url = $self->session->url->append($url, $params);
+    }
+    return $url;
 }
 
 #-------------------------------------------------------------------
+# Template variables for normal form view and email message
+
 sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
@@ -498,138 +605,100 @@ sub getRecordTemplateVars {
 	$var->{error_loop} = [] unless (exists $var->{error_loop});
 	$var->{"form.start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden($self->session,{name=>"func",value=>"process"});
-	my @tabs;
-	my $select = "select a.name, a.DataForm_fieldId, a.DataForm_tabId,a.label, a.status, a.isMailField, a.subtext, a.type, a.defaultValue, a.possibleValues, a.width, a.rows, a.extras, a.vertical";
-	my $join;
-	my $where = "where a.assetId=".$self->session->db->quote($self->getId);
+    my $fields = $self->getFieldConfig;
+    # If we have an entry id, we're doing this based on existing data
+    my $entry;
+    my $entryData;
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>"entryId",value=>$var->{entryId}});
-		my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
+        $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
+        $entryData = decode_json( $entry->{entryData} );
+        my $date = WebGUI::DateTime->new($self->session, $entry->{submissionDate})->cloneToUserTimeZone;
 		$var->{ipAddress} = $entry->{ipAddress};
 		$var->{username} = $entry->{username};
 		$var->{userId} = $entry->{userId};
-		$var->{date} = $self->session->datetime->epochToHuman($entry->{submissionDate});
-		$var->{epoch} = $entry->{submissionDate};
+        $var->{date} = $date->webguiDate;
+        $var->{epoch} = $date->epoch;
 		$var->{"edit.URL"} = $self->getFormUrl('entryId='.$var->{entryId});
-		$where .= " and b.DataForm_entryId=".$self->session->db->quote($var->{entryId});
-		$join = "left join DataForm_entryData as b on a.DataForm_fieldId=b.DataForm_fieldId";
-		$select .= ", b.value";
 	    $var->{"delete.url"} = $self->getUrl('func=deleteEntry;entryId='.$var->{entryId});
 	    $var->{"delete.label"} = $i18n->get(90);
 	}
-	my %data;
-	tie %data, 'Tie::CPHash';
-	my %tab;
-	tie %tab, 'Tie::CPHash';
-	my $tabsth = $self->session->db->read("select * from DataForm_tab where assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-	while (%tab = $tabsth->hash) {
-		my @fields;
-		my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId=".$self->session->db->quote($tab{DataForm_tabId})." order by a.sequenceNumber");
-		while (%data = $sth->hash) {
-			my $formValue = $self->session->form->process($data{name});
-			if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
-				$data{value} = $formValue;
-				$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");
-			}
-			if (not exists $data{value}) {
-				my $defaultValue = $data{defaultValue};
-				WebGUI::Macro::process($self->session,\$defaultValue);
-				$data{value} = $defaultValue;
-			}
-			my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
-			my $value = $data{value};
-			$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
-			$value = $self->session->datetime->epochToHuman($value,"%z %Z") if ($data{type} eq "dateTime");
-			my $subtext = $data{subtext};
-			$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
-			push(@fields, {
-				"tab.field.form" => $self->_createField(\%data),
-				"tab.field.name" => $data{name},
-				"tab.field.tid" => $data{DataForm_tabId},
-				"tab.field.value" => $value,
-				"tab.field.label" => $data{label},
-				"tab.field.isMailField" => $data{isMailField},
-				"tab.field.isHidden" => $hidden,
-				"tab.field.isDisplayed" => ($data{status} eq "visible" && !$hidden),
-				"tab.field.isRequired" => ($data{status} eq "required" && !$hidden),
-				"tab.field.subtext" => $subtext,
-				"tab.field.type" => $data{type},
-				"tab.field.controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
-			});
-		}
-		$sth->finish;
-		push(@tabs, {
-			"tab.start" => '<div id="tabcontent'.$tab{sequenceNumber}.'" class="tabBody">',
-			"tab.end" =>'</div>',
-			"tab.sequence" => $tab{sequenceNumber},
-			"tab.label" => $tab{label},
-			"tab.tid" => $tab{DataForm_tabId},
-			"tab.subtext" => $tab{subtext},
-			"tab.controls" => $self->_tabAdminIcons($tab{DataForm_tabId}),
-			"tab.field_loop" => \@fields,
-		});
-	}
-	
-	my @fields;
-	my $sth = $self->session->db->read("$select from DataForm_field as a $join $where and a.DataForm_tabId = '0' order by a.sequenceNumber");
-	while (%data = $sth->hash) {
-		my $formValue = $self->session->form->process($data{name});
-		if ((not exists $data{value}) && $self->session->form->process("func") ne "editSave" && $self->session->form->process("func") ne "editFieldSave" && defined $formValue) {
-			$data{value} = $formValue;
-			$data{value} = $self->session->datetime->setToEpoch($data{value}) if ($data{type} eq "date");
-		}
-		if (not exists $data{value}) {
-			my $defaultValue = $data{defaultValue};
-			WebGUI::Macro::process($self->session,\$defaultValue);
-			$data{value} = $defaultValue;
-		}
-		my $hidden = (($data{status} eq "hidden" && !$self->session->var->get("adminOn")) || ($data{isMailField} && !$self->get("mailData")));
-		my $value = $data{value};
-		$value = $self->session->datetime->epochToHuman($value,"%z") if ($data{type} eq "date");
-		$value = $self->session->datetime->epochToHuman($value) if ($data{type} eq "dateTime");
-		my $subtext = $data{subtext};
-		$subtext = sprintf("<a href='%s'>%s</a>",$self->getUrl('func=deleteAttachedFile;fieldId='.$data{DataForm_fieldId}), $i18n->get("delete file")) if ($data{type} eq "file" && $value);
+    my $ignoreForm = $self->session->form->process('func') eq 'editSave' || $self->session->form->process('func') eq 'editFieldSave';
+    my %tabById;
+    my @tabLoop;
+    my $tabIdx = 0;
+    for my $tabId (@{ $self->getTabOrder} ) {
+        $tabIdx++;
+        my $tab = $self->getTabConfig($tabId);
+        my $tabVars = {
+            "tab.start"         => '<div id="tabcontent' . $tabIdx . '" class="tabBody">',
+            "tab.end"           => '</div>',
+            "tab.sequence"      => $tabIdx,
+            "tab.label"         => $tab->{label},
+            "tab.tid"           => $tabId,
+            "tab.subtext"       => $tab->{subtext},
+            "tab.controls"      => $self->_tabAdminIcons($tabId),
+            "tab.field_loop"    => [],
+        };
+        push @tabLoop, $tabVars;
+        $tabById{$tabId} = $tabVars;
+    }
 
-		my %fieldProperties = (
-			"form" => $self->_createField(\%data),
-			"name" => $data{name},
-			"tid" => $data{DataForm_tabId},
-			"inTab".$data{DataForm_tabId} => 1,
-			"value" => $value,
-			"label" => $data{label},
-			"isMailField" => $data{isMailField},
-			"isHidden" => $hidden,
-			"isDisplayed" => ($data{status} eq "visible" && !$hidden),
-			"isRequired" => ($data{status} eq "required" && !$hidden),
-			"subtext" => $subtext,
-			"type" => $data{type},
-			"controls" => $self->_fieldAdminIcons($data{DataForm_fieldId},$data{DataForm_tabId},$data{isMailField})
-		);
-		push(@fields, { map {("field.".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
-		foreach (keys(%fieldProperties)) {
-			$var->{"field.noloop.".$data{name}.".$_"} = $fieldProperties{$_};
-		}
-	}
-	$sth->finish;
-	$var->{field_loop} = \@fields;
-	$tabsth->finish;
-	$var->{tab_loop} = \@tabs;
-	$var->{"form.send"} = WebGUI::Form::submit($self->session,{value=>$i18n->get(73)});
-	$var->{"form.save"} = WebGUI::Form::submit($self->session,);
-        
-        # Create CAPTCHA if configured and user is not a Registered User
-        if ( $self->useCaptcha ) {
-            # Create one captcha we can use multiple times
-            my $captcha
-                = WebGUI::Form::Captcha( $self->session, {
-                    name        => 'captcha',
-                } );
-
-            $var->{ "form.captcha" } = $captcha;
+    my @fieldLoop;
+    my @fields = map { $self->getFieldConfig($_) } @{ $self->getFieldOrder };
+    for my $field (@fields) {
+        # need a copy
+        my $value;
+        if ($entry) {
+            $value = $entryData->{ $field->{name} };
         }
-
-	$var->{"form.end"} = WebGUI::Form::formFooter($self->session,);
-	return $var;
+        elsif (!$ignoreForm && (my $formValue = $self->session->form->process($field->{name}))) {
+            $value = $formValue;
+        }
+        my $hidden = ($field->{status} eq 'hidden' && !$self->session->var->isAdminOn) || ($field->{isMailField} && !$self->get('mailData'));
+        my $form = $self->_createForm($field, $value);
+        $value = $form->getValueAsHtml;
+        my %fieldProperties = (
+            "form"          => $form->toHtml,
+            "name"          => $field->{name},
+            "tid"           => $field->{tabId},
+            "inTab".$field->{tabId} => 1,
+            "value"         => $form->getValueAsHtml,
+            "label"         => $field->{label},
+            "isMailField"   => $field->{isMailField},
+            "isHidden"      => $hidden,
+            "isDisplayed"   => ($field->{status} eq "visible" && !$hidden),
+            "isRequired"    => ($field->{status} eq "required" && !$hidden),
+            "subtext"       => $field->{subtext},
+            "type"          => $field->{type},
+            "controls"      => $self->_fieldAdminIcons($field->{name}),
+        );
+        my %fieldLoopEntry;
+        my %tabLoopEntry;
+        while (my ($propKey, $propValue) = each %fieldProperties) {
+            $var->{"field.noloop.$field->{name}.$propKey"} = $propKey;
+            $fieldLoopEntry{"field.$propKey"} = $propValue;
+            $tabLoopEntry{"tab.field.$propKey"} = $propValue;
+        }
+        push @fieldLoop, \%fieldLoopEntry;
+        my $tab = $tabById{$field->{tabId}};
+        if ($tab) {
+            push @{ $tab->{'tab.field_loop'} }, \%tabLoopEntry;
+        }
+    }
+    $var->{field_loop} = \@fieldLoop;
+    $var->{tab_loop} = \@tabLoop;
+    $var->{'form.send'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(73)});
+    $var->{'form.save'} = WebGUI::Form::submit($self->session);
+    # Create CAPTCHA if configured and user is not a Registered User
+    if ( $self->useCaptcha ) {
+        # Create one captcha we can use multiple times
+        $var->{ 'form_captcha' } = WebGUI::Form::Captcha( $self->session, {
+            name        => 'captcha',
+        } );
+    }
+    $var->{"form.end"} = WebGUI::Form::formFooter($self->session);
+    return $var;
 }
 
 #----------------------------------------------------------------------------
@@ -708,126 +777,28 @@ sub prepareView {
 	}
 }
 
-
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {	
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-	my $i18n = WebGUI::International->new($self->session, "Asset_DataForm");
-	if ($self->session->form->process("assetId") eq "new") {
-		$self->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			DataForm_tabId=>0,
-			name=>"from",
-			label=>$i18n->get(10),
-			status=>"editable",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$self->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			DataForm_tabId=>0,
-			name=>"to",
-			label=>$i18n->get(11),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email",
-			defaultValue=>$self->session->setting->get("companyEmail")
-			});
-		$self->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			DataForm_tabId=>0,
-			name=>"cc",
-			label=>$i18n->get(12),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$self->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			DataForm_tabId=>0,
-			name=>"bcc",
-			label=>$i18n->get(13),
-			status=>"hidden",
-			isMailField=>1,
-			width=>0,
-			type=>"email"
-			});
-		$self->setCollateral("DataForm_field","DataForm_fieldId",{
-			DataForm_fieldId=>"new",
-			DataForm_tabId=>0,
-			name=>"subject",
-			label=>$i18n->get(14),
-			status=>"editable",
-			isMailField=>1,
-			width=>0,
-			type=>"text",
-			defaultValue=>$i18n->get(2)
-			});
-	}
-	if ($self->session->form->process("fid") eq "new") { # hack to get proceed to work.
-		$self->session->stow->set('whatNext',$self->session->form->process("proceed"));
-	} else { $self->session->stow->set('whatNext','nothing'); }
-}
-
 #-------------------------------------------------------------------
 sub purge {
-	my $self = shift;
-	$self->deleteAttachedFiles;
-    	$self->session->db->write("delete from DataForm_field where assetId=".$self->session->db->quote($self->getId));
-    	$self->session->db->write("delete from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
-    	$self->session->db->write("delete from DataForm_entryData where assetId=".$self->session->db->quote($self->getId));
-	$self->session->db->write("delete from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
-    	$self->SUPER::purge();
+    my $self = shift;
+    $self->deleteAttachedFiles;
+    $self->session->db->write("delete from DataForm_entry where assetId=?", [$self->getId]);
+    return $self->SUPER::purge(@_);
 }
 
 #-------------------------------------------------------------------
 sub sendEmail {
 	my $self = shift;
 	my $var = shift;
-	my ($to, $subject, $from, $bcc, $cc);
-	foreach my $row (@{$var->{field_loop}}) {
-		if ($row->{"field.name"} eq "to") {
-			$to = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "from") {
-			$from = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "cc") {
-			$cc = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "bcc") {
-			$bcc = $row->{"field.value"};
-		} elsif ($row->{"field.name"} eq "subject") {
-			$subject = $row->{"field.value"};
-		} elsif ($row->{"field.type"} eq "textArea") {
-			$row->{"field.value"} =~ s/\n/<br\/>/;
-		} elsif ($row->{"field.type"} eq "textarea") {
-			$row->{"field.value"} = WebGUI::HTML::format($row->{"field.value"},'mixed');
-		}
-	}
-    my @rows = map { @{ $_->{'tab.field_loop'} } } @{$var->{tab_loop}};
-    foreach my $row (@rows) {
-        if ($row->{"tab.field.name"} eq "to") {
-            $to = $row->{"tab.field.value"};
-        } elsif ($row->{"tab.field.name"} eq "from") {
-            $from = $row->{"tab.field.value"};
-        } elsif ($row->{"tab.field.name"} eq "cc") {
-            $cc = $row->{"tab.field.value"};
-        } elsif ($row->{"tab.field.name"} eq "bcc") {
-            $bcc = $row->{"tab.field.value"};
-        } elsif ($row->{"tab.field.name"} eq "subject") {
-            $subject = $row->{"tab.field.value"};
-        } elsif ($row->{"tab.field.type"} eq "textArea") {
-            $row->{"tab.field.value"} =~ s/\n/<br\/>/;
-        } elsif ($row->{"tab.field.type"} eq "textarea") {
-            $row->{"tab.field.value"} = WebGUI::HTML::format($row->{"tab.field.value"},'mixed');
-        }
-    }
+    my $entryData = shift;
+    my $to = $entryData->{to};
+    my $subject = $entryData->{subject};
+    my $from = $entryData->{from};
+    my $bcc = $entryData->{bcc};
+    my $cc = $entryData->{cc};
     my $message = $self->processTemplate($var,$self->get("emailTemplateId"));
-	WebGUI::Macro::process($self->session,\$message);
-	my @attachments = $self->get('mailAttachments')?
-	    @{$self->getAttachedFiles({returnType=>'attachments',entryId=>$var->{entryId}})}
+    WebGUI::Macro::process($self->session,\$message);
+    my @attachments = $self->get('mailAttachments')
+        ? @{ $self->getAttachedFiles($entryData) }
 		: ();
 	if ($to =~ /\@/) {
 		my $mail = WebGUI::Mail::Send->create($self->session,{
@@ -842,38 +813,41 @@ sub sendEmail {
 		$mail->addFooter;
 		$mail->addAttachment($_) for (@attachments);
 		$mail->queue;
-	} else {
-                my ($userId) = $self->session->db->quickArray("select userId from users where username=".$self->session->db->quote($to));
-                my $groupId;
-                # if no user is found, try finding a matching group
-                unless ($userId) {
-                        ($groupId) = $self->session->db->quickArray("select groupId from groups where groupName=".$self->session->db->quote($to));
-                }
-                unless ($userId || $groupId) {
-                        $self->session->errorHandler->warn($self->getId.": Unable to send message, no user or group found.");
-                } else {
-			WebGUI::Inbox->new($self->session)->addMessage({
-				userId=>$userId,
-				groupId=>$groupId,
-                sentBy => $self->session->user->userId,
-				subject=>$subject,
-				message=>$message,
-				status=>'unread'
-				});
-			if ($cc) {
-                my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, replyTo=>$from, subject=>$subject, from=>$from});
-				$mail->addHtml($message);
-				$mail->addAttachment($_) for (@attachments);
-				$mail->addFooter;
-				$mail->queue;
-            }
-            if ($bcc) {
-                my $mail = WebGUI::Mail::Send->create($self->session, {to=>$bcc, replyTo=>$from, subject=>$subject, from=>$from});
-				$mail->addHtml($message);
-				$mail->addAttachment($_) for (@attachments);
-				$mail->addFooter;
-				$mail->queue;
-            }
+	}
+    else {
+        my $userId;
+        my $groupId;
+        if (my $user = WebGUI::User->newByUsername($self->session, $to)) {
+            $userId = $user->userId;
+        }
+        elsif (my $group = WebGUI::Group->find($self->session, $to)) {
+            $groupId = $group->getId;
+        }
+        else {
+            $self->session->errorHandler->warn($self->getId.": Unable to send message, no user or group found.");
+            return;
+        }
+        WebGUI::Inbox->new($self->session)->addMessage({
+            userId  => $userId,
+            groupId => $groupId,
+            sentBy  => $self->session->user->userId,
+            subject => $subject,
+            message => $message,
+            status  => 'unread',
+        });
+        if ($cc) {
+            my $mail =  WebGUI::Mail::Send->create($self->session,{to=>$cc, replyTo=>$from, subject=>$subject, from=>$from});
+            $mail->addHtml($message);
+            $mail->addAttachment($_) for (@attachments);
+            $mail->addFooter;
+            $mail->queue;
+        }
+        if ($bcc) {
+            my $mail = WebGUI::Mail::Send->create($self->session, {to=>$bcc, replyTo=>$from, subject=>$subject, from=>$from});
+            $mail->addHtml($message);
+            $mail->addAttachment($_) for (@attachments);
+            $mail->addFooter;
+            $mail->queue;
         }
     }
 }
@@ -926,32 +900,34 @@ sub viewForm {
 	$self->session->style->setScript($self->session->url->extras('tabs/tabs.js'), {"type"=>"text/javascript"});
 	$var->{entryId} = $self->session->form->process("entryId") if ($self->canEdit);
 	$var = $passedVars || $self->getRecordTemplateVars($var);
+    #warn Data::Dumper::Dumper($var);
 	return $self->processTemplate($var,$self->get("templateId"));
 }
 
 #-------------------------------------------------------------------
 sub www_deleteAllEntriesConfirm {
 	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$self->session->db->write("delete from DataForm_entry where assetId=?",[$self->getId]);
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    $self->deleteAttachedFiles;
+    $self->session->db->write("DELETE FROM `DataForm_entry` WHERE `assetId`=?", [$self->getId]);
 	return $self->www_view;
 }
 
 #-------------------------------------------------------------------
-sub www_deleteAttachedFile {
-	my $self = shift;
-	my $fieldId = $self->session->form->process('fieldId');
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$self->deleteAttachedFiles($fieldId);
-	return $self->www_view;
-}
+#sub www_deleteAttachedFile {
+#	my $self = shift;
+#	my $fieldId = $self->session->form->process('fieldId');
+#	return $self->session->privilege->insufficient() unless ($self->canEdit);
+#	$self->deleteAttachedFiles($fieldId);
+#	return $self->www_view;
+#}
 
 #-------------------------------------------------------------------
 sub www_deleteEntry {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-        my $entryId = $self->session->form->process("entryId");
-	$self->deleteAttachedFiles($entryId);
+    my $entryId = $self->session->form->process("entryId");
+	$self->deleteAttachedFiles(entryId => $entryId);
 	$self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
 	$self->session->stow->set("mode","list");
 	return $self->www_view;
@@ -959,347 +935,409 @@ sub www_deleteEntry {
 
 #-------------------------------------------------------------------
 sub www_deleteFieldConfirm {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->deleteCollateral("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"));
-	$self->reorderCollateral("DataForm_field","DataForm_fieldId");
-       	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    $self->deleteField($self->session->form->process("fieldName"));
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_deleteTabConfirm {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->deleteCollateral("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
-	$self->deleteCollateral("DataForm_field","DataForm_tabId",$self->session->form->process("tid"));
-	$self->reorderCollateral("DataForm_tab","DataForm_tabId");
-       	return "";
+    $self->deleteTab($self->session->form->process("tabId"));
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_editField {
-	my $self = shift;
-	my $fid = shift || $self->session->form->process("fid") || 'new';
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-    	my (%field, $f, %fieldStatus,$tab);
-    	tie %field, 'Tie::CPHash';
-    	tie %fieldStatus, 'Tie::IxHash';
-	%fieldStatus = ( 
-		"hidden" => $i18n->get(4),
-		"visible" => $i18n->get(5),
-		"editable" => $i18n->get(6),
-		"required" => $i18n->get(75) 
-		);
-	unless ($fid eq "new") {	
-        	%field = $self->session->db->quickHash("select * from DataForm_field where DataForm_fieldId=".$self->session->db->quote($fid));
-	}
-	$tab = $self->session->db->buildHashRef("select DataForm_tabId,label from DataForm_tab where assetId=".$self->session->db->quote($self->getId));
-	$tab->{0} = $i18n->get("no tab");
-        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-		-name => "fid",
-		-value => $fid
-	);
-        $f->hidden(
-		-name => "func",
-		-value => "editFieldSave"
-	);
-	$f->text(
-                -name=>"label",
-                -label=>$i18n->get(77),
-                -hoverHelp=>$i18n->get('77 description'),
-                -value=>$field{label}
-                );
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $fieldName = shift || $self->session->form->process("fieldName");
+    my $field;
+    undef $fieldName
+        if $fieldName eq 'new';
+    if ($fieldName) {
+        $field = $self->getFieldConfig($fieldName);
+    }
+    else {
+        $field = {};
+    }
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->hidden(
+        name => "fieldName",
+        value => $field->{name},
+    );
+    $f->hidden(
+        name => "func",
+        value => "editFieldSave"
+    );
+    $f->text(
+        name=>"label",
+        label=>$i18n->get(77),
+        hoverHelp=>$i18n->get('77 description'),
+        value=>$field->{label}
+    );
+    if ($field->{isMailField}) {
+        $f->readOnly(
+            name        => "newName",
+            label       => $i18n->get(21),
+            hoverHelp   => $i18n->get('21 description'),
+            value       => $field->{name},
+        );
+    }
+    else {
         $f->text(
-		-name=>"name",
-		-label=>$i18n->get(21),
-		-hoverHelp=>$i18n->get('21 description'),
-		-value=>$field{name}
-		);
-	if($field{sequenceNumber} && ! $field{isMailField}) {
-		$f->integer(
-			-name=>"position",
-			-label=>$i18n->get('Field Position'),
-			-hoverHelp=>$i18n->get('Field Position description'),
-			-value=>$field{sequenceNumber}
-		);	
-	}
-	$f->selectBox(
-		-name=>"tid",
-		-options=>$tab,
-		-label=>$i18n->get(104),
-		-hoverHelp=>$i18n->get('104 description'),
-		-value=>[ $field{DataForm_tabId} || 0 ]
-		); 
-        $f->text(
-                -name=>"subtext",
-                -value=>$field{subtext},
-                -label=>$i18n->get(79),
-                -hoverHelp=>$i18n->get('79 description'),
-                );
-        $f->selectBox(
-		-name=>"status",
-		-options=>\%fieldStatus,
-		-label=>$i18n->get(22),
-		-hoverHelp=>$i18n->get('22 description'),
-		-value=> [ $field{status} || "editable" ] ,
-		); 
-	$f->fieldType(
-		-name=>"type",
-		-label=>$i18n->get(23),
-		-hoverHelp=>$i18n->get('23 description'),
-		-value=>$field{type} || "text",
-		-types=>[qw(dateTime TimeField float zipcode text textarea HTMLArea url date email phone integer yesNo selectList radioList checkList selectBox file)]
-		);
-	$f->integer(
-		-name=>"width",
-		-label=>$i18n->get(8),
-		-hoverHelp=>$i18n->get('8 description'),
-		-value=>($field{width} || 0)
-		);
-	$f->integer(
-                -name=>"rows",
-		-value=>$field{rows} || 0,
-		-label=>$i18n->get(27),
-		-hoverHelp=>$i18n->get('27 description'),
-		-subtext=>$i18n->get(28),
-		);
-	$f->yesNo(
-		-name=>"vertical",
-		-value=>$field{vertical},
-		-label=>$i18n->get('editField vertical label'),
-		-hoverHelp=>$i18n->get('editField vertical label description'),
-		-subtext=>$i18n->get('editField vertical subtext')
-		);
-	$f->text(
-		-name=>"extras",
-		-value=>$field{extras},
-		-label=>$i18n->get('editField extras label'),
-		-hoverHelp=>$i18n->get('editField extras label description'),
-		);
-        $f->textarea(
-		-name=>"possibleValues",
-		-label=>$i18n->get(24),
-		-hoverHelp=>$i18n->get('24 description'),
-		-value=>$field{possibleValues},
-		-subtext=>'<br />'.$i18n->get(85)
-		);
-        $f->textarea(
-		-name=>"defaultValue",
-		-label=>$i18n->get(25),
-		-hoverHelp=>$i18n->get('25 description'),
-		-value=>$field{defaultValue},
-		-subtext=>'<br />'.$i18n->get(85)
-		);
-	if ($fid eq "new" && $self->session->form->process("proceed") ne "manageAssets") {
-        	$f->whatNext(
-			-options=>{
-				"editField"=>$i18n->get(76),
-				"viewDataForm"=>$i18n->get(745)
-				},
-			-value=>"editField"
-			);
-	}
-        $f->submit;
-	my $ac = $self->getAdminConsole;
-        return $ac->render($f->print,$i18n->get('20'));
+            name        => "newName",
+            label       => $i18n->get(21),
+            hoverHelp   => $i18n->get('21 description'),
+            value       => $field->{name},
+        );
+    }
+    tie my %tabs, 'Tie::IxHash';
+    %tabs = (
+        0   => $i18n->get("no tab"),
+        map { $_ => $self->getTabConfig($_)->{label} } @{ $self->getTabOrder },
+    );
+    $f->selectBox(
+        name        => "tabId",
+        options     => \%tabs,
+        label       => $i18n->get(104),
+        hoverHelp   => $i18n->get('104 description'),
+        value       => [ $field->{tabId} ]
+    );
+    $f->text(
+        name        => "subtext",
+        value       => $field->{subtext},
+        label       => $i18n->get(79),
+        hoverHelp   => $i18n->get('79 description'),
+    );
+    tie my %fieldStatus, 'Tie::IxHash';
+    %fieldStatus = (
+        "hidden"    => $i18n->get(4),
+        "visible"   => $i18n->get(5),
+        "editable"  => $i18n->get(6),
+        "required"  => $i18n->get(75),
+    );
+    $f->selectBox(
+        name        => "status",
+        options     => \%fieldStatus,
+        label       => $i18n->get(22),
+        hoverHelp   => $i18n->get('22 description'),
+        value       => [ $field->{status} || "editable" ],
+    );
+    $f->fieldType(
+        name        => "type",
+        label       => $i18n->get(23),
+        hoverHelp   => $i18n->get('23 description'),
+        value       => "\u$field->{type}" || "Text",
+        types       => [qw(DateTime TimeField Float Zipcode Text Textarea HTMLArea Url Date Email Phone Integer YesNo SelectList RadioList CheckList SelectBox File)],
+    );
+    $f->integer(
+        name        => "width",
+        label       => $i18n->get(8),
+        hoverHelp   => $i18n->get('8 description'),
+        value       => ($field->{width} || 0),
+    );
+    $f->integer(
+        name        => "rows",
+        value       => $field->{rows} || 0,
+        label       => $i18n->get(27),
+        hoverHelp   => $i18n->get('27 description'),
+        subtext     => $i18n->get(28),
+    );
+    $f->yesNo(
+        name=>"vertical",
+        value=>$field->{vertical},
+        label=>$i18n->get('editField vertical label'),
+        hoverHelp=>$i18n->get('editField vertical label description'),
+        subtext=>$i18n->get('editField vertical subtext')
+    );
+    $f->text(
+        name=>"extras",
+        value=>$field->{extras},
+        label=>$i18n->get('editField extras label'),
+        hoverHelp=>$i18n->get('editField extras label description'),
+    );
+    $f->textarea(
+        -name=>"options",
+        -label=>$i18n->get(24),
+        -hoverHelp=>$i18n->get('24 description'),
+        -value=>$field->{options},
+        -subtext=>'<br />'.$i18n->get(85)
+    );
+    $f->textarea(
+        -name=>"defaultValue",
+        -label=>$i18n->get(25),
+        -hoverHelp=>$i18n->get('25 description'),
+        -value=>$field->{defaultValue},
+        -subtext=>'<br />'.$i18n->get(85)
+    );
+    if (!$fieldName) {
+        $f->whatNext(
+            options => {
+                "editField"     => $i18n->get(76),
+                "viewDataForm"  => $i18n->get(745),
+            },
+            value  => "editField"
+        );
+    }
+    $f->submit;
+    my $ac = $self->getAdminConsole;
+    return $ac->render($f->print,$i18n->get('20'));
 }
 
 #-------------------------------------------------------------------
 sub www_editFieldSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $form = $self->session->form;
-	my $tid = $form->process("tid", 'selectBox') || "0";
-	my $name = $self->session->url->urlize($form->process("name") || $form->process("label"));
-        $name =~ s/\-//g;
-        $name =~ s/\///g;
-    my $exists = 1;
-    while ($exists) {
-        $exists = $self->session->db->quickScalar('SELECT DataForm_fieldId FROM DataForm_field WHERE assetId=? AND name=?', [$self->getId, $name]);
-        if ($exists) {
-            $name =~ s/(\d+|)$/$1 + 1/e; # increment number at the end of the name
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $form = $self->session->form;
+    my $fieldName = $form->process('fieldName');
+    my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
+    $newName =~ tr{-/}{};
+    if (!$fieldName || $fieldName ne $newName) {
+        my $i = '';
+        while ($self->getFieldConfig($newName . $i)) {
+            $i ||= 1;
+            $i++;
         }
+        $newName .= $i;
     }
-	$self->setCollateral("DataForm_field","DataForm_fieldId",{
-		DataForm_fieldId=>$form->process("fid"),
-		width=>$form->process("width", 'integer'),
-		name=>$name,
-		label=>$form->process("label"),
-		DataForm_tabId=>$tid,
-		status=>$form->process("status", 'selectBox'),
-		type=>$form->process("type", 'fieldType'),
-		possibleValues=>$form->process("possibleValues", 'textarea'),
-		defaultValue=>$form->process("defaultValue", 'textarea'),
-		subtext=>$form->process("subtext"),
-		rows=>$form->process("rows", 'integer'),
-		vertical=>$form->process("vertical", 'yesNo'),
-		extras=>$form->process("extras"),
-		}, "1","1", _tonull("DataForm_tabId",$tid));
-	if($form->process("position")) {
-		$self->session->db->write("update DataForm_field set sequenceNumber=".$self->session->db->quote($form->process("position", 'integer')).
-					" where DataForm_fieldId=".$self->session->db->quote($form->process("fid")));
-	}
-	$self->reorderCollateral("DataForm_field","DataForm_fieldId", _tonull("DataForm_tabId",$tid)) if ($form->process("fid") ne "new");
-        if ($self->session->stow->get('whatNext') eq "editField" || $form->process("proceed") eq "editField") {
-            return $self->www_editField('new');
+    my $field;
+    if ($fieldName) {
+        if ($fieldName ne $newName) {
+            $self->renameField($fieldName, $newName);
         }
-        return "";
+        $field = $self->getFieldConfig($newName);
+    }
+    else {
+        $field = {
+            name => $newName,
+        };
+        $self->getFieldConfig->{$newName} = $field;
+        push @{ $self->getFieldOrder }, $newName;
+    }
+
+
+    $field->{width}             = $form->process("width", 'integer');
+    $field->{label}             = $form->process("label");
+    $field->{tabId}             = $form->process("tabId") || undef;
+    $field->{status}            = $form->process("status", 'selectBox');
+    $field->{type}              = $form->process("type", 'fieldType');
+    $field->{options}           = $form->process("options", 'textarea');
+    $field->{defaultValue}      = $form->process("defaultValue", 'textarea');
+    $field->{subtext}           = $form->process("subtext");
+    $field->{rows}              = $form->process("rows", 'integer');
+    $field->{vertical}          = $form->process("vertical", 'yesNo');
+    $field->{extras}            = $form->process("extras"),
+    $self->_saveFieldConfig;
+    if ($self->session->stow->get('whatNext') eq "editField" || $form->process("proceed") eq "editField") {
+        return $self->www_editField('new');
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_editTab {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
-    	my (%tab, $f);
-    	tie %tab, 'Tie::CPHash';
-        my $tid = shift || $self->session->form->process("tid") || "new";
-	$self->session->errorHandler->warn("tid: $tid");
-	unless ($tid eq "new") {	
-        	%tab = $self->session->db->quickHash("select * from DataForm_tab where DataForm_tabId=".$self->session->db->quote($tid));
-	}
-        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-		-name => "tid",
-		-value => $tid
-	);
-        $f->hidden(
-		-name => "func",
-		-value => "editTabSave"
-	);
-	$f->text(
-                -name=>"label",
-		-label=>$i18n->get(101),
-                -value=>$tab{label}
-                );
-        $f->textarea(
-		-name=>"subtext",
-		-label=>$i18n->get(79),
-		-value=>$tab{subtext},
-		-subtext=>""
-		);
-	if ($tid eq "new") {
-        	$f->whatNext(
-			-options=>{
-				editTab=>$i18n->get(103),
-				""=>$i18n->get(745)
-				},
-			-value=>"editTab"
-			);
-	}
-        $f->submit;
-	my $ac = $self->getAdminConsole;
-	return $ac->render($f->print,$i18n->get('103')) if $tid eq "new";
-	return $ac->render($f->print,$i18n->get('102'));
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
+    my $tabId = shift || $self->session->form->process("tabId") || "new";
+    my $tab;
+    unless ($tabId eq "new") {
+        $tab = $self->getTabConfig($tabId);
+    }
+
+    my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $f->hidden(
+        -name => "tabIdd",
+        -value => $tabId,
+    );
+    $f->hidden(
+        -name => "func",
+        -value => "editTabSave"
+    );
+    $f->text(
+        -name=>"label",
+        -label=>$i18n->get(101),
+        -value=>$tab->{label}
+    );
+    $f->textarea(
+        -name=>"subtext",
+        -label=>$i18n->get(79),
+        -value=>$tab->{subtext},
+        -subtext=>""
+    );
+    if ($tabId eq "new") {
+        $f->whatNext(
+            options=>{
+                editTab=>$i18n->get(103),
+                ""=>$i18n->get(745)
+            },
+            -value=>"editTab"
+        );
+    }
+    $f->submit;
+    my $ac = $self->getAdminConsole;
+    return $ac->render($f->print,$i18n->get('103')) if $tabId eq "new";
+    return $ac->render($f->print,$i18n->get('102'));
 }
 
 #-------------------------------------------------------------------
 sub www_editTabSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	my $name = $self->session->form->process("name") || $self->session->form->process("label");;
-	$name = $self->session->url->urlize($name);
-	$name =~ s/\-//g;
-	$name =~ s/\///g;
-	$self->setCollateral("DataForm_tab","DataForm_tabId",{
-		DataForm_tabId=>$self->session->form->process("tid"),
-		label=>$self->session->form->process("label"),
-		subtext=>$self->session->form->process("subtext", 'textarea')
-		});
-        if ($self->session->form->process("proceed") eq "editTab") {
-            return $self->www_editTab("new");
-        }
-        return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $name = $self->session->form->process("name") || $self->session->form->process("label");
+    $name = $self->session->url->urlize($name);
+    my $tabId = $self->session->form->process('tabId');
+    undef $tabId
+        if $tabId eq 'new';
+
+    $name =~ tr{-/}{};
+    my $tab;
+    if (!$tabId || !($tab = $self->getTabConfig($tabId)) ) {
+        $tabId = $self->session->id->generate;
+        $tab = {
+            tabId   => $tabId,
+        };
+        $self->getTabConfig->{$tabId} = $tab;
+        push @{ $self->getTabOrder }, $tabId;
+    }
+    $tab->{label}   = $self->session->form->process("label");
+    $tab->{subtext} = $self->session->form->process("subtext", 'textarea');
+    $self->_saveTabConfig;
+    if ($self->session->form->process("proceed") eq "editTab") {
+        return $self->www_editTab("new");
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_exportTab {
         my $self = shift;
         return $self->session->privilege->insufficient() unless $self->canEdit;
-        $self->session->http->setFilename($self->get("url").".tab","text/plain");
-        my %fields;
-        tie %fields, 'Tie::IxHash';
-        %fields = $self->session->db->buildHash("select DataForm_fieldId,name from DataForm_field where
-                assetId=".$self->session->db->quote($self->getId)." order by sequenceNumber");
-        my @data;
-        my $entries = $self->session->db->read("select * from DataForm_entry where assetId=".$self->session->db->quote($self->getId));
-        my $i;
-        my $noMailData = ($self->get("mailData") == 0);
+        my @exportRows;
+        my $entries = $self->session->db->read("select * from DataForm_entry where assetId=?", [$self->getId]);
+        my @exportFields;
+        for my $field ( map { $self->getFieldConfig($_) } $self->getFieldOrder ) {
+            next
+                if $field->{isMailField} && !$self->get('mailData');
+            push @exportFields, $field->{name};
+        }
+        my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n"});
+        $tsv->combine(
+            'entryId',
+            'ipAddress',
+            'username',
+            'userId',
+            'submissionDate',
+            @exportFields,
+        );
+        my $outText = $tsv->print;
+
         while (my $entryData = $entries->hashRef) {
-                $data[$i] = {
-                        entryId => $entryData->{DataForm_entryId},
-                        ipAddress => $entryData->{ipAddress},
-                        username => $entryData->{username},
-                        userId => $entryData->{userId},
-                        submissionDate => $self->session->datetime->epochToHuman($entryData->{submissionDate}),
-                        };
-                my $values = $self->session->db->read("select value,DataForm_fieldId from DataForm_entryData where
-                        DataForm_entryId=".$self->session->db->quote($entryData->{DataForm_entryId}));
-                while (my ($value, $fieldId) = $values->array) {
-                        next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
-                        $data[$i]{$fields{$fieldId}} = $value;
-                }
-                $values->finish;
-                $i++;
+            my $entryFields = decode_json($entryData->{entryData});
+            $tsv->combine(
+                $entryData->{DataForm_entryId},
+                $entryData->{ipAddress},
+                $entryData->{username},
+                $entryData->{userId},
+                WebGUI::DateTime->new($self->session, $entryData->{submissionDate})->webguiDate,
+                @{ $entryFields }{@exportFields},
+            );
+            $outText .= $tsv->print;
         }
         $entries->finish;
-
-        ##Output field headers
-        my @validFields;
-        foreach my $fieldId (keys %fields) {
-                next if (isIn($fields{$fieldId}, qw(to from cc bcc subject)) && $noMailData);
-                push(@validFields, $fields{$fieldId});
-        }
-        unshift @validFields, qw/entryId ipAddress username userId submissionDate/;
-        my $tab = join("\t",@validFields)."\n";
-
-        ##Output actual row data
-        foreach my $record (@data) {
-                my @row = ();
-                foreach my $fieldName (@validFields) {
-                        my $value = $record->{$fieldName};
-                        $value =~ s/\t/\\t/g;
-                        $value =~ s/\r//g;
-                        $value =~ s/\n/;/g;
-                        push(@row, $value);
-                }
-                $tab .= join("\t", @row)."\n";
-        }
-        return $tab;
+        $self->session->http->setFilename($self->get("url").".tab","text/plain");
+        return $outText;
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldDown {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->moveCollateralDown("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
-	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $fieldName = $self->session->form->process('fieldName');
+    my $fieldOrder = $self->getFieldOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$fieldOrder; $currentPos++) {
+        last
+            if $fieldName eq $fieldOrder->[$currentPos];
+    }
+    my $tabId = $self->getFieldConfig($fieldName)->{tabId};
+    my $newPos;
+    for ($newPos = $currentPos + 1; $newPos < @$fieldOrder; $newPos++) {
+        last
+            if $tabId eq $self->getFieldConfig($fieldOrder->[$newPos])->{tabId};
+    }
+    if ($newPos < @$fieldOrder) {
+        splice @$fieldOrder, $newPos, 0, splice(@$fieldOrder, $currentPos, 1);
+        $self->_saveFieldConfig;
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveFieldUp {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->moveCollateralUp("DataForm_field","DataForm_fieldId",$self->session->form->process("fid"),_tonull("DataForm_tabId",$self->session->form->process("tid")));
-	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $fieldName = $self->session->form->process('fieldName');
+    my $fieldOrder = $self->getFieldOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$fieldOrder; $currentPos++) {
+        last
+            if $fieldName eq $fieldOrder->[$currentPos];
+    }
+    my $tabId = $self->getFieldConfig($fieldName)->{tabId};
+    my $newPos;
+    for ($newPos = $currentPos - 1; $newPos < 0; $newPos--) {
+        last
+            if $tabId eq $self->getFieldConfig($fieldOrder->[$newPos])->{tabId};
+    }
+
+    if ($newPos >= 0) {
+        splice @$fieldOrder, $newPos, 0, splice(@$fieldOrder, $currentPos, 1);
+        $self->_saveFieldConfig;
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabRight {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->moveCollateralDown("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
-	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $tabId = $self->session->form->process('tabId');
+    my $tabOrder = $self->getTabOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$tabOrder; $currentPos++) {
+        last
+            if $tabId eq $tabOrder->[$currentPos];
+    }
+    my $newPos = $currentPos + 1;
+    if ($newPos < @$tabOrder) {
+        splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
+        $self->_saveFieldConfig;
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
 sub www_moveTabLeft {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	$self->moveCollateralUp("DataForm_tab","DataForm_tabId",$self->session->form->process("tid"));
-	return "";
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $tabId = $self->session->form->process('tabId');
+    my $tabOrder = $self->getTabOrder;
+    my $currentPos;
+    for ($currentPos = 0; $currentPos < @$tabOrder; $currentPos++) {
+        last
+            if $tabId eq $tabOrder->[$currentPos];
+    }
+    my $newPos = $currentPos - 1;
+    if ($newPos >= 0) {
+        splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
+        $self->_saveFieldConfig;
+    }
+    return "";
 }
 
 #-------------------------------------------------------------------
@@ -1309,81 +1347,42 @@ sub www_process {
     my $session = $self->session;
     my $db      = $self->session->db;
     my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
-    # TODO: Why do we create the entire entry instead of just generating the entryId 
-    # and only adding the entry data if there are no errors?
-    my $entryId 
-        = $self->setCollateral("DataForm_entry","DataForm_entryId", {
-            DataForm_entryId    => $session->form->process("entryId") || undef,
-            assetId             => $self->getId,
-            userId              => $session->user->userId,
-            username            => $session->user->username,
-            ipAddress           => $session->env->getIp,
-            submissionDate      => $session->datetime->time,
-        }, 0
-    );
+    my $entryId = $self->session->form->process('entryId');
+    my $entry;
+    my $entryData;
+    if ($entryId) {
+        my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId", $entryId);
+        eval {
+            $entryData = decode_json($entry->{entryData});
+        };
+    }
+
     my $var = $self->getTemplateVars;
-    $var->{entryId} = $entryId;
-    
+
     # Process form
     my (@errors, $updating, $hadErrors);
-    tie my %row, "Tie::CPHash";
-    my $sth = $self->session->db->read(
-        "SELECT * FROM DataForm_field WHERE assetId=? ORDER BY sequenceNumber",
-        [ $self->getId ]
-    );
-    while (%row = $sth->hash) {
-        my $value = $row{defaultValue};
-        if ($row{status} eq "required" || $row{status} eq "editable") {
-            $value = $self->session->form->process($row{name},$row{type},$row{defaultValue});
+    for my $field (values %{ $self->getFieldConfig }) {
+        my $default = $field->{defaultValue};
+        WebGUI::Macro::process($self->session, \$default);
+        my $value = $entryData->{ $field->{name} } || $default;
+        if ($field->{status} eq "required" || $field->{status} eq "editable") {
+            $value = $self->session->form->process($field->{name}, $field->{type}, undef, {
+                defaultValue    => $default,
+                value           => $value,
+            });
             WebGUI::Macro::filter(\$value);
         }
-        if ($row{status} eq "required" && (!$value || $value =~ /^\s*$/)) {
+        if ($field->{status} eq "required" && (!$value || $value =~ /^\s*$/)) {
             push @errors, {
-                "error.message" => $row{label} . " " . $i18n->get(29) . ".",
+                "error.message" => $field->{label} . " " . $i18n->get(29) . ".",
             };
-            $hadErrors = 1;
-            delete $var->{entryId};
         }
-        if ($row{status} eq "hidden") {
-            $value = $row{defaultValue};
-            WebGUI::Macro::process($self->session,\$value);
-        }
-
-        # Keep adding rows unless there was an error
-        unless ($hadErrors) {
-            # Check if this entry / field exists and do what's appropriate
-            # TODO: This should be refactored into a method
-            my $exists 
-                = $db->quickScalar(
-                    "SELECT COUNT(*) FROM DataForm_entryData WHERE DataForm_entryId=?
-                    AND DataForm_fieldId=?",
-                    [ $entryId, $row{DataForm_fieldId} ]
-                );
-            if ($exists) {
-                if ( $self->canEdit ) {
-                    $db->write(
-                        "UPDATE DataForm_entryData SET value=?
-                        WHERE DataForm_entryId=? AND DataForm_fieldId=?",
-                        [ $value, $entryId, $row{DataForm_fieldId} ],
-                    );
-                    $updating = 1;
-                }
-            } else {
-                $db->write(
-                    "INSERT INTO DataForm_entryData ( DataForm_entryId, DataForm_fieldId, assetId, value) 
-                    VALUES ( ?, ?, ?, ? )",
-                    [ $entryId, $row{DataForm_fieldId}, $self->getId, $value ],
-                );
-            }
-        }
+        $entryData->{ $field->{name} } = $value;
     }
-    $sth->finish;
 
     # Process CAPTCHA
     if ( $self->useCaptcha ) {
         if ( !$self->session->form->process( 'captcha', 'captcha' ) ) {
-            $hadErrors  = 1;
-            delete $var->{ entryId };
             push @errors, {
                 "error.message" => $i18n->get( 'error captcha' ),
             };
@@ -1391,23 +1390,29 @@ sub www_process {
     }
 
     $var->{error_loop} = \@errors;
-    $var = $self->getRecordTemplateVars($var);
-    if ($hadErrors && !$updating) {
-        # TODO: This is not right. See the TODO at the top of this method (where the entry is created)
-        $db->write(
-            "DELETE FROM DataForm_entryData WHERE DataForm_entryId=?",
-            [ $entryId ]
-        );
-        $self->deleteCollateral("DataForm_entry","DataForm_entryId",$entryId);
+    $var = $self->getRecordTemplateVars($var, $entryData);
+    if (@errors) {
         $self->prepareView($var);
-        $self->processStyle($self->view);
-    } else {
-        $self->sendEmail($var) if ($self->get("mailData") && !$updating);
-        return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId")) if $self->defaultViewForm;
+        return $self->processStyle($self->view);
     }
+    if ($self->get("mailData") && !$entryId) {
+        $self->sendEmail($var, $entryData);
+    }
+    if ($self->get('storeData')) {
+        my $entryJSON = encode_json($entryData);
+        my $collData = {
+            DataForm_entryId    => $entryId,
+            userId              => $self->session->user->userId,
+            username            => $self->session->user->username,
+            ipAddress           => $self->session->env->getIp,
+            submissionDate      => WebGUI::DateTime->new($self->session, time())->toDatabase,
+            entryData           => $entryJSON,
+        };
+        $self->setCollateral("DataForm_entry","DataForm_entryId", $collData, 0, 1);
+    }
+    return $self->session->style->process($self->processTemplate($var,$self->get("acknowlegementTemplateId")),$self->get("styleTemplateId"))
+        if $self->defaultViewForm;
 }
 
-
 1;
-
 

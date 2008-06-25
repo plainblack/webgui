@@ -412,6 +412,78 @@ The form in which the user can enter his subscription code.<br />|,
 		context => q|help for the thank you message field|,
 	},
 
+	'template' => {
+		message => q|Subscription template|,
+		lastUpdated => 0,
+		context => q|Asset property|,
+	},
+
+	'template help' => {
+		message => q|Choose the template you wish to use to display this subscription|,
+		lastUpdated => 0,
+		context => q|Asset property hover help|,
+	},
+
+	'batch name' => {
+		message => q|Batch Name|,
+		lastUpdated => 0,
+		context => q|create subscription code form|,
+	},
+
+	'batch name description' => {
+		message => q|Select a name for this batch of subscription codes.|,
+		lastUpdated => 0,
+		context => q|hover help for batch name|,
+	},
+
+	'subscription template' => {
+		message => q|Subscription Template|,
+		lastUpdated => 0,
+		context => q|Title for the subscription template help page|,
+	},
+
+	'formHeader' => {
+		message => q|The top of the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'formFooter' => {
+		message => q|The bottom of the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'purchaseButton' => {
+		message => q|The button for the subscription form.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the subscription to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'codeControls' => {
+		message => q|A series of links for creating subscription code batches and listing subscription codes and code batches.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'redeemCodeLabel' => {
+		message => q|An internationalized label for the link to redeem a subscription code.  If there are no subscription codes, this will be blank|,
+		lastUpdated => 1213936319,
+		context => q|template variable|
+	},
+
+	'redeemCodeUrl' => {
+		message => q|The URL to redeem a subscription code.  If there are no subscription codes, this will be blank.|,
+		lastUpdated => 1213936341,
+		context => q|template variable|
+	},
+
 };
 
 1;

@@ -21,6 +21,7 @@ use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Cart;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::Pay;
+use WebGUI::Shop::Products;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
 use WebGUI::Shop::Transaction;
@@ -180,6 +181,28 @@ sub www_pay {
     my $pay = WebGUI::Shop::Pay->new($session);
     if ($method ne "www_" && $pay->can($method)) {
         $output = $pay->$method();
+    }
+    else {
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+    }
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_products ()
+
+Hand off to the tax system.
+
+=cut
+
+sub www_products {
+    my $session = shift;
+    my $output = undef;
+    my $method = "www_".$session->form->get("method");
+    my $products = WebGUI::Shop::Products->new($session);
+    if ($method ne "www_" && WebGUI::Shop::Products->can($method)) {
+        $output = $products->$method();
     }
     else {
         WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);

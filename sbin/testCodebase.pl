@@ -15,6 +15,7 @@ use FindBin;
 use lib "$FindBin::Bin/../t/lib";
 use File::Spec qw[];
 use Getopt::Long;
+use Pod::Usage;
 
 my $configFile;
 my $help;
@@ -32,32 +33,8 @@ GetOptions(
 	'coverage'=>\$coverage,
 	);
 
-my $helpmsg=<<STOP;
-
-	perl $0 --configFile
-
-	--configFile		The config file of the WebGUI site you'll use
-				to test the codebase. Note that you should not
-				use a production config file as some tests may
-				be destructive.
-
-	--coverage		Turns on additional coverage tests. Note that
-				this can take a long time to run.
-
-	--noLongTests		Prevent long tests from being run
-
-	--perlBase		The path of the perl installation you want to 
-				use. Defaults to the perl installation in your
-				PATH.
-
-	--verbose		Turns on additional output.
-
-STOP
-
-if ($help) {
-    print $helpmsg;
-    die "\n";
-}
+pod2usage( verbose => 2 ) if $help;
+pod2usage() unless $configFile ne '';
 
 my $verboseFlag = "-v" if ($verbose);
 
@@ -86,3 +63,67 @@ $prefix .= " HARNESS_PERL_SWITCHES='-MDevel::Cover=-db,/tmp/coverdb'" if $covera
 print(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t'); print "\n";
 system(join ' ', $prefix, $perlBase."prove", $verboseFlag, '-r ../t');
 
+__END__
+
+=head1 NAME
+
+testCodebase - Test WebGUI's code base.
+
+=head1 SYNOPSIS
+
+ testCodebase --configFile config.conf
+              [--coverage]
+              [--noLongTests]
+              [--perlBase path]
+              [--verbose]
+
+ testCodebase --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility script tests all of WebGUI's installed code base
+using a particular confiuration file. It uses B<prove> to run all
+the WebGUI supplied test routines, located in the B<t> subdirectory
+of the WebGUI root.
+
+You should B<NOT> use a production config file for testing, since some
+of the test may be destructive.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory. Be
+aware that some of the tests may be destructive. This parameter is required.
+
+=item B<--coverage>
+
+Turns on additional L<Devel::Cover> based coverage tests. Note that
+this can take a long time to run.
+
+=item B<--noLongTests>
+
+Prevent long tests from being run
+
+=item B<--perlBase path>
+
+Specify a path to an alternative Perl installation you wish to use for the
+tests. If left unspecified, it defaults to the Perl installation in the
+current PATH.
+
+=item B<--verbose>
+
+Turns on additional information during tests.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

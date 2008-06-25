@@ -198,6 +198,17 @@ our $I18N = {
 		lastUpdated => 1149220294,
 	},
 
+        'showMessageOnLogin return' => {
+            message     => q{Continue to the site},
+            lastUpdated => 0,
+        },
+
+        "showMessageOnLoginSeen" => {
+            message     => q{Seen Message On Login Times},
+            lastUpdated => 0,
+            context     => q{Label for user profile field},
+        },
+
 	'topicName' => {
 		message => q|Authentication|,
 		lastUpdated => 1164338173,

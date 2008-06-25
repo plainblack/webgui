@@ -6,7 +6,7 @@ function taskEdit_getResourceListDiv() {
 }
 
 function taskEdit_searchPopup(url) {
-        window.open(url, null, 'status=1,scrollbars=1,toolbar=0,location=0,menubar=0,directories=0,resizable=1,height=350,width=400');
+        window.open(url, "searchWindow", 'status=1,scrollbars=1,toolbar=0,location=0,menubar=0,directories=0,resizable=1,height=350,width=400');
 }
 
 function taskEdit_getResources() {
@@ -55,18 +55,21 @@ function taskEdit_updateResources(resources) {
 	taskEdit_updateExclude("taskEdit_resourceList_addGroup_a", 'group', resources);
 
 	taskEdit_pending = [];
-	AjaxRequest.get({
-		'url' : url,
-		'onSuccess' : function(req) {
+	
+	var callback = {
+		success : function(req) {
 			div.innerHTML = req.responseText;
 			taskEdit_doPending();
 		},
-		'onError' : function(req) {
-			// Buggo: need better error handling
+		failure : function(req) {
+			// ToDo: Need better error handling
 			div.innerHTML = savedInnerHTML;
 			taskEdit_doPending();
 		}
-	});
+    }
+	
+    var status = YAHOO.util.Connect.asyncRequest('GET',url,callback);
+   
 }
 
 function taskEdit_doPending() {

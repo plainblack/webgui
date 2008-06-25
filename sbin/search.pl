@@ -8,8 +8,14 @@
 # http://www.plainblack.com			info@plainblack.com
 #-------------------------------------------------------------------
 
+our ($webguiRoot);
+
+BEGIN {
+    $webguiRoot = "..";
+    unshift (@INC, $webguiRoot."/lib");
+}
+
 use strict;
-use lib '../lib';
 use Getopt::Long;
 use WebGUI::Asset;
 use WebGUI::Config;
@@ -17,6 +23,7 @@ use WebGUI::Session;
 use WebGUI::Search;
 use WebGUI::Search::Index;
 use Time::HiRes;
+use Pod::Usage;
 
 $|=1;
 my $search = "";
@@ -35,8 +42,10 @@ GetOptions(
 	'updatesite'=>\$updatesite
 	);
 
+pod2usage( verbose => 2 ) if $help;
+
 if ($configFile) {
-	my $session = WebGUI::Session->open("..", $configFile);
+	my $session = WebGUI::Session->open($webguiRoot, $configFile);
 	if ($indexsite) {
 		reindexSite($session);
 	} elsif ($updatesite) {
@@ -44,57 +53,22 @@ if ($configFile) {
 	} elsif ($search) {
 		searchSite($session, $search);
 	} else {
-		displayHelp();
+		pod2usage();
 	}
 	$session->var->end;
 	$session->close;
 } elsif ($indexAll) {
 	reindexAllSites();
 } else {
-	displayHelp();
+	pod2usage();
 }
-
-#-------------------------------------------------------------------
-sub displayHelp {
-	print <<STOP;
-perl $0 [ options ]
-
-Options:
-
-	--configFile=		The config file of the site you wish to perform
-				an action on.
-
-	--help			Displays this message.
-
-	--indexall		Reindexes all the sites. Note that this can take
-				many hours and will affect the performance of the
-				server during the indexing process.
-
-	--indexsite *		Reindexes the entire site. Note that depending
-				upon the amount of content you have, it may take
-				hours to index a site and server performance will
-				suffer somewhat during the indexing process.
-
-	--search= *		Searches the site for a keyword or phrase and
-				returns the results.
-
-	--updatesite *		Indexes content that has not be indexed, but does not
-				index content that has been indexed. This is useful
-				if the --indexsite option had to be stopped part way
-				through.
-
-	* This option requires the --configFile option.
-
-STOP
-}
-
 
 #-------------------------------------------------------------------
 sub reindexAllSites {
-	my $configs = WebGUI::Config->readAllConfigs("..");
+	my $configs = WebGUI::Config->readAllConfigs($webguiRoot);
 	foreach my $site (keys %{$configs}) {
 		print "Indexing ".$site."...\n";
-		my $session = WebGUI::Session->open("..",$site);
+		my $session = WebGUI::Session->open($webguiRoot,$site);
 		reindexSite($session);
 		$session->var->end;
 		$session->close;
@@ -165,3 +139,73 @@ sub updateSite {
 	print "\nSite indexing took ".Time::HiRes::tv_interval($siteTime)." seconds.\n";
 }
 
+__END__
+
+=head1 NAME
+
+search - Reindex and search a WebGUI site.
+
+=head1 SYNOPSIS
+
+ search --configFile config.conf --indexsite
+
+ search --configFile config.conf --updatesite
+
+ search --configFile config.conf --search text
+
+ search --indexall
+
+ search --help
+
+=head1 DESCRIPTION
+
+This WebGUI utility scripts helps maintaining search indexes on
+any site. It can be used to build the index for an entire site,
+build the index only for new content, and perform searches.
+
+=over
+
+=item B<--configFile config.conf>
+
+The WebGUI config file to use. Only the file name needs to be specified,
+since it will be looked up inside WebGUI's configuration directory.
+This parameter is required.
+
+=item B<--indexsite>
+
+Reindexes the entire site specified in the config file. This process
+may take a while (even hours) depending on the amount of content the
+site has. Server performance will suffer somewhat during the
+indexing process. This option requires a B<--configFile> to be
+specified.
+
+=item B<--updatesite>
+
+Indexes content that has not be indexed for the site specified in
+the config file, keeping the indexes for already indexed content
+intact. This is useful if the B<--indexsite> had to be stopped
+partway through. This option requires a B<--configFile> to be
+specified.
+
+=item B<--search text>
+
+Searches the site specified in the config file for a given keyword or
+phrase, returning the results. This option requires a B<--configFile>
+to be specified.
+
+=item B<--indexall>
+
+Reindexes B<all> the sites. Note that this can take many hours and
+will affect performance of the server during the indexing process.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2001-2008 Plain Black Corporation.
+
+=cut

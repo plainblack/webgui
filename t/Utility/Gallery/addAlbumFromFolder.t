@@ -58,6 +58,8 @@ for (0..2) {
     );
 }
 
+$versionTags[-1]->commit;
+
 # File to GalleryFile field mappings. Should be mostly the same
 my %fileField  = (
     title       => "title",
@@ -111,7 +113,9 @@ ok(
     "addAlbumFromFolder croaks if second argument is not a Folder asset",
 );
 
+push @versionTags, WebGUI::VersionTag->getWorking( $session );
 $utility->addAlbumFromFolder( $gallery, $folder );
+$versionTags[-1]->commit;
 
 is(
     scalar @{ $gallery->getAlbumIds }, 1,

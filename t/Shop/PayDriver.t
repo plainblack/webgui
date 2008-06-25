@@ -69,7 +69,6 @@ cmp_deeply  (
 $definition = WebGUI::Shop::PayDriver->definition($session);
 
 use Data::Dumper;
-diag Dumper $definition;
 
 cmp_deeply  (
     $definition,
@@ -98,15 +97,8 @@ cmp_deeply  (
                 fieldType       => 'template',
                 label           => ignore(),
                 hoverHelp       => ignore(),
-                defaultValue    => '',
+                defaultValue    => 'BMzuE91-XB8E-XGll1zpvA',
                 namespace       => 'Shop/ReceiptEmail',
-            },
-            saleNotificationTemplateId  => {
-                fieldType       => 'template',
-                label           => ignore(),
-                hoverHelp       => ignore(),
-                defaultValue    => '',
-                namespace       => 'Shop/SaleEmail',
             },
             saleNotificationGroupId  => {
                 fieldType       => 'group',
@@ -316,7 +308,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is          (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is          (scalar @inputs, 12, 'getEditForm: the form has 10 controls');
+is          (scalar @inputs, 11, 'getEditForm: the form has 11 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -366,10 +358,6 @@ cmp_deeply(
         },
         {
             name    => 'receiptEmailTemplateId',
-            type    => 'option',
-        },
-        {
-            name    => 'saleNotificationTemplateId',
             type    => 'option',
         },
         {

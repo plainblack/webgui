@@ -50,7 +50,7 @@ $dynamic = WebGUI::Form::DynamicField->new(
 	fieldType => 'SelectList',
 	name => 'mySelectList',
 	label => 'list of selections',
-	possibleValues => join("\n", qw(a b c d e f g h)),
+	options => join("\n", qw(a b c d e f g h)),
 	value => join("\n", qw(a e c g)),
 	sortByValue => 1,
 	multiple => 1,
@@ -79,7 +79,7 @@ $dynamic = WebGUI::Form::DynamicField->new(
 	fieldType => 'CheckList',
 	name => 'myCheckList',
 	label => 'list of selections',
-	possibleValues => join("\n", qw(a b c d e f g h)),
+	options => join("\n", qw(a b c d e f g h)),
 	value => join("\n", qw(a c e g)),
 	sortByValue => 1,
 );
@@ -106,7 +106,7 @@ $dynamic = WebGUI::Form::DynamicField->new(
 	fieldType => 'RadioList',
 	name => 'myRadioList',
 	label => 'list of selections',
-	possibleValues => join("\n", qw(a b c d e f g h)),
+	options => join("\n", qw(a b c d e f g h)),
 	value => 'b',
 	sortByValue => 1,
 );
@@ -133,7 +133,7 @@ $dynamic = WebGUI::Form::DynamicField->new(
 	fieldType => 'SelectBox',
 	name => 'mySelectBox',
 	label => 'list of selections',
-	possibleValues => join("\n", qw(a b c d e f g h)),
+	options => join("\n", qw(a b c d e f g h)),
 	value => 'b',
 	sortByValue => 1,
 );

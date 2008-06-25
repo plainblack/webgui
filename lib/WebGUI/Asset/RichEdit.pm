@@ -148,6 +148,10 @@ sub definition {
                 fieldType       => "yesNo",
                 defaultValue    => 0,
             },
+            allowMedia => {
+                fieldType       => "yesNo",
+                defaultValue    => 0,
+            },
         },
     });
     return $class->SUPER::definition($session, $definition);
@@ -395,6 +399,12 @@ sub getEditForm {
         -hoverHelp=>$i18n->get('inline popups description'),
         -name=>"inlinePopups"
     );
+    $tabform->getTab("properties")->yesNo(
+        value       => $self->getValue("allowMedia"),
+        label       => $i18n->get('editForm allowMedia label'),
+        hoverHelp   => $i18n->get('editForm allowMedia description'),
+        name        => "allowMedia",
+    );
 	return $tabform;
 }
 
@@ -452,6 +462,8 @@ sub getRichEditor {
         if $self->getValue("enableContextMenu");
     push @plugins, "inlinepopups"
         if $self->getValue("inlinePopups");
+    push @plugins, "media"
+        if $self->getValue( 'allowMedia' );
 
     my @toolbarRows = map{[split "\n", $self->getValue("toolbarRow$_")]} (1..3);
     my @toolbarButtons = map{ @{$_} } @toolbarRows;
@@ -545,11 +557,15 @@ sub getRichEditor {
 
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
+    $self->session->style->setScript( $self->session->url->extras( "yui/build/yahoo-dom-event/yahoo-dom-event.js" ), { type => "text/javascript" } );
     my $out = "<script type=\"text/javascript\">\n";
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out .= "tinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . ");\n</script>";
+    $out    .= "YAHOO.util.Event.addListener( window, 'load', function () { \n"
+            . "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
+            . "} );\n"
+            . "</script>";
 }
 
 

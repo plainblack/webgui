@@ -558,14 +558,20 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
- 	'event start date' => {
+
+ 	'add/edit event start date' => {
 		message 	=> q|Start|,
 		lastUpdated => 0,
 		context 	=> q|Event start date field label|
 	},
 
-	'event start date help' => {
+ 	'add/edit event end date' => {
+		message 	=> q|End|,
+		lastUpdated => 0,
+		context 	=> q|Event end date field label|
+	},
+
+	'add/edit event start date help' => {
 		message 	=> q|The time and date when the event starts.|,
 		lastUpdated => 0,
 		context 	=> q|hover help for Event Start Date field|
@@ -621,6 +627,11 @@ our $I18N = {
 		lastUpdated => 1138312761,
 	},
 
+	'add/edit event maximum attendees' => {
+		message => q|Description|,
+		lastUpdated => 1138312761,
+	},
+
 	'price' => {
 		message 	=> q|Price|,
 		lastUpdated => 1138312761,
@@ -636,6 +647,18 @@ our $I18N = {
 	'add/edit event price description' => {
 		message => q|The cost to attend the event.|,
 		lastUpdated => 1138312761,
+	},
+
+	'price must be greater than zero' => {
+		message 	=> q|Price must be greater than 0|,
+		lastUpdated => 1213318055,
+		context		=> q|field label|,
+	},
+	
+	'price help' => {
+		message		=> q|How much do you want to charge for this item?|,
+		lastUpdated	=> 0,
+		context		=> q|field label help|,
 	},
 
 	'add/edit useSalesTax' => {
@@ -698,6 +721,12 @@ our $I18N = {
 
 	'import record parse error' => {
 		message => q|There was an error processing record %d: '%s'|,
+		lastUpdated => 0,
+		context => q|Couldn't parse a line of the import file|,
+	},
+
+	'import line parse error' => {
+		message => q|There was an error processing this input, '%s', on line %d.|,
 		lastUpdated => 0,
 		context => q|Couldn't parse a line of the import file|,
 	},
@@ -1305,7 +1334,7 @@ by setting the "hide" form variable.|,
 		lastUpdated => 1149828900,
 	},
 
-	'event template help title' => {
+	'add/edit event template' => {
 		message => q|Event Management System Event Template|,
 		lastUpdated => 1140465899,
 	},
@@ -1333,6 +1362,11 @@ by setting the "hide" form variable.|,
 	'manage purchases' => {
 		message => q|Manage Purchases|,
 		lastUpdated => 1145396293,
+	},
+
+	'manage event metadata' => {
+		message => q|Manage Event Metadata|,
+		lastUpdated => 1213317997,
 	},
 
 	'view purchase' => {
@@ -1904,6 +1938,12 @@ added to the user's cart and would be discounted if the Attend All Sessions even
 		message => q|Overwrite|,
 		lastUpdated => 0,
 	},
+
+	'status' => {
+		message => q|Status|,
+		lastUpdated => 0,
+	},
+
 };
 
 1;

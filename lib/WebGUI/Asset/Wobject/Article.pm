@@ -71,12 +71,10 @@ Override the default method in order to deal with attachments.
 
 sub addRevision {
     my $self = shift;
-    my $oldStorage = $self->get('storageId');
     my $newSelf = $self->SUPER::addRevision(@_);
-    my $newStorageId = $newSelf->get('storageId');
-    if ($newStorageId && $newStorageId eq $self->get('storageId')) {
-        my $newStorage = WebGUI::Storage->get($self->session, $newStorageId)->copy;
-        $newSelf->update({storageId=>$newStorage->getId});
+    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
+        my $newStorage = WebGUI::Storage->get($self->session,$self->get("storageId"))->copy;
+        $newSelf->update({storageId => $newStorage->getId});
     }
     return $newSelf;
 }

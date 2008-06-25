@@ -204,7 +204,7 @@ sub fatal {
 	my $message = shift;
 
 	$self->session->http->setStatus("500","Server Error");
-	#Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
+	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
 	$self->session->http->sendHeader if ($self->session->request);

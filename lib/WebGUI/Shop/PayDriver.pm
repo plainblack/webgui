@@ -186,7 +186,7 @@ sub definition {
             namespace       => "Shop/EmailReceipt",
             label           => $i18n->get("receipt email template"),
             hoverHelp       => $i18n->get("receipt email template help"),
-            defaultValue    => '',
+            defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
         },
         saleNotificationGroupId => {
             fieldType       => 'group',
@@ -268,6 +268,29 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 getAddress ( addressId )
+
+Returns an instantiated WebGUI::Shop::Address object for the passed address id.
+
+=head3 addressId
+
+The id of the adress to instantiate.
+
+=cut
+
+sub getAddress {
+    my $self        = shift;
+    my $addressId   = shift;
+
+    if ($addressId) {
+        return $self->getCart->getAddressBook->getAddress( $addressId );
+    }
+
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getButton ( )
 
 Returns the form that will take the user to check out.
@@ -344,23 +367,6 @@ sub getEditForm {
     my $definition = $self->definition($self->session);
     my $form = WebGUI::HTMLForm->new($self->session);
     $form->submit;
-#    $form->hidden(
-#        -name   => 'shop',
-#        -value  => 'pay',
-#    );
-#    $form->hidden(
-#        -name   => 'method',
-#        -value  => 'do',
-#    );
-#    $form->hidden(
-#        -name   => 'do',
-#        -value  => 'editSave',
-#    );
-#
-#    $form->hidden(
-#        name  => 'paymentGatewayId',
-#        value => $self->getId,
-#    );
     
     $self->getDoFormTags('editSave', $form);
     $form->hidden(
@@ -406,6 +412,51 @@ sub getName {
     my $definition  = $class->definition($session);
 
     return $definition->[0]->{name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSelectAddressButton ( returnMethod, [ buttonLabel ] )
+
+Generates a button for selecting an address.
+
+=head3 returnMethod
+
+The name of the www_ method the selected addressId should be returned to. Without the 'www_' part.
+
+=head3 buttonLabel
+
+The label for the button, defaults to the internationalized version of 'Choose billing address'.
+
+=cut
+
+sub getSelectAddressButton {
+    my $self            = shift;
+    my $returnMethod    = shift;
+    my $buttonLabel     = shift || 'Choose billing address';
+    my $session         = $self->session;
+
+    # Generate the json string that defines where the address book posts the selected address
+    my $callbackParams = {
+        url     => $session->url->page,
+        params  => [
+            { name => 'shop',               value => 'pay'          },
+            { name => 'method',             value => 'do'           },
+            { name => 'do',                 value => $returnMethod  },
+            { name => 'paymentGatewayId',   value => $self->getId   },
+        ],
+    };
+    my $callbackJson = JSON::to_json( $callbackParams );
+
+    # Generate 'Choose billing address' button
+    my $addressButton = WebGUI::Form::formHeader( $session )
+        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'address'      } )
+        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'view'         } )
+        . WebGUI::Form::hidden( $session, { name => 'callback', value => $callbackJson  } )
+        . WebGUI::Form::submit( $session, { value => $buttonLabel                       } )
+        . WebGUI::Form::formFooter( $session );
+
+    return $addressButton;
 }
 
 #-------------------------------------------------------------------
@@ -527,6 +578,7 @@ sub processTransaction {
     $transactionProperties->{ paymentMethod     } = $self;
     $transactionProperties->{ cart              } = $cart;
     $transactionProperties->{ paymentAddress    } = $paymentAddress if defined $paymentAddress;
+    $transactionProperties->{ isRecurring       } = $cart->requiresRecurringPayment;
 
     # Create a transaction...
     my $transaction = WebGUI::Shop::Transaction->create( $self->session, $transactionProperties );
@@ -627,25 +679,25 @@ sub sendNotifications {
     $var{items} = \@items;
 
     # render
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("receiptEmailTemplateId"));
+    my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
 
     # purchase receipt
-    $inbox->addMessage(
+    $inbox->addMessage( {
         message     => $template->process(\%var),
         subject     => $i18n->get('receipt subject').' '.$transaction->get('orderNumber'),
         userId      => $transaction->get('userId'),
         status      => 'completed',
-        );
+    } );
     
     # shop owner notification
     $var{viewDetailUrl} = $url->page('shop=transaction;method=view;transactionId='.$transaction->getId,1);
-    $inbox->addMessage(
+    $inbox->addMessage( {
         message     => $template->process(\%var),
         subject     => $i18n->get('a sale has been made').' '.$transaction->get('orderNumber'),
         groupId     => $self->get('saleNotificationGroupId'),
         status      => 'unread',
-        );
+    } );
 }
 
 #-------------------------------------------------------------------
@@ -697,14 +749,14 @@ sub www_edit {
     my $self    = shift;
     my $session = $self->session;
     my $admin   = WebGUI::Shop::Admin->new($session);
-    my $i18n    = WebGUI::International->new($session, "Pay");
+    my $i18n    = WebGUI::International->new($session, "PayDriver");
 
     return $session->privilege->insufficient() unless $session->user->isInGroup(3);
 
     my $form = $self->getEditForm;
     $form->submit;
   
-    return $admin->getAdminConsole->render($form->print, $i18n->echo("payment methods"));
+    return $admin->getAdminConsole->render($form->print, $i18n->get('payment methods'));
 }
 
 #-------------------------------------------------------------------

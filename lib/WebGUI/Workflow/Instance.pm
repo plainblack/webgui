@@ -71,7 +71,7 @@ sub create {
 
     # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
-	my $self = $class->new($session, $instanceId);
+	my $self = $class->new($session, $instanceId, 1);
 	$self->set($properties,1);
 	
 	return $self;
@@ -267,9 +267,17 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $instanceId = shift;
+    my $isNew = shift;
 	my $data = $session->db->getRow("WorkflowInstance","instanceId", $instanceId);
 	return undef unless $data->{instanceId};
-	bless {_session=>$session, _id=>$instanceId, _data=>$data, _started=>0}, $class;
+	my $self = {
+        _session    => $session, 
+        _id         => $instanceId, 
+        _data       => $data, 
+        _started    => ($isNew ? 0 : 1)
+        };
+	bless $self, $class;
+    return $self;
 }
 
 #-------------------------------------------------------------------

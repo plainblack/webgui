@@ -52,7 +52,7 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, "Subscription");
+	my $i18n = WebGUI::International->new($session, "Asset_Subscription");
 	push(@{$definition}, {
 		name=>$i18n->get("expire subscription codes"),
 		properties=> { }
@@ -71,7 +71,14 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	$self->session->db->write("update subscriptionCode set status='Expired' where status = 'Unused' and dateCreated + expires < ?", [time()]);
+	$self->session->db->write(
+        "update Subscription_code set status='Expired' where status = 'Unused' and batchId in"
+        ." ( select batchId from Subscription_codeBatch where expirationDate < ? )",
+        [
+            time()
+        ]
+    );
+
 	return $self->COMPLETE;
 }
 

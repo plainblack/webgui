@@ -631,6 +631,30 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar resolutions_loop resolution' => {
+        message     => q{The resolution of the photo.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar resolutions_' => {
+        message     => q{A URL direct to a known resolution. "800" resolution would be "resolutions_800".},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'helpvar isPending' => {
+        message     => q{A flag to set if the Photo is not yet approved. Users who can edit the photo are allowed to see them before they are approved.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
+    'error no space' => {
+        message     => q{You do not have enough disk space to upload this file.},
+        lastUpdated => 0,
+        context     => q{Error when user is out of disk space.},
+    },
+
 };
 
 1;

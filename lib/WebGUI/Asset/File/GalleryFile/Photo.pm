@@ -166,6 +166,40 @@ sub getDownloadFileUrl {
 
 #----------------------------------------------------------------------------
 
+=head2 getEditFormUploadControl
+
+Returns the HTML to render the upload box and link to delete the existing 
+file, if necessary.
+
+=cut
+
+sub getEditFormUploadControl {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session, 'Asset_File');
+    my $html        = '';
+
+    if ($self->get("filename") ne "") {
+        $html .= WebGUI::Form::readOnly( $session, {
+            label       => $i18n->get('current file'),
+            hoverHelp   => $i18n->get('current file description'),
+            value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getThumbnailUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
+        });
+    }
+
+    # Control to upload a new file
+    $html .= WebGUI::Form::file( $session, {
+        name        => 'newFile',
+        label       => $i18n->get('new file'),
+        hoverHelp   => $i18n->get('new file description'),
+    });
+
+    return $html;
+}
+
+
+#----------------------------------------------------------------------------
+
 =head2 getExifData ( )
 
 Gets a hash reference of Exif data about this Photo.
@@ -176,7 +210,19 @@ sub getExifData {
     my $self        = shift;
 
     return unless $self->get('exifData');    
-    return decode_json( $self->get('exifData') );
+
+    # Our processing and eliminating of bad / unparsable keys
+    # isn't perfect, so handle errors gracefully
+    my $exif    = eval { decode_json( $self->get('exifData') ) };
+    if ( $@ ) {
+        $self->session->errorHandler->warn( 
+            "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
+            . "' (" . $self->getId . "): " . $@
+        );
+        return;
+    }
+    
+    return $exif;
 }
 
 #----------------------------------------------------------------------------
@@ -193,7 +239,7 @@ sub getResolutions {
     my $storage     = $self->getStorageLocation;
 
     # Return a list not including the web view image.
-    return [ grep { $_ ne $self->get("filename") } @{ $storage->getFiles } ];
+    return [ sort { $a <=> $b } grep { $_ ne $self->get("filename") } @{ $storage->getFiles } ];
 }
 
 #----------------------------------------------------------------------------
@@ -224,9 +270,14 @@ sub getTemplateVars {
 
     ### Download resolutions
     for my $resolution ( @{ $self->getResolutions } ) {
+        my $label       = $resolution;
+        $label          =~ s/\.[^.]+$//;
+        my $downloadUrl = $self->getStorageLocation->getUrl( $resolution );
         push @{ $var->{ resolutions_loop } }, { 
-            url_download => $self->getStorageLocation->getPathFrag($resolution) 
+            resolution      => $label,
+            url_download    => $downloadUrl,
         };
+        $var->{ "resolution_" . $resolution } = $downloadUrl;
     }
 
     ### Format exif vars
@@ -391,8 +442,8 @@ sub updateExifDataFromFile {
         }
     }
 
-    # Remove other, pointless keys
-    for my $key ( qw( Directory ) ) {
+    # Remove other, pointless, possibly harmful keys
+    for my $key ( qw( Directory NativeDigest CameraID CameraType ) ) {
         delete $info->{ $key };
     }
 
@@ -455,6 +506,15 @@ sub www_edit {
         url_addArchive      => $self->getParent->getUrl('func=addArchive'),
         url_album           => $self->getParent->getUrl('func=album'),
     };
+    
+    # Process errors if any
+    if ( $session->stow->get( 'editFormErrors' ) ) {
+        for my $error ( @{ $session->stow->get( 'editFormErrors' ) } ) {
+            push @{ $var->{ errors } }, {
+                error       => $error,
+            };
+        }
+    }
 
     if ( $form->get('func') eq "add" ) {
         $var->{ isNewPhoto }    = 1;
@@ -502,6 +562,8 @@ sub www_edit {
             name        => "title",
             value       => ( $form->get("title") || $self->get("title") ),
         });
+    
+    $self->getGallery;
 
     $var->{ form_synopsis }
         = WebGUI::Form::HTMLArea( $session, {

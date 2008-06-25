@@ -28,7 +28,7 @@ Package WebGUI::Asset::Sku
 
 =head1 DESCRIPTION
 
-This is the base class for all products in the commerce system.
+This is the base class for all products in the WebGUI Shop.
 
 =head1 SYNOPSIS
 

@@ -536,29 +536,29 @@ throughout the site.  Check yes if you want this Asset to be available as a pack
 		context => q|The title of the content profiling manager for the admin console.|
 	},
 
-        'Field Name description' => {
-                message => q|<p>The name of this metadata property.  It must be unique. <br />
+    'Field Name description' => {
+        message => q|<p>The name of this metadata property.  It must be unique. <br />
 It is advisable to use only letters (a-z), numbers (0-9) or underscores (_) for
-the field names.</p>|,
-                lastUpdated => 1167186196,
-        },
+the field names, and only be less than 100 characters long.</p>|,
+        lastUpdated => 1213247248,
+    },
 
-        'Metadata Description description' => {
-                message => q|<p>An optional description for this metadata property. This text is displayed
+    'Metadata Description description' => {
+        message => q|<p>An optional description for this metadata property. This text is displayed
 as mouseover text in the asset properties tab.</p>|,
-                lastUpdated => 1129329870,
-        },
+        lastUpdated => 1129329870,
+    },
 
-        'Data Type description' => {
-                message => q|<p>Choose the type of form element for this field.</p>|,
-                lastUpdated => 1129329870,
-        },
+    'Data Type description' => {
+            message => q|<p>Choose the type of form element for this field.</p>|,
+            lastUpdated => 1129329870,
+    },
 
-        'Possible Values description' => {
-                message => q|<p>This field is used only for the Radio List and Select List data types. Enter
-the values you wish to appear, one per line.</p>|,
-                lastUpdated => 1129329870,
-        },
+    'Possible Values description' => {
+        message => q|<p>This field is used only for the Radio List and Select List data types. Enter
+the values you wish to appear, one per line.  Each line should be less than 255 characters long.</p>|,
+        lastUpdated => 1213247476,
+    },
 
 	'metadata edit property' => {
 		message => q|Metadata, Edit|,
@@ -652,33 +652,35 @@ the values you wish to appear, one per line.</p>|,
                   },
         '107' => {
                    lastUpdated => 1031514049,
-                   message => q|Security|
+                   message => q|Security|,
                  },
         '174' => {
                    lastUpdated => 1031514049,
-                   message => q|Display the title?|
+                   message => q|Display the title?|,
                  },
         '487' => {
                    lastUpdated => 1031514049,
-                   message => q|Possible Values|
+                   message => q|Possible Values|,
                  },
-        'default value' => {
-                   lastUpdated => 0,
-                   message => q|Default Value(s)|
-                 },
-        'default value description' => {
-                   lastUpdated => 0,
-                   message => q|The default value for this field. If there are multiple default values, as in the
-                   case of the check box list, then enter one per line.|
-                 },
+
+    'default value' => {
+        message => q|Default Value(s)|,
+        lastUpdated => 0,
+     },
+
+    'default value description' => {
+        message => q|The default value for this field. If there are multiple default values, as in the
+case of the check box list, then enter one per line.  The total amount of data is limited to 255 characters.|,
+        lastUpdated => 1213248323,
+     },
         'Depth' => {
                      lastUpdated => 1089039511,
                      context => q|Field label for the Export Page operation|,
-                     message => q|Depth|
+                     message => q|Depth|,
                    },
         '964' => {
                    lastUpdated => 1052850265,
-                   message => q|Manage system trash.|
+                   message => q|Manage system trash.|,
                  },
         '105' => {
                    lastUpdated => 1046638916,
@@ -1046,6 +1048,16 @@ Couldn't open %-s because %-s <br />
     'make asset exportable description' => {
         message => q|<p>Will this asset be exportable? This asset, and all of its parent assets, must be exportable for this asset to be exported.</p>|,
         lastUpdated => 0,
+    },
+
+    'does asset inherit URL from parent' => {
+        message => q|Prepend URL from parent?|,
+        lastUpdated => 1212183809,
+    },
+
+    'does asset inherit URL from parent description' => {
+        message => q|<p>Will this asset have its URL prepended with its parent URL?</p>|,
+        lastUpdated => 1212183809,
     },
 
     'search' => {

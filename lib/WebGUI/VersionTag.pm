@@ -162,6 +162,14 @@ The ID of the group that's allowed to use this tag. Defaults to the turn admin o
 
 The epoch date the tag was committed.
 
+=head4 startTime
+
+The time that this version tag should be committed
+
+=head4 endTime
+
+The time that this version tag should no longer be available.
+
 =head3 creationDate
 
 The epoch date the tag was created.
@@ -409,7 +417,7 @@ sub requestCommit {
 	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-	$instance->start;
+    $instance->start;
     return undef;
 }
 
@@ -478,14 +486,36 @@ The ID of the group that's allowed to use this tag. Defaults to the turn admin o
 
 Some text about this version tag, what it's for, why it was committed, why it was denied, why it was approved, etc.
 
+=head4 startTime
+
+The time that a version tag should start displaying on the website
+
+=head4 endTime
+
+The time that a version tag shoudl stop displaying on the website.
+
 =cut
 
 sub set {
 	my $self = shift;
 	my $properties = shift;
-	$self->{_data}{name} = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman()." (Autotag)";
-	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
-	$self->{_data}{groupToUse} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
+    
+    my $now        = $self->session->datetime->time();
+    my $startTime  = WebGUI::DateTime->new($self->session,$now)->toDatabase;
+    my $endTime    = WebGUI::DateTime->new($self->session,'2036-01-01 00:00:00')->toDatabase;
+    
+	$self->{_data}{'name'      } = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman()." (Autotag)";
+	$self->{_data}{'workflowId'} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
+	$self->{_data}{'groupToUse'} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
+    
+    #This is necessary for upgrade prior to 7.5.11 in order to ensure that this field exists.
+    #The if() blocks should be removd once the next branch point is reached.
+    my $assetVersionTagDesc = $self->session->db->buildHashRef('describe assetVersionTag');
+    if(grep { $_ =~ /^startTime/ } keys %{$assetVersionTagDesc}) {
+        #If startTime is there, so is endTime.  No need for the additional check.
+        $self->{_data}{'startTime' } = $properties->{startTime} || $self->{_data}{startTime} || $startTime;
+        $self->{_data}{'endTime'   } = $properties->{endTime} || $self->{_data}{endTime} || $endTime;
+    }
 	if (exists $properties->{comments}) {
 		$self->{_data}{comments}=$self->session->datetime->epochToHuman.' - '.$self->session->user->username
                                 ."\n"

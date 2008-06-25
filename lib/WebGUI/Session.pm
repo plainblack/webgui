@@ -60,7 +60,7 @@ B<NOTE:> It is important to distinguish the difference between a WebGUI session 
  $session->db
  $session->dbSlave
  $session->env
- $session->errorHandler
+ $session->log
  $session->form
  $session->http
  $session->icon
@@ -261,16 +261,13 @@ sub env {
 
 =head2 errorHandler ( )
 
-Returns a WebGUI::Session::ErrorHandler object.
+An alias for log(). Depricated. Will be removed in WebGUI 8.
 
 =cut
 
 sub errorHandler {
 	my $self = shift;
-	unless (exists $self->{_errorHandler}) {
-		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
-	}
-	return $self->{_errorHandler};
+    return $self->log;
 }
 
 #-------------------------------------------------------------------
@@ -352,6 +349,22 @@ sub id {
 	return $self->{_id};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 log ( )
+
+Returns a WebGUI::Session::ErrorHandler object, which is used for logging.
+
+=cut
+
+sub log {
+	my $self = shift;
+	unless (exists $self->{_errorHandler}) {
+		$self->{_errorHandler}  = WebGUI::Session::ErrorHandler->new($self);
+	}
+	return $self->{_errorHandler};
+}
 
 #-------------------------------------------------------------------
 

@@ -47,36 +47,13 @@ sub addRevision {
     my $newSelf = $self->SUPER::addRevision(@_);
     if ($newSelf->getRevisionCount > 1) {
         foreach my $field (qw(image1 image2 image3 brochure manual warranty)) {
-            if ($self->get($field)) {
+            if ($self->get($field) && $self->get($field) ne $newSelf->get($field)) {
                 my $newStorage = WebGUI::Storage->get($self->session,$self->get($field))->copy;
                 $newSelf->update({$field=>$newStorage->getId});
             }
         }
     }
     return $newSelf;
-}
-
-#-------------------------------------------------------------------
-
-=head2 addToCart ( variant )
-
-Override/extend Sku's addToCart method to handle inventory control.
-
-=head3 variant
-
-A hashref of variant information for the variant of the Product
-that is being added to the cart.  Adding the variant to the
-cart decrements the quantity by 1.
-
-=cut
-
-sub addToCart {
-    my $self     = shift;
-    my $variant  = shift;
-    my $i18n     = WebGUI::International->new($self->session, 'Asset_Product');
-    $variant->{quantity} -= 1;
-    $self->setCollateral('variantsJSON', 'variantId', $variant);
-    $self->SUPER::addToCart($variant);
 }
 
 #-------------------------------------------------------------------
@@ -103,6 +80,13 @@ sub definition {
             label=>$i18n->get(62),
             hoverHelp=>$i18n->get('62 description'),
             defaultValue=>'PBtmpl0000000000000056'
+        },
+        thankYouMessage => {
+            tab             => "properties",
+            defaultValue    => $i18n->get("default thank you message"),
+            fieldType       => "HTMLArea",
+            label           => $i18n->get("thank you message"),
+            hoverHelp       => $i18n->get("thank you message help"),
         },
         image1=>{
             tab => "properties",
@@ -308,7 +292,8 @@ sub getCollateral {
     my $table = $self->getAllCollateral($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return {} if $index == -1;
-    return $table->[$index];
+    my %copy = %{ $table->[$index] };
+    return \%copy;
 }
 
 
@@ -415,7 +400,14 @@ Product.
 
 sub getPrice {
     my $self = shift;
-    return $self->getOptions->{price};
+    if (! keys %{ $self->getOptions} ) {
+        my $variants = $self->getAllCollateral('variantsJSON');
+        return '' unless @{ $variants };
+        return $variants->[0]->{price};
+    }
+    else {
+        return $self->getOptions->{price};
+    }
 }
 
 #-------------------------------------------------------------------
@@ -450,10 +442,36 @@ sub getQuantityAvailable {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getThumbnailUrl ( [$store] )
+
+Return a URL to the thumbnail for an image stored in this Product by creating
+a WebGUI::Storage::Image object and calling its getThumbnailUrl method.
+
+=head3 $store
+
+This should be a WebGUI::Storage::Image object.  If it is not defined,
+then by default getThumbnailUrl will attempt to look up the URL for
+the 'image1' property.
+
+If image1 is not defined for this Product and a separate storage object is not
+sent in, it will return the empty string.
+
+=cut
+
 sub getThumbnailUrl {
     my $self = shift;
-    my $store = shift || WebGUI::Storage::Image->get($self->session, $self->get('image1'));
-    return $store->getThumbnailUrl($store->getFiles->[0]);
+    my $store = shift;
+    if (defined $store) {
+        return $store->getThumbnailUrl($store->getFiles->[0]); 
+    }
+    elsif ($self->get('image1')) {
+        $store = WebGUI::Storage::Image->get($self->session, $self->get('image1'));
+        return $store->getThumbnailUrl($store->getFiles->[0]); 
+    }
+    else {
+        return '';
+    }
 }
 
 #-------------------------------------------------------------------
@@ -598,11 +616,11 @@ sub onAdjustQuantityInCart {
     my $item   = shift;
     my $amount = shift;
     ##Update myself, as options
-    $self->getOptions->{quantity} += $amount;
+    $self->getOptions->{quantity} -= $amount;
     ##Update my collateral
     my $vid = $self->getOptions->{variantId};
     my $collateral = $self->getCollateral('variantsJSON', 'variantId', $vid);
-    $collateral->{quantity} += $amount;
+    $collateral->{quantity} -= $amount;
     $self->setCollateral('variantsJSON', 'variantId', $vid, $collateral);
 }
 
@@ -682,14 +700,20 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
-sub purgeRevision    {
+=head2 purgeRevision ( )
+
+See WebGUI::Asset::purgeRevision() for details.
+
+=cut
+
+sub purgeRevision {
     my $self = shift;
-    WebGUI::Storage->get($self->session,$self->get("image1"))->delete if    ($self->get("image1"));
-    WebGUI::Storage->get($self->session,$self->get("image2"))->delete if    ($self->get("image2"));
-    WebGUI::Storage->get($self->session,$self->get("image3"))->delete if    ($self->get("image3"));
-    WebGUI::Storage->get($self->session,$self->get("brochure"))->delete if    ($self->get("brochure"));
-    WebGUI::Storage->get($self->session,$self->get("manual"))->delete if    ($self->get("manual"));
-    WebGUI::Storage->get($self->session,$self->get("warranty"))->delete if    ($self->get("warranty"));
+    WebGUI::Storage->get($self->session, $self->get("image1"))->delete   if ($self->get("image1"));
+    WebGUI::Storage->get($self->session, $self->get("image2"))->delete   if ($self->get("image2"));
+    WebGUI::Storage->get($self->session, $self->get("image3"))->delete   if ($self->get("image3"));
+    WebGUI::Storage->get($self->session, $self->get("brochure"))->delete if ($self->get("brochure"));
+    WebGUI::Storage->get($self->session, $self->get("manual"))->delete   if ($self->get("manual"));
+    WebGUI::Storage->get($self->session, $self->get("warranty"))->delete if ($self->get("warranty"));
     return $self->SUPER::purgeRevision;
 }
 
@@ -960,11 +984,9 @@ sub www_buy {
     my $vid = $self->session->form->process('vid');
     my $variant = $self->getCollateral('variantsJSON', 'variantId', $vid);
     return '' unless keys %{ $variant };
-    my $error = $self->addToCart($variant);
-    if ($error) {
-        $self->view($error);
-    }
-    return '';
+    $self->addToCart($variant);
+    $self->{_hasAddedToCart} = 1;
+    return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -1530,16 +1552,21 @@ sub view {
                  . $self->session->icon->edit('func=editVariant&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveUp('func=moveVariantUp&vid='.$id,$self->get('url'))
                  . $self->session->icon->moveDown('func=moveVariantDown&vid='.$id,$self->get('url'));
+        my $price = sprintf('%.2f', $collateral->{price});
+        my $desc  = $collateral->{shortdesc};
         push(@variantLoop,{
                                    'variant_controls' => $segment,
                                    'variant_sku'      => $collateral->{varSku},
-                                   'variant_title'    => $collateral->{shortdesc},
-                                   'variant_price'    => sprintf('%.2f', $collateral->{price}),
+                                   'variant_title'    => $desc,
+                                   'variant_price'    => $price,
                                    'variant_weight'   => $collateral->{weight},
                                    'variant_quantity' => $collateral->{quantity},
                                 });
-        $variants{$id} = $collateral->{shortdesc} if $collateral->{quantity} > 0;
+        if ($collateral->{quantity} > 0) {
+            $variants{$id} = join ", ", $desc, $price;
+        }
     }
+
     if (scalar keys %variants) {
         ##Don't display the form unless you have available variants to sell.
         $var{buy_form_header} = WebGUI::Form::formHeader($session, { action => $self->getUrl} )
@@ -1553,13 +1580,21 @@ sub view {
                 value   => [0],
             },
         );
-        $var{buy_button}      = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+        $var{buy_button} = WebGUI::Form::submit($session, { value => $i18n->get('add to cart') } );
+        $var{in_stock} = 1;
     }
+    else {
+        $var{in_stock} = 0;
+        $var{no_stock_message} = $i18n->get('out of stock');
+    }
+
     if ($self->canEdit) {
         $var{'addvariant_url'}   = $self->getUrl('func=editVariant');
         $var{'addvariant_label'} = $i18n->get('add a variant');
+        $var{'canEdit'}          = 1;
     }
     $var{variant_loop} = \@variantLoop;
+    $var{hasAddedToCart} = $self->{_hasAddedToCart};
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {

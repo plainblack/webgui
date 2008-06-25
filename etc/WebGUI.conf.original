@@ -209,6 +209,8 @@
 # Add Content menus.
 
 "assets" : [
+    "WebGUI::Asset::Sku::Product",
+    "WebGUI::Asset::Sku::Subscription",
     "WebGUI::Asset::Sku::Donation",
     "WebGUI::Asset::Sku::FlatDiscount",
 	"WebGUI::Asset::Snippet", 
@@ -237,8 +239,8 @@
 	"WebGUI::Asset::File::ZipArchive",
 	"WebGUI::Asset::Wobject::WSClient",
 	"WebGUI::Asset::Wobject::Shelf", 
-	"WebGUI::Asset::Wobject::SQLForm",
-	"WebGUI::Asset::Wobject::Thingy"
+	"WebGUI::Asset::Wobject::Thingy",
+    "WebGUI::Asset::Wobject::UserList"
     ],
 
 # Specify the list assets that are used for utility purposes only
@@ -408,9 +410,8 @@
 			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", "WebGUI::Workflow::Activity::ExpireEmsCartItems",
 			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
 			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
-			"WebGUI::Workflow::Activity::SendQueuedMailMessages","WebGUI::Workflow::Activity::CleanDatabaseCache",
-			"WebGUI::Workflow::Activity::CalendarUpdateFeeds","WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags,
-			"WebGUI::Workflow::Activity::CheckFluxRules"],
+			"WebGUI::Workflow::Activity::SendQueuedMailMessages","WebGUI::Workflow::Activity::CleanDatabaseCache","WebGUI::Workflow::Activity::CheckFluxRules",
+			"WebGUI::Workflow::Activity::CalendarUpdateFeeds","WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags"],
 		"WebGUI::User" : ["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
 		"WebGUI::VersionTag" : ["WebGUI::Workflow::Activity::CommitVersionTag", "WebGUI::Workflow::Activity::RollbackVersionTag", 
 			"WebGUI::Workflow::Activity::TrashVersionTag", "WebGUI::Workflow::Activity::CreateCronJob",
@@ -474,12 +475,13 @@
 "contentHandlers" : [
     "WebGUI::Content::Prefetch",
     "WebGUI::Content::Maintenance",
+    "WebGUI::Content::AssetManager",
     "WebGUI::Content::Operation",
+    "WebGUI::Content::Flux",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
     "WebGUI::Content::Asset",
-    "WebGUI::Content::NotFound",
-    "WebGUI::Content::Flux"
+    "WebGUI::Content::NotFound"
     ]
 
 }

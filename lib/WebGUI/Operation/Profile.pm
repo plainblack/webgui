@@ -50,6 +50,8 @@ This method is deprecated, and should not be used in new code.  Use
 the getRequiredFields method from WebGUI::ProfileField and specify the
 translation to template variables directly instead.
 
+NOTE: You should use the getRequiredFields method in WebGUI::ProfileField instead.
+
 =head3 session
 
 The current WebGUI session object.
@@ -230,7 +232,7 @@ sub www_editProfile {
 	$vars->{'profile.form.elements'} = \@array;
 	$vars->{'profile.form.submit'} = WebGUI::Form::submit($session,{});
 	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000051")->process($vars));
+	return $session->style->userStyle(WebGUI::Asset::Template->new($session, $session->setting->get('editUserProfileTemplate'))->process($vars));
 }
 
 #-------------------------------------------------------------------
@@ -319,7 +321,7 @@ sub www_viewProfile {
         };
     }
 
-    return $session->style->userStyle(WebGUI::Asset::Template->new($session,"PBtmpl0000000000000052")->process($vars));
+    return $session->style->userStyle(WebGUI::Asset::Template->new($session, $session->setting->get('viewUserProfileTemplate'))->process($vars));
 }
 
 

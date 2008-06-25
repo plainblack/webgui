@@ -294,10 +294,24 @@ A reference to the current session.
 sub getList {
 	my $class = shift;
 	my $session = shift;
-	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink order by title");
+	my $list = $session->db->buildHashRef("select databaseLinkId, title from databaseLink where databaseLinkId !=
+'0' order by title");
 	my $i18n = WebGUI::International->new($session);
 	$list->{'0'} = $i18n->get(1076);
 	return $list;
+}
+
+#-------------------------------------------------------------------
+
+=head2 macroAccessIsAllowed ( )
+
+Returns a boolean indicating if macros are allowed to access this database link.
+
+=cut
+
+sub macroAccessIsAllowed {
+    my $self = shift;
+    return $self->{_databaseLink}{allowMacroAccess};
 }
 
 
@@ -333,7 +347,7 @@ sub new {
 				identifier=>$session->config->get("dbpass"),
 				title=>"WebGUI Database",
 				allowedKeywords=>"select\ndescribe\ndesc\nshow\ncall",
-                allowMacroAccess=>0,
+                allowMacroAccess=>$session->db->quickScalar("select allowMacroAccess from databaseLink where databaseLinkId='0'"),
                 additionalParameters=>'',
 				);
 		} else {

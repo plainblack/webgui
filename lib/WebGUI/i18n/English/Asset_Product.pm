@@ -765,7 +765,7 @@ be useful, others may not.|,
 	},
 
 	'buy_form_options' => {
-		message => q|A dropdown list of available variants for this product.|,
+		message => q|A dropdown list of available variants for this product.  Only products with a quantity greater than zero are listed.|,
 		lastUpdated => 1210611784,
 	},
 
@@ -779,6 +779,22 @@ be useful, others may not.|,
 		lastUpdated => 1210611784,
 	},
 
+	'in_stock' => {
+		message => q|A boolean which says whether or not there are available variants of this product for sale|,
+		lastUpdated => 1212787075,
+	},
+
+	'no_stock_message' => {
+		message => q|An internationalized message saying that there are no variants of this product available for sale.|,
+		lastUpdated => 1210611784,
+	},
+
+	'out of stock' => {
+		message => q|Out of stock|,
+		lastUpdated => 1210611784,
+        context => q|Message displayed to the user when there is no inventory available for sale for a product.|,
+	},
+
 	'options' => {
 		message => q|Options|,
 		lastUpdated => 1211168603,
@@ -787,6 +803,36 @@ be useful, others may not.|,
 	'other products' => {
 		message => q|Other Products|,
 		lastUpdated => 1211168991,
+	},
+
+	'default thank you message' => {
+		message => q|Thank you for your purchase.|,
+		lastUpdated => 0,
+		context => q|the default message that will go in the thank you message field|
+	},
+
+	'thank you message' => {
+		message => q|Thank You Message|,
+		lastUpdated => 0,
+		context => q|the label for the field where you type in a message thanking the user for their purchase|
+	},
+
+	'thank you message help' => {
+		message => q|Write a thank you message to your user for buying something from your site.  Be sincere, or they may cancel their purchase and get it from Amazon instead.|,
+		lastUpdated => 0,
+		context => q|help for default price field|
+	},
+
+	'hasAddedToCart' => {
+		message => q|A condition indicating that the user has added the product to their cart, so we can display the thank you message.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'canEdit' => {
+		message => q|A boolean that is true if the user can edit this Product.|,
+		lastUpdated => 0,
+		context => q|template variable|
 	},
 
 };
