@@ -12,6 +12,8 @@
  - fixed: Shop: Product asset- image not showing
  - fixed: User List- Missing Hover Help (Yung Han Khoe)
  - fixed: UserList wobject not in new content menu (Yung Han Khoe)
+ - fixed: Default Product template does not show an "out of stock" message
+   when there are no available variants.
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly
