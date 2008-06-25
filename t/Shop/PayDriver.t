@@ -97,8 +97,8 @@ cmp_deeply  (
                 fieldType       => 'template',
                 label           => ignore(),
                 hoverHelp       => ignore(),
-                defaultValue    => 'BMzuE91-XB8E-XGll1zpvA',
-                namespace       => 'Shop/ReceiptEmail',
+                defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
+                namespace       => 'Shop/EmailReceipt',
             },
             saleNotificationGroupId  => {
                 fieldType       => 'group',
