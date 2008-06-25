@@ -19,10 +19,10 @@ use LWP::MediaTypes qw(guess_media_type);
 use MIME::Entity;
 use MIME::Parser;
 use Net::SMTP;
-use Text::Wrap;
 use WebGUI::Group;
 use WebGUI::Macro;
 use WebGUI::User;
+use Encode qw(encode);
 
 =head1 NAME
 
@@ -167,14 +167,10 @@ sub addHtmlRaw {
     my $self        = shift;
     my $text        = shift;
 
-    # Wrap text after 78 characters
-    local $Text::Wrap::columns   = 78;
-    # Do not break up words
-    local $Text::Wrap::huge      = "overflow";
-
     $self->getMimeEntity->attach(
         Charset     => "UTF-8",
-        Data        => wrap( '', '', $text ),
+        Encoding    => "quoted-printable",
+        Data        => encode('utf8', $text ),
         Type        => "text/html",
     );
 
@@ -197,15 +193,12 @@ A string of text.
 sub addText {
     my $self    = shift;
     my $text    = shift;
-    
-    # Wrap text after 78 characters
-    local $Text::Wrap::columns   = 78;
-    # Do not break up words
-    local $Text::Wrap::huge      = "overflow";
 
     $self->getMimeEntity->attach(
         Charset     => "UTF-8",
-        Data        => wrap( '', '', $text ),
+        Encoding    => "quoted-printable",
+        Data        => encode('utf8', $text ),
+        Type        => 'text/plain',
     );
 
     return undef;
@@ -315,7 +308,7 @@ sub create {
 		Bcc=>$headers->{bcc},
 		"Reply-To"=>$replyTo,
 		"In-Reply-To"=>$headers->{inReplyTo},
-		Subject=>$headers->{subject},
+		Subject=> encode('MIME-Q', $headers->{subject}),
 		"Message-Id"=>$id,
 		Date=>$session->datetime->epochToMail,
 		"X-Mailer"=>"WebGUI"
