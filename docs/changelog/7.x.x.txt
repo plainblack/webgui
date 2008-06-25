@@ -1,4 +1,5 @@
 7.5.14
+ - fixed: Rich editor collateral image uploader is broken
  - fixed: ems 2.0: tickets get created as badges also
  - fixed: Non-admin users can now add Gallery assets
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
