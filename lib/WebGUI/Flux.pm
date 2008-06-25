@@ -224,4 +224,94 @@ sub generateGraph {
     return $PATH;
 }
 
+#-------------------------------------------------------------------
+
+=head2 evaluateFor ( arg_ref )
+
+Convenience method. Instantiates a Flux Rule and evaluates it against a given user and assetId.
+Currently, if anything goes wrong we return 1 (permit access). This will likely change later.
+
+=head3 arg_ref
+
+Hash ref of properties:
+
+=head4 user
+
+The WebGUI::User for whom the Flux Rule should be evaluated against
+
+=head4 fluxRuleId
+
+The fluxRuleId of the Flux Rule
+
+=head4 assetId
+
+The assetId of the asset/wobject being evaluated against 
+
+=cut
+
+#TODO: Add in some tests for this convenience method.
+
+sub evaluateFor {
+    my ($class, $arg_ref) = @_;
+    
+    # Check arguments..
+    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
+        WebGUI::Error::InvalidNamedParamHashRef->throw(
+            param => $arg_ref,
+            error => 'invalid named param hash ref.'
+        );
+    }
+    foreach my $field qw(user fluxRuleId assetId) {
+        if ( !exists $arg_ref->{$field} ) {
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+        }
+    }
+    if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
+        WebGUI::Error::InvalidObject->throw(
+            param    => $arg_ref->{user},
+            error    => 'named param missing.',
+            expected => 'WebGUI::User',
+            got      => ref $arg_ref->{user},
+        );
+    }
+    
+    my $session = $arg_ref->{user}->session();
+    
+    # Debugging.. (remove later)
+    {
+        my $asset = WebGUI::Asset->new($session, $arg_ref->{assetId});
+        $session->log->info("Getting Flux Result for: " . $asset->getUrl());
+    }
+    
+    # Instantiate the Flux Rule..
+    my $fluxRuleId = $arg_ref->{fluxRuleId};                
+    if (!$fluxRuleId) {
+        $session->log->info('Invalid fluxRuleId, returning 1');
+        return 1;
+    }
+    my $fluxRule = eval {WebGUI::Flux->getRule($session, $fluxRuleId)};
+    if (my $e = Exception::Class->caught()) {
+        $session->log->warn($e->error);
+        return 1;
+    }
+    if (!$fluxRule) {
+        $session->log->info('Unable to instantiate Flux Rule, returning 1');
+        return 1;
+    }
+    $session->log->info('->Flux using Rule: ' . $fluxRule->get('name'));
+    
+    # Evaluate the Flux Rule..
+    my $result = eval {
+        $fluxRule->evaluateFor( $arg_ref )
+    };
+    if (my $e = Exception::Class->caught()) {
+        $session->log->warn($e->error);
+        return 1;
+    }
+    
+    # Return the result..
+    $session->log->info('->Result: ' . $result);
+    return $result;
+}
+
 1;

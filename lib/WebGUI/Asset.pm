@@ -36,6 +36,7 @@ use WebGUI::Keyword;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
+use WebGUI::Flux;
 
 =head1 NAME
 
@@ -239,12 +240,21 @@ sub canEdit {
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
     my $user = WebGUI::User->new($self->session, $userId);
+    
+    # See if we should delegate to Flux..
+    if ($self->get('fluxEnabled')) {
+        return WebGUI::Flux->evaluateFor({
+            user => $user, 
+            assetId => $self->getId(), 
+            fluxRuleId => $self->get('fluxRuleIdEdit')
+        });
+    }
+    
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
     return $user->isInGroup($self->get("groupIdEdit"));
 }
-
 
 #-------------------------------------------------------------------
 
@@ -272,6 +282,16 @@ sub canView {
         $user =  $self->session->user;
         $userId = $user->userId();
     }
+    
+    # See if we should delegate to Flux..
+    if ($self->get('fluxEnabled')) {
+        return WebGUI::Flux->evaluateFor({
+            user => $user, 
+            assetId => $self->getId(), 
+            fluxRuleId => $self->get('fluxRuleIdView')
+        });
+    }
+    
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
@@ -421,6 +441,27 @@ sub definition {
                         fieldType=>'group',
 					    filter=>'fixId',
                         defaultValue=>'4'
+                    },
+                    fluxEnabled=>{
+					    tab=>"security",
+					    label=>'Enable Flux',
+					    hoverHelp=>'Enable Flux',
+					    uiLevel=>6,
+                        fieldType=>'yesNo',
+                    },
+                    fluxRuleIdView=>{
+					    tab=>"security",
+					    label=>'Who Can View (Flux Rule)',
+					    hoverHelp=>'Who Can View (Flux Rule)',
+					    uiLevel=>6,
+                        fieldType=>'fluxRule',
+                    },
+                    fluxRuleIdEdit=>{
+					    tab=>"security",
+					    label=>'Who Can Edit (Flux Rule)',
+					    hoverHelp=>'Who Can Edit (Flux Rule)',
+					    uiLevel=>6,
+                        fieldType=>'fluxRule',
                     },
                     synopsis=>{
 					    tab=>"meta",
@@ -2143,6 +2184,9 @@ sub www_add {
 		parentId => $self->getId,
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
+		fluxEnabled => $self->get("fluxEnabled"),
+		fluxRuleIdView => $self->get("fluxEnabled"),
+		fluxRuleIdEdit => $self->get("fluxEnabled"),
 		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
 		styleTemplateId => $self->get("styleTemplateId"),

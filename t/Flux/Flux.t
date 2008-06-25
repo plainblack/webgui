@@ -164,14 +164,14 @@ $session->db->write('delete from fluxExpression');
     );
     $rule1->addExpression(
         {   operand1     => 'TextValue',
-            operand1Args => '{"value":  "test value"}',
+            operand1Args => '{"value":  "boring dry everyday value"}',
             operand2     => 'TextValue',
-            operand2Args => '{"value":  "test value"}',
+            operand2Args => '{"value":  "super lucky crazy value"}',
             operator     => 'IsEqualTo',
             name         => 'Test Second Thing',
         }
     );
-    $rule1->update( { name => 'Simple Rule', combinedExpression => 'e1 or e2' } );
+    $rule1->update( { name => 'Simple Rule', combinedExpression => 'not e1 or e2' } );
 
     my $rule2    = WebGUI::Flux::Rule->create($session);
     my $rule2_id = $rule2->getId();
@@ -238,7 +238,7 @@ $session->db->write('delete from fluxExpression');
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from fluxRule');
+    $session->db->write('delete from fluxRule') unless $ENV{FLUX_NO_CLEANUP};
     $session->db->write('delete from fluxRuleUserData');
-    $session->db->write('delete from fluxExpression');
+    $session->db->write('delete from fluxExpression') unless $ENV{FLUX_NO_CLEANUP};
 }
