@@ -1,4 +1,5 @@
 7.4.40
+ - fixed: RSS feeds report modified date instead of create date
  - fixed: edit branch can't update URLs on most assets
  - fixed: Country list not up-to-date, thanks to user zzois for the patch.
  - fixed: Password Recovery no longer allows Deactivated users to recover passwords
