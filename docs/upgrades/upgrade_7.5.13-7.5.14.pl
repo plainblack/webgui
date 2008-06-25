@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+deleteBadReceiptEmailTemplate($session);
 
 finish($session); # this line required
 
@@ -41,6 +42,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub deleteBadReceiptEmailTemplate {
+    my $session = shift;
+    print "\tDeleting bad Shop Email Receipt template... " unless $quiet;
+    my $badTemplate = WebGUI::Asset->newByDynamicClass($session, 'BMzuE91-XB8E-XGll1zpvA');
+    if (defined $badTemplate) {
+        $badTemplate->purge;
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
