@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 deleteBadReceiptEmailTemplate($session);
+unlockShelfAssets($session);
 
 finish($session); # this line required
 
@@ -42,6 +43,23 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub unlockShelfAssets {
+    my $session = shift;
+    print "\tUnlocking assets from improper Shelf package import..." unless $quiet;
+    for my $id (qw(4e-_rNs6mSWedZhQ_V5kJA 6tK47xsaIH-ELw0IBo0uRQ XNd7a_g_cTvJVYrVHcx2Mw _bZJ9LA_KNekZiFPaP2SeQ nFen0xjkZn8WkpM93C9ceQ)) {
+        my $asset = WebGUI::Asset->new($session, $id);
+        if ($asset && $asset->get('isLockedBy')) {
+            my $tagId = $asset->get('tagId');
+            my $versionTag = WebGUI::VersionTag->new($session, $tagId);
+            if (! $versionTag->get('isLocked')) {
+                $asset->commit;
+            }
+        }
+    }
+    print "Done.\n" unless $quiet;
+}
+
 
 sub deleteBadReceiptEmailTemplate {
     my $session = shift;
