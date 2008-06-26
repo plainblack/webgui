@@ -120,7 +120,7 @@ sub www_view {
 			$subvar = {};
 			@$subvar{'title', 'link', 'description'} = $self->_tlsOfAsset($item);
 			$subvar->{guid} = $subvar->{link};
-			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('revisionDate')));
+			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('creationDate')));
 		} elsif (ref $item eq 'HASH') {
             foreach my $key (keys %$item) {
                 $subvar->{$key} = _escapeXml($item->{$key});

@@ -1,4 +1,5 @@
 7.5.14
+ - fixed: RSS feeds report modified date instead of create date
  - fixed: Rich editor collateral image uploader is broken
  - fixed: ems 2.0: tickets get created as badges also
  - shortcut overrides display titles instead of field names

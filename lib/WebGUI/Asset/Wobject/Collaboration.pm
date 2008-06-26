@@ -886,7 +886,7 @@ SQL
 		    'link'          => $postUrl, 
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
-		    pubDate         => $datetime->epochToMail($post->get('revisionDate')),
+		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
 		    attachmentLoop  => $attachmentLoop, 
 			userDefined1 => $post->get("userDefined1"),
 			userDefined2 => $post->get("userDefined2"),
