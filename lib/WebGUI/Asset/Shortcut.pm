@@ -369,8 +369,9 @@ sub getOverridesList {
 	foreach my $definition (@{$shortcut->definition($self->session)}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
+            next if $definition->{properties}{$prop}{label} eq '';
 			$output .= '<tr>';
-			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
+            $output .= '<td class="tableData">'.$definition->{properties}{$prop}{label}.'</td>';
 			$output .= '<td class="tableData">';
 			$output .= $self->session->icon->edit('func=editOverride;fieldName='.$prop,$self->get("url"));
 			$output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};

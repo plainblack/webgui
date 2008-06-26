@@ -1,6 +1,7 @@
 7.5.14
  - fixed: Rich editor collateral image uploader is broken
  - fixed: ems 2.0: tickets get created as badges also
+ - shortcut overrides display titles instead of field names
  - fixed: Non-admin users can now add Gallery assets
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
