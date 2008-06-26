@@ -411,7 +411,7 @@ sub connect {
     });
 
 	unless (defined $dbh) {
-		$session->errorHandler->error("Couldn't connect to database: $dsn");
+		$session->errorHandler->error("Couldn't connect to database: $dsn : $DBI::errstr");
 		return undef;
 	}
 
