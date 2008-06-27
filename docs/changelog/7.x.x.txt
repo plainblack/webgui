@@ -3,6 +3,7 @@
  - fixed: Reverted change to RichEdit that caused IE6 to stop working
  - fixed: Subscription: Price not displaying
  - fixed: Flat Discount Coupon: Add to Cart button seems broken
+ - fixed: Deleting unProtected user profile fields
 
 7.5.14
  - fixed: RSS feeds report modified date instead of create date

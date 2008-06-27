@@ -95,36 +95,36 @@ sub canView {
 =head2 www_deleteProfileCategoryConfirm ( $session )
 
 Deletes the profile category in form variable C<cid>, unless the category is
-protected, in which case it returns $session->privilege->vitalComponent.
-Othewise, it returns the user to www_editProfileSettings.
+protected, or it contains protected fields, in which case it returns $session->privilege->vitalComponent.
+Otherwise, it returns the user to www_editProfileSettings.
 
 =cut
 
 sub www_deleteProfileCategoryConfirm {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
-	my $category = WebGUI::ProfileCategory->new($session,$session->form->process("cid"));
-        return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($category->isProtected);
-	$category->delete;	
-        return www_editProfileSettings($session);
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
+    my $category = WebGUI::ProfileCategory->new($session,$session->form->process("cid"));
+    return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($category->isProtected or $category->hasProtected);
+    $category->delete;	
+    return www_editProfileSettings($session);
 }
 
 =head2 www_deleteProfileFieldConfirm ( $session )
 
 Deletes the profile field in form variable C<fid>, unless the field is
 protected, in which case it returns $session->privilege->vitalComponent.
-Othewise, it returns the user to www_editProfileSettings.
+Otherwise, it returns the user to www_editProfileSettings.
 
 =cut
 
 #-------------------------------------------------------------------
 sub www_deleteProfileFieldConfirm {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
-	my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
-        return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($field->isProtected);
-	$field->delete;
-        return www_editProfileSettings($session); 
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
+    my $field = WebGUI::ProfileField->new($session,$session->form->process("fid"));
+    return WebGUI::AdminConsole->new($session,"userProfiling")->render($session->privilege->vitalComponent()) if ($field->isProtected);
+    $field->delete;
+    return www_editProfileSettings($session); 
 }
 
 =head2 www_editProfileCategory ( $session )
