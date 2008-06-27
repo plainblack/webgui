@@ -51,7 +51,7 @@ our $I18N = {
 	},
 	
 	'badge group name help' => {
-		message 	=> q|Enter a name to be used to link badges with tickets under.|,
+		message 	=> q|This name will be used to refer to all the badges in this group, together.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a badge group property label|,
 	},
