@@ -112,7 +112,13 @@ our $I18N = {
 	},
 
 	'hasAddedToCart' => {
-		message => q|A condition indicating that the user has added the product to their cart, so we can display the thank you message.|,
+		message => q|A conditional indicating that the user has added the product to their cart, so we can display the thank you message.|,
+		lastUpdated => 1214598286,
+		context => q|template variable|
+	},
+
+	'alreadyHasCoupon' => {
+		message => q|A conditional indicating that the user already has this coupon in their cart.|,
 		lastUpdated => 0,
 		context => q|template variable|
 	},
