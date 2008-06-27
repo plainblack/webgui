@@ -267,9 +267,9 @@ sub getAdminConsoleWithSubmenu {
 	my $ac      = $self->getAdminConsole;
 	my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
 
-	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'), $i18n->get('generate batch'));
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes'),       $i18n->get('manage codes')  );
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'), $i18n->get('manage batches'));
+	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'),        $i18n->get('generate batch'));
+	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes;selection=dc'), $i18n->get('manage codes')  );
+	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'),        $i18n->get('manage batches'));
 
 	return $ac;
 }
@@ -740,6 +740,7 @@ sub www_listSubscriptionCodeBatches {
             'func=deleteSubscriptionCodeBatch;bid='.$batch->{batchId}, 
             $self->getUrl,
             $i18n->get('delete batch confirm'));
+		$output .= '</td>';		
 		$output .= '<td>' . $batch->{ description } . '</td>';
 		$output .= '<td>'
             . '<a href="' . $self->getUrl('func=listSubscriptionCodes;selection=b;bid=' . $batch->{ batchId }) . '">'
