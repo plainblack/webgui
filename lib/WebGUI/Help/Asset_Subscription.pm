@@ -25,6 +25,7 @@ our $HELP = {
 			{	name => 'thankYouMessage', description=>'thank you message help' },
 			{	name => 'redeemCodeLabel' , required=>1 },
 			{	name => 'redeemCodeUrl' , required=>1 },
+			{	name => 'price' , required=>1 },
 		],
 		related => [  
 		],

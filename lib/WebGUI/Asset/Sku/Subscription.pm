@@ -509,6 +509,7 @@ sub view {
             '<a href="'.$self->getUrl('func=listSubscriptionCodes')       .'">'.$i18n->get('manage codes').'</a>',
             '<a href="'.$self->getUrl('func=listSubscriptionCodeBatches') .'">'.$i18n->get('manage batches').'</a>',
             )),
+        price               => sprintf("%.2f", $self->getPrice),
     );
     my $hasCodes = $self->session->db->quickScalar('select count(*) from Subscription_code as t1, Subscription_codeBatch as t2 where t1.batchId = t2.batchId and t2.subscriptionId=?', [$self->getId]);
     if ($hasCodes) {

@@ -484,6 +484,12 @@ The form in which the user can enter his subscription code.<br />|,
 		context => q|template variable|
 	},
 
+	'price' => {
+		message => q|The price for the subscription, formatted to two decimal places|,
+		lastUpdated => 1214592963,
+		context => q|template variable|
+	},
+
 };
 
 1;
