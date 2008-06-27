@@ -1,5 +1,6 @@
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)
+ - fixed: Reverted change to RichEdit that caused IE6 to stop working
 
 7.5.14
  - fixed: RSS feeds report modified date instead of create date
