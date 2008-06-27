@@ -1,3 +1,5 @@
+7.5.15
+
 7.5.14
  - fixed: RSS feeds report modified date instead of create date
  - fixed: Rich editor collateral image uploader is broken
