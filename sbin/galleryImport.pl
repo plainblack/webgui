@@ -26,6 +26,7 @@ use WebGUI::Storage::Image;
 
 # custom flags
 my ($fromAssetId, $fromPath, $fromAssetUrl, $toId, $toUrl) = undef;
+my $tags = [];
 
 # init
 my $session = start();
@@ -158,6 +159,7 @@ sub addAlbumFromFilesystem {
                     menuTitle           => $albumName,
                     title               => $albumName,
                     url                 => $gallery->get('url') . "/" . $albumName,
+                    keywords            => $tags,
                     }, undef, undef, $addOptions );
 
                 # do the import
@@ -175,6 +177,7 @@ sub addAlbumFromFilesystem {
                         menuTitle           => $title,
                         title               => $title,
                         url                 => $album->get('url') . "/" . $title,
+                        keywords            => $tags,
                         }, undef, undef, $addOptions );
                     $asset->setFile( $File::Find::name."/".$filename );
                 }
@@ -216,6 +219,7 @@ sub addAlbumFromFolder {
         ownerUserId         => $folder->get('ownerUserId'),
         synopsis            => $folder->get('synopsis'),
         title               => $folder->get('title'),
+        keywords            => $tags,
         url                 => $gallery->get('url') . "/" . $folder->get('title'),
     }, undef, $folder->get('revisionDate'), $addOptions );
 
@@ -240,6 +244,7 @@ sub addAlbumFromFolder {
             menuTitle           => $oldFile->get('menuTitle'),
             ownerUserId         => $oldFile->get('ownerUserId'),
             synopsis            => $oldFile->get('synopsis'),
+            keywords            => $tags,
             title               => $oldFile->get('title'),
             url                 => $album->get('url') . "/" . $oldFile->get('menuTitle'),
         }, undef, $oldFile->get('revisionDate'), $addOptions );
@@ -278,6 +283,7 @@ sub addAlbumFromThread {
         creationDate        => $thread->get('creationDate'),
         ownerUserId         => $thread->get('ownerUserId'),
         synopsis            => $thread->get('synopsis'),
+        keywords            => $tags,
         title               => $thread->get('title'),
         url                 => $gallery->get('url') . "/" . $thread->get('title'),
         userDefined1        => $thread->get('userDefined1'),
@@ -318,6 +324,7 @@ sub addAlbumFromThread {
                     synopsis            => $synopsis,
                     title               => $title,
                     url                 => $album->get('url') . "/" . $title,
+                    keywords            => $tags,
                     userDefined1        => $post->get('userDefined1'),
                     userDefined2        => $post->get('userDefined2'),
                     userDefined3        => $post->get('userDefined3'),
@@ -352,6 +359,7 @@ sub start {
     GetOptions(
         'configFile=s'      => \$configFile,
         'help'              => \$help,
+        'tags=s{1,10}'      => $tags,
         'toUrl=s'           => \$toUrl,
         'fromAssetUrl=s'    => \$fromAssetUrl,
         'toId=s'            => \$toId,
@@ -431,6 +439,13 @@ files contained in the folder are added as photos in the folder.
 =item B<--help>
 
 Shows this documentation, then exits.
+
+=item B<--tags keyword keyword keyword>
+
+Attach keyword tags to the photos and albums created. One to 10 keywords may 
+be specified. You may specify multi-word tags by wrapping them in quotes.
+
+Eg: --tags=green old "very expensive"
 
 =item B<--toId assetId>
 
