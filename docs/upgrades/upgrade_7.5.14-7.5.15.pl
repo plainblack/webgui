@@ -20,7 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use File::Path;
 
 my $toVersion = '7.5.15';
 my $quiet; # this line required
@@ -28,19 +28,21 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+removeOldGalleryImport($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub removeOldGalleryImport {
+    my $session = shift;
+    print "\tRemoving old gallery import mechanism... " unless $quiet;
+    unlink "../../sbin/migrateCollabToGallery.pl";
+    unlink "../../sbin/migrateFolderToGallery.pl";
+    rmtree "../../lib/WebGUI/Utility";
+    rmtree "../../t/Utility/Gallery";
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

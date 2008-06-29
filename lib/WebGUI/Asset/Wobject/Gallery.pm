@@ -1,7 +1,5 @@
 package WebGUI::Asset::Wobject::Gallery;
 
-$VERSION = "1.0.0";
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
