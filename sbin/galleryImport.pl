@@ -149,7 +149,7 @@ sub addAlbumFromFilesystem {
             if (scalar(@photos)) {
                 # get album name
                 my $albumName = $File::Find::name;
-                $albumName =~ s{.*\/([A-Za-z0-9\.-_\s]+)$}{$1}; 
+                $albumName =~ s{.*\/([A-Za-z0-9\.-_'\,\s]+)$}{$1}; 
 
                 # create album
                 print "Creating album $albumName\n";
