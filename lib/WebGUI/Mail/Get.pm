@@ -242,12 +242,13 @@ sub parseParts {
 	}
 	my $body = $message->bodyhandle;
 	if (defined $body) {
-		my $disposition = $message->head->get("Content-Disposition");
-		my $filename = "";
-        if($disposition =~ m/filename=\"(.*)\"/) {
-		    $filename = $1;
-        }
-		return [{content => $body->as_string, type=>$type, filename=>$filename}];
+        my $filename = $message->head->mime_attr('content-disposition.filename');
+        my $decoder = Encode::find_encoding($message->head->mime_attr('content-type.charset'));
+        return [{
+            content     => $decoder ? $decoder->decode($body->as_string) : $body->as_string,
+            type        => $type,
+            filename    => $filename,
+        }];
 	}
 	my @parts = ();
 	foreach my $part ($message->parts) {
