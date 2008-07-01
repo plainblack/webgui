@@ -5,6 +5,7 @@
  - Replaced CLI gallery import system with a better one.
  - fixed: Flat Discount Coupon: Add to Cart button seems broken
  - fixed: Deleting unProtected user profile fields
+ - fixed: Synopsis doesn't update after editting posts
 
 7.5.14
  - fixed: RSS feeds report modified date instead of create date

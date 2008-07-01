@@ -835,6 +835,8 @@ sub processPropertiesFromFormPost {
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
+    # force the value to be empty so it gets updated properly by content
+    $self->update({synopsis => ($self->session->form->process("synopsis") || "")});
 	if ($self->session->form->process("archive") && $self->getThread->getParent->canModerate) {
 		$self->getThread->archive;
 	} elsif ($self->getThread->get("status") eq "archived") {
