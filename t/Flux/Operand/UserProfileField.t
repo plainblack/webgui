@@ -36,18 +36,18 @@ $user->profileField('lastName', 'Hortensius');
     $rule->addExpression(
         {   operand1     => 'UserProfileField',
             operand1Args => '{"field":  "firstName"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "Quintus"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, }), q{A Roman is among us} );
     $rule->addExpression(
         {   operand1     => 'UserProfileField',
             operand1Args => '{"field":  "lastName"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "Hortensius"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, }), q{An orator no less!} );

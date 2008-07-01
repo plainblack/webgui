@@ -60,9 +60,9 @@ $activity->set( 'groupId', $group->getId() );
     $rule->addExpression( # Add an expression that will fail, kaaboom!
         {   operand1     => 'UserProfileField',
             operand1Args => '{"field":  "firstName"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "Alphonse"}',
-            operator     => 'IsEqualTo',
         }
     );
     is( $session->db->quickScalar(

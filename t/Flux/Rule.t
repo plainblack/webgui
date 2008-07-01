@@ -146,8 +146,8 @@ $session->db->write('delete from fluxRuleUserData');
     # Create Expression
     my $expression = $rule->addExpression(
         {   operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
+            operand2 => 'DUMMY_OPERAND_2',
         }
     );
     isa_ok( $expression, 'WebGUI::Flux::Expression', 'addExpression returns an object' );
@@ -165,14 +165,14 @@ $session->db->write('delete from fluxRuleUserData');
     # Create Expression
     my $expression1 = $rule->addExpression(
         {   operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
+            operand2 => 'DUMMY_OPERAND_2',
         }
     );
     my $expression2 = $rule->addExpression(
         {   operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
+            operand2 => 'DUMMY_OPERAND_2',
         }
     );
     my @expressions = @{ $rule->getExpressions() };
@@ -242,26 +242,26 @@ $session->db->write('delete from fluxRuleUserData');
     $rule1->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
     my $rule2 = WebGUI::Flux::Rule->create($session);
     $rule2->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
     $rule2->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
     is( $session->db->quickScalar('select count(*) from fluxRule'),       2, '2 Rules to delete' );
@@ -338,9 +338,9 @@ $session->db->write('delete from fluxRuleUserData');
     $rule->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{"test value" == "test value"} );
@@ -370,9 +370,9 @@ $session->db->write('delete from fluxRuleUserData');
             operand1Args         => qq[{"value":  "$dbDateTime"}],
             operand1Modifier     => 'DateTimeFormat',
             operand1ModifierArgs => qq[{"pattern": "%x %X", "time_zone": "UTC"}],
+            operator             => 'IsEqualTo',
             operand2             => 'TextValue',
             operand2Args         => '{"value":  "Oct 16, 1984 4:12:47 PM"}',
-            operator             => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{true with two expressions and no cE} );
@@ -391,9 +391,9 @@ $session->db->write('delete from fluxRuleUserData');
     $rule->addExpression(
         {   operand1     => 'NumericValue',
             operand1Args => '{"value":  10}',
+            operator     => 'IsLessThan',
             operand2     => 'NumericValue',
             operand2Args => '{"value":  5}',
-            operator     => 'IsLessThan',
         }
     );
     ok( !$rule->evaluateFor( { user => $user, } ), q{false with no cE bc E3 is false} );
@@ -500,9 +500,9 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     $rule->addExpression( # Add an expression that will fail, kaaboom!
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "apples"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "oranges"}',
-            operator     => 'IsEqualTo',
         }
     );
     $rule->update( { onAccessFirstFalseWorkflowId => $test_workflow->getId() } );

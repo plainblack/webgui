@@ -157,8 +157,8 @@ $session->db->write('delete from fluxExpression');
     # Add a second Expression (to test sequenceNumber)
     my $expression2 = $rule->addExpression(
         {   operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
+            operand2 => 'DUMMY_OPERAND_2',
         }
     );
     is( $expression2->get('sequenceNumber'), 2,           'second sequenceNumber is 2' );
@@ -174,8 +174,8 @@ $session->db->write('delete from fluxExpression');
     my $expression = WebGUI::Flux::Expression->create(
         $rule,
         {   operand1 => 'DUMMY_OPERAND_1',
-            operand2 => 'DUMMY_OPERAND_2',
             operator => 'DUMMY_OPERATOR',
+            operand2 => 'DUMMY_OPERAND_2',
         }
     );
     is( $expression->getId(), $expression->get('fluxExpressionId'), 'getId is a shortcut for ->get' );

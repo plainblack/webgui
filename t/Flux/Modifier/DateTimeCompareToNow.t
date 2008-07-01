@@ -80,9 +80,9 @@ my $rule   = WebGUI::Flux::Rule->create($session);
             operand1Args => qq[{"value":  "$dbDateTime"}],
             operand1Modifier => 'DateTimeCompareToNow',
             operand1ModifierArgs => qq[{ "units": "hours", "time_zone": "user" }],
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => qq[{"value":  "$hours"}],
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{timezone can be specified as 'user'} );

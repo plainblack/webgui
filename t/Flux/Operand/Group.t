@@ -35,9 +35,9 @@ my $groupId = $group->getId();
     $rule->addExpression(
         {   operand1     => 'Group',
             operand1Args => qq[{"groupId":  "$groupId"}],
+            operator     => 'IsEqualTo',
             operand2     => 'TruthValue',
             operand2Args => '{"value":  "1"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( !$rule->evaluateFor( { user => $user, }), q{Mr User is not yet in our group} );

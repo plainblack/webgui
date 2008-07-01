@@ -156,18 +156,18 @@ $session->db->write('delete from fluxExpression');
     $rule1->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
             name         => 'Test First Thing',
         }
     );
     $rule1->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "boring dry everyday value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "super lucky crazy value"}',
-            operator     => 'IsEqualTo',
             name         => 'Test Second Thing',
         }
     );
@@ -178,18 +178,18 @@ $session->db->write('delete from fluxExpression');
     $rule2->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$rule1_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
             name         => 'Check Simple Rule',
         }
     );
     $rule2->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
             name         => 'Test Something Else',
         }
     );
@@ -199,18 +199,18 @@ $session->db->write('delete from fluxExpression');
     $rule3->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$rule1_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
             name         => 'Check Simple Rule',
         }
     );
     $rule3->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$rule2_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
             name         => 'Check Dependent Rule',
         }
     );
@@ -222,11 +222,11 @@ $session->db->write('delete from fluxExpression');
 
     my $rule5 = WebGUI::Flux::Rule->create($session);
     $rule5->addExpression( # This time put the FluxRule into operand2
-        {   operand1     => 'TextValue',
+        {   operand1     => 'TruthValue',
             operand1Args => '{"value":  "1"}',
+            operator     => 'IsEqualTo',
             operand2     => 'FluxRule',
             operand2Args => qq[{"fluxRuleId":  "$rule4_id"}],
-            operator     => 'IsEqualTo',
             name         => 'Check the empty Rule',
         }
     );

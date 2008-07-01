@@ -245,10 +245,13 @@ An expression object's unique id.
 
 sub getExpression {
     my ( $self, $expressionId ) = @_;
-    my $id = ref $self;
+    my $id = id $self;
+    
     if ( !exists $expressionCache{$id}{$expressionId} ) {
         $expressionCache{$id}{$expressionId} = WebGUI::Flux::Expression->new( $self, $expressionId );
-    }
+    } 
+
+#    return WebGUI::Flux::Expression->new( $self, $expressionId );
     return $expressionCache{$id}{$expressionId};
 }
 
@@ -475,7 +478,7 @@ sub evaluateFor {
     if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
         WebGUI::Error::InvalidObject->throw(
             param    => $arg_ref->{user},
-            error    => 'named param missing.',
+            error    => 'need a user.',
             expected => 'WebGUI::User',
             got      => ref $arg_ref->{user},
         );

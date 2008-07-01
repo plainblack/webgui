@@ -66,9 +66,9 @@ my $dbDateTime = WebGUI::DateTime->new( $dt->epoch() )->toDatabase();
     $rule->addExpression(
         {   operand1     => 'DateTime',
             operand1Args => qq[{"value":  "$dbDateTime"}],
+            operator     => 'IsEqualTo',
             operand2     => 'DateTime',
             operand2Args => qq[{"value":  "$dbDateTime"}],
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{"$dbDateTime" == "$dbDateTime"} );
@@ -82,9 +82,9 @@ my $dbDateTime = WebGUI::DateTime->new( $dt->epoch() )->toDatabase();
             operand1Args => qq[{"value":  "$dbDateTime"}],
             operand1Modifier => 'DateTimeFormat',
             operand1ModifierArgs => qq[{"pattern": "%x %X", "time_zone": "UTC"}],
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "Oct 16, 1984 4:12:47 PM"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), 'Got the same UTC time back, formatted differently' );
@@ -93,9 +93,9 @@ my $dbDateTime = WebGUI::DateTime->new( $dt->epoch() )->toDatabase();
             operand1Args => qq[{"value":  "$dbDateTime"}],
             operand1Modifier => 'DateTimeFormat',
             operand1ModifierArgs => qq[{"pattern": "%x %X", "time_zone": "Australia/Melbourne"}],
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "Oct 17, 1984 2:12:47 AM"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), 'Australia/Melbourne 10hrs ahead of UTC' );

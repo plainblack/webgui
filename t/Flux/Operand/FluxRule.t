@@ -37,9 +37,9 @@ my $user = $session->user();
     $simple_rule->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
 
@@ -49,9 +49,9 @@ my $user = $session->user();
     $dependent_rule->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$simple_rule_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
         }
     );
 
@@ -65,9 +65,9 @@ my $user = $session->user();
     $simple_rule->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$dependent_rule_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
         }
     );
     {
@@ -86,9 +86,9 @@ my $user = $session->user();
     $self_circular_rule->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$self_circular_rule_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
         }
     );
     {
@@ -111,9 +111,9 @@ my $user = $session->user();
     $simple_rule->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
 
@@ -123,17 +123,17 @@ my $user = $session->user();
     $dependent_rule->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$simple_rule_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
         }
     );
     $dependent_rule->addExpression(
         {   operand1     => 'FluxRule',
             operand1Args => qq[{"fluxRuleId":  "$simple_rule_id"}],
-            operand2     => 'TextValue',
-            operand2Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
+            operand2     => 'TruthValue',
+            operand2Args => '{"value":  "1"}',
         }
     );
 

@@ -269,7 +269,7 @@ sub evaluateFor {
     if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
         WebGUI::Error::InvalidObject->throw(
             param    => $arg_ref->{user},
-            error    => 'named param missing.',
+            error    => 'need a user.',
             expected => 'WebGUI::User',
             got      => ref $arg_ref->{user},
         );
@@ -277,11 +277,11 @@ sub evaluateFor {
     
     my $session = $arg_ref->{user}->session();
     
-    # Debugging.. (remove later)
-    {
-        my $asset = WebGUI::Asset->new($session, $arg_ref->{assetId});
-        $session->log->info("Getting Flux Result for: " . $asset->getUrl());
-    }
+#    # Debugging.. (remove later)
+#    {
+#        my $asset = WebGUI::Asset->new($session, $arg_ref->{assetId});
+#        $session->log->info("Getting Flux Result for: " . $asset->getUrl());
+#    }
     
     # Instantiate the Flux Rule..
     my $fluxRuleId = $arg_ref->{fluxRuleId};                
@@ -305,7 +305,7 @@ sub evaluateFor {
         $fluxRule->evaluateFor( $arg_ref )
     };
     if (my $e = Exception::Class->caught()) {
-        $session->log->warn($e->error);
+        $session->log->warn('Flux caught an exception, returning 1 - ' . $e->error);
         return 1;
     }
     

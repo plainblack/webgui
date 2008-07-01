@@ -49,9 +49,9 @@ my $user   = $session->user();
     $rule->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "test value"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "test value"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( $rule->evaluateFor( { user => $user, } ), q{"test value" == "test value"} );
@@ -62,9 +62,9 @@ my $user   = $session->user();
     $rule->addExpression(
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "applea"}',
+            operator     => 'IsEqualTo',
             operand2     => 'TextValue',
             operand2Args => '{"value":  "oranges"}',
-            operator     => 'IsEqualTo',
         }
     );
     ok( !$rule->evaluateFor( { user => $user, } ), q{"apples" != "oranges"} );
