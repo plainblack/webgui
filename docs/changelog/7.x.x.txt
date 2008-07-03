@@ -8,6 +8,7 @@
  - fixed: Synopsis doesn't update after editting posts
  - fixed: Mail messages not properly decoded
  - fixed: Style 1, other areas broken due to case sensitivity in uploads
+ - fixed: Wait Until, new approval request workflow not available to add
 
 7.5.14
  - fixed: RSS feeds report modified date instead of create date

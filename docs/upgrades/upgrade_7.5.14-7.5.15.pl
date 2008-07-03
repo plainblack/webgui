@@ -29,9 +29,19 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 removeOldGalleryImport($session);
+addMissingWorkflowActivities($session);
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub addMissingWorkflowActivities {
+    my $session = shift;
+    print "Adding Request Approval and Wait Until workflow activities to config..." unless $quiet;
+    $session->config->addToArray("workflowActivities/WebGUI::VersionTag", "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup");
+    $session->config->addToArray("workflowActivities/WebGUI::VersionTag", "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage");
+    $session->config->addToArray("workflowActivities/WebGUI::VersionTag", "WebGUI::Workflow::Activity::WaitUntil");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub removeOldGalleryImport {
