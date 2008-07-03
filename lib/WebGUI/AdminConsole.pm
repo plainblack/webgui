@@ -392,6 +392,15 @@ sub getAdminFunction {
 			op      => "viewActiveSessions",
             class   => 'WebGUI::Operation::ActiveSessions',
 		},
+		"flux" => {
+			title => {
+				id          => "flux",
+				namespace   => "Flux",
+			},
+			icon    => "flux.gif",
+			url      => $self->session->url->page("flux=admin"),
+            group   => $self->session->setting->get('groupIdAdminFlux'),
+		},
 		"shop" => {
 			title => {
 				id          => "shop",

@@ -2,7 +2,6 @@ package WebGUI::Content::Flux;
 
 use strict;
 
-
 =head1 NAME
 
 Package WebGUI::Content::Flux
@@ -32,37 +31,26 @@ The content handler for this package.
 
 sub handler {
     my ($session) = @_;
-    my $output = undef;
-    my $flux = $session->form->get("flux");
-    return $output unless ($flux);
-    my $function = "www_".$flux;
-    if ($function ne "www_" && (my $sub = __PACKAGE__->can($function))) {
-        $output = $sub->($session);
-    }
-    else {
-        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $function", method=>$function);
-    }
-    return $output;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_admin ()
-
-Hand off to admin processor.
-
-=cut
-
-sub www_admin {
-    my $session = shift;
-    my $output = undef;
-    my $method = "www_". ( $session->form->get("method") || "editSettings");
+    my $output    = undef;
+    
+    # Get the requested action..
+    my $flux      = $session->form->get('flux');
+    return $output 
+        if !$flux;
+    
+    # Construct the www_ method from the action..
+    my $method = 'www_' . ( $flux || 'admin' );
+    
+    # Call the method on the Flux Admin object
     my $admin = WebGUI::Flux::Admin->new($session);
-    if ($admin->can($method)) {
+    if ( $admin->can($method) ) {
         $output = $admin->$method();
     }
     else {
-        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method", method=>$method);
+        WebGUI::Error::MethodNotFound->throw(
+            error  => "Couldn't call non-existant method $method",
+            method => $method
+        );
     }
     return $output;
 }

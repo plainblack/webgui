@@ -70,6 +70,7 @@ private property              => my %property;                # Hash of object p
 private expressionCache       => my %expressionCache;         # (hash) cache of WebGUI::Flux::Expression objects
 readonly evaluatingForUser    => my %evaluatingForUser;       # Set to a WebGUI::User when Rule is being evaluated
 readonly evaluatingForAssetId => my %evaluatingForAssetId;    # Set to an assetId when Rule is being evaluated
+readonly evaluationInfo       => my %evaluationInfo;          # Evaluation info
 public resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
 public unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
 
@@ -246,12 +247,12 @@ An expression object's unique id.
 sub getExpression {
     my ( $self, $expressionId ) = @_;
     my $id = id $self;
-    
+
     if ( !exists $expressionCache{$id}{$expressionId} ) {
         $expressionCache{$id}{$expressionId} = WebGUI::Flux::Expression->new( $self, $expressionId );
-    } 
+    }
 
-#    return WebGUI::Flux::Expression->new( $self, $expressionId );
+    #    return WebGUI::Flux::Expression->new( $self, $expressionId );
     return $expressionCache{$id}{$expressionId};
 }
 
@@ -352,6 +353,7 @@ sub new {
     $property{$id}            = $rule;
     $resolvedRuleCache{$id}   = {};                        # cache initially empty
     $unresolvedRuleCache{$id} = { $ruleId => $ruleId };    # this rule initially unresolved
+    $evaluationInfo{$id}      = {};
 
     return $self;
 }
@@ -452,24 +454,36 @@ A WebGUI::User object corresponding to the user who the Rule is being evaluated 
 
 The assetId of the asset/wobject for which the Rule is being evaluated for (optional) 
 
-=head4 indirect
+=head4 access (optional)
 
-Indicates that this Rule is being evaluated as a result of another Rule
-being evaluated (or some other circumstance) in which case fluxRuleUserData
-fields relating to 'access' should not be set. 
+Indicates that this Rule is being evaluated as a result of the user trying to
+directly perform a wobject action, as opposed to non-access such as a general 
+sweep of the Rules to generate the Flux Graph or a scheduled workflow. 
+This field determines which fluxRuleUserData datetime fields are updated.
+
+Defaults to true.
+
+=head4 recursive (optional)
+
+Indicates that this Rule is being evaluated as part of a recursive call
+by another Rule.
+
+Defaults to false.
  
 =cut
 
 sub evaluateFor {
     my ( $self, $arg_ref ) = @_;
 
-    # Check args
+    # Check args..
     if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
         WebGUI::Error::InvalidNamedParamHashRef->throw(
             param => $arg_ref,
             error => 'invalid named param hash ref.'
         );
     }
+
+    # check compulsory fields..
     foreach my $field qw(user) {
         if ( !exists $arg_ref->{$field} ) {
             WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
@@ -484,15 +498,11 @@ sub evaluateFor {
         );
     }
 
-    # Determine if Rule is being evaluated directly or indirectly..
-    my $is_indirect
-        = ( exists $arg_ref->{indirect} )
-        ? $arg_ref->{indirect}
-        : 0;
+    # Cache $id for speed
+    my $id = id $self;
 
     # Take note of which user we're evaluating the Rule for..
     my $user = $arg_ref->{user};
-    my $id   = id $self;
     $evaluatingForUser{$id} = $user;
 
     # Take note of which asset we're evaluating the Rule for (if set)..
@@ -500,9 +510,21 @@ sub evaluateFor {
         $evaluatingForAssetId{$id} = $arg_ref->{assetId};
     }
 
+    # Take note of whether this is a recursive call or not..
+    $evaluationInfo{$id}{is_recursive}
+        = ( exists $arg_ref->{recursive} )
+        ? $arg_ref->{recursive}
+        : 0;    # defaults to false
+
+    # Take note of whether this is wobject access or not..
+    $evaluationInfo{$id}{is_access}
+        = ( exists $arg_ref->{access} )
+        ? $arg_ref->{access}
+        : 1;    # defaults to true
+
     # Rule with no expressions defaults to true
     if ( $self->getExpressionCount() == 0 ) {
-        return $self->_finishEvaluating( 1, $is_indirect );
+        return $self->_finishEvaluating( 1, $id );
     }
 
     # Check if we can apply the sticky optimisation..
@@ -515,7 +537,7 @@ sub evaluateFor {
         if ($dateRuleFirstTrue) {
             WebGUI::Error::NotImplemented->throw( error => 'STICKY OPTIMISATION NOT TESTED YET.' );
 
-            return $self->_finishEvaluating( 1, $is_indirect );
+            return $self->_finishEvaluating( 1, $id );
         }
     }
 
@@ -559,6 +581,7 @@ by setting the environment variable: LIST_MOREUTILS_PP
             $was_successful = eval("($parsed_combined_expression)");
         }
         if ( my $e = Exception::Class->caught() ) {
+            $self->resetEvaluationInfo($id);
             $e->rethrow() if ref $e;            # Re-throw Exception::Class errors for other code to catch
         }
         if ($EVAL_ERROR) {
@@ -571,41 +594,72 @@ by setting the environment variable: LIST_MOREUTILS_PP
     }
 
     # We've finished evaluating now
-    return $self->_finishEvaluating( $was_successful, $is_indirect );
+    return $self->_finishEvaluating( $was_successful, $id );
 }
 
 #-------------------------------------------------------------------
 
-=head2 _finishEvaluating ( user )
+=head2 _finishEvaluating ( result id )
 
 Clean up after evaluating (update fluxRuleUserData table and
 reset caches).
 
-=head3 was_successful
+=head3 result
 
 The boolean status of the Rule evaluation
 
-=head3 is_indirect
+head3 id
 
-Whether Rule evaluation was direct/indirect 
+value of "id $self" (optimisation)
  
 =cut
 
 sub _finishEvaluating {
-    my ( $self, $was_successful, $is_indirect ) = @_;
+    my ( $self, $result, $id ) = @_;
 
-    # Update the fluxRuleUserData table
-    $self->_updateDataAndTriggerWorkflows( $was_successful, $is_indirect );
-
-    my $id = id $self;
-    delete $evaluatingForUser{$id};
-    delete $evaluatingForAssetId{$id};
-    if ( !$is_indirect ) {
-        $resolvedRuleCache{$id} = {};
-        $unresolvedRuleCache{$id} = { $self->getId() => $self->getId() };
+    # Check arguments..
+    if ( @_ != 3 ) {
+        WebGUI::Error::InvalidParamCount->throw(
+            got      => scalar(@_),
+            expected => 3,
+            error    => 'invalid param count',
+        );
     }
 
-    return $was_successful;
+    # Update the fluxRuleUserData table
+    $self->_updateDataAndTriggerWorkflows( $result, $id );
+
+    # Clear evaluation-data
+    $self->resetEvaluationInfo($id);
+
+    return $result;
+}
+
+sub resetEvaluationInfo {
+    my ( $self, $id ) = @_;
+
+    delete $evaluatingForUser{$id};
+    delete $evaluatingForAssetId{$id};
+
+    # We clean up a lot more if this is a non-recursive evaluation so
+    # that Rule is returned to a pristine state
+    # N.B. This is bad for performance if people want to evaluate the same
+    # rule twice, but that shouldn't really happen in a single request, and it
+    # leads to weird behaviour of rules if they are modified between
+    # evaluations (caches get stale).
+    my $is_recursive = $evaluationInfo{$id}{is_recursive};
+    if ( !$is_recursive ) {
+
+        # Reset the resolved/unresolved Rule Caches too..
+        my $rule_id = $self->getId();
+        $resolvedRuleCache{$id} = {};
+        $unresolvedRuleCache{$id} = { $rule_id => $rule_id };
+
+        # And reset the depth counter..
+        use WebGUI::Flux::Operand::FluxRule;
+        WebGUI::Flux::Operand::FluxRule->resetDepthCounter();
+    }
+    $evaluationInfo{$id} = {};
 }
 
 #-------------------------------------------------------------------
@@ -694,7 +748,7 @@ sub _parseCombinedExpression {
 
 #-------------------------------------------------------------------
 
-=head2 _updateDataAndTriggerWorkflows ( )
+=head2 _updateDataAndTriggerWorkflows ( result, id )
 
 Updates the rule/user row in the fluxRuleUserData table after a Rule is
 evaluated. Uses the boolean outcome of the Rule (was_successful) and a
@@ -704,18 +758,18 @@ dateAccessFirstTrue, etc..).
 
 Also triggers any related Workflows.
 
-=head3 was_successful
+=head3 result
 
 The boolean status of the Rule evaluation
 
-=head3 is_indirect
+=head3 id
 
-Whether Rule evaluation was direct/indirect 
+value of "id $self" (optimisation)
 
 =cut
 
 sub _updateDataAndTriggerWorkflows {
-    my ( $self, $was_successful, $is_indirect ) = @_;
+    my ( $self, $result, $id ) = @_;
 
     # Check arguments..
     if ( @_ != 3 ) {
@@ -726,8 +780,10 @@ sub _updateDataAndTriggerWorkflows {
         );
     }
 
+    my $is_access = $evaluationInfo{$id}{is_access};
+
     # Check for entry in fluxRuleUserData table
-    my $user     = $evaluatingForUser{ id $self};
+    my $user     = $evaluatingForUser{$id};
     my %userData = %{
         $self->session->db->quickHashRef( 'select * from fluxRuleUserData where fluxRuleId=? and userId=?',
             [ $self->getId(), $user->userId() ] )
@@ -737,9 +793,9 @@ sub _updateDataAndTriggerWorkflows {
     my $dt = WebGUI::DateTime->new(time)->toDatabase();
 
     # Along the way, keep track of..
-    my $db_write_required = 0;    # whether we need to write to the db
-    my %field_updates;            # what fields need to be updated
-    my %trigger_workflow;         # what workflows need to be triggered
+    my $db_write_required = 0;                 # whether we need to write to the db
+    my %field_updates;                         # what fields need to be updated
+    my %trigger_workflow;                      # what workflows need to be triggered
 
     # Has rule ever been checked for this user?
     if ( !exists $userData{fluxRuleUserDataId} ) {
@@ -753,43 +809,43 @@ sub _updateDataAndTriggerWorkflows {
     }
 
     # First time Rule true or false?
-    if ( !exists $userData{dateRuleFirstTrue} && $was_successful ) {
+    if ( !exists $userData{dateRuleFirstTrue} && $result ) {
         $db_write_required                = 1;
         $field_updates{dateRuleFirstTrue} = $dt;
         $trigger_workflow{RuleFirstTrue}  = 1;
     }
-    if ( !exists $userData{dateRuleFirstFalse} && !$was_successful ) {
+    if ( !exists $userData{dateRuleFirstFalse} && !$result ) {
         $db_write_required                 = 1;
         $field_updates{dateRuleFirstFalse} = $dt;
         $trigger_workflow{RuleFirstFalse}  = 1;
     }
 
     # Direct access attempt?
-    if ( !$is_indirect && $was_successful ) {
+    if ( $is_access && $result ) {
         $db_write_required                         = 1;
         $field_updates{dateAccessMostRecentlyTrue} = $dt;
         $trigger_workflow{AccessTrue}              = 1;
     }
-    if ( !$is_indirect && !$was_successful ) {
+    if ( $is_access && !$result ) {
         $db_write_required                          = 1;
         $field_updates{dateAccessMostRecentlyFalse} = $dt;
         $trigger_workflow{AccessFalse}              = 1;
     }
 
     # First direct access attempt?
-    if ( !exists $userData{dateAccessFirstAttempted} && !$is_indirect ) {
+    if ( !exists $userData{dateAccessFirstAttempted} && $is_access ) {
         $db_write_required = 1;
         $field_updates{dateAccessFirstAttempted} = $dt;
     }
 
     # First time direct access true/false?
-    if ( !$is_indirect ) {
-        if ( !exists $userData{dateAccessFirstTrue} && $was_successful ) {
+    if ($is_access) {
+        if ( !exists $userData{dateAccessFirstTrue} && $result ) {
             $db_write_required                  = 1;
             $field_updates{dateAccessFirstTrue} = $dt;
             $trigger_workflow{AccessFirstTrue}  = 1;
         }
-        if ( !exists $userData{dateAccessFirstFalse} && !$was_successful ) {
+        if ( !exists $userData{dateAccessFirstFalse} && !$result ) {
             $db_write_required                   = 1;
             $field_updates{dateAccessFirstFalse} = $dt;
             $trigger_workflow{AccessFirstFalse}  = 1;
@@ -805,13 +861,12 @@ sub _updateDataAndTriggerWorkflows {
     foreach my $w ( keys %trigger_workflow ) {
         my $full_workflow_name = 'on' . $w . 'WorkflowId';
         if ( my $workflowId = $self->get($full_workflow_name) ) {
-
             my $workflow = WebGUI::Workflow::Instance->create(
                 $self->session,
                 {   workflowId => $workflowId,
                     className  => "WebGUI::User",
                     methodName => "new",
-                    parameters => $evaluatingForUser{ id $self}->userId(),
+                    parameters => $evaluatingForUser{$id}->userId(),
                 }
             );
             $workflow->start();

@@ -84,7 +84,7 @@ sub execute {
             # be smart and return a cached result if it's user-independent 
             $rule->evaluateFor(
                 {   user     => $user,
-                    indirect => 1
+                    access => 0,
                 }
             );
         }

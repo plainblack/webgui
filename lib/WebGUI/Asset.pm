@@ -284,7 +284,7 @@ sub canView {
     }
     
     # See if we should delegate to Flux..
-    if ($self->get('fluxEnabled')) {
+    if ($self->get('fluxEnabled') && $self->session->setting->get('fluxEnabled')) {
         return WebGUI::Flux->evaluateFor({
             user => $user, 
             assetId => $self->getId(), 
@@ -447,21 +447,21 @@ sub definition {
 					    label=>'Enable Flux',
 					    hoverHelp=>'Enable Flux',
 					    uiLevel=>6,
-                        fieldType=>'yesNo',
+					    fieldType       => ($session->setting->get("fluxEnabled") ? 'yesNo' : 'hidden'),
                     },
                     fluxRuleIdView=>{
 					    tab=>"security",
 					    label=>'Who Can View (Flux Rule)',
 					    hoverHelp=>'Who Can View (Flux Rule)',
 					    uiLevel=>6,
-                        fieldType=>'fluxRule',
+                        fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
                     },
                     fluxRuleIdEdit=>{
 					    tab=>"security",
 					    label=>'Who Can Edit (Flux Rule)',
 					    hoverHelp=>'Who Can Edit (Flux Rule)',
 					    uiLevel=>6,
-                        fieldType=>'fluxRule',
+                        fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
                     },
                     synopsis=>{
 					    tab=>"meta",

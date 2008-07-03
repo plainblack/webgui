@@ -5,19 +5,16 @@
 # Output from my dev machine:
 #
 #    [Benchmarks]
-#                Rate f_deep f_complex f_combined f_group f_fluxrule f_dt group f_profile f_text
-#    f_deep     161/s     --      -25%       -25%    -47%       -62% -72%  -74%      -79%   -80%
-#    f_complex  216/s    34%        --        -0%    -29%       -50% -62%  -64%      -72%   -73%
-#    f_combined 216/s    34%        0%         --    -29%       -50% -62%  -64%      -72%   -73%
-#    f_group    304/s    89%       41%        41%      --       -29% -47%  -50%      -60%   -62%
-#    f_fluxrule 430/s   167%       99%        99%     41%         -- -25%  -29%      -44%   -46%
-#    f_dt       575/s   257%      166%       166%     89%        34%   --   -6%      -25%   -27%
-#    group      609/s   278%      182%       182%    100%        42%   6%    --      -20%   -23%
-#    f_profile  765/s   375%      254%       254%    152%        78%  33%   26%        --    -3%
-#    f_text     790/s   390%      266%       265%    160%        84%  37%   30%        3%     --
-#
-# For profiling use a command like:
-#    FLUX_PROFILING=1 perl -d:Profile t/Flux/benchmark.pl && less prof.out
+#                 Rate f_complex f_deep f_combined f_group f_fluxrule f_dt group f_profile f_text
+#    f_complex  28.3/s        --   -54%       -87%    -91%       -93% -95%  -95%      -96%   -97%
+#    f_deep     61.5/s      117%     --       -72%    -81%       -84% -90%  -90%      -92%   -93%
+#    f_combined  220/s      676%   257%         --    -32%       -42% -63%  -64%      -73%   -73%
+#    f_group     322/s     1039%   424%        47%      --       -15% -46%  -48%      -60%   -61%
+#    f_fluxrule  378/s     1235%   514%        72%     17%         -- -37%  -39%      -53%   -54%
+#    f_dt        595/s     2005%   868%       171%     85%        58%   --   -3%      -26%   -28%
+#    group       616/s     2079%   902%       181%     91%        63%   4%    --      -23%   -25%
+#    f_profile   801/s     2732%  1203%       265%    149%       112%  35%   30%        --    -3%
+#    f_text      824/s     2812%  1239%       275%    156%       118%  38%   34%        3%     --
 #
 #
 use strict;
@@ -36,7 +33,6 @@ use Benchmark qw( cmpthese );
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
-$session->config->set( "disableCache", 1 );
 
 #----------------------------------------------------------------------------
 
@@ -53,7 +49,9 @@ $versionTag->set( { name => 'Flux Benchmark Test' } );
 # Note that we need to use 'our' package variables because the Benchmark module does string evals
 
 # Create a test asset
+$session->user( { userId => 3 } );
 our $article1 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article1->update( { title => 'Test Article 1', description => 'Test Article 1 Content..' } );
 our $article1_id = $article1->getId();
 
 # Create a test User and group
@@ -63,23 +61,6 @@ our $group   = WebGUI::Group->new( $session, 'new' );
 our $groupId = $group->getId();
 $user->addToGroups( [$groupId] );
 $user->profileField( 'firstName', 'George' );
-
-#---------------------------------
-if ( $ENV{FLUX_PROFILING} ) {
-    print "[Profiling]\n";
-
-    our $deep_rule_id = create_combined( create_combined( create_combined() ) )->getId();
-    my $second_deep_rule_id = create_combined( create_combined( create_combined() ) )->getId();
-    our $complex_rule_id
-        = expr_fluxrule( expr_fluxrule( create_rule(), $deep_rule_id ), $second_deep_rule_id )->getId();
-
-    WebGUI::Flux->generateGraph($session);
-
-    for my $i ( 1 .. 1000 ) {
-        WebGUI::Flux->evaluateFor( { user => $user, fluxRuleId => $complex_rule_id, assetId => $article1_id } );
-    }
-    exit;
-}
 
 #---------------------------------
 print "[Benchmarks]\n";
@@ -97,25 +78,140 @@ our $complex_rule_id
 
 WebGUI::Flux->generateGraph($session);
 
+# Disable cache for these benchmarks
+$session->config->set( "disableCache", 1 );
+#cmpthese(
+#    -10,
+#    {   group => '$user->isInGroup($groupId)',
+#        f_group =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $group_rule_id, assetId=> $article1_id})',
+#        f_text =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $text_rule_id, assetId=> $article1_id})',
+#        f_dt =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $datetime_rule_id, assetId=> $article1_id})',
+#        f_profile =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $profile_rule_id, assetId=> $article1_id})',
+#        f_fluxrule =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $fluxrule_rule_id, assetId=> $article1_id})',
+#        f_combined =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $combined_rule_id, assetId=> $article1_id})',
+#        f_deep =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $deep_rule_id, assetId=> $article1_id})',
+#        f_complex =>
+#            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $complex_rule_id, assetId=> $article1_id})',
+#    }
+#);
+
+# Benchmark Requests
+use WWW::Mechanize;
+our $m = new WWW::Mechanize( autocheck => 0 );
+
+# Login as admin
+$m->get('http://dev.localhost.localdomain?op=auth;method=init');
+$m->form_number(0);
+$m->field( username   => 'admin' );
+$m->field( identifier => '123qwe' );
+$m->submit();
+
+# Set working version
+$m->get( '/?op=setWorkingVersionTag;tagId=' . $versionTag->getId() );
+
+#$m->get( $article1->getUrl() );
+#print $m->content();
+
+$article1->update(
+    {   groupIdView => $groupId,
+        ownerUserId => 1,          # don't want this to be our user otherwise canView will short-circuit
+    }
+);
+our $article1_url = $article1->getUrl();
+
+# Article 2 - $group_rule_id
+my $article2 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article2->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $group_rule_id,
+    }
+);
+our $article2_url = $article2->getUrl();
+
+# Article 3 - $text_rule_id
+my $article3 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article3->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $text_rule_id,
+    }
+);
+our $article3_url = $article3->getUrl();
+
+# Article 4 - $datetime_rule_id
+my $article4 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article4->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $datetime_rule_id,
+    }
+);
+our $article4_url = $article4->getUrl();
+
+# Article 5 - $profile_rule_id
+my $article5 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article5->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $profile_rule_id,
+    }
+);
+our $article5_url = $article5->getUrl();
+
+# Article 6 - $fluxrule_rule_id
+my $article6 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article6->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $fluxrule_rule_id,
+    }
+);
+our $article6_url = $article6->getUrl();
+
+# Article 7 - $combined_rule_id
+my $article7 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article7->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $combined_rule_id,
+    }
+);
+our $article7_url = $article7->getUrl();
+
+# Article 8 - $deep_rule_id
+my $article8 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article8->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $deep_rule_id,
+    }
+);
+our $article8_url = $article8->getUrl();
+
+# Article 9 - $complex_rule_id
+my $article9 = $node->addChild( { className => 'WebGUI::Asset::Wobject::Article' } );
+$article9->update(
+    {   fluxEnabled    => 1,
+        fluxRuleIdView => $complex_rule_id,
+    }
+);
+our $article9_url = $article9->getUrl();
+
+# Re-enable cache for these benchmarks (requires wre restart to take effect)
+$session->config->set( "disableCache", 1 );
 cmpthese(
-    -1,
-    {   group => '$user->isInGroup($groupId)',
-        f_group =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $group_rule_id, assetId=> $article1_id})',
-        f_text =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $text_rule_id, assetId=> $article1_id})',
-        f_dt =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $datetime_rule_id, assetId=> $article1_id})',
-        f_profile =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $profile_rule_id, assetId=> $article1_id})',
-        f_fluxrule =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $fluxrule_rule_id, assetId=> $article1_id})',
-        f_combined =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $combined_rule_id, assetId=> $article1_id})',
-        f_deep =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $deep_rule_id, assetId=> $article1_id})',
-        f_complex =>
-            'WebGUI::Flux->evaluateFor({user => $user, fluxRuleId => $complex_rule_id, assetId=> $article1_id})',
+    300,
+    {   group      => '$m->get($article1_url)',
+        f_group    => '$m->get($article2_url)',
+        f_text     => '$m->get($article3_url)',
+        f_dt       => '$m->get($article4_url)',
+        f_profile  => '$m->get($article5_url)',
+        f_fluxrule => '$m->get($article6_url)',
+        f_combined => '$m->get($article7_url)',
+        f_deep     => '$m->get($article8_url)',
+        f_complex  => '$m->get($article9_url)',
+
     }
 );
 

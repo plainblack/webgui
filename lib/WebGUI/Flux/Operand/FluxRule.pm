@@ -68,13 +68,18 @@ sub evaluate {
 
     $_depth_counter++;
     my $was_successful = $requestedRule->evaluateFor(
-        { user => $thisRule->evaluatingForUser(), indirect => 1, assetId => $thisRule->evaluatingForAssetId() } );
+        { user => $thisRule->evaluatingForUser(), access => 0, recursive => 1, assetId => $thisRule->evaluatingForAssetId() } );
 
     # Requested Rule is now resolved..
     delete $unresolvedRuleCache_ref->{$requestedFluxRuleId};    # so remove it from unresolved cache
     $resolvedRuleCache_ref->{$requestedFluxRuleId} = $was_successful;    # .. and add to resolved cache
 
     return $was_successful;
+}
+
+#-------------------------------------------------------------------
+sub resetDepthCounter {
+    $_depth_counter = 0;
 }
 
 #-------------------------------------------------------------------
