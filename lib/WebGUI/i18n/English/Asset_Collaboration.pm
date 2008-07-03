@@ -1081,7 +1081,7 @@ our $I18N = {
         },
 
         'approval workflow' => {
-                message => q|Approval Workflow|,
+                message => q|Post Workflow|,
                 lastUpdated => 0,
         },
 
