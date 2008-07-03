@@ -48,7 +48,7 @@ Package that makes creating tab-based forms simple through an object-oriented AP
 
  $tabform = WebGUI::TabForm->new($self->session,\%tabs);
 
- $tabform->hidden($name, $value);
+ $tabform->hidden({name => $name, value => $value});
  $tabform->submit(\%params);
 
  $html = $tabform->print;
