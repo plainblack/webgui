@@ -136,7 +136,7 @@ sub generateGraph {
     }
 
     # Create the GraphViz object used to generate the image
-    my $g = GraphViz->new( bgcolor => 'beige', fontsize => 10 );
+    my $g = GraphViz->new( bgcolor => 'white', fontsize => 10 );
     Readonly my $PATH => $session->config->get("uploadsPath") . '/FluxGraph.png';
 
     # Generate the image by iterating over all defined Rules..
@@ -180,9 +180,9 @@ sub generateGraph {
                             [
                             $rule->getId() => $dependendRuleId,
                             taillabel      => 'e' . $e->get('sequenceNumber') . '    ',
-                            labelfontcolor => 'brown',
+                            labelfontcolor => 'CornflowerBlue',
                             labelfontsize  => $FONTSIZE,
-                            color          => 'brown'
+                            color          => 'CornflowerBlue'
                             ];
                     }
                 }
@@ -207,8 +207,8 @@ sub generateGraph {
             fontsize  => $FONTSIZE,
             shape     => 'ellipse',
             style     => 'filled',
-            color     => 'chocolate',
-            fillcolor => 'burlywood',
+            color     => 'CornflowerBlue',
+            fillcolor => 'LightBlue',
         );
 
     }

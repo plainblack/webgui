@@ -75,13 +75,13 @@ public resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of 
 public unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
 
 # Default values used in create() method
-Readonly my %RULE_DEFAULTS => (
+Readonly my %FIELD_DEFAULTS => (
     name   => 'Undefined',
     sticky => 0,
 );
 
 # Properties/db fields that can be updated via update() method
-Readonly my @MUTABLE_PROPERTIES => qw(
+Readonly my @MUTABLE_FIELDS => qw(
     name                        sticky
     onRuleFirstTrueWorkflowId   onRuleFirstFalseWorkflowId
     onAccessFirstTrueWorkflowId onAccessFirstFalseWorkflowId
@@ -166,7 +166,7 @@ sub create {
 
     # Create a bare-minimum entry in the db..
     my $id = $session->db->setRow( 'fluxRule', 'fluxRuleId',
-        { %RULE_DEFAULTS, fluxRuleId => 'new', sequenceNumber => $sequenceNumber } );
+        { %FIELD_DEFAULTS, fluxRuleId => 'new', sequenceNumber => $sequenceNumber } );
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $rule = $class->new( $session, $id );
@@ -230,6 +230,31 @@ sub get {
     }
     my %copyOfHashRef = %{ $property{ id $self} };
     return \%copyOfHashRef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getMutableFields ( )
+
+Returns the list of mutable fields
+
+=cut
+
+sub getMutableFields {
+    return @MUTABLE_FIELDS;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFieldDefaults ( )
+
+Returns the hash of field default values
+
+=cut
+
+sub getFieldDefaults {
+    return %FIELD_DEFAULTS;
 }
 
 #-------------------------------------------------------------------
@@ -429,7 +454,7 @@ sub update {
     }
 
     my $id = id $self;
-    foreach my $field (@MUTABLE_PROPERTIES) {
+    foreach my $field (@MUTABLE_FIELDS) {
         $property{$id}{$field}
             = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
     }

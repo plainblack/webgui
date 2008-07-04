@@ -63,10 +63,10 @@ readonly rule    => my %rule;
 private property => my %property;
 
 # Default values used in create() method
-Readonly my %EXPRESSION_DEFAULTS => ( name => 'Undefined', );
+Readonly my %FIELD_DEFAULTS => ( name => 'Undefined', );
 
 # Properties/db fields that can be updated via update() method
-Readonly my @MUTABLE_PROPERTIES => qw(
+Readonly my @MUTABLE_FIELDS => qw(
     name
     operand1             operand1Args
     operand1AssetId
@@ -126,7 +126,7 @@ sub create {
     }
     foreach my $field qw(operand1 operand2 operator) {
         if ( !exists $properties_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing: ' . $field );
         }
     }
 
@@ -140,7 +140,7 @@ sub create {
     my $id = $rule->session->db->setRow(
         'fluxExpression',
         'fluxExpressionId',
-        {   %EXPRESSION_DEFAULTS,
+        {   %FIELD_DEFAULTS,
             fluxExpressionId => 'new',
             fluxRuleId       => $rule->getId(),
             sequenceNumber   => $sequenceNumber
@@ -192,6 +192,31 @@ sub get {
     }
     my %copyOfHashRef = %{ $property{ id $self} };
     return \%copyOfHashRef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getMutableFields ( )
+
+Returns the list of mutable fields
+
+=cut
+
+sub getMutableFields {
+    return @MUTABLE_FIELDS;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getFieldDefaults ( )
+
+Returns the hash of field default values
+
+=cut
+
+sub getFieldDefaults {
+    return %FIELD_DEFAULTS;
 }
 
 #-------------------------------------------------------------------
@@ -347,7 +372,7 @@ sub update {
     $self->rule->resetCombinedExpression();
 
     my $id = id $self;
-    foreach my $field (@MUTABLE_PROPERTIES) {
+    foreach my $field (@MUTABLE_FIELDS) {
         $property{$id}{$field}
             = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
     }
