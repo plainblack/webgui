@@ -204,7 +204,7 @@ A reference to the current session.
 =head3 namespace
 
 Specify the namespace to build the list for.  If no namespace is specified,
-then  an empty hash reference will be returned.
+then an empty hash reference will be returned.
 
 =head3 clause
 
