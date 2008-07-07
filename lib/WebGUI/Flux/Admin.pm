@@ -228,7 +228,8 @@ sub www_graph {
     WebGUI::Flux->generateGraph( $self->session );
 
     # Return a simple hard-coded page displaying the Flux Graph.
-    my $graph = qq{<img src="/uploads/FluxGraph.png">};
+    my $img = $self->session->url->gateway('uploads/FluxGraph.png');
+    my $graph = qq{<img src="$img">};
 
     return $ac->render( $graph, 'Flux Graph' );
 }

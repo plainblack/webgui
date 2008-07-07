@@ -24,7 +24,7 @@ sub evaluate {
     my $a = $self->operand1();
     my $b = $self->operand2();
     
-    return $a =~ /\Q$b\E/;    
+    return $a =~ /\Q$b\E/i;    
 }
 
 1;

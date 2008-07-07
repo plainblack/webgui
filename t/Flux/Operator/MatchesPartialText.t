@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 4;
+plan tests => 6;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -28,13 +28,11 @@ plan tests => 4;
 use_ok('WebGUI::Flux::Operator');
 my $rule   = WebGUI::Flux::Rule->create($session);
 {
-    # Numeric operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => '23', operand2 => 23} ), q{'23' matches partial text 23} );    
-
-    # String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'def'} ), q{'abcdef' matches partial text  'def'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'xyz'} ), q{'abcdef' does not match partial text 'xyz'} );
-
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'def'} ), 'Matches at the end of the string' );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'abc'} ), 'Matches at the start of the string' );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'cde'} ), 'Matches in the middle of the string' );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'CdE'} ), 'Case-insensitive' );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'MatchesPartialText', {rule => $rule, operand1 => 'abc.[]!@#$%^&*()def', operand2 => '.[]!@#$%^&*()'} ), 'Meta-chars are ok' );
 }
 
 #----------------------------------------------------------------------------
