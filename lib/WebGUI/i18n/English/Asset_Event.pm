@@ -576,7 +576,7 @@ be useful, others may not.|,
         message     => q{Location},
         lastUpdated => 1204668000,
     },
-    'description' => {
+    'description label' => {
         message     => q{Description},
         lastUpdated => 1204668000,
     },

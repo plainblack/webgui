@@ -243,6 +243,18 @@ Thanks,
         lastUpdated => 1193193904,
     },
 
+    'subject' => {
+        message     => q{Subject},
+        lastUpdated => 1215395668,
+        context     => q|Label for the manage friends template|,
+    },
+
+    'message' => {
+        message     => q{Message},
+        lastUpdated => 1215395674,
+        context     => q|Label for the manage friends template|,
+    },
+
     'sendMessageButton' => {
         message     => q{HTML code for a button to send an email to selected Friends.},
         lastUpdated => 1193193904,
