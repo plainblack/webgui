@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 13;
+plan tests => 4;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -30,26 +30,14 @@ my $rule   = WebGUI::Flux::Rule->create($session);
 {
 
     # Numeric operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => 23} ), q{23 == 23} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => 66} ), q{23 == 66} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => 23} ), q{23 does not contain 23} );
+  
 
     # String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 'a', operand2 => 'a'} ), q{'a' == 'a'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 'a', operand2 => 'az'} ), q{'a' == 'az'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 'abcdef', operand2 => 'wxyz'} ), q{'abcdef' does not contain 'wxyz'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 'sazf', operand2 => 'az'} ), q{'a' does contain 'az'} );
 
-    # Mixed Numeric/String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => '23'} ), q{23 == '23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => '24'} ), q{23 == '23'} );
 
-    # Whitespace that should be automatically trimmed
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => '23 '} ), q{23 == '23 '} );
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 == ' 23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => '24 '} ), q{23 == '24 '} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => ' 24'} ), q{23 == ' 24'} );
-
-    # Garbage strings
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => '23abc'} ), q{23 == '23abc'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'DoesNotMatchPartialText', {rule => $rule, operand1 => 23, operand2 => 'abc23'} ), q{23 == 'abc23'} );
 }
 
 #----------------------------------------------------------------------------

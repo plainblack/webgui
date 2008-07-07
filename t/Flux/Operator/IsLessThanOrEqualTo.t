@@ -1,4 +1,4 @@
-# Tests WebGUI::Flux::Operator::IsEqualTo
+# Tests WebGUI::Flux::Operator::IsLessThanOrEqualTo
 #
 #
 
@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 13;
+plan tests => 12;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -30,26 +30,25 @@ my $rule   = WebGUI::Flux::Rule->create($session);
 {
 
     # Numeric operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => 23} ), q{23 == 23} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => 66} ), q{23 == 66} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 21, operand2 => 23} ), q{21 <= 23} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 123, operand2 => 66} ), q{123 <= 66} );
 
     # String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'a'} ), q{'a' == 'a'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'az'} ), q{'a' == 'az'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'a'} ), q{'a' <= 'a'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 'z', operand2 => 'a'} ), q{'z' <= 'a'} );
 
     # Mixed Numeric/String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => '23'} ), q{23 == '23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => '24'} ), q{23 == '23'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 23, operand2 => '123'} ), q{23 <= '123'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 28, operand2 => '24'} ), q{28 <= '24'} );
 
     # Whitespace that should be automatically trimmed
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => '23 '} ), q{23 == '23 '} );
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 == ' 23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => '24 '} ), q{23 == '24 '} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 24'} ), q{23 == ' 24'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 23, operand2 => '23 '} ), q{23 <= '23 '} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 <= ' 23'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 28, operand2 => '24 '} ), q{28 <= '24 '} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 28, operand2 => ' 24'} ), q{28 <= ' 24'} );
 
     # Garbage strings
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => '23abc'} ), q{23 == '23abc'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 23, operand2 => 'abc23'} ), q{23 == 'abc23'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThanOrEqualTo', {rule => $rule, operand1 => 23, operand2 => '19abc'} ), q{23 <= '19abc'} );    
 }
 
 #----------------------------------------------------------------------------

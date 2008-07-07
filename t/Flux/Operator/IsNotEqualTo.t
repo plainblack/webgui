@@ -30,26 +30,26 @@ my $rule   = WebGUI::Flux::Rule->create($session);
 {
 
     # Numeric operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => 23} ), q{23 == 23} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => 66} ), q{23 == 66} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 24, operand2 => 23} ), q{24 != 23} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => 23} ), q{23 != 23} );
 
     # String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'a'} ), q{'a' == 'a'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'az'} ), q{'a' == 'az'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'b'} ), q{'a' != 'b'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 'a', operand2 => 'a'} ), q{'a' != 'a'} );
 
     # Mixed Numeric/String operands
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23'} ), q{23 == '23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '24'} ), q{23 == '23'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '24'} ), q{23 != '24'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23'} ), q{23 != '23'} );
 
     # Whitespace that should be automatically trimmed
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23 '} ), q{23 == '23 '} );
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 == ' 23'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '24 '} ), q{23 == '24 '} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 24'} ), q{23 == ' 24'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '24 '} ), q{23 != '24 '} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 24'} ), q{23 != ' 24'} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23 '} ), q{23 != '23 '} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 != ' 23'} );
 
     # Garbage strings
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23abc'} ), q{23 == '23abc'} );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => 'abc23'} ), q{23 == 'abc23'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => '23abc'} ), q{23 != '23abc'} );
+    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsNotEqualTo', {rule => $rule, operand1 => 23, operand2 => 'abc23'} ), q{23 != 'abc23'} );
 }
 
 #----------------------------------------------------------------------------

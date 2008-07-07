@@ -24,12 +24,7 @@ sub evaluate {
     my $a = $self->operand1();
     my $b = $self->operand2();
     
-    if ( looks_like_number($a) && looks_like_number($b) ) {
-        return 0;
-    }
-    else {
-        return $a =~ /$b/;
-    }
+    return $a =~ /\Q$b\E/;    
 }
 
 1;
