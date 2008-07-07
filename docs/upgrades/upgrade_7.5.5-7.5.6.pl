@@ -39,6 +39,7 @@ finish($session); # this line required
 sub convertCacheToBinary {
     my $session = shift;
     print "\tConverting database cache to binary data.\n" unless ($quiet);
+    $session->db->write('DELETE FROM `cache`');
     $session->db->write('ALTER TABLE `cache` MODIFY COLUMN `content` mediumblob');
     $session->db->write('DELETE FROM `cache`');
 }
