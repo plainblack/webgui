@@ -1,4 +1,4 @@
-package WebGUI::Flux::Operator::IsLessThan;
+package WebGUI::Flux::Operator::IsGreaterThan;
 use strict;
 use warnings;
 
@@ -7,11 +7,11 @@ use Scalar::Util qw(looks_like_number);
 
 =head1 NAME
 
-Package WebGUI::Flux::Operator::IsEqualTo
+Package WebGUI::Flux::Operator::IsGreaterThan
 
 =head1 DESCRIPTION
 
-Less than operator ('<' for numbers, 'lt' for strings).
+Greater than operator ('>' for numbers, 'gt' for strings).
 
 See WebGUI::Flux::Operator base class for more information.
 
@@ -26,10 +26,10 @@ sub evaluate {
     my $b = $self->operand2();
     
     if ( looks_like_number($a) && looks_like_number($b) ) {
-        return $a < $b;
+        return $a > $b;
     }
     else {
-        return $a lt $b;
+        return $a gt $b;
     }
 }
 
