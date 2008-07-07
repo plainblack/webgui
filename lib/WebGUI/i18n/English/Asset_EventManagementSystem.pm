@@ -411,8 +411,8 @@ our $I18N = {
 	},
 	
 	'token instructions help' => {
-		message 	=> q|Give the user some help on what to do with a ribbon.|,
-		lastUpdated	=> 0,
+		message 	=> q|Give the user some help on what to do with a token.|,
+		lastUpdated	=> 1215445816,
 		context		=> q|help for a property label|,
 	},
 	
