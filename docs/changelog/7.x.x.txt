@@ -1,5 +1,6 @@
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
+ - fixed: More permissive DSN checking to allow use of SQLite (thanks pathma)
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)

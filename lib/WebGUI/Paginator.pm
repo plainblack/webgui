@@ -103,7 +103,6 @@ sub _setDataByQuery {
 		$sth = $dbh->read($sql,$placeholders);
 	}
 	my $defaultPageNumber = $self->getPageNumber;
-	$self->{_totalRows} = $sth->rows;
 	$self->{_columnNames} = [ $sth->getColumnNames ];  
 	my $pageCount = 1;
 	while (my $data = $sth->hashRef) {
@@ -125,6 +124,7 @@ sub _setDataByQuery {
 			}
 		}
 	}
+	$self->{_totalRows} = $sth->rows;
 	$sth->finish;
 	$self->{_rowRef} = \@row;
     #Purposely do not set $self->{_setByQuery} = 1 so the data is processed appropriately
