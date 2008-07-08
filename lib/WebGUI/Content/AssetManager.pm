@@ -326,48 +326,46 @@ sub www_manage {
     my $i18n            = WebGUI::International->new( $session, "Asset" );
 
     ### Do Action
-    if ( my $action = $session->form->get( 'action' ) ) {
-        my @assetIds    = $session->form->get( 'assetId' );
+    my @assetIds    = $session->form->get( 'assetId' );
 
-        if ( $action eq "update" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                my $rank        = $session->form->get( $assetId . '_rank' );
-                next unless $rank; # There's no such thing as zero
+    if ( $session->form->get( 'action_update' ) ) {
+        for my $assetId ( @assetIds ) {
+            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+            next unless $asset;
+            my $rank        = $session->form->get( $assetId . '_rank' );
+            next unless $rank; # There's no such thing as zero
 
-                $asset->setRank( $rank );
-            }
+            $asset->setRank( $rank );
         }
-        elsif ( $action eq "trash" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                $asset->trash;
-            }
+    }
+    elsif ( $session->form->get( 'action_delete' ) ) {
+        for my $assetId ( @assetIds ) {
+            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+            next unless $asset;
+            $asset->trash;
         }
-        elsif ( $action eq "cut" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                $asset->cut;
-            }
+    }
+    elsif ( $session->form->get( 'action_cut' ) ) {
+        for my $assetId ( @assetIds ) {
+            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+            next unless $asset;
+            $asset->cut;
         }
-        elsif ( $action eq "copy" ) {
-            for my $assetId ( @assetIds ) {
-                # Copy == Duplicate + Cut
-		my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId);
-                my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-                $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
-                $newAsset->cut;
-            }
+    }
+    elsif ( $session->form->get( 'action_copy' ) ) {
+        for my $assetId ( @assetIds ) {
+            # Copy == Duplicate + Cut
+            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId);
+            my $newAsset    = $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
+            $newAsset->update( { title => $newAsset->getTitle . ' (copy)' } );
+            $newAsset->cut;
         }
-        elsif ( $action eq "duplicate" ) {
-            for my $assetId ( @assetIds ) {
-                my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-                next unless $asset;
-                $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
-            }
+    }
+    elsif ( $session->form->get( 'action_duplicate' ) ) {
+        for my $assetId ( @assetIds ) {
+            my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+            next unless $asset;
+            $asset->duplicate( { skipAutoCommitWorkflows => 1 } );
         }
     }
 
@@ -420,11 +418,11 @@ ENDHTML
                     . q{<div id="dataTableContainer">}
                     . q{</div>} 
                     . q{<p class="actions">} . $i18n->get( 'with selected' )
-                    . q{<button name="action" value="update">} . $i18n->get( "update" ) . q{</button>}
-                    . q{<button name="action" value="trash">} . $i18n->get( "delete" ) . q{</button>}
-                    . q{<button name="action" value="cut">} . $i18n->get( 'cut' ) . q{</button>}
-                    . q{<button name="action" value="copy">} . $i18n->get( "copy" ) . q{</button>}
-                    . q{<button name="action" value="duplicate">} . $i18n->get( "duplicate" ) . q{</button>}
+                    . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" />}
+                    . q{<input type="submit" name="action_delete" value="} . $i18n->get( "delete" ) . q{" onclick="return confirm('} . $i18n->get( 43 ) . q{')" />}
+                    . q{<input type="submit" name="action_cut" value="} . $i18n->get( 'cut' ) . q{" />}
+                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "copy" ) . q{" />}
+                    . q{<input type="submit" name="action_duplicate" value="} . $i18n->get( "duplicate" ) . q{" />}
                     . q{</p>}
                     . q{</form>}
                     . q{<div id="pagination"> } 
