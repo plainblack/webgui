@@ -6,6 +6,8 @@
  - fixed: Syndicated Content doesn't always decode text properly
  - fixed: Syndicated Content caches improperly
  - added File::Path 2.04 as a prerequisite
+ - fixed: Asset Manager shows data error when no child assets to display
+ - changed: show 25 items per page in asset manager
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)

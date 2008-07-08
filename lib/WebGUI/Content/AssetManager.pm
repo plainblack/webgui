@@ -2,7 +2,7 @@ package WebGUI::Content::AssetManager;
 
 use strict;
 
-use JSON qw( from_json to_json );
+use JSON qw( decode_json encode_json );
 use URI;
 use WebGUI::Form;
 use WebGUI::Paginator;
@@ -221,7 +221,7 @@ sub getMoreMenu {
         };
     }
 
-    return to_json \@more_fields;
+    return encode_json \@more_fields;
 }
 
 #----------------------------------------------------------------------------
@@ -271,7 +271,7 @@ formatted in a WebGUI.AssetManager data table.
 sub www_ajaxGetManagerPage {
     my $session         = shift;
     my $i18n            = WebGUI::International->new( $session, "Asset" );
-    my $assetInfo       = {};
+    my $assetInfo       = { assets => [] };
     my $p               = getManagerPaginator( $session );
 
     for my $assetId ( @{ $p->getPageData } ) {
@@ -307,7 +307,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
     $session->http->setMimeType( 'application/json' );
-    return to_json( $assetInfo );
+    return encode_json( $assetInfo );
 }
 
 #----------------------------------------------------------------------------
@@ -406,7 +406,7 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s')">%s</a></li>},
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s'); return false;">%s</a></li>},
             $currentAsset->getUrl,
             $currentAsset->get( "menuTitle" ),
             ;
