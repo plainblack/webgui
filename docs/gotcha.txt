@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.16
+--------------------------------------------------------------------
+ * You need the following Perl Modules installed before you upgrade:
+    File::Path
+
+
 7.5.13
 --------------------------------------------------------------------
  * RSSFromParent now uses the parent asset's canView method to 
@@ -30,10 +36,10 @@ save you many hours of grief.
 7.5.11
 --------------------------------------------------------------------
  * You need the following new Perl Modules installed before you upgrade:
-	Archive::Any
-	Exception::Class
-	Path::Class
-	Image::ExifTool
+    Archive::Any
+    Exception::Class
+    Path::Class
+    Image::ExifTool
     List::MoreUtils
 
  * SQL Form is no longer part of the official distribution of WebGUI,

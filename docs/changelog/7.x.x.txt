@@ -5,6 +5,7 @@
  - fixed: Project manager modal dialog doesn't work in some instances.
  - fixed: Syndicated Content doesn't always decode text properly
  - fixed: Syndicated Content caches improperly
+ - added File::Path 2.04 as a prerequisite
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)
