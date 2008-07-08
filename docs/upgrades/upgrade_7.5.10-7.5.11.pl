@@ -829,6 +829,7 @@ sub convertTransactionLog {
                 $status = 'NotShipped' if $status eq 'NotSent';
                 $db->setRow("transactionItem","itemId",{
                     itemId                  => "new",
+                    assetId                 => $oldItem->{itemId},
                     transactionId           => $oldItem->{transactionId},
                     configuredTitle         => $oldItem->{itemName},
                     options                 => '{}',
@@ -838,7 +839,7 @@ sub convertTransactionLog {
                     quantity                => $oldItem->{quantity},
                     price                   => $oldItem->{amount},
                     vendorId                => "defaultvendor000000000",
-                    }, $oldItem->{itemId});
+                    });
             }
     }
     $db->write("drop table oldtransaction");

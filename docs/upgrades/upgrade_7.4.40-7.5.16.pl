@@ -942,6 +942,7 @@ sub convertTransactionLog {
                 $status = 'NotShipped' if $status eq 'NotSent';
                 $db->setRow("transactionItem","itemId",{
                     itemId                  => "new",
+                    assetId                 => $oldItem->{itemId},
                     transactionId           => $oldItem->{transactionId},
                     configuredTitle         => $oldItem->{itemName},
                     options                 => '{}',
@@ -951,7 +952,7 @@ sub convertTransactionLog {
                     quantity                => $oldItem->{quantity},
                     price                   => $oldItem->{amount},
                     vendorId                => "defaultvendor000000000",
-                    }, $oldItem->{itemId});
+                    });
             }
     }
     my $driverId = $db->quickScalar("select paymentGatewayId from paymentGateway where className='WebGUI::Shop::PayDriver::ITransact'");
