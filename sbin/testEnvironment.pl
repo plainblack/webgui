@@ -47,10 +47,10 @@ printResult($webguiRoot);
 ###################################
 
 printTest("Perl Interpreter");
-if ($] >= 5.006) {
+if ($] >= 5.008) {
 	printResult("OK");
 } else {
-	failAndExit("Please upgrade to 5.6 or later! Cannot continue without Perl 5.6 or higher.");
+	failAndExit("Please upgrade to 5.8 or later! Cannot continue without Perl 5.8 or higher.");
 }
 
 
