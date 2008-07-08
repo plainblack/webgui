@@ -7,421 +7,529 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|workflow activity title|,
 	},
-	
+
 	'item expiration time' => {
 		message 	=> q|Item Expiration Time|,
 		lastUpdated	=> 0,
 		context		=> q|a workflow activity field label|,
 	},
-	
+
 	'item expiration time help' => {
 		message 	=> q|How long should EMS items be allowed to sit in a cart before they are expired to be freed up for someone else to purchase?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a workflow activity field label|,
 	},
-		
+
 	'user' => {
 		message 	=> q|User|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'badge number' => {
 		message 	=> q|Badge #|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'percentage discount' => {
 		message 	=> q|Percentage Discount|,
 		lastUpdated	=> 0,
 		context		=> q|a ribbon property label|,
 	},
-	
+
 	'percentage discount help' => {
 		message 	=> q|What percentage discount will be applied to the tickets if the user purchases this ribbon?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a ribbon property label|,
 	},
-		
+
 	'badge group name' => {
 		message 	=> q|Badge Group Name|,
 		lastUpdated	=> 0,
 		context		=> q|a badge group property label|,
 	},
-	
+
 	'badge group name help' => {
 		message 	=> q|This name will be used to refer to all the badges in this group, together.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a badge group property label|,
 	},
-		
+
 	'badge groups' => {
 		message 	=> q|Badge Groups|,
 		lastUpdated	=> 0,
 		context		=> q|a header label|,
 	},
-	
+
 	'hours' => {
 		message 	=> q|Hours|,
 		lastUpdated	=> 0,
 		context		=> q|subtext for the duration form field|,
 	},
-	
+
 	'add a badge group' => {
 		message 	=> q|Add A Badge Group|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add an event meta field' => {
 		message 	=> q|Add An Event Meta Field|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'view tickets' => {
 		message 	=> q|View Tickets|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'view badges' => {
 		message 	=> q|View Badges|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'buy badge' => {
 		message 	=> q|Buy A Badge|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'switch to badge for' => {
 		message 	=> q|Switch To '%s' Badge|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'lookup badge' => {
 		message 	=> q|Look Up A Badge|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'remove' => {
 		message 	=> q|Remove|,
 		lastUpdated	=> 0,
 		context		=> q|a link label, as in "remove from cart"|,
 	},
-	
+
 	'import' => {
 		message 	=> q|Import|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'export' => {
 		message 	=> q|Export|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'meta fields' => {
 		message 	=> q|Meta Fields|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add a badge' => {
 		message 	=> q|Add a badge|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add a token' => {
 		message 	=> q|Add a token|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add a ticket' => {
 		message 	=> q|Add a ticket|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add a ribbon' => {
 		message 	=> q|Add a ribbon|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'sold out' => {
 		message 	=> q|Sold Out|,
 		lastUpdated	=> 0,
 		context		=> q|a message telling the user there are none left to buy|,
 	},
-	
+
 	'manage' => {
 		message 	=> q|Manage|,
 		lastUpdated	=> 0,
 		context		=> q|a column label in the badge builder|,
 	},
-	
+
 	'quantity available' => {
 		message 	=> q|# Available|,
 		lastUpdated	=> 0,
 		context		=> q|a column label in the badge builder|,
 	},
-	
+
 	'buy' => {
 		message 	=> q|Buy|,
 		lastUpdated	=> 0,
 		context		=> q|a button label in the badge builder|,
 	},
-	
+
 	'delete' => {
 		message 	=> q|Delete|,
 		lastUpdated	=> 0,
 		context		=> q|a button label in the badge builder|,
 	},
-	
+
 	'edit' => {
 		message 	=> q|Edit|,
 		lastUpdated	=> 0,
 		context		=> q|a button label in the badge builder|,
 	},
-	
+
 	'search' => {
 		message 	=> q|Search|,
 		lastUpdated	=> 0,
 		context		=> q|a button label in the badge builder|,
 	},
-	
+
 	'tickets' => {
 		message 	=> q|Tickets|,
 		lastUpdated	=> 0,
 		context		=> q|a template label a tab in the badge builder|,
 	},
-	
+
 	'ribbons' => {
 		message 	=> q|Ribbons|,
 		lastUpdated	=> 0,
 		context		=> q|a template label a tab in the badge builder|,
 	},
-	
+
 	'tokens' => {
 		message 	=> q|Tokens|,
 		lastUpdated	=> 0,
 		context		=> q|a template label a tab in the badge builder|,
 	},
-	
+
 	'lookup registrant template' => {
 		message 	=> q|Lookup Registrant Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'lookup registrant template help' => {
 		message 	=> q|Which template would you like to use for the lookup registrant screen?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'print badge template' => {
 		message 	=> q|Print Badge Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'print badge template help' => {
 		message 	=> q|Which template would you like to use for printing badges?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'print ticket template' => {
 		message 	=> q|Print Ticket Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'print ticket template help' => {
 		message 	=> q|Which template would you like to use for printing tickets?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'badge builder template' => {
 		message 	=> q|Badge Builder Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'badge builder template help' => {
 		message 	=> q|Which template would you like to use for the badge builder screen?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
+	'addTicketUrl' => {
+		message 	=> q|The URL to add a ticket to a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'addRibbonUrl' => {
+		message 	=> q|The URL to add a ribbon to a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'addTokenUrl' => {
+		message 	=> q|The URL to add a token to a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'importTicketsUrl' => {
+		message 	=> q|The URL to import tickets.  Currently not implemented.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'exportTicketsUrl' => {
+		message 	=> q|The URL to export tickets.  Currently not implemented.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'getTicketsUrl' => {
+		message 	=> q|The URL to get ticket information as JSON.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'getRibbonsUrl' => {
+		message 	=> q|The URL to get ribbon information as JSON.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'getTokensUrl' => {
+		message 	=> q|The URL to get token information as JSON.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'hasBadge' => {
+		message 	=> q|A conditional that shows whether or not the current user has a badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'badgeId' => {
+		message 	=> q|The ID of the current user's badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'whichTab' => {
+		message 	=> q|The currently selected tab in the badge builder screen.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'url' => {
+		message 	=> q|The URL to this Event Management System.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'viewCartUrl' => {
+		message 	=> q|A URL to take the user to the View Cart screen.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'customRequestUrl' => {
+		message 	=> q|A URL for the YUI to lookup information about the current badge.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'manageEventMetaFieldsUrl' => {
+		message 	=> q|The URL to the Manage Event Metadata screen.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'otherBadgesInCart' => {
+		message 	=> q|A loop containing links and labels for other badges that are in this user's cart.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'badgeUrl' => {
+		message 	=> q|The URL another badge in the user's cart.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
+	'badgeLabel' => {
+		message 	=> q|An internationalized, personalized label to go with this other badge in the user's cart.|,
+		lastUpdated	=> 0,
+		context		=> q|badge builder template variable|,
+	},
+
 	'main template' => {
 		message 	=> q|Main Template|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'main template help' => {
 		message 	=> q|Which template would you like to use for the main screen that lists the badges for purchase?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'location' => {
 		message 	=> q|Location|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'location help' => {
 		message 	=> q|In what room or location will this event be held?|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'event number' => {
 		message 	=> q|Event #|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'event number help' => {
 		message 	=> q|A number that represents the event, which is easily referenceable for things like event catalogs.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-		
+
 	'badge instructions' => {
 		message 	=> q|Badge Instructions|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'badge instructions help' => {
 		message 	=> q|Give the user some help on what to do with a badge.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'default badge instructions' => {
 		message 	=> q|You need a badge to attend this convention. Choose a badge that meets your needs and budget.|,
 		lastUpdated	=> 0,
 		context		=> q|the default value for a property|,
 	},
-	
+
 	'ticket instructions' => {
 		message 	=> q|Ticket Instructions|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'ticket instructions help' => {
 		message 	=> q|Give the user some help on what to do with a ticket.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'default ticket instructions' => {
 		message 	=> q|Tickets allow you to reserve a seat at events that are going on at the convention. Add tickets to your badge for any events you plan to attend.|,
 		lastUpdated	=> 0,
 		context		=> q|the default value for a property|,
 	},
-	
+
 	'ribbon instructions' => {
 		message 	=> q|Ribbon Instructions|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'print' => {
 		message 	=> q|Print|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'checked in' => {
 		message 	=> q|Checked In|,
 		lastUpdated	=> 0,
 		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
 	},
-	
+
 	'not checked in' => {
 		message 	=> q|Not Checked In|,
 		lastUpdated	=> 0,
 		context		=> q|used in registration management to alert staff whether user has already picked up badge|,
 	},
-	
+
 	'mark as not checked in' => {
 		message 	=> q|Mark As Not Checked In|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'mark as checked in' => {
 		message 	=> q|Mark As Checked In|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'refund' => {
 		message 	=> q|Refund|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'add more items' => {
 		message 	=> q|Add More Items|,
 		lastUpdated	=> 0,
 		context		=> q|a link label|,
 	},
-	
+
 	'notes' => {
 		message 	=> q|Notes|,
 		lastUpdated	=> 0,
 		context		=> q|a property label for registrant notes|,
 	},
-	
+
 	'ribbon instructions help' => {
 		message 	=> q|Give the user some help on what to do with a ribbon.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'default ribbon instructions' => {
 		message 	=> q|Ribbons give you discounts on a group of related events. You may add one ore more ribbons to your badge to give you discounts on related events.|,
 		lastUpdated	=> 0,
 		context		=> q|the default value for a property|,
 	},
-	
+
 	'token instructions' => {
 		message 	=> q|Token Instructions|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'token instructions help' => {
 		message 	=> q|Give the user some help on what to do with a token.|,
 		lastUpdated	=> 1215445816,
 		context		=> q|help for a property label|,
 	},
-	
+
 	'default token instructions' => {
 		message 	=> q|Tokens are like convention currency. They allow you to purchase events and other items without buying a specific ticket.|,
 		lastUpdated	=> 0,
 		context		=> q|the default value for a property|,
 	},
-	
+
 	'assetName' => {
 		message 	=> q|Event Manager|,
 		lastUpdated => 1211045812,
@@ -474,31 +582,31 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|used in an error message|,
 	},
-	
+
 	'email address' => {
 		message 	=> q|Email Address|,
 		lastUpdated	=> 0,
 		context		=> q|form label|,
 	},
-	
+
 	'organization' => {
 		message 	=> q|Organization|,
 		lastUpdated	=> 0,
 		context		=> q|form label for company/school/etc|,
 	},
-	
+
 	'badge holder information' => {
 		message 	=> q|Badge Holder Information|,
 		lastUpdated	=> 0,
 		context		=> q|heading on add badge to cart screen|,
 	},
-	
+
 	'add to cart' => {
 		message 	=> q|Add To Cart|,
 		lastUpdated	=> 0,
 		context		=> q|a button on the add badge to cart screen|,
 	},
-	
+
 	'populate from address book' => {
 		message 	=> q|Populate From Address Book|,
 		lastUpdated	=> 0,
@@ -510,49 +618,49 @@ our $I18N = {
 		lastUpdated	=> 0,
 		context		=> q|an ems property label|,
 	},
-	
+
 	'registration staff group help' => {
 		message 	=> q|Pick a group of users that will handle registration. These users will be able to look up and manage badge registrations for any attendee.|,
 		lastUpdated	=> 0,
 		context		=> q|help for an ems property label|,
 	},
-	
+
 	'related badge groups' => {
 		message 	=> q|Related Badge Groups|,
 		lastUpdated	=> 0,
 		context		=> q|a ticket property label|,
 	},
-	
+
 	'related badge groups ticket help' => {
 		message 	=> q|Check the badge groups that can act as a prerequisite to being able to attend this event. If none are checked, then any badge will do.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a ticket property label|,
 	},
-	
+
 	'related badge groups badge help' => {
 		message 	=> q|Check the badge groups that related to this badge, so that tickets can be assigned prerequisite badges.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a ticket property label|,
 	},
-	
+
 	'related ribbons' => {
 		message 	=> q|Related Ribbons|,
 		lastUpdated	=> 0,
 		context		=> q|a ribbon ticket label|,
 	},
-	
+
 	'related ribbons help' => {
 		message 	=> q|Check the ribbons that can provide a discount for this ticket.|,
 		lastUpdated	=> 0,
 		context		=> q|help for a ticket property label|,
 	},
-	
+
 	'time zone' => {
 		message 	=> q|Time Zone|,
 		lastUpdated	=> 0,
 		context		=> q|a property label|,
 	},
-	
+
 	'time zone help' => {
 		message 	=> q|Select the time zone that this event will be taking place in.|,
 		lastUpdated	=> 0,
@@ -588,8 +696,6 @@ our $I18N = {
 		lastUpdated => 0,
 		context 	=> q|hover help for duration field|
 	},
-
-
 
 	'cancel registration' => {
 		message => q|Cancel Registration|,
@@ -637,7 +743,7 @@ our $I18N = {
 		lastUpdated => 1138312761,
 		context		=> q|field label|,
 	},
-	
+
 	'price help' => {
 		message		=> q|How much do you want to charge for this item?|,
 		lastUpdated	=> 0,
@@ -654,7 +760,7 @@ our $I18N = {
 		lastUpdated => 1213318055,
 		context		=> q|field label|,
 	},
-	
+
 	'price help' => {
 		message		=> q|How much do you want to charge for this item?|,
 		lastUpdated	=> 0,
@@ -884,74 +990,49 @@ our $I18N = {
 		lastUpdated => 1142362439,
 	},
 
-	'template help title' => {
-		message => q|Event Management System Template Variables|,
-		lastUpdated => 1140465899,
+	'main template help title' => {
+		message => q|Event Management System Main Template|,
+		lastUpdated => 1215212860,
 	},
 
-	'checkout.url' => {
-		message => q|A URL to take the user the screen that displays the contents of the shopping cart.|,
-		lastUpdated => 1165517333,
+	'main template help body' => {
+		message => q|This template uses YUI to do most of the display work.  Please change the CSS in order to make display or style changes.|,
+		lastUpdated => 1215212860,
 	},
 
-	'checkout.label' => {
-		message => q|A label to go with checkout.url.  The internationalized word "Checkout".|,
-		lastUpdated => 1149828278,
+	'addBadgeUrl' => {
+		message => q|URL to add a badge to the system.|,
+		lastUpdated => 1215213297,
 	},
 
-	'events_loop' => {
-		message => q|This loop contains all events that have been approved so that users can register.|,
-		lastUpdated => 1149828278,
+	'buildBadgeUrl' => {
+		message => q|URL to display information about the current badge.|,
+		lastUpdated => 1215213340,
 	},
 
-	'tmplVar event' => {
-		message => q|The information for one event that has been processed by its own event template.|,
-		lastUpdated => 1149828278,
+	'manageBadgeGroupsUrl' => {
+		message => q|URL to display a list of badge groups.|,
+		lastUpdated => 1215213347,
 	},
 
-	'paginateBar' => {
-		message => q|A bar to help the user page through sets of Events if several pages of Events exist.|,
-		lastUpdated => 1149828278,
+	'getBadgesUrl' => {
+		message => q|URL to return badge information as JSON for the YUI datatable.|,
+		lastUpdated => 1215212860,
 	},
 
-	'Pagination variables' => {
-		message => q|Common pagination template variables.|,
-		lastUpdated => 1149828278,
+	'canEdit' => {
+		message => q|A conditional indicating whether or not the current user can edit the Event Management System.|,
+		lastUpdated => 1215213833,
 	},
 
-	'canManageEvents' => {
-		message => q|A flag to indicate if the current user is allowed to Manage Events.|,
-		lastUpdated => 1149829190,
-	},
-
-	'manageEvents.url' => {
-		message => q|A URL to take the user to the screen where Events can be managed (i.e. added, approved, deleted)|,
-		lastUpdated => 1149828278,
-	},
-
-	'manageEvents.label' => {
-		message => q|An internationalized label to display to the user the link for managing events.|,
-		lastUpdated => 1165511492,
-	},
-
-	'managePurchases.url' => {
-		message => q|A URL to take the user to the screen where purchases can be managed (i.e. added, approved, deleted)|,
-		lastUpdated => 1149828278,
-	},
-
-	'managePurchases.label' => {
-		message => q|An internationalized label to display to the user the link for managing purchases.|,
-		lastUpdated => 1165511507,
+	'lookupRegistrantUrl' => {
+		message => q|URL to get information about the badges for the current user, or for all users if the current user is part of the registration staff.|,
+		lastUpdated => 1215213901,
 	},
 
 	'event template help title' => {
 		message => q|Event Management System Event Template|,
 		lastUpdated => 1140465899,
-	},
-
-	'title' => {
-		message => q|The title of this event.|,
-		lastUpdated => 1149828404,
 	},
 
 	'short title' => {
@@ -964,80 +1045,8 @@ our $I18N = {
 		lastUpdated => 1165513731,
 	},
 
-	'description' => {
-		message => q|The description of this event.|,
-		lastUpdated => 1149828404,
-	},
-
 	'image' => {
 		message => q|The image assigned to represent this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'tmplVar price' => {
-		message => q|The price of this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'tmplVar sku' => {
-		message => q|The SKU for this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'tmplVar sku template' => {
-		message => q|The SKU templates used to generate the SKU for this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'tmplVar weight' => {
-		message => q|The weight associated with materials for this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'numberRegistered' => {
-		message => q|The number of people currently registered for this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'maximumAttendees' => {
-		message => q|The number of people allowed to attend this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'seatsRemaining' => {
-		message => q|The number of available seats remaining for this event.|,
-		lastUpdated => 1149828404,
-	},
-
-	'eventIsFull' => {
-		message => q|A boolean that is true if there are no available seats remaining in this event.|,
-		lastUpdated => 1165517259,
-	},
-
-	'eventIsApproved' => {
-		message => q|A boolean that is true if the event has been approved.|,
-		lastUpdated => 1149828404,
-	},
-
-	'startDate.human' => {
-		message => q|The date and time this event starts, in human readable format.|,
-		lastUpdated => 1149828404,
-	},
-
-	'endDate.human' => {
-		message => q|The date and time this event ends, in human readable format.|,
-		lastUpdated => 1149828404,
-	},
-
-	'purchase.label' => {
-		message => q|An internationalized label to display to the user the link for purchasing this event.
-If the event is full, the label will be "Sold out".|,
-		lastUpdated => 1149828404,
-	},
-
-	'purchase.url' => {
-		message => q|A URL for the user to register for this event and add it to their shopping cart.
-If the event is full, the url will be blank.|,
 		lastUpdated => 1149828404,
 	},
 
@@ -1065,118 +1074,6 @@ If the event is full, this variable will be blank.|,
 		lastUpdated => 1149828404,
 	},
 
-	'manage purchases template help title' => {
-		message => q|EMS Manage Purchases Template|,
-		lastUpdated => 1140465899,
-	},
-
-	'purchasesLoop' => {
-		message => q|This loop contains all events that have been approved so that users can view their purchases.|,
-		lastUpdated => 1149828546,
-	},
-
-	'purchaseUrl' => {
-		message => q|A link to view the details of this purchase.|,
-		lastUpdated => 1149828546,
-	},
-
-	'datePurchasedHuman' => {
-		message => q|The date and time this purchase was started in a human readable format.|,
-		lastUpdated => 1149828546,
-	},
-
-	'managePurchasesTitle' => {
-		message => q|An internationalized label to title this screen.|,
-		lastUpdated => 1149828546,
-	},
-
-	'view purchase template help title' => {
-		message => q|EMS View Purchases Template|,
-		lastUpdated => 1140465899,
-	},
-
-	'purchasesLoop' => {
-		message => q|This loop contains all registrations that are included in this purchase.|,
-		lastUpdated => 1149828601,
-	},
-
-	'regLoop' => {
-		message => q|This loop contains all events that are included in this registration.|,
-		lastUpdated => 1149828601,
-	},
-
-	'startDateHuman' => {
-		message => q|The start date in a human readable format for this event.|,
-		lastUpdated => 1149828601,
-	},
-
-	'startDateHuman' => {
-		message => q|The start date in a human readable format for this event.|,
-		lastUpdated => 1149828601,
-	},
-
-	'endDateHuman' => {
-		message => q|The end date in a human readable format for this event.|,
-		lastUpdated => 1149828601,
-	},
-
-	'startDate' => {
-		message => q|This event's start date and time in epoch format.|,
-		lastUpdated => 1149828601,
-	},
-
-	'endDateHuman' => {
-		message => q|This event's end date and time in epoch format.|,
-		lastUpdated => 1149828601,
-	},
-
-	'registrationId' => {
-		message => q|The user's registration Id for this event.|,
-		lastUpdated => 1165511539,
-	},
-
-	'templateId' => {
-		message => q|The template used to style this event if it is to be displayed.|,
-		lastUpdated => 1149828601,
-	},
-
-	'returned' => {
-		message => q|A boolean that will be 1 if this event has been returned by the user.|,
-		lastUpdated => 1149828601,
-	},
-
-	'tmplVar approved' => {
-		message => q|A boolean that will be 1 if this event has been approved.|,
-		lastUpdated => 1149828601,
-	},
-
-	'templateId' => {
-		message => q|The template used to style this event if it is to be displayed.|,
-		lastUpdated => 1149828601,
-	},
-
-	'userId' => {
-		message => q|The Id of the user set to use this badge.|,
-		lastUpdated => 1149828601,
-	},
-
-	'createdByUserId' => {
-		message => q|The Id of the user who created this badge.|,
-		lastUpdated => 1149828601,
-	},
-
-	'canReturnItinerary' => {
-		message => q|A boolean indicating whether or not this event can be returned.|,
-		lastUpdated => 1149828601,
-	},
-
-	'canAddEvents' => {
-		message => q|A boolean indicating whether or not the current user is allowed to add events.  Admins, the owner
-of the transaction, the user who created the registration or the user who the registration is
-for are allowed to add events.|,
-		lastUpdated => 1149828601,
-	},
-
 	'canReturnTransaction' => {
 		message => q|A boolean that is true if any purchase can be returned.|,
 		lastUpdated => 1149828601,
@@ -1187,151 +1084,9 @@ for are allowed to add events.|,
 		lastUpdated => 1149828601,
 	},
 
-	'canReturn' => {
-		message => q|A boolean indicating if the current user may return events in the purchase.  Users who can add events 
-fall into this group.|,
-		lastUpdated => 1149828601,
-	},
-
 	'transactionId' => {
 		message => q|The unique identifier for this transaction in the database.|,
 		lastUpdated => 1149828601,
-	},
-
-	'appUrl' => {
-		message => q|A URL back to the main screen of the Asset.|,
-		lastUpdated => 1149828601,
-	},
-
-	'search template help title' => {
-		message => q|EMS Search Template|,
-		lastUpdated => 1140465899,
-	},
-
-	'calendarJS' => {
-		message => q|Script tag to set up the javascript calendar picker.|,
-		lastUpdated => 1149828900,
-	},
-
-	'basicSearch.formHeader' => {
-		message => q|Form header for a basic search.|,
-		lastUpdated => 1149828900,
-	},
-
-	'advSearch.formHeader' => {
-		message => q|Form header for an advanced search.|,
-		lastUpdated => 1149828900,
-	},
-
-	'isAdvSearch' => {
-		message => q|Boolean indicating if an advanced search form has been requested.|,
-		lastUpdated => 1149828900,
-	},
-
-	'search.formFooter' => {
-		message => q|Form footer code for either type of search.|,
-		lastUpdated => 1149828900,
-	},
-
-	'search.formSubmit' => {
-		message => q|A button to submit the user's search data.  The button will contain the internationalized word "Filter".|,
-		lastUpdated => 1149828900,
-	},
-
-	'endDate' => {
-		message => q|The date and time this event ends, in epoch format.|,
-		lastUpdated => 1149828900,
-	},
-
-	'productId' => {
-		message => q|The unique identifier for this product.|,
-		lastUpdated => 1149828900,
-	},
-
-	'manageToolbar' => {
-		message => q|Code for an toolbar with icons to delete, edit and reorder events.|,
-		lastUpdated => 1149828900,
-	},
-
-	'noSearchDialog' => {
-		message => q|A boolean that indicates if the user has requested that no search dialog be presented
-by setting the "hide" form variable.|,
-		lastUpdated => 1149828900,
-	},
-
-	'addEvent.url' => {
-		message => q|A URL to take the user to the screen to add a new event.|,
-		lastUpdated => 1149828900,
-	},
-
-	'addEvent.label' => {
-		message => q|An internationalized label to display to the user the link for adding an event.|,
-		lastUpdated => 1165511512,
-	},
-
-	'message' => {
-		message => q|Messages from the system about the number and type of results being displayed.|,
-		lastUpdated => 1149828900,
-	},
-
-	'numberOfSearchResults' => {
-		message => q|The number of results returned by the current search.|,
-		lastUpdated => 1149828900,
-	},
-
-	'continue.url' => {
-		message => q|A url to add this event to the cart.|,
-		lastUpdated => 1149828900,
-	},
-
-	'continue.label' => {
-		message => q|The internationalized label, "Continue" to go with continue.url.|,
-		lastUpdated => 1149828900,
-	},
-
-	'name.label' => {
-		message => q|The internationalized label, "Event".|,
-		lastUpdated => 1149828900,
-	},
-
-	'starts.label' => {
-		message => q|The internationalized label, "Starts".|,
-		lastUpdated => 1149828900,
-	},
-
-	'ends.label' => {
-		message => q|The internationalized label, "Ends".|,
-		lastUpdated => 1149828900,
-	},
-
-	'price.label' => {
-		message => q|The internationalized label, "Price".|,
-		lastUpdated => 1149828900,
-	},
-
-	'seats.label' => {
-		message => q|The internationalized label, "Seats".|,
-		lastUpdated => 1149828900,
-	},
-
-	'addToBadgeMessage' => {
-		message => q|A message from the system if a badge was successfully added to this transaction.|,
-		lastUpdated => 1149828900,
-	},
-
-	'search.filters.options' => {
-		message => q|Javascript for a search interface for Events based on their properties and metadata.|,
-		lastUpdated => 1149828900,
-	},
-
-	'search.data.url' => {
-		message => q|The URL to this Asset.|,
-		lastUpdated => 1149828900,
-	},
-
-	'ems.wobject.dir' => {
-		message => q|The URL the EventManagementSystem area in the WebGUI Extras directory.|,
-		lastUpdated => 1149828900,
 	},
 
 	'add/edit event template' => {
@@ -1879,28 +1634,6 @@ added to the user's cart and would be discounted if the Attend All Sessions even
                 message => q|Are you sure you want to delete this item from your cart?  Any changes you have made to the current badge you are editing will also be lost.|,
                 lastUpdated => 1147108858,
         },
-	
-	'checkout template help title' => {
-		message => q|EMS Checkout Template|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar isError' => {
-		message => q|This template variable is used inside of a tmpl_if statement and returns true if there is a processing error with a badge holders registration information.  This variable is only checked when the <b>registration</b> template variable is true.
-			    |,
-		lastUpdated => 0,
-	},
-
-	'tmplVar error' => {
-		message => q|Contains an internationalized error message informing the user that certain fields cannot be blank.  The field name returned inside this error message is the internationalized label for the field that was left blank.
-			    |,
-		lastUpdated => 0,
-	},
-	
-	'tmplLoop errorLoop' => {
-		message => q|A loop that returns error messages related to the completion of the user registration form for each badge.  This loop only contains messages when <b>isError</b> is true.|,
-		lastUpdated => 0,
-	},
 
 	'choose a file to import' => {
 		message => q|Choose a file to import|,
@@ -1942,6 +1675,77 @@ added to the user's cart and would be discounted if the Attend All Sessions even
 	'status' => {
 		message => q|Status|,
 		lastUpdated => 0,
+	},
+
+	'ems asset template variables' => {
+		message => q|Event Management System Asset Template Variables|,
+		lastUpdated => 0,
+	},
+
+	'timezone help' => {
+		message => q|The time zone that this event is configured to be in.|,
+		lastUpdated => 0,
+	},
+
+	'templateId help' => {
+		message => q|The ID of the template for the main Event Management System screen.|,
+		lastUpdated => 0,
+	},
+
+	'badgeBuilderTemplateId help' => {
+		message => q|The ID of the template for the badge builder screen.|,
+		lastUpdated => 0,
+	},
+
+	'lookupRegistrantTemplateId help' => {
+		message => q|The ID of the template for the lookup registrant screen.|,
+		lastUpdated => 0,
+	},
+
+	'printBadgeTemplateId help' => {
+		message => q|The ID of the template for printing a badge.|,
+		lastUpdated => 0,
+	},
+
+	'printTicketTemplateId help' => {
+		message => q|The ID of the template for printing a ticket.|,
+		lastUpdated => 0,
+	},
+
+	'badgeInstructions help' => {
+		message => q|Instructions to the user for what to do with a badge.|,
+		lastUpdated => 0,
+	},
+
+	'ticketInstructions help' => {
+		message => q|Instructions to the user for what to do with a ticket.|,
+		lastUpdated => 0,
+	},
+
+	'ribbonInstructions help' => {
+		message => q|Instructions to the user for what to do with a ribbon.|,
+		lastUpdated => 0,
+	},
+
+	'tokenInstructions help' => {
+		message => q|Instructions to the user for what to do with a token.|,
+		lastUpdated => 0,
+	},
+
+	'registrationStaffGroupId help' => {
+		message => q|The ID of the group set up to handle registration.|,
+		lastUpdated => 0,
+	},
+
+	'registrationStaffGroupId help' => {
+		message => q|The ID of the group set up to handle registration.|,
+		lastUpdated => 0,
+	},
+
+ 	'event start date' => {
+		message 	=> q|Start Date|,
+		lastUpdated => 0,
+		context 	=> q|Event start date field label in the badge builder screen|
 	},
 
 };

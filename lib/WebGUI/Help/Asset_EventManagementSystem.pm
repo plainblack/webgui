@@ -4,231 +4,134 @@ use strict;
 ##Stub document for creating help documents.
 
 our $HELP = {
-    'event management system template' => {
+
+    'event management system main template' => {
         source    => 'sub view',
-        title     => 'template help title',
-        body      => '',
+        title     => 'main template help title',
+        body      => 'main template help body',
         variables => [
-            { 'name' => 'checkout.url' },
-            { 'name' => 'checkout.label' },
-            {   'name'      => 'events_loop',
-                'variables' => [
-                    {   'name'        => 'event',
-                        'description' => 'tmplVar event'
-                    }
-                ]
-            },
-            { 'name' => 'paginateBar' },
-            { 'name' => 'Pagination variables' },
-            { 'name' => 'canManageEvents' },
-            { 'name' => 'manageEvents.url' },
-            { 'name' => 'manageEvents.label' },
-            { 'name' => 'managePurchases.url' },
-            { 'name' => 'managePurchases.label' }
+            { 'name' => 'addBadgeUrl',          required => 1 },
+            { 'name' => 'buildBadgeUrl',        required => 1 },
+            { 'name' => 'manageBadgeGroupsUrl', required => 1  },
+            { 'name' => 'getBadgesUrl',         required => 1  },
+            { 'name' => 'canEdit' },
+            { 'name' => 'lookupRegistrantUrl',  required => 1  },
         ],
-        fields  => [],
-        related => [
-            {   tag       => 'pagination template variables',
-                namespace => 'WebGUI',
+        isa   => [
+            {   namespace => "Asset_EventManagementSystem",
+                tag       => "ems asset template variables"
             },
-        ],
-    },
-
-    'event management system event template' => {
-        source    => 'sub www_editEvent',
-        title     => 'event template help title',
-        body      => '',
-        variables => [
-            { 'name' => 'title' },
-            { 'name' => 'title.url' },
-            { 'name' => 'description' },
-            { 'name' => 'image' },
-            {   'name'        => 'price',
-                'description' => 'tmplVar price'
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
             },
-            {   'name'        => 'sku',
-                'description' => 'tmplVar sku'
-            },
-            {   'name'        => 'sku template',
-                'description' => 'tmplVar sku template'
-            },
-            {   'name'        => 'weight',
-                'description' => 'tmplVar weight'
-            },
-            { 'name' => 'numberRegistered' },
-            { 'name' => 'maximumAttendees' },
-            { 'name' => 'seatsRemaining' },
-            { 'name' => 'eventIsFull' },
-            { 'name' => 'eventIsApproved' },
-            { 'name' => 'startDate.human' },
-            { 'name' => 'endDate.human' },
-            { 'name' => 'purchase.label' },
-            { 'name' => 'purchase.url' },
-            { 'name' => 'purchase.message' },
-            { 'name' => 'purchase.wantToSearch.url' },
-            { 'name' => 'purchase.wantToContinue.url' },
-            { 'name' => 'purchase.label' }
-        ],
-        fields  => [],
-        related => [
-            {   tag       => 'event management system template',
-                namespace => 'Asset_EventManagementSystem',
-            },
-        ],
-    },
-
-    'ems manage purchases template' => {
-        source    => 'sub www_managePurchases',
-        title     => 'manage purchases template help title',
-        body      => '',
-        variables => [
-            {   'name'      => 'purchasesLoop',
-                'variables' => [ { 'name' => 'purchaseUrl' }, { 'name' => 'datePurchasedHuman' } ]
-            },
-            { 'name' => 'managePurchasesTitle' }
-        ],
-        fields  => [],
-        related => [],
-    },
-
-    'ems checkout template' => {
-        source    => 'sub getRegistrationInfo',
-        title     => 'checkout template help title',
-        body      => '',
-        variables => [
-            {   'name'        => 'isError',
-                'description' => 'tmplVar isError',
-            },
-            {   'name'        => 'errorLoop',
-                'description' => 'tmplLoop errorLoop',
-                'variables'   => [
-                    {   'name'        => 'error',
-                        'description' => 'tmplVar error'
-                    },
-                ]
+            {   namespace => "Asset_Wobject",
+                tag       => "wobject template variables"
             },
         ],
         fields  => [],
         related => [],
     },
 
-    'ems view purchase template' => {
-        source    => 'sub www_viewPurchases',
-        title     => 'view purchase template help title',
+    'ems badge builder template' => {
+        source    => 'sub www_buildBadge',
+        title     => 'badge builder template',
         body      => '',
         variables => [
-            {   'name'      => 'purchasesLoop',
-                'variables' => [
-                    {   'name'      => 'regLoop',
-                        'variables' => [
-                            { 'name' => 'startDateHuman' },
-                            { 'name' => 'startDateHuman' },
-                            { 'name' => 'endDateHuman' },
-                            { 'name' => 'startDate' },
-                            { 'name' => 'endDateHuman' },
-                            { 'name' => 'registrationId' },
-                            { 'name' => 'title', },
-                            { 'name' => 'description', },
-                            {   'name'        => 'price',
-                                'description' => 'tmplVar price'
-                            },
-                            { 'name' => 'templateId' },
-                            { 'name' => 'returned' },
-                            {   'name'        => 'approved',
-                                'description' => 'tmplVar approved'
-                            },
-                            { 'name' => 'templateId' },
-                            { 'name' => 'maximumAttendees', },
-                            { 'name' => 'userId' },
-                            { 'name' => 'createdByUserId' }
-                        ]
-                    },
-                    { 'name' => 'canReturnItinerary' },
-                    { 'name' => 'canAddEvents' }
-                ]
+            { 'name' => 'addTicketUrl'},
+            { 'name' => 'addRibbonUrl'},
+            { 'name' => 'addTokenUrl'},
+            { 'name' => 'importTicketsUrl'},
+            { 'name' => 'exportTicketsUrl'},
+            { 'name' => 'canEdit'},
+            { 'name' => 'hasBadge'},
+            { 'name' => 'badgeId'},
+            { 'name' => 'getTicketsUrl', required => 1,},
+            { 'name' => 'getRibbonsUrl', required => 1,},
+            { 'name' => 'whichTab',      required => 1,},
+            { 'name' => 'getTokensUrl',  required => 1,},
+            { 'name' => 'whichTab',      required => 1,},
+            {
+                name        => 'lookupBadgeUrl',
+                description => 'lookupRegistrantUrl',
             },
-            { 'name' => 'canReturnTransaction' },
-            { 'name' => 'viewPurchaseTitle' },
-            { 'name' => 'canReturn' },
-            { 'name' => 'transactionId' },
-            { 'name' => 'appUrl' }
+            { 'name' => 'url',      required => 1,},
+            { 'name' => 'viewCartUrl'},
+            { 'name' => 'customRequestUrl',      required => 1,},
+            { 'name' => 'manageEventMetaFieldsUrl'},
+            { 'name' => 'otherBadgesInCart',
+              'variables' => [
+                { 'name' => 'badgeUrl'},
+                { 'name' => 'badgeLabel'},
+              ],
+            },
+        ],
+        isa   => [
+            {   namespace => "Asset_EventManagementSystem",
+                tag       => "ems asset template variables"
+            },
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
+            {   namespace => "Asset_Wobject",
+                tag       => "wobject template variables"
+            },
         ],
         fields  => [],
         related => [],
     },
 
-    'ems search template' => {
-        source    => 'sub www_search',
-        title     => 'search template help title',
+    'ems asset template variables' => {
+        source    => 'sub definition',
+        title     => 'ems asset template variables',
         body      => '',
         variables => [
-            { 'name' => 'calendarJS' },
-            { 'name' => 'basicSearch.formHeader' },
-            { 'name' => 'advSearch.formHeader' },
-            { 'name' => 'isAdvSearch' },
-            { 'name' => 'search.formFooter' },
-            { 'name' => 'search.formSubmit' },
-            {   'name'      => 'events_loop',
-                'variables' => [
-                    { 'name' => 'event', },
-                    { 'name' => 'title', },
-                    { 'name' => 'description', },
-                    {   'name'        => 'price',
-                        'description' => 'tmplVar price'
-                    },
-                    {   'name'        => 'sku',
-                        'description' => 'tmplVar sku'
-                    },
-                    {   'name'        => 'sku template',
-                        'description' => 'tmplVar sku template'
-                    },
-                    {   'name'        => 'weight',
-                        'description' => 'tmplVar weight'
-                    },
-                    { 'name' => 'numberRegistered', },
-                    { 'name' => 'maximumAttendees', },
-                    { 'name' => 'seatsRemaining', },
-                    { 'name' => 'startDate.human', },
-                    { 'name' => 'startDate', },
-                    { 'name' => 'endDate.human', },
-                    { 'name' => 'endDate' },
-                    { 'name' => 'productId' },
-                    { 'name' => 'eventIsFull', },
-                    { 'name' => 'eventIsApproved', },
-                    { 'name' => 'manageToolbar' },
-                    { 'name' => 'purchase.label', },
-                    { 'name' => 'purchase.url', }
-                ],
+            {
+                name        => 'timezone',
+                description => 'timezone help',
             },
-            { 'name' => 'paginateBar', },
-            { 'name' => 'manageEvents.url', },
-            { 'name' => 'manageEvents.label', },
-            { 'name' => 'managePurchases.url', },
-            { 'name' => 'managePurchases.label', },
-            { 'name' => 'noSearchDialog' },
-            { 'name' => 'addEvent.url' },
-            { 'name' => 'addEvent.label' },
-            { 'name' => 'canManageEvents', },
-            { 'name' => 'message' },
-            { 'name' => 'numberOfSearchResults' },
-            { 'name' => 'continue.url' },
-            { 'name' => 'continue.label' },
-            { 'name' => 'name.label' },
-            { 'name' => 'starts.label' },
-            { 'name' => 'ends.label' },
-            { 'name' => 'price.label' },
-            { 'name' => 'seats.label' },
-            { 'name' => 'addToBadgeMessage' },
-            { 'name' => 'search.filters.options' },
-            { 'name' => 'search.data.url' },
-            { 'name' => 'ems.wobject.dir' }
+            {
+                name        => 'templateId',
+                description => 'templateId help',
+            },
+            {
+                name        => 'badgeBuilderTemplateId',
+                description => 'badgeBuilderTemplateId help',
+            },
+            {
+                name        => 'lookupRegistrantTemplateId',
+                description => 'lookupRegistrantTemplateId help',
+            },
+            {
+                name        => 'printBadgeTemplateId',
+                description => 'printBadgeTemplateId help',
+            },
+            {
+                name        => 'printTicketTemplateId',
+                description => 'printTicketTemplateId help',
+            },
+            {
+                name        => 'badgeInstructions',
+                description => 'badgeInstructions help',
+            },
+            {
+                name        => 'ticketInstructions',
+                description => 'ticketInstructions help',
+            },
+            {
+                name        => 'ribbonInstructions',
+                description => 'ribbonInstructions help',
+            },
+            {
+                name        => 'tokenInstructions',
+                description => 'tokenInstructions help',
+            },
+            {
+                name        => 'registrationStaffGroupId',
+                description => 'registrationStaffGroupId help',
+            },
         ],
         fields  => [],
-        related => [
-            {   tag       => 'pagination template variables',
-                namespace => 'WebGUI',
-            },
-        ],
+        related => [],
     },
 
 };
