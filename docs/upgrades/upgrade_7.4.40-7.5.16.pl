@@ -1225,7 +1225,7 @@ EOSQL1
         while (my $acc = $accessorySth->hashRef()) {
             push @accessories, $acc;
         }
-        my $accJson = to_json(\@accessories);
+        my $accJson = encode_json(\@accessories);
         $session->db->write('update Product set accessoryJSON=? where assetId=?',[$accJson, $assetId]);
 
         ##Related
@@ -1234,7 +1234,7 @@ EOSQL1
         while (my $acc = $relatedSth->hashRef()) {
             push @related, $acc;
         }
-        my $relJson = to_json(\@related);
+        my $relJson = encode_json(\@related);
         $session->db->write('update Product set relatedJSON=? where assetId=?',[$relJson, $assetId]);
 
         ##Specification
@@ -1243,7 +1243,7 @@ EOSQL1
         while (my $spec = $specificationSth->hashRef()) {
             push @specification, $spec;
         }
-        my $specJson = to_json(\@specification);
+        my $specJson = encode_json(\@specification);
         $session->db->write('update Product set specificationJSON=? where assetId=?',[$specJson, $assetId]);
 
         ##Feature
@@ -1252,7 +1252,7 @@ EOSQL1
         while (my $feature = $featureSth->hashRef()) {
             push @features, $feature;
         }
-        my $featJson = to_json(\@features);
+        my $featJson = encode_json(\@features);
         $session->db->write('update Product set featureJSON=? where assetId=?',[$featJson, $assetId]);
 
         ##Benefit
@@ -1261,7 +1261,7 @@ EOSQL1
         while (my $benefit = $benefitSth->hashRef()) {
             push @benefits, $benefit;
         }
-        my $beneJson = to_json(\@benefits);
+        my $beneJson = encode_json(\@benefits);
         $session->db->write('update Product set benefitJSON=? where assetId=?',[$beneJson, $assetId]);
 
     }
