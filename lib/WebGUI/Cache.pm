@@ -19,6 +19,8 @@ use File::Path;
 use HTTP::Headers;
 use HTTP::Request;
 use LWP::UserAgent;
+use Digest::MD5;
+use Encode;
 
 =head1 NAME
 
@@ -157,17 +159,16 @@ sub parseKey {
 	my $class = shift;
 	my $key = shift;
 	if (ref $key eq "ARRAY") {
-		my @parts = @{$key};
-		my @fixed;
-		foreach my $part (@parts) {
-			$part = Digest::MD5::md5_base64($part);
-        		$part =~ s/\//-/g;
-			push(@fixed,$part);
-		}
-		return join('/',@fixed);
-	} else {
-		$key = Digest::MD5::md5_base64($key);
-                $key =~ s/\//-/g;
+        my @parts = @{ $key };
+        foreach my $part (@parts) {
+            $part = Digest::MD5::md5_base64(Encode::encode_utf8($part));
+            $part =~ tr{/}{-};
+        }
+        return join('/',@parts);
+    }
+    else {
+		$key = Digest::MD5::md5_base64(Encode::encode_utf8($key));
+        $key =~ tr{/}{-};
 		return $key;
 	}
 }
@@ -234,14 +235,15 @@ sub setByHTTP {
         my $referer = "http://webgui.http.request/".$self->session->env->get("SERVER_NAME").$self->session->env->get("REQUEST_URI");
         chomp $referer;
         $header->referer($referer);
-        my $request = new HTTP::Request (GET => $url, $header);
-        my $response = $userAgent->request($request);
-        if ($response->is_error) {
-                $self->session->errorHandler->error($url." could not be retrieved.");
-        } else {
-                $self->set($response->content,$ttl);
-        }
-        return $response->content;
+    my $request = HTTP::Request->new(GET => $url, $header);
+    my $response = $userAgent->request($request);
+    if ($response->is_error) {
+        $self->session->errorHandler->error($url." could not be retrieved.");
+    }
+    else {
+        $self->set($response->decoded_content,$ttl);
+    }
+    return $response->decoded_content;
 }
 
 #-------------------------------------------------------------------
