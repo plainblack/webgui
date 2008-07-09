@@ -80,6 +80,62 @@ our $HELP = {
         related => [],
     },
 
+    'ems lookup registrant template' => {
+        source    => 'sub www_lookupRegistrant',
+        title     => 'lookup registrant template',
+        body      => '',
+        variables => [
+            { 'name' => 'buyBadgeUrl'},
+            { 'name' => 'viewEventsUrl'},
+            { 'name' => 'viewCartUrl'},
+            { 'name' => 'getRegistrantsUrl', required => 1},
+            { 'name' => 'isRegistrationStaff'},
+        ],
+        isa   => [
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
+        ],
+        fields  => [],
+        related => [],
+    },
+
+    'ems print badge template' => {
+        source    => 'sub www_printBadge',
+        title     => 'print badge template',
+        body      => '',
+        variables => [
+            { 'name' => 'badgeTitle'},
+            { 'name' => 'badgeId'},
+            { 'name' => 'badgeNumber'},
+            { 'name' => 'badgeAssetId'},
+            { 'name' => 'emsAssetId'},
+            { 'name' => 'userId'},
+            { 'name' => 'name'},
+            { 'name' => 'address1'},
+            { 'name' => 'address2'},
+            { 'name' => 'address3'},
+            { 'name' => 'city'},
+            { 'name' => 'state'},
+            { 'name' => 'zipcode'},
+            { 'name' => 'country'},
+            { 'name' => 'phoneNumber'},
+            { 'name' => 'organization'},
+            { 'name' => 'email'},
+            { 'name' => 'notes'},
+            { 'name' => 'purchaseComplete'},
+            { 'name' => 'hasCheckedIn'},
+            { 'name' => 'transactionItemId'},
+        ],
+        isa   => [
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
+        ],
+        fields  => [],
+        related => [],
+    },
+
     'ems asset template variables' => {
         source    => 'sub definition',
         title     => 'ems asset template variables',
