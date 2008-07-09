@@ -360,9 +360,9 @@ The description of the batch tied to the subscription code.<br />
 <b>message</b><br />
 The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br />
 <br />
-<b>codeForm</b>
+<b>codeForm</b><br />
 The form in which the user can enter his subscription code.<br />|,
-		lastUpdated => 1146593261,
+		lastUpdated => 1215618652,
 		context => q|The body of the help page of the code redemption template.|
 	},
 
