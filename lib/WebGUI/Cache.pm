@@ -157,20 +157,23 @@ Can either be a text key, or a composite key. If it's a composite key, it will b
 
 sub parseKey {
 	my $class = shift;
-	my $key = shift;
-	if (ref $key eq "ARRAY") {
-        my @parts = @{ $key };
-        foreach my $part (@parts) {
-            $part = Digest::MD5::md5_base64(Encode::encode_utf8($part));
-            $part =~ tr{/}{-};
-        }
-        return join('/',@parts);
+    # check for composite or simple key, make array from either
+    my @key;
+    if (! $_[0]) {
+        return;
+    }
+    elsif (ref $_[0] eq 'ARRAY') {
+        @key = @{ +shift };
     }
     else {
-		$key = Digest::MD5::md5_base64(Encode::encode_utf8($key));
-        $key =~ tr{/}{-};
-		return $key;
-	}
+        @key = shift;
+    }
+    foreach my $part (@key) {
+        # convert to octets, then md5 them
+        $part = Digest::MD5::md5_base64(Encode::encode_utf8($part));
+        $part =~ tr{/}{-};
+    }
+    return join('/', @key);
 }
 
 #-------------------------------------------------------------------
