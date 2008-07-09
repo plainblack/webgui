@@ -30,18 +30,26 @@ plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;
 
-# put your tests here
+##Find the name of the International macro in the user's config file.
+my $configFileMacros = $session->config->get('macros');
+my %macroNameLookup = reverse %{ $configFileMacros };
+my $international;
+$international = (exists $macroNameLookup{'International'}) ? $macroNameLookup{'International'} : 'International';
 
-my $digits  = qr/(\d+)/;
+#diag "International macro name = $international";
+
+##Regexp setup for parsing out the Macro calls.
 my $bareword  = qr/([^,)]+)/;  ##Anything that's not a comma
 my $quotelike = qr/((['])([^'\s\$]+\s*)+([']))/;
 my $sub_args  = qr/(($quotelike|$bareword)(?:,\s*)?)+/;  ##Don't really need spaces
 my $macro     = qr/
-			  \^International
+			  \^$international
 			  \(			##Opening paren
 			    ($sub_args)
 			  \);			##Closing paren and semicolon
-		    /x;
+		    /xo;
+
+# put your tests here
 
 my $getATemplate = WebGUI::Asset::Template->getIsa($session);
 
