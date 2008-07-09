@@ -28,9 +28,17 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addIndexToInbox($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addIndexToInbox {
+    my $session = shift;
+    print "\tAdding index to inbox table... " unless $quiet;
+    $session->db->write('ALTER TABLE `inbox` ADD INDEX `completedOn_dateStamp` (`completedOn`, `dateStamp`)');
+    print "Done.\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------

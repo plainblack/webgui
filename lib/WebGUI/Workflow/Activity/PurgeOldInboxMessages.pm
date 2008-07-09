@@ -90,7 +90,7 @@ sub execute {
 
     my $sth 
         = $session->db->read(
-            "SELECT messageId FROM inbox WHERE completedOn IS NOT NULL AND dateStamp < ? ORDER BY dateStamp ASC LIMIT $limit",
+            "SELECT messageId FROM inbox WHERE completedOn IS NOT NULL AND dateStamp < ? ASC LIMIT $limit",
             [ $start - $self->get('purgeAfter') ],
         );
 
