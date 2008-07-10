@@ -1,6 +1,10 @@
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
  - fixed: transactions lost during 7.5.11 upgrade
+ - Fixed a problem where shop could create internal server errors instead of
+   catching the exceptions.
+ - Made the iTransact terminal link a button that automatically logs you in.
+ - iTransact now more gracefully handles recurring payment postback errors.
  - fixed: More permissive DSN checking to allow use of SQLite (thanks pathma)
  - fixed: Project manager modal dialog doesn't work in some instances.
  - fixed: Syndicated Content doesn't always decode text properly

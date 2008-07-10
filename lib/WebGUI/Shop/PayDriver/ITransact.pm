@@ -441,33 +441,6 @@ sub getButton {
 }
 
 #-------------------------------------------------------------------
-sub getEditForm {
-    my $self    = shift;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
-
-    my $f       = $self->SUPER::getEditForm( @_ );
-    $f->readOnly(
-        -value  => '<br />'
-    );
-    $f->readOnly(
-            -value => '<a target="_blank" href="https://secure.paymentclearing.com/support/login.html">'.$i18n->get('show terminal').'</a>'
-    ) if $self->get('vendorId');
-    $f->readOnly(
-        -value  => '<br />'
-    );
-    $f->readOnly(
-        -value  => 
-            $i18n->get('extra info')
-            .'<br />'
-            .'<b>https://'.$session->config->get("sitename")->[0]
-            .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>'
-    );
-
-    return $f;
-}
-
-#-------------------------------------------------------------------
 
 =head2 handlesRecurring
 
@@ -585,6 +558,44 @@ sub processPayment {
 
         return ( 0, undef, 'ConnectionError', $response->status_line );
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Generates an edit form.
+
+=cut
+
+sub www_edit {
+    my $self    = shift;
+    my $session = $self->session;
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
+
+    return $session->privilege->insufficient() unless $admin->canManage;
+
+    my $form = $self->getEditForm;
+    $form->submit;
+
+    my $terminal = WebGUI::HTMLForm->new($session, action=>"https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi", extras=>'target="_blank"');
+    $terminal->hidden(name=>"ret_addr", value=>"/cgi-bin/rc/sure/sure.cgi?sure_template_code=session_check&sure_use_session_mid=1");
+    $terminal->hidden(name=>"override", value=>1);
+    $terminal->hidden(name=>"cookie_precheck", value=>0);
+    $terminal->hidden(name=>"mid", value=>$self->get('vendorId'));
+    $terminal->hidden(name=>"pwd", value=>$self->get('password'));
+    $terminal->submit(value=>$i18n->get('show terminal'));
+    
+    my $output = '<br />';
+    if ($self->get('vendorId')) {
+        $output .= $terminal->print.'<br />';
+    }
+    $output .= $i18n->get('extra info').'<br />'
+            .'<b>https://'.$session->config->get("sitename")->[0]
+            .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>';
+
+    return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
 }
 
 #-------------------------------------------------------------------
@@ -727,13 +738,14 @@ sub www_processRecurringTransactionPostback {
     my $errorMessage    = $form->process( 'error_message'   );
 
     # Fetch the original transaction
-    my $baseTransaction = WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId );
+    my $baseTransaction = eval{WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId )};
 
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
-    unless ( $baseTransaction ) {   
-        $session->errorHandler->warn->("Check recurring postback: No base transction for XID: [$originatingXid]");
-        return "Check recurring postback: No base transction for XID: [$originatingXid]";
+    if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
+        $session->errorHandler->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
+	$session->http->setStatus('500', "No base transction for XID: [$originatingXid]");
+        return "Check recurring postback. No base transction for XID: [$originatingXid]";
     }
 
     # Secondly check if the postback is coming from secure.paymentclearing.com
