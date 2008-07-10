@@ -277,16 +277,30 @@ sub www_runCronJob {
 	}
 	my $taskId = $session->form->param("taskId");
 	if ($taskId) {
-		my $task = WebGUI::Workflow::Cron->new($session, $taskId);
+		# Try to instantiate the task
+                my $task = WebGUI::Workflow::Cron->new($session, $taskId);
 		return "done" unless (defined $task);
-		WebGUI::Workflow::Instance->create($session, {
-			workflowId=>$task->get("workflowId"),
-			className=>$task->get("className"),
-			methodName=>$task->get("methodName"),
-			parameters=>$task->get("parameters"),
-			priority=>$task->get("priority"),
-			})->start(1);
-		$task->delete(1) if ($task->get("runOnce"));
+                
+                # Make a new workflow instance
+                my $instance = 
+                    WebGUI::Workflow::Instance->create($session, {
+			workflowId  => $task->get("workflowId"),
+			className   => $task->get("className"),
+			methodName  => $task->get("methodName"),
+			parameters  => $task->get("parameters"),
+			priority    => $task->get("priority"),
+                    });
+                if ( !$instance ) {
+                    $session->errorHandler->error( 
+                        "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
+                        . "': The result was undefined"
+                    );
+                    return "done";
+                }
+                
+                # Run the instance
+                $instance->start( 1 );
+		$task->delete( 1 ) if ( $task->get("runOnce") );
 		return "done";
 	}
 	$session->errorHandler->warn("No task ID passed to cron job runner.");
