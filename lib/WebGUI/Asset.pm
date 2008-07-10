@@ -1003,11 +1003,11 @@ sub getEditForm {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
                         my $fieldType = $meta->{$field}{fieldType} || "text";
-                        my $options;
+                        my $options = $meta->{$field}{possibleValues};
                         # Add a "Select..." option on top of a select list to prevent from
                         # saving the value on top of the list when no choice is made.
-                        if($fieldType eq "selectList") {
-                                $options = {"", $i18n->get("Select")};
+                        if("\l$fieldType" eq "selectBox") {
+                            $options = "|" . $i18n->get("Select") . "\n" . $options;
                         }
                         $tabform->getTab("meta")->dynamicField(
                                                 name=>"metadata_".$meta->{$field}{fieldId},
@@ -1015,7 +1015,6 @@ sub getEditForm {
                                                 uiLevel=>5,
                                                 value=>$meta->{$field}{value},
                                                 extras=>qq/title="$meta->{$field}{description}"/,
-                                                possibleValues=>$meta->{$field}{possibleValues},
                                                 options=>$options,
 						fieldType=>$fieldType
                                 );
