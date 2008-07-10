@@ -19,6 +19,10 @@
  - Added more information about workflow instance errors, so we can debug without having 
    to watch SPECTRE's debug output.
  - fixed: List style Content profile fields broken
+ - Added additional error messages
+ - fixed: Added a friendly message so when a user who approves a version tag, 
+   but cannot view the version tag (is not in Turn Admin On group), they do 
+   not see "Permission Denied"
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)

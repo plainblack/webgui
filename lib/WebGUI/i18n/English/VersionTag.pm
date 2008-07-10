@@ -436,7 +436,24 @@ our $I18N = {
         message     => q|End Time|,
         lastUpdated => 1148360141,      
     },
+    
+    'approved'  => {
+        message     => q{approved},
+        lastUpdated => 0,
+        context     => 'Status of version tag',
+    },
 
+    'denied' => {
+        message     => q{denied},
+        lastUpdated => 0,
+        context     => 'Status of version tag',
+    },
+
+    'approveVersionTag message' => {
+        message     => q{Your version tag has been %s. <a href="%s">Back to site</a>.},
+        lastUpdated => 0,
+        context     => q{Message for when someone approves a version tag},
+    },
 };
 
 1;
