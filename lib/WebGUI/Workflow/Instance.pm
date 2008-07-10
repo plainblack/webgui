@@ -330,7 +330,9 @@ sub run {
 	if ($class && $method) {
         $object = eval { WebGUI::Pluggable::instanciate($class, $method, [$self->session, $params]) };
         if ($@) {
-			$self->session->errorHandler->error($@);
+			$self->session->errorHandler->error(
+                            q{Error on workflow instance '} . $self->getId . q{': }. $@
+                        );
 			$self->set({lastStatus=>"error"}, 1);
 			return "error";
         } 

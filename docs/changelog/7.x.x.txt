@@ -16,6 +16,8 @@
  - fixed: Donation: Add to Cart still visible in Thank You Message screen
  - optimized PurgeOldInboxMessages workflow
  - fixed: Calendar: Reorder Events in Week View Broken
+ - Added more information about workflow instance errors, so we can debug without having 
+   to watch SPECTRE's debug output.
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)
