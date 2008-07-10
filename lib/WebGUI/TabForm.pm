@@ -134,6 +134,7 @@ The name of the tab to return the form object for.
 sub getTab {
 	my $self = shift;
 	my $key = shift;
+    $self->session->log->warn('Trying to fetch non-existant tab: '.$key) if !exists $self->{_tab}{$key};
 	return $self->{_tab}{$key}{form};
 }
 
