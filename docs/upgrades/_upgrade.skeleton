@@ -75,13 +75,13 @@ sub start {
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->set({name=>"Upgrade to ".$toVersion});
     $session->db->write("insert into webguiVersion values (".$session->db->quote($toVersion).",'upgrade',".$session->datetime->time().")");
-    updateTemplates($session);
     return $session;
 }
 
 #-------------------------------------------------
 sub finish {
     my $session = shift;
+    updateTemplates($session);
     my $versionTag = WebGUI::VersionTag->getWorking($session);
     $versionTag->commit;
     $session->close();
