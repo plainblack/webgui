@@ -816,11 +816,17 @@ sub getContentLastModified {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditTabs
+
+Add a tab for the mail interface.
+
+=cut
+
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-
-	return (['mail', $i18n->get('mail'), 9]);
+	return ($self->SUPER::getEditTabs(), ['mail', $i18n->get('mail'), 9]);
 }
 
 #-------------------------------------------------------------------

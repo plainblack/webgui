@@ -872,7 +872,7 @@ Please see the example below for adding 1 tab.
     sub getEditTabs {
         my $self = shift;
         my $i18n = WebGUI::International->new($self->session,"myNamespace");
-        return (['myTab', $i18n->get('myTabName'), 9]);
+        return ($self->SUPER::getEditTabs, ['myTab', $i18n->get('myTabName'), 9]);
     }
 
 =cut

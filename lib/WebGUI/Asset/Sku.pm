@@ -197,7 +197,7 @@ Not to be modified, just defines a new tab.
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Sku");
-	return (['shop', $i18n->get('shop'), 9]);
+	return ($self->SUPER::getEditTabs(), ['shop', $i18n->get('shop'), 9]);
 }
 
 #-------------------------------------------------------------------
