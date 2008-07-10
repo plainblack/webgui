@@ -848,6 +848,33 @@ Returns a list of arrayrefs, one per extra tab to add to the edit
 form.  The default is no extra tabs.  Override this in a subclass to
 add extra tabs.
 
+Each array ref will have 3 fields:
+
+=over 4
+
+=item tabName
+
+This is the name of the tab that you will use in the definition subroutine to
+add fields to the new tab.
+
+=item label
+
+This should be an internationalized label that will be displayed on the tab.
+
+=item uiLevel
+
+This is the UI level for the tab.
+
+=back
+
+Please see the example below for adding 1 tab.
+
+    sub getEditTabs {
+        my $self = shift;
+        my $i18n = WebGUI::International->new($self->session,"myNamespace");
+        return (['myTab', $i18n->get('myTabName'), 9]);
+    }
+
 =cut
 
 sub getEditTabs {
@@ -859,7 +886,8 @@ sub getEditTabs {
 
 =head2 getEditForm ()
 
-Creates and returns a tabform to edit parameters of an Asset.
+Creates and returns a tabform to edit parameters of an Asset. See L<getEditTabs> for
+adding additional tabs.
 
 =cut
 
