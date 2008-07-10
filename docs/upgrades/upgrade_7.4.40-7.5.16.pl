@@ -124,7 +124,18 @@ unlockShelfAssets($session);
 removeOldGalleryImport($session);
 addMissingWorkflowActivities($session);
 addIndexToInbox($session);
+fixEventSequenceNumbers($session);
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub fixEventSequenceNumbers {
+    my $session = shift;
+    print "\tFixing Event sequence numbers... " unless $quiet;
+    $session->db->write('set @seqNum=0');
+    $session->db->write('select MAX(sequenceNumber) into @seqNum from Event');
+    $session->db->write('update Event set sequenceNumber=@seqNum:=@seqNum+16384 where sequenceNumber IS NULL order by revisionDate');
+    print "Done.\n" unless $quiet;
+}
 
 #-----------------------------------------------------------
 sub addIndexToInbox {

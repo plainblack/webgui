@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 addIndexToInbox($session);
+fixEventSequenceNumbers($session);
 
 finish($session); # this line required
 
@@ -37,6 +38,16 @@ sub addIndexToInbox {
     my $session = shift;
     print "\tAdding index to inbox table... " unless $quiet;
     $session->db->write('ALTER TABLE `inbox` ADD INDEX `completedOn_dateStamp` (`completedOn`, `dateStamp`)');
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub fixEventSequenceNumbers {
+    my $session = shift;
+    print "\tFixing Event sequence numbers... " unless $quiet;
+    $session->db->write('set @seqNum=0');
+    $session->db->write('select MAX(sequenceNumber) into @seqNum from Event');
+    $session->db->write('update Event set sequenceNumber=@seqNum:=@seqNum+16384 where sequenceNumber IS NULL order by revisionDate');
     print "Done.\n" unless $quiet;
 }
 

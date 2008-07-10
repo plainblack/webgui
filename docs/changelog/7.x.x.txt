@@ -11,6 +11,7 @@
  - fixed: Asset Manager buttons now work in IE6
  - fixed: Donation: Add to Cart still visible in Thank You Message screen
  - optimized PurgeOldInboxMessages workflow
+ - fixed: Calendar: Reorder Events in Week View Broken
 
 7.5.15
  - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)
