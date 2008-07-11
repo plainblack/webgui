@@ -174,6 +174,11 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|An error indicating that an invalid expiration date has been entered.|
 	},
+	'Itransact' => {
+		message => q|Credit Card (ITransact).|,
+		lastUpdated => 0,
+		context => q|Name of the gateway from the definition|
+	},
 	'expired expiration date' => {
 		message => q|The expiration date on your card has already passed.|,
 		lastUpdated => 0,

@@ -58,8 +58,8 @@ our $I18N = {
 	},
 
 	'label help' => {
-		message => q|The name by which this payment gateway is displayed.|,
-		lastUpdated => 1213891193,
+		message => q|The name by which this payment gateway is displayed in the Payment methods screen.|,
+		lastUpdated => 1215799966,
 		context => q|Hover help for the label option.|
 	},
 
@@ -104,6 +104,12 @@ our $I18N = {
         message => q|Payment Methods.|,
         lastUpdated => 1213313375,
         context => q|Help body for the email receipt template|,
+    },
+
+    'credit card' => {
+        message => q|Credit Card|,
+        lastUpdated => 1215799807,
+        context => q|Generic label for credit cards to be used through the pay drivers|,
     },
 
 };

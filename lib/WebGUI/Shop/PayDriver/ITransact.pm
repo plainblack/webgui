@@ -376,7 +376,7 @@ sub definition {
     );
  
     push @{ $definition }, {
-        name        => $i18n->echo('Itransact'),
+        name        => $i18n->get('Itransact'),
         properties  => \%fields,
     };
 
@@ -430,11 +430,11 @@ sub doXmlRequest {
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITansact');
+    my $i18n    = WebGUI::International->new($session, 'PayDriver');
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->echo('ITransact') })
+        . WebGUI::Form::submit($session, {value => $i18n->get('credit card') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
@@ -619,7 +619,7 @@ sub www_getCredentials {
     # Process form errors
     if ( $errors ) {
     #### TODO: i18n
-        $output .= $i18n->echo('The following errors occurred:')
+        $output .= $i18n->get('error occurred message')
             . '<ul><li>' . join( '</li><li>', @{ $errors } ) . '</li></ul>';
     }
     

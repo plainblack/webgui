@@ -1,5 +1,6 @@
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
+ - fixed: Payment Method Titles Don't Match Buttons
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
