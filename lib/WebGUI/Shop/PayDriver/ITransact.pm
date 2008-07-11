@@ -354,23 +354,23 @@ sub definition {
     %fields = (
         vendorId        => {
            fieldType    => 'text',
-           label        => $i18n->echo('vendorId'),
-           hoverHelp    => $i18n->echo('vendorId help'),
+           label        => $i18n->get('vendorId'),
+           hoverHelp    => $i18n->get('vendorId help'),
         },
         password        => {
             fieldType   => 'password',
-            label       => $i18n->echo('password'),
-            hoverHelp   => $i18n->echo('password help'),
+            label       => $i18n->get('password'),
+            hoverHelp   => $i18n->get('password help'),
         },
         useCVV2         => {
             fieldType   => 'yesNo',
-            label       => $i18n->echo('use cvv2'),
-            hoverHelp   => $i18n->echo('use cvv2 help'),
+            label       => $i18n->get('use cvv2'),
+            hoverHelp   => $i18n->get('use cvv2 help'),
         },
         emailMessage    => {
             fieldType   => 'textarea',
-            label       => $i18n->echo('emailMessage'),
-            hoverHelp   => $i18n->echo('emailMessage help'),
+            label       => $i18n->get('emailMessage'),
+            hoverHelp   => $i18n->get('emailMessage help'),
         },
         # readonly stuff from old plugin here?
     );
