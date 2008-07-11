@@ -1,3 +1,5 @@
+7.5.17
+
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
  - fixed: transactions lost during 7.5.11 upgrade
