@@ -1,9 +1,7 @@
 # Tests WebGUI::Flux
 #
 # Coverage:
-# cover -delete -silent /tmp/fluxcvr && \
-# HARNESS_PERL_SWITCHES='-MDevel::Cover=-db,/tmp/fluxcvr,-ignore,.,-select,lib/WebGUI/Flux' \
-# prove -r t/Flux && cover /tmp/fluxcvr
+# cover -delete -silent /tmp/fluxcvr && HARNESS_PERL_SWITCHES='-MDevel::Cover=-db,/tmp/fluxcvr,-ignore,.,-select,lib/WebGUI/Flux' prove -r t/Flux && cover /tmp/fluxcvr
 #
 # Profiling:
 # FASTPROF_CONFIG='filename=/tmp/fluxprof' HARNESS_PERL_SWITCHES='-d:FastProf' prove -r t/Flux
