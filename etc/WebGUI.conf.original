@@ -250,7 +250,7 @@
     "WebGUI::Asset::Wobject::TimeTracking",
     "WebGUI::Asset::Wobject::UserList"
     "WebGUI::Asset::Wobject::WeatherData",
-    "WebGUI::Asset::Wobject::WSClient",
+    "WebGUI::Asset::Wobject::WSClient"
     ],
 
 # Specify the list assets that are used for utility purposes only
@@ -261,7 +261,7 @@
     "WebGUI::Asset::File"
     "WebGUI::Asset::File::Image",
     "WebGUI::Asset::RichEdit",
-    "WebGUI::Asset::Template",
+    "WebGUI::Asset::Template"
     ],
 
 # Specify the list of assets you want to appear in your add
@@ -442,7 +442,7 @@
         "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
         "WebGUI::Workflow::Activity::SyncProfilesToLdap",
         "WebGUI::Workflow::Activity::TrashClipboard",
-        "WebGUI::Workflow::Activity::TrashExpiredEvents",
+        "WebGUI::Workflow::Activity::TrashExpiredEvents"
     ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
@@ -515,16 +515,18 @@
     ],
 
 # Content handlers are used to produce content from the content URL handler.
+# Note, these handlers are processed in the order listed.  Do not change
+# unless you know what you're doing.
 
 "contentHandlers" : [
-    "WebGUI::Content::Asset",
-    "WebGUI::Content::AssetManager",
-    "WebGUI::Content::Maintenance",
-    "WebGUI::Content::NotFound"
-    "WebGUI::Content::Operation",
     "WebGUI::Content::Prefetch",
+    "WebGUI::Content::Maintenance",
+    "WebGUI::Content::AssetManager",
+    "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
+    "WebGUI::Content::Asset",
+    "WebGUI::Content::NotFound"
     ]
 
 }
