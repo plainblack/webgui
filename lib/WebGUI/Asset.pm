@@ -1405,6 +1405,23 @@ sub getUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModified
+
+Returns the overall modification time of the object and its content in Unix
+epoch format, for the purpose of the Last-Modified HTTP header.  Override this
+for subclasses that contain content that is not solely dependent on the
+revisionDate of the asset.
+
+=cut
+
+sub getContentLastModified {
+	my $self = shift;
+	return $self->get("revisionDate");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( key )
 
 Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it
@@ -1451,6 +1468,19 @@ sub indexContent {
 	$indexer->setIsPublic(0) if ($self->getId eq "PBasset000000000000001");
 	return $indexer;
 }
+
+#-------------------------------------------------------------------
+
+=head2 isValidRssItem ( )
+
+Returns true iff this asset should be included in RSS feeds from the
+RSS From Parent asset.  If false, this asset will be ignored when
+generating feeds, even if it appears in the item list.  Defaults to
+true.
+
+=cut
+
+sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
 
@@ -1732,6 +1762,130 @@ sub newPending {
 
 #-------------------------------------------------------------------
 
+=head2 outputWidgetMarkup ( width, height, templateId )
+
+Output the markup required for the widget view. Includes markup to handle the
+widget macro in the iframe holding the widgetized asset. This does the following: 
+
+=over 4
+
+=item *
+
+retrieves the content for this asset using its L</view> method
+
+=item *
+
+processes macros in that content
+
+=item *
+
+serializes the processed content in JSON
+
+=item *
+
+writes the JSON to a storage location
+
+=item *
+
+refers the user to download this JSON
+
+=item *
+
+references the appropriate JS files for the templating engine and the widget macro
+
+=item *
+
+invokes the templating engine on this JSON
+
+=back
+
+=head3 width
+
+The width of the iframe. Required for making widget-in-widget function properly.
+
+=head3 height
+
+The height of the iframe. Required for making widget-in-widget function properly.
+
+=head3 templateId
+
+The templateId for this widgetized asset to use. Required for making
+widget-in-widget function properly.
+
+=cut
+
+sub outputWidgetMarkup {
+    # get our parameters.
+    my $self            = shift;
+    my $width           = shift;
+    my $height          = shift;
+    my $templateId      = shift;
+
+    # construct / retrieve the values we'll use later.
+    my $assetId         = $self->getId;
+    my $session         = $self->session;
+    my $conf            = $session->config;
+    my $extras          = $conf->get('extrasURL');
+
+    # the widgetized version of content that has the widget macro in it is
+    # executing in an iframe. this iframe doesn't have a style object.
+    # therefore, the macro won't be able to output the stylesheet and JS
+    # information it needs to do its work. because of this, we need to output
+    # that content manually. construct the filesystem paths for those files.
+    my $containerCss    = $extras . '/yui/build/container/assets/container.css';
+    my $containerJs     = $extras . '/yui/build/container/container-min.js';
+    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
+    my $wgWidgetJs      = $extras . '/wgwidget.js';
+    my $ttJs            = $extras . '/tt.js';
+    
+    # the templating engine requires its source data to be in json format.
+    # write this out to disk and then serve the URL to the user. in this case,
+    # we'll be serializing the content of the asset which is being widgetized. 
+    my $storage         = WebGUI::Storage->get($session, $assetId);
+    my $content         = $self->view;
+    WebGUI::Macro::process($session, \$content);
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
+    $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
+    my $jsonUrl         = $storage->getUrl("$assetId.js");
+
+    # WebGUI.widgetBox.initButton() needs the full URL of the asset being
+    # widgetized, and also the full URL of the JS file that does most of the
+    # work.
+    my $fullUrl         = "http://" . $conf->get("sitename")->[0] . $self->getUrl;
+    my $wgWidgetPath    = 'http://' . $conf->get('sitename')->[0] . $extras . '/wgwidget.js';
+
+    # finally, given all of the above, construct our output. WebGUI outputs
+    # fully valid XHTML 1.0 Strict, and there's no reason this should be any
+    # different.
+    my $output          = <<OUTPUT;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="$containerCss" />
+        <script type="text/javascript" src="$jsonUrl"></script>
+        <script type="text/javascript" src="$ttJs"></script>
+        <script type='text/javascript' src='$yahooDomJs'></script>
+        <script type='text/javascript' src='$containerJs'></script>
+        <script type='text/javascript' src='$wgWidgetJs'></script>
+        <script type='text/javascript'>
+            function setupPage() {
+                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
+                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+            }
+            YAHOO.util.Event.addListener(window, 'load', setupPage);
+        </script>
+    </head>
+    <body id="widget$assetId">
+        \${asset$assetId.content}
+    </body>
+</html>
+OUTPUT
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 Executes what is necessary to make the view() method work with content chunking. This includes things like processing template head tags.
@@ -1750,6 +1904,28 @@ sub prepareView {
             }); 
     }
 	$style->setRawHeadTags($self->getExtraHeadTags);
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareWidgetView ( )
+
+Prepares the widget view for this asset. Specifically, sets up some JS to
+ensure that links selected / forms submitted in the widgetized form of the
+asset open in a new window.
+
+=cut
+
+sub prepareWidgetView {
+    my $self            = shift;
+    my $templateId      = shift;
+    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $session         = $self->session;
+    my $extras          = $session->config->get('extrasURL');
+
+    $template->prepare;
+
+    $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -2387,19 +2563,6 @@ sub www_manageAssets {
 
 #-------------------------------------------------------------------
 
-=head2 getContentLastModified
-
-Returns the overall modification time of the object and its content in Unix epoch format, for the purpose of the Last-Modified HTTP header.  Override this for subclasses that contain content that is not solely dependent on the revisionDate of the asset.
-
-=cut
-
-sub getContentLastModified {
-	my $self = shift;
-	return $self->get("revisionDate");
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_view ( )
 
 Returns the view() method of the asset object if the requestor canView.
@@ -2424,19 +2587,6 @@ sub www_view {
 	$self->session->output->print($self->view);
 	return undef;
 }
-
-#-------------------------------------------------------------------
-
-=head2 isValidRssItem ( )
-
-Returns true iff this asset should be included in RSS feeds from the
-RSS From Parent asset.  If false, this asset will be ignored when
-generating feeds, even if it appears in the item list.  Defaults to
-true.
-
-=cut
-
-sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
 
@@ -2466,152 +2616,4 @@ sub www_widgetView {
         return $self->outputWidgetMarkup($width, $height, $templateId);
 }
 
-#-------------------------------------------------------------------
-
-=head2 prepareWidgetView ( )
-
-Prepares the widget view for this asset. Specifically, sets up some JS to
-ensure that links selected / forms submitted in the widgetized form of the
-asset open in a new window.
-
-=cut
-
-sub prepareWidgetView {
-    my $self            = shift;
-    my $templateId      = shift;
-    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
-    my $session         = $self->session;
-    my $extras          = $session->config->get('extrasURL');
-
-    $template->prepare;
-
-    $self->{_viewTemplate} = $template;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 outputWidgetMarkup ( width, height, templateId )
-
-Output the markup required for the widget view. Includes markup to handle the
-widget macro in the iframe holding the widgetized asset. This does the following: 
-
-=over 4
-
-=item *
-
-retrieves the content for this asset using its L</view> method
-
-=item *
-
-processes macros in that content
-
-=item *
-
-serializes the processed content in JSON
-
-=item *
-
-writes the JSON to a storage location
-
-=item *
-
-refers the user to download this JSON
-
-=item *
-
-references the appropriate JS files for the templating engine and the widget macro
-
-=item *
-
-invokes the templating engine on this JSON
-
-=back
-
-=head3 width
-
-The width of the iframe. Required for making widget-in-widget function properly.
-
-=head3 height
-
-The height of the iframe. Required for making widget-in-widget function properly.
-
-=head3 templateId
-
-The templateId for this widgetized asset to use. Required for making
-widget-in-widget function properly.
-
-=cut
-
-sub outputWidgetMarkup {
-    # get our parameters.
-    my $self            = shift;
-    my $width           = shift;
-    my $height          = shift;
-    my $templateId      = shift;
-
-    # construct / retrieve the values we'll use later.
-    my $assetId         = $self->getId;
-    my $session         = $self->session;
-    my $conf            = $session->config;
-    my $extras          = $conf->get('extrasURL');
-
-    # the widgetized version of content that has the widget macro in it is
-    # executing in an iframe. this iframe doesn't have a style object.
-    # therefore, the macro won't be able to output the stylesheet and JS
-    # information it needs to do its work. because of this, we need to output
-    # that content manually. construct the filesystem paths for those files.
-    my $containerCss    = $extras . '/yui/build/container/assets/container.css';
-    my $containerJs     = $extras . '/yui/build/container/container-min.js';
-    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
-    my $wgWidgetJs      = $extras . '/wgwidget.js';
-    my $ttJs            = $extras . '/tt.js';
-    
-    # the templating engine requires its source data to be in json format.
-    # write this out to disk and then serve the URL to the user. in this case,
-    # we'll be serializing the content of the asset which is being widgetized. 
-    my $storage         = WebGUI::Storage->get($session, $assetId);
-    my $content         = $self->view;
-    WebGUI::Macro::process($session, \$content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
-    $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
-    my $jsonUrl         = $storage->getUrl("$assetId.js");
-
-    # WebGUI.widgetBox.initButton() needs the full URL of the asset being
-    # widgetized, and also the full URL of the JS file that does most of the
-    # work.
-    my $fullUrl         = "http://" . $conf->get("sitename")->[0] . $self->getUrl;
-    my $wgWidgetPath    = 'http://' . $conf->get('sitename')->[0] . $extras . '/wgwidget.js';
-
-    # finally, given all of the above, construct our output. WebGUI outputs
-    # fully valid XHTML 1.0 Strict, and there's no reason this should be any
-    # different.
-    my $output          = <<OUTPUT;
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title></title>
-        <link rel="stylesheet" type="text/css" href="$containerCss" />
-        <script type="text/javascript" src="$jsonUrl"></script>
-        <script type="text/javascript" src="$ttJs"></script>
-        <script type='text/javascript' src='$yahooDomJs'></script>
-        <script type='text/javascript' src='$containerJs'></script>
-        <script type='text/javascript' src='$wgWidgetJs'></script>
-        <script type='text/javascript'>
-            function setupPage() {
-                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
-                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
-            }
-            YAHOO.util.Event.addListener(window, 'load', setupPage);
-        </script>
-    </head>
-    <body id="widget$assetId">
-        \${asset$assetId.content}
-    </body>
-</html>
-OUTPUT
-    return $output;
-}
-
 1;
-
