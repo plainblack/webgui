@@ -3,6 +3,7 @@
  - fixed: Payment Method Titles Don't Match Buttons
  - fixed: Gallery: Description Text appearing in Album
  - fixed: Deleting Ticket from Event Management System Asset
+ - fixed: Thingy Search Broken
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.

@@ -1339,12 +1339,14 @@ sub www_editThing {
             ."</td><td valign='top' class='tableData'>";
         $fieldsViewScreen .= WebGUI::Form::checkbox($self->session, {                 
                 checked => $field->{display},
-                name  => "display_".$field->{fieldId}
+                name  => "display_".$field->{fieldId},
+                value => 1,
             });
         $fieldsViewScreen .= "</td>\n<td valign='top' class='tableData'>";
         $fieldsViewScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{viewScreenTitle},
-                name  => "viewScreenTitle_".$field->{fieldId}
+                name  => "viewScreenTitle_".$field->{fieldId},
+                value => 1,
             });
         $fieldsViewScreen .= "</td>\n</tr>\n</fieldset>";
 
@@ -1353,12 +1355,14 @@ sub www_editThing {
             ."</td>\n<td valign='top' class='tableData'>";
         $fieldsSearchScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{displayInSearch},
-                name  => "displayInSearch_".$field->{fieldId}
+                name  => "displayInSearch_".$field->{fieldId},
+                value => 1,
             });
         $fieldsSearchScreen .= "</td>\n<td valign='top' class='tableData'>";
         $fieldsSearchScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{searchIn},
-                name  => "searchIn_".$field->{fieldId}
+                name  => "searchIn_".$field->{fieldId},
+                value => 1,
             });
         my $sortBy;
         $sortBy = 1 if ($properties{sortBy} eq $field->{fieldId});
@@ -2191,12 +2195,14 @@ sub www_importForm {
         $fieldOptions .= "<tr><td>".$field->{label}."</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
                 checked => "",
-                name  => "fileContains_".$field->{fieldId}
+                name  => "fileContains_".$field->{fieldId},
+                value => 1,
             });
         $fieldOptions .= "</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
                 checked => "",
-                name  => "checkDuplicates_".$field->{fieldId}
+                name  => "checkDuplicates_".$field->{fieldId},
+                value => 1,
             });
         $fieldOptions .= "</td></tr>";
     }
