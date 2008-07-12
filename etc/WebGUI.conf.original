@@ -248,7 +248,7 @@
     "WebGUI::Asset::Wobject::SyndicatedContent",
     "WebGUI::Asset::Wobject::Thingy",
     "WebGUI::Asset::Wobject::TimeTracking",
-    "WebGUI::Asset::Wobject::UserList"
+    "WebGUI::Asset::Wobject::UserList",
     "WebGUI::Asset::Wobject::WeatherData",
     "WebGUI::Asset::Wobject::WSClient"
     ],
@@ -258,7 +258,7 @@
 # management.
 
 "utilityAssets" : [
-    "WebGUI::Asset::File"
+    "WebGUI::Asset::File",
     "WebGUI::Asset::File::Image",
     "WebGUI::Asset::RichEdit",
     "WebGUI::Asset::Template"
@@ -434,7 +434,7 @@
         "WebGUI::Workflow::Activity::ExpireGroupings",
         "WebGUI::Workflow::Activity::ExpireSubscriptionCodes",
         "WebGUI::Workflow::Activity::GetSyndicatedContent",
-        "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags"
+        "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags",
         "WebGUI::Workflow::Activity::ProcessRecurringPayments",
         "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
         "WebGUI::Workflow::Activity::PurgeOldTrash",
