@@ -153,7 +153,7 @@ my $drivers = $pay->getDrivers();
 
 my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::Cash'      => 'Cash',
-    'WebGUI::Shop::PayDriver::ITransact' => 'Itransact',
+    'WebGUI::Shop::PayDriver::ITransact' => 'Credit Card (ITransact)',
 };
 
 cmp_deeply( $drivers, $defaultPayDrivers, 'getDrivers returns the default PayDrivers');
