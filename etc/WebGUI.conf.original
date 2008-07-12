@@ -6,7 +6,10 @@
 # The first site in the list will be used as the default
 # sitename for generating offline URLs and other functions.
 
-"sitename" : [ "www.example.com", "example.com"],
+"sitename" : [ 
+    "www.example.com",
+    "example.com"
+    ],
 
 # Set to 1 if you want to use WebGUI's SSL functions, including encrypting user logins.
 
@@ -123,22 +126,22 @@
 # increase WebGUI's read performance.
 
 # "dbslave1" : { 
-#	"dsn" : "DBI:mysql:www_example_com;host=dbslave1.example.com",
-#	"user" : "webgui",
-#	"pass" : "password"
-#	},
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave1.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
 
 # "dbslave2" : { 
-#	"dsn" : "DBI:mysql:www_example_com;host=dbslave2.example.com",
-#	"user" : "webgui",
-#	"pass" : "password"
-#	},
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave2.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
 
 # "dbslave3" : { 
-#	"dsn" : "DBI:mysql:www_example_com;host=dbslave3.example.com",
-#	"user" : "webgui",
-#	"pass" : "password"
-#	},
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave3.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
 
 # You can configure a backup master database as a failover in case
 # your primary database goes down. WebGUI will use this database until
@@ -148,10 +151,10 @@
 # it from a slave to a master.
 
 # "failoverdb" : {
-#        "dsn" : "DBI:mysql:www_example_com;host=failover.example.com;port=3306",
-#        "user" : "webgui",
-#        "password" : "password"
-#        },
+#     "dsn" : "DBI:mysql:www_example_com;host=failover.example.com;port=3306",
+#     "user"     : "webgui",
+#     "password" : "password"
+#     },
 
 # Set this value if you wish to override all outbound emails to a specific
 # user for testing purposes.
@@ -171,16 +174,23 @@
 # List the merchant gateways you have installed and wish to be
 # available on this site.
 
-"paymentDrivers" : ["WebGUI::Shop::PayDriver::Cash", "WebGUI::Shop::PayDriver::ITransact"],
+"paymentDrivers" : [
+    "WebGUI::Shop::PayDriver::Cash",
+    "WebGUI::Shop::PayDriver::ITransact"
+    ],
 
 # List the shipping drivers you have installed and wish to be
 # available for configuration on the site.
 
-"shippingDrivers" : ["WebGUI::Shop::ShipDriver::FlatRate"],
+"shippingDrivers" : [
+    "WebGUI::Shop::ShipDriver::FlatRate"
+    ],
 
 # Specify the list of template parsers available in the system.
 
-"templateParsers" : ["WebGUI::Asset::Template::HTMLTemplate"],
+"templateParsers" : [
+    "WebGUI::Asset::Template::HTMLTemplate"
+    ],
 
 # Specify the default template parser.
 
@@ -192,11 +202,11 @@
 # return either text or html content.
 
 "searchIndexerPlugins" : {
-	"txt" : "/bin/cat", 
-	"readme" : "/bin/cat", 
-	"html" : "/bin/cat",
-	"htm" : "/bin/cat"
-	},
+    "txt"    : "/bin/cat", 
+    "readme" : "/bin/cat", 
+    "html"   : "/bin/cat",
+    "htm"    : "/bin/cat"
+    },
 
 # Enter the maximum number of assets that should be allowed to
 # be created on this site. Keep in mind that a base install of
@@ -209,45 +219,50 @@
 # Add Content menus.
 
 "assets" : [
-    "WebGUI::Asset::Sku::Product",
-    "WebGUI::Asset::Sku::Subscription",
+    "WebGUI::Asset::FilePile", 
+    "WebGUI::Asset::File::ZipArchive",
+    "WebGUI::Asset::Redirect", 
     "WebGUI::Asset::Sku::Donation",
     "WebGUI::Asset::Sku::FlatDiscount",
-	"WebGUI::Asset::Snippet", 
-	"WebGUI::Asset::Redirect", 
-	"WebGUI::Asset::FilePile", 
-	"WebGUI::Asset::Wobject::Article", 
-	"WebGUI::Asset::Wobject::Collaboration", 
-	"WebGUI::Asset::Wobject::DataForm", 
-	"WebGUI::Asset::Wobject::Calendar", 
-	"WebGUI::Asset::Wobject::EventManagementSystem",
-	"WebGUI::Asset::Wobject::Gallery",
-	"WebGUI::Asset::Wobject::HttpProxy", 
-	"WebGUI::Asset::Wobject::Navigation", 
-	"WebGUI::Asset::Wobject::Matrix", 
-	"WebGUI::Asset::Wobject::Poll", 
-	"WebGUI::Asset::Wobject::ProjectManager",
-	"WebGUI::Asset::Wobject::SQLReport", 
-	"WebGUI::Asset::Wobject::Search",
-	"WebGUI::Asset::Wobject::Survey", 
-	"WebGUI::Asset::Wobject::TimeTracking",
-	"WebGUI::Asset::Wobject::WeatherData",
-	"WebGUI::Asset::Wobject::MultiSearch",
-	"WebGUI::Asset::Wobject::StockData",
-	"WebGUI::Asset::Wobject::SyndicatedContent",
-	"WebGUI::Asset::Wobject::InOutBoard",
-	"WebGUI::Asset::File::ZipArchive",
-	"WebGUI::Asset::Wobject::WSClient",
-	"WebGUI::Asset::Wobject::Shelf", 
-	"WebGUI::Asset::Wobject::Thingy",
+    "WebGUI::Asset::Sku::Product",
+    "WebGUI::Asset::Sku::Subscription",
+    "WebGUI::Asset::Snippet", 
+    "WebGUI::Asset::Wobject::Article", 
+    "WebGUI::Asset::Wobject::Calendar", 
+    "WebGUI::Asset::Wobject::Collaboration", 
+    "WebGUI::Asset::Wobject::DataForm", 
+    "WebGUI::Asset::Wobject::EventManagementSystem",
+    "WebGUI::Asset::Wobject::Gallery",
+    "WebGUI::Asset::Wobject::HttpProxy", 
+    "WebGUI::Asset::Wobject::InOutBoard",
+    "WebGUI::Asset::Wobject::Matrix", 
+    "WebGUI::Asset::Wobject::MultiSearch",
+    "WebGUI::Asset::Wobject::Navigation", 
+    "WebGUI::Asset::Wobject::Poll", 
+    "WebGUI::Asset::Wobject::ProjectManager",
+    "WebGUI::Asset::Wobject::Search",
+    "WebGUI::Asset::Wobject::Shelf", 
+    "WebGUI::Asset::Wobject::SQLReport", 
+    "WebGUI::Asset::Wobject::StockData",
+    "WebGUI::Asset::Wobject::Survey", 
+    "WebGUI::Asset::Wobject::SyndicatedContent",
+    "WebGUI::Asset::Wobject::Thingy",
+    "WebGUI::Asset::Wobject::TimeTracking",
     "WebGUI::Asset::Wobject::UserList"
+    "WebGUI::Asset::Wobject::WeatherData",
+    "WebGUI::Asset::Wobject::WSClient",
     ],
 
 # Specify the list assets that are used for utility purposes only
 # and are not typically used as a normal part of content
 # management.
 
-"utilityAssets" : ["WebGUI::Asset::Template", "WebGUI::Asset::RichEdit", "WebGUI::Asset::File::Image", "WebGUI::Asset::File"],
+"utilityAssets" : [
+    "WebGUI::Asset::File"
+    "WebGUI::Asset::File::Image",
+    "WebGUI::Asset::RichEdit",
+    "WebGUI::Asset::Template",
+    ],
 
 # Specify the list of assets you want to appear in your add
 # content menus that should act as containers for other content.
@@ -255,10 +270,12 @@
 # layout mechanisms.
 
 "assetContainers" : [
-    "WebGUI::Asset::Wobject::Layout", "WebGUI::Asset::Wobject::Folder",
-    "WebGUI::Asset::Wobject::Dashboard", "WebGUI::Asset::Wobject::MessageBoard", 
-	"WebGUI::Asset::Sku::Product", 
-	"WebGUI::Asset::Wobject::WikiMaster"
+    "WebGUI::Asset::Sku::Product", 
+    "WebGUI::Asset::Wobject::Dashboard",
+    "WebGUI::Asset::Wobject::Folder",
+    "WebGUI::Asset::Wobject::Layout",
+    "WebGUI::Asset::Wobject::MessageBoard", 
+    "WebGUI::Asset::Wobject::WikiMaster"
     ],
 
 # Optionally specify a group id for assets to tell WebGUI what
@@ -266,9 +283,9 @@
 # asset.
 
 # "assetAddPrivilege" : {
-#	"WebGUI::Asset::Wobject::SQLReport" : 3, 
-#	"WebGUI:::Asset::Template" : 4
-#	},
+#     "WebGUI::Asset::Template"           : 4
+#     "WebGUI::Asset::Wobject::SQLReport" : 3, 
+#     },
 
 # Optionally add a "Save and Commit" button to assets so that you
 # don't have to hit "Commit My Changes" seperately.
@@ -280,28 +297,28 @@
 # to add assets of that type.
 
 # "assetUiLevel" : {
-#	"WebGUI::Asset::Wobject::WSClient" : 7,
-#	"WebGUI::Asset::RichEdit" : 4
-#	},
+#    "WebGUI::Asset::RichEdit"          : 4
+#    "WebGUI::Asset::Wobject::WSClient" : 7,
+#    },
 
 # Configure the UI Levels of the asset toolbar links.
 
 "assetToolbarUiLevel" : {
-	"edit" : 1,
-	"delete" : 1,
-	"cut" : 1,
-	"copy" : 1,
-	"shortcut" : 5,
-	"editBranch" : 9,
-	"lock" : 5,
-	"export" : 9,
-	"changeUrl" : 9,
-	"promote" : 3,
-	"demote" : 3,
-	"manage" : 5,
-	"revisions" : 5,
-	"view" : 1
-	},
+    "copy"       : 1,
+    "cut"        : 1,
+    "delete"     : 1,
+    "edit"       : 1,
+    "view"       : 1,
+    "demote"     : 3,
+    "promote"    : 3,
+    "lock"       : 5,
+    "manage"     : 5,
+    "revisions"  : 5,
+    "shortcut"   : 5,
+    "changeUrl"  : 9,
+    "editBranch" : 9,
+    "export"     : 9
+    },
 
 # You can override the UI Levels of any field in the edit form of
 # any asset using the following variables. Basically just take the
@@ -332,57 +349,57 @@
 # Specify the list of macros you wish to be processed on each page.
 
 "macros" : {
-	"#" : "Hash_userId", 
-        "/" : "Slash_gatewayUrl", 
-        "@" : "At_username", 
-        "a" : "a_account", 
-        "AOIHits" : "AOIHits", 
-        "AOIRank" : "AOIRank", 
-        "AdminBar" : "AdminBar", 
-        "AdminText" : "AdminText", 
-        "AdminToggle" : "AdminToggle", 
-	"AdSpace" : "AdSpace",
-        "AssetProxy" : "AssetProxy", 
-        "c" : "c_companyName", 
-        "CanEditText" : "CanEditText", 
-        "CartItemCount" : "CartItemCount",
-        "D" : "D_date", 
-        "e" : "e_companyEmail", 
-        "EditableToggle" : "EditableToggle", 
-        "Extras" : "Extras", 
-        "FetchMimeType" : "FetchMimeType", 
-        "FileUrl" : "FileUrl", 
-        "GroupAdd" : "GroupAdd", 
-        "GroupDelete" : "GroupDelete", 
-        "GroupText" : "GroupText", 
-        "H" : "H_homeLink", 
-        "International" : "International", 
-        "L" : "L_loginBox", 
-        "LastModified" : "LastModified", 
-        "LoginToggle" : "LoginToggle", 
-        "MiniCart" : "MiniCart",
-        "Page" : "Page", 
-        "PageTitle" : "PageTitle", 
-        "PageUrl" : "PageUrl", 
-        "r" : "r_printable", 
-        "RandomAssetProxy" : "RandomAssetProxy", 
-	"RandomThread" : "RandomThread", 
-        "RootTitle" : "RootTitle", 
-        "Spacer" : "Spacer", 
-        "Thumbnail" : "Thumbnail", 
-        "u" : "u_companyUrl",
-        "User" : "User", 
-        "ViewCart" : "ViewCart"
-	},
-
-#Specify any LDAP aliases for synchronizing user profiles to LDAP	
-"ldapAlias" : {	
-        "firstName" : "givenName",
-		"lastName" : "sn",
-		"email" : "mail",
-		"companyName" : "o"	
+    "@"                : "At_username", 
+    "#"                : "Hash_userId", 
+    "/"                : "Slash_gatewayUrl", 
+    "a"                : "a_account", 
+    "AdminBar"         : "AdminBar", 
+    "AdminText"        : "AdminText", 
+    "AdminToggle"      : "AdminToggle", 
+    "AdSpace"          : "AdSpace",
+    "AOIHits"          : "AOIHits", 
+    "AOIRank"          : "AOIRank", 
+    "AssetProxy"       : "AssetProxy", 
+    "CanEditText"      : "CanEditText", 
+    "CartItemCount"    : "CartItemCount",
+    "c"                : "c_companyName", 
+    "D"                : "D_date", 
+    "EditableToggle"   : "EditableToggle", 
+    "e"                : "e_companyEmail", 
+    "Extras"           : "Extras", 
+    "FetchMimeType"    : "FetchMimeType", 
+    "FileUrl"          : "FileUrl", 
+    "GroupAdd"         : "GroupAdd", 
+    "GroupDelete"      : "GroupDelete", 
+    "GroupText"        : "GroupText", 
+    "H"                : "H_homeLink", 
+    "International"    : "International", 
+    "LastModified"     : "LastModified", 
+    "L"                : "L_loginBox", 
+    "LoginToggle"      : "LoginToggle", 
+    "MiniCart"         : "MiniCart",
+    "Page"             : "Page", 
+    "PageTitle"        : "PageTitle", 
+    "PageUrl"          : "PageUrl", 
+    "RandomAssetProxy" : "RandomAssetProxy", 
+    "RandomThread"     : "RandomThread", 
+    "RootTitle"        : "RootTitle", 
+    "r"                : "r_printable", 
+    "Spacer"           : "Spacer", 
+    "Thumbnail"        : "Thumbnail", 
+    "User"             : "User", 
+    "u"                : "u_companyUrl",
+    "ViewCart"         : "ViewCart"
     },
-	
+
+#Specify any LDAP aliases for synchronizing user profiles to LDAP    
+"ldapAlias" : {    
+    "firstName"   : "givenName",
+    "lastName"    : "sn",
+    "email"       : "mail",
+    "companyName" : "o"    
+    },
+    
 # Define the subnets that WebGUI should expect Spectre communication
 # to come from. All other subnets will be ignored. The subnet
 # should be listed in CIDR notation.
@@ -403,38 +420,56 @@
 # process and what object types they support. 
 
 "workflowActivities" : {
-		"None" : ["WebGUI::Workflow::Activity::DecayKarma", "WebGUI::Workflow::Activity::TrashClipboard", "WebGUI::Workflow::Activity::CleanTempStorage", 
-			"WebGUI::Workflow::Activity::CleanFileCache", "WebGUI::Workflow::Activity::CleanLoginHistory", "WebGUI::Workflow::Activity::ArchiveOldThreads",
-			"WebGUI::Workflow::Activity::TrashExpiredEvents", "WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::DeleteExpiredSessions",
-			"WebGUI::Workflow::Activity::ExpireGroupings", "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
-			"WebGUI::Workflow::Activity::ExpireSubscriptionCodes", "WebGUI::Workflow::Activity::PurgeOldTrash", "WebGUI::Workflow::Activity::ExpireEmsCartItems",
-			"WebGUI::Workflow::Activity::GetSyndicatedContent", "WebGUI::Workflow::Activity::ProcessRecurringPayments",
-			"WebGUI::Workflow::Activity::SyncProfilesToLdap", "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
-			"WebGUI::Workflow::Activity::SendQueuedMailMessages","WebGUI::Workflow::Activity::CleanDatabaseCache",
-			"WebGUI::Workflow::Activity::CalendarUpdateFeeds","WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags"],
-		"WebGUI::User" : ["WebGUI::Workflow::Activity::CreateCronJob", "WebGUI::Workflow::Activity::NotifyAboutUser"],
-        "WebGUI::VersionTag" : [
-            "WebGUI::Workflow::Activity::CommitVersionTag",
-            "WebGUI::Workflow::Activity::RollbackVersionTag",
-            "WebGUI::Workflow::Activity::TrashVersionTag",
-            "WebGUI::Workflow::Activity::CreateCronJob",
-            "WebGUI::Workflow::Activity::UnlockVersionTag",
-            "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
-            "WebGUI::Workflow::Activity::RequestApprovalForVersionTag",
-            "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup",
-            "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage",
-            "WebGUI::Workflow::Activity::ExportVersionTagToHtml",
-            "WebGUI::Workflow::Activity::WaitUntil"
-        ]
-		},
+    "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldThreads",
+        "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
+        "WebGUI::Workflow::Activity::CleanDatabaseCache",
+        "WebGUI::Workflow::Activity::CleanFileCache",
+        "WebGUI::Workflow::Activity::CleanLoginHistory",
+        "WebGUI::Workflow::Activity::CleanTempStorage", 
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::DecayKarma",
+        "WebGUI::Workflow::Activity::DeleteExpiredSessions",
+        "WebGUI::Workflow::Activity::ExpireEmsCartItems",
+        "WebGUI::Workflow::Activity::ExpireGroupings",
+        "WebGUI::Workflow::Activity::ExpireSubscriptionCodes",
+        "WebGUI::Workflow::Activity::GetSyndicatedContent",
+        "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags"
+        "WebGUI::Workflow::Activity::ProcessRecurringPayments",
+        "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
+        "WebGUI::Workflow::Activity::PurgeOldTrash",
+        "WebGUI::Workflow::Activity::SendQueuedMailMessages",
+        "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
+        "WebGUI::Workflow::Activity::SyncProfilesToLdap",
+        "WebGUI::Workflow::Activity::TrashClipboard",
+        "WebGUI::Workflow::Activity::TrashExpiredEvents",
+    ],
+    "WebGUI::User" : [
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::NotifyAboutUser"
+    ],
+    "WebGUI::VersionTag" : [
+        "WebGUI::Workflow::Activity::CommitVersionTag",
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::ExportVersionTagToHtml",
+        "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage",
+        "WebGUI::Workflow::Activity::RollbackVersionTag",
+        "WebGUI::Workflow::Activity::TrashVersionTag",
+        "WebGUI::Workflow::Activity::UnlockVersionTag",
+        "WebGUI::Workflow::Activity::WaitUntil"
+    ]
+    },
 
 # Enter the graphing plugins that you want to enable for your site.
 
 "graphingPlugins" : [
-	"WebGUI::Image::Graph::Pie",
-	"WebGUI::Image::Graph::XYGraph::Bar",
-	"WebGUI::Image::Graph::XYGraph::Line"
-	],
+    "WebGUI::Image::Graph::Pie",
+    "WebGUI::Image::Graph::XYGraph::Bar",
+    "WebGUI::Image::Graph::XYGraph::Line"
+    ],
 
 # Here you can define the dictionaries that are available through the tinyMCE spellchecker. You should set
 # id to the name the dictionary is known by ASpell (eg. en or en_US or nl), use the name parameter to set 
@@ -442,15 +477,15 @@
 # parameter.
 
 #"availableDictionaries" : [
-#   	{
-#		"id" : "en_US",
-#		"name" : "English",
-#		"default" : "1"
-#	},
-#	{
-#		"id" : "nl",
-#		"name" : "Dutch"
-#	}
+#    {
+#        "id"      : "en_US",
+#        "name"    : "English",
+#        "default" : "1"
+#    },
+#    {
+#        "id"      : "nl",
+#        "name"    : "Dutch"
+#    }
 #],
 
 # Optional script to run upon successful login.  The script can contain macros
@@ -482,14 +517,14 @@
 # Content handlers are used to produce content from the content URL handler.
 
 "contentHandlers" : [
-    "WebGUI::Content::Prefetch",
-    "WebGUI::Content::Maintenance",
+    "WebGUI::Content::Asset",
     "WebGUI::Content::AssetManager",
+    "WebGUI::Content::Maintenance",
+    "WebGUI::Content::NotFound"
     "WebGUI::Content::Operation",
+    "WebGUI::Content::Prefetch",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
-    "WebGUI::Content::Asset",
-    "WebGUI::Content::NotFound"
     ]
 
 }
