@@ -492,7 +492,14 @@ sub getTemplateVars {
     my $gallery     = $self->getParent;
     my $var         = $self->get;
     my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
-    
+
+    # Fix 'undef' vars since HTML::Template does inheritence on them
+    for my $key ( qw( description ) ) {
+        unless ( defined $var->{$key} ) {
+            $var->{ $key } = '';
+        }
+    }    
+ 
     # Permissions
     $var->{ canAddFile              } = $self->canAddFile;
     $var->{ canEdit                 } = $self->canEdit;
