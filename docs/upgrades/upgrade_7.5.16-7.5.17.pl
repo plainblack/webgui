@@ -27,20 +27,18 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+moveProductImportToShelf($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub moveProductImportToShelf {
+    my $session = shift;
+    print "\tMoving product import to shelves... " unless $quiet;
+    unlink "../../lib/WebGUI/Shop/Products.pm";
+    $session->db->write("update asset set isSystem=0 where assetId='PBproductimportnode001'");
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

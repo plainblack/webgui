@@ -927,30 +927,6 @@ our $I18N = {
         context => q|Period name for a yearly subscription.|
     },
 
-    'import' => {
-        message => q|Import|,
-        lastUpdated => 1212550974,
-        context => q|Label for bringing data into the Shop (Tax, Product, etc.)|
-    },
-
-	'export' => {
-		message => q|Export|,
-		lastUpdated => 1212550978,
-		context => q|Label for taking data out of the Shop (Tax, Product, etc.)|,
-	},
-
-    'import successful' => {
-        message => q|Your products have been imported.|,
-        lastUpdated => 1213047491,
-        context => q|Message telling the user the their products have been imported successfully.|
-    },
-
-    'view products' => {
-        message => q|View all imported products|,
-        lastUpdated => 1213047491,
-        context => q|Label for a shortcut to the import products folder|
-    },
-
     'address1 help' => {
         message => q|The first address line.|,
         lastUpdated => 1213121298,

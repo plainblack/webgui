@@ -2,6 +2,7 @@
  - fixed: Payment Methods Hover Help Incomplete
  - fixed: Payment Method Titles Don't Match Buttons
  - fixed: Gallery: Description Text appearing in Album
+ - Moved product imports to shelves
  - fixed: Deleting Ticket from Event Management System Asset
  - fixed: Thingy Search Broken
 

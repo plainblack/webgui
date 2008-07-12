@@ -33,13 +33,18 @@ The current WebGUI session object.
 
 A URL to safely append to the end of the page URL.
 
+=head3 $query
+
+The post query (?) parameters you'd like to add to the URL.
+
 =cut
 
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
 	my $url = shift;
-	my $pageUrl = $session->url->page();
+    my $query = shift;
+	my $pageUrl = $session->url->page($query);
 	if ($url) {
 		my $uri = URI->new($pageUrl);
 		##Append the requested URL to the path part of the URL
