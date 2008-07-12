@@ -34,13 +34,11 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 7;        # Increment this number for each test you create
+plan tests => 5;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
-my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
-isa_ok($node, 'WebGUI::Asset::Wobject::Folder', 'getProductImportNode returns a Folder');
-is($node->getId, 'PBproductimportnode001', 'Product Import Node has the correct GUID');
+my $node = WebGUI::Asset->getRoot($session);
 
 my $product = $node->addChild({
     className => "WebGUI::Asset::Sku::Product",
