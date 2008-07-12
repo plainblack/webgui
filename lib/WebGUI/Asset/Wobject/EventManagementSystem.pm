@@ -937,7 +937,8 @@ sub www_getTicketsAsJson {
 	# looking for specific events
 	if ($keywords =~ m{^[\d+,*\s*]+$}) {
 		@ids = $db->buildArray("select distinct(EMSTicket.assetId) from EMSTicket left join asset using (assetId) where
-			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.") order by EMSTicket.eventNumber",[$self->getId]);
+			asset.parentId=? and EMSTicket.eventNumber in (".$keywords.") and asset.state='published' 
+            order by EMSTicket.eventNumber",[$self->getId]);
 	}
 	
 	# looking for keywords
@@ -951,7 +952,8 @@ sub www_getTicketsAsJson {
 	
 	# just get all tickets
 	else {
-		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and className='WebGUI::Asset::Sku::EMSTicket' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by eventNumber", [$self->getId]);
+		@ids = $db->buildArray("select assetId from asset left join EMSTicket using (assetId) where parentId=? and
+className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate=(select max(revisionDate) from EMSTicket where assetId=asset.assetId) order by eventNumber", [$self->getId]);
 	}
 	
 	# get badge's badge groups

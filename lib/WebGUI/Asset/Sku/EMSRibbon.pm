@@ -18,7 +18,7 @@ use strict;
 use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
 use WebGUI::HTMLForm;
-
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -235,8 +235,12 @@ Override to return to appropriate page.
 
 sub www_delete {
 	my ($self) = @_;
-	$self->SUPER::www_delete;
-	return $self->getParent->www_buildBadge(undef,'ribbons');
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
+    return $self->session->privilege->vitalComponent() if $self->get('isSystem');
+    return $self->session->privilege->vitalComponent() if (isIn($self->getId,
+$self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+    $self->trash;
+    return $self->getParent->www_buildBadge(undef,'ribbons');
 }
 
 
