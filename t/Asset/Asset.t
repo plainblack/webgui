@@ -708,7 +708,7 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 # getIsa
 #
 ################################################################
-my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+my $node = WebGUI::Asset->getRoot($session);
 my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
