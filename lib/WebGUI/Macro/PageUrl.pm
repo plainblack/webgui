@@ -21,7 +21,7 @@ Package WebGUI::Macro::Page
 
 Macro for displaying the url for the current asset.
 
-=head2 process ( $session, $url )
+=head2 process ( $session, $url, $query )
 
 process is really a wrapper around $session->url->page();
 
