@@ -44,11 +44,11 @@ my $loaded = use_ok('WebGUI::Shop::Products');
 my $storage;
 my ($e, $failure);
 
-my $products = WebGUI::Shop::Products->new($session);
-
 SKIP: {
 
     skip 'Unable to load module WebGUI::Shop::Products', $tests unless $loaded;
+
+    my $products = WebGUI::Shop::Products->new($session);
 
     #######################################################################
     #
