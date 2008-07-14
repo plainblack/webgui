@@ -369,6 +369,7 @@ sub www_editProfileFieldSave {
 		my $field = WebGUI::ProfileField->create($session,$session->form->text("fid"), \%data, $categoryId);
 	} else {
 		my $field = WebGUI::ProfileField->new($session,	$session->form->process("fid"));
+        $data{protected} = $field->get('protected');  ##Protected is sticky and not in the UI.
 		$field->set(\%data);
 		$field->setCategory($categoryId);
 	}

@@ -6,6 +6,7 @@
  - fixed: Deleting Ticket from Event Management System Asset
  - fixed: Thingy Search Broken
  - fixed: DataForm noloop template variables have incorrect values
+ - fixed: Alias field in user profiling
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
