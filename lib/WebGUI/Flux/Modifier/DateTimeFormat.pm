@@ -27,7 +27,8 @@ sub evaluate {
         = ( $self->args()->{time_zone} eq 'user' )
         ? $self->user()->profileField("timeZone")
         : $self->args()->{time_zone};
-    my $dt       = $self->operand()->set_time_zone($time_zone);
+    my $dt       = $self->operand();
+    $dt->set_time_zone($time_zone);
     return $dt->strftime($pattern);
 }
 

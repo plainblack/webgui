@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 11;
+plan tests => 12;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -62,7 +62,7 @@ my $rule = WebGUI::Flux::Rule->create($session);
 {
     eval {
         WebGUI::Flux::Modifier->evaluateUsing( 'Qbit',
-            { rule => $rule, operand => undef, args => {}} );
+            { rule => $rule, operand => {}, args => {}} );
     };
     my $e = Exception::Class->caught();
     isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'evaluateUsing takes exception to invalid Modifier' );
@@ -75,7 +75,7 @@ my $rule = WebGUI::Flux::Rule->create($session);
 {
     eval {
         WebGUI::Flux::Modifier->evaluateUsing( 'DateTimeFormat',
-            { rule => $rule, operand => undef, args => {}} );
+            { rule => $rule, operand => {}, args => {}} );
     };
     my $e = Exception::Class->caught();
 
@@ -94,6 +94,19 @@ my $rule = WebGUI::Flux::Rule->create($session);
 {
 
     # Try out evaluateUsing(), using DateTimeFormat as our guinea pig
+    
+    # First check that an empty string is returned if the operand is undefined
+    is( WebGUI::Flux::Modifier->evaluateUsing(
+            'DateTimeFormat',
+            {   rule    => $rule,
+                operand => undef,
+                args    => { pattern => 'DUMMY', time_zone => 'DUMMY' }
+            }
+        ),
+        '',
+        'Undefined operand returns empty string'
+    );
+
     my $dt = DateTime->new(
         year   => 1984,
         month  => 10,

@@ -184,7 +184,7 @@ this is not used, it uses the current session user object.
 sub canManage {
     my $self = shift;
     my $user = shift || $self->session->user;
-    return $user->isInGroup( $self->session->setting->get('groupIdAdminCommerce') );
+    return $user->isInGroup( $self->session->setting->get('groupIdAdminFlux') );
 }
 
 #-------------------------------------------------------------------

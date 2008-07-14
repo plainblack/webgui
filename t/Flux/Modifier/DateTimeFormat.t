@@ -29,6 +29,7 @@ use_ok('WebGUI::Flux::Modifier');
 my $rule   = WebGUI::Flux::Rule->create($session);
 
 # Not much to test since WebGUI::Flux::Modifier does all the heavy lifting (and that's tested in Modifier.t)
+
 {
     my $dt = DateTime->new(
         year   => 1984,

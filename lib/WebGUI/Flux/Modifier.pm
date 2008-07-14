@@ -189,6 +189,9 @@ sub evaluateUsing {
         );
     }
     
+    # Return empty string if Operand is undefined
+    return q{} if !defined $arg_ref->{operand};
+    
     # The Modifier module we are going to dynamically instantiate and evaluate
     my $modifierModule = "WebGUI::Flux::Modifier::$modifier";
 

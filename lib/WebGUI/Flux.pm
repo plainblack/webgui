@@ -189,17 +189,13 @@ sub generateGraph {
 
             }
 
-            # Add the Combined Expresssion to the output (generating the default if necessary)
-            $label .= 'Combined: \l';
-            $label .= $LDQUOT;
+            # Add the Combined Expresssion to the output if defined
             if ( defined $rule->get('combinedExpression') ) {
+                $label .= 'Combined: \l';
+                $label .= $LDQUOT;
                 $label .= $rule->get('combinedExpression');
+                $label .= $RDQUOT;
             }
-            else {
-                $label .= join ' and ', map {"e$_"} ( 1 .. $count );
-            }
-            $label .= $RDQUOT;
-
         }
         $g->add_node(
             $rule->getId(),
