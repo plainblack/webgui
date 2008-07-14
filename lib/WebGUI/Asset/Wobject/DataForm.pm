@@ -676,7 +676,7 @@ sub getRecordTemplateVars {
         my %fieldLoopEntry;
         my %tabLoopEntry;
         while (my ($propKey, $propValue) = each %fieldProperties) {
-            $var->{"field.noloop.$field->{name}.$propKey"} = $propKey;
+            $var->{"field.noloop.$field->{name}.$propKey"} = $propValue;
             $fieldLoopEntry{"field.$propKey"} = $propValue;
             $tabLoopEntry{"tab.field.$propKey"} = $propValue;
         }
