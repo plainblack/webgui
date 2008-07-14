@@ -9,6 +9,7 @@ use WebGUI::Exception::Shop;
 use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::HTMLForm;
+use WebGUI::Macro;
 use WebGUI::Shop::Cart;
 use JSON;
 
@@ -681,10 +682,12 @@ sub sendNotifications {
     # render
     my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
+    my $receipt = $template->process(\%var);
+    WebGUI::Macro::process($session, \$receipt);
 
     # purchase receipt
     $inbox->addMessage( {
-        message     => $template->process(\%var),
+        message     => $receipt,
         subject     => $i18n->get('receipt subject').' '.$transaction->get('orderNumber'),
         userId      => $transaction->get('userId'),
         status      => 'completed',
@@ -692,8 +695,10 @@ sub sendNotifications {
     
     # shop owner notification
     $var{viewDetailUrl} = $url->page('shop=transaction;method=view;transactionId='.$transaction->getId,1);
+    my $notification = $template->process(\%var);
+    WebGUI::Macro::process($session, \$notification);
     $inbox->addMessage( {
-        message     => $template->process(\%var),
+        message     => $notification,
         subject     => $i18n->get('a sale has been made').' '.$transaction->get('orderNumber'),
         groupId     => $self->get('saleNotificationGroupId'),
         status      => 'unread',

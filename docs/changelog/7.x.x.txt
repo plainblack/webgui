@@ -7,6 +7,7 @@
  - fixed: Thingy Search Broken
  - fixed: DataForm noloop template variables have incorrect values
  - fixed: Alias field in user profiling
+ - fixed: Email Receipt after Successful Checkout
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
