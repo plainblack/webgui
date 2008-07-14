@@ -213,6 +213,13 @@ sub deleteCollateral {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate
+
+Override the duplicate method so uploaded files and images also get copied.
+
+=cut
+
 sub duplicate {
     my $self = shift;
     my $newAsset = $self->SUPER::duplicate(@_);
