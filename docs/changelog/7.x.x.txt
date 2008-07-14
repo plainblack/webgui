@@ -9,6 +9,7 @@
  - fixed: Alias field in user profiling
  - fixed: Email Receipt after Successful Checkout
  - fixed: DataForm captcha doesn't show up
+ - fixed: edit branch only changes meta data fields if another value is changed
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.

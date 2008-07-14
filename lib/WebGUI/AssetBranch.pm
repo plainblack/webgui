@@ -285,21 +285,25 @@ sub www_editBranchSave {
             $wobjectData{url} = $data{url};
 		}
         my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
-        next
-            if (scalar %$newData == 0);
-        my $newRevision = $descendant->addRevision(
-            $newData,
-            undef,
-            {skipAutoCommitWorkflows => 1, skipNotification => 1},
-        );
-		foreach my $form ($self->session->form->param) {
-                	if ($form =~ /^metadata_(.*)$/) {
-				my $fieldName = $1;
-				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
-                        		$newRevision->updateMetaData($fieldName,$self->session->form->process($form));
-				}
-                	}
-        	}
+        my $revision;
+        if (scalar %$newData > 0) {
+            $revision = $descendant->addRevision(
+                $newData,
+                undef,
+                {skipAutoCommitWorkflows => 1, skipNotification => 1},
+            );
+        }
+        else {
+            $revision = $descendant;
+        }
+        foreach my $form ($self->session->form->param) {
+            if ($form =~ /^metadata_(.*)$/) {
+                my $fieldName = $1;
+                if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
+                    $revision->updateMetaData($fieldName,$self->session->form->process($form));
+                }
+            }
+        }
 	}
 	if ($self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {
