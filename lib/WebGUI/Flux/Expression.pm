@@ -414,7 +414,7 @@ sub evaluate {
 
     # Evaluate operand1..
     my $operand1_val = WebGUI::Flux::Operand->evaluateUsing( $operand1, { rule => $rule, args => $operand1Args } );
-    $rule->session->log->debug("Flux evaluated Operand1: $operand1_val");
+    $rule->session->log->debug("Flux evaluated Operand1: " . ($operand1_val || '[NULL]'));
     
     if ($operand1Modifier) {
 
@@ -423,12 +423,12 @@ sub evaluate {
             = from_json( $property{$id}{operand1ModifierArgs} );         # deserialise JSON-encoded args
         $operand1_val = WebGUI::Flux::Modifier->evaluateUsing( $operand1Modifier,
             { rule => $rule, operand => $operand1_val, args => $operand1ModifierArgs } );
-        $rule->session->log->debug("Flux evaluated Operand1Modifier: $operand1_val");
+        $rule->session->log->debug("Flux evaluated Operand1Modifier: " . ($operand1_val || '[NULL]'));
     }
 
     # Evaluate operand2..
     my $operand2_val = WebGUI::Flux::Operand->evaluateUsing( $operand2, { rule => $rule, args => $operand2Args } );
-    $rule->session->log->debug("Flux evaluated Operand2: $operand2_val");
+    $rule->session->log->debug("Flux evaluated Operand2: " . ($operand2_val || '[NULL]'));
     if ($operand2Modifier) {
 
         # Modifier is optional so only try it if it's defined..
@@ -436,7 +436,7 @@ sub evaluate {
             = from_json( $property{$id}{operand2ModifierArgs} );         # deserialise JSON-encoded args
         $operand2_val = WebGUI::Flux::Modifier->evaluateUsing( $operand2Modifier,
             { rule => $rule, operand => $operand2_val, args => $operand2ModifierArgs } );
-        $rule->session->log->debug("Flux evaluated Operand2Modifier: $operand2_val");
+        $rule->session->log->debug("Flux evaluated Operand2Modifier: " . ($operand2_val || '[NULL]'));
     }
 
     # Evaluate operator, passing in the two operands
