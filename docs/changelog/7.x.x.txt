@@ -10,6 +10,8 @@
  - fixed: Email Receipt after Successful Checkout
  - fixed: DataForm captcha doesn't show up
  - fixed: edit branch only changes meta data fields if another value is changed
+ - fixed: Gallery reverts to undeletable bare asset if created with default
+   view "Single Album"
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.

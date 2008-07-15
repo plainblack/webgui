@@ -323,7 +323,7 @@ our $I18N = {
         context     => '',
     },
     "viewAlbumAssetId description" => {
-        message     => "The album to view when the default view is 'Album'",
+        message     => "The album to view when the default view is 'Single Album'",
         lastUpdated => 0,
         context     => '',
     },
