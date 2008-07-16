@@ -462,10 +462,12 @@ sub www_getTaxesAsJson {
     }
     push(@placeholders, $sortKey, $sortDir, $startIndex, $numberOfResults);
     $sql .= ' order by ? ? limit ?,?';
+#$self->session->errorHandler->warn("$sql $sortKey $sortDir $startIndex $numberOfResults");
     my %results = ();
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
 	while (my $record = $sth->hashRef) {
+#$self->session->errorHandler->warn($$record{country});
 		push(@records,$record);
 	}
     $results{'recordsReturned'} = $sth->rows()+0;
@@ -650,9 +652,13 @@ EODSURL
 
     // Custom function to handle pagination requests
     var handlePagination = function (state,dt) {
-        var sortedBy  = dt.get('sortedBy');
 
+        var sortedBy = dt.get('sortedBy');
+	if(sortedBy == null){
+		sortedBy = {'key': "country",'dir':"desc"};
+	}
         // Define the new state
+
         var newState = {
             startIndex: state.recordOffset,
             sorting: {
