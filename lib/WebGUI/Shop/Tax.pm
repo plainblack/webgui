@@ -410,7 +410,7 @@ sub www_addTax {
     $params->{state}   = $form->get('state',   'text');
     $params->{city}    = $form->get('city',    'text');
     $params->{code}    = $form->get('code',    'text');
-    $params->{taxRate} = $form->get('taxRate', 'integer');
+    $params->{taxRate} = $form->get('taxRate', 'float');
     $self->add($params);
     return $self->www_manage;
 }
@@ -576,7 +576,7 @@ sub www_manage {
         hoverHelp => $i18n->get('code help'),
         name      => 'code',
     );
-    $addForm->integer(
+    $addForm->float(
         label     => $i18n->get('tax rate'),
         hoverHelp => $i18n->get('tax rate help'),
         name      => 'taxRate',
