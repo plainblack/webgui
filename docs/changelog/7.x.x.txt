@@ -17,6 +17,7 @@
    mode.
  - fixed: Cannot enter floating point percentages (Kaleb Murphy, aka
    perlmonkey2)
+ - fixed: Thing list drop down broken when multiple thingy's on one page.
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.
