@@ -504,6 +504,7 @@ sub view {
         formFooter          => WebGUI::Form::formFooter($session),
         purchaseButton      => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
         hasAddedToCart      => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
         codeControls        => join (' &middot; ', (
             '<a href="'.$self->getUrl('func=createSubscriptionCodeBatch') .'">'.$i18n->get('generate batch').'</a>',
             '<a href="'.$self->getUrl('func=listSubscriptionCodes')       .'">'.$i18n->get('manage codes').'</a>',

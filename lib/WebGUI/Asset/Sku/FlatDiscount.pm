@@ -233,6 +233,7 @@ sub view {
         formFooter      => WebGUI::Form::formFooter($session),
         addToCartButton => WebGUI::Form::submit( $session, { value => $i18n->get("add to cart") }),
         hasAddedToCart  => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
         );
     $var{alreadyHasCoupon} = $self->hasCoupon();
 

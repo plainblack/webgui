@@ -21,6 +21,7 @@ our $HELP = {
 			{	name => 'formFooter' , required=>1 },
 			{	name => 'purchaseButton' , required=>1 },
 			{	name => 'hasAddedToCart' , required=>1 },
+			{	name => 'continueShoppingUrl' },
 			{	name => 'codeControls' , required=>1 },
 			{	name => 'thankYouMessage', description=>'thank you message help' },
 			{	name => 'redeemCodeLabel' , required=>1 },

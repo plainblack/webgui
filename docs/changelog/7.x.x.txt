@@ -12,6 +12,9 @@
  - fixed: edit branch only changes meta data fields if another value is changed
  - fixed: Gallery reverts to undeletable bare asset if created with default
    view "Single Album"
+ - fixed: The Sku's, Donation, Product, Subscription and FlatDiscount have a
+   continue shopping url that will take the user back the Sku in its normal
+   mode.
 
 7.5.16
  - Created a migration from 7.4.40 directly to 7.5.16.

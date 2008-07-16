@@ -1583,8 +1583,9 @@ sub view {
         $var{'addvariant_label'} = $i18n->get('add a variant');
         $var{'canEdit'}          = 1;
     }
-    $var{variant_loop} = \@variantLoop;
-    $var{hasAddedToCart} = $self->{_hasAddedToCart};
+    $var{variant_loop}        = \@variantLoop;
+    $var{hasAddedToCart}      = $self->{_hasAddedToCart};
+    $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
     if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {

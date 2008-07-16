@@ -835,6 +835,12 @@ be useful, others may not.|,
 		context => q|template variable|
 	},
 
+	'continueShoppingUrl' => {
+		message => q|A URL to reset the Product so that the user can continue shopping.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 };
 
 1;
