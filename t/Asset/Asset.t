@@ -435,7 +435,7 @@ my $importNodeTitle = $importNode->getTitle();
 
 foreach my $test (@fixTitleTests) {
     my $fixedTitle    = $importNode->fixTitle($test->{title}, 'ownerUserId');
-    my $expectedTitle = $test->{fixed} || $importNodeTitle;
+    my $expectedTitle = defined $test->{fixed} ? $test->{fixed} : $importNodeTitle;
     is($fixedTitle, $expectedTitle, $test->{comment});
 }
 
@@ -697,9 +697,7 @@ is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
 ################################################################
 my $assetProps = $rootAsset->get();
 my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
-diag $assetProps->{title};
 $assetProps->{title} = $funkyTitle;
-diag $assetProps->{title};
 
 isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
@@ -881,29 +879,29 @@ sub getFixIdTests {
 }
 
 ##Return an array of hashrefs.  Each hashref describes a test
-##for the fixTitle method.  If "fixed" != 0, it should
+##for the fixTitle method.  If "fixed" != undef, it should
 ##contain what the fixTitle method will return.
 
 sub getFixTitleTests {
     my $session = shift;
     return ({
         title   => undef,
-        fixed   => 0,
+        fixed   => undef,
         comment => "undef returns the Asset's title",
     },
     {
         title   => '',
-        fixed    => 0,
+        fixed    => undef,
         comment => "null string returns the Asset's title",
     },
     {
         title   => 'untitled',
-        fixed    => 0,
+        fixed    => undef,
         comment => "'untitled' returns the Asset's title",
     },
     {
         title   => 'UnTiTlEd',
-        fixed    => 0,
+        fixed    => undef,
         comment => "'untitled' in any case returns the Asset's title",
     },
     {
@@ -925,6 +923,11 @@ sub getFixTitleTests {
         title   => 'This is a good Title',
         fixed    => 'This is a good Title',
         comment => "Good titles are passed",
+    },
+    {
+        title   => '<b></b>',
+        fixed    => '',
+        comment => "If there is no title left after processing, then it is set to untitled.",
     },
     );
 }
