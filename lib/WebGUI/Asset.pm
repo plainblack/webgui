@@ -1894,7 +1894,9 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-	$self->{_toolbar} = $self->getToolbar;
+    if ($self->session->var->isAdminOn) {
+        $self->{_toolbar} = $self->getToolbar;
+    }
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
