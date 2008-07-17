@@ -454,12 +454,9 @@ sub www_getTaxesAsJson {
     my $numberOfResults = $form->get('results')    || 25;
     my %goodKeys = qw/country 1 state 1 city 1 code 1 'tax rate' 1/;
     my $sortKey = $form->get('sortKey');
-$self->session->errorHandler->warn("$sortKey");
     $sortKey = $goodKeys{$sortKey} == 1 ? $sortKey : 'country';
     my $sortDir = $form->get('sortDir');
-$self->session->errorHandler->warn("$sortDir");
     $sortDir = lc($sortDir) eq 'desc' ? 'desc' : 'asc';
-$self->session->errorHandler->warn("$sortKey,$sortDir");
     my @placeholders = ();
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
@@ -480,7 +477,8 @@ $self->session->errorHandler->warn("$sortKey,$sortDir");
     $results{'totalRecords'} = $db->quickScalar('select found_rows()')+0; ##Convert to numeric
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
-    $results{'dir'}          = "desc";
+#    $results{'dir'}          = "desc";
+    $results{'dir'}          = $sortDir;
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
@@ -641,7 +639,7 @@ EODSURL
         return ";startIndex=" + state.pagination.recordOffset +
                ";keywords="   + Dom.get('keywordsField').value +
                ";sortKey="    + state.sorting.key +
-               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc") +
+               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC || state.sorting.dir == 'desc') ? "desc" : "asc") +
                ";results="    + state.pagination.rowsPerPage;
     };
 
@@ -662,7 +660,9 @@ EODSURL
 		sortedBy = {'key': "country",'dir':"desc"};
 	}
         // Define the new state
-
+    if(sortedBy.dir == "desc" || sortedBy.dir == "asc"){
+	    sortedBy.dir = sortedBy.dir == "desc" ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC;
+    }
         var newState = {
             startIndex: state.recordOffset,
             sorting: {
@@ -674,7 +674,6 @@ EODSURL
                 rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
             }
         };
-
         // Create callback object for the request
         var oCallback = {
             success: dt.onDataReturnSetRows,
@@ -692,7 +691,7 @@ EODSURL
         initialRequest         : ';startIndex=0;results=25',
         generateRequest        : buildQueryString,
         paginationEventHandler : handlePagination,
-	sortedBy               : {key:"country", dir:'asc'},
+        sortedBy               : {key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC},
         //paginator            : myPaginator
         paginator              : new YAHOO.widget.Paginator({rowsPerPage:25})
     };
