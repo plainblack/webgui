@@ -452,22 +452,26 @@ sub www_getTaxesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
-    my $sortKey         = $form->get('sortKey')    || 'country';
-    my $sortDir         = $form->get('sortDir')    || 'desc';
+    my %goodKeys = qw/country 1 state 1 city 1 code 1 'tax rate' 1/;
+    my $sortKey = $form->get('sortKey');
+$self->session->errorHandler->warn("$sortKey");
+    $sortKey = $goodKeys{$sortKey} == 1 ? $sortKey : 'country';
+    my $sortDir = $form->get('sortDir');
+$self->session->errorHandler->warn("$sortDir");
+    $sortDir = lc($sortDir) eq 'desc' ? 'desc' : 'asc';
+$self->session->errorHandler->warn("$sortKey,$sortDir");
     my @placeholders = ();
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
     if ($keywords ne "") {
         $db->buildSearchQuery(\$sql, \@placeholders, $keywords, [qw{country state city code}])
     }
-    push(@placeholders, $sortKey, $sortDir, $startIndex, $numberOfResults);
-    $sql .= ' order by ? ? limit ?,?';
-#$self->session->errorHandler->warn("$sql $sortKey $sortDir $startIndex $numberOfResults");
+    push(@placeholders, $startIndex, $numberOfResults);
+    $sql .= sprintf (" order by %s limit ?,?","$sortKey $sortDir");
     my %results = ();
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
 	while (my $record = $sth->hashRef) {
-#$self->session->errorHandler->warn($$record{country});
 		push(@records,$record);
 	}
     $results{'recordsReturned'} = $sth->rows()+0;
@@ -688,7 +692,8 @@ EODSURL
         initialRequest         : ';startIndex=0;results=25',
         generateRequest        : buildQueryString,
         paginationEventHandler : handlePagination,
-        //paginator              : myPaginator
+	sortedBy               : {key:"country", dir:'asc'},
+        //paginator            : myPaginator
         paginator              : new YAHOO.widget.Paginator({rowsPerPage:25})
     };
 STOP
@@ -717,7 +722,6 @@ EOCHJS
     myTable.sortColumn = function(oColumn) { 
         // Default ascending 
         var sDir = "asc"; 
-         
         // If already sorted, sort in opposite direction 
         if(oColumn.key === this.get("sortedBy").key) { 
             sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ? 
