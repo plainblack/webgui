@@ -1,3 +1,5 @@
+7.5.18
+
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
  - fixed: Payment Method Titles Don't Match Buttons
