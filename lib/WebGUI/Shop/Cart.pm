@@ -35,7 +35,7 @@ These subroutines are available from this package:
 =cut
 
 readonly session => my %session;
-private properties => my %properties;
+public properties => my %properties;
 private error => my %error;
 private itemCache => my %itemCache;
 private addressBookCache => my %addressBookCache;
@@ -454,7 +454,7 @@ sub newBySession {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
-    return $class->new($session, $cartId) if (defined $cartId);
+    return $class->new($session, $cartId) if (defined $cartId and $cartId ne '');
     return $class->create($session);
 }
 

@@ -1392,7 +1392,7 @@ sub view {
     my $self = shift;
     my $error = shift;
     my $session = $self->session;
-    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
@@ -1588,7 +1588,7 @@ sub view {
     $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && $self->{_hasAddedToCart} != 1){
         WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
     }
     return $out;

@@ -349,6 +349,7 @@
 # Specify the list of macros you wish to be processed on each page.
 
 "macros" : {
+    "SessionId"        : "SessionId", 
     "@"                : "At_username", 
     "#"                : "Hash_userId", 
     "/"                : "Slash_gatewayUrl", 
