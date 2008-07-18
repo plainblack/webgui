@@ -272,6 +272,36 @@ our $I18N = {
         context        => q|template variable for the print badge screen|,
     },
 
+    'ticketTitle' => {
+        message     => q|The title of the ticket to be printed.|,
+        lastUpdated    => 0,
+        context        => q|template variable for the print ticket screen|,
+    },
+
+    'ticketStart' => {
+        message     => q|The start date of the ticket.|,
+        lastUpdated    => 0,
+        context        => q|template variable for the print ticket screen|,
+    },
+
+    'ticketDuration' => {
+        message     => q|How long the ticket lasts.|,
+        lastUpdated    => 0,
+        context        => q|template variable for the print ticket screen|,
+    },
+
+    'ticketLocation' => {
+        message     => q|Where the ticket is good for.|,
+        lastUpdated    => 0,
+        context        => q|template variable for the print ticket screen|,
+    },
+
+    'ticketEventNumber' => {
+        message     => q|The event number for the ticket.|,
+        lastUpdated    => 0,
+        context        => q|template variable for the print ticket screen|,
+    },
+
     'userId' => {
         message     => q|The badge user's userId.|,
         lastUpdated    => 0,
