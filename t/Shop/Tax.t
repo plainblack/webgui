@@ -686,5 +686,5 @@ END {
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
-    #$storage->delete;
+    $storage->delete;
 }
