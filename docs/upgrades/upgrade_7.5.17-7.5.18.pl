@@ -30,8 +30,22 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+nukeAnEmptyTemplate($session);
+
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub nukeAnEmptyTemplate {
+    my $session = shift;
+    print "\tNuke an empty template from old Shop work" unless $quiet;
+    # and here's our code
+    my $emptyTemplate = WebGUI::Asset->new($session, 'UTmPS_SxenN2XrWEnB4uyQ');
+    return unless defined $emptyTemplate;
+    $emptyTemplate->purge;
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
