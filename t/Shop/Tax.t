@@ -616,7 +616,7 @@ SKIP: {
             startIndex      => 0,
             totalRecords    => 1778,
             recordsReturned => 25,
-            dir             => 'desc',
+            dir             => 'asc',
             records         => array_each({
                 taxId=>ignore,
                 country => 'USA',
