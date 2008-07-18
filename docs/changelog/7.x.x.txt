@@ -1,5 +1,9 @@
 7.5.18
  - fixed: Product no longer shows "Continue Shopping" view when a different user adds the Product to their Cart.  The issue was the Product cached itself when an item was added to the cart.  Now it checks for if a cart asset exists for this session.
+ - fixed: HTML Export now creates a new session for each asset it exports to 
+   stop problems from certain flags that get set once per session.
+ - fixed: Clicking on Widget gear causes user to jump to another part of the page.
+
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
  - fixed: Payment Method Titles Don't Match Buttons

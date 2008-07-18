@@ -270,24 +270,24 @@ sub exportAsHtml {
 
     my $assetIds    = $self->exportGetDescendants($user, $depth);
 
-    # now, create a new session as the user doing the exports. this is so that
-    # the exported assets are taken from that user's perspective.
-    my $exportSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
-    $exportSession->user( { userId => $userId } );
-
     # make sure this user can view the top level asset we're exporting. if not,
     # don't do anything.
     unless ( $self->canView($userId) ) {
         $returnCode = 0;
         $message    = "can't view asset at URL " . $self->getUrl;
-        $exportSession->var->end;
-        $exportSession->close;
         return ($returnCode, $message);
     }
 
 
     my $exportedCount = 0;
     foreach my $assetId ( @{$assetIds} ) {
+        # now, create a new session as the user doing the exports. this is so that
+        # the exported assets are taken from that user's perspective.
+        # Must be created once for each asset, since session is supposed to only handle
+        # one main asset
+        my $exportSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
+        $exportSession->user( { userId => $userId } );
+
         # set a scratch variable for widgets to know we're exporting
         $exportSession->scratch->set('exportUrl', $exportUrl);
 
@@ -347,6 +347,9 @@ sub exportAsHtml {
         unless( $quiet ) {
             $session->output->print($i18n->get('done'));
         }
+
+        $exportSession->var->end;
+        $exportSession->close;
     }
     
     # handle symlinking
@@ -367,10 +370,6 @@ sub exportAsHtml {
             return ($returnCode, $message);
         }
     }
-
-    # we don't need the session any more, so close it.
-    $exportSession->var->end;
-    $exportSession->close;
 
     # we're done. give the user a status report.
     $returnCode = 1;

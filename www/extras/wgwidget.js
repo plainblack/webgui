@@ -136,7 +136,8 @@ WebGUI.widgetBox = {
 
         YAHOO.util.Event.addListener("show" + params.assetId, "click", WebGUI.widgetBox.handleButtonShow, codeGeneratorButton, true);
     },
-    handleButtonShow : function() {
+    handleButtonShow : function(e) {
+        e.preventDefault();
         codeGeneratorButton.show();
         var tag = document.getElementById('jsWidgetCode');
         tag.focus();

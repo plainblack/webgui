@@ -50,6 +50,9 @@ sub process {
 
     # construct the absolute URL and get the asset ID
     my $asset           = WebGUI::Asset->newByUrl($session, $url);
+    if ( !$asset ) {
+        return "Widget: Could not find asset with URL '$url'";
+    }
     my $assetId         = $asset->getId;
 
     # ... and the full URL. If there's an exportWidget scratch variable, we're
