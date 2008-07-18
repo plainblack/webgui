@@ -35,7 +35,7 @@ These subroutines are available from this package:
 =cut
 
 readonly session => my %session;
-public properties => my %properties;
+private properties => my %properties;
 private error => my %error;
 private itemCache => my %itemCache;
 private addressBookCache => my %addressBookCache;
