@@ -737,7 +737,7 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach my $batch ( @{$batches} ) {
 		$output .= '<tr><td>';		
-		$output .= $session->icon->delete(
+        $output .= $session->icon->delete(
             'func=deleteSubscriptionCodeBatch;bid='.$batch->{batchId}, 
             $self->getUrl,
             $i18n->get('delete batch confirm'));
@@ -780,7 +780,7 @@ sub www_listSubscriptionCodes {
     my $batchId     = $session->form->process('bid');
     my $selection   = $session->form->process('selection');
 	my $batches = 
-        $session->db->buildHashRef('select batchId, description from Subscription_codeBatch where subscriptionId=?',
+        $session->db->buildHashRef('select batchId, name from Subscription_codeBatch where subscriptionId=?',
         [
             $self->getId,
         ]);	
@@ -816,7 +816,7 @@ sub www_listSubscriptionCodes {
     $f->readOnly(
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'b', checked => ($selection eq 'b') } )
-            . $i18n->get('selection batch id'),
+            . $i18n->get('selection batch name'),
         value   =>
             WebGUI::Form::selectBox( $session, { name => 'bid', value => $batchId, options => $batches } ),
     );
@@ -860,7 +860,7 @@ sub www_listSubscriptionCodes {
 	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr>';
-	$output .= '<th>'.$i18n->get('batch id').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
+	$output .= '<th>&nbsp;</th><th>'.$i18n->get('batch id').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
 		'</th><th>'.$i18n->get('dateUsed').'</th><th>'.$i18n->get('status').'</th>';	$output .= '</tr>';
 	foreach (@{$codes}) {
 		$output .= '<tr>';

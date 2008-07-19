@@ -281,8 +281,8 @@ our $I18N = {
 	},
 
 	'delete codes' => {
-		message => q|Delete selected codes|,
-		lastUpdated => 1101228391,
+		message => q|Delete all codes selected above.|,
+		lastUpdated => 1216437724,
 		context => q|Shows up in listSubscriptionCodes.|
 	},
 
@@ -345,8 +345,9 @@ characters long.</p>|,
 		lastUpdated => 0,
 		context => q|The enter a code message for the code redemption function.|
 	},
-	'selection batch id' => {
-		message => q|batch ID|,
+
+	'selection batch name' => {
+		message => q|batch name|,
 		lastUpdated => 0,
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},

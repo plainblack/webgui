@@ -4,6 +4,7 @@
    stop problems from certain flags that get set once per session.
  - fixed: Clicking on Widget gear causes user to jump to another part of the page.
  - fixed: Manage Subscription Code Batches: Names of Batches not Displayed
+ - fixed: Manage Subscription Codes: No way to Select
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
