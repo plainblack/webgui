@@ -742,6 +742,7 @@ sub www_listSubscriptionCodeBatches {
             $self->getUrl,
             $i18n->get('delete batch confirm'));
 		$output .= '</td>';		
+		$output .= '<td>' . $batch->{ name        } . '</td>';
 		$output .= '<td>' . $batch->{ description } . '</td>';
 		$output .= '<td>'
             . '<a href="' . $self->getUrl('func=listSubscriptionCodes;selection=b;bid=' . $batch->{ batchId }) . '">'

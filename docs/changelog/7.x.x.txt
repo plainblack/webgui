@@ -3,6 +3,7 @@
  - fixed: HTML Export now creates a new session for each asset it exports to 
    stop problems from certain flags that get set once per session.
  - fixed: Clicking on Widget gear causes user to jump to another part of the page.
+ - fixed: Manage Subscription Code Batches: Names of Batches not Displayed
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
