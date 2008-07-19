@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.17
+--------------------------------------------------------------------
+ * If users are allowed to self register and emails are not required, this
+   might cause downstream bugs in other assets that require email addresses.
+
 7.5.16
 --------------------------------------------------------------------
  * You need the following Perl Modules installed before you upgrade:

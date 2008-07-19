@@ -5,6 +5,7 @@
  - fixed: Clicking on Widget gear causes user to jump to another part of the page.
  - fixed: Manage Subscription Code Batches: Names of Batches not Displayed
  - fixed: Manage Subscription Codes: No way to Select
+ - fixed: Self registration that does not require passwords, now allows multiple users with empty passwords.  This means that users can self register without a password and might cause downstream bugs with other wobjects.
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
