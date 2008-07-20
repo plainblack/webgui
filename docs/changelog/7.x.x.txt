@@ -9,6 +9,9 @@
  - fixed: Calendar now uses the correct method to get the current user's time-zone
  - Shortcut ##userPref:<profile field>## macros now work even if Shortcut is not
    under a Dashboard
+ - fixed backwards compatibility with new form control API additions: getValue is now
+   an alias to getValueFromForm instead of vice-versa. getValue is still the preferred 
+   method, getValueFromForm is still the deprecated method.
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

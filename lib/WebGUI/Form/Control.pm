@@ -400,14 +400,13 @@ An optional value to process, instead of POST input.
 
 =cut
 
+# Note: This method calls getValueFromPost to maintain backwards compatibility.
+# getValueFromPost is deprecated, use getValue
 sub getValue {
-	my ($self, $value) = @_;
-    return $value if (defined $value);
-    if ($self->session->request) {
-        $value = $self->session->form->param($self->get("name"));
-        return $value if (defined $value);
-    }
-    return $self->getDefaultValue;
+    my $self    = shift;
+    my $value   = shift;
+    return $value if defined $value;
+    return $self->getValueFromPost;
 }
 
 #-------------------------------------------------------------------
@@ -447,9 +446,15 @@ Depricated. See getValue().
 
 =cut
 
+# Note: This method does the actual work of getValue for backwards compatibility
+# getValueFromPost is deprecated, use getValue
 sub getValueFromPost {
-    my $self = shift;
-    return $self->getValue(@_);
+    my $self    = shift;
+    if ($self->session->request) {
+        my $value = $self->session->form->param($self->get("name"));
+        return $value if (defined $value);
+    }
+    return $self->getDefaultValue;
 }
 
 #-------------------------------------------------------------------
