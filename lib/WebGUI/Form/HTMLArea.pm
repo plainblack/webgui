@@ -402,7 +402,7 @@ sub www_addFolderSave {
 		className                => 'WebGUI::Asset::Wobject::Folder',
 		#filename                 => $filename,
 		});
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLForm;sub=imageTree'));
+	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
 }
 
