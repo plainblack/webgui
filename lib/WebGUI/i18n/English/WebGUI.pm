@@ -3536,8 +3536,8 @@ LongTruncOk=1</p>
 	},
 
     'user profile edit template description' => {
-        message => q|The template used show to build a form so the user can edit their template.|,
-        lastUpdated => 1213323173,
+        message => q|The template used show to build a form so the user can edit their user profile.|,
+        lastUpdated => 1216587732,
     },
 
     'send private message' => {
