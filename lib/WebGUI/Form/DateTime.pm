@@ -66,8 +66,13 @@ Defaults to 19. The displayed size of the box for the date to be typed in.
 
 If no value is specified, this will be used. Defaults to today and now.
 
-If the defaultValue is a MySQL date/time string, this form control will return
-MySQL date/time strings adjusted for the user's time zone.
+=head4 timeZone
+
+The time zone in which MySQL date/time strings are entered. Values selected using 
+this form control will be converted from this time zone to UTC. This control will 
+return MySQL date/time strings adjusted for this time zone.
+
+Defaults to the users time zone.
 
 =cut
 
@@ -85,6 +90,9 @@ sub definition {
 		size=>{
 			defaultValue=> 19
 			},
+        timeZone=>{
+            defaultValue=> $session->user->profileField("timeZone")
+            },
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -143,8 +151,8 @@ sub getValue {
 			unless ($value =~ m/(?:\d{2}|\d{4})\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/);
 		
 		# Fix time zone
-		$value 	= WebGUI::DateTime->new(mysql => $value, time_zone => $self->session->user->profileField("timeZone"))
-			->set_time_zone("UTC")->toMysql;
+		$value 	= WebGUI::DateTime->new(mysql => $value, time_zone => $self->get("timeZone"))
+			    ->set_time_zone("UTC")->toMysql;
 		
 		return $value;
 	}
@@ -170,6 +178,10 @@ sub getValueAsHtml {
     else {
 		# MySQL format
 		my $value = $self->getDefaultValue;
+        # Fix time zone
+        $value  = WebGUI::DateTime->new($self->session, mysql => $value)
+                ->set_time_zone($self->get("timeZone"))
+                ->strftime("%Y-%m-%d %H:%M:%S");
         return $value;
 	}
 }
@@ -208,9 +220,9 @@ sub toHtml {
 		# MySQL format
 		$value	= $self->getDefaultValue;
 		# Fix time zone
-		$value 	= WebGUI::DateTime->new($value)
-			->set_time_zone($self->session->user->profileField("timeZone"))
-			->toMysql;
+		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
+                ->set_time_zone($self->get("timeZone"))
+                ->strftime("%Y-%m-%d %H:%M:%S");
 	}
         $self->session->style->setLink($self->session->url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
         $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
@@ -253,9 +265,9 @@ sub toHtmlAsHidden {
 		# MySQL format
 		$value = $self->getDefaultValue;
 		# Fix Time zone
-		$value 	= WebGUI::DateTime->new($value)
-			->set_time_zone($self->session->user->profileField("timeZone"))
-			->toMysql;
+		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
+                ->set_time_zone($self->get("timeZone"))
+                ->strftime("%Y-%m-%d %H:%M:%S");
 	}
 	
 	return WebGUI::Form::Hidden->new(

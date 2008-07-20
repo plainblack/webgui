@@ -1026,7 +1026,9 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         foreach my $field (keys %{$meta}) {
             $description .= '<p><b>'.$field.'</b>: '.$meta->{$field}.'</p>' unless ($meta->{$field} eq "");
         }
-		my $date = WebGUI::DateTime->new($session, $ticket->get('startDate'));
+		my $date = WebGUI::DateTime->new($session, mysql => $ticket->get('startDate'))
+                ->set_time_zone($self->get("timezone"))
+                ->webguiDate("%W %z %Z");
 		push(@records, {
 			title 				=> $ticket->getTitle,
 			description			=> $description,
@@ -1038,7 +1040,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 			assetId				=> $ticket->getId,
 			eventNumber			=> $ticket->get('eventNumber'),
 			location			=> $ticket->get('location'),
-			startDate			=> $date->webguiDate("%W @ %H:%n%p"),
+			startDate			=> $date,
 			duration			=> $ticket->get('duration'),
 			});
 		last unless (scalar(@records) < $numberOfResults);

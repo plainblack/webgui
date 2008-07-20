@@ -13,6 +13,7 @@
    an alias to getValueFromForm instead of vice-versa. getValue is still the preferred 
    method, getValueFromForm is still the deprecated method.
  - fixed: Image Collateral Uploader in Rich Editor now works correctly
+ - fixed: problem with Calendar in EMS "Ticket" tab, "Start" field
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

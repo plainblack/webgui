@@ -95,13 +95,12 @@ sub definition {
 			label           => $i18n->get("event number"),
 			hoverHelp       => $i18n->get("event number help"),
 			},
-		startDate => {
-			tab             => "properties",
-			fieldType       => "dateTime",
-			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("add/edit event start date"),
-			hoverHelp       => $i18n->get("add/edit event start date help"),
-			},
+        startDate => {
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            defaultValue    => $date->toDatabase,
+            autoGenerate    => 0,
+            },			    
 		duration => {
 			tab             => "properties",
 			fieldType       => "float",
@@ -252,6 +251,9 @@ sub getEditForm {
 	my $self = shift;
 	my $form = $self->SUPER::getEditForm(@_);
 	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+    my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+    my $date = WebGUI::DateTime->new($self->session, time());
+
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {
 		$form->getTab("meta")->DynamicField(
 			name			=> "eventmeta ".$field->{label},
@@ -262,6 +264,14 @@ sub getEditForm {
 			label			=> $field->{label},
 			);
 	}
+    $form->getTab("properties")->DateTime(
+            name            => "startDate", 
+            defaultValue    => $date->toDatabase,
+            label           => $i18n->get("add/edit event start date"),
+            hoverHelp       => $i18n->get("add/edit event start date help"),
+            timeZone        => $self->getParent->get("timezone"),
+            value           => $self->get("startDate"),
+    );
 	return $form;
 }
 
@@ -400,7 +410,10 @@ sub processPropertiesFromFormPost {
 		$metadata{$field->{label}} = $form->process('eventmeta '.$field->{label}, $field->{dataType},
 			{ defaultValue => $field->{defaultValues}, options => $field->{possibleValues}});
 	}
-	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata)});
+    my $date = WebGUI::DateTime->new($self->session, time())->toDatabase;
+    my $startDate = $form->process('startDate', "dateTime", $date, 
+        { defaultValue => $date, timeZone => $self->getParent->get("timezone")});
+	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata), startDate => $startDate});
 }
 
 #-------------------------------------------------------------------
