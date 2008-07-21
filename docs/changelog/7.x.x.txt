@@ -18,6 +18,7 @@
  - fixed: Bad International macro calls in Gallery Template
  - fixed: more i18n (Shop tags)
  - fixed: i18nagain
+ - fixed: Cash available as a payment option to everyone
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

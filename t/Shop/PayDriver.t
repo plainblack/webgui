@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 46;
+my $tests = 49;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -458,6 +458,21 @@ cmp_deeply(
     'update() actually stores data',
 );
 
+
+#######################################################################
+#
+# canUse
+#
+#######################################################################
+
+$session->user({userId => 3});
+ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
+ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');
+
+TODO: {
+    local $TODO = 'tests for canUse';
+    ok(0, 'Test other users and groups');
+}
 
 #######################################################################
 #

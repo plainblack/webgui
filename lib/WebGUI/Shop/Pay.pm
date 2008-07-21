@@ -91,7 +91,10 @@ sub getDrivers {
 
 =head2 getOptions ( $cart )
 
-Returns a list of options for the user to pay to.  It is a hash of hashrefs, with the key of the primary hash being the paymentGatewayId of the driver, and sub keys of label and button.
+Returns a set of options for the user to pay to.  It is a hash of
+hashrefs, with the key of the primary hash being the paymentGatewayId
+of the driver, and sub keys of label and button.  The hash will only
+contain payment gateways that this user is allowed to use.
 
 =head3 $cart
 
@@ -110,6 +113,7 @@ sub getOptions {
     my %options = ();
 
     foreach my $gateway (@{ $self->getPaymentGateways() }) {
+        next unless $gateway->canUse;
         if (!$recurringRequired || $gateway->handlesRecurring) {
             $options{$gateway->getId} = {
                 label   => $gateway->get("label"),

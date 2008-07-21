@@ -10,6 +10,7 @@ use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
+use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
 
@@ -81,9 +82,51 @@ sub cancelRecurringPayment {
     my $self        = shift;
     my $transaction = shift;
     WebGUI::Error::OverrideMe->throw();
-}    
+}
     
 #-------------------------------------------------------------------
+
+=head2 canUse ( user )
+
+Checks to see if the user can use this Payment Driver.
+
+=head3 user
+
+A hashref containing user information.  The user referenced will be checked
+to see if they can use the Payment Driver.  If missing, then $session->user
+will be used.
+
+=head4 userId
+
+A userId used to build a user object.
+
+=head4 user
+
+A user object that will be used directly.
+
+=cut
+
+sub canUse {
+    my $self = shift;
+    my $user = shift;
+    my $userObject;
+    if (!defined $user or ref($user) ne 'HASH') {
+        $userObject = $self->session->user;
+    }
+    else {
+        if (exists $user->{user}) {
+            $userObject = $user->{user};
+        }
+        elsif (exists $user->{userId}) {
+            $userObject = WebGUI::User->new($self->session, $user->{userId});
+        }
+        else {
+            WebGUI::Error::InvalidParam->throw(error => q{Must provide user information})
+        }
+    }
+    return $userObject->isInGroup($self->get('groupToUse'));
+}
+ #-------------------------------------------------------------------
 
 =head2 className (  )
 
