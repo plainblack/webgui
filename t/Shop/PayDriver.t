@@ -471,7 +471,7 @@ my $count = $session->db->quickScalar('select count(*) from paymentGateway where
     $driver->paymentGatewayId
 ]);
 
-is          ($count, 0, 'delete deleted the object');
+is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
@@ -481,5 +481,4 @@ undef $driver;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from paymentGateway');
 }
