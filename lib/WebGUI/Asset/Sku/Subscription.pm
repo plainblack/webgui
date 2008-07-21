@@ -723,17 +723,53 @@ sub www_listSubscriptionCodeBatches {
 
     # Check privs
     return $session->privilege->insufficient unless $self->canEdit;
-	
+
+	my $dcStart     = $session->form->date('dcStart');
+	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
+    my $selection   = $session->form->process('selection');
+
+    my $f = WebGUI::HTMLForm->new( $session );
+    $f->hidden(
+        name    => 'func',
+        value   => 'listSubscriptionCodeBatches',
+    );
+
+    $f->readOnly(
+        label   =>
+            WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
+            . $i18n->get('selection created'),
+        value   =>
+            WebGUI::Form::date( $session,   { name => 'dcStart',    value=> $dcStart } )
+            . ' ' . $i18n->get( 'and' ) . ' ' 
+            . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
+    );
+    $f->readOnly(
+        label   =>
+            WebGUI::Form::radio( $session, { name => 'selection', value => 'all', checked => ($selection ne 'dc') } )
+            . $i18n->get('display all'),
+        value   => '',
+    );
+    $f->submit(
+        value   => $i18n->get('select'),
+    );
+
+    ##Configure the SQL query based on what the user has selected.
+    my $sqlQuery  = 'select * from Subscription_codeBatch where subscriptionId=?';
+    my $sqlParams = [ $self->getId ];
+    if ($selection eq 'dc') {
+        $sqlQuery .= ' and dateCreated >= ? and dateCreated <= ?';
+        push @{ $sqlParams }, $dcStart, $dcStop;
+    }
+
     # Set up a paginator to paginate the list of batches
 	my $p = WebGUI::Paginator->new( $session, $self->getUrl('func=listSubscriptionCodeBatches') );
-	$p->setDataByQuery( 'select * from Subscription_codeBatch where subscriptionId=?', undef, 1, [
-        $self->getId,
-    ]);
+	$p->setDataByQuery( $sqlQuery, undef, 1, $sqlParams);
 
     # Fetch the list of batches at the current paginition index
     my $batches = $p->getPageData;
 
-	my $output = $p->getBarTraditional($session->form->process("pn"));
+	my $output = $f->print;
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach my $batch ( @{$batches} ) {
 		$output .= '<tr><td>';		
@@ -752,7 +788,7 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	
-	$output = $i18n->get('no subscription code batches') unless ( @{$batches} );
+	$output = $i18n->get('no subscription code batches') unless $session->db->quickScalar('select count(*) from Subscription_codeBatch');
 
 	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('manage batches') );
 }
@@ -855,7 +891,7 @@ sub www_listSubscriptionCodes {
 
 	$output = $i18n->get('selection message');
     $output .= $f->print;
-	$output .= '<br />'.$delete.'<br />' if ($delete);
+	$output .= '<br />'.$delete.'<br />' if ($delete) and $p->getRowCount;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';

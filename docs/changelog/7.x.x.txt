@@ -14,6 +14,7 @@
    method, getValueFromForm is still the deprecated method.
  - fixed: Image Collateral Uploader in Rich Editor now works correctly
  - fixed: problem with Calendar in EMS "Ticket" tab, "Start" field
+ - fixed: Manage Subscription Codes: Search on wrong screen?
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

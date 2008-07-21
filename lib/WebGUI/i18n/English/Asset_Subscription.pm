@@ -220,6 +220,12 @@ our $I18N = {
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
 
+	'display all' => {
+		message => q|display all|,
+		lastUpdated => 1216612381,
+		context => q|Shows up in the selection part of listSubscriptionCodes.|
+	},
+
 	'manage batches' => {
 		message => q|Manage subscription code batches|,
 		lastUpdated => 1101228391,
