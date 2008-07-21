@@ -633,8 +633,8 @@ Remove an item from the cart and then display the cart again.
 sub www_removeItem {
     my $self = shift;
     my $item = $self->getItem($self->session->form->get("itemId"));
-    delete $itemCache{ref $self}{$item->getId};
     $item->remove;
+    delete $itemCache{ref $self}{$item->getId};
     return $self->www_view;
 }
 

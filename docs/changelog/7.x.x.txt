@@ -20,6 +20,7 @@
  - fixed: i18nagain
  - fixed: Cash available as a payment option to everyone
  - fixed: Web::Form::Asset can now accept assets with '|" in their names.
+ - fixed: Shop: remove an item and Apache segfaults
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
