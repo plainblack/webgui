@@ -287,8 +287,8 @@ our $I18N = {
 	},
 
 	'delete codes' => {
-		message => q|Delete all codes in the selected batch(es).|,
-		lastUpdated => 1216672637,
+		message => q|Delete all these codes.|,
+		lastUpdated => 1216673469,
 		context => q|Shows up in listSubscriptionCodes.|
 	},
 
