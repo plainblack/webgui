@@ -19,6 +19,7 @@
  - fixed: more i18n (Shop tags)
  - fixed: i18nagain
  - fixed: Cash available as a payment option to everyone
+ - fixed: Web::Form::Asset can now accept assets with '|" in their names.
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
