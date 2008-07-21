@@ -16,6 +16,7 @@
  - fixed: problem with Calendar in EMS "Ticket" tab, "Start" field
  - fixed: Manage Subscription Codes: Search on wrong screen?
  - fixed: Bad International macro calls in Gallery Template
+ - fixed: more i18n (Shop tags)
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
