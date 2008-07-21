@@ -655,6 +655,18 @@ our $I18N = {
         context     => q{Error when user is out of disk space.},
     },
 
+    'template comment add title' => {
+        message     => q{Add comment},
+        lastUpdated => 0,
+        context     => q{Title for the edit comment screen.},
+    },
+
+    'template comment edit title' => {
+        message     => q{Edit comment.},
+        lastUpdated => 0,
+        context     => q{Title for the edit comment screen.},
+    },
+
 };
 
 1;
