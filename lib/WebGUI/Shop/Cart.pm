@@ -191,8 +191,7 @@ sub delete {
     my ($self) = @_;
     $self->empty;
     $self->session->db->write("delete from cart where cartId=?",[$self->getId]);
-    undef $self;
-    $itemCache{ref $self} = {};
+    #delete $itemCache{ref $self};
     return undef;
 }
 
@@ -209,7 +208,7 @@ sub empty {
     foreach my $item (@{$self->getItems}) {
         $item->remove;
     }
-    $itemCache{ref $self} = {};
+    #$itemCache{ref $self} = {};
 }
 
 #-------------------------------------------------------------------
@@ -301,11 +300,11 @@ sub getItem {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
     my $id = ref $self;
-    if (exists $itemCache{$id}{$itemId}) {
-        return $itemCache{$id}{$itemId};
-    }
+    #if (exists $itemCache{$id}{$itemId}) {
+        #return $itemCache{$id}{$itemId};
+    #}
     my $item = WebGUI::Shop::CartItem->new($self, $itemId);
-    $itemCache{$id}{$itemId} = $item;
+    #$itemCache{$id}{$itemId} = $item;
     return $item;
 }
 
@@ -634,7 +633,7 @@ sub www_removeItem {
     my $self = shift;
     my $item = $self->getItem($self->session->form->get("itemId"));
     $item->remove;
-    delete $itemCache{ref $self}{$item->getId};
+    #delete $itemCache{ref $self}{$item->getId};
     return $self->www_view;
 }
 
