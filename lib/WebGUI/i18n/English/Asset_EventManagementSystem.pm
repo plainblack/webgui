@@ -537,8 +537,8 @@ our $I18N = {
     },
 
     'badgeUrl' => {
-        message     => q|The URL another badge in the user's cart.|,
-        lastUpdated    => 0,
+        message     => q|The URL to add another badge in the user's cart.|,
+        lastUpdated    => 1216654838,
         context        => q|badge builder template variable|,
     },
 
