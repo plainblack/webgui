@@ -6,8 +6,9 @@ function initHoverHelp (root) {
     var tips;
     if (root == 'DOMReady') {
         tips = YAHOO.util.Dom.getElementsByClassName('wg-hoverhelp');
-    }else{
-	tips = YAHOO.util.Dom.getElementsByClassName('wg-hoverhelp','',root);
+    }
+    else {
+        tips = YAHOO.util.Dom.getElementsByClassName('wg-hoverhelp','',root);
     }
     for (var i = tips.length; i--; ) {
         var myTip = new YAHOO.widget.Tooltip(tips[i], {  
