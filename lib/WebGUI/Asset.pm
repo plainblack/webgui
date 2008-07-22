@@ -1953,8 +1953,7 @@ sub prepareWidgetView {
     my $self            = shift;
     my $templateId      = shift;
     my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
-    my $session         = $self->session;
-    my $extras          = $session->config->get('extrasURL');
+    my $extras          = $self->session->config->get('extrasURL');
 
     $template->prepare;
 
