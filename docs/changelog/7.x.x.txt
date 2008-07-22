@@ -21,6 +21,9 @@
  - fixed: Cash available as a payment option to everyone
  - fixed: Web::Form::Asset can now accept assets with '|" in their names.
  - fixed: Shop: remove an item and Apache segfaults
+ - Converted asset context menus to YUI menus
+ - fixed: asset context menu is positioned incorrectly on RTL pages
+ - fixed: asset context menu broken if the only asset is a navigation included by AssetProxy
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

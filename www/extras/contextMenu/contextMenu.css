@@ -1,37 +1,9 @@
-.contextMenu_skin {
-        position:absolute;
-        border:2px outset #eeeeee;
-        font-family: helvetica, arial, sans-serif;
-        line-height:18px;
-	width: 100px;
-        cursor: default;
-        font-size:10px;
-        z-index:100;
-        visibility:hidden;
-        padding: 4px;
-	font-weight: normal;
-	text-align: left;
-	background-color:#F0F0F0;
-        border-bottom: 3px groove #999999;
-        border-top: 0px groove #999999;
-        border-right: 3px groove #999999;
-        border-left: 0px groove #999999;
-}
-.contextMenu_skin A, .contextMenu_skin A:link, .contextMenu_skin A:visited {
-	font-weight: normal;
-        width: 100%;
-        color: black;
-        text-decoration: none;
-        margin: 1px;
-	font-size: 10px;
-}
-.contextMenu_skin A:hover {
-        text-decoration: none;
-	font-weight: normal;
-        color: #154c66;
-        margin: 0px;
-        background-color: #c3cfd4;
-	border: 1px solid #F0F0F0;
-	width: 100%;
+.wg-contextmenu {
+    position: absolute;
+    visibility: hidden;
+    font-family: helvetica, arial, sans-serif;
 }
 
+.wg-contextmenu .yuimenuitemlabel {
+    font-size: 10px
+}
