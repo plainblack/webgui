@@ -100,7 +100,6 @@ Removes this item from the cart without calling $sku->onRemoveFromCart which wou
 sub delete {
     my $self = shift;
     $self->cart->session->db->deleteRow("cartItem","itemId",$self->getId);
-    #undef $self;
     return undef;
 }
 
