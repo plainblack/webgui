@@ -1294,8 +1294,8 @@ our $I18N = {
     },
 
     'item shippingAddressCountry' => {
-        message => q|The state from the shipping address for this item.|,
-        lastUpdated => 1213133715,
+        message => q|The country from the shipping address for this item.|,
+        lastUpdated => 1216787074,
         context => q|Template variable for email receipt template|,
     },
 
