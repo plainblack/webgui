@@ -36,11 +36,6 @@ like in Form/Asset.pm, line 107.
 
 Handle scoping, like in Content/Setup.pm and other places.
 
-=item +
-
-Handle the case when variables are concatenated to form either a key or a namespace, such
-as in Auth::LDAP, line 542
-
 =back
 
 =cut
