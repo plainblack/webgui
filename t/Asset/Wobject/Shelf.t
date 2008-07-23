@@ -15,7 +15,7 @@
 
 use FindBin;
 use strict;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
 use Exception::Class;
@@ -39,16 +39,18 @@ plan tests => 1 + $tests;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::Products');
+my $class  = 'WebGUI::Asset::Wobject::Shelf';
+my $loaded = use_ok($class);
 
 my $storage;
 my ($e, $failure);
+my $shelf;
 
 SKIP: {
 
-    skip 'Unable to load module WebGUI::Shop::Products', $tests unless $loaded;
+    skip "Unable to load module $class", $tests unless $loaded;
 
-    my $products = WebGUI::Shop::Products->new($session);
+    my $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
 
     #######################################################################
     #
@@ -56,14 +58,12 @@ SKIP: {
     #
     #######################################################################
 
-    my $importNode = WebGUI::Asset::Sku::Product->getProductImportNode($session);
-
-    eval { $products->importProducts(); };
+    eval { $shelf->importProducts(); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'importProducts: error handling for an undefined path to file');
     is($e->error, 'Must provide the path to a file', 'importProducts: error handling for an undefined path to file');
 
-    eval { $products->importProducts('/path/to/nowhere'); };
+    eval { $shelf->importProducts('/path/to/nowhere'); };
     $e = Exception::Class->caught();
     isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that does not exist in the filesystem');
     is($e->error, 'File could not be found', 'importProducts: error handling for file that does not exist in the filesystem');
@@ -84,7 +84,7 @@ SKIP: {
         my $originalChmod = (stat $productsFile)[2];
         chmod oct(0000), $productsFile;
 
-        eval { $products->importProducts($productsFile); };
+        eval { $shelf->importProducts($productsFile); };
         $e = Exception::Class->caught();
         isa_ok($e, 'WebGUI::Error::InvalidFile', 'importProducts: error handling for file that cannot be read');
         is($e->error, 'File is not readable', 'importProducts: error handling for file that that cannot be read');
@@ -101,7 +101,7 @@ SKIP: {
     }
 
     eval {
-        $failure = $products->importProducts(
+        $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/missingHeaders.csv'),
         );
     };
@@ -118,7 +118,7 @@ SKIP: {
     );
 
     eval {
-        $failure = $products->importProducts(
+        $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/badHeaders.csv'),
         );
     };
@@ -134,7 +134,7 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
-    my $pass = $products->importProducts(
+    my $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/goodProductTable.csv'),
     );
     ok($pass, 'Products imported');
@@ -194,7 +194,7 @@ SKIP: {
     #
     #######################################################################
 
-    my $productsOut = $products->exportProducts();
+    my $productsOut = $shelf->exportProducts();
     isa_ok($productsOut, 'WebGUI::Storage', 'exportProducts returns a Storage object');
     is(scalar @{ $productsOut->getFiles }, 1, 'The storage contains just 1 file...');
     is(scalar $productsOut->getFiles->[0], 'siteProductData.csv', '...with the correct filename');
@@ -228,7 +228,7 @@ SKIP: {
     #
     #######################################################################
 
-    $pass = $products->importProducts(
+    $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
     );
     ok($pass, 'Products imported for the second time');
@@ -302,7 +302,7 @@ SKIP: {
     #
     #######################################################################
 
-    $pass = $products->importProducts(
+    $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/thirdProductTable.csv'),
     );
     ok($pass, 'Products imported for the third time');
@@ -368,8 +368,7 @@ SKIP: {
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
-    while (my $product = $getAProduct->()) {
-        $product->purge;
+    if (defined $shelf and ref $shelf eq $class) {
+        $shelf->purge;
     }
 }
