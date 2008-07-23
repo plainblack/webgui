@@ -150,7 +150,6 @@ Delete a meta field.
 sub deleteEventMetaField {
     my $self = shift;
     my $id = shift;
-	$self->deleteCollateral('EMSEventMetaData', 'fieldId', $id); # deleteCollateral doesn't care about assetId.
 	$self->deleteCollateral('EMSEventMetaField', 'fieldId', $id);
 	$self->reorderCollateral('EMSEventMetaField', 'fieldId');
 }
