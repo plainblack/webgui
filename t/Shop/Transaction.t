@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 67;        # Increment this number for each test you create
+plan tests => 65;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -165,13 +165,6 @@ $item->update({
 is($item->get("shippingTrackingNumber"), 'adfs', "update and get shipping tracking number");
 is($item->get("orderStatus"), 'BackOrdered', "update and get shipping status");
 
-# make sure shipping date is updated when shipping status is changed
-like($item->get("shippingDate"), qr/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/, "shipping date is set");
-my $dateNow = $item->get('shippingDate');
-sleep(1);
-$item->update({orderStatus=>'Cancelled'});
-isnt($item->get('shippingDate'), $dateNow, 'shipping date is updated');
-
 # make sure new() works
 my $icopy = $transaction->getItem($item->getId);
 isa_ok($icopy, "WebGUI::Shop::TransactionItem");
@@ -186,14 +179,13 @@ is(scalar @{$transaction->getItems}, 0, "can delete items");
 
 #######################################################################
 #
-# www_getTaxesAsJson
+# www_getTransactionsAsJson
 #
 #######################################################################
 
 $session->user({userId=>3});
 my $json = WebGUI::Shop::Transaction->www_getTransactionsAsJson($session);
 ok($json, 'www_getTransactionsAsJson returned something');
-diag $json;
 my $jsonTransactions = JSON::from_json($json);
 cmp_deeply(
     $jsonTransactions,
@@ -220,7 +212,7 @@ cmp_deeply(
 );
 
 TODO: {
-    local $TODO = 'More getTaxesAsJson tests';
+    local $TODO = 'More getTransactionsAsJson tests';
     ok(0, 'test group privileges to this method');
     ok(0, 'test startIndex variable');
     ok(0, 'test results form variable');
@@ -237,4 +229,5 @@ is($session->db->quickScalar("select transactionId from transaction where transa
 # Cleanup
 END {
     $session->db->write('delete from transaction');
+    $session->db->write('delete from transactionItem');
 }
