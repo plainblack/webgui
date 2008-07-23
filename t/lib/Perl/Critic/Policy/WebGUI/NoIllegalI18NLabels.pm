@@ -115,16 +115,20 @@ sub violates {
         my $arg_list = $elem->snext_sibling;
         return unless ref $arg_list eq 'PPI::Structure::List'; 
         my @arguments = _get_args($arg_list);
-        ##Many assumptions being made here
+        use Data::Dumper;
+        print Dumper \@arguments;
+        ##First argument should be a quote, and there shouldn't be any operators when
+        ##constructing arguments for the get call.
+        return if exists $arguments[0]->[1] and $arguments[0]->[1]->isa('PPI::Token::Operator');
         return unless $arguments[0]->[0]->isa('PPI::Token::Quote');
         my $label = $arguments[0]->[0]->string;
         my $namespace = $self->{_i18n_objects}->{$symbol_name};
         if ($arguments[1]) {
             $namespace = $arguments[1]->[0]->string;
         }
-#        print "object    : $symbol_name\n";
-#        print "label     : $label\n";
-#        print "namespace : $namespace\n";
+        print "object    : $symbol_name\n";
+        print "label     : $label\n";
+        print "namespace : $namespace\n";
         if (! $self->{i18n}->get($label, $namespace)) {
             return $self->violation(
                 $DESC,
