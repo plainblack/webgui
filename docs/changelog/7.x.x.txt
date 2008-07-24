@@ -26,6 +26,7 @@
  - fixed: asset context menu broken if the only asset is a navigation included by AssetProxy
  - fixed: EMS Ticket Meta Fields- Can't Delete
  - fixed: Ribbons and Tokens on badge page error
+ - fixed: Variable 'description' not filled in RSS templates
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete

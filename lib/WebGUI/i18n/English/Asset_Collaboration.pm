@@ -1510,8 +1510,8 @@ the Collaboration Asset, the user will be notified.|,
 	},
 
 	'feed description' => {
-		message => q|The description of the rss feed (comes from the collaboration description).|,
-		lastUpdated => 1149656056,
+		message => q|The description of the rss feed (comes from the collaboration synopsis).|,
+		lastUpdated => 1216913516,
 	},
 
 	'generator' => {
