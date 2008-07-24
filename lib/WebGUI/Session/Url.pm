@@ -241,6 +241,43 @@ sub getRefererUrl {
 	}
 }
 
+#-------------------------------------------------------------------
+
+=head2 forceSecureConnection( url )
+
+Attempts to create an SSL connection with the current or passed in url.
+
+=head3 url
+
+The optional url that the page should forward to as an SSL connection.
+
+=cut
+
+sub forceSecureConnection{
+    my $self = shift;
+    my $url = shift;
+    my ($conf, $env, $http) = $self->session->quick(qw(config env http));
+   
+    if ($conf->get("sslEnabled") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")){
+   
+        $url = $self->session->url->page if(! $url);
+        $url = $self->session->env->get('QUERY_STRING') if(! $url);
+
+        if($url !~ /^$self->getSiteURL()/i){
+            $url = $self->getSiteURL() . $url;
+        }
+        if($env->get('QUERY_STRING')){ 
+            $url .= "?". $env->get('QUERY_STRING');
+        }
+        if($url =~ /^http/i) {
+            $url =~ s/^https?/https/i;
+            $http->setRedirect($url);
+            return 1;
+        }
+    } 
+    return 0;
+}
+
 
 #-------------------------------------------------------------------
 

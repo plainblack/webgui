@@ -678,7 +678,10 @@ sub www_view {
     my $url = $session->url;
     my $i18n = WebGUI::International->new($session, "Shop");
     my @items = ();
-    
+
+    if($url->forceSecureConnection()){
+            return "redirect";
+    }
     # set up html header
     $session->style->setRawHeadTags(q|
         <script type="text/javascript">
